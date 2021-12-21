@@ -208,18 +208,16 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->onClick(
 				'return PopUp("popup.generic", jQuery.extend('.json_encode([
-						'srctbl' => 'items',
-						'srcfld1' => 'itemid',
-						'srcfld2' => 'name',
-						'dstfrm' => $graphForm->getName(),
-						'dstfld1' => 'ymin_itemid',
-						'dstfld2' => 'ymin_name',
-						'with_webitems' => '1',
-						'numeric' => '1',
-						'writeonly' => '1'
-					]).', getOnlyHostParam()),
-					{trigger_element: this}
-				);'
+					'srctbl' => 'items',
+					'srcfld1' => 'itemid',
+					'srcfld2' => 'name',
+					'dstfrm' => $graphForm->getName(),
+					'dstfld1' => 'ymin_itemid',
+					'dstfld2' => 'ymin_name',
+					'with_webitems' => '1',
+					'numeric' => '1',
+					'writeonly' => '1'
+				]).', getOnlyHostParam()));'
 			)
 			->setEnabled(!$readonly);
 
@@ -230,17 +228,15 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 				->addClass(ZBX_STYLE_BTN_GREY)
 				->onClick(
 					'return PopUp("popup.generic", '.json_encode([
-							'srctbl' => 'item_prototypes',
-							'srcfld1' => 'itemid',
-							'srcfld2' => 'name',
-							'dstfrm' => $graphForm->getName(),
-							'dstfld1' => 'ymin_itemid',
-							'dstfld2' => 'ymin_name',
-							'parent_discoveryid' => $data['parent_discoveryid'],
-							'numeric' => '1'
-						]).',
-						{trigger_element: this}
-					);'
+						'srctbl' => 'item_prototypes',
+						'srcfld1' => 'itemid',
+						'srcfld2' => 'name',
+						'dstfrm' => $graphForm->getName(),
+						'dstfld1' => 'ymin_itemid',
+						'dstfld2' => 'ymin_name',
+						'parent_discoveryid' => $data['parent_discoveryid'],
+						'numeric' => '1'
+					]).');'
 				)
 				->setEnabled(!$readonly);
 		}
@@ -298,18 +294,16 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->onClick(
 				'return PopUp("popup.generic", jQuery.extend('.json_encode([
-						'srctbl' => 'items',
-						'srcfld1' => 'itemid',
-						'srcfld2' => 'name',
-						'dstfrm' => $graphForm->getName(),
-						'dstfld1' => 'ymax_itemid',
-						'dstfld2' => 'ymax_name',
-						'with_webitems' => '1',
-						'numeric' => '1',
-						'writeonly' => '1'
-					]).', getOnlyHostParam()),
-					{trigger_element: this}
-				);'
+					'srctbl' => 'items',
+					'srcfld1' => 'itemid',
+					'srcfld2' => 'name',
+					'dstfrm' => $graphForm->getName(),
+					'dstfld1' => 'ymax_itemid',
+					'dstfld2' => 'ymax_name',
+					'with_webitems' => '1',
+					'numeric' => '1',
+					'writeonly' => '1'
+				]).');'
 			)
 			->setEnabled(!$readonly);
 
@@ -320,17 +314,15 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 				->addClass(ZBX_STYLE_BTN_GREY)
 				->onClick(
 					'return PopUp("popup.generic", '.json_encode([
-							'srctbl' => 'item_prototypes',
-							'srcfld1' => 'itemid',
-							'srcfld2' => 'name',
-							'dstfrm' => $graphForm->getName(),
-							'dstfld1' => 'ymax_itemid',
-							'dstfld2' => 'ymax_name',
-							'parent_discoveryid' => $data['parent_discoveryid'],
-							'numeric' => '1'
-						]).',
-						{trigger_element: this}
-					);'
+						'srctbl' => 'item_prototypes',
+						'srcfld1' => 'itemid',
+						'srcfld2' => 'name',
+						'dstfrm' => $graphForm->getName(),
+						'dstfld1' => 'ymax_itemid',
+						'dstfld2' => 'ymax_name',
+						'parent_discoveryid' => $data['parent_discoveryid'],
+						'numeric' => '1'
+					]).');'
 				)
 				->setEnabled(!$readonly);
 		}
@@ -386,7 +378,7 @@ $items_table = (new CTable())
 		$readonly ? null : (new CTableColumn(_('Action')))->addClass('table-col-action')
 	]);
 
-$popup_options_add = [
+$parameters_add = [
 	'srctbl' => 'items',
 	'srcfld1' => 'itemid',
 	'srcfld2' => 'name',
@@ -397,13 +389,13 @@ $popup_options_add = [
 	'with_webitems' => '1'
 ];
 if ($data['normal_only']) {
-	$popup_options_add['normal_only'] = '1';
+	$parameters_add['normal_only'] = '1';
 }
 if ($data['hostid']) {
-	$popup_options_add['hostid'] = $data['hostid'];
+	$parameters_add['hostid'] = $data['hostid'];
 }
 
-$popup_options_add_prototype = [
+$parameters_add_prototype = [
 	'srctbl' => 'item_prototypes',
 	'srcfld1' => 'itemid',
 	'srcfld2' => 'name',
@@ -414,10 +406,10 @@ $popup_options_add_prototype = [
 	'graphtype' => $data['graphtype']
 ];
 if ($data['normal_only']) {
-	$popup_options_add_prototype['normal_only'] = '1';
+	$parameters_add_prototype['normal_only'] = '1';
 }
 if ($data['parent_discoveryid']) {
-	$popup_options_add_prototype['parent_discoveryid'] = $data['parent_discoveryid'];
+	$parameters_add_prototype['parent_discoveryid'] = $data['parent_discoveryid'];
 }
 
 $items_table->addRow(
@@ -429,19 +421,13 @@ $items_table->addRow(
 					(new CButton('add_item', _('Add')))
 						->onClick(
 							'return PopUp("popup.generic",
-								jQuery.extend('.json_encode($popup_options_add).', getOnlyHostParam()),
-								{trigger_element: this}
+								jQuery.extend('.json_encode($parameters_add).', getOnlyHostParam())
 							);'
 						)
 						->addClass(ZBX_STYLE_BTN_LINK),
 					$data['parent_discoveryid']
 						? (new CButton('add_protoitem', _('Add prototype')))
-							->onClick(
-								'return PopUp("popup.generic",
-									'.json_encode($popup_options_add_prototype).',
-									{trigger_element: this}
-								);'
-							)
+							->onClick('return PopUp("popup.generic", '.json_encode($parameters_add_prototype).');')
 							->addClass(ZBX_STYLE_BTN_LINK)
 						: null
 				])

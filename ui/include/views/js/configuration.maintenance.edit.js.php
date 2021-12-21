@@ -67,8 +67,7 @@
 		// Maintenance periods.
 		$('#maintenance_periods').on('click', '[data-action]', function() {
 			var button = $(this),
-				rows = $('#maintenance_periods table > tbody > tr'),
-				parameters;
+				rows = $('#maintenance_periods table > tbody > tr');
 
 			switch (button.data('action')) {
 				case 'remove':
@@ -77,8 +76,7 @@
 
 				case 'edit':
 					var row = button.closest('tr');
-
-					parameters = {
+					var parameters = {
 						update: 1,
 						index: row.find('[type="hidden"]:first').attr('name').match(/\[(\d+)\]/)[1]
 					};
@@ -92,9 +90,10 @@
 						}
 					});
 
-					PopUp('popup.maintenance.period', parameters,
-						{dialogue_class: 'modal-popup-medium', trigger_element: button[0]}
-					);
+					PopUp('popup.maintenance.period', parameters, {
+						dialogue_class: 'modal-popup-medium',
+						trigger_element: this
+					});
 					break;
 
 				case 'add':
@@ -106,13 +105,10 @@
 						);
 					});
 
-					parameters = {
-						index: index + 1
-					}
-
-					PopUp("popup.maintenance.period", parameters,
-						{dialogue_class: 'modal-popup-medium', trigger_element: button[0]}
-					);
+					PopUp('popup.maintenance.period', {index: index + 1}, {
+						dialogue_class: 'modal-popup-medium',
+						trigger_element: this
+					});
 					break;
 			}
 		});

@@ -1091,11 +1091,9 @@ class CDashboard extends CBaseComponent {
 
 	editWidgetProperties(properties = {}, {new_widget_pos = null} = {}) {
 		const overlay = PopUp('dashboard.widget.edit', {
-				templateid: this._data.templateid ?? undefined,
-				...properties
-			},
-			{dialogue_id: 'widget_properties', dialoogue_class: 'modal-popup-generic'}
-		);
+			templateid: this._data.templateid ?? undefined,
+			...properties
+		}, {dialogue_id: 'widget_properties', dialogue_class: 'modal-popup-generic'});
 
 		overlay.xhr.then(() => {
 			const form = overlay.$dialogue.$body[0].querySelector('form');

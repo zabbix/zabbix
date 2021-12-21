@@ -423,18 +423,16 @@ if ($data['single_host_selected']) {
 			->removeId()
 			->onClick(
 				'return PopUp("popup.generic", '.json_encode([
-						'srctbl' => 'items',
-						'srcfld1' => 'itemid',
-						'srcfld2' => 'name',
-						'dstfrm' => $form->getName(),
-						'dstfld1' => 'master_itemid',
-						'dstfld2' => 'master_itemname',
-						'only_hostid' => $data['hostid'],
-						'with_webitems' => 1,
-						'normal_only' => 1
-					]).',
-					{trigger_element: this}
-				);'
+					'srctbl' => 'items',
+					'srcfld1' => 'itemid',
+					'srcfld2' => 'name',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'master_itemid',
+					'dstfld2' => 'master_itemname',
+					'only_hostid' => $data['hostid'],
+					'with_webitems' => 1,
+					'normal_only' => 1
+				]).');'
 			);
 
 		$master_item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
@@ -443,16 +441,14 @@ if ($data['single_host_selected']) {
 			->removeId()
 			->onClick(
 				'return PopUp("popup.generic", '.json_encode([
-						'srctbl' => 'item_prototypes',
-						'srcfld1' => 'itemid',
-						'srcfld2' => 'name',
-						'dstfrm' => $form->getName(),
-						'dstfld1' => 'master_itemid',
-						'dstfld2' => 'master_itemname',
-						'parent_discoveryid' => $data['parent_discoveryid']
-					]).',
-					{trigger_element: this}
-				);'
+					'srctbl' => 'item_prototypes',
+					'srcfld1' => 'itemid',
+					'srcfld2' => 'name',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'master_itemid',
+					'dstfld2' => 'master_itemname',
+					'parent_discoveryid' => $data['parent_discoveryid']
+				]).');'
 			);
 	}
 

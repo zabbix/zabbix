@@ -325,13 +325,12 @@ $user_group_shares_table = (new CTable())
 $add_user_group_btn = ([(new CButton(null, _('Add')))
 	->onClick(
 		'return PopUp("popup.generic", '.json_encode([
-				'srctbl' => 'usrgrp',
-				'srcfld1' => 'usrgrpid',
-				'srcfld2' => 'name',
-				'dstfrm' => $form->getName(),
-				'multiselect' => '1'
-			]).
-		');'
+			'srctbl' => 'usrgrp',
+			'srcfld1' => 'usrgrpid',
+			'srcfld2' => 'name',
+			'dstfrm' => $form->getName(),
+			'multiselect' => '1'
+		]).');'
 	)
 	->addClass(ZBX_STYLE_BTN_LINK)]);
 
@@ -363,13 +362,12 @@ $user_shares_table = (new CTable())
 $add_user_btn = ([(new CButton(null, _('Add')))
 	->onClick(
 		'return PopUp("popup.generic", '.json_encode([
-				'srctbl' => 'users',
-				'srcfld1' => 'userid',
-				'srcfld2' => 'fullname',
-				'dstfrm' => $form->getName(),
-				'multiselect' => '1'
-			]).'
-		);'
+			'srctbl' => 'users',
+			'srcfld1' => 'userid',
+			'srcfld2' => 'fullname',
+			'dstfrm' => $form->getName(),
+			'multiselect' => '1'
+		]).');'
 	)
 	->addClass(ZBX_STYLE_BTN_LINK)]);
 

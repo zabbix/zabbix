@@ -45,10 +45,10 @@ window.popup_generic = {
 
 		jQuery('.multiselect', overlay.$dialogue).each(function (i, ms) {
 			jQuery(ms).on('change', {overlay: overlay}, function (e) {
-				const groups = jQuery(this).multiSelect('getData').map(i => i.id);
+				const groups = jQuery(this).multiSelect('getData').map((item) => item.id);
 				const parameters = groups.length ? {groupid: groups[0]} : {filter_groupid_rst: 1, groupid: []};
 
-				PopUp(e.data.overlay.action, { ...e.data.overlay.options, ...parameters }, {
+				PopUp(e.data.overlay.action, {...e.data.overlay.options, ...parameters}, {
 					dialogue_id: e.data.overlay.dialogueid
 				});
 			});
@@ -60,7 +60,7 @@ window.popup_generic = {
 
 		jQuery('.multiselect', overlay.$dialogue).each(function (i, ms) {
 			jQuery(ms).on('change', {overlay: overlay}, function (e) {
-				const hosts = jQuery(this).multiSelect('getData').map(i => i.id);
+				const hosts = jQuery(this).multiSelect('getData').map((item) => item.id);
 				const parameters = hosts.length ? {hostid: hosts[0]} : {filter_hostid_rst: 1, hostid: []};
 
 				PopUp(e.data.overlay.action, {...e.data.overlay.options, ...parameters}, {

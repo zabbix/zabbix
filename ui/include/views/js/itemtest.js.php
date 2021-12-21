@@ -255,11 +255,11 @@
 	/**
 	 * Creates item test modal dialog.
 	 *
-	 * @param {array}  step_nums          List of step numbers to collect.
-	 * @param {bool}   show_final_result  Either the final result should be displayed.
-	 * @param {bool}   get_value          Either to show 'get value from host' section.
-	 * @param {object} trigger_element    UI element that triggered function.
-	 * @param {int}    step_obj_nr        Value defines which 'test' button was pressed to open test item dialog:
+	 * @param {array} step_nums          List of step numbers to collect.
+	 * @param {bool}  show_final_result  Either the final result should be displayed.
+	 * @param {bool}  get_value          Either to show 'get value from host' section.
+	 * @param {Node}  trigger_element    UI element that triggered function.
+	 * @param {int}   step_obj_nr        Value defines which 'test' button was pressed to open test item dialog:
 	 *                                     - 'test' button in edit form footer (-2);
 	 *                                     - 'test all' button in preprocessinf tab (-1);
 	 *                                     - 'test' button to test single preprocessing step (step index).
@@ -277,15 +277,13 @@
 		}
 
 		PopUp('popup.itemtest.edit', jQuery.extend(item_properties, {
-				steps: getPreprocessingSteps(step_nums),
-				hostid: <?= $data['hostid'] ?>,
-				test_type: <?= $data['preprocessing_test_type'] ?>,
-				step_obj: step_obj_nr,
-				show_final_result: show_final_result ? 1 : 0,
-				get_value: get_value ? 1 : 0,
-				data: cached_values
-			}),
-			{dialogue_id: 'item-test', trigger_element}
-		);
+			steps: getPreprocessingSteps(step_nums),
+			hostid: <?= $data['hostid'] ?>,
+			test_type: <?= $data['preprocessing_test_type'] ?>,
+			step_obj: step_obj_nr,
+			show_final_result: show_final_result ? 1 : 0,
+			get_value: get_value ? 1 : 0,
+			data: cached_values
+		}), {dialogue_id: 'item-test', trigger_element});
 	}
 </script>

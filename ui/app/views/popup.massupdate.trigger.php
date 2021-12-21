@@ -102,18 +102,16 @@ if ($data['prototype']) {
 	$bttn_prototype = (new CButton('add_dep_trigger_prototype', _('Add prototype')))
 	->onClick(
 		'return PopUp("popup.generic", '.json_encode([
-				'srctbl' => 'trigger_prototypes',
-				'srcfld1' => 'triggerid',
-				'dstfrm' => 'massupdate',
-				'dstfld1' => 'new_dependency',
-				'dstact' => 'add_dependency',
-				'reference' => 'deptrigger_prototype',
-				'multiselect' => '1',
-				'objname' => 'triggers',
-				'parent_discoveryid' => $data['parent_discoveryid']
-			]).',
-			{trigger_element: this}
-		);'
+			'srctbl' => 'trigger_prototypes',
+			'srcfld1' => 'triggerid',
+			'dstfrm' => 'massupdate',
+			'dstfld1' => 'new_dependency',
+			'dstact' => 'add_dependency',
+			'reference' => 'deptrigger_prototype',
+			'multiselect' => '1',
+			'objname' => 'triggers',
+			'parent_discoveryid' => $data['parent_discoveryid']
+		]).');'
 	)
 	->addClass(ZBX_STYLE_BTN_LINK);
 }
@@ -127,20 +125,18 @@ $dependencies_form_list->addRow(
 			(new CButton('btn1', _('Add')))
 				->onClick(
 					'return PopUp("popup.generic", '.json_encode([
-							'srctbl' => 'triggers',
-							'srcfld1' => 'triggerid',
-							'dstfrm' => 'massupdate',
-							'dstfld1' => 'new_dependency',
-							'dstact' => 'add_dependency',
-							'reference' => 'deptrigger',
-							'objname' => 'triggers',
-							'multiselect' => '1',
-							'with_triggers' => '1',
-							'normal_only' => '1',
-							'noempty' => '1'
-						]).',
-						{trigger_element: this}
-					);'
+						'srctbl' => 'triggers',
+						'srcfld1' => 'triggerid',
+						'dstfrm' => 'massupdate',
+						'dstfld1' => 'new_dependency',
+						'dstact' => 'add_dependency',
+						'reference' => 'deptrigger',
+						'objname' => 'triggers',
+						'multiselect' => '1',
+						'with_triggers' => '1',
+						'normal_only' => '1',
+						'noempty' => '1'
+					]).');'
 				)
 				->addClass(ZBX_STYLE_BTN_LINK),
 			$bttn_prototype

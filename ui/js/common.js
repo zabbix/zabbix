@@ -338,7 +338,7 @@ function PopUp(action, parameters, {
 	dialogue_id = null,
 	dialogue_class = '',
 	trigger_element = document.activeElement
-}) {
+} = {}) {
 	var overlay = overlays_stack.getById(dialogue_id);
 
 	if (!overlay) {
@@ -550,9 +550,9 @@ function reloadPopup(form, action) {
 		action = action || 'popup.generic',
 		parameters = {};
 
-	jQuery(form.elements).each(function() {
-		parameters[this.name] = this.value;
-	});
+	for (const input of form.elements) {
+		parameters[input.name] = input.value;
+	};
 
 	PopUp(action, parameters, {dialogue_id, dialogue_class});
 }
@@ -1004,9 +1004,9 @@ Function.prototype.bindAsEventListener = function (context) {
 
 function openMassupdatePopup(action, parameters = {}, {
 	dialogue_class = '',
-	target_element = document.activeElement
+	trigger_element = document.activeElement
 }) {
-	const form = target_element.closest('form');
+	const form = trigger_element.closest('form');
 
 	parameters.ids = chkbxRange.getSelectedIds();
 
@@ -1028,7 +1028,7 @@ function openMassupdatePopup(action, parameters = {}, {
 			break;
 	}
 
-	return PopUp(action, parameters, {dialogue_class, target_element});
+	return PopUp(action, parameters, {dialogue_class, trigger_element});
 }
 
 /**

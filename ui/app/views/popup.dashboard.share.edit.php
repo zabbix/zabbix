@@ -36,14 +36,12 @@ $table_user_groups = (new CTable())
 				(new CButton(null, _('Add')))
 					->onClick(
 						'return PopUp("popup.generic", '. json_encode([
-								'srctbl' => 'usrgrp',
-								'srcfld1' => 'usrgrpid',
-								'srcfld2' => 'name',
-								'dstfrm' => $form->getName(),
-								'multiselect' => '1'
-							]).',
-							{trigger_element: this}
-						);'
+							'srctbl' => 'usrgrp',
+							'srcfld1' => 'usrgrpid',
+							'srcfld2' => 'name',
+							'dstfrm' => $form->getName(),
+							'multiselect' => '1'
+						]).');'
 					)
 					->addClass(ZBX_STYLE_BTN_LINK)
 			))->setColSpan(3)
@@ -59,14 +57,12 @@ $table_users = (new CTable())
 				(new CButton(null, _('Add')))
 					->onClick(
 						'return PopUp("popup.generic", '.json_encode([
-								'srctbl' => 'users',
-								'srcfld1' => 'userid',
-								'srcfld2' => 'fullname',
-								'dstfrm' => $form->getName(),
-								'multiselect' => '1'
-							]).',
-							{trigger_element: this}
-						);'
+							'srctbl' => 'users',
+							'srcfld1' => 'userid',
+							'srcfld2' => 'fullname',
+							'dstfrm' => $form->getName(),
+							'multiselect' => '1'
+						]).');'
 					)
 					->addClass(ZBX_STYLE_BTN_LINK)
 			))->setColSpan(3)

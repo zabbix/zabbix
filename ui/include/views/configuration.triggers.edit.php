@@ -150,11 +150,9 @@ $expression_row = [
 	(new CButton('insert', ($data['expression_constructor'] == IM_TREE) ? _('Edit') : _('Add')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->onClick(
-			'return PopUp("popup.triggerexpr", "modal-popup ", jQuery.extend('.
-					json_encode($popup_options).',
+			'return PopUp("popup.triggerexpr", "modal-popup ", jQuery.extend('.json_encode($popup_options).',
 					{expression: jQuery(\'[name="'.$data['expression_field_name'].'"]\').val()}
-				),
-				{dialogue_class: "modal-popup-generic", trigger_element: this}
+				), {dialogue_class: "modal-popup-generic"}
 			);'
 		)
 		->setEnabled(!$readonly)
@@ -291,10 +289,9 @@ if ($data['expression_constructor'] == IM_TREE) {
 
 	$testButton = (new CButton('test_expression', _('Test')))
 		->onClick(
-			'return PopUp("popup.testtriggerexpr",
-				{expression: this.form.elements["expression"].value},
-				{dialogue_class: "modal-popup-generic", trigger_element: this}
-			);'
+			'return PopUp("popup.testtriggerexpr", {expression: this.form.elements["expression"].value}, {
+				dialogue_class: "modal-popup-generic"
+			});'
 		)
 		->addClass(ZBX_STYLE_BTN_LINK)
 		->removeId();
@@ -359,11 +356,9 @@ $recovery_expression_row = [
 	(new CButton('insert', ($data['recovery_expression_constructor'] == IM_TREE) ? _('Edit') : _('Add')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->onClick(
-			'return PopUp("popup.triggerexpr", jQuery.extend('.
-					json_encode($popup_options).',
+			'return PopUp("popup.triggerexpr", jQuery.extend('.json_encode($popup_options).',
 					{expression: jQuery(\'[name="'.$data['recovery_expression_field_name'].'"]\').val()}
-				),
-				{dialogue_class: "modal-popup-generic" , trigger_element: this}
+				), {dialogue_class: "modal-popup-generic"}
 			);'
 		)
 		->setEnabled(!$readonly)
@@ -497,10 +492,9 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 
 	$testButton = (new CButton('test_expression', _('Test')))
 		->onClick(
-			'return PopUp("popup.testtriggerexpr",
-				{expression: this.form.elements["recovery_expression"].value},
-				{dialogue_class: "modal-popup-generic"}
-			);'
+			'return PopUp("popup.testtriggerexpr", {expression: this.form.elements["recovery_expression"].value}, {
+				dialogue_class: "modal-popup-generic"
+			});'
 		)
 		->addClass(ZBX_STYLE_BTN_LINK)
 		->removeId();

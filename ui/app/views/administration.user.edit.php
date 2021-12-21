@@ -353,7 +353,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 						(new CButton(null, _('Edit')))
 							->addClass(ZBX_STYLE_BTN_LINK)
 							->onClick(
-								'return PopUp("popup.media", '.json_encode($parameters).', {trigger_element: this});'
+								'return PopUp("popup.media", '.json_encode($parameters).');'
 							),
 						(new CButton(null, _('Remove')))
 							->addClass(ZBX_STYLE_BTN_LINK)
@@ -369,9 +369,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 			$media_table_info,
 			(new CButton(null, _('Add')))
 				->onClick(
-					'return PopUp("popup.media", '.json_encode(['dstfrm' => $user_form->getName()]).',
-						{trigger_element: this}
-					);'
+					'return PopUp("popup.media", '.json_encode(['dstfrm' => $user_form->getName()]).');'
 				)
 				->addClass(ZBX_STYLE_BTN_LINK)
 		]))

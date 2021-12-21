@@ -131,10 +131,10 @@ class CTabFilterItem extends CBaseComponent {
 	/**
 	 * Open tab filter configuration popup.
 	 *
-	 * @param {object}      params    Object of params to be passed to ajax call when opening popup.
-	 * @param {HTMLElement} edit_element  HTML element to broadcast popup update or delete event.
+	 * @param {object} params    Object of params to be passed to ajax call when opening popup.
+	 * @param {Node}   trigger_element  DOM element to broadcast popup update or delete event.
 	 */
-	openPropertiesDialog(params, edit_element) {
+	openPropertiesDialog(params, trigger_element) {
 		let defaults = {
 			idx: this._idx_namespace,
 			idx2: this._index,
@@ -151,10 +151,9 @@ class CTabFilterItem extends CBaseComponent {
 
 		this.updateUnsavedState();
 
-		return PopUp('popup.tabfilter.edit', { ...defaults, ...params }, {
-			dialogue_id: 'tabfilter_dialogue',
-			trigger_element: edit_element
-		});
+		return PopUp('popup.tabfilter.edit', { ...defaults, ...params },
+			{dialogue_id: 'tabfilter_dialogue', trigger_element}
+		);
 	}
 
 	/**

@@ -309,8 +309,7 @@ $button_list += [
 		'content' => (new CButton('', _('Mass update')))
 			->onClick(
 				"return openMassupdatePopup('popup.massupdate.item', {}, {
-					dialogue_class: 'modal-popup-preprocessing',
-					target_element: this
+					dialogue_class: 'modal-popup-preprocessing'
 				});"
 			)
 			->addClass(ZBX_STYLE_BTN_ALT)

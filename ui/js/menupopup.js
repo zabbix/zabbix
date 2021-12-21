@@ -102,7 +102,7 @@ function getMenuPopupHistory(options) {
  * @param {bool}   options['allowed_ui_problems']     Whether user has access to problems page.
  * @param {bool}   options['allowed_ui_hosts']        Whether user has access to monitoring hosts pages.
  * @param {bool}   options['allowed_ui_conf_hosts']   Whether user has access to configuration hosts page.
- * @param {object} trigger_element                      UI element which triggered opening of overlay dialogue.
+ * @param {Node}   trigger_element                    UI element which triggered opening of overlay dialogue.
  *
  * @return array
  */
@@ -948,7 +948,7 @@ function getMenuPopupTriggerMacro(options) {
  * Build script menu tree.
  *
  * @param array scripts           Script names amd nenu paths.
- * @param {object} trigger_element  UI element which triggered opening of overlay dialogue.
+ * @param {Node} trigger_element  UI element which triggered opening of overlay dialogue.
  * @param array hostid            Host ID.
  * @param array eventid           Event ID.
  *

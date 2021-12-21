@@ -708,23 +708,22 @@ insert_javascript_for_visibilitybox();
 	 * Opens override popup - edit or create form.
 	 * Note: a callback this.onStepOverlayReadyCb is called from within popup form once it is parsed.
 	 *
-	 * @param {number} step     Override index.
-	 * @param {object} refocus  A node to set focus to, when popup is closed.
+	 * @param {number} step             Override index.
+	 * @param {Node}   trigger_element  A node to set focus to, when popup is closed.
 	 */
-	Override.prototype.open = function(no, refocus) {
+	Override.prototype.open = function(no, trigger_element) {
 		return PopUp('popup.lldoverride', {
-				no:                 no,
-				templated:          lldoverrides.templated,
-				name:               this.data.name,
-				old_name:           this.data.name,
-				stop:               this.data.stop,
-				overrides_evaltype: this.data.overrides_evaltype,
-				overrides_formula:  this.data.overrides_formula,
-				overrides_filters:  this.data.overrides_filters,
-				operations:         this.data.operations,
-				overrides_names:    lldoverrides.overrides.getOverrideNames()
-			}, {dialogue_class: 'modal-popup-generic', trigger_element: refocus}
-		);
+			no:                 no,
+			templated:          lldoverrides.templated,
+			name:               this.data.name,
+			old_name:           this.data.name,
+			stop:               this.data.stop,
+			overrides_evaltype: this.data.overrides_evaltype,
+			overrides_formula:  this.data.overrides_formula,
+			overrides_filters:  this.data.overrides_filters,
+			operations:         this.data.operations,
+			overrides_names:    lldoverrides.overrides.getOverrideNames()
+		}, {dialogue_class: 'modal-popup-generic', trigger_element});
 	};
 
 	/**
@@ -1006,10 +1005,10 @@ insert_javascript_for_visibilitybox();
 	 * Opens override popup - edit or create form.
 	 * Note: a callback this.onStepOverlayReadyCb is called from within popup form once it is parsed.
 	 *
-	 * @param {number}  step     Override index.
-	 * @param {object}  refocus  A node to set focus to, when popup is closed.
+	 * @param {number} step             Override index.
+	 * @param {Node}   trigger_element  A node to set focus to, when popup is closed.
 	 */
-	Operation.prototype.open = function(no, refocus) {
+	Operation.prototype.open = function(no, trigger_element) {
 		var parameters = {
 			no:                 no,
 			templated:          lldoverrides.templated,
@@ -1024,9 +1023,7 @@ insert_javascript_for_visibilitybox();
 			}
 		}.bind(this));
 
-		return PopUp('popup.lldoperation', parameters,
-			{dialogue_class: 'modal-popup-generic', trigger_element: refocus}
-		);
+		return PopUp('popup.lldoperation', parameters, {dialogue_class: 'modal-popup-generic', trigger_element});
 	};
 
 	/**

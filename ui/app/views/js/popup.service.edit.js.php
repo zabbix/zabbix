@@ -504,11 +504,9 @@ window.service_edit_popup = {
 		}
 
 		const overlay = PopUp('popup.services', {
-				title: <?= json_encode(_('Add child services')) ?>,
-				exclude_serviceids
-			},
-			{dialogue_id: 'services'}
-		);
+			title: <?= json_encode(_('Add child services')) ?>,
+			exclude_serviceids
+		}, {dialogue_id: 'services'});
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 			for (const service of e.detail) {
@@ -536,11 +534,9 @@ window.service_edit_popup = {
 		}
 
 		const overlay = PopUp('popup.services', {
-				title: <?= json_encode(_('Add parent services')) ?>,
-				exclude_serviceids
-			},
-			{dialogue_id: 'services'}
-		);
+			title: <?= json_encode(_('Add parent services')) ?>,
+			exclude_serviceids
+		}, {dialogue_id: 'services'});
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 			const data = [];

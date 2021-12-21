@@ -327,15 +327,11 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 
 		valuemap_table.querySelectorAll('[name$="[name]"]').forEach((element) => disable_names.push(element.value));
 		PopUp('popup.generic', {
-				srctbl: 'valuemaps',
-				srcfld1: 'valuemapid',
-				disable_names: disable_names,
-				editable: true
-			}, {
-				dialogue_class: 'modal-popup-generic',
-				trigger_element: element
-			}
-		);
+			srctbl: 'valuemaps',
+			srcfld1: 'valuemapid',
+			disable_names: disable_names,
+			editable: true
+		}, {dialogue_class: 'modal-popup-generic', trigger_element: element});
 	}
 
 	function toggleVisible(obj, data_type) {

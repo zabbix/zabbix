@@ -105,13 +105,11 @@ if (!$readonly) {
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->onClick(
 			'return PopUp("popup.generic", jQuery.extend('.json_encode([
-					'srctbl' => 'help_items',
-					'srcfld1' => 'key',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => 'key'
-				]).', {itemtype: jQuery("#type").val()}),
-				{trigger_element: this}
-			);'
+				'srctbl' => 'help_items',
+				'srcfld1' => 'key',
+				'dstfrm' => $form->getName(),
+				'dstfld1' => 'key'
+			]).', {itemtype: jQuery("#type").val()}));'
 		);
 }
 

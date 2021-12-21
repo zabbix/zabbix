@@ -217,14 +217,13 @@ function createFontSelect(string $name): CSelect {
 							->addClass(ZBX_STYLE_BTN_GREY)
 							->onClick(
 								'return PopUp("popup.generic", jQuery.extend('.json_encode([
-										'srctbl' => 'sysmaps',
-										'srcfld1' => 'sysmapid',
-										'srcfld2' => 'name',
-										'dstfrm' => 'selementForm',
-										'dstfld1' => 'sysmapid',
-										'dstfld2' => 'elementNameMap'
-									]).', {excludeids: [#{sysmapid}]})
-								);'
+									'srctbl' => 'sysmaps',
+									'srcfld1' => 'sysmapid',
+									'srcfld2' => 'name',
+									'dstfrm' => 'selementForm',
+									'dstfld1' => 'sysmapid',
+									'dstfld2' => 'elementNameMap'
+								]).', {excludeids: [#{sysmapid}]}));'
 							)
 					], 'mapSelectRow')
 					->addRow(_('Tags'),
@@ -796,15 +795,14 @@ function createFontSelect(string $name): CSelect {
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->onClick(
 									'return PopUp("popup.generic", '.json_encode([
-											'srctbl' => 'triggers',
-											'srcfld1' => 'triggerid',
-											'reference' => 'linktrigger',
-											'multiselect' => '1',
-											'real_hosts' => '1',
-											'with_triggers' => '1',
-											'noempty' => '1'
-										]).'
-									);'
+										'srctbl' => 'triggers',
+										'srcfld1' => 'triggerid',
+										'reference' => 'linktrigger',
+										'multiselect' => '1',
+										'real_hosts' => '1',
+										'with_triggers' => '1',
+										'noempty' => '1'
+									]).');'
 								)
 						]))
 							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)

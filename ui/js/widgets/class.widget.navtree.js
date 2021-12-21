@@ -186,13 +186,11 @@ class CWidgetNavTree extends CWidget {
 				};
 
 				return PopUp('popup.generic', {
-						srctbl: 'sysmaps',
-						srcfld1: 'sysmapid',
-						srcfld2: 'name',
-						multiselect: '1'
-					},
-					{dialogue_class: 'modal-popup-generic', trigger_element: e.target}
-				);
+					srctbl: 'sysmaps',
+					srcfld1: 'sysmapid',
+					srcfld2: 'name',
+					multiselect: '1'
+				}, {dialogue_class: 'modal-popup-generic', trigger_element: e.target});
 			},
 
 			editItem: (e) => {

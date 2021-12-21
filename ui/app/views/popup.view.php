@@ -26,7 +26,7 @@
 (new CWidget())->show();
 
 (new CScriptTag(
-	'PopUp("'.$data['popup']['action'].'", '.json_encode($data['popup']['options']).', {trigger_element: null});'.
+	'PopUp("'.$data['popup']['action'].'", '.json_encode($data['popup']['options']).');'.
 
 	'$.subscribe("acknowledge.create", function(event, response, overlay) {'.
 		'clearMessages();'.

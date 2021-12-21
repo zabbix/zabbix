@@ -518,7 +518,7 @@ function overlayDialogueDestroy(dialogueid) {
  * @param string   params.dialogueid            (optional)  Unique dialogue identifier to reuse existing overlay dialog
  *                                                          or create a new one if value is not set.
  * @param string   params.script_inline         (optional)  Custom javascript code to execute when initializing dialog.
- * @param {object} trigger_elmnt                (optional)  UI element which triggered opening of overlay dialogue.
+ * @param {Node|null} trigger_elmnt                         UI element which triggered opening of overlay dialogue.
  *
  * @return {Overlay}
  */
@@ -547,7 +547,7 @@ function overlayDialogue(params, trigger_elmnt) {
  *
  * @param string scriptid			Script ID.
  * @param string confirmation		Confirmation text.
- * @param {object} trigger_element	UI element that was clicked to open overlay dialogue.
+ * @param {Node} trigger_element	UI element that was clicked to open overlay dialogue.
  * @param string hostid				Host ID.
  * @param string eventid			Event ID.
  */

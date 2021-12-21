@@ -774,28 +774,26 @@
 	 * Opens step popup - edit or create form.
 	 * Note: a callback this.onStepOverlayReadyCb is called from within popup form once it is parsed.
 	 *
-	 * @param {int}  no       Step index.
-	 * @param {Node} refocus  A node to set focus to, when popup is closed.
+	 * @param {int}  no               Step index.
+	 * @param {Node} trigger_element  A node to set focus to, when popup is closed.
 	 */
-	Step.prototype.open = function(no, refocus) {
+	Step.prototype.open = function(no, trigger_element) {
 		return PopUp('popup.httpstep', {
-				no:               no,
-				httpstepid:       this.data.httpstepid,
-				templated:        httpconf.templated,
-				name:             this.data.name,
-				url:              this.data.url,
-				posts:            this.data.posts,
-				post_type:        this.data.post_type,
-				timeout:          this.data.timeout,
-				required:         this.data.required,
-				status_codes:     this.data.status_codes,
-				old_name:         this.data.name,
-				retrieve_mode:    this.data.retrieve_mode,
-				follow_redirects: this.data.follow_redirects,
-				steps_names:      httpconf.steps.getStepNames()
-			},
-			{dialogue_class: 'modal-popup-generic', trigger_element: refocus}
-		);
+			no:               no,
+			httpstepid:       this.data.httpstepid,
+			templated:        httpconf.templated,
+			name:             this.data.name,
+			url:              this.data.url,
+			posts:            this.data.posts,
+			post_type:        this.data.post_type,
+			timeout:          this.data.timeout,
+			required:         this.data.required,
+			status_codes:     this.data.status_codes,
+			old_name:         this.data.name,
+			retrieve_mode:    this.data.retrieve_mode,
+			follow_redirects: this.data.follow_redirects,
+			steps_names:      httpconf.steps.getStepNames()
+		}, {dialogue_class: 'modal-popup-generic', trigger_element});
 	};
 
 	/**
