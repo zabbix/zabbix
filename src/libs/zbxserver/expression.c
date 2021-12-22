@@ -3569,6 +3569,10 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				{
 					replace_to = zbx_strdup(replace_to, zbx_trigger_state_string(c_event->value));
 				}
+				else if (0 == strcmp(m, MVAR_TRIGGER_STATE_ERROR))
+				{
+					ret = DBget_trigger_error(&event->trigger, &replace_to);
+				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_TEMPLATE_NAME))
 				{
 					ret = DBget_trigger_template_name(c_event->objectid, userid, &replace_to);
@@ -3594,10 +3598,6 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				{
 					if (NULL != alert)
 						replace_to = zbx_strdup(replace_to, alert->message);
-				}
-				else if (0 == strcmp(m, MVAR_TRIGGER_STATE_ERROR))
-				{
-					ret = DBget_trigger_error(&event->trigger, &replace_to);
 				}
 			}
 			else if (0 == indexed_macro && EVENT_SOURCE_DISCOVERY == c_event->source)
