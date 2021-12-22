@@ -80,6 +80,18 @@ class CSetupWizard extends CForm {
 	}
 
 	private function doAction(): void {
+		/*
+		 * Having non-super-admin authenticated at this step means:
+		 *   - Either the config file has been manually created by the user.
+		 *   - Or dealing with a spoofed session cookie.
+		 *
+		 * Since it is not possible to distinguish between the two, skip data validation and prevent stage switching.
+		 * Any of either cases is only possible with self::STAGE_INSTALL stage.
+		 */
+		if (CWebUser::$data && CWebUser::getType() < USER_TYPE_SUPER_ADMIN) {
+			return;
+		}
+
 		if (hasRequest('back') && array_key_exists($this->getStep(), getRequest('back'))) {
 			$this->doBack();
 		}
