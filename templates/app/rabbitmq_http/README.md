@@ -19,7 +19,7 @@ This template was tested on:
 
 > See [Zabbix template operation](https://www.zabbix.com/documentation/5.0/manual/config/templates_out_of_the_box/http) for basic instructions.
 
-Enable the RabbitMQ management plugin. See [RabbitMQ’s documentation](https://www.rabbitmq.com/management.html) to enable it.
+Enable the RabbitMQ management plugin. See [RabbitMQ's documentation](https://www.rabbitmq.com/management.html) to enable it.
 
 Create a user to monitor the service:
 
@@ -58,7 +58,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Health Check 3.8.10+ discovery |<p>Version 3.8.10+ specific metrics</p> |DEPENDENT |rabbitmq.healthcheck.v3810.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.management_version`</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
+|Health Check 3.8.10+ discovery |<p>Version 3.8.10+ specific metrics</p> |DEPENDENT |rabbitmq.healthcheck.v3810.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.management_version`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |Exchanges discovery |<p>Individual exchange metrics</p> |DEPENDENT |rabbitmq.exchanges.discovery<p>**Filter**:</p>AND <p>- A: {#EXCHANGE} MATCHES_REGEX `{$RABBITMQ.LLD.FILTER.EXCHANGE.MATCHES}`</p><p>- B: {#EXCHANGE} NOT_MATCHES_REGEX `{$RABBITMQ.LLD.FILTER.EXCHANGE.NOT_MATCHES}`</p> |
 
 ## Items collected
@@ -113,7 +113,7 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|RabbitMQ: There are active alarms in the cluster |<p>http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html</p> |`{TEMPLATE_NAME:rabbitmq.healthcheck.alarms[{#SINGLETON}].last()}=503` |AVERAGE | |
+|RabbitMQ: There are active alarms in the cluster |<p>http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html</p> |`{TEMPLATE_NAME:rabbitmq.healthcheck.alarms[{#SINGLETON}].last()}=0` |AVERAGE | |
 |RabbitMQ: Failed to fetch overview data (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes</p> |`{TEMPLATE_NAME:rabbitmq.get_overview.nodata(30m)}=1` |WARNING |<p>Manual close: YES</p> |
 
 ## Feedback
@@ -130,7 +130,7 @@ For Zabbix version: 5.0 and higher
 The template to monitor RabbitMQ by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
-Template `RabbitMQ Node` — (Zabbix version >= 4.2) collects metrics by polling [RabbitMQ management plugin](https://www.rabbitmq.com/management.html) with HTTP agent remotely.
+Template `RabbitMQ Node` — (Zabbix version >= 4.2) collects metrics by polling [RabbitMQ management plugin](https://www.rabbitmq.com/management.html) with HTTP agent remotely.
 
 
 
@@ -140,7 +140,7 @@ This template was tested on:
 
 ## Setup
 
-Enable the RabbitMQ management plugin. See [RabbitMQ’s documentation](https://www.rabbitmq.com/management.html) to enable it.
+Enable the RabbitMQ management plugin. See [RabbitMQ's documentation](https://www.rabbitmq.com/management.html) to enable it.
 
 Create a user to monitor the service:
 
@@ -182,8 +182,8 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Health Check 3.8.10+ discovery |<p>Version 3.8.10+ specific metrics</p> |DEPENDENT |rabbitmq.healthcheck.v3810.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.management_version`</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
-|Health Check 3.8.9- discovery |<p>Specific metrics up to and including version 3.8.4</p> |DEPENDENT |rabbitmq.healthcheck.v389.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.management_version`</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
+|Health Check 3.8.10+ discovery |<p>Version 3.8.10+ specific metrics</p> |DEPENDENT |rabbitmq.healthcheck.v3810.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.management_version`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
+|Health Check 3.8.9- discovery |<p>Specific metrics up to and including version 3.8.4</p> |DEPENDENT |rabbitmq.healthcheck.v389.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.management_version`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |Queues discovery |<p>Individual queue metrics</p> |DEPENDENT |rabbitmq.queues.discovery<p>**Filter**:</p>AND <p>- A: {#QUEUE} MATCHES_REGEX `{$RABBITMQ.LLD.FILTER.QUEUE.MATCHES}`</p><p>- B: {#QUEUE} NOT_MATCHES_REGEX `{$RABBITMQ.LLD.FILTER.QUEUE.NOT_MATCHES}`</p><p>- C: {#NODE} MATCHES_REGEX `{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}`</p> |
 
 ## Items collected
@@ -247,11 +247,11 @@ There are no template links in this template.
 |RabbitMQ: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:rabbitmq.node.uptime.last()}<10m` |INFO |<p>Manual close: YES</p> |
 |RabbitMQ: Service is down |<p>-</p> |`{TEMPLATE_NAME:net.tcp.service[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"].last()}=0` |AVERAGE |<p>Manual close: YES</p> |
 |RabbitMQ: Service response time is too high (over {$RABBITMQ.RESPONSE_TIME.MAX.WARN}s for 5m) |<p>-</p> |`{TEMPLATE_NAME:net.tcp.service.perf[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"].min(5m)}>{$RABBITMQ.RESPONSE_TIME.MAX.WARN}` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- RabbitMQ: Service is down</p> |
-|RabbitMQ: There are active alarms in the node |<p>http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html</p> |`{TEMPLATE_NAME:rabbitmq.healthcheck.local_alarms[{#SINGLETON}].last()}=503` |AVERAGE | |
-|RabbitMQ: There are valid TLS certificates expiring in the next month |<p>http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html</p> |`{TEMPLATE_NAME:rabbitmq.healthcheck.certificate_expiration[{#SINGLETON}].last()}=503` |AVERAGE | |
-|RabbitMQ: There are not running virtual hosts |<p>http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html</p> |`{TEMPLATE_NAME:rabbitmq.healthcheck.virtual_hosts[{#SINGLETON}].last()}=503` |AVERAGE | |
-|RabbitMQ: There are queues that could potentially lose data if the this node goes offline. |<p>http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html</p> |`{TEMPLATE_NAME:rabbitmq.healthcheck.mirror_sync[{#SINGLETON}].last()}=503` |AVERAGE | |
-|RabbitMQ: There are queues that would lose their quorum and availability if the this node is shut down. |<p>http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html</p> |`{TEMPLATE_NAME:rabbitmq.healthcheck.quorum[{#SINGLETON}].last()}=503` |AVERAGE | |
+|RabbitMQ: There are active alarms in the node |<p>http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html</p> |`{TEMPLATE_NAME:rabbitmq.healthcheck.local_alarms[{#SINGLETON}].last()}=0` |AVERAGE | |
+|RabbitMQ: There are valid TLS certificates expiring in the next month |<p>http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html</p> |`{TEMPLATE_NAME:rabbitmq.healthcheck.certificate_expiration[{#SINGLETON}].last()}=0` |AVERAGE | |
+|RabbitMQ: There are not running virtual hosts |<p>http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html</p> |`{TEMPLATE_NAME:rabbitmq.healthcheck.virtual_hosts[{#SINGLETON}].last()}=0` |AVERAGE | |
+|RabbitMQ: There are queues that could potentially lose data if the this node goes offline. |<p>http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html</p> |`{TEMPLATE_NAME:rabbitmq.healthcheck.mirror_sync[{#SINGLETON}].last()}=0` |AVERAGE | |
+|RabbitMQ: There are queues that would lose their quorum and availability if the this node is shut down. |<p>http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html</p> |`{TEMPLATE_NAME:rabbitmq.healthcheck.quorum[{#SINGLETON}].last()}=0` |AVERAGE | |
 |RabbitMQ: Node healthcheck failed |<p>https://www.rabbitmq.com/monitoring.html#health-checks</p> |`{TEMPLATE_NAME:rabbitmq.healthcheck[{#SINGLETON}].last()}=0` |AVERAGE | |
 |RabbitMQ: Too many messages in queue (over {$RABBITMQ.MESSAGES.MAX.WARN} for 5m) |<p>-</p> |`{TEMPLATE_NAME:rabbitmq.queue.messages["{#VHOST}/{#QUEUE}"].min(5m)}>{$RABBITMQ.MESSAGES.MAX.WARN:"{#QUEUE}"}` |WARNING | |
 |RabbitMQ: Failed to fetch nodes data (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes.</p> |`{TEMPLATE_NAME:rabbitmq.get_nodes.nodata(30m)}=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- RabbitMQ: Service is down</p> |

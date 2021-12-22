@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-04-14T11:32:43Z</date>
+   <date>2021-12-21T18:59:52Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -18,7 +18,7 @@ You can set {$WILDFLY.USER} and {$WILDFLY.PASSWORD} macros in the template for u
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -35,7 +35,6 @@ Template tooling version used: 0.38</description>
                <type>JMX</type>
                <key>jmx["java.lang:type=Runtime","Uptime"]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <units>s</units>
                <username>{$WILDFLY.USER}</username>
                <password>{$WILDFLY.PASSWORD}</password>
@@ -68,7 +67,6 @@ Template tooling version used: 0.38</description>
                <key>jmx["jboss.as:management-root=server","launchType"]</key>
                <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <username>{$WILDFLY.USER}</username>
                <password>{$WILDFLY.PASSWORD}</password>
@@ -92,7 +90,6 @@ Template tooling version used: 0.38</description>
                <key>jmx["jboss.as:management-root=server","name"]</key>
                <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <username>{$WILDFLY.USER}</username>
                <password>{$WILDFLY.PASSWORD}</password>
@@ -117,7 +114,6 @@ For domain mode: The name given to this domain</description>
                <key>jmx["jboss.as:management-root=server","processType"]</key>
                <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <username>{$WILDFLY.USER}</username>
                <password>{$WILDFLY.PASSWORD}</password>
@@ -141,7 +137,6 @@ For domain mode: The name given to this domain</description>
                <key>jmx["jboss.as:management-root=server","productVersion"]</key>
                <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <username>{$WILDFLY.USER}</username>
                <password>{$WILDFLY.PASSWORD}</password>
@@ -201,7 +196,6 @@ For domain mode: The name given to this domain</description>
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",autoStart]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <username>{$WILDFLY.USER}</username>
                      <password>{$WILDFLY.PASSWORD}</password>
                      <description>Whether or not this server should be started when the Host Controller starts.</description>
@@ -231,7 +225,6 @@ For domain mode: The name given to this domain</description>
                      <key>jmx["{#JMXOBJ}",group]</key>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <username>{$WILDFLY.USER}</username>
                      <password>{$WILDFLY.PASSWORD}</password>
@@ -264,7 +257,6 @@ For domain mode: The name given to this domain</description>
                      <key>jmx["{#JMXOBJ}",status]</key>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <username>{$WILDFLY.USER}</username>
                      <password>{$WILDFLY.PASSWORD}</password>
@@ -292,7 +284,6 @@ For domain mode: The name given to this domain</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <lld_macro_paths>
                   <lld_macro_path>
                      <lld_macro>{#SERVER}</lld_macro>
@@ -335,7 +326,6 @@ For domain mode: The name given to this domain</description>
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",enabled]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <username>{$WILDFLY.USER}</username>
                      <password>{$WILDFLY.PASSWORD}</password>
                      <description>Boolean indicating whether the deployment content is currently deployed in the runtime (or should be deployed in the runtime the next time the server starts.)</description>
@@ -364,7 +354,6 @@ For domain mode: The name given to this domain</description>
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",managed]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <username>{$WILDFLY.USER}</username>
                      <password>{$WILDFLY.PASSWORD}</password>
                      <description>Indicates if the deployment is managed (aka uses the ContentRepository).</description>
@@ -389,7 +378,6 @@ For domain mode: The name given to this domain</description>
                      <jmx_endpoint>service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}</jmx_endpoint>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <lld_macro_paths>
                   <lld_macro_path>
                      <lld_macro>{#SERVER_GROUP}</lld_macro>
