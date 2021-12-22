@@ -113,8 +113,7 @@ $add_expression_button = (new CButton('insert', ($data['expression_constructor']
 	->onClick(
 		'return PopUp("popup.triggerexpr", "modal-popup , jQuery.extend('.json_encode($popup_options).', {
 				expression: jQuery(\'[name="'.$data['expression_field_name'].'"]\').val()
-			}),
-			{dialogue_class: "modal-popup-generic"}
+			}), {dialogue_class: "modal-popup-generic"}
 		);'
 	)
 	->removeId();
@@ -319,7 +318,8 @@ $add_recovery_expression_button = (new CButton('insert',
 			'dstfld1' => $data['recovery_expression_field_name'],
 			'parent_discoveryid' => $data['parent_discoveryid']
 		]).', {expression: jQuery(\'[name="'.$data['recovery_expression_field_name'].'"]\').val()}),
-		{dialogue_class: "modal-popup-generic"});'
+			{dialogue_class: "modal-popup-generic"}
+		);'
 	);
 
 if ($data['limited']) {

@@ -34,7 +34,7 @@ $widget = (new CWidget())
 			->addItem(new CRedirectButton(_('Create media type'), 'zabbix.php?action=mediatype.edit'))
 			->addItem(
 				(new CButton('', _('Import')))
-					->onClick('return PopUp("popup.import", {rules_preset: "mediatype"}, {trigger_element: this});')
+					->onClick('return PopUp("popup.import", {rules_preset: "mediatype"});')
 					->removeId()
 			)
 		))
@@ -144,8 +144,7 @@ foreach ($data['mediatypes'] as $mediaType) {
 		->onClick('
 			return PopUp("popup.mediatypetest.edit", '.json_encode(['mediatypeid' => $mediaType['mediatypeid']]).', {
 				dialogue_id: "mediatypetest_edit",
-				dialogue_class: "modal-popup-medium",
-				trigger_element: this
+				dialogue_class: "modal-popup-medium"
 			});'
 		);
 
