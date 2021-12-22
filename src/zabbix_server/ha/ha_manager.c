@@ -1988,6 +1988,9 @@ pause:
 					zbx_ipc_client_send(client, ZBX_IPC_SERVICE_HA_STOP, NULL, 0);
 					stop = SUCCEED;
 					break;
+				case ZBX_IPC_SERVICE_HA_PAUSE:
+					zbx_ipc_client_send(client, ZBX_IPC_SERVICE_HA_PAUSE, NULL, 0);
+					break;
 			}
 
 			zbx_ipc_message_free(message);
