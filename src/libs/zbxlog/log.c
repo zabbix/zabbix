@@ -695,8 +695,7 @@ char	*strerror_from_module(unsigned long error, const wchar_t *module)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_strlog_alloc(int level, char **out, size_t *out_alloc, size_t *out_offset, const char *format,
-		...)
+void	zbx_strlog_alloc(int level, char **out, size_t *out_alloc, size_t *out_offset, const char *format, ...)
 {
 	va_list	args;
 	size_t	len;
@@ -716,7 +715,7 @@ void	zbx_strlog_alloc(int level, char **out, size_t *out_alloc, size_t *out_offs
 	va_end(args);
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(level))
-			zabbix_log(level, "%s",  buf);
+		zabbix_log(level, "%s", buf);
 
 	if (NULL != out)
 	{
