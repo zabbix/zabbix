@@ -35,6 +35,6 @@ typedef struct
 sha256_ctx;
 
 void	zbx_sha256_hash(const char *in, char *out);
-void*	zbx_sha256_hash_for_hmac(const void* data, const size_t datalen, void* out,const size_t outlen);
+void*	zbx_sha256_hash_for_hmac(const void* data, const size_t datalen, void* out, const size_t outlen);
 
 #endif /* ZABBIX_SHA256CRYPT_H */
