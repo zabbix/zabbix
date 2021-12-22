@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-12-21T23:12:33Z'
+  date: '2021-12-22T00:14:30Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -27,7 +27,7 @@ zabbix_export:
               tag: Application
               value: 'Zabbix proxy'
         -
-          uuid: eae279ab9c524cf2afd60dabd9ba7859
+          uuid: 5131f979c17a4346a95f8ba77e7133a4
           name: 'Zabbix proxy: Utilization of availability manager internal processes, in %'
           type: INTERNAL
           key: 'zabbix[process,availability manager,avg,busy]'
@@ -41,7 +41,7 @@ zabbix_export:
               value: 'Zabbix proxy'
           triggers:
             -
-              uuid: 5acc7b82388b4c1faf0c75c0c0d2cc9e
+              uuid: 5a8375a8eee642f2940ed813ee062336
               expression: 'avg(/Zabbix proxy health/zabbix[process,availability manager,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"availability manager"}'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,availability manager,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"availability manager"}'
