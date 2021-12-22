@@ -1786,7 +1786,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	while (ZBX_IS_RUNNING())
 	{
-		time_t	now;
+		time_t			now;
 		zbx_ipc_client_t	*client;
 		zbx_ipc_message_t	*message;
 

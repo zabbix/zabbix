@@ -152,6 +152,7 @@ void	zbx_signal_process_by_pid(int pid, int flags, char **out)
 	int		i, found = 0;
 	size_t		out_alloc = 0, out_offset = 0;
 
+	s.sival_ptr = NULL;
 	s.ZBX_SIVAL_INT = flags;
 
 	for (i = 0; i < threads_num; i++)
@@ -435,6 +436,7 @@ int	zbx_sigusr_send(int flags)
 	{
 		union sigval	s;
 
+		s.sival_ptr = NULL;
 		s.ZBX_SIVAL_INT = flags;
 
 		if (-1 != sigqueue(pid, SIGUSR1, s))

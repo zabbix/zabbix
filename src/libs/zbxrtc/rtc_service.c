@@ -247,7 +247,7 @@ int	zbx_rtc_init(zbx_rtc_t *rtc ,char **error)
  * Purpose: accept and process runtime control request                        *
  *                                                                            *
  ******************************************************************************/
-void 	zbx_rtc_dispatch(zbx_ipc_client_t *client, zbx_ipc_message_t *message)
+void	zbx_rtc_dispatch(zbx_ipc_client_t *client, zbx_ipc_message_t *message)
 {
 	char		*result = NULL, *result_ex = NULL;
 	zbx_uint32_t	size = 0;

@@ -157,7 +157,7 @@ int	zbx_ha_change_loglevel(int direction, char **error)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	cmd = 0 < direction ? ZBX_IPC_SERVICE_HA_LOGLEVEL_INCREASE :  ZBX_IPC_SERVICE_HA_LOGLEVEL_DECREASE;
+	cmd = 0 < direction ? ZBX_IPC_SERVICE_HA_LOGLEVEL_INCREASE : ZBX_IPC_SERVICE_HA_LOGLEVEL_DECREASE;
 
 	ret = zbx_ipc_async_exchange(ZBX_IPC_SERVICE_HA, cmd, ZBX_HA_SERVICE_TIMEOUT, NULL, 0, &result, error);
 	zbx_free(result);
