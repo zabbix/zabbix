@@ -358,6 +358,12 @@ $toc-title-bg-color: #4f4f4f;
 // Time selection.
 .ui-tabs-nav {
 	.ui-tabs-active {
+		.btn-info {
+			&::after {
+				background: url($sprite-path) no-repeat -431px -621px;
+			}
+		}
+
 		.btn-time {
 			&::after {
 				background-position: -87px -583px;

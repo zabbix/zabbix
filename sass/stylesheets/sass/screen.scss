@@ -6,8 +6,8 @@ $ui-transitions: true !default;
 $ui-transition-duration: .3s !default;
 
 // Sprite path
-$sprite-path: '../img/icon-sprite.svg?20200407';
-$browser-sprite-path: '../img/browser-sprite.png?20200407';
+$sprite-path: '../img/icon-sprite.svg?20211222';
+$browser-sprite-path: '../img/browser-sprite.png?20211222';
 
 @import "utils/mixins";
 
@@ -2172,7 +2172,7 @@ $icon-widget-btn: (
 		background-image: none;
 
 		&::after {
-			background: url($sprite-path) no-repeat -398px -407px;
+			background: url($sprite-path) no-repeat -431px -621px;
 		}
 	}
 
@@ -2221,7 +2221,7 @@ $icon-widget-btn: (
 
 		.btn-info {
 			&::after {
-				background-position: -398px -430px;
+				background-position: -279px -621px;
 				top: 1px;
 			}
 		}
@@ -5388,11 +5388,12 @@ button {
 [data-count][class*='icon-']::after,
 .icon-description::after {
 	position: absolute;
+	top: -2px;
 	content: attr(data-count);
 	text-align: center;
-	margin-top: -2px;
 	font-size: 9px;
 	letter-spacing: -.25px;
+	line-height: 18px;
 	width: 18px;
 }
 
@@ -6477,7 +6478,7 @@ z-select,
 // Geomap widget.
 .geomap-filter-button,
 .navigate-home-button {
-	background-image: url('../img/icon-sprite.svg');
+	background-image: url($sprite-path);
 	background-repeat: no-repeat;
 }
 .geomap-filter-button {

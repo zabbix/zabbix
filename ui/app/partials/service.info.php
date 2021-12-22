@@ -77,7 +77,7 @@ if (array_key_exists('slas', $data)) {
 
 			$sla_html[] = ': ';
 			$sla_html[] = CSlaHelper::getSliTag($current_period_sli, (float) $sla['slo']);
-			$sla_html[] = (new CSpan())
+			$sla_html[] = (new CLink(null, '#'))
 				->addClass(ZBX_STYLE_ICON_DESCRIPTION)
 				->setHint($hint);
 		}

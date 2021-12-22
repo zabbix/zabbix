@@ -22,13 +22,31 @@
 	}
 
 	.service-info-value {
-
 		.service-info-value-sla {
 			display: inline-block;
 			word-break: break-word;
+			line-height: 18px;
 
 			&:not(:last-child) {
 				margin-right: 10px;
+			}
+
+			a {
+				vertical-align: middle;
+			}
+
+			.icon-description {
+				border-radius: 2px;
+
+				&:link,
+				&:hover,
+				&:focus {
+					border-bottom: none;
+				}
+
+				&:focus {
+					box-shadow: 0 0 0 2px $btn-border-focus-color;
+				}
 			}
 		}
 	}

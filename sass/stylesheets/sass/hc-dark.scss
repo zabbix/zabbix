@@ -173,6 +173,7 @@ $msg-warning-border-color: #ffb319;
 $btn-font-color: #333333;
 $btn-bg-color: #e0e0e0;
 $btn-border-color: #333333;
+$btn-border-focus-color: #ffffff;
 
 $btn-alt-font-color: #ffffff;
 $btn-alt-bg-color: transparent;
@@ -1201,6 +1202,12 @@ td.inactive-bg {
 
 // Time selection.
 .ui-tabs-nav {
+	.btn-info {
+		&::after {
+			background-position: -279px -621px;
+		}
+	}
+
 	.btn-time {
 		&::after {
 			background-position: -246px -583px;
@@ -1242,6 +1249,12 @@ td.inactive-bg {
 	}
 
 	.ui-tabs-active {
+		.btn-info {
+			&::after {
+				background-position: -431px -621px;
+			}
+		}
+
 		.btn-time {
 			&::after {
 				background-position: -87px -583px;
