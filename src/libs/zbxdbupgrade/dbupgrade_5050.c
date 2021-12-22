@@ -1252,6 +1252,21 @@ static int	DBpatch_5050114(void)
 	return ret;
 }
 
+static int	DBpatch_5050115(void)
+{
+	const ZBX_FIELD	field = {"hide_deprecated_widgets", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_5050116(void)
+{
+	if (ZBX_DB_OK > DBexecute("update config set hide_deprecated_widgets=0"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(5050)
@@ -1360,5 +1375,7 @@ DBPATCH_ADD(5050111, 0, 1)
 DBPATCH_ADD(5050112, 0, 1)
 DBPATCH_ADD(5050113, 0, 1)
 DBPATCH_ADD(5050114, 0, 1)
+DBPATCH_ADD(5050115, 0, 1)
+DBPATCH_ADD(5050116, 0, 1)
 
 DBPATCH_END()

@@ -45,6 +45,35 @@ class CWidgetHelper {
 	 * @return CFormList
 	 */
 	public static function createFormList($name, $type, $view_mode, $known_widget_types, $field_rf_rate) {
+		$deprecated_types = array_intersect_key(
+			$known_widget_types,
+			array_flip(CWidgetConfig::DEPRECATED_WIDGETS)
+		);
+		$known_widget_types = array_diff_key($known_widget_types, $deprecated_types);
+		$types_select = (new CSelect('type'))
+			->setFocusableElementId('label-type')
+			->setId('type')
+			->setValue($type)
+			->addOptions(CSelect::createOptionsFromArray($known_widget_types));
+
+		if (!CSettingsHelper::get(CSettingsHelper::HIDE_DEPRECATED_WIDGETS)) {
+			$types_select->addOptionGroup(
+				(new CSelectOptionGroup(_('Deprecated')))->addOptions(
+					CSelect::createOptionsFromArray($deprecated_types)
+			));
+		}
+		else if ($type === WIDGET_DATA_OVER) {
+			$types_select->addOptionGroup(
+				(new CSelectOptionGroup(_('Deprecated')))->addOption(
+					new CSelectOption($type, $deprecated_types[$type])
+			));
+			$types_select->setReadonly(true);
+		}
+
+		if (!$types_select->getAttribute('readonly')) {
+			$types_select->setAttribute('autofocus', 'autofocus');
+		}
+
 		$form_list = (new CFormList())
 			->addItem((new CListItem([
 					(new CDiv(new CLabel(_('Type'), 'label-type')))->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
@@ -55,12 +84,7 @@ class CWidgetHelper {
 							->setId('show_header')
 							->setChecked($view_mode == ZBX_WIDGET_VIEW_MODE_NORMAL)
 						))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN),
-						(new CSelect('type'))
-							->setFocusableElementId('label-type')
-							->setId('type')
-							->setValue($type)
-							->setAttribute('autofocus', 'autofocus')
-							->addOptions(CSelect::createOptionsFromArray($known_widget_types))
+						$types_select
 					]))->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)
 				]))->addClass('table-forms-row-with-second-field')
 			)

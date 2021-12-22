@@ -22,7 +22,7 @@ define('ZABBIX_VERSION',		'6.0.0beta2');
 define('ZABBIX_API_VERSION',	'6.0.0');
 define('ZABBIX_EXPORT_VERSION',	'6.0');
 
-define('ZABBIX_DB_VERSION',		5050114);
+define('ZABBIX_DB_VERSION',		5050116);
 
 define('DB_VERSION_SUPPORTED',				0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',		1);
@@ -1487,7 +1487,6 @@ define('ZBX_HINTBOX_CONTENT_LIMIT',				8192);
 // dashboard widgets
 define('WIDGET_ACTION_LOG',			'actionlog');
 define('WIDGET_CLOCK',				'clock');
-define('WIDGET_DATA_OVER',			'dataover');
 define('WIDGET_DISCOVERY',			'discovery');
 define('WIDGET_FAV_GRAPHS',			'favgraphs');
 define('WIDGET_FAV_MAPS',			'favmaps');
@@ -1503,10 +1502,13 @@ define('WIDGET_PROBLEM_HOSTS',		'problemhosts');
 define('WIDGET_PROBLEMS',			'problems');
 define('WIDGET_PROBLEMS_BY_SV',		'problemsbysv');
 define('WIDGET_SYSTEM_INFO',		'systeminfo');
+define('WIDGET_TOP_HOSTS_DATA',		'datatable');
 define('WIDGET_TRIG_OVER',			'trigover');
 define('WIDGET_URL',				'url');
 define('WIDGET_WEB',				'web');
 define('WIDGET_ITEM',				'item');
+// Deprecated widgets
+define('WIDGET_DATA_OVER',			'dataover');
 
 // Item widget object positions.
 define('WIDGET_ITEM_POS_LEFT',		0);

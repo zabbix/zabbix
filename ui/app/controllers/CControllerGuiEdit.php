@@ -47,7 +47,8 @@ class CControllerGuiEdit extends CController {
 			'show_technical_errors' =>		'db config.show_technical_errors',
 			'history_period' =>				'db config.history_period',
 			'period_default' =>				'db config.period_default',
-			'max_period' =>					'db config.max_period'
+			'max_period' =>					'db config.max_period',
+			'hide_deprecated_widgets' =>	'db config.hide_deprecated_widgets'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -89,7 +90,10 @@ class CControllerGuiEdit extends CController {
 			'period_default' => $this->getInput('period_default', CSettingsHelper::get(
 				CSettingsHelper::PERIOD_DEFAULT
 			)),
-			'max_period' => $this->getInput('max_period', CSettingsHelper::get(CSettingsHelper::MAX_PERIOD))
+			'max_period' => $this->getInput('max_period', CSettingsHelper::get(CSettingsHelper::MAX_PERIOD)),
+			'hide_deprecated_widgets' => $this->getInput('hide_deprecated_widgets', CSettingsHelper::get(
+				CSettingsHelper::HIDE_DEPRECATED_WIDGETS
+			))
 		];
 
 		$response = new CControllerResponseData($data);

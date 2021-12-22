@@ -22,6 +22,13 @@
 class CWidgetConfig {
 
 	/**
+	 * Array of deprecated widgets constants.
+	 */
+	public const DEPRECATED_WIDGETS = [
+		WIDGET_DATA_OVER
+	];
+
+	/**
 	 * Classifier for non-template dashboards.
 	 */
 	public const CONTEXT_DASHBOARD = 'dashboard';
@@ -63,7 +70,8 @@ class CWidgetConfig {
 			WIDGET_SYSTEM_INFO			=> _('System information'),
 			WIDGET_TRIG_OVER			=> _('Trigger overview'),
 			WIDGET_URL					=> _('URL'),
-			WIDGET_WEB					=> _('Web monitoring')
+			WIDGET_WEB					=> _('Web monitoring'),
+			WIDGET_TOP_HOSTS_DATA		=> _('Top hosts data grid')
 		];
 
 		$types = array_filter($types,
@@ -106,7 +114,8 @@ class CWidgetConfig {
 			WIDGET_SYSTEM_INFO			=> 'CWidget',
 			WIDGET_TRIG_OVER			=> 'CWidgetTrigerOver',
 			WIDGET_URL					=> 'CWidget',
-			WIDGET_WEB					=> 'CWidget'
+			WIDGET_WEB					=> 'CWidget',
+			WIDGET_TOP_HOSTS_DATA		=> 'CWidget'
 		];
 	}
 
@@ -175,7 +184,8 @@ class CWidgetConfig {
 			WIDGET_SYSTEM_INFO			=> ['width' => 12,	'height' => 5],
 			WIDGET_TRIG_OVER			=> ['width' => 12,	'height' => 5],
 			WIDGET_URL					=> ['width' => 12,	'height' => 5],
-			WIDGET_WEB					=> ['width' => 6,	'height' => 3]
+			WIDGET_WEB					=> ['width' => 6,	'height' => 3],
+			WIDGET_TOP_HOSTS_DATA		=> ['width' => 12,	'height' => 5]
 		];
 	}
 
@@ -253,6 +263,7 @@ class CWidgetConfig {
 		switch ($type) {
 			case WIDGET_ACTION_LOG:
 			case WIDGET_DATA_OVER:
+			case WIDGET_TOP_HOSTS_DATA:
 			case WIDGET_DISCOVERY:
 			case WIDGET_GEOMAP:
 			case WIDGET_GRAPH:
