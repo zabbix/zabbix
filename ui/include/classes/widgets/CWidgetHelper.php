@@ -62,12 +62,10 @@ class CWidgetHelper {
 					CSelect::createOptionsFromArray($deprecated_types)
 			));
 		}
-		else if ($type === WIDGET_DATA_OVER) {
-			$types_select->addOptionGroup(
-				(new CSelectOptionGroup(_('Deprecated')))->addOption(
-					new CSelectOption($type, $deprecated_types[$type])
-			));
-			$types_select->setReadonly(true);
+		else if (array_key_exists($type, $deprecated_types)) {
+			$types_select
+				->addOption(new CSelectOption($type, $deprecated_types[$type]))
+				->setReadonly(true);
 		}
 
 		if (!$types_select->getAttribute('readonly')) {
