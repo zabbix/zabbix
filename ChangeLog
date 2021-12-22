@@ -1,3 +1,9 @@
+Changes for 5.0.19rc2
+
+Bug fixes:
+..F....... [ZBX-20382] updated jquery version (ashubin)
+
+--------------------------------------------------------------------------------
 Changes for 5.0.19rc1
 
 New features:
@@ -2336,9 +2342,8 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 --------------------------------------------------------------------------------
 Changes for 4.0.37rc1
 
-New features:
-
 Bug fixes:
+..F....... [ZBX-20382] updated jquery version (ashubin)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.36
