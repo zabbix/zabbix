@@ -128,10 +128,10 @@ int	zbx_ha_set_failover_delay(int delay, char **error)
  ******************************************************************************/
 int	zbx_ha_get_failover_delay(int *delay, char **error)
 {
-	unsigned char		*data;
+	unsigned char	*data;
 
 	if (SUCCEED != zbx_ipc_async_exchange(ZBX_IPC_SERVICE_HA, ZBX_IPC_SERVICE_HA_GET_FAILOVER_DELAY,
-			ZBX_HA_SERVICE_TIMEOUT, (unsigned char *)&delay, sizeof(delay), &data, error))
+			ZBX_HA_SERVICE_TIMEOUT, NULL, 0, &data, error))
 	{
 		return FAIL;
 	}
