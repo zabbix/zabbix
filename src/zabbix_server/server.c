@@ -338,6 +338,14 @@ char	*CONFIG_WEBSERVICE_URL	= NULL;
 
 int	CONFIG_SERVICEMAN_SYNC_FREQUENCY	= 60;
 
+#if defined(HAVE_POSTGRESQL)
+extern int	ZBX_TSDB_VERSION;
+#endif
+
+struct zbx_db_version_info_t	db_version_info;
+
+static volatile sig_atomic_t	zbx_rtc_command;
+
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num)
@@ -1179,9 +1187,8 @@ int	main(int argc, char **argv)
 
 static void	zbx_check_db(void)
 {
-	struct zbx_db_version_info_t	db_version_info;
-	struct zbx_json			db_version_json;
-	int				result = SUCCEED;
+	struct zbx_json	db_version_json;
+	int		result = SUCCEED;
 
 	memset(&db_version_info, 0, sizeof(db_version_info));
 	result = zbx_db_check_version_info(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS);
@@ -1216,6 +1223,11 @@ static void	zbx_check_db(void)
 			zabbix_log(LOG_LEVEL_WARNING, "database could be upgraded to use primary keys in history tables");
 		}
 
+#if defined(HAVE_POSTGRESQL)
+		if (ZBX_TSDB_VERSION > 0)
+			zbx_tsdb_update_dbversion_info(&db_version_info);
+#endif
+
 		zbx_db_version_json_create(&db_version_json, &db_version_info);
 
 		if (SUCCEED == result)
@@ -1226,6 +1238,7 @@ static void	zbx_check_db(void)
 	}
 
 	DBclose();
+
 	zbx_free(db_version_info.friendly_current_version);
 	zbx_free(db_version_info.extension);
 	zbx_free(db_version_info.ext_friendly_current_version);
@@ -1233,6 +1246,7 @@ static void	zbx_check_db(void)
 
 	if(SUCCEED != result)
 	{
+		zbx_free(db_version_info.friendly_current_version);
 		exit(EXIT_FAILURE);
 	}
 }
@@ -1620,6 +1634,7 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 		exit(EXIT_FAILURE);
 	}
 }
+
 
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
