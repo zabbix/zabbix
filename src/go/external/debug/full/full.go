@@ -41,7 +41,7 @@ type Plugin struct {
 var impl Plugin
 
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	p.Debugf("export %s%v", key, params)
+	p.Debugf("export %s%v, with interval: %d", key, params, p.options.Interval)
 
 	if len(params) == 0 {
 		return "debug full test response, without parameters", nil
@@ -80,6 +80,5 @@ func (p *Plugin) Stop() {
 }
 
 func init() {
-	impl.options.Interval = 1
 	plugin.RegisterMetrics(&impl, "DebugFull", "debug.external.full", "Returns test value.")
 }
