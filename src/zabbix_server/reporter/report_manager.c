@@ -443,8 +443,7 @@ static char	*report_create_cookie(zbx_rm_t *manager, const char *sessionid)
 	zbx_json_init(&j, 512);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_SESSIONID, sessionid, ZBX_JSON_TYPE_STRING);
 
-	hmac_sha256(manager->session_key, strlen(manager->session_key), j.buffer, j.buffer_size, &out,
-			sizeof(out));
+	hmac_sha256(manager->session_key, strlen(manager->session_key), j.buffer, j.buffer_size, &out, sizeof(out));
 	memset(&out_str, 0, sizeof(out_str));
 
 	for (i = 0; i < sizeof(out); i++)
