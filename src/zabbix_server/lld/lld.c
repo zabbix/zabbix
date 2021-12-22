@@ -1001,7 +1001,6 @@ int	lld_validate_item_override_no_discover(const zbx_vector_ptr_t *overrides, co
 			{
 				return ZBX_PROTOTYPE_NO_DISCOVER == override_operation->discover ? FAIL : SUCCEED;
 			}
-
 		}
 	}
 
