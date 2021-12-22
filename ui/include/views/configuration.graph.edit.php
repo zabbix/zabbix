@@ -303,7 +303,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 					'with_webitems' => '1',
 					'numeric' => '1',
 					'writeonly' => '1'
-				]).');'
+				]).', getOnlyHostParam()));'
 			)
 			->setEnabled(!$readonly);
 
