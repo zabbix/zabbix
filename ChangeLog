@@ -287,6 +287,12 @@ Bug fixes:
 .........T [ZBX-19395] changed version in links of the templates and the media (mchudinov)
 
 --------------------------------------------------------------------------------
+Changes for 5.4.9rc2
+
+Bug fixes:
+..F....... [ZBX-20382] updated jquery version (ashubin)
+
+--------------------------------------------------------------------------------
 Changes for 5.4.9rc1
 
 New features:
@@ -1447,6 +1453,12 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.19rc2
+
+Bug fixes:
+..F....... [ZBX-20382] updated jquery version (ashubin)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.19rc1
@@ -3787,9 +3799,8 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 --------------------------------------------------------------------------------
 Changes for 4.0.37rc1
 
-New features:
-
 Bug fixes:
+..F....... [ZBX-20382] updated jquery version (ashubin)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.36
