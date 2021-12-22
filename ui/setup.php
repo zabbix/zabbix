@@ -71,30 +71,18 @@ $fields = [
 	'back' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,				null]
 ];
 
-CSessionHelper::set('check_fields_result', check_fields($fields, false));
-if (!CSessionHelper::has('step')) {
-	CSessionHelper::set('step', 0);
-}
+$check_fields_result = check_fields($fields, false);
 
-// if a guest or a non-super admin user is logged in
-if (CWebUser::$data && CWebUser::getType() < USER_TYPE_SUPER_ADMIN) {
-	/*
-	 * On the last step of the setup guest user always logged in. When pressed "Finish" or "Cancel" button, guest user
-	 * must be redirected to the login screen.
-	 */
-	if (CWebUser::isGuest() && (hasRequest('finish') || hasRequest('cancel'))) {
-		redirect('index.php');
-	}
-	// the guest user can also view the last step of the setup
-	// all other user types must not have access to the setup
-	elseif (!(CWebUser::isGuest() && CSessionHelper::get('step') == 6)) {
-		access_deny(ACCESS_DENY_PAGE);
-	}
-}
-// if a super admin or a non-logged in user presses the "Finish" or "Login" button - redirect him to the login screen
-elseif (hasRequest('cancel') || hasRequest('finish')) {
+if (hasRequest('cancel') || hasRequest('finish')) {
 	redirect('index.php');
 }
+
+if (CWebUser::$data && CWebUser::getType() < USER_TYPE_SUPER_ADMIN
+		&& CSessionHelper::get('step') != 6) {
+	access_deny(ACCESS_DENY_PAGE);
+}
+
+CSessionHelper::set('check_fields_result', $check_fields_result);
 
 // Set default language.
 $default_lang = ZBX_DEFAULT_LANG;
