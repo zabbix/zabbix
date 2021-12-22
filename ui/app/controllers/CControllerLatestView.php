@@ -146,7 +146,7 @@ class CControllerLatestView extends CControllerLatest {
 
 		// Prepare subfilter data.
 		$subfilters_fields = self::getSubfilterFields($filter);
-		$subfilters = self::getSubfilters($subfilters_fields, $prepared_data);
+		$subfilters = self::getSubfilters($subfilters_fields, $prepared_data, $filter);
 		$prepared_data['items'] = self::applySubfilters($prepared_data['items']);
 
 		$view_url = (new CUrl('zabbix.php'))->setArgument('action', 'latest.view');
@@ -158,8 +158,8 @@ class CControllerLatestView extends CControllerLatest {
 			'groupids' => $filter['groupids'],
 			'hostids' => $filter['hostids'],
 			'name' => $filter['name'],
-			'show_without_data' => $filter['show_without_data'] ? 1 : null,
-			'show_details' => $filter['show_details'] ? 1 : null,
+			'show_without_data' => $filter['show_without_data'] ? 1 : 0,
+			'show_details' => $filter['show_details'] ? 1 : 0,
 			'evaltype' => $filter['evaltype'],
 			'tags' => $filter['tags'],
 			'show_tags' => $filter['show_tags'],

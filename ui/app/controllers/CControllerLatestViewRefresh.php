@@ -53,7 +53,7 @@ class CControllerLatestViewRefresh extends CControllerLatestView {
 
 			// Prepare subfilter data.
 			$subfilters_fields = self::getSubfilterFields($filter);
-			$subfilters = self::getSubfilters($subfilters_fields, $prepared_data);
+			$subfilters = self::getSubfilters($subfilters_fields, $prepared_data, $filter);
 			$prepared_data['items'] = self::applySubfilters($prepared_data['items']);
 
 			$page = $this->getInput('page', 1);

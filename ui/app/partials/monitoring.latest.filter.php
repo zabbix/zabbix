@@ -181,13 +181,16 @@ $right_column = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Show details')),
 		new CFormField([
-			(new CCheckBox('show_details'))->setChecked(true),
+			(new CCheckBox('show_details'))
+				->setChecked($data['show_details'] == 1)
+				->setUncheckedValue(0)
+				->removeId(),
 			(new CDiv([
 				(new CLabel(_('Show items without data'), 'show_without_data'))
 					->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
 				(new CCheckBox('show_without_data'))
 					->setAttribute('disabled', 'disabled')
-					->setChecked($data['show_without_data'])
+					->setChecked($data['show_without_data'] == 1)
 					->setUncheckedValue(0)
 					->removeId()
 			]))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
@@ -349,9 +352,12 @@ if (array_key_exists('render_html', $data)) {
 		];
 
 		fields.forEach(key => {
-			var elm = $('[name="' + key + '"]', container);
+			const elm = $('[name="' + key + '"]', container);
 
-			if (elm.is(':radio,:checkbox')) {
+			if (key === 'show_without_data' || key === 'show_details') {
+				elm.prop('checked', (data[key] == 1));
+			}
+			else if (elm.is(':radio,:checkbox')) {
 				elm.filter('[value="' + data[key] + '"]').prop('checked', true);
 			}
 			else {
@@ -389,13 +395,15 @@ if (array_key_exists('render_html', $data)) {
 
 		// Show without data can be used only with 1+ hosts.
 		$('#hostids_' + data.uniqid, container).on('change', function (e) {
+			const $chbox = $('[name="show_without_data"]', container);
+
 			if ($(this).multiSelect('getData').length == 0) {
-				$('[name="show_without_data"]').prop('checked', true);
-				$('[name="show_without_data"]').prop('disabled', true);
+				$chbox.prop('checked', true);
+				$chbox.prop('disabled', true);
 			}
 			else {
-				$('[name="show_without_data"]').prop('checked', Boolean(data['show_without_data']));
-				$('[name="show_without_data"]').prop('disabled', false);
+				$chbox.prop('checked', (data['show_without_data'] == 1));
+				$chbox.prop('disabled', false);
 			}
 		});
 

@@ -387,10 +387,12 @@ abstract class CControllerLatest extends CController {
 	 * @param string $prepared_data['hosts'][]['name']
 	 * @param array  $prepared_data['items']
 	 * @param int    $prepared_data['items'][]['hostid']
+	 * @param array  $filter
+	 * @param int    $filter['show_without_data']
 	 *
 	 * @return array
 	 */
-	protected static function getSubfilters(array $subfilters, array &$prepared_data): array {
+	protected static function getSubfilters(array $subfilters, array &$prepared_data, array $filter): array {
 		$subfilter_options = self::getSubfilterOptions($prepared_data, $subfilters);
 		$prepared_data['items'] = self::getItemMatchings($prepared_data['items'], $subfilters);
 
@@ -442,9 +444,11 @@ abstract class CControllerLatest extends CController {
 				}
 			}
 
-			// Data subfilter.
-			$data_key = (int) $item['has_data'];
-			$subfilter_options['data'][$data_key]['count']++;
+			// Data subfilter. Enabled only when 'Show without data' checkbox is on.
+			if ($filter['show_without_data']) {
+				$data_key = (int) $item['has_data'];
+				$subfilter_options['data'][$data_key]['count']++;
+			}
 		}
 
 		return $subfilter_options;
