@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-13 14:04+0200\n"
-"PO-Revision-Date: 2013-10-10 08:35+0300\n"
-"Last-Translator: richlv <richlv@nakts.net>\n"
+"POT-Creation-Date: 2021-12-22 17:24+0200\n"
+"PO-Revision-Date: 2021-12-22 15:20+0300\n"
+"Last-Translator: Yurii <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: none\n"
 "Language: pt_PT\n"
 "MIME-Version: 1.0\n"
@@ -12,18 +12,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1381386929.000000\n"
+"X-POOTLE-MTIME: 1640179210.000000\n"
 
 #: include/classes/items/CHelpItems.php:1089
+#, fuzzy
 msgid "\tThe average time a read from the virtual disk takes , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
-msgstr ""
+msgstr "\tO tempo médio a ler do disco virtual é de, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
 #: include/classes/db/PostgresqlDbBackend.php:96
 #, c-format
 msgid "\"%1$s\" instead \"%2$s\""
-msgstr ""
+msgstr "\"%1$s\" em alternativa a \"%2$s\""
 
 #: include/classes/import/validators/C10XmlValidator.php:321
 #: include/classes/import/validators/C10XmlValidator.php:338
@@ -61,7 +62,7 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:1399
 #, c-format
 msgid "\"%1$s\" value must be less than or equal to \"%2$s\" value"
-msgstr ""
+msgstr "\"%1$s\" o valor deve ser menor ou igual ao valor \"%2$s\""
 
 #: include/classes/import/validators/C10XmlValidator.php:356
 #: include/classes/import/validators/C10XmlValidator.php:378
@@ -74,7 +75,7 @@ msgstr "é esperado par \"host:key\""
 #: include/views/js/configuration.host.discovery.edit.js.php:98
 #: include/views/js/item.preprocessing.js.php:148
 msgid "$.path.to.node"
-msgstr ""
+msgstr "$.path.to.node"
 
 #: include/classes/api/services/CDRule.php:556
 #, c-format
@@ -92,19 +93,19 @@ msgstr[1] "%1$d dias"
 #, c-format
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
-msgstr ""
+msgstr "%1$d correspondências para %2$s encontradas"
 
 #: app/controllers/CControllerWidgetProblemsView.php:55
 #, c-format
 msgid "%1$d of %3$d%2$s problem is shown"
 msgid_plural "%1$d of %3$d%2$s problems are shown"
-msgstr[0] "é mostrado %1$d de %3$d%2$s problema"
-msgstr[1] "são mostrados %1$d de %3$d%2$s problemas"
+msgstr[0] ""
+msgstr[1] ""
 
 #: app/controllers/CControllerPopupAcknowledgeEdit.php:117
 #, c-format
 msgid "%1$d problems selected."
-msgstr ""
+msgstr "%1$d problemas selecionados."
 
 #: chart4.php:94 chart5.php:89
 #, c-format
@@ -112,9 +113,9 @@ msgid "%1$s (year %2$s)"
 msgstr "%1$s (ano %2$s)"
 
 #: include/classes/core/CModuleManager.php:228
-#, c-format
+#, fuzzy, c-format
 msgid "%1$s - thrown by module located at %2$s."
-msgstr ""
+msgstr "%1$s - executado pelo módulo localizado em %2$s."
 
 #: include/classes/api/services/CItemGeneral.php:2608
 #: include/classes/import/readers/CXmlImportReader.php:46
@@ -127,18 +128,18 @@ msgstr "%1$s [Linha: %2$s | Coluna: %3$s]"
 msgctxt "screen reader"
 msgid "%1$s action"
 msgid_plural "%1$s actions"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s ação"
+msgstr[1] "%1$s ações"
 
 #: jsLoader.php:288
 #, c-format
 msgid "%1$s characters"
-msgstr ""
+msgstr "%1$s caracteres"
 
 #: jsLoader.php:289
 #, c-format
 msgid "%1$s characters remaining"
-msgstr ""
+msgstr "%1$s caracteres restantes"
 
 #: app/views/popup.acknowledge.edit.php:60
 #: app/views/popup.acknowledge.edit.php:65
@@ -152,15 +153,15 @@ msgstr[1] "%1$s eventos"
 #, c-format
 msgid "%1$s host in maintenance"
 msgid_plural "%1$s hosts in maintenance"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s servidor em manutenção "
+msgstr[1] "%1$s servidores em manutenção "
 
 #: include/func.inc.php:2625
 #, c-format
 msgid "%1$s hour"
 msgid_plural "%1$s hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s hora"
+msgstr[1] "%1$s horas"
 
 #: app/controllers/CControllerWidgetPlainTextView.php:134
 #: app/controllers/CControllerWidgetPlainTextView.php:135
@@ -176,8 +177,8 @@ msgstr[1] "%1$s items"
 msgctxt "screen reader"
 msgid "%1$s message"
 msgid_plural "%1$s messages"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s mensagem"
+msgstr[1] "%1$s mensagens"
 
 #: include/classes/widgets/CWidgetConfig.php:285
 #: include/classes/widgets/CWidgetConfig.php:286
@@ -201,22 +202,22 @@ msgstr[1] ""
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s preselected, use down,up arrow keys and enter to select"
-msgstr ""
+msgstr "%1$s pré-selecionado, use as teclas de seta para cima e para baixo e enter para selecionar "
 
 #: include/maps.inc.php:340 include/maps.inc.php:344 include/maps.inc.php:351
 #: include/maps.inc.php:400
 #, c-format
 msgid "%1$s problem"
 msgid_plural "%1$s problems"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s problema"
+msgstr[1] "%1$s problemas"
 
 #: include/classes/helpers/CMapHelper.php:319
 #, c-format
 msgid "%1$s problem in total"
 msgid_plural "%1$s problems in total"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s problema no total"
+msgstr[1] "%1$s problemas no total"
 
 #: app/views/monitoring.widget.actionlog.view.php:45
 #: include/actions.inc.php:2117
@@ -242,27 +243,27 @@ msgstr[1] "%1$s segundos"
 #, c-format
 msgid "%1$s unacknowledged problem"
 msgid_plural "%1$s unacknowledged problems"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s problema não reconhecido "
+msgstr[1] "%1$s problemas não reconhecidos "
 
 #: app/views/monitoring.widget.problemhosts.view.php:108
 #: app/views/monitoring.widget.problems.view.php:207
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, Severity, %2$s"
-msgstr ""
+msgstr "%1$s, Gravidade , %2$s"
 
 #: jsLoader.php:302
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, read only"
-msgstr ""
+msgstr "%1$s, somente para leitura"
 
 #: jsLoader.php:345
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, selected"
-msgstr ""
+msgstr "%1$s, selecionado"
 
 #: include/func.inc.php:1880
 #, c-format
@@ -351,7 +352,7 @@ msgstr "últimos 500 valores"
 #: app/views/js/popup.itemtestedit.view.js.php:37
 #: app/views/js/popup.itemtestedit.view.js.php:44
 msgid "<empty string>"
-msgstr ""
+msgstr "<empty string>"
 
 #: include/forms.inc.php:1341 include/views/js/item.preprocessing.js.php:197
 msgid "<label name>"
@@ -1093,7 +1094,7 @@ msgstr "Hosts permitidos"
 msgid "Allowed methods"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:682
+#: include/classes/setup/CSetupWizard.php:696
 msgid "Alternatively, you can install it manually:"
 msgstr "Alternativamente, pode instalar manualmente:"
 
@@ -2033,7 +2034,7 @@ msgstr "Não foi possível criar o mapa de ícones"
 msgid "Cannot create scheduled report"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:678
+#: include/classes/setup/CSetupWizard.php:692
 msgid "Cannot create the configuration file."
 msgstr "Não foi possível criar o arquivo de configuração."
 
@@ -2058,11 +2059,10 @@ msgid "Cannot delete action"
 msgstr "Não foi possível eliminar acção"
 
 #: app/controllers/CControllerCorrelationDelete.php:68
-#, fuzzy
 msgid "Cannot delete correlation"
 msgid_plural "Cannot delete correlations"
 msgstr[0] "Não foi possível eliminar a correlação"
-msgstr[1] "Não foi possível eliminar a correlação"
+msgstr[1] "Não foi possível eliminar as correlações"
 
 #: app/controllers/CControllerDashboardDelete.php:63
 #: app/controllers/CControllerTemplateDashboardDelete.php:61
@@ -2077,11 +2077,10 @@ msgid "Cannot delete dependency"
 msgstr "Não foi possível eliminar dependência"
 
 #: app/controllers/CControllerDiscoveryDelete.php:69 host_discovery.php:412
-#, fuzzy
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
-msgstr[0] "Não foi possível eliminar regra de descoberta"
-msgstr[1] "Não foi possível eliminar regra de descoberta"
+msgstr[0] "Não foi possível eliminar a regra de descoberta"
+msgstr[1] "Não foi possível eliminar as regras de descoberta"
 
 #: host_discovery.php:760
 msgid "Cannot delete discovery rules"
@@ -2290,7 +2289,7 @@ msgstr "Não foi possível eliminar triggers"
 msgid "Cannot delete user"
 msgid_plural "Cannot delete users"
 msgstr[0] "Não foi possível eliminar o utilizador"
-msgstr[1] ""
+msgstr[1] "Não foi possível eliminar os utilizadores"
 
 #: app/controllers/CControllerUsergroupDelete.php:59
 msgid "Cannot delete user group"
@@ -3587,7 +3586,7 @@ msgstr "Configuração"
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "Configuração de estatísticas de cache. Cache - buffer (modes: pfree, total, used, free)."
 
-#: include/classes/setup/CSetupWizard.php:700
+#: include/classes/setup/CSetupWizard.php:723
 #, c-format
 msgid "Configuration file \"%1$s\" created."
 msgstr "O arquivo de configuração \"%1$s\" foi criado."
@@ -3748,7 +3747,7 @@ msgstr "Configura a ligação com o DB"
 msgid "Confirmation text"
 msgstr "Texto de confirmação"
 
-#: include/classes/setup/CSetupWizard.php:698
+#: include/classes/setup/CSetupWizard.php:721
 msgid "Congratulations! You have successfully installed Zabbix frontend."
 msgstr "Parabéns! Instalou com sucesso a interface web do Zabbix."
 
@@ -3966,11 +3965,10 @@ msgid "Correlation added"
 msgstr "Correlacionamento adicionado"
 
 #: app/controllers/CControllerCorrelationDelete.php:65
-#, fuzzy
 msgid "Correlation deleted"
 msgid_plural "Correlations deleted"
 msgstr[0] "Correlacionamento eliminado"
-msgstr[1] "Correlacionamento eliminado"
+msgstr[1] "Correlacionamentos eliminados"
 
 #: app/controllers/CControllerCorrelationDisable.php:72
 msgid "Correlation disabled"
@@ -4506,14 +4504,14 @@ msgstr "Périodo de armazenamento de dados"
 
 #: include/classes/setup/CSetupWizard.php:388
 #: include/classes/setup/CSetupWizard.php:534
-#: include/classes/setup/CSetupWizard.php:740
+#: include/classes/setup/CSetupWizard.php:762
 msgid "Database TLS CA file"
 msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:668
 #: include/classes/setup/CSetupWizard.php:400
 #: include/classes/setup/CSetupWizard.php:540
-#: include/classes/setup/CSetupWizard.php:748
+#: include/classes/setup/CSetupWizard.php:770
 msgid "Database TLS certificate file"
 msgstr ""
 
@@ -4533,7 +4531,7 @@ msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:394
 #: include/classes/setup/CSetupWizard.php:537
-#: include/classes/setup/CSetupWizard.php:744
+#: include/classes/setup/CSetupWizard.php:766
 msgid "Database TLS key file"
 msgstr ""
 
@@ -5486,11 +5484,10 @@ msgid "Discovery rule created"
 msgstr "Regra de descoberta criada"
 
 #: app/controllers/CControllerDiscoveryDelete.php:66 host_discovery.php:412
-#, fuzzy
 msgid "Discovery rule deleted"
 msgid_plural "Discovery rules deleted"
 msgstr[0] "Regra de descoberta eliminada"
-msgstr[1] "Regra de descoberta eliminada"
+msgstr[1] "Regras de descoberta eliminadas"
 
 #: app/controllers/CControllerDiscoveryDisable.php:71 host_discovery.php:747
 msgid "Discovery rule disabled"
@@ -5659,7 +5656,7 @@ msgstr "Descer"
 msgid "Download image"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:684
+#: include/classes/setup/CSetupWizard.php:698
 msgid "Download the configuration file"
 msgstr "Transferir a configuração"
 
@@ -6214,7 +6211,6 @@ msgid "Event ID"
 msgstr "ID do evento"
 
 #: include/actions.inc.php:61
-#, fuzzy
 msgid "Event acknowledged"
 msgstr "Evento reconhecido"
 
@@ -8673,9 +8669,9 @@ msgstr "O nome para o campo \"%1$s\" é inválido ou o valor é incorrecto para 
 msgid "Incorrect fields for sysmap."
 msgstr "Campos inválidos para o mapa do sistema."
 
-#: include/classes/setup/CSetupWizard.php:740
-#: include/classes/setup/CSetupWizard.php:744
-#: include/classes/setup/CSetupWizard.php:748
+#: include/classes/setup/CSetupWizard.php:762
+#: include/classes/setup/CSetupWizard.php:766
+#: include/classes/setup/CSetupWizard.php:770
 #, c-format
 msgid "Incorrect file path for \"%1$s\": %2$s."
 msgstr ""
@@ -8800,7 +8796,7 @@ msgstr "Lista de itens incorrecta."
 
 #: app/controllers/CControllerPopupMaintenancePeriod.php:89
 msgid "Incorrect maintenance - date must be between 1970.01.01 and 2038.01.18"
-msgstr "Período de manutenção inválido - a data deve estar entre 01/01/1970 e 18/01/2038"
+msgstr "Período de manutenção inválido - a data deve estar entre 1970.01.01 e 2038.01.18"
 
 #: app/controllers/CControllerPopupMaintenancePeriod.php:125
 msgid "Incorrect maintenance period (minimum 5 minutes)"
@@ -9447,11 +9443,12 @@ msgid "Insert expression"
 msgstr "Insira a expressão"
 
 #: include/classes/setup/CSetupWizard.php:69
-#: include/classes/setup/CSetupWizard.php:705
+#: include/classes/setup/CSetupWizard.php:704
+#: include/classes/setup/CSetupWizard.php:727
 msgid "Install"
 msgstr "Instalação"
 
-#: setup.php:174
+#: setup.php:162
 msgid "Installation"
 msgstr "Instalação"
 
@@ -10561,7 +10558,7 @@ msgstr ""
 msgid "Length"
 msgstr ""
 
-#: setup.php:197
+#: setup.php:185
 msgid "Licensed under"
 msgstr ""
 
@@ -12635,7 +12632,7 @@ msgstr "Número de itens activados no host."
 
 #: include/blocks.inc.php:536
 msgid "Number of hosts (enabled/disabled)"
-msgstr ""
+msgstr "Número de servidores (ativo/desativado) "
 
 #: include/blocks.inc.php:549
 msgid "Number of items (enabled/disabled/not supported)"
@@ -12661,7 +12658,7 @@ msgstr ""
 
 #: include/classes/items/CHelpItems.php:1189
 msgid "Number of monitored hosts"
-msgstr "Quantidade de hosts monitorados"
+msgstr "Quantidade de servidores monitorizados"
 
 #: include/classes/items/CHelpItems.php:101
 #: include/classes/items/CHelpItems.php:459
@@ -13766,7 +13763,7 @@ msgstr ""
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
 msgstr "Por favor crie a base de dados manualmente e informe os parâmetros de ligação para a base. Pressione o botão \"%1$s\" quando estiver pronto."
 
-#: include/classes/setup/CSetupWizard.php:888
+#: include/classes/setup/CSetupWizard.php:922
 msgid "Please enable \"allow_url_fopen\" directive."
 msgstr ""
 
@@ -14942,7 +14939,7 @@ msgstr "Retorna o valor de um atributo de um objeto MBean."
 
 #: include/classes/items/CHelpItems.php:761
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
-msgstr "Tempo de resposta do ICMP ping. Exemplo: 0,02"
+msgstr "Tempo de resposta do ICMP ping. Exemplo: 0.02"
 
 #: include/classes/items/CHelpItems.php:1181
 msgid "Returns a JSON array describing the host network interfaces configured in Zabbix. Can be used for LLD."
@@ -15292,7 +15289,7 @@ msgstr ""
 msgid "Save changes"
 msgstr "Salvar alterações"
 
-#: include/classes/setup/CSetupWizard.php:685
+#: include/classes/setup/CSetupWizard.php:699
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "Salvar como \"%1$s\""
@@ -16599,7 +16596,7 @@ msgstr "Nome do host. Retorna: texto"
 #: include/classes/helpers/CRoleHelper.php:403
 #: include/classes/widgets/CWidgetConfig.php:61
 msgid "System information"
-msgstr ""
+msgstr "Informação do sistema"
 
 #: include/classes/items/CHelpItems.php:253
 #: include/classes/items/CHelpItems.php:611
@@ -18254,7 +18251,7 @@ msgstr ""
 msgid "User deleted"
 msgid_plural "Users deleted"
 msgstr[0] "Utilizador eliminado"
-msgstr[1] ""
+msgstr[1] "Utilizadores eliminados"
 
 #: app/controllers/CControllerAuditLogList.php:193
 #: app/partials/js/scheduledreport.subscription.js.php:83
@@ -18471,8 +18468,8 @@ msgstr "Nome de utilizador"
 msgid "Username and password"
 msgstr "Utilizador e senha"
 
-#: include/classes/setup/CSetupWizard.php:600
-#: include/classes/setup/CSetupWizard.php:906
+#: include/classes/setup/CSetupWizard.php:614
+#: include/classes/setup/CSetupWizard.php:940
 msgid "Username and password must be stored in Vault secret keys \"username\" and \"password\"."
 msgstr ""
 
@@ -18933,7 +18930,7 @@ msgid "Vault authentication token"
 msgstr ""
 
 #: include/classes/core/ZBase.php:229
-#: include/classes/setup/CSetupWizard.php:902 include/config.inc.php:53
+#: include/classes/setup/CSetupWizard.php:936 include/config.inc.php:53
 msgid "Vault connection failed."
 msgstr ""
 

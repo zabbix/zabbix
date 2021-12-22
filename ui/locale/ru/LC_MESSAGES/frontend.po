@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-13 14:04+0200\n"
+"POT-Creation-Date: 2021-12-22 17:24+0200\n"
 "PO-Revision-Date: 2021-11-13 21:56+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -1116,7 +1116,7 @@ msgstr "Разрешенные хосты"
 msgid "Allowed methods"
 msgstr "Разрешенные методы"
 
-#: include/classes/setup/CSetupWizard.php:682
+#: include/classes/setup/CSetupWizard.php:696
 msgid "Alternatively, you can install it manually:"
 msgstr "В качестве альтернативы, вы можете установить его вручную:"
 
@@ -2064,7 +2064,7 @@ msgstr "Не удалось создать соответствие иконок
 msgid "Cannot create scheduled report"
 msgstr "Не удалось создать регулярный отчет"
 
-#: include/classes/setup/CSetupWizard.php:678
+#: include/classes/setup/CSetupWizard.php:692
 msgid "Cannot create the configuration file."
 msgstr "Не возможно создать конфигурационный файл."
 
@@ -3662,7 +3662,7 @@ msgstr "Настройка"
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "Статистика конфигурационного кэша. Кэш - буфер (режимы: pfree, total, used, free)."
 
-#: include/classes/setup/CSetupWizard.php:700
+#: include/classes/setup/CSetupWizard.php:723
 #, c-format
 msgid "Configuration file \"%1$s\" created."
 msgstr "Файл конфигурации \"%1$s\" создан."
@@ -3823,7 +3823,7 @@ msgstr "Настройка подключения к БД"
 msgid "Confirmation text"
 msgstr "Текст подтверждения"
 
-#: include/classes/setup/CSetupWizard.php:698
+#: include/classes/setup/CSetupWizard.php:721
 msgid "Congratulations! You have successfully installed Zabbix frontend."
 msgstr "Поздравляем! Вы успешно установили Zabbix веб-интерфейс."
 
@@ -4595,14 +4595,14 @@ msgstr "Период хранения данных"
 
 #: include/classes/setup/CSetupWizard.php:388
 #: include/classes/setup/CSetupWizard.php:534
-#: include/classes/setup/CSetupWizard.php:740
+#: include/classes/setup/CSetupWizard.php:762
 msgid "Database TLS CA file"
 msgstr "Файл TLS CA базы данных"
 
 #: include/classes/setup/CFrontendSetup.php:668
 #: include/classes/setup/CSetupWizard.php:400
 #: include/classes/setup/CSetupWizard.php:540
-#: include/classes/setup/CSetupWizard.php:748
+#: include/classes/setup/CSetupWizard.php:770
 msgid "Database TLS certificate file"
 msgstr "Файл TLS сертификата базы данных"
 
@@ -4622,7 +4622,7 @@ msgstr "TLS шифрование базы данных"
 
 #: include/classes/setup/CSetupWizard.php:394
 #: include/classes/setup/CSetupWizard.php:537
-#: include/classes/setup/CSetupWizard.php:744
+#: include/classes/setup/CSetupWizard.php:766
 msgid "Database TLS key file"
 msgstr "Файл TLS ключа базы данных"
 
@@ -5749,7 +5749,7 @@ msgstr "Недоступен"
 msgid "Download image"
 msgstr "Загрузить изображение"
 
-#: include/classes/setup/CSetupWizard.php:684
+#: include/classes/setup/CSetupWizard.php:698
 msgid "Download the configuration file"
 msgstr "Загрузить конфигурационный файл"
 
@@ -8769,9 +8769,9 @@ msgstr "Некорректное имя поля \"%1$s\" или значени�
 msgid "Incorrect fields for sysmap."
 msgstr "Некорректные поля для карты сети."
 
-#: include/classes/setup/CSetupWizard.php:740
-#: include/classes/setup/CSetupWizard.php:744
-#: include/classes/setup/CSetupWizard.php:748
+#: include/classes/setup/CSetupWizard.php:762
+#: include/classes/setup/CSetupWizard.php:766
+#: include/classes/setup/CSetupWizard.php:770
 #, c-format
 msgid "Incorrect file path for \"%1$s\": %2$s."
 msgstr "Некорректный путь к файлу для \"%1$s\": %2$s."
@@ -9543,11 +9543,12 @@ msgid "Insert expression"
 msgstr "Вставить выражение"
 
 #: include/classes/setup/CSetupWizard.php:69
-#: include/classes/setup/CSetupWizard.php:705
+#: include/classes/setup/CSetupWizard.php:704
+#: include/classes/setup/CSetupWizard.php:727
 msgid "Install"
 msgstr "Установка"
 
-#: setup.php:174
+#: setup.php:162
 msgid "Installation"
 msgstr "Инсталляция"
 
@@ -10666,7 +10667,7 @@ msgstr "Легенда"
 msgid "Length"
 msgstr "Длина"
 
-#: setup.php:197
+#: setup.php:185
 msgid "Licensed under"
 msgstr "Распространяется по лицензии"
 
@@ -13881,7 +13882,7 @@ msgstr "Пожалуйста, подтвердите, что хотите уда
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
 msgstr "Пожалуйста, создайте базу данных вручную и укажите параметры конфигурации для соединения с этой базой. Нажмите кнопку \"%1$s\" при завершении."
 
-#: include/classes/setup/CSetupWizard.php:888
+#: include/classes/setup/CSetupWizard.php:922
 msgid "Please enable \"allow_url_fopen\" directive."
 msgstr "Пожалуйста, включите \"allow_url_fopen\" директиву."
 
@@ -15409,7 +15410,7 @@ msgstr "Сохранить как"
 msgid "Save changes"
 msgstr "Сохранить изменения"
 
-#: include/classes/setup/CSetupWizard.php:685
+#: include/classes/setup/CSetupWizard.php:699
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "Сохранить как \"%1$s\""
@@ -18604,8 +18605,8 @@ msgstr "Имя пользователя"
 msgid "Username and password"
 msgstr "Имя пользователя и пароль"
 
-#: include/classes/setup/CSetupWizard.php:600
-#: include/classes/setup/CSetupWizard.php:906
+#: include/classes/setup/CSetupWizard.php:614
+#: include/classes/setup/CSetupWizard.php:940
 msgid "Username and password must be stored in Vault secret keys \"username\" and \"password\"."
 msgstr "Имя пользователя и пароль должны храниться в ключах \"username\" и \"password\" Хранилища секретов."
 
@@ -19066,7 +19067,7 @@ msgid "Vault authentication token"
 msgstr "Токен аутентификации Хранилища"
 
 #: include/classes/core/ZBase.php:229
-#: include/classes/setup/CSetupWizard.php:902 include/config.inc.php:53
+#: include/classes/setup/CSetupWizard.php:936 include/config.inc.php:53
 msgid "Vault connection failed."
 msgstr "Ошибка подключения к Хранилищу."
 
