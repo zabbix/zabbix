@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 The template to monitor VMware vCenter and ESX hypervisor.
 The "VMware Hypervisor" and "VMware Guest" templates are used by discovery and normally should not be manually linked to a host.
 For additional information please check https://www.zabbix.com/documentation/6.0/manual/vm_monitoring
@@ -71,7 +71,7 @@ You can also provide a feedback, discuss the template or ask for help with it at
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 
 ## Setup
 
@@ -125,7 +125,7 @@ No specific Zabbix configuration is required.
 |VMware |VMware: CPU usage in percents |<p>CPU usage as a percentage during the interval.</p> |SIMPLE |vmware.vm.cpu.usage.perf[{$VMWARE.URL},{$VMWARE.VM.UUID}] |
 |VMware |VMware: CPU latency in percents |<p>Percentage of time the virtual machine is unable to run because it is contending for access to the physical CPU(s).</p> |SIMPLE |vmware.vm.cpu.latency[{$VMWARE.URL},{$VMWARE.VM.UUID}] |
 |VMware |VMware: CPU readiness latency in percents |<p>Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU.</p> |SIMPLE |vmware.vm.cpu.readiness[{$VMWARE.URL},{$VMWARE.VM.UUID}] |
-|VMware |VMware: CPU swap-in latence in percents |<p>Percentage of CPU time spent waiting for swap-in.</p> |SIMPLE |vmware.vm.cpu.swapwait[{$VMWARE.URL},{$VMWARE.VM.UUID}] |
+|VMware |VMware: CPU swap-in latency in percents |<p>Percentage of CPU time spent waiting for swap-in.</p> |SIMPLE |vmware.vm.cpu.swapwait[{$VMWARE.URL},{$VMWARE.VM.UUID}] |
 |VMware |VMware: Uptime of guest OS |<p>Total time elapsed since the last operating system boot-up (in seconds).</p> |SIMPLE |vmware.vm.guest.osuptime[{$VMWARE.URL},{$VMWARE.VM.UUID}] |
 |VMware |VMware: Number of bytes received on interface {#IFDESC} |<p>VMware virtual machine network interface input statistics (bytes per second).</p> |SIMPLE |vmware.vm.net.if.in[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME},bps] |
 |VMware |VMware: Number of packets received on interface {#IFDESC} |<p>VMware virtual machine network interface input statistics (packets per second).</p> |SIMPLE |vmware.vm.net.if.in[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME},pps] |
@@ -149,7 +149,7 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|VMware: VM has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:vmware.vm.guest.osuptime[{$VMWARE.URL},{$VMWARE.VM.UUID}].last()}<10m` |WARNING |<p>Manual close: YES</p> |
+|VMware: VM has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/VMware Guest/vmware.vm.guest.osuptime[{$VMWARE.URL},{$VMWARE.VM.UUID}])<10m` |WARNING |<p>Manual close: YES</p> |
 
 ## Feedback
 
@@ -159,7 +159,7 @@ Please report any issues with the template at https://support.zabbix.com
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 
 ## Setup
 
@@ -222,13 +222,13 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|VMware: Hypervisor is down |<p>The service is unavailable or does not accept ICMP ping.</p> |`{TEMPLATE_NAME:icmpping[].last()}=0` |AVERAGE |<p>Manual close: YES</p> |
-|VMware: The {$VMWARE.HV.UUID} health is Red |<p>One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.</p> |`{TEMPLATE_NAME:vmware.hv.sensor.health.state[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}=3` |HIGH |<p>**Depends on**:</p><p>- VMware: The {$VMWARE.HV.UUID} health is Red</p> |
-|VMware: The {$VMWARE.HV.UUID} health is Yellow |<p>One or more components in the appliance might become overloaded soon.</p> |`{TEMPLATE_NAME:vmware.hv.sensor.health.state[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}=2` |AVERAGE |<p>**Depends on**:</p><p>- VMware: The {$VMWARE.HV.UUID} health is Red</p><p>- VMware: The {$VMWARE.HV.UUID} health is Red</p><p>- VMware: The {$VMWARE.HV.UUID} health is Yellow</p> |
-|VMware: The {$VMWARE.HV.UUID} health is Red |<p>One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.</p> |`{TEMPLATE_NAME:vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}=3` |HIGH | |
-|VMware: The {$VMWARE.HV.UUID} health is Yellow |<p>One or more components in the appliance might become overloaded soon.</p> |`{TEMPLATE_NAME:vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}=2` |AVERAGE |<p>**Depends on**:</p><p>- VMware: The {$VMWARE.HV.UUID} health is Red</p> |
-|VMware: Hypervisor has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:vmware.hv.uptime[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}<10m` |WARNING |<p>Manual close: YES</p> |
-|VMware: The multipath count has been changed |<p>The number of available datastore paths less than registered ({#MULTIPATH.COUNT}).</p> |`{TEMPLATE_NAME:vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}].diff()}=1 and {TEMPLATE_NAME:vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}].last()}<{#MULTIPATH.COUNT}` |AVERAGE |<p>Manual close: YES</p> |
+|VMware: Hypervisor is down |<p>The service is unavailable or does not accept ICMP ping.</p> |`last(/VMware Hypervisor/icmpping[])=0` |AVERAGE |<p>Manual close: YES</p> |
+|VMware: The {$VMWARE.HV.UUID} health is Red |<p>One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.</p> |`last(/VMware Hypervisor/vmware.hv.sensor.health.state[{$VMWARE.URL},{$VMWARE.HV.UUID}])=3` |HIGH |<p>**Depends on**:</p><p>- VMware: The {$VMWARE.HV.UUID} health is Red</p> |
+|VMware: The {$VMWARE.HV.UUID} health is Yellow |<p>One or more components in the appliance might become overloaded soon.</p> |`last(/VMware Hypervisor/vmware.hv.sensor.health.state[{$VMWARE.URL},{$VMWARE.HV.UUID}])=2` |AVERAGE |<p>**Depends on**:</p><p>- VMware: The {$VMWARE.HV.UUID} health is Red</p><p>- VMware: The {$VMWARE.HV.UUID} health is Red</p><p>- VMware: The {$VMWARE.HV.UUID} health is Yellow</p> |
+|VMware: The {$VMWARE.HV.UUID} health is Red |<p>One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.</p> |`last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=3` |HIGH | |
+|VMware: The {$VMWARE.HV.UUID} health is Yellow |<p>One or more components in the appliance might become overloaded soon.</p> |`last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=2` |AVERAGE |<p>**Depends on**:</p><p>- VMware: The {$VMWARE.HV.UUID} health is Red</p> |
+|VMware: Hypervisor has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/VMware Hypervisor/vmware.hv.uptime[{$VMWARE.URL},{$VMWARE.HV.UUID}])<10m` |WARNING |<p>Manual close: YES</p> |
+|VMware: The multipath count has been changed |<p>The number of available datastore paths less than registered ({#MULTIPATH.COUNT}).</p> |`last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}],#1)<>last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}],#2) and last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}])<{#MULTIPATH.COUNT}` |AVERAGE |<p>Manual close: YES</p> |
 
 ## Feedback
 
@@ -238,7 +238,7 @@ Please report any issues with the template at https://support.zabbix.com
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 
 ## Setup
 

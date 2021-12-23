@@ -1111,7 +1111,7 @@ class testFormTemplateDashboards extends CWebTest {
 			$this->assertEquals($display_periods, $form->getField('Default page display period')->getOptions()->asText());
 		}
 		else {
-			$this->assertEquals(['Clock', 'Graph (classic)', 'Graph prototype', 'Item', 'Plain text', 'URL'],
+			$this->assertEquals(['Clock', 'Graph (classic)', 'Graph prototype', 'Item value', 'Plain text', 'URL'],
 					$form->getField('Type')->getOptions()->asText()
 			);
 		}

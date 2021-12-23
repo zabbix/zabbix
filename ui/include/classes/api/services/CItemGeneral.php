@@ -1506,7 +1506,9 @@ abstract class CItemGeneral extends CApiService {
 									'params', _('second parameter is expected')
 								));
 							}
-							elseif (!array_key_exists(2, $params)) {
+							elseif (!array_key_exists(2, $params)
+									&& ($params[1] === ZBX_PREPROC_PROMETHEUS_LABEL
+										|| $params[1] === ZBX_PREPROC_PROMETHEUS_FUNCTION)) {
 								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 									'params', _('third parameter is expected')
 								));
@@ -1527,7 +1529,7 @@ abstract class CItemGeneral extends CApiService {
 
 							switch ($params[1]) {
 								case ZBX_PREPROC_PROMETHEUS_VALUE:
-									if ($params[2] !== '') {
+									if (array_key_exists(2, $params) && $params[2] !== '') {
 										self::exception(ZBX_API_ERROR_PARAMETERS,
 											_s('Incorrect value for field "%1$s": %2$s.', 'params',
 												_('invalid Prometheus output')
@@ -2894,5 +2896,34 @@ abstract class CItemGeneral extends CApiService {
 				));
 			}
 		}
+	}
+
+	/**
+	 * Normalize preprocessing step parameters.
+	 *
+	 * @param array  $preprocessing                   Preprocessing steps.
+	 * @param string $preprocessing[<num>]['params']  Preprocessing step parameters.
+	 * @param int    $preprocessing[<num>]['type']    Preprocessing step type.
+	 *
+	 * @return array
+	 */
+	protected function normalizeItemPreprocessingSteps(array $preprocessing): array {
+		foreach ($preprocessing as &$step) {
+			$step['params'] = str_replace("\r\n", "\n", $step['params']);
+			$params = explode("\n", $step['params']);
+
+			switch ($step['type']) {
+				case ZBX_PREPROC_PROMETHEUS_PATTERN:
+					if (!array_key_exists(2, $params)) {
+						$params[2] = '';
+					}
+					break;
+			}
+
+			$step['params'] = implode("\n", $params);
+		}
+		unset($step);
+
+		return $preprocessing;
 	}
 }

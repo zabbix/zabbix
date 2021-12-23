@@ -27,7 +27,7 @@ class CEncryptHelper {
 	/**
 	 * Signature algorithm.
 	 */
-	public const SIGN_ALGO = 'aes-256-ecb';
+	public const SIGN_ALGO = 'sha256';
 
 	/**
 	 * Session secret key.
@@ -82,7 +82,7 @@ class CEncryptHelper {
 	public static function sign(string $data): string {
 		$key = self::getKey();
 
-		return openssl_encrypt($data, self::SIGN_ALGO, $key);
+		return hash_hmac(self::SIGN_ALGO, $data, $key, false);
 	}
 
 	/**
@@ -109,16 +109,5 @@ class CEncryptHelper {
 			' SET session_key='.zbx_dbstr($key).
 			' WHERE '.dbConditionInt('configid', [$db_config['configid']])
 		);
-	}
-
-	/**
-	 * Generate a hash value.
-	 *
-	 * @param string $message
-	 *
-	 * @return string
-	 */
-	public static function hash(string $message): string {
-		return hash('sha256', $message, false);
 	}
 }
