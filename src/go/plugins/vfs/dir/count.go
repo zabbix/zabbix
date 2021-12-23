@@ -133,7 +133,7 @@ func (cp *countParams) skip(path string, d fs.DirEntry) (bool, error) {
 		return true, err
 	}
 
-	s = cp.skipType(d)
+	s = cp.skipType(path, d)
 	if s {
 		return true, nil
 	}
@@ -147,10 +147,14 @@ func (cp *countParams) skip(path string, d fs.DirEntry) (bool, error) {
 		return true, nil
 	}
 
+	if cp.osSkip(path, d) {
+		return true, nil
+	}
+
 	return false, nil
 }
 
-func (cp *countParams) skipType(d fs.DirEntry) bool {
+func (cp *countParams) skipType(path string, d fs.DirEntry) bool {
 	if len(cp.typesInclude) > 0 && !isTypeMatch(cp.typesInclude, d.Type()) {
 		return true
 	}

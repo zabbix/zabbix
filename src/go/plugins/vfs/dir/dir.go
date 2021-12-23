@@ -38,6 +38,7 @@ type common struct {
 	regExclude    *regexp.Regexp
 	regInclude    *regexp.Regexp
 	dirRegExclude *regexp.Regexp
+	files         []fs.FileInfo
 }
 
 //Export -

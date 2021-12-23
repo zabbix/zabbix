@@ -127,6 +127,10 @@ func (sp *sizeParams) skip(path string, d fs.DirEntry) (bool, error) {
 		return true, nil
 	}
 
+	if sp.osSkip(path, d) {
+		return true, nil
+	}
+
 	return false, nil
 }
 
