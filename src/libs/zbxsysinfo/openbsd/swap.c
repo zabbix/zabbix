@@ -316,6 +316,5 @@ int	SYSTEM_SWAP_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 		SET_MSG_RESULT(result, error);
 
-
 	return ret;
 }

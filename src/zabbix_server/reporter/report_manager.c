@@ -1111,7 +1111,6 @@ static void	rm_update_cache_reports(zbx_rm_t *manager, int now)
 		int		nextcheck, start_time, active_since, active_till, reschedule = 0;
 		unsigned char	period, cycle, weekdays;
 
-
 		ZBX_STR2UINT64(reportid, row[0]);
 		zbx_vector_uint64_append(&reportids, reportid);
 
@@ -2149,7 +2148,6 @@ static void	rm_finish_job(zbx_rm_t *manager, zbx_rm_job_t *job, int status, cons
 		{
 			char	*info = NULL;
 			size_t	info_alloc = 0, info_offset = 0;
-
 
 			status = ZBX_REPORT_STATE_SUCCESS;
 			if (batch->sent_num != batch->total_num)

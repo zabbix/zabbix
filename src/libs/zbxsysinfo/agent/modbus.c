@@ -118,7 +118,6 @@ static uint8_t	read_reg_8_less(uint16_t *reg16, modbus_endianness_t endianness)
 			MODBUS_GET_LOW_BYTE(*reg16) : MODBUS_GET_HIGH_BYTE(*reg16));
 }
 
-
 static void	set_serial_params_default(zbx_modbus_connection_serial *serial_params)
 {
 	serial_params->data_bits = 8;
@@ -557,7 +556,6 @@ static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slave
 		dst8 = zbx_malloc(NULL, sizeof(uint8_t) * total_count);
 	else
 		dst16 = zbx_malloc(NULL, sizeof(uint16_t) * total_count);
-
 
 	LOCK_MODBUS;
 

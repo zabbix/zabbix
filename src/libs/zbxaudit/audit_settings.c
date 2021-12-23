@@ -40,4 +40,3 @@ void	zbx_audit_settings_create_entry(int audit_action, zbx_uint64_t configid)
 		zbx_hashset_insert(zbx_get_audit_hashset(), &new_entry, sizeof(new_entry));
 	}
 }
-

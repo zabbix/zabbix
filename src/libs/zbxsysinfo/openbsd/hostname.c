@@ -53,4 +53,3 @@ int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	return rc;
 }
-

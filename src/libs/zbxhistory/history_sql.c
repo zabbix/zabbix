@@ -495,7 +495,6 @@ static int	db_read_values_by_count(zbx_uint64_t itemid, int value_type, zbx_vect
 		step++;
 	}
 
-
 	if (0 < count)
 	{
 		/* no more data in database, return success */

@@ -3532,7 +3532,6 @@ static void lld_item_discovery_prepare_update(const zbx_lld_item_prototype_t *it
 	}
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: lld_items_save                                                   *

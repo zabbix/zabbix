@@ -320,8 +320,6 @@ static int	elastic_is_error_present(zbx_httppage_t *page, char **err)
  *                                                                                                                *
  ******************************************************************************************************************/
 
-
-
 /************************************************************************************
  *                                                                                  *
  * Function: elastic_writer_init                                                    *
@@ -841,7 +839,6 @@ static int	elastic_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid, in
 			ret = FAIL;
 			goto out;
 		}
-
 
 		zabbix_log(LOG_LEVEL_DEBUG, "elasticsearch closing scroll %s", data->post_url);
 

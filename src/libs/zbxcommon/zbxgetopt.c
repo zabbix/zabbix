@@ -20,9 +20,7 @@
    along with this program; if not, write to the Free Software
    Foundation, 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.  */
 
-
 #include "common.h"
-
 
 /* If GETOPT_COMPAT is defined, `+' as well as `--' can introduce a
    long-named option.  Because this is not POSIX.2 compliant, it is
@@ -153,7 +151,6 @@ static int last_nonopt;
        reverse options:     -x -y c b a
        reverse non options: -x -y a b c
 */
-
 
 static void exchange (char **argv)
 {
@@ -605,7 +602,6 @@ int zbx_getopt_long(int argc, char **argv, const char *options,
 {
   return zbx_getopt_internal (argc, argv, options, long_options, opt_index, 0);
 }
-
 
 #ifdef TEST2
 
