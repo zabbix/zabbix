@@ -150,19 +150,16 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 					maxlength: 6
 				})
 					.css('width', ZBX_TEXTAREA_COLOR_WIDTH + 'px')
-					.on('input keydown paste', e => {
+					.on('input keydown paste', (e) => {
 						const color = e.target.value;
 						if (color.length == 0 || color.length == 6) {
 							setPreviewColor(color);
 						}
 					})
-					.keyup(event => {
-						if (event.keyCode == 13) {
-							const color = event.target.value;
-
-							if (color.length == 0 || color.length == 6) {
-								setColorHandler(color);
-							}
+					.on('keypress', (e) => {
+						const color = e.target.value;
+						if (e.keyCode == KEY_ENTER && (color.length == 0 || color.length == 6)) {
+							setColorHandler(e.target.value);
 						}
 					});
 
@@ -176,8 +173,8 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 				})
 					.html(t('Use default'))
 					.on('click', () => setColorHandler(''));
-
 				options = $.extend(defaults, options || {});
+
 				overlay = $('<div>', {
 					class: 'overlay-dialogue',
 					id: 'color_picker'
@@ -192,14 +189,14 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 						$.map(options.palette, (colors) => {
 							return $('<div>', {class: 'color-picker'}).append(
 								$.map(colors, (color) => {
-									return $('<div>', {'title': '#' + color})
+									return $('<button>', {'title': '#' + color, type: 'button'})
 										.css('background', '#' + color)
 										.data('color', color);
 								})
 							);
 						})
 					)
-					.on('click', '.color-picker div', function () {
+					.on('click', '.color-picker button', function () {
 						setColorHandler($(this).data('color'));
 					});
 
@@ -334,34 +331,29 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 			const callback = (options && 'onUpdate' in options) ? options.onUpdate : null;
 
 			if ($('#lbl_' + id).length) {
-				// Prevent multiple initialization on same element.
 				return;
 			}
 
-			$('<div>')
-				.attr({
-					id: 'lbl_' + id,
-					tabindex: 0,
-					title: element.value ? '#' + element.value : '',
-					'data-use-default': t('D')
+			$('<button>', {
+				id: 'lbl_' + id,
+				type: 'button',
+				title: element.value ? '#' + element.value : ''
+			})
+				.data('use-default', t('D'))
+				.on('keydown', function (e) {
+					if (e.keyCode == KEY_ENTER || e.keyCode == KEY_SPACE) {
+						e.preventDefault();
+						methods.show(id, e.target);
+					}
 				})
-				.on('click', (event) => {
-					/**
-					 * Prefix 'lbl_' should be striped out of colorbox id attribute value to get id of associated input
-					 * element.
-					 */
-					methods.show(id, event);
+				.on('click', function (e) {
+					methods.show(id, e.target);
 				})
-				.insertAfter(element)
-				.keyup(event => (event.keyCode == 32) ? methods.show(id, event) : null);
+				.insertAfter(element);
 
 			$(element)
 				.data('use_default', (options && 'use_default' in options))
 				.change(function () {
-					/**
-					 * Id attribute value of input element can be changed dynamically, for example when row with
-					 * colorpicker is sorted in graph configuration form.
-					 */
 					methods.set_color_by_id($(element).attr('id'), this.value);
 					callback && callback.call(element, this.value);
 				});
