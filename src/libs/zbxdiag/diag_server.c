@@ -542,4 +542,3 @@ int	diag_add_section_info(const char *section, const struct zbx_json_parse *jp, 
 
 	return ret;
 }
-

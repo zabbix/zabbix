@@ -472,7 +472,6 @@ static duk_ret_t	es_httprequest_customrequest(duk_context *ctx)
 	return es_httprequest_query(ctx, method);
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: es_httprequest_set_proxy                                         *

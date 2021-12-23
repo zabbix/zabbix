@@ -1182,7 +1182,6 @@ static int	eval_append_operand(zbx_eval_context_t *ctx, zbx_eval_token_t *token,
 	return SUCCEED;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: eval_append_arg_null                                             *

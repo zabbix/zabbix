@@ -325,7 +325,6 @@ static zbx_uint64_t	evt_req_chunk_size;
 #	define ZBX_XPATH_LN2(LN1, LN2)		"/" ZBX_XPATH_LN(LN1) ZBX_XPATH_LN(LN2)
 #	define ZBX_XPATH_LN3(LN1, LN2, LN3)	"/" ZBX_XPATH_LN(LN1) ZBX_XPATH_LN(LN2) ZBX_XPATH_LN(LN3)
 
-
 #define ZBX_XPATH_PROP_OBJECTS_ID(type, id)								\
 	"/*/*/*/*/*[local-name()='objects'][*[local-name()='obj'][@type='" type "']" id "][1]"
 
@@ -964,7 +963,6 @@ static void	vmware_entities_shared_clean_stats(zbx_hashset_t *entities)
 	zbx_vmware_perf_entity_t	*entity;
 	zbx_vmware_perf_counter_t	*counter;
 	zbx_hashset_iter_t		iter;
-
 
 	zbx_hashset_iter_reset(entities, &iter);
 	while (NULL != (entity = (zbx_vmware_perf_entity_t *)zbx_hashset_iter_next(&iter)))
@@ -2299,7 +2297,6 @@ static int	vmware_service_get_perf_counter_refreshrate(zbx_vmware_service_t *ser
 	int	ret = FAIL;
 	xmlDoc	*doc = NULL;
 
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type: %s id: %s", __func__, type, id);
 
 	id_esc = xml_escape_dyn(id);
@@ -2864,7 +2861,6 @@ out:
 
 	return ret;
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -3609,7 +3605,6 @@ static zbx_uint64_t	vmware_hv_get_ds_access(xmlDoc *xdoc, const char *ds_id)
 	xmlXPathObject		*xpathObj;
 	xmlNode			*xml_node;
 	char			*value;
-
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() for DS:%s", __func__, ds_id);
 
@@ -6132,7 +6127,6 @@ static void	vmware_service_retrieve_perf_counters(zbx_vmware_service_t *service,
 			else
 				start_counter = j;
 
-
 			if (ZBX_VMWARE_PERF_INTERVAL_NONE != entity->refresh)
 			{
 				zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:intervalId>%d</ns0:intervalId>",
@@ -6454,7 +6448,6 @@ out:
 
 	return service;
 }
-
 
 /******************************************************************************
  *                                                                            *

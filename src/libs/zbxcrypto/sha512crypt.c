@@ -252,7 +252,6 @@ sha512_finish_ctx (struct sha512_ctx *ctx, void *resbuf)
 	return resbuf;
 }
 
-
 static void
 sha512_process_bytes (const void *buffer, size_t len, struct sha512_ctx *ctx)
 {

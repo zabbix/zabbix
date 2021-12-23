@@ -1934,7 +1934,6 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, const char *hostname, zbx_ve
 
 	DBfree_result(result);
 
-
 	sql_offset = 0;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -5977,7 +5976,6 @@ clean:
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&host_prototype_ids);
 	zbx_vector_str_destroy(&host_prototype_names);
-
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
