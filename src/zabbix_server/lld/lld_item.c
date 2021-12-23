@@ -2552,7 +2552,6 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, zbx_vector_p
 				zbx_vector_ptr_remove_noorder(&item_prototype->lld_rows, j);
 				break;
 			}
-
 		}
 	}
 

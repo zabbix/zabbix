@@ -1004,7 +1004,7 @@ int	lld_validate_item_override_no_discover(const zbx_vector_ptr_t *overrides, co
 		}
 	}
 
-	return ZBX_PROTOTYPE_NO_DISCOVER != override_default ? SUCCEED : FAIL;
+	return ZBX_PROTOTYPE_NO_DISCOVER == override_default ? FAIL : SUCCEED;
 }
 
 static int	lld_rows_get(const char *value, lld_filter_t *filter, zbx_vector_ptr_t *lld_rows,
