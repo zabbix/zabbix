@@ -47,9 +47,14 @@ func createSigsChan() chan os.Signal {
 	return sigs
 }
 
-func handleSig(sig os.Signal) {
+// handleSig() checks received signal and returns true if the signal is handled
+// and can be ignored, false if the progam should stop.
+// Needed for consistency with Unix.
+func handleSig(sig os.Signal) bool {
 	switch sig {
 	case syscall.SIGINT, syscall.SIGTERM:
 		sendServiceStop()
 	}
+
+	return false
 }
