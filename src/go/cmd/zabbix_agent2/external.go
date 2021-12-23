@@ -155,7 +155,6 @@ func removeSocket(socket string) error {
 }
 
 func removePath(privateOptions interface{}) interface{} {
-
 	if root, ok := privateOptions.(*conf.Node); ok {
 		for i, v := range root.Nodes {
 			if node, ok := v.(*conf.Node); ok {

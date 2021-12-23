@@ -553,20 +553,6 @@ func parseConfig(root *Node, data []byte) (err error) {
 	return nil
 }
 
-func convertMap(parent *Node, props map[string]interface{}) {
-	if nodes, ok := props["Nodes"]; ok {
-		node := &Node{Name: props["Name"].(string), Line: int(props["Line"].(float64)), Nodes: make([]interface{}, 0)}
-		parent.Nodes = append(parent.Nodes, node)
-		for _, n := range nodes.([]interface{}) {
-			convertMap(node, n.(map[string]interface{}))
-		}
-	} else {
-		v := &Value{Line: int(props["Line"].(float64))}
-		v.Value, _ = base64.StdEncoding.DecodeString(props["Value"].(string))
-		parent.Nodes = append(parent.Nodes, v)
-	}
-}
-
 func addObject(parent *Node, v interface{}) error {
 	if attr, ok := v.(map[string]interface{}); ok {
 		if _, ok := attr["Nodes"]; ok {

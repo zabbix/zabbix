@@ -538,18 +538,6 @@ func Test_checkGlobPattern(t *testing.T) {
 	}
 }
 
-func dumpNode(v interface{}, ident string) {
-	switch u := v.(type) {
-	case *Node:
-		fmt.Printf("%sname:%s\n", ident, u.Name)
-		for _, n := range u.Nodes {
-			dumpNode(n, ident+"  ")
-		}
-	case *Value:
-		fmt.Printf("%svalue:%s\n", ident, string(u.Value))
-	}
-}
-
 func Test_jsonMarshaling(t *testing.T) {
 	type Options struct {
 		LogFile  string
