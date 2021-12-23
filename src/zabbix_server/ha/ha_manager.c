@@ -125,7 +125,7 @@ static int	ha_db_execute(zbx_ha_info_t *info, const char *sql, ...) __zbx_attr_f
  *               FAIL    - error occurred                                     *
  *                                                                            *
  ******************************************************************************/
-int	ha_manager_send_message(zbx_uint32_t code, int timeout, const unsigned char *data, zbx_uint32_t size,
+static int	ha_manager_send_message(zbx_uint32_t code, int timeout, const unsigned char *data, zbx_uint32_t size,
 		unsigned char **out, char **error)
 {
 	zbx_ipc_message_t	*message;

@@ -34,6 +34,7 @@ void 	zbx_rtc_dispatch(zbx_ipc_client_t *client, zbx_ipc_message_t *message);
 
 /* client API */
 int	zbx_rtc_process(const char *option, char **error);
+int	rtc_parse_options(const char *opt, zbx_uint32_t *code, char **data, char **error);
 int	zbx_rtc_open(zbx_ipc_async_socket_t *asocket, int timeout, char **error);
 
 #endif
