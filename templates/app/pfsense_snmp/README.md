@@ -32,7 +32,7 @@ No specific Zabbix configuration is required.
 |{$ICMP_LOSS_WARN} |<p>Threshold of ICMP packets loss for warning trigger in %.</p> |`20` |
 |{$ICMP_RESPONSE_TIME_WARN} |<p>Threshold of average ICMP response time for warning trigger in seconds.</p> |`0.15` |
 |{$IF.ERRORS.WARN} |<p>Threshold of error packets rate for warning trigger. Can be used with interface name as context.</p> |`2` |
-|{$IF.UTIL.MAX} |<p>Threshold of interface bandwith utilization for warning trigger in %. Can be used with interface name as context.</p> |`90` |
+|{$IF.UTIL.MAX} |<p>Threshold of interface bandwidth utilization for warning trigger in %. Can be used with interface name as context.</p> |`90` |
 |{$IFCONTROL} |<p>Macro for operational state of the interface for link down trigger. Can be used with interface name as context.</p> |`1` |
 |{$LOAD_AVG_PER_CPU.MAX.WARN} |<p>Load per CPU considered sustainable. Tune if needed.</p> |`1.5` |
 |{$MEMORY.AVAILABLE.MIN} |<p>Threshold of available memory for trigger in bytes.</p> |`20M` |
