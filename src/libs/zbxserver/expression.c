@@ -799,8 +799,8 @@ static int	DBget_trigger_error(const DB_TRIGGER *trigger, char **replace_to)
 		goto out;
 	}
 
-	if (NULL != (row = DBfetch(result)))
-		*replace_to = zbx_strdup(*replace_to, row[0]);
+	*replace_to = zbx_strdup(*replace_to, (NULL == (row = DBfetch(result))) ?  "" : row[0]);
+
 	DBfree_result(result);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
