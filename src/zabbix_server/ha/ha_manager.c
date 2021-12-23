@@ -1353,13 +1353,7 @@ static void	ha_send_status(zbx_ha_info_t *info, zbx_ipc_client_t *client)
 	ret = zbx_ipc_client_send(client, ZBX_IPC_SERVICE_HA_STATUS, data, len);
 	zbx_free(data);
 
-	if (SUCCEED != ret)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot send HA response");
-		exit(EXIT_FAILURE);
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 }
 
 
