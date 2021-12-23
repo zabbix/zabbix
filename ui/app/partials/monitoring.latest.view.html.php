@@ -80,7 +80,8 @@ foreach ($data['items'] as $itemid => $item) {
 	$state_css = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? ZBX_STYLE_GREY : null;
 
 	$item_name = (new CDiv([
-		(new CSpan($item['name_expanded']))->addClass('label'),
+		(new CLinkAction($item['name_expanded']))
+		->setMenuPopup(CMenuPopupHelper::getItemData(['itemid' => $itemid, 'context' => 'host'])),
 		($item['description_expanded'] !== '') ? makeDescriptionIcon($item['description_expanded']) : null
 	]))->addClass('action-container');
 
@@ -166,16 +167,7 @@ foreach ($data['items'] as $itemid => $item) {
 		->setMenuPopup(CMenuPopupHelper::getHost($item['hostid']));
 
 	if ($data['filter']['show_details']) {
-		$item_config_url = (new CUrl('items.php'))
-			->setArgument('form', 'update')
-			->setArgument('itemid', $itemid)
-			->setArgument('context', 'host');
-
-		$item_key = ($item['type'] == ITEM_TYPE_HTTPTEST)
-			? (new CSpan($item['key_expanded']))->addClass(ZBX_STYLE_GREEN)
-			: (new CLink($item['key_expanded'], $item_config_url))
-				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(ZBX_STYLE_GREEN);
+		$item_key = (new CSpan($item['key_expanded']))->addClass(ZBX_STYLE_GREEN);
 
 		if (in_array($item['type'], [ITEM_TYPE_SNMPTRAP, ITEM_TYPE_TRAPPER, ITEM_TYPE_DEPENDENT])
 				|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_expanded'], 'mqtt.get', 8) === 0)) {

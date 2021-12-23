@@ -154,6 +154,10 @@ jQuery(function($) {
 				sections = getMenuPopupItem(data, $obj);
 				break;
 
+			case 'item_data':
+				sections = getMenuPopupItemData(data);
+				break;
+
 			case 'item_prototype':
 				sections = getMenuPopupItemPrototype(data);
 				break;

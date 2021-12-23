@@ -23,7 +23,7 @@ class CControllerMenuPopup extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'type' => 'required|in history,host,item,item_prototype,map_element,refresh,trigger,trigger_macro,widget_actions',
+			'type' => 'required|in history,host,item,item_data,item_prototype,map_element,refresh,trigger,trigger_macro,widget_actions',
 			'data' => 'array'
 		];
 
@@ -263,6 +263,68 @@ class CControllerMenuPopup extends CController {
 					'triggerid' => $db_trigger['triggerid'],
 					'name' => $db_trigger['description']
 				];
+			}
+
+			return $menu_data;
+		}
+
+		error(_('No permissions to referred object or it does not exist!'));
+
+		return null;
+	}
+
+	/**
+	 * Prepare data for item latest data context menu popup.
+	 *
+	 * @param array  $data
+	 * @param string $data['itemid']
+	 * @param bool   $data['has_goto']           (optional) Can be used to hide "GO TO" menu section. Default: true.
+	 *
+	 * @return mixed
+	 */
+	private static function getMenuDataItemData(array $data) {
+		$has_goto = !array_key_exists('has_goto', $data) || $data['has_goto'];
+
+		$db_items = $has_goto
+			? API::Item()->get([
+				'output' => ['hostid', 'value_type', 'history', 'trends'],
+				'itemids' => $data['itemid']
+			])
+			: API::Item()->get([
+				'output' => ['hostid'],
+				'itemids' => $data['itemid']
+			]);
+
+		if ($db_items) {
+			$db_item = $db_items[0];
+			$rw_hosts = false;
+
+			if ($has_goto && CWebUser::getType() > USER_TYPE_ZABBIX_USER) {
+				$rw_hosts = (bool) API::Host()->get([
+					'output' => [],
+					'hostids' => $db_item['hostid'],
+					'editable' => true
+				]);
+			}
+
+			$menu_data = [
+				'type' => 'item_data',
+				'itemid' => $data['itemid'],
+				'hostid' => $db_item['hostid'],
+				'hasGoTo' => $has_goto
+			];
+
+			if ($has_goto) {
+				$menu_data['showGraph'] = ($db_item['value_type'] === ITEM_VALUE_TYPE_FLOAT
+					|| $db_item['value_type'] === ITEM_VALUE_TYPE_UINT64
+				);
+				$menu_data['history'] = $db_item['history'] !== '0';
+				$menu_data['trends'] = $db_item['trends'] !== '0';
+				$menu_data['isWriteable'] = $rw_hosts;
+				$menu_data['allowed_ui_hosts'] = CWebUser::checkAccess(CRoleHelper::UI_MONITORING_HOSTS);
+				$menu_data['allowed_ui_conf_hosts'] = CWebUser::checkAccess(
+					CRoleHelper::UI_CONFIGURATION_HOSTS
+				);
 			}
 
 			return $menu_data;
@@ -749,6 +811,10 @@ class CControllerMenuPopup extends CController {
 
 			case 'item':
 				$menu_data = self::getMenuDataItem($data);
+				break;
+
+			case 'item_data':
+				$menu_data = self::getMenuDataItemData($data);
 				break;
 
 			case 'item_prototype':

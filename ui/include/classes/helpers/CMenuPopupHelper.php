@@ -181,6 +181,25 @@ class CMenuPopupHelper {
 	}
 
 	/**
+	 * Prepare data for item latest data popup menu.
+	 *
+	 * @param array  $data
+	 * @param string $data['itemid']   Item ID.
+	 * @param string $data['context']  Additional parameter in URL to identify main section.
+	 *
+	 * @return array
+	 */
+	public static function getItemData(array $data): array {
+		return [
+			'type' => 'item_data',
+			'data' => [
+				'itemid' => $data['itemid']
+			],
+			'context' => $data['context']
+		];
+	}
+
+	/**
 	 * Prepare data for item prototype popup menu.
 	 *
 	 * @param array  $data
