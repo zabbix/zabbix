@@ -220,7 +220,6 @@ int	DBconnect(int flag)
  *                                                                            *
  * Function: DBinit                                                           *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 int	DBinit(char **error)
@@ -239,7 +238,6 @@ void	DBdeinit(void)
  *                                                                            *
  * Purpose: helper function to loop transaction operation while DB is down    *
  *                                                                            *
- * Author: Eugene Grigorjev, Vladimir Levijev                                 *
  *                                                                            *
  ******************************************************************************/
 static void	DBtxn_operation(int (*txn_operation)(void))
@@ -268,7 +266,6 @@ static void	DBtxn_operation(int (*txn_operation)(void))
  *                                                                            *
  * Purpose: start a transaction                                               *
  *                                                                            *
- * Author: Eugene Grigorjev, Vladimir Levijev                                 *
  *                                                                            *
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
@@ -284,7 +281,6 @@ void	DBbegin(void)
  *                                                                            *
  * Purpose: commit a transaction                                              *
  *                                                                            *
- * Author: Eugene Grigorjev, Vladimir Levijev                                 *
  *                                                                            *
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
@@ -306,7 +302,6 @@ int	DBcommit(void)
  *                                                                            *
  * Purpose: rollback a transaction                                            *
  *                                                                            *
- * Author: Eugene Grigorjev, Vladimir Levijev                                 *
  *                                                                            *
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
@@ -1317,7 +1312,6 @@ static char	buf_string[640];
  *                                                                            *
  * Return value: <host> or "???" if host not found                            *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 const char	*zbx_host_string(zbx_uint64_t hostid)
@@ -1347,7 +1341,6 @@ const char	*zbx_host_string(zbx_uint64_t hostid)
  *                                                                            *
  * Return value: <host>:<key> or "???" if item not found                      *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 const char	*zbx_host_key_string(zbx_uint64_t itemid)
@@ -1447,7 +1440,6 @@ out:
  *                                                                            *
  * Return value: "Name Surname (Alias)" or "unknown" if user not found        *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 const char	*zbx_user_string(zbx_uint64_t userid)
@@ -1518,7 +1510,6 @@ out:
  * Return value: "=<id>" if id not equal zero,                                *
  *               otherwise " is null"                                         *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: NB! Do not use this function more than once in same SQL query    *
  *                                                                            *
@@ -1544,7 +1535,6 @@ const char	*DBsql_id_cmp(zbx_uint64_t id)
  *                                                                            *
  * Parameters: host - host name                                               *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
@@ -1889,7 +1879,6 @@ void	DBregister_host_clean(zbx_vector_ptr_t *autoreg_hosts)
  *                                                                            *
  * Parameters: host - host name                                               *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 void	DBproxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port,
@@ -1921,7 +1910,6 @@ void	DBproxy_register_host(const char *host, const char *ip, const char *dns, un
  *                                                                            *
  * Purpose: execute a set of SQL statements IF it is big enough               *
  *                                                                            *
- * Author: Dmitry Borovikov                                                   *
  *                                                                            *
  ******************************************************************************/
 int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
@@ -1975,7 +1963,6 @@ int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
  *                                                                            *
  * Return value: unique host name which does not exist in the database        *
  *                                                                            *
- * Author: Dmitry Borovikov                                                   *
  *                                                                            *
  * Comments: the sample cannot be empty                                       *
  *           constructs new by adding "_$(number+1)", where "number"          *
@@ -2075,7 +2062,6 @@ clean:
  * Return value: "<id>" if id not equal zero,                                 *
  *               otherwise "null"                                             *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 const char	*DBsql_id_ins(zbx_uint64_t id)
@@ -2104,7 +2090,6 @@ const char	*DBsql_id_ins(zbx_uint64_t id)
  *                                                                            *
  * Return value: field name or NULL if value of inventory_link is incorrect   *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 const char	*DBget_inventory_field(unsigned char inventory_link)

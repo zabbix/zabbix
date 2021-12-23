@@ -61,7 +61,6 @@ extern ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
  * Return value: SUCCEED - on splitting without errors                        *
  *               FAIL - on splitting with errors                              *
  *                                                                            *
- * Author: Dmitry Borovikov, Aleksandrs Saveljevs                             *
  *                                                                            *
  * Comments: Memory for "part1" and "part2" is allocated only on SUCCEED.     *
  *                                                                            *
@@ -118,7 +117,6 @@ out:
  * Return value: SUCCEED - on successful splitting                            *
  *               FAIL - on unable to split sensibly                           *
  *                                                                            *
- * Author: Dmitry Borovikov                                                   *
  *                                                                            *
  * Comments: Allocates memory for "directory" and "filename_regexp" only on   *
  *           SUCCEED. On FAIL memory, allocated for "directory" and           *
@@ -1486,7 +1484,6 @@ static int	find_old2new(const char * const old2new, int num_new, int i_old)
  *             filename - name of a logfile (with full path)                  *
  *             st - structure returned by stat()                              *
  *                                                                            *
- * Author: Dmitry Borovikov                                                   *
  *                                                                            *
  ******************************************************************************/
 static void	add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num, const char *filename,
@@ -2462,7 +2459,6 @@ out:
  * Return value: returns SUCCEED on successful reading,                       *
  *               FAIL on other cases                                          *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments:                                                                  *
  *           This function does not deal with log file rotation.              *

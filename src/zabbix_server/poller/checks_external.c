@@ -37,7 +37,6 @@ extern char	*CONFIG_EXTERNALSCRIPTS;
  *                         and result_str (as string)                         *
  *               NOTSUPPORTED - requested item is not supported               *
  *                                                                            *
- * Author: Mike Nestor, rewritten by Alexander Vladishev                      *
  *                                                                            *
  ******************************************************************************/
 int	get_value_external(const DC_ITEM *item, AGENT_RESULT *result)

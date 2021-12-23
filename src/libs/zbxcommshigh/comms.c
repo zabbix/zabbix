@@ -224,7 +224,6 @@ out:
  * Return value: SUCCEED - data successfully transmitted                      *
  *               NETWORK_ERROR - network related error occurred               *
  *                                                                            *
- * Author: Alexander Vladishev, Alexei Vladishev                              *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *

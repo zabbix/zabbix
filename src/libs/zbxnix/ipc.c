@@ -32,7 +32,6 @@
  * Return value: If the function succeeds, then return SHM ID                 *
  *               -1 on an error                                               *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
 int	zbx_shm_create(size_t size)
@@ -60,7 +59,6 @@ int	zbx_shm_create(size_t size)
  * Return value: If the function succeeds, then return 0                      *
  *               -1 on an error                                               *
  *                                                                            *
- * Author: Andrea Biscuola                                                    *
  *                                                                            *
  ******************************************************************************/
 int	zbx_shm_destroy(int shmid)

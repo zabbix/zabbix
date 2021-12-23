@@ -40,7 +40,6 @@ static zbx_int64_t	json_parse_object(const char *start, char **error);
  * Return value: 0 - the json_error() function always returns 0 value         *
  *                      so it can be used to return from failed parses        *
  *                                                                            *
- * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
 static zbx_int64_t	json_error(const char *message, const char *json_buffer, char **error)
@@ -69,7 +68,6 @@ static zbx_int64_t	json_error(const char *message, const char *json_buffer, char
  *               error parameter (if not NULL) contains allocated error       *
  *               message.                                                     *
  *                                                                            *
- * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
 static zbx_int64_t	json_parse_string(const char *start, char **error)
@@ -146,7 +144,6 @@ static zbx_int64_t	json_parse_string(const char *start, char **error)
  *               error parameter (if not NULL) contains allocated error       *
  *               message.                                                     *
  *                                                                            *
- * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
 static zbx_int64_t	json_parse_array(const char *start, char **error)
@@ -195,7 +192,6 @@ static zbx_int64_t	json_parse_array(const char *start, char **error)
  *               error parameter (if not NULL) contains allocated error       *
  *               message.                                                     *
  *                                                                            *
- * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
 static zbx_int64_t	json_parse_number(const char *start, char **error)
@@ -271,7 +267,6 @@ static zbx_int64_t	json_parse_number(const char *start, char **error)
  *               error parameter (if not NULL) contains allocated error       *
  *               message.                                                     *
  *                                                                            *
- * Author: Andris Zeila                                                       *
  *                                                                            *
  * Comments: This function is used to parse JSON literal values null, true    *
  *           false.                                                           *
@@ -305,7 +300,6 @@ static zbx_int64_t	json_parse_literal(const char *start, const char *text, char 
  *               error parameter (if not NULL) contains allocated error       *
  *               message.                                                     *
  *                                                                            *
- * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
 zbx_int64_t	json_parse_value(const char *start, char **error)
@@ -377,7 +371,6 @@ zbx_int64_t	json_parse_value(const char *start, char **error)
  *               error parameter (if not NULL) contains allocated error       *
  *               message.                                                     *
  *                                                                            *
- * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
 static zbx_int64_t	json_parse_object(const char *start, char **error)
@@ -448,7 +441,6 @@ static zbx_int64_t	json_parse_object(const char *start, char **error)
  *               error parameter (if not NULL) contains allocated error       *
  *               message.                                                     *
  *                                                                            *
- * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
 zbx_int64_t	zbx_json_validate(const char *start, char **error)

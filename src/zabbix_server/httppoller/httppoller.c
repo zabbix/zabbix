@@ -40,7 +40,6 @@ extern ZBX_THREAD_LOCAL int		server_num, process_num;
  *                                                                            *
  * Return value: timestamp of earliest check or -1 if not found               *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
 static int	get_minnextcheck(void)
@@ -86,7 +85,6 @@ static int	get_minnextcheck(void)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: never returns                                                    *
  *                                                                            *

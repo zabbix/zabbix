@@ -59,7 +59,6 @@ static void	zbx_housekeeper_sigusr_handler(int flags)
  *                                                                            *
  * Return value: number of rows records                                       *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -139,7 +138,6 @@ rollback:
  * Return value: SUCCEED - information removed successfully                   *
  *               FAIL - otherwise                                             *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *

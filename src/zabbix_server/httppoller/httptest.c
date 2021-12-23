@@ -91,7 +91,6 @@ static size_t	curl_ignore_cb(void *ptr, size_t size, size_t nmemb, void *userdat
  *                                                                            *
  * Parameters: httptest - [IN] the http test data                             *
  *                                                                            *
- * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
 static void	httptest_remove_macros(zbx_httptest_t *httptest)
@@ -631,7 +630,6 @@ out:
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1063,7 +1061,6 @@ httptest_error:
  *                                                                            *
  * Return value: number of processed httptests                                *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: always SUCCEED                                                   *
  *                                                                            *

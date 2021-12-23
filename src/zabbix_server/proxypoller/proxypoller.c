@@ -509,7 +509,6 @@ out:
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *

@@ -391,7 +391,6 @@ void	zbx_locks_enable(void)
  * Return value: If the function succeeds, then return SUCCEED,               *
  *               FAIL on an error                                             *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
 int	zbx_mutex_create(zbx_mutex_t *mutex, zbx_mutex_name_t name, char **error)
@@ -422,7 +421,6 @@ int	zbx_mutex_create(zbx_mutex_t *mutex, zbx_mutex_name_t name, char **error)
  *                                                                            *
  * Parameters: mutex - handle of mutex                                        *
  *                                                                            *
- * Author: Eugene Grigorjev, Alexander Vladishev                              *
  *                                                                            *
  ******************************************************************************/
 void	__zbx_mutex_lock(const char *filename, int line, zbx_mutex_t mutex)
@@ -496,7 +494,6 @@ void	__zbx_mutex_lock(const char *filename, int line, zbx_mutex_t mutex)
  *                                                                            *
  * Parameters: mutex - handle of mutex                                        *
  *                                                                            *
- * Author: Eugene Grigorjev, Alexander Vladishev                              *
  *                                                                            *
  ******************************************************************************/
 void	__zbx_mutex_unlock(const char *filename, int line, zbx_mutex_t mutex)
@@ -552,7 +549,6 @@ void	__zbx_mutex_unlock(const char *filename, int line, zbx_mutex_t mutex)
  *                                                                            *
  * Parameters: mutex - handle of mutex                                        *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
 void	zbx_mutex_destroy(zbx_mutex_t *mutex)

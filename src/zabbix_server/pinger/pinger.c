@@ -51,7 +51,6 @@ extern ZBX_THREAD_LOCAL int		server_num, process_num;
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Alexei Vladishev, Alexander Vladishev                              *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -115,7 +114,6 @@ clean:
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Alexei Vladishev, Alexander Vladishev                              *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -403,7 +401,6 @@ static void	add_icmpping_item(icmpitem_t **items, int *items_alloc, int *items_c
  * Return value: SUCCEED - the file was created successfully                  *
  *               FAIL - otherwise                                             *
  *                                                                            *
- * Author: Alexei Vladishev, Alexander Vladishev                              *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -514,7 +511,6 @@ static void	add_pinger_host(ZBX_FPING_HOST **hosts, int *hosts_alloc, int *hosts
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -569,7 +565,6 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: never returns                                                    *
  *                                                                            *

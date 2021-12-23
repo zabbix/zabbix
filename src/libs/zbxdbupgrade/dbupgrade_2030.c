@@ -986,7 +986,6 @@ static int	DBpatch_2030094(void)
  * Return value: return SUCCEED and move exp to the next char after right ')' *
  *               or FAIL and move exp to incorrect character                  *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: This function is outdated and should be used in this upgrade     *
  *           only. For other applications consider zbx_function_find() or     *

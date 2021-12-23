@@ -85,7 +85,6 @@ static void	db_trigger_queue_cleanup(void)
  *                                                                            *
  * Purpose: periodically synchronises data in memory cache with database      *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: never returns                                                    *
  *                                                                            *

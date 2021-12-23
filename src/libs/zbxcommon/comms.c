@@ -123,7 +123,6 @@ int	comms_parse_response(char *xml, char *host, size_t host_len, char *key, size
  *                                                                            *
  * Return value: unsigned integer 64 bit in little-endian byte order format   *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -158,7 +157,6 @@ zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data)
  *                                                                            *
  * Return value: unsigned integer 64 bit in host byte order                   *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *

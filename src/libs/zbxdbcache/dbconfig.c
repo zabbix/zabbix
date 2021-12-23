@@ -5938,7 +5938,6 @@ static void	dc_load_trigger_queue(zbx_hashset_t *trend_functions)
  *                                                                            *
  * Purpose: Synchronize configuration data from database                      *
  *                                                                            *
- * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  ******************************************************************************/
 void	DCsync_configuration(unsigned char mode, const struct zbx_json_parse *jp_kvs_paths)
@@ -7007,7 +7006,6 @@ static int	__config_data_session_compare(const void *d1, const void *d2)
  *                                                                            *
  * Purpose: Allocate shared memory for configuration cache                    *
  *                                                                            *
- * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  ******************************************************************************/
 int	init_configuration_cache(char **error)
@@ -7204,7 +7202,6 @@ out:
  *                                                                            *
  * Purpose: Free memory allocated for configuration cache                     *
  *                                                                            *
- * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
  *                                                                            *
  ******************************************************************************/
 void	free_configuration_cache(void)
@@ -7330,7 +7327,6 @@ static void	DCget_host(DC_HOST *dst_host, const ZBX_DC_HOST *src_host, unsigned 
  *                                                                            *
  * Return value: SUCCEED if record located and FAIL otherwise                 *
  *                                                                            *
- * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  ******************************************************************************/
 int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid)
@@ -8119,7 +8115,6 @@ static void	DCclean_trigger(DC_TRIGGER *trigger)
  *             errcodes - [OUT] SUCCEED if record located and FAIL otherwise  *
  *             num      - [IN] number of elements in items, keys, errcodes    *
  *                                                                            *
- * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  ******************************************************************************/
 void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_host_key_t *keys, int *errcodes, size_t num)
@@ -8178,7 +8173,6 @@ int	DCconfig_get_hostid_by_name(const char *host, zbx_uint64_t *hostid)
  *             errcodes - [OUT] SUCCEED if item found, otherwise FAIL         *
  *             num      - [IN] number of elements                             *
  *                                                                            *
- * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  ******************************************************************************/
 void	DCconfig_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, size_t num)
@@ -8482,7 +8476,6 @@ void	DCconfig_get_triggers_by_triggerids(DC_TRIGGER *triggers, const zbx_uint64_
  *             errcodes    - [OUT] SUCCEED if item found, otherwise FAIL      *
  *             num         - [IN] number of elements                          *
  *                                                                            *
- * Author: Aleksandrs Saveljevs, Alexander Vladishev                          *
  *                                                                            *
  ******************************************************************************/
 void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions, zbx_uint64_t *functionids, int *errcodes,
@@ -8512,7 +8505,6 @@ void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions, zbx_uint64_t 
  *                                                                            *
  * Function: DCconfig_clean_functions                                         *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 void	DCconfig_clean_functions(DC_FUNCTION *functions, int *errcodes, size_t num)
@@ -8560,7 +8552,6 @@ void	DCconfig_clean_triggers(DC_TRIGGER *triggers, int *errcodes, size_t num)
  *                                 locked for processing; unlock those using  *
  *                                 DCconfig_unlock_triggers() function        *
  *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
  * Comments: This does not solve the problem fully (e.g., ZBX-7484). There is *
  *           a significant time period between the place where we lock the    *
@@ -8668,7 +8659,6 @@ void	DCconfig_lock_triggers_by_triggerids(zbx_vector_uint64_t *triggerids_in, zb
  *                                                                            *
  * Function: DCconfig_unlock_triggers                                         *
  *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
  ******************************************************************************/
 void	DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids)
@@ -8719,7 +8709,6 @@ void	DCconfig_unlock_all_triggers(void)
  *                                                                            *
  * Purpose: get enabled triggers for specified items                          *
  *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
  ******************************************************************************/
 void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
@@ -9400,7 +9389,6 @@ static int	dc_config_get_queue_nextcheck(zbx_binary_heap_t *queue)
  *                                                                            *
  * Return value: nextcheck or FAIL if no items for selected poller            *
  *                                                                            *
- * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  ******************************************************************************/
 int	DCconfig_get_poller_nextcheck(unsigned char poller_type)
@@ -9476,7 +9464,6 @@ static void	dc_requeue_item_at(ZBX_DC_ITEM *dc_item, ZBX_DC_HOST *dc_host, int n
  *                                                                            *
  * Return value: number of items in items array                               *
  *                                                                            *
- * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  * Comments: Items leave the queue only through this function. Pollers must   *
  *           always return the items they have taken using DCrequeue_items()  *
@@ -9729,7 +9716,6 @@ int	DCconfig_get_ipmi_poller_items(int now, DC_ITEM *items, int items_num, int *
  *                                                                            *
  * Return value: number of interface IDs returned                             *
  *                                                                            *
- * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
  ******************************************************************************/
 int	DCconfig_get_snmp_interfaceids_by_addr(const char *addr, zbx_uint64_t **interfaceids)
@@ -9769,7 +9755,6 @@ unlock:
  *                                                                            *
  * Return value: number of items returned                                     *
  *                                                                            *
- * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
  ******************************************************************************/
 size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM **items)
@@ -10501,7 +10486,6 @@ static int	DCconfig_check_trigger_dependencies_rec(const ZBX_DC_TRIGGER_DEPLIST 
  * Return value: SUCCEED - trigger can change its value                       *
  *               FAIL - otherwise                                             *
  *                                                                            *
- * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
  *                                                                            *
  ******************************************************************************/
 int	DCconfig_check_trigger_dependencies(zbx_uint64_t triggerid)
@@ -10573,7 +10557,6 @@ exit:
  *                                                                            *
  * Purpose: assign each trigger an index based on trigger dependency topology *
  *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
  ******************************************************************************/
 static void	DCconfig_sort_triggers_topologically(void)
@@ -10643,7 +10626,6 @@ void	DCconfig_triggers_apply_changes(zbx_vector_ptr_t *trigger_diff)
  *                                                                            *
  * Purpose: get statistics of the database cache                              *
  *                                                                            *
- * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  ******************************************************************************/
 void	*DCconfig_get_stats(int request)
@@ -10770,7 +10752,6 @@ void	DCconfig_wait_sync(void)
  *                                                                            *
  * Return value: number of proxies in hosts array                             *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: Proxies leave the queue only through this function. Pollers must *
  *           always return the proxies they have taken using DCrequeue_proxy. *
@@ -10822,7 +10803,6 @@ int	DCconfig_get_proxypoller_hosts(DC_PROXY *proxies, int max_hosts)
  *                                                                            *
  * Return value: nextcheck or FAIL if no passive proxies in queue             *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 int	DCconfig_get_proxypoller_nextcheck(void)

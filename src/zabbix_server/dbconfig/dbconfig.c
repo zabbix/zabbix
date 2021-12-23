@@ -71,7 +71,6 @@ static void	zbx_dbconfig_sigusr_handler(int flags)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: never returns                                                    *
  *                                                                            *

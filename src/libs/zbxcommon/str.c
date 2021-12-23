@@ -45,7 +45,6 @@ static const char	help_message_footer[] =
  * Purpose: print version and compilation time of application on stdout       *
  *          by application request with parameter '-V'                        *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments:  title_message - is global variable which must be initialized    *
  *                            in each zabbix application                      *
@@ -69,7 +68,6 @@ void	version(void)
  * Purpose: print application parameters on stdout with layout suitable for   *
  *          80-column terminal                                                *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments:  usage_message - is global variable which must be initialized    *
  *                            in each zabbix application                      *
@@ -127,7 +125,6 @@ void	usage(void)
  * Purpose: print help of application parameters on stdout by application     *
  *          request with parameter '-h'                                       *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments:  help_message - is global variable which must be initialized     *
  *                            in each zabbix application                      *
@@ -157,7 +154,6 @@ void	help(void)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
 void	zbx_error(const char *fmt, ...)
@@ -187,7 +183,6 @@ void	zbx_error(const char *fmt, ...)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
 size_t	zbx_snprintf(char *str, size_t count, const char *fmt, ...)
@@ -217,7 +212,6 @@ size_t	zbx_snprintf(char *str, size_t count, const char *fmt, ...)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Alexei Vladishev, Alexander Vladishev                              *
  *                                                                            *
  ******************************************************************************/
 void	zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const char *fmt, ...)
@@ -266,7 +260,6 @@ retry:
  * Return value: the number of characters in the output buffer                *
  *               (not including the trailing '\0')                            *
  *                                                                            *
- * Author: Alexei Vladishev (see also zbx_snprintf)                           *
  *                                                                            *
  ******************************************************************************/
 size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args)
@@ -301,7 +294,6 @@ size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args)
  *             src       - [IN] copied string                                 *
  *             n         - [IN] maximum number of bytes to copy               *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n)
@@ -470,7 +462,6 @@ char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2
  *                                                                            *
  * Return value: string without right '0'                                     *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: 10.0100 => 10.01, 10. => 10                                      *
  *                                                                            *
@@ -538,7 +529,6 @@ void	del_zeros(char *s)
  *                                                                            *
  * Return value: number of trimmed characters                                 *
  *                                                                            *
- * Author: Eugene Grigorjev, Aleksandrs Saveljevs                             *
  *                                                                            *
  ******************************************************************************/
 int	zbx_rtrim(char *str, const char *charlist)
@@ -569,7 +559,6 @@ int	zbx_rtrim(char *str, const char *charlist)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
 void	zbx_ltrim(char *str, const char *charlist)
@@ -619,7 +608,6 @@ void	zbx_lrtrim(char *str, const char *charlist)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 void	zbx_remove_chars(char *str, const char *charlist)
@@ -777,7 +765,6 @@ size_t	zbx_strlcpy_utf8(char *dst, const char *src, size_t size)
  *                                                                            *
  * Return value: formatted string                                             *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: returns a pointer to allocated memory                            *
  *                                                                            *
@@ -822,7 +809,6 @@ char	*zbx_dvsprintf(char *dest, const char *f, va_list args)
  *                                                                            *
  * Return value: formatted string                                             *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: returns a pointer to allocated memory                            *
  *                                                                            *
@@ -849,7 +835,6 @@ char	*zbx_dsprintf(char *dest, const char *f, ...)
  *                                                                            *
  * Return value: new pointer of string                                        *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: returns a pointer to allocated memory                            *
  *           zbx_strdcat(NULL, "") will return "", not NULL!                  *
@@ -883,7 +868,6 @@ char	*zbx_strdcat(char *dest, const char *src)
  *                                                                            *
  * Return value: new pointer of string                                        *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: returns a pointer to allocated memory                            *
  *                                                                            *
@@ -917,7 +901,6 @@ char	*zbx_strdcatf(char *dest, const char *f, ...)
  *               or FAIL if hostname contains invalid chars, is empty         *
  *               or is longer than MAX_ZBX_HOSTNAME_LEN                       *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 int	zbx_check_hostname(const char *hostname, char **error)
@@ -969,7 +952,6 @@ int	zbx_check_hostname(const char *hostname, char **error)
  * Return value: returns FAIL only if no key is present (length 0),           *
  *               or the whole string is invalid. SUCCEED otherwise.           *
  *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
  * Comments: the pointer is advanced to the first invalid character even if   *
  *           FAIL is returned (meaning there is a syntax error in item key).  *
@@ -1089,7 +1071,6 @@ succeed:
  *                                                                            *
  * Return value: return SUCCEED or FAIL                                       *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 int	parse_host_key(char *exp, char **host, char **key)
@@ -1133,7 +1114,6 @@ int	parse_host_key(char *exp, char **host, char **key)
  *                                                                            *
  * Return value: size of the escaped string                                   *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 size_t	zbx_get_escape_string_len(const char *src, const char *charlist)
@@ -1160,7 +1140,6 @@ size_t	zbx_get_escape_string_len(const char *src, const char *charlist)
  *                                                                            *
  * Return value: the escaped string                                           *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 char	*zbx_dyn_escape_string(const char *src, const char *charlist)
@@ -1339,7 +1318,6 @@ int	cmp_key_id(const char *key_1, const char *key_2)
  *                                                                            *
  * Parameters: proc_type - [IN] process type; ZBX_PROCESS_TYPE_*              *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: used in internals checks zabbix["process",...], process titles   *
  *           and log files                                                    *
@@ -2584,7 +2562,6 @@ int	is_ascii_string(const char *str)
  *                                                                            *
  * Return value: newly allocated copy of input string with linefeeds          *
  *                                                                            *
- * Author: Vladimir Levijev                                                   *
  *                                                                            *
  * Comments: allocates memory                                                 *
  *                                                                            *
@@ -2652,7 +2629,6 @@ char	*str_linefeed(const char *src, size_t maxline, const char *delim)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Vladimir Levijev                                                   *
  *                                                                            *
  * Comments: allocates memory, calls assert() if that fails                   *
  *                                                                            *
@@ -2674,7 +2650,6 @@ void	zbx_strarr_init(char ***arr)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Vladimir Levijev                                                   *
  *                                                                            *
  * Comments: allocates memory, calls assert() if that fails                   *
  *                                                                            *
@@ -2704,7 +2679,6 @@ void	zbx_strarr_add(char ***arr, const char *entry)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Vladimir Levijev                                                   *
  *                                                                            *
  ******************************************************************************/
 void	zbx_strarr_free(char ***arr)
@@ -2727,7 +2701,6 @@ void	zbx_strarr_free(char ***arr)
  *             r     - [IN/OUT] right position of the block                   *
  *             value - [IN] the string to replace the block with              *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value)
@@ -2767,7 +2740,6 @@ void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value)
  *                         delimiter)                                         *
  *             delimiter - the list delimiter                                 *
  *                                                                            *
- * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
 void	zbx_trim_str_list(char *list, char delimiter)
@@ -4819,7 +4791,6 @@ int	zbx_suffixed_number_parse(const char *number, int *len)
  * Return value: number of parameters (starting from 1) or                    *
  *               0 if syntax error                                            *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments:  delimiter for parameters is ','. Empty parameter list or a list *
  *            containing only spaces is handled as having one empty parameter *
@@ -4924,7 +4895,6 @@ int	num_param(const char *p)
  *      1 - requested parameter missing or buffer overflow                    *
  *      0 - requested parameter found (value - 'buf' can be empty string)     *
  *                                                                            *
- * Author: Eugene Grigorjev, rewritten by Alexei Vladishev                    *
  *                                                                            *
  * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
@@ -5095,7 +5065,6 @@ int	get_param(const char *p, int num, char *buf, size_t max_len, zbx_request_par
  *      0 - requested parameter found                                         *
  *          (for first parameter result is always 0)                          *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: delimiter for parameters is ','                                  *
  *                                                                            *
@@ -5226,7 +5195,6 @@ static int	get_param_len(const char *p, int num, size_t *sz)
  *      otherwise - requested parameter                                       *
  *          (for first parameter result is not NULL)                          *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
@@ -5549,7 +5517,6 @@ int	str_n_in_list(const char *list, const char *value, size_t len, char delimite
  *                                                                            *
  * Return value: SUCCEED - string is in the list, FAIL - otherwise            *
  *                                                                            *
- * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
  *                                                                            *
  ******************************************************************************/
 int	str_in_list(const char *list, const char *value, char delimiter)
@@ -5574,7 +5541,6 @@ int	str_in_list(const char *list, const char *value, char delimiter)
  *      1 - requested parameter missing                                       *
  *      0 - requested parameter found (value - 'buf' can be empty string)     *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
@@ -5609,7 +5575,6 @@ int	get_key_param(char *param, int num, char *buf, size_t max_len)
  *                                                                            *
  * Return value: count of parameters                                          *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *

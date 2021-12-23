@@ -41,7 +41,6 @@
  *                0 - the macro names are equal                               *
  *               >0 - the first macro name is 'greater' than second           *
  *                                                                            *
- * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
 static int 	httpmacro_cmp_func(const void *d1, const void *d2)
@@ -75,7 +74,6 @@ static int 	httpmacro_cmp_func(const void *d1, const void *d2)
  *                          wrong key format or failed regular expression     *
  *                          match.                                            *
  *                                                                            *
- * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
 static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, size_t nkey,
@@ -176,7 +174,6 @@ out:
  * Parameters: httptest - [IN]     the http test data                         *
  *             data     - [IN/OUT] string to substitute macros in             *
  *                                                                            *
- * Author: Alexei Vladishev, Andris Zeila                                     *
  *                                                                            *
  ******************************************************************************/
 int	http_substitute_variables(const zbx_httptest_t *httptest, char **data)
@@ -285,7 +282,6 @@ int	http_substitute_variables(const zbx_httptest_t *httptest, char **data)
  *               FAIL    - the variable processing failed (regexp match       *
  *                         failed).                                           *
  *                                                                            *
- * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
 int	http_process_variables(zbx_httptest_t *httptest, zbx_vector_ptr_pair_t *variables, const char *data,

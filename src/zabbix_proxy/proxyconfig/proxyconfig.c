@@ -155,7 +155,6 @@ out:
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: never returns                                                    *
  *                                                                            *

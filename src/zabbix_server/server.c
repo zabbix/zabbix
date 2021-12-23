@@ -543,7 +543,6 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
  *                                                                            *
  * Purpose: set configuration defaults                                        *
  *                                                                            *
- * Author: Vladimir Levijev                                                   *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_set_defaults(void)
@@ -616,7 +615,6 @@ static void	zbx_set_defaults(void)
  *                                                                            *
  * Purpose: validate configuration parameters                                 *
  *                                                                            *
- * Author: Vladimir Levijev                                                   *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_validate_config(ZBX_TASK_EX *task)
@@ -749,7 +747,6 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: will terminate process if parsing fails                          *
  *                                                                            *
@@ -1009,7 +1006,6 @@ static void	zbx_free_config(void)
  *                                                                            *
  * Purpose: executes server processes                                         *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
 int	main(int argc, char **argv)
