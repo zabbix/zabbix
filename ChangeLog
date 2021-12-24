@@ -5,6 +5,7 @@ New features:
 ...G...PS. [ZBXNEXT-4922] added support for pcre2 (yurii)
 
 Bug fixes:
+...G.....T [ZBX-19185] fixed free bytes calculation for temporary tablespace in Oracle by ODBC and by agent2 template (abiba)
 ........S. [ZBX-20377] implemented hmac-sha256 for server for scheduled reports cookies (arimdjonoks)
 .........T [ZBX-20258] fixed tags processing for Zammad media type (abiba)
 A.F....... [ZBX-20350] changed hash algo for encrypted cookies (rlataria)
