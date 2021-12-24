@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-08-30T17:48:41Z</date>
+   <date>2021-12-24T06:24:32Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -1067,7 +1067,7 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
-               <description>Total number of logins started per second. This does not include pooled connections. Any value over 2 may indicate insufcient connection pooling.</description>
+               <description>Total number of logins started per second. This does not include pooled connections. Any value over 2 may indicate insufficient connection pooling.</description>
                <applications>
                   <application>
                      <name>MSSQL</name>
@@ -1094,7 +1094,7 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
-               <description>Total number of logout operations started per second. Any value over 2 may indicate insufcient connection pooling.</description>
+               <description>Total number of logout operations started per second. Any value over 2 may indicate insufficient connection pooling.</description>
                <applications>
                   <application>
                      <name>MSSQL</name>
@@ -1426,7 +1426,7 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                      <expression>{min(15m)} &gt; {$MSSQL.PERCENT_COMPILATIONS.MAX}</expression>
                      <name>MSSQL: Percent of adhoc queries running is over {$MSSQL.PERCENT_COMPILATIONS.MAX}% for 15m</name>
                      <priority>WARNING</priority>
-                     <description>The lower this value is the better. High values often indicate excessive adhoc querying and should be as low as possible. If excessive adhoc querying is happening, try rewriting the queries as procedures or invoke the queries using sp_executeSQL. When rewriting isn’t possible, consider using a plan guide or setting the database to parameterization forced mode.</description>
+                     <description>The lower this value is the better. High values often indicate excessive adhoc querying and should be as low as possible. If excessive adhoc querying is happening, try rewriting the queries as procedures or invoke the queries using sp_executeSQL. When rewriting isn't possible, consider using a plan guide or setting the database to parameterization forced mode.</description>
                   </trigger>
                </triggers>
             </item>
@@ -1451,7 +1451,7 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                      <expression>{min(15m)} &gt; {$MSSQL.PERCENT_RECOMPILATIONS.MAX}</expression>
                      <name>MSSQL: Percent of times statement recompiles is over {$MSSQL.PERCENT_RECOMPILATIONS.MAX}% for 15m</name>
                      <priority>WARNING</priority>
-                     <description>This number should be at or near zero, since recompiles can cause deadlocks and exclusive compile locks. This counter’s value should follow in proportion to “Batch Requests/sec” and “SQL Compilations/sec”.</description>
+                     <description>This number should be at or near zero, since recompiles can cause deadlocks and exclusive compile locks. This counter's value should follow in proportion to “Batch Requests/sec” and “SQL Compilations/sec”.</description>
                   </trigger>
                </triggers>
             </item>
@@ -2044,7 +2044,7 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                      <expression>{max(5m)}&lt;{$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}</expression>
                      <name>MSSQL: Percentage of work tables available from the work table cache is low (below {$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}% for 5m)</name>
                      <priority>HIGH</priority>
-                     <description>A value less than 90% may indicate insufcient memory, since execution plans are being dropped, or on 32-bit systems, may indicate the need for an upgrade to a 64-bit system</description>
+                     <description>A value less than 90% may indicate insufficient memory, since execution plans are being dropped, or on 32-bit systems, may indicate the need for an upgrade to a 64-bit system</description>
                   </trigger>
                </triggers>
             </item>
@@ -2268,7 +2268,6 @@ FROM sys.dm_hadr_availability_group_states ags JOIN sys.availability_groups ag O
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -2925,7 +2924,6 @@ FROM sys.databases</params>
                      </master_item>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>MSSQL DB '{#DBNAME}': Log size</name>
@@ -3191,7 +3189,6 @@ FROM sys.databases</params>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -3360,7 +3357,6 @@ partially healthy if synchronization_state is 1 (SYNCHRONIZING).&#13;
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -3594,7 +3590,6 @@ WHERE m.mirroring_state_desc IS NOT NULL</params>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>MSSQL Mirroring '{#DBNAME}': States</name>
@@ -3744,7 +3739,6 @@ JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replic
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -4065,7 +4059,6 @@ On a secondary replica, upon detecting that it is disconnected, the secondary re
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template DB MSSQL by ODBC:mssql.replica.connected_state["{#GROUP_NAME}_{#REPLICA_NAME}"].last()}=0 and {Template DB MSSQL by ODBC:mssql.replica.role["{#GROUP_NAME}_{#REPLICA_NAME}"].last()}=2</expression>
@@ -4777,60 +4770,6 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
    </graphs>
    <value_maps>
       <value_map>
-         <name>Service state</name>
-         <mappings>
-            <mapping>
-               <value>0</value>
-               <newvalue>Down</newvalue>
-            </mapping>
-            <mapping>
-               <value>1</value>
-               <newvalue>Up</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>MSSQL DB state</name>
-         <mappings>
-            <mapping>
-               <value>0</value>
-               <newvalue>ONLINE</newvalue>
-            </mapping>
-            <mapping>
-               <value>1</value>
-               <newvalue>RESTORING</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>RECOVERING</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>RECOVERY_PENDING</newvalue>
-            </mapping>
-            <mapping>
-               <value>4</value>
-               <newvalue>SUSPECT</newvalue>
-            </mapping>
-            <mapping>
-               <value>5</value>
-               <newvalue>EMERGENCY</newvalue>
-            </mapping>
-            <mapping>
-               <value>6</value>
-               <newvalue>OFFLINE</newvalue>
-            </mapping>
-            <mapping>
-               <value>7</value>
-               <newvalue>COPYING</newvalue>
-            </mapping>
-            <mapping>
-               <value>10</value>
-               <newvalue>OFFLINE_SECONDARY</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
          <name>MSSQL AG Connected state</name>
          <mappings>
             <mapping>
@@ -4945,15 +4884,89 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
          </mappings>
       </value_map>
       <value_map>
-         <name>MSSQL - Yes / No</name>
+         <name>MSSQL DB state</name>
          <mappings>
             <mapping>
                <value>0</value>
-               <newvalue>No</newvalue>
+               <newvalue>ONLINE</newvalue>
             </mapping>
             <mapping>
                <value>1</value>
-               <newvalue>Yes</newvalue>
+               <newvalue>RESTORING</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>RECOVERING</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>RECOVERY_PENDING</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>SUSPECT</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>EMERGENCY</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>OFFLINE</newvalue>
+            </mapping>
+            <mapping>
+               <value>7</value>
+               <newvalue>COPYING</newvalue>
+            </mapping>
+            <mapping>
+               <value>10</value>
+               <newvalue>OFFLINE_SECONDARY</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>MSSQL Job Run Status</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Failed</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Succeeded</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Retry</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Canceled</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>Running</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>Unknown</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>MSSQL Mirroring Role</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Database is inaccessible or is not mirrored</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Principal</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Mirror</newvalue>
             </mapping>
          </mappings>
       </value_map>
@@ -4991,23 +5004,6 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
             <mapping>
                <value>7</value>
                <newvalue>Database is inaccessible or is not mirrored</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>MSSQL Mirroring Role</name>
-         <mappings>
-            <mapping>
-               <value>0</value>
-               <newvalue>Database is inaccessible or is not mirrored</newvalue>
-            </mapping>
-            <mapping>
-               <value>1</value>
-               <newvalue>Principal</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>Mirror</newvalue>
             </mapping>
          </mappings>
       </value_map>
@@ -5054,31 +5050,28 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
          </mappings>
       </value_map>
       <value_map>
-         <name>MSSQL Job Run Status</name>
+         <name>MSSQL - Yes / No</name>
          <mappings>
             <mapping>
                <value>0</value>
-               <newvalue>Failed</newvalue>
+               <newvalue>No</newvalue>
             </mapping>
             <mapping>
                <value>1</value>
-               <newvalue>Succeeded</newvalue>
+               <newvalue>Yes</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>Service state</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Down</newvalue>
             </mapping>
             <mapping>
-               <value>2</value>
-               <newvalue>Retry</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>Canceled</newvalue>
-            </mapping>
-            <mapping>
-               <value>4</value>
-               <newvalue>Running</newvalue>
-            </mapping>
-            <mapping>
-               <value>5</value>
-               <newvalue>Unknown</newvalue>
+               <value>1</value>
+               <newvalue>Up</newvalue>
             </mapping>
          </mappings>
       </value_map>

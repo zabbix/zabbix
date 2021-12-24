@@ -1,5 +1,5 @@
 
-# Apache Cassandra by JMX
+# Template DB Apache Cassandra by JMX
 
 ## Overview
 
@@ -65,7 +65,7 @@ There are no template links in this template.
 |Cassandra |Compaction: Number of completed tasks |<p>Number of completed compactions since server [re]start.</p> |JMX |jmx["org.apache.cassandra.metrics:name=CompletedTasks,type=Compaction","Value"] |
 |Cassandra |Compaction: Total compactions completed |<p>Throughput of completed compactions since server [re]start.</p> |JMX |jmx["org.apache.cassandra.metrics:name=TotalCompactionsCompleted,type=Compaction","Count"] |
 |Cassandra |Compaction: Pending tasks |<p>Estimated number of compactions remaining to perform.</p> |JMX |jmx["org.apache.cassandra.metrics:type=Compaction,name=PendingTasks","Value"] |
-|Cassandra |Commitlog: Pending tasks |<p>Number of commit log messages written but yet to be fsync’d.</p> |JMX |jmx["org.apache.cassandra.metrics:name=PendingTasks,type=CommitLog","Value"] |
+|Cassandra |Commitlog: Pending tasks |<p>Number of commit log messages written but yet to be fsync'd.</p> |JMX |jmx["org.apache.cassandra.metrics:name=PendingTasks,type=CommitLog","Value"] |
 |Cassandra |Commitlog: Total size |<p>Current size, in bytes, used by all the commit log segments.</p> |JMX |jmx["org.apache.cassandra.metrics:name=TotalCommitLogSize,type=CommitLog","Value"] |
 |Cassandra |Latency: Read median |<p>Latency read from disk in milliseconds - median.</p> |JMX |jmx["org.apache.cassandra.metrics:name=ReadLatency,type=Table","50thPercentile"]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
 |Cassandra |Latency: Read 75 percentile |<p>Latency read from disk in milliseconds - p75.</p> |JMX |jmx["org.apache.cassandra.metrics:name=ReadLatency,type=Table","75thPercentile"]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
