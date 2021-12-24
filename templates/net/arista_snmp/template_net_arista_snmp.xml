@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-10-22T12:34:41Z</date>
+   <date>2021-12-23T17:53:43Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -18,7 +18,7 @@ ENTITY-SENSORS-MIB&#13;
 ENTITY-STATE-MIB&#13;
 ENTITY-MIB&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <templates>
             <template>
                <name>Template Module EtherLike-MIB SNMP</name>
@@ -166,7 +166,6 @@ return JSON.stringify(data);</params>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Fan discovery</name>
@@ -202,25 +201,8 @@ entPhySensorScale, and entPhySensorPrecision objects must also be examined.</des
                      </applications>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{max(5m)} &lt; {#THRESHOLD_LO_WARN}</expression>
-                           <name>{#SENSOR_INFO}: Fan speed is below the warning threshold of {#THRESHOLD_LO_WARN}rpm for 5m</name>
-                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                           <priority>WARNING</priority>
-                           <description>This trigger uses fan sensor values defined in the device.</description>
-                           <dependencies>
-                              <dependency>
-                                 <name>{#SENSOR_INFO}: Fan is in critical state</name>
-                                 <expression>{Template Net Arista SNMP:sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
-                              </dependency>
-                              <dependency>
-                                 <name>{#SENSOR_INFO}: Fan speed is below the critical threshold of {#THRESHOLD_LO_CRIT}rpm for 5m</name>
-                                 <expression>{Template Net Arista SNMP:sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}].max(5m)} &lt; {#THRESHOLD_LO_CRIT}</expression>
-                              </dependency>
-                           </dependencies>
-                        </trigger_prototype>
-                        <trigger_prototype>
-                           <expression>{max(5m)} &lt; {#THRESHOLD_LO_CRIT}</expression>
-                           <name>{#SENSOR_INFO}: Fan speed is below the critical threshold of {#THRESHOLD_LO_CRIT}rpm for 5m</name>
+                           <expression>{min(5m)} &gt; {#THRESHOLD_HI_CRIT}</expression>
+                           <name>{#SENSOR_INFO}: Fan speed is above the critical threshold of {#THRESHOLD_HI_CRIT}rpm for 5m</name>
                            <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>HIGH</priority>
                            <description>This trigger uses fan sensor values defined in the device.</description>
@@ -249,8 +231,8 @@ entPhySensorScale, and entPhySensorPrecision objects must also be examined.</des
                            </dependencies>
                         </trigger_prototype>
                         <trigger_prototype>
-                           <expression>{min(5m)} &gt; {#THRESHOLD_HI_CRIT}</expression>
-                           <name>{#SENSOR_INFO}: Fan speed is above the critical threshold of {#THRESHOLD_HI_CRIT}rpm for 5m</name>
+                           <expression>{max(5m)} &lt; {#THRESHOLD_LO_CRIT}</expression>
+                           <name>{#SENSOR_INFO}: Fan speed is below the critical threshold of {#THRESHOLD_LO_CRIT}rpm for 5m</name>
                            <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>HIGH</priority>
                            <description>This trigger uses fan sensor values defined in the device.</description>
@@ -258,6 +240,23 @@ entPhySensorScale, and entPhySensorPrecision objects must also be examined.</des
                               <dependency>
                                  <name>{#SENSOR_INFO}: Fan is in critical state</name>
                                  <expression>{Template Net Arista SNMP:sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
+                              </dependency>
+                           </dependencies>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{max(5m)} &lt; {#THRESHOLD_LO_WARN}</expression>
+                           <name>{#SENSOR_INFO}: Fan speed is below the warning threshold of {#THRESHOLD_LO_WARN}rpm for 5m</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>WARNING</priority>
+                           <description>This trigger uses fan sensor values defined in the device.</description>
+                           <dependencies>
+                              <dependency>
+                                 <name>{#SENSOR_INFO}: Fan is in critical state</name>
+                                 <expression>{Template Net Arista SNMP:sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
+                              </dependency>
+                              <dependency>
+                                 <name>{#SENSOR_INFO}: Fan speed is below the critical threshold of {#THRESHOLD_LO_CRIT}rpm for 5m</name>
+                                 <expression>{Template Net Arista SNMP:sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}].max(5m)} &lt; {#THRESHOLD_LO_CRIT}</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -292,7 +291,6 @@ The operational status of the sensor {#SENSOR_INFO}</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <master_item>
                   <key>sensors.get</key>
                </master_item>
@@ -432,7 +430,6 @@ The operational status of the sensor {#SENSOR_INFO}</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature discovery</name>
@@ -500,21 +497,8 @@ entPhySensorScale, and entPhySensorPrecision objects must also be examined.</des
                      </preprocessing>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{max(5m)} &lt; {#THRESHOLD_LO_WARN}</expression>
-                           <name>{#SENSOR_INFO}: Temperature is below the warning threshold of {#THRESHOLD_LO_WARN}°C for 5m</name>
-                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                           <priority>WARNING</priority>
-                           <description>This trigger uses temperature sensor values defined in the device.</description>
-                           <dependencies>
-                              <dependency>
-                                 <name>{#SENSOR_INFO}: Temperature is below the critical threshold of {#THRESHOLD_LO_CRIT}°C for 5m</name>
-                                 <expression>{Template Net Arista SNMP:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)} &lt; {#THRESHOLD_LO_CRIT}</expression>
-                              </dependency>
-                           </dependencies>
-                        </trigger_prototype>
-                        <trigger_prototype>
-                           <expression>{max(5m)} &lt; {#THRESHOLD_LO_CRIT}</expression>
-                           <name>{#SENSOR_INFO}: Temperature is below the critical threshold of {#THRESHOLD_LO_CRIT}°C for 5m</name>
+                           <expression>{min(5m)} &gt; {#THRESHOLD_HI_CRIT}</expression>
+                           <name>{#SENSOR_INFO}: Temperature is above the critical threshold of {#THRESHOLD_HI_CRIT}°C for 5m</name>
                            <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>HIGH</priority>
                            <description>This trigger uses temperature sensor values defined in the device.</description>
@@ -533,16 +517,28 @@ entPhySensorScale, and entPhySensorPrecision objects must also be examined.</des
                            </dependencies>
                         </trigger_prototype>
                         <trigger_prototype>
-                           <expression>{min(5m)} &gt; {#THRESHOLD_HI_CRIT}</expression>
-                           <name>{#SENSOR_INFO}: Temperature is above the critical threshold of {#THRESHOLD_HI_CRIT}°C for 5m</name>
+                           <expression>{max(5m)} &lt; {#THRESHOLD_LO_CRIT}</expression>
+                           <name>{#SENSOR_INFO}: Temperature is below the critical threshold of {#THRESHOLD_LO_CRIT}°C for 5m</name>
                            <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>HIGH</priority>
                            <description>This trigger uses temperature sensor values defined in the device.</description>
                         </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{max(5m)} &lt; {#THRESHOLD_LO_WARN}</expression>
+                           <name>{#SENSOR_INFO}: Temperature is below the warning threshold of {#THRESHOLD_LO_WARN}°C for 5m</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>WARNING</priority>
+                           <description>This trigger uses temperature sensor values defined in the device.</description>
+                           <dependencies>
+                              <dependency>
+                                 <name>{#SENSOR_INFO}: Temperature is below the critical threshold of {#THRESHOLD_LO_CRIT}°C for 5m</name>
+                                 <expression>{Template Net Arista SNMP:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)} &lt; {#THRESHOLD_LO_CRIT}</expression>
+                              </dependency>
+                           </dependencies>
+                        </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <master_item>
                   <key>sensors.get</key>
                </master_item>
@@ -672,21 +668,8 @@ entPhySensorScale, and entPhySensorPrecision objects must also be examined.</des
                      </applications>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{max(5m)} &lt; {#THRESHOLD_LO_WARN}</expression>
-                           <name>{#SENSOR_INFO}: Voltage is below the warning threshold of {#THRESHOLD_LO_WARN}V for 5m</name>
-                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                           <priority>WARNING</priority>
-                           <description>This trigger uses voltage sensor values defined in the device.</description>
-                           <dependencies>
-                              <dependency>
-                                 <name>{#SENSOR_INFO}: Voltage is below the critical threshold of {#THRESHOLD_LO_CRIT}V for 5m</name>
-                                 <expression>{Template Net Arista SNMP:sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}].max(5m)} &lt; {#THRESHOLD_LO_CRIT}</expression>
-                              </dependency>
-                           </dependencies>
-                        </trigger_prototype>
-                        <trigger_prototype>
-                           <expression>{max(5m)} &lt; {#THRESHOLD_LO_CRIT}</expression>
-                           <name>{#SENSOR_INFO}: Voltage is below the critical threshold of {#THRESHOLD_LO_CRIT}V for 5m</name>
+                           <expression>{min(5m)} &gt; {#THRESHOLD_HI_CRIT}</expression>
+                           <name>{#SENSOR_INFO}: Voltage is above the critical threshold of {#THRESHOLD_HI_CRIT}V for 5m</name>
                            <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>HIGH</priority>
                            <description>This trigger uses voltage sensor values defined in the device.</description>
@@ -705,16 +688,28 @@ entPhySensorScale, and entPhySensorPrecision objects must also be examined.</des
                            </dependencies>
                         </trigger_prototype>
                         <trigger_prototype>
-                           <expression>{min(5m)} &gt; {#THRESHOLD_HI_CRIT}</expression>
-                           <name>{#SENSOR_INFO}: Voltage is above the critical threshold of {#THRESHOLD_HI_CRIT}V for 5m</name>
+                           <expression>{max(5m)} &lt; {#THRESHOLD_LO_CRIT}</expression>
+                           <name>{#SENSOR_INFO}: Voltage is below the critical threshold of {#THRESHOLD_LO_CRIT}V for 5m</name>
                            <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>HIGH</priority>
                            <description>This trigger uses voltage sensor values defined in the device.</description>
                         </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{max(5m)} &lt; {#THRESHOLD_LO_WARN}</expression>
+                           <name>{#SENSOR_INFO}: Voltage is below the warning threshold of {#THRESHOLD_LO_WARN}V for 5m</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>WARNING</priority>
+                           <description>This trigger uses voltage sensor values defined in the device.</description>
+                           <dependencies>
+                              <dependency>
+                                 <name>{#SENSOR_INFO}: Voltage is below the critical threshold of {#THRESHOLD_LO_CRIT}V for 5m</name>
+                                 <expression>{Template Net Arista SNMP:sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}].max(5m)} &lt; {#THRESHOLD_LO_CRIT}</expression>
+                              </dependency>
+                           </dependencies>
+                        </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <master_item>
                   <key>sensors.get</key>
                </master_item>
@@ -837,6 +832,23 @@ entPhySensorScale, and entPhySensorPrecision objects must also be examined.</des
    </templates>
    <value_maps>
       <value_map>
+         <name>ENTITY-SENSORS-MIB::EntitySensorStatus</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>ok</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>unavailable</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>nonoperational</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
          <name>ENTITY-STATE-MIB::EntityOperState</name>
          <mappings>
             <mapping>
@@ -854,23 +866,6 @@ entPhySensorScale, and entPhySensorPrecision objects must also be examined.</des
             <mapping>
                <value>4</value>
                <newvalue>testing</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>ENTITY-SENSORS-MIB::EntitySensorStatus</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>ok</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>unavailable</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>nonoperational</newvalue>
             </mapping>
          </mappings>
       </value_map>
