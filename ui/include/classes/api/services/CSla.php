@@ -1089,7 +1089,7 @@ class CSla extends CApiService {
 
 		$reporting_periods = self::getReportingPeriods($db_sla, $options);
 
-		if ($reporting_periods && $options['serviceids']) {
+		if ($reporting_periods) {
 			$db_services = API::Service()->get([
 				'output' => ['created_at'],
 				'selectStatusTimeline' => $reporting_periods,
