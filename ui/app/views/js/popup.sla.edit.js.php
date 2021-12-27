@@ -257,6 +257,13 @@ window.sla_edit_popup = {
 		fields.name = fields.name.trim();
 		fields.slo = fields.slo.trim();
 
+		if ('service_tags' in fields) {
+			for (const service_tag of Object.values(fields.service_tags)) {
+				service_tag.tag = service_tag.tag.trim();
+				service_tag.value = service_tag.value.trim();
+			}
+		}
+
 		for (const el of this.form.parentNode.children) {
 			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
 				el.parentNode.removeChild(el);

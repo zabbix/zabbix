@@ -510,6 +510,20 @@ window.service_edit_popup = {
 		fields.name = fields.name.trim();
 		fields.child_serviceids = [...this.children.keys()];
 
+		if ('tags' in fields) {
+			for (const tag of Object.values(fields.tags)) {
+				tag.tag = tag.tag.trim();
+				tag.value = tag.value.trim();
+			}
+		}
+
+		if ('problem_tags' in fields) {
+			for (const problem_tag of Object.values(fields.problem_tags)) {
+				problem_tag.tag = problem_tag.tag.trim();
+				problem_tag.value = problem_tag.value.trim();
+			}
+		}
+
 		for (const el of this.form.parentNode.children) {
 			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
 				el.parentNode.removeChild(el);
