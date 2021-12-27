@@ -85,7 +85,10 @@ class CControllerSlaReportList extends CController {
 		if ($slaid != 0) {
 			$slas = API::Sla()->get([
 				'output' => ['slaid', 'name', 'period', 'slo', 'timezone'],
-				'slaids' => $slaid
+				'slaids' => $slaid,
+				'filter' => [
+					'status' => ZBX_SLA_STATUS_ENABLED
+				]
 			]);
 
 			if ($slas) {
