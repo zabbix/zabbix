@@ -1065,6 +1065,9 @@ static char	*lld_eval_expression_expand(zbx_eval_context_t *ctx, const zbx_vecto
 		{
 			const zbx_lld_function_t	*function = (zbx_lld_function_t *)functions->values[j];
 
+			if (0 != (ZBX_FLAG_LLD_FUNCTION_DELETE & function->flags))
+				continue;
+
 			if (function->index == index)
 			{
 				char	*value;
