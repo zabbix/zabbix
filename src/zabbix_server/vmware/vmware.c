@@ -35,7 +35,6 @@
 
 #include "vmware.h"
 #include "../../libs/zbxalgo/vectorimpl.h"
-#include "comms.h"
 
 /*
  * The VMware data (zbx_vmware_service_t structure) are stored in shared memory.
@@ -3662,49 +3661,6 @@ clean:
 	return mi_access;
 }
 
-
-
-/******************************************************************************
- * Function: vmware_ip2socket                                                 *
- *                                                                            *
- * Purpose: Create socket mock base of ip                                     *
- *                                                                            *
- * Parameters: ssf - [IN] ip version 4 or 6                                   *
- *             ip  - [IN] ip sting                                            *
- *             s   - [OUT] socket mock                                        *
- *                                                                            *
- * Return value: SUCCEED - the socket mock was initialized successfully       *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-static int	vmware_ip2socket(int ssf, const char *ip, zbx_socket_t *s)
-{
-	void		*buf;
-
-	switch (ssf)
-	{
-		case 4:
-			s->peer_info.ss_family = AF_INET;
-			buf = &((struct sockaddr_in *)&s->peer_info)->sin_addr.s_addr;
-			break;
-#ifdef HAVE_IPV6
-		case 6:
-			s->peer_info.ss_family = AF_INET6;
-			buf = ((struct sockaddr_in6 *)&s->peer_info)->sin6_addr.s6_addr;
-			break;
-#endif
-		default:
-			return FAIL;
-	}
-
-	if (1 != inet_pton(s->peer_info.ss_family, ip, buf))
-		return FAIL;
-
-	zbx_strlcpy(s->peer, ip, sizeof(s->peer));
-
-	return SUCCEED;
-}
-
 /******************************************************************************
  * Function: vmware_v4mask2pefix                                              *
  *                                                                            *
@@ -3735,9 +3691,6 @@ static int	vmware_v4mask2pefix(const char *mask)
 #	undef	V4MASK_MAX
 }
 
-ZBX_VECTOR_DECL(int, int)
-ZBX_VECTOR_IMPL(int, int)
-
 /******************************************************************************
  * Function: vmware_hv_ip_search                                              *
  *                                                                            *
@@ -3755,7 +3708,6 @@ static char	*vmware_hv_ip_search(xmlDoc *xdoc)
 		ZBX_XNN("VirtualNicManagerNetConfig") "[" ZBX_XNN("nicType") "[text()='"nicType "']]/"	\
 		ZBX_XNN("candidateVnic") "[" ZBX_XNN("key") "=../" ZBX_XNN("selectedVnic") "]//"	\
 		ZBX_XNN("ip") ZBX_XPATH_LN(addr)
-
 
 #define ZBX_XPATH_HV_IPV4(nicType)	ZBX_XPATH_HV_IP(nicType, "ipAddress")
 #define ZBX_XPATH_HV_IPV6(nicType)	ZBX_XPATH_HV_IP(nicType, "ipV6Config")				\
@@ -3776,7 +3728,6 @@ static char	*vmware_hv_ip_search(xmlDoc *xdoc)
 	xmlXPathObject		*xpathObj;
 	xmlNode			*node;
 	zbx_vector_str_t	selected_ifs, selected_ips;
-	zbx_vector_int_t	selected_ssf;
 	char			*value = NULL, *ip_vc = NULL, *ip_gw = NULL, *end;
 	int			i;
 
@@ -3790,7 +3741,6 @@ static char	*vmware_hv_ip_search(xmlDoc *xdoc)
 		goto out;
 	}
 
-
 	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
 		goto out;
 
@@ -3798,7 +3748,6 @@ static char	*vmware_hv_ip_search(xmlDoc *xdoc)
 
 	zbx_vector_str_create(&selected_ifs);
 	zbx_vector_str_create(&selected_ips);
-	zbx_vector_int_create(&selected_ssf);
 
 	if (SUCCEED != zbx_xml_node_read_values(xdoc, node, ZBX_XNN("VirtualNicManagerNetConfig")
 			"[" ZBX_XNN("nicType") "[text()='management']]/" ZBX_XNN("selectedVnic"),
@@ -3815,18 +3764,18 @@ static char	*vmware_hv_ip_search(xmlDoc *xdoc)
 		goto out;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() managementServerIp rule; selected_ifs:%d", __func__, selected_ifs.values_num);
-	zbx_vector_str_sort(&selected_ifs, ZBX_DEFAULT_STR_COMPARE_FUNC);
+	zbx_vector_str_sort(&selected_ifs, zbx_natural_str_compare_func);
 
 	/* prefer IP which shares the IP-subnet with the vCenter IP */
 
 	ip_vc = zbx_xml_doc_read_value(xdoc, ZBX_XPATH_PROP_NAME("summary.managementServerIp"));
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() managementServerIp rule; selected_ifs:%d ip_vc:%s", __func__,
+			selected_ifs.values_num, ZBX_NULL2EMPTY_STR(ip_vc));
 
 	for (i = 0; i < selected_ifs.values_num; i++)
 	{
-		char		*ip_hv = NULL, *mask = NULL, buff[MAX_STRING_LEN];
-		int		ssf;
-		zbx_socket_t	s;
+		char	*ip_hv = NULL, *mask = NULL, buff[MAX_STRING_LEN];
+		int	ssf;
 
 		zbx_snprintf(buff, sizeof(buff), ZBX_XPATH_HV_NIC_IPV4("management"), selected_ifs.values[i]);
 
@@ -3861,16 +3810,8 @@ static char	*vmware_hv_ip_search(xmlDoc *xdoc)
 
 		zbx_free(mask);
 		zbx_vector_str_append(&selected_ips, zbx_strdup(NULL, buff));
-		zbx_vector_int_append(&selected_ssf, ssf);
-		memset(&s, 0, sizeof(zbx_socket_t));
 
-		if (NULL == ip_vc || SUCCEED != vmware_ip2socket(ssf, ip_vc, &s))
-		{
-			zbx_free(ip_hv);
-			continue;
-		}
-
-		if (SUCCEED == zbx_tcp_check_allowed_peers(&s, buff))
+		if (NULL != ip_vc && SUCCEED == ip_in_list(buff, ip_vc))
 		{
 			value = ip_hv;
 			goto out;
@@ -3880,25 +3821,21 @@ static char	*vmware_hv_ip_search(xmlDoc *xdoc)
 		zabbix_log(LOG_LEVEL_TRACE, "%s() managementServerIp fail; ip_vc:%s ip_hv:%s", __func__, ip_vc, buff);
 	}
 
-	if (0 != selected_ips.values)
+	if (0 == selected_ips.values)
 		goto out;
 
 	/* prefer IP from IP-subnet with default gateway */
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() default gateway rule; selected_ifs:%d", __func__, selected_ips.values_num);
 	ip_gw = zbx_xml_doc_read_value(xdoc, ZBX_XPATH_PROP_NAME("config.network.ipRouteConfig.defaultGateway"));
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() default gateway rule; selected_ips:%d ip_gw:%s", __func__,
+			selected_ips.values_num, ZBX_NULL2EMPTY_STR(ip_gw));
 
 	for (i = 0; NULL != ip_gw && i < selected_ips.values_num; i++)
 	{
-		zbx_socket_t	s;
-
-		memset(&s, 0, sizeof(zbx_socket_t));
-
-		if (SUCCEED != vmware_ip2socket(selected_ssf.values[i], ip_gw, &s) ||
-				SUCCEED != zbx_tcp_check_allowed_peers(&s, selected_ips.values[i]))
+		if (SUCCEED != ip_in_list(selected_ips.values[i], ip_gw))
 		{
-			zabbix_log(LOG_LEVEL_TRACE, "%s() default gateway fail; ssf:%d ip_gw:%s ip_hv:%s", __func__,
-					selected_ssf.values[i], ip_gw, selected_ips.values[i]);
+			zabbix_log(LOG_LEVEL_TRACE, "%s() default gateway fail; ip_gw:%s ip_hv:%s", __func__,
+					ip_gw, selected_ips.values[i]);
 			continue;
 		}
 
@@ -3910,7 +3847,8 @@ static char	*vmware_hv_ip_search(xmlDoc *xdoc)
 	}
 
 	/* prefer IP from interface with lowest id */
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() lowest interface id rule; value:%s", __func__, selected_ifs.values[0]);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() lowest interface id rule", __func__);
 
 	if (NULL != (end = strchr(selected_ips.values[0], '/')))
 		*end = '\0';
@@ -3921,13 +3859,12 @@ out:
 	zbx_vector_str_clear_ext(&selected_ips, zbx_str_free);
 	zbx_vector_str_destroy(&selected_ifs);
 	zbx_vector_str_destroy(&selected_ips);
-	zbx_vector_int_destroy(&selected_ssf);
 	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
 	zbx_free(ip_vc);
 	zbx_free(ip_gw);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ip=%s", __func__, ZBX_NULL2EMPTY_STR(value));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ip:%s", __func__, ZBX_NULL2EMPTY_STR(value));
 
 	return value;
 }
@@ -7333,7 +7270,7 @@ out:
  *                                                                            *
  * Function: zbx_xml_read_values                                              *
  *                                                                            *
- * Purpose: populate array of values from a xml data                          *
+ * Purpose: populate array of values from an xml data                         *
  *                                                                            *
  * Parameters: xdoc   - [IN] XML document                                     *
  *             xpath  - [IN] XML XPath                                        *
@@ -7352,7 +7289,7 @@ static int	zbx_xml_read_values(xmlDoc *xdoc, const char *xpath, zbx_vector_str_t
  *                                                                            *
  * Function: zbx_xml_node_read_values                                         *
  *                                                                            *
- * Purpose: populate array of values from a xml data                          *
+ * Purpose: populate array of values from an xml data                         *
  *                                                                            *
  * Parameters: xdoc   - [IN] XML document                                     *
  *             node   - [IN] the XML node                                     *
