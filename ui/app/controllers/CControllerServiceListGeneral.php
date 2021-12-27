@@ -199,8 +199,11 @@ abstract class CControllerServiceListGeneral extends CController {
 		$limit = CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE);
 
 		$slas = API::Sla()->get([
-			'output' => ['slaid', 'name', 'period', 'slo', 'timezone'],
+			'output' => ['slaid', 'name', 'period', 'slo', 'timezone', 'status'],
 			'serviceids' => $this->service['serviceid'],
+			'filter' => [
+				'status' => ZBX_SLA_STATUS_ENABLED
+			],
 			'sortfield' => 'name',
 			'sortorder' => ZBX_SORT_UP,
 			'limit' => $limit + 1,

@@ -51,7 +51,8 @@ $filter = (new CFilter())
 								'srctbl' => 'sla',
 								'srcfld1' => 'slaid',
 								'dstfrm' => 'zbx_filter',
-								'dstfld1' => 'filter_slaid'
+								'dstfld1' => 'filter_slaid',
+								'enabled_only' => 1
 							]
 						]
 					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)

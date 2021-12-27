@@ -596,6 +596,9 @@ switch ($data['method']) {
 			case 'sla':
 				$slas = API::Sla()->get([
 					'output' => ['slaid', 'name'],
+					'filter' => [
+						'status' => array_key_exists('enabled_only', $data) ? ZBX_SLA_STATUS_ENABLED : null
+					],
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'limit' => $limit
 				]);

@@ -116,6 +116,20 @@ foreach ($data['slas'] as $slaid => $sla) {
 			: (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED);
 	}
 
+	if ($data['has_access'][CRoleHelper::UI_SERVICES_SLA_REPORT]) {
+		$sla_report_tag = $sla['status'] == ZBX_SLA_STATUS_ENABLED
+			? new CLink(_('SLA report'),
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'slareport.list')
+					->setArgument('filter_slaid', $slaid)
+					->setArgument('filter_set', 1)
+			)
+			: '';
+	}
+	else {
+		$sla_report_tag = null;
+	}
+
 	$row = [
 		$data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA]
 			? new CCheckBox('slaids['.$slaid.']', $slaid)
@@ -131,14 +145,7 @@ foreach ($data['slas'] as $slaid => $sla) {
 		CSlaHelper::getPeriodNames()[$sla['period']],
 		$sla['timezone'],
 		CSlaHelper::getScheduleTag($sla['schedule']),
-		$data['has_access'][CRoleHelper::UI_SERVICES_SLA_REPORT]
-			? new CLink(_('SLA report'),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'slareport.list')
-					->setArgument('filter_slaid', $slaid)
-					->setArgument('filter_set', 1)
-			)
-			: null,
+		$sla_report_tag,
 		$status_tag
 	];
 

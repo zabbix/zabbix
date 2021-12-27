@@ -440,6 +440,7 @@ class CControllerPopupGeneric extends CController {
 			'itemtype' =>							'in '.implode(',', self::ALLOWED_ITEM_TYPES),
 			'value_types' =>						'array',
 			'context' =>							'string|in host,template',
+			'enabled_only' =>						'in 1',
 			'disable_names' =>						'array',
 			'numeric' =>							'in 1',
 			'reference' =>							'string',
@@ -1371,8 +1372,7 @@ class CControllerPopupGeneric extends CController {
 
 			case 'dashboard':
 				$options += [
-					'output' => ['dashboardid', 'name'],
-					'preservekeys' => true
+					'output' => ['dashboardid', 'name']
 				];
 
 				$records = API::Dashboard()->get($options);
@@ -1383,7 +1383,9 @@ class CControllerPopupGeneric extends CController {
 			case 'sla':
 				$options += [
 					'output' => ['slaid', 'name'],
-					'preservekeys' => true
+					'filter' => [
+						'status' => $this->hasInput('enabled_only') ? ZBX_SLA_STATUS_ENABLED : null
+					]
 				];
 
 				$records = API::Sla()->get($options);
