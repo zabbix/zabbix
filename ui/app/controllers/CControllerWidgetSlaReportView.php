@@ -51,51 +51,53 @@ class CControllerWidgetSlaReportView extends CControllerWidget {
 		];
 
 		$db_slas = API::Sla()->get([
-			'output' => ['slaid', 'name', 'period', 'slo', 'timezone'],
+			'output' => ['slaid', 'name', 'period', 'slo', 'timezone', 'status'],
 			'slaids' => $fields['slaid']
 		]);
 
 		if ($db_slas) {
 			$data['sla'] = $db_slas[0];
 
-			$data['services'] = API::Service()->get([
-				'output' => ['name'],
-				'serviceids' => $fields['serviceid'] ?: null,
-				'sortfield' => 'name',
-				'sortorder' => ZBX_SORT_UP,
-				'limit' => CWebUser::$data['rows_per_page'] + 1,
-				'preservekeys' => true
-			]);
-
-			if ($fields['serviceid'] && !$data['services']) {
-				$data['has_permissions_error'] = true;
-			}
-			else {
-				$range_time_parser = new CRangeTimeParser();
-
-				if ($fields['date_from'] !== ''
-						&& $range_time_parser->parse($fields['date_from']) == CParser::PARSE_SUCCESS) {
-					$period_from = $range_time_parser->getDateTime(true)->getTimestamp();
-				}
-				else {
-					$period_from = null;
-				}
-
-				if ($fields['date_to'] !== ''
-						&& $range_time_parser->parse($fields['date_to']) == CParser::PARSE_SUCCESS) {
-					$period_to = $range_time_parser->getDateTime(false)->getTimestamp();
-				}
-				else {
-					$period_to = null;
-				}
-
-				$data['sli'] = API::Sla()->getSli([
-					'slaid' => $data['sla']['slaid'],
-					'serviceids' => array_keys($data['services']),
-					'periods' => $fields['show_periods'] !== '' ? $fields['show_periods'] : null,
-					'period_from' => $period_from,
-					'period_to' => $period_to
+			if ($data['sla']['status'] == ZBX_SLA_STATUS_ENABLED) {
+				$data['services'] = API::Service()->get([
+					'output' => ['name'],
+					'serviceids' => $fields['serviceid'] ?: null,
+					'sortfield' => 'name',
+					'sortorder' => ZBX_SORT_UP,
+					'limit' => CWebUser::$data['rows_per_page'] + 1,
+					'preservekeys' => true
 				]);
+
+				if ($fields['serviceid'] && !$data['services']) {
+					$data['has_permissions_error'] = true;
+				}
+				else {
+					$range_time_parser = new CRangeTimeParser();
+
+					if ($fields['date_from'] !== ''
+							&& $range_time_parser->parse($fields['date_from']) == CParser::PARSE_SUCCESS) {
+						$period_from = $range_time_parser->getDateTime(true)->getTimestamp();
+					}
+					else {
+						$period_from = null;
+					}
+
+					if ($fields['date_to'] !== ''
+							&& $range_time_parser->parse($fields['date_to']) == CParser::PARSE_SUCCESS) {
+						$period_to = $range_time_parser->getDateTime(false)->getTimestamp();
+					}
+					else {
+						$period_to = null;
+					}
+
+					$data['sli'] = API::Sla()->getSli([
+						'slaid' => $data['sla']['slaid'],
+						'serviceids' => array_keys($data['services']),
+						'periods' => $fields['show_periods'] !== '' ? $fields['show_periods'] : null,
+						'period_from' => $period_from,
+						'period_to' => $period_to
+					]);
+				}
 			}
 		}
 		else {

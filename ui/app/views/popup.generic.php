@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $output = [
@@ -155,7 +156,6 @@ switch ($data['popup_type']) {
 	case 'roles':
 	case 'api_methods':
 	case 'dashboard':
-	case 'sla':
 		foreach ($data['table_records'] as $item) {
 			$check_box = $data['multiselect']
 				? new CCheckBox('item['.$item['id'].']', $item['id'])
@@ -614,6 +614,43 @@ switch ($data['popup_type']) {
 			$table->addRow([$check_box, $name, [
 				(new CDiv($mappings_table))->addClass(ZBX_STYLE_VALUEMAP_MAPPINGS_TABLE), $hellip
 			]]);
+		}
+		break;
+
+	case 'sla':
+		foreach ($data['table_records'] as $item) {
+			$check_box = $data['multiselect']
+				? new CCheckBox('item['.$item['id'].']', $item['id'])
+				: null;
+
+			if (array_key_exists('_disabled', $item)) {
+				if ($data['multiselect']) {
+					$check_box->setChecked(1);
+					$check_box->setEnabled(false);
+				}
+				$name = $item['name'];
+
+				unset($data['table_records'][$item['id']]);
+			}
+			else {
+				$js_action = 'javascript: addValue('.zbx_jsvalue($options['reference']).', '.
+						zbx_jsvalue($item['id']).', '.$options['parentid'].');';
+
+				$name = (new CLink($item['name'], 'javascript:void(0);'))
+					->setId('spanid'.$item['id'])
+					->onClick($js_action.$js_action_onclick);
+			}
+
+			if (array_key_exists('status', $item)) {
+				$status_tag = $item['status'] == ZBX_SLA_STATUS_ENABLED
+					? (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN)
+					: (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED);
+			}
+			else {
+				$status_tag = null;
+			}
+
+			$table->addRow([$check_box, $name, $status_tag]);
 		}
 		break;
 }

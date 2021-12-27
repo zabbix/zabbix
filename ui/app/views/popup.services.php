@@ -59,7 +59,6 @@ $services = (new CTableInfo())
 		$data['is_multiple'] ? (new CColHeader(new CCheckBox('serviceid_all')))->addClass(ZBX_STYLE_CELL_WIDTH) : null,
 		_('Name'),
 		_('Tags'),
-		_('Status calculation rule'),
 		_('Problem tags')
 	]);
 
@@ -69,12 +68,10 @@ foreach ($data['services'] as $service) {
 		(new CCol([
 			$data['is_multiple'] ? null : (new CVar('serviceid', $service['serviceid']))->removeId(),
 			(new CVar('name', $service['name']))->removeId(),
-			(new CVar('algorithm', $service['algorithm']))->removeId(),
 			(new CVar('problem_tags_html', $data['problem_tags_html'][$service['serviceid']]))->removeId(),
 			(new CLink($service['name']))->addClass('js-name')
 		]))->addClass(ZBX_STYLE_WORDBREAK),
 		new CCol($data['tags'][$service['serviceid']]),
-		(new CCol(CServiceHelper::getAlgorithmNames()[$service['algorithm']]))->addClass(ZBX_STYLE_NOWRAP),
 		new CCol($data['problem_tags'][$service['serviceid']])
 	]);
 }

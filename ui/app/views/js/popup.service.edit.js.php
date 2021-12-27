@@ -31,7 +31,6 @@ window.service_edit_popup = {
 	serviceid: null,
 	children: new Map(),
 
-	algorithm_names: null,
 	create_url: null,
 	update_url: null,
 	delete_url: null,
@@ -42,13 +41,12 @@ window.service_edit_popup = {
 	form: null,
 	footer: null,
 
-	init({serviceid, children, children_problem_tags_html, problem_tags, status_rules, algorithm_names, create_url,
-			update_url, delete_url, search_limit}) {
+	init({serviceid, children, children_problem_tags_html, problem_tags, status_rules, create_url, update_url,
+			delete_url, search_limit}) {
 		this.initTemplates();
 
 		this.serviceid = serviceid;
 
-		this.algorithm_names = algorithm_names;
 		this.create_url = create_url;
 		this.update_url = update_url;
 		this.delete_url = delete_url;
@@ -67,7 +65,6 @@ window.service_edit_popup = {
 			this.children.set(service.serviceid, {
 				serviceid: service.serviceid,
 				name: service.name,
-				algorithm: service.algorithm,
 				problem_tags_html: children_problem_tags_html[service.serviceid]
 			});
 		}
@@ -186,7 +183,6 @@ window.service_edit_popup = {
 		this.child_template = new Template(`
 			<tr data-serviceid="#{serviceid}">
 				<td class="<?= ZBX_STYLE_WORDWRAP ?>" style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;">#{name}</td>
-				<td>#{algorithm}</td>
 				<td class="<?= ZBX_STYLE_WORDWRAP ?>">#{*problem_tags_html}</td>
 				<td>
 					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
@@ -304,7 +300,6 @@ window.service_edit_popup = {
 			.insertAdjacentHTML('beforeend', this.child_template.evaluate({
 				serviceid: service.serviceid,
 				name: service.name,
-				algorithm: this.algorithm_names[service.algorithm],
 				problem_tags_html: service.problem_tags_html
 			}));
 	},

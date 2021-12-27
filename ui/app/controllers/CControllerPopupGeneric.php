@@ -764,7 +764,7 @@ class CControllerPopupGeneric extends CController {
 	 * Main controller action.
 	 */
 	protected function doAction() {
-		$popup = $this->popup_properties[$this->source_table];
+		$popup = $this->getPopupProperties();
 
 		// Update or read profile.
 		if ($this->groupids) {
@@ -829,6 +829,25 @@ class CControllerPopupGeneric extends CController {
 		}
 
 		$this->setResponse(new CControllerResponseData($data));
+	}
+
+	/**
+	 * Customize and return popup properties.
+	 *
+	 * @return array
+	 */
+	protected function getPopupProperties(): array {
+		$popup_properties = $this->popup_properties[$this->source_table];
+
+		switch ($this->source_table) {
+			case 'sla':
+				if (!$this->hasInput('enabled_only')) {
+					$popup_properties['table_columns'] = array_merge($popup_properties['table_columns'], [_('Status')]);
+				}
+				break;
+		}
+
+		return $popup_properties;
 	}
 
 	/**
@@ -1381,12 +1400,16 @@ class CControllerPopupGeneric extends CController {
 				break;
 
 			case 'sla':
-				$options += [
-					'output' => ['slaid', 'name'],
-					'filter' => [
-						'status' => $this->hasInput('enabled_only') ? ZBX_SLA_STATUS_ENABLED : null
+				$options += $this->hasInput('enabled_only')
+					? [
+						'output' => ['slaid', 'name'],
+						'filter' => [
+							'status' => ZBX_SLA_STATUS_ENABLED
+						]
 					]
-				];
+					: [
+						'output' => ['slaid', 'name', 'status']
+					];
 
 				$records = API::Sla()->get($options);
 				CArrayHelper::sort($records, ['name']);

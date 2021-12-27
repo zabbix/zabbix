@@ -59,7 +59,7 @@ class CControllerPopupServices extends CController {
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 
 		$services = API::Service()->get([
-			'output' => ['serviceid', 'name', 'algorithm'],
+			'output' => ['serviceid', 'name'],
 			'selectTags' => ['tag', 'value'],
 			'selectProblemTags' => ['tag', 'value'],
 			'search' => ['name' => $this->hasInput('filter_name') ? $this->getInput('filter_name') : null],

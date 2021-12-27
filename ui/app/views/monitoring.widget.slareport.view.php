@@ -29,6 +29,9 @@ $report = (new CTableInfo())->addClass(ZBX_STYLE_LIST_TABLE_STICKY_HEADER);
 if ($data['has_permissions_error']) {
 	$report->setNoDataMessage(_('No permissions to referred object or it does not exist!'));
 }
+elseif ($data['sla']['status'] != ZBX_SLA_STATUS_ENABLED) {
+	$report->setNoDataMessage(_('SLA is disabled.'));
+}
 elseif (!$data['has_serviceid']) {
 	$header = [
 		_('Service'),

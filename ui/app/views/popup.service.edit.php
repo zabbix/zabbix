@@ -267,7 +267,6 @@ $child_services = (new CTable())
 	->setHeader(
 		(new CRowHeader([
 			_('Service'),
-			_('Status calculation rule'),
 			_('Problem tags'),
 			_('Action')
 		]))->addClass(ZBX_STYLE_GREY)
@@ -287,7 +286,7 @@ $child_services = (new CTable())
 							(new CListItem(null))
 								->addClass(ZBX_STYLE_INLINE_FILTER_STATS)
 						)
-				))->setColSpan(4)
+				))->setColSpan(3)
 			)
 	);
 
@@ -334,7 +333,7 @@ $form
 	->addItem($tabs)
 	->addItem(
 		(new CScriptTag('
-			const params = '.json_encode([
+			service_edit_popup.init('.json_encode([
 				'serviceid' => $data['serviceid'],
 				'children' => $data['form']['children'],
 				'children_problem_tags_html' => $data['form']['children_problem_tags_html'],
@@ -350,11 +349,7 @@ $form
 					->setArgument('action', 'service.delete')
 					->getUrl(),
 				'search_limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
-			]).'
-
-			params.algorithm_names = '.json_encode(CServiceHelper::getAlgorithmNames(), JSON_FORCE_OBJECT).';
-
-			service_edit_popup.init(params);
+			]).');
 		'))->setOnDocumentReady()
 	);
 
