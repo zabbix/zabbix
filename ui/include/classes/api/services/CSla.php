@@ -1426,8 +1426,8 @@ class CSla extends CApiService {
 	}
 
 	/**
-	 * @param array $reporting_period
 	 * @param array $db_sla
+	 * @param array $reporting_period
 	 *
 	 * @throws Exception
 	 *
