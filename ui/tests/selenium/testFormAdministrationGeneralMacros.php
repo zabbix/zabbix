@@ -837,7 +837,9 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 
 		// Open the list of "Available host" host items and check macro resolution in item name.
 		$this->page->login()->open($item_url)->waitUntilReady();
-		$this->assertTrue($this->query('link', 'Macro value: '.$macro['value'])->exists());
+//		Caused by https://support.zabbix.com/browse/ZBXNEXT-7115
+//		Support of user macros in item names has been dropped.
+//		$this->assertTrue($this->query('link', 'Macro value: '.$macro['value'])->exists());
 
 		// Change macro type.
 		$this->page->open('zabbix.php?action=macros.edit')->waitUntilReady();
@@ -847,7 +849,9 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 
 		// Open list of items and check that macro value is hidden.
 		$this->page->open($item_url)->waitUntilReady();
-		$this->assertTrue($this->query('link', 'Macro value: ******')->exists());
+//		Caused by https://support.zabbix.com/browse/ZBXNEXT-7115
+//		Support of user macros in item names has been dropped.
+//		$this->assertTrue($this->query('link', 'Macro value: ******')->exists());
 	}
 
 	public function getCreateVaultMacrosData() {
