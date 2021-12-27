@@ -62,7 +62,9 @@ class CSla extends CApiService {
 				'status' =>						['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [ZBX_SLA_STATUS_DISABLED, ZBX_SLA_STATUS_ENABLED])]
 			]],
 			'search' =>						['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				'name' =>						['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
+				'name' =>						['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'timezone' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'description' =>				['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
 			]],
 			'searchByAny' =>				['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>				['type' => API_FLAG, 'default' => false],
