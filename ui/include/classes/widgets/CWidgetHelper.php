@@ -444,8 +444,10 @@ class CWidgetHelper {
 	 *
 	 * @return CNumericBox
 	 */
-	public static function getIntegerBox($field) {
-		return (new CNumericBox($field->getName(), $field->getValue(), $field->getMaxLength()))
+	public static function getIntegerBox(CWidgetFieldIntegerBox $field): CNumericBox {
+		return (new CNumericBox($field->getName(), $field->getValue(), $field->getMaxLength(), false,
+			($field->getFlags() & CWidgetField::FLAG_NOT_EMPTY) == 0
+		))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 			->setAriaRequired(self::isAriaRequired($field));
 	}
