@@ -95,7 +95,6 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 		$breadcrumbs = $this->getBreadcrumbs($path, $filter['filter_set']);
 
 		$parent_url = count($breadcrumbs) > 1
-				&& array_key_exists('curl', $breadcrumbs[count($breadcrumbs) - 2])
 			? $breadcrumbs[count($breadcrumbs) - 2]['curl']->getUrl()
 			: $breadcrumbs[0]['curl']->getUrl();
 
