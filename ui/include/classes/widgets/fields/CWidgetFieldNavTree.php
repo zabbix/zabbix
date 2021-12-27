@@ -134,7 +134,12 @@ class CWidgetFieldNavTree extends CWidgetField {
 		return $navtree_items;
 	}
 
-	public function validate($strict = false) {
+	/**
+	 * @param bool $strict
+	 *
+	 * @return array
+	 */
+	public function validate(bool $strict = false): array {
 		$errors = parent::validate($strict);
 
 		if (!$errors) {

@@ -57,7 +57,7 @@ class CWidgetFormSlaReport extends CWidgetForm
 		$this->fields[$field_show_periods->getName()] = $field_show_periods;
 
 		// Date from.
-		$field_date_from = new CWidgetFieldDatePicker('date_from', _('From'));
+		$field_date_from = new CWidgetFieldDatePicker('date_from', _('From'), DATE_FORMAT, true);
 
 		if (array_key_exists('date_from', $this->data)) {
 			$field_date_from->setValue($this->data['date_from']);
@@ -66,12 +66,45 @@ class CWidgetFormSlaReport extends CWidgetForm
 		$this->fields[$field_date_from->getName()] = $field_date_from;
 
 		// Date to.
-		$field_date_to = new CWidgetFieldDatePicker('date_to', _('To'));
+		$field_date_to = new CWidgetFieldDatePicker('date_to', _('To'), DATE_FORMAT, true);
 
 		if (array_key_exists('date_to', $this->data)) {
 			$field_date_to->setValue($this->data['date_to']);
 		}
 
 		$this->fields[$field_date_to->getName()] = $field_date_to;
+	}
+
+	/**
+	 * @param bool $strict
+	 *
+	 * @return array
+	 */
+	public function validate($strict = false): array {
+		if ($errors = parent::validate($strict)) {
+			return $errors;
+		}
+
+		$absolute_time_parser = new CAbsoluteTimeParser();
+
+		if (!$absolute_time_parser->parse($this->fields['date_from']->getValue()) == CParser::PARSE_SUCCESS) {
+			return [];
+		}
+
+		$date_from_timestamp = $absolute_time_parser->getDateTime(false);
+
+		if (!$absolute_time_parser->parse($this->fields['date_to']->getValue()) == CParser::PARSE_SUCCESS) {
+			return [];
+		}
+
+		$date_to_timestamp = $absolute_time_parser->getDateTime(false);
+
+		if ($date_to_timestamp < $date_from_timestamp) {
+			return [
+				_s('"%1$s" date must be less than "%2$s" date.', _('From'), _('To'))
+			];
+		}
+
+		return [];
 	}
 }

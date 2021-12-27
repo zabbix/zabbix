@@ -209,13 +209,11 @@ class CWidgetField {
 	}
 
 	/**
-	 * Validate field.
+	 * @param bool $strict  Widget form submit validation?
 	 *
-	 * @param bool $strict  Enables more strict validation of the field.
-	 *
-	 * @return bool
+	 * @return array  Errors.
 	 */
-	public function validate($strict = false) {
+	public function validate(bool $strict = false): array {
 		$errors = [];
 
 		$validation_rules = ($strict && $this->strict_validation_rules !== null)

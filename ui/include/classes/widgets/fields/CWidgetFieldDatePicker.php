@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,41 +19,100 @@
 **/
 
 
-/**
- * Class makes datepicker widget field.
- */
 class CWidgetFieldDatePicker extends CWidgetField {
 
+	private $date_time_format;
+	private $is_date_only;
+
 	/**
-	 * Date picker widget field.
-	 *
-	 * @param string $name   Field name in form.
-	 * @param string $label  Label for the field in form.
+	 * @param string $name
+	 * @param string $label
+	 * @param string $date_time_format
+	 * @param bool   $is_date_only
 	 */
-	public function __construct($name, $label) {
+	public function __construct(string $name, string $label, string $date_time_format, bool $is_date_only) {
 		parent::__construct($name, $label);
 
+		$this->date_time_format = $date_time_format;
+		$this->is_date_only = $is_date_only;
+
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
-		$this->setValidationRules(['type' => API_RANGE_TIME, 'length' => 255]);
+		$this->setValidationRules([
+			'type' => API_STRING_UTF8,
+			'length' => DB::getFieldLength('widget_field', 'value_str')
+		]);
 		$this->setDefault('');
 	}
 
 	/**
-	 * Set additional flags, which can be used in configuration form.
-	 *
-	 * @param int $flags
-	 *
-	 * @return $this
+	 * @return string
 	 */
-	public function setFlags($flags) {
-		parent::setFlags($flags);
+	public function getDateTimeFormat(): string {
+		return $this->date_time_format;
+	}
 
-		if ($flags & self::FLAG_NOT_EMPTY) {
-			$validation_rules = $this->getValidationRules();
-			self::setValidationRuleFlag($validation_rules, API_NOT_EMPTY);
-			$this->setValidationRules($validation_rules);
+	/**
+	 * @return bool
+	 */
+	public function isDateOnly(): bool {
+		return $this->is_date_only;
+	}
+
+	/**
+	 * @param bool $strict
+	 *
+	 * @return array
+	 */
+	public function validate(bool $strict = false): array {
+		if ($errors = parent::validate($strict)) {
+			return $errors;
 		}
 
-		return $this;
+		$label = $this->full_name ?? $this->label ?? $this->name;
+		$value = $this->value ?? $this->default;
+
+		if ($value === '' && ($this->getFlags() & self::FLAG_NOT_EMPTY) == 0) {
+			$this->setValue('');
+
+			return [];
+		}
+
+		$datetime = DateTime::createFromFormat('!'.$this->getDateTimeFormat(), $value);
+		$last_errors = DateTime::getLastErrors();
+
+		if ($datetime !== false && $last_errors['warning_count'] == 0 && $last_errors['error_count'] == 0) {
+			$this->setValue($value);
+
+			return [];
+		}
+
+		$relative_time_parser = new CRelativeTimeParser();
+
+		if ($relative_time_parser->parse($value) == CParser::PARSE_SUCCESS) {
+			$has_errors = false;
+
+			if ($this->isDateOnly()) {
+				foreach ($relative_time_parser->getTokens() as $token) {
+					if ($token['suffix'] === 'h' || $token['suffix'] === 'm' || $token['suffix'] === 's') {
+						$has_errors = true;
+						break;
+					}
+				}
+			}
+
+			if (!$has_errors) {
+				$this->setValue($value);
+
+				return [];
+			}
+		}
+
+		$this->setValue($this->default);
+
+		return [
+			_s('Invalid parameter "%1$s": %2$s.', $label,
+				$this->isDateOnly() ? _('a date is expected') : _('a time is expected')
+			)
+		];
 	}
 }

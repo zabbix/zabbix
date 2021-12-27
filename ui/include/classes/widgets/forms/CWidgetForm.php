@@ -184,7 +184,7 @@ class CWidgetForm {
 	 * @param bool $strict  Enables more strict validation of the form fields.
 	 *                      Must be enabled for validation of input parameters in the widget configuration form.
 	 *
-	 * @return bool
+	 * @return array
 	 */
 	public function validate($strict = false) {
 		$errors = [];

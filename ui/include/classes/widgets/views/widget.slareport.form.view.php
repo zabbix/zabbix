@@ -61,16 +61,16 @@ $form_list->addRow(
 $form_list->addRow(
 	CWidgetHelper::getLabel($fields['date_from']),
 	CWidgetHelper::getDatePicker($fields['date_from'])
-		->setDateFormat(ZBX_DATE)
-		->setPlaceholder(_('YYYY-MM-DD'))
+		->setDateFormat(DATE_FORMAT)
+		->setPlaceholder(DATE_FORMAT_PLACEHOLDER)
 );
 
 // Date to.
 $form_list->addRow(
 	CWidgetHelper::getLabel($fields['date_to']),
 	CWidgetHelper::getDatePicker($fields['date_to'])
-		->setDateFormat(ZBX_DATE)
-		->setPlaceholder(_('YYYY-MM-DD'))
+		->setDateFormat(DATE_FORMAT)
+		->setPlaceholder(DATE_FORMAT_PLACEHOLDER)
 );
 
 $form->addItem($form_list);
