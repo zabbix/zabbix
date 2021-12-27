@@ -201,6 +201,8 @@ abstract class CControllerServiceListGeneral extends CController {
 		$slas = API::Sla()->get([
 			'output' => ['slaid', 'name', 'period', 'slo', 'timezone'],
 			'serviceids' => $this->service['serviceid'],
+			'sortfield' => 'name',
+			'sortorder' => ZBX_SORT_UP,
 			'limit' => $limit + 1,
 		]);
 
