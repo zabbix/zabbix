@@ -42,7 +42,9 @@ $filter = (new CFilter())
 					(new CMultiSelect([
 						'name' => 'filter_slaid',
 						'object_name' => 'sla',
-						'data' => $data['ms_sla'],
+						'data' => $data['sla'] !== null
+							? [CArrayHelper::renameKeys($data['sla'], ['slaid' => 'id'])]
+							: [],
 						'multiple' => false,
 						'popup' => [
 							'parameters' => [
@@ -59,7 +61,9 @@ $filter = (new CFilter())
 					(new CMultiSelect([
 						'name' => 'filter_serviceid',
 						'object_name' => 'service',
-						'data' => $data['ms_service'],
+						'data' => $data['service'] !== null
+							? [CArrayHelper::renameKeys($data['service'], ['serviceid' => 'id'])]
+							: [],
 						'multiple' => false,
 						'custom_select' => true
 					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)

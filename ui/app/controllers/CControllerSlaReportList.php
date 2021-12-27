@@ -188,12 +188,6 @@ class CControllerSlaReportList extends CController {
 			'active_tab' => CProfile::get('web.slareport.list.filter.active', 1),
 			'sort' => $sort_field,
 			'sortorder' => $sort_order,
-			'ms_sla' => $sla !== null
-				? [CArrayHelper::renameKeys($sla, ['slaid' => 'id'])]
-				: [],
-			'ms_service' => $service !== null
-				? [CArrayHelper::renameKeys($service, ['serviceid' => 'id'])]
-				: [],
 			'sla' => $sla,
 			'service' => $service,
 			'has_errors' => $has_errors
