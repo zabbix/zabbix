@@ -313,10 +313,6 @@ class CWidgetConfig {
 			case WIDGET_GRAPH_PROTOTYPE:
 				return true;
 
-			case WIDGET_SLA_REPORT:
-				// TODO: check period from widget configuration
-				return true;
-
 			case WIDGET_SVG_GRAPH:
 				return !CWidgetFormSvgGraph::hasOverrideTime($fields);
 
