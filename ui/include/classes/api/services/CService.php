@@ -98,8 +98,8 @@ class CService extends CApiService {
 			'selectProblemEvents' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['eventid', 'severity', 'name']), 'default' => null],
 			'selectStatusRules' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['type', 'limit_value', 'limit_status', 'new_status']), 'default' => null],
 			'selectStatusTimeline' =>	['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NOT_EMPTY, 'uniq' => [['from', 'to']], 'default' => null, 'fields' => [
-				'period_from' =>			['type' => API_INT32, 'flags' => API_REQUIRED],
-				'period_to' =>				['type' => API_INT32, 'flags' => API_REQUIRED]
+				'period_from' =>			['type' => API_INT32, 'in' => '0:'.ZBX_MAX_DATE, 'flags' => API_REQUIRED],
+				'period_to' =>				['type' => API_INT32, 'in' => '0:'.ZBX_MAX_DATE, 'flags' => API_REQUIRED]
 			]],
 			// sort and limit
 			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', ['serviceid', 'name', 'status', 'sortorder', 'created_at']), 'uniq' => true, 'default' => []],
@@ -113,6 +113,8 @@ class CService extends CApiService {
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
+
+
 
 		if ($permissions === null) {
 			$accessible_services = null;
