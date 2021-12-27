@@ -1343,7 +1343,6 @@ define('API_OUTPUT',				22);
 define('API_TIME_UNIT',				23);
 define('API_URL',					24);
 define('API_H_NAME',				25);
-define('API_RANGE_TIME',			26);
 define('API_COLOR',					27);
 define('API_NUMERIC',				28);
 define('API_LLD_MACRO',				29);
