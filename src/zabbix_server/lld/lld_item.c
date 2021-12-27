@@ -1331,7 +1331,7 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 	int		ret = SUCCEED;
 	zbx_token_t	token;
 	char		err[MAX_STRING_LEN], *errmsg = NULL;
-	char		param1[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *param2;
+	char		param1[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *param2, *param3;
 	const char	*regexp_err = NULL;
 	zbx_uint64_t	value_ui64;
 	zbx_jsonpath_t	jsonpath;
@@ -1363,6 +1363,7 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 			if (FAIL == (ret = zbx_regexp_compile(param1, NULL, &regexp_err)))
 			{
 				zbx_strlcpy(err, regexp_err, sizeof(err));
+				zbx_regexp_err_msg_free(regexp_err);
 			}
 			break;
 		case ZBX_PREPROC_JSONPATH:
@@ -1433,7 +1434,10 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 			/* break; is not missing here */
 		case ZBX_PREPROC_VALIDATE_NOT_REGEX:
 			if (FAIL == (ret = zbx_regexp_compile(pp->params, NULL, &regexp_err)))
+			{
 				zbx_strlcpy(err, regexp_err, sizeof(err));
+				zbx_regexp_err_msg_free(regexp_err);
+			}
 			break;
 		case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 			if (SUCCEED != str2uint64(pp->params, "smhdw", &value_ui64) || 0 == value_ui64)
@@ -1452,6 +1456,14 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 			}
 			*param2++ = '\0';
 
+			if (NULL == (param3 = strchr(param2, '\n')))
+			{
+				zbx_snprintf(err, sizeof(err), "cannot find third parameter: %s", pp->params);
+				ret = FAIL;
+				break;
+			}
+			*param3++ = '\0';
+
 			if (FAIL == zbx_prometheus_validate_filter(param1, &errmsg))
 			{
 				zbx_snprintf(err, sizeof(err), "invalid pattern: %s", param1);
@@ -1460,9 +1472,17 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 				break;
 			}
 
-			if (FAIL == zbx_prometheus_validate_label(param2))
+			if (0 != strcmp(param2, "value") && 0 != strcmp(param2, "label") &&
+					0 != strcmp(param2, "function"))
 			{
-				zbx_snprintf(err, sizeof(err), "invalid label name: %s", param2);
+				zbx_snprintf(err, sizeof(err), "invalid second parameter: %s", param2);
+				ret = FAIL;
+				break;
+			}
+
+			if (FAIL == zbx_prometheus_validate_label(param3))
+			{
+				zbx_snprintf(err, sizeof(err), "invalid label name: %s", param3);
 				ret = FAIL;
 				break;
 			}
@@ -3511,7 +3531,6 @@ static void lld_item_discovery_prepare_update(const zbx_lld_item_prototype_t *it
 		DBexecute_overflowed_sql(sql, sql_alloc, sql_offset);
 	}
 }
-
 
 /******************************************************************************
  *                                                                            *

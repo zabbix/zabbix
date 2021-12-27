@@ -76,7 +76,6 @@ static void	ushiftr128(zbx_uint128_t *base, unsigned int bits)
 	base->hi >>= bits;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: ushiftl128                                                       *

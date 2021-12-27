@@ -2042,7 +2042,6 @@ static int	evaluate_PERCENTILE(zbx_variant_t  *value, DC_ITEM *item, const char 
 		goto out;
 	}
 
-
 	switch (arg1_type)
 	{
 		case ZBX_VALUE_SECONDS:
@@ -2344,8 +2343,8 @@ static int	evaluate_FUZZYTIME(zbx_variant_t *value, DC_ITEM *item, const char *p
 		goto out;
 	}
 
-	fuzlow = (int)(ts->sec - arg1);
-	fuzhig = (int)(ts->sec + arg1);
+	fuzlow = (zbx_uint64_t)(ts->sec - arg1);
+	fuzhig = (zbx_uint64_t)(ts->sec + arg1);
 
 	if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
 	{
@@ -2551,8 +2550,8 @@ static int	evaluate_FORECAST(zbx_variant_t *value, DC_ITEM *item, const char *pa
 
 	if (0 < values.values_num)
 	{
-		t = (double *)zbx_malloc(t, values.values_num * sizeof(double));
-		x = (double *)zbx_malloc(x, values.values_num * sizeof(double));
+		t = (double *)zbx_malloc(t, (size_t)values.values_num * sizeof(double));
+		x = (double *)zbx_malloc(x, (size_t)values.values_num * sizeof(double));
 
 		zero_time.sec = values.values[values.values_num - 1].timestamp.sec;
 		zero_time.ns = values.values[values.values_num - 1].timestamp.ns;
@@ -2700,8 +2699,8 @@ static int	evaluate_TIMELEFT(zbx_variant_t *value, DC_ITEM *item, const char *pa
 
 	if (0 < values.values_num)
 	{
-		t = (double *)zbx_malloc(t, values.values_num * sizeof(double));
-		x = (double *)zbx_malloc(x, values.values_num * sizeof(double));
+		t = (double *)zbx_malloc(t, (size_t)values.values_num * sizeof(double));
+		x = (double *)zbx_malloc(x, (size_t)values.values_num * sizeof(double));
 
 		zero_time.sec = values.values[values.values_num - 1].timestamp.sec;
 		zero_time.ns = values.values[values.values_num - 1].timestamp.ns;
@@ -3642,6 +3641,148 @@ out:
 #undef PREV
 #undef LAST
 
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_BASELINE                                                *
+ *                                                                            *
+ * Purpose: evaluate baseline* functions for the item                         *
+ *                                                                            *
+ * Parameters: value      - [OUT] the function result                         *
+ *             item       - [IN] item (performance metric)                    *
+ *             func       - [IN] the baseline function to evaluate            *
+ *                               (wma, dev)                                   *
+ *             parameters - [IN] function parameters                          *
+ *             ts         - [IN] the historical time when function must be    *
+ *                               evaluated                                    *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	evaluate_BASELINE(zbx_variant_t *value, DC_ITEM *item, const char *func, const char *parameters,
+		const zbx_timespec_t *ts, char **error)
+{
+	int			ret = FAIL, season_num;
+	char			*period = NULL, *tmp = NULL;
+	zbx_vector_dbl_t	values;
+	zbx_vector_uint64_t	index;
+	double			value_dbl;
+	zbx_time_unit_t		season_unit;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_dbl_create(&values);
+	zbx_vector_uint64_create(&index);
+
+	if (3 != num_param(parameters))
+	{
+		*error = zbx_strdup(*error, "invalid number of parameters");
+		goto out;
+	}
+
+	if (SUCCEED != get_function_parameter_str(parameters, 1, &period))
+	{
+		*error = zbx_strdup(*error, "invalid second parameter");
+		goto out;
+	}
+
+	if (SUCCEED != get_function_parameter_str(parameters, 2, &tmp) ||
+			ZBX_TIME_UNIT_HOUR > (season_unit = zbx_tm_str_to_unit(tmp)))
+	{
+		*error = zbx_strdup(*error, "invalid third parameter");
+		goto out;
+	}
+	zbx_free(tmp);
+
+	if (SUCCEED != get_function_parameter_str(parameters, 3, &tmp) || 0 >= (season_num = atoi(tmp)))
+	{
+		*error = zbx_strdup(*error, "invalid fourth parameter");
+		goto out;
+	}
+
+	if (0 == strcmp(func, "wma"))
+	{
+		int	i, weights = 0;
+
+		if (SUCCEED != zbx_baseline_get_data(item->itemid, item->value_type, ts->sec, period, season_num,
+				season_unit, 1, &values, &index, error))
+		{
+			goto out;
+		}
+
+		if (0 == values.values_num)
+		{
+			*error = zbx_strdup(NULL, "not enough data");
+			goto out;
+		}
+
+		value_dbl = 0;
+
+		for (i = 0; i < values.values_num; i++)
+		{
+			int	weight = season_num - (int)index.values[i];
+
+			value_dbl += values.values[i] * weight;
+			weights += weight;
+		}
+
+		value_dbl /= weights;
+	}
+	else if (0 == strcmp(func, "dev"))
+	{
+		double	value_dev, value_avg = 0;
+		int	i;
+
+		if (SUCCEED != zbx_baseline_get_data(item->itemid, item->value_type, ts->sec, period, season_num,
+				season_unit, 0, &values, &index, error))
+		{
+			goto out;
+		}
+
+		if (1 >= values.values_num)
+		{
+			*error = zbx_strdup(NULL, "not enough data");
+			goto out;
+		}
+
+		if (SUCCEED != zbx_eval_calc_stddevpop(&values, &value_dev, error))
+			goto out;
+
+		if (ZBX_DOUBLE_EPSILON <= value_dev)
+		{
+			for (i = 0; i < values.values_num; i++)
+				value_avg += values.values[i];
+			value_avg /= values.values_num;
+
+			value_dbl = fabs(values.values[0] - value_avg) / value_dev;
+		}
+		else
+			value_dbl = 0;
+
+		zabbix_log(LOG_LEVEL_TRACE, "fabs(" ZBX_FS_DBL " - " ZBX_FS_DBL ") / " ZBX_FS_DBL " = " ZBX_FS_DBL,
+				values.values[0], value_avg, value_dev, value_dbl);
+	}
+	else
+	{
+		*error = zbx_strdup(*error, "unknown baseline function");
+		goto out;
+	}
+
+	zbx_variant_set_dbl(value, value_dbl);
+
+	ret = SUCCEED;
+out:
+	zbx_free(tmp);
+	zbx_free(period);
+
+	zbx_vector_uint64_destroy(&index);
+	zbx_vector_dbl_destroy(&values);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
 static void	history_to_dbl_vector(const zbx_history_record_t *v, int n, unsigned char value_type,
 		zbx_vector_dbl_t *values)
 {
@@ -3870,6 +4011,10 @@ int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function
 	{
 		ret = evaluate_CHANGECOUNT(value, item, parameter, ts, error);
 	}
+	else if (0 == strncmp(function, "baseline", 8))
+	{
+		ret = evaluate_BASELINE(value, item, function + 8, parameter, ts, error);
+	}
 	else
 	{
 		*error = zbx_strdup(*error, "function is not supported");
@@ -3905,7 +4050,8 @@ int	zbx_is_trigger_function(const char *name, size_t len)
 			"pi", "e", "expm1", "atan2", "first", "kurtosis", "mad", "skewness", "stddevpop", "stddevsamp",
 			"sumofsquares", "varpop", "varsamp", "ascii", "bitlength", "char", "concat", "insert", "lcase",
 			"left", "ltrim", "bytelength", "repeat", "replace", "right", "rtrim", "mid", "trim", "between",
-			"in", "bitor", "bitxor", "bitnot", "bitlshift", "bitrshift", NULL};
+			"in", "bitor", "bitxor", "bitnot", "bitlshift", "bitrshift", "baselinewma", "baselinedev",
+			NULL};
 	char	**ptr;
 
 	for (ptr = functions; NULL != *ptr; ptr++)

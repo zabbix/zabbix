@@ -214,7 +214,6 @@ typedef struct
 }
 zbx_object_events_t;
 
-
 /* source events hashset support */
 static zbx_hash_t	DBpatch_3010021_trigger_events_hash_func(const void *data)
 {
@@ -240,7 +239,6 @@ static int	DBpatch_3010021_trigger_events_compare_func(const void *d1, const voi
 
 	return 0;
 }
-
 
 /******************************************************************************
  *                                                                            *

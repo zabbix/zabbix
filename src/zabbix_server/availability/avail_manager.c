@@ -153,4 +153,3 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 	exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL
 }
-
