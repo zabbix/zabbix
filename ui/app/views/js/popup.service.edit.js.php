@@ -469,16 +469,13 @@ window.service_edit_popup = {
 				}
 
 				if ('success' in response) {
-					postMessageOk(response.success.title);
-
-					if ('messages' in response.success) {
-						postMessageDetails('success', response.success.messages);
-					}
-
-					uncheckTableRows('service');
+					this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {
+						detail: {
+							title: response.success.title,
+							messages: ('messages' in response.success) ? response.success.messages : null
+						}
+					}));
 				}
-
-				location.href = location.href;
 			})
 			.catch((error) => {
 				this.overlay.unsetLoading();

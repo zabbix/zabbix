@@ -32,6 +32,7 @@
 	const view = {
 		serviceid: null,
 		mode_switch_url: null,
+		parent_url: null,
 		delete_url: null,
 		refresh_url: null,
 		refresh_interval: null,
@@ -39,14 +40,14 @@
 		is_refresh_paused: false,
 		is_refresh_pending: false,
 
-		init({serviceid, mode_switch_url, delete_url, refresh_url, refresh_interval, back_url = null}) {
+		init({serviceid, mode_switch_url, parent_url, delete_url, refresh_url, refresh_interval, back_url = null}) {
 			this.serviceid = serviceid;
 			this.mode_switch_url = mode_switch_url;
+			this.parent_url = parent_url;
 			this.delete_url = delete_url;
 			this.refresh_url = refresh_url;
 			this.refresh_interval = refresh_interval;
 			this.back_url = back_url;
-
 			this.initViewModeSwitcher();
 			this.initTagFilter();
 			this.initActionButtons();
@@ -111,8 +112,9 @@
 			this.pauseRefresh();
 
 			const overlay = PopUp('popup.service.edit', options, 'service_edit', document.activeElement);
+			const dialogue = overlay.$dialogue[0];
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+			dialogue.addEventListener('dialogue.submit', (e) => {
 				postMessageOk(e.detail.title);
 
 				if (e.detail.messages !== null) {
@@ -122,7 +124,19 @@
 				location.href = location.href;
 			});
 
-			overlay.$dialogue[0].addEventListener('overlay.close', () => this.resumeRefresh(), {once: true});
+			dialogue.addEventListener('dialogue.delete', (e) => {
+				uncheckTableRows('service');
+
+				postMessageOk(e.detail.title);
+
+				if (e.detail.messages !== null) {
+					postMessageDetails('success', e.detail.messages);
+				}
+
+				location.href = options.serviceid === this.serviceid ? this.parent_url : location.href;
+			});
+
+			dialogue.addEventListener('overlay.close', () => this.resumeRefresh(), {once: true});
 		},
 
 		delete(target, serviceids) {

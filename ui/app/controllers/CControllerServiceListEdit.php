@@ -92,6 +92,13 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 			$filter['tags'][] = $tag;
 		}
 
+		$breadcrumbs = $this->getBreadcrumbs($path, $filter['filter_set']);
+
+		$parent_url = count($breadcrumbs) > 1
+				&& array_key_exists('curl', $breadcrumbs[count($breadcrumbs) - 2])
+			? $breadcrumbs[count($breadcrumbs) - 2]['curl']->getUrl()
+			: $breadcrumbs[0]['curl']->getUrl();
+
 		$reset_curl = (new CUrl('zabbix.php'))
 			->setArgument('action', 'service.list.edit')
 			->setArgument('path', $path ?: null)
@@ -128,7 +135,8 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 		$data = [
 			'can_monitor_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
 			'path' => $path,
-			'breadcrumbs' => $this->getBreadcrumbs($path, $filter['filter_set']),
+			'breadcrumbs' => $breadcrumbs,
+			'parent_url' => $parent_url,
 			'filter' => $filter,
 			'is_filtered' => $filter['filter_set'],
 			'active_tab' => CProfile::get('web.service.filter.active', 1),

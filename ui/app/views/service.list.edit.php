@@ -34,13 +34,13 @@ $breadcrumbs = [];
 $filter = null;
 
 if (count($data['breadcrumbs']) > 1) {
-	while ($path_item = array_shift($data['breadcrumbs'])) {
+	foreach ($data['breadcrumbs'] as $index => $path_item) {
 		$breadcrumbs[] = (new CSpan())
 			->addItem(array_key_exists('curl', $path_item)
 				? new CLink($path_item['name'], $path_item['curl'])
 				: $path_item['name']
 			)
-			->addClass(!$data['breadcrumbs'] ? ZBX_STYLE_SELECTED : null);
+			->addClass($index == count($data['breadcrumbs']) - 1 ? ZBX_STYLE_SELECTED : null);
 	}
 }
 
@@ -155,6 +155,7 @@ $filter->addFilterTab(_('Filter'), [
 	view.init('.json_encode([
 		'serviceid' => $data['service'] !== null ? $data['service']['serviceid'] : null,
 		'mode_switch_url' => $data['view_mode_url'],
+		'parent_url' => $data['parent_url'],
 		'delete_url' => (new CUrl('zabbix.php'))
 			->setArgument('action', 'service.delete')
 			->setArgumentSID()
