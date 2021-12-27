@@ -1,6 +1,3 @@
-//go:build !windows
-// +build !windows
-
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -20,40 +17,34 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package main
+package external
 
 import (
-	"os"
-	"os/signal"
-	"syscall"
+	"net"
+	"time"
 
-	"zabbix.com/pkg/log"
+	"github.com/natefinch/npipe"
 )
 
-func loadOSDependentItems() error {
-	return nil
-}
+func (h *handler) setConnection(path string, timeout time.Duration) (err error) {
+	var i int
 
-func createSigsChan() chan os.Signal {
-	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM, syscall.SIGCHLD)
-
-	return sigs
-}
-
-// handleSig() checks received signal and returns true if the signal is handled
-// and can be ignored, false if the program should stop.
-func handleSig(sig os.Signal) bool {
-	switch sig {
-	case syscall.SIGINT, syscall.SIGTERM:
-		sendServiceStop()
-	case syscall.SIGCHLD:
-		if err := checkExternalExits(); err != nil {
-			log.Warningf("Error: %s", err)
-			sendServiceStop()
-		} else {
-			return true
+	for start := time.Now(); ; {
+		if i%5 == 0 {
+			if time.Since(start) > timeout {
+				break
+			}
 		}
+
+		var conn net.Conn
+		if conn, err = npipe.DialTimeout(path, timeout); err != nil {
+			return
+		}
+
+		h.connection = conn
+
+		return
 	}
-	return false
+
+	return
 }

@@ -1,6 +1,3 @@
-//go:build !windows
-// +build !windows
-
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -23,37 +20,33 @@
 package main
 
 import (
-	"os"
-	"os/signal"
-	"syscall"
+	"errors"
 
-	"zabbix.com/pkg/log"
+	"zabbix.com/pkg/plugin"
 )
 
-func loadOSDependentItems() error {
-	return nil
+// Plugin -
+type Plugin struct {
+	plugin.Base
 }
 
-func createSigsChan() chan os.Signal {
-	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM, syscall.SIGCHLD)
+var impl Plugin
 
-	return sigs
-}
-
-// handleSig() checks received signal and returns true if the signal is handled
-// and can be ignored, false if the program should stop.
-func handleSig(sig os.Signal) bool {
-	switch sig {
-	case syscall.SIGINT, syscall.SIGTERM:
-		sendServiceStop()
-	case syscall.SIGCHLD:
-		if err := checkExternalExits(); err != nil {
-			log.Warningf("Error: %s", err)
-			sendServiceStop()
-		} else {
-			return true
-		}
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	switch key {
+	case "debug.external.multikeyOne":
+		return "debug first test response", nil
+	case "debug.external.multikeyTwo":
+		return "debug second test response", nil
+	default:
+		return "", errors.New("Unsupported metric")
 	}
-	return false
+}
+
+func init() {
+	plugin.RegisterMetrics(
+		&impl, "DebugMultikey",
+		"debug.external.multikeyOne", "Returns first test value.",
+		"debug.external.multikeyTwo", "Returns second test value.",
+	)
 }

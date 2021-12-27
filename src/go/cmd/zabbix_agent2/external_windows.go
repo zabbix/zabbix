@@ -1,6 +1,3 @@
-//go:build !windows
-// +build !windows
-
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -23,37 +20,34 @@
 package main
 
 import (
-	"os"
-	"os/signal"
-	"syscall"
+	"fmt"
+	"net"
 
-	"zabbix.com/pkg/log"
+	"github.com/natefinch/npipe"
+	"zabbix.com/plugins/external"
 )
 
-func loadOSDependentItems() error {
+func getListener(socket string) (listener net.Listener, err error) {
+	listener, err = npipe.Listen(socket)
+	if err != nil {
+		err = fmt.Errorf(
+			"failed to create plugin listener with socket path, %s, %s", socket, err.Error(),
+		)
+
+		return
+	}
+
+	return
+}
+
+func cleanUpExternal() {}
+
+func checkExternalExits() error {
 	return nil
 }
 
-func createSigsChan() chan os.Signal {
-	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM, syscall.SIGCHLD)
-
-	return sigs
+func checkExternalExit() error {
+	return nil
 }
 
-// handleSig() checks received signal and returns true if the signal is handled
-// and can be ignored, false if the program should stop.
-func handleSig(sig os.Signal) bool {
-	switch sig {
-	case syscall.SIGINT, syscall.SIGTERM:
-		sendServiceStop()
-	case syscall.SIGCHLD:
-		if err := checkExternalExits(); err != nil {
-			log.Warningf("Error: %s", err)
-			sendServiceStop()
-		} else {
-			return true
-		}
-	}
-	return false
-}
+func listenOnPluginFail(p *external.Plugin, name string) {}

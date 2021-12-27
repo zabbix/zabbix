@@ -615,7 +615,7 @@ func (m *Manager) QueryUserParams() (status string) {
 
 func (m *Manager) validatePlugins(options *agent.AgentOptions) (err error) {
 	for _, p := range plugin.Plugins {
-		if c, ok := p.(plugin.Configurator); ok {
+		if c, ok := p.(plugin.Configurator); ok && !p.IsExternal() {
 			if err = c.Validate(options.Plugins[p.Name()]); err != nil {
 				return fmt.Errorf("invalid plugin %s configuration: %s", p.Name(), err)
 			}
