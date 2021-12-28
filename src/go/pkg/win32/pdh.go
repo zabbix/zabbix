@@ -149,7 +149,7 @@ func PdhGetFormattedCounterValueDoubleHelper(counter PDH_HCOUNTER, retry bool) (
 	if syscall.Errno(ret) != windows.ERROR_SUCCESS {
 		if ret == PDH_CALC_NEGATIVE_DENOMINATOR {
 			if retry {
-				log.Warningf("Detected performance counter with negative denominator, retrying in 1 second")
+				log.Debugf("Detected performance counter with negative denominator, retrying in 1 second")
 				time.Sleep(time.Second)
 				return PdhGetFormattedCounterValueDoubleHelper(counter, false)
 			} else {
