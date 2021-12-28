@@ -41,6 +41,8 @@ class testDashboardSingleItemWidget extends CWebTest {
 	}
 
 	protected static $dashboardid;
+	protected static $old_name = 'New widget';
+	protected static $first = true;
 
 	public static function prepareDashboardData() {
 		$response = CDataHelper::call('dashboard.create', [
@@ -53,7 +55,7 @@ class testDashboardSingleItemWidget extends CWebTest {
 						'widgets' => [
 							[
 								'type' => 'item',
-								'name' => 'New item view',
+								'name' => self::$old_name,
 								'x' => 0,
 								'y' => 0,
 								'width' => 12,
@@ -125,6 +127,21 @@ class testDashboardSingleItemWidget extends CWebTest {
 										'value' => 14
 									]
 								]
+							],
+							[
+								'type' => 'item',
+								'name' => 'Widget to delete',
+								'x' => 13,
+								'y' => 0,
+								'width' => 4,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'itemid',
+										'value' => 29177
+									]
+								]
 							]
 						]
 					]
@@ -134,42 +151,14 @@ class testDashboardSingleItemWidget extends CWebTest {
 		self::$dashboardid = $response['dashboardids'][0];
 	}
 
-	public function getWidgetData() {
-		return [
-			[
-				[
-					'name' => 'New item view' // 0
-				]
-			],
-//			[
-//				[
-//					'name' => 'Clock widget', // 1
-//					'check_type' => 'id',
-//					'tag' => 'div'
-//				]
-//			]
-		];
-	}
-
-	/**
-	 * Test to check Single Item Widget.
-	 *
-	 * @dataProvider getWidgetData
-	 */
-	public function testDashboardSingleItemWidget_check($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
-
-		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
-		$widget = $dashboard->getWidget($data['name']);
-	}
-
-	public static function getCreateWidgetData() {
+	public static function getWidgetData() {
 		return [
 			[
 				[ // Min fields. 0
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Type' => 'Item',
+						'Name' => 'Some name',
 						'Item' => [
 							'values' => 'Available memory in %',
 							'context' => [
@@ -194,7 +183,9 @@ class testDashboardSingleItemWidget extends CWebTest {
 								'context' => 'Zabbix servers'
 							]
 						],
+						'id:show_1' => true,
 						'id:show_2' => false,
+						'id:show_3' => true,
 						'id:show_4' => false,
 						'Advanced configuration' => true,
 						'id:description' => 'Несколько слов. Dāži vārdi.',
@@ -223,7 +214,9 @@ class testDashboardSingleItemWidget extends CWebTest {
 							]
 						],
 						'id:show_1' => false,
+						'id:show_2' => true,
 						'id:show_3' => false,
+						'id:show_4' => true,
 						'Advanced configuration' => true,
 						'id:units' => 'Some Units',
 						'id:units_pos' => 'Below value',
@@ -240,18 +233,16 @@ class testDashboardSingleItemWidget extends CWebTest {
 						'Name' => 'New Single Item Widget',
 						'Refresh interval' => '2 minutes',
 						'Item' => [
-							'values' => 'Http agent item for delete',
+							'values' => 'Http agent item form',
 							'context' => [
 								'values' => 'Host for different items types',
 								'context' => 'Zabbix servers'
 							]
 						],
-//						'Show' => [
-//							'Description' => true,
-//							'Time' => true,
-//							'Value' => true,
-//							'Change indicator' => true
-//						],
+						'id:show_1' => true,
+						'id:show_2' => true,
+						'id:show_3' => true,
+						'id:show_4' => true,
 						'Advanced configuration' => true,
 						'id:description' => 'Some description here.',
 						'id:desc_h_pos' => 'Left',
@@ -281,6 +272,13 @@ class testDashboardSingleItemWidget extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Type' => 'Item',
+						'Item' => [
+							'values' => '',
+							'context' => [
+								'values' => '',
+								'context' => ''
+							]
+						],
 					],
 					'error' => ['Invalid parameter "Item": cannot be empty.']
 				]
@@ -385,7 +383,47 @@ class testDashboardSingleItemWidget extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider getCreateWidgetData
+	 * Test to check Single Item Widget.
+	 *
+	 * @dataProvider getWidgetData
+	 */
+	public function testDashboardSingleItemWidget_Update($data) {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
+
+		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
+		$old_widget_count = $dashboard->getWidgets()->count();
+		$header = self::$old_name;
+		$widget = $dashboard->getWidget($header);
+		$form = $widget->edit()->asForm();
+		$form->fill($data['fields']);
+		COverlayDialogElement::find()->waitUntilReady()->one();
+
+		$form->submit();
+		$this->page->waitUntilReady();
+
+		switch ($data['expected']) {
+			case TEST_GOOD:
+				// Make sure that the widget is present before saving the dashboard.
+				$new_header = CTestArrayHelper::get($data['fields'], 'Name', 'Item');
+				$dashboard->getWidget($new_header);
+				$dashboard->save();
+
+				// Check that Dashboard has been saved and that widget is in place.
+				$this->checkDashboardUpdateMessage();
+				$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
+
+				// Check that widget is.
+				$this->checkRefreshInterval($data, $new_header);
+				self::$old_name = $new_header;
+				break;
+		case TEST_BAD:
+				$this->assertMessage($data['expected'], null, $data['error']);
+				break;
+		}
+	}
+
+	/**
+	 * @dataProvider getWidgetData
 	 */
 	public function testDashboardSingleItemWidget_Create($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
@@ -418,6 +456,20 @@ class testDashboardSingleItemWidget extends CWebTest {
 				$this->assertMessage($data['expected'], null, $data['error']);
 				break;
 		}
+	}
+
+	public function testDashboardSingleItemWidget_Delete() {
+		$name = 'Widget to delete';
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
+		$dashboard = CDashboardElement::find()->one()->edit();
+		$old_widget_count = $dashboard->getWidgets()->count();
+		$widget = $dashboard->getWidget($name);
+		$this->assertEquals(true, $widget->isEditable());
+		$dashboard->deleteWidget($name);
+		$dashboard->save();
+		$this->checkDashboardUpdateMessage();
+		$this->assertEquals($old_widget_count - 1, $dashboard->getWidgets()->count());
+
 	}
 
 	private function checkDashboardUpdateMessage() {
