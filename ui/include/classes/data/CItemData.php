@@ -733,12 +733,10 @@ final class CItemData {
 					'value_type' => [
 						ITEM_VALUE_TYPE_STR,
 						ITEM_VALUE_TYPE_LOG,
-						ITEM_VALUE_TYPE_TEXT
 					],
 					'value_type_steps' => [
 						ITEM_VALUE_TYPE_STR,
 						ITEM_VALUE_TYPE_LOG,
-						ITEM_VALUE_TYPE_TEXT
 					]
 				]
 			],
