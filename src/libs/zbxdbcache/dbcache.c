@@ -5002,7 +5002,6 @@ void	zbx_db_trigger_queue_unlock(void)
 	cache->db_trigger_queue_lock = 0;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_hc_proxyqueue_peek                                           *

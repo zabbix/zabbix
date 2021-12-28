@@ -72,4 +72,3 @@ void	zbx_service_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size,
 		exit(EXIT_FAILURE);
 	}
 }
-

@@ -355,7 +355,6 @@ int	VFS_DEV_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 						zbx_fclose(f);
 					}
 
-
 					if (0 == devtype_found)
 					{
 						zbx_snprintf(tmp, sizeof(tmp), ZBX_SYS_BLKDEV_PFX "%u:%u/uevent",

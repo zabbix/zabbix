@@ -126,7 +126,6 @@ static void	zbx_lld_deserialize_diag_stats(const unsigned char *data, zbx_uint64
 	(void)zbx_deserialize_value(data, values_num);
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_lld_serialize_top_request                                    *

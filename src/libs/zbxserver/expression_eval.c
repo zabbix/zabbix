@@ -1975,7 +1975,6 @@ typedef struct
 }
 zbx_host_index_t;
 
-
 static int	host_index_compare(const void *d1, const void *d2)
 {
 	const int	*i1 = *(const int **)d1;

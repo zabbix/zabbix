@@ -175,7 +175,6 @@ static int	rw_get_report(const char *url, const char *cookie, int width, int hei
 		}
 	}
 
-
 	if (CURLE_OK != (err = curl_easy_perform(curl)))
 	{
 		*error = zbx_dsprintf(*error, "Cannot connect to web service: %s", (curl_error = rw_curl_error(err)));

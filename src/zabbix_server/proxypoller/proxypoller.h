@@ -28,4 +28,3 @@ extern int	CONFIG_TRAPPER_TIMEOUT;
 ZBX_THREAD_ENTRY(proxypoller_thread, args);
 
 #endif
-

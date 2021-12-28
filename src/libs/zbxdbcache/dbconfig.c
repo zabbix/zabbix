@@ -9720,7 +9720,6 @@ int	DCconfig_get_ipmi_poller_items(int now, DC_ITEM *items, int items_num, int *
 	return num;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: DCconfig_get_snmp_interfaceids_by_addr                           *

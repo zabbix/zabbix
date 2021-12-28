@@ -55,5 +55,3 @@ const char	*zbx_ha_status_str(int ha_status);
 int	zbx_ha_check_pid(pid_t pid);
 
 #endif
-
-
