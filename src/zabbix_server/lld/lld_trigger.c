@@ -1580,12 +1580,23 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 	}
 
 	/* functions are recreated instead of being updated */
-	if (func_num != trigger->functions.values_num && NULL != expression)
+	if (func_num != trigger->functions.values_num)
 	{
-		trigger->expression_orig = trigger->expression;
-		trigger->expression = expression;
-		expression = NULL;
-		trigger->flags |= ZBX_FLAG_LLD_TRIGGER_UPDATE_EXPRESSION;
+		if (NULL != expression)
+		{
+			trigger->expression_orig = trigger->expression;
+			trigger->expression = expression;
+			expression = NULL;
+			trigger->flags |= ZBX_FLAG_LLD_TRIGGER_UPDATE_EXPRESSION;
+		}
+
+		if (NULL != recovery_expression)
+		{
+			trigger->recovery_expression_orig = trigger->recovery_expression;
+			trigger->recovery_expression = recovery_expression;
+			recovery_expression = NULL;
+			trigger->flags |= ZBX_FLAG_LLD_TRIGGER_UPDATE_RECOVERY_EXPRESSION;
+		}
 	}
 
 	trigger->flags |= ZBX_FLAG_LLD_TRIGGER_DISCOVERED;
