@@ -28,6 +28,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 @import "layout/form-grid";
 
 @import "components/buttons";
+@import "components/color-picker";
 @import "components/dashboard/dashboard";
 @import "components/dashboard/widget-item";
 @import "components/diff";
@@ -4286,102 +4287,6 @@ td.inactive-bg {
 		top: 3px;
 		left: -3px;
 		position: absolute;
-	}
-}
-
-// Color picker.
-.color-picker {
-	height: 20px;
-	white-space: nowrap;
-
-	button,
-	div {
-		display: inline-block;
-		width: 18px;
-		height: 18px;
-		border: 1px solid $ui-bg-color;
-
-		&:focus,
-		&:hover {
-			border-color: $alt-dark-blue;
-			box-shadow: inset 0 0 0 1px $ui-bg-color;
-			cursor: pointer;
-		}
-
-		&:active {
-			box-shadow: inset 0 0 0 2px $ui-bg-color;
-			cursor: pointer;
-		}
-	}
-
-	button {
-		padding: 0;
-		margin: auto;
-		min-height: 20px;
-		height: 20px;
-		width: 20px;
-	}
-}
-
-.input-color-picker {
-	display: inline-block;
-	vertical-align: middle;
-
-	button,
-	div {
-		width: 18px;
-		height: 18px;
-		background: url($sprite-path) no-repeat -323px -411px;
-		border: 1px solid $form-border-color;
-		margin: 1px;
-		cursor: pointer;
-
-		&:focus {
-			border-color: $form-border-focus-color;
-			outline: none;
-		}
-	}
-
-	div.use-default {
-		background: none;
-		position: relative;
-
-		&::after {
-			content: attr(data-use-default);
-			position: absolute;
-			text-align: center;
-			line-height: 18px;
-			right: 0;
-			left: 0;
-		}
-	}
-
-	input:disabled + div {
-		cursor: default;
-		background: $form-disabled-font-color !important;
-		border-color: $form-disabled-font-color;
-	}
-
-	input[type="text"] {
-		padding-left: 25px;
-	}
-}
-
-.color-picker-controls {
-	margin-bottom: 5px;
-
-	.input-color-picker {
-		position: relative;
-		cursor: default;
-		margin-top: -2px;
-
-		div {
-			position: absolute;
-			border-width: 1px;
-			margin: 0px;
-			left: 2px;
-			top: 2px;
-		}
 	}
 }
 

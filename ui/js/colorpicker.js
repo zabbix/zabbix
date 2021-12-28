@@ -44,8 +44,7 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 				['891515','660A3B','370F69','24146D','131A5E','093578','044174','00484B','003930','144618','264E16','615911','B75F11','BF5300','AC3C00','8F2809','2E1D1A','1C252A'],
 				['5B0E0E','440727','250A46','180D49','0D113F','062350','002B4D','003032','002620','0D2F10','19340F','413B0B','7A3F0B','7F3700','732800','5F1B06','1F1311','13191C'],
 				['2D0707','220313','120523','0C0624','06081F','031128','001526','001819','00131D','061708','0C1A07','201D05','3D1F05','3F1B00','391400','2F0D03','0F0908','090C0E'],
-			],
-			'appendTo': 'body'
+			]
 		},
 		/**
 		 * Click handler for every colorpicker cell.
@@ -134,7 +133,6 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 			 *
 			 * @param object         options
 			 * @param array          options.palette   Every nested array contains hex color for one cell.
-			 * @param string|object  options.appendTo  Target element where overlay should be appended.
 			 */
 			init: function(options) {
 				const $close = $('<button>', {
@@ -152,12 +150,14 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 					.css('width', ZBX_TEXTAREA_COLOR_WIDTH + 'px')
 					.on('input keydown paste', (e) => {
 						const color = e.target.value;
+
 						if (color.length == 0 || color.length == 6) {
 							setPreviewColor(color);
 						}
 					})
 					.on('keypress', (e) => {
 						const color = e.target.value;
+
 						if (e.keyCode == KEY_ENTER && (color.length == 0 || color.length == 6)) {
 							setColorHandler(e.target.value);
 						}
@@ -173,6 +173,7 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 				})
 					.html(t('Use default'))
 					.on('click', () => setColorHandler(''));
+
 				options = $.extend(defaults, options || {});
 
 				overlay = $('<div>', {
@@ -200,7 +201,7 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 						setColorHandler($(this).data('color'));
 					});
 
-				overlay.appendTo($(options.appendTo));
+				$('body').append(overlay);
 
 				methods.hide();
 			},
@@ -208,13 +209,15 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 			 * Hide colorpicker overlay.
 			 */
 			hide: function() {
+				colorbox = null;
+				input = null;
+
 				overlay.css({
 					'zIndex': 1000,
 					'display': 'none',
 					'left': '-' + (overlay.width() ? overlay.width() : 100) + 'px'
 				});
-				colorbox = null;
-				input = null;
+
 				removeFromOverlaysStack('color_picker');
 			},
 			/**
@@ -231,7 +234,7 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 					return;
 				}
 
-				var pos = getOverlayPosition(id);
+				const pos = getOverlayPosition(id);
 
 				overlay.css({
 					'left': pos.left + 'px',

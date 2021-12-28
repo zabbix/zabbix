@@ -780,6 +780,74 @@ footer {
   .subfilter-disable-btn:focus, .subfilter-disable-btn:active {
     color: #e6e6e6; }
 
+.color-picker {
+  height: 20px;
+  white-space: nowrap; }
+  .color-picker button {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border: 1px solid #ffffff; }
+    .color-picker button:focus, .color-picker button:hover {
+      border-color: #7499ff;
+      box-shadow: inset 0 0 0 1px #ffffff;
+      cursor: pointer; }
+    .color-picker button:active {
+      box-shadow: inset 0 0 0 2px #ffffff;
+      cursor: pointer; }
+  .color-picker button {
+    padding: 0;
+    margin: auto;
+    min-height: 20px;
+    height: 20px;
+    width: 20px; }
+
+.input-color-picker {
+  display: inline-block;
+  line-height: 1.2;
+  vertical-align: sub; }
+  .input-color-picker button,
+  .input-color-picker div {
+    width: 18px;
+    height: 18px;
+    background: url("../img/icon-sprite.svg?20200407") no-repeat -323px -411px;
+    border: 1px solid #acbbc2;
+    cursor: pointer;
+    vertical-align: inherit; }
+    .input-color-picker button:focus,
+    .input-color-picker div:focus {
+      border-color: #02659f;
+      outline: none; }
+  .input-color-picker div.use-default {
+    background: none;
+    position: relative; }
+    .input-color-picker div.use-default::after {
+      content: attr(data-use-default);
+      position: absolute;
+      text-align: center;
+      line-height: 18px;
+      right: 0;
+      left: 0; }
+  .input-color-picker input:disabled + div {
+    cursor: default;
+    background: #acbbc2 !important;
+    border-color: #acbbc2; }
+  .input-color-picker input[type="text"] {
+    padding-left: 25px; }
+
+.color-picker-controls {
+  margin-bottom: 5px; }
+  .color-picker-controls .input-color-picker {
+    position: relative;
+    cursor: default;
+    margin-top: -2px; }
+    .color-picker-controls .input-color-picker div {
+      position: absolute;
+      border-width: 1px;
+      margin: 0px;
+      left: 2px;
+      top: 2px; }
+
 .header-kioskmode-controls .dashboard-kioskmode-controls li {
   margin-right: 6px; }
 
@@ -5253,77 +5321,6 @@ td[class] + td.disaster-bg {
     top: 3px;
     left: -3px;
     position: absolute; }
-
-.color-picker {
-  height: 20px;
-  white-space: nowrap; }
-  .color-picker button,
-  .color-picker div {
-    display: inline-block;
-    width: 18px;
-    height: 18px;
-    border: 1px solid #ffffff; }
-    .color-picker button:focus, .color-picker button:hover,
-    .color-picker div:focus,
-    .color-picker div:hover {
-      border-color: #7499ff;
-      box-shadow: inset 0 0 0 1px #ffffff;
-      cursor: pointer; }
-    .color-picker button:active,
-    .color-picker div:active {
-      box-shadow: inset 0 0 0 2px #ffffff;
-      cursor: pointer; }
-  .color-picker button {
-    padding: 0;
-    margin: auto;
-    min-height: 20px;
-    height: 20px;
-    width: 20px; }
-
-.input-color-picker {
-  display: inline-block;
-  vertical-align: middle; }
-  .input-color-picker button,
-  .input-color-picker div {
-    width: 18px;
-    height: 18px;
-    background: url("../img/icon-sprite.svg?20200407") no-repeat -323px -411px;
-    border: 1px solid #acbbc2;
-    margin: 1px;
-    cursor: pointer; }
-    .input-color-picker button:focus,
-    .input-color-picker div:focus {
-      border-color: #02659f;
-      outline: none; }
-  .input-color-picker div.use-default {
-    background: none;
-    position: relative; }
-    .input-color-picker div.use-default::after {
-      content: attr(data-use-default);
-      position: absolute;
-      text-align: center;
-      line-height: 18px;
-      right: 0;
-      left: 0; }
-  .input-color-picker input:disabled + div {
-    cursor: default;
-    background: #acbbc2 !important;
-    border-color: #acbbc2; }
-  .input-color-picker input[type="text"] {
-    padding-left: 25px; }
-
-.color-picker-controls {
-  margin-bottom: 5px; }
-  .color-picker-controls .input-color-picker {
-    position: relative;
-    cursor: default;
-    margin-top: -2px; }
-    .color-picker-controls .input-color-picker div {
-      position: absolute;
-      border-width: 1px;
-      margin: 0px;
-      left: 2px;
-      top: 2px; }
 
 @keyframes is-loading-kf {
   to {
