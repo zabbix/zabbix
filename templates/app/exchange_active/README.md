@@ -16,13 +16,13 @@ This template was tested on:
 
 > See [Zabbix template operation](https://www.zabbix.com/documentation/5.0/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
 
-Metrics are collected by Zabbix agent.
+Metrics are collected by Zabbix agent active.
 
 1\. Import the template into Zabbix.
 
 2\. Link the imported template to a host with MS Exchange.
 
-Note that template doesn't provide information about Windows services state. Recommended to use it with "OS Windows by Zabbix agent" template.
+Note that template doesn't provide information about Windows services state. Recommended to use it with "OS Windows by Zabbix agent active" template.
 
 
 ## Zabbix configuration
