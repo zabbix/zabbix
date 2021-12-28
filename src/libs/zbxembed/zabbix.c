@@ -121,8 +121,8 @@ out:
  * Comments: Throws an error:                                                 *
  *               - if the top value at ctx value stack is not a uint          *
  *               - if the value stack is empty                                *
- *               - if the expected sleep time is longer than time left for    *
- *                 JS execution before timeout occurs                         *
+ *               - if the expected sleep duration is longer than time left    *
+ *                 for JS execution before timeout occurs                     *
  *                                                                            *
  ******************************************************************************/
 static duk_ret_t	es_zabbix_sleep(duk_context *ctx)
@@ -141,9 +141,14 @@ static duk_ret_t	es_zabbix_sleep(duk_context *ctx)
 
 	if (time(NULL) + sleep.tv_sec > env->start_time.sec + env->timeout)
 	{
-		duk_push_error_object(ctx, DUK_RET_RANGE_ERROR,
-				"Zabbix.sleep(%d) duration is longer than time left for JS execution", msec);
-		return duk_throw(ctx);
+		if (-1 == duk_push_error_object(ctx, DUK_RET_ERROR,
+				"Zabbix.sleep(%d) duration is longer than time left for JS execution", msec))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "es_zabbix_sleep(): failed to set sleep duration error");
+			return -1;
+		}
+		else
+			return duk_throw(ctx);
 	}
 
 	nanosleep(&sleep, NULL);
