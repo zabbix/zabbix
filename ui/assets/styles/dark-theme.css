@@ -793,73 +793,69 @@ footer {
   .subfilter-disable-btn:focus, .subfilter-disable-btn:active {
     color: #d9d9d9; }
 
-.color-picker {
-  height: 20px;
-  white-space: nowrap; }
-  .color-picker button {
-    display: inline-block;
-    width: 18px;
-    height: 18px;
-    border: 1px solid #2b2b2b; }
-    .color-picker button:focus, .color-picker button:hover {
-      border-color: #7499ff;
-      box-shadow: inset 0 0 0 1px #2b2b2b;
-      cursor: pointer; }
-    .color-picker button:active {
-      box-shadow: inset 0 0 0 2px #2b2b2b;
-      cursor: pointer; }
-  .color-picker button {
-    padding: 0;
-    margin: auto;
-    min-height: 20px;
-    height: 20px;
-    width: 20px; }
+.color-picker .color-picker-preview,
+.color-picker-dialogue .color-picker-preview {
+  position: relative;
+  background: url("../img/icon-sprite.svg?20200407") no-repeat -323px -411px;
+  border: 1px solid #4f4f4f;
+  color: #f2f2f2;
+  vertical-align: inherit; }
+.color-picker .use-default,
+.color-picker-dialogue .use-default {
+  background: none; }
+  .color-picker .use-default::after,
+  .color-picker-dialogue .use-default::after {
+    content: attr(data-use-default);
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    text-align: center; }
 
-.input-color-picker {
+.color-picker {
   display: inline-block;
   line-height: 1.2;
-  vertical-align: sub; }
-  .input-color-picker button,
-  .input-color-picker div {
-    width: 18px;
-    height: 18px;
-    background: url("../img/icon-sprite.svg?20200407") no-repeat -323px -411px;
-    border: 1px solid #4f4f4f;
-    cursor: pointer;
-    vertical-align: inherit; }
-    .input-color-picker button:focus,
-    .input-color-picker div:focus {
-      border-color: #768d99;
-      outline: none; }
-  .input-color-picker div.use-default {
-    background: none;
-    position: relative; }
-    .input-color-picker div.use-default::after {
-      content: attr(data-use-default);
-      position: absolute;
-      text-align: center;
-      line-height: 18px;
-      right: 0;
-      left: 0; }
-  .input-color-picker input:disabled + div {
-    cursor: default;
+  vertical-align: middle; }
+  .color-picker .color-picker-preview {
+    padding: 0;
+    background-position: -321px -409px;
+    width: 24px; }
+    .color-picker .color-picker-preview:after {
+      line-height: 22px; }
+  .color-picker input:disabled + button {
+    pointer-events: none;
     background: #525252 !important;
     border-color: #525252; }
-  .input-color-picker input[type="text"] {
-    padding-left: 25px; }
 
-.color-picker-controls {
+.color-picker-dialogue > div:first-of-type {
   margin-bottom: 5px; }
-  .color-picker-controls .input-color-picker {
-    position: relative;
-    cursor: default;
-    margin-top: -2px; }
-    .color-picker-controls .input-color-picker div {
-      position: absolute;
-      border-width: 1px;
-      margin: 0px;
-      left: 2px;
-      top: 2px; }
+.color-picker-dialogue > div:not(:first-of-type) button {
+  padding: 0;
+  width: 20px;
+  min-height: 20px;
+  border: 1px solid #2b2b2b;
+  border-radius: 0;
+  vertical-align: middle;
+  transition: none; }
+  .color-picker-dialogue > div:not(:first-of-type) button:hover, .color-picker-dialogue > div:not(:first-of-type) button:focus {
+    border-color: #768d99;
+    box-shadow: inset 0 0 0 1px #2b2b2b; }
+  .color-picker-dialogue > div:not(:first-of-type) button:active {
+    box-shadow: inset 0 0 0 2px #2b2b2b; }
+.color-picker-dialogue .color-picker-input {
+  position: relative;
+  display: inline-block;
+  margin-right: 3px; }
+  .color-picker-dialogue .color-picker-input .color-picker-preview {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 18px;
+    height: 18px; }
+    .color-picker-dialogue .color-picker-input .color-picker-preview:after {
+      line-height: 18px; }
+  .color-picker-dialogue .color-picker-input input {
+    padding-left: 25px; }
 
 .header-kioskmode-controls .dashboard-kioskmode-controls li {
   margin-right: 6px; }
@@ -5630,7 +5626,8 @@ svg {
   .overrides-options-list > li {
     display: inline-block;
     margin: 2px 7px 2px 0;
-    white-space: nowrap; }
+    white-space: nowrap;
+    vertical-align: middle; }
     .overrides-options-list > li > div {
       position: relative;
       padding: 1px 18px 1px 1px;
@@ -5650,6 +5647,11 @@ svg {
         right: 0;
         top: 0;
         min-height: 24px; }
+  .overrides-options-list .color-picker .color-picker-preview {
+    margin: 1px;
+    width: 20px;
+    min-height: 20px;
+    background-position: -323px -411px; }
 
 .list-accordion-foot > div {
   display: table-cell;

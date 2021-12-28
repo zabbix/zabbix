@@ -103,7 +103,7 @@ class CColor extends CDiv {
 	 */
 	public function toString($destroy = true): string {
 		$this
-			->addClass(ZBX_STYLE_INPUT_COLOR_PICKER)
+			->addClass(ZBX_STYLE_COLOR_PICKER)
 			->cleanItems()
 			->addItem(
 			(new CInput('hidden', $this->name, $this->value))->setEnabled($this->enabled)

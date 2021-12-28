@@ -44,7 +44,8 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 				['891515','660A3B','370F69','24146D','131A5E','093578','044174','00484B','003930','144618','264E16','615911','B75F11','BF5300','AC3C00','8F2809','2E1D1A','1C252A'],
 				['5B0E0E','440727','250A46','180D49','0D113F','062350','002B4D','003032','002620','0D2F10','19340F','413B0B','7A3F0B','7F3700','732800','5F1B06','1F1311','13191C'],
 				['2D0707','220313','120523','0C0624','06081F','031128','001526','001819','00131D','061708','0C1A07','201D05','3D1F05','3F1B00','391400','2F0D03','0F0908','090C0E'],
-			]
+			],
+			'appendTo': 'body'
 		},
 		/**
 		 * Click handler for every colorpicker cell.
@@ -69,19 +70,19 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 
 			if (input.data('use_default') && color.length == 0) {
 				$overlay_colorbox
-					.css({'color': '', 'background': ''})
+					.css({'background': ''})
 					.attr('title', t('Use default'))
 					.addClass('use-default');
 			}
 			else if (/^[0-9A-F]{6}$/i.test(color)) {
 				$overlay_colorbox
-					.css({'color': '#' + color, 'background': '#' + color})
+					.css({'background': '#' + color})
 					.attr('title', '#' + color)
 					.removeClass('use-default');
 			}
 			else {
 				$overlay_colorbox
-					.css({'color': '', 'background': ''})
+					.css({'background': ''})
 					.attr('title', t('Use default'))
 					.removeClass('use-default');
 			}
@@ -133,6 +134,7 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 			 *
 			 * @param object         options
 			 * @param array          options.palette   Every nested array contains hex color for one cell.
+			 * @param string|object  options.appendTo  Target element where overlay should be appended.
 			 */
 			init: function(options) {
 				const $close = $('<button>', {
@@ -163,7 +165,10 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 						}
 					});
 
-				$overlay_colorbox = $('<div>', {'data-use-default': t('D')});
+				$overlay_colorbox = $('<div>', {
+					class: 'color-picker-preview',
+					'data-use-default': t('D')
+				});
 
 				$button_use_default = $('<button>', {
 					type: 'button',
@@ -177,31 +182,29 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 				options = $.extend(defaults, options || {});
 
 				overlay = $('<div>', {
-					class: 'overlay-dialogue',
+					class: 'overlay-dialogue color-picker-dialogue',
 					id: 'color_picker'
 				})
 					.append($close)
-					.append($('<div>', {class: 'color-picker-controls'}).append([
-						$('<div>', {class: 'input-color-picker'}).append([$overlay_colorbox, $overlay_input]),
-						$('<div>', {class: 'form-input-margin'}),
+					.append($('<div>').append([
+						$('<div>', {class: 'color-picker-input'}).append([$overlay_colorbox, $overlay_input]),
 						$button_use_default
 					]))
 					.append(
 						$.map(options.palette, (colors) => {
-							return $('<div>', {class: 'color-picker'}).append(
+							return $('<div>').append(
 								$.map(colors, (color) => {
-									return $('<button>', {'title': '#' + color, type: 'button'})
+									return $('<button>', {'title': '#' + color, type: 'button', 'data-color': color})
 										.css('background', '#' + color)
-										.data('color', color);
 								})
 							);
 						})
 					)
-					.on('click', '.color-picker button', function () {
+					.on('click', '[data-color]', function () {
 						setColorHandler($(this).data('color'));
 					});
 
-				$('body').append(overlay);
+				overlay.appendTo($(options.appendTo));
 
 				methods.hide();
 			},
@@ -223,8 +226,8 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 			/**
 			 * Show colorpicker for specific element.
 			 *
-			 * @param string id       Id of input element which will be associated with opened colorpicker instance.
-			 * @param object target   jQuery element (colorbox) which triggered show action.
+			 * @param string id      Id of input element which will be associated with opened colorpicker instance.
+			 * @param object target  jQuery element (colorbox) which triggered show action.
 			 */
 			show: function(id, target) {
 				input = $('#' + id);
@@ -266,19 +269,19 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 
 				if (input.data('use_default') && color.length == 0) {
 					colorbox
-						.css({'color': '', 'background': ''})
+						.css({'background': ''})
 						.attr('title', t('Use default'))
 						.addClass('use-default');
 				}
 				else if (/^[0-9A-F]{6}$/i.test(color)) {
 					colorbox
-						.css({'color': '#' + color, 'background': '#' + color})
+						.css({'background': '#' + color})
 						.attr('title', '#' + color)
 						.removeClass('use-default');
 				}
 				else {
 					colorbox
-						.css({'color': '', 'background': ''})
+						.css({'background': ''})
 						.attr('title', t('Use default'))
 						.removeClass('use-default');
 				}
@@ -340,9 +343,10 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 			$('<button>', {
 				id: 'lbl_' + id,
 				type: 'button',
-				title: element.value ? '#' + element.value : ''
+				class: 'color-picker-preview',
+				title: element.value ? '#' + element.value : '',
+				'data-use-default': t('D')
 			})
-				.data('use-default', t('D'))
 				.on('keydown', function (e) {
 					if (e.keyCode == KEY_ENTER || e.keyCode == KEY_SPACE) {
 						e.preventDefault();
