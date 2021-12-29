@@ -787,7 +787,6 @@ function getMenuPopupItem(options, trigger_elmnt) {
  * @param string options['showGraph']                 Link to Monitoring->Items->Graphs page.
  * @param string options['history']                   Is history available.
  * @param string options['trends']                    Are trends available.
- * @param string options['hasGoTo']                   "Go to" block in popup.
  * @param string options['allowed_ui_hosts']          Whether user has access to monitoring hosts pages.
  * @param string options['allowed_ui_conf_hosts']     Whether user has access to configuration hosts pages.
  * @param string options['isWriteable']               Whether user has read and write access to host and its items.
@@ -796,79 +795,77 @@ function getMenuPopupItem(options, trigger_elmnt) {
  * @return array
  */
 function getMenuPopupItemData(options) {
-	if (options.hasGoTo) {
-		const items = [];
-		let url;
+	const items = [];
+	let url;
 
-		url = new Curl('history.php', false);
-		url.setArgument('action', 'showgraph');
-		url.setArgument('itemids[]', options.itemid);
+	url = new Curl('history.php', false);
+	url.setArgument('action', 'showgraph');
+	url.setArgument('itemids[]', options.itemid);
 
-		const graph = {
-			label: t('Graph'),
-			url: url.getUrl()
-		}
-		if (!options.showGraph) {
-			graph.disabled = true;
-		}
-
-		url = new Curl('history.php', false);
-		url.setArgument('action', 'showvalues');
-		url.setArgument('itemids[]', options.itemid);
-
-		const values = {
-			label: t('Values'),
-			url: url.getUrl()
-		}
-
-		url = new Curl('history.php', false);
-		url.setArgument('action', 'showlatest');
-		url.setArgument('itemids[]', options.itemid);
-
-		const latest = {
-			label: t('500 latest values'),
-			url: url.getUrl()
-		}
-
-		if (options.history || options.trends) {
-			values.disabled = false;
-			latest.disabled = false;
-		}
-		else {
-			values.disabled = true;
-			latest.disabled = true;
-		}
-
-		if (options.allowed_ui_hosts) {
-			items.push(graph);
-			items.push(values);
-			items.push(latest);
-		}
-
-		if (options.allowed_ui_conf_hosts) {
-			const config = {
-				label: t('Configuration'),
-				disabled: !options.isWriteable
-			};
-
-			if (options.isWriteable) {
-				url = new Curl('items.php', false);
-				url.setArgument('form', 'update');
-				url.setArgument('hostid', options.hostid);
-				url.setArgument('itemid', options.itemid);
-				url.setArgument('context', options.context);
-
-				config.url = url.getUrl();
-			}
-
-			items.push(config);
-		}
-
-		return [{
-			label: 'ITEM',
-			items: items
-		}];
+	const graph = {
+		label: t('Graph'),
+		url: url.getUrl()
 	}
+	if (!options.showGraph) {
+		graph.disabled = true;
+	}
+
+	url = new Curl('history.php', false);
+	url.setArgument('action', 'showvalues');
+	url.setArgument('itemids[]', options.itemid);
+
+	const values = {
+		label: t('Values'),
+		url: url.getUrl()
+	}
+
+	url = new Curl('history.php', false);
+	url.setArgument('action', 'showlatest');
+	url.setArgument('itemids[]', options.itemid);
+
+	const latest = {
+		label: t('500 latest values'),
+		url: url.getUrl()
+	}
+
+	if (options.history || options.trends) {
+		values.disabled = false;
+		latest.disabled = false;
+	}
+	else {
+		values.disabled = true;
+		latest.disabled = true;
+	}
+
+	if (options.allowed_ui_hosts) {
+		items.push(graph);
+		items.push(values);
+		items.push(latest);
+	}
+
+	if (options.allowed_ui_conf_hosts) {
+		const config = {
+			label: t('Configuration'),
+			disabled: !options.isWriteable
+		};
+
+		if (options.isWriteable) {
+			url = new Curl('items.php', false);
+			url.setArgument('form', 'update');
+			url.setArgument('hostid', options.hostid);
+			url.setArgument('itemid', options.itemid);
+			url.setArgument('context', options.context);
+
+			config.url = url.getUrl();
+		}
+
+		items.push(config);
+	}
+
+	return [{
+		label: 'ITEM',
+		items: items
+	}];
 }
 
 /**
