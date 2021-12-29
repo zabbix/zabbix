@@ -234,8 +234,7 @@ class CControllerMenuPopup extends CController {
 		$db_items = API::Item()->get([
 			'output' => ['hostid', 'key_', 'name', 'flags'],
 			'selectHosts' => ['host'],
-			'itemids' => $data['itemid'],
-			'webitems' => true
+			'itemids' => $data['itemid']
 		]);
 
 		if ($db_items) {
