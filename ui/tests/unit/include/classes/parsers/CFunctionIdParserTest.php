@@ -19,8 +19,6 @@
 **/
 
 
-use PHPUnit\Framework\TestCase;
-
 class CFunctionIdParserTest extends CParserTest {
 
 	protected function getParser() {

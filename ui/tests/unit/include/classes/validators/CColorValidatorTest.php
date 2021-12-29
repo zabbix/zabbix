@@ -19,8 +19,6 @@
 **/
 
 
-use PHPUnit\Framework\TestCase;
-
 class CColorValidatorTest extends CValidatorTest {
 
 	public function dataProviderValidParam() {
