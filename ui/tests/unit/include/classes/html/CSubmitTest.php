@@ -19,8 +19,6 @@
 **/
 
 
-use PHPUnit\Framework\TestCase;
-
 class CSubmitTest extends CTagTest {
 
 	public function constructProvider() {
