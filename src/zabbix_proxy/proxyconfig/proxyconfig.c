@@ -27,6 +27,7 @@
 #include "proxyconfig.h"
 #include "zbxcrypto.h"
 #include "zbxcompress.h"
+#include "zbxrtc.h"
 
 #define CONFIG_PROXYCONFIG_RETRY	120	/* seconds */
 
@@ -164,6 +165,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 {
 	size_t	data_size;
 	double	sec;
+	char	*error = NULL;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -182,6 +184,13 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 
 	zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
 	DCsync_configuration(ZBX_DBSYNC_INIT, NULL);
+
+	if (SUCCEED != zbx_rtc_notify_config_sync(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot send configuration syncer notification: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
 
 	while (ZBX_IS_RUNNING())
 	{

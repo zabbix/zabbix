@@ -10751,14 +10751,6 @@ int	DCconfig_get_last_sync_time(void)
 	return config->sync_ts;
 }
 
-void	DCconfig_wait_sync(void)
-{
-	struct timespec	ts = {0, 1e8};
-
-	while (0 == config->sync_ts)
-		nanosleep(&ts, NULL);
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: DCconfig_get_proxypoller_hosts                                   *

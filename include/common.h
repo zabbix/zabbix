@@ -982,6 +982,7 @@ typedef enum
 }
 zbx_task_t;
 
+/* runtime control commands */
 #define ZBX_RTC_UNKNOWN				0
 #define ZBX_RTC_LOG_LEVEL_INCREASE		1
 #define ZBX_RTC_LOG_LEVEL_DECREASE		2
@@ -996,6 +997,11 @@ zbx_task_t;
 #define ZBX_RTC_HA_REMOVE_NODE			15
 #define ZBX_RTC_HA_SET_FAILOVER_DELAY		16
 #define ZBX_RTC_USER_PARAMETERS_RELOAD		17
+
+/* runtime control notifications, must be less than 10000 */
+#define ZBX_RTC_CONFIG_SYNC_NOTIFY		9999
+
+#define ZBX_IPC_RTC_MAX				9999
 
 typedef enum
 {

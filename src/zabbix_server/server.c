@@ -1201,7 +1201,7 @@ static void	zbx_check_db(void)
  * Purpose: initialize shared resources and start processes                   *
  *                                                                            *
  ******************************************************************************/
-static int	server_startup(zbx_socket_t *listen_sock)
+static int	server_startup(zbx_socket_t *listen_sock, zbx_rtc_t *rtc)
 {
 	int	i, ret = SUCCEED;
 	char	*error = NULL;
@@ -1296,7 +1296,7 @@ static int	server_startup(zbx_socket_t *listen_sock)
 				break;
 			case ZBX_PROCESS_TYPE_CONFSYNCER:
 				zbx_thread_start(dbconfig_thread, &thread_args, &threads[i]);
-				DCconfig_wait_sync();
+				zbx_rtc_wait_config_sync(rtc);
 
 				if (SUCCEED != (ret = zbx_ha_get_status(&ha_status, &error)))
 				{
@@ -1751,7 +1751,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
 	{
-		if (SUCCEED != server_startup(&listen_sock))
+		if (SUCCEED != server_startup(&listen_sock, &rtc))
 		{
 			sig_exiting = ZBX_EXIT_FAILURE;
 			ha_status = ZBX_NODE_STATUS_ERROR;
@@ -1802,8 +1802,11 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		}
 		else
 		{
-			if (ZBX_NODE_STATUS_ACTIVE == ha_status)
+			if (ZBX_NODE_STATUS_ACTIVE == ha_status || ZBX_RTC_LOG_LEVEL_DECREASE == message->code ||
+					ZBX_RTC_LOG_LEVEL_INCREASE == message->code)
+			{
 				zbx_rtc_dispatch(client, message);
+			}
 			else
 			{
 				const char	*result = "Runtime commands can be executed only in active mode\n";
@@ -1828,7 +1831,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			switch (ha_status)
 			{
 				case ZBX_NODE_STATUS_ACTIVE:
-					if (SUCCEED != server_startup(&listen_sock))
+					if (SUCCEED != server_startup(&listen_sock, &rtc))
 					{
 						sig_exiting = ZBX_EXIT_FAILURE;
 						ha_status = ZBX_NODE_STATUS_ERROR;

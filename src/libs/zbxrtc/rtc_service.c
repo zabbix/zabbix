@@ -275,3 +275,54 @@ void	zbx_rtc_dispatch(zbx_ipc_client_t *client, zbx_ipc_message_t *message)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_rtc_wait_config_sync                                         *
+ *                                                                            *
+ * Purpose: wait for configuration sync notification while optionally         *
+ *          dispatching runtime control commands                              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_rtc_wait_config_sync(zbx_rtc_t *rtc)
+{
+	zbx_timespec_t	rtc_timeout = {1, 0};
+	int		sync = 0;
+
+	while (ZBX_IS_RUNNING() && 0 == sync)
+	{
+		zbx_ipc_client_t	*client;
+		zbx_ipc_message_t	*message;
+
+		(void)zbx_ipc_service_recv(&rtc->service, &rtc_timeout, &client, &message);
+
+		if (NULL != message)
+		{
+			switch (message->code)
+			{
+				case ZBX_RTC_CONFIG_SYNC_NOTIFY:
+					sync = 1;
+					break;
+				case ZBX_RTC_LOG_LEVEL_DECREASE:
+				case ZBX_RTC_LOG_LEVEL_INCREASE:
+					zbx_rtc_dispatch(client, message);
+					break;
+				default:
+					if (ZBX_IPC_RTC_MAX >= message->code)
+					{
+						const char *rtc_error = "Cannot perform specified runtime control"
+								" command during initial configuration cache sync\n";
+						zbx_ipc_client_send(client, message->code,
+								(const unsigned char *)rtc_error,
+								(zbx_uint32_t)strlen(rtc_error) + 1);
+					}
+			}
+			zbx_ipc_message_free(message);
+
+		}
+
+		if (NULL != client)
+			zbx_ipc_client_release(client);
+	}
+}
+

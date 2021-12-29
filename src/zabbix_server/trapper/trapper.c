@@ -35,6 +35,7 @@
 #include "../../libs/zbxserver/zabbix_stats.h"
 #include "zbxipcservice.h"
 #include "../poller/checks_snmp.h"
+#include "zbxrtc.h"
 
 #include "trapper_auth.h"
 #include "trapper_preproc.h"
@@ -1229,8 +1230,17 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 	/* configuration sync is performed by trappers on passive Zabbix proxy */
 	if (1 == process_num && 0 == CONFIG_CONFSYNCER_FORKS)
 	{
+		char	*error = NULL;
+
 		zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
 		DCsync_configuration(ZBX_DBSYNC_INIT, NULL);
+
+		if (SUCCEED != zbx_rtc_notify_config_sync(&error))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot send configuration syncer notification: %s", error);
+			zbx_free(error);
+			exit(EXIT_FAILURE);
+		}
 	}
 
 	zbx_set_sigusr_handler(zbx_trapper_sigusr_handler);

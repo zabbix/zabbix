@@ -221,3 +221,31 @@ int	zbx_rtc_open(zbx_ipc_async_socket_t *asocket, int timeout, char **error)
 
 	return SUCCEED;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_rtc_notify_config_sync                                       *
+ *                                                                            *
+ * Purpose: notify RTC service about finishing initial configuration sync     *
+ *                                                                            *
+ * Parameters: error - [OUT] error message                                    *
+ *                                                                            *
+ * Return value: SUCCEED - the notification was sent successfully             *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_rtc_notify_config_sync(char **error)
+{
+	zbx_ipc_socket_t	sock;
+	int			ret;
+
+	if (FAIL == zbx_ipc_socket_open(&sock, ZBX_IPC_SERVICE_RTC, CONFIG_TIMEOUT, error))
+		return FAIL;
+
+	if (FAIL == (ret = zbx_ipc_socket_write(&sock, ZBX_RTC_CONFIG_SYNC_NOTIFY, NULL, 0)))
+		*error = zbx_strdup(NULL, "failed to send message");
+
+	zbx_ipc_socket_close(&sock);
+
+	return ret;
+}

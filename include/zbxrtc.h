@@ -31,10 +31,12 @@ zbx_rtc_t;
 /* provider API */
 int	zbx_rtc_init(zbx_rtc_t *rtc ,char **error);
 void 	zbx_rtc_dispatch(zbx_ipc_client_t *client, zbx_ipc_message_t *message);
+void	zbx_rtc_wait_config_sync(zbx_rtc_t *rtc);
 
 /* client API */
 int	zbx_rtc_process(const char *option, char **error);
 int	rtc_parse_options(const char *opt, zbx_uint32_t *code, char **data, char **error);
 int	zbx_rtc_open(zbx_ipc_async_socket_t *asocket, int timeout, char **error);
+int	zbx_rtc_notify_config_sync(char **error);
 
 #endif

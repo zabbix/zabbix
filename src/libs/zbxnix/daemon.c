@@ -157,7 +157,7 @@ void	zbx_signal_process_by_pid(int pid, int flags, char **out)
 
 	for (i = 0; i < threads_num; i++)
 	{
-		if (0 != pid && threads[i] != pid)
+		if ((0 != pid && threads[i] != pid) || 0 == threads[i])
 			continue;
 
 		found = 1;
