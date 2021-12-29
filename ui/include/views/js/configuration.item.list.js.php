@@ -47,42 +47,6 @@
 	});
 </script>
 
-<script type="text/x-jquery-tmpl" id="tmpl_expressions_list_row">
-<?=
-	(new CRow([
-		(new CCol([
-			(new CDiv())
-				->addClass(ZBX_STYLE_DRAG_ICON)
-				->addStyle('top: 0px;'),
-			(new CSpan())->addClass('ui-icon ui-icon-arrowthick-2-n-s move '.ZBX_STYLE_TD_DRAG_ICON)
-		]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-		(new CDiv('#{expression}'))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
-		new CDiv('#{type_label}'),
-		(new CCol([
-			(new CVar('expressions[][value]', '#{expression}')),
-			(new CVar('expressions[][type]', '#{type}')),
-			(new CButton(null, _('Remove')))->addClass(ZBX_STYLE_BTN_LINK)
-		]))->addClass(ZBX_STYLE_NOWRAP)
-	]))
-		->addClass('sortable form_row')
-?>
-</script>
-
-<script type="text/x-jquery-tmpl" id="tmpl_expressions_part_list_row">
-<?=
-	(new CRow([
-		(new CDiv('#{keyword}'))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
-		new CDiv('#{type_label}'),
-		(new CCol([
-			(new CVar('keys[][value]', '#{keyword}')),
-			(new CVar('keys[][type]', '#{type_label}')),
-			(new CButton(null, _('Remove')))->addClass(ZBX_STYLE_BTN_LINK)
-		]))->addClass(ZBX_STYLE_NOWRAP)
-	]))
-		->addClass('form_row')
-?>
-</script>
-
 <script type="text/x-jquery-tmpl" id="filter-tag-row-tmpl">
 	<?= CTagFilterFieldHelper::getTemplate(); ?>
 </script>
