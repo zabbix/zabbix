@@ -894,10 +894,6 @@ function getMenuPopupItemPrototype(options) {
 		url: url.getUrl()
 	});
 
-	const edit_trigger_prototypes = {
-		label: t('Trigger prototypes')
-	};
-
 	if (options.trigger_prototypes.length > 0) {
 		const trigger_prototypes = [];
 
@@ -914,8 +910,10 @@ function getMenuPopupItemPrototype(options) {
 			});
 		});
 
-		edit_trigger_prototypes.items = trigger_prototypes;
-		items.push(edit_trigger_prototypes);
+		items.push({
+			label: t('Trigger prototypes'),
+			items: trigger_prototypes
+		});
 	}
 
 	url = new Curl('disc_prototypes.php', false);
