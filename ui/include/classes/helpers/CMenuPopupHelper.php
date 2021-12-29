@@ -194,8 +194,7 @@ class CMenuPopupHelper {
 			'type' => 'item_data',
 			'data' => [
 				'itemid' => $data['itemid']
-			],
-			'context' => $data['context']
+			]
 		];
 	}
 

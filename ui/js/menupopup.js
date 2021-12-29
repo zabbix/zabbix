@@ -790,7 +790,6 @@ function getMenuPopupItem(options, trigger_elmnt) {
  * @param string options['allowed_ui_hosts']          Whether user has access to monitoring hosts pages.
  * @param string options['allowed_ui_conf_hosts']     Whether user has access to configuration hosts pages.
  * @param string options['isWriteable']               Whether user has read and write access to host and its items.
- * @param string options['context']                   Additional parameter in URL to identify main section.
  *
  * @return array
  */
@@ -854,7 +853,7 @@ function getMenuPopupItemData(options) {
 			url.setArgument('form', 'update');
 			url.setArgument('hostid', options.hostid);
 			url.setArgument('itemid', options.itemid);
-			url.setArgument('context', options.context);
+			url.setArgument('context', 'host');
 
 			config.url = url.getUrl();
 		}
