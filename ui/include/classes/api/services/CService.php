@@ -114,8 +114,6 @@ class CService extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-
-
 		if ($permissions === null) {
 			$accessible_services = null;
 		}
