@@ -185,7 +185,6 @@ class CMenuPopupHelper {
 	 *
 	 * @param array  $data
 	 * @param string $data['itemid']   Item ID.
-	 * @param string $data['context']  Additional parameter in URL to identify main section.
 	 *
 	 * @return array
 	 */
