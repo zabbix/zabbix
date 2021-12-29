@@ -234,7 +234,7 @@ void	zbx_eval_set_exception(zbx_eval_context_t *ctx, char *message);
 #define ZBX_EVAL_EXTRACT_VAR_STR	0x0002
 #define ZBX_EVAL_EXTRACT_VAR_MACRO	0x0004
 
-#define ZBX_EVAL_EXCTRACT_ALL	(ZBX_EVAL_EXTRACT_FUNCTIONID | ZBX_EVAL_EXTRACT_VAR_STR | ZBX_EVAL_EXTRACT_VAR_MACRO)
+#define ZBX_EVAL_EXTRACT_ALL	(ZBX_EVAL_EXTRACT_FUNCTIONID | ZBX_EVAL_EXTRACT_VAR_STR | ZBX_EVAL_EXTRACT_VAR_MACRO)
 
 zbx_eval_context_t *zbx_eval_deserialize_dyn(const unsigned char *data, const char *expression,
 		zbx_uint64_t mask);
