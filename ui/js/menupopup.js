@@ -724,10 +724,6 @@ function getMenuPopupItem(options, trigger_elmnt) {
 	});
 
 	// edit
-	const edit_trigger = {
-		label: t('Triggers')
-	};
-
 	if (options.triggers.length > 0) {
 		const triggers = [];
 
@@ -743,8 +739,10 @@ function getMenuPopupItem(options, trigger_elmnt) {
 			});
 		});
 
-		edit_trigger.items = triggers;
-		items.push(edit_trigger);
+		items.push({
+			label: t('Triggers'),
+			items: triggers
+		})
 	}
 
 	url = new Curl('items.php', false);
@@ -862,7 +860,7 @@ function getMenuPopupItemData(options) {
 	}
 
 	return [{
-		label: 'ITEM',
+		label: t('Item'),
 		items: items
 	}];
 }

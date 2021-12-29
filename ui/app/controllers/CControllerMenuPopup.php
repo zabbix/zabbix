@@ -247,15 +247,14 @@ class CControllerMenuPopup extends CController {
 				'name' => $db_item['name'],
 				'key' => $db_item['key_'],
 				'create_dependent_item' => ($db_item['flags'] != ZBX_FLAG_DISCOVERY_CREATED),
-				'create_dependent_discovery' => ($db_item['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
+				'create_dependent_discovery' => ($db_item['flags'] != ZBX_FLAG_DISCOVERY_CREATED),
+				'triggers' => []
 			];
 
 			$db_triggers = API::Trigger()->get([
 				'output' => ['triggerid', 'description'],
 				'itemids' => $data['itemid']
 			]);
-
-			$menu_data['triggers'] = [];
 
 			foreach ($db_triggers as $db_trigger) {
 				$menu_data['triggers'][] = [
@@ -348,15 +347,14 @@ class CControllerMenuPopup extends CController {
 				'name' => $db_item_prototype['name'],
 				'key' => $db_item_prototype['key_'],
 				'host' => $db_item_prototype['hosts'][0]['host'],
-				'parent_discoveryid' => $db_item_prototype['discoveryRule']['itemid']
+				'parent_discoveryid' => $db_item_prototype['discoveryRule']['itemid'],
+				'trigger_prototypes' => []
 			];
 
 			$db_trigger_prototypes = API::TriggerPrototype()->get([
 				'output' => ['triggerid', 'description'],
 				'itemids' => $data['itemid']
 			]);
-
-			$menu_data['trigger_prototypes'] = [];
 
 			foreach ($db_trigger_prototypes as $db_trigger_prototype) {
 				$menu_data['trigger_prototypes'][] = [
