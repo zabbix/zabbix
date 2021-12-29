@@ -282,8 +282,9 @@ class CControllerMenuPopup extends CController {
 	 */
 	private static function getMenuDataItemData(array $data) {
 		$db_items = API::Item()->get([
-				'output' => ['hostid', 'value_type', 'history', 'trends'],
-				'itemids' => $data['itemid']
+				'output' => ['hostid', 'type', 'value_type', 'history', 'trends'],
+				'itemids' => $data['itemid'],
+				'webitems' => true
 			]);
 
 		if ($db_items) {
@@ -296,6 +297,10 @@ class CControllerMenuPopup extends CController {
 					'hostids' => $db_item['hostid'],
 					'editable' => true
 				]);
+			}
+
+			if ($db_item['type'] == ITEM_TYPE_HTTPTEST) {
+				$rw_hosts = false;
 			}
 
 			return [
