@@ -772,7 +772,6 @@ void	zbx_preprocessor_result_flush(zbx_preproc_result_buffer_t *buf, zbx_ipc_soc
 	}
 }
 
-
 void	zbx_preprocessor_result_append(zbx_preproc_result_buffer_t *buf, zbx_uint64_t itemid, unsigned char flags,
 		unsigned char value_type, const zbx_variant_t *value, const char *error,
 		const zbx_vector_ptr_t *history, zbx_ipc_socket_t *socket)
@@ -1111,7 +1110,6 @@ void	zbx_preprocessor_unpack_task(zbx_uint64_t *itemid, unsigned char *value_typ
 	(void)preprocessor_unpack_steps(offset, steps, steps_num);
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: free_steps                                                       *
@@ -1342,7 +1340,6 @@ static void	agent_result_set_value(zbx_variant_t *value, zbx_item_value_type_t v
 			return;
 	}
 }
-
 
 /******************************************************************************
  *                                                                            *

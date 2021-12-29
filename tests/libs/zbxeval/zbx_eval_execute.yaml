@@ -2206,7 +2206,16 @@ in:
   rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
   expression: 'histogram_quantile(0.8, 0.1, 1, 0.2, 2, "+Inf", 0)'
 out:
-  result: FAIL
+  result: SUCCEED
+  value: '0.16000000000000003'
+---
+test case: Expression 'histogram_quantile(0.8, 0.1, 0, 0.2, 0, +Inf, 0)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'histogram_quantile(0.8, 0.1, 0, 0.2, 0, "+Inf", 0)'
+out:
+  result: SUCCEED
+  value: '-1'
 ---
 test case: Expression 'histogram_quantile(-0.1, 0.2, 10, 0.4, 20, 1.0, 60, 1.2, 70, +Inf, 80)'
 in:

@@ -592,13 +592,6 @@ int	zbx_eval_calc_histogram_quantile(const double q, const zbx_vector_dbl_t *val
 		goto err;
 	}
 
-	if (0 == LAST(histogram).count)
-	{
-		*error = zbx_dsprintf(*error, "invalid parameters: value of infinity bucket must not be zero"
-				" for function at \"%s\"", err_fn);
-		goto err;
-	}
-
 	remove_duplicate_backet(&histogram);
 
 	if (histogram.values_num < 2)
@@ -613,8 +606,8 @@ int	zbx_eval_calc_histogram_quantile(const double q, const zbx_vector_dbl_t *val
 
 	if (FP_ZERO == fpclassify(total))
 	{
-		*error = zbx_dsprintf(*error, "invalid zero value of infinity bucket for function at \"%s\"", err_fn);
-		goto err;
+		res = -1;	/* preprocessing pending with discard value */
+		goto end;
 	}
 
 	rank = q * total;

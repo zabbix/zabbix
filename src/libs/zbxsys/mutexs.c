@@ -606,4 +606,3 @@ zbx_mutex_name_t	zbx_mutex_create_per_process_name(const zbx_mutex_name_t prefix
 	return name;
 }
 #endif
-

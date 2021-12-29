@@ -173,4 +173,3 @@ void	zbx_get_zabbix_stats(struct zbx_json *json)
 
 	zbx_json_close(json);
 }
-

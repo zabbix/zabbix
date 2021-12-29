@@ -2042,7 +2042,6 @@ static int	evaluate_PERCENTILE(zbx_variant_t  *value, DC_ITEM *item, const char 
 		goto out;
 	}
 
-
 	switch (arg1_type)
 	{
 		case ZBX_VALUE_SECONDS:

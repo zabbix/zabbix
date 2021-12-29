@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'6.0.0alpha8');
+define('ZABBIX_VERSION',		'6.0.0beta2');
 define('ZABBIX_API_VERSION',	'6.0.0');
 define('ZABBIX_EXPORT_VERSION',	'6.0');
 
@@ -1242,6 +1242,12 @@ define('ZBX_BYTE_SUFFIX_MULTIPLIERS', [
 	'T' => ZBX_TEBIBYTE
 ]);
 
+// Geographic coordinate system edges.
+define('GEOMAP_LAT_MIN', -90);
+define('GEOMAP_LAT_MAX', 90);
+define('GEOMAP_LNG_MIN', -180);
+define('GEOMAP_LNG_MAX', 180);
+
 // Regular expressions.
 define('ZBX_PREG_PRINT', '^\x00-\x1F');
 define('ZBX_PREG_MACRO_NAME', '([A-Z0-9\._]+)');
@@ -1329,6 +1335,7 @@ define('API_INTS32',				12);
 define('API_FLOATS',				13);
 define('API_UINTS64',				14);
 define('API_CUIDS',					44);
+define('API_USER_MACROS',			52);
 // specific types
 define('API_HG_NAME',				15);
 define('API_SCRIPT_MENU_PATH',		16);
@@ -1366,8 +1373,8 @@ define('API_EXEC_PARAMS',			48);
 define('API_COND_FORMULA',			49);
 define('API_COND_FORMULAID',		50);
 define('API_UNEXPECTED',			51);
-define('API_INT32_RANGES',			52);
-define('API_LAT_LNG_ZOOM',			53);
+define('API_INT32_RANGES',			53);
+define('API_LAT_LNG_ZOOM',			54);
 
 // flags
 define('API_REQUIRED',					0x00001);
@@ -1474,6 +1481,8 @@ define('ZBX_ACTION_RENAME',		4);
 
 // Maximum width for popups in Actions column for problems.
 define('ZBX_ACTIONS_POPUP_MAX_WIDTH',			800);
+
+define('ZBX_HINTBOX_CONTENT_LIMIT',				8192);
 
 // dashboard widgets
 define('WIDGET_ACTION_LOG',			'actionlog');
@@ -1988,6 +1997,7 @@ define('ZBX_STYLE_YELLOW', 'yellow');
 define('ZBX_STYLE_YELLOW_BG', 'yellow-bg');
 define('ZBX_STYLE_FIELD_LABEL_ASTERISK', 'form-label-asterisk');
 define('ZBX_STYLE_PROBLEM_ICON_LIST' , 'problem-icon-list');
+define('ZBX_STYLE_PROBLEM_ICON_LINK' , 'problem-icon-link');
 define('ZBX_STYLE_PROBLEM_ICON_LIST_ITEM' , 'problem-icon-list-item');
 define('ZBX_STYLE_ZABBIX_LOGO', 'zabbix-logo');
 define('ZBX_STYLE_ZABBIX_SIDEBAR_LOGO', 'zabbix-sidebar-logo');

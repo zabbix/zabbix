@@ -598,7 +598,6 @@ static void	hk_drop_partition_for_rule(zbx_hk_history_rule_t *rule, int now)
 				rule->table, keep_from);
 	}
 
-
 	if (NULL == result)
 		zabbix_log(LOG_LEVEL_ERR, "cannot drop chunks for %s", rule->table);
 	else
@@ -1123,7 +1122,6 @@ static int	housekeeping_proxy_dhistory(int now)
 
 	return deleted;
 }
-
 
 static int	get_housekeeping_period(double time_slept)
 {

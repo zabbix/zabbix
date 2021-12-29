@@ -1911,7 +1911,8 @@ abstract class CTriggerGeneral extends CApiService {
 			'output' => $output,
 			'selectTags' => ['tag', 'value'],
 			'hostids' => $data['templateids'],
-			'preservekeys' => true
+			'preservekeys' => true,
+			'nopermissions' => true
 		]);
 
 		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers,
