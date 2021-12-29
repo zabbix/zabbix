@@ -25,6 +25,7 @@ class CColor extends CDiv {
 	private $value;
 	private $enabled = true;
 	private $append_color_picker_js = true;
+	private $input_id;
 
 	/**
 	 * Either "Use default" is enabled.
@@ -36,14 +37,16 @@ class CColor extends CDiv {
 	/**
 	 * Creates a color picker form element.
 	 *
-	 * @param string $name        Color picker field name.
-	 * @param string $value       Color value in HEX RGB format.
+	 * @param string $name      Color picker field name.
+	 * @param string $value     Color value in HEX RGB format.
+	 * @param string $input_id  (optional) Color input field id.
 	 */
-	public function __construct($name, $value) {
+	public function __construct($name, $value, $input_id = null) {
 		parent::__construct();
 
 		$this->name = $name;
 		$this->value = $value;
+		$this->input_id = $input_id;
 	}
 
 	/**
@@ -102,12 +105,16 @@ class CColor extends CDiv {
 	 * @return string
 	 */
 	public function toString($destroy = true): string {
+		$input = (new CInput('hidden', $this->name, $this->value))->setEnabled($this->enabled);
+
+		if ($this->input_id !== null) {
+			$input->setId($this->input_id);
+		}
+
 		$this
 			->addClass(ZBX_STYLE_COLOR_PICKER)
 			->cleanItems()
-			->addItem(
-			(new CInput('hidden', $this->name, $this->value))->setEnabled($this->enabled)
-		);
+			->addItem($input);
 
 		return parent::toString($destroy).($this->append_color_picker_js ? get_js($this->getInitJavascript()) : '');
 	}

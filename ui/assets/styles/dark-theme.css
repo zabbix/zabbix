@@ -815,7 +815,7 @@ footer {
 .color-picker {
   display: inline-block;
   line-height: 1.2;
-  vertical-align: middle; }
+  vertical-align: sub; }
   .color-picker .color-picker-preview {
     padding: 0;
     background-position: -321px -409px;
