@@ -806,6 +806,7 @@ function getMenuPopupItemData(options) {
 	if (!options.showGraph) {
 		graph.disabled = true;
 	}
+	items.push(graph);
 
 	url = new Curl('history.php', false);
 	url.setArgument('action', 'showvalues');
@@ -834,11 +835,8 @@ function getMenuPopupItemData(options) {
 		latest.disabled = true;
 	}
 
-	if (options.allowed_ui_hosts) {
-		items.push(graph);
 		items.push(values);
 		items.push(latest);
-	}
 
 	if (options.allowed_ui_conf_hosts) {
 		const config = {
