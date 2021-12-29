@@ -19,8 +19,6 @@
 **/
 
 
-use PHPUnit\Framework\TestCase;
-
 class CReferenceParserTest extends CParserTest {
 
 	protected function getParser() {

@@ -19,8 +19,6 @@
 **/
 
 
-use PHPUnit\Framework\TestCase;
-
 class CRowTest extends CTagTest {
 
 	public function constructProvider() {
