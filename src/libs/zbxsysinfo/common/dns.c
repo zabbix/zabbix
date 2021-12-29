@@ -612,11 +612,11 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 
 	if (1 == short_answer)
 	{
-		SET_UI64_RESULT(result, NOERROR != hp->rcode || 0 == ntohs(hp->ancount) || -1 == res ? 0 : 1);
+		SET_UI64_RESULT(result, -1 == res || NOERROR != hp->rcode || 0 == ntohs(hp->ancount) ? 0 : 1);
 		return SYSINFO_RET_OK;
 	}
 
-	if (NOERROR != hp->rcode || 0 == ntohs(hp->ancount) || -1 == res)
+	if (-1 == res || NOERROR != hp->rcode || 0 == ntohs(hp->ancount))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot perform DNS query."));
 		return SYSINFO_RET_FAIL;
