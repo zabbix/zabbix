@@ -37,9 +37,11 @@ require_once dirname(__FILE__).'/testHistoryValueDuplicates.php';
 require_once dirname(__FILE__).'/testUserParametersReload.php';
 require_once dirname(__FILE__).'/testTriggerState.php';
 
+use PHPUnit\Framework\TestSuite;
+
 class IntegrationTests {
 	public static function suite() {
-		$suite = new PHPUnit_Framework_TestSuite('Integration');
+		$suite = new TestSuite('Integration');
 		$suite->addTestSuite('testDataCollection');
 		$suite->addTestSuite('testDiagnosticDataTask');
 		$suite->addTestSuite('testLowLevelDiscovery');
