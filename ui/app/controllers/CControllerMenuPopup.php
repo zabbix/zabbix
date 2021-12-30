@@ -290,16 +290,12 @@ class CControllerMenuPopup extends CController {
 			$db_item = $db_items[0];
 			$rw_hosts = false;
 
-			if (CWebUser::getType() > USER_TYPE_ZABBIX_USER) {
+			if ($db_item['type'] != ITEM_TYPE_HTTPTEST && CWebUser::getType() > USER_TYPE_ZABBIX_USER) {
 				$rw_hosts = (bool) API::Host()->get([
 					'output' => [],
 					'hostids' => $db_item['hostid'],
 					'editable' => true
 				]);
-			}
-
-			if ($db_item['type'] == ITEM_TYPE_HTTPTEST) {
-				$rw_hosts = false;
 			}
 
 			return [
