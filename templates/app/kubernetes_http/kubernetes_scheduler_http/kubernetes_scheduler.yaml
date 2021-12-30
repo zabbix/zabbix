@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-30T10:12:58Z'
+  date: '2021-12-30T16:45:41Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -99,7 +99,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of HTTP requests with 2XX  status code per second.'
+          description: 'Number of HTTP requests with 2XX status code per second.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -116,7 +116,7 @@ zabbix_export:
             key: kubernetes.scheduler.get_metrics
           tags:
             -
-              tag: http-code
+              tag: 'http code'
               value: 2XX
             -
               tag: resource
@@ -132,7 +132,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of HTTP requests with 3XX  status code per second.'
+          description: 'Number of HTTP requests with 3XX status code per second.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -149,7 +149,7 @@ zabbix_export:
             key: kubernetes.scheduler.get_metrics
           tags:
             -
-              tag: http-code
+              tag: 'http code'
               value: 3XX
             -
               tag: resource
@@ -165,7 +165,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of HTTP requests with 4XX  status code per second.'
+          description: 'Number of HTTP requests with 4XX status code per second.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -182,7 +182,7 @@ zabbix_export:
             key: kubernetes.scheduler.get_metrics
           tags:
             -
-              tag: http-code
+              tag: 'http code'
               value: 4XX
             -
               tag: resource
@@ -198,7 +198,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of HTTP requests with 5XX  status code per second.'
+          description: 'Number of HTTP requests with 5XX status code per second.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -215,7 +215,7 @@ zabbix_export:
             key: kubernetes.scheduler.get_metrics
           tags:
             -
-              tag: http-code
+              tag: 'http code'
               value: 5XX
             -
               tag: resource
@@ -631,9 +631,9 @@ zabbix_export:
           item_prototypes:
             -
               uuid: eaeb8c321626466bbf7c08008a82b9c8
-              name: 'Kubernetes Scheduler: [{#RESULT}]: e2e scheduling seconds bucket, {#LE}'
+              name: 'Kubernetes Scheduler: ["{#RESULT}"]: e2e scheduling seconds bucket, {#LE}'
               type: DEPENDENT
-              key: 'kubernetes.scheduler.e2e_scheduling_bucket[{#LE},{#RESULT}]'
+              key: 'kubernetes.scheduler.e2e_scheduling_bucket[{#LE},"{#RESULT}"]'
               delay: '0'
               history: 7d
               discover: NO_DISCOVER
@@ -661,14 +661,14 @@ zabbix_export:
                   value: histogram
             -
               uuid: b8fd5b4454484f4298e2c2b1e5c832c5
-              name: 'Kubernetes Scheduler: [{#RESULT}]: e2e scheduling, p50'
+              name: 'Kubernetes Scheduler: ["{#RESULT}"]: e2e scheduling, p50'
               type: CALCULATED
-              key: 'kubernetes.scheduler.e2e_scheduling_p50[{#RESULT}]'
+              key: 'kubernetes.scheduler.e2e_scheduling_p50["{#RESULT}"]'
               history: 7d
               discover: NO_DISCOVER
               value_type: FLOAT
               units: s
-              params: 'bucket_percentile(//kubernetes.scheduler.e2e_scheduling_bucket[*,{#RESULT}],5m,50)'
+              params: 'bucket_percentile(//kubernetes.scheduler.e2e_scheduling_bucket[*,"{#RESULT}"],5m,50)'
               description: '50 percentile of e2e scheduling latency.'
               tags:
                 -
@@ -682,14 +682,14 @@ zabbix_export:
                   value: percentile
             -
               uuid: 01edd56cd1c94d4b80589d91349e4be5
-              name: 'Kubernetes Scheduler: [{#RESULT}]: e2e scheduling, p90'
+              name: 'Kubernetes Scheduler: ["{#RESULT}"]: e2e scheduling, p90'
               type: CALCULATED
-              key: 'kubernetes.scheduler.e2e_scheduling_p90[{#RESULT}]'
+              key: 'kubernetes.scheduler.e2e_scheduling_p90["{#RESULT}"]'
               history: 7d
               discover: NO_DISCOVER
               value_type: FLOAT
               units: s
-              params: 'bucket_percentile(//kubernetes.scheduler.e2e_scheduling_bucket[*,{#RESULT}],5m,90)'
+              params: 'bucket_percentile(//kubernetes.scheduler.e2e_scheduling_bucket[*,"{#RESULT}"],5m,90)'
               description: '90 percentile of e2e scheduling latency.'
               tags:
                 -
@@ -703,14 +703,14 @@ zabbix_export:
                   value: percentile
             -
               uuid: 706fc27da4d34a4e9189c566c7aa96ff
-              name: 'Kubernetes Scheduler: [{#RESULT}]: e2e scheduling, p90'
+              name: 'Kubernetes Scheduler: ["{#RESULT}"]: e2e scheduling, p90'
               type: CALCULATED
-              key: 'kubernetes.scheduler.e2e_scheduling_p95[{#RESULT}]'
+              key: 'kubernetes.scheduler.e2e_scheduling_p95["{#RESULT}"]'
               history: 7d
               discover: NO_DISCOVER
               value_type: FLOAT
               units: s
-              params: 'bucket_percentile(//kubernetes.scheduler.e2e_scheduling_bucket[*,{#RESULT}],5m,95)'
+              params: 'bucket_percentile(//kubernetes.scheduler.e2e_scheduling_bucket[*,"{#RESULT}"],5m,95)'
               description: '95 percentile of e2e scheduling latency.'
               tags:
                 -
@@ -724,14 +724,14 @@ zabbix_export:
                   value: percentile
             -
               uuid: 829627aeab764590b3a17e6b10c56709
-              name: 'Kubernetes Scheduler: [{#RESULT}]: e2e scheduling, p99'
+              name: 'Kubernetes Scheduler: ["{#RESULT}"]: e2e scheduling, p99'
               type: CALCULATED
-              key: 'kubernetes.scheduler.e2e_scheduling_p99[{#RESULT}]'
+              key: 'kubernetes.scheduler.e2e_scheduling_p99["{#RESULT}"]'
               history: 7d
               discover: NO_DISCOVER
               value_type: FLOAT
               units: s
-              params: 'bucket_percentile(//kubernetes.scheduler.e2e_scheduling_bucket[*,{#RESULT}],5m,99)'
+              params: 'bucket_percentile(//kubernetes.scheduler.e2e_scheduling_bucket[*,"{#RESULT}"],5m,99)'
               description: '95 percentile of e2e scheduling latency.'
               tags:
                 -
@@ -746,38 +746,38 @@ zabbix_export:
           graph_prototypes:
             -
               uuid: be0cb738e2a346f8a24cabf0f76a6e6a
-              name: 'Kubernetes Scheduler: [{#RESULT}] E2e latency'
+              name: 'Kubernetes Scheduler: ["{#RESULT}"] E2e latency'
               graph_items:
                 -
                   color: 1A7C11
                   item:
                     host: 'Kubernetes Scheduler by HTTP'
-                    key: 'kubernetes.scheduler.e2e_scheduling_p50[{#RESULT}]'
+                    key: 'kubernetes.scheduler.e2e_scheduling_p50["{#RESULT}"]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
                     host: 'Kubernetes Scheduler by HTTP'
-                    key: 'kubernetes.scheduler.e2e_scheduling_p90[{#RESULT}]'
+                    key: 'kubernetes.scheduler.e2e_scheduling_p90["{#RESULT}"]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
                     host: 'Kubernetes Scheduler by HTTP'
-                    key: 'kubernetes.scheduler.e2e_scheduling_p95[{#RESULT}]'
+                    key: 'kubernetes.scheduler.e2e_scheduling_p95["{#RESULT}"]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
                     host: 'Kubernetes Scheduler by HTTP'
-                    key: 'kubernetes.scheduler.e2e_scheduling_p99[{#RESULT}]'
+                    key: 'kubernetes.scheduler.e2e_scheduling_p99["{#RESULT}"]'
           master_item:
             key: kubernetes.scheduler.get_metrics
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
               parameters:
-                - ''
+                - '{__name__=~ "scheduler_e2e_scheduling_duration_*"}'
             -
               type: JAVASCRIPT
               parameters:

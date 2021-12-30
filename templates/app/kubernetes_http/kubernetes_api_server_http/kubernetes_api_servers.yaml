@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-30T13:57:57Z'
+  date: '2021-12-30T16:47:23Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -968,7 +968,7 @@ zabbix_export:
               uuid: 860cc40806254564bddb3617b8b75e74
               name: 'Kubernetes API: Certificate expiration seconds bucket, {#LE}'
               type: DEPENDENT
-              key: 'kubernetes.api.client_certificate_expiration_seconds_bucket["{#LE}"]'
+              key: 'kubernetes.api.client_certificate_expiration_seconds_bucket[{#LE}]'
               delay: '0'
               history: 7d
               value_type: FLOAT
@@ -1289,7 +1289,7 @@ zabbix_export:
               uuid: 5135a1bc92514c79965edea9d7d2a47e
               name: 'Kubernetes API: ["{#VERB}"] Requests bucket: {#LE}'
               type: DEPENDENT
-              key: 'kubernetes.api.request_duration_seconds_bucket["{#LE}","{#VERB}"]'
+              key: 'kubernetes.api.request_duration_seconds_bucket[{#LE},"{#VERB}"]'
               delay: '0'
               history: 7d
               discover: NO_DISCOVER

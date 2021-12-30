@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-30T10:35:46Z'
+  date: '2021-12-30T16:46:07Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -421,7 +421,7 @@ zabbix_export:
               uuid: 70277a128a254462ad0bf7a023738ba0
               name: 'Kubernetes Controller Manager: ["{#NAME}"]: Workqueue duration seconds bucket, {#LE}'
               type: DEPENDENT
-              key: 'kubernetes.controller.duration_seconds_bucket["{#LE},{#NAME}"]'
+              key: 'kubernetes.controller.duration_seconds_bucket[{#LE},"{#NAME}"]'
               delay: '0'
               history: 7d
               discover: NO_DISCOVER
@@ -451,7 +451,7 @@ zabbix_export:
               uuid: 8357905c82ea42b98d686eee2d9c35f6
               name: 'Kubernetes Controller Manager: ["{#NAME}"]: Queue duration seconds bucket, {#LE}'
               type: DEPENDENT
-              key: 'kubernetes.controller.queue_duration_seconds_bucket["{#LE},{#NAME}"]'
+              key: 'kubernetes.controller.queue_duration_seconds_bucket[{#LE},"{#NAME}"]'
               delay: '0'
               history: 7d
               discover: NO_DISCOVER
@@ -581,7 +581,7 @@ zabbix_export:
               discover: NO_DISCOVER
               value_type: FLOAT
               units: s
-              params: 'bucket_percentile(//kubernetes.controller.queue_duration_seconds_bucket[*,{#NAME}"],5m,50)'
+              params: 'bucket_percentile(//kubernetes.controller.queue_duration_seconds_bucket[*,"{#NAME}"],5m,50)'
               description: '50 percentile of how long in seconds an item stays in workqueue before being requested. If there are no requests for 5 minute, item value will be discarded.'
               preprocessing:
                 -
@@ -607,7 +607,7 @@ zabbix_export:
               discover: NO_DISCOVER
               value_type: FLOAT
               units: s
-              params: 'bucket_percentile(//kubernetes.controller.queue_duration_seconds_bucket[*,{#NAME}"],5m,90)'
+              params: 'bucket_percentile(//kubernetes.controller.queue_duration_seconds_bucket[*,"{#NAME}"],5m,90)'
               description: '90 percentile of how long in seconds an item stays in workqueue before being requested, by queue.'
               tags:
                 -
@@ -628,7 +628,7 @@ zabbix_export:
               discover: NO_DISCOVER
               value_type: FLOAT
               units: s
-              params: 'bucket_percentile(//kubernetes.controller.queue_duration_seconds_bucket[*,{#NAME}"],5m,95)'
+              params: 'bucket_percentile(//kubernetes.controller.queue_duration_seconds_bucket[*,"{#NAME}"],5m,95)'
               description: '95 percentile of how long in seconds an item stays in workqueue before being requested, by queue.'
               tags:
                 -
@@ -649,7 +649,7 @@ zabbix_export:
               discover: NO_DISCOVER
               value_type: FLOAT
               units: s
-              params: 'bucket_percentile(//kubernetes.controller.queue_duration_seconds_bucket[*,{#NAME}"],5m,99)'
+              params: 'bucket_percentile(//kubernetes.controller.queue_duration_seconds_bucket[*,"{#NAME}"],5m,99)'
               description: '99 percentile of how long in seconds an item stays in workqueue before being requested, by queue.'
               tags:
                 -
@@ -735,7 +735,7 @@ zabbix_export:
               discover: NO_DISCOVER
               value_type: FLOAT
               units: s
-              params: 'bucket_percentile(//kubernetes.controller.duration_seconds_bucket[*,{#NAME}"],5m,50)'
+              params: 'bucket_percentile(//kubernetes.controller.duration_seconds_bucket[*,"{#NAME}"],5m,50)'
               description: '50 percentiles of how long in seconds processing an item from workqueue takes, by queue.'
               tags:
                 -
@@ -756,7 +756,7 @@ zabbix_export:
               discover: NO_DISCOVER
               value_type: FLOAT
               units: s
-              params: 'bucket_percentile(//kubernetes.controller.duration_seconds_bucket[*,{#NAME}"],5m,90)'
+              params: 'bucket_percentile(//kubernetes.controller.duration_seconds_bucket[*,"{#NAME}"],5m,90)'
               description: '90 percentile of how long in seconds processing an item from workqueue takes, by queue.'
               tags:
                 -
@@ -777,7 +777,7 @@ zabbix_export:
               discover: NO_DISCOVER
               value_type: FLOAT
               units: s
-              params: 'bucket_percentile(//kubernetes.controller.duration_seconds_bucket[*,{#NAME}"],5m,95)'
+              params: 'bucket_percentile(//kubernetes.controller.duration_seconds_bucket[*,"{#NAME}"],5m,95)'
               description: '95 percentile of how long in seconds processing an item from workqueue takes, by queue.'
               tags:
                 -
@@ -798,7 +798,7 @@ zabbix_export:
               discover: NO_DISCOVER
               value_type: FLOAT
               units: s
-              params: 'bucket_percentile(//kubernetes.controller.duration_seconds_bucket[*,{#NAME}"],5m,99)'
+              params: 'bucket_percentile(//kubernetes.controller.duration_seconds_bucket[*,"{#NAME}"],5m,99)'
               description: '99 percentile of how long in seconds processing an item from workqueue takes, by queue.'
               tags:
                 -
