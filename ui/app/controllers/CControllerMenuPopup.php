@@ -309,7 +309,6 @@ class CControllerMenuPopup extends CController {
 				'history' => $db_item['history'] != 0,
 				'trends' => $db_item['trends'] != 0,
 				'isWriteable' => $rw_hosts,
-				'allowed_ui_hosts' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_HOSTS),
 				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 			];
 		}

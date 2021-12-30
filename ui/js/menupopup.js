@@ -783,12 +783,11 @@ function getMenuPopupItem(options, trigger_elmnt) {
  *
  * @param string options['itemid']
  * @param string options['hostid']
- * @param string options['showGraph']                 Link to Monitoring->Items->Graphs page.
- * @param string options['history']                   Is history available.
- * @param string options['trends']                    Are trends available.
- * @param string options['allowed_ui_hosts']          Whether user has access to monitoring hosts pages.
- * @param string options['allowed_ui_conf_hosts']     Whether user has access to configuration hosts pages.
- * @param string options['isWriteable']               Whether user has read and write access to host and its items.
+ * @param bool options['showGraph']                   Link to Monitoring->Items->Graphs page.
+ * @param bool options['history']                     Is history available.
+ * @param bool options['trends']                      Are trends available.
+ * @param bool options['allowed_ui_conf_hosts']       Whether user has access to configuration hosts pages.
+ * @param bool options['isWriteable']                 Whether user has read and write access to host and its items.
  *
  * @return array
  */
