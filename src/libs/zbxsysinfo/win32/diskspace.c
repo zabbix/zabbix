@@ -22,7 +22,6 @@
 #include "zbxjson.h"
 #include "zbxalgo.h"
 #include "log.h"
-#include "zbxconf.h"
 
 typedef struct
 {

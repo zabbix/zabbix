@@ -20,7 +20,6 @@
 #include "common.h"
 #include "sysinfo.h"
 #include "log.h"
-#include "zbxconf.h"
 
 static int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result)
 {

@@ -21,7 +21,6 @@
 #include "sysinfo.h"
 #include "log.h"
 #include "inodes.h"
-#include "zbxconf.h"
 
 #define get_string(field)	#field
 
