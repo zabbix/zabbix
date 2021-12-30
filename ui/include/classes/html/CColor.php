@@ -32,7 +32,7 @@ class CColor extends CDiv {
 	 *
 	 * @var bool
 	 */
-	private $use_default;
+	private $use_default = false;
 
 	/**
 	 * Creates a color picker form element.

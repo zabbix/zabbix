@@ -28,7 +28,7 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 		$overlay_colorbox,
 		$button_use_default,
 		defaults = {
-			'palette': [
+			palette: [
 				['FF0000','FF0080','BF00FF','4000FF','0040FF','0080FF','00BFFF','00FFFF','00FFBF','00FF00','80FF00','BFFF00','FFFF00','FFBF00','FF8000','FF4000','CC6600','666699'],
 				['000000','0F0F0F','1E1E1E','2D2D2D','3C3C3C','4B4B4B','5A5A5A','696969','787878','878787','969696','A5A5A5','B4B4B4','C3C3C3','D2D2D2','E1E1E1','F0F0F0','FFFFFF'],
 				['FFEBEE','FCE4EC','F3E5F5','EDE7F6','E8EAF6','E3F2FD','E1F5FE','E0F7FA','E0F2F1','E8F5E9','F1F8E9','F9FBE7','FFFDE7','FFF8E1','FFF3E0','FBE9E7','EFEBE9','ECEFF1'],
@@ -45,7 +45,9 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 				['5B0E0E','440727','250A46','180D49','0D113F','062350','002B4D','003032','002620','0D2F10','19340F','413B0B','7A3F0B','7F3700','732800','5F1B06','1F1311','13191C'],
 				['2D0707','220313','120523','0C0624','06081F','031128','001526','001819','00131D','061708','0C1A07','201D05','3D1F05','3F1B00','391400','2F0D03','0F0908','090C0E'],
 			],
-			'appendTo': 'body'
+			appendTo: 'body',
+			use_default: false,
+			onUpdate: null
 		},
 		/**
 		 * Click handler for every colorpicker cell.
@@ -178,8 +180,6 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 				})
 					.html(t('Use default'))
 					.on('click', () => setColorHandler(''));
-
-				options = $.extend(defaults, options || {});
 
 				overlay = $('<div>', {
 					class: 'overlay-dialogue color-picker-dialogue',
@@ -318,6 +318,8 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 	}
 
 	$.fn.colorpicker = function(options) {
+		options = $.extend(defaults, options || {});
+
 		/**
 		 * Initialize colorpicker overlay if it is not initialized.
 		 */
@@ -334,7 +336,6 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 		 */
 		return this.each(function (_, element) {
 			const id = $(element).attr('id');
-			const callback = (options && 'onUpdate' in options) ? options.onUpdate : null;
 
 			if ($('#lbl_' + id).length) {
 				return;
@@ -359,10 +360,12 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 				.insertAfter(element);
 
 			$(element)
-				.data('use_default', (options && 'use_default' in options))
+				.data('use_default', options.use_default)
 				.change(function () {
 					methods.set_color_by_id($(element).attr('id'), this.value);
-					callback && callback.call(element, this.value);
+					if (options.onUpdate !== null) {
+						options.onUpdate.call(element, this.value);
+					}
 				});
 
 			methods.set_color_by_id(id, element.value);
