@@ -128,30 +128,58 @@ out:
 static duk_ret_t	es_zabbix_sleep(duk_context *ctx)
 {
 	zbx_es_env_t		*env;
-	struct timespec		sleep;
-	unsigned int		msec;
 	duk_memory_functions	out_funcs;
+	struct timespec		ts_sleep;
+	zbx_uint64_t		timeout, duration;
+	unsigned int		sleep_ms, ret_fail = 0;
+	duk_idx_t		err_idx;
 
-	msec = duk_require_uint(ctx, 0);
-	sleep.tv_sec = msec / 1000;
-	sleep.tv_nsec = msec % 1000 * 1000000;
-
+	sleep_ms = duk_require_uint(ctx, 0);
 	duk_get_memory_functions(ctx, &out_funcs);
 	env = (zbx_es_env_t *)out_funcs.udata;
 
-	if (time(NULL) + sleep.tv_sec > env->start_time.sec + env->timeout)
+	timeout = (unsigned int)env->timeout * 1000;
+	duration = zbx_get_duration_ms(&env->start_time);
+
+	if (sleep_ms > timeout)
 	{
-		if (-1 == duk_push_error_object(ctx, DUK_RET_ERROR,
-				"Zabbix.sleep(%d) duration is longer than time left for JS execution", msec))
+		ret_fail = 1;
+		err_idx = duk_push_error_object(ctx, DUK_RET_ERROR,
+				"Zabbix.sleep(%d) duration is longer than JS execution timeout(%d)", sleep_ms, timeout);
+		goto out;
+	}
+
+	if (timeout < duration)
+	{
+		ret_fail = 1;
+		err_idx = duk_push_error_object(ctx, DUK_RET_ERROR, "execution timeout");
+		goto out;
+	}
+
+	timeout -= duration;
+
+	if (sleep_ms > timeout)
+	{
+		ret_fail = 1;
+		err_idx = duk_push_error_object(ctx, DUK_RET_ERROR, "execution timeout");
+		sleep_ms = timeout;
+	}
+
+	ts_sleep.tv_sec = sleep_ms / 1000;
+	ts_sleep.tv_nsec = sleep_ms % 1000 * 1000000;
+
+	nanosleep(&ts_sleep, NULL);
+out:
+	if (1 == ret_fail)
+	{
+		if (-1 == err_idx)
 		{
-			zabbix_log(LOG_LEVEL_ERR, "es_zabbix_sleep(): failed to set sleep duration error");
+			zabbix_log(LOG_LEVEL_ERR, "es_zabbix_sleep(): failed to set timeout error");
 			return -1;
 		}
 		else
 			return duk_throw(ctx);
 	}
-
-	nanosleep(&sleep, NULL);
 
 	return 0;
 }
