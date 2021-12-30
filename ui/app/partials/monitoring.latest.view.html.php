@@ -79,10 +79,10 @@ foreach ($data['items'] as $itemid => $item) {
 	$checkbox = (new CCheckBox('itemids['.$itemid.']', $itemid))->setEnabled($is_graph);
 	$state_css = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? ZBX_STYLE_GREY : null;
 
-	$item_name = (new CDiv([
+	$item_name = new CDiv([
 		(new CLinkAction($item['name_expanded']))->setMenuPopup(CMenuPopupHelper::getItemData(['itemid' => $itemid])),
 		($item['description_expanded'] !== '') ? makeDescriptionIcon($item['description_expanded']) : null
-	]));
+	]);
 
 	// Row history data preparation.
 	$last_history = array_key_exists($itemid, $data['history'])
