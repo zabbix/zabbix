@@ -1825,8 +1825,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		if (ZBX_NODE_STATUS_UNKNOWN != ha_status && ha_status != ha_status_old)
 		{
 			ha_status_old = ha_status;
-			zabbix_log(LOG_LEVEL_INFORMATION, "\"%s\" node switched to \"%s\" mode", CONFIG_HA_NODE_NAME,
-							zbx_ha_status_str(ha_status));
+			zabbix_log(LOG_LEVEL_INFORMATION, "\"%s\" node switched to \"%s\" mode",
+					ZBX_NULL2EMPTY_STR(CONFIG_HA_NODE_NAME), zbx_ha_status_str(ha_status));
 
 			switch (ha_status)
 			{
