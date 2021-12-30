@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-30T16:47:23Z'
+  date: '2021-12-30T17:40:15Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -285,7 +285,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: s
-          params: 'bucket_percentile(//kubernetes.api.client_certificate_expiration[*],5m,1)'
+          params: 'bucket_percentile(//kubernetes.api.client_certificate_expiration_seconds_bucket[*],5m,1)'
           description: '1 percentile of of the remaining lifetime on the certificate used to authenticate a request.'
           tags:
             -
