@@ -688,6 +688,7 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
  * @param array  options['triggers']                  (optional)
  * @param string options['triggers'][n]['triggerid']
  * @param string options['triggers'][n]['name']
+ * @param bool   options['allowed_ui_latest_data']    Whether user has access to latest data page.
  * @param string options['context']                   Additional parameter in URL to identify main section.
  * @param {object} trigger_elmnt                      UI element that was clicked to open overlay dialogue.
  *
@@ -697,7 +698,7 @@ function getMenuPopupItem(options, trigger_elmnt) {
 	const items = [];
 	let url;
 
-	if (options.context === 'host') {
+	if (options.context === 'host' && options.allowed_ui_latest_data) {
 		url = new Curl('zabbix.php', false);
 		url.setArgument('action', 'latest.view');
 		url.setArgument('filter_hostids[]', options.hostid);

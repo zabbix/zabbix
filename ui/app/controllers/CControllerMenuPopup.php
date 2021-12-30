@@ -248,6 +248,7 @@ class CControllerMenuPopup extends CController {
 				'key' => $db_item['key_'],
 				'create_dependent_item' => ($db_item['flags'] != ZBX_FLAG_DISCOVERY_CREATED),
 				'create_dependent_discovery' => ($db_item['flags'] != ZBX_FLAG_DISCOVERY_CREATED),
+				'allowed_ui_latest_data' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA),
 				'triggers' => []
 			];
 
