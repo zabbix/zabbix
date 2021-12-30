@@ -902,7 +902,7 @@ clean_dns:
 #endif	/* defined(HAVE_RES_QUERY) || defined(_WINDOWS) || defined(__MINGW32__)*/
 }
 
-#if !defined(WINDOWS) && !defined(MINGW32_) && !defined(_AIX)
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
 static int	dns_query_short_threaded(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return dns_query(request, result, 1);
@@ -930,7 +930,7 @@ static int	dns_query_is_tcp(AGENT_REQUEST *request)
 
 int	NET_DNS(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-#if !defined(WINDOWS) && !defined(MINGW32_)
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
 	if (SUCCEED == dns_query_is_tcp(request))
 		return zbx_execute_threaded_metric(dns_query_short_threaded, request, result);
 #endif
@@ -939,7 +939,7 @@ int	NET_DNS(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	NET_DNS_RECORD(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-#if !defined(WINDOWS) && !defined(MINGW32_)
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
 	if (SUCCEED == dns_query_is_tcp(request))
 		return zbx_execute_threaded_metric(dns_query_threaded, request, result);
 #endif
