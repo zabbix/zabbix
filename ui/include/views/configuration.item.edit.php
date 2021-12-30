@@ -969,9 +969,11 @@ $item_tab
 	->addItem([
 		new CLabel(_('Enabled')),
 		new CFormField((new CCheckBox('status', ITEM_STATUS_ACTIVE))->setChecked($data['status'] == ITEM_STATUS_ACTIVE))
-	])
+	]);
+
 	// Add link to Latest data.
-	->addItem(
+if (CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA) && $data['context'] === 'host') {
+	$item_tab->addItem(
 		(new CFormField((new CLink(_('Latest data'),
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'latest.view')
@@ -979,7 +981,8 @@ $item_tab
 				->setArgument('filter_select', $data['name'])
 				->setArgument('filter_set', 1)
 		))->setTarget('_blank')))
-);
+	);
+}
 
 // Append tabs to form.
 $item_tabs = (new CTabView())
