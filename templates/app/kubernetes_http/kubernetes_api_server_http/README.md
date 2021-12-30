@@ -38,7 +38,7 @@ No specific Zabbix configuration is required.
 |{$KUBE.API.CERT.EXPIRATION} |<p>Number of days for alert of client certificate used for trigger</p> |`7` |
 |{$KUBE.API.HTTP.CLIENT.ERROR} |<p>Maximum number of HTTP client requests failures used for trigger</p> |`2` |
 |{$KUBE.API.HTTP.SERVER.ERROR} |<p>Maximum number of HTTP client requests failures used for trigger</p> |`2` |
-|{$KUBE.API.SERVER.URL} |<p>instance URL</p> |`http://localhost:8086` |
+|{$KUBE.API.SERVER.URL} |<p>instance URL</p> |`http://localhost:8086/metrics` |
 |{$KUBE.API.TOKEN} |<p>API Authorization Token</p> |`` |
 
 ## Template links

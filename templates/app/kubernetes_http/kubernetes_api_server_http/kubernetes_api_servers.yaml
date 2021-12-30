@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-30T11:10:33Z'
+  date: '2021-12-30T13:57:57Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1619,7 +1619,7 @@ zabbix_export:
           description: 'Maximum number of HTTP client requests failures used for trigger'
         -
           macro: '{$KUBE.API.SERVER.URL}'
-          value: 'http://localhost:8086'
+          value: 'http://localhost:8086/metrics'
           description: 'instance URL'
         -
           macro: '{$KUBE.API.TOKEN}'
