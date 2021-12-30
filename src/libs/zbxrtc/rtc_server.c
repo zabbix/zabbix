@@ -135,6 +135,10 @@ int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data, char 
  *             data   - [IN] the runtime control parameter (optional)         *
  *             result - [OUT] the runtime control result                      *
  *                                                                            *
+ * Return value: SUCCEED - the loglevel command was processed                 *
+ *               FAIL    - the loglevel command must be processed by the      *
+ *                         default loglevel command handler                   *
+ *                                                                            *
  ******************************************************************************/
 static int	rtc_process_loglevel(int direction, const char *data, char **result)
 {
@@ -418,6 +422,10 @@ static void	rtc_ha_failover_delay(const char *data, char **out)
  * Parameters: code   - [IN] the request code                                 *
  *             data   - [IN] the runtime control parameter (optional)         *
  *             result - [OUT] the runtime control result                      *
+ *                                                                            *
+ * Return value: SUCCEED - the rtc command was processed                      *
+ *               FAIL    - the rtc command must be processed by the default   *
+ *                         rtc command handler                                *
  *                                                                            *
  ******************************************************************************/
 int	rtc_process_request_ex(int code, const unsigned char *data, char **result)

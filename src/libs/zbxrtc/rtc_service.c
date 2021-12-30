@@ -156,15 +156,27 @@ static void	rtc_process_diaginfo(const char *data, char **result)
 	}
 
 	if (0 == strcmp(buf, "all"))
+	{
 		scope = (1 << ZBX_DIAGINFO_HISTORYCACHE) | (1 << ZBX_DIAGINFO_PREPROCESSING) | (1 << ZBX_DIAGINFO_LOCKS);
+	}
 	else if (0 == strcmp(buf, ZBX_DIAG_HISTORYCACHE))
+	{
 		scope = 1 << ZBX_DIAGINFO_HISTORYCACHE;
+	}
 	else if (0 == strcmp(buf, ZBX_DIAG_PREPROCESSING))
+	{
 		scope = 1 << ZBX_DIAGINFO_PREPROCESSING;
+	}
 	else if (0 == strcmp(buf, ZBX_DIAG_LOCKS))
+	{
 		scope = 1 << ZBX_DIAGINFO_LOCKS;
+	}
 	else
+	{
+		if (NULL == *result)
+			*result = zbx_dsprintf(NULL, "Unknown diaginfo section \"%s\"\n", buf);
 		return;
+	}
 
 	zbx_diag_log_info(scope, result);
 }
@@ -225,6 +237,8 @@ static void	rtc_process_request(int code, const unsigned char *data, char **resu
 		case ZBX_RTC_DIAGINFO:
 			rtc_process_diaginfo((const char *)data, result);
 			return;
+		default:
+			*result = zbx_strdup(*result, "Unknown runtime control option\n");
 	}
 }
 
@@ -262,8 +276,8 @@ void	zbx_rtc_dispatch(zbx_ipc_client_t *client, zbx_ipc_message_t *message)
 
 	if (NULL == result)
 	{
-		/* all runtime commands generate some output */
-		result = zbx_strdup(NULL, "Unknown runtime control option\n");
+		/* generate default success message if no specific success or error messages were returned */
+		result = zbx_strdup(NULL, "Runtime control command was forwarded successfully\n");
 	}
 
 	size = (zbx_uint32_t)strlen(result) + 1;

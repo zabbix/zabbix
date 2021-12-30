@@ -89,7 +89,7 @@ static void	common_sigusr_handler(int flags)
 
 void	zbx_signal_process_by_type(int proc_type, int proc_num, int flags, char **out)
 {
-	int		process_num, found = 0, i;
+	int		process_num, found = 0, i, failed_num = 0;
 	union sigval	s;
 	unsigned char	process_type;
 	size_t		out_alloc = 0, out_offset = 0;
@@ -118,14 +118,13 @@ void	zbx_signal_process_by_type(int proc_type, int proc_num, int flags, char **o
 
 		if (-1 != sigqueue(threads[i], SIGUSR1, s))
 		{
-			zbx_strlog_alloc(LOG_LEVEL_DEBUG, out, &out_alloc, &out_offset,
-					"the signal was redirected to \"%s\" process"
+			zabbix_log(LOG_LEVEL_DEBUG, "the signal was redirected to \"%s\" process"
 					" pid:%d", get_process_type_string(process_type), threads[i]);
 		}
 		else
 		{
-			zbx_strlog_alloc(LOG_LEVEL_ERR, out, &out_alloc, &out_offset,
-					"cannot redirect signal: %s", zbx_strerror(errno));
+			zabbix_log(LOG_LEVEL_ERR, "cannot redirect signal: %s", zbx_strerror(errno));
+			failed_num++;
 		}
 	}
 
@@ -144,12 +143,17 @@ void	zbx_signal_process_by_type(int proc_type, int proc_num, int flags, char **o
 					get_process_type_string(proc_type), proc_num);
 		}
 	}
+	else
+	{
+		if (0 != failed_num)
+			*out = zbx_strdup(*out, "failed to redirect remote control signal(s)");
+	}
 }
 
 void	zbx_signal_process_by_pid(int pid, int flags, char **out)
 {
 	union sigval	s;
-	int		i, found = 0;
+	int		i, found = 0, failed_num = 0;
 	size_t		out_alloc = 0, out_offset = 0;
 
 	s.sival_ptr = NULL;
@@ -164,13 +168,12 @@ void	zbx_signal_process_by_pid(int pid, int flags, char **out)
 
 		if (-1 != sigqueue(threads[i], SIGUSR1, s))
 		{
-			zbx_strlog_alloc(LOG_LEVEL_DEBUG, out, &out_alloc, &out_offset,
-					"the signal was redirected to process pid:%d",	threads[i]);
+			zabbix_log(LOG_LEVEL_DEBUG, "the signal was redirected to process pid:%d",	threads[i]);
 		}
 		else
 		{
-			zbx_strlog_alloc(LOG_LEVEL_ERR, out, &out_alloc, &out_offset,
-					"cannot redirect signal: %s", zbx_strerror(errno));
+			zabbix_log(LOG_LEVEL_ERR, "cannot redirect signal: %s", zbx_strerror(errno));
+			failed_num++;
 		}
 	}
 
@@ -178,6 +181,11 @@ void	zbx_signal_process_by_pid(int pid, int flags, char **out)
 	{
 		zbx_strlog_alloc(LOG_LEVEL_DEBUG, out, &out_alloc, &out_offset,
 				"cannot redirect signal: process pid:%d is not a Zabbix child process", pid);
+	}
+	else
+	{
+		if (0 != failed_num)
+			*out = zbx_strdup(*out, "failed to redirect remote control signal(s)");
 	}
 }
 
