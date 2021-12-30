@@ -147,7 +147,7 @@ static int	vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE time
 
 int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return zbx_execute_threaded_metric(vfs_fs_size, request, result, CONFIG_TIMEOUT);
+	return zbx_execute_threaded_metric(vfs_fs_size, request, result);
 }
 
 static const char	*get_drive_type_string(UINT type)
@@ -452,5 +452,5 @@ out:
 
 int	VFS_FS_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return zbx_execute_threaded_metric(vfs_fs_get, request, result, CONFIG_TIMEOUT);
+	return zbx_execute_threaded_metric(vfs_fs_get, request, result);
 }

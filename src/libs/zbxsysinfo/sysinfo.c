@@ -1601,9 +1601,8 @@ zbx_uint64_t	get_kstat_numeric_value(const kstat_named_t *kn)
 
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 #if defined(WITH_AGENT2_METRICS)
-int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result, int timeout)
+int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	ZBX_UNUSED(timeout);
 	/* calling fork() in a multithreaded program may result in deadlock on mutex */
 	return metric_func(request, result);
 }
@@ -1792,7 +1791,7 @@ static int	write_all(int fd, const char *buf, size_t n)
  *         SYSINFO_RET_FAIL - otherwise                                       *
  *                                                                            *
  ******************************************************************************/
-int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result, int timeout)
+int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int	ret = SYSINFO_RET_OK;
 	pid_t	pid;
@@ -1843,7 +1842,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 
 	close(fds[1]);
 
-	zbx_alarm_on(timeout);
+	zbx_alarm_on(CONFIG_TIMEOUT);
 
 	while (0 != (n = read(fds[0], buffer, sizeof(buffer))))
 	{
