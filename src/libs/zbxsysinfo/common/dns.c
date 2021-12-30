@@ -916,11 +916,7 @@ static int	dns_query_is_tcp(AGENT_REQUEST *request)
 {
 	char	*param;
 
-	param = get_rparam(request, 5);
-
-	if (NULL == param || '\0' == *param || 0 == strcmp(param, "udp"))
-		return FAIL;
-	else if (0 == strcmp(param, "tcp"))
+	if (NULL != (param = get_rparam(request, 5)) && 0 == strcmp(param, "tcp"))
 		return SUCCEED;
 
 	return FAIL;
