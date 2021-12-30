@@ -902,7 +902,7 @@ clean_dns:
 #endif	/* defined(HAVE_RES_QUERY) || defined(_WINDOWS) || defined(__MINGW32__)*/
 }
 
-#if defined(HAVE_RES_NINIT) && !defined(_AIX) && (defined(HAVE_RES_U_EXT) || defined(HAVE_RES_U_EXT_EXT))
+#if !defined(WINDOWS) && !defined(MINGW32_) && !defined(_AIX)
 static int	dns_query_short_threaded(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return dns_query(request, result, 1);
@@ -916,7 +916,6 @@ static int	dns_query_threaded(AGENT_REQUEST *request, AGENT_RESULT *result)
 static int	dns_query_is_tcp(AGENT_REQUEST *request, int *timeout)
 {
 	char	*param;
-	int	ret = FAIL;
 
 	param = get_rparam(request, 5);
 
@@ -933,16 +932,19 @@ static int	dns_query_is_tcp(AGENT_REQUEST *request, int *timeout)
 		else if (SUCCEED != is_uint31(param, timeout) || 0 == *timeout)
 			return FAIL;
 
+		if (CONFIG_TIMEOUT < *timeout)
+			*timeout = CONFIG_TIMEOUT;
+
 		return SUCCEED;
 	}
 
-	return ret;
+	return FAIL;
 }
 #endif
 
 int	NET_DNS(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-#if defined(HAVE_RES_NINIT) && !defined(_AIX) && (defined(HAVE_RES_U_EXT) || defined(HAVE_RES_U_EXT_EXT))
+#if !defined(WINDOWS) && !defined(MINGW32_) && !defined(_AIX)
 	int	tcp_timeout;
 
 	if (SUCCEED == dns_query_is_tcp(request, &tcp_timeout))
@@ -953,12 +955,11 @@ int	NET_DNS(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	NET_DNS_RECORD(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-#if defined(HAVE_RES_NINIT) && !defined(_AIX) && (defined(HAVE_RES_U_EXT) || defined(HAVE_RES_U_EXT_EXT))
+#if !defined(WINDOWS) && !defined(MINGW32_) && !defined(_AIX)
 	int	tcp_timeout;
 
 	if (SUCCEED == dns_query_is_tcp(request, &tcp_timeout))
 		return zbx_execute_threaded_metric(dns_query_threaded, request, result, tcp_timeout);
 #endif
-
 	return dns_query(request, result, 0);
 }
