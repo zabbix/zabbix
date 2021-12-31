@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-12-22 17:24+0200\n"
-"PO-Revision-Date: 2021-12-22 15:20+0300\n"
-"Last-Translator: Yurii <jurijs.klopovskis@zabbix.com>\n"
+"PO-Revision-Date: 2021-12-31 13:31+0300\n"
+"Last-Translator: hugosantos <hugopedrosantos@gmail.com>\n"
 "Language-Team: none\n"
 "Language: pt_PT\n"
 "MIME-Version: 1.0\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1640179210.000000\n"
+"X-POOTLE-MTIME: 1640950291.000000\n"
 
 #: include/classes/items/CHelpItems.php:1089
 #, fuzzy
@@ -42,11 +42,12 @@ msgstr "\"%1$s\" em alternativa a \"%2$s\""
 msgid "\"%1$s\" is expected"
 msgstr "é esperado \"%1$s\""
 
+# Yurii This string was corrected translated, what was the reason to reset?
 #: include/classes/api/services/CReport.php:237
 #: include/classes/api/services/CReport.php:651
 #, c-format
 msgid "\"%1$s\" must be an empty string or greater than \"%2$s\"."
-msgstr ""
+msgstr "\"%1$s\" deve ser uma string vazia ou maior que \"%2$s\"."
 
 #: include/classes/api/services/CMaintenance.php:359
 #: include/classes/api/services/CMaintenance.php:366
@@ -57,7 +58,7 @@ msgstr ""
 #: maintenance.php:143 services.php:182 services.php:191
 #, c-format
 msgid "\"%1$s\" must be between 1970.01.01 and 2038.01.18."
-msgstr ""
+msgstr "\"%1$s\" deve ser entre 1970.01.01 e 2038.01.18."
 
 #: include/classes/api/services/CItemGeneral.php:1399
 #, c-format
@@ -99,8 +100,8 @@ msgstr "%1$d correspondências para %2$s encontradas"
 #, c-format
 msgid "%1$d of %3$d%2$s problem is shown"
 msgid_plural "%1$d of %3$d%2$s problems are shown"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$d de %3$d%2$s problema visível"
+msgstr[1] "%1$d de %3$d%2$s problemas visíveis"
 
 #: app/controllers/CControllerPopupAcknowledgeEdit.php:117
 #, c-format
@@ -195,8 +196,8 @@ msgstr[1] "%1$s minutos"
 #, c-format
 msgid "%1$s of %2$s element in problem state"
 msgid_plural "%1$s of %2$s elements in problem state"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s de %2$s elemento no estado do problema"
+msgstr[1] "%1$s de %2$s elementos no estado do problema"
 
 #: jsLoader.php:308
 #, c-format
