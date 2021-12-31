@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-12-22 17:25+0200\n"
-"PO-Revision-Date: 2021-11-13 21:53+0300\n"
+"PO-Revision-Date: 2021-12-29 12:47+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1636833203.000000\n"
+"X-POOTLE-MTIME: 1640774856.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
@@ -397,7 +397,7 @@ msgstr "<подменю/подменю/...>"
 #: jsLoader.php:184
 msgctxt "abbreviation of severity level"
 msgid "A"
-msgstr ""
+msgstr "Ср"
 
 #: include/classes/widgets/CWidgetHelper.php:834
 msgid "ADD OVERRIDE"
@@ -478,7 +478,7 @@ msgstr "API токены"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:251
 msgid "Above value"
-msgstr ""
+msgstr "Выше значения"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:370
 msgid "Abscissa"
@@ -1004,7 +1004,7 @@ msgstr "Администрирование"
 #: app/views/popup.service.edit.php:137
 #: include/classes/widgets/forms/CWidgetFormItem.php:69
 msgid "Advanced configuration"
-msgstr "Расширенная конфигурация"
+msgstr "Расширенная настройка"
 
 #: include/views/monitoring.sysmap.edit.php:158
 msgid "Advanced labels"
@@ -1012,7 +1012,7 @@ msgstr "Расширенные подписи"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:252
 msgid "After value"
-msgstr ""
+msgstr "После значения"
 
 #: include/events.inc.php:288
 msgid "Age"
@@ -1074,7 +1074,7 @@ msgstr "Сообщение оповещения"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1115
 msgid "Algorithm"
-msgstr ""
+msgstr "Алгоритм"
 
 #: include/hosts.inc.php:114
 msgid "Alias"
@@ -1426,7 +1426,7 @@ msgstr "Попыток"
 
 #: app/views/administration.geomaps.edit.php:88
 msgid "Attribution"
-msgstr ""
+msgstr "Атрибуция"
 
 #: app/views/administration.housekeeping.edit.php:178
 #: include/classes/helpers/CMenuHelper.php:119
@@ -1652,11 +1652,11 @@ msgstr "Простая"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:250
 msgid "Before value"
-msgstr ""
+msgstr "До значения"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:253
 msgid "Below value"
-msgstr ""
+msgstr "Ниже значения"
 
 #: app/views/administration.authentication.edit.php:187
 msgid "Bind DN"
@@ -1702,7 +1702,7 @@ msgstr "Тело и заголовки"
 #: include/classes/widgets/forms/CWidgetFormItem.php:275
 #: include/classes/widgets/forms/CWidgetFormItem.php:335
 msgid "Bold"
-msgstr ""
+msgstr "Жирный"
 
 #: include/graphs.inc.php:59 include/views/js/monitoring.sysmaps.js.php:781
 #: include/views/js/monitoring.sysmaps.js.php:871
@@ -2787,13 +2787,13 @@ msgstr "Не удалось найти преобразование значен
 #: include/classes/api/services/CRole.php:683
 #, c-format
 msgid "Cannot have non-default \"%2$s\" rule while having \"%3$s\" set to %4$d for user role \"%1$s\"."
-msgstr ""
+msgstr "Нельзя иметь нестандартное \"%2$s\" правило при наличии \"%3$s\" заданном в %4$d у роли пользователей \"%1$s\"."
 
 #: include/classes/api/services/CRole.php:569
 #: include/classes/api/services/CRole.php:645
 #, c-format
 msgid "Cannot have non-empty tag value while having empty tag in rule \"%2$s\" for user role \"%1$s\"."
-msgstr ""
+msgstr "Нельзя иметь не пустое значение тега при наличии пустого тега в правиле \"%2$s\" у роли пользователей \"%1$s\"."
 
 #: include/classes/import/importers/CTemplateImporter.php:258
 #: include/classes/import/importers/CTemplateImporter.php:410
@@ -2816,84 +2816,84 @@ msgstr "Не удалось присоединить шаблон"
 #: include/classes/api/services/CHostBase.php:755
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to dependency of trigger \"%3$s\"."
-msgstr ""
+msgstr "Не удалось присоединить \"%1$s\" шаблон к узлу сети \"%2$s\" из-за зависимости триггера \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:805
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to expression of trigger \"%3$s\"."
-msgstr ""
+msgstr "Не удалось присоединить \"%1$s\" шаблон к узлу сети \"%2$s\" из-за выражения триггера \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:520
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to its parent template \"%3$s\" will be linked twice."
-msgstr ""
+msgstr "Не удалось присоединить \"%1$s\" шаблон к узлу сети \"%2$s\" из-за того, что родительский шаблон \"%3$s\" будет присоединён дважды."
 
 #: include/classes/api/services/CHostBase.php:675
 #: include/classes/api/services/CHostBase.php:752
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" due to dependency of trigger \"%3$s\"."
-msgstr ""
+msgstr "Не удалось присоединить \"%1$s\" шаблон к прототипу узлов сети \"%2$s\" из-за зависимости триггера \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:802
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" due to expression of trigger \"%3$s\"."
-msgstr ""
+msgstr "Не удалось присоединить \"%1$s\" шаблон к прототипу узлов сети \"%2$s\" из-за выражения триггера \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:517
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" due to its parent template \"%3$s\" will be linked twice."
-msgstr ""
+msgstr "Не удалось присоединить \"%1$s\" шаблон к прототипу узлов сети \"%2$s\" из-за того, что родительский шаблон \"%3$s\" будет присоединён дважды."
 
 #: include/classes/api/services/CHostBase.php:381
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\" due to circular linkage (%3$s) will occurs."
-msgstr ""
+msgstr "Не удалось присоединить \"%1$s\" шаблон к шаблону \"%2$s\" из-за возникновения цикличной связи (%3$s)."
 
 #: include/classes/api/services/CHostBase.php:672
 #: include/classes/api/services/CHostBase.php:749
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\" due to dependency of trigger \"%3$s\"."
-msgstr ""
+msgstr "Не удалось присоединить \"%1$s\" шаблон к шаблону \"%2$s\" из-за зависимости триггера \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:799
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\" due to expression of trigger \"%3$s\"."
-msgstr ""
+msgstr "Не удалось присоединить \"%1$s\" шаблон к шаблону \"%2$s\" из-за выражения триггера \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:514
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\" due to its parent template \"%3$s\" will be linked twice."
-msgstr ""
+msgstr "Не удалось присоединить \"%1$s\" шаблон к шаблону \"%2$s\" из-за того, что родительский шаблон \"%3$s\" будет присоединён дважды."
 
 #: include/classes/api/services/CHostBase.php:705
 #, c-format
 msgid "Cannot link template \"%1$s\" without template \"%2$s\" to host \"%3$s\" due to dependency of trigger \"%4$s\"."
-msgstr ""
+msgstr "Не удалось присоединить \"%1$s\" шаблон без шаблона \"%2$s\" к узлу сети \"%3$s\" из-за зависимости триггера \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:832
 #, c-format
 msgid "Cannot link template \"%1$s\" without template \"%2$s\" to host \"%3$s\" due to expression of trigger \"%4$s\"."
-msgstr ""
+msgstr "Не удалось присоединить \"%1$s\" шаблон без шаблона \"%2$s\" к узлу сети \"%3$s\" из-за выражения триггера \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:702
 #, c-format
 msgid "Cannot link template \"%1$s\" without template \"%2$s\" to host prototype \"%3$s\" due to dependency of trigger \"%4$s\"."
-msgstr ""
+msgstr "Не удалось присоединить \"%1$s\" шаблон без шаблона \"%2$s\" к прототипу узлов сети \"%3$s\" из-за зависимости триггера \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:829
 #, c-format
 msgid "Cannot link template \"%1$s\" without template \"%2$s\" to host prototype \"%3$s\" due to expression of trigger \"%4$s\"."
-msgstr ""
+msgstr "Не удалось присоединить \"%1$s\" шаблон без шаблона \"%2$s\" к прототипу узлов сети \"%3$s\" из-за выражения триггера \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:699
 #, c-format
 msgid "Cannot link template \"%1$s\" without template \"%2$s\" to template \"%3$s\" due to dependency of trigger \"%4$s\"."
-msgstr ""
+msgstr "Не удалось присоединить \"%1$s\" шаблон без шаблона \"%2$s\" к шаблону \"%3$s\" из-за зависимости триггера \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:826
 #, c-format
 msgid "Cannot link template \"%1$s\" without template \"%2$s\" to template \"%3$s\" due to expression of trigger \"%4$s\"."
-msgstr ""
+msgstr "Не удалось присоединить \"%1$s\" шаблон без шаблона \"%2$s\" к шаблону \"%3$s\" из-за выражения триггера \"%4$s\"."
 
 #: app/controllers/CControllerModuleEdit.php:106
 #: include/classes/core/ZBase.php:674
@@ -3015,7 +3015,7 @@ msgstr "Не удалось установить cookie сессии."
 #: include/classes/api/services/CService.php:1412
 #, c-format
 msgid "Cannot specify \"propagation_rule\" parameter without specifying \"propagation_value\" parameter for service \"%1$s\"."
-msgstr ""
+msgstr "Не удалось задать \"propagation_rule\" параметр без указания \"propagation_value\" параметра услуге \"%1$s\"."
 
 #: jsLoader.php:294
 msgid "Cannot support notification audio for this device."
@@ -3049,22 +3049,22 @@ msgstr "Не удалось отсоединить шаблон"
 #: include/classes/api/services/CHostBase.php:256
 #, c-format
 msgid "Cannot unlink template \"%1$s\" without template \"%2$s\" from host \"%3$s\" due to dependency of trigger \"%4$s\"."
-msgstr ""
+msgstr "Не удалось отсоединить \"%1$s\" шаблон без шаблона \"%2$s\" от узла сети \"%3$s\" из-за зависимости триггера \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:300
 #, c-format
 msgid "Cannot unlink template \"%1$s\" without template \"%2$s\" from host \"%3$s\" due to expression of trigger \"%4$s\"."
-msgstr ""
+msgstr "Не удалось отсоединить \"%1$s\" шаблон без шаблона \"%2$s\" от узла сети \"%3$s\" из-за выражения триггера \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:255
 #, c-format
 msgid "Cannot unlink template \"%1$s\" without template \"%2$s\" from template \"%3$s\" due to dependency of trigger \"%4$s\"."
-msgstr ""
+msgstr "Не удалось отсоединить \"%1$s\" шаблон без шаблона \"%2$s\" от шаблона \"%3$s\" из-за зависимости триггера \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:299
 #, c-format
 msgid "Cannot unlink template \"%1$s\" without template \"%2$s\" from template \"%3$s\" due to expression of trigger \"%4$s\"."
-msgstr ""
+msgstr "Не удалось отсоединить \"%1$s\" шаблон без шаблона \"%2$s\" от шаблона \"%3$s\" из-за выражения триггера \"%4$s\"."
 
 #: include/classes/api/services/CHostGeneral.php:1151
 #, c-format
@@ -3172,7 +3172,7 @@ msgstr "Не удалось обновить корреляцию"
 #: include/classes/api/services/CTrigger.php:836
 #, c-format
 msgid "Cannot update dependencies of inherited trigger \"%1$s\"."
-msgstr ""
+msgstr "Не удалось обновить зависимости унаследованного триггера \"%1$s\"."
 
 #: app/controllers/CControllerDiscoveryUpdate.php:48
 #: app/controllers/CControllerDiscoveryUpdate.php:102 host_discovery.php:717
@@ -3461,7 +3461,7 @@ msgstr "Изменить PSK"
 #: include/classes/widgets/views/widget.item.form.view.php:53
 #: include/classes/widgets/views/widget.item.form.view.php:184
 msgid "Change indicator"
-msgstr ""
+msgstr "Индикатор изменений"
 
 #: app/views/administration.authentication.edit.php:149
 #: app/views/administration.mediatype.edit.php:137
@@ -3762,7 +3762,7 @@ msgstr "Комбинированный результат"
 
 #: include/classes/widgets/views/widget.geomap.form.view.php:68
 msgid "Comma separated center coordinates and zoom level to display when the widget is initially loaded."
-msgstr ""
+msgstr "Координаты центра и уровень масштаба разделенные запятой отображаемые, когда виджет загружается в первый раз."
 
 #: app/views/administration.script.edit.php:173 include/actions.inc.php:1943
 #: include/views/administration.auditacts.list.php:103
@@ -4644,12 +4644,12 @@ msgstr "Чешский (cs_CZ)"
 #: jsLoader.php:396
 msgctxt "Default color option"
 msgid "D"
-msgstr ""
+msgstr "D"
 
 #: jsLoader.php:182
 msgctxt "abbreviation of severity level"
 msgid "D"
-msgstr ""
+msgstr "Ч"
 
 #: include/classes/import/validators/C10XmlValidator.php:321
 msgctxt "XML date format"
@@ -4823,11 +4823,11 @@ msgstr "Файл TLS ключа базы данных"
 
 #: app/partials/administration.system.info.php:121
 msgid "Database history tables upgraded"
-msgstr ""
+msgstr "Таблицы истории базы данных обновлены"
 
 #: app/partials/administration.system.info.php:129
 msgid "Database history tables use primary key"
-msgstr ""
+msgstr "Таблицы истории базы данных используют первичный ключ"
 
 #: include/classes/setup/CSetupWizard.php:484
 msgid "Database host"
@@ -5465,11 +5465,11 @@ msgstr "Подробности о веб-сценарии"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1100
 msgid "Detection period"
-msgstr ""
+msgstr "Период обнаружения"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1110
 msgid "Deviations"
-msgstr ""
+msgstr "Отклонения"
 
 #: include/actions.inc.php:76
 msgid "Device"
@@ -5999,7 +5999,7 @@ msgstr "Дубликат значения \"имя\" \"%1$s\" у карты се
 #: include/classes/api/services/CMap.php:1285
 #, c-format
 msgid "Duplicate \"usrgrpid\" \"%1$s\" in user groups for map \"%2$s\"."
-msgstr ""
+msgstr "Дубликат \"usrgrpid\" \"%1$s\" в группах пользователей у карты \"%2$s\"."
 
 #: include/classes/api/services/CTrigger.php:1155
 #, c-format
@@ -6469,7 +6469,7 @@ msgstr "Ошибка: %1$s"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1090
 msgid "Evaluation period"
-msgstr ""
+msgstr "Период анализа"
 
 #: include/events.inc.php:180
 msgid "Event"
@@ -6555,7 +6555,7 @@ msgstr "Каждую неделю(и)"
 
 #: app/views/administration.geomaps.edit.php:33
 msgid "Example"
-msgstr ""
+msgstr "Например"
 
 #: app/views/administration.miscconfig.edit.php:36
 msgid "Example: https://localhost/zabbix/ui/"
@@ -6998,7 +6998,7 @@ msgstr "Свойства фильтра"
 
 #: app/controllers/CControllerServiceListGeneral.php:181
 msgid "Filter results"
-msgstr ""
+msgstr "Результаты фильтрации"
 
 #: app/views/popup.lldoverride.php:183
 #: include/views/configuration.host.discovery.edit.php:822
@@ -7189,11 +7189,11 @@ msgstr "Сгенерировано за %1$s сек"
 #: app/views/administration.geomaps.edit.php:127
 #: include/classes/helpers/CMenuHelper.php:244 include/html.inc.php:895
 msgid "Geographical maps"
-msgstr ""
+msgstr "Географические карты"
 
 #: include/classes/widgets/CWidgetConfig.php:51
 msgid "Geomap"
-msgstr ""
+msgstr "Геокарта"
 
 #: include/locales.inc.php:55
 msgid "Georgian (ka_GE)"
@@ -7544,7 +7544,7 @@ msgstr "Гостевой пользователь"
 #: jsLoader.php:183
 msgctxt "abbreviation of severity level"
 msgid "H"
-msgstr ""
+msgstr "В"
 
 #: include/translateDefines.inc.php:35
 msgid "H:i"
@@ -7786,7 +7786,7 @@ msgstr "Выравнивание по горизонтали"
 #: include/classes/widgets/forms/CWidgetFormItem.php:171
 #: include/classes/widgets/forms/CWidgetFormItem.php:294
 msgid "Horizontal position"
-msgstr ""
+msgstr "Расположение по горизонтали"
 
 #: app/controllers/CControllerAuditLogList.php:219
 #: app/partials/configuration.host.edit.html.php:522
@@ -8183,7 +8183,7 @@ msgstr "Узлы сети обновлены"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:118
 msgid "Hour"
-msgstr ""
+msgstr "Час"
 
 #: app/views/popup.maintenance.period.php:170
 msgid "Hours"
@@ -8203,7 +8203,7 @@ msgstr "Венгерский (hu_HU)"
 #: jsLoader.php:186
 msgctxt "abbreviation of severity level"
 msgid "I"
-msgstr ""
+msgstr "И"
 
 #: app/partials/massupdate.macros.tab.php:111
 msgid "I confirm to remove all macros"
@@ -8640,7 +8640,7 @@ msgstr "Статистика входящего трафика сетевого 
 #: include/classes/api/services/CService.php:1450
 #, c-format
 msgid "Incompatible \"propagation_rule\" and \"propagation_value\" parameters for service \"%1$s\"."
-msgstr ""
+msgstr "Несовместимые параметры \"propagation_rule\" и \"propagation_value\" услуги \"%1$s\"."
 
 #: include/classes/api/services/CMap.php:655
 #: include/classes/api/services/CMap.php:1138
@@ -8731,15 +8731,15 @@ msgstr "Некорректный тип события в условии дей�
 
 #: include/classes/api/services/CAction.php:2999
 msgid "Incorrect action condition or operation host group. Host group does not exist or you have no access to it."
-msgstr ""
+msgstr "Некорректные условие действия или группа узлов операции. Группа узлов сети не существует или у вас нет прав доступа к ней."
 
 #: include/classes/api/services/CAction.php:3059
 msgid "Incorrect action condition or operation host. Host does not exist or you have no access to it."
-msgstr ""
+msgstr "Некорректные условие действия или узел сети операции. Узел сети не существует или у вас нет прав доступа к нему."
 
 #: include/classes/api/services/CAction.php:3197
 msgid "Incorrect action condition or operation template. Template does not exist or you have no access to it."
-msgstr ""
+msgstr "Некорректные условие действия или шаблон операции. Шаблон не существует или у вас нет прав доступа к нему."
 
 #: include/classes/validators/CActionCondValidator.php:131
 #, c-format
@@ -8752,7 +8752,7 @@ msgstr "Некорректный прокси в условии действия
 
 #: include/classes/api/services/CAction.php:3401
 msgid "Incorrect action condition service. Service does not exist or you have no access to it."
-msgstr ""
+msgstr "Некорректное условие на действие на услуги. Услуга не существует или у вас нет прав доступа к ней."
 
 #: include/classes/validators/CActionCondValidator.php:155
 msgid "Incorrect action condition trigger severity."
@@ -8774,7 +8774,7 @@ msgstr "Некорректные значения шага эскалации д
 
 #: include/classes/api/services/CAction.php:2899
 msgid "Incorrect action operation media type. Media type does not exist or you have no access to it."
-msgstr ""
+msgstr "Некорректный способ оповещения операции действия. Способ оповещения не существует или у вас нет прав доступа к нему."
 
 #: app/controllers/CControllerActionOperationValidate.php:63
 #, c-format
@@ -8783,11 +8783,11 @@ msgstr "Некорректный тип операции действия \"%1$s
 
 #: include/classes/api/services/CAction.php:3145
 msgid "Incorrect action operation user group. User group does not exist or you have no access to it."
-msgstr ""
+msgstr "Некорректная группа пользователей операции действия. Группа пользователей не существует или у вас нет прав доступа к ней."
 
 #: include/classes/api/services/CAction.php:3102
 msgid "Incorrect action operation user. User does not exist or you have no access to it."
-msgstr ""
+msgstr "Некорректный пользователь операции действия. Пользователь не существует или у вас нет прав доступа к нему."
 
 #: include/classes/api/services/CDRule.php:206
 #: include/classes/api/services/CDRule.php:348
@@ -9520,11 +9520,11 @@ msgstr "Унаследованные элементы данных"
 
 #: include/classes/widgets/forms/CWidgetFormGeoMap.php:75
 msgid "Initial view"
-msgstr ""
+msgstr "Начальный вид"
 
 #: include/classes/widgets/views/widget.geomap.form.view.php:78
 msgid "Initial view is ignored if the default view is set."
-msgstr ""
+msgstr "Начальный вид игнорируется, если задан вид по умолчанию."
 
 #: app/views/popup.triggerexpr.php:258
 msgid "Insert"
@@ -10030,7 +10030,7 @@ msgstr "Ошибочный период времени."
 #: include/classes/validators/CApiInputValidator.php:2869
 #, c-format
 msgid "Invalid zoomparameter \"%1$s\": %2$s."
-msgstr ""
+msgstr "Ошибочный параметрмасштаба \"%1$s\": %2$s."
 
 #: app/partials/configuration.host.edit.html.php:526
 #: app/views/popup.massupdate.host.php:295
@@ -10249,7 +10249,7 @@ msgstr "Элемент данных использует некорректны�
 
 #: include/classes/widgets/CWidgetConfig.php:52
 msgid "Item value"
-msgstr ""
+msgstr "Значение элемента данных"
 
 #: chart.php:101 chart.php:104
 msgid "Item values"
@@ -10756,13 +10756,13 @@ msgstr "Связь"
 #: include/classes/api/services/CMap.php:1476
 #, c-format
 msgid "Link \"selementid1\" field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
-msgstr ""
+msgstr "Поле \"selementid1\" связи ссылается на несуществующий \"%1$s\" ID элемента на карте \"%2$s\"."
 
 #: include/classes/api/services/CMap.php:1014
 #: include/classes/api/services/CMap.php:1484
 #, c-format
 msgid "Link \"selementid2\" field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
-msgstr ""
+msgstr "Поле \"selementid2\" связи ссылается на несуществующий \"%1$s\" ID элемента на карте \"%2$s\"."
 
 #: include/views/js/monitoring.sysmaps.js.php:737
 #: include/views/js/monitoring.sysmaps.js.php:748
@@ -10816,7 +10816,7 @@ msgstr "Список обнаруженных CPU / ядер CPU. Возвращ
 
 #: include/classes/data/CItemData.php:1164
 msgid "List of directory entries, recursively. Returns JSON"
-msgstr ""
+msgstr "Список записей директории, рекурсивно. Возвращает JSON"
 
 #: include/classes/data/CItemData.php:1216
 msgid "List of mounted filesystems and their types. Returns JSON"
@@ -11339,7 +11339,7 @@ msgstr "Макс. период селектора периода времени"
 
 #: app/views/administration.geomaps.edit.php:98
 msgid "Max zoom level"
-msgstr ""
+msgstr "Максимальный уровень масштаба"
 
 #: include/classes/data/CItemData.php:896
 msgid "Maximum number of opened files supported by OS. Returns integer"
@@ -11372,7 +11372,7 @@ msgstr "Превышена максимальная длина email адрес�
 
 #: app/views/administration.geomaps.edit.php:61
 msgid "Maximum zoom level of the map."
-msgstr ""
+msgstr "Максимальный уровень масштаба карты."
 
 #: include/func.inc.php:104 include/func.inc.php:241 jsLoader.php:236
 msgid "May"
@@ -11824,19 +11824,19 @@ msgstr "Моя"
 #: include/classes/helpers/CServiceHelper.php:37
 #: include/classes/helpers/CServiceHelper.php:47
 msgid "N"
-msgstr ""
+msgstr "N"
 
 #: jsLoader.php:187
 msgctxt "abbreviation of severity level"
 msgid "N"
-msgstr ""
+msgstr "Н"
 
 #: include/classes/helpers/CServiceHelper.php:42
 #: include/classes/helpers/CServiceHelper.php:52
 #: include/classes/helpers/CServiceHelper.php:62
 #: include/classes/helpers/CServiceHelper.php:72
 msgid "N%"
-msgstr ""
+msgstr "N%"
 
 #: include/discovery.inc.php:53
 msgid "NNTP"
@@ -12041,11 +12041,11 @@ msgstr "Пространство имён"
 
 #: jsLoader.php:188
 msgid "Navigate to default view"
-msgstr ""
+msgstr "Перейти к виду по умолчанию"
 
 #: jsLoader.php:189
 msgid "Navigate to initial view"
-msgstr ""
+msgstr "Перейти к начальному виду"
 
 #: app/views/administration.housekeeping.edit.php:76
 msgid "Network discovery data storage period"
@@ -12256,7 +12256,7 @@ msgstr "Условия не заданы."
 
 #: app/views/monitoring.widget.item.view.php:157
 msgid "No data"
-msgstr ""
+msgstr "Нет данных"
 
 #: include/views/configuration.maintenance.edit.php:105
 #: include/views/configuration.maintenance.list.php:111
@@ -12313,7 +12313,7 @@ msgstr "Файл не был загружен."
 #: include/graphs.inc.php:153
 #, c-format
 msgid "No graph item with graph ID \"%1$s\"."
-msgstr ""
+msgstr "Нет элемента графика с ID графика \"%1$s\"."
 
 #: app/views/monitoring.widget.favgraphs.view.php:26
 msgid "No graphs added."
@@ -12389,7 +12389,7 @@ msgstr "Новые модули не обнаружены"
 #: include/classes/api/services/CAction.php:2779
 #, c-format
 msgid "No operations defined for action \"%1$s\"."
-msgstr ""
+msgstr "Операции не заданы для действия \"%1$s\"."
 
 #: include/classes/api/services/CUser.php:1550
 #: include/classes/api/services/CUser.php:2054
@@ -12631,7 +12631,7 @@ msgstr "Файл приватного ключа не указан."
 
 #: jsLoader.php:174
 msgid "No problems"
-msgstr ""
+msgstr "Проблемы отсутствуют"
 
 #: app/views/configuration.discovery.edit.php:54
 msgid "No proxy"
@@ -12644,7 +12644,7 @@ msgstr "Файл публичного ключа не указан."
 #: app/controllers/CControllerActionOperationValidate.php:110
 #: include/classes/api/services/CAction.php:2836
 msgid "No recipients specified for action operation message."
-msgstr ""
+msgstr "Не указаны получатели для сообщения операции действия."
 
 #: include/classes/widgets/CWidgetConfig.php:291 jsLoader.php:166
 msgid "No refresh"
@@ -12665,7 +12665,7 @@ msgstr "Цель не выбрана."
 #: app/controllers/CControllerActionOperationValidate.php:142
 #: include/classes/api/services/CAction.php:2847
 msgid "No targets specified for action operation global script."
-msgstr ""
+msgstr "Не указаны цели для глобального скрипта действия."
 
 #: include/triggers.inc.php:91
 #, c-format
@@ -12814,7 +12814,7 @@ msgstr "Оповещения"
 
 #: actionconf.php:87 include/views/configuration.action.edit.php:477
 msgid "Notify about canceled escalations"
-msgstr ""
+msgstr "Оповещение об отмененных эскалациях"
 
 #: include/actions.inc.php:865 include/actions.inc.php:1038
 #: include/actions.inc.php:1039
@@ -12904,7 +12904,7 @@ msgstr "Количество строк"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:126
 msgid "Number of seasons"
-msgstr ""
+msgstr "Количество сезонов"
 
 #: include/views/reports.toptriggers.php:86
 msgid "Number of status changes"
@@ -13209,7 +13209,7 @@ msgstr "Операция"
 #: include/classes/api/services/CAction.php:2805
 #, c-format
 msgid "Operation \"%1$s\" already exists for action \"%2$s\"."
-msgstr ""
+msgstr "Операция \"%1$s\" уже существует у действия \"%2$s\"."
 
 #: actionconf.php:384
 #, c-format
@@ -13377,7 +13377,7 @@ msgstr "Оригинальное"
 #: app/views/administration.geomaps.edit.php:72
 #: include/classes/helpers/CMenuHelper.php:254 include/html.inc.php:898
 msgid "Other"
-msgstr "Прочие"
+msgstr "Другое"
 
 #: app/controllers/CControllerMiscConfigEdit.php:134
 #: app/views/administration.miscconfig.edit.php:29
@@ -13711,7 +13711,7 @@ msgstr "Параметры"
 #: app/controllers/CControllerActionOperationValidate.php:76
 #: include/classes/api/services/CAction.php:2817
 msgid "Parameters \"esc_step_from\" and \"esc_step_to\" must be set together."
-msgstr ""
+msgstr "Параметры \"esc_step_from\" и \"esc_step_to\" должны быть заданы вместе."
 
 #: include/views/configuration.host.discovery.edit.php:52
 #: include/views/configuration.host.prototype.edit.php:61
@@ -14036,7 +14036,7 @@ msgstr "Португальский (pt_PT)"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:249
 msgid "Position"
-msgstr ""
+msgstr "Расположение"
 
 #: app/views/popup.httpstep.php:90
 msgid "Post fields"
@@ -15021,7 +15021,7 @@ msgstr "Сбросить по умолчанию"
 
 #: jsLoader.php:173
 msgid "Reset to initial view"
-msgstr ""
+msgstr "Сброс к начальному виду"
 
 #: jsLoader.php:292
 msgid "Resolved"
@@ -15696,11 +15696,11 @@ msgstr "Тип поиска"
 #: app/controllers/CControllerPopupTriggerExpr.php:114
 #: app/controllers/CControllerPopupTriggerExpr.php:1105
 msgid "Season"
-msgstr ""
+msgstr "Сезон"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1120
 msgid "Season deviation window"
-msgstr ""
+msgstr "Окно отклонения от сезона"
 
 #: include/hosts.inc.php:434
 msgid "Secondary POC cell"
@@ -16065,7 +16065,7 @@ msgstr "Задать состояние в ОК"
 
 #: jsLoader.php:172
 msgid "Set this view as default"
-msgstr ""
+msgstr "Задать этот вид умолчанием"
 
 #: app/views/js/popup.itemtestedit.view.js.php:365 include/forms.inc.php:1441
 #: include/views/js/item.preprocessing.js.php:67
@@ -16138,7 +16138,7 @@ msgstr "Важность уменьшена"
 
 #: jsLoader.php:153
 msgid "Severity filter"
-msgstr ""
+msgstr "Фильтр важности"
 
 #: include/actions.inc.php:1780
 msgctxt "screen reader"
@@ -16514,7 +16514,7 @@ msgstr "Стандартные элементы данных"
 
 #: app/partials/administration.ha.nodes.php:45
 msgid "Standby"
-msgstr ""
+msgstr "Резервный"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:668
 #: app/controllers/CControllerPopupTriggerExpr.php:786
@@ -16839,11 +16839,11 @@ msgstr "Поддержка"
 
 #: include/classes/widgets/views/widget.geomap.form.view.php:70
 msgid "Supported formats:"
-msgstr ""
+msgstr "Поддерживаемые макросы:"
 
 #: include/classes/widgets/views/widget.item.form.view.php:59
 msgid "Supported macros:"
-msgstr ""
+msgstr "Поддерживаемые макросы:"
 
 #: include/html.inc.php:972
 #, c-format
@@ -17298,7 +17298,7 @@ msgstr "Метод \"%1$s.%2$s\" должен вызываться без \"auth
 
 #: app/views/administration.geomaps.edit.php:30
 msgid "The URL template is used to load and display the tile layer on geographical maps."
-msgstr ""
+msgstr "Шаблон URL используется для загрузки и отображения слоя плитки на географических картах."
 
 #: include/classes/db/DbBackend.php:130
 #, c-format
@@ -17327,7 +17327,7 @@ msgstr "Склонированный шаблон содержит пользо�
 
 #: app/views/administration.geomaps.edit.php:36
 msgid "The following placeholders are supported:"
-msgstr ""
+msgstr "Поддерживаются следующие символы-заполнители:"
 
 #: include/html.inc.php:688
 #, c-format
@@ -17384,7 +17384,7 @@ msgstr "Элемент данных более не обнаруживается
 #: include/classes/widgets/views/widget.geomap.form.view.php:76
 #, c-format
 msgid "The maximum zoom level is \"%1$s\"."
-msgstr ""
+msgstr "Максимальный уровень масштаба - \"%1$s\"."
 
 #: include/classes/data/CItemData.php:1024
 msgid "The number of processes. Returns integer"
@@ -17481,15 +17481,15 @@ msgstr "Четверг"
 
 #: app/views/administration.geomaps.edit.php:77
 msgid "Tile URL"
-msgstr ""
+msgstr "URL плитки"
 
 #: app/views/administration.geomaps.edit.php:65
 msgid "Tile provider"
-msgstr ""
+msgstr "Провайдер плитки"
 
 #: app/views/administration.geomaps.edit.php:58
 msgid "Tile provider attribution data displayed in a small text box on the map."
-msgstr ""
+msgstr "Данные атрибуции поставщика плитки отображаются в небольшом текстовом поле на карте."
 
 #: app/views/popup.service.time.edit.php:90
 #: app/views/popup.service.time.edit.php:141 report4.php:191
@@ -17969,7 +17969,7 @@ msgstr "Необходимо выбрать два элемента карты"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:442
 msgid "Two or more fields cannot occupy same space."
-msgstr ""
+msgstr "Два и более полей не могут занимать одно место."
 
 #: app/controllers/CControllerPopupGeneric.php:233
 #: app/controllers/CControllerPopupGeneric.php:284
@@ -18200,7 +18200,7 @@ msgstr "Только неподтвержденные"
 
 #: app/partials/administration.ha.nodes.php:56
 msgid "Unavailable"
-msgstr "Недоступна"
+msgstr "Недоступен"
 
 #: app/views/administration.user.list.php:249
 msgid "Unblock"
@@ -18232,7 +18232,7 @@ msgstr "Неожиданная ошибка сервера."
 #: include/views/configuration.item.edit.php:718
 #: include/views/configuration.item.prototype.edit.php:697
 msgid "Units"
-msgstr "Ед. измерения"
+msgstr "Единицы измерения"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:177
 #: app/views/administration.token.list.php:170
@@ -18513,7 +18513,7 @@ msgstr "Использовать пользовательские цвета с�
 
 #: jsLoader.php:398
 msgid "Use default"
-msgstr ""
+msgstr "Использовать умолчание"
 
 #: app/views/administration.user.edit.php:294 app/views/popup.media.php:88
 msgid "Use if severity"
@@ -18705,7 +18705,7 @@ msgstr "Пользователю не разрешается удалять са
 
 #: include/classes/widgets/views/widget.item.form.view.php:64
 msgid "User macros"
-msgstr ""
+msgstr "Пользовательские макросы"
 
 #: app/partials/layout.htmlpage.aside.php:94
 msgid "User menu"
@@ -19358,7 +19358,7 @@ msgstr "Выравнивание по вертикали"
 #: include/classes/widgets/forms/CWidgetFormItem.php:186
 #: include/classes/widgets/forms/CWidgetFormItem.php:309
 msgid "Vertical position"
-msgstr ""
+msgstr "Расположение по вертикали"
 
 #: include/locales.inc.php:78
 msgid "Vietnamese (vi_VN)"
@@ -19394,7 +19394,7 @@ msgstr "Видимое имя не может быть пустым, если и
 #: include/classes/helpers/CServiceHelper.php:57
 #: include/classes/helpers/CServiceHelper.php:67
 msgid "W"
-msgstr ""
+msgstr "П"
 
 #: jsLoader.php:253
 msgctxt "Wednesday short"
@@ -19404,7 +19404,7 @@ msgstr "Ср"
 #: jsLoader.php:185
 msgctxt "abbreviation of severity level"
 msgid "W"
-msgstr ""
+msgstr "П"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:172
 #: app/views/administration.trigdisplay.edit.php:118
@@ -19520,7 +19520,7 @@ msgstr "Среда"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:120
 msgid "Week"
-msgstr ""
+msgstr "Неделя"
 
 #: app/partials/scheduledreport.formgrid.html.php:99
 #: app/partials/scheduledreport.table.html.php:50
@@ -19747,7 +19747,7 @@ msgstr "d.m.Y H:i:s"
 
 #: include/translateDefines.inc.php:37
 msgid "Y-n-d"
-msgstr ""
+msgstr "d-n-Y"
 
 #: include/views/js/monitoring.sysmaps.js.php:446
 msgid "Y1"
@@ -19861,7 +19861,7 @@ msgstr "Вы не выполнили вход"
 
 #: app/views/popup.generic.php:79
 msgid "You cannot switch hosts for current selection."
-msgstr ""
+msgstr "Вы не можете переключить узлы сети для текущего выбора."
 
 #: include/classes/api/services/CAuditLog.php:73
 #: include/classes/api/services/CHaNode.php:45
@@ -19946,6 +19946,9 @@ msgid ""
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Incorrect network configuration.\n"
 msgstr ""
+"Не удалось достигнуть Zabbix сервер \"%1$s\". Возможные причины:\n"
+"1. Некорректный IP/DNS сервера в \"zabbix.conf.php\";\n"
+"2. Некорректная настройка сети.\n"
 
 #: app/views/administration.script.edit.php:124
 msgid "Zabbix server (proxy)"
@@ -19993,7 +19996,7 @@ msgstr "ожидается логическое"
 
 #: include/classes/validators/CNewValidator.php:300
 msgid "a boolean value is expected"
-msgstr ""
+msgstr "ожидается логическое значение"
 
 #: include/classes/api/services/CUser.php:908
 #: include/classes/import/validators/CXmlValidatorGeneral.php:269
@@ -20210,7 +20213,7 @@ msgstr "латинскую букву в нижнем и верхнем реги
 
 #: app/views/administration.geomaps.edit.php:47
 msgid "and"
-msgstr ""
+msgstr "и"
 
 #: include/views/monitoring.history.php:186
 msgid "as Blue"
@@ -20285,11 +20288,11 @@ msgstr "avg() - Среднее значение за период Т"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1052
 msgid "baselinedev() - Returns the number of deviations between data periods in seasons and the last data period"
-msgstr ""
+msgstr "baselinedev() - Возвращает количество отклонения между периодами времени в сезонах и последним периодом данных"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1059
 msgid "baselinewma() - Calculates baseline by averaging data periods in seasons"
-msgstr ""
+msgstr "baselinewma() - Вычисление базиса путем усреднения данных периодов в сезонах"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:387
 msgid "between() - Checks if a value belongs to the given range (1 - in range, 0 - otherwise)"
@@ -20347,7 +20350,7 @@ msgstr "вычисляемое"
 
 #: app/views/administration.geomaps.edit.php:52
 msgid "can be used to add \"@2x\" to the URL to load retina tiles."
-msgstr ""
+msgstr "можно использовать для добавления \"@2x\" в URL для загрузки retina плитки."
 
 #: include/classes/api/services/CItemGeneral.php:229
 msgid "cannot be changed"
@@ -20456,11 +20459,11 @@ msgstr "не может быть пустым"
 #: include/classes/api/services/CTemplate.php:1019
 #, c-format
 msgid "cannot be specified the value of parameter \"%1$s\""
-msgstr ""
+msgstr "невозможно указать значение параметра \"%1$s\""
 
 #: include/classes/api/services/CHostBase.php:111
 msgid "cannot be unlinked"
-msgstr ""
+msgstr "не удалось отсоединить"
 
 #: include/classes/api/services/CItemGeneral.php:2602
 msgid "cannot convert to JSON, result value too long"
@@ -20488,7 +20491,7 @@ msgstr "change() - Разница между последним и предыд�
 
 #: app/controllers/CControllerPopupTriggerExpr.php:511
 msgid "changecount() - Number of changes between adjacent values, Mode (all - all changes, inc - only increases, dec - only decreases)"
-msgstr ""
+msgstr "changecount() - Количество изменений между смежными значениями, Режим (all - все изменения, inc - только увеличения, dec - только уменьшения)"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:518
 msgid "char() - Returns the character which represents the given ASCII code"
@@ -20709,7 +20712,7 @@ msgstr "ошибка при разборе JSON"
 
 #: include/classes/validators/CApiInputValidator.php:2797
 msgid "file format is unsupported"
-msgstr ""
+msgstr "формат файла не поддерживается"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:617
 msgid "find() - Check occurrence of pattern V (which fulfill operator O) for period T (1 - match, 0 - no match)"
@@ -20747,7 +20750,7 @@ msgstr "fuzzytime() - Разница между значением элемен�
 
 #: include/classes/validators/CApiInputValidator.php:2863
 msgid "geographical coordinates (values of comma separated latitude and longitude) are expected"
-msgstr ""
+msgstr "ожидаются географические координаты (значения широты и долготы, разделенные запятой)"
 
 #: include/views/configuration.item.edit.php:803
 #: include/views/configuration.item.edit.php:808
@@ -20850,7 +20853,7 @@ msgstr "некорректное выражение начиная с \"%1$s\""
 #: include/classes/api/services/CAction.php:2715
 #: include/classes/api/services/CCorrelation.php:723
 msgid "incorrect number of conditions"
-msgstr ""
+msgstr "некорректное количество условий"
 
 #: include/classes/parsers/CParser.php:118
 #, c-format
@@ -20891,7 +20894,7 @@ msgstr "ошибочный диапазон адресов \"%1$s\""
 
 #: include/classes/api/services/CItemGeneral.php:1526
 msgid "invalid aggregation method"
-msgstr ""
+msgstr "ошибочный метод агрегации"
 
 #: include/classes/validators/CApiInputValidator.php:354
 msgid "invalid byte sequence in UTF-8"
@@ -20955,12 +20958,12 @@ msgstr "недопустимый второй параметр в функции
 #: include/classes/validators/CHistFunctionValidator.php:69
 #, c-format
 msgid "invalid seventh parameter in function \"%1$s\""
-msgstr ""
+msgstr "ошибочный седьмой параметр в функции \"%1$s\""
 
 #: include/classes/validators/CHistFunctionValidator.php:68
 #, c-format
 msgid "invalid sixth parameter in function \"%1$s\""
-msgstr ""
+msgstr "ошибочный шестой параметр в функции \"%1$s\""
 
 #: include/classes/validators/CHistFunctionValidator.php:65
 #, c-format
@@ -21009,7 +21012,7 @@ msgstr "kurtosis() - Измерение \"островершинности\" в 
 
 #: include/forms.inc.php:1353 include/views/js/item.preprocessing.js.php:119
 msgid "label"
-msgstr ""
+msgstr "метка"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1377
 #: include/classes/graphdraw/CPieGraphDraw.php:296 include/graphs.inc.php:88
@@ -21191,11 +21194,11 @@ msgstr "mod() - Остаток от деления"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:821
 msgid "monodec() - Check for continuous item value decrease (1 - data is monotonic, 0 - otherwise), Mode (strict - require strict monotonicity)"
-msgstr ""
+msgstr "monodec() - Проверка постоянного уменьшения значения элемента данных (1 - данные монотонны, 0 - в противном случае), Режим (strict - требование строгой монотонности)"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:828
 msgid "monoinc() - Check for continuous item value increase (1 - data is monotonic, 0 - otherwise), Mode (strict - require strict monotonicity)"
-msgstr ""
+msgstr "monoinc() - Проверка постоянного увеличения значения элемента данных (1 - данные монотонны, 0 - в противном случае), Режим (strict - требование строгой монотонности)"
 
 #: include/func.inc.php:583
 msgctxt "millisecond short"
@@ -21245,7 +21248,7 @@ msgstr "должен содержать по крайней мере один с
 #: app/views/administration.user.edit.php:146
 #: include/classes/validators/CPasswordComplexityValidator.php:108
 msgid "must not be one of common or context-specific passwords"
-msgstr ""
+msgstr "не должен быть одним из общих или контекстно-зависимых паролей"
 
 #: app/views/administration.authentication.edit.php:97
 #: app/views/administration.user.edit.php:145
@@ -21255,11 +21258,11 @@ msgstr "не должен содержать имени, фамилии или �
 
 #: include/translateDefines.inc.php:38
 msgid "n-d"
-msgstr ""
+msgstr "d-n"
 
 #: include/translateDefines.inc.php:36
 msgid "n-d H:i"
-msgstr ""
+msgstr "d-n H:i"
 
 #: include/views/configuration.host.discovery.edit.php:190
 #: include/views/configuration.host.discovery.edit.php:334
@@ -21443,7 +21446,7 @@ msgstr "rand() - Случайное целое число"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:885
 msgid "rate() - Returns per-second average rate for monotonically increasing counters"
-msgstr ""
+msgstr "rate() - Возвращает среднее изменение за секунду монотонно увеличивающихся счётчиков "
 
 #: include/classes/api/services/CService.php:2565
 #, c-format
@@ -21453,7 +21456,7 @@ msgstr "требуются права доступа чтения-записи �
 #: include/classes/api/services/CService.php:489
 #, c-format
 msgid "read-write access to the child service \"%1$s\" must be retained"
-msgstr ""
+msgstr "доступ чтения-записи к дочерней услуге \"%1$s\" должен быть сохранен"
 
 #: include/classes/api/services/CService.php:476
 #: include/classes/api/services/CService.php:2482
@@ -21464,7 +21467,7 @@ msgstr "требуются права доступа чтения-записи �
 #: include/classes/api/services/CService.php:2541
 #: include/classes/api/services/CService.php:2602
 msgid "read-write access to the service must be retained"
-msgstr ""
+msgstr "доступ чтения-записи к услуге должен быть сохранен"
 
 #: include/classes/widgets/fields/CWidgetFieldNavTree.php:110
 msgid "reference to a non-existent tree element"
@@ -21504,15 +21507,15 @@ msgstr "замена"
 
 #: app/views/administration.geomaps.edit.php:48
 msgid "represent tile coordinates;"
-msgstr ""
+msgstr "выражает координаты плитки;"
 
 #: app/views/administration.geomaps.edit.php:40
 msgid "represents one of the available subdomains;"
-msgstr ""
+msgstr "выражает один из доступных поддоменов;"
 
 #: app/views/administration.geomaps.edit.php:44
 msgid "represents zoom level parameter in the URL;"
-msgstr ""
+msgstr "выражает параметр уровня масштабирования в URL;"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1516
 msgid "right"
@@ -21640,7 +21643,7 @@ msgstr "sqrt() - Квадратный корень значения"
 
 #: app/partials/administration.ha.nodes.php:63
 msgid "standalone server"
-msgstr ""
+msgstr "автономный сервер"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:997
 msgid "stddevpop() - Population standard deviation"
@@ -21697,7 +21700,7 @@ msgstr "шаблон с ID \"%1$s\" был встречен %2$s раз"
 
 #: include/classes/validators/CApiInputValidator.php:2830
 msgid "the last new line feed is missing"
-msgstr ""
+msgstr "последний перевод на новую строку отсутствует"
 
 #: app/controllers/CControllerDashboardUpdate.php:192
 #: app/controllers/CControllerDashboardUpdate.php:201
@@ -21793,7 +21796,7 @@ msgstr "trendmin() - Минимальное значение за период �
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1087
 msgid "trendstl() - Anomaly detection for period T"
-msgstr ""
+msgstr "trendstl() - Обнаружение аномалии за период T"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1130
 msgid "trendsum() - Sum of values of a period T with exact period shift"
@@ -21932,7 +21935,7 @@ msgstr "неизвестная функция \"%1$s\""
 
 #: include/classes/api/services/CItemGeneral.php:1557
 msgid "unsupported Prometheus function"
-msgstr ""
+msgstr "неподдерживаемая Prometheus функция"
 
 #: app/controllers/CControllerPopupItemTestSend.php:192
 msgid "unsupported time suffix"
@@ -21944,7 +21947,7 @@ msgstr "неподдерживаемый номер версии"
 
 #: include/classes/validators/CApiInputValidator.php:506
 msgid "uppercase identifier expected"
-msgstr ""
+msgstr "ожидается идентификатор в верхнем регистре"
 
 #: app/partials/configuration.tags.tab.php:67
 #: app/partials/monitoring.host.filter.php:57
@@ -22063,7 +22066,7 @@ msgstr "значение должно быть между \"%1$s\" и \"%2$s\""
 
 #: include/classes/validators/CApiInputValidator.php:586
 msgid "value must be empty"
-msgstr ""
+msgstr "значение должно быть пустым"
 
 #: include/classes/validators/CApiInputValidator.php:581
 #, c-format
@@ -22159,4 +22162,4 @@ msgstr "г"
 #: include/classes/validators/CApiInputValidator.php:2870
 #, c-format
 msgid "zoom level must be between \"%1$s\" and \"%2$s\""
-msgstr ""
+msgstr "уровень масштаба должен быть между \"%1$s\" и \"%2$s\""
