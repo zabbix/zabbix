@@ -71,7 +71,7 @@ class CWebTest extends CTest {
 	/**
 	 * @inheritdoc
 	 */
-	protected function onNotSuccessfulTest($exception) {
+	protected function onNotSuccessfulTest($exception): void {
 		if ($this->browser_errors !== null && $exception instanceof Exception) {
 			CExceptionHelper::setMessage($exception, $exception->getMessage()."\n\n".$this->browser_errors);
 		}
