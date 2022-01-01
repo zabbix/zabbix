@@ -103,7 +103,7 @@ class CWebTest extends CTest {
 	/**
 	 * @inheritdoc
 	 */
-	protected function tearDown() {
+	protected function tearDown(): void {
 		// Check for JS errors.
 		$errors = [];
 		if (self::$shared_page !== null) {
