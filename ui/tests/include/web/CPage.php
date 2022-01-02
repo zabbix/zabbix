@@ -126,10 +126,10 @@ class CPage {
 		$this->resetViewport();
 
 		if (self::$cookie !== null) {
-			$session_id = $this->driver->manage()->getCookieNamed('zbx_sessionid');
+			$cookie = $this->driver->manage()->getCookieNamed('zbx_sessionid');
 
-			if ($session_id === null || !array_key_exists('value', $session_id)
-					|| $session_id['value'] !== self::$cookie['value']) {
+			if ($cookie === null
+					|| $cookie->getValue() !== self::$cookie['value']) {
 				self::$cookie = null;
 			}
 		}
