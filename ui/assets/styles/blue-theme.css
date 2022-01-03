@@ -2039,9 +2039,8 @@ footer {
     line-height: 18px; }
     .service-info .service-info-value .service-info-value-sla:not(:last-child) {
       margin-right: 10px; }
-    .service-info .service-info-value .service-info-value-sla a {
-      vertical-align: middle; }
     .service-info .service-info-value .service-info-value-sla .icon-description {
+      margin: 0 0 -5px 5px;
       border-radius: 2px; }
       .service-info .service-info-value .service-info-value-sla .icon-description:link, .service-info .service-info-value .service-info-value-sla .icon-description:hover, .service-info .service-info-value .service-info-value-sla .icon-description:focus {
         border-bottom: none; }
