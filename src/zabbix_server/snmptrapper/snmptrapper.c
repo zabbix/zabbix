@@ -524,7 +524,6 @@ out:
  * Return value: SUCCEED - there are new traps to be parsed                   *
  *               FAIL - there are no new traps or trap file does not exist    *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 static int	get_latest_data(void)
 {
@@ -597,7 +596,6 @@ static int	get_latest_data(void)
  * Function: main_snmptrapper_loop                                            *
  *                                                                            *
  * Purpose: SNMP trap reader's entry point                                    *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 ZBX_THREAD_ENTRY(snmptrapper_thread, args)

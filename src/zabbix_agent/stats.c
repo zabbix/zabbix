@@ -415,7 +415,6 @@ void	diskstat_shm_extend(void)
  *                                                                            *
  * Purpose: Collect system information                                        *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 ZBX_THREAD_ENTRY(collector_thread, args)
 {

@@ -372,7 +372,6 @@ clean:
  * Return value: SUCCEED - parsed successfully                                *
  *               FAIL - error processing config file                          *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level, int optional, int strict, int noexit)
 {

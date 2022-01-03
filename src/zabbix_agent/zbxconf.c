@@ -125,7 +125,6 @@ int	load_user_parameters(char **lines, char **err)
  * Return value: SUCCEED - successful execution                               *
  *               FAIL    - failed to add rule                                 *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 int	load_key_access_rule(const char *value, const struct cfg_line *cfg)
 {
@@ -152,7 +151,6 @@ int	load_key_access_rule(const char *value, const struct cfg_line *cfg)
  *             eng_lines - array of PerfCounterEn configuration entries       *
  *                                                                            *
  * Return value:                                                              *
- *                                                                            *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *

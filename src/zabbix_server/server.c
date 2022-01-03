@@ -1003,7 +1003,6 @@ static void	zbx_free_config(void)
  *                                                                            *
  * Purpose: executes server processes                                         *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 int	main(int argc, char **argv)
 {

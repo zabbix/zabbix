@@ -137,7 +137,6 @@ rollback:
  * Return value: SUCCEED - information removed successfully                   *
  *               FAIL - otherwise                                             *
  *                                                                            *
- *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/

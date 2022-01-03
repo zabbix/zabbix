@@ -1482,7 +1482,6 @@ static int	find_old2new(const char * const old2new, int num_new, int i_old)
  *             filename - name of a logfile (with full path)                  *
  *             st - structure returned by stat()                              *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 static void	add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num, const char *filename,
 		zbx_stat_t *st)

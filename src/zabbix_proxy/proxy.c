@@ -454,7 +454,6 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
  *                                                                            *
  * Purpose: set configuration defaults                                        *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 static void	zbx_set_defaults(void)
 {
@@ -688,7 +687,6 @@ static int	proxy_add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vec
  * Function: zbx_load_config                                                  *
  *                                                                            *
  * Purpose: parse config file and update configuration parameters             *
- *                                                                            *
  *                                                                            *
  * Comments: will terminate process if parsing fails                          *
  *                                                                            *

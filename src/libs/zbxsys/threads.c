@@ -67,7 +67,6 @@ int	zbx_fork(void)
  *                                                                            *
  * Return value: same as system fork() function                               *
  *                                                                            *
- *                                                                            *
  * Comments: use this function only for forks from the main process           *
  *                                                                            *
  ******************************************************************************/

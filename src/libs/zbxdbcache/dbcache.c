@@ -347,7 +347,6 @@ void	*DCget_stats(int request)
  *                                                                            *
  * Return value: pointer to a trend structure                                 *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 static ZBX_DC_TREND	*DCget_trend(zbx_uint64_t itemid)
 {
@@ -792,7 +791,6 @@ static void	DBflush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uin
  *                                                                            *
  * Purpose: move trend to the array of trends for flushing to DB              *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 static void	DCflush_trend(ZBX_DC_TREND *trend, ZBX_DC_TREND **trends, int *trends_alloc, int *trends_num)
 {
@@ -817,7 +815,6 @@ static void	DCflush_trend(ZBX_DC_TREND *trend, ZBX_DC_TREND **trends, int *trend
  * Function: DCadd_trend                                                      *
  *                                                                            *
  * Purpose: add new value to the trends                                       *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 static void	DCadd_trend(const ZBX_DC_HISTORY *history, ZBX_DC_TREND **trends, int *trends_alloc, int *trends_num)
@@ -4756,7 +4753,6 @@ static void	DCsync_all(void)
  * Function: free_database_cache                                              *
  *                                                                            *
  * Purpose: Free memory allocated for database cache                          *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 void	free_database_cache(int sync)

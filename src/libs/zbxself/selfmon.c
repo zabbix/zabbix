@@ -136,7 +136,6 @@ extern ZBX_THREAD_LOCAL int		process_num;
  *                                                                            *
  * Return value: number of processes                                          *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 int	get_process_type_forks(unsigned char proc_type)
 {
@@ -294,7 +293,6 @@ out:
  * Function: free_selfmon_collector                                           *
  *                                                                            *
  * Purpose: Free memory allocated for self-monitoring collector               *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 void	free_selfmon_collector(void)
@@ -671,7 +669,6 @@ static int	sleep_remains;
  * Purpose: sleeping process                                                  *
  *                                                                            *
  * Parameters: sleeptime - [IN] required sleeptime, in seconds                *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 void	zbx_sleep_loop(int sleeptime)

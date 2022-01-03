@@ -134,7 +134,6 @@ out:
  *                                                                            *
  * Return value: program name without path                                    *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 const char	*get_program_name(const char *path)
 {
@@ -593,7 +592,6 @@ void	*zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_
  *                                                                            *
  * Return value: returns a pointer to the newly allocated memory              *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 void	*zbx_malloc2(const char *filename, int line, void *old, size_t size)
 {
@@ -733,7 +731,6 @@ void	zbx_setproctitle(const char *fmt, ...)
  *                                                                            *
  * Return value: FAIL - out of period, SUCCEED - within the period            *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 static int	check_time_period(const zbx_time_period_t period, struct tm *tm)
 {
@@ -758,7 +755,6 @@ static int	check_time_period(const zbx_time_period_t period, struct tm *tm)
  *                                                                            *
  * Return value: delay value - either default or minimum delay value          *
  *                             out of all applicable intervals                *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 static int	get_current_delay(int default_delay, const zbx_flexible_interval_t *flex_intervals, time_t now)
@@ -2388,7 +2384,6 @@ time_t	calculate_proxy_nextcheck(zbx_uint64_t hostid, unsigned int delay, time_t
  * Return value: SUCCEED - is IPv4 address                                    *
  *               FAIL - otherwise                                             *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 int	is_ip4(const char *ip)
 {
@@ -2439,7 +2434,6 @@ int	is_ip4(const char *ip)
  *                                                                            *
  * Return value: SUCCEED - is IPv6 address                                    *
  *               FAIL - otherwise                                             *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 int	is_ip6(const char *ip)
@@ -2650,7 +2644,6 @@ out:
  *                                                                            *
  * Return value: FAIL - out of period, SUCCEED - within the period            *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 int	int_in_list(char *list, int value)
 {
@@ -2771,7 +2764,6 @@ static int	is_double_valid_syntax(const char *str)
  *                FAIL - the string does not represent a valid 'double' or    *
  *                       its value is outside of valid range                  *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 int	is_double(const char *str, double *value)
 {
@@ -2810,7 +2802,6 @@ int	is_double(const char *str, double *value)
  *                                                                            *
  * Return value: SUCCEED - the string is valid and within reasonable limits   *
  *               FAIL    - otherwise                                          *
- *                                                                            *
  *                                                                            *
  * Comments: the function automatically processes suffixes s, m, h, d, w      *
  *                                                                            *
@@ -3031,7 +3022,6 @@ int	is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint
  *                                                                            *
  * Return value:  SUCCEED - the string is boolean                             *
  *                FAIL - otherwise                                            *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 int	is_boolean(const char *str, zbx_uint64_t *value)
@@ -3277,7 +3267,6 @@ int	uint64_array_exists(const zbx_uint64_t *values, int num, zbx_uint64_t value)
  *                                                                            *
  * Purpose: remove uint64 values from array                                   *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 void	uint64_array_remove(zbx_uint64_t *values, int *num, const zbx_uint64_t *rm_values, int rm_num)
 {
@@ -3332,7 +3321,6 @@ zbx_uint64_t	suffix2factor(char c)
  *                                                                            *
  * Return value:  SUCCEED - the string is unsigned integer                    *
  *                FAIL - otherwise                                            *
- *                                                                            *
  *                                                                            *
  * Comments: the function automatically processes suffixes K, M, G, T         *
  *                                                                            *
@@ -3389,7 +3377,6 @@ double	str2double(const char *str)
  *                                                                            *
  * Return value:  SUCCEED - the char is allowed in the host name              *
  *                FAIL - otherwise                                            *
- *                                                                            *
  *                                                                            *
  * Comments: in host name allowed characters: '0-9a-zA-Z. _-'                 *
  *           !!! Don't forget to sync the code with PHP !!!                   *
@@ -3454,7 +3441,6 @@ int	is_function_char(unsigned char c)
  *                                                                            *
  * Return value:  SUCCEED - the char is allowed in the macro name             *
  *                FAIL - otherwise                                            *
- *                                                                            *
  *                                                                            *
  * Comments: allowed characters in macro names: '0-9A-Z._'                    *
  *           !!! Don't forget to sync the code with PHP !!!                   *
@@ -3532,7 +3518,6 @@ zbx_function_type_t	zbx_get_function_type(const char *func)
  * Purpose: replace all not-allowed hostname characters in the string         *
  *                                                                            *
  * Parameters: host - the target C-style string                               *
- *                                                                            *
  *                                                                            *
  * Comments: the string must be null-terminated, otherwise not secure!        *
  *                                                                            *

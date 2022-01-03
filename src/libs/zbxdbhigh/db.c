@@ -220,7 +220,6 @@ int	DBconnect(int flag)
  *                                                                            *
  * Function: DBinit                                                           *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 int	DBinit(char **error)
 {
@@ -237,7 +236,6 @@ void	DBdeinit(void)
  * Function: DBtxn_operation                                                  *
  *                                                                            *
  * Purpose: helper function to loop transaction operation while DB is down    *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 static void	DBtxn_operation(int (*txn_operation)(void))
@@ -265,7 +263,6 @@ static void	DBtxn_operation(int (*txn_operation)(void))
  * Function: DBbegin                                                          *
  *                                                                            *
  * Purpose: start a transaction                                               *
- *                                                                            *
  *                                                                            *
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
@@ -300,7 +297,6 @@ int	DBcommit(void)
  * Function: DBrollback                                                       *
  *                                                                            *
  * Purpose: rollback a transaction                                            *
- *                                                                            *
  *                                                                            *
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
@@ -1311,7 +1307,6 @@ static char	buf_string[640];
  *                                                                            *
  * Return value: <host> or "???" if host not found                            *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 const char	*zbx_host_string(zbx_uint64_t hostid)
 {
@@ -1438,7 +1433,6 @@ out:
  *                                                                            *
  * Return value: "Name Surname (Alias)" or "unknown" if user not found        *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 const char	*zbx_user_string(zbx_uint64_t userid)
 {
@@ -1507,7 +1501,6 @@ out:
  *                                                                            *
  * Return value: "=<id>" if id not equal zero,                                *
  *               otherwise " is null"                                         *
- *                                                                            *
  *                                                                            *
  * Comments: NB! Do not use this function more than once in same SQL query    *
  *                                                                            *
@@ -1906,7 +1899,6 @@ void	DBproxy_register_host(const char *host, const char *ip, const char *dns, un
  *                                                                            *
  * Purpose: execute a set of SQL statements IF it is big enough               *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
 {
@@ -2057,7 +2049,6 @@ clean:
  * Return value: "<id>" if id not equal zero,                                 *
  *               otherwise "null"                                             *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 const char	*DBsql_id_ins(zbx_uint64_t id)
 {
@@ -2084,7 +2075,6 @@ const char	*DBsql_id_ins(zbx_uint64_t id)
  * Parameters: inventory_link - [IN] field link 1..HOST_INVENTORY_FIELD_COUNT *
  *                                                                            *
  * Return value: field name or NULL if value of inventory_link is incorrect   *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 const char	*DBget_inventory_field(unsigned char inventory_link)

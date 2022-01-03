@@ -5938,7 +5938,6 @@ static void	dc_load_trigger_queue(zbx_hashset_t *trend_functions)
  *                                                                            *
  * Purpose: Synchronize configuration data from database                      *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 void	DCsync_configuration(unsigned char mode, const struct zbx_json_parse *jp_kvs_paths)
 {
@@ -7006,7 +7005,6 @@ static int	__config_data_session_compare(const void *d1, const void *d2)
  *                                                                            *
  * Purpose: Allocate shared memory for configuration cache                    *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 int	init_configuration_cache(char **error)
 {
@@ -7201,7 +7199,6 @@ out:
  * Function: free_configuration_cache                                         *
  *                                                                            *
  * Purpose: Free memory allocated for configuration cache                     *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 void	free_configuration_cache(void)
@@ -8473,7 +8470,6 @@ void	DCconfig_get_triggers_by_triggerids(DC_TRIGGER *triggers, const zbx_uint64_
  *             errcodes    - [OUT] SUCCEED if item found, otherwise FAIL      *
  *             num         - [IN] number of elements                          *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions, zbx_uint64_t *functionids, int *errcodes,
 		size_t num)
@@ -8547,7 +8543,6 @@ void	DCconfig_clean_triggers(DC_TRIGGER *triggers, int *errcodes, size_t num)
  *             triggerids  - [OUT] list of trigger IDs that this function has *
  *                                 locked for processing; unlock those using  *
  *                                 DCconfig_unlock_triggers() function        *
- *                                                                            *
  *                                                                            *
  * Comments: This does not solve the problem fully (e.g., ZBX-7484). There is *
  *           a significant time period between the place where we lock the    *
@@ -9457,7 +9452,6 @@ static void	dc_requeue_item_at(ZBX_DC_ITEM *dc_item, ZBX_DC_HOST *dc_host, int n
  *                                                                            *
  * Return value: number of items in items array                               *
  *                                                                            *
- *                                                                            *
  * Comments: Items leave the queue only through this function. Pollers must   *
  *           always return the items they have taken using DCrequeue_items()  *
  *           or DCpoller_requeue_items().                                     *
@@ -9708,7 +9702,6 @@ int	DCconfig_get_ipmi_poller_items(int now, DC_ITEM *items, int items_num, int *
  * Purpose: get array of interface IDs for the specified address              *
  *                                                                            *
  * Return value: number of interface IDs returned                             *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 int	DCconfig_get_snmp_interfaceids_by_addr(const char *addr, zbx_uint64_t **interfaceids)
@@ -10478,7 +10471,6 @@ static int	DCconfig_check_trigger_dependencies_rec(const ZBX_DC_TRIGGER_DEPLIST 
  * Return value: SUCCEED - trigger can change its value                       *
  *               FAIL - otherwise                                             *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 int	DCconfig_check_trigger_dependencies(zbx_uint64_t triggerid)
 {
@@ -10617,7 +10609,6 @@ void	DCconfig_triggers_apply_changes(zbx_vector_ptr_t *trigger_diff)
  *                                                                            *
  * Purpose: get statistics of the database cache                              *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 void	*DCconfig_get_stats(int request)
 {
@@ -10742,7 +10733,6 @@ void	DCconfig_wait_sync(void)
  *             max_hosts - [IN] elements in hosts array                       *
  *                                                                            *
  * Return value: number of proxies in hosts array                             *
- *                                                                            *
  *                                                                            *
  * Comments: Proxies leave the queue only through this function. Pollers must *
  *           always return the proxies they have taken using DCrequeue_proxy. *

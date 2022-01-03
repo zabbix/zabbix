@@ -73,7 +73,6 @@ static int 	httpmacro_cmp_func(const void *d1, const void *d2)
  *                          wrong key format or failed regular expression     *
  *                          match.                                            *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, size_t nkey,
 			const char *pvalue, size_t nvalue, const char *data, char **err_str)
@@ -172,7 +171,6 @@ out:
  *                                                                            *
  * Parameters: httptest - [IN]     the http test data                         *
  *             data     - [IN/OUT] string to substitute macros in             *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 int	http_substitute_variables(const zbx_httptest_t *httptest, char **data)
@@ -280,7 +278,6 @@ int	http_substitute_variables(const zbx_httptest_t *httptest, char **data)
  * Return value: SUCCEED - the variables were processed successfully          *
  *               FAIL    - the variable processing failed (regexp match       *
  *                         failed).                                           *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 int	http_process_variables(zbx_httptest_t *httptest, zbx_vector_ptr_pair_t *variables, const char *data,

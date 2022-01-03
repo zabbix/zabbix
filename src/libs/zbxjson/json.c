@@ -524,7 +524,6 @@ static zbx_json_type_t	__zbx_json_type(const char *p)
  * Return value: position of right bracket                                    *
  *               NULL - an error occurred                                     *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 static const char	*__zbx_json_rbracket(const char *p)
 {
@@ -1042,7 +1041,6 @@ const char	*zbx_json_pair_next(const struct zbx_json_parse *jp, const char *p, c
  *        {"name":["a","b",...]}                                              *
  *                ^ - returned pointer                                        *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 const char	*zbx_json_pair_by_name(const struct zbx_json_parse *jp, const char *name)
 {
@@ -1061,7 +1059,6 @@ const char	*zbx_json_pair_by_name(const struct zbx_json_parse *jp, const char *n
 /******************************************************************************
  *                                                                            *
  * Function: zbx_json_next_value                                              *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 const char	*zbx_json_next_value(const struct zbx_json_parse *jp, const char *p, char *string, size_t len,
@@ -1140,7 +1137,6 @@ int	zbx_json_value_by_name_dyn(const struct zbx_json_parse *jp, const char *name
  * Return value: SUCCESS - processed successfully                             *
  *               FAIL - an error occurred                                     *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 int	zbx_json_brackets_open(const char *p, struct zbx_json_parse *jp)
 {
@@ -1164,7 +1160,6 @@ int	zbx_json_brackets_open(const char *p, struct zbx_json_parse *jp)
  * Return value: SUCCESS - processed successfully                             *
  *               FAIL - an error occurred                                     *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 int	zbx_json_brackets_by_name(const struct zbx_json_parse *jp, const char *name, struct zbx_json_parse *out)
 {
@@ -1185,7 +1180,6 @@ int	zbx_json_brackets_by_name(const struct zbx_json_parse *jp, const char *name,
  *                                                                            *
  * Return value: SUCCESS - if object is empty                                 *
  *               FAIL - if object contains data                               *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 int	zbx_json_object_is_empty(const struct zbx_json_parse *jp)

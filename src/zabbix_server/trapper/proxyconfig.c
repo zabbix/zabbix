@@ -34,7 +34,6 @@
  * Purpose: send configuration tables to the proxy from server                *
  *          (for active proxies)                                              *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {

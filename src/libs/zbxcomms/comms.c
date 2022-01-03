@@ -58,7 +58,6 @@ extern int	CONFIG_TCP_MAX_BACKLOG_SIZE;
  *                                                                            *
  * Return value: pointer to the null terminated string                        *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 
 #define ZBX_SOCKET_STRERROR_LEN	512
@@ -131,7 +130,6 @@ static int	zbx_socket_peer_ip_save(zbx_socket_t *s)
  * Function: zbx_gethost_by_ip                                                *
  *                                                                            *
  * Purpose: retrieve 'hostent' by IP address                                  *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 #ifdef HAVE_IPV6
@@ -303,7 +301,6 @@ static void	zbx_socket_clean(zbx_socket_t *s)
  * Function: zbx_socket_free                                                  *
  *                                                                            *
  * Purpose: free socket's dynamic buffer                                      *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_socket_free(zbx_socket_t *s)
@@ -485,7 +482,6 @@ static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, sock
  *                                                                            *
  * Return value: SUCCEED - connected successfully                             *
  *               FAIL - an error occurred                                     *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 #ifdef HAVE_IPV6
@@ -942,7 +938,6 @@ cleanup:
  *                                                                            *
  * Purpose: close open TCP socket                                             *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 void	zbx_tcp_close(zbx_socket_t *s)
 {
@@ -967,7 +962,6 @@ void	zbx_tcp_close(zbx_socket_t *s)
  *                                                                            *
  * Return value: SUCCEED - success                                            *
  *               FAIL - an error occurred                                     *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 #ifdef HAVE_IPV6
@@ -1520,7 +1514,6 @@ out:
  *                                                                            *
  * Purpose: close accepted connection                                         *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 void	zbx_tcp_unaccept(zbx_socket_t *s)
 {
@@ -1753,7 +1746,6 @@ static ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len)
  *                                                                            *
  * Return value: number of bytes received - success,                          *
  *               FAIL - an error occurred                                     *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout, unsigned char flags)

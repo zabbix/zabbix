@@ -239,7 +239,6 @@ static int	hk_item_update_cache_compare(const void *d1, const void *d2)
  *             history     - [IN] a number of seconds the history data for    *
  *                           item_record must be kept.                        *
  *                                                                            *
- *                                                                            *
  * Comments: If item is added to delete queue, its oldest record timestamp    *
  *           (min_clock) is updated to the calculated 'cutoff' value.         *
  *                                                                            *
@@ -320,7 +319,6 @@ static void	hk_history_prepare(zbx_hk_history_rule_t *rule)
  *                                                                            *
  * Parameters: rule  - [IN/OUT] the history housekeeping rule                 *
  *                                                                            *
- *                                                                            *
  * Comments: This function is called to release resources allocated by        *
  *           history housekeeping rule after housekeeping was disabled        *
  *           for the table referred by this rule.                             *
@@ -347,7 +345,6 @@ static void	hk_history_release(zbx_hk_history_rule_t *rule)
  *             itemid  - [IN] the item to update                              *
  *             history - [IN] the number of seconds the item data             *
  *                       should be kept in history                            *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 static void	hk_history_item_update(zbx_hk_history_rule_t *rules, zbx_hk_history_rule_t *rule_add, int count,
@@ -610,7 +607,6 @@ out:
  *                                                                            *
  * Parameters: now    - [IN] the current timestamp                            *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 static int	housekeeping_history_and_trends(int now)
 {
@@ -673,7 +669,6 @@ static int	housekeeping_history_and_trends(int now)
  *                    clean and the required data (fields, filters, time)     *
  *                                                                            *
  * Return value: the number of deleted records                                *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)

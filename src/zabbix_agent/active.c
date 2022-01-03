@@ -302,7 +302,6 @@ static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
  * Return value: returns SUCCEED on successful parsing,                       *
  *               FAIL on an incorrect format of string                        *
  *                                                                            *
- *                                                                            *
  * Comments:                                                                  *
  *    String represented as "ZBX_EOF" termination list                        *
  *    With '\n' delimiter between elements.                                   *
@@ -715,7 +714,6 @@ static int	refresh_active_checks(zbx_vector_ptr_t *addrs)
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
  *                                                                            *
- *                                                                            *
  * Comments: zabbix_sender has almost the same function!                      *
  *                                                                            *
  ******************************************************************************/
@@ -760,7 +758,6 @@ static int	check_response(char *response)
  *                      free elements, or recently sent)                      *
  *                    - data successfully sent to server (proxy)              *
  *               FAIL - error when sending data                               *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 static int	send_buffer(zbx_vector_ptr_t *addrs, zbx_vector_pre_persistent_t *prep_vec)
@@ -950,7 +947,6 @@ ret:
  *                                                                            *
  * Return value: returns SUCCEED on successful parsing,                       *
  *               FAIL on other cases                                          *
- *                                                                            *
  *                                                                            *
  * Comments: ATTENTION! This function's address and pointers to arguments     *
  *           are described in Zabbix defined type "zbx_process_value_func_t"  *

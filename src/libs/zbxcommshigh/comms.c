@@ -224,7 +224,6 @@ out:
  * Return value: SUCCEED - data successfully transmitted                      *
  *               NETWORK_ERROR - network related error occurred               *
  *                                                                            *
- *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/

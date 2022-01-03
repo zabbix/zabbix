@@ -492,7 +492,6 @@ void	__zbx_mutex_lock(const char *filename, int line, zbx_mutex_t mutex)
  *                                                                            *
  * Parameters: mutex - handle of mutex                                        *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 void	__zbx_mutex_unlock(const char *filename, int line, zbx_mutex_t mutex)
 {

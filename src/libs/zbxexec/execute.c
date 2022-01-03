@@ -38,7 +38,6 @@
  *                                                                            *
  * Return value: difference between times in milliseconds                     *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 static int	zbx_get_timediff_ms(struct _timeb *time1, struct _timeb *time2)
 {
@@ -316,7 +315,6 @@ exit:
  *                                                                            *
  * Return value: SUCCEED if processed successfully, TIMEOUT_ERROR if          *
  *               timeout occurred or FAIL otherwise                           *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 int	zbx_execute(const char *command, char **output, char *error, size_t max_error_len, int timeout,

@@ -558,7 +558,6 @@ out:
  *                                                                            *
  * Purpose: set configuration defaults                                        *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 static void	set_defaults(void)
 {

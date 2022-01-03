@@ -2758,7 +2758,6 @@ clean:
  *                                                                            *
  * Parameters: action - action to execute operations for                      *
  *                                                                            *
- *                                                                            *
  * Comments: for message, command operations see                              *
  *           escalation_execute_operations(),                                 *
  *           escalation_execute_recovery_operations().                        *

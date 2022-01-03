@@ -1050,7 +1050,6 @@ static int	zbx_oid_is_new(zbx_hashset_t *hs, size_t root_len, const oid *p_oid, 
  *               CONFIG_ERROR - item configuration error                      *
  *               SUCCEED - if function successfully completed                 *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const char *snmp_oid, char *error,
 		size_t max_error_len, int *max_succeed, int *min_fail, int max_vars, int bulk,

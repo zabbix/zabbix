@@ -67,7 +67,6 @@ void	version(void)
  * Purpose: print application parameters on stdout with layout suitable for   *
  *          80-column terminal                                                *
  *                                                                            *
- *                                                                            *
  * Comments:  usage_message - is global variable which must be initialized    *
  *                            in each zabbix application                      *
  *                                                                            *
@@ -152,7 +151,6 @@ void	help(void)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 void	zbx_error(const char *fmt, ...)
 {
@@ -209,7 +207,6 @@ size_t	zbx_snprintf(char *str, size_t count, const char *fmt, ...)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 void	zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const char *fmt, ...)
 {
@@ -257,7 +254,6 @@ retry:
  * Return value: the number of characters in the output buffer                *
  *               (not including the trailing '\0')                            *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args)
 {
@@ -290,7 +286,6 @@ size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args)
  *             offset    - [IN/OUT] offset for writing                        *
  *             src       - [IN] copied string                                 *
  *             n         - [IN] maximum number of bytes to copy               *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n)
@@ -459,7 +454,6 @@ char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2
  *                                                                            *
  * Return value: string without right '0'                                     *
  *                                                                            *
- *                                                                            *
  * Comments: 10.0100 => 10.01, 10. => 10                                      *
  *                                                                            *
  ******************************************************************************/
@@ -602,7 +596,6 @@ void	zbx_lrtrim(char *str, const char *charlist)
  *             charlist - null terminated list of characters                  *
  *                                                                            *
  * Return value:                                                              *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 void	zbx_remove_chars(char *str, const char *charlist)
@@ -860,7 +853,6 @@ char	*zbx_strdcat(char *dest, const char *src)
  *                                                                            *
  * Return value: new pointer of string                                        *
  *                                                                            *
- *                                                                            *
  * Comments: returns a pointer to allocated memory                            *
  *                                                                            *
  ******************************************************************************/
@@ -942,7 +934,6 @@ int	zbx_check_hostname(const char *hostname, char **error)
  *              ^                                                             *
  * Return value: returns FAIL only if no key is present (length 0),           *
  *               or the whole string is invalid. SUCCEED otherwise.           *
- *                                                                            *
  *                                                                            *
  * Comments: the pointer is advanced to the first invalid character even if   *
  *           FAIL is returned (meaning there is a syntax error in item key).  *
@@ -1104,7 +1095,6 @@ int	parse_host_key(char *exp, char **host, char **key)
  *                                                                            *
  * Return value: size of the escaped string                                   *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 size_t	zbx_get_escape_string_len(const char *src, const char *charlist)
 {
@@ -1129,7 +1119,6 @@ size_t	zbx_get_escape_string_len(const char *src, const char *charlist)
  *             charlist - [IN] null terminated to-be-escaped character list   *
  *                                                                            *
  * Return value: the escaped string                                           *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 char	*zbx_dyn_escape_string(const char *src, const char *charlist)
@@ -1307,7 +1296,6 @@ int	cmp_key_id(const char *key_1, const char *key_2)
  * Purpose: Returns process name                                              *
  *                                                                            *
  * Parameters: proc_type - [IN] process type; ZBX_PROCESS_TYPE_*              *
- *                                                                            *
  *                                                                            *
  * Comments: used in internals checks zabbix["process",...], process titles   *
  *           and log files                                                    *
@@ -2552,7 +2540,6 @@ int	is_ascii_string(const char *str)
  *                                                                            *
  * Return value: newly allocated copy of input string with linefeeds          *
  *                                                                            *
- *                                                                            *
  * Comments: allocates memory                                                 *
  *                                                                            *
  ******************************************************************************/
@@ -2638,7 +2625,6 @@ void	zbx_strarr_init(char ***arr)
  *             entry - string to add                                          *
  *                                                                            *
  * Return value:                                                              *
- *                                                                            *
  *                                                                            *
  * Comments: allocates memory, calls assert() if that fails                   *
  *                                                                            *
@@ -2726,7 +2712,6 @@ void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value)
  * Parameters: list      - the list (a string containing items separated by   *
  *                         delimiter)                                         *
  *             delimiter - the list delimiter                                 *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 void	zbx_trim_str_list(char *list, char delimiter)

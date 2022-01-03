@@ -53,7 +53,6 @@ static void	udec128_128(zbx_uint128_t *base, const zbx_uint128_t *value)
  * Parameters: base  - [IN,OUT] the initial value and result                  *
  *             bits  - [IN] the number of bits to shift for.                  *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 static void	ushiftr128(zbx_uint128_t *base, unsigned int bits)
 {
@@ -82,7 +81,6 @@ static void	ushiftr128(zbx_uint128_t *base, unsigned int bits)
  *                                                                            *
  * Parameters: base  - [IN,OUT] the initial value and result                  *
  *             bits  - [IN] the number of bits to shift for.                  *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 static void	ushiftl128(zbx_uint128_t *base, unsigned int bits)
@@ -165,7 +163,6 @@ static void	umul64_32_shift(zbx_uint128_t *base, zbx_uint64_t value, zbx_uint64_
  * Parameters: base   - [IN,OUT] the integer to increment.                    *
  *             value  - [IN] the value to increment by.                       *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 void	uinc128_64(zbx_uint128_t *base, zbx_uint64_t value)
 {
@@ -186,7 +183,6 @@ void	uinc128_64(zbx_uint128_t *base, zbx_uint64_t value)
  *                                                                            *
  * Parameters: base   - [IN,OUT] the integer to increment.                    *
  *             value  - [IN] the value to increment by.                       *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 void	uinc128_128(zbx_uint128_t *base, const zbx_uint128_t *value)

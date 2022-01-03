@@ -1512,7 +1512,6 @@ static zbx_log_t	*get_result_log_value(AGENT_RESULT *result)
  * Return value:                                                              *
  *         NULL - if value is missing or can't be converted                   *
  *                                                                            *
- *                                                                            *
  * Comments:  better use definitions                                          *
  *                GET_UI64_RESULT                                             *
  *                GET_DBL_RESULT                                              *

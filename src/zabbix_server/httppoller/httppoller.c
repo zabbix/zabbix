@@ -40,7 +40,6 @@ extern ZBX_THREAD_LOCAL int		server_num, process_num;
  *                                                                            *
  * Return value: timestamp of earliest check or -1 if not found               *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 static int	get_minnextcheck(void)
 {

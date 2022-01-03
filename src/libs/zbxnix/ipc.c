@@ -32,7 +32,6 @@
  * Return value: If the function succeeds, then return SHM ID                 *
  *               -1 on an error                                               *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 int	zbx_shm_create(size_t size)
 {
