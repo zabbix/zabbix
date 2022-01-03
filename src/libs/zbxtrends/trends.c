@@ -705,4 +705,3 @@ const char	*zbx_trends_error(zbx_trend_state_t state)
 
 	return trends_errors[state];
 }
-

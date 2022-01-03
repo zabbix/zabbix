@@ -154,4 +154,3 @@ ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
 }
-

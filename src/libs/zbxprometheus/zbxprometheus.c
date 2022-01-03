@@ -1766,7 +1766,6 @@ out:
 	return ret;
 }
 
-
 static void	prometheus_label_index_free(zbx_prometheus_label_index_t *label_index)
 {
 	zbx_hashset_iter_t	iter;
@@ -2225,7 +2224,6 @@ int	zbx_prometheus_validate_label(const char *label)
 
 	return SUCCEED;
 }
-
 
 #ifdef HAVE_TESTS
 #	include "../../../tests/libs/zbxprometheus/prometheus_test.c"

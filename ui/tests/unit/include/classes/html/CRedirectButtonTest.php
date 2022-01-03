@@ -19,8 +19,6 @@
 **/
 
 
-use PHPUnit\Framework\TestCase;
-
 class CRedirectButtonTest extends CTagTest {
 
 	public function constructProvider() {

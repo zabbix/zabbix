@@ -147,4 +147,3 @@ int	zbx_lld_macro_value_by_name(const struct zbx_json_parse *jp_row, const zbx_v
 
 	return FAIL;
 }
-

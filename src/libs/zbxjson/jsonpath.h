@@ -157,5 +157,4 @@ typedef struct
 }
 zbx_jsonpath_token_t;
 
-
 #endif
