@@ -913,7 +913,6 @@ static void	am_db_update_watchdog(zbx_am_db_t *amdb)
 	}
 	DBfree_result(result);
 
-
 	/* update media types used for watchdog alerts */
 
 	if (0 != mediatypeids.values_num)

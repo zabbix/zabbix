@@ -69,7 +69,6 @@ typedef struct zbx_preprocessing_request_base
 }
 zbx_preprocessing_request_base_t;
 
-
 /* preprocessing request */
 typedef struct preprocessing_request
 {
@@ -110,7 +109,6 @@ typedef struct
 	void			*task;		/* the current task data */
 }
 zbx_preprocessing_worker_t;
-
 
 /* item link index */
 typedef struct
@@ -723,7 +721,6 @@ static void	preprocessor_flush_dep_results(zbx_preprocessing_manager_t *manager,
 		unsigned char	state;
 
 		state = (NULL == request->results[i].error ? ITEM_STATE_NORMAL : ITEM_STATE_NOTSUPPORTED);
-
 
 		if (0 == (request->results[i].flags & ZBX_FLAG_DISCOVERY_RULE) ||
 				0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
@@ -1724,7 +1721,6 @@ static	void	preprocessor_get_items_view(zbx_preprocessing_manager_t *manager, zb
 	while (SUCCEED == zbx_list_iterator_next(&iterator))
 	{
 		zbx_list_iterator_peek(&iterator, (void **)&base);
-
 
 		switch (base->kind)
 		{

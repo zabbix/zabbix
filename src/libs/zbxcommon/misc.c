@@ -3824,7 +3824,6 @@ char	*zbx_create_token(zbx_uint64_t seed)
 	return token;
 }
 
-
 #if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
 /******************************************************************************
  *                                                                            *

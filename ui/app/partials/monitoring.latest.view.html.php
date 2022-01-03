@@ -69,7 +69,8 @@ else {
 		(new CColHeader(_('Last value')))->addStyle('width: 14%'),
 		(new CColHeader(_x('Change', 'noun')))->addStyle('width: 10%'),
 		(new CColHeader(_('Tags')))->addClass(ZBX_STYLE_COLUMN_TAGS_3),
-		(new CColHeader())->addStyle('width: 6%')
+		(new CColHeader())->addStyle('width: 6%'),
+		(new CColHeader(_('Info')))->addStyle('width: 35px')
 	]);
 }
 
@@ -80,7 +81,7 @@ foreach ($data['items'] as $itemid => $item) {
 	$state_css = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? ZBX_STYLE_GREY : null;
 
 	$item_name = new CDiv([
-		(new CLinkAction($item['name_expanded']))->setMenuPopup(CMenuPopupHelper::getItemData(['itemid' => $itemid])),
+		(new CLinkAction($item['name']))->setMenuPopup(CMenuPopupHelper::getItemData(['itemid' => $itemid])),
 		($item['description_expanded'] !== '') ? makeDescriptionIcon($item['description_expanded']) : null
 	]);
 
@@ -91,8 +92,18 @@ foreach ($data['items'] as $itemid => $item) {
 
 	if ($last_history) {
 		$prev_history = (count($data['history'][$itemid]) > 1) ? $data['history'][$itemid][1] : null;
-		$last_check = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $last_history['clock']);
-		$last_value = formatHistoryValue($last_history['value'], $item, false);
+
+		$last_check = (new CSpan(zbx_date2age($last_history['clock'])))
+			->addClass(ZBX_STYLE_CURSOR_POINTER)
+			->setHint(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $last_history['clock']), '', true, '', 0);
+
+		$last_value = (new CSpan(formatHistoryValue($last_history['value'], $item, false)))
+			->addClass(ZBX_STYLE_CURSOR_POINTER)
+			->setHint(
+				(new CDiv(mb_substr($last_history['value'], 0, 8000)))->addClass(ZBX_STYLE_HINTBOX_WRAP),
+				'', true, '', 0
+			);
+
 		$change = '';
 
 		if ($prev_history && in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
@@ -165,6 +176,12 @@ foreach ($data['items'] as $itemid => $item) {
 		->addClass($host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_RED : null)
 		->setMenuPopup(CMenuPopupHelper::getHost($item['hostid']));
 
+
+	$item_icons = [];
+	if ($item['status'] == ITEM_STATUS_ACTIVE && $item['error'] !== '') {
+		$item_icons[] = makeErrorIcon($item['error']);
+	}
+
 	if ($data['filter']['show_details']) {
 		$item_key = (new CSpan($item['key_expanded']))->addClass(ZBX_STYLE_GREEN);
 
@@ -181,11 +198,6 @@ foreach ($data['items'] as $itemid => $item) {
 		}
 		else {
 			$item_delay = (new CSpan($item['delay']))->addClass(ZBX_STYLE_RED);
-		}
-
-		$item_icons = [];
-		if ($item['status'] == ITEM_STATUS_ACTIVE && $item['error'] !== '') {
-			$item_icons[] = makeErrorIcon($item['error']);
 		}
 
 		$table_row = new CRow([
@@ -213,7 +225,8 @@ foreach ($data['items'] as $itemid => $item) {
 			(new CCol($last_value))->addClass($state_css),
 			(new CCol($change))->addClass($state_css),
 			$data['tags'][$itemid],
-			$actions
+			$actions,
+			makeInformationList($item_icons)
 		]);
 	}
 

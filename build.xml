@@ -378,6 +378,7 @@
 		<exec executable="phpunit" dir="ui/tests" failonerror="off">
 			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml"/>
 			<arg line="--bootstrap=bootstrap.php"/>
+			<arg line="--dont-report-useless-tests"/>
 			<arg line="${phpunit_filter}"/>
 			<arg line="frontend.php"/>
 		</exec>

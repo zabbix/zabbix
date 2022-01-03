@@ -927,7 +927,6 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		}
 	}
 
-
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 	zbx_db_validate_config();
 #endif

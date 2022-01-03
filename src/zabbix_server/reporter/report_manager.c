@@ -29,7 +29,8 @@
 #include "zbxmedia.h"
 #include "dbcache.h"
 #include "zbxreport.h"
-#include "../../libs/zbxcrypto/aes.h"
+#include "../../libs/zbxcrypto/hmac_sha256.h"
+#include "sha256crypt.h"
 #include "../../libs/zbxalgo/vectorimpl.h"
 #include "zbxalert.h"
 #include "zbxserver.h"
@@ -436,38 +437,26 @@ static char	*rm_time_to_urlfield(const struct tm *tm)
 static char	*report_create_cookie(zbx_rm_t *manager, const char *sessionid)
 {
 	struct zbx_json	j;
-	char		*sign = NULL, *cookie = NULL, *sign_esc, *sign_raw;
-	size_t		size, i;
-	unsigned char	*data;
-	struct AES_ctx 	ctx;
+	char		*cookie = NULL, *out_str_raw = NULL;
+	size_t		i;
+	char		out_str[ZBX_SHA256_DIGEST_SIZE * 2 + 1];
+	uint8_t		out[ZBX_SHA256_DIGEST_SIZE];
 
 	zbx_json_init(&j, 512);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_SESSIONID, sessionid, ZBX_JSON_TYPE_STRING);
 
-	size = (j.buffer_size / 16 + 1) * 16;
-	data = zbx_malloc(NULL, size);
-	memcpy(data, j.buffer, j.buffer_size);
+	hmac_sha256(manager->session_key, strlen(manager->session_key), j.buffer, j.buffer_size, &out, sizeof(out));
+	memset(&out_str, 0, sizeof(out_str));
 
-	if (j.buffer_size < size)
-		memset(data + j.buffer_size, (int)(size - j.buffer_size), size - j.buffer_size);
+	for (i = 0; i < sizeof(out); i++)
+		zbx_snprintf(&out_str[i*2], 3, "%02x", out[i]);
 
-	AES_init_ctx(&ctx, (unsigned char *)manager->session_key);
-
-	for (i = 0; i < size / 16; i++)
-		AES_ECB_encrypt(&ctx, data + i * 16);
-
-	str_base64_encode_dyn((char *)data, &sign, size);
-	sign_esc = zbx_dyn_escape_string(sign, "/");
-	sign_raw = zbx_dsprintf(NULL, "\"%s\"", sign_esc);
-
-	zbx_json_addraw(&j, ZBX_PROTO_TAG_SIGN, sign_raw);
+	out_str_raw = zbx_dsprintf(NULL, "\"%s\"", out_str);
+	zbx_json_addraw(&j, ZBX_PROTO_TAG_SIGN, out_str_raw);
 	str_base64_encode_dyn(j.buffer, &cookie, j.buffer_size);
 
-	zbx_free(sign_raw);
-	zbx_free(sign_esc);
-	zbx_free(sign);
-	zbx_free(data);
 	zbx_json_clean(&j);
+	zbx_free(out_str_raw);
 
 	return cookie;
 }
@@ -1121,7 +1110,6 @@ static void	rm_update_cache_reports(zbx_rm_t *manager, int now)
 		zbx_uint64_t	reportid;
 		int		nextcheck, start_time, active_since, active_till, reschedule = 0;
 		unsigned char	period, cycle, weekdays;
-
 
 		ZBX_STR2UINT64(reportid, row[0]);
 		zbx_vector_uint64_append(&reportids, reportid);
@@ -2160,7 +2148,6 @@ static void	rm_finish_job(zbx_rm_t *manager, zbx_rm_job_t *job, int status, cons
 		{
 			char	*info = NULL;
 			size_t	info_alloc = 0, info_offset = 0;
-
 
 			status = ZBX_REPORT_STATE_SUCCESS;
 			if (batch->sent_num != batch->total_num)

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-13 16:02+0200\n"
+"POT-Creation-Date: 2021-12-22 17:25+0200\n"
 "PO-Revision-Date: 2021-11-21 09:37+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
@@ -308,7 +308,7 @@ msgstr "(רק מנהלי על יכולים ליצור קבוצות)"
 msgid "(no proxy)"
 msgstr "(אין מתווך)"
 
-#: include/classes/setup/CSetupWizard.php:480
+#: include/classes/setup/CSetupWizard.php:492
 msgid "0 - use default port"
 msgstr "0 - שימוש בפתחת בררת המחדל"
 
@@ -1145,7 +1145,7 @@ msgstr "מארחים מורשים"
 msgid "Allowed methods"
 msgstr "שיטות מורשות"
 
-#: include/classes/setup/CSetupWizard.php:854
+#: include/classes/setup/CSetupWizard.php:880
 msgid "Alternatively, you can install it manually:"
 msgstr "לחלופין, ניתן להתקין ידנית:"
 
@@ -1549,7 +1549,7 @@ msgstr "פעולות רישום אוטומטי"
 msgid "Autoregistration data storage period"
 msgstr "תקופת אחסון נתוני רישום אוטומטי"
 
-#: app/partials/monitoring.host.view.html.php:31
+#: app/partials/monitoring.host.view.html.php:36
 #: app/views/configuration.host.list.php:193
 msgid "Availability"
 msgstr "זמינות"
@@ -1586,8 +1586,8 @@ msgstr "מומלץ להימנע מססמאות שקל לנחש"
 msgid "Axes"
 msgstr "צירים"
 
-#: include/classes/setup/CSetupWizard.php:322
-#: include/classes/setup/CSetupWizard.php:741
+#: include/classes/setup/CSetupWizard.php:334
+#: include/classes/setup/CSetupWizard.php:753
 msgid "Back"
 msgstr "חזרה"
 
@@ -1839,7 +1839,7 @@ msgstr "קריאה"
 #: app/views/monitoring.dashboard.view.php:148
 #: app/views/popup.import.compare.php:162
 #: include/classes/html/CButtonCancel.php:25
-#: include/classes/setup/CSetupWizard.php:310 jsLoader.php:206
+#: include/classes/setup/CSetupWizard.php:322 jsLoader.php:206
 #: jsLoader.php:216 jsLoader.php:331 jsLoader.php:405
 msgid "Cancel"
 msgstr "ביטול"
@@ -2068,7 +2068,7 @@ msgstr "לא ניתן לסגור את התקלה: %1$s."
 msgid "Cannot connect to LDAP server."
 msgstr "לא ניתן להתחבר אל שרת ה־LDAP."
 
-#: include/classes/setup/CSetupWizard.php:579
+#: include/classes/setup/CSetupWizard.php:591
 msgid "Cannot connect to the database."
 msgstr "לא ניתן להתחבר למסד הנתונים."
 
@@ -2140,7 +2140,7 @@ msgstr "לא ניתן ליצור דוח מתוזמן"
 msgid "Cannot create service \"%1$s\": %2$s."
 msgstr "לא ניתן ליצור את השירות „%1$s”:‏ %2$s."
 
-#: include/classes/setup/CSetupWizard.php:850
+#: include/classes/setup/CSetupWizard.php:876
 msgid "Cannot create the configuration file."
 msgstr "לא ניתן ליצור קובץ תצורה."
 
@@ -3463,7 +3463,7 @@ msgid "Check for not supported value"
 msgstr "בדיקת האם הערך נתמך"
 
 #: include/classes/setup/CSetupWizard.php:58
-#: include/classes/setup/CSetupWizard.php:451
+#: include/classes/setup/CSetupWizard.php:463
 msgid "Check of pre-requisites"
 msgstr "בדיקת דרישות הקדם"
 
@@ -3778,7 +3778,7 @@ msgstr "הגדרות"
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "הגדרות זיכרון מטמון לסטטיסטיקה. זיכרון מטמון - buffer (מצבים: pfree,‏ total,‏ used,‏ free)."
 
-#: include/classes/setup/CSetupWizard.php:872
+#: include/classes/setup/CSetupWizard.php:907
 #, c-format
 msgid "Configuration file \"%1$s\" created."
 msgstr "קובץ ההגדרות „%1$s“ נוצר."
@@ -3933,7 +3933,7 @@ msgid "Configuration updated"
 msgstr "ההגדרות עודכנו"
 
 #: include/classes/setup/CSetupWizard.php:62
-#: include/classes/setup/CSetupWizard.php:587
+#: include/classes/setup/CSetupWizard.php:599
 msgid "Configure DB connection"
 msgstr "הגדרת חיבור למסד הנתונים"
 
@@ -3941,7 +3941,7 @@ msgstr "הגדרת חיבור למסד הנתונים"
 msgid "Confirmation text"
 msgstr "טקסט אימות"
 
-#: include/classes/setup/CSetupWizard.php:870
+#: include/classes/setup/CSetupWizard.php:905
 msgid "Congratulations! You have successfully installed Zabbix frontend."
 msgstr "ברכותינו! התקנת בהצלחה את מנשק המשתמש של Zabbix."
 
@@ -4012,7 +4012,7 @@ msgstr ""
 msgid "Connection to Zabbix server failed. Incorrect configuration."
 msgstr "החיבור לשרת ה־Zabbix נכשל. הגדרות שגויות."
 
-#: include/classes/setup/CSetupWizard.php:538
+#: include/classes/setup/CSetupWizard.php:550
 msgid "Connection will not be encrypted because it uses a socket file (on Unix) or shared memory (Windows)."
 msgstr "החיבור לא יוצפן כיוון שהוא משתמש בקובץ שקע (ביוניקס) או בזיכרון שיתופי (Windows)."
 
@@ -4489,7 +4489,7 @@ msgstr "מארח נוכחי"
 msgid "Current user"
 msgstr "משתמש נוכחי"
 
-#: include/classes/setup/CSetupWizard.php:409
+#: include/classes/setup/CSetupWizard.php:421
 msgid "Current value"
 msgstr "ערך נוכחי"
 
@@ -4660,9 +4660,9 @@ msgstr "לוח מחוונים עם המזהה „%1$s” אינו זמין."
 #: app/controllers/CControllerHostDashboardView.php:122
 #: app/controllers/CControllerPopupGeneric.php:370
 #: app/controllers/CControllerPopupImportCompare.php:170
-#: app/partials/monitoring.host.view.html.php:38
-#: app/partials/monitoring.host.view.html.php:138
-#: app/partials/monitoring.host.view.html.php:145
+#: app/partials/monitoring.host.view.html.php:42
+#: app/partials/monitoring.host.view.html.php:142
+#: app/partials/monitoring.host.view.html.php:149
 #: app/views/configuration.dashboard.edit.php:50
 #: app/views/configuration.dashboard.list.php:74
 #: app/views/monitoring.dashboard.list.php:35
@@ -4708,16 +4708,16 @@ msgstr "ערכת נתונים"
 msgid "Data storage period"
 msgstr "תקופת אחסון נתונים"
 
-#: include/classes/setup/CSetupWizard.php:551
-#: include/classes/setup/CSetupWizard.php:703
-#: include/classes/setup/CSetupWizard.php:940
+#: include/classes/setup/CSetupWizard.php:563
+#: include/classes/setup/CSetupWizard.php:715
+#: include/classes/setup/CSetupWizard.php:974
 msgid "Database TLS CA file"
 msgstr "קובץ CA ל־TLS של מסד הנתונים"
 
 #: include/classes/setup/CFrontendSetup.php:668
-#: include/classes/setup/CSetupWizard.php:561
-#: include/classes/setup/CSetupWizard.php:711
-#: include/classes/setup/CSetupWizard.php:948
+#: include/classes/setup/CSetupWizard.php:573
+#: include/classes/setup/CSetupWizard.php:723
+#: include/classes/setup/CSetupWizard.php:982
 msgid "Database TLS certificate file"
 msgstr "קובץ אישור ל־TLS של מסד הנתונים"
 
@@ -4725,19 +4725,19 @@ msgstr "קובץ אישור ל־TLS של מסד הנתונים"
 msgid "Database TLS certificate files must be read-only"
 msgstr "קובצי האישורים ל־TLS של מסד הנתונים חייבים להיות לקריאה בלבד"
 
-#: include/classes/setup/CSetupWizard.php:571
-#: include/classes/setup/CSetupWizard.php:721
+#: include/classes/setup/CSetupWizard.php:583
+#: include/classes/setup/CSetupWizard.php:733
 msgid "Database TLS cipher list"
 msgstr "רשימת צפנים ל־TLS של מסד הנתונים"
 
-#: include/classes/setup/CSetupWizard.php:534
-#: include/classes/setup/CSetupWizard.php:696
+#: include/classes/setup/CSetupWizard.php:546
+#: include/classes/setup/CSetupWizard.php:708
 msgid "Database TLS encryption"
 msgstr "הצפנת TLS של מסד הנתונים"
 
-#: include/classes/setup/CSetupWizard.php:556
-#: include/classes/setup/CSetupWizard.php:707
-#: include/classes/setup/CSetupWizard.php:944
+#: include/classes/setup/CSetupWizard.php:568
+#: include/classes/setup/CSetupWizard.php:719
+#: include/classes/setup/CSetupWizard.php:978
 msgid "Database TLS key file"
 msgstr "קובץ מפתח TLS של מסד הנתונים"
 
@@ -4749,12 +4749,12 @@ msgstr ""
 msgid "Database history tables use primary key"
 msgstr "טבלאות היסטוריה במסד הנתונים משתמשות במפתח עיקרי"
 
-#: include/classes/setup/CSetupWizard.php:472
+#: include/classes/setup/CSetupWizard.php:484
 msgid "Database host"
 msgstr "מארח מסד נתונים"
 
-#: include/classes/setup/CSetupWizard.php:566
-#: include/classes/setup/CSetupWizard.php:715
+#: include/classes/setup/CSetupWizard.php:578
+#: include/classes/setup/CSetupWizard.php:727
 msgid "Database host verification"
 msgstr "אימות מארח מסד נתונים"
 
@@ -4762,35 +4762,35 @@ msgstr "אימות מארח מסד נתונים"
 msgid "Database monitor"
 msgstr "מנטר מסד נתונים"
 
-#: include/classes/setup/CSetupWizard.php:482
-#: include/classes/setup/CSetupWizard.php:660 setup.php:45
+#: include/classes/setup/CSetupWizard.php:494
+#: include/classes/setup/CSetupWizard.php:672 setup.php:45
 msgid "Database name"
 msgstr "שם מסד הנתונים"
 
-#: include/classes/setup/CSetupWizard.php:668
+#: include/classes/setup/CSetupWizard.php:680
 msgid "Database password"
 msgstr "ססמת מסד הנתונים"
 
-#: include/classes/setup/CSetupWizard.php:476
-#: include/classes/setup/CSetupWizard.php:656 setup.php:44
+#: include/classes/setup/CSetupWizard.php:488
+#: include/classes/setup/CSetupWizard.php:668 setup.php:44
 msgid "Database port"
 msgstr "פתחת מסד הנתונים"
 
-#: include/classes/setup/CSetupWizard.php:486
-#: include/classes/setup/CSetupWizard.php:674
+#: include/classes/setup/CSetupWizard.php:498
+#: include/classes/setup/CSetupWizard.php:686
 msgid "Database schema"
 msgstr "סכמת מסד הנתונים"
 
-#: include/classes/setup/CSetupWizard.php:652
+#: include/classes/setup/CSetupWizard.php:664
 msgid "Database server"
 msgstr "שרת מסד הנתונים"
 
-#: include/classes/setup/CSetupWizard.php:465
-#: include/classes/setup/CSetupWizard.php:635
+#: include/classes/setup/CSetupWizard.php:477
+#: include/classes/setup/CSetupWizard.php:647
 msgid "Database type"
 msgstr "סוג מסד הנתונים"
 
-#: include/classes/setup/CSetupWizard.php:664
+#: include/classes/setup/CSetupWizard.php:676
 msgid "Database user"
 msgstr "שם המשתמש במסד הנתונים"
 
@@ -4906,7 +4906,7 @@ msgid "Default host inventory mode"
 msgstr "מצב מאגר כבררת מחדל למארחים"
 
 #: app/views/administration.gui.edit.php:70
-#: include/classes/setup/CSetupWizard.php:399
+#: include/classes/setup/CSetupWizard.php:411
 msgid "Default language"
 msgstr "שפת בררת המחדל"
 
@@ -4927,12 +4927,12 @@ msgid "Default page display period"
 msgstr "משך כבררת מחדל להצגת עמוד"
 
 #: app/views/administration.gui.edit.php:82
-#: include/classes/setup/CSetupWizard.php:614
+#: include/classes/setup/CSetupWizard.php:626
 msgid "Default theme"
 msgstr "ערכת בררת מחדל"
 
 #: app/views/administration.gui.edit.php:75
-#: include/classes/setup/CSetupWizard.php:607
+#: include/classes/setup/CSetupWizard.php:619
 msgid "Default time zone"
 msgstr "אזור זמן בררת המחדל"
 
@@ -5515,7 +5515,7 @@ msgstr "להשבית את תרחישי הרשת הנבחרים?"
 #: app/partials/configuration.filter.items.php:188
 #: app/partials/configuration.host.edit.html.php:358
 #: app/partials/monitoring.host.filter.php:129
-#: app/partials/monitoring.host.view.html.php:102
+#: app/partials/monitoring.host.view.html.php:117
 #: app/partials/scheduledreport.table.html.php:80
 #: app/views/administration.mediatype.list.php:57
 #: app/views/administration.mediatype.list.php:135
@@ -5774,7 +5774,7 @@ msgstr "סטטיסטיקת כתיבה לכונן. מחזירה מספר שלם �
 msgid "Display OK triggers for"
 msgstr "הצגת הקפצות תקינות עבור"
 
-#: app/partials/monitoring.latest.view.html.php:237
+#: app/partials/monitoring.latest.view.html.php:250
 msgid "Display graph"
 msgstr "הצגת תרשים"
 
@@ -5782,7 +5782,7 @@ msgstr "הצגת תרשים"
 msgid "Display problems"
 msgstr "הצגת תקלות"
 
-#: app/partials/monitoring.latest.view.html.php:236
+#: app/partials/monitoring.latest.view.html.php:249
 msgid "Display stacked graph"
 msgstr "הצגת תרשים מוערם"
 
@@ -5883,7 +5883,7 @@ msgstr "למטה"
 msgid "Download image"
 msgstr "הורדת תמונה"
 
-#: include/classes/setup/CSetupWizard.php:856
+#: include/classes/setup/CSetupWizard.php:882
 msgid "Download the configuration file"
 msgstr "הורדת קובץ ההגדרות"
 
@@ -6246,7 +6246,7 @@ msgstr "הפעלת לכידה"
 #: app/partials/configuration.filter.items.php:187
 #: app/partials/configuration.host.edit.html.php:279
 #: app/partials/monitoring.host.filter.php:128
-#: app/partials/monitoring.host.view.html.php:101
+#: app/partials/monitoring.host.view.html.php:116
 #: app/partials/scheduledreport.formgrid.html.php:201
 #: app/partials/scheduledreport.table.html.php:84
 #: app/views/administration.mediatype.edit.php:267
@@ -6688,7 +6688,7 @@ msgstr "שקר"
 msgid "FTP"
 msgstr "FTP"
 
-#: include/classes/setup/CSetupWizard.php:425
+#: include/classes/setup/CSetupWizard.php:437
 msgid "Fail"
 msgstr "כשל"
 
@@ -6934,7 +6934,7 @@ msgstr "חיפוש מחרוזת בקובץ. מחזירה שורה שמכילה �
 msgid "Find string on a web page. Returns the matched string, or as specified by the optional output parameter"
 msgstr "חיפוש מחרוזת באתר. מחזירה את המחרוזת שנמצאה או כפי שצוין על ידי פרמטר הפלט כרשות"
 
-#: include/classes/setup/CSetupWizard.php:334
+#: include/classes/setup/CSetupWizard.php:346
 msgid "Finish"
 msgstr "סיום"
 
@@ -7202,7 +7202,7 @@ msgid "Gradient line"
 msgstr "קו מדורג"
 
 #: app/controllers/CControllerAuditLogList.php:216
-#: app/partials/monitoring.latest.view.html.php:154
+#: app/partials/monitoring.latest.view.html.php:165
 #: app/views/monitoring.charts.view.php:55
 #: include/classes/macros/CMacrosResolverGeneral.php:1270
 #: include/classes/screens/CScreenProblem.php:1305
@@ -7346,9 +7346,9 @@ msgstr "תרשים בשם „%1$s” כבר קיים בתרשימים או בא�
 
 #: app/controllers/CControllerPopupGeneric.php:248
 #: app/controllers/CControllerPopupImportCompare.php:167
-#: app/partials/monitoring.host.view.html.php:37
-#: app/partials/monitoring.host.view.html.php:127
-#: app/partials/monitoring.host.view.html.php:135
+#: app/partials/monitoring.host.view.html.php:41
+#: app/partials/monitoring.host.view.html.php:131
+#: app/partials/monitoring.host.view.html.php:139
 #: app/views/configuration.host.list.php:186
 #: app/views/configuration.host.list.php:443
 #: app/views/monitoring.charts.view.php:38
@@ -7524,7 +7524,7 @@ msgstr "חומרה (פרטים מלאים)"
 msgid "Hardware sensor reading. Returns float"
 msgstr "קריאת חיישן חומרה. מחזירה שבר עשרוני"
 
-#: include/classes/setup/CSetupWizard.php:499
+#: include/classes/setup/CSetupWizard.php:511
 msgid "HashiCorp Vault"
 msgstr "Vault מבית HashiCorp"
 
@@ -7626,7 +7626,7 @@ msgstr "הדגשת שורה שלמה"
 
 #: app/partials/configuration.filter.items.php:152
 #: app/partials/monitoring.latest.view.html.php:52
-#: app/partials/monitoring.latest.view.html.php:154
+#: app/partials/monitoring.latest.view.html.php:165
 #: app/partials/monitoring.problem.filter.php:31
 #: app/views/administration.housekeeping.edit.php:121
 #: app/views/popup.acknowledge.edit.php:43 history.php:27
@@ -8483,7 +8483,7 @@ msgstr "פריט בלתי נגיש"
 msgid "Inaccessible item prototype"
 msgstr "אבטיפוס פריט בלתי נגיש"
 
-#: app/partials/monitoring.host.view.html.php:89
+#: app/partials/monitoring.host.view.html.php:105
 #: app/views/configuration.host.list.php:267
 #: include/classes/screens/CScreenProblem.php:386
 #: include/hostgroups.inc.php:293 include/triggers.inc.php:2027
@@ -8813,9 +8813,9 @@ msgstr "שם או ערך שגוי לשדה „%1$s” בביטוי where בטב�
 msgid "Incorrect fields for sysmap."
 msgstr "שדות שגויים למערכת המפות."
 
-#: include/classes/setup/CSetupWizard.php:940
-#: include/classes/setup/CSetupWizard.php:944
-#: include/classes/setup/CSetupWizard.php:948
+#: include/classes/setup/CSetupWizard.php:974
+#: include/classes/setup/CSetupWizard.php:978
+#: include/classes/setup/CSetupWizard.php:982
 #, c-format
 msgid "Incorrect file path for \"%1$s\": %2$s."
 msgstr "נתיב הקובץ של „%1$s” שגוי: %2$s."
@@ -9352,6 +9352,7 @@ msgstr "אינסוף"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:172
 #: app/partials/monitoring.latest.view.html.php:60
+#: app/partials/monitoring.latest.view.html.php:73
 #: app/partials/scheduledreport.table.html.php:45
 #: app/views/configuration.host.list.php:195
 #: app/views/monitoring.service.list.edit.php:61
@@ -9443,11 +9444,12 @@ msgid "Insert expression"
 msgstr "הוספת ביטוי"
 
 #: include/classes/setup/CSetupWizard.php:74
-#: include/classes/setup/CSetupWizard.php:877
+#: include/classes/setup/CSetupWizard.php:888
+#: include/classes/setup/CSetupWizard.php:911
 msgid "Install"
 msgstr "התקנה"
 
-#: setup.php:172
+#: setup.php:160
 msgid "Installation"
 msgstr "התקנה"
 
@@ -9459,7 +9461,7 @@ msgstr "שם המתקין"
 msgid "Integrations"
 msgstr "שילובים"
 
-#: app/partials/monitoring.host.view.html.php:30
+#: app/partials/monitoring.host.view.html.php:35
 #: app/views/administration.proxy.edit.php:76
 #: app/views/configuration.host.list.php:189 disc_prototypes.php:40
 #: host_discovery.php:47 include/classes/html/CHostAvailability.php:76
@@ -10549,9 +10551,9 @@ msgid "Last week graph"
 msgstr "תרשים השבוע שעבר"
 
 #: app/controllers/CControllerLatestView.php:189
-#: app/partials/monitoring.host.view.html.php:35
-#: app/partials/monitoring.host.view.html.php:105
-#: app/partials/monitoring.host.view.html.php:111
+#: app/partials/monitoring.host.view.html.php:39
+#: app/partials/monitoring.host.view.html.php:120
+#: app/partials/monitoring.host.view.html.php:126
 #: app/views/monitoring.latest.view.php:35 app/views/search.php:72
 #: app/views/search.php:78 app/views/search.php:231 app/views/search.php:237
 #: include/classes/helpers/CMenuHelper.php:52
@@ -10612,7 +10614,7 @@ msgstr "מקרא"
 msgid "Length"
 msgstr "אורך"
 
-#: setup.php:195
+#: setup.php:183
 msgid "Licensed under"
 msgstr "כפוף לרישיון"
 
@@ -11765,7 +11767,7 @@ msgstr "NTLM"
 #: app/partials/configuration.tags.tab.php:39
 #: app/partials/configuration.valuemap.php:29
 #: app/partials/monitoring.host.filter.php:78
-#: app/partials/monitoring.host.view.html.php:29
+#: app/partials/monitoring.host.view.html.php:34
 #: app/partials/monitoring.latest.view.html.php:41
 #: app/partials/monitoring.service.list.edit.php:41
 #: app/partials/monitoring.service.list.edit.php:49
@@ -12054,9 +12056,9 @@ msgstr "הקפצות חדשות"
 msgid "Next page"
 msgstr "העמוד הבא"
 
-#: include/classes/setup/CSetupWizard.php:331
-#: include/classes/setup/CSetupWizard.php:589
-#: include/classes/setup/CSetupWizard.php:741
+#: include/classes/setup/CSetupWizard.php:343
+#: include/classes/setup/CSetupWizard.php:601
+#: include/classes/setup/CSetupWizard.php:753
 msgid "Next step"
 msgstr "השלב הבא"
 
@@ -13665,7 +13667,7 @@ msgstr "פאסיבי"
 #: app/views/popup.massupdate.item.php:175
 #: app/views/popup.massupdate.item.php:199 disc_prototypes.php:218
 #: host_discovery.php:191 httpconf.php:74
-#: include/classes/setup/CSetupWizard.php:527
+#: include/classes/setup/CSetupWizard.php:539
 #: include/views/configuration.host.discovery.edit.php:413
 #: include/views/configuration.host.discovery.edit.php:554
 #: include/views/configuration.host.discovery.edit.php:593
@@ -13823,7 +13825,7 @@ msgid "Placing algorithm"
 msgstr "אלגוריתם הצבה"
 
 #: app/views/administration.mediatype.edit.php:208
-#: include/classes/setup/CSetupWizard.php:498
+#: include/classes/setup/CSetupWizard.php:510
 #: include/classes/widgets/CWidgetConfig.php:58
 msgid "Plain text"
 msgstr "טקסט פשוט"
@@ -13837,7 +13839,7 @@ msgstr "ניגון"
 msgid "Play sound"
 msgstr "ניגון צליל"
 
-#: include/classes/setup/CSetupWizard.php:741
+#: include/classes/setup/CSetupWizard.php:753
 #, c-format
 msgid "Please check configuration parameters. If all is correct, press \"%1$s\" button, or \"%2$s\" button to change configuration parameters."
 msgstr "נא לבדוק את משתני התצורה. אם כולם נכונים, יש ללחוץ על הכפתור „%1$s” או לחלופין על הכפתור „%2$s” כדי לשנות משתני תצורה."
@@ -13850,12 +13852,12 @@ msgstr "נא לאשר שברצונך להסיר את כל תסריטי המאק�
 msgid "Please confirm that you want to remove all value mappings."
 msgstr "נא לאשר שברצונך להסיר את כל מיפויי הערכים."
 
-#: include/classes/setup/CSetupWizard.php:589
+#: include/classes/setup/CSetupWizard.php:601
 #, c-format
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
 msgstr "נא ליצור מסד נתונים ידנית ולהגדיר את משתני התצורה לחיבור למסד הנתונים הזה. יש ללחוץ על הכפתור „%1$s” לאחר סיום הפעולה."
 
-#: include/classes/setup/CSetupWizard.php:177
+#: include/classes/setup/CSetupWizard.php:189
 msgid "Please enable \"allow_url_fopen\" directive."
 msgstr "נא להפעיל את ההנחיה „allow_url_fopen” (לאפשר פתיחת קישורים)."
 
@@ -13941,7 +13943,7 @@ msgid "Power value"
 msgstr "ערך חזקה"
 
 #: include/classes/setup/CSetupWizard.php:70
-#: include/classes/setup/CSetupWizard.php:739
+#: include/classes/setup/CSetupWizard.php:751
 msgid "Pre-installation summary"
 msgstr "תקציר טרום התקנה"
 
@@ -14146,10 +14148,7 @@ msgid "Problem update"
 msgstr "עדכון תקלה"
 
 #: app/controllers/CControllerProblemView.php:151
-#: app/partials/monitoring.host.view.html.php:33
-#: app/partials/monitoring.host.view.html.php:36
-#: app/partials/monitoring.host.view.html.php:115
-#: app/partials/monitoring.host.view.html.php:122
+#: app/partials/monitoring.host.view.html.php:40
 #: app/partials/monitoring.problem.filter.php:30
 #: app/views/monitoring.problem.view.php:94 app/views/search.php:83
 #: app/views/search.php:89 app/views/search.php:247 app/views/search.php:253
@@ -14840,7 +14839,7 @@ msgstr "הבקשה נשלחה בהצלחה"
 msgid "Request type"
 msgstr "סוג בקשה"
 
-#: include/classes/setup/CSetupWizard.php:409
+#: include/classes/setup/CSetupWizard.php:421
 #: include/views/configuration.httpconf.edit.php:205
 msgid "Required"
 msgstr "נדרש"
@@ -15406,7 +15405,7 @@ msgstr "שמירה בשם"
 msgid "Save changes"
 msgstr "שמירת השינויים"
 
-#: include/classes/setup/CSetupWizard.php:857
+#: include/classes/setup/CSetupWizard.php:883
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "שמירה בתור „%1$s“"
@@ -15968,7 +15967,7 @@ msgstr "הגדרת ההפניות ב־LDAP ל„כבוי” נכשלה."
 
 #: app/controllers/CControllerAuditLogList.php:238
 #: include/classes/setup/CSetupWizard.php:66
-#: include/classes/setup/CSetupWizard.php:624
+#: include/classes/setup/CSetupWizard.php:636
 msgid "Settings"
 msgstr "הגדרות"
 
@@ -16458,7 +16457,7 @@ msgstr "סטטיסטיקה וזמינות זיכרון מטמון הכתיבה �
 #: app/partials/administration.ha.nodes.php:28
 #: app/partials/configuration.filter.items.php:184
 #: app/partials/monitoring.host.filter.php:125
-#: app/partials/monitoring.host.view.html.php:34
+#: app/partials/monitoring.host.view.html.php:38
 #: app/partials/monitoring.service.list.edit.php:54
 #: app/partials/monitoring.service.list.php:51
 #: app/partials/scheduledreport.subscription.php:35
@@ -16627,12 +16626,12 @@ msgstr "נעצר"
 msgid "Storage period"
 msgstr "תקופת אחסון"
 
-#: include/classes/setup/CSetupWizard.php:496
+#: include/classes/setup/CSetupWizard.php:508
 msgid "Store credentials in"
 msgstr "אחסון פרטי הגישה תחת"
 
-#: include/classes/setup/CSetupWizard.php:642
-#: include/classes/setup/CSetupWizard.php:643
+#: include/classes/setup/CSetupWizard.php:654
+#: include/classes/setup/CSetupWizard.php:655
 msgid "Stored in HashiCorp Vault secret"
 msgstr "מאוחסן בסוד בכספת (Vault) מבית HashiCorp"
 
@@ -16877,7 +16876,7 @@ msgstr "ערך תגית"
 #: app/partials/configuration.filter.items.php:166
 #: app/partials/configuration.host.edit.html.php:524
 #: app/partials/monitoring.host.filter.php:133
-#: app/partials/monitoring.host.view.html.php:32
+#: app/partials/monitoring.host.view.html.php:37
 #: app/partials/monitoring.latest.view.html.php:58
 #: app/partials/monitoring.latest.view.html.php:71
 #: app/partials/monitoring.problem.filter.php:231
@@ -18412,7 +18411,7 @@ msgstr "בשימוש בפעולות"
 #: app/views/administration.user.edit.php:284
 #: app/views/reports.auditlog.list.php:90 httpconf.php:65
 #: include/actions.inc.php:1700 include/actions.inc.php:1754
-#: include/actions.inc.php:1976 include/classes/setup/CSetupWizard.php:522
+#: include/actions.inc.php:1976 include/classes/setup/CSetupWizard.php:534
 #: include/hosts.inc.php:61 include/users.inc.php:52
 #: include/views/configuration.httpconf.edit.php:165
 msgid "User"
@@ -18711,8 +18710,8 @@ msgstr "שם משתמש"
 msgid "Username and password"
 msgstr "שם משתמש וססמה"
 
-#: include/classes/setup/CSetupWizard.php:194
-#: include/classes/setup/CSetupWizard.php:774
+#: include/classes/setup/CSetupWizard.php:206
+#: include/classes/setup/CSetupWizard.php:800
 msgid "Username and password must be stored in Vault secret keys \"username\" and \"password\"."
 msgstr "יש לאחסן את שם המשתמש והססמה במפתחות הסודיים של הכספת „username” ו־„password” (שם משתמש וססמה)."
 
@@ -19165,18 +19164,18 @@ msgstr "משתנים"
 msgid "Various information about specific process(es). Returns float"
 msgstr "מידע מגוון על תהליך/ים מסוים/ים. מחזירה שבר עשרוני"
 
-#: include/classes/setup/CSetupWizard.php:502
-#: include/classes/setup/CSetupWizard.php:682
+#: include/classes/setup/CSetupWizard.php:514
+#: include/classes/setup/CSetupWizard.php:694
 msgid "Vault API endpoint"
 msgstr "נקודת הגישה ל־API של הכספת"
 
-#: include/classes/setup/CSetupWizard.php:515
-#: include/classes/setup/CSetupWizard.php:690
+#: include/classes/setup/CSetupWizard.php:527
+#: include/classes/setup/CSetupWizard.php:702
 msgid "Vault authentication token"
 msgstr "אסימון אימות כספת"
 
 #: include/classes/core/ZBase.php:231
-#: include/classes/setup/CSetupWizard.php:191 include/config.inc.php:53
+#: include/classes/setup/CSetupWizard.php:203 include/config.inc.php:53
 msgid "Vault connection failed."
 msgstr "החיבור לכספת נכשל."
 
@@ -19184,8 +19183,8 @@ msgstr "החיבור לכספת נכשל."
 msgid "Vault secret"
 msgstr "סוד לכספת"
 
-#: include/classes/setup/CSetupWizard.php:508
-#: include/classes/setup/CSetupWizard.php:686
+#: include/classes/setup/CSetupWizard.php:520
+#: include/classes/setup/CSetupWizard.php:698
 msgid "Vault secret path"
 msgstr "נתיב סודי לכספת"
 
@@ -19197,7 +19196,7 @@ msgstr "יצרן"
 msgid "Verbose"
 msgstr "מפורט"
 
-#: include/classes/setup/CSetupWizard.php:546
+#: include/classes/setup/CSetupWizard.php:558
 msgid "Verify database certificate"
 msgstr "אימות אישור מסד נתונים"
 
@@ -19283,7 +19282,7 @@ msgstr "ז"
 msgid "Warning"
 msgstr "אזהרה"
 
-#: include/classes/setup/CSetupWizard.php:421
+#: include/classes/setup/CSetupWizard.php:433
 msgctxt "setup"
 msgid "Warning"
 msgstr "אזהרה"
@@ -19301,9 +19300,9 @@ msgstr "אזהרה! גרסת שרת מסד נתונים %1$s אינה נתמכת
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr "אנו מתנצלים, כמות הרכיבים המרבית האפשרית נוצלה."
 
-#: app/partials/monitoring.host.view.html.php:39
-#: app/partials/monitoring.host.view.html.php:148
-#: app/partials/monitoring.host.view.html.php:156
+#: app/partials/monitoring.host.view.html.php:43
+#: app/partials/monitoring.host.view.html.php:152
+#: app/partials/monitoring.host.view.html.php:160
 #: app/views/configuration.host.list.php:188
 #: app/views/configuration.host.list.php:461 app/views/search.php:110
 #: app/views/search.php:116 app/views/search.php:158 app/views/search.php:163
@@ -19405,7 +19404,7 @@ msgstr "משקל"
 msgid "Welcome"
 msgstr "ברוך בואך"
 
-#: include/classes/setup/CSetupWizard.php:353
+#: include/classes/setup/CSetupWizard.php:365
 msgid "Welcome to"
 msgstr "ברוך בואך אל"
 
@@ -19719,7 +19718,7 @@ msgstr "נכנסת בשם „%1$s“."
 
 #: app/views/administration.gui.edit.php:66
 #: app/views/administration.user.edit.php:233
-#: include/classes/setup/CSetupWizard.php:391
+#: include/classes/setup/CSetupWizard.php:403
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "אין לך אפשרות לבחור בחלק מהשפות כיוון שההגדרות עבורן אינן מותקנות בשרת."
 
@@ -19830,8 +19829,8 @@ msgstr "שרת ה־Zabbix אינו פעיל: יכול להיות שהמידע ה
 msgid "Zabbix server is running"
 msgstr "שרת ה־Zabbix פעיל"
 
-#: include/classes/setup/CSetupWizard.php:602
-#: include/classes/setup/CSetupWizard.php:733
+#: include/classes/setup/CSetupWizard.php:614
+#: include/classes/setup/CSetupWizard.php:745
 msgid "Zabbix server name"
 msgstr "שם שרת ה־Zabbix"
 
@@ -20457,7 +20456,7 @@ msgstr "ימים"
 #: app/controllers/CControllerMapView.php:123
 #: app/partials/js/configuration.valuemap.js.php:156
 #: app/views/popup.generic.php:600 app/views/popup.valuemap.edit.php:83
-#: include/classes/setup/CSetupWizard.php:639
+#: include/classes/setup/CSetupWizard.php:651
 #: include/classes/widgets/CWidgetHelper.php:69
 msgid "default"
 msgstr "בררת מחדל"
@@ -21273,7 +21272,7 @@ msgstr "אחר"
 msgid "output"
 msgstr "פלט"
 
-#: include/classes/setup/CSetupWizard.php:510
+#: include/classes/setup/CSetupWizard.php:522
 msgid "path/to/secret"
 msgstr "נתיב/אל/סוד"
 

@@ -346,7 +346,6 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto out;
 	}
 
-
 	for (i = 0; i < mount_paths.values_num; i++)
 	{
 		get_fs_data(mount_paths.values[i], &fsname, &fstype, &fslabel, &fsdrivetype);

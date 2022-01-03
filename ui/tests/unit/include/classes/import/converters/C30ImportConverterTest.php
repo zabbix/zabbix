@@ -19,8 +19,6 @@
 **/
 
 
-use PHPUnit\Framework\TestCase;
-
 class C30ImportConverterTest extends CImportConverterTest {
 
 	public function dataProviderConvert() {

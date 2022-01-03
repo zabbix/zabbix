@@ -574,14 +574,13 @@ class CControllerMenuPopup extends CController {
 		$db_triggers = API::Trigger()->get([
 			'output' => ['expression', 'url', 'comments', 'manual_close'],
 			'selectHosts' => ['hostid', 'name', 'status'],
-			'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
+			'selectItems' => ['itemid', 'hostid', 'name', 'value_type'],
 			'triggerids' => $data['triggerid'],
 			'preservekeys' => true
 		]);
 
 		if ($db_triggers) {
 			$db_trigger = reset($db_triggers);
-			$db_trigger['items'] = CMacrosResolverHelper::resolveItemNames($db_trigger['items']);
 
 			if (array_key_exists('eventid', $data)) {
 				$db_trigger['eventid'] = $data['eventid'];
@@ -614,8 +613,8 @@ class CControllerMenuPopup extends CController {
 			foreach ($db_trigger['items'] as $item) {
 				$items[] = [
 					'name' => $with_hostname
-						? $item['hostname'].NAME_DELIMITER.$item['name_expanded']
-						: $item['name_expanded'],
+						? $item['hostname'].NAME_DELIMITER.$item['name']
+						: $item['name'],
 					'params' => [
 						'itemid' => $item['itemid'],
 						'action' => in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])

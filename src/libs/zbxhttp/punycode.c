@@ -366,4 +366,3 @@ int	zbx_http_punycode_encode_url(char **url)
 
 	return SUCCEED;
 }
-

@@ -2318,8 +2318,6 @@ static void	item_parents_sql_alloc(char **sql, size_t *sql_alloc, zbx_vector_uin
 			objectids_tmp->values, objectids_tmp->values_num);
 }
 
-
-
 /******************************************************************************
  *                                                                            *
  * Function: check_intern_host_template_condition                             *
@@ -2565,7 +2563,6 @@ static void	check_internal_condition(const zbx_vector_ptr_t *esc_events, zbx_con
 		zabbix_log(LOG_LEVEL_ERR, "unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
 				(int)condition->op, condition->conditionid);
 	}
-
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 }

@@ -228,7 +228,6 @@ typedef struct
 }
 zbx_lld_trigger_node_iter_t;
 
-
 static void	lld_tag_free(zbx_lld_tag_t *tag)
 {
 	zbx_free(tag->tag);

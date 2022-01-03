@@ -109,5 +109,3 @@ void	zbx_preproc_cache_clear(zbx_preproc_cache_t *cache)
 
 	zbx_vector_ppcache_destroy(&cache->refs);
 }
-
-
