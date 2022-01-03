@@ -439,10 +439,13 @@ int	rtc_process_request_ex(int code, const unsigned char *data, char **result)
 		case ZBX_RTC_LOG_LEVEL_DECREASE:
 			return rtc_process_loglevel(-1, (const char *)data, result);
 		case ZBX_RTC_CONFIG_CACHE_RELOAD:
-		case ZBX_RTC_SERVICE_CACHE_RELOAD:
 			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_SERVICEMAN, 1,
 					ZBX_RTC_MAKE_MESSAGE(ZBX_RTC_SERVICE_CACHE_RELOAD, 0, 0), result);
 			return FAIL;
+		case ZBX_RTC_SERVICE_CACHE_RELOAD:
+			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_SERVICEMAN, 1,
+					ZBX_RTC_MAKE_MESSAGE(ZBX_RTC_SERVICE_CACHE_RELOAD, 0, 0), result);
+			return SUCCEED;
 		case ZBX_RTC_SECRETS_RELOAD:
 			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_CONFSYNCER, 1, ZBX_RTC_MAKE_MESSAGE(code, 0, 0),
 					result);
