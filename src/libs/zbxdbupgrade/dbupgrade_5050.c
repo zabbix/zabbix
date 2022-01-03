@@ -1634,10 +1634,7 @@ static int	DBpatch_5050127(void)
 	result = DBselect("select default_timezone from config");
 	if (NULL != (row = DBfetch(result)))
 	{
-		if (0 == strcmp(row[0], "system"))
-			default_timezone = zbx_strdup(NULL, "UTC");
-		else
-			default_timezone = zbx_strdup(NULL, row[0]);
+		default_timezone = zbx_strdup(NULL, row[0]);
 	}
 	else
 	{

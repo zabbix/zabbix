@@ -60,7 +60,7 @@ class CSla extends CApiService {
 				'period' =>						['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [ZBX_SLA_PERIOD_DAILY, ZBX_SLA_PERIOD_WEEKLY, ZBX_SLA_PERIOD_MONTHLY, ZBX_SLA_PERIOD_QUARTERLY, ZBX_SLA_PERIOD_ANNUALLY])],
 				'slo' =>						['type' => API_FLOATS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => '0:100'],
 				'effective_date' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => '0:'.ZBX_MAX_DATE],
-				'timezone' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', array_keys(CTimezoneHelper::getList()))],
+				'timezone' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' =>  array_merge([ZBX_DEFAULT_TIMEZONE], array_keys(CTimezoneHelper::getList()))],
 				'status' =>						['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [ZBX_SLA_STATUS_DISABLED, ZBX_SLA_STATUS_ENABLED])]
 			]],
 			'search' =>						['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
@@ -172,7 +172,7 @@ class CSla extends CApiService {
 			'period' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_SLA_PERIOD_DAILY, ZBX_SLA_PERIOD_WEEKLY, ZBX_SLA_PERIOD_MONTHLY, ZBX_SLA_PERIOD_QUARTERLY, ZBX_SLA_PERIOD_ANNUALLY])],
 			'slo' =>				['type' => API_FLOAT, 'flags' => API_REQUIRED, 'in' => '0:100'],
 			'effective_date' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:'.ZBX_MAX_DATE],
-			'timezone' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', array_keys(CTimezoneHelper::getList())), 'length' => DB::getFieldLength('sla', 'timezone')],
+			'timezone' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', array_merge([ZBX_DEFAULT_TIMEZONE], array_keys(CTimezoneHelper::getList()))), 'length' => DB::getFieldLength('sla', 'timezone')],
 			'status' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_SLA_STATUS_DISABLED, ZBX_SLA_STATUS_ENABLED])],
 			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sla', 'description')],
 			'service_tags' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['tag', 'value']], 'fields' => [
@@ -250,7 +250,7 @@ class CSla extends CApiService {
 			'period' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_SLA_PERIOD_DAILY, ZBX_SLA_PERIOD_WEEKLY, ZBX_SLA_PERIOD_MONTHLY, ZBX_SLA_PERIOD_QUARTERLY, ZBX_SLA_PERIOD_ANNUALLY])],
 			'slo' =>				['type' => API_FLOAT, 'in' => '0:100'],
 			'effective_date' =>		['type' => API_INT32, 'in' => '0:'.ZBX_MAX_DATE],
-			'timezone' =>			['type' => API_STRING_UTF8, 'in' => implode(',', array_keys(CTimezoneHelper::getList())), 'length' => DB::getFieldLength('sla', 'timezone')],
+			'timezone' =>			['type' => API_STRING_UTF8, 'in' => implode(',', array_merge([ZBX_DEFAULT_TIMEZONE], array_keys(CTimezoneHelper::getList()))), 'length' => DB::getFieldLength('sla', 'timezone')],
 			'status' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_SLA_STATUS_DISABLED, ZBX_SLA_STATUS_ENABLED])],
 			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sla', 'description')],
 			'service_tags' =>		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['tag', 'value']], 'fields' => [
@@ -1126,7 +1126,10 @@ class CSla extends CApiService {
 			ZBX_SLA_PERIOD_ANNUALLY => 'P1Y'
 		][$sla['period']]);
 
-		$timezone = new DateTimeZone($sla['timezone']);
+		$timezone = new DateTimeZone($sla['timezone'] !== ZBX_DEFAULT_TIMEZONE
+			? $sla['timezone']
+			: CTimezoneHelper::getSystemTimezone()
+		);
 
 		$effective_min = (new DateTime('@'.$sla['effective_date']))->setTimezone($timezone);
 		self::alignDateToPeriodStart($effective_min, (int) $sla['period']);
@@ -1442,7 +1445,10 @@ class CSla extends CApiService {
 
 		$week_offset = $reporting_period['period_from'] -
 			(new DateTime('@'.$reporting_period['period_from']))
-				->setTimezone(new DateTimeZone($db_sla['timezone']))
+				->setTimezone(new DateTimeZone($db_sla['timezone'] !== ZBX_DEFAULT_TIMEZONE
+					? $db_sla['timezone']
+					: CTimezoneHelper::getSystemTimezone()
+				))
 				->modify('1 day')
 				->modify('last Monday')
 				->getTimestamp();

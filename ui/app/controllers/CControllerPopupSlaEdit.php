@@ -116,22 +116,16 @@ class CControllerPopupSlaEdit extends CController {
 			];
 		}
 		else {
-			$timezone = CWebUser::$data['timezone'];
-
-			if ($timezone === ZBX_DEFAULT_TIMEZONE) {
-				$timezone = CTimezoneHelper::getSystemTimezone();
-			}
-
 			$data = [
 				'slaid' => null,
 				'form' => [
 					'name' => $defaults['name'],
 					'slo' => '',
 					'period' => ZBX_SLA_PERIOD_WEEKLY,
-					'timezone' => $timezone,
+					'timezone' => ZBX_DEFAULT_TIMEZONE,
 					'schedule_mode' => CSlaHelper::SCHEDULE_MODE_24X7,
 					'schedule_periods' => [0 => ''] + array_fill(1, 5, '8:00-17:00') + [6 => ''],
-					'effective_date' => zbx_date2str(DATE_FORMAT, null, $timezone),
+					'effective_date' => zbx_date2str(DATE_FORMAT, null, CTimezoneHelper::getSystemTimezone()),
 					'service_tags' => [
 						['tag' => '', 'operator' => ZBX_SLA_SERVICE_TAG_OPERATOR_EQUAL, 'value' => '']
 					],

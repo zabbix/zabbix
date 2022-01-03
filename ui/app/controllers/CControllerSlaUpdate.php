@@ -41,7 +41,7 @@ class CControllerSlaUpdate extends CControllerSlaCreateUpdate {
 			'name' =>				'required|string|not_empty',
 			'slo' =>				'required|string|not_empty',
 			'period' =>				'required|in '.implode(',', [ZBX_SLA_PERIOD_DAILY, ZBX_SLA_PERIOD_WEEKLY, ZBX_SLA_PERIOD_MONTHLY, ZBX_SLA_PERIOD_QUARTERLY, ZBX_SLA_PERIOD_ANNUALLY]),
-			'timezone' =>			'required|in '.implode(',', array_keys(CTimezoneHelper::getList())),
+			'timezone' =>			'required|in '.implode(',', array_merge([ZBX_DEFAULT_TIMEZONE], array_keys(CTimezoneHelper::getList()))),
 			'schedule_mode' =>		'required|in '.implode(',', [CSlaHelper::SCHEDULE_MODE_24X7, CSlaHelper::SCHEDULE_MODE_CUSTOM]),
 			'schedule_enabled' =>	'array',
 			'schedule_periods' =>	'array',

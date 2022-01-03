@@ -112,7 +112,6 @@ class CControllerSlaList extends CController {
 				CRoleHelper::ACTIONS_MANAGE_SLA => $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SLA),
 				CRoleHelper::UI_SERVICES_SLA_REPORT => $this->checkAccess(CRoleHelper::UI_SERVICES_SLA_REPORT)
 			],
-
 			'filter' => $filter,
 			'active_tab' => CProfile::get('web.sla.list.filter.active', 1),
 			'sort' => $sort_field,

@@ -143,7 +143,9 @@ foreach ($data['slas'] as $slaid => $sla) {
 		CSlaHelper::getSloTag((float) $sla['slo']),
 		zbx_date2str(DATE_FORMAT, $sla['effective_date'], 'UTC'),
 		CSlaHelper::getPeriodNames()[$sla['period']],
-		$sla['timezone'],
+		$sla['timezone'] !== ZBX_DEFAULT_TIMEZONE
+			? $sla['timezone']
+			: CTimezoneHelper::getTitle(CTimezoneHelper::getSystemTimezone(), _('System default')),
 		CSlaHelper::getScheduleTag($sla['schedule']),
 		$sla_report_tag,
 		$status_tag

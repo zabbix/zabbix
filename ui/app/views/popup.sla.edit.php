@@ -86,7 +86,11 @@ $sla_tab = (new CFormGrid())
 				->setId('timezone')
 				->setFocusableElementId('timezone-focusable')
 				->setValue($data['form']['timezone'])
-				->addOptions(CSelect::createOptionsFromArray(CTimezoneHelper::getList()))
+				->addOptions(CSelect::createOptionsFromArray([
+					ZBX_DEFAULT_TIMEZONE => CTimezoneHelper::getTitle(CTimezoneHelper::getSystemTimezone(),
+						_('System default')
+					)
+				] + CTimezoneHelper::getList()))
 		)
 	])
 	->addItem([
