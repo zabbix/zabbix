@@ -152,9 +152,8 @@ func PdhGetFormattedCounterValueDoubleHelper(counter PDH_HCOUNTER, retry bool) (
 				log.Debugf("Detected performance counter with negative denominator, retrying in 1 second")
 				time.Sleep(time.Second)
 				return PdhGetFormattedCounterValueDoubleHelper(counter, false)
-			} else {
-				log.Warningf("Detected performance counter with negative denominator the second time after retry, giving up...")
 			}
+			log.Warningf("Detected performance counter with negative denominator the second time after retry, giving up...")
 		} else if ret == PDH_INVALID_DATA || ret == PDH_CSTATUS_INVALID_DATA {
 			return nil, nil
 		}
@@ -174,12 +173,11 @@ func PdhGetFormattedCounterValueInt64Helper(counter PDH_HCOUNTER, retry bool) (v
 	if syscall.Errno(ret) != windows.ERROR_SUCCESS {
 		if ret == PDH_CALC_NEGATIVE_DENOMINATOR {
 			if retry {
-				log.Warningf("Detected performance counter with negative denominator, retrying in 1 second")
+				log.Debugf("Detected performance counter with negative denominator, retrying in 1 second")
 				time.Sleep(time.Second)
 				return PdhGetFormattedCounterValueInt64Helper(counter, false)
-			} else {
-				log.Warningf("Detected performance counter with negative denominator the second time after retry, giving up...")
 			}
+			log.Warningf("Detected performance counter with negative denominator the second time after retry, giving up...")
 		} else if ret == PDH_INVALID_DATA || ret == PDH_CSTATUS_INVALID_DATA {
 			return nil, nil
 		}
