@@ -32,7 +32,9 @@ function error($error) {
 	return true;
 }
 
-class class_CDescription extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class class_CDescription extends TestCase {
 
 	public static function setUpBeforeClass() {
 		$app = new App();
