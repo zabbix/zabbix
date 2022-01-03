@@ -119,10 +119,11 @@ out:
  * Parameters: ctx - [IN] pointer to duk_context                              *
  *                                                                            *
  * Comments: Throws an error:                                                 *
- *               - if the top value at ctx value stack is not a uint          *
- *               - if the value stack is empty                                *
- *               - if the expected sleep duration is longer than time left    *
- *                 for JS execution before timeout occurs                     *
+ *               - if the top value at ctx value stack cannot be converted to *
+ *                 unsigned integer                                           *
+ *               - if the sleep duration is 0 or longer than timeout          *
+ *               - if the sleep duration is longer than time left for JS      *
+ *                 execution before timeout occurs                            *
  *                                                                            *
  ******************************************************************************/
 static duk_ret_t	es_zabbix_sleep(duk_context *ctx)
@@ -131,55 +132,44 @@ static duk_ret_t	es_zabbix_sleep(duk_context *ctx)
 	duk_memory_functions	out_funcs;
 	struct timespec		ts_sleep;
 	zbx_uint64_t		timeout, duration;
-	unsigned int		sleep_ms, ret_fail = 0;
-	duk_idx_t		err_idx;
+	unsigned int		sleep_ms;
+	duk_idx_t		err_idx = -1;
 
-	sleep_ms = duk_require_uint(ctx, 0);
+	sleep_ms = duk_to_uint(ctx, 0);
+
+	if (0 == sleep_ms)
+		return duk_error(ctx, DUK_ERR_EVAL_ERROR, "invalid Zabbix.sleep() duration");
+
 	duk_get_memory_functions(ctx, &out_funcs);
 	env = (zbx_es_env_t *)out_funcs.udata;
-
 	timeout = (unsigned int)env->timeout * 1000;
-	duration = zbx_get_duration_ms(&env->start_time);
 
 	if (sleep_ms > timeout)
 	{
-		ret_fail = 1;
-		err_idx = duk_push_error_object(ctx, DUK_RET_ERROR,
-				"Zabbix.sleep(%d) duration is longer than JS execution timeout(%d)", sleep_ms, timeout);
-		goto out;
+		return duk_error(ctx, DUK_ERR_EVAL_ERROR,
+				"Zabbix.sleep(%u) duration is longer than JS execution timeout(" ZBX_FS_UI64 ")",
+				sleep_ms, timeout);
 	}
 
+	duration = zbx_get_duration_ms(&env->start_time);
+
 	if (timeout < duration)
-	{
-		ret_fail = 1;
-		err_idx = duk_push_error_object(ctx, DUK_RET_ERROR, "execution timeout");
-		goto out;
-	}
+		return duk_error(ctx, DUK_ERR_RANGE_ERROR, "execution timeout");
 
 	timeout -= duration;
 
 	if (sleep_ms > timeout)
 	{
-		ret_fail = 1;
-		err_idx = duk_push_error_object(ctx, DUK_RET_ERROR, "execution timeout");
+		err_idx = duk_push_error_object(ctx, DUK_ERR_RANGE_ERROR, "execution timeout");
 		sleep_ms = timeout;
 	}
 
 	ts_sleep.tv_sec = sleep_ms / 1000;
 	ts_sleep.tv_nsec = sleep_ms % 1000 * 1000000;
-
 	nanosleep(&ts_sleep, NULL);
-out:
-	if (1 == ret_fail)
-	{
-		if (-1 == err_idx)
-		{
-			zabbix_log(LOG_LEVEL_ERR, "es_zabbix_sleep(): failed to set timeout error");
-			return -1;
-		}
-		else
-			return duk_throw(ctx);
-	}
+
+	if (-1 != err_idx)
+		return duk_throw(ctx);
 
 	return 0;
 }
