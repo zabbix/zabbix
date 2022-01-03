@@ -202,86 +202,6 @@ static int	get_problem_update_actions(const DB_ACKNOWLEDGE *ack, int actions, ch
 
 /******************************************************************************
  *                                                                            *
- * Function: item_description                                                 *
- *                                                                            *
- * Purpose: substitute key parameters and user macros in                      *
- *          the item description string with real values                      *
- *                                                                            *
- ******************************************************************************/
-static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
-{
-	AGENT_REQUEST	request;
-	char		c, *p, *m, *n, *str_out = NULL, *replace_to = NULL;
-	int		macro_r, context_l, context_r, warning = 0;
-
-	init_request(&request);
-
-	if (SUCCEED != parse_item_key(key, &request))
-		goto out;
-
-	p = *data;
-
-	while (NULL != (m = strchr(p, '$')))
-	{
-		if (m > p && '{' == *(m - 1) && FAIL != zbx_user_macro_parse(m - 1, &macro_r, &context_l, &context_r,
-				NULL))
-		{
-			/* user macros */
-
-			n = m + macro_r;
-			c = *n;
-			*n = '\0';
-			DCget_user_macro(&hostid, 1, m - 1, &replace_to);
-
-			if (NULL != replace_to)
-			{
-				*(m - 1) = '\0';
-				str_out = zbx_strdcat(str_out, p);
-				*(m - 1) = '{';
-
-				str_out = zbx_strdcat(str_out, replace_to);
-				zbx_free(replace_to);
-			}
-			else
-				str_out = zbx_strdcat(str_out, p);
-
-			*n = c;
-			p = n;
-		}
-		else
-		{
-			if (0 == warning && '1' <= *(m + 1) && *(m + 1) <= '9')
-			{
-				/* macros $1, $2, ... */
-				zabbix_log(LOG_LEVEL_WARNING, "Use of positional macros ($1,$2... $9 - referring to the"
-						" first, second... ninth parameter of the item key '%s') is "
-						"no longer supported", key);
-
-				warning = 1;
-			}
-
-			/* just a dollar sign */
-
-			c = *++m;
-			*m = '\0';
-			str_out = zbx_strdcat(str_out, p);
-			*m = c;
-			p = m;
-		}
-	}
-
-	if (NULL != str_out)
-	{
-		str_out = zbx_strdcat(str_out, p);
-		zbx_free(*data);
-		*data = str_out;
-	}
-out:
-	free_request(&request);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: DBget_host_value                                                 *
  *                                                                            *
  * Purpose: request host name by hostid                                       *
@@ -618,34 +538,21 @@ static int	get_host_value(zbx_uint64_t itemid, char **replace_to, int request)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_substitute_item_name_macros                                  *
+ * Function: zbx_substitute_macros_in_item_key                                *
  *                                                                            *
- * Purpose: substitute key macros and use it to substitute item name macros   *
- *          if item name is specified                                         *
+ * Purpose: get item key, replace macros in the key                           *
  *                                                                            *
  * Parameters: dc_item    - [IN] item information used in substitution        *
- *             name       - [IN] optional item name to substitute             *
- *             replace_to - [OUT] expanded item name or key if name is absent *
+ *             replace_to - [OUT] string with item key with replaced macros   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_substitute_item_name_macros(DC_ITEM *dc_item, const char *name, char **replace_to)
+static void	zbx_substitute_macros_in_item_key(DC_ITEM *dc_item, char **replace_to)
 {
-	char	*key;
+	char	*key = zbx_strdup(NULL, dc_item->key_orig);
 
-	key = zbx_strdup(NULL, dc_item->key_orig);
 	substitute_key_macros_impl(&key, NULL, dc_item, NULL, NULL, MACRO_TYPE_ITEM_KEY, NULL, 0);
-
-	if (NULL != name)
-	{
-		*replace_to = zbx_strdup(*replace_to, name);
-		item_description(replace_to, key, dc_item->host.hostid);
-		zbx_free(key);
-	}
-	else	/* ZBX_REQUEST_ITEM_KEY */
-	{
-		zbx_free(*replace_to);
-		*replace_to = key;
-	}
+	zbx_free(*replace_to);
+	*replace_to = key;
 }
 
 /******************************************************************************
@@ -701,22 +608,15 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_ITEM_NAME:
-				DCconfig_get_items_by_itemids(&dc_item, &itemid, &errcode, 1);
-
-				if (SUCCEED == errcode)
-				{
-					zbx_substitute_item_name_macros(&dc_item, row[3], replace_to);
-					ret = SUCCEED;
-				}
-
-				DCconfig_clean_items(&dc_item, &errcode, 1);
+				*replace_to = zbx_strdup(*replace_to, row[3]);
+				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_ITEM_KEY:
 				DCconfig_get_items_by_itemids(&dc_item, &itemid, &errcode, 1);
 
 				if (SUCCEED == errcode)
 				{
-					zbx_substitute_item_name_macros(&dc_item, NULL, replace_to);
+					zbx_substitute_macros_in_item_key(&dc_item, replace_to);
 					ret = SUCCEED;
 				}
 

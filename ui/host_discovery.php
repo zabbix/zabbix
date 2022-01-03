@@ -954,7 +954,6 @@ else {
 	}
 
 	$data['discoveries'] = API::DiscoveryRule()->get($options);
-	$data['discoveries'] = CMacrosResolverHelper::resolveItemNames($data['discoveries']);
 
 	switch ($sort_field) {
 		case 'delay':

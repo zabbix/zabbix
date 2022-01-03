@@ -1100,7 +1100,7 @@ static void	db_get_items_info_by_itemid(zbx_hashset_t *items_info, const zbx_vec
 			continue;
 		}
 
-		zbx_substitute_item_name_macros(item_info->item, row[1], &item_info->name);
+		item_info->name = zbx_strdup(item_info->name, row[1]);
 	}
 	DBfree_result(result);
 
