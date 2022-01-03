@@ -150,7 +150,7 @@ $expression_row = [
 	(new CButton('insert', ($data['expression_constructor'] == IM_TREE) ? _('Edit') : _('Add')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->onClick(
-			'return PopUp("popup.triggerexpr", "modal-popup ", jQuery.extend('.json_encode($popup_options).',
+			'return PopUp("popup.triggerexpr", jQuery.extend('.json_encode($popup_options).',
 					{expression: jQuery(\'[name="'.$data['expression_field_name'].'"]\').val()}
 				), {dialogue_class: "modal-popup-generic"}
 			);'
