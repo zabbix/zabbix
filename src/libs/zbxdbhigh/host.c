@@ -1115,7 +1115,6 @@ out:
  *                                                                            *
  * Parameters: itemids - [IN] item identifiers from database                  *
  *                                                                            *
- *                                                                            *
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
@@ -1415,7 +1414,6 @@ out:
  *                                                                            *
  * Parameters: httptestids - [IN] array of httptest id's from database        *
  *                                                                            *
- *                                                                            *
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
@@ -1633,7 +1631,6 @@ clean:
  * Parameters: hostid      - [IN] host identifier from database               *
  *             templateids - [IN] array of template IDs                       *
  *                                                                            *
- *                                                                            *
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
@@ -1676,7 +1673,6 @@ static void	DBdelete_template_graphs(zbx_uint64_t hostid, const zbx_vector_uint6
  *                                                                            *
  * Parameters: hostid      - [IN] host identifier from database               *
  *             templateids - [IN] array of template IDs                       *
- *                                                                            *
  *                                                                            *
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
@@ -1808,7 +1804,6 @@ clean:
  *                                                                            *
  * Parameters: hostid      - [IN] host identifier from database               *
  *             templateids - [IN/OUT] array of template IDs                   *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 static void	get_templates_by_hostid(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)

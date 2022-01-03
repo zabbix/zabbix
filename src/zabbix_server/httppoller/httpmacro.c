@@ -41,7 +41,6 @@
  *                0 - the macro names are equal                               *
  *               >0 - the first macro name is 'greater' than second           *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 static int 	httpmacro_cmp_func(const void *d1, const void *d2)
 {

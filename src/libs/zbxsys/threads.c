@@ -51,7 +51,6 @@ void CALLBACK	ZBXEndThread(ULONG_PTR dwParam)
  *                                                                            *
  * Return value: same as system fork() function                               *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 int	zbx_fork(void)
 {
@@ -109,7 +108,6 @@ void	zbx_child_fork(pid_t *pid)
  *             thread_args - [IN] arguments for thread function               *
  *             thread      - [OUT] handle to a newly created thread           *
  *                                                                            *
- *                                                                            *
  * Comments: The zbx_thread_exit must be called from the handler!             *
  *                                                                            *
  ******************************************************************************/
@@ -154,7 +152,6 @@ void	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread_args_t *thre
  * Parameters: "thread" handle                                                *
  *                                                                            *
  * Return value: process or thread exit code                                  *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 int	zbx_thread_wait(ZBX_THREAD_HANDLE thread)
@@ -250,7 +247,6 @@ static void	threads_kill(ZBX_THREAD_HANDLE *threads, int threads_num, const int 
  * Purpose: Waits until the "threads" are in the signalled state              *
  *                                                                            *
  * Parameters: "threads" handles                                              *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 void	zbx_threads_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int threads_num, int ret)

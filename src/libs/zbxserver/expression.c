@@ -873,7 +873,6 @@ static int	DBget_trigger_event_count(zbx_uint64_t triggerid, char **replace_to, 
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
  *                                                                            *
- *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
@@ -970,7 +969,6 @@ static int	DBget_dchecks_value_by_event(const DB_EVENT *event, char **replace_to
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
- *                                                                            *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1401,7 +1399,6 @@ static void	get_escalation_history(zbx_uint64_t actionid, const DB_EVENT *event,
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
@@ -1480,7 +1477,6 @@ static void	get_event_update_history(const DB_EVENT *event, char **replace_to, c
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
- *                                                                            *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -2828,7 +2824,6 @@ static int	resolve_host_target_macros(const char *m, const DC_HOST *dc_host, DC_
  * Function: substitute_simple_macros_impl                                    *
  *                                                                            *
  * Purpose: substitute simple macros in data string with real values          *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_EVENT *event,

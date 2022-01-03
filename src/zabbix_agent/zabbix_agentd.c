@@ -653,7 +653,6 @@ static void	zbx_validate_config_hostnames(zbx_vector_str_t *hostnames)
  *                                                                            *
  * Purpose: validate configuration parameters                                 *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 static void	zbx_validate_config(ZBX_TASK_EX *task)
 {
@@ -1008,7 +1007,6 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
  * Function: zbx_free_config                                                  *
  *                                                                            *
  * Purpose: free configuration memory                                         *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_free_config(void)

@@ -45,7 +45,6 @@ static const char	help_message_footer[] =
  * Purpose: print version and compilation time of application on stdout       *
  *          by application request with parameter '-V'                        *
  *                                                                            *
- *                                                                            *
  * Comments:  title_message - is global variable which must be initialized    *
  *                            in each zabbix application                      *
  *                                                                            *
@@ -125,7 +124,6 @@ void	usage(void)
  * Purpose: print help of application parameters on stdout by application     *
  *          request with parameter '-h'                                       *
  *                                                                            *
- *                                                                            *
  * Comments:  help_message - is global variable which must be initialized     *
  *                            in each zabbix application                      *
  *                                                                            *
@@ -182,7 +180,6 @@ void	zbx_error(const char *fmt, ...)
  *             fmt - format                                                   *
  *                                                                            *
  * Return value:                                                              *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 size_t	zbx_snprintf(char *str, size_t count, const char *fmt, ...)
@@ -529,7 +526,6 @@ void	del_zeros(char *s)
  *                                                                            *
  * Return value: number of trimmed characters                                 *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 int	zbx_rtrim(char *str, const char *charlist)
 {
@@ -558,7 +554,6 @@ int	zbx_rtrim(char *str, const char *charlist)
  *             charlist - null terminated list of characters                  *
  *                                                                            *
  * Return value:                                                              *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 void	zbx_ltrim(char *str, const char *charlist)
@@ -765,7 +760,6 @@ size_t	zbx_strlcpy_utf8(char *dst, const char *src, size_t size)
  *                                                                            *
  * Return value: formatted string                                             *
  *                                                                            *
- *                                                                            *
  * Comments: returns a pointer to allocated memory                            *
  *                                                                            *
  ******************************************************************************/
@@ -809,7 +803,6 @@ char	*zbx_dvsprintf(char *dest, const char *f, va_list args)
  *                                                                            *
  * Return value: formatted string                                             *
  *                                                                            *
- *                                                                            *
  * Comments: returns a pointer to allocated memory                            *
  *                                                                            *
  ******************************************************************************/
@@ -834,7 +827,6 @@ char	*zbx_dsprintf(char *dest, const char *f, ...)
  * Purpose: dynamical cating of strings                                       *
  *                                                                            *
  * Return value: new pointer of string                                        *
- *                                                                            *
  *                                                                            *
  * Comments: returns a pointer to allocated memory                            *
  *           zbx_strdcat(NULL, "") will return "", not NULL!                  *
@@ -900,7 +892,6 @@ char	*zbx_strdcatf(char *dest, const char *f, ...)
  * Return value: return SUCCEED if hostname is valid                          *
  *               or FAIL if hostname contains invalid chars, is empty         *
  *               or is longer than MAX_ZBX_HOSTNAME_LEN                       *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 int	zbx_check_hostname(const char *hostname, char **error)
@@ -1070,7 +1061,6 @@ succeed:
  *                ^                                                           *
  *                                                                            *
  * Return value: return SUCCEED or FAIL                                       *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 int	parse_host_key(char *exp, char **host, char **key)
@@ -2629,7 +2619,6 @@ char	*str_linefeed(const char *src, size_t maxline, const char *delim)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- *                                                                            *
  * Comments: allocates memory, calls assert() if that fails                   *
  *                                                                            *
  ******************************************************************************/
@@ -2679,7 +2668,6 @@ void	zbx_strarr_add(char ***arr, const char *entry)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 void	zbx_strarr_free(char ***arr)
 {
@@ -2700,7 +2688,6 @@ void	zbx_strarr_free(char ***arr)
  *             l     - [IN] left position of the block                        *
  *             r     - [IN/OUT] right position of the block                   *
  *             value - [IN] the string to replace the block with              *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value)
@@ -4613,7 +4600,6 @@ static size_t	zbx_no_function(const char *expr)
  *             error         - [OUT] error message                            *
  *             max_error_len - [IN] error size                                *
  *                                                                            *
- *                                                                            *
  * Return value: SUCCEED - function was found at func_pos                     *
  *               FAIL    - there are no functions in the expression           *
  *                                                                            *
@@ -4791,7 +4777,6 @@ int	zbx_suffixed_number_parse(const char *number, int *len)
  * Return value: number of parameters (starting from 1) or                    *
  *               0 if syntax error                                            *
  *                                                                            *
- *                                                                            *
  * Comments:  delimiter for parameters is ','. Empty parameter list or a list *
  *            containing only spaces is handled as having one empty parameter *
  *            and 1 is returned.                                              *
@@ -4894,7 +4879,6 @@ int	num_param(const char *p)
  * Return value:                                                              *
  *      1 - requested parameter missing or buffer overflow                    *
  *      0 - requested parameter found (value - 'buf' can be empty string)     *
- *                                                                            *
  *                                                                            *
  * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
@@ -5065,7 +5049,6 @@ int	get_param(const char *p, int num, char *buf, size_t max_len, zbx_request_par
  *      0 - requested parameter found                                         *
  *          (for first parameter result is always 0)                          *
  *                                                                            *
- *                                                                            *
  * Comments: delimiter for parameters is ','                                  *
  *                                                                            *
  ******************************************************************************/
@@ -5194,7 +5177,6 @@ static int	get_param_len(const char *p, int num, size_t *sz)
  *      NULL - requested parameter missing                                    *
  *      otherwise - requested parameter                                       *
  *          (for first parameter result is not NULL)                          *
- *                                                                            *
  *                                                                            *
  * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
@@ -5517,7 +5499,6 @@ int	str_n_in_list(const char *list, const char *value, size_t len, char delimite
  *                                                                            *
  * Return value: SUCCEED - string is in the list, FAIL - otherwise            *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 int	str_in_list(const char *list, const char *value, char delimiter)
 {
@@ -5540,7 +5521,6 @@ int	str_in_list(const char *list, const char *value, char delimiter)
  * Return value:                                                              *
  *      1 - requested parameter missing                                       *
  *      0 - requested parameter found (value - 'buf' can be empty string)     *
- *                                                                            *
  *                                                                            *
  * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
@@ -5574,7 +5554,6 @@ int	get_key_param(char *param, int num, char *buf, size_t max_len)
  *      param  - parameter list                                               *
  *                                                                            *
  * Return value: count of parameters                                          *
- *                                                                            *
  *                                                                            *
  * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *

@@ -1785,7 +1785,6 @@ err_alert:
  *                                                                            *
  * Return value: SUCCEED - matches, FAIL - otherwise                          *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 static int	check_operation_conditions(const DB_EVENT *event, zbx_uint64_t operationid, unsigned char evaltype)
 {
@@ -3424,7 +3423,6 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
  * Parameters:                                                                *
  *                                                                            *
  * Return value:                                                              *
- *                                                                            *
  *                                                                            *
  * Comments: never returns                                                    *
  *                                                                            *

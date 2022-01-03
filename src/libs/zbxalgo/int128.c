@@ -33,7 +33,6 @@
  * Parameters: base   - [IN,OUT] the integer to decrement.                    *
  *             value  - [IN] the value to decrement by.                       *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 static void	udec128_128(zbx_uint128_t *base, const zbx_uint128_t *value)
 {
@@ -117,7 +116,6 @@ static void	ushiftl128(zbx_uint128_t *base, unsigned int bits)
  *                0  - value1 = value2                                        *
  *                1  - value1 > value2                                        *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 static int	ucmp128_128(const zbx_uint128_t *value1, const zbx_uint128_t *value2)
 {
@@ -142,7 +140,6 @@ static int	ucmp128_128(const zbx_uint128_t *value1, const zbx_uint128_t *value2)
  *                      adding it to the base value.                          *
  *                                                                            *
  * Comments: This is a helper function for umul64_64 implementation.          *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 static void	umul64_32_shift(zbx_uint128_t *base, zbx_uint64_t value, zbx_uint64_t factor, int shift)
@@ -213,7 +210,6 @@ void	uinc128_128(zbx_uint128_t *base, const zbx_uint128_t *value)
  *             value  - [IN] the value to multiply.                           *
  *             factor - [IN] the factor to multiply by.                       *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 void	umul64_64(zbx_uint128_t *result, zbx_uint64_t value, zbx_uint64_t factor)
 {
@@ -234,7 +230,6 @@ void	umul64_64(zbx_uint128_t *result, zbx_uint64_t value, zbx_uint64_t factor)
  * Parameters: result    - [OUT] the resulting quotient value.                *
  *             dividend  - [IN] the dividend.                                 *
  *             value     - [IN] the divisor.                                  *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 void	udiv128_64(zbx_uint128_t *result, const zbx_uint128_t *dividend, zbx_uint64_t value)

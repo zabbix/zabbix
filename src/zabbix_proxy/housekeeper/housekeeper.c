@@ -59,7 +59,6 @@ static void	zbx_housekeeper_sigusr_handler(int flags)
  *                                                                            *
  * Return value: number of rows records                                       *
  *                                                                            *
- *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/

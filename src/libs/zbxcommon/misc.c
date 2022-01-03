@@ -155,7 +155,6 @@ const char	*get_program_name(const char *path)
  *                                                                            *
  * Purpose: Gets the current time.                                            *
  *                                                                            *
- *                                                                            *
  * Comments: Time in seconds since midnight (00:00:00),                       *
  *           January 1, 1970, coordinated universal time (UTC).               *
  *                                                                            *
@@ -279,7 +278,6 @@ void	zbx_timespec(zbx_timespec_t *ts)
  *                                                                            *
  * Return value: Time in seconds                                              *
  *                                                                            *
- *                                                                            *
  * Comments: Time in seconds since midnight (00:00:00),                       *
  *           January 1, 1970, coordinated universal time (UTC).               *
  *                                                                            *
@@ -300,7 +298,6 @@ double	zbx_time(void)
  * Purpose: Gets the current time including UTC offset                        *
  *                                                                            *
  * Return value: Time in seconds                                              *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 double	zbx_current_time(void)
@@ -635,7 +632,6 @@ void	*zbx_malloc2(const char *filename, int line, void *old, size_t size)
  *                                                                            *
  * Return value: returns a pointer to the newly allocated memory              *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 void	*zbx_realloc2(const char *filename, int line, void *old, size_t size)
 {
@@ -704,7 +700,6 @@ void	*zbx_guaranteed_memset(void *v, int c, size_t n)
  * Function: __zbx_zbx_setproctitle                                           *
  *                                                                            *
  * Purpose: set process title                                                 *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 void	zbx_setproctitle(const char *fmt, ...)
@@ -796,7 +791,6 @@ static int	get_current_delay(int default_delay, const zbx_flexible_interval_t *f
  *                                                                            *
  * Return value: SUCCEED - there is a next interval                           *
  *               FAIL - otherwise (in this case, next_interval is unaffected) *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 static int	get_next_delay_interval(const zbx_flexible_interval_t *flex_intervals, time_t now, time_t *next_interval)
@@ -2221,7 +2215,6 @@ void	zbx_custom_interval_free(zbx_custom_interval_t *custom_intervals)
  *                                                                            *
  * Return value: nextcheck value                                              *
  *                                                                            *
- *                                                                            *
  * Comments: if item check is forbidden with delay=0 (default and flexible),  *
  *           a timestamp very far in the future is returned                   *
  *                                                                            *
@@ -2371,7 +2364,6 @@ int	calculate_item_nextcheck_unreachable(int simple_interval, const zbx_custom_i
  *                                                                            *
  * Return value: nextcheck value                                              *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 time_t	calculate_proxy_nextcheck(zbx_uint64_t hostid, unsigned int delay, time_t now)
 {
@@ -2513,7 +2505,6 @@ int	is_ip6(const char *ip)
  * Return value: SUCCEED - is IP address                                      *
  *               FAIL - otherwise                                             *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 int	is_supported_ip(const char *ip)
 {
@@ -2536,7 +2527,6 @@ int	is_supported_ip(const char *ip)
  *                                                                            *
  * Return value: SUCCEED - is IP address                                      *
  *               FAIL - otherwise                                             *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 int	is_ip(const char *ip)
@@ -2728,7 +2718,6 @@ int	zbx_double_compare(double a, double b)
  *                                                                            *
  * Return value:  SUCCEED - the string is double                              *
  *                FAIL - otherwise                                            *
- *                                                                            *
  *                                                                            *
  * Comments: the function automatically processes suffixes K, M, G, T and     *
  *           s, m, h, d, w                                                    *
@@ -2927,7 +2916,6 @@ int	_wis_uint(const wchar_t *wide_string)
  *                FAIL - the string is not a number or its value is outside   *
  *                       the specified range                                  *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max)
 {
@@ -3085,7 +3073,6 @@ int	is_boolean(const char *str, zbx_uint64_t *value)
  * Return value:  SUCCEED - the string is unsigned octal                      *
  *                FAIL - otherwise                                            *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 int	is_uoct(const char *str)
 {
@@ -3123,7 +3110,6 @@ int	is_uoct(const char *str)
  * Return value:  SUCCEED - the string is unsigned hexadecimal                *
  *                FAIL - otherwise                                            *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 int	is_uhex(const char *str)
 {
@@ -3160,7 +3146,6 @@ int	is_uhex(const char *str)
  *                                                                            *
  * Return value:  SUCCEED - the string is formatted like the example above    *
  *                FAIL - otherwise                                            *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 int	is_hex_string(const char *str)
@@ -3241,7 +3226,6 @@ int	get_nearestindex(const void *p, size_t sz, int num, zbx_uint64_t id)
  *                                                                            *
  * Purpose: add uint64 value to dynamic array                                 *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t value, int alloc_step)
 {
@@ -3274,7 +3258,6 @@ int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t v
 /******************************************************************************
  *                                                                            *
  * Function: uint64_array_exists                                              *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 int	uint64_array_exists(const zbx_uint64_t *values, int num, zbx_uint64_t value)
@@ -3387,7 +3370,6 @@ int	str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value)
  *                                                                            *
  * Return value: converted double value                                       *
  *                                                                            *
- *                                                                            *
  * Comments: the function automatically processes suffixes K, M, G, T and     *
  *           s, m, h, d, w                                                    *
  *                                                                            *
@@ -3430,7 +3412,6 @@ int	is_hostname_char(unsigned char c)
  *                                                                            *
  * Return value:  SUCCEED - the char is allowed in the item key               *
  *                FAIL - otherwise                                            *
- *                                                                            *
  *                                                                            *
  * Comments: in key allowed characters: '0-9a-zA-Z._-'                        *
  *           !!! Don't forget to sync the code with PHP !!!                   *
@@ -3579,7 +3560,6 @@ void	make_hostname(char *host)
  *                                                                            *
  * Return value: Interface type                                               *
  *                                                                            *
- *                                                                            *
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
@@ -3618,7 +3598,6 @@ unsigned char	get_interface_type_by_item_type(unsigned char type)
  *             max_sleeptime - [IN] maximum sleep time, in seconds            *
  *                                                                            *
  * Return value: sleep time, in seconds                                       *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 int	calculate_sleeptime(int nextcheck, int max_sleeptime)

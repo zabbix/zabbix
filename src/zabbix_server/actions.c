@@ -913,7 +913,6 @@ static void	check_condition_event_tag_value(const zbx_vector_ptr_t *esc_events, 
  *                                                                            *
  * Return value: SUCCEED - matches, FAIL - otherwise                          *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 static void	check_trigger_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
 {
@@ -1801,7 +1800,6 @@ static int	check_dservice_port_condition(const zbx_vector_ptr_t *esc_events, zbx
  *                                                                            *
  * Return value: SUCCEED - matches, FAIL - otherwise                          *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 static void	check_discovery_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
 {
@@ -2024,7 +2022,6 @@ static int	check_areg_proxy_condition(const zbx_vector_ptr_t *esc_events, zbx_co
  *             condition - condition for matching                             *
  *                                                                            *
  * Return value: SUCCEED - matches, FAIL - otherwise                          *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 static void	check_autoregistration_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
@@ -2619,7 +2616,6 @@ static void	check_events_condition(const zbx_vector_ptr_t *esc_events, unsigned 
  *                                                                            *
  * Return value: SUCCEED - matches, FAIL - otherwise                          *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 int	check_action_condition(const DB_EVENT *event, zbx_condition_t *condition)
 {
@@ -3016,7 +3012,6 @@ static int	uniq_conditions_compare_func(const void *d1, const void *d2)
  * Purpose: generate hash based on condition values                           *
  *                                                                            *
  * Parameters: data - [IN] condition structure                                *
- *                                                                            *
  *                                                                            *
  * Return value: hash is generated                                            *
  *                                                                            *

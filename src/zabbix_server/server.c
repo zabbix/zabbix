@@ -543,7 +543,6 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
  *                                                                            *
  * Purpose: set configuration defaults                                        *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 static void	zbx_set_defaults(void)
 {
@@ -614,7 +613,6 @@ static void	zbx_set_defaults(void)
  * Function: zbx_validate_config                                              *
  *                                                                            *
  * Purpose: validate configuration parameters                                 *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_validate_config(ZBX_TASK_EX *task)
@@ -746,7 +744,6 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
  * Parameters:                                                                *
  *                                                                            *
  * Return value:                                                              *
- *                                                                            *
  *                                                                            *
  * Comments: will terminate process if parsing fails                          *
  *                                                                            *

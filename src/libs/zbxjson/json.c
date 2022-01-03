@@ -31,7 +31,6 @@
  *                                                                            *
  * Return value: pointer to the null terminated string                        *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 #define ZBX_JSON_MAX_STRERROR	255
 
@@ -68,7 +67,6 @@ void	zbx_set_json_strerror(const char *fmt, ...)
 /******************************************************************************
  *                                                                            *
  * Function: __zbx_json_realloc                                               *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 static void	__zbx_json_realloc(struct zbx_json *j, size_t need)
@@ -220,7 +218,6 @@ static size_t	__zbx_json_stringsize(const char *string, zbx_json_type_t type)
  *                                                                            *
  * Return value:                                                              *
  *      '0'-'f'                                                               *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 static char	zbx_num2hex(unsigned char c)
@@ -495,7 +492,6 @@ int	zbx_json_close(struct zbx_json *j)
  *                                                                            *
  * Return value: type of pointed value                                        *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 static zbx_json_type_t	__zbx_json_type(const char *p)
 {
@@ -633,7 +629,6 @@ int	zbx_json_open(const char *buffer, struct zbx_json_parse *jp)
  *      {"name",...    or  "array":["name", ... ,1,null]                      *
  * p =   ^                                         ^                          *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 const char	*zbx_json_next(const struct zbx_json_parse *jp, const char *p)
 {
@@ -726,7 +721,6 @@ static int	zbx_is_valid_json_hex(const char *p)
  *                                                                            *
  * Return value:                                                              *
  *      0-15                                                                  *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 static unsigned int	zbx_hex2num(char c)
@@ -1101,7 +1095,6 @@ const char	*zbx_json_next_value_dyn(const struct zbx_json_parse *jp, const char 
  *                                                                            *
  * Return value: SUCCEED - if value successfully parsed, FAIL - otherwise     *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 int	zbx_json_value_by_name(const struct zbx_json_parse *jp, const char *name, char *string, size_t len,
 		zbx_json_type_t *type)
@@ -1124,7 +1117,6 @@ int	zbx_json_value_by_name(const struct zbx_json_parse *jp, const char *name, ch
  * Purpose: return value by pair name                                         *
  *                                                                            *
  * Return value: SUCCEED - if value successfully parsed, FAIL - otherwise     *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 int	zbx_json_value_by_name_dyn(const struct zbx_json_parse *jp, const char *name, char **string,
@@ -1206,7 +1198,6 @@ int	zbx_json_object_is_empty(const struct zbx_json_parse *jp)
  * Function: zbx_json_count                                                   *
  *                                                                            *
  * Return value: number of elements in zbx_json_parse object                  *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 int	zbx_json_count(const struct zbx_json_parse *jp)

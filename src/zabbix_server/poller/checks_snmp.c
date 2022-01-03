@@ -1567,7 +1567,6 @@ out:
  *                                                                            *
  * Purpose: translate well-known object identifiers into numeric form         *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 static void	zbx_snmp_translate(char *oid_translated, const char *snmp_oid, size_t max_oid_len)
 {

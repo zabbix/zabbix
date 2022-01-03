@@ -7327,7 +7327,6 @@ static void	DCget_host(DC_HOST *dst_host, const ZBX_DC_HOST *src_host, unsigned 
  *                                                                            *
  * Return value: SUCCEED if record located and FAIL otherwise                 *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid)
 {
@@ -8115,7 +8114,6 @@ static void	DCclean_trigger(DC_TRIGGER *trigger)
  *             errcodes - [OUT] SUCCEED if record located and FAIL otherwise  *
  *             num      - [IN] number of elements in items, keys, errcodes    *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_host_key_t *keys, int *errcodes, size_t num)
 {
@@ -8172,7 +8170,6 @@ int	DCconfig_get_hostid_by_name(const char *host, zbx_uint64_t *hostid)
  *             itemids  - [IN] array of item IDs                              *
  *             errcodes - [OUT] SUCCEED if item found, otherwise FAIL         *
  *             num      - [IN] number of elements                             *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 void	DCconfig_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, size_t num)
@@ -8505,7 +8502,6 @@ void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions, zbx_uint64_t 
  *                                                                            *
  * Function: DCconfig_clean_functions                                         *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 void	DCconfig_clean_functions(DC_FUNCTION *functions, int *errcodes, size_t num)
 {
@@ -8659,7 +8655,6 @@ void	DCconfig_lock_triggers_by_triggerids(zbx_vector_uint64_t *triggerids_in, zb
  *                                                                            *
  * Function: DCconfig_unlock_triggers                                         *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 void	DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids)
 {
@@ -8708,7 +8703,6 @@ void	DCconfig_unlock_all_triggers(void)
  * Function: DCconfig_get_triggers_by_itemids                                 *
  *                                                                            *
  * Purpose: get enabled triggers for specified items                          *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
@@ -9389,7 +9383,6 @@ static int	dc_config_get_queue_nextcheck(zbx_binary_heap_t *queue)
  *                                                                            *
  * Return value: nextcheck or FAIL if no items for selected poller            *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 int	DCconfig_get_poller_nextcheck(unsigned char poller_type)
 {
@@ -9754,7 +9747,6 @@ unlock:
  * Purpose: get array of snmp trap items for the specified interfaceid        *
  *                                                                            *
  * Return value: number of items returned                                     *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM **items)
@@ -10557,7 +10549,6 @@ exit:
  *                                                                            *
  * Purpose: assign each trigger an index based on trigger dependency topology *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 static void	DCconfig_sort_triggers_topologically(void)
 {
@@ -10802,7 +10793,6 @@ int	DCconfig_get_proxypoller_hosts(DC_PROXY *proxies, int max_hosts)
  * Purpose: Get nextcheck for passive proxies                                 *
  *                                                                            *
  * Return value: nextcheck or FAIL if no passive proxies in queue             *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 int	DCconfig_get_proxypoller_nextcheck(void)

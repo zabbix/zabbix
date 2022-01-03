@@ -63,7 +63,6 @@ zbx_mutex_t		diskstats_lock = ZBX_MUTEX_NULL;
  *                                                                            *
  * Return value: number of CPUs                                               *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 static int	zbx_get_cpu_num(void)
 {
@@ -132,7 +131,6 @@ return_one:
  * Function: init_collector_data                                              *
  *                                                                            *
  * Purpose: Allocate memory for collector                                     *
- *                                                                            *
  *                                                                            *
  * Comments: Unix version allocates memory as shared.                         *
  *                                                                            *
@@ -224,7 +222,6 @@ out:
  * Function: free_collector_data                                              *
  *                                                                            *
  * Purpose: Free memory allocated for collector                               *
- *                                                                            *
  *                                                                            *
  * Comments: Unix version allocated memory as shared.                         *
  *                                                                            *

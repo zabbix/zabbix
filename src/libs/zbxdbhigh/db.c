@@ -281,7 +281,6 @@ void	DBbegin(void)
  *                                                                            *
  * Purpose: commit a transaction                                              *
  *                                                                            *
- *                                                                            *
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
@@ -1341,7 +1340,6 @@ const char	*zbx_host_string(zbx_uint64_t hostid)
  *                                                                            *
  * Return value: <host>:<key> or "???" if item not found                      *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 const char	*zbx_host_key_string(zbx_uint64_t itemid)
 {
@@ -1534,7 +1532,6 @@ const char	*DBsql_id_cmp(zbx_uint64_t id)
  * Purpose: register unknown host and generate event                          *
  *                                                                            *
  * Parameters: host - host name                                               *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
@@ -1879,7 +1876,6 @@ void	DBregister_host_clean(zbx_vector_ptr_t *autoreg_hosts)
  *                                                                            *
  * Parameters: host - host name                                               *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 void	DBproxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port,
 		unsigned int connection_type, const char *host_metadata, unsigned short flag)
@@ -1962,7 +1958,6 @@ int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
  *             field_name       - field name for host or host visible name    *
  *                                                                            *
  * Return value: unique host name which does not exist in the database        *
- *                                                                            *
  *                                                                            *
  * Comments: the sample cannot be empty                                       *
  *           constructs new by adding "_$(number+1)", where "number"          *

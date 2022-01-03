@@ -267,7 +267,6 @@ static int zbx_is_win_ver_or_greater(zbx_uint32_t major, zbx_uint32_t minor, zbx
  *                                                                            *
  * Return value: SUCCEED or FAIL - an error occurred                          *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 #ifdef _WINDOWS
 int	zbx_socket_start(char **error)
@@ -290,7 +289,6 @@ int	zbx_socket_start(char **error)
  * Function: zbx_socket_clean                                                 *
  *                                                                            *
  * Purpose: initialize socket                                                 *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_socket_clean(zbx_socket_t *s)
@@ -323,7 +321,6 @@ static void	zbx_socket_free(zbx_socket_t *s)
  * Parameters: s       - [IN] socket descriptor                               *
  *             timeout - [IN] timeout, in seconds                             *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 void	zbx_socket_timeout_set(zbx_socket_t *s, int timeout)
 {
@@ -354,7 +351,6 @@ void	zbx_socket_timeout_set(zbx_socket_t *s, int timeout)
  * Purpose: clean up timeout for socket operations                            *
  *                                                                            *
  * Parameters: s - [OUT] socket descriptor                                    *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_socket_timeout_cleanup(zbx_socket_t *s)
@@ -1017,7 +1013,6 @@ out:
  * Return value: SUCCEED - success                                            *
  *               FAIL - an error occurred                                     *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 #ifdef HAVE_IPV6
 int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen_port)
@@ -1404,7 +1399,6 @@ void	zbx_tcp_unlisten(zbx_socket_t *s)
  *                                                                            *
  * Return value: SUCCEED - success                                            *
  *               FAIL - an error occurred                                     *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept)
@@ -2294,7 +2288,6 @@ int	zbx_validate_peer_list(const char *peer_list, char **error)
  *                                                                            *
  * Return value: SUCCEED - connection allowed                                 *
  *               FAIL - connection is not allowed                             *
- *                                                                            *
  *                                                                            *
  * Comments: standard, compatible and IPv4-mapped addresses are treated       *
  *           the same: 127.0.0.1 == ::127.0.0.1 == ::ffff:127.0.0.1           *

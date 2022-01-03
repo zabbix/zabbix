@@ -31,7 +31,6 @@
  *                                                                            *
  * (*) chunk: a contiguous piece of memory that is either free or used        *
  *                                                                            *
- *                                                                            *
  *                    +-------- size of + --------------+                     *
  *                    |       (8 bytes) |               |                     *
  *                    |                 v               |                     *
@@ -47,7 +46,6 @@
  *                                                                            *
  *                     8-aligned               8-aligned                      *
  *                                                                            *
- *                                                                            *
  *     when a chunk is used, `size' fields have MEM_FLG_USED bit set          *
  *                                                                            *
  *     when a chunk is free, the first 2 * ZBX_PTR_SIZE bytes of allocatable  *
@@ -60,7 +58,6 @@
  *         - size is kept on both left and right ends for quick merging       *
  *           (when freeing a chunk, we can quickly see if the previous        *
  *           and next chunks are free, those will not have MEM_FLG_USED)      *
- *                                                                            *
  *                                                                            *
  * (*) free chunks are stored in doubly-linked lists according to their sizes *
  *                                                                            *

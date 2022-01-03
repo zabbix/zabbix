@@ -85,7 +85,6 @@ void	load_aliases(char **lines)
  * Return value: SUCCEED - successfully loaded user parameters                *
  *               FAIL    - failed to load user parameters                     *
  *                                                                            *
- *                                                                            *
  * Comments: calls add_user_parameter() for each entry                        *
  *                                                                            *
  ******************************************************************************/

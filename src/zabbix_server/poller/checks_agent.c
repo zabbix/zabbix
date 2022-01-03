@@ -43,7 +43,6 @@ extern unsigned char	program_type;
  *               AGENT_ERROR - uncritical error on agent side occurred        *
  *               FAIL - otherwise                                             *
  *                                                                            *
- *                                                                            *
  * Comments: error will contain error message                                 *
  *                                                                            *
  ******************************************************************************/

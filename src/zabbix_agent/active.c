@@ -599,7 +599,6 @@ static void process_config_item(struct zbx_json *json, char *config, size_t leng
  * Return value: returns SUCCEED on successful parsing,                       *
  *               FAIL on other cases                                          *
  *                                                                            *
- *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/

@@ -29,7 +29,6 @@
  *                                                                            *
  * Function: lld_field_str_rollback                                           *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 void	lld_field_str_rollback(char **field, char **field_orig, zbx_uint64_t *flags, zbx_uint64_t flag)
 {

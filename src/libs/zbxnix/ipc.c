@@ -59,7 +59,6 @@ int	zbx_shm_create(size_t size)
  * Return value: If the function succeeds, then return 0                      *
  *               -1 on an error                                               *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 int	zbx_shm_destroy(int shmid)
 {

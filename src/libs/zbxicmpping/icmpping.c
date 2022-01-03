@@ -719,7 +719,6 @@ out:
  * Return value: SUCCEED - successfully processed hosts                       *
  *               NOTSUPPORTED - otherwise                                     *
  *                                                                            *
- *                                                                            *
  * Comments: use external binary 'fping' to avoid superuser privileges        *
  *                                                                            *
  ******************************************************************************/

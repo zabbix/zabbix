@@ -561,7 +561,6 @@ static void	zbx_set_defaults(void)
  *                                                                            *
  * Purpose: validate configuration parameters                                 *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 static void	zbx_validate_config(ZBX_TASK_EX *task)
 {
@@ -950,7 +949,6 @@ static void	zbx_free_config(void)
  * Function: main                                                             *
  *                                                                            *
  * Purpose: executes proxy processes                                          *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 int	main(int argc, char **argv)

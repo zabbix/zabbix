@@ -61,7 +61,6 @@ extern ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
  * Return value: SUCCEED - on splitting without errors                        *
  *               FAIL - on splitting with errors                              *
  *                                                                            *
- *                                                                            *
  * Comments: Memory for "part1" and "part2" is allocated only on SUCCEED.     *
  *                                                                            *
  ******************************************************************************/
@@ -116,7 +115,6 @@ out:
  *                                                                            *
  * Return value: SUCCEED - on successful splitting                            *
  *               FAIL - on unable to split sensibly                           *
- *                                                                            *
  *                                                                            *
  * Comments: Allocates memory for "directory" and "filename_regexp" only on   *
  *           SUCCEED. On FAIL memory, allocated for "directory" and           *
@@ -2458,7 +2456,6 @@ out:
  *                                                                            *
  * Return value: returns SUCCEED on successful reading,                       *
  *               FAIL on other cases                                          *
- *                                                                            *
  *                                                                            *
  * Comments:                                                                  *
  *           This function does not deal with log file rotation.              *

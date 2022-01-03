@@ -261,7 +261,6 @@ static zbx_ipmi_request_t	*ipmi_poller_pop_request(zbx_ipmi_poller_t *poller)
  * Parameters: poller  - [IN] the IPMI poller                                 *
  *             request - [IN] the IPMI request to push                        *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 static void	ipmi_poller_push_request(zbx_ipmi_poller_t *poller, zbx_ipmi_request_t *request)
 {

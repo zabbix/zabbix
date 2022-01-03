@@ -91,7 +91,6 @@ static size_t	curl_ignore_cb(void *ptr, size_t size, size_t nmemb, void *userdat
  *                                                                            *
  * Parameters: httptest - [IN] the http test data                             *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 static void	httptest_remove_macros(zbx_httptest_t *httptest)
 {
@@ -1060,7 +1059,6 @@ httptest_error:
  * Parameters: now - current timestamp                                        *
  *                                                                            *
  * Return value: number of processed httptests                                *
- *                                                                            *
  *                                                                            *
  * Comments: always SUCCEED                                                   *
  *                                                                            *

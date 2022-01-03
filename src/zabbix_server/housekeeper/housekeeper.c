@@ -213,7 +213,6 @@ static void	zbx_housekeeper_sigusr_handler(int flags)
  *               >0 - the first item is greater than the second               *
  *               =0 - the items are the same                                  *
  *                                                                            *
- *                                                                            *
  * Comments: this function is used to sort delete queue by itemids            *
  *                                                                            *
  ******************************************************************************/
@@ -276,7 +275,6 @@ static void	hk_history_delete_queue_append(zbx_hk_history_rule_t *rule, int now,
  * Purpose: prepares history housekeeping rule                                *
  *                                                                            *
  * Parameters: rule        - [IN/OUT] the history housekeeping rule           *
- *                                                                            *
  *                                                                            *
  * Comments: This function is called to initialize history rule data either   *
  *           at start or when housekeeping is enabled for this rule.          *
@@ -491,7 +489,6 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
  * Parameters: rules  - [IN/OUT] the history housekeeping rules               *
  *             now    - [IN] the current timestamp                            *
  *                                                                            *
- *                                                                            *
  * Comments: This function also handles history rule initializing/releasing   *
  *           when the rule just became enabled/disabled.                      *
  *                                                                            *
@@ -534,7 +531,6 @@ static void	hk_history_delete_queue_prepare_all(zbx_hk_history_rule_t *rules, in
  *                                                                            *
  * Parameters: rule   - [IN/OUT] the history housekeeping rule                *
  *             now    - [IN] the current timestamp                            *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 static void	hk_history_delete_queue_clear(zbx_hk_history_rule_t *rule)
@@ -894,7 +890,6 @@ static int	hk_table_cleanup(const char *table, const char *field, zbx_uint64_t i
  * Purpose: remove deleted items/triggers data                                *
  *                                                                            *
  * Return value: number of rows deleted                                       *
- *                                                                            *
  *                                                                            *
  * Comments: sqlite3 does not use CONFIG_MAX_HOUSEKEEPER_DELETE, deletes all  *
  *                                                                            *

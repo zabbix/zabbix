@@ -125,7 +125,6 @@ out:
  *                                                                            *
  * Purpose: receive configuration tables from server (passive proxies)        *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 void	recv_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {

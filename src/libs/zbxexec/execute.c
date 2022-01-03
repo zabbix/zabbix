@@ -67,7 +67,6 @@ static int	zbx_get_timediff_ms(struct _timeb *time1, struct _timeb *time2)
  *                                                                            *
  * Return value: SUCCEED, FAIL or TIMEOUT_ERROR if timeout reached            *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t *buf_size, size_t *offset, int timeout_ms)
 {
@@ -132,7 +131,6 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t *buf_size, size_t
  *                                                                            *
  * Return value: on success, reading file descriptor is returned. On error,   *
  *               -1 is returned, and errno is set appropriately               *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 static int	zbx_popen(pid_t *pid, const char *command, const char *dir)
@@ -250,7 +248,6 @@ static int	zbx_popen(pid_t *pid, const char *command, const char *dir)
  *                                                                            *
  * Return value: on success, PID is returned. On error,                       *
  *               -1 is returned, and errno is set appropriately               *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 static int	zbx_waitpid(pid_t pid, int *status)
@@ -562,7 +559,6 @@ close:
  *          suppresses the std output                                         *
  *                                                                            *
  * Parameters: command - [IN] command for execution                           *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 int	zbx_execute_nowait(const char *command)

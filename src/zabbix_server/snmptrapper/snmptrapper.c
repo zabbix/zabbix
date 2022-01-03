@@ -77,7 +77,6 @@ static void	DBupdate_lastsize(void)
  * Return value: SUCCEED - a matching item was found                          *
  *               FAIL - no matching item was found (including fallback items) *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_timespec_t *ts)
 {
@@ -237,7 +236,6 @@ next:
  *             begin - [IN] beginning of the trap message                     *
  *             end - [IN] end of the trap message                             *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 static void	process_trap(const char *addr, char *begin, char *end)
 {
@@ -278,7 +276,6 @@ static void	process_trap(const char *addr, char *begin, char *end)
  * Function: parse_traps                                                      *
  *                                                                            *
  * Purpose: split traps and process them with process_trap()                  *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 static void	parse_traps(int flag)
@@ -417,7 +414,6 @@ static void	delay_trap_logs(char *error, int log_level)
  *                                                                            *
  * Purpose: read the traps and then parse them with parse_traps()             *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 static int	read_traps(void)
 {
@@ -463,7 +459,6 @@ out:
  *                                                                            *
  * Purpose: close trap file and reset lastsize                                *
  *                                                                            *
- *                                                                            *
  * Comments: !!! do not reset lastsize elsewhere !!!                          *
  *                                                                            *
  ******************************************************************************/
@@ -484,7 +479,6 @@ static void	close_trap_file(void)
  * Purpose: open the trap file and get it's node number                       *
  *                                                                            *
  * Return value: file descriptor of the opened file or -1 otherwise           *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 static int	open_trap_file(void)

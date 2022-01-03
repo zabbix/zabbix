@@ -85,7 +85,6 @@ static int	get_minnextcheck(void)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- *                                                                            *
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/

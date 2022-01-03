@@ -181,7 +181,6 @@ static int	zbx_host_interfaces_discovery(zbx_uint64_t hostid, struct zbx_json *j
  * Return value: SUCCEED - data successfully retrieved and stored in result   *
  *               NOTSUPPORTED - requested item is not supported               *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 {

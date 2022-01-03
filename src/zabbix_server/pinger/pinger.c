@@ -51,7 +51,6 @@ extern ZBX_THREAD_LOCAL int		server_num, process_num;
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
@@ -401,7 +400,6 @@ static void	add_icmpping_item(icmpitem_t **items, int *items_alloc, int *items_c
  * Return value: SUCCEED - the file was created successfully                  *
  *               FAIL - otherwise                                             *
  *                                                                            *
- *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
@@ -511,7 +509,6 @@ static void	add_pinger_host(ZBX_FPING_HOST **hosts, int *hosts_alloc, int *hosts
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
@@ -564,7 +561,6 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count)
  * Parameters:                                                                *
  *                                                                            *
  * Return value:                                                              *
- *                                                                            *
  *                                                                            *
  * Comments: never returns                                                    *
  *                                                                            *

@@ -267,7 +267,6 @@ static zbx_int64_t	json_parse_number(const char *start, char **error)
  *               error parameter (if not NULL) contains allocated error       *
  *               message.                                                     *
  *                                                                            *
- *                                                                            *
  * Comments: This function is used to parse JSON literal values null, true    *
  *           false.                                                           *
  *                                                                            *
@@ -371,7 +370,6 @@ zbx_int64_t	json_parse_value(const char *start, char **error)
  *               error parameter (if not NULL) contains allocated error       *
  *               message.                                                     *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 static zbx_int64_t	json_parse_object(const char *start, char **error)
 {
@@ -440,7 +438,6 @@ static zbx_int64_t	json_parse_object(const char *start, char **error)
  * Return value: The number of characters parsed. On error 0 is returned and  *
  *               error parameter (if not NULL) contains allocated error       *
  *               message.                                                     *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 zbx_int64_t	zbx_json_validate(const char *start, char **error)

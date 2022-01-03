@@ -225,7 +225,6 @@ int	get_process_type_forks(unsigned char proc_type)
  * Purpose: Initialize structures and prepare state                           *
  *          for self-monitoring collector                                     *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 int	init_selfmon_collector(char **error)
 {
@@ -323,7 +322,6 @@ void	free_selfmon_collector(void)
  *                                                                            *
  * Parameters: state - [IN] new process state; ZBX_PROCESS_STATE_*            *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 void	update_selfmon_counter(unsigned char state)
 {
@@ -390,7 +388,6 @@ void	update_selfmon_counter(unsigned char state)
 /******************************************************************************
  *                                                                            *
  * Function: collect_selfmon_stats                                            *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 void	collect_selfmon_stats(void)
@@ -480,7 +477,6 @@ out:
  *             state        - [IN] process state; ZBX_PROCESS_STATE_*         *
  *             value        - [OUT] a pointer to a variable that receives     *
  *                                  requested statistics                      *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 void	get_selfmon_stats(unsigned char proc_type, unsigned char aggr_func, int proc_num, unsigned char state,
