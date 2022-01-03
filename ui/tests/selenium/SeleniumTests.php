@@ -193,9 +193,11 @@ require_once dirname(__FILE__).'/reports/testPageScheduledReport.php';
 require_once dirname(__FILE__).'/reports/testScheduledReportPermissions.php';
 require_once dirname(__FILE__).'/testSID.php';
 
+use PHPUnit\Framework\TestSuite;
+
 class SeleniumTests {
 	public static function suite() {
-		$suite = new PHPUnit_Framework_TestSuite('selenium');
+		$suite = new TestSuite('selenium');
 
 		$suite->addTestSuite('testGeneric');
 		$suite->addTestSuite('testGraphAxis');
