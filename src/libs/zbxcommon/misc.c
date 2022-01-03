@@ -512,7 +512,6 @@ int	zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec, int *t
  * Return value: 28-31 depending on number of days in the month, defaults to  *
  *               30 if the month is outside of allowed range                  *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 int	zbx_day_in_month(int year, int mon)
 {
@@ -553,7 +552,6 @@ zbx_uint64_t	zbx_get_duration_ms(const zbx_timespec_t *ts)
  * Purpose: allocates nmemb * size bytes of memory and fills it with zeros    *
  *                                                                            *
  * Return value: returns a pointer to the newly allocated memory              *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 void	*zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_t size)
@@ -3421,7 +3419,6 @@ int	is_key_char(unsigned char c)
  *                                                                            *
  * Return value:  SUCCEED - the char is allowed in the trigger function       *
  *                FAIL - otherwise                                            *
- *                                                                            *
  *                                                                            *
  * Comments: in trigger function allowed characters: 'a-z'                    *
  *           !!! Don't forget to sync the code with PHP !!!                   *
