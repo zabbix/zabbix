@@ -227,6 +227,7 @@ class CApiInputValidator {
 
 			case API_LAT_LNG_ZOOM:
 				return self::validateLatLngZoom($rule, $data, $path, $error);
+
 			case API_TIMESTAMP:
 				return self::validateTimestamp($rule, $data, $path, $error);
 		}
@@ -2884,12 +2885,12 @@ class CApiInputValidator {
 	}
 
 	/**
-	 * Timestamps validator.
+	 * Timestamp validator.
 	 *
 	 * @param array  $rule
 	 * @param int    $rule[flags]    (optional) API_ALLOW_NULL
 	 * @param string $rule[in]       (optional) A comma-delimited character string, for example: '0,60:900'.
-	 * @param array  $rule[compare]  (optional) Data of the object field to which make comparison.
+	 * @param array  $rule[compare]  (optional) Data of the object field to compare against.
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -3004,12 +3005,17 @@ class CApiInputValidator {
 			case '>':
 				if ($data <= $rule['compare']['value']) {
 					$error = _s('Invalid parameter "%1$s": %2$s.', $path,
-						_s('cannot be less than or equals the value of parameter "%1$s"', $rule['compare']['path'])
+						_s('cannot be less than or equal to the value of parameter "%1$s"', $rule['compare']['path'])
 					);
 
 					return false;
 				}
 				break;
+
+			default:
+				$error = 'Incorrect validation rules.';
+
+				return false;
 		}
 
 		return true;

@@ -666,7 +666,7 @@ class CMaintenance extends CApiService {
 			}
 
 			foreach ($maintenance['timeperiods'] as &$timeperiod) {
-				$timeperiod['period'] = timeUnitToSeconds($timeperiod['period'], API_TIME_UNIT_WITH_YEAR);
+				$timeperiod['period'] = timeUnitToSeconds($timeperiod['period'], true);
 				$timeperiod['period'] -= $timeperiod['period'] % SEC_PER_MIN;
 
 				if ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME) {
@@ -680,12 +680,14 @@ class CMaintenance extends CApiService {
 					if ((!array_key_exists('day', $timeperiod) || $timeperiod['day'] == 0)
 							&& (!array_key_exists('dayofweek', $timeperiod) || $timeperiod['dayofweek'] == 0)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_('At least one day of week or day must be specified.')
+							_('At least one day of the week or day of the month must be specified.')
 						);
 					}
 					elseif (array_key_exists('day', $timeperiod) && $timeperiod['day'] != 0
 							&& array_key_exists('dayofweek', $timeperiod) && $timeperiod['dayofweek'] != 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Only day of week or day is allowed.'));
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_('Day of the week and day of the month cannot be specified simultaneously.')
+						);
 					}
 				}
 			}
@@ -1106,13 +1108,21 @@ class CMaintenance extends CApiService {
 	}
 
 	/**
-	 * Add the existing tags, groups, hosts and timeperiods.
-	 *
 	 * @param array $maintenances
 	 * @param array $db_maintenances
 	 */
 	private static function addAffectedObjects(array $maintenances, array &$db_maintenances): void {
-		$maintenanceids = ['tags' => [], 'groups' => [] , 'hosts' => [], 'timeperiods' => []];
+		self::addAffectedTags($maintenances, $db_maintenances);
+		self::addAffectedGroupsAndHosts($maintenances, $db_maintenances);
+		self::addAffectedTimeperiods($maintenances, $db_maintenances);
+	}
+
+	/**
+	 * @param array $maintenances
+	 * @param array $db_maintenances
+	 */
+	private static function addAffectedTags(array $maintenances, array &$db_maintenances): void {
+		$maintenanceids = [];
 
 		foreach ($maintenances as $maintenance) {
 			$db_maintenance_type = $db_maintenances[$maintenance['maintenanceid']]['maintenance_type'];
@@ -1120,84 +1130,106 @@ class CMaintenance extends CApiService {
 			if (array_key_exists('tags', $maintenance)
 					|| ($maintenance['maintenance_type'] != $db_maintenance_type
 						&& $maintenance['maintenance_type'] == MAINTENANCE_TYPE_NODATA)) {
-				$maintenanceids['tags'][] = $maintenance['maintenanceid'];
+				$maintenanceids[] = $maintenance['maintenanceid'];
 				$db_maintenances[$maintenance['maintenanceid']]['tags'] = [];
 			}
+		}
 
+		if (!$maintenanceids) {
+			return;
+		}
+
+		$options = [
+			'output' => ['maintenancetagid', 'maintenanceid', 'tag', 'operator', 'value'],
+			'filter' => ['maintenanceid' => $maintenanceids]
+		];
+		$db_tags = DBselect(DB::makeSql('maintenance_tag', $options));
+
+		while ($db_tag = DBfetch($db_tags)) {
+			$db_maintenances[$db_tag['maintenanceid']]['tags'][$db_tag['maintenancetagid']] = [
+				'maintenancetagid' => $db_tag['maintenancetagid'],
+				'tag' => $db_tag['tag'],
+				'operator' => $db_tag['operator'],
+				'value' => $db_tag['value']
+			];
+		}
+	}
+
+	/**
+	 * @param array $maintenances
+	 * @param array $db_maintenances
+	 */
+	private static function addAffectedGroupsAndHosts(array $maintenances, array &$db_maintenances): void {
+		$maintenanceids = [];
+
+		foreach ($maintenances as $maintenance) {
 			if (array_key_exists('groups', $maintenance) || array_key_exists('hosts', $maintenance)) {
-				$maintenanceids['groups'][] = $maintenance['maintenanceid'];
+				$maintenanceids[] = $maintenance['maintenanceid'];
 				$db_maintenances[$maintenance['maintenanceid']]['groups'] = [];
-
-				$maintenanceids['hosts'][] = $maintenance['maintenanceid'];
 				$db_maintenances[$maintenance['maintenanceid']]['hosts'] = [];
 			}
+		}
 
+		if (!$maintenanceids) {
+			return;
+		}
+
+		$options = [
+			'output' => ['maintenance_groupid', 'maintenanceid', 'groupid'],
+			'filter' => ['maintenanceid' => $maintenanceids]
+		];
+		$db_groups = DBselect(DB::makeSql('maintenances_groups', $options));
+
+		while ($db_group = DBfetch($db_groups)) {
+			$db_maintenances[$db_group['maintenanceid']]['groups'][$db_group['maintenance_groupid']] = [
+				'maintenance_groupid' => $db_group['maintenance_groupid'],
+				'groupid' => $db_group['groupid']
+			];
+		}
+
+		$options = [
+			'output' => ['maintenance_hostid', 'maintenanceid', 'hostid'],
+			'filter' => ['maintenanceid' => $maintenanceids]
+		];
+		$db_hosts = DBselect(DB::makeSql('maintenances_hosts', $options));
+
+		while ($db_host = DBfetch($db_hosts)) {
+			$db_maintenances[$db_host['maintenanceid']]['hosts'][$db_host['maintenance_hostid']] = [
+				'maintenance_hostid' => $db_host['maintenance_hostid'],
+				'hostid' => $db_host['hostid']
+			];
+		}
+	}
+
+	/**
+	 * @param array $maintenances
+	 * @param array $db_maintenances
+	 */
+	private static function addAffectedTimeperiods(array $maintenances, array &$db_maintenances): void {
+		$maintenanceids = [];
+
+		foreach ($maintenances as $maintenance) {
 			if (array_key_exists('timeperiods', $maintenance)) {
-				$maintenanceids['timeperiods'][] = $maintenance['maintenanceid'];
+				$maintenanceids[] = $maintenance['maintenanceid'];
 				$db_maintenances[$maintenance['maintenanceid']]['timeperiods'] = [];
 			}
 		}
 
-		if ($maintenanceids['tags']) {
-			$options = [
-				'output' => ['maintenancetagid', 'maintenanceid', 'tag', 'operator', 'value'],
-				'filter' => ['maintenanceid' => $maintenanceids['tags']]
-			];
-			$db_tags = DBselect(DB::makeSql('maintenance_tag', $options));
-
-			while ($db_tag = DBfetch($db_tags)) {
-				$db_maintenances[$db_tag['maintenanceid']]['tags'][$db_tag['maintenancetagid']] = [
-					'maintenancetagid' => $db_tag['maintenancetagid'],
-					'tag' => $db_tag['tag'],
-					'operator' => $db_tag['operator'],
-					'value' => $db_tag['value']
-				];
-			}
+		if (!$maintenanceids) {
+			return;
 		}
 
-		if ($maintenanceids['groups']) {
-			$options = [
-				'output' => ['maintenance_groupid', 'maintenanceid', 'groupid'],
-				'filter' => ['maintenanceid' => $maintenanceids['groups']]
-			];
-			$db_groups = DBselect(DB::makeSql('maintenances_groups', $options));
+		$db_timeperiods = DBselect(
+			'SELECT mw.maintenanceid,mw.timeperiodid,t.timeperiod_type,t.every,t.month,t.dayofweek,t.day,t.start_time,'.
+				't.period,t.start_date'.
+			' FROM maintenances_windows mw,timeperiods t'.
+			' WHERE mw.timeperiodid=t.timeperiodid'.
+				' AND '.dbConditionInt('mw.maintenanceid', $maintenanceids)
+		);
 
-			while ($db_group = DBfetch($db_groups)) {
-				$db_maintenances[$db_group['maintenanceid']]['groups'][$db_group['maintenance_groupid']] = [
-					'maintenance_groupid' => $db_group['maintenance_groupid'],
-					'groupid' => $db_group['groupid']
-				];
-			}
-		}
-
-		if ($maintenanceids['hosts']) {
-			$options = [
-				'output' => ['maintenance_hostid', 'maintenanceid', 'hostid'],
-				'filter' => ['maintenanceid' => $maintenanceids['hosts']]
-			];
-			$db_hosts = DBselect(DB::makeSql('maintenances_hosts', $options));
-
-			while ($db_host = DBfetch($db_hosts)) {
-				$db_maintenances[$db_host['maintenanceid']]['hosts'][$db_host['maintenance_hostid']] = [
-					'maintenance_hostid' => $db_host['maintenance_hostid'],
-					'hostid' => $db_host['hostid']
-				];
-			}
-		}
-
-		if ($maintenanceids['timeperiods']) {
-			$db_timeperiods = DBselect(
-				'SELECT mw.maintenanceid,mw.timeperiodid,t.timeperiod_type,t.every,t.month,t.dayofweek,t.day,'.
-					't.start_time,t.period,t.start_date'.
-				' FROM maintenances_windows mw,timeperiods t'.
-				' WHERE mw.timeperiodid=t.timeperiodid'.
-					' AND '.dbConditionInt('mw.maintenanceid', $maintenanceids['timeperiods'])
-			);
-
-			while ($db_timeperiod = DBfetch($db_timeperiods)) {
-				$db_maintenances[$db_timeperiod['maintenanceid']]['timeperiods'][$db_timeperiod['timeperiodid']] =
-					array_diff_key($db_timeperiod, array_flip(['maintenanceid']));
-			}
+		while ($db_timeperiod = DBfetch($db_timeperiods)) {
+			$db_maintenances[$db_timeperiod['maintenanceid']]['timeperiods'][$db_timeperiod['timeperiodid']] =
+				array_diff_key($db_timeperiod, array_flip(['maintenanceid']));
 		}
 	}
 

@@ -22,6 +22,7 @@
 use PHPUnit\Framework\TestCase;
 
 class CApiInputValidatorTest extends TestCase {
+
 	protected $default_timezone;
 
 	protected function setUp(): void {
