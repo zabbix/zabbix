@@ -673,7 +673,7 @@ class testConfiguration extends CAPITest {
 
 		// Condition for different error message text.
 		if (array_key_exists('error_contains', $data)) {
-			$this->assertContains($data['error_contains'], $result['error']['data']);
+			$this->assertStringContainsString($data['error_contains'], $result['error']['data']);
 		}
 		else {
 			$this->assertSame($data['error'], $result['error']['data']);
