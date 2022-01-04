@@ -1229,7 +1229,7 @@ class CSla extends CApiService {
 			case ZBX_SLA_PERIOD_WEEKLY:
 				$date
 					->modify('1 day')
-					->modify('last Monday');
+					->modify('last Sunday');
 				break;
 
 			case ZBX_SLA_PERIOD_MONTHLY:
@@ -1450,7 +1450,7 @@ class CSla extends CApiService {
 					: CTimezoneHelper::getSystemTimezone()
 				))
 				->modify('1 day')
-				->modify('last Monday')
+				->modify('last Sunday')
 				->getTimestamp();
 
 		for ($week = 0;; $week++) {
