@@ -90,7 +90,7 @@ finish:
  *               FAIL    - an error occurred                                  *
  *                                                                            *
  ******************************************************************************/
-int	rtc_parse_options(const char *opt, zbx_uint32_t *code, char **data, char **error)
+static int	rtc_parse_options(const char *opt, zbx_uint32_t *code, char **data, char **error)
 {
 	if (0 == strncmp(opt, ZBX_LOG_LEVEL_INCREASE, ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_INCREASE)))
 	{
