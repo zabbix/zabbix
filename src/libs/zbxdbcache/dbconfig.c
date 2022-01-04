@@ -9973,7 +9973,7 @@ static void	DCagent_set_availability(zbx_agent_availability_t *av,  unsigned cha
 		if (dst != src)					\
 			dst = src;				\
 		else						\
-			flags &= (~(mask));			\
+			flags &= (unsigned char)(~(mask));	\
 	}
 
 #define AGENT_AVAILABILITY_ASSIGN_STR(flags, mask, dst, src)	\
@@ -9982,7 +9982,7 @@ static void	DCagent_set_availability(zbx_agent_availability_t *av,  unsigned cha
 		if (0 != strcmp(dst, src))			\
 			DCstrpool_replace(1, &dst, src);	\
 		else						\
-			flags &= (~(mask));			\
+			flags &= (unsigned char)(~(mask));	\
 	}
 
 	AGENT_AVAILABILITY_ASSIGN(av->flags, ZBX_FLAGS_AGENT_STATUS_AVAILABLE, *available, av->available);

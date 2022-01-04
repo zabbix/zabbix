@@ -62,7 +62,7 @@ void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 		goto out;
 	}
 
-	zbx_update_proxy_data(&proxy, zbx_get_proxy_protocol_version(jp), time(NULL),
+	zbx_update_proxy_data(&proxy, zbx_get_proxy_protocol_version(jp), (int)time(NULL),
 			(0 != (sock->protocol & ZBX_TCP_COMPRESS) ? 1 : 0), ZBX_FLAGS_PROXY_DIFF_UPDATE_CONFIG);
 
 	if (0 != proxy.auto_compress)
@@ -95,16 +95,18 @@ void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 		zabbix_log(LOG_LEVEL_WARNING, "sending configuration data to proxy \"%s\" at \"%s\", datalen "
 				ZBX_FS_SIZE_T ", bytes " ZBX_FS_SIZE_T " with compression ratio %.1f", proxy.host,
 				sock->peer, (zbx_fs_size_t)reserved, (zbx_fs_size_t)buffer_size,
-				(double)reserved / buffer_size);
+				(double)reserved / (double)buffer_size);
 
-		ret = zbx_tcp_send_ext(sock, buffer, buffer_size, reserved, flags, CONFIG_TRAPPER_TIMEOUT);
+		ret = zbx_tcp_send_ext(sock, buffer, buffer_size, reserved, (unsigned char)flags,
+				CONFIG_TRAPPER_TIMEOUT);
 	}
 	else
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "sending configuration data to proxy \"%s\" at \"%s\", datalen "
 				ZBX_FS_SIZE_T, proxy.host, sock->peer, (zbx_fs_size_t)j.buffer_size);
 
-		ret = zbx_tcp_send_ext(sock, j.buffer, strlen(j.buffer), 0, flags, CONFIG_TRAPPER_TIMEOUT);
+		ret = zbx_tcp_send_ext(sock, j.buffer, strlen(j.buffer), 0, (unsigned char)flags,
+				CONFIG_TRAPPER_TIMEOUT);
 	}
 
 	if (SUCCEED != ret)
