@@ -171,6 +171,9 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 						if (color.length == 0 || color.length == 6) {
 							setColorHandler(color);
 						}
+						else {
+							methods.hide();
+						}
 					});
 
 				$overlay_colorbox = $('<div>', {
