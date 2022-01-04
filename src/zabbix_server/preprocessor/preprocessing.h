@@ -60,7 +60,6 @@ typedef struct
 }
 zbx_preproc_item_value_t;
 
-
 /* dependent item batch preprocessing request */
 typedef struct
 {

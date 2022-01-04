@@ -19,8 +19,6 @@
 **/
 
 
-use PHPUnit\Framework\TestCase;
-
 class CEventCorrCondValidatorTest extends CValidatorTest {
 
 	public function dataProviderValidParam() {

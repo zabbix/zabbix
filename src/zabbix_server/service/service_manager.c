@@ -2927,7 +2927,6 @@ static void	process_parentlist(const zbx_ipc_message_t *message, zbx_service_man
 	zbx_free(data);
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: service_update_event_severity                                    *
@@ -3496,4 +3495,3 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 	exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL
 }
-

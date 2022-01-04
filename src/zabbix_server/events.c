@@ -931,7 +931,6 @@ static void	correlation_condition_add_tag_match(char **sql, size_t *sql_alloc, s
 	zbx_free(tag_esc);
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: correlation_condition_get_event_filter                           *
@@ -2407,7 +2406,6 @@ static void	event_problem_free(zbx_event_problem_t *problem)
 	zbx_vector_ptr_destroy(&problem->tags);
 	zbx_free(problem);
 }
-
 
 /******************************************************************************
  *                                                                            *

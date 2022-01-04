@@ -684,7 +684,6 @@ static int	DBpatch_5050068_calc_services_write_value(zbx_uint64_t roleid, int *v
 		if (0 == strcmp("services.write", row[0]))
 			goto out;
 
-
 		if (0 == strcmp("actions.default_access", row[0]))
 			default_access = atoi(row[1]);
 	}

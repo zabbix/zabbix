@@ -238,19 +238,17 @@ class CControllerDashboardWidgetEdit extends CController {
 
 		if ($itemids) {
 			$items = API::Item()->get([
-				'output' => ['itemid', 'hostid', 'name', 'key_'],
+				'output' => ['name'],
 				'selectHosts' => ['name'],
 				'itemids' => array_keys($itemids),
 				'webitems' => true,
 				'preservekeys' => true
 			]);
 
-			$items = CMacrosResolverHelper::resolveItemNames($items);
-
 			foreach ($items as $itemid => $item) {
 				foreach ($itemids[$itemid] as $field_name) {
 					$captions['ms']['items'][$field_name][$itemid] += [
-						'name' => $item['name_expanded'],
+						'name' => $item['name'],
 						'prefix' => $item['hosts'][0]['name'].NAME_DELIMITER
 					];
 				}
@@ -277,18 +275,16 @@ class CControllerDashboardWidgetEdit extends CController {
 
 		if ($prototype_itemids) {
 			$item_prototypes = API::ItemPrototype()->get([
-				'output' => ['itemid', 'hostid', 'name', 'key_'],
+				'output' => ['name'],
 				'selectHosts' => ['name'],
 				'itemids' => array_keys($prototype_itemids),
 				'preservekeys' => true
 			]);
 
-			$item_prototypes = CMacrosResolverHelper::resolveItemNames($item_prototypes);
-
 			foreach ($item_prototypes as $itemid => $item) {
 				foreach ($prototype_itemids[$itemid] as $field_name) {
 					$captions['ms']['item_prototypes'][$field_name][$itemid] += [
-						'name' => $item['name_expanded'],
+						'name' => $item['name'],
 						'prefix' => $item['hosts'][0]['name'].NAME_DELIMITER
 					];
 				}
