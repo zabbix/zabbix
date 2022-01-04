@@ -396,7 +396,7 @@ class CMaintenance extends CApiService {
 	 *
 	 * @return array
 	 */
-	public function update(array $maintenances) {
+	public function update(array $maintenances): array {
 		if (self::$userData['type'] == USER_TYPE_ZABBIX_USER) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
@@ -587,7 +587,7 @@ class CMaintenance extends CApiService {
 	 *
 	 * @return array
 	 */
-	public function delete(array $maintenanceids) {
+	public function delete(array $maintenanceids): array {
 		if (self::$userData['type'] == USER_TYPE_ZABBIX_USER) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
