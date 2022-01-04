@@ -428,7 +428,7 @@ class testMaintenance extends CAPITest {
 					'active_since' => '1546207200',
 					'active_till' => '1514757600'
 				] + $def_options,
-				'expected_error' => 'Invalid parameter "/1/active_till": cannot be less than or equals the value of parameter "/1/active_since".'
+				'expected_error' => 'Invalid parameter "/1/active_till": cannot be less than or equal to the value of parameter "/1/active_since".'
 			],
 			// Fail. Empty groups.
 			[
@@ -1347,7 +1347,7 @@ class testMaintenance extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'At least one day of week or day must be specified.'
+				'expected_error' => 'At least one day of the week or day of the month must be specified.'
 			],
 			// Fail. Monthly period.
 			[
@@ -1424,7 +1424,7 @@ class testMaintenance extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Only day of week or day is allowed.'
+				'expected_error' => 'Day of the week and day of the month cannot be specified simultaneously.'
 			],
 			// Fail. Monthly period.
 			[
@@ -1443,7 +1443,7 @@ class testMaintenance extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'At least one day of week or day must be specified.'
+				'expected_error' => 'At least one day of the week or day of the month must be specified.'
 			],
 			// Fail. Monthly period.
 			[
