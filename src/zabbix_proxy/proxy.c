@@ -528,7 +528,7 @@ static void	zbx_set_defaults(void)
 
 	if (ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE)
 	{
-		CONFIG_CONFSYNCER_FORKS = CONFIG_DATASENDER_FORKS = 0;
+		CONFIG_DATASENDER_FORKS = 0;
 		program_type = ZBX_PROGRAM_TYPE_PROXY_PASSIVE;
 	}
 
@@ -925,7 +925,6 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			exit(EXIT_FAILURE);
 		}
 	}
-
 
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 	zbx_db_validate_config();
@@ -1335,8 +1334,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			case ZBX_PROCESS_TYPE_TRAPPER:
 				thread_args.args = &listen_sock;
 				zbx_thread_start(trapper_thread, &thread_args, &threads[i]);
-				if (0 == CONFIG_CONFSYNCER_FORKS && 1 == thread_args.process_num)
-					zbx_rtc_wait_config_sync(&rtc);
 				break;
 			case ZBX_PROCESS_TYPE_HEARTBEAT:
 				zbx_thread_start(heart_thread, &thread_args, &threads[i]);

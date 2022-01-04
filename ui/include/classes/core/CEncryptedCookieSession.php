@@ -52,7 +52,7 @@ class CEncryptedCookieSession extends CCookieSession {
 	/**
 	 * Prepare session data.
 	 *
-	 * @param string $data
+	 * @param array $data
 	 *
 	 * @return string
 	 */

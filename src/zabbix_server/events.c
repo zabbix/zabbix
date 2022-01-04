@@ -931,7 +931,6 @@ static void	correlation_condition_add_tag_match(char **sql, size_t *sql_alloc, s
 	zbx_free(tag_esc);
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: correlation_condition_get_event_filter                           *
@@ -989,7 +988,7 @@ static char	*correlation_condition_get_event_filter(zbx_corr_condition_t *condit
 			if (0 == values.values_num)
 			{
 				/* no new tag found, substitute condition with failure expression */
-				filter = zbx_strdup(NULL, "0");
+				filter = zbx_strdup(NULL, "1=0");
 			}
 			else
 			{
@@ -2407,7 +2406,6 @@ static void	event_problem_free(zbx_event_problem_t *problem)
 	zbx_vector_ptr_destroy(&problem->tags);
 	zbx_free(problem);
 }
-
 
 /******************************************************************************
  *                                                                            *

@@ -22,7 +22,6 @@ package com.zabbix.gateway;
 import org.junit.*;
 import static org.junit.Assert.*;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -145,7 +144,6 @@ public class JMXTest {
 					useRMISSLforURLHintCache.put(JMX_APP_URL, false);
 				}
 			}
-
 
 			MBeanServerConnection mbsc = jmxc.getMBeanServerConnection();
 

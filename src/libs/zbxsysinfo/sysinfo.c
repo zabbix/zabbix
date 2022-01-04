@@ -116,7 +116,6 @@ static int	parse_command_dyn(const char *command, char **cmd, char **param)
 	return ZBX_COMMAND_WITH_PARAMS;
 }
 
-
 static int	add_to_metrics(ZBX_METRIC **metrics, ZBX_METRIC *metric, char *error, size_t max_error_len)
 {
 	int		i = 0;
@@ -441,7 +440,6 @@ void	finalize_key_access_rules_configuration(void)
 	int			i, j, rules_num, sysrun_index = ZBX_MAX_UINT31_1;
 	zbx_key_access_rule_t	*rule, *sysrun_deny;
 	char			sysrun_pattern[] = "system.run[*]";
-
 
 	rules_num = key_access_rules.values_num;
 

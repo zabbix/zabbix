@@ -137,10 +137,18 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 			 * @param string|object  options.appendTo  Target element where overlay should be appended.
 			 */
 			init: function(options) {
-				const $close = $('<button type="button" class="overlay-close-btn" title="' + t('S_CLOSE') + '"/>')
-						.click(methods.hide);
+				const $close = $('<button>', {
+					type: 'button',
+					class: 'overlay-close-btn',
+					title: t('S_CLOSE')
+				})
+					.click(methods.hide);
 
-				$overlay_input = $('<input/>', {'type': 'text', 'autofocus': 'autofocus', 'maxlength': 6})
+				$overlay_input = $('<input>', {
+					type: 'text',
+					autofocus: 'autofocus',
+					maxlength: 6
+				})
 					.css('width', ZBX_TEXTAREA_COLOR_WIDTH + 'px')
 					.on('input keydown paste', e => {
 						const color = e.target.value;
@@ -158,30 +166,33 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 						}
 					});
 
-				$overlay_colorbox = $('<div/>', {'data-use-default': t('D')});
+				$overlay_colorbox = $('<div>', {'data-use-default': t('D')});
 
-				$button_use_default = $('<button/>', {
-						'type': 'button',
-						'class': 'btn-alt',
-						'aria-label': t('Use default'),
-						'title': t('Use default')
-					})
+				$button_use_default = $('<button>', {
+					type: 'button',
+					class: 'btn-alt',
+					title: t('Use default'),
+					'aria-label': t('Use default')
+				})
 					.html(t('Use default'))
 					.on('click', () => setColorHandler(''));
 
 				options = $.extend(defaults, options || {});
-				overlay = $('<div class="overlay-dialogue" id="color_picker"/>')
+				overlay = $('<div>', {
+					class: 'overlay-dialogue',
+					id: 'color_picker'
+				})
 					.append($close)
-					.append($('<div/>', {'class': 'color-picker-controls'}).append([
-						$('<div/>', {'class': 'input-color-picker'}).append([$overlay_colorbox, $overlay_input]),
-						$('<div/>', {'class': 'form-input-margin'}),
+					.append($('<div>', {class: 'color-picker-controls'}).append([
+						$('<div>', {class: 'input-color-picker'}).append([$overlay_colorbox, $overlay_input]),
+						$('<div>', {class: 'form-input-margin'}),
 						$button_use_default
 					]))
 					.append(
 						$.map(options.palette, (colors) => {
-							return $('<div class="color-picker"/>').append(
+							return $('<div>', {class: 'color-picker'}).append(
 								$.map(colors, (color) => {
-									return $('<div/>', {'title': '#' + color})
+									return $('<div>', {'title': '#' + color})
 										.css('background', '#' + color)
 										.data('color', color);
 								})
@@ -327,11 +338,11 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 				return;
 			}
 
-			$('<div/>')
+			$('<div>')
 				.attr({
-					'id': 'lbl_' + id,
-					'tabindex': 0,
-					'title': element.value ? '#' + element.value : '',
+					id: 'lbl_' + id,
+					tabindex: 0,
+					title: element.value ? '#' + element.value : '',
 					'data-use-default': t('D')
 				})
 				.on('click', (event) => {

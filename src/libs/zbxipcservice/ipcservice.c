@@ -1529,7 +1529,6 @@ void	zbx_ipc_service_free_env(void)
 	ipc_service_free_libevent();
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_ipc_service_start                                            *

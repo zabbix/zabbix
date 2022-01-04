@@ -41,7 +41,7 @@
 
 		$('#regenerate').on('click', ({target}) => {
 			if (confirm($(target).data('confirmation'))) {
-				$form.append($('<input />', {type: 'hidden', name: 'regenerate', value: '1'}));
+				$form.append($('<input>', {type: 'hidden', name: 'regenerate', value: '1'}));
 				$form.find('#action_dst').val('user.token.view');
 				$form.submit();
 			}

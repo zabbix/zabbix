@@ -1363,6 +1363,7 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 			if (FAIL == (ret = zbx_regexp_compile(param1, NULL, &regexp_err)))
 			{
 				zbx_strlcpy(err, regexp_err, sizeof(err));
+				zbx_regexp_err_msg_free(regexp_err);
 			}
 			break;
 		case ZBX_PREPROC_JSONPATH:
@@ -1433,7 +1434,10 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 			/* break; is not missing here */
 		case ZBX_PREPROC_VALIDATE_NOT_REGEX:
 			if (FAIL == (ret = zbx_regexp_compile(pp->params, NULL, &regexp_err)))
+			{
 				zbx_strlcpy(err, regexp_err, sizeof(err));
+				zbx_regexp_err_msg_free(regexp_err);
+			}
 			break;
 		case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 			if (SUCCEED != str2uint64(pp->params, "smhdw", &value_ui64) || 0 == value_ui64)
@@ -1933,7 +1937,8 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 
 	item->name = zbx_strdup(NULL, item_prototype->name);
 	item->name_proto = NULL;
-	substitute_lld_macros(&item->name, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&item->name, jp_row, lld_macro_paths, ZBX_TOKEN_LLD_MACRO | ZBX_TOKEN_LLD_FUNC_MACRO,
+			NULL, 0);
 	zbx_lrtrim(item->name, ZBX_WHITESPACE);
 
 	delay = item_prototype->delay;
@@ -2150,7 +2155,8 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	buffer = zbx_strdup(buffer, item_prototype->name);
-	substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_TOKEN_LLD_MACRO | ZBX_TOKEN_LLD_FUNC_MACRO, NULL,
+			0);
 	zbx_lrtrim(buffer, ZBX_WHITESPACE);
 	if (0 != strcmp(item->name, buffer))
 	{
@@ -3527,7 +3533,6 @@ static void lld_item_discovery_prepare_update(const zbx_lld_item_prototype_t *it
 		DBexecute_overflowed_sql(sql, sql_alloc, sql_offset);
 	}
 }
-
 
 /******************************************************************************
  *                                                                            *

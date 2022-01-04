@@ -5294,25 +5294,39 @@ svg {
 			animation: fadein .5s;
 		}
 	}
+}
 
-	.problem-icon-list {
-		flex-wrap: nowrap;
+.problem-icon-link,
+.problem-icon-list {
+	display: inline-flex;
+	margin: 1px 0;
+
+	.problem-icon-list-item {
+		color: $btn-font-color;
+		font-size: 12px;
+		line-height: 1;
+		padding: 3px 5px 2px;
+	}
+}
+
+.problem-icon-link {
+	overflow: hidden;
+	border-radius: 3px;
+
+	&:link,
+	&:hover,
+	&:focus {
+		border-bottom: none;
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 2px rgba($blue, .35);
 	}
 }
 
 .problem-icon-list {
-	display: flex;
-	flex-wrap: wrap;
-
 	.problem-icon-list-item {
 		border-radius: 3px;
-		color: $btn-font-color;
-		display: inline-block;
-		flex: 0 0 7px;
-		font-size: 12px;
-		line-height: 1;
-		padding: 3px 4px 2px;
-		margin: 1px 0;
 
 		&:not(:last-of-type) {
 			margin-right: 5px;

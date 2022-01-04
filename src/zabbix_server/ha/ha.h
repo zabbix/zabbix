@@ -43,5 +43,3 @@ int	zbx_ha_dispatch_message(zbx_ipc_message_t *message, int *ha_status, char **e
 int	zbx_ha_check_pid(pid_t pid);
 
 #endif
-
-

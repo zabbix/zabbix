@@ -461,4 +461,3 @@ char	*zbx_gen_uuid4(const char *seed)
 
 	return uuid;
 }
-

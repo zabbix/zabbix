@@ -28,12 +28,14 @@ type Accessor interface {
 	Name() string
 	Capacity() int
 	SetCapacity(capactity int)
+	IsExternal() bool
 }
 
 type Base struct {
 	log.Logger
 	name     string
 	capacity int
+	external bool
 }
 
 func (b *Base) Init(name string) {
@@ -52,4 +54,12 @@ func (b *Base) Capacity() int {
 
 func (b *Base) SetCapacity(capacity int) {
 	b.capacity = capacity
+}
+
+func (b *Base) IsExternal() bool {
+	return b.external
+}
+
+func (b *Base) SetExternal(isExternal bool) {
+	b.external = isExternal
 }

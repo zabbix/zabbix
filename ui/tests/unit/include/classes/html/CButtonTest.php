@@ -19,8 +19,6 @@
 **/
 
 
-use PHPUnit\Framework\TestCase;
-
 class CButtonTest extends CTagTest {
 
 	public function constructProvider() {

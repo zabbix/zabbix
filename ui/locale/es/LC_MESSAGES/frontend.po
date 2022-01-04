@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-13 16:02+0200\n"
-"PO-Revision-Date: 2021-12-10 11:02+0300\n"
+"POT-Creation-Date: 2021-12-22 17:25+0200\n"
+"PO-Revision-Date: 2021-12-22 11:36+0300\n"
 "Last-Translator: cesar.fernandez <cesar.fernandez@mrinformatica.es>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1639126964.000000\n"
+"X-POOTLE-MTIME: 1640165765.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
@@ -98,7 +98,7 @@ msgstr[1] "%1$d días"
 #, c-format
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
-msgstr ""
+msgstr "%1$d coincidencias para %2$s encontradas"
 
 #: app/controllers/CControllerWidgetProblemsView.php:55
 #, c-format
@@ -110,7 +110,7 @@ msgstr[1] "Se muestran %1$d de %3$d%2$s problemas"
 #: app/controllers/CControllerPopupAcknowledgeEdit.php:117
 #, c-format
 msgid "%1$d problems selected."
-msgstr ""
+msgstr "%1$d problemas seleccionados."
 
 #: chart4.php:94
 #, c-format
@@ -120,7 +120,7 @@ msgstr "%1$s (año %2$s)"
 #: include/classes/core/CModuleManager.php:228
 #, c-format
 msgid "%1$s - thrown by module located at %2$s."
-msgstr ""
+msgstr "%1$s - lanzado por el módulo localizado en %2$s."
 
 #: include/classes/api/services/CItemGeneral.php:2654
 #: include/classes/import/readers/CXmlImportReader.php:46
@@ -133,18 +133,18 @@ msgstr "%1$s [Línea: %2$s | Columna: %3$s]"
 msgctxt "screen reader"
 msgid "%1$s action"
 msgid_plural "%1$s actions"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s acción"
+msgstr[1] "%1$s acciones"
 
 #: jsLoader.php:327
 #, c-format
 msgid "%1$s characters"
-msgstr ""
+msgstr "%1$s caracteres"
 
 #: jsLoader.php:328
 #, c-format
 msgid "%1$s characters remaining"
-msgstr ""
+msgstr "%1$s caracteres restantes"
 
 #: app/views/popup.acknowledge.edit.php:60
 #: app/views/popup.acknowledge.edit.php:65
@@ -158,15 +158,15 @@ msgstr[1] "%1$s eventos"
 #, c-format
 msgid "%1$s host in maintenance"
 msgid_plural "%1$s hosts in maintenance"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s equipo en mantenimiento"
+msgstr[1] "%1$s equipos en mantenimiento"
 
 #: include/func.inc.php:2535
 #, c-format
 msgid "%1$s hour"
 msgid_plural "%1$s hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s hora"
+msgstr[1] "%1$s horas"
 
 #: app/controllers/CControllerWidgetPlainTextView.php:134
 #: app/controllers/CControllerWidgetPlainTextView.php:135
@@ -182,8 +182,8 @@ msgstr[1] "%1$s elementos"
 msgctxt "screen reader"
 msgid "%1$s message"
 msgid_plural "%1$s messages"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s mensaje"
+msgstr[1] "%1$s mensajes"
 
 #: include/classes/widgets/CWidgetConfig.php:294
 #: include/classes/widgets/CWidgetConfig.php:295
@@ -207,7 +207,7 @@ msgstr[1] "%1$s elementos de %2$s en estado de problema"
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s preselected, use down,up arrow keys and enter to select"
-msgstr ""
+msgstr "%1$s preseleccionada, use las teclas de arriba/abajo y presione intro para seleccionar"
 
 #: include/maps.inc.php:340 include/maps.inc.php:344 include/maps.inc.php:351
 #: include/maps.inc.php:400
@@ -248,8 +248,8 @@ msgstr[1] "%1$s segundos"
 #, c-format
 msgid "%1$s unacknowledged problem"
 msgid_plural "%1$s unacknowledged problems"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s problema no reconocido"
+msgstr[1] "%1$s problemas no reconocidos"
 
 #: app/views/monitoring.widget.problemhosts.view.php:108
 #: app/views/monitoring.widget.problems.view.php:207
@@ -309,7 +309,7 @@ msgstr "(Sólo los súper administradores pueden crear grupos)"
 msgid "(no proxy)"
 msgstr "(sin proxy)"
 
-#: include/classes/setup/CSetupWizard.php:480
+#: include/classes/setup/CSetupWizard.php:492
 msgid "0 - use default port"
 msgstr "0 - usar el puerto por defecto"
 
@@ -1146,7 +1146,7 @@ msgstr "Equipos permitidos"
 msgid "Allowed methods"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:854
+#: include/classes/setup/CSetupWizard.php:880
 msgid "Alternatively, you can install it manually:"
 msgstr "Alternativamente, puede instalarlo manualmente:"
 
@@ -1548,7 +1548,7 @@ msgstr ""
 msgid "Autoregistration data storage period"
 msgstr ""
 
-#: app/partials/monitoring.host.view.html.php:31
+#: app/partials/monitoring.host.view.html.php:36
 #: app/views/configuration.host.list.php:193
 msgid "Availability"
 msgstr "Disponibilidad"
@@ -1585,8 +1585,8 @@ msgstr ""
 msgid "Axes"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:322
-#: include/classes/setup/CSetupWizard.php:741
+#: include/classes/setup/CSetupWizard.php:334
+#: include/classes/setup/CSetupWizard.php:753
 msgid "Back"
 msgstr "Volver"
 
@@ -1838,7 +1838,7 @@ msgstr "Devolución de llamada"
 #: app/views/monitoring.dashboard.view.php:148
 #: app/views/popup.import.compare.php:162
 #: include/classes/html/CButtonCancel.php:25
-#: include/classes/setup/CSetupWizard.php:310 jsLoader.php:206
+#: include/classes/setup/CSetupWizard.php:322 jsLoader.php:206
 #: jsLoader.php:216 jsLoader.php:331 jsLoader.php:405
 msgid "Cancel"
 msgstr "Cancelar"
@@ -2067,7 +2067,7 @@ msgstr "No se pudo cerrar el problema: %1$s."
 msgid "Cannot connect to LDAP server."
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:579
+#: include/classes/setup/CSetupWizard.php:591
 msgid "Cannot connect to the database."
 msgstr "No se pudo conectar a la base de datos."
 
@@ -2139,7 +2139,7 @@ msgstr ""
 msgid "Cannot create service \"%1$s\": %2$s."
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:850
+#: include/classes/setup/CSetupWizard.php:876
 msgid "Cannot create the configuration file."
 msgstr "No se pudo crear el archivo de configuración."
 
@@ -3468,7 +3468,7 @@ msgid "Check for not supported value"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:58
-#: include/classes/setup/CSetupWizard.php:451
+#: include/classes/setup/CSetupWizard.php:463
 msgid "Check of pre-requisites"
 msgstr "Comprobación de requisitos previos"
 
@@ -3783,7 +3783,7 @@ msgstr "Configuración"
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "Configuración de estadísticas de memoria caché. Caché - memoria temporal (modos: pfree, total, used, free)."
 
-#: include/classes/setup/CSetupWizard.php:872
+#: include/classes/setup/CSetupWizard.php:907
 #, c-format
 msgid "Configuration file \"%1$s\" created."
 msgstr "Archivo de configuración \"%1$s\" creado."
@@ -3938,7 +3938,7 @@ msgid "Configuration updated"
 msgstr "Configuración actualizada"
 
 #: include/classes/setup/CSetupWizard.php:62
-#: include/classes/setup/CSetupWizard.php:587
+#: include/classes/setup/CSetupWizard.php:599
 msgid "Configure DB connection"
 msgstr "Configurar la conexión de BD"
 
@@ -3946,7 +3946,7 @@ msgstr "Configurar la conexión de BD"
 msgid "Confirmation text"
 msgstr "Texto de confirmación"
 
-#: include/classes/setup/CSetupWizard.php:870
+#: include/classes/setup/CSetupWizard.php:905
 msgid "Congratulations! You have successfully installed Zabbix frontend."
 msgstr "¡Felicidades! Has instalado la interfaz web de Zabbix satisfactoriamente."
 
@@ -4006,7 +4006,7 @@ msgstr ""
 msgid "Connection to Zabbix server failed. Incorrect configuration."
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:538
+#: include/classes/setup/CSetupWizard.php:550
 msgid "Connection will not be encrypted because it uses a socket file (on Unix) or shared memory (Windows)."
 msgstr ""
 
@@ -4484,7 +4484,7 @@ msgstr "Equipo actual"
 msgid "Current user"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:409
+#: include/classes/setup/CSetupWizard.php:421
 msgid "Current value"
 msgstr "Valor actual"
 
@@ -4655,9 +4655,9 @@ msgstr ""
 #: app/controllers/CControllerHostDashboardView.php:122
 #: app/controllers/CControllerPopupGeneric.php:370
 #: app/controllers/CControllerPopupImportCompare.php:170
-#: app/partials/monitoring.host.view.html.php:38
-#: app/partials/monitoring.host.view.html.php:138
-#: app/partials/monitoring.host.view.html.php:145
+#: app/partials/monitoring.host.view.html.php:42
+#: app/partials/monitoring.host.view.html.php:142
+#: app/partials/monitoring.host.view.html.php:149
 #: app/views/configuration.dashboard.edit.php:50
 #: app/views/configuration.dashboard.list.php:74
 #: app/views/monitoring.dashboard.list.php:35
@@ -4703,16 +4703,16 @@ msgstr ""
 msgid "Data storage period"
 msgstr "Periodo de almacenamiento de datos"
 
-#: include/classes/setup/CSetupWizard.php:551
-#: include/classes/setup/CSetupWizard.php:703
-#: include/classes/setup/CSetupWizard.php:940
+#: include/classes/setup/CSetupWizard.php:563
+#: include/classes/setup/CSetupWizard.php:715
+#: include/classes/setup/CSetupWizard.php:974
 msgid "Database TLS CA file"
 msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:668
-#: include/classes/setup/CSetupWizard.php:561
-#: include/classes/setup/CSetupWizard.php:711
-#: include/classes/setup/CSetupWizard.php:948
+#: include/classes/setup/CSetupWizard.php:573
+#: include/classes/setup/CSetupWizard.php:723
+#: include/classes/setup/CSetupWizard.php:982
 msgid "Database TLS certificate file"
 msgstr ""
 
@@ -4720,19 +4720,19 @@ msgstr ""
 msgid "Database TLS certificate files must be read-only"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:571
-#: include/classes/setup/CSetupWizard.php:721
+#: include/classes/setup/CSetupWizard.php:583
+#: include/classes/setup/CSetupWizard.php:733
 msgid "Database TLS cipher list"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:534
-#: include/classes/setup/CSetupWizard.php:696
+#: include/classes/setup/CSetupWizard.php:546
+#: include/classes/setup/CSetupWizard.php:708
 msgid "Database TLS encryption"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:556
-#: include/classes/setup/CSetupWizard.php:707
-#: include/classes/setup/CSetupWizard.php:944
+#: include/classes/setup/CSetupWizard.php:568
+#: include/classes/setup/CSetupWizard.php:719
+#: include/classes/setup/CSetupWizard.php:978
 msgid "Database TLS key file"
 msgstr ""
 
@@ -4744,12 +4744,12 @@ msgstr ""
 msgid "Database history tables use primary key"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:472
+#: include/classes/setup/CSetupWizard.php:484
 msgid "Database host"
 msgstr "Servidor de base de datos"
 
-#: include/classes/setup/CSetupWizard.php:566
-#: include/classes/setup/CSetupWizard.php:715
+#: include/classes/setup/CSetupWizard.php:578
+#: include/classes/setup/CSetupWizard.php:727
 msgid "Database host verification"
 msgstr ""
 
@@ -4757,35 +4757,35 @@ msgstr ""
 msgid "Database monitor"
 msgstr "Monitor de base de datos"
 
-#: include/classes/setup/CSetupWizard.php:482
-#: include/classes/setup/CSetupWizard.php:660 setup.php:45
+#: include/classes/setup/CSetupWizard.php:494
+#: include/classes/setup/CSetupWizard.php:672 setup.php:45
 msgid "Database name"
 msgstr "Nombre de la base de datos"
 
-#: include/classes/setup/CSetupWizard.php:668
+#: include/classes/setup/CSetupWizard.php:680
 msgid "Database password"
 msgstr "Contraseña de la base de datos"
 
-#: include/classes/setup/CSetupWizard.php:476
-#: include/classes/setup/CSetupWizard.php:656 setup.php:44
+#: include/classes/setup/CSetupWizard.php:488
+#: include/classes/setup/CSetupWizard.php:668 setup.php:44
 msgid "Database port"
 msgstr "Puerto de la base de datos"
 
-#: include/classes/setup/CSetupWizard.php:486
-#: include/classes/setup/CSetupWizard.php:674
+#: include/classes/setup/CSetupWizard.php:498
+#: include/classes/setup/CSetupWizard.php:686
 msgid "Database schema"
 msgstr "Esquema de la base de datos"
 
-#: include/classes/setup/CSetupWizard.php:652
+#: include/classes/setup/CSetupWizard.php:664
 msgid "Database server"
 msgstr "Servidor de base de datos"
 
-#: include/classes/setup/CSetupWizard.php:465
-#: include/classes/setup/CSetupWizard.php:635
+#: include/classes/setup/CSetupWizard.php:477
+#: include/classes/setup/CSetupWizard.php:647
 msgid "Database type"
 msgstr "Tipo de base de datos"
 
-#: include/classes/setup/CSetupWizard.php:664
+#: include/classes/setup/CSetupWizard.php:676
 msgid "Database user"
 msgstr "Usuario de base de datos"
 
@@ -4901,7 +4901,7 @@ msgid "Default host inventory mode"
 msgstr "Modo de inventario de host por defecto"
 
 #: app/views/administration.gui.edit.php:70
-#: include/classes/setup/CSetupWizard.php:399
+#: include/classes/setup/CSetupWizard.php:411
 msgid "Default language"
 msgstr ""
 
@@ -4922,12 +4922,12 @@ msgid "Default page display period"
 msgstr ""
 
 #: app/views/administration.gui.edit.php:82
-#: include/classes/setup/CSetupWizard.php:614
+#: include/classes/setup/CSetupWizard.php:626
 msgid "Default theme"
 msgstr "Tema por defecto"
 
 #: app/views/administration.gui.edit.php:75
-#: include/classes/setup/CSetupWizard.php:607
+#: include/classes/setup/CSetupWizard.php:619
 msgid "Default time zone"
 msgstr ""
 
@@ -5510,7 +5510,7 @@ msgstr "¿Desea desactivar los escenarios web seleccionados?"
 #: app/partials/configuration.filter.items.php:188
 #: app/partials/configuration.host.edit.html.php:358
 #: app/partials/monitoring.host.filter.php:129
-#: app/partials/monitoring.host.view.html.php:102
+#: app/partials/monitoring.host.view.html.php:117
 #: app/partials/scheduledreport.table.html.php:80
 #: app/views/administration.mediatype.list.php:57
 #: app/views/administration.mediatype.list.php:135
@@ -5771,7 +5771,7 @@ msgstr "Estadísticas de escritura en disco. Devuelve un valor de tipo entero en
 msgid "Display OK triggers for"
 msgstr "Mostrar iniciadores OK para"
 
-#: app/partials/monitoring.latest.view.html.php:237
+#: app/partials/monitoring.latest.view.html.php:250
 msgid "Display graph"
 msgstr "Mostrar gráfica"
 
@@ -5779,7 +5779,7 @@ msgstr "Mostrar gráfica"
 msgid "Display problems"
 msgstr "Mostrar problemas"
 
-#: app/partials/monitoring.latest.view.html.php:236
+#: app/partials/monitoring.latest.view.html.php:249
 msgid "Display stacked graph"
 msgstr "Mostrar gráfico apilado"
 
@@ -5880,7 +5880,7 @@ msgstr "Caído"
 msgid "Download image"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:856
+#: include/classes/setup/CSetupWizard.php:882
 msgid "Download the configuration file"
 msgstr "Descargar el archivo de configuración"
 
@@ -6243,7 +6243,7 @@ msgstr ""
 #: app/partials/configuration.filter.items.php:187
 #: app/partials/configuration.host.edit.html.php:279
 #: app/partials/monitoring.host.filter.php:128
-#: app/partials/monitoring.host.view.html.php:101
+#: app/partials/monitoring.host.view.html.php:116
 #: app/partials/scheduledreport.formgrid.html.php:201
 #: app/partials/scheduledreport.table.html.php:84
 #: app/views/administration.mediatype.edit.php:267
@@ -6686,7 +6686,7 @@ msgstr "INACTIVO"
 msgid "FTP"
 msgstr "FTP"
 
-#: include/classes/setup/CSetupWizard.php:425
+#: include/classes/setup/CSetupWizard.php:437
 msgid "Fail"
 msgstr "Ha fallado"
 
@@ -6932,7 +6932,7 @@ msgstr ""
 msgid "Find string on a web page. Returns the matched string, or as specified by the optional output parameter"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:334
+#: include/classes/setup/CSetupWizard.php:346
 msgid "Finish"
 msgstr "Finalizar"
 
@@ -7200,7 +7200,7 @@ msgid "Gradient line"
 msgstr "Línea de gradiente"
 
 #: app/controllers/CControllerAuditLogList.php:216
-#: app/partials/monitoring.latest.view.html.php:154
+#: app/partials/monitoring.latest.view.html.php:165
 #: app/views/monitoring.charts.view.php:55
 #: include/classes/macros/CMacrosResolverGeneral.php:1270
 #: include/classes/screens/CScreenProblem.php:1305
@@ -7344,9 +7344,9 @@ msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:248
 #: app/controllers/CControllerPopupImportCompare.php:167
-#: app/partials/monitoring.host.view.html.php:37
-#: app/partials/monitoring.host.view.html.php:127
-#: app/partials/monitoring.host.view.html.php:135
+#: app/partials/monitoring.host.view.html.php:41
+#: app/partials/monitoring.host.view.html.php:131
+#: app/partials/monitoring.host.view.html.php:139
 #: app/views/configuration.host.list.php:186
 #: app/views/configuration.host.list.php:443
 #: app/views/monitoring.charts.view.php:38
@@ -7522,7 +7522,7 @@ msgstr "Hardware (detallado)"
 msgid "Hardware sensor reading. Returns float"
 msgstr "Lectura del sensor hardware. Devuelve decimal"
 
-#: include/classes/setup/CSetupWizard.php:499
+#: include/classes/setup/CSetupWizard.php:511
 msgid "HashiCorp Vault"
 msgstr ""
 
@@ -7624,7 +7624,7 @@ msgstr ""
 
 #: app/partials/configuration.filter.items.php:152
 #: app/partials/monitoring.latest.view.html.php:52
-#: app/partials/monitoring.latest.view.html.php:154
+#: app/partials/monitoring.latest.view.html.php:165
 #: app/partials/monitoring.problem.filter.php:31
 #: app/views/administration.housekeeping.edit.php:121
 #: app/views/popup.acknowledge.edit.php:43 history.php:27
@@ -8483,7 +8483,7 @@ msgstr "Elemento inaccesible"
 msgid "Inaccessible item prototype"
 msgstr ""
 
-#: app/partials/monitoring.host.view.html.php:89
+#: app/partials/monitoring.host.view.html.php:105
 #: app/views/configuration.host.list.php:267
 #: include/classes/screens/CScreenProblem.php:386
 #: include/hostgroups.inc.php:293 include/triggers.inc.php:2027
@@ -8814,9 +8814,9 @@ msgstr "Valor o nombre de campo incorrecto \"%1$s\" en la cláusula where para l
 msgid "Incorrect fields for sysmap."
 msgstr "Campos incorrectos para el mapa de sistemas."
 
-#: include/classes/setup/CSetupWizard.php:940
-#: include/classes/setup/CSetupWizard.php:944
-#: include/classes/setup/CSetupWizard.php:948
+#: include/classes/setup/CSetupWizard.php:974
+#: include/classes/setup/CSetupWizard.php:978
+#: include/classes/setup/CSetupWizard.php:982
 #, c-format
 msgid "Incorrect file path for \"%1$s\": %2$s."
 msgstr ""
@@ -9354,6 +9354,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:172
 #: app/partials/monitoring.latest.view.html.php:60
+#: app/partials/monitoring.latest.view.html.php:73
 #: app/partials/scheduledreport.table.html.php:45
 #: app/views/configuration.host.list.php:195
 #: app/views/monitoring.service.list.edit.php:61
@@ -9445,11 +9446,12 @@ msgid "Insert expression"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:74
-#: include/classes/setup/CSetupWizard.php:877
+#: include/classes/setup/CSetupWizard.php:888
+#: include/classes/setup/CSetupWizard.php:911
 msgid "Install"
 msgstr ""
 
-#: setup.php:172
+#: setup.php:160
 msgid "Installation"
 msgstr "Instalación"
 
@@ -9461,7 +9463,7 @@ msgstr ""
 msgid "Integrations"
 msgstr ""
 
-#: app/partials/monitoring.host.view.html.php:30
+#: app/partials/monitoring.host.view.html.php:35
 #: app/views/administration.proxy.edit.php:76
 #: app/views/configuration.host.list.php:189 disc_prototypes.php:40
 #: host_discovery.php:47 include/classes/html/CHostAvailability.php:76
@@ -10551,9 +10553,9 @@ msgid "Last week graph"
 msgstr "Gráfico de la última semana"
 
 #: app/controllers/CControllerLatestView.php:189
-#: app/partials/monitoring.host.view.html.php:35
-#: app/partials/monitoring.host.view.html.php:105
-#: app/partials/monitoring.host.view.html.php:111
+#: app/partials/monitoring.host.view.html.php:39
+#: app/partials/monitoring.host.view.html.php:120
+#: app/partials/monitoring.host.view.html.php:126
 #: app/views/monitoring.latest.view.php:35 app/views/search.php:72
 #: app/views/search.php:78 app/views/search.php:231 app/views/search.php:237
 #: include/classes/helpers/CMenuHelper.php:52
@@ -10614,7 +10616,7 @@ msgstr ""
 msgid "Length"
 msgstr ""
 
-#: setup.php:195
+#: setup.php:183
 msgid "Licensed under"
 msgstr ""
 
@@ -11767,7 +11769,7 @@ msgstr ""
 #: app/partials/configuration.tags.tab.php:39
 #: app/partials/configuration.valuemap.php:29
 #: app/partials/monitoring.host.filter.php:78
-#: app/partials/monitoring.host.view.html.php:29
+#: app/partials/monitoring.host.view.html.php:34
 #: app/partials/monitoring.latest.view.html.php:41
 #: app/partials/monitoring.service.list.edit.php:41
 #: app/partials/monitoring.service.list.edit.php:49
@@ -12056,9 +12058,9 @@ msgstr ""
 msgid "Next page"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:331
-#: include/classes/setup/CSetupWizard.php:589
-#: include/classes/setup/CSetupWizard.php:741
+#: include/classes/setup/CSetupWizard.php:343
+#: include/classes/setup/CSetupWizard.php:601
+#: include/classes/setup/CSetupWizard.php:753
 msgid "Next step"
 msgstr ""
 
@@ -13667,7 +13669,7 @@ msgstr "Pasivo"
 #: app/views/popup.massupdate.item.php:175
 #: app/views/popup.massupdate.item.php:199 disc_prototypes.php:218
 #: host_discovery.php:191 httpconf.php:74
-#: include/classes/setup/CSetupWizard.php:527
+#: include/classes/setup/CSetupWizard.php:539
 #: include/views/configuration.host.discovery.edit.php:413
 #: include/views/configuration.host.discovery.edit.php:554
 #: include/views/configuration.host.discovery.edit.php:593
@@ -13825,7 +13827,7 @@ msgid "Placing algorithm"
 msgstr ""
 
 #: app/views/administration.mediatype.edit.php:208
-#: include/classes/setup/CSetupWizard.php:498
+#: include/classes/setup/CSetupWizard.php:510
 #: include/classes/widgets/CWidgetConfig.php:58
 msgid "Plain text"
 msgstr "Texto plano"
@@ -13839,7 +13841,7 @@ msgstr "Reproducir"
 msgid "Play sound"
 msgstr "Reproducir sonido"
 
-#: include/classes/setup/CSetupWizard.php:741
+#: include/classes/setup/CSetupWizard.php:753
 #, c-format
 msgid "Please check configuration parameters. If all is correct, press \"%1$s\" button, or \"%2$s\" button to change configuration parameters."
 msgstr ""
@@ -13852,12 +13854,12 @@ msgstr ""
 msgid "Please confirm that you want to remove all value mappings."
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:589
+#: include/classes/setup/CSetupWizard.php:601
 #, c-format
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:177
+#: include/classes/setup/CSetupWizard.php:189
 msgid "Please enable \"allow_url_fopen\" directive."
 msgstr ""
 
@@ -13943,7 +13945,7 @@ msgid "Power value"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:70
-#: include/classes/setup/CSetupWizard.php:739
+#: include/classes/setup/CSetupWizard.php:751
 msgid "Pre-installation summary"
 msgstr ""
 
@@ -14148,10 +14150,7 @@ msgid "Problem update"
 msgstr ""
 
 #: app/controllers/CControllerProblemView.php:151
-#: app/partials/monitoring.host.view.html.php:33
-#: app/partials/monitoring.host.view.html.php:36
-#: app/partials/monitoring.host.view.html.php:115
-#: app/partials/monitoring.host.view.html.php:122
+#: app/partials/monitoring.host.view.html.php:40
 #: app/partials/monitoring.problem.filter.php:30
 #: app/views/monitoring.problem.view.php:94 app/views/search.php:83
 #: app/views/search.php:89 app/views/search.php:247 app/views/search.php:253
@@ -14842,7 +14841,7 @@ msgstr ""
 msgid "Request type"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:409
+#: include/classes/setup/CSetupWizard.php:421
 #: include/views/configuration.httpconf.edit.php:205
 msgid "Required"
 msgstr "Requerido"
@@ -15408,7 +15407,7 @@ msgstr ""
 msgid "Save changes"
 msgstr "Guardar cambios"
 
-#: include/classes/setup/CSetupWizard.php:857
+#: include/classes/setup/CSetupWizard.php:883
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "Guardarlo como \"%1$s\""
@@ -15971,7 +15970,7 @@ msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:238
 #: include/classes/setup/CSetupWizard.php:66
-#: include/classes/setup/CSetupWizard.php:624
+#: include/classes/setup/CSetupWizard.php:636
 msgid "Settings"
 msgstr ""
 
@@ -16461,7 +16460,7 @@ msgstr ""
 #: app/partials/administration.ha.nodes.php:28
 #: app/partials/configuration.filter.items.php:184
 #: app/partials/monitoring.host.filter.php:125
-#: app/partials/monitoring.host.view.html.php:34
+#: app/partials/monitoring.host.view.html.php:38
 #: app/partials/monitoring.service.list.edit.php:54
 #: app/partials/monitoring.service.list.php:51
 #: app/partials/scheduledreport.subscription.php:35
@@ -16630,12 +16629,12 @@ msgstr ""
 msgid "Storage period"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:496
+#: include/classes/setup/CSetupWizard.php:508
 msgid "Store credentials in"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:642
-#: include/classes/setup/CSetupWizard.php:643
+#: include/classes/setup/CSetupWizard.php:654
+#: include/classes/setup/CSetupWizard.php:655
 msgid "Stored in HashiCorp Vault secret"
 msgstr ""
 
@@ -16880,7 +16879,7 @@ msgstr ""
 #: app/partials/configuration.filter.items.php:166
 #: app/partials/configuration.host.edit.html.php:524
 #: app/partials/monitoring.host.filter.php:133
-#: app/partials/monitoring.host.view.html.php:32
+#: app/partials/monitoring.host.view.html.php:37
 #: app/partials/monitoring.latest.view.html.php:58
 #: app/partials/monitoring.latest.view.html.php:71
 #: app/partials/monitoring.problem.filter.php:231
@@ -18415,7 +18414,7 @@ msgstr ""
 #: app/views/administration.user.edit.php:284
 #: app/views/reports.auditlog.list.php:90 httpconf.php:65
 #: include/actions.inc.php:1700 include/actions.inc.php:1754
-#: include/actions.inc.php:1976 include/classes/setup/CSetupWizard.php:522
+#: include/actions.inc.php:1976 include/classes/setup/CSetupWizard.php:534
 #: include/hosts.inc.php:61 include/users.inc.php:52
 #: include/views/configuration.httpconf.edit.php:165
 msgid "User"
@@ -18714,8 +18713,8 @@ msgstr ""
 msgid "Username and password"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:194
-#: include/classes/setup/CSetupWizard.php:774
+#: include/classes/setup/CSetupWizard.php:206
+#: include/classes/setup/CSetupWizard.php:800
 msgid "Username and password must be stored in Vault secret keys \"username\" and \"password\"."
 msgstr ""
 
@@ -19168,18 +19167,18 @@ msgstr "Variables"
 msgid "Various information about specific process(es). Returns float"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:502
-#: include/classes/setup/CSetupWizard.php:682
+#: include/classes/setup/CSetupWizard.php:514
+#: include/classes/setup/CSetupWizard.php:694
 msgid "Vault API endpoint"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:515
-#: include/classes/setup/CSetupWizard.php:690
+#: include/classes/setup/CSetupWizard.php:527
+#: include/classes/setup/CSetupWizard.php:702
 msgid "Vault authentication token"
 msgstr ""
 
 #: include/classes/core/ZBase.php:231
-#: include/classes/setup/CSetupWizard.php:191 include/config.inc.php:53
+#: include/classes/setup/CSetupWizard.php:203 include/config.inc.php:53
 msgid "Vault connection failed."
 msgstr ""
 
@@ -19187,8 +19186,8 @@ msgstr ""
 msgid "Vault secret"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:508
-#: include/classes/setup/CSetupWizard.php:686
+#: include/classes/setup/CSetupWizard.php:520
+#: include/classes/setup/CSetupWizard.php:698
 msgid "Vault secret path"
 msgstr ""
 
@@ -19200,7 +19199,7 @@ msgstr "Vendedor"
 msgid "Verbose"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:546
+#: include/classes/setup/CSetupWizard.php:558
 msgid "Verify database certificate"
 msgstr ""
 
@@ -19286,7 +19285,7 @@ msgstr ""
 msgid "Warning"
 msgstr "Advertencia"
 
-#: include/classes/setup/CSetupWizard.php:421
+#: include/classes/setup/CSetupWizard.php:433
 msgctxt "setup"
 msgid "Warning"
 msgstr ""
@@ -19304,9 +19303,9 @@ msgstr ""
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr ""
 
-#: app/partials/monitoring.host.view.html.php:39
-#: app/partials/monitoring.host.view.html.php:148
-#: app/partials/monitoring.host.view.html.php:156
+#: app/partials/monitoring.host.view.html.php:43
+#: app/partials/monitoring.host.view.html.php:152
+#: app/partials/monitoring.host.view.html.php:160
 #: app/views/configuration.host.list.php:188
 #: app/views/configuration.host.list.php:461 app/views/search.php:110
 #: app/views/search.php:116 app/views/search.php:158 app/views/search.php:163
@@ -19408,7 +19407,7 @@ msgstr ""
 msgid "Welcome"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:353
+#: include/classes/setup/CSetupWizard.php:365
 msgid "Welcome to"
 msgstr ""
 
@@ -19722,7 +19721,7 @@ msgstr ""
 
 #: app/views/administration.gui.edit.php:66
 #: app/views/administration.user.edit.php:233
-#: include/classes/setup/CSetupWizard.php:391
+#: include/classes/setup/CSetupWizard.php:403
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "No puede elegir algunos idiomas porque las «locales» para ellos no están instalados en el servidor web."
 
@@ -19830,8 +19829,8 @@ msgstr ""
 msgid "Zabbix server is running"
 msgstr "El servidor Zabbix se está ejecutando"
 
-#: include/classes/setup/CSetupWizard.php:602
-#: include/classes/setup/CSetupWizard.php:733
+#: include/classes/setup/CSetupWizard.php:614
+#: include/classes/setup/CSetupWizard.php:745
 msgid "Zabbix server name"
 msgstr "Nombre del servidor Zabbix"
 
@@ -20457,7 +20456,7 @@ msgstr "días"
 #: app/controllers/CControllerMapView.php:123
 #: app/partials/js/configuration.valuemap.js.php:156
 #: app/views/popup.generic.php:600 app/views/popup.valuemap.edit.php:83
-#: include/classes/setup/CSetupWizard.php:639
+#: include/classes/setup/CSetupWizard.php:651
 #: include/classes/widgets/CWidgetHelper.php:69
 msgid "default"
 msgstr "por defecto"
@@ -21273,7 +21272,7 @@ msgstr "otro"
 msgid "output"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:510
+#: include/classes/setup/CSetupWizard.php:522
 msgid "path/to/secret"
 msgstr ""
 
