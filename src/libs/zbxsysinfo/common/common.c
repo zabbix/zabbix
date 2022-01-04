@@ -246,4 +246,3 @@ static int	SYSTEM_RUN_LOCAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return system_run(request, result, LOG_LEVEL_DEBUG);
 }
-

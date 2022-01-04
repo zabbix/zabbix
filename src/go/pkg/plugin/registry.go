@@ -133,10 +133,28 @@ func ClearRegistry() {
 	Plugins = make(map[string]Accessor)
 }
 
-func ClearUserParamMetrics() {
-	for k, _ := range Metrics {
-		if Metrics[k].UsrPrm {
-			delete(Metrics, k)
+func GetByName(name string) (acc Accessor, err error) {
+	if p, ok := Plugins[name]; ok {
+		return p, nil
+	}
+	return nil, UnsupportedMetricError
+}
+
+func ClearUserParamMetrics() (metricsFallback map[string]*Metric) {
+	metricsFallback = make(map[string]*Metric)
+
+	for key, metric := range Metrics {
+		if metric.UsrPrm {
+			metricsFallback[key] = metric
+			delete(Metrics, key)
 		}
+	}
+
+	return
+}
+
+func RestoreUserParamMetrics(metrics map[string]*Metric) {
+	for key, metric := range metrics {
+		Metrics[key] = metric
 	}
 }

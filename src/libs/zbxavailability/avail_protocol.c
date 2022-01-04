@@ -67,7 +67,6 @@ void	zbx_availability_deserialize(const unsigned char *data, zbx_uint32_t size,
 		zbx_interface_availability_t	*interface_availability;
 		zbx_uint32_t			deserialize_error_len;
 
-
 		interface_availability = (zbx_interface_availability_t *)zbx_malloc(NULL,
 				sizeof(zbx_interface_availability_t));
 
@@ -83,4 +82,3 @@ void	zbx_availability_deserialize(const unsigned char *data, zbx_uint32_t size,
 		data += zbx_deserialize_str(data, &interface_availability->agent.error, deserialize_error_len);
 	}
 }
-

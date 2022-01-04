@@ -19,8 +19,6 @@
 **/
 
 
-use PHPUnit\Framework\TestCase;
-
 class CStringValidatorTest extends CValidatorTest {
 
 	public function dataProviderValidParam() {

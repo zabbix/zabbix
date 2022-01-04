@@ -27,7 +27,6 @@
 #include "comms.h"
 #include "modbtype.h"
 
-
 char	*CONFIG_HOSTS_ALLOWED		= NULL;
 char	*CONFIG_HOSTNAMES		= NULL;
 char	*CONFIG_HOSTNAME_ITEM		= NULL;

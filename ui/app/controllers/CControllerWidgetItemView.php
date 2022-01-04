@@ -21,12 +21,15 @@
 
 class CControllerWidgetItemView extends CControllerWidget {
 
+	public const CHANGE_INDICATOR_UP = 1;
+	public const CHANGE_INDICATOR_DOWN = 2;
+	public const CHANGE_INDICATOR_UP_DOWN = 3;
+
 	public function __construct() {
 		parent::__construct();
 
 		$this->setType(WIDGET_ITEM);
 		$this->setValidationRules([
-			'edit_mode' => 'in 0,1',
 			'name' => 'string',
 			'fields' => 'json',
 			'dynamic_hostid' => 'db hosts.hostid'
@@ -34,16 +37,18 @@ class CControllerWidgetItemView extends CControllerWidget {
 	}
 
 	protected function doAction() {
-		$data = [];
+		$name = $this->getDefaultName();
+		$cells = [];
+		$url = null;
 		$error = '';
 		$fields = $this->getForm()->getFieldsData();
 		$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
 		$description = '';
-		$value = '';
-		$change_indicator = [];
+		$value = null;
+		$change_indicator = null;
 		$time = '';
 		$units = '';
-		$decimals = '';
+		$decimals = null;
 		$is_dynamic = ($this->hasInput('dynamic_hostid')
 				&& ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
 					|| $fields['dynamic'] == WIDGET_DYNAMIC_ITEM)
@@ -81,6 +86,24 @@ class CControllerWidgetItemView extends CControllerWidget {
 
 		$show = array_flip($fields['show']);
 
+		/*
+		 * Select original item name in several cases: if user is in normal dashboards or in template dashboards when
+		 * user is in view mode to display that item name in widget name. Item name should be select only if it is not
+		 * overwritten. Host name can be attached to item name with delimiter when user is in normal dashboards.
+		 */
+		if ($this->getInput('name', '') === '') {
+			if ($this->getContext() === CWidgetConfig::CONTEXT_DASHBOARD
+					|| $this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
+					&& $this->hasInput('dynamic_hostid') && $tmp_items) {
+				$options['output'] = array_merge($options['output'], ['name']);
+			}
+
+			if ($this->getContext() === CWidgetConfig::CONTEXT_DASHBOARD) {
+				$options['selectHosts'] = ['name'];
+			}
+		}
+
+		// Add other fields in case current widget is set in dynamic mode, template dashboard or has a specified host.
 		if ($is_dynamic && $tmp_items || !$is_dynamic) {
 			// If description contains user macros, we need "itemid" and "hostid" to resolve them.
 			if (array_key_exists(WIDGET_ITEM_SHOW_DESCRIPTION, $show)) {
@@ -118,13 +141,6 @@ class CControllerWidgetItemView extends CControllerWidget {
 				// Get values regardless of show status, since change indicator can be shown independently.
 				$last_value = $history[$itemid][0]['value'];
 
-				// Override item units if needed.
-				if (array_key_exists(WIDGET_ITEM_SHOW_VALUE, $show) && $fields['units_show'] == 1) {
-					$units = ($fields['units'] === '')
-						? $items[$itemid]['units']
-						: $fields['units'];
-				}
-
 				// Time can be shown independently.
 				if (array_key_exists(WIDGET_ITEM_SHOW_TIME, $show)) {
 					$time = date(ZBX_FULL_DATE_TIME, (int) $history[$itemid][0]['clock']);
@@ -133,6 +149,13 @@ class CControllerWidgetItemView extends CControllerWidget {
 				switch ($value_type) {
 					case ITEM_VALUE_TYPE_FLOAT:
 					case ITEM_VALUE_TYPE_UINT64:
+						// Override item units if needed.
+						if (array_key_exists(WIDGET_ITEM_SHOW_VALUE, $show) && $fields['units_show'] == 1) {
+							$units = ($fields['units'] === '')
+								? $items[$itemid]['units']
+								: $fields['units'];
+						}
+
 						// Apply unit conversion always because it will also convert values to scientific notation.
 						$raw_units = convertUnitsRaw([
 							'value' => $last_value,
@@ -181,9 +204,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 
 							// Show of hide change indicator for mapped value.
 							if (array_key_exists(WIDGET_ITEM_SHOW_CHANGE_INDICATOR, $show)) {
-								$change_indicator = ['up' => true, 'down' => true,
-									'fill_color' => $fields['updown_color']
-								];
+								$change_indicator = self::CHANGE_INDICATOR_UP_DOWN;
 							}
 						}
 						elseif (array_key_exists(1, $history[$itemid])
@@ -195,10 +216,10 @@ class CControllerWidgetItemView extends CControllerWidget {
 							$prev_value = $history[$itemid][1]['value'];
 
 							if ($last_value > $prev_value) {
-								$change_indicator = ['up' => true, 'fill_color' => $fields['up_color']];
+								$change_indicator = self::CHANGE_INDICATOR_UP;
 							}
 							elseif ($last_value < $prev_value) {
-								$change_indicator = ['down' => true, 'fill_color' => $fields['down_color']];
+								$change_indicator = self::CHANGE_INDICATOR_DOWN;
 							}
 						}
 						break;
@@ -229,21 +250,31 @@ class CControllerWidgetItemView extends CControllerWidget {
 							$prev_value = $history[$itemid][1]['value'];
 
 							if ($last_value !== $prev_value) {
-								$change_indicator = ['up' => true, 'down' => true,
-									'fill_color' => $fields['updown_color']
-								];
+								$change_indicator = self::CHANGE_INDICATOR_UP_DOWN;
 							}
 						}
 						break;
 				}
 			}
 			else {
-				$value = _('No data');
 				$value_type = ITEM_VALUE_TYPE_TEXT;
 
 				// Since there no value, we can still show time.
 				if (array_key_exists(WIDGET_ITEM_SHOW_TIME, $show)) {
 					$time = date(ZBX_FULL_DATE_TIME);
+				}
+			}
+
+			if ($this->getInput('name', '') === '') {
+				if ($this->getContext() === CWidgetConfig::CONTEXT_DASHBOARD
+						|| $this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
+						&& $this->hasInput('dynamic_hostid')) {
+					// Resolve original item name when user is in normal dashboards or template dashbods view mode.
+					$name = $items[$itemid]['name'];
+				}
+
+				if ($this->getContext() === CWidgetConfig::CONTEXT_DASHBOARD) {
+					$name = $items[$itemid]['hosts'][0]['name'].NAME_DELIMITER.$name;
 				}
 			}
 
@@ -266,11 +297,10 @@ class CControllerWidgetItemView extends CControllerWidget {
 				$description = $items[$itemid]['name'];
 			}
 
-			$data = $this->prepareData($fields, [
+			$cells = self::arrangeByCells($fields, [
 				'description' => $description,
 				'value_type' => $value_type,
 				'units' => $units,
-				'history' => $history,
 				'value' => $value,
 				'decimals' => $decimals,
 				'change_indicator' => $change_indicator,
@@ -278,14 +308,26 @@ class CControllerWidgetItemView extends CControllerWidget {
 				'items' => $items,
 				'itemid' => $itemid
 			]);
+
+			// Use the real item value type.
+			$url = (new CUrl('history.php'))
+				->setArgument('action',
+					($items[$itemid]['value_type'] == ITEM_VALUE_TYPE_FLOAT
+							|| $items[$itemid]['value_type'] == ITEM_VALUE_TYPE_UINT64)
+						? HISTORY_GRAPH
+						: HISTORY_VALUES
+				)
+				->setArgument('itemids[]', $itemid);
 		}
 		else {
 			$error = _('No permissions to referred object or it does not exist!');
 		}
 
 		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', $this->getDefaultName()),
-			'data' => $data,
+			'name' => $this->getInput('name', $name),
+			'cells' => $cells,
+			'url' => $url,
+			'bg_color' => $fields['bg_color'],
 			'error' => $error,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
@@ -294,55 +336,10 @@ class CControllerWidgetItemView extends CControllerWidget {
 	}
 
 	/**
-	 * Translate horizontal posittion to CSS class.
-	 *
-	 * @static
-	 *
-	 * @param int $pos  Position of element.
-	 *
-	 * @return string
-	 */
-	private static function trHPos(int $pos): string {
-		switch ($pos) {
-			case WIDGET_ITEM_POS_LEFT:
-				return 'left';
-
-			case WIDGET_ITEM_POS_CENTER:
-				return 'center';
-
-			case WIDGET_ITEM_POS_RIGHT:
-				return 'right';
-		}
-	}
-
-	/**
-	 * Translate vertical posittion to CSS class.
-	 *
-	 * @static
-	 *
-	 * @param int $pos  Position of element.
-	 *
-	 * @return string
-	 */
-	private static function trVPos(int $pos): string {
-		switch ($pos) {
-			case WIDGET_ITEM_POS_TOP:
-				return 'top';
-
-			case WIDGET_ITEM_POS_MIDDLE:
-				return 'middle';
-
-			case WIDGET_ITEM_POS_BOTTOM:
-				return 'bottom';
-
-		}
-	}
-
-	/**
-	 * Convert numeric value using precice decimal points.
+	 * Convert numeric value using precise decimal points.
 	 *
 	 * @param string $value     Value to convert.
-	 * @param int    $decimals  Numer of decimal places.
+	 * @param int    $decimals  Number of decimal places.
 	 *
 	 * @return double|string  Return string if number is very large. Otherwise returns double (float).
 	 */
@@ -355,296 +352,133 @@ class CControllerWidgetItemView extends CControllerWidget {
 		}
 	}
 
-	/*
-	 * Calculate what to show and where, and prepare the output $data for view that contains classes, styles all the
-	 * values and structure in order that the blocks should be displayed.
+	/**
+	 * Arrange all widget parts by cells, apply all related configuration settings to each part.
 	 *
-	 * @param array  $fields                      Input fields from the form.
-	 * @param array  $fields['show']              Show checkboxes for description, value, time and change indicator.
-	 * @param int    $fields['desc_v_pos']        Vertical position of the description.
-	 * @param int    $fields['desc_h_pos']        Horizontal position of the description.
-	 * @param int    $fields['desc_bold']         Font weight of the description (0 - normal, 1 - bold).
-	 * @param int    $fields['desc_size']         Font size of the description.
-	 * @param string $fields['desc_color']        Font color of the description.
-	 * @param int    $fields['value_v_pos']       Vertical position of the value.
-	 * @param int    $fields['value_h_pos']       Horizontal position of the value.
-	 * @param int    $fields['value_bold']        Font weight of the value (0 - normal, 1 - bold).
-	 * @param int    $fields['value_size']        Font size of the value.
-	 * @param string $fields['value_color']       Font color of the value.
-	 * @param int    $fields['units_show']        Display units or not (0 - hide, 1 - show).
-	 * @param int    $fields['units_pos']         Position of the units.
-	 * @param int    $fields['units_bold']        Font weight of the units (0 - normal, 1 - bold).
-	 * @param int    $fields['units_size']        Font size of the units.
-	 * @param string $fields['units_color']       Font color of the units.
-	 * @param int    $fields['decimal_size']      Font size of the fraction.
-	 * @param int    $fields['time_v_pos']        Vertical position of the time.
-	 * @param int    $fields['time_h_pos']        Horizontal position of the time.
-	 * @param int    $fields['time_bold']         Font weight of the time (0 - normal, 1 - bold).
-	 * @param int    $fields['time_size']         Font size of the time.
-	 * @param string $fields['time_color']        Font color of the time.
-	 * @param string $fields['bg_color']          Background color of the widget (not including the header).
-	 * @param array  $values                      Array of pre-processed data that needs to be displayed.
-	 * @param string $values['description']       Item description with all macros resolved. Outgoing description can be
-	 *                                            string or array if it contains multiple lines.
-	 * @param string $values['value_type']        Calculated value type. It can be integer or text.
-	 * @param string $values['units']             Units of the item. Can be empty string if nothing to show.
-	 * @param array  $values['history']           History data. Can empty if item has no values.
-	 * @param string $values['value']             Value of the item or "No data" string.
-	 * @param string $values['decimals']          Decimal places.
-	 * @param array  $values['change_indicator']  Change indicator data (arrow up, arrow down and color).
-	 * @param string $values['time']              Time when item received the value or current time of no data.
-	 * @param array  $values['items']             The original array of items.
-	 * @param string $values['itemid']            Item ID from the host.
+	 * @static
+	 *
+	 * @param array       $fields                      Input fields from the form.
+	 * @param array       $fields['show']              Flags to show description, value, time and change indicator.
+	 * @param int         $fields['desc_v_pos']        Vertical position of the description.
+	 * @param int         $fields['desc_h_pos']        Horizontal position of the description.
+	 * @param int         $fields['desc_bold']         Font weight of the description (0 - normal, 1 - bold).
+	 * @param int         $fields['desc_size']         Font size of the description.
+	 * @param string      $fields['desc_color']        Font color of the description.
+	 * @param int         $fields['value_v_pos']       Vertical position of the value.
+	 * @param int         $fields['value_h_pos']       Horizontal position of the value.
+	 * @param int         $fields['value_bold']        Font weight of the value (0 - normal, 1 - bold).
+	 * @param int         $fields['value_size']        Font size of the value.
+	 * @param string      $fields['value_color']       Font color of the value.
+	 * @param int         $fields['units_show']        Display units or not (0 - hide, 1 - show).
+	 * @param int         $fields['units_pos']         Position of the units.
+	 * @param int         $fields['units_bold']        Font weight of the units (0 - normal, 1 - bold).
+	 * @param int         $fields['units_size']        Font size of the units.
+	 * @param string      $fields['units_color']       Font color of the units.
+	 * @param int         $fields['decimal_size']      Font size of the fraction.
+	 * @param int         $fields['time_v_pos']        Vertical position of the time.
+	 * @param int         $fields['time_h_pos']        Horizontal position of the time.
+	 * @param int         $fields['time_bold']         Font weight of the time (0 - normal, 1 - bold).
+	 * @param int         $fields['time_size']         Font size of the time.
+	 * @param string      $fields['time_color']        Font color of the time.
+	 * @param array       $values                      Array of pre-processed data that needs to be displayed.
+	 * @param string      $values['description']       Item description with all macros resolved.
+	 * @param string      $values['value_type']        Calculated value type. It can be integer or text.
+	 * @param string      $values['units']             Units of the item. Can be empty string if nothing to show.
+	 * @param string|null $values['value']             Value of the item or NULL if there is no value.
+	 * @param string|null $values['decimals']          Decimal places or NULL if there is no decimals to show.
+	 * @param int|null    $values['change_indicator']  Change indicator type or NULL if indicator should not be shown.
+	 * @param string      $values['time']              Time when item received the value or current time if no data.
+	 * @param array       $values['items']             The original array of items.
+	 * @param string      $values['itemid']            Item ID from the host.
 	 *
 	 * @return array
 	 */
-	private function prepareData(array $fields, array $values): array {
-		$data = [];
+	private static function arrangeByCells(array $fields, array $values): array {
+		$cells = [];
 
 		$show = array_flip($fields['show']);
 
 		if (array_key_exists(WIDGET_ITEM_SHOW_DESCRIPTION, $show)) {
-			$v = $fields['desc_v_pos'];
-			$h = $fields['desc_h_pos'];
-
-			$classes = ['item-description', self::trVPos($v), self::trHPos($h)];
-			if ($fields['desc_bold'] == 1) {
-				$classes[] = 'bold';
-			}
-
-			if (strpos($values['description'], "\n") !== false) {
-				$classes[] = 'multiline';
-				$values['description'] = zbx_nl2br($values['description']);
-			}
-
-			$styles = ['--widget-item-font' => number_format($fields['desc_size'] / 100, 2)];
-			// If advanced configuration is off, the color is null. Otherwise if default color is used, it is empty.
-			if ($fields['desc_color'] !== null && $fields['desc_color'] !== '') {
-				$styles['color'] = '#'.$fields['desc_color'];
-			}
-
-			$data[$v][$h] = [
+			$cells[$fields['desc_v_pos']][$fields['desc_h_pos']] = [
 				'item_description' => [
-					// Description can be array or string.
-					'data' => $values['description'],
-					'classes' => $classes,
-					'styles' => $styles
+					'text' => $values['description'],
+					'font_size' => $fields['desc_size'],
+					'bold' => ($fields['desc_bold'] == 1),
+					'color' => $fields['desc_color']
 				]
 			];
 		}
 
 		if (array_key_exists(WIDGET_ITEM_SHOW_VALUE, $show)) {
-			$v = $fields['value_v_pos'];
-			$h = $fields['value_h_pos'];
-
-			// Wrap value, decimals, change indicator and units in "item-value" DIV.
-			$classes = ['item-value', self::trVPos($v), self::trHPos($h),
-				($values['value_type'] == ITEM_VALUE_TYPE_FLOAT || $values['value_type'] == ITEM_VALUE_TYPE_UINT64)
-					? 'type-number'
-					: 'type-text'
-			];
-
-			$data[$v][$h] = [
-				'item_value' => [
-					'item_value_content' => [
-						'data' => [],
-						'classes' => ['item-value-content']
-					],
-					'classes' => $classes
-				]
+			$item_value_cell = [
+				'value_type' => $values['value_type']
 			];
 
 			if ($fields['units_show'] == 1 && $values['units'] !== '') {
-				// Append "data" either before or after the wrapper if above or below value. Otherwise units are inside.
-				if ($fields['units_pos'] == WIDGET_ITEM_POS_ABOVE) {
-					$data[$v][$h]['item_value'] = [
-						'data' => []
-					] + $data[$v][$h]['item_value'];
-				}
-				elseif ($fields['units_pos'] == WIDGET_ITEM_POS_BELOW) {
-					$data[$v][$h]['item_value']['data'] = [];
-				}
-
-				$units_classes = ['units'];
-				if ($fields['units_bold'] == 1) {
-					$units_classes[] = 'bold';
-				}
-
-				$units_styles = ['--widget-item-font' => number_format($fields['units_size'] / 100, 2)];
-				// No need to check for null, since displaying units depend on value checkbox.
-				if ($fields['units_color'] !== '') {
-					$units_styles['color'] = '#'.$fields['units_color'];
-				}
-
-				if ($fields['units_pos'] == WIDGET_ITEM_POS_BEFORE) {
-					$data[$v][$h]['item_value']['item_value_content']['data'][] = [
-						'units' => [
-							'data' => $values['units'],
-							'classes' => $units_classes,
-							'styles' => $units_styles
-						]
-					];
-				}
-				elseif ($fields['units_pos'] == WIDGET_ITEM_POS_ABOVE) {
-					$data[$v][$h]['item_value']['data'][] = [
-						'units' => [
-							'data' => $values['units'],
-							'classes' => $units_classes,
-							'styles' => $units_styles
-						]
-					];
-				}
+				$item_value_cell['parts']['units'] = [
+					'text' => $values['units'],
+					'font_size' => $fields['units_size'],
+					'bold' => ($fields['units_bold'] == 1),
+					'color' => $fields['units_color']
+				];
+				$item_value_cell['units_pos'] = $fields['units_pos'];
 			}
 
-			$classes = ['value'];
-			if ($fields['value_bold'] == 1) {
-				$classes[] = 'bold';
-			}
-
-			if (!$values['history']) {
-				$classes[] = 'item-value-no-data';
-			}
-
-			$styles = ['--widget-item-font' => number_format($fields['value_size'] / 100, 2)];
-			if ($fields['value_color'] !== null && $fields['value_color'] !== '') {
-				$styles['color'] = '#'.$fields['value_color'];
-			}
-
-			$data[$v][$h]['item_value']['item_value_content']['data'][] = [
-				'value' => [
-					'data' => $values['value'],
-					'classes' => $classes,
-					'styles' => $styles
-				]
+			$item_value_cell['parts']['value'] = [
+				'text' => $values['value'],
+				'font_size' => $fields['value_size'],
+				'bold' => ($fields['value_bold'] == 1),
+				'color' => $fields['value_color']
 			];
 
-			if ($values['decimals'] !== '' && ($values['value_type'] == ITEM_VALUE_TYPE_FLOAT
-							|| $values['value_type'] == ITEM_VALUE_TYPE_UINT64)) {
-				$classes = ['decimals'];
-				if ($fields['value_bold'] == 1) {
-					$classes[] = 'bold';
-				}
-
-				$styles = ['--widget-item-font' => number_format($fields['decimal_size'] / 100, 2)];
-				if ($fields['value_color'] !== null && $fields['value_color'] !== '') {
-					$styles['color'] = '#'.$fields['value_color'];
-				}
-
-				$data[$v][$h]['item_value']['item_value_content']['data'][] = [
-					'decimals' => [
-						'data' => $values['decimals'],
-						'classes' => $classes,
-						'styles' => $styles
-					]
+			if ($values['decimals'] !== null) {
+				$item_value_cell['parts']['decimals'] = [
+					'text' => $values['decimals'],
+					'font_size' => $fields['decimal_size'],
+					'bold' => ($fields['value_bold'] == 1),
+					'color' => $fields['value_color']
 				];
 			}
 
-			if (array_key_exists(WIDGET_ITEM_SHOW_CHANGE_INDICATOR, $show) && $values['change_indicator']) {
-				$data[$v][$h]['item_value']['item_value_content']['data'][] = [
-					'change_indicator' => [
-						'data' => $values['change_indicator'],
-						'classes' => ['change-indicator'],
-						'styles' => [
-							'--widget-item-font' => number_format(
-								max($fields['value_size'], $fields['decimal_size']) / 100, 2
-							)
-						]
-					]
-				];
-			}
-
-			if ($fields['units_show'] == 1 && $values['units'] !== '') {
-				if ($fields['units_pos'] == WIDGET_ITEM_POS_AFTER) {
-					$data[$v][$h]['item_value']['item_value_content']['data'][] = [
-						'units' => [
-							'data' => $values['units'],
-							'classes' => $units_classes,
-							'styles' => $units_styles
-						]
-					];
-				}
-				elseif ($fields['units_pos'] == WIDGET_ITEM_POS_BELOW) {
-					$data[$v][$h]['item_value']['data'][] = [
-						'units' => [
-							'data' => $values['units'],
-							'classes' => $units_classes,
-							'styles' => $units_styles
-						]
-					];
-				}
-			}
+			$cells[$fields['value_v_pos']][$fields['value_h_pos']] = [
+				'item_value' => $item_value_cell
+			];
 		}
-		elseif (array_key_exists(WIDGET_ITEM_SHOW_CHANGE_INDICATOR, $show) && $values['change_indicator']) {
-			$v = $fields['value_v_pos'];
-			$h = $fields['value_h_pos'];
 
-			/*
-			 * Show only change indicator without value, but do get the position of value where it should be.
-			 * If change indicator is alone, it doesn't matter if type is text or number.
-			 */
-			$classes = ['item-value', self::trVPos($v), self::trHPos($h)];
+		if (array_key_exists(WIDGET_ITEM_SHOW_CHANGE_INDICATOR, $show) && $values['change_indicator'] !== null) {
+			$colors = [
+				self::CHANGE_INDICATOR_UP => $fields['up_color'],
+				self::CHANGE_INDICATOR_DOWN => $fields['down_color'],
+				self::CHANGE_INDICATOR_UP_DOWN => $fields['updown_color']
+			];
 
-			$data[$v][$h] = [
-				'item_value' => [
-					'item_value_content' => [
-						'data' => [[
-							'change_indicator' => [
-								'data' => $values['change_indicator'],
-								'classes' => ['change-indicator'],
-								'styles' => ['--widget-item-font' => number_format($fields['value_size'] / 100, 2)]
-							]
-						]],
-						'classes' => ['item-value-content']
-					],
-					'classes' => $classes
-				]
+			// Change indicator can be displayed with or without value.
+			$cells[$fields['value_v_pos']][$fields['value_h_pos']]['item_value']['parts']['change_indicator'] = [
+				'type' => $values['change_indicator'],
+				'font_size' => ($values['decimals'] !== null)
+					? max($fields['value_size'], $fields['decimal_size'])
+					: $fields['value_size'],
+				'color' => $colors[$values['change_indicator']]
 			];
 		}
 
 		if (array_key_exists(WIDGET_ITEM_SHOW_TIME, $show)) {
-			$v = $fields['time_v_pos'];
-			$h = $fields['time_h_pos'];
-
-			$classes = ['item-time', self::trVPos($v), self::trHPos($h)];
-			if ($fields['time_bold'] == 1) {
-				$classes[] = 'bold';
-			}
-
-			$styles = ['--widget-item-font' => number_format($fields['time_size'] / 100, 2)];
-			if ($fields['time_color'] !== null && $fields['time_color'] !== '') {
-				$styles['color'] = '#'.$fields['time_color'];
-			}
-
-			$data[$v][$h] = [
+			$cells[$fields['time_v_pos']][$fields['time_h_pos']] = [
 				'item_time' => [
-					'data' => $values['time'],
-					'classes' => $classes,
-					'styles' => $styles
+					'text' => $values['time'],
+					'font_size' => $fields['time_size'],
+					'bold' => ($fields['time_bold'] == 1),
+					'color' => $fields['time_color']
 				]
 			];
 		}
 
 		// Sort data column blocks in order - left, center, right.
-		foreach ($data as &$row) {
+		foreach ($cells as &$row) {
 			ksort($row);
 		}
 		unset($row);
 
-		// Sort data row blocks in order - top, middle, bottom.
-		ksort($data);
-
-		// Use the real item value type.
-		$data['url'] = (new CUrl('history.php'))
-			->setArgument('action',
-				($values['items'][$values['itemid']]['value_type'] == ITEM_VALUE_TYPE_FLOAT
-					|| $values['items'][$values['itemid']]['value_type'] == ITEM_VALUE_TYPE_UINT64)
-				? HISTORY_GRAPH
-				: HISTORY_VALUES
-			)
-			->setArgument('itemids[]', $values['itemid']);
-
-		$data['bg_color'] = ($fields['bg_color'] !== null && $fields['bg_color'] !== '') ? $fields['bg_color'] : '';
-
-		return $data;
+		return $cells;
 	}
 }

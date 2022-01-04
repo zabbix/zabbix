@@ -28,122 +28,81 @@ if ($data['error'] !== '') {
 	$body = (new CTableInfo())->setNoDataMessage($data['error']);
 }
 else {
-	$items = [];
+	$classes_vertical = [
+		WIDGET_ITEM_POS_TOP => 'top',
+		WIDGET_ITEM_POS_MIDDLE => 'middle',
+		WIDGET_ITEM_POS_BOTTOM => 'bottom'
+	];
+	$classes_horizontal = [
+		WIDGET_ITEM_POS_LEFT => 'left',
+		WIDGET_ITEM_POS_CENTER => 'center',
+		WIDGET_ITEM_POS_RIGHT => 'right'
+	];
 
-	foreach ([WIDGET_ITEM_POS_TOP, WIDGET_ITEM_POS_MIDDLE, WIDGET_ITEM_POS_BOTTOM] as $key) {
-		$items[$key] = new CDiv();
+	$rows = [];
 
-		if (!array_key_exists($key, $data['data'])) {
-			continue;
-		}
+	foreach ($classes_vertical as $row_key => $row_class) {
+		$cols = [];
 
-		$row = $data['data'][$key];
-
-		foreach ($row as $column) {
-			// The $column_key can be "item_value", "item_time" or "item_description".
-			foreach ($column as $column_key => $block) {
-				$cell_div = new CDiv();
-
-				// The "item_value" block is special and contain more blocks inside.
-				if ($column_key === 'item_value') {
-					/*
-					 * The $block_key can be "data", "item_value_content" or "classes". We need to loop this because
-					 * units can be inside (before or after value) or outside (above or below) the wrapper. So which
-					 * ever block comes first. Except for classes. That is added for "div_item_value_content" DIV.
-					 */
-					foreach ($block as $block_key => $content) {
-						if ($block_key === 'item_value_content') {
-							$item_outer_div = new CDiv();
-
-							foreach ($content['data'] as $content_inner) {
-								foreach ($content_inner as $item_key => $item) {
-									if ($item_key === 'change_indicator') {
-										$item_inner_div = new CDiv(new CSvgArrow($item['data']));
-									}
-									else {
-										$item_inner_div = new CDiv($item['data']);
-									}
-
-									foreach ($item['classes'] as $class) {
-										$item_inner_div->addClass($class);
-									}
-
-									$cnt = count($item['styles']);
-									$i = 0;
-
-									foreach ($item['styles'] as $style => $value) {
-										$item_inner_div->addStyle($style.': '.$value.(($i + 1) != $cnt ? '; ' : ''));
-										$i++;
-									}
-
-									$item_outer_div->addItem($item_inner_div);
-								}
-							}
-
-							foreach ($block[$block_key]['classes'] as $class) {
-								$item_outer_div->addClass($class);
-							}
-
-							$cell_div->addItem($item_outer_div);
-						}
-						elseif ($block_key === 'data') {
-							foreach ($content as $content_inner) {
-								foreach ($content_inner as $item) {
-									$item_inner_div = new CDiv($item['data']);
-
-									foreach ($item['classes'] as $class) {
-										$item_inner_div->addClass($class);
-									}
-
-									$cnt = count($item['styles']);
-									$i = 0;
-
-									foreach ($item['styles'] as $style => $value) {
-										$item_inner_div->addStyle($style.': '.$value.(($i + 1) != $cnt ? '; ' : ''));
-										$i++;
-									}
-
-									$cell_div->addItem($item_inner_div);
-								}
-							}
-						}
-					}
-				}
-				else {
-					/*
-					 * This block is either description or time. Description can be array as well if it contains
-					 * multiple lines.
-					 */
-					$cell_div->addItem($block['data']);
-				}
-
-				// Regardless of whether it is description, value or time block, they have classes.
-				foreach ($block['classes'] as $class) {
-					$cell_div->addClass($class);
-				}
-
-				// Value block may not have styles.
-				if (array_key_exists('styles', $block)) {
-					$cnt = count($block['styles']);
-					$i = 0;
-
-					foreach ($block['styles'] as $style => $value) {
-						$cell_div->addStyle($style.': '.$value.(($i + 1) != $cnt ? '; ' : ''));
-						$i++;
-					}
-				}
-
-				$items[$key]->addItem($cell_div);
+		foreach ($classes_horizontal as $column_key => $column_class) {
+			if (!array_key_exists($row_key, $data['cells'])
+					|| !array_key_exists($column_key, $data['cells'][$row_key])) {
+				continue;
 			}
+
+			$div = new CDiv();
+
+			$cell = $data['cells'][$row_key][$column_key];
+			$cell_type = array_keys($cell)[0];
+			$cell_data = array_values($cell)[0];
+
+			$div->addClass($row_class);
+			$div->addClass($column_class);
+
+			switch ($cell_type) {
+				case 'item_description':
+					$div->addClass('item-description');
+
+					if (strpos($cell_data['text'], "\n") !== false) {
+						$cell_data['text'] = zbx_nl2br($cell_data['text']);
+						$div->addClass('multiline');
+					}
+
+					$div = addTextFormatting($div, $cell_data);
+					break;
+
+				case 'item_time':
+					$div->addClass('item-time');
+					$div = addTextFormatting($div, $cell_data);
+					break;
+
+				case 'item_value':
+					$div->addClass('item-value');
+
+					if (array_key_exists('value_type', $cell_data)) {
+						$div->addClass(($cell_data['value_type'] == ITEM_VALUE_TYPE_FLOAT
+								|| $cell_data['value_type'] == ITEM_VALUE_TYPE_UINT64)
+							? 'type-number'
+							: 'type-text'
+						);
+					}
+
+					$div->addItem(drawValueCell($cell_data));
+					break;
+			}
+
+			$cols[] = $div;
 		}
+
+		$rows[] = new CDiv($cols);
 	}
 
 	$body = (new CDiv(
-		new CLink($items, $data['data']['url'])
+		new CLink($rows, $data['url'])
 	))->addClass('dashboard-grid-widget-item');
 
-	if ($data['data']['bg_color'] !== '') {
-		$body->addStyle('background-color: #'.$data['data']['bg_color']);
+	if ($data['bg_color'] !== '') {
+		$body->addStyle('background-color: #'.$data['bg_color']);
 	}
 }
 
@@ -162,3 +121,111 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 }
 
 echo json_encode($output);
+
+
+/**
+ * Prepare content for value cell.
+ *
+ * @param array $cell_data  Data with all value cell parts.
+ *
+ * @return array
+ */
+function drawValueCell(array $cell_data): array {
+	$item_cell = [];
+
+	if (array_key_exists('units', $cell_data['parts'])) {
+		$units_div = (new CDiv())->addClass('units');
+		$units_div = addTextFormatting($units_div, $cell_data['parts']['units']);
+	}
+
+	// Units ABOVE value.
+	if (array_key_exists('units', $cell_data['parts']) && $cell_data['units_pos'] == WIDGET_ITEM_POS_ABOVE) {
+		$item_cell[] = $units_div;
+	}
+
+	$item_content_div = (new CDiv())->addClass('item-value-content');
+
+	// Units BEFORE value.
+	if (array_key_exists('units', $cell_data['parts']) && $cell_data['units_pos'] == WIDGET_ITEM_POS_BEFORE) {
+		$item_content_div->addItem($units_div);
+	}
+
+	if (array_key_exists('value', $cell_data['parts'])) {
+		$item_value_div = (new CDiv())->addClass('value');
+
+		if ($cell_data['parts']['value']['text'] === null) {
+			$cell_data['parts']['value']['text'] = _('No data');
+			$item_value_div->addClass('item-value-no-data');
+		}
+
+		$item_value_div = addTextFormatting($item_value_div, $cell_data['parts']['value']);
+		$item_content_div->addItem($item_value_div);
+	}
+
+	if (array_key_exists('decimals', $cell_data['parts'])) {
+		$item_decimals_div = (new CDiv())->addClass('decimals');
+		$item_decimals_div = addTextFormatting($item_decimals_div, $cell_data['parts']['decimals']);
+		$item_content_div->addItem($item_decimals_div);
+	}
+
+	if (array_key_exists('change_indicator', $cell_data['parts'])) {
+		$change_data = $cell_data['parts']['change_indicator'];
+		$item_change_div = (new CDiv())->addClass('change-indicator');
+		$item_change_div->addStyle(
+			sprintf('--widget-item-font: %1$s;', number_format($change_data['font_size'] / 100, 2))
+		);
+
+		switch ($change_data['type']) {
+			case CControllerWidgetItemView::CHANGE_INDICATOR_UP:
+				$arrow_data = ['up' => true, 'fill_color' => $change_data['color']];
+				break;
+			case CControllerWidgetItemView::CHANGE_INDICATOR_DOWN:
+				$arrow_data = ['down' => true, 'fill_color' => $change_data['color']];
+				break;
+			case CControllerWidgetItemView::CHANGE_INDICATOR_UP_DOWN:
+				$arrow_data = ['up' => true, 'down' => true, 'fill_color' => $change_data['color']];
+				break;
+		}
+
+		$item_change_div->addItem(new CSvgArrow($arrow_data));
+		$item_content_div->addItem($item_change_div);
+	}
+
+	// Units AFTER value.
+	if (array_key_exists('units', $cell_data['parts']) && $cell_data['units_pos'] == WIDGET_ITEM_POS_AFTER) {
+		$item_content_div->addItem($units_div);
+	}
+
+	$item_cell[] = $item_content_div;
+
+	// Units BELOW value.
+	if (array_key_exists('units', $cell_data['parts']) && $cell_data['units_pos'] == WIDGET_ITEM_POS_BELOW) {
+		$item_cell[] = $units_div;
+	}
+
+	return $item_cell;
+}
+
+/**
+ * Adds formatting and content for text part on widget, based on provided data.
+ *
+ * @param CDiv    $div        Div where text element will be displayed.
+ * @param array   $text_data  Text divs settings and content.
+ *
+ * @return CDiv
+ */
+function addTextFormatting(CDiv $div, array $text_data): CDiv {
+	if ($text_data['bold']) {
+		$div->addClass('bold');
+	}
+
+	$div->addStyle(sprintf('--widget-item-font: %1$s;', number_format($text_data['font_size'] / 100, 2)));
+
+	if ($text_data['color'] !== '') {
+		$div->addStyle(sprintf('color: #%1$s;', $text_data['color']));
+	}
+
+	$div->addItem($text_data['text']);
+
+	return $div;
+}

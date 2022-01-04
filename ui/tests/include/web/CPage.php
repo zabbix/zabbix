@@ -126,10 +126,10 @@ class CPage {
 		$this->resetViewport();
 
 		if (self::$cookie !== null) {
-			$session_id = $this->driver->manage()->getCookieNamed('zbx_session');
+			$cookie = $this->driver->manage()->getCookieNamed('zbx_session');
 
-			if ($session_id === null || !array_key_exists('value', $session_id)
-					|| $session_id['value'] !== self::$cookie['value']) {
+			if ($cookie === null
+					|| $cookie->getValue() !== self::$cookie['value']) {
 				self::$cookie = null;
 			}
 		}
@@ -210,7 +210,7 @@ class CPage {
 			$data = ['sessionid' => $sessionid];
 
 			$config = CDBHelper::getRow('SELECT session_key FROM config WHERE configid=1');
-			$data['sign'] = openssl_encrypt(json_encode($data), 'aes-256-ecb', $config['session_key']);
+			$data['sign'] = hash_hmac('sha256', json_encode($data), $config['session_key'], false);
 
 			$path = parse_url(PHPUNIT_URL, PHP_URL_PATH);
 			self::$cookie = [

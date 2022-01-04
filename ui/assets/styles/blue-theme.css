@@ -5756,10 +5756,7 @@ svg {
   .preprocessing-list select {
     width: 100%;
     min-width: 0; }
-  .preprocessing-list input[type=text]:not(:last-of-type),
-  .preprocessing-list .btn-link:not(:last-of-type),
-  .preprocessing-list .interface-container .interface-row .interface-cell .interface-btn-toggle:not(:last-of-type),
-  .interface-container .interface-row .interface-cell .preprocessing-list .interface-btn-toggle:not(:last-of-type) {
+  .preprocessing-list .btn-link:not(:last-of-type), .preprocessing-list .interface-container .interface-row .interface-cell .interface-btn-toggle:not(:last-of-type), .interface-container .interface-row .interface-cell .preprocessing-list .interface-btn-toggle:not(:last-of-type) {
     margin-right: 10px; }
   .preprocessing-list .preprocessing-list-head,
   .preprocessing-list .preprocessing-list-foot,
@@ -5784,6 +5781,11 @@ svg {
     max-width: 295px; }
   .preprocessing-list .step-parameters {
     flex: 1; }
+    .preprocessing-list .step-parameters z-select {
+      flex: 0 0 auto; }
+    .preprocessing-list .step-parameters > input[type=text]:not(:last-child),
+    .preprocessing-list .step-parameters z-select:not(:last-child) {
+      margin-right: 5px; }
   .preprocessing-list .step-on-fail {
     flex: 0 0 100px;
     max-width: 100px;
@@ -5979,23 +5981,30 @@ svg {
   .navtree .tree .placeholder {
     background-color: #ebeef0;
     animation: fadein .5s; }
-.navtree .problem-icon-list {
-  flex-wrap: nowrap; }
 
+.problem-icon-link,
 .problem-icon-list {
-  display: flex;
-  flex-wrap: wrap; }
+  display: inline-flex;
+  margin: 1px 0; }
+  .problem-icon-link .problem-icon-list-item,
   .problem-icon-list .problem-icon-list-item {
-    border-radius: 3px;
     color: #ffffff;
-    display: inline-block;
-    flex: 0 0 7px;
     font-size: 12px;
     line-height: 1;
-    padding: 3px 4px 2px;
-    margin: 1px 0; }
-    .problem-icon-list .problem-icon-list-item:not(:last-of-type) {
-      margin-right: 5px; }
+    padding: 3px 5px 2px; }
+
+.problem-icon-link {
+  overflow: hidden;
+  border-radius: 3px; }
+  .problem-icon-link:link, .problem-icon-link:hover, .problem-icon-link:focus {
+    border-bottom: none; }
+  .problem-icon-link:focus {
+    box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35); }
+
+.problem-icon-list .problem-icon-list-item {
+  border-radius: 3px; }
+  .problem-icon-list .problem-icon-list-item:not(:last-of-type) {
+    margin-right: 5px; }
 
 :-ms-input-placeholder {
   color: #9d9d9d !important; }
@@ -6789,3 +6798,7 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   .leaflet-control.disabled .geomap-filter-button {
     cursor: default;
     opacity: .4; }
+
+.leaflet-container {
+  height: 100%;
+  z-index: 1; }

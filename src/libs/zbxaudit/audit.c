@@ -665,5 +665,3 @@ void	zbx_audit_entry_append_string(zbx_audit_entry_t *entry, int audit_op, const
 
 	va_end(args);
 }
-
-

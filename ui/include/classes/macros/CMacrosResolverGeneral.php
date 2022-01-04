@@ -726,7 +726,7 @@ class CMacrosResolverGeneral {
 	 * Resolves macros in the item key parameters.
 	 *
 	 * @param string $key_chain		an item key chain
-	 * @param string $params_raw
+	 * @param array  $params_raw
 	 * @param array  $macros		the list of macros (['{<MACRO>}' => '<value>', ...])
 	 * @param array  $types			the types of macros (see getMacroPositions() for more details)
 	 *
@@ -992,7 +992,6 @@ class CMacrosResolverGeneral {
 		]);
 
 		$db_items = CMacrosResolverHelper::resolveItemKeys($db_items);
-		$db_items = CMacrosResolverHelper::resolveItemNames($db_items);
 		$db_items = CMacrosResolverHelper::resolveItemDescriptions($db_items);
 
 		foreach ($db_items as &$db_item) {
@@ -1000,10 +999,8 @@ class CMacrosResolverGeneral {
 		}
 		unset($db_item);
 
-
-
 		$item_macros = ['{ITEM.DESCRIPTION}' => 'description_expanded', '{ITEM.DESCRIPTION.ORIG}' => 'description',
-			'{ITEM.KEY}' => 'key_expanded', '{ITEM.KEY.ORIG}' => 'key_', '{ITEM.NAME}' => 'name_expanded',
+			'{ITEM.KEY}' => 'key_expanded', '{ITEM.KEY.ORIG}' => 'key_', '{ITEM.NAME}' => 'name',
 			'{ITEM.NAME.ORIG}' => 'name', '{ITEM.STATE}' => 'state', '{ITEM.VALUETYPE}' => 'value_type'
 		];
 
@@ -1170,14 +1167,13 @@ class CMacrosResolverGeneral {
 		];
 
 		$functions = DBfetchArray(DBselect(
-			'SELECT f.triggerid,f.functionid,i.itemid,i.hostid,i.name,i.key_,i.value_type,i.units,i.valuemapid'.
+			'SELECT f.triggerid,f.functionid,i.itemid,i.name,i.value_type,i.units,i.valuemapid'.
 			' FROM functions f'.
 				' JOIN items i ON f.itemid=i.itemid'.
 				' JOIN hosts h ON i.hostid=h.hostid'.
 			' WHERE '.dbConditionInt('f.functionid', array_keys($macros))
 		));
 
-		$functions = CMacrosResolverHelper::resolveItemNames($functions);
 		$functions = self::getItemsValueMaps($functions);
 
 		// False passed to DBfetch to get data without null converted to 0, which is done by default.
@@ -1259,7 +1255,7 @@ class CMacrosResolverGeneral {
 						$hint_table = (new CTable())
 							->addClass('list-table')
 							->addRow([
-								new CCol($function['name_expanded']),
+								new CCol($function['name']),
 								new CCol(
 									($clock !== null)
 										? zbx_date2str(DATE_TIME_FORMAT_SECONDS, $clock)
@@ -1305,7 +1301,7 @@ class CMacrosResolverGeneral {
 		}
 
 		$functions = DBfetchArray(DBselect(
-			'SELECT f.triggerid,f.functionid,i.itemid,i.hostid,i.name,i.key_,i.value_type'.
+			'SELECT f.triggerid,f.functionid,i.itemid,i.value_type'.
 			' FROM functions f'.
 				' JOIN items i ON f.itemid=i.itemid'.
 				' JOIN hosts h ON i.hostid=h.hostid'.
@@ -1316,8 +1312,6 @@ class CMacrosResolverGeneral {
 		if (!$functions) {
 			return $macro_values;
 		}
-
-		$functions = CMacrosResolverHelper::resolveItemNames($functions);
 
 		foreach ($functions as $function) {
 			foreach ($macros[$function['functionid']] as $m => $tokens) {
@@ -1679,9 +1673,11 @@ class CMacrosResolverGeneral {
 				$interfaceids[$db_item['interfaceid']][] = $itemid;
 			}
 			else {
-				// Collecting host IDs for items without interface. Macros for such items will resolve to either the
-				// Zabbix agent, SNMP, JMX or IPMI interface of the host in this order of priority or to 'UNKNOWN' if
-				// the host does not have any interface.
+				/*
+				 * Collecting host IDs for items without interface. Macros for such items will resolve to either the
+				 * Zabbix agent, SNMP, JMX or IPMI interface of the host in this order of priority or to 'UNKNOWN' if
+				 * the host does not have any interface.
+				 */
 				$hostids[$db_item['hostid']][] = $itemid;
 			}
 		}
@@ -1702,9 +1698,11 @@ class CMacrosResolverGeneral {
 				return self::interfacePriorities[$b['type']] <=> self::interfacePriorities[$a['type']];
 			});
 
-			// Collecting host interfaces:
-			//  - with highest priority for each host
-			//  - with interface IDs contained in the $interfaceids array
+			/*
+			 * Collecting host interfaces:
+			 *  - with highest priority for each host
+			 *  - with interface IDs contained in the $interfaceids array
+			 */
 			foreach ($db_interfaces as $interfaceid => $db_interface) {
 				if (array_key_exists($db_interface['hostid'], $hostids)) {
 					$host_interfaces[$db_interface['hostid']] = $interfaceid;

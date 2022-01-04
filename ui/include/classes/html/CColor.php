@@ -121,7 +121,7 @@ class CColor extends CDiv {
 	}
 
 	/**
-	 * Make coloricker initialization javascript.
+	 * Make colorpicker initialization javascript.
 	 *
 	 * @return string
 	 */

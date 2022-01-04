@@ -19,8 +19,6 @@
 **/
 
 
-use PHPUnit\Framework\TestCase;
-
 class CCollectionValidatorTest extends CValidatorTest {
 
 	public function dataProviderValidParam() {

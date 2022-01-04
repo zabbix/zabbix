@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-10-11T06:06:55Z'
+  date: '2021-11-29T15:35:13Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -631,7 +631,7 @@ zabbix_export:
               history: 7d
               description: |
                 MIB: MIKROTIK-MIB
-                mtxrWlApClientCount Client established connection to AP, but didn't finish all authetncation procedures for full connection.
+                mtxrWlApClientCount Client established connection to AP, but didn't finish all authentication procedures for full connection.
               tags:
                 -
                   tag: Application
@@ -700,7 +700,7 @@ zabbix_export:
               history: 7d
               description: |
                 MIB: MIKROTIK-MIB
-                mtxrWlCMRegClientCount Client established connection to AP, but didn't finish all authetncation procedures for full connection.
+                mtxrWlCMRegClientCount Client established connection to AP, but didn't finish all authentication procedures for full connection.
               tags:
                 -
                   tag: Application

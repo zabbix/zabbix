@@ -36,10 +36,10 @@
 		 */
 		var data = JSON.parse('<?= json_encode($data) ?>'),
 			$table = $('#charts'),
-			$tmpl_row = $('<tr />').append(
-				$('<div />', {class: 'flickerfreescreen'}).append(
-					$('<div />', {class: '<?= ZBX_STYLE_CENTER ?>', style: 'min-height: 100px;'}).append(
-						$('<img />')
+			$tmpl_row = $('<tr>').append(
+				$('<div>', {class: 'flickerfreescreen'}).append(
+					$('<div>', {class: '<?= ZBX_STYLE_CENTER ?>', style: 'min-height: 100px;'}).append(
+						$('<img>')
 					)
 				)
 			);

@@ -387,7 +387,7 @@ foreach ($data['inventory_fields'] as $inventory_no => $inventory_field) {
 
 	// Link to populating item at the right side (if any).
 	if (array_key_exists($inventory_no, $data['inventory_items'])) {
-		$item_name = $data['inventory_items'][$inventory_no]['name_expanded'];
+		$item_name = $data['inventory_items'][$inventory_no]['name'];
 
 		$link = (new CLink($item_name,
 			(new CUrl('items.php'))

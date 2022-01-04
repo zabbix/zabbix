@@ -2318,8 +2318,6 @@ static void	item_parents_sql_alloc(char **sql, size_t *sql_alloc, zbx_vector_uin
 			objectids_tmp->values, objectids_tmp->values_num);
 }
 
-
-
 /******************************************************************************
  *                                                                            *
  * Function: check_intern_host_template_condition                             *
@@ -2565,7 +2563,6 @@ static void	check_internal_condition(const zbx_vector_ptr_t *esc_events, zbx_con
 		zabbix_log(LOG_LEVEL_ERR, "unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
 				(int)condition->op, condition->conditionid);
 	}
-
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 }
@@ -3602,7 +3599,7 @@ void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actio
 	DBadd_condition_alloc(&filter, &filter_alloc, &filter_offset, "actionid", actionids->values,
 			actionids->values_num);
 
-	result = DBselect("select actionid,name,status,eventsource,esc_period,pause_suppressed"
+	result = DBselect("select actionid,name,status,eventsource,esc_period,pause_suppressed,notify_if_canceled"
 				" from actions"
 				" where%s order by actionid", filter);
 
@@ -3627,6 +3624,7 @@ void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actio
 		zbx_free(tmp);
 
 		ZBX_STR2UCHAR(action->pause_suppressed, row[5]);
+		ZBX_STR2UCHAR(action->notify_if_canceled, row[6]);
 		action->name = zbx_strdup(NULL, row[1]);
 		action->recovery = ZBX_ACTION_RECOVERY_NONE;
 

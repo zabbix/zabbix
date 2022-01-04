@@ -234,4 +234,3 @@ zbx_uint32_t	zbx_letoh_uint32(zbx_uint32_t data)
 
 	return data;
 }
-

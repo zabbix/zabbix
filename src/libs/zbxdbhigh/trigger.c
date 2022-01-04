@@ -304,7 +304,6 @@ void	zbx_append_trigger_diff(zbx_vector_ptr_t *trigger_diff, zbx_uint64_t trigge
 	zbx_vector_ptr_append(trigger_diff, diff);
 }
 
-
 /* temporary cache of trigger related data */
 typedef struct
 {
@@ -778,7 +777,6 @@ static void	db_trigger_get_expression(const zbx_eval_context_t *ctx, char **expr
 
 	zbx_eval_clear(&local_ctx);
 }
-
 
 /******************************************************************************
  *                                                                            *

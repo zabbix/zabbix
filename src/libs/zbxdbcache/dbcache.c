@@ -1100,7 +1100,7 @@ static void	db_get_items_info_by_itemid(zbx_hashset_t *items_info, const zbx_vec
 			continue;
 		}
 
-		zbx_substitute_item_name_macros(item_info->item, row[1], &item_info->name);
+		item_info->name = zbx_strdup(item_info->name, row[1]);
 	}
 	DBfree_result(result);
 
@@ -3928,6 +3928,9 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned
 		return;
 	}
 
+	if (NULL == result)
+		return;
+
 	/* allow proxy to send timestamps of empty (throttled etc) values to update nextchecks for queue */
 	if (!ISSET_VALUE(result) && !ISSET_META(result) && 0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return;
@@ -4998,7 +5001,6 @@ void	zbx_db_trigger_queue_unlock(void)
 {
 	cache->db_trigger_queue_lock = 0;
 }
-
 
 /******************************************************************************
  *                                                                            *

@@ -335,7 +335,7 @@ class testFormSetup extends CWebTest {
 
 	public function testFormSetup_installSection() {
 		$this->openSpecifiedSection('Install');
-		$this->checkPageTextElements('Install', '/conf/zabbix.conf.php" created.');
+		$this->checkPageTextElements('Install', 'Configuration file "conf/zabbix.conf.php" created.');
 		$this->assertEquals('Congratulations! You have successfully installed Zabbix frontend.',
 				$this->query('class:green')->one()->getText());
 		$this->checkButtons('last section');

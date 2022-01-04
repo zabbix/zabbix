@@ -502,6 +502,10 @@ class CItem extends CItemGeneral {
 				$item['query_fields'] = '';
 				$item['headers'] = '';
 			}
+
+			if (array_key_exists('preprocessing', $item)) {
+				$item['preprocessing'] = $this->normalizeItemPreprocessingSteps($item['preprocessing']);
+			}
 		}
 		unset($item);
 
@@ -710,6 +714,10 @@ class CItem extends CItemGeneral {
 					return $tag + ['value' => ''];
 				}, $item['tags']);
 			}
+
+			if (array_key_exists('preprocessing', $item)) {
+				$item['preprocessing'] = $this->normalizeItemPreprocessingSteps($item['preprocessing']);
+			}
 		}
 		unset($item);
 
@@ -789,7 +797,8 @@ class CItem extends CItemGeneral {
 			'selectTags' => ['tag', 'value'],
 			'hostids' => $data['templateids'],
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
-			'preservekeys' => true
+			'preservekeys' => true,
+			'nopermissions' => true
 		]);
 
 		foreach ($tpl_items as &$tpl_item) {

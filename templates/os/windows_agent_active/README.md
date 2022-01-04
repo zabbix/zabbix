@@ -136,7 +136,7 @@ No specific Zabbix configuration is required.
 |{$VFS.FS.FSDRIVETYPE.MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p> |`fixed` |
 |{$VFS.FS.FSDRIVETYPE.NOT_MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p> |`^\s$` |
 |{$VFS.FS.FSNAME.MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p> |`.*` |
-|{$VFS.FS.FSNAME.NOT_MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p> |`^(/dev|/sys|/run|/proc|.+/shm$)` |
+|{$VFS.FS.FSNAME.NOT_MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p> |`^(?:/dev|/sys|/run|/proc|.+/shm$)` |
 |{$VFS.FS.FSTYPE.MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p> |`.*` |
 |{$VFS.FS.FSTYPE.NOT_MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p> |`^\s$` |
 |{$VFS.FS.PUSED.MAX.CRIT} |<p>The critical threshold of the filesystem utilization in percent.</p> |`90` |
@@ -367,9 +367,9 @@ No specific Zabbix configuration is required.
 |Name|Description|Default|
 |----|-----------|-------|
 |{$SERVICE.NAME.MATCHES} |<p>This macro is used in Service discovery. Can be overridden on the host or linked template level.</p> |`^.*$` |
-|{$SERVICE.NAME.NOT_MATCHES} |<p>This macro is used in Service discovery. Can be overridden on the host or linked template level.</p> |`^RemoteRegistry|MMCSS|gupdate|SysmonLog|clr_optimization_v.+|clr_optimization_v.+|sppsvc|gpsvc|Pml Driver HPZ12|Net Driver HPZ12|MapsBroker|IntelAudioService|Intel\(R\) TPM Provisioning Service|dbupdate|DoSvc$` |
-|{$SERVICE.STARTUPNAME.MATCHES} |<p>This macro is used in Service discovery. Can be overridden on the host or linked template level.</p> |`^automatic|automatic delayed$` |
-|{$SERVICE.STARTUPNAME.NOT_MATCHES} |<p>This macro is used in Service discovery. Can be overridden on the host or linked template level.</p> |`^manual|disabled$` |
+|{$SERVICE.NAME.NOT_MATCHES} |<p>This macro is used in Service discovery. Can be overridden on the host or linked template level.</p> |`^(?:RemoteRegistry|MMCSS|gupdate|SysmonLog|clr_optimization_v.+|clr_optimization_v.+|sppsvc|gpsvc|Pml Driver HPZ12|Net Driver HPZ12|MapsBroker|IntelAudioService|Intel\(R\) TPM Provisioning Service|dbupdate|DoSvc)$` |
+|{$SERVICE.STARTUPNAME.MATCHES} |<p>This macro is used in Service discovery. Can be overridden on the host or linked template level.</p> |`^(?:automatic|automatic delayed)$` |
+|{$SERVICE.STARTUPNAME.NOT_MATCHES} |<p>This macro is used in Service discovery. Can be overridden on the host or linked template level.</p> |`^(?:manual|disabled)$` |
 
 ## Template links
 
