@@ -24,7 +24,7 @@ import (
 	"net"
 
 	"github.com/natefinch/npipe"
-	"zabbix.com/plugins/plugin/container"
+	"zabbix.com/plugins/external"
 )
 
 func getListener(socket string) (listener net.Listener, err error) {
