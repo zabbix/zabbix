@@ -5220,7 +5220,7 @@ class CApiInputValidatorTest extends TestCase {
 					'active_till' => '1640995200' // 2022-01-01 00:00:00
 				],
 				'/',
-				'Invalid parameter "/active_till": cannot be less than or equals the value of parameter "/active_since".',
+				'Invalid parameter "/active_till": cannot be less than or equal to the value of parameter "/active_since".',
 			]
 		];
 	}
