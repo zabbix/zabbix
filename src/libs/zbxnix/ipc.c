@@ -23,8 +23,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_shm_create                                                   *
- *                                                                            *
  * Purpose: Create block of shared memory                                     *
  *                                                                            *
  * Parameters:  size - size                                                   *
@@ -50,8 +48,6 @@ int	zbx_shm_create(size_t size)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_shm_destroy                                                  *
  *                                                                            *
  * Purpose: Destroy block of shared memory                                    *
  *                                                                            *

@@ -27,8 +27,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_rtc_parse_loglevel_option                                    *
- *                                                                            *
  * Purpose: parse loglevel runtime control option                             *
  *                                                                            *
  * Parameters: opt       - [IN] the runtime control option                    *

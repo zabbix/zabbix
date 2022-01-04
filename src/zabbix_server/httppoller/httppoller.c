@@ -34,8 +34,6 @@ extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 /******************************************************************************
  *                                                                            *
- * Function: get_minnextcheck                                                 *
- *                                                                            *
  * Purpose: calculate when we have to process earliest httptest               *
  *                                                                            *
  * Return value: timestamp of earliest check or -1 if not found               *
@@ -77,8 +75,6 @@ static int	get_minnextcheck(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: main_httppoller_loop                                             *
  *                                                                            *
  * Purpose: main loop of processing of httptests                              *
  *                                                                            *

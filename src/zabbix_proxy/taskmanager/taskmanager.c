@@ -45,8 +45,6 @@ static volatile sig_atomic_t	snmp_cache_reload_requested;
 
 /******************************************************************************
  *                                                                            *
- * Function: tm_execute_remote_command                                        *
- *                                                                            *
  * Purpose: execute remote command task                                       *
  *                                                                            *
  * Parameters: taskid - [IN] the task identifier                              *
@@ -164,8 +162,6 @@ finish:
 
 /******************************************************************************
  *                                                                            *
- * Function: tm_process_check_now                                             *
- *                                                                            *
  * Purpose: process check now tasks for item rescheduling                     *
  *                                                                            *
  * Return value: The number of successfully processed tasks                   *
@@ -219,8 +215,6 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 
 /******************************************************************************
  *                                                                            *
- * Function: tm_execute_data_json                                             *
- *                                                                            *
  * Purpose: process data task with json contents                              *
  *                                                                            *
  * Return value: SUCCEED - the data task was executed                         *
@@ -252,8 +246,6 @@ static int	tm_execute_data_json(int type, const char *data, char **info)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: tm_execute_data                                                  *
  *                                                                            *
  * Purpose: process data task                                                 *
  *                                                                            *
@@ -321,8 +313,6 @@ finish:
 
 /******************************************************************************
  *                                                                            *
- * Function: tm_process_tasks                                                 *
- *                                                                            *
  * Purpose: process task manager tasks depending on task type                 *
  *                                                                            *
  * Return value: The number of successfully processed tasks                   *
@@ -382,8 +372,6 @@ static int	tm_process_tasks(int now)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: tm_remove_old_tasks                                              *
  *                                                                            *
  * Purpose: remove old done/expired tasks                                     *
  *                                                                            *

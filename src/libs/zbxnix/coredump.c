@@ -24,8 +24,6 @@
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
- * Function: zbx_coredump_disable                                             *
- *                                                                            *
  * Purpose: disable core dump                                                 *
  *                                                                            *
  * Return value: SUCCEED - core dump disabled                                 *

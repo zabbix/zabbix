@@ -71,8 +71,6 @@ zbx_regmatch_t;
 
 /******************************************************************************
  *                                                                            *
- * Function: regexp_compile                                                   *
- *                                                                            *
  * Purpose: compiles a regular expression                                     *
  *                                                                            *
  * Parameters:                                                                *
@@ -187,8 +185,6 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 
 /*******************************************************
  *                                                     *
- * Function: zbx_regexp_compile                        *
- *                                                     *
  * Purpose: public wrapper for regexp_compile          *
  *                                                     *
  *******************************************************/
@@ -203,8 +199,6 @@ int	zbx_regexp_compile(const char *pattern, zbx_regexp_t **regexp, const char **
 
 /*******************************************************
  *                                                     *
- * Function: zbx_regexp_compile_ext                    *
- *                                                     *
  * Purpose: public wrapper for regexp_compile          *
  *                                                     *
  *******************************************************/
@@ -214,8 +208,6 @@ int	zbx_regexp_compile_ext(const char *pattern, zbx_regexp_t **regexp, int flags
 }
 
 /****************************************************************************************************
- *                                                                                                  *
- * Function: regexp_prepare                                                                         *
  *                                                                                                  *
  * Purpose: wrapper for zbx_regexp_compile. Caches and reuses the last used regexp.                 *
  *                                                                                                  *
@@ -269,8 +261,6 @@ static unsigned long int compute_recursion_limit(void)
 }
 
 /***********************************************************************************
- *                                                                                 *
- * Function: regexp_exec                                                           *
  *                                                                                 *
  * Purpose: wrapper for pcre_exec(), searches for a given pattern, specified by    *
  *          regexp, in the string                                                  *
@@ -395,8 +385,6 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_regexp_free                                                  *
- *                                                                            *
  * Purpose: wrapper for pcre_free                                             *
  *                                                                            *
  * Parameters: regexp - [IN] compiled regular expression                      *
@@ -422,8 +410,6 @@ void	zbx_regexp_free(zbx_regexp_t *regexp)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_regexp_match_precompiled                                     *
- *                                                                            *
  * Purpose: checks if string matches a precompiled regular expression without *
  *          returning matching groups                                         *
  *                                                                            *
@@ -443,8 +429,6 @@ int     zbx_regexp_match_precompiled(const char *string, const zbx_regexp_t *reg
 }
 
 /****************************************************************************************************
- *                                                                                                  *
- * Function: zbx_regexp                                                                             *
  *                                                                                                  *
  * Purpose: compiles and executes a regexp                                                          *
  *                                                                                                  *
@@ -497,8 +481,6 @@ char	*zbx_regexp_match(const char *string, const char *pattern, int *len)
 
 /******************************************************************************
  *                                                                            *
- * Function: strncpy_alloc                                                    *
- *                                                                            *
  * Purpose: zbx_strncpy_alloc with maximum allocated memory limit.            *
  *                                                                            *
  * Parameters: str       - [IN/OUT] destination buffer pointer                *
@@ -518,8 +500,6 @@ static void	strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const c
 }
 
 /*********************************************************************************
- *                                                                               *
- * Function: regexp_sub_replace                                                  *
  *                                                                               *
  * Purpose: Constructs a string from the specified template and regexp match.    *
  *                                                                               *
@@ -639,8 +619,6 @@ out:
 
 /*********************************************************************************
  *                                                                               *
- * Function: regexp_sub                                                          *
- *                                                                               *
  * Purpose: Test if a string matches the specified regular expression. If yes    *
  *          then create a return value by substituting '\<n>' sequences in       *
  *          output template with the captured groups.                            *
@@ -701,8 +679,6 @@ static int	regexp_sub(const char *string, const char *pattern, const char *outpu
 
 /*********************************************************************************
  *                                                                               *
- * Function: zbx_mregexp_sub_precompiled                                         *
- *                                                                               *
  * Purpose: Test if a string matches precompiled regular expression. If yes      *
  *          then create a return value by substituting '\<n>' sequences in       *
  *          output template with the captured groups.                            *
@@ -752,8 +728,6 @@ int	zbx_mregexp_sub_precompiled(const char *string, const zbx_regexp_t *regexp, 
 
 /*********************************************************************************
  *                                                                               *
- * Function: zbx_regexp_sub                                                      *
- *                                                                               *
  * Purpose: Test if a string matches the specified regular expression. If yes    *
  *          then create a return value by substituting '\<n>' sequences in       *
  *          output template with the captured groups.                            *
@@ -781,8 +755,6 @@ int	zbx_regexp_sub(const char *string, const char *pattern, const char *output_t
 
 /*********************************************************************************
  *                                                                               *
- * Function: zbx_mregexp_sub                                                     *
- *                                                                               *
  * Purpose: This function is similar to zbx_regexp_sub() with exception that     *
  *          multiline matches are accepted.                                      *
  *                                                                               *
@@ -794,8 +766,6 @@ int	zbx_mregexp_sub(const char *string, const char *pattern, const char *output_
 
 /*********************************************************************************
  *                                                                               *
- * Function: zbx_iregexp_sub                                                     *
- *                                                                               *
  * Purpose: This function is similar to zbx_regexp_sub() with exception that     *
  *          case insensitive matches are accepted.                               *
  *                                                                               *
@@ -806,8 +776,6 @@ int	zbx_iregexp_sub(const char *string, const char *pattern, const char *output_
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_regexp_clean_expressions                                     *
  *                                                                            *
  * Purpose: frees expression data retrieved by DCget_expressions function or  *
  *          prepared with add_regexp_ex() function calls                      *
@@ -849,8 +817,6 @@ void	add_regexp_ex(zbx_vector_ptr_t *regexps, const char *name, const char *expr
 }
 
 /**********************************************************************************
- *                                                                                *
- * Function: regexp_match_ex_regsub                                               *
  *                                                                                *
  * Purpose: Test if the string matches regular expression with the specified      *
  *          case sensitivity option and allocates output variable to store the    *
@@ -912,8 +878,6 @@ static int	regexp_match_ex_regsub(const char *string, const char *pattern, int c
 
 /**********************************************************************************
  *                                                                                *
- * Function: regexp_match_ex_substring                                            *
- *                                                                                *
  * Purpose: Test if the string contains substring with the specified case         *
  *          sensitivity option.                                                   *
  *                                                                                *
@@ -944,8 +908,6 @@ static int	regexp_match_ex_substring(const char *string, const char *pattern, in
 }
 
 /**********************************************************************************
- *                                                                                *
- * Function: regexp_match_ex_substring_list                                       *
  *                                                                                *
  * Purpose: Test if the string contains a substring from list with the specified  *
  *          delimiter and case sensitivity option.                                *
@@ -987,8 +949,6 @@ static int	regexp_match_ex_substring_list(const char *string, char *pattern, int
 }
 
 /**********************************************************************************
- *                                                                                *
- * Function: regexp_sub_ex                                                        *
  *                                                                                *
  * Purpose: Test if the string matches regular expression with the specified      *
  *          case sensitivity option and allocates output variable to store the    *
@@ -1145,8 +1105,6 @@ int	zbx_global_regexp_exists(const char *name, const zbx_vector_ptr_t *regexps)
 
 /**********************************************************************************
  *                                                                                *
- * Function: zbx_regexp_escape_stringsize                                         *
- *                                                                                *
  * Purpose: calculate a string size after symbols escaping                        *
  *                                                                                *
  * Parameters: string - [IN] the string to check                                  *
@@ -1199,8 +1157,6 @@ static size_t	zbx_regexp_escape_stringsize(const char *string)
 
 /**********************************************************************************
  *                                                                                *
- * Function: zbx_regexp_escape_string                                             *
- *                                                                                *
  * Purpose: replace . \ + * ? [ ^ ] $ ( ) { } = ! < > | : - symbols in string     *
  *          with combination of \ and escaped symbol                              *
  *                                                                                *
@@ -1250,8 +1206,6 @@ static void	zbx_regexp_escape_string(char *p, const char *string)
 
 /**********************************************************************************
  *                                                                                *
- * Function: zbx_regexp_escape                                                    *
- *                                                                                *
  * Purpose: escaping of symbols for using in regexp expression                    *
  *                                                                                *
  * Parameters: string - [IN/OUT] the string to update                             *
@@ -1273,8 +1227,6 @@ void	zbx_regexp_escape(char **string)
 }
 
 /**********************************************************************************
- *                                                                                *
- * Function: zbx_wildcard_minimize                                                *
  *                                                                                *
  * Purpose: remove repeated wildcard characters from the expression               *
  *                                                                                *
@@ -1306,8 +1258,6 @@ void	zbx_wildcard_minimize(char *str)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_wildcard_match                                               *
  *                                                                            *
  * Purpose: Matches string value to specified wildcard.                       *
  *          Asterisk (*) characters match to any characters of any length.    *

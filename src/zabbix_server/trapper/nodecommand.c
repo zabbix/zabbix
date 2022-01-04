@@ -33,8 +33,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: execute_remote_script                                            *
- *                                                                            *
  * Purpose: execute remote command and wait for the result                    *
  *                                                                            *
  * Return value:  SUCCEED - the remote command was executed successfully      *
@@ -187,8 +185,6 @@ fail:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_check_event_end_recovery_event                               *
- *                                                                            *
  * Purpose: check if the specified event id corresponds to a problem event    *
  *          caused by a trigger, find its recovery event (if it exists)       *
  *                                                                            *
@@ -224,8 +220,6 @@ static int	zbx_check_event_end_recovery_event(zbx_uint64_t eventid, zbx_uint64_t
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: execute_script                                                   *
  *                                                                            *
  * Purpose: executing command                                                 *
  *                                                                            *
@@ -490,8 +484,6 @@ fail:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: node_process_command                                             *
  *                                                                            *
  * Purpose: process command received from the frontend                        *
  *                                                                            *

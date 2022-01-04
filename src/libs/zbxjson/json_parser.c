@@ -29,8 +29,6 @@ static zbx_int64_t	json_parse_object(const char *start, char **error);
 
 /******************************************************************************
  *                                                                            *
- * Function: json_error                                                       *
- *                                                                            *
  * Purpose: Prepares JSON parsing error message                               *
  *                                                                            *
  * Parameters: message     - [IN] the error message                           *
@@ -57,8 +55,6 @@ static zbx_int64_t	json_error(const char *message, const char *json_buffer, char
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: json_parse_string                                                *
  *                                                                            *
  * Purpose: Parses JSON string value or object name                           *
  *                                                                            *
@@ -135,8 +131,6 @@ static zbx_int64_t	json_parse_string(const char *start, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Function: json_parse_array                                                 *
- *                                                                            *
  * Purpose: Parses JSON array value                                           *
  *                                                                            *
  * Parameters: start - [IN] the JSON data without leading whitespace          *
@@ -183,8 +177,6 @@ static zbx_int64_t	json_parse_array(const char *start, char **error)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: json_parse_number                                                *
  *                                                                            *
  * Purpose: Parses JSON number value                                          *
  *                                                                            *
@@ -259,8 +251,6 @@ static zbx_int64_t	json_parse_number(const char *start, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Function: json_parse_literal                                               *
- *                                                                            *
  * Purpose: Parses the specified literal value                                *
  *                                                                            *
  * Parameters: start - [IN] the JSON data without leading whitespace          *
@@ -293,8 +283,6 @@ static zbx_int64_t	json_parse_literal(const char *start, const char *text, char 
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: json_parse_value                                                 *
  *                                                                            *
  * Purpose: Parses JSON object value                                          *
  *                                                                            *
@@ -366,8 +354,6 @@ zbx_int64_t	json_parse_value(const char *start, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Function: json_parse_object                                                *
- *                                                                            *
  * Purpose: Parses JSON object                                                *
  *                                                                            *
  * Parameters: start - [IN] the JSON data                                     *
@@ -434,8 +420,6 @@ static zbx_int64_t	json_parse_object(const char *start, char **error)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_json_validate                                                *
  *                                                                            *
  * Purpose: Validates JSON object                                             *
  *                                                                            *

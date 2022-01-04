@@ -44,8 +44,6 @@ static zbx_es_t	es_engine;
 
 /******************************************************************************
  *                                                                            *
- * Function: execute_script_alert                                             *
- *                                                                            *
  * Purpose: execute script alert type                                         *
  *                                                                            *
  ******************************************************************************/
@@ -66,8 +64,6 @@ static int	execute_script_alert(const char *command, char *error, size_t max_err
 
 /******************************************************************************
  *                                                                            *
- * Function: alerter_register                                                 *
- *                                                                            *
  * Purpose: registers alerter with alert manager                              *
  *                                                                            *
  * Parameters: socket - [IN] the connections socket                           *
@@ -83,8 +79,6 @@ static void	alerter_register(zbx_ipc_socket_t *socket)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: alerter_send_result                                              *
  *                                                                            *
  * Purpose: sends alert sending result to alert manager                       *
  *                                                                            *
@@ -107,8 +101,6 @@ static void	alerter_send_result(zbx_ipc_socket_t *socket, const char *value, int
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: create_email_inreplyto                                           *
  *                                                                            *
  * Purpose: create email In-Reply_To field value to group related messages    *
  *                                                                            *
@@ -141,8 +133,6 @@ static char	*create_email_inreplyto(zbx_uint64_t mediatypeid, const char *sendto
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: alerter_process_email                                            *
  *                                                                            *
  * Purpose: processes email alert                                             *
  *                                                                            *
@@ -185,8 +175,6 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 
 /******************************************************************************
  *                                                                            *
- * Function: alerter_process_sms                                              *
- *                                                                            *
  * Purpose: processes SMS alert                                               *
  *                                                                            *
  * Parameters: socket      - [IN] the connections socket                      *
@@ -214,8 +202,6 @@ static void	alerter_process_sms(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc
 
 /******************************************************************************
  *                                                                            *
- * Function: alerter_process_exec                                             *
- *                                                                            *
  * Purpose: processes script alert                                            *
  *                                                                            *
  * Parameters: socket      - [IN] the connections socket                      *
@@ -239,8 +225,6 @@ static void	alerter_process_exec(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ip
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: alerter_process_webhook                                          *
  *                                                                            *
  * Purpose: processes webhook alert                                           *
  *                                                                            *
@@ -296,8 +280,6 @@ static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: main_alerter_loop                                                *
  *                                                                            *
  * Purpose: periodically check table alerts and send notifications if needed  *
  *                                                                            *

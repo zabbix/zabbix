@@ -160,8 +160,6 @@ static void	delete_json(struct zbx_json *json, const char *audit_op, const char 
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_auditlog_global_script                                       *
- *                                                                            *
  * Purpose: record global script execution results into audit log             *
  *                                                                            *
  * Comments: 'hostid' should be always > 0. 'eventid' is > 0 in case of       *

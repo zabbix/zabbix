@@ -681,8 +681,6 @@ char	*strerror_from_module(unsigned long error, const wchar_t *module)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_strlog_alloc                                                 *
- *                                                                            *
  * Purpose: log the message optionally appending to a string buffer           *
  *                                                                            *
  * Parameters: lebel      - [IN] the log level                                *

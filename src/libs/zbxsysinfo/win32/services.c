@@ -39,8 +39,6 @@ zbx_startup_type_t;
 
 /******************************************************************************
  *                                                                            *
- * Function: get_state_code                                                   *
- *                                                                            *
  * Purpose: convert service state code from value used in Microsoft Windows   *
  *          to value used in Zabbix                                           *
  *                                                                            *
@@ -119,8 +117,6 @@ static void	log_if_buffer_too_small(const char *function_name, DWORD sz)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_get_service_config                                           *
- *                                                                            *
  * Purpose: wrapper function around QueryServiceConfig()                      *
  *                                                                            *
  * Parameters:                                                                *
@@ -145,8 +141,6 @@ static int	zbx_get_service_config(SC_HANDLE hService, LPQUERY_SERVICE_CONFIG buf
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_get_service_config2                                          *
  *                                                                            *
  * Purpose: wrapper function around QueryServiceConfig2()                     *
  *                                                                            *

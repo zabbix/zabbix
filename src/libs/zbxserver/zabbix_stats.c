@@ -32,8 +32,6 @@ extern unsigned char	program_type;
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_send_zabbix_stats                                            *
- *                                                                            *
  * Purpose: collects all metrics required for Zabbix stats request            *
  *                                                                            *
  * Parameters: json - [OUT] the json data                                     *

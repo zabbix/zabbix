@@ -49,8 +49,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dbsync_preproc_row_func_t                                    *
- *                                                                            *
  * Purpose: applies necessary preprocessing before row is compared/used       *
  *                                                                            *
  * Parameter: row - [IN] the row to preprocess                                *

@@ -24,8 +24,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_get_events_by_eventids                                    *
- *                                                                            *
  * Purpose: get events and flags that indicate what was filled in DB_EVENT    *
  *          structure                                                         *
  *                                                                            *
@@ -217,8 +215,6 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_free_event                                                *
- *                                                                            *
  * Purpose: free the event with it's resources                                *
  *                                                                            *
  * Parameters: event - [IN] event data                                        *
@@ -241,8 +237,6 @@ void	zbx_db_free_event(DB_EVENT *event)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: get_db_eventid_r_eventid_pairs                                   *
  *                                                                            *
  * Purpose: get recovery event IDs by event IDs then map them together also   *
  *          additional create a separate array of recovery event IDs          *

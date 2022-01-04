@@ -78,8 +78,6 @@ static void	count_sensor(int do_task, const char *filename, double *aggr, int *c
 #ifndef KERNEL_2_4
 /*********************************************************************************
  *                                                                               *
- * Function: sysfs_read_attr                                                     *
- *                                                                               *
  * Purpose: locate and read the name attribute of a sensor from sysfs            *
  *                                                                               *
  * Parameters:  device        - [IN] the path to sensor data in sysfs            *

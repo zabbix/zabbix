@@ -135,8 +135,6 @@ static void	disconnect_proxy(zbx_socket_t *sock)
 
 /******************************************************************************
  *                                                                            *
- * Function: get_data_from_proxy                                              *
- *                                                                            *
  * Purpose: get historical data from proxy                                    *
  *                                                                            *
  * Parameters: proxy   - [IN/OUT] proxy data                                  *
@@ -242,8 +240,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: proxy_send_configuration                                         *
- *                                                                            *
  * Purpose: sends configuration data to proxy                                 *
  *                                                                            *
  * Parameters: proxy - [IN/OUT] proxy data                                    *
@@ -347,8 +343,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: proxy_process_proxy_data                                         *
- *                                                                            *
  * Purpose: processes proxy data request                                      *
  *                                                                            *
  * Parameters: proxy  - [IN/OUT] proxy data                                   *
@@ -413,8 +407,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: proxy_get_data                                                   *
- *                                                                            *
  * Purpose: gets data from proxy ('proxy data' request)                       *
  *                                                                            *
  * Parameters: proxy  - [IN] proxy data                                       *
@@ -461,8 +453,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: proxy_get_tasks                                                  *
- *                                                                            *
  * Purpose: gets data from proxy ('proxy data' request)                       *
  *                                                                            *
  * Parameters: proxy - [IN/OUT] the proxy data                                *
@@ -500,8 +490,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: process_proxy                                                    *
  *                                                                            *
  * Purpose: retrieve values of metrics from monitored hosts                   *
  *                                                                            *

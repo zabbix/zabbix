@@ -27,8 +27,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: es_zabbix_dtor                                                   *
- *                                                                            *
  * Purpose: Zabbix destructor                                                 *
  *                                                                            *
  ******************************************************************************/
@@ -40,8 +38,6 @@ static duk_ret_t	es_zabbix_dtor(duk_context *ctx)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: es_zabbix_ctor                                                   *
  *                                                                            *
  * Purpose: Zabbix constructor                                                *
  *                                                                            *
@@ -60,8 +56,6 @@ static duk_ret_t	es_zabbix_ctor(duk_context *ctx)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: es_zabbix_status                                                 *
  *                                                                            *
  * Purpose: Zabbix.Status method                                              *
  *                                                                            *

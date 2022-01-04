@@ -26,8 +26,6 @@ extern int	CONFIG_TIMEOUT;
 
 /******************************************************************************
  *                                                                            *
- * Function: rtc_parse_log_level_parameter                                    *
- *                                                                            *
  * Purpose: parse loglevel runtime control option                             *
  *                                                                            *
  * Parameters: opt   - [IN] the runtime control option                        *
@@ -75,8 +73,6 @@ finish:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: rtc_parse_options                                                *
  *                                                                            *
  * Purpose: parse runtime control options and create a runtime control        *
  *          message                                                           *
@@ -160,8 +156,6 @@ static int	rtc_parse_options(const char *opt, zbx_uint32_t *code, char **data, c
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_rtc_process                                                  *
- *                                                                            *
  * Purpose: process runtime control option and print result                   *
  *                                                                            *
  * Parameters: opt   - [IN] the runtime control option                        *
@@ -223,8 +217,6 @@ int	zbx_rtc_open(zbx_ipc_async_socket_t *asocket, int timeout, char **error)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_rtc_notify_config_sync                                       *
  *                                                                            *
  * Purpose: notify RTC service about finishing initial configuration sync     *
  *                                                                            *

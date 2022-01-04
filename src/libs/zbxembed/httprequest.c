@@ -89,8 +89,6 @@ static size_t	curl_header_cb(void *ptr, size_t size, size_t nmemb, void *userdat
 
 /******************************************************************************
  *                                                                            *
- * Function: es_httprequest                                                   *
- *                                                                            *
  * Purpose: return backing C structure embedded in CurlHttpRequest object     *
  *                                                                            *
  ******************************************************************************/
@@ -107,8 +105,6 @@ static zbx_es_httprequest_t *es_httprequest(duk_context *ctx)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: es_httprequest_dtor                                              *
  *                                                                            *
  * Purpose: CurlHttpRequest destructor                                        *
  *                                                                            *
@@ -137,8 +133,6 @@ static duk_ret_t	es_httprequest_dtor(duk_context *ctx)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: es_httprequest_ctor                                              *
  *                                                                            *
  * Purpose: CurlHttpRequest constructor                                       *
  *                                                                            *
@@ -204,8 +198,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: es_httprequest_add_header                                        *
- *                                                                            *
  * Purpose: CurlHttpRequest.SetHeader method                                  *
  *                                                                            *
  ******************************************************************************/
@@ -239,8 +231,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: es_httprequest_clear_header                                      *
- *                                                                            *
  * Purpose: CurlHttpRequest.ClearHeader method                                *
  *                                                                            *
  ******************************************************************************/
@@ -259,8 +249,6 @@ static duk_ret_t	es_httprequest_clear_header(duk_context *ctx)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: es_httprequest_query                                             *
  *                                                                            *
  * Purpose: CurlHttpRequest HTTP request implementation                       *
  *                                                                            *
@@ -346,8 +334,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: es_httprequest_get                                               *
- *                                                                            *
  * Purpose: HttpRequest.Get / CurlHttpRequest.Get method                      *
  *                                                                            *
  ******************************************************************************/
@@ -357,8 +343,6 @@ static duk_ret_t	es_httprequest_get(duk_context *ctx)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: es_httprequest_put                                               *
  *                                                                            *
  * Purpose: HttpRequest.Put / CurlHttpRequest.Put method                      *
  *                                                                            *
@@ -370,8 +354,6 @@ static duk_ret_t	es_httprequest_put(duk_context *ctx)
 
 /******************************************************************************
  *                                                                            *
- * Function: es_httprequest_post                                              *
- *                                                                            *
  * Purpose: HttpRequest.Post / CurlHttpRequest.Post method                    *
  *                                                                            *
  ******************************************************************************/
@@ -381,8 +363,6 @@ static duk_ret_t	es_httprequest_post(duk_context *ctx)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: es_httprequest_delete                                            *
  *                                                                            *
  * Purpose: HttpRequest.Delete / CurlHttpRequest.Delete method                *
  *                                                                            *
@@ -394,8 +374,6 @@ static duk_ret_t	es_httprequest_delete(duk_context *ctx)
 
 /******************************************************************************
  *                                                                            *
- * Function: es_httprequest_head                                              *
- *                                                                            *
  * Purpose: HttpRequest.head method                                           *
  *                                                                            *
  ******************************************************************************/
@@ -405,8 +383,6 @@ static duk_ret_t	es_httprequest_head(duk_context *ctx)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: es_httprequest_patch                                             *
  *                                                                            *
  * Purpose: HttpRequest.patch method                                          *
  *                                                                            *
@@ -418,8 +394,6 @@ static duk_ret_t	es_httprequest_patch(duk_context *ctx)
 
 /******************************************************************************
  *                                                                            *
- * Function: es_httprequest_options                                           *
- *                                                                            *
  * Purpose: HttpRequest.options method                                        *
  *                                                                            *
  ******************************************************************************/
@@ -429,8 +403,6 @@ static duk_ret_t	es_httprequest_options(duk_context *ctx)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: es_httprequest_trace                                             *
  *                                                                            *
  * Purpose: HttpRequest.trace method                                          *
  *                                                                            *
@@ -442,8 +414,6 @@ static duk_ret_t	es_httprequest_trace(duk_context *ctx)
 
 /******************************************************************************
  *                                                                            *
- * Function: es_httprequest_connect                                           *
- *                                                                            *
  * Purpose: HttpRequest.connect method                                        *
  *                                                                            *
  ******************************************************************************/
@@ -453,8 +423,6 @@ static duk_ret_t	es_httprequest_connect(duk_context *ctx)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: es_httprequest_customrequest                                     *
  *                                                                            *
  * Purpose: HttpRequest.customRequest method                                  *
  *                                                                            *
@@ -473,8 +441,6 @@ static duk_ret_t	es_httprequest_customrequest(duk_context *ctx)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: es_httprequest_set_proxy                                         *
  *                                                                            *
  * Purpose: CurlHttpRequest.SetProxy method                                   *
  *                                                                            *
@@ -498,8 +464,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: es_httprequest_status                                            *
- *                                                                            *
  * Purpose: CurlHttpRequest.Status method                                     *
  *                                                                            *
  ******************************************************************************/
@@ -521,8 +485,6 @@ static duk_ret_t	es_httprequest_status(duk_context *ctx)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: parse_header                                                     *
  *                                                                            *
  * Purpose: retrieves value of a header                                       *
  *                                                                            *
@@ -548,8 +510,6 @@ static int	parse_header(char *header, char **value_out)
 
 /******************************************************************************
  *                                                                            *
- * Function: es_obj_put_http_header                                           *
- *                                                                            *
  * Purpose: puts http header <field>: <value> as object property/value        *
  *                                                                            *
  * Parameters: ctx    - [IN] the duktape context                              *
@@ -571,8 +531,6 @@ static void	es_put_header(duk_context *ctx, int idx, char *header)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: get_headers_as_strings                                           *
  *                                                                            *
  * Purpose: retrieve headers from request in form of strings                  *
  *                                                                            *
@@ -615,8 +573,6 @@ static void	cached_headers_free(zbx_cached_header_t *header)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: get_headers_as_arrays                                            *
  *                                                                            *
  * Purpose: retrieve headers from request in form of arrays                   *
  *                                                                            *
@@ -699,8 +655,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: es_httprequest_get_headers                                       *
- *                                                                            *
  * Purpose: HttpRequest.getHeaders / CurlHttpRequest.GetHeaders method        *
  *                                                                            *
  ******************************************************************************/
@@ -725,8 +679,6 @@ static duk_ret_t	es_httprequest_get_headers(duk_context *ctx)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: es_httprequest_set_httpauth                                      *
  *                                                                            *
  * Purpose: CurlHttpRequest.SetHttpAuth method                                *
  *                                                                            *

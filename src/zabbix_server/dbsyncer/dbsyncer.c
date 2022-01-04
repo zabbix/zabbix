@@ -37,8 +37,6 @@ static sigset_t				orig_mask;
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_flush_timer_queue                                         *
- *                                                                            *
  * Purpose: flush timer queue to the database                                 *
  *                                                                            *
  ******************************************************************************/
@@ -80,8 +78,6 @@ static void	db_trigger_queue_cleanup(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: main_dbsyncer_loop                                               *
  *                                                                            *
  * Purpose: periodically synchronises data in memory cache with database      *
  *                                                                            *

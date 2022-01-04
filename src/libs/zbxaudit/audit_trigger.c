@@ -216,8 +216,6 @@ PREPARE_AUDIT_TRIGGER_UPDATE(recovery_expression, const char*, string)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_audit_DBselect_delete_for_trigger                            *
- *                                                                            *
  * Parameters: sql - [IN] sql statement                                       *
  *             ids - [OUT] sorted list of selected uint64 values              *
  *                                                                            *

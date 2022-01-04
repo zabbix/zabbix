@@ -148,8 +148,6 @@ static void	read_step(const char *path, zbx_preproc_op_t *op)
 
 /******************************************************************************
  *                                                                            *
- * Function: is_step_supported                                                *
- *                                                                            *
  * Purpose: checks if the preprocessing step is supported based on build      *
  *          configuration or other settings                                   *
  *                                                                            *

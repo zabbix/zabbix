@@ -85,8 +85,6 @@ static size_t	curl_ignore_cb(void *ptr, size_t size, size_t nmemb, void *userdat
 
 /******************************************************************************
  *                                                                            *
- * Function: httptest_remove_macros                                           *
- *                                                                            *
  * Purpose: remove all macro variables cached during http test execution      *
  *                                                                            *
  * Parameters: httptest - [IN] the http test data                             *
@@ -203,8 +201,6 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 
 /******************************************************************************
  *                                                                            *
- * Function: httpstep_pairs_join                                              *
- *                                                                            *
  * Purpose: performs concatenation of vector of pairs into delimited string   *
  *                                                                            *
  * Parameters: str             - [IN/OUT] result string                       *
@@ -237,8 +233,6 @@ static void	httpstep_pairs_join(char **str, size_t *alloc_len, size_t *offset, c
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: httppairs_free                                                   *
  *                                                                            *
  * Purpose: frees memory allocated for vector of pairs                        *
  *                                                                            *
@@ -345,8 +339,6 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: httpstep_load_pairs                                              *
  *                                                                            *
  * Purpose: loads http fields of web scenario step                            *
  *                                                                            *
@@ -500,8 +492,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: add_http_headers                                                 *
- *                                                                            *
  * Purpose: adds HTTP headers to curl_slist and prepares cookie header string *
  *                                                                            *
  * Parameters: headers         - [IN] HTTP headers as string                  *
@@ -532,8 +522,6 @@ static void	add_http_headers(char *headers, struct curl_slist **headers_slist, c
 #endif
 
 /******************************************************************************
- *                                                                            *
- * Function: httptest_load_pairs                                              *
  *                                                                            *
  * Purpose: loads http fields of web scenario                                 *
  *                                                                            *
@@ -622,8 +610,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: process_httptest                                                 *
  *                                                                            *
  * Purpose: process single scenario of http test                              *
  *                                                                            *
@@ -1054,8 +1040,6 @@ httptest_error:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: process_httptests                                                *
  *                                                                            *
  * Purpose: process httptests                                                 *
  *                                                                            *

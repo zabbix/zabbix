@@ -81,8 +81,6 @@ static char	*rw_curl_error(CURLcode err)
 
 /******************************************************************************
  *                                                                            *
- * Function: rw_get_report                                                    *
- *                                                                            *
  * Purpose: get report from web service                                       *
  *                                                                            *
  * Parameters: url         - [IN] the report url                              *
@@ -243,8 +241,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: rw_begin_report                                                  *
- *                                                                            *
  * Purpose: begin report dispatch                                             *
  *                                                                            *
  * Parameters: msg      - [IN] the begin report request message               *
@@ -306,8 +302,6 @@ static int	rw_begin_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispa
 
 /******************************************************************************
  *                                                                            *
- * Function: rw_send_report                                                   *
- *                                                                            *
  * Purpose: send report to the recipients using specified media type          *
  *                                                                            *
  * Parameters: msg      - [IN] the send report request message                *
@@ -348,8 +342,6 @@ static int	rw_send_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispat
 
 /******************************************************************************
  *                                                                            *
- * Function: rw_end_report                                                    *
- *                                                                            *
  * Purpose: finish report dispatch                                            *
  *                                                                            *
  * Parameters: dispatch - [IN] the alerter dispatch                           *
@@ -374,8 +366,6 @@ static int	rw_end_report(zbx_alerter_dispatch_t *dispatch, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Function: rw_send_result                                                   *
- *                                                                            *
  * Purpose: send report result back to manager                                *
  *                                                                            *
  * Parameters: socket - [IN] the report manager IPC socket                    *
@@ -398,8 +388,6 @@ static void	rw_send_result(zbx_ipc_socket_t *socket, zbx_alerter_dispatch_t *dis
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: report_writer_thread                                             *
  *                                                                            *
  ******************************************************************************/
 ZBX_THREAD_ENTRY(report_writer_thread, args)

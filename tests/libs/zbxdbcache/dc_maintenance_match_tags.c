@@ -117,8 +117,6 @@ static void	get_maintenance(zbx_dc_maintenance_t *maintenance)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_mock_test_entry                                              *
- *                                                                            *
  ******************************************************************************/
 void	zbx_mock_test_entry(void **state)
 {

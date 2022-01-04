@@ -86,8 +86,6 @@ static int	substitute_key_macros_impl(char **data, zbx_uint64_t *hostid, DC_ITEM
 
 /******************************************************************************
  *                                                                            *
- * Function: get_trigger_severity_name                                        *
- *                                                                            *
  * Purpose: get trigger severity name                                         *
  *                                                                            *
  * Parameters: trigger    - [IN] a trigger data with priority field;          *
@@ -116,8 +114,6 @@ static int	get_trigger_severity_name(unsigned char priority, char **replace_to)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: get_problem_update_actions                                       *
  *                                                                            *
  * Purpose: get human readable list of problem update actions                 *
  *                                                                            *
@@ -202,8 +198,6 @@ static int	get_problem_update_actions(const DB_ACKNOWLEDGE *ack, int actions, ch
 
 /******************************************************************************
  *                                                                            *
- * Function: DBget_host_value                                                 *
- *                                                                            *
  * Purpose: request host name by hostid                                       *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
@@ -234,8 +228,6 @@ static int	DBget_host_value(zbx_uint64_t hostid, char **replace_to, const char *
 
 /******************************************************************************
  *                                                                            *
- * Function: DBget_templateid_by_triggerid                                    *
- *                                                                            *
  * Purpose: get template trigger ID from which the trigger is inherited       *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
@@ -265,8 +257,6 @@ static int	DBget_templateid_by_triggerid(zbx_uint64_t triggerid, zbx_uint64_t *t
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: DBget_trigger_template_name                                      *
  *                                                                            *
  * Purpose: get comma-space separated trigger template names in which         *
  *          the trigger is defined                                            *
@@ -383,8 +373,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: DBget_trigger_hostgroup_name                                     *
- *                                                                            *
  * Purpose: get comma-space separated host group names in which the trigger   *
  *          is defined                                                        *
  *                                                                            *
@@ -469,8 +457,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: get_interface_value                                              *
- *                                                                            *
  * Purpose: retrieve a particular value associated with the interface         *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
@@ -538,8 +524,6 @@ static int	get_host_value(zbx_uint64_t itemid, char **replace_to, int request)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_substitute_macros_in_item_key                                *
- *                                                                            *
  * Purpose: get item key, replace macros in the key                           *
  *                                                                            *
  * Parameters: dc_item    - [IN] item information used in substitution        *
@@ -556,8 +540,6 @@ static void	zbx_substitute_macros_in_item_key(DC_ITEM *dc_item, char **replace_t
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: DBget_item_value                                                 *
  *                                                                            *
  * Purpose: retrieve a particular value associated with the item              *
  *                                                                            *
@@ -710,8 +692,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: DBget_trigger_value                                              *
- *                                                                            *
  * Purpose: retrieve a particular value associated with the trigger's         *
  *          N_functionid'th function                                          *
  *                                                                            *
@@ -735,8 +715,6 @@ int	DBget_trigger_value(const DB_TRIGGER *trigger, char **replace_to, int N_func
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: DBget_trigger_event_count                                        *
  *                                                                            *
  * Purpose: retrieve number of events (acknowledged or unacknowledged) for a  *
  *          trigger (in an OK or PROBLEM state) which generated an event      *
@@ -793,8 +771,6 @@ static int	DBget_trigger_event_count(zbx_uint64_t triggerid, char **replace_to, 
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: DBget_dhost_value_by_event                                       *
  *                                                                            *
  * Purpose: retrieve discovered host value by event and field name            *
  *                                                                            *
@@ -856,8 +832,6 @@ static int	DBget_dhost_value_by_event(const DB_EVENT *event, char **replace_to, 
 
 /******************************************************************************
  *                                                                            *
- * Function: DBget_dchecks_value_by_event                                     *
- *                                                                            *
  * Purpose: retrieve discovery rule check value by event and field name       *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
@@ -892,8 +866,6 @@ static int	DBget_dchecks_value_by_event(const DB_EVENT *event, char **replace_to
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: DBget_dservice_value_by_event                                    *
  *                                                                            *
  * Purpose: retrieve discovered service value by event and field name         *
  *                                                                            *
@@ -934,8 +906,6 @@ static int	DBget_dservice_value_by_event(const DB_EVENT *event, char **replace_t
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: DBget_drule_value_by_event                                       *
  *                                                                            *
  * Purpose: retrieve discovery rule value by event and field name             *
  *                                                                            *
@@ -985,8 +955,6 @@ static int	DBget_drule_value_by_event(const DB_EVENT *event, char **replace_to, 
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: DBget_history_log_value                                          *
  *                                                                            *
  * Purpose: retrieve a particular attribute of a log value                    *
  *                                                                            *
@@ -1062,8 +1030,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: DBitem_get_value                                                 *
- *                                                                            *
  * Purpose: retrieve item value by item id                                    *
  *                                                                            *
  * Parameters:                                                                *
@@ -1120,8 +1086,6 @@ static int	DBitem_get_value(zbx_uint64_t itemid, char **lastvalue, int raw, zbx_
 
 /******************************************************************************
  *                                                                            *
- * Function: DBitem_value                                                     *
- *                                                                            *
  * Purpose: retrieve item value by trigger expression and number of function  *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
@@ -1146,8 +1110,6 @@ static int	DBitem_value(const DB_TRIGGER *trigger, char **value, int N_functioni
 
 /******************************************************************************
  *                                                                            *
- * Function: DBitem_lastvalue                                                 *
- *                                                                            *
  * Purpose: retrieve item lastvalue by trigger expression                     *
  *          and number of function                                            *
  *                                                                            *
@@ -1171,8 +1133,6 @@ static int	DBitem_lastvalue(const DB_TRIGGER *trigger, char **lastvalue, int N_f
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: format_user_fullname                                             *
  *                                                                            *
  * Purpose: formats full user name from name, surname and alias               *
  *                                                                            *
@@ -1215,8 +1175,6 @@ static char	*format_user_fullname(const char *name, const char *surname, const c
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: get_escalation_history                                           *
  *                                                                            *
  * Purpose: retrieve escalation history                                       *
  *                                                                            *
@@ -1326,8 +1284,6 @@ static void	get_escalation_history(zbx_uint64_t actionid, const DB_EVENT *event,
 
 /******************************************************************************
  *                                                                            *
- * Function: get_event_update_history                                         *
- *                                                                            *
  * Purpose: retrieve event acknowledges history                               *
  *                                                                            *
  * Parameters:                                                                *
@@ -1403,8 +1359,6 @@ static void	get_event_update_history(const DB_EVENT *event, char **replace_to, c
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: get_autoreg_value_by_event                                       *
  *                                                                            *
  * Purpose: request value from autoreg_host table by event                    *
  *                                                                            *
@@ -1834,8 +1788,6 @@ static inventory_field_t	inventory_fields[] =
 
 /******************************************************************************
  *                                                                            *
- * Function: get_action_value                                                 *
- *                                                                            *
  * Purpose: request action value by macro                                     *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
@@ -1870,8 +1822,6 @@ static int	get_action_value(const char *macro, zbx_uint64_t actionid, char **rep
 
 /******************************************************************************
  *                                                                            *
- * Function: get_host_inventory                                               *
- *                                                                            *
  * Purpose: request host inventory value by macro and trigger                 *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
@@ -1901,8 +1851,6 @@ static int	get_host_inventory(const char *macro, const DB_TRIGGER *trigger, char
 
 /******************************************************************************
  *                                                                            *
- * Function: get_host_inventory_by_itemid                                     *
- *                                                                            *
  * Purpose: request host inventory value by macro and itemid                  *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
@@ -1923,8 +1871,6 @@ static int	get_host_inventory_by_itemid(const char *macro, zbx_uint64_t itemid, 
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: get_host_inventory_by_itemid                                     *
  *                                                                            *
  * Purpose: request host inventory value by macro and hostid                  *
  *                                                                            *
@@ -1947,8 +1893,6 @@ static int	get_host_inventory_by_hostid(const char *macro, zbx_uint64_t hostid, 
 
 /******************************************************************************
  *                                                                            *
- * Function: compare_tags                                                     *
- *                                                                            *
  * Purpose: comparison function to sort tags by tag/value                     *
  *                                                                            *
  ******************************************************************************/
@@ -1966,8 +1910,6 @@ static int	compare_tags(const void *d1, const void *d2)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: get_event_tags                                                   *
  *                                                                            *
  * Purpose: format event tags string in format <tag1>[:<value1>], ...         *
  *                                                                            *
@@ -2020,8 +1962,6 @@ static void	get_event_tags(const DB_EVENT *event, char **replace_to)
 
 /******************************************************************************
  *                                                                            *
- * Function: get_event_tags_json                                              *
- *                                                                            *
  * Purpose: format event tags string in JSON format                           *
  *                                                                            *
  * Parameters: event        [IN] the event                                    *
@@ -2051,8 +1991,6 @@ static void	get_event_tags_json(const DB_EVENT *event, char **replace_to)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: get_event_tag_by_name                                            *
  *                                                                            *
  * Purpose: get event tag value by name                                       *
  *                                                                            *
@@ -2098,8 +2036,6 @@ static void	get_event_tag_by_name(const char *text, const DB_EVENT *event, char 
 
 /******************************************************************************
  *                                                                            *
- * Function: get_recovery_event_value                                         *
- *                                                                            *
  * Purpose: request recovery event value by macro                             *
  *                                                                            *
  ******************************************************************************/
@@ -2141,8 +2077,6 @@ static void	get_recovery_event_value(const char *macro, const DB_EVENT *r_event,
 
 /******************************************************************************
  *                                                                            *
- * Function: get_current_event_value                                          *
- *                                                                            *
  * Purpose: request current event value by macro                              *
  *                                                                            *
  ******************************************************************************/
@@ -2160,8 +2094,6 @@ static void	get_current_event_value(const char *macro, const DB_EVENT *event, ch
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: get_event_value                                                  *
  *                                                                            *
  * Purpose: request event value by macro                                      *
  *                                                                            *
@@ -2260,8 +2192,6 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
 
 /******************************************************************************
  *                                                                            *
- * Function: rootcause_free                                                   *
- *                                                                            *
  * Purpose: free memory allocated for root cause                              *
  *                                                                            *
  ******************************************************************************/
@@ -2274,8 +2204,6 @@ static void	rootcause_free(zbx_rootcause_t *rootcause)
 
 /******************************************************************************
  *                                                                            *
- * Function: rootcause_compare                                                *
- *                                                                            *
  * Purpose: compare root cause to sort by highest severity and host name      *
  *                                                                            *
  ******************************************************************************/
@@ -2287,8 +2215,6 @@ static int	rootcause_compare(const zbx_rootcause_t *d1, const zbx_rootcause_t *d
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: get_rootcause                                                    *
  *                                                                            *
  * Purpose: get root cause of service being in problem state                  *
  *                                                                            *
@@ -2346,8 +2272,6 @@ fail:
 
 /******************************************************************************
  *                                                                            *
- * Function: get_history_log_value                                            *
- *                                                                            *
  * Purpose: retrieve a particular attribute of a log value                    *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
@@ -2399,8 +2323,6 @@ static int	get_history_log_value(const char *m, const DB_TRIGGER *trigger, char 
 
 /******************************************************************************
  *                                                                            *
- * Function: is_indexed_macro                                                 *
- *                                                                            *
  * Purpose: check if a token contains indexed macro                           *
  *                                                                            *
  ******************************************************************************/
@@ -2425,8 +2347,6 @@ static int	is_indexed_macro(const char *str, const zbx_token_t *token)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: macro_in_list                                                    *
  *                                                                            *
  * Purpose: check if a macro in string is one of the list and extract index   *
  *                                                                            *
@@ -2479,8 +2399,6 @@ static const char	*macro_in_list(const char *str, zbx_strloc_t strloc, const cha
 
 /******************************************************************************
  *                                                                            *
- * Function: func_macro_in_list                                               *
- *                                                                            *
  * Purpose: check if a macro function one in the list for the macro           *
  *                                                                            *
  * Parameters: str          - [IN] string containing potential macro          *
@@ -2526,8 +2444,6 @@ static const char	*func_macro_in_list(const char *str, zbx_token_func_macro_t *f
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: get_expression_macro_result                                      *
  *                                                                            *
  * Purpose: calculate result of expression macro                              *
  *                                                                            *
@@ -2587,8 +2503,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: cache_item_hostid                                                *
- *                                                                            *
  * Purpose: cache host identifier referenced by an item or a lld-rule         *
  *                                                                            *
  * Parameters: hostids - [OUT] the host identifier cache                      *
@@ -2629,8 +2543,6 @@ static const char	*zbx_dobject_status2str(int st)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: resolve_opdata                                                   *
  *                                                                            *
  * Purpose: resolve {EVENT.OPDATA} macro                                      *
  *                                                                            *
@@ -2680,8 +2592,6 @@ static void	resolve_opdata(const DB_EVENT *event, char **replace_to, const char 
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: resolve_user_macros                                              *
  *                                                                            *
  * Purpose: resolve {USER.*} macros                                           *
  *                                                                            *
@@ -2760,8 +2670,6 @@ static int	resolve_host_target_macros(const char *m, const DC_HOST *dc_host, DC_
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: substitute_simple_macros_impl                                    *
  *                                                                            *
  * Purpose: substitute simple macros in data string with real values          *
  *                                                                            *
@@ -4868,8 +4776,6 @@ zbx_trigger_func_position_t;
 
 /******************************************************************************
  *                                                                            *
- * Function: expand_trigger_macros                                            *
- *                                                                            *
  * Purpose: expand macros in a trigger expression                             *
  *                                                                            *
  * Parameters: event - The trigger event structure                            *
@@ -4904,8 +4810,6 @@ static int	expand_trigger_macros(zbx_eval_context_t *ctx, const DB_EVENT *event,
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_link_triggers_with_functions                                 *
  *                                                                            *
  * Purpose: triggers links with functions                                     *
  *                                                                            *
@@ -4956,8 +4860,6 @@ static void	zbx_link_triggers_with_functions(zbx_vector_ptr_t *triggers_func_pos
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_determine_items_in_expressions                               *
  *                                                                            *
  * Purpose: mark triggers that use one of the items in problem expression     *
  *          with ZBX_DC_TRIGGER_PROBLEM_EXPRESSION flag                       *
@@ -5087,8 +4989,6 @@ static void	func_clean(void *ptr)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_populate_function_items                                      *
  *                                                                            *
  * Purpose: prepare hashset of functions to evaluate                          *
  *                                                                            *
@@ -5379,8 +5279,6 @@ static void	zbx_substitute_functions_results(zbx_hashset_t *ifuncs, zbx_vector_p
 
 /******************************************************************************
  *                                                                            *
- * Function: substitute_functions                                             *
- *                                                                            *
  * Purpose: substitute expression functions with their values                 *
  *                                                                            *
  * Parameters: triggers - [IN] vector of DC_TRIGGER pointers, sorted by      *
@@ -5430,8 +5328,6 @@ empty:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: prepare_triggers                                                 *
  *                                                                            *
  * Purpose: prepare triggers for evaluation                                   *
  *                                                                            *
@@ -5489,8 +5385,6 @@ static int	evaluate_expression(zbx_eval_context_t *ctx, const zbx_timespec_t *ts
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: evaluate_expressions                                             *
  *                                                                            *
  * Purpose: evaluate trigger expressions                                      *
  *                                                                            *
@@ -5607,8 +5501,6 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers, const zbx_vector_uint64_t 
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: process_lld_macro_token                                          *
  *                                                                            *
  * Purpose: expand discovery macro in expression                              *
  *                                                                            *
@@ -5737,8 +5629,6 @@ static void	process_lld_macro_token(char **data, zbx_token_t *token, int flags, 
 
 /******************************************************************************
  *                                                                            *
- * Function: process_user_macro_token                                         *
- *                                                                            *
  * Purpose: expand discovery macro in user macro context                      *
  *                                                                            *
  * Parameters: data          - [IN/OUT] the expression containing lld macro   *
@@ -5791,8 +5681,6 @@ static int	process_user_macro_token(char **data, zbx_token_t *token, const struc
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: substitute_query_filter_lld_macros                               *
  *                                                                            *
  * Purpose: substitute lld macros in calculated item query filter             *
  *                                                                            *
@@ -5861,8 +5749,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: substitute_item_query_macros                                     *
- *                                                                            *
  * Purpose: substitute lld macros in history function item query argument     *
  *          /host/key?[filter]                                                *
  *                                                                            *
@@ -5918,8 +5804,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_substitute_expression_macros                                 *
  *                                                                            *
  * Purpose: substitutes lld macros in an expression                           *
  *                                                                            *
@@ -5997,8 +5881,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: process_expression_macro_token                                   *
- *                                                                            *
  * Purpose: expand discovery macro in expression macro                        *
  *                                                                            *
  * Parameters: data            - [IN/OUT] the expression containing macro     *
@@ -6036,8 +5918,6 @@ static int	process_expression_macro_token(char **data, zbx_token_t *token, const
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: substitute_func_macro                                            *
  *                                                                            *
  * Purpose: substitute lld macros in function macro parameters                *
  *                                                                            *
@@ -6089,8 +5969,6 @@ static int	substitute_func_macro(char **data, zbx_token_t *token, const struct z
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: substitute_lld_macros                                            *
  *                                                                            *
  * Parameters: data   - [IN/OUT] pointer to a buffer                          *
  *             jp_row - [IN] discovery data                                   *
@@ -6191,8 +6069,6 @@ replace_key_param_data_t;
 
 /******************************************************************************
  *                                                                            *
- * Function: replace_key_param                                                *
- *                                                                            *
  * Comments: auxiliary function for substitute_key_macros()                   *
  *                                                                            *
  ******************************************************************************/
@@ -6235,8 +6111,6 @@ static int	replace_key_param_cb(const char *data, int key_type, int level, int n
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: substitute_key_macros_impl                                       *
  *                                                                            *
  * Purpose: safely substitutes macros in parameters of an item key and OID    *
  *                                                                            *
@@ -6305,8 +6179,6 @@ static int	substitute_key_macros_impl(char **data, zbx_uint64_t *hostid, DC_ITEM
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: substitute_function_lld_param                                    *
  *                                                                            *
  * Purpose: substitute lld macros in function parameters                      *
  *                                                                            *
@@ -6412,8 +6284,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: substitute_macros_in_json_pairs                                  *
- *                                                                            *
  * Purpose: substitute LLD macros in JSON pairs                               *
  *                                                                            *
  * Parameters: data   -    [IN/OUT] pointer to a buffer that JSON pair        *
@@ -6491,8 +6361,6 @@ exit:
 
 #ifdef HAVE_LIBXML2
 /******************************************************************************
- *                                                                            *
- * Function: substitute_macros_in_xml_elements                                *
  *                                                                            *
  * Comments: auxiliary function for substitute_macros_xml()                   *
  *                                                                            *
@@ -6593,8 +6461,6 @@ static void	substitute_macros_in_xml_elements(const DC_ITEM *item, const struct 
 
 /******************************************************************************
  *                                                                            *
- * Function: substitute_macros_xml_impl                                       *
- *                                                                            *
  * Purpose: substitute simple or LLD macros in XML text nodes, attributes of  *
  *          a node or in CDATA section, validate XML                          *
  *                                                                            *
@@ -6657,8 +6523,6 @@ exit:
 #ifdef HAVE_LIBXML2
 /******************************************************************************
  *                                                                            *
- * Function: libxml_handle_error                                              *
- *                                                                            *
  * Purpose: libxml2 callback function for error handle                        *
  *                                                                            *
  * Parameters: user_data - [IN/OUT] the user context                          *
@@ -6687,8 +6551,6 @@ static void	libxml_handle_error(void *user_data, xmlErrorPtr err)
 #endif
 
 /******************************************************************************
- *                                                                            *
- * Function: xml_xpath_check                                                  *
  *                                                                            *
  * Purpose: validate xpath string                                             *
  *                                                                            *
@@ -6735,8 +6597,6 @@ int	xml_xpath_check(const char *xpath, char *error, size_t errlen)
 
 /******************************************************************************
  *                                                                            *
- * Function: substitute_simple_macros                                         *
- *                                                                            *
  * Purpose: substitute_simple_macros with masked secret macros                *
  *          (default setting)                                                 *
  *                                                                            *
@@ -6752,8 +6612,6 @@ int	substitute_simple_macros(const zbx_uint64_t *actionid, const DB_EVENT *event
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: substitute_simple_macros_unmasked                                *
  *                                                                            *
  * Purpose: substitute_simple_macros with unmasked secret macros              *
  *                                                                            *
@@ -6776,8 +6634,6 @@ int	substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const DB_EVE
 
 /******************************************************************************
  *                                                                            *
- * Function: substitute_macros_xml                                            *
- *                                                                            *
  * substitute_macros_xml with masked secret macros                            *
  *                                                                            *
  ******************************************************************************/
@@ -6788,8 +6644,6 @@ int	substitute_macros_xml(char **data, const DC_ITEM *item, const struct zbx_jso
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: substitute_macros_xml_unmasked                                   *
  *                                                                            *
  * substitute_macros_xml with unmasked secret macros                          *
  *                                                                            *
@@ -6808,8 +6662,6 @@ int	substitute_macros_xml_unmasked(char **data, const DC_ITEM *item, const struc
 
 /******************************************************************************
  *                                                                            *
- * Function: substitute_key_macros                                            *
- *                                                                            *
  * substitute_key_macros with masked secret macros                            *
  *                                                                            *
  ******************************************************************************/
@@ -6820,8 +6672,6 @@ int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, c
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: substitute_key_macros_unmasked                                   *
  *                                                                            *
  * substitute_key_macros with unmasked secret macros                          *
  *                                                                            *
@@ -6840,8 +6690,6 @@ int	substitute_key_macros_unmasked(char **data, zbx_uint64_t *hostid, DC_ITEM *d
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_host_macro_index                                             *
  *                                                                            *
  * Purpose: extract index from valid indexed host macro                       *
  *                                                                            *

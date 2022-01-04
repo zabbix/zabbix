@@ -23,8 +23,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: get_component_process_type_forks                                 *
- *                                                                            *
  * Purpose: Returns number of processes depending on process type             *
  *                                                                            *
  * Parameters: proc_type - [IN] process type; ZBX_PROCESS_TYPE_*              *

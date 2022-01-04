@@ -28,8 +28,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_tm_get_remote_tasks                                          *
- *                                                                            *
  * Purpose: get tasks scheduled to be executed on the server                  *
  *                                                                            *
  * Parameters: tasks        - [OUT] the tasks to execute                      *

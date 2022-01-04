@@ -23,8 +23,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_get_zabbix_stats_ext                                         *
- *                                                                            *
  * Purpose: get program type (proxy) specific internal statistics             *
  *                                                                            *
  * Parameters: param1  - [IN/OUT] the json data                               *

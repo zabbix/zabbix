@@ -23,8 +23,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_save_item_changes                                         *
- *                                                                            *
  * Purpose: save item state, error, mtime, lastlogsize changes to             *
  *          database                                                          *
  *                                                                            *

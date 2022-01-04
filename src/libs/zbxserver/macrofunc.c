@@ -24,8 +24,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: macrofunc_regsub                                                 *
- *                                                                            *
  * Purpose: calculates regular expression substitution                        *
  *                                                                            *
  * Parameters: params - [IN] the function parameters                          *
@@ -57,8 +55,6 @@ static int	macrofunc_regsub(char **params, size_t nparam, char **out)
 
 /******************************************************************************
  *                                                                            *
- * Function: macrofunc_iregsub                                                *
- *                                                                            *
  * Purpose: calculates case insensitive regular expression substitution       *
  *                                                                            *
  * Parameters: params - [IN] the function parameters                          *
@@ -89,8 +85,6 @@ static int	macrofunc_iregsub(char **params, size_t nparam, char **out)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: macrofunc_fmttime                                                *
  *                                                                            *
  * Purpose: time formatting macro function                                    *
  *                                                                            *
@@ -181,8 +175,6 @@ static int	macrofunc_fmttime(char **params, size_t nparam, char **out)
 
 /******************************************************************************
  *                                                                            *
- * Function: macrofunc_fmtnum                                                 *
- *                                                                            *
  * Purpose: number formatting macro function                                  *
  *                                                                            *
  * Parameters: params - [IN] the function data                                *
@@ -222,8 +214,6 @@ static int	macrofunc_fmtnum(char **params, size_t nparam, char **out)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_calculate_macro_function                                     *
  *                                                                            *
  * Purpose: calculates macro function value                                   *
  *                                                                            *

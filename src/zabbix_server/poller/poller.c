@@ -57,8 +57,6 @@ static volatile sig_atomic_t	snmp_cache_reload_requested;
 
 /******************************************************************************
  *                                                                            *
- * Function: update_interface_availability                                    *
- *                                                                            *
  * Purpose: write interface availability changes into database                *
  *                                                                            *
  * Parameters: data        - [IN/OUT] the serialized availability data        *
@@ -83,8 +81,6 @@ static int	update_interface_availability(unsigned char **data, size_t *data_allo
 
 /******************************************************************************
  *                                                                            *
- * Function: interface_get_availability                                       *
- *                                                                            *
  * Purpose: get interface availability data                                   *
  *                                                                            *
  * Parameters: dc_interface - [IN] the interface                              *
@@ -106,8 +102,6 @@ static void	interface_get_availability(const DC_INTERFACE *dc_interface, zbx_int
 }
 
 /********************************************************************************
- *                                                                              *
- * Function: interface_set_availability                                         *
  *                                                                              *
  * Purpose: sets interface availability data                                    *
  *                                                                              *
@@ -152,8 +146,6 @@ static int	interface_availability_by_item_type(unsigned char item_type, unsigned
 }
 
 /********************************************************************************
- *                                                                              *
- * Function: zbx_activate_item_interface                                        *
  *                                                                              *
  * Purpose: activate item interface                                             *
  *                                                                              *
@@ -207,8 +199,6 @@ out:
 }
 
 /********************************************************************************
- *                                                                              *
- * Function: zbx_deactivate_item_interface                                      *
  *                                                                              *
  * Purpose: deactivate item interface                                           *
  *                                                                              *
@@ -783,8 +773,6 @@ void	zbx_clean_items(DC_ITEM *items, int num, AGENT_RESULT *results)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: get_values                                                       *
  *                                                                            *
  * Purpose: retrieve values of metrics from monitored hosts                   *
  *                                                                            *

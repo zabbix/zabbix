@@ -196,8 +196,6 @@ static char	*get_item_security_name(const DC_ITEM *item)
 
 /******************************************************************************
  *                                                                            *
- * Function: cache_get_snmp_index                                             *
- *                                                                            *
  * Purpose: retrieve index that matches value from the relevant index cache   *
  *                                                                            *
  * Parameters: item      - [IN] configuration of Zabbix item, contains        *
@@ -251,8 +249,6 @@ end:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: cache_put_snmp_index                                             *
  *                                                                            *
  * Purpose: store the index-value pair in the relevant index cache            *
  *                                                                            *
@@ -318,8 +314,6 @@ static void	cache_put_snmp_index(const DC_ITEM *item, const char *snmp_oid, cons
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: cache_del_snmp_index_subtree                                     *
  *                                                                            *
  * Purpose: delete index-value mappings from the specified index cache        *
  *                                                                            *
@@ -1028,8 +1022,6 @@ static int	zbx_oid_is_new(zbx_hashset_t *hs, size_t root_len, const oid *p_oid, 
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_snmp_walk                                                    *
- *                                                                            *
  * Purpose: retrieve information by walking an OID tree                       *
  *                                                                            *
  * Parameters: ss            - [IN] SNMP session handle                       *
@@ -1564,8 +1556,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_snmp_translate                                               *
- *                                                                            *
  * Purpose: translate well-known object identifiers into numeric form         *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -1675,8 +1665,6 @@ static int	zbx_snmp_dobject_compare(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_snmp_ddata_init                                              *
- *                                                                            *
  * Purpose: initializes snmp discovery data object                            *
  *                                                                            *
  * Parameters: data          - [IN] snmp discovery data object                *
@@ -1746,8 +1734,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_snmp_ddata_clean                                             *
  *                                                                            *
  * Purpose: releases data allocated by snmp discovery                         *
  *                                                                            *

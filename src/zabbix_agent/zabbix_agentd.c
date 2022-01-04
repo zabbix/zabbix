@@ -553,8 +553,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: set_defaults                                                     *
- *                                                                            *
  * Purpose: set configuration defaults                                        *
  *                                                                            *
  * Author: Vladimir Levijev, Rudolfs Kreicbergs                               *
@@ -619,8 +617,6 @@ static void	set_defaults(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_validate_config_hostnames                                    *
- *                                                                            *
  * Purpose: validate listed host names                                        *
  *                                                                            *
  ******************************************************************************/
@@ -648,8 +644,6 @@ static void	zbx_validate_config_hostnames(zbx_vector_str_t *hostnames)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_validate_config                                              *
  *                                                                            *
  * Purpose: validate configuration parameters                                 *
  *                                                                            *
@@ -793,8 +787,6 @@ static void	parse_hostnames(const char *hostname_param, zbx_vector_str_t *hostna
 
 /******************************************************************************
  *                                                                            *
- * Function: load_enable_remote_commands                                      *
- *                                                                            *
  * Purpose: aliases EnableRemoteCommands parameter to                         *
  *          Allow/DenyKey=system.run[*]                                       *
  *                                                                            *
@@ -824,8 +816,6 @@ static int	load_enable_remote_commands(const char *value, const struct cfg_line 
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_load_config                                                  *
  *                                                                            *
  * Purpose: load configuration from config file                               *
  *                                                                            *
@@ -1005,8 +995,6 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_free_config                                                  *
  *                                                                            *
  * Purpose: free configuration memory                                         *
  *                                                                            *
@@ -1274,8 +1262,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_free_service_resources                                       *
  *                                                                            *
  * Purpose: free service resources allocated by main thread                   *
  *                                                                            *

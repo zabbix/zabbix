@@ -32,8 +32,6 @@ static GETLPIEX		get_lpiex;
 
 /******************************************************************************
  *                                                                            *
- * Function: get_cpu_num_win32                                                *
- *                                                                            *
  * Purpose: find number of active logical CPUs                                *
  *                                                                            *
  * Return value: number of CPUs or 0 on failure                               *
@@ -127,8 +125,6 @@ finish:
 
 /******************************************************************************
  *                                                                            *
- * Function: get_cpu_group_num_win32                                          *
- *                                                                            *
  * Purpose: returns the number of active processor groups                     *
  *                                                                            *
  * Return value: number of groups, 1 if groups are not supported              *
@@ -166,8 +162,6 @@ int	get_cpu_group_num_win32(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: get_numa_node_count_win32                                        *
  *                                                                            *
  * Purpose: returns the number of NUMA nodes                                  *
  *                                                                            *

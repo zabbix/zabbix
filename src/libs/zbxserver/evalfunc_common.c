@@ -101,8 +101,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: get_function_parameter_hist_range                                *
- *                                                                            *
  * Purpose: get the value of sec|num + timeshift trigger function parameter   *
  *                                                                            *
  * Parameters: from           - [IN] the function calculation time            *

@@ -37,8 +37,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: ts_get_component_end                                             *
- *                                                                            *
  * Purpose: finds the next character after numeric time component             *
  *                                                                            *
  * Parameters: text - [IN] the text                                           *
@@ -58,8 +56,6 @@ static const char	*ts_get_component_end(const char *text)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ts_get_date                                                      *
  *                                                                            *
  * Purpose: parses year, month and day from date component having             *
  *          YYYY-MM-DD format                                                 *
@@ -116,8 +112,6 @@ static zbx_mock_error_t	ts_get_date(const char *text, int *year, int *month, int
 
 /******************************************************************************
  *                                                                            *
- * Function: ts_get_time                                                      *
- *                                                                            *
  * Purpose: parses hours, minutes and seconds from time component having      *
  *          HH:MM:SS format                                                   *
  *                                                                            *
@@ -173,8 +167,6 @@ static zbx_mock_error_t	ts_get_time(const char *text, int *hours, int *minutes, 
 
 /******************************************************************************
  *                                                                            *
- * Function: ts_get_ns                                                        *
- *                                                                            *
  * Purpose: parses nanoseconds from time component having .NNNNNNNNN format   *
  *                                                                            *
  * Parameters: text  - [IN] the text                                          *
@@ -208,8 +200,6 @@ static zbx_mock_error_t	ts_get_ns(const char *text, int *ns, const char **pnext)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ts_get_tz                                                        *
  *                                                                            *
  * Purpose: parses timezone offset seconds from timezone component having     *
  *         (+|-)HH[:MM] format                                                *
@@ -254,8 +244,6 @@ static zbx_mock_error_t	ts_get_tz(const char *text, int *sec, const char **pnext
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_time_to_localtime                                            *
- *                                                                            *
  * Purpose: converts timestamp to a broken-down time representation and       *
  *          timezone offset (in seconds).                                     *
  *                                                                            *
@@ -294,8 +282,6 @@ static zbx_mock_error_t	zbx_time_to_localtime(time_t timestamp, struct tm *local
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_tz_format                                                    *
- *                                                                            *
  * Purpose: formats timezone to +hh:mm format                                 *
  *                                                                            *
  * Parameters: buffer - [OUT] the output buffer                               *
@@ -333,8 +319,6 @@ typedef enum
 zbx_mock_time_parser_state_t;
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_strtime_to_timespec                                          *
  *                                                                            *
  * Purpose: converts YAML space separated timestamp having                    *
  *          YYYY-MM-DD hh:mm:ss.nnnnnnnnn TZ format to zabbix timespec        *
@@ -489,8 +473,6 @@ zbx_mock_error_t	zbx_strtime_to_timespec(const char *strtime, zbx_timespec_t *ts
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_time_to_strtime                                              *
- *                                                                            *
  * Purpose: converts time to YAML space separated timestamp in                *
  *          YYYY-MM-DD hh:mm:ss TZ format                                     *
  *                                                                            *
@@ -530,8 +512,6 @@ zbx_mock_error_t	zbx_time_to_strtime(time_t timestamp, char *buffer, size_t size
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_timespec_to_strtime                                          *
  *                                                                            *
  * Purpose: converts timespec (seconds + nanoseconds) to YAML space separated *
  *          timestamp in YYYY-MM-DD hh:mm:ss.nnnnnnnnn TZ format              *

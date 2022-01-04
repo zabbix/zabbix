@@ -44,8 +44,6 @@ void	zbx_am_db_mediatype_clear(zbx_am_db_mediatype_t *mediatype)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_am_db_alert_free                                             *
- *                                                                            *
  * Purpose: frees the alert object                                            *
  *                                                                            *
  * Parameters: alert - [IN] the alert object                                  *
@@ -772,8 +770,6 @@ void	zbx_alerter_deserialize_ids(const unsigned char *data, zbx_uint64_t **ids, 
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_alerter_serialize_diag_stats                                 *
- *                                                                            *
  ******************************************************************************/
 zbx_uint32_t	zbx_alerter_serialize_diag_stats(unsigned char **data, zbx_uint64_t alerts_num)
 {
@@ -788,8 +784,6 @@ zbx_uint32_t	zbx_alerter_serialize_diag_stats(unsigned char **data, zbx_uint64_t
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_alerter_deserialize_diag_stats                               *
- *                                                                            *
  ******************************************************************************/
 static void	zbx_alerter_deserialize_diag_stats(const unsigned char *data, zbx_uint64_t *alerts_num)
 {
@@ -797,8 +791,6 @@ static void	zbx_alerter_deserialize_diag_stats(const unsigned char *data, zbx_ui
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_alerter_serialize_top_request                                *
  *                                                                            *
  ******************************************************************************/
 static zbx_uint32_t	zbx_alerter_serialize_top_request(unsigned char **data, int limit)
@@ -813,8 +805,6 @@ static zbx_uint32_t	zbx_alerter_serialize_top_request(unsigned char **data, int 
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_alerter_deserialize_top_request                              *
- *                                                                            *
  ******************************************************************************/
 void	zbx_alerter_deserialize_top_request(const unsigned char *data, int *limit)
 {
@@ -822,8 +812,6 @@ void	zbx_alerter_deserialize_top_request(const unsigned char *data, int *limit)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_alerter_serialize_top_mediatypes_result                      *
  *                                                                            *
  ******************************************************************************/
 zbx_uint32_t	zbx_alerter_serialize_top_mediatypes_result(unsigned char **data, zbx_am_mediatype_t **mediatypes,
@@ -857,8 +845,6 @@ zbx_uint32_t	zbx_alerter_serialize_top_mediatypes_result(unsigned char **data, z
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_alerter_deserialize_top_mediatypes_result                    *
- *                                                                            *
  ******************************************************************************/
 static void	zbx_alerter_deserialize_top_mediatypes_result(const unsigned char *data,
 		zbx_vector_uint64_pair_t *mediatypes)
@@ -885,8 +871,6 @@ static void	zbx_alerter_deserialize_top_mediatypes_result(const unsigned char *d
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_alerter_serialize_top_sources_result                         *
  *                                                                            *
  ******************************************************************************/
 zbx_uint32_t	zbx_alerter_serialize_top_sources_result(unsigned char **data, zbx_am_source_stats_t **sources,
@@ -924,8 +908,6 @@ zbx_uint32_t	zbx_alerter_serialize_top_sources_result(unsigned char **data, zbx_
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_alerter_deserialize_top_sources_result                       *
- *                                                                            *
  ******************************************************************************/
 static void	zbx_alerter_deserialize_top_sources_result(const unsigned char *data, zbx_vector_ptr_t *sources)
 {
@@ -953,8 +935,6 @@ static void	zbx_alerter_deserialize_top_sources_result(const unsigned char *data
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_alerter_get_diag_stats                                       *
- *                                                                            *
  * Purpose: get alerter manager diagnostic statistics                         *
  *                                                                            *
  ******************************************************************************/
@@ -975,8 +955,6 @@ int	zbx_alerter_get_diag_stats(zbx_uint64_t *alerts_num, char **error)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_alerter_get_top_mediatypes                                   *
  *                                                                            *
  * Purpose: get the top N mediatypes by the number of queued alerts           *
  *                                                                            *
@@ -1011,8 +989,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_alerter_get_top_sources                                      *
  *                                                                            *
  * Purpose: get the top N sources by the number of queued alerts              *
  *                                                                            *
@@ -1172,8 +1148,6 @@ void	zbx_alerter_deserialize_send_dispatch(const unsigned char *data, DB_MEDIATY
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_alerter_begin_dispatch                                       *
- *                                                                            *
  * Purpose: begin data dispatch                                               *
  *                                                                            *
  * Parameters: dispatch     - [IN] the dispatcher                             *
@@ -1235,8 +1209,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_alerter_send_dispatch                                        *
- *                                                                            *
  * Purpose: dispatch data                                                     *
  *                                                                            *
  * Parameters: dispatch   - [IN] the dispatcher                               *
@@ -1278,8 +1250,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_alerter_end_dispatch                                         *
  *                                                                            *
  * Purpose: finish data dispatch                                              *
  *                                                                            *

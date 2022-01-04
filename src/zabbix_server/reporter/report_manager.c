@@ -176,8 +176,6 @@ zbx_rm_writer_t;
 
 /******************************************************************************
  *                                                                            *
- * Function: rm_get_writer                                                    *
- *                                                                            *
  * Purpose: return writer with the specified client                           *
  *                                                                            *
  ******************************************************************************/
@@ -198,8 +196,6 @@ static	zbx_rm_writer_t	*rm_get_writer(zbx_rm_t *manager, const zbx_ipc_client_t 
 
 /******************************************************************************
  *                                                                            *
- * Function: rm_writer_free                                                   *
- *                                                                            *
  ******************************************************************************/
 static void	rm_writer_free(zbx_rm_writer_t *writer)
 {
@@ -208,8 +204,6 @@ static void	rm_writer_free(zbx_rm_writer_t *writer)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: rm_report_compare_nextcheck                                      *
  *                                                                            *
  ******************************************************************************/
 static int	rm_report_compare_nextcheck(const void *d1, const void *d2)
@@ -221,8 +215,6 @@ static int	rm_report_compare_nextcheck(const void *d1, const void *d2)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: rm_report_clean                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	rm_report_clean(zbx_rm_report_t *report)
@@ -239,8 +231,6 @@ static void	rm_report_clean(zbx_rm_report_t *report)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: rm_job_free                                                      *
  *                                                                            *
  ******************************************************************************/
 static void	rm_job_free(zbx_rm_job_t *job)
@@ -260,8 +250,6 @@ static void	rm_job_free(zbx_rm_job_t *job)
 
 /******************************************************************************
  *                                                                            *
- * Function: rm_batch_clean                                                   *
- *                                                                            *
  ******************************************************************************/
 static void	rm_batch_clean(zbx_rm_batch_t *batch)
 {
@@ -271,8 +259,6 @@ static void	rm_batch_clean(zbx_rm_batch_t *batch)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: rm_init                                                          *
  *                                                                            *
  * Purpose: initializes report manager                                        *
  *                                                                            *
@@ -319,8 +305,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: rm_destroy                                                       *
- *                                                                            *
  * Purpose: destroys report manager                                           *
  *                                                                            *
  * Parameters: manager - [IN] the manager to destroy                          *
@@ -360,8 +344,6 @@ static void	rm_destroy(zbx_rm_t *manager)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: rm_register_writer                                               *
  *                                                                            *
  * Purpose: registers report writer                                           *
  *                                                                            *
@@ -403,8 +385,6 @@ static void	rm_register_writer(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_
 
 /******************************************************************************
  *                                                                            *
- * Function: rm_time_to_urlfield                                              *
- *                                                                            *
  * Purpose: convert timestamp to range format used in URL query fields        *
  *                                                                            *
  * Parameters: tm - [IN] the timestamp                                        *
@@ -423,8 +403,6 @@ static char	*rm_time_to_urlfield(const struct tm *tm)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: report_create_cookie                                             *
  *                                                                            *
  * Purpose: create zbx_session cookie for frontend authentication             *
  *                                                                            *
@@ -462,8 +440,6 @@ static char	*report_create_cookie(zbx_rm_t *manager, const char *sessionid)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: rm_get_session                                                   *
  *                                                                            *
  * Purpose: get specified user session, creating one if necessary             *
  *                                                                            *
@@ -524,8 +500,6 @@ static	zbx_rm_session_t	*rm_get_session(zbx_rm_t *manager, zbx_uint64_t userid)
 
 /******************************************************************************
  *                                                                            *
- * Function: rm_db_flush_sessions                                             *
- *                                                                            *
  * Purpose: flushes session lastaccess changes to database                    *
  *                                                                            *
  * Parameters: manager - [IN] the manager                                     *
@@ -567,8 +541,6 @@ static void	rm_db_flush_sessions(zbx_rm_t *manager)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: rm_db_flush_reports                                              *
  *                                                                            *
  * Purpose: flushes report state, lastaccess and error fields                 *
  *                                                                            *
@@ -659,8 +631,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: rm_get_report_range                                              *
- *                                                                            *
  * Purpose: calculate report range from report time and period                *
  *                                                                            *
  * Parameters: report_time - [IN] the report writing time                     *
@@ -691,8 +661,6 @@ static int	rm_get_report_range(int report_time, unsigned char period, struct tm 
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: rm_get_report_name                                               *
  *                                                                            *
  * Purpose: make report attachment name based on report name and timestamp    *
  *                                                                            *
@@ -738,8 +706,6 @@ static char	*rm_get_report_name(const char *name, int report_time)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: rm_create_job                                                    *
  *                                                                            *
  * Purpose: create new job to be processed by report writers                  *
  *                                                                            *
@@ -814,8 +780,6 @@ static zbx_rm_job_t	*rm_create_job(zbx_rm_t *manager, const char *report_name, z
 
 /******************************************************************************
  *                                                                            *
- * Function: rm_update_report                                                 *
- *                                                                            *
  * Purpose: update report state, lastsent, error in cache                     *
  *                                                                            *
  * Parameters: manager - [IN] the report manager                              *
@@ -865,8 +829,6 @@ static void	rm_update_report(zbx_rm_t *manager, zbx_rm_report_t *report, int sta
 
 /******************************************************************************
  *                                                                            *
- * Function: rm_report_calc_nextcheck                                         *
- *                                                                            *
  * Purpose: calculate time when report must be generated                      *
  *                                                                            *
  * Parameters: report - [IN] the report                                       *
@@ -901,8 +863,6 @@ static int	rm_report_calc_nextcheck(const zbx_rm_report_t *report, int now, char
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: rm_report_update_params                                          *
  *                                                                            *
  * Purpose: update report parameters                                          *
  *                                                                            *
@@ -961,8 +921,6 @@ static void	rm_report_update_params(zbx_rm_report_t *report, zbx_vector_ptr_pair
 
 /******************************************************************************
  *                                                                            *
- * Function: rm_report_update_users                                           *
- *                                                                            *
  * Purpose: update report recipient users                                     *
  *                                                                            *
  * Parameters: report     - [IN] the report                                   *
@@ -983,8 +941,6 @@ static void	rm_report_update_users(zbx_rm_report_t *report, const zbx_vector_rec
 
 /******************************************************************************
  *                                                                            *
- * Function: rm_report_update_usergroups                                      *
- *                                                                            *
  * Purpose: update report recipient user groups                               *
  *                                                                            *
  * Parameters: report     - [IN] the report                                   *
@@ -998,8 +954,6 @@ static void	rm_report_update_usergroups(zbx_rm_report_t *report, const zbx_vecto
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: rm_update_cache_settings                                         *
  *                                                                            *
  * Purpose: update general settings cache                                     *
  *                                                                            *
@@ -1032,8 +986,6 @@ static void	rm_update_cache_settings(zbx_rm_t *manager)
 
 /******************************************************************************
  *                                                                            *
- * Function: rm_is_report_active                                              *
- *                                                                            *
  * Purpose: check if the report is active based on the specified time         *
  *                                                                            *
  * Parameters: report - [IN] the report                                       *
@@ -1056,8 +1008,6 @@ static int	rm_is_report_active(const zbx_rm_report_t *report, int now)
 
 /******************************************************************************
  *                                                                            *
- * Function: rm_dequeue_report                                                *
- *                                                                            *
  * Purpose: remove report from queue if it was queued                         *
  *                                                                            *
  * Parameters: manager - [IN] the manager                                     *
@@ -1074,8 +1024,6 @@ static void	rm_dequeue_report(zbx_rm_t *manager, zbx_rm_report_t *report)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: rm_update_cache_reports                                          *
  *                                                                            *
  * Purpose: update reports cache                                              *
  *                                                                            *
@@ -1234,8 +1182,6 @@ static void	rm_update_cache_reports(zbx_rm_t *manager, int now)
 
 /******************************************************************************
  *                                                                            *
- * Function: rm_update_cache_report_param                                     *
- *                                                                            *
  * Purpose: update cached report parameters                                   *
  *                                                                            *
  * Parameters: manager - [IN] the manager                                     *
@@ -1296,8 +1242,6 @@ static void	rm_update_cache_reports_params(zbx_rm_t *manager)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: rm_update_cache_reports_users                                    *
  *                                                                            *
  * Purpose: update cached report recipient users                              *
  *                                                                            *
@@ -1371,8 +1315,6 @@ static void	rm_update_cache_reports_users(zbx_rm_t *manager)
 
 /******************************************************************************
  *                                                                            *
- * Function: rm_update_cache_reports_usergroups                               *
- *                                                                            *
  * Purpose: update cached report recipient user groups                        *
  *                                                                            *
  * Parameters: manager - [IN] the manager                                     *
@@ -1433,8 +1375,6 @@ static void	rm_update_cache_reports_usergroups(zbx_rm_t *manager)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: rm_dump_cache                                                    *
  *                                                                            *
  * Purpose: dump cached reports into log                                      *
  *                                                                            *
@@ -1523,8 +1463,6 @@ static void	rm_dump_cache(zbx_rm_t *manager)
 
 /******************************************************************************
  *                                                                            *
- * Function: rm_update_cache                                                  *
- *                                                                            *
  * Purpose: update configuration and report cache                             *
  *                                                                            *
  * Parameters: manager - [IN] the manager                                     *
@@ -1565,8 +1503,6 @@ static void	zbx_report_dst_free(zbx_report_dst_t *dst)
 #define ZBX_REPORT_BOTTOM_MARGIN	12
 
 /******************************************************************************
- *                                                                            *
- * Function: rm_get_report_dimensions                                         *
  *                                                                            *
  * Purpose: calculate report dimensions based on dashboard contents           *
  *                                                                            *
@@ -1610,8 +1546,6 @@ static void	rm_get_report_dimensions(zbx_uint64_t dashboardid, int *width, int *
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: rm_writer_process_job                                            *
  *                                                                            *
  * Purpose: process job by sending it to writer                               *
  *                                                                            *
@@ -1778,8 +1712,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: rm_report_create_jobs                                            *
- *                                                                            *
  * Purpose: create jobs to process the report                                 *
  *                                                                            *
  * Parameters: manager       - [IN] the manager                               *
@@ -1831,8 +1763,6 @@ static int	rm_jobs_add_user(zbx_rm_t *manager, zbx_rm_report_t *report, zbx_uint
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: rm_report_create_usergroup_jobs                                  *
  *                                                                            *
  * Purpose: create user group based jobs                                      *
  *                                                                            *
@@ -1909,8 +1839,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: rm_report_create_jobs                                            *
  *                                                                            *
  * Purpose: create jobs to process the report                                 *
  *                                                                            *
@@ -2025,8 +1953,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: rm_schedule_jobs                                                 *
- *                                                                            *
  * Purpose: process queue                                                     *
  *                                                                            *
  * Parameters: manager - [IN] the manager                                     *
@@ -2088,8 +2014,6 @@ static int	rm_schedule_jobs(zbx_rm_t *manager, int now)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: rm_finish_job                                                    *
  *                                                                            *
  * Purpose: finish job                                                        *
  *                                                                            *
@@ -2180,8 +2104,6 @@ static void	rm_finish_job(zbx_rm_t *manager, zbx_rm_job_t *job, int status, cons
 
 /******************************************************************************
  *                                                                            *
- * Function: rm_send_test_error_result                                        *
- *                                                                            *
  * Purpose: send error result in response to test request                     *
  *                                                                            *
  * Parameters: client - [IN] the connected trapper                            *
@@ -2199,8 +2121,6 @@ static void	rm_send_test_error_result(zbx_ipc_client_t *client, const char *erro
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: rm_process_jobs                                                  *
  *                                                                            *
  * Purpose: process queue                                                     *
  *                                                                            *
@@ -2252,8 +2172,6 @@ static int	rm_process_jobs(zbx_rm_t *manager)
 
 /******************************************************************************
  *                                                                            *
- * Function: rm_test_report                                                   *
- *                                                                            *
  * Purpose: test report                                                       *
  *                                                                            *
  * Parameters: manager - [IN] the manager                                     *
@@ -2299,8 +2217,6 @@ static int	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_m
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: rm_process_result                                                *
  *                                                                            *
  * Purpose: process report result message                                     *
  *                                                                            *

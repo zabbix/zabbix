@@ -30,8 +30,6 @@ extern unsigned char	program_type;
 
 /******************************************************************************
  *                                                                            *
- * Function: get_value_agent                                                  *
- *                                                                            *
  * Purpose: retrieve data from Zabbix agent                                   *
  *                                                                            *
  * Parameters: item - item we are interested in                               *

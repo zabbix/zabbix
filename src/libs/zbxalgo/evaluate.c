@@ -178,8 +178,6 @@ static double	evaluate_number(int *unknown_idx)
 
 /******************************************************************************
  *                                                                            *
- * Function: variant_convert_to_double                                        *
- *                                                                            *
  * Purpose: cast string variant to a double variant                           *
  *                                                                            *
  * Parameters: var - [IN/OUT] the variant to cast                             *
@@ -201,8 +199,6 @@ static void	variant_convert_to_double(zbx_variant_t *var)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: variant_get_double                                               *
  *                                                                            *
  * Purpose: get variant value in double (float64) format                      *
  *                                                                            *
@@ -1044,8 +1040,6 @@ int	evaluate(double *value, const char *expression, char *error, size_t max_erro
 
 /******************************************************************************
  *                                                                            *
- * Function: evaluate_unknown                                                 *
- *                                                                            *
  * Purpose: evaluate an expression like "(26.416>10) and not(0=ZBX_UNKNOWN0)" *
  *                                                                            *
  * Parameters: expression    - [IN]  expression to evaluate                   *
@@ -1095,8 +1089,6 @@ int	evaluate_unknown(const char *expression, double *value, char *error, size_t 
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: evaluate_string_to_double                                        *
  *                                                                            *
  * Purpose: cast string to a double, expand suffixes and parse negative sign  *
  *                                                                            *

@@ -87,8 +87,6 @@ static void	get_source_ip_option(const char *fping, const char **option, unsigne
 
 /******************************************************************************
  *                                                                            *
- * Function: get_interval_option                                              *
- *                                                                            *
  * Purpose: detect minimal possible fping packet interval                     *
  *                                                                            *
  * Parameters: fping         - [IN] the location of fping program             *
@@ -226,8 +224,6 @@ out:
 
 #ifdef HAVE_IPV6
 /******************************************************************************
- *                                                                            *
- * Function: get_ipv6_support                                                 *
  *                                                                            *
  * Purpose: check fping supports IPv6                                         *
  *                                                                            *
@@ -697,8 +693,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_ping                                                         *
  *                                                                            *
  * Purpose: ping hosts listed in the host files                               *
  *                                                                            *

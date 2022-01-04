@@ -26,8 +26,6 @@ ZBX_VECTOR_IMPL(ppcache, zbx_preproc_cache_ref_t);
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_preproc_cache_get                                            *
- *                                                                            *
  * Purpose: get cache by preprocessing step type                              *
  *                                                                            *
  * Parameters: cache - [IN] the preprocessing cache                           *
@@ -52,8 +50,6 @@ void	*zbx_preproc_cache_get(zbx_preproc_cache_t *cache, unsigned char type)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_preproc_cache_put                                            *
- *                                                                            *
  * Purpose: put preprocessing step cache into preprocessing cache             *
  *                                                                            *
  * Parameters: cache - [IN] the preprocessing cache                           *
@@ -76,8 +72,6 @@ void	zbx_preproc_cache_put(zbx_preproc_cache_t *cache, unsigned char type, void 
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_preproc_cache_init                                           *
- *                                                                            *
  * Purpose: initialize preprocessing cache                                    *
  *                                                                            *
  ******************************************************************************/
@@ -87,8 +81,6 @@ void	zbx_preproc_cache_init(zbx_preproc_cache_t *cache)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_preproc_cache_clear                                          *
  *                                                                            *
  * Purpose: free resources allocated by preprocessing cache                   *
  *                                                                            *

@@ -290,8 +290,6 @@ static void	trigger_tag_insert_temp_free(zbx_trigger_tag_insert_temp_t *trigger_
 
 /********************************************************************************
  *                                                                              *
- * Function: DBcopy_template_trigger_tags                                       *
- *                                                                              *
  * Purpose: copies tags from template triggers to created/linked triggers       *
  *                                                                              *
  * Parameters: new_triggerids - the created trigger ids                         *
@@ -1363,8 +1361,6 @@ static void	trigger_copies_free(zbx_trigger_copy_t *trigger_copy)
 }
 
 /********************************************************************************
- *                                                                              *
- * Function: DBcopy_template_triggers                                           *
  *                                                                              *
  * Purpose: Copy template triggers to host                                      *
  *                                                                              *

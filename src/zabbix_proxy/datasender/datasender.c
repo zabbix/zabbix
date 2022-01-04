@@ -56,8 +56,6 @@ extern unsigned int	configured_tls_connect_mode;
 
 /******************************************************************************
  *                                                                            *
- * Function: get_hist_upload_state                                            *
- *                                                                            *
  * Purpose: Get current history upload state (disabled/enabled)               *
  *                                                                            *
  * Parameters: buffer - [IN] the contents of a packet (JSON)                  *
@@ -84,8 +82,6 @@ static void	get_hist_upload_state(const char *buffer, int *state)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: proxy_data_sender                                                *
  *                                                                            *
  * Purpose: collects host availability, history, discovery, autoregistration  *
  *          data and sends 'proxy data' request                               *
@@ -264,8 +260,6 @@ clean:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: main_datasender_loop                                             *
  *                                                                            *
  * Purpose: periodically sends history and events to the server               *
  *                                                                            *

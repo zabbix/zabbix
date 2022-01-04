@@ -22,8 +22,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_lock_maintenanceids                                       *
- *                                                                            *
  * Purpose: lock maintenances in database                                     *
  *                                                                            *
  * Parameters: maintenanceids - [IN/OUT] a vector of unique maintenance ids   *

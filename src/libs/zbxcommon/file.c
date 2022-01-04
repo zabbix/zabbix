@@ -80,8 +80,6 @@ void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, s
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_read                                                         *
- *                                                                            *
  * Purpose: Read one text line from a file descriptor into buffer             *
  *                                                                            *
  * Parameters: fd       - [IN] file descriptor to read from                   *
@@ -188,8 +186,6 @@ char	*zbx_fgets(char *buffer, int size, FILE *fp)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_write_all                                                    *
  *                                                                            *
  * Purpose: call write in a loop, iterating until all the data is written.    *
  *                                                                            *

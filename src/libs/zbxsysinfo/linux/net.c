@@ -294,8 +294,6 @@ static int	get_net_stat(const char *if_name, net_stat_t *result, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Function: proc_read_tcp_listen                                             *
- *                                                                            *
  * Purpose: reads /proc/net/tcp(6) file by chunks until the last line in      *
  *          in buffer has non-listening socket state                          *
  *                                                                            *
@@ -378,8 +376,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: proc_read_file                                                   *
  *                                                                            *
  * Purpose: reads whole file into a buffer in a single read operation         *
  *                                                                            *

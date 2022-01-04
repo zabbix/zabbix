@@ -126,8 +126,6 @@ void	zbx_hashset_destroy(zbx_hashset_t *hs)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_hashset_reserve                                              *
- *                                                                            *
  * Purpose: allocation not less than the required number of slots for hashset *
  *                                                                            *
  * Parameters: hs            - [IN] the destination hashset                   *

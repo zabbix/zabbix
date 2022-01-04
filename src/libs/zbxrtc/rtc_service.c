@@ -27,8 +27,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: rtc_change_service_loglevel                                      *
- *                                                                            *
  * Purpose: change log level of service process                               *
  *                                                                            *
  ******************************************************************************/
@@ -63,8 +61,6 @@ static void	rtc_change_service_loglevel(int code)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: rtc_process_loglevel                                             *
  *                                                                            *
  * Purpose: process loglevel runtime control option                           *
  *                                                                            *
@@ -134,8 +130,6 @@ static void	rtc_process_loglevel(int code, const char *data, char **result)
 
 /******************************************************************************
  *                                                                            *
- * Function: rtc_process_diaginfo                                             *
- *                                                                            *
  * Purpose: process diaginfo runtime control option                           *
  *                                                                            *
  * Parameters: data   - [IN] the runtime control parameter (optional)         *
@@ -182,8 +176,6 @@ static void	rtc_process_diaginfo(const char *data, char **result)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: rtc_process_request                                              *
  *                                                                            *
  * Purpose: process runtime control option                                    *
  *                                                                            *
@@ -244,8 +236,6 @@ static void	rtc_process_request(int code, const unsigned char *data, char **resu
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_rtc_init                                                     *
- *                                                                            *
  * Purpose: initialize runtime control service                                *
  *                                                                            *
  ******************************************************************************/
@@ -255,8 +245,6 @@ int	zbx_rtc_init(zbx_rtc_t *rtc ,char **error)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_rtc_dispatch                                                 *
  *                                                                            *
  * Purpose: accept and process runtime control request                        *
  *                                                                            *
@@ -291,8 +279,6 @@ void	zbx_rtc_dispatch(zbx_ipc_client_t *client, zbx_ipc_message_t *message)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_rtc_wait_config_sync                                         *
  *                                                                            *
  * Purpose: wait for configuration sync notification while optionally         *
  *          dispatching runtime control commands                              *

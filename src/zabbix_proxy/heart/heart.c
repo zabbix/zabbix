@@ -40,8 +40,6 @@ extern unsigned int	configured_tls_connect_mode;
 
 /******************************************************************************
  *                                                                            *
- * Function: send_heartbeat                                                   *
- *                                                                            *
  ******************************************************************************/
 static int	send_heartbeat(void)
 {
@@ -88,8 +86,6 @@ clean:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: main_heart_loop                                                  *
  *                                                                            *
  * Purpose: periodically send heartbeat message to the server                 *
  *                                                                            *

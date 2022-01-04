@@ -105,8 +105,6 @@ static int	ha_db_execute(zbx_ha_info_t *info, const char *sql, ...) __zbx_attr_f
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_manager_send_message                                          *
- *                                                                            *
  * Purpose: connect, send message and receive response in a given timeout     *
  *                                                                            *
  * Parameters: service_name - [IN] the IPC service name                       *
@@ -170,8 +168,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_update_parent                                                 *
- *                                                                            *
  * Purpose: update parent process with ha_status and failover delay           *
  *                                                                            *
  ******************************************************************************/
@@ -210,8 +206,6 @@ static void	ha_update_parent(zbx_ipc_async_socket_t *rtc_socket, zbx_ha_info_t *
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_send_heartbeat                                                *
- *                                                                            *
  * Purpose: send heartbeat message to main process                            *
  *                                                                            *
  ******************************************************************************/
@@ -226,8 +220,6 @@ static void	ha_send_heartbeat(zbx_ipc_async_socket_t *rtc_socket)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_ha_set_error                                                 *
  *                                                                            *
  * Purpose: set HA manager error                                              *
  *                                                                            *
@@ -256,8 +248,6 @@ static void	ha_set_error(zbx_ha_info_t *info, const char *fmt, ...)
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_db_begin                                                      *
- *                                                                            *
  * Purpose: start database transaction                                        *
  *                                                                            *
  * Comments: Sets error status on non-recoverable database error              *
@@ -279,8 +269,6 @@ static int	ha_db_begin(zbx_ha_info_t *info)
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_db_rollback                                                   *
- *                                                                            *
  * Purpose: roll back database transaction                                    *
  *                                                                            *
  * Comments: Sets error status on non-recoverable database error              *
@@ -301,8 +289,6 @@ static int	ha_db_rollback(zbx_ha_info_t *info)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ha_db_commit                                                     *
  *                                                                            *
  * Purpose: commit/rollback database transaction depending on commit result   *
  *                                                                            *
@@ -328,8 +314,6 @@ static int	ha_db_commit(zbx_ha_info_t *info)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ha_db_select                                                     *
  *                                                                            *
  * Purpose: perform database select sql query based on current database       *
  *          connection status                                                 *
@@ -362,8 +346,6 @@ static DB_RESULT	ha_db_select(zbx_ha_info_t *info, const char *sql, ...)
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_db_select                                                     *
- *                                                                            *
  * Purpose: perform database sql query based on current database              *
  *          connection status                                                 *
  *                                                                            *
@@ -384,8 +366,6 @@ static int	ha_db_execute(zbx_ha_info_t *info, const char *sql, ...)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ha_db_update_config                                              *
  *                                                                            *
  * Purpose: update HA configuration from database                             *
  *                                                                            *
@@ -414,8 +394,6 @@ static int	ha_db_update_config(zbx_ha_info_t *info)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ha_db_get_nodes                                                  *
  *                                                                            *
  * Purpose: get all nodes from database                                       *
  *                                                                            *
@@ -463,8 +441,6 @@ static int	ha_db_get_nodes(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes, int
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_check_registered_node                                         *
- *                                                                            *
  * Purpose: check if the node is registered in node table and get ID          *
  *                                                                            *
  ******************************************************************************/
@@ -483,8 +459,6 @@ static zbx_ha_node_t	*ha_find_node_by_name(zbx_vector_ha_node_t *nodes, const ch
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_get_external_address                                          *
- *                                                                            *
  * Purpose: get server external address and port from configuration           *
  *                                                                            *
  ******************************************************************************/
@@ -494,8 +468,6 @@ static void	ha_get_external_address(char **address, unsigned short *port)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ha_db_lock_nodes                                                 *
  *                                                                            *
  * Purpose: lock nodes in database                                            *
  *                                                                            *
@@ -516,8 +488,6 @@ static int	ha_db_lock_nodes(zbx_ha_info_t *info)
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_is_available                                                  *
- *                                                                            *
  * Purpose: check availability based on lastaccess timestamp, database time   *
  *          and failover delay                                                *
  *                                                                            *
@@ -534,8 +504,6 @@ static int	ha_is_available(const zbx_ha_info_t *info, int lastaccess, int db_tim
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ha_check_standalone_config                                       *
  *                                                                            *
  * Purpose: check if server can be started in standalone configuration        *
  *                                                                            *
@@ -567,8 +535,6 @@ static int	ha_check_standalone_config(zbx_ha_info_t *info, zbx_vector_ha_node_t 
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ha_check_cluster_config                                          *
  *                                                                            *
  * Purpose: check if server can be started in cluster configuration           *
  *                                                                            *
@@ -625,8 +591,6 @@ static int	ha_check_cluster_config(zbx_ha_info_t *info, zbx_vector_ha_node_t *no
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_db_get_time                                                   *
- *                                                                            *
  * Purpose: get current database time                                         *
  *                                                                            *
  ******************************************************************************/
@@ -658,8 +622,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_flush_audit                                                   *
- *                                                                            *
  * Purpose: flush audit taking in account database connection status          *
  *                                                                            *
  ******************************************************************************/
@@ -675,8 +637,6 @@ static void	ha_flush_audit(zbx_ha_info_t *info)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ha_db_create_node                                                *
  *                                                                            *
  * Purpose: add new node record in ha_node table if necessary                 *
  *                                                                            *
@@ -760,8 +720,6 @@ finish:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ha_db_register_node                                              *
  *                                                                            *
  * Purpose: register server node                                              *
  *                                                                            *
@@ -883,8 +841,6 @@ finish:
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_check_standby_nodes                                           *
- *                                                                            *
  * Purpose: check for standby nodes being unavailable for failrover_delay     *
  *          seconds and mark them unavailable                                 *
  *                                                                            *
@@ -943,8 +899,6 @@ static int	ha_check_standby_nodes(zbx_ha_info_t *info, zbx_vector_ha_node_t *nod
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_check_active_node                                             *
- *                                                                            *
  * Purpose: check for active nodes being unavailable for failover_delay       *
  *          seconds, mark them unavailable and set own status to active       *
  *                                                                            *
@@ -997,8 +951,6 @@ static int	ha_check_active_node(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ha_check_nodes                                                   *
  *                                                                            *
  * Purpose: check HA status based on nodes                                    *
  *                                                                            *
@@ -1113,8 +1065,6 @@ finish:
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_db_update_lastaccess                                          *
- *                                                                            *
  * Purpose: update node lastaccess                                            *
  *                                                                            *
  ******************************************************************************/
@@ -1138,8 +1088,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ha_db_get_nodes_json                                             *
  *                                                                            *
  * Purpose: get cluster status in lld compatible json format                  *
  *                                                                            *
@@ -1202,8 +1150,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ha_remove_node_impl                                              *
  *                                                                            *
  * Purpose: remove node by its cuid or name                                   *
  *                                                                            *
@@ -1292,8 +1238,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_report_cluster_status                                         *
- *                                                                            *
  * Purpose: report cluster status in log file                                 *
  *                                                                            *
  ******************************************************************************/
@@ -1326,8 +1270,6 @@ static void	ha_remove_node(zbx_ha_info_t *info, zbx_ipc_client_t *client, const 
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_send_status                                                   *
- *                                                                            *
  * Purpose: reply to ha_status request                                        *
  *                                                                            *
  ******************************************************************************/
@@ -1358,8 +1300,6 @@ static void	ha_send_status(zbx_ha_info_t *info, zbx_ipc_client_t *client)
 
 
 /******************************************************************************
- *                                                                            *
- * Function: ha_set_failover_delay                                            *
  *                                                                            *
  * Purpose: set failover delay                                                *
  *                                                                            *
@@ -1416,8 +1356,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_get_failover_delay                                            *
- *                                                                            *
  * Purpose: get failover delay                                                *
  *                                                                            *
  ******************************************************************************/
@@ -1432,8 +1370,6 @@ static void	ha_get_failover_delay(zbx_ha_info_t *info, zbx_ipc_client_t *client)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 /******************************************************************************
- *                                                                            *
- * Function: ha_send_node_list                                               *
  *                                                                            *
  * Purpose: reply to get nodes request                                        *
  *                                                                            *
@@ -1468,8 +1404,6 @@ static void	ha_send_node_list(zbx_ha_info_t *info, zbx_ipc_client_t *client)
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_db_update_exit_status                                         *
- *                                                                            *
  * Purpose: update node status in database on shutdown                        *
  *                                                                            *
  ******************************************************************************/
@@ -1501,8 +1435,6 @@ out:
  */
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_ha_get_status                                                *
  *                                                                            *
  * Purpose: get HA manager status                                             *
  *                                                                            *
@@ -1556,8 +1488,6 @@ int	zbx_ha_get_status(int *ha_status, char **error)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_ha_dispatch_message                                          *
  *                                                                            *
  * Purpose: handle HA manager notifications                                   *
  *                                                                            *
@@ -1620,8 +1550,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_ha_start                                                     *
  *                                                                            *
  * Purpose: start HA manager                                                  *
  *                                                                            *
@@ -1691,8 +1619,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_ha_pause                                                     *
- *                                                                            *
  * Purpose: pause HA manager                                                  *
  *                                                                            *
  * Comments: HA manager must be paused before stopping it normally            *
@@ -1715,8 +1641,6 @@ int	zbx_ha_pause(char **error)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_ha_stop                                                      *
  *                                                                            *
  * Purpose: stop  HA manager                                                  *
  *                                                                            *
@@ -1759,8 +1683,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_ha_kill                                                      *
- *                                                                            *
  * Purpose: kill HA manager                                                   *
  *                                                                            *
  ******************************************************************************/
@@ -1772,8 +1694,6 @@ void	zbx_ha_kill(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_ha_check_pid                                                 *
  *                                                                            *
  * Purpose: check if the pid is HA manager pid                                *
  *                                                                            *

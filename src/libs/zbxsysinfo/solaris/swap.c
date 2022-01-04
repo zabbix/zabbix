@@ -23,8 +23,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: get_swapinfo                                                     *
- *                                                                            *
  * Purpose: get swap usage statistics                                         *
  *                                                                            *
  * Return value: SUCCEED if swap usage statistics retrieved successfully      *

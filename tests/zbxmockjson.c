@@ -154,8 +154,6 @@ static void	json_flatten_contents(struct zbx_json_parse *jp, const char *prefix,
 
 /******************************************************************************
  *                                                                            *
- * Function: json_flatten                                                     *
- *                                                                            *
  * Purpose: flattens json into vector of key (json path), value pairs, sorted *
  *          by keys                                                           *
  *                                                                            *
@@ -167,8 +165,6 @@ static void	json_flatten(struct zbx_json_parse *jp, zbx_vector_ptr_pair_t *props
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: __zbx_mock_assert_json_eq                                        *
  *                                                                            *
  * Purpose: compares returned json with expected                              *
  *                                                                            *

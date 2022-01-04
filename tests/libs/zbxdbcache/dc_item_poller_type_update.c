@@ -181,8 +181,6 @@ static void	read_test(const zbx_mock_handle_t *handle, test_config_t *test_confi
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_mock_test_entry                                              *
- *                                                                            *
  ******************************************************************************/
 void	zbx_mock_test_entry(void **state)
 {

@@ -141,8 +141,6 @@ static int	tfc_compare_func(const void *v1, const void *v2)
 
 /******************************************************************************
  *                                                                            *
- * Function: tfc_malloc_func                                                  *
- *                                                                            *
  * Purpose: allocate memory for indexing hashset                              *
  *                                                                            *
  * Comments: There are two kinds of allocations that should be done:          *
@@ -182,8 +180,6 @@ static void	tfc_free_func(void *ptr)
 
 /******************************************************************************
  *                                                                            *
- * Function: tfc_lru_append                                                   *
- *                                                                            *
  * Purpose: append data to the tail of least recently used slot list          *
  *                                                                            *
  ******************************************************************************/
@@ -206,8 +202,6 @@ static void	tfc_lru_append(zbx_tfc_data_t *data)
 
 /******************************************************************************
  *                                                                            *
- * Function: tfc_lru_remove                                                   *
- *                                                                            *
  * Purpose: remove data from least recently used slot list                    *
  *                                                                            *
  ******************************************************************************/
@@ -225,8 +219,6 @@ static void	tfc_lru_remove(zbx_tfc_data_t *data)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: tfc_value_append                                                 *
  *                                                                            *
  * Purpose: append data to the tail of same item value list                   *
  *                                                                            *
@@ -249,8 +241,6 @@ static void	tfc_value_append(zbx_tfc_data_t *root, zbx_tfc_data_t *data)
 
 /******************************************************************************
  *                                                                            *
- * Function: tfc_value_remove                                                 *
- *                                                                            *
  * Purpose: remove data from same item value list                             *
  *                                                                            *
  ******************************************************************************/
@@ -261,8 +251,6 @@ static void	tfc_value_remove(zbx_tfc_data_t *data)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: tfc_free_data                                                    *
  *                                                                            *
  * Purpose: frees slot used to store trends function data                     *
  *                                                                            *
@@ -283,8 +271,6 @@ static void	tfc_free_data(zbx_tfc_data_t *data)
 
 /******************************************************************************
  *                                                                            *
- * Function: tfc_reserve_slot                                                 *
- *                                                                            *
  * Purpose: ensure there is a free slot available                             *
  *                                                                            *
  ******************************************************************************/
@@ -303,8 +289,6 @@ static void	tfc_reserve_slot(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: tfc_index_add                                                    *
  *                                                                            *
  * Purpose: indexes data by adding it to the index hashset                    *
  *                                                                            *
@@ -330,8 +314,6 @@ static zbx_tfc_data_t	*tfc_index_add(zbx_tfc_data_t *data_local)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: tfc_function_str                                                 *
  *                                                                            *
  * Purpose: return trend function name in readable format                     *
  *                                                                            *
@@ -359,8 +341,6 @@ static const char	*tfc_function_str(zbx_trend_function_t function)
 
 /******************************************************************************
  *                                                                            *
- * Function: tfc_state_str                                                    *
- *                                                                            *
  * Purpose: return trend cache state in readable format                       *
  *                                                                            *
  ******************************************************************************/
@@ -380,8 +360,6 @@ static const char	*tfc_state_str(zbx_trend_state_t state)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_tfc_init                                                     *
  *                                                                            *
  * Purpose: initialize trend function cache                                   *
  *                                                                            *
@@ -451,8 +429,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_tfc_destroy                                                  *
- *                                                                            *
  * Purpose: destroy trend function cache                                      *
  *                                                                            *
  ******************************************************************************/
@@ -468,8 +444,6 @@ void	zbx_tfc_destroy(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_tfc_get_value                                                *
  *                                                                            *
  * Purpose: get value and state from trend function cache                     *
  *                                                                            *
@@ -547,8 +521,6 @@ int	zbx_tfc_get_value(zbx_uint64_t itemid, int start, int end, zbx_trend_functio
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_tfc_put_value                                                *
  *                                                                            *
  * Purpose: put value and state from trend function cache                     *
  *                                                                            *

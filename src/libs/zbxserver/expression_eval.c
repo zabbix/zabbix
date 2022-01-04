@@ -117,8 +117,6 @@ static void	expression_query_free(zbx_expression_query_t *query)
 
 /******************************************************************************
  *                                                                            *
- * Function: test_key_param_wildcard_cb                                       *
- *                                                                            *
  * Purpose: check if key parameter is a wildcard '*'                          *
  *                                                                            *
  ******************************************************************************/
@@ -143,8 +141,6 @@ static int	test_key_param_wildcard_cb(const char *data, int key_type, int level,
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: expression_create_query                                          *
  *                                                                            *
  * Purpose: create expression item query from item query /host/key?[filter]   *
  *                                                                            *
@@ -199,8 +195,6 @@ static zbx_expression_query_t*	expression_create_query(const char *itemquery)
 
 /******************************************************************************
  *                                                                            *
- * Function: expression_group_free                                            *
- *                                                                            *
  ******************************************************************************/
 static void	expression_group_free(zbx_expression_group_t *group)
 {
@@ -210,8 +204,6 @@ static void	expression_group_free(zbx_expression_group_t *group)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: expression_get_group                                             *
  *                                                                            *
  * Purpose: get group from cache by name                                      *
  *                                                                            *
@@ -247,8 +239,6 @@ static zbx_expression_group_t	*expression_get_group(zbx_expression_eval_t *eval,
 
 /******************************************************************************
  *                                                                            *
- * Function: expression_get_item                                              *
- *                                                                            *
  * Purpose: get item from cache by itemid                                     *
  *                                                                            *
  * Parameters: eval    - [IN] the evaluation data                             *
@@ -283,8 +273,6 @@ static zbx_expression_item_t	*expression_get_item(zbx_expression_eval_t *eval, z
 
 /******************************************************************************
  *                                                                            *
- * Function: expression_item_free                                             *
- *                                                                            *
  ******************************************************************************/
 static void	expression_item_free(zbx_expression_item_t *item)
 {
@@ -294,8 +282,6 @@ static void	expression_item_free(zbx_expression_item_t *item)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: expression_init_query_one                                        *
  *                                                                            *
  * Purpose: initialize one item query                                         *
  *                                                                            *
@@ -313,8 +299,6 @@ static void	expression_init_query_one(zbx_expression_eval_t *eval, zbx_expressio
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: replace_key_param_wildcard_cb                                    *
  *                                                                            *
  * Purpose: replace wildcards '*'in key parameters with % and escape existing *
  *          %, \ characters for SQL like operation                            *
@@ -357,8 +341,6 @@ static int	replace_key_param_wildcard_cb(const char *data, int key_type, int lev
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: expression_match_item_key                                        *
  *                                                                            *
  * Purpose: check if item key matches the pattern                             *
  *                                                                            *
@@ -407,8 +389,6 @@ typedef struct
 zbx_expression_eval_many_t;
 
 /******************************************************************************
- *                                                                            *
- * Function: expression_get_item_candidates                                   *
  *                                                                            *
  * Purpose: get itemids + hostids of items that might match query based on    *
  *          host, key and filter groups                                       *
@@ -553,8 +533,6 @@ static void	expression_get_item_candidates(zbx_expression_eval_t *eval, const zb
 
 /******************************************************************************
  *                                                                            *
- * Function: expression_item_check_tag                                        *
- *                                                                            *
  * Purpose: check if the item matches the tag                                 *
  *                                                                            *
  * Parameters: item - [IN] the item with tags                                 *
@@ -596,8 +574,6 @@ static int	expression_item_check_tag(zbx_expression_item_t *item, const char *ta
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: expression_eval_filter                                           *
  *                                                                            *
  * Purpose: evaluate filter function                                          *
  *                                                                            *
@@ -671,8 +647,6 @@ static int	expression_eval_filter(const char *name, size_t len, int args_num, co
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: expression_init_query_many                                       *
  *                                                                            *
  * Purpose: initialize many item query                                        *
  *                                                                            *
@@ -802,8 +776,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: expression_cache_dcitems_hk                                      *
- *                                                                            *
  * Purpose: cache items used in one item queries                              *
  *                                                                            *
  * Parameters: eval - [IN] the evaluation data                                *
@@ -860,8 +832,6 @@ static int	expression_find_dcitem_by_itemid(const void *d1, const void *d2)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: expression_cache_dcitems                                         *
  *                                                                            *
  * Purpose: cache items used in many item queries                             *
  *                                                                            *
@@ -939,8 +909,6 @@ static void	expression_cache_dcitems(zbx_expression_eval_t *eval)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: expression_eval_one                                              *
  *                                                                            *
  * Purpose: evaluate historical function for one item query                   *
  *                                                                            *
@@ -1110,8 +1078,6 @@ static int	get_function_by_name(const char *name, size_t len)
 
 /******************************************************************************
  *                                                                            *
- * Function: evaluate_history_func_min                                        *
- *                                                                            *
  * Purpose: calculate minimum value from the history value vector             *
  *                                                                            *
  * Parameters: values      - [IN] a vector containing history values          *
@@ -1143,8 +1109,6 @@ static void	evaluate_history_func_min(zbx_vector_history_record_t *values, int v
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: evaluate_history_func_max                                        *
  *                                                                            *
  * Purpose: calculate maximum value from the history value vector             *
  *                                                                            *
@@ -1178,8 +1142,6 @@ static void	evaluate_history_func_max(zbx_vector_history_record_t *values, int v
 
 /******************************************************************************
  *                                                                            *
- * Function: evaluate_history_func_sum                                        *
- *                                                                            *
  * Purpose: calculate sum of values from the history value vector             *
  *                                                                            *
  * Parameters: values      - [IN] a vector containing history values          *
@@ -1208,8 +1170,6 @@ static void	evaluate_history_func_sum(zbx_vector_history_record_t *values, int v
 
 /******************************************************************************
  *                                                                            *
- * Function: evaluate_history_func_avg                                        *
- *                                                                            *
  * Purpose: calculate average value of values from the history value vector   *
  *                                                                            *
  * Parameters: values      - [IN] a vector containing history values          *
@@ -1226,8 +1186,6 @@ static void	evaluate_history_func_avg(zbx_vector_history_record_t *values, int v
 
 /******************************************************************************
  *                                                                            *
- * Function: evaluate_history_func_count                                      *
- *                                                                            *
  * Purpose: calculate number of values in value vector                        *
  *                                                                            *
  * Parameters: values      - [IN] a vector containing history values          *
@@ -1242,8 +1200,6 @@ static void	evaluate_history_func_count(zbx_vector_history_record_t *values, dou
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: evaluate_history_func_last                                       *
  *                                                                            *
  * Purpose: calculate the last (newest) value in value vector                 *
  *                                                                            *
@@ -1260,8 +1216,6 @@ static void	evaluate_history_func_last(zbx_vector_history_record_t *values, int 
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: evaluate_history_func                                            *
  *                                                                            *
  * Purpose: calculate function with values from value vector                  *
  *                                                                            *
@@ -1304,8 +1258,6 @@ static void	evaluate_history_func(zbx_vector_history_record_t *values, int value
 
 /******************************************************************************
  *                                                                            *
- * Function: get_dcitem                                                       *
- *                                                                            *
  * Purpose: get item from cache by itemid                                     *
  *                                                                            *
  * Parameters: eval    - [IN] the evaluation data                             *
@@ -1325,8 +1277,6 @@ static DC_ITEM	*get_dcitem(zbx_vector_ptr_t *dcitem_refs, zbx_uint64_t itemid)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: expression_eval_exists                                           *
  *                                                                            *
  * Purpose: evaluate functions 'exists_foreach' and 'item_count'              *
  *          for multiple items                                                *
@@ -1383,8 +1333,6 @@ static void	expression_eval_exists(zbx_expression_eval_t *eval, zbx_expression_q
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: expression_eval_bucket_rate                                      *
  *                                                                            *
  * Purpose: evaluate functions 'bucket_rate_foreach' for 'histogram_quantile' *
  *          and evaluate functions 'bucket_percentile'                        *
@@ -1566,8 +1514,6 @@ err:
 
 /******************************************************************************
  *                                                                            *
- * Function: expression_eval_many                                             *
- *                                                                            *
  * Purpose: evaluate historical function for multiple items (aggregate checks)*
  *                                                                            *
  * Parameters: eval     - [IN] the evaluation data                            *
@@ -1710,8 +1656,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: expression_eval_history                                          *
- *                                                                            *
  * Purpose: evaluate historical function                                      *
  *                                                                            *
  * Parameters: name     - [IN] the function name (not zero terminated)        *
@@ -1790,8 +1734,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: expression_eval_common                                           *
- *                                                                            *
  * Purpose: evaluate common function                                          *
  *                                                                            *
  * Parameters: name     - [IN] the function name (not zero terminated)        *
@@ -1851,8 +1793,6 @@ static int	expression_eval_common(const char *name, size_t len, int args_num, co
 
 /******************************************************************************
  *                                                                            *
- * Function: expression_eval_init                                             *
- *                                                                            *
  * Purpose: initialize expression evaluation data                             *
  *                                                                            *
  * Parameters: eval     - [IN] the evaluation data                            *
@@ -1906,8 +1846,6 @@ void	zbx_expression_eval_init(zbx_expression_eval_t *eval, int mode, zbx_eval_co
 
 /******************************************************************************
  *                                                                            *
- * Function: expression_eval_clear                                            *
- *                                                                            *
  * Purpose: free resources allocated by expression evaluation data            *
  *                                                                            *
  * Parameters: eval     - [IN] the evaluation data                            *
@@ -1943,8 +1881,6 @@ void	zbx_expression_eval_clear(zbx_expression_eval_t *eval)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_expression_eval_resolve_item_hosts                           *
  *                                                                            *
  * Purpose: resolve calculated item formula empty and macro host references   *
  *          (// , {HOST.HOST}) to host names                                  *
@@ -1990,8 +1926,6 @@ static void	host_index_free(zbx_host_index_t *index)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_expression_eval_resolve_trigger_hosts                        *
  *                                                                            *
  * Purpose: resolve expression macro empty and macro host references          *
  *          (// , {HOST.HOST}, {HOST.HOST<N>}) to  host names                 *
@@ -2049,8 +1983,6 @@ void	zbx_expression_eval_resolve_trigger_hosts(zbx_expression_eval_t *eval, cons
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_expression_eval_execute                                      *
  *                                                                            *
  * Purpose: execute expression containing history functions                   *
  *                                                                            *
