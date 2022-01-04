@@ -62,6 +62,7 @@
 #include "zbxvault.h"
 #include "zbxdiag.h"
 #include "sighandler.h"
+#include "zbxrtc.h"
 
 #ifdef HAVE_OPENIPMI
 #include "../zabbix_server/ipmi/ipmi_manager.h"
@@ -155,7 +156,7 @@ ZBX_THREAD_LOCAL unsigned char	process_type	= ZBX_PROCESS_TYPE_UNKNOWN;
 ZBX_THREAD_LOCAL int		process_num	= 0;
 ZBX_THREAD_LOCAL int		server_num	= 0;
 
-static int	CONFIG_PROXYMODE	= ZBX_PROXYMODE_ACTIVE;
+int	CONFIG_PROXYMODE		= ZBX_PROXYMODE_ACTIVE;
 int	CONFIG_DATASENDER_FORKS		= 1;
 int	CONFIG_DISCOVERER_FORKS		= 1;
 int	CONFIG_HOUSEKEEPER_FORKS	= 1;
@@ -315,8 +316,6 @@ int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 int	CONFIG_DOUBLE_PRECISION		= ZBX_DB_DBL_PRECISION_ENABLED;
 
 zbx_vector_ptr_t	zbx_addrs;
-
-volatile sig_atomic_t	zbx_diaginfo_scope = ZBX_DIAGINFO_UNDEFINED;
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
@@ -979,9 +978,7 @@ int	main(int argc, char **argv)
 				break;
 			case 'R':
 				opt_r++;
-				if (SUCCEED != parse_rtc_options(zbx_optarg, program_type, &t.data))
-					exit(EXIT_FAILURE);
-
+				t.opts = zbx_strdup(t.opts, zbx_optarg);
 				t.task = ZBX_TASK_RUNTIME_CONTROL;
 				break;
 			case 'h':
@@ -1034,23 +1031,27 @@ int	main(int argc, char **argv)
 	zbx_load_config(&t);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
-		exit(SUCCEED == zbx_sigusr_send(t.data) ? EXIT_SUCCESS : EXIT_FAILURE);
+	{
+		int	ret;
+		char	*error = NULL;
+
+		if (FAIL == zbx_ipc_service_init_env(CONFIG_SOCKET_PATH, &error))
+		{
+			zbx_error("cannot initialize IPC services: %s", error);
+			zbx_free(error);
+			exit(EXIT_FAILURE);
+		}
+
+		if (SUCCEED != (ret = zbx_rtc_process(t.opts, &error)))
+		{
+			zbx_error("Cannot perform runtime control command: %s", error);
+			zbx_free(error);
+		}
+
+		exit(SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE);
+	}
 
 	return daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
-}
-
-static void	zbx_main_sigusr_handler(int flags)
-{
-	if (ZBX_RTC_DIAGINFO == ZBX_RTC_GET_MSG(flags))
-	{
-		int	scope = ZBX_RTC_GET_SCOPE(flags);
-
-		if (ZBX_DIAGINFO_ALL == scope)
-			zbx_diaginfo_scope = (1 << ZBX_DIAGINFO_HISTORYCACHE) | (1 << ZBX_DIAGINFO_PREPROCESSING) |
-			(1 << ZBX_DIAGINFO_LOCKS);
-		else
-			zbx_diaginfo_scope = 1 << scope;
-	}
 }
 
 static void	zbx_check_db(void)
@@ -1094,7 +1095,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	zbx_socket_t	listen_sock;
 	char		*error = NULL;
-	int		i, db_type;
+	int		i, db_type, ret;
+	zbx_rtc_t	rtc;
+	zbx_timespec_t	rtc_timeout = {1, 0};
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
@@ -1196,6 +1199,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 
 	zbx_free_config();
+
+	if (SUCCEED != zbx_rtc_init(&rtc, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize runtime control service: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
 
 	if (SUCCEED != init_database_cache(&error))
 	{
@@ -1319,7 +1329,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		{
 			case ZBX_PROCESS_TYPE_CONFSYNCER:
 				zbx_thread_start(proxyconfig_thread, &thread_args, &threads[i]);
-				DCconfig_wait_sync();
+				zbx_rtc_wait_config_sync(&rtc);
 				break;
 			case ZBX_PROCESS_TYPE_TRAPPER:
 				thread_args.args = &listen_sock;
@@ -1400,23 +1410,36 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		}
 	}
 
-	zbx_set_sigusr_handler(zbx_main_sigusr_handler);
 	zbx_unset_exit_on_terminate();
 
-	while (ZBX_IS_RUNNING() && -1 == wait(&i))	/* wait for any child to exit */
+	while (ZBX_IS_RUNNING())
 	{
-		if (EINTR != errno)
+		zbx_ipc_client_t	*client;
+		zbx_ipc_message_t	*message;
+
+		(void)zbx_ipc_service_recv(&rtc.service, &rtc_timeout, &client, &message);
+
+		if (NULL != message)
 		{
-			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
+			zbx_rtc_dispatch(client, message);
+			zbx_ipc_message_free(message);
+		}
+
+		if (NULL != client)
+			zbx_ipc_client_release(client);
+
+		if (0 < (ret = waitpid((pid_t)-1, &i, WNOHANG)))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "PROCESS EXIT: %d", ret);
 			sig_exiting = ZBX_EXIT_FAILURE;
 			break;
 		}
 
-		/* check if the wait was interrupted because of diaginfo remote command */
-		if (ZBX_DIAGINFO_UNDEFINED != zbx_diaginfo_scope)
+		if (-1 == ret && EINTR != errno)
 		{
-			zbx_diag_log_info((unsigned int)zbx_diaginfo_scope);
-			zbx_diaginfo_scope = ZBX_DIAGINFO_UNDEFINED;
+			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
+			sig_exiting = ZBX_EXIT_FAILURE;
+			break;
 		}
 	}
 
