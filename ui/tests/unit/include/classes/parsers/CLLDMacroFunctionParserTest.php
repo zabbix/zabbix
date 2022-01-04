@@ -19,8 +19,6 @@
 **/
 
 
-use PHPUnit\Framework\TestCase;
-
 class CLLDMacroFunctionParserTest extends CParserTest {
 
 	protected function getParser() {

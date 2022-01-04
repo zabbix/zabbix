@@ -965,4 +965,3 @@ out:
 	zbx_free(info);
 	zbx_json_free(&j);
 }
-

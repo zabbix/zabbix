@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-13 16:02+0200\n"
+"POT-Creation-Date: 2021-12-22 17:25+0200\n"
 "PO-Revision-Date: 2016-05-11 02:08+0300\n"
 "Last-Translator: 岂几 <tom3000@126.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -298,7 +298,7 @@ msgstr "(只有超级管理员能创建群组)"
 msgid "(no proxy)"
 msgstr "(无agent代理程序)"
 
-#: include/classes/setup/CSetupWizard.php:480
+#: include/classes/setup/CSetupWizard.php:492
 msgid "0 - use default port"
 msgstr "0 - 使用默认端口"
 
@@ -1130,7 +1130,7 @@ msgstr "允许的主机"
 msgid "Allowed methods"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:854
+#: include/classes/setup/CSetupWizard.php:880
 msgid "Alternatively, you can install it manually:"
 msgstr "另外，您也可以手动安装:"
 
@@ -1532,7 +1532,7 @@ msgstr ""
 msgid "Autoregistration data storage period"
 msgstr ""
 
-#: app/partials/monitoring.host.view.html.php:31
+#: app/partials/monitoring.host.view.html.php:36
 #: app/views/configuration.host.list.php:193
 msgid "Availability"
 msgstr "可用性"
@@ -1569,8 +1569,8 @@ msgstr ""
 msgid "Axes"
 msgstr "坐标轴"
 
-#: include/classes/setup/CSetupWizard.php:322
-#: include/classes/setup/CSetupWizard.php:741
+#: include/classes/setup/CSetupWizard.php:334
+#: include/classes/setup/CSetupWizard.php:753
 msgid "Back"
 msgstr "返回"
 
@@ -1822,7 +1822,7 @@ msgstr "回调"
 #: app/views/monitoring.dashboard.view.php:148
 #: app/views/popup.import.compare.php:162
 #: include/classes/html/CButtonCancel.php:25
-#: include/classes/setup/CSetupWizard.php:310 jsLoader.php:206
+#: include/classes/setup/CSetupWizard.php:322 jsLoader.php:206
 #: jsLoader.php:216 jsLoader.php:331 jsLoader.php:405
 msgid "Cancel"
 msgstr "取消"
@@ -2050,7 +2050,7 @@ msgstr "无法关闭问题: %1$s."
 msgid "Cannot connect to LDAP server."
 msgstr "无法连接到 LDAP 服务器。"
 
-#: include/classes/setup/CSetupWizard.php:579
+#: include/classes/setup/CSetupWizard.php:591
 msgid "Cannot connect to the database."
 msgstr "不能连接到数据库。"
 
@@ -2119,7 +2119,7 @@ msgstr ""
 msgid "Cannot create service \"%1$s\": %2$s."
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:850
+#: include/classes/setup/CSetupWizard.php:876
 msgid "Cannot create the configuration file."
 msgstr "无法创建配置文件。"
 
@@ -3398,7 +3398,7 @@ msgid "Check for not supported value"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:58
-#: include/classes/setup/CSetupWizard.php:451
+#: include/classes/setup/CSetupWizard.php:463
 msgid "Check of pre-requisites"
 msgstr "必要条件检测"
 
@@ -3713,7 +3713,7 @@ msgstr "配置"
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "配置缓存统计.缓存—缓冲(模式：空闲的百分数，总计，已使用，未使用"
 
-#: include/classes/setup/CSetupWizard.php:872
+#: include/classes/setup/CSetupWizard.php:907
 #, c-format
 msgid "Configuration file \"%1$s\" created."
 msgstr "配置文件 \"%1$s\" 已创建。"
@@ -3868,7 +3868,7 @@ msgid "Configuration updated"
 msgstr "配置已更新"
 
 #: include/classes/setup/CSetupWizard.php:62
-#: include/classes/setup/CSetupWizard.php:587
+#: include/classes/setup/CSetupWizard.php:599
 msgid "Configure DB connection"
 msgstr "配置DB连接"
 
@@ -3876,7 +3876,7 @@ msgstr "配置DB连接"
 msgid "Confirmation text"
 msgstr "确认文字"
 
-#: include/classes/setup/CSetupWizard.php:870
+#: include/classes/setup/CSetupWizard.php:905
 msgid "Congratulations! You have successfully installed Zabbix frontend."
 msgstr "恩！不错zabbix前端已经配置好了！千山万水第一步！加油，少年！"
 
@@ -3936,7 +3936,7 @@ msgstr ""
 msgid "Connection to Zabbix server failed. Incorrect configuration."
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:538
+#: include/classes/setup/CSetupWizard.php:550
 msgid "Connection will not be encrypted because it uses a socket file (on Unix) or shared memory (Windows)."
 msgstr ""
 
@@ -4411,7 +4411,7 @@ msgstr "当前主机"
 msgid "Current user"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:409
+#: include/classes/setup/CSetupWizard.php:421
 msgid "Current value"
 msgstr "当前值"
 
@@ -4581,9 +4581,9 @@ msgstr ""
 #: app/controllers/CControllerHostDashboardView.php:122
 #: app/controllers/CControllerPopupGeneric.php:370
 #: app/controllers/CControllerPopupImportCompare.php:170
-#: app/partials/monitoring.host.view.html.php:38
-#: app/partials/monitoring.host.view.html.php:138
-#: app/partials/monitoring.host.view.html.php:145
+#: app/partials/monitoring.host.view.html.php:42
+#: app/partials/monitoring.host.view.html.php:142
+#: app/partials/monitoring.host.view.html.php:149
 #: app/views/configuration.dashboard.edit.php:50
 #: app/views/configuration.dashboard.list.php:74
 #: app/views/monitoring.dashboard.list.php:35
@@ -4629,16 +4629,16 @@ msgstr "数据设置"
 msgid "Data storage period"
 msgstr "数据存储期"
 
-#: include/classes/setup/CSetupWizard.php:551
-#: include/classes/setup/CSetupWizard.php:703
-#: include/classes/setup/CSetupWizard.php:940
+#: include/classes/setup/CSetupWizard.php:563
+#: include/classes/setup/CSetupWizard.php:715
+#: include/classes/setup/CSetupWizard.php:974
 msgid "Database TLS CA file"
 msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:668
-#: include/classes/setup/CSetupWizard.php:561
-#: include/classes/setup/CSetupWizard.php:711
-#: include/classes/setup/CSetupWizard.php:948
+#: include/classes/setup/CSetupWizard.php:573
+#: include/classes/setup/CSetupWizard.php:723
+#: include/classes/setup/CSetupWizard.php:982
 msgid "Database TLS certificate file"
 msgstr ""
 
@@ -4646,19 +4646,19 @@ msgstr ""
 msgid "Database TLS certificate files must be read-only"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:571
-#: include/classes/setup/CSetupWizard.php:721
+#: include/classes/setup/CSetupWizard.php:583
+#: include/classes/setup/CSetupWizard.php:733
 msgid "Database TLS cipher list"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:534
-#: include/classes/setup/CSetupWizard.php:696
+#: include/classes/setup/CSetupWizard.php:546
+#: include/classes/setup/CSetupWizard.php:708
 msgid "Database TLS encryption"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:556
-#: include/classes/setup/CSetupWizard.php:707
-#: include/classes/setup/CSetupWizard.php:944
+#: include/classes/setup/CSetupWizard.php:568
+#: include/classes/setup/CSetupWizard.php:719
+#: include/classes/setup/CSetupWizard.php:978
 msgid "Database TLS key file"
 msgstr ""
 
@@ -4670,12 +4670,12 @@ msgstr ""
 msgid "Database history tables use primary key"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:472
+#: include/classes/setup/CSetupWizard.php:484
 msgid "Database host"
 msgstr "数据库主机"
 
-#: include/classes/setup/CSetupWizard.php:566
-#: include/classes/setup/CSetupWizard.php:715
+#: include/classes/setup/CSetupWizard.php:578
+#: include/classes/setup/CSetupWizard.php:727
 msgid "Database host verification"
 msgstr ""
 
@@ -4683,35 +4683,35 @@ msgstr ""
 msgid "Database monitor"
 msgstr "数据库监控"
 
-#: include/classes/setup/CSetupWizard.php:482
-#: include/classes/setup/CSetupWizard.php:660 setup.php:45
+#: include/classes/setup/CSetupWizard.php:494
+#: include/classes/setup/CSetupWizard.php:672 setup.php:45
 msgid "Database name"
 msgstr "数据库名称"
 
-#: include/classes/setup/CSetupWizard.php:668
+#: include/classes/setup/CSetupWizard.php:680
 msgid "Database password"
 msgstr "数据库密码"
 
-#: include/classes/setup/CSetupWizard.php:476
-#: include/classes/setup/CSetupWizard.php:656 setup.php:44
+#: include/classes/setup/CSetupWizard.php:488
+#: include/classes/setup/CSetupWizard.php:668 setup.php:44
 msgid "Database port"
 msgstr "数据库端口"
 
-#: include/classes/setup/CSetupWizard.php:486
-#: include/classes/setup/CSetupWizard.php:674
+#: include/classes/setup/CSetupWizard.php:498
+#: include/classes/setup/CSetupWizard.php:686
 msgid "Database schema"
 msgstr "数据库概要"
 
-#: include/classes/setup/CSetupWizard.php:652
+#: include/classes/setup/CSetupWizard.php:664
 msgid "Database server"
 msgstr "数据库服务器"
 
-#: include/classes/setup/CSetupWizard.php:465
-#: include/classes/setup/CSetupWizard.php:635
+#: include/classes/setup/CSetupWizard.php:477
+#: include/classes/setup/CSetupWizard.php:647
 msgid "Database type"
 msgstr "数据库类型"
 
-#: include/classes/setup/CSetupWizard.php:664
+#: include/classes/setup/CSetupWizard.php:676
 msgid "Database user"
 msgstr "数据库用户"
 
@@ -4827,7 +4827,7 @@ msgid "Default host inventory mode"
 msgstr "默认主机资产记录模式"
 
 #: app/views/administration.gui.edit.php:70
-#: include/classes/setup/CSetupWizard.php:399
+#: include/classes/setup/CSetupWizard.php:411
 msgid "Default language"
 msgstr ""
 
@@ -4848,12 +4848,12 @@ msgid "Default page display period"
 msgstr ""
 
 #: app/views/administration.gui.edit.php:82
-#: include/classes/setup/CSetupWizard.php:614
+#: include/classes/setup/CSetupWizard.php:626
 msgid "Default theme"
 msgstr "默认主题"
 
 #: app/views/administration.gui.edit.php:75
-#: include/classes/setup/CSetupWizard.php:607
+#: include/classes/setup/CSetupWizard.php:619
 msgid "Default time zone"
 msgstr ""
 
@@ -5436,7 +5436,7 @@ msgstr "禁用所选定的web场景？"
 #: app/partials/configuration.filter.items.php:188
 #: app/partials/configuration.host.edit.html.php:358
 #: app/partials/monitoring.host.filter.php:129
-#: app/partials/monitoring.host.view.html.php:102
+#: app/partials/monitoring.host.view.html.php:117
 #: app/partials/scheduledreport.table.html.php:80
 #: app/views/administration.mediatype.list.php:57
 #: app/views/administration.mediatype.list.php:135
@@ -5693,7 +5693,7 @@ msgstr "磁盘写入数据。类型是sectors, operations, bytes;返回整数，
 msgid "Display OK triggers for"
 msgstr "显示OK触发器予"
 
-#: app/partials/monitoring.latest.view.html.php:237
+#: app/partials/monitoring.latest.view.html.php:250
 msgid "Display graph"
 msgstr "显示数据图"
 
@@ -5701,7 +5701,7 @@ msgstr "显示数据图"
 msgid "Display problems"
 msgstr "显示问题"
 
-#: app/partials/monitoring.latest.view.html.php:236
+#: app/partials/monitoring.latest.view.html.php:249
 msgid "Display stacked graph"
 msgstr "显示堆叠数据图"
 
@@ -5802,7 +5802,7 @@ msgstr "下"
 msgid "Download image"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:856
+#: include/classes/setup/CSetupWizard.php:882
 msgid "Download the configuration file"
 msgstr "下载配置文件"
 
@@ -6165,7 +6165,7 @@ msgstr "启用trapping"
 #: app/partials/configuration.filter.items.php:187
 #: app/partials/configuration.host.edit.html.php:279
 #: app/partials/monitoring.host.filter.php:128
-#: app/partials/monitoring.host.view.html.php:101
+#: app/partials/monitoring.host.view.html.php:116
 #: app/partials/scheduledreport.formgrid.html.php:201
 #: app/partials/scheduledreport.table.html.php:84
 #: app/views/administration.mediatype.edit.php:267
@@ -6606,7 +6606,7 @@ msgstr "假"
 msgid "FTP"
 msgstr "FTP"
 
-#: include/classes/setup/CSetupWizard.php:425
+#: include/classes/setup/CSetupWizard.php:437
 msgid "Fail"
 msgstr "失败"
 
@@ -6852,7 +6852,7 @@ msgstr "查找文件中的字符串，返回内容是被匹配内容的整行字
 msgid "Find string on a web page. Returns the matched string, or as specified by the optional output parameter"
 msgstr "查找网页中的字符串，返回内容是被匹配内容的整行字符串，或者其他可选参数"
 
-#: include/classes/setup/CSetupWizard.php:334
+#: include/classes/setup/CSetupWizard.php:346
 msgid "Finish"
 msgstr "完成"
 
@@ -7121,7 +7121,7 @@ msgid "Gradient line"
 msgstr "梯度线"
 
 #: app/controllers/CControllerAuditLogList.php:216
-#: app/partials/monitoring.latest.view.html.php:154
+#: app/partials/monitoring.latest.view.html.php:165
 #: app/views/monitoring.charts.view.php:55
 #: include/classes/macros/CMacrosResolverGeneral.php:1270
 #: include/classes/screens/CScreenProblem.php:1305
@@ -7264,9 +7264,9 @@ msgstr "图表名称 \"%1$s\" 已经存在在图表或者图表原型."
 
 #: app/controllers/CControllerPopupGeneric.php:248
 #: app/controllers/CControllerPopupImportCompare.php:167
-#: app/partials/monitoring.host.view.html.php:37
-#: app/partials/monitoring.host.view.html.php:127
-#: app/partials/monitoring.host.view.html.php:135
+#: app/partials/monitoring.host.view.html.php:41
+#: app/partials/monitoring.host.view.html.php:131
+#: app/partials/monitoring.host.view.html.php:139
 #: app/views/configuration.host.list.php:186
 #: app/views/configuration.host.list.php:443
 #: app/views/monitoring.charts.view.php:38
@@ -7442,7 +7442,7 @@ msgstr "硬件(全细节)"
 msgid "Hardware sensor reading. Returns float"
 msgstr "硬件传感器读数。返回浮点型"
 
-#: include/classes/setup/CSetupWizard.php:499
+#: include/classes/setup/CSetupWizard.php:511
 msgid "HashiCorp Vault"
 msgstr ""
 
@@ -7545,7 +7545,7 @@ msgstr "高亮整行"
 
 #: app/partials/configuration.filter.items.php:152
 #: app/partials/monitoring.latest.view.html.php:52
-#: app/partials/monitoring.latest.view.html.php:154
+#: app/partials/monitoring.latest.view.html.php:165
 #: app/partials/monitoring.problem.filter.php:31
 #: app/views/administration.housekeeping.edit.php:121
 #: app/views/popup.acknowledge.edit.php:43 history.php:27
@@ -8396,7 +8396,7 @@ msgstr "无法访问的项"
 msgid "Inaccessible item prototype"
 msgstr ""
 
-#: app/partials/monitoring.host.view.html.php:89
+#: app/partials/monitoring.host.view.html.php:105
 #: app/views/configuration.host.list.php:267
 #: include/classes/screens/CScreenProblem.php:386
 #: include/hostgroups.inc.php:293 include/triggers.inc.php:2027
@@ -8726,9 +8726,9 @@ msgstr "不正确的栏位名称\"%1$s\"或用于资料表\"%2$s\"的where描述
 msgid "Incorrect fields for sysmap."
 msgstr "错误的sysmap字段."
 
-#: include/classes/setup/CSetupWizard.php:940
-#: include/classes/setup/CSetupWizard.php:944
-#: include/classes/setup/CSetupWizard.php:948
+#: include/classes/setup/CSetupWizard.php:974
+#: include/classes/setup/CSetupWizard.php:978
+#: include/classes/setup/CSetupWizard.php:982
 #, c-format
 msgid "Incorrect file path for \"%1$s\": %2$s."
 msgstr ""
@@ -9265,6 +9265,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:172
 #: app/partials/monitoring.latest.view.html.php:60
+#: app/partials/monitoring.latest.view.html.php:73
 #: app/partials/scheduledreport.table.html.php:45
 #: app/views/configuration.host.list.php:195
 #: app/views/monitoring.service.list.edit.php:61
@@ -9356,11 +9357,12 @@ msgid "Insert expression"
 msgstr "插入表达式"
 
 #: include/classes/setup/CSetupWizard.php:74
-#: include/classes/setup/CSetupWizard.php:877
+#: include/classes/setup/CSetupWizard.php:888
+#: include/classes/setup/CSetupWizard.php:911
 msgid "Install"
 msgstr "安装"
 
-#: setup.php:172
+#: setup.php:160
 msgid "Installation"
 msgstr "安装"
 
@@ -9372,7 +9374,7 @@ msgstr "安装名称"
 msgid "Integrations"
 msgstr ""
 
-#: app/partials/monitoring.host.view.html.php:30
+#: app/partials/monitoring.host.view.html.php:35
 #: app/views/administration.proxy.edit.php:76
 #: app/views/configuration.host.list.php:189 disc_prototypes.php:40
 #: host_discovery.php:47 include/classes/html/CHostAvailability.php:76
@@ -10452,9 +10454,9 @@ msgid "Last week graph"
 msgstr "上周图形"
 
 #: app/controllers/CControllerLatestView.php:189
-#: app/partials/monitoring.host.view.html.php:35
-#: app/partials/monitoring.host.view.html.php:105
-#: app/partials/monitoring.host.view.html.php:111
+#: app/partials/monitoring.host.view.html.php:39
+#: app/partials/monitoring.host.view.html.php:120
+#: app/partials/monitoring.host.view.html.php:126
 #: app/views/monitoring.latest.view.php:35 app/views/search.php:72
 #: app/views/search.php:78 app/views/search.php:231 app/views/search.php:237
 #: include/classes/helpers/CMenuHelper.php:52
@@ -10516,7 +10518,7 @@ msgstr "图例"
 msgid "Length"
 msgstr ""
 
-#: setup.php:195
+#: setup.php:183
 msgid "Licensed under"
 msgstr ""
 
@@ -11660,7 +11662,7 @@ msgstr "NTLM"
 #: app/partials/configuration.tags.tab.php:39
 #: app/partials/configuration.valuemap.php:29
 #: app/partials/monitoring.host.filter.php:78
-#: app/partials/monitoring.host.view.html.php:29
+#: app/partials/monitoring.host.view.html.php:34
 #: app/partials/monitoring.latest.view.html.php:41
 #: app/partials/monitoring.service.list.edit.php:41
 #: app/partials/monitoring.service.list.edit.php:49
@@ -11949,9 +11951,9 @@ msgstr "新触发器"
 msgid "Next page"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:331
-#: include/classes/setup/CSetupWizard.php:589
-#: include/classes/setup/CSetupWizard.php:741
+#: include/classes/setup/CSetupWizard.php:343
+#: include/classes/setup/CSetupWizard.php:601
+#: include/classes/setup/CSetupWizard.php:753
 msgid "Next step"
 msgstr "下一步"
 
@@ -13559,7 +13561,7 @@ msgstr "被动式"
 #: app/views/popup.massupdate.item.php:175
 #: app/views/popup.massupdate.item.php:199 disc_prototypes.php:218
 #: host_discovery.php:191 httpconf.php:74
-#: include/classes/setup/CSetupWizard.php:527
+#: include/classes/setup/CSetupWizard.php:539
 #: include/views/configuration.host.discovery.edit.php:413
 #: include/views/configuration.host.discovery.edit.php:554
 #: include/views/configuration.host.discovery.edit.php:593
@@ -13718,7 +13720,7 @@ msgid "Placing algorithm"
 msgstr "置入演算法"
 
 #: app/views/administration.mediatype.edit.php:208
-#: include/classes/setup/CSetupWizard.php:498
+#: include/classes/setup/CSetupWizard.php:510
 #: include/classes/widgets/CWidgetConfig.php:58
 msgid "Plain text"
 msgstr "文本"
@@ -13732,7 +13734,7 @@ msgstr "播放"
 msgid "Play sound"
 msgstr "播放声音"
 
-#: include/classes/setup/CSetupWizard.php:741
+#: include/classes/setup/CSetupWizard.php:753
 #, c-format
 msgid "Please check configuration parameters. If all is correct, press \"%1$s\" button, or \"%2$s\" button to change configuration parameters."
 msgstr "请检查配置参数。如果无误请按%1$s\" ，如果需要修改请按 \"%2$s\" "
@@ -13745,12 +13747,12 @@ msgstr ""
 msgid "Please confirm that you want to remove all value mappings."
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:589
+#: include/classes/setup/CSetupWizard.php:601
 #, c-format
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
 msgstr "请手动创建数据并且完成一些必要的设置。完成后按\"%1$s\"来结束。"
 
-#: include/classes/setup/CSetupWizard.php:177
+#: include/classes/setup/CSetupWizard.php:189
 msgid "Please enable \"allow_url_fopen\" directive."
 msgstr ""
 
@@ -13836,7 +13838,7 @@ msgid "Power value"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:70
-#: include/classes/setup/CSetupWizard.php:739
+#: include/classes/setup/CSetupWizard.php:751
 msgid "Pre-installation summary"
 msgstr "安装前汇总"
 
@@ -14041,10 +14043,7 @@ msgid "Problem update"
 msgstr ""
 
 #: app/controllers/CControllerProblemView.php:151
-#: app/partials/monitoring.host.view.html.php:33
-#: app/partials/monitoring.host.view.html.php:36
-#: app/partials/monitoring.host.view.html.php:115
-#: app/partials/monitoring.host.view.html.php:122
+#: app/partials/monitoring.host.view.html.php:40
 #: app/partials/monitoring.problem.filter.php:30
 #: app/views/monitoring.problem.view.php:94 app/views/search.php:83
 #: app/views/search.php:89 app/views/search.php:247 app/views/search.php:253
@@ -14735,7 +14734,7 @@ msgstr "请求发送成功"
 msgid "Request type"
 msgstr "请求类型"
 
-#: include/classes/setup/CSetupWizard.php:409
+#: include/classes/setup/CSetupWizard.php:421
 #: include/views/configuration.httpconf.edit.php:205
 msgid "Required"
 msgstr "要求的"
@@ -15302,7 +15301,7 @@ msgstr ""
 msgid "Save changes"
 msgstr "保存设置"
 
-#: include/classes/setup/CSetupWizard.php:857
+#: include/classes/setup/CSetupWizard.php:883
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "保存为 \"%1$s\""
@@ -15860,7 +15859,7 @@ msgstr "将 LDAP 引用设置为「关闭」失败。"
 
 #: app/controllers/CControllerAuditLogList.php:238
 #: include/classes/setup/CSetupWizard.php:66
-#: include/classes/setup/CSetupWizard.php:624
+#: include/classes/setup/CSetupWizard.php:636
 msgid "Settings"
 msgstr ""
 
@@ -16350,7 +16349,7 @@ msgstr ""
 #: app/partials/administration.ha.nodes.php:28
 #: app/partials/configuration.filter.items.php:184
 #: app/partials/monitoring.host.filter.php:125
-#: app/partials/monitoring.host.view.html.php:34
+#: app/partials/monitoring.host.view.html.php:38
 #: app/partials/monitoring.service.list.edit.php:54
 #: app/partials/monitoring.service.list.php:51
 #: app/partials/scheduledreport.subscription.php:35
@@ -16519,12 +16518,12 @@ msgstr ""
 msgid "Storage period"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:496
+#: include/classes/setup/CSetupWizard.php:508
 msgid "Store credentials in"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:642
-#: include/classes/setup/CSetupWizard.php:643
+#: include/classes/setup/CSetupWizard.php:654
+#: include/classes/setup/CSetupWizard.php:655
 msgid "Stored in HashiCorp Vault secret"
 msgstr ""
 
@@ -16769,7 +16768,7 @@ msgstr "标记值"
 #: app/partials/configuration.filter.items.php:166
 #: app/partials/configuration.host.edit.html.php:524
 #: app/partials/monitoring.host.filter.php:133
-#: app/partials/monitoring.host.view.html.php:32
+#: app/partials/monitoring.host.view.html.php:37
 #: app/partials/monitoring.latest.view.html.php:58
 #: app/partials/monitoring.latest.view.html.php:71
 #: app/partials/monitoring.problem.filter.php:231
@@ -18298,7 +18297,7 @@ msgstr "用于动作中"
 #: app/views/administration.user.edit.php:284
 #: app/views/reports.auditlog.list.php:90 httpconf.php:65
 #: include/actions.inc.php:1700 include/actions.inc.php:1754
-#: include/actions.inc.php:1976 include/classes/setup/CSetupWizard.php:522
+#: include/actions.inc.php:1976 include/classes/setup/CSetupWizard.php:534
 #: include/hosts.inc.php:61 include/users.inc.php:52
 #: include/views/configuration.httpconf.edit.php:165
 msgid "User"
@@ -18592,8 +18591,8 @@ msgstr "用户名称"
 msgid "Username and password"
 msgstr "用户名和密码"
 
-#: include/classes/setup/CSetupWizard.php:194
-#: include/classes/setup/CSetupWizard.php:774
+#: include/classes/setup/CSetupWizard.php:206
+#: include/classes/setup/CSetupWizard.php:800
 msgid "Username and password must be stored in Vault secret keys \"username\" and \"password\"."
 msgstr ""
 
@@ -19046,18 +19045,18 @@ msgstr "变量"
 msgid "Various information about specific process(es). Returns float"
 msgstr "具体处理的各个信息。返回浮点数"
 
-#: include/classes/setup/CSetupWizard.php:502
-#: include/classes/setup/CSetupWizard.php:682
+#: include/classes/setup/CSetupWizard.php:514
+#: include/classes/setup/CSetupWizard.php:694
 msgid "Vault API endpoint"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:515
-#: include/classes/setup/CSetupWizard.php:690
+#: include/classes/setup/CSetupWizard.php:527
+#: include/classes/setup/CSetupWizard.php:702
 msgid "Vault authentication token"
 msgstr ""
 
 #: include/classes/core/ZBase.php:231
-#: include/classes/setup/CSetupWizard.php:191 include/config.inc.php:53
+#: include/classes/setup/CSetupWizard.php:203 include/config.inc.php:53
 msgid "Vault connection failed."
 msgstr ""
 
@@ -19065,8 +19064,8 @@ msgstr ""
 msgid "Vault secret"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:508
-#: include/classes/setup/CSetupWizard.php:686
+#: include/classes/setup/CSetupWizard.php:520
+#: include/classes/setup/CSetupWizard.php:698
 msgid "Vault secret path"
 msgstr ""
 
@@ -19078,7 +19077,7 @@ msgstr "提供者"
 msgid "Verbose"
 msgstr "冗余"
 
-#: include/classes/setup/CSetupWizard.php:546
+#: include/classes/setup/CSetupWizard.php:558
 msgid "Verify database certificate"
 msgstr ""
 
@@ -19164,7 +19163,7 @@ msgstr ""
 msgid "Warning"
 msgstr "警告"
 
-#: include/classes/setup/CSetupWizard.php:421
+#: include/classes/setup/CSetupWizard.php:433
 msgctxt "setup"
 msgid "Warning"
 msgstr "设置"
@@ -19182,9 +19181,9 @@ msgstr ""
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr "很抱歉, 已经到了最大的组件数量."
 
-#: app/partials/monitoring.host.view.html.php:39
-#: app/partials/monitoring.host.view.html.php:148
-#: app/partials/monitoring.host.view.html.php:156
+#: app/partials/monitoring.host.view.html.php:43
+#: app/partials/monitoring.host.view.html.php:152
+#: app/partials/monitoring.host.view.html.php:160
 #: app/views/configuration.host.list.php:188
 #: app/views/configuration.host.list.php:461 app/views/search.php:110
 #: app/views/search.php:116 app/views/search.php:158 app/views/search.php:163
@@ -19284,7 +19283,7 @@ msgstr ""
 msgid "Welcome"
 msgstr "欢迎"
 
-#: include/classes/setup/CSetupWizard.php:353
+#: include/classes/setup/CSetupWizard.php:365
 msgid "Welcome to"
 msgstr "欢迎来到"
 
@@ -19598,7 +19597,7 @@ msgstr "\"%1$s\" 欢迎登入."
 
 #: app/views/administration.gui.edit.php:66
 #: app/views/administration.user.edit.php:233
-#: include/classes/setup/CSetupWizard.php:391
+#: include/classes/setup/CSetupWizard.php:403
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "您无法选择某些语言, 因为这些语言并未安装在web服务器上。"
 
@@ -19706,8 +19705,8 @@ msgstr "Zabbix server is not running: the information displayed may not be curre
 msgid "Zabbix server is running"
 msgstr "Zabbix服务器端运行中"
 
-#: include/classes/setup/CSetupWizard.php:602
-#: include/classes/setup/CSetupWizard.php:733
+#: include/classes/setup/CSetupWizard.php:614
+#: include/classes/setup/CSetupWizard.php:745
 msgid "Zabbix server name"
 msgstr "Zabbix主机名称"
 
@@ -20333,7 +20332,7 @@ msgstr "日"
 #: app/controllers/CControllerMapView.php:123
 #: app/partials/js/configuration.valuemap.js.php:156
 #: app/views/popup.generic.php:600 app/views/popup.valuemap.edit.php:83
-#: include/classes/setup/CSetupWizard.php:639
+#: include/classes/setup/CSetupWizard.php:651
 #: include/classes/widgets/CWidgetHelper.php:69
 msgid "default"
 msgstr "默认的"
@@ -21149,7 +21148,7 @@ msgstr "其它"
 msgid "output"
 msgstr "输出"
 
-#: include/classes/setup/CSetupWizard.php:510
+#: include/classes/setup/CSetupWizard.php:522
 msgid "path/to/secret"
 msgstr ""
 

@@ -1,9 +1,15 @@
 Changes for 6.0.0beta2
 
 New features:
+........S. [ZBXNEXT-3140] added {ITEM.STATE.ERROR},{LLDRULE.STATE.ERROR},{TRIGGER.STATE.ERROR} macros to indicate error messages in internal monitoring alerts (arimdjonoks)
+...G...... [ZBXNEXT-6958] added external plugin loader for Zabbix agent 2 (esneiders)
+..F....... [ZBXNEXT-7092] improved usability for Latest data and Hosts views (acikuns)
 ...G...PS. [ZBXNEXT-4922] added support for pcre2 (yurii)
 
 Bug fixes:
+...G.....T [ZBX-19185] fixed free bytes calculation for temporary tablespace in Oracle by ODBC and by agent2 template (abiba)
+........S. [ZBX-20377] implemented hmac-sha256 for server for scheduled reports cookies (arimdjonoks)
+.........T [ZBX-20258] fixed tags processing for Zammad media type (abiba)
 A.F....... [ZBX-20350] changed hash algo for encrypted cookies (rlataria)
 ...G...... [ZBX-20164] fixed agent2 crash caused by wmi metrics (asestakovs)
 ........S. [ZBX-20249] fixed escalator query failure on Oracle (ssimonenko)
@@ -282,6 +288,27 @@ A.F....... [ZBXNEXT-6528,ZBXNEXT-6669] moved auditlog calls from frontend sectio
 
 Bug fixes:
 .........T [ZBX-19395] changed version in links of the templates and the media (mchudinov)
+
+--------------------------------------------------------------------------------
+Changes for 5.4.10rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.4.9
+
+5.4.9rc2 was released as 5.4.9 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.4.9rc2
+
+Bug fixes:
+..F....... [ZBX-20382] updated jquery version (ashubin)
+.....J.... [ZBX-20383] updated logback-core, logback-classic and slf4j-api jars to the latest stable versions (vso)
+..F.I..... [ZBX-20384] fixed possibility to view setup pages by non-superadmin if config already file exists (averza)
+..F....... [ZBX-20388] fixed XSS vulnerability in multiselect (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 5.4.9rc1
@@ -1444,6 +1471,27 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.20rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.19
+
+5.0.19rc2 was released as 5.0.19 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.19rc2
+
+Bug fixes:
+..F....... [ZBX-20382] updated jquery version (ashubin)
+.....J.... [ZBX-20383] updated logback-core, logback-classic and slf4j-api jars to the latest stable versions (vso)
+..F.I..... [ZBX-20384] fixed possibility to view setup pages by non-superadmin if config already file exists (averza)
+..F....... [ZBX-20388] fixed XSS vulnerability in multiselect (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.19rc1
@@ -3782,11 +3830,24 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
-Changes for 4.0.37rc1
+Changes for 4.0.38rc1
 
 New features:
 
 Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.37
+
+4.0.37rc1 was released as 4.0.37 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.37rc1
+
+Bug fixes:
+..F....... [ZBX-20382] updated jquery version (ashubin)
+.....J.... [ZBX-20383] updated logback-core, logback-classic and slf4j-api jars to the latest stable versions (vso)
+..F.I..... [ZBX-20384] fixed possibility to view setup pages by non-superadmin if config already file exists (averza)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.36

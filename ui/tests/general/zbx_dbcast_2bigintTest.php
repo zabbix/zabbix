@@ -24,7 +24,9 @@ require_once dirname(__FILE__).'/../../include/defines.inc.php';
 require_once dirname(__FILE__).'/../../include/db.inc.php';
 
 
-class zbx_dbcast_2bigintTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class zbx_dbcast_2bigintTest extends TestCase {
 
 	/**
 	 * Possible test values.

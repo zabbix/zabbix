@@ -43,7 +43,6 @@ typedef struct
 	/* process command line in format <arg0> <arg1> ... <argN>\0 */
 	char		*cmdline;
 
-
 #ifdef HAVE_ZONE_H
 	zoneid_t	zoneid;
 #endif
@@ -704,7 +703,6 @@ out:
 
 	return SYSINFO_RET_OK;
 }
-
 
 /******************************************************************************
  *                                                                            *

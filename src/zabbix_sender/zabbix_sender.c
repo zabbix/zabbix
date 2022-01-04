@@ -450,7 +450,6 @@ static void	zbx_thread_handle_pipe_response(ZBX_THREAD_SENDVAL_ARGS *sendval_arg
 }
 #endif
 
-
 /******************************************************************************
  *                                                                            *
  * Function: sender_threads_wait                                              *

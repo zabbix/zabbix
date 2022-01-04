@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-13 16:02+0200\n"
-"PO-Revision-Date: 2021-12-07 04:12+0300\n"
+"POT-Creation-Date: 2021-12-22 17:25+0200\n"
+"PO-Revision-Date: 2021-12-14 11:32+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1638843176.000000\n"
+"X-POOTLE-MTIME: 1639474328.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
@@ -292,7 +292,7 @@ msgstr "(特権管理者のみがグループを作成できます)"
 msgid "(no proxy)"
 msgstr "(プロキシなし)"
 
-#: include/classes/setup/CSetupWizard.php:480
+#: include/classes/setup/CSetupWizard.php:492
 msgid "0 - use default port"
 msgstr "0 - デフォルトのポート番号を使用"
 
@@ -438,7 +438,7 @@ msgstr "APIトークン"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:251
 msgid "Above value"
-msgstr ""
+msgstr "値の上"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:370
 msgid "Abscissa"
@@ -968,7 +968,7 @@ msgstr "拡張ラベル"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:252
 msgid "After value"
-msgstr ""
+msgstr "値の後"
 
 #: include/events.inc.php:288
 msgid "Age"
@@ -1124,7 +1124,7 @@ msgstr "許可されたホスト"
 msgid "Allowed methods"
 msgstr "許可されたメソッド"
 
-#: include/classes/setup/CSetupWizard.php:854
+#: include/classes/setup/CSetupWizard.php:880
 msgid "Alternatively, you can install it manually:"
 msgstr "代わりに、手動でインストールすることができます:"
 
@@ -1526,7 +1526,7 @@ msgstr "自動登録アクション"
 msgid "Autoregistration data storage period"
 msgstr "自動登録データの保存期間"
 
-#: app/partials/monitoring.host.view.html.php:31
+#: app/partials/monitoring.host.view.html.php:36
 #: app/views/configuration.host.list.php:193
 msgid "Availability"
 msgstr "エージェントの状態"
@@ -1563,8 +1563,8 @@ msgstr "推測されやすいパスワードの回避"
 msgid "Axes"
 msgstr "軸"
 
-#: include/classes/setup/CSetupWizard.php:322
-#: include/classes/setup/CSetupWizard.php:741
+#: include/classes/setup/CSetupWizard.php:334
+#: include/classes/setup/CSetupWizard.php:753
 msgid "Back"
 msgstr "戻る"
 
@@ -1604,11 +1604,11 @@ msgstr "Basic"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:250
 msgid "Before value"
-msgstr ""
+msgstr "値の前"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:253
 msgid "Below value"
-msgstr ""
+msgstr "値の下"
 
 #: app/views/administration.authentication.edit.php:187
 msgid "Bind DN"
@@ -1654,7 +1654,7 @@ msgstr "ボディとヘッダー"
 #: include/classes/widgets/forms/CWidgetFormItem.php:275
 #: include/classes/widgets/forms/CWidgetFormItem.php:335
 msgid "Bold"
-msgstr ""
+msgstr "太字"
 
 #: include/graphs.inc.php:59 include/views/js/monitoring.sysmaps.js.php:781
 #: include/views/js/monitoring.sysmaps.js.php:871
@@ -1816,7 +1816,7 @@ msgstr "コールバック"
 #: app/views/monitoring.dashboard.view.php:148
 #: app/views/popup.import.compare.php:162
 #: include/classes/html/CButtonCancel.php:25
-#: include/classes/setup/CSetupWizard.php:310 jsLoader.php:206
+#: include/classes/setup/CSetupWizard.php:322 jsLoader.php:206
 #: jsLoader.php:216 jsLoader.php:331 jsLoader.php:405
 msgid "Cancel"
 msgstr "キャンセル"
@@ -2044,7 +2044,7 @@ msgstr "障害をクローズできません: %1$s。"
 msgid "Cannot connect to LDAP server."
 msgstr "LDAPサーバーに接続できません。"
 
-#: include/classes/setup/CSetupWizard.php:579
+#: include/classes/setup/CSetupWizard.php:591
 msgid "Cannot connect to the database."
 msgstr "データベースに接続できません。"
 
@@ -2113,7 +2113,7 @@ msgstr "定期レポートを作成できません"
 msgid "Cannot create service \"%1$s\": %2$s."
 msgstr "サービス\"%1$s\"の作成ができません：%2$s。"
 
-#: include/classes/setup/CSetupWizard.php:850
+#: include/classes/setup/CSetupWizard.php:876
 msgid "Cannot create the configuration file."
 msgstr "設定ファイルが作成できません。"
 
@@ -2680,12 +2680,12 @@ msgstr "テンプレートをリンクできません"
 #: include/classes/api/services/CHostBase.php:755
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to dependency of trigger \"%3$s\"."
-msgstr ""
+msgstr "トリガー\"%3$s\"の依存関係によってテンプレート\"%1$s\"をホスト\"%2$s\"にリンクできません。"
 
 #: include/classes/api/services/CHostBase.php:805
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to expression of trigger \"%3$s\"."
-msgstr ""
+msgstr "トリガー\"%3$s\"の条件式によってテンプレート\"%1$s\"をホスト\"%2$s\"にリンクできません。"
 
 #: include/classes/api/services/CHostBase.php:520
 #, c-format
@@ -3032,7 +3032,7 @@ msgstr "相関関係を更新できません"
 #: include/classes/api/services/CTrigger.php:836
 #, c-format
 msgid "Cannot update dependencies of inherited trigger \"%1$s\"."
-msgstr ""
+msgstr "継承されたトリガー\"%1$s\"の依存関係を更新できません。"
 
 #: app/controllers/CControllerDiscoveryUpdate.php:48
 #: app/controllers/CControllerDiscoveryUpdate.php:102 host_discovery.php:717
@@ -3311,7 +3311,7 @@ msgstr "PSK変更"
 #: include/classes/widgets/views/widget.item.form.view.php:53
 #: include/classes/widgets/views/widget.item.form.view.php:184
 msgid "Change indicator"
-msgstr ""
+msgstr "変化表示"
 
 #: app/views/administration.authentication.edit.php:149
 #: app/views/administration.mediatype.edit.php:137
@@ -3389,7 +3389,7 @@ msgid "Check for not supported value"
 msgstr "サポートしていない値のチェック"
 
 #: include/classes/setup/CSetupWizard.php:58
-#: include/classes/setup/CSetupWizard.php:451
+#: include/classes/setup/CSetupWizard.php:463
 msgid "Check of pre-requisites"
 msgstr "前提条件のチェック"
 
@@ -3612,7 +3612,7 @@ msgstr "最終結果"
 
 #: include/classes/widgets/views/widget.geomap.form.view.php:68
 msgid "Comma separated center coordinates and zoom level to display when the widget is initially loaded."
-msgstr ""
+msgstr "ウィジェットが最初に読み込まれた時に表示するカンマ区切りの中心座標とズームレベル。"
 
 #: app/views/administration.script.edit.php:173 include/actions.inc.php:1943
 #: include/views/administration.auditacts.list.php:103
@@ -3704,7 +3704,7 @@ msgstr "設定"
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "設定したキャッシュの統計。cache - buffer (mode: pfree, total, used, free)。"
 
-#: include/classes/setup/CSetupWizard.php:872
+#: include/classes/setup/CSetupWizard.php:907
 #, c-format
 msgid "Configuration file \"%1$s\" created."
 msgstr "設定ファイル\"%1$s\"を作成しました。"
@@ -3859,7 +3859,7 @@ msgid "Configuration updated"
 msgstr "設定を更新しました"
 
 #: include/classes/setup/CSetupWizard.php:62
-#: include/classes/setup/CSetupWizard.php:587
+#: include/classes/setup/CSetupWizard.php:599
 msgid "Configure DB connection"
 msgstr "データベース接続設定"
 
@@ -3867,7 +3867,7 @@ msgstr "データベース接続設定"
 msgid "Confirmation text"
 msgstr "確認テキスト"
 
-#: include/classes/setup/CSetupWizard.php:870
+#: include/classes/setup/CSetupWizard.php:905
 msgid "Congratulations! You have successfully installed Zabbix frontend."
 msgstr "おめでとうございます！Webインターフェースのインストールが終了しました。"
 
@@ -3938,7 +3938,7 @@ msgstr ""
 msgid "Connection to Zabbix server failed. Incorrect configuration."
 msgstr "Zabbixサーバーへの接続に失敗しました。設定が正しくありません。"
 
-#: include/classes/setup/CSetupWizard.php:538
+#: include/classes/setup/CSetupWizard.php:550
 msgid "Connection will not be encrypted because it uses a socket file (on Unix) or shared memory (Windows)."
 msgstr "ソケットファイル(UNIX系OS上)や共有メモリ(Windows上)が使用されるので接続は暗号化されません。"
 
@@ -4412,7 +4412,7 @@ msgstr "現在のホスト"
 msgid "Current user"
 msgstr "現在のユーザー"
 
-#: include/classes/setup/CSetupWizard.php:409
+#: include/classes/setup/CSetupWizard.php:421
 msgid "Current value"
 msgstr "現在の値"
 
@@ -4488,7 +4488,7 @@ msgstr "チェコ語 (cs_CZ)"
 #: jsLoader.php:396
 msgctxt "Default color option"
 msgid "D"
-msgstr ""
+msgstr "D"
 
 #: jsLoader.php:182
 msgctxt "abbreviation of severity level"
@@ -4582,9 +4582,9 @@ msgstr "ID\"%1$s\"のダッシュボードは使用できません。"
 #: app/controllers/CControllerHostDashboardView.php:122
 #: app/controllers/CControllerPopupGeneric.php:370
 #: app/controllers/CControllerPopupImportCompare.php:170
-#: app/partials/monitoring.host.view.html.php:38
-#: app/partials/monitoring.host.view.html.php:138
-#: app/partials/monitoring.host.view.html.php:145
+#: app/partials/monitoring.host.view.html.php:42
+#: app/partials/monitoring.host.view.html.php:142
+#: app/partials/monitoring.host.view.html.php:149
 #: app/views/configuration.dashboard.edit.php:50
 #: app/views/configuration.dashboard.list.php:74
 #: app/views/monitoring.dashboard.list.php:35
@@ -4630,16 +4630,16 @@ msgstr "データセット"
 msgid "Data storage period"
 msgstr "データ保存期間"
 
-#: include/classes/setup/CSetupWizard.php:551
-#: include/classes/setup/CSetupWizard.php:703
-#: include/classes/setup/CSetupWizard.php:940
+#: include/classes/setup/CSetupWizard.php:563
+#: include/classes/setup/CSetupWizard.php:715
+#: include/classes/setup/CSetupWizard.php:974
 msgid "Database TLS CA file"
 msgstr "データベースのTLS CAファイル"
 
 #: include/classes/setup/CFrontendSetup.php:668
-#: include/classes/setup/CSetupWizard.php:561
-#: include/classes/setup/CSetupWizard.php:711
-#: include/classes/setup/CSetupWizard.php:948
+#: include/classes/setup/CSetupWizard.php:573
+#: include/classes/setup/CSetupWizard.php:723
+#: include/classes/setup/CSetupWizard.php:982
 msgid "Database TLS certificate file"
 msgstr "データベースのTLS証明書ファイル"
 
@@ -4647,19 +4647,19 @@ msgstr "データベースのTLS証明書ファイル"
 msgid "Database TLS certificate files must be read-only"
 msgstr "データベースのTLS証明書ファイルは読み込み専用にしてください"
 
-#: include/classes/setup/CSetupWizard.php:571
-#: include/classes/setup/CSetupWizard.php:721
+#: include/classes/setup/CSetupWizard.php:583
+#: include/classes/setup/CSetupWizard.php:733
 msgid "Database TLS cipher list"
 msgstr "データベースのTLS暗号化方式リスト"
 
-#: include/classes/setup/CSetupWizard.php:534
-#: include/classes/setup/CSetupWizard.php:696
+#: include/classes/setup/CSetupWizard.php:546
+#: include/classes/setup/CSetupWizard.php:708
 msgid "Database TLS encryption"
 msgstr "データベースのTLS暗号化"
 
-#: include/classes/setup/CSetupWizard.php:556
-#: include/classes/setup/CSetupWizard.php:707
-#: include/classes/setup/CSetupWizard.php:944
+#: include/classes/setup/CSetupWizard.php:568
+#: include/classes/setup/CSetupWizard.php:719
+#: include/classes/setup/CSetupWizard.php:978
 msgid "Database TLS key file"
 msgstr "データベースのTLSキーファイル"
 
@@ -4671,12 +4671,12 @@ msgstr "データベースのヒストリテーブルのアップグレード"
 msgid "Database history tables use primary key"
 msgstr "データベースのヒストリテーブルが主キーを使用"
 
-#: include/classes/setup/CSetupWizard.php:472
+#: include/classes/setup/CSetupWizard.php:484
 msgid "Database host"
 msgstr "データベースホスト"
 
-#: include/classes/setup/CSetupWizard.php:566
-#: include/classes/setup/CSetupWizard.php:715
+#: include/classes/setup/CSetupWizard.php:578
+#: include/classes/setup/CSetupWizard.php:727
 msgid "Database host verification"
 msgstr "データベースのホスト検証"
 
@@ -4684,35 +4684,35 @@ msgstr "データベースのホスト検証"
 msgid "Database monitor"
 msgstr "データベースモニタ"
 
-#: include/classes/setup/CSetupWizard.php:482
-#: include/classes/setup/CSetupWizard.php:660 setup.php:45
+#: include/classes/setup/CSetupWizard.php:494
+#: include/classes/setup/CSetupWizard.php:672 setup.php:45
 msgid "Database name"
 msgstr "データベース名"
 
-#: include/classes/setup/CSetupWizard.php:668
+#: include/classes/setup/CSetupWizard.php:680
 msgid "Database password"
 msgstr "データベースパスワード"
 
-#: include/classes/setup/CSetupWizard.php:476
-#: include/classes/setup/CSetupWizard.php:656 setup.php:44
+#: include/classes/setup/CSetupWizard.php:488
+#: include/classes/setup/CSetupWizard.php:668 setup.php:44
 msgid "Database port"
 msgstr "データベースポート"
 
-#: include/classes/setup/CSetupWizard.php:486
-#: include/classes/setup/CSetupWizard.php:674
+#: include/classes/setup/CSetupWizard.php:498
+#: include/classes/setup/CSetupWizard.php:686
 msgid "Database schema"
 msgstr "データベーススキーマ"
 
-#: include/classes/setup/CSetupWizard.php:652
+#: include/classes/setup/CSetupWizard.php:664
 msgid "Database server"
 msgstr "データベースサーバー"
 
-#: include/classes/setup/CSetupWizard.php:465
-#: include/classes/setup/CSetupWizard.php:635
+#: include/classes/setup/CSetupWizard.php:477
+#: include/classes/setup/CSetupWizard.php:647
 msgid "Database type"
 msgstr "データベースタイプ"
 
-#: include/classes/setup/CSetupWizard.php:664
+#: include/classes/setup/CSetupWizard.php:676
 msgid "Database user"
 msgstr "データベースユーザー"
 
@@ -4828,7 +4828,7 @@ msgid "Default host inventory mode"
 msgstr "デフォルトのホストインベントリモード"
 
 #: app/views/administration.gui.edit.php:70
-#: include/classes/setup/CSetupWizard.php:399
+#: include/classes/setup/CSetupWizard.php:411
 msgid "Default language"
 msgstr "デフォルトの言語"
 
@@ -4849,12 +4849,12 @@ msgid "Default page display period"
 msgstr "デフォルトのページ表示間隔"
 
 #: app/views/administration.gui.edit.php:82
-#: include/classes/setup/CSetupWizard.php:614
+#: include/classes/setup/CSetupWizard.php:626
 msgid "Default theme"
 msgstr "デフォルトのテーマ"
 
 #: app/views/administration.gui.edit.php:75
-#: include/classes/setup/CSetupWizard.php:607
+#: include/classes/setup/CSetupWizard.php:619
 msgid "Default time zone"
 msgstr "デフォルトのタイムゾーン"
 
@@ -5437,7 +5437,7 @@ msgstr "選択したWebシナリオを無効にしますか？"
 #: app/partials/configuration.filter.items.php:188
 #: app/partials/configuration.host.edit.html.php:358
 #: app/partials/monitoring.host.filter.php:129
-#: app/partials/monitoring.host.view.html.php:102
+#: app/partials/monitoring.host.view.html.php:117
 #: app/partials/scheduledreport.table.html.php:80
 #: app/views/administration.mediatype.list.php:57
 #: app/views/administration.mediatype.list.php:135
@@ -5693,7 +5693,7 @@ msgstr "ディスク書き込み統計。typeがsectors、operations、bytesの�
 msgid "Display OK triggers for"
 msgstr "正常イベントの表示期間"
 
-#: app/partials/monitoring.latest.view.html.php:237
+#: app/partials/monitoring.latest.view.html.php:250
 msgid "Display graph"
 msgstr "グラフ表示"
 
@@ -5701,7 +5701,7 @@ msgstr "グラフ表示"
 msgid "Display problems"
 msgstr "障害数の表示"
 
-#: app/partials/monitoring.latest.view.html.php:236
+#: app/partials/monitoring.latest.view.html.php:249
 msgid "Display stacked graph"
 msgstr "積算グラフ表示"
 
@@ -5802,7 +5802,7 @@ msgstr "Down"
 msgid "Download image"
 msgstr "イメージのダウンロード"
 
-#: include/classes/setup/CSetupWizard.php:856
+#: include/classes/setup/CSetupWizard.php:882
 msgid "Download the configuration file"
 msgstr "設定ファイルのダウンロード"
 
@@ -6165,7 +6165,7 @@ msgstr "トラッピングの有効化"
 #: app/partials/configuration.filter.items.php:187
 #: app/partials/configuration.host.edit.html.php:279
 #: app/partials/monitoring.host.filter.php:128
-#: app/partials/monitoring.host.view.html.php:101
+#: app/partials/monitoring.host.view.html.php:116
 #: app/partials/scheduledreport.formgrid.html.php:201
 #: app/partials/scheduledreport.table.html.php:84
 #: app/views/administration.mediatype.edit.php:267
@@ -6606,7 +6606,7 @@ msgstr "偽"
 msgid "FTP"
 msgstr "FTP"
 
-#: include/classes/setup/CSetupWizard.php:425
+#: include/classes/setup/CSetupWizard.php:437
 msgid "Fail"
 msgstr "失敗"
 
@@ -6852,7 +6852,7 @@ msgstr "ファイル内の文字列検索。一致する文字列を含む行か
 msgid "Find string on a web page. Returns the matched string, or as specified by the optional output parameter"
 msgstr "Webページ上の文字列検索。一致する文字列かoutputパラメータで指定したものを返す。"
 
-#: include/classes/setup/CSetupWizard.php:334
+#: include/classes/setup/CSetupWizard.php:346
 msgid "Finish"
 msgstr "終了"
 
@@ -7120,7 +7120,7 @@ msgid "Gradient line"
 msgstr "グラデーションライン"
 
 #: app/controllers/CControllerAuditLogList.php:216
-#: app/partials/monitoring.latest.view.html.php:154
+#: app/partials/monitoring.latest.view.html.php:165
 #: app/views/monitoring.charts.view.php:55
 #: include/classes/macros/CMacrosResolverGeneral.php:1270
 #: include/classes/screens/CScreenProblem.php:1305
@@ -7263,9 +7263,9 @@ msgstr "\"%1$s\"の名前を持つグラフはグラフもしくはグラフの�
 
 #: app/controllers/CControllerPopupGeneric.php:248
 #: app/controllers/CControllerPopupImportCompare.php:167
-#: app/partials/monitoring.host.view.html.php:37
-#: app/partials/monitoring.host.view.html.php:127
-#: app/partials/monitoring.host.view.html.php:135
+#: app/partials/monitoring.host.view.html.php:41
+#: app/partials/monitoring.host.view.html.php:131
+#: app/partials/monitoring.host.view.html.php:139
 #: app/views/configuration.host.list.php:186
 #: app/views/configuration.host.list.php:443
 #: app/views/monitoring.charts.view.php:38
@@ -7440,7 +7440,7 @@ msgstr "ハードウェア (詳細)"
 msgid "Hardware sensor reading. Returns float"
 msgstr "ハードウェアセンサーの読み込み。 浮動小数点値を返す。"
 
-#: include/classes/setup/CSetupWizard.php:499
+#: include/classes/setup/CSetupWizard.php:511
 msgid "HashiCorp Vault"
 msgstr "HashiCorp Vault"
 
@@ -7542,7 +7542,7 @@ msgstr "行を強調表示"
 
 #: app/partials/configuration.filter.items.php:152
 #: app/partials/monitoring.latest.view.html.php:52
-#: app/partials/monitoring.latest.view.html.php:154
+#: app/partials/monitoring.latest.view.html.php:165
 #: app/partials/monitoring.problem.filter.php:31
 #: app/views/administration.housekeeping.edit.php:121
 #: app/views/popup.acknowledge.edit.php:43 history.php:27
@@ -7616,7 +7616,7 @@ msgstr "横位置"
 #: include/classes/widgets/forms/CWidgetFormItem.php:171
 #: include/classes/widgets/forms/CWidgetFormItem.php:294
 msgid "Horizontal position"
-msgstr ""
+msgstr "水平の位置"
 
 #: app/controllers/CControllerAuditLogList.php:219
 #: app/partials/configuration.host.edit.html.php:522
@@ -8393,7 +8393,7 @@ msgstr "アクセスできないアイテム"
 msgid "Inaccessible item prototype"
 msgstr "アクセスできないアイテムのプロトタイプ"
 
-#: app/partials/monitoring.host.view.html.php:89
+#: app/partials/monitoring.host.view.html.php:105
 #: app/views/configuration.host.list.php:267
 #: include/classes/screens/CScreenProblem.php:386
 #: include/hostgroups.inc.php:293 include/triggers.inc.php:2027
@@ -8723,9 +8723,9 @@ msgstr "テーブル\"%2$s\"へのwhereステートメントのフィールド\"
 msgid "Incorrect fields for sysmap."
 msgstr "マップの設定が正しくありません。"
 
-#: include/classes/setup/CSetupWizard.php:940
-#: include/classes/setup/CSetupWizard.php:944
-#: include/classes/setup/CSetupWizard.php:948
+#: include/classes/setup/CSetupWizard.php:974
+#: include/classes/setup/CSetupWizard.php:978
+#: include/classes/setup/CSetupWizard.php:982
 #, c-format
 msgid "Incorrect file path for \"%1$s\": %2$s."
 msgstr "\"%1$s\": %2$sのファイルパスが正しくありません。"
@@ -9262,6 +9262,7 @@ msgstr "無限大"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:172
 #: app/partials/monitoring.latest.view.html.php:60
+#: app/partials/monitoring.latest.view.html.php:73
 #: app/partials/scheduledreport.table.html.php:45
 #: app/views/configuration.host.list.php:195
 #: app/views/monitoring.service.list.edit.php:61
@@ -9353,11 +9354,12 @@ msgid "Insert expression"
 msgstr "条件式の挿入"
 
 #: include/classes/setup/CSetupWizard.php:74
-#: include/classes/setup/CSetupWizard.php:877
+#: include/classes/setup/CSetupWizard.php:888
+#: include/classes/setup/CSetupWizard.php:911
 msgid "Install"
 msgstr "インストール"
 
-#: setup.php:172
+#: setup.php:160
 msgid "Installation"
 msgstr "インストール"
 
@@ -9369,7 +9371,7 @@ msgstr "インストーラ名"
 msgid "Integrations"
 msgstr "インテグレーション"
 
-#: app/partials/monitoring.host.view.html.php:30
+#: app/partials/monitoring.host.view.html.php:35
 #: app/views/administration.proxy.edit.php:76
 #: app/views/configuration.host.list.php:189 disc_prototypes.php:40
 #: host_discovery.php:47 include/classes/html/CHostAvailability.php:76
@@ -10057,7 +10059,7 @@ msgstr "アイテムに正しくないインターフェースタイプが設定
 
 #: include/classes/widgets/CWidgetConfig.php:52
 msgid "Item value"
-msgstr ""
+msgstr "アイテムの値"
 
 #: chart.php:101 chart.php:104
 msgid "Item values"
@@ -10449,9 +10451,9 @@ msgid "Last week graph"
 msgstr "最新1週間のグラフ"
 
 #: app/controllers/CControllerLatestView.php:189
-#: app/partials/monitoring.host.view.html.php:35
-#: app/partials/monitoring.host.view.html.php:105
-#: app/partials/monitoring.host.view.html.php:111
+#: app/partials/monitoring.host.view.html.php:39
+#: app/partials/monitoring.host.view.html.php:120
+#: app/partials/monitoring.host.view.html.php:126
 #: app/views/monitoring.latest.view.php:35 app/views/search.php:72
 #: app/views/search.php:78 app/views/search.php:231 app/views/search.php:237
 #: include/classes/helpers/CMenuHelper.php:52
@@ -10512,7 +10514,7 @@ msgstr "凡例"
 msgid "Length"
 msgstr "長さ"
 
-#: setup.php:195
+#: setup.php:183
 msgid "Licensed under"
 msgstr "ライセンスは"
 
@@ -11656,7 +11658,7 @@ msgstr "NTLM"
 #: app/partials/configuration.tags.tab.php:39
 #: app/partials/configuration.valuemap.php:29
 #: app/partials/monitoring.host.filter.php:78
-#: app/partials/monitoring.host.view.html.php:29
+#: app/partials/monitoring.host.view.html.php:34
 #: app/partials/monitoring.latest.view.html.php:41
 #: app/partials/monitoring.service.list.edit.php:41
 #: app/partials/monitoring.service.list.edit.php:49
@@ -11945,9 +11947,9 @@ msgstr "新規トリガー"
 msgid "Next page"
 msgstr "次のページ"
 
-#: include/classes/setup/CSetupWizard.php:331
-#: include/classes/setup/CSetupWizard.php:589
-#: include/classes/setup/CSetupWizard.php:741
+#: include/classes/setup/CSetupWizard.php:343
+#: include/classes/setup/CSetupWizard.php:601
+#: include/classes/setup/CSetupWizard.php:753
 msgid "Next step"
 msgstr "次のステップ"
 
@@ -12034,7 +12036,7 @@ msgstr "アクションの実行条件が設定されていません。"
 
 #: app/views/monitoring.widget.item.view.php:157
 msgid "No data"
-msgstr ""
+msgstr "データがありません"
 
 #: include/views/configuration.maintenance.edit.php:105
 #: include/views/configuration.maintenance.list.php:111
@@ -13555,7 +13557,7 @@ msgstr "パッシブ"
 #: app/views/popup.massupdate.item.php:175
 #: app/views/popup.massupdate.item.php:199 disc_prototypes.php:218
 #: host_discovery.php:191 httpconf.php:74
-#: include/classes/setup/CSetupWizard.php:527
+#: include/classes/setup/CSetupWizard.php:539
 #: include/views/configuration.host.discovery.edit.php:413
 #: include/views/configuration.host.discovery.edit.php:554
 #: include/views/configuration.host.discovery.edit.php:593
@@ -13713,7 +13715,7 @@ msgid "Placing algorithm"
 msgstr "配置アルゴリズム"
 
 #: app/views/administration.mediatype.edit.php:208
-#: include/classes/setup/CSetupWizard.php:498
+#: include/classes/setup/CSetupWizard.php:510
 #: include/classes/widgets/CWidgetConfig.php:58
 msgid "Plain text"
 msgstr "プレーンテキスト"
@@ -13727,7 +13729,7 @@ msgstr "再生"
 msgid "Play sound"
 msgstr "サウンド再生"
 
-#: include/classes/setup/CSetupWizard.php:741
+#: include/classes/setup/CSetupWizard.php:753
 #, c-format
 msgid "Please check configuration parameters. If all is correct, press \"%1$s\" button, or \"%2$s\" button to change configuration parameters."
 msgstr "設定値を確認してください。正しければ\"%1$s\"ボタンを押してください。もしくは、\"%2$s\"ボタンを押して設定値を修正してください。"
@@ -13740,12 +13742,12 @@ msgstr "すべてのマクロを削除してよいか確認してください。
 msgid "Please confirm that you want to remove all value mappings."
 msgstr "すべての値のマッピングを削除してよいか確認してください。"
 
-#: include/classes/setup/CSetupWizard.php:589
+#: include/classes/setup/CSetupWizard.php:601
 #, c-format
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
 msgstr "データベースを手動で作成してください。そしてデータベースに接続するための設定値を設定してください。終了したら\"%1$s\"ボタンを押してください。"
 
-#: include/classes/setup/CSetupWizard.php:177
+#: include/classes/setup/CSetupWizard.php:189
 msgid "Please enable \"allow_url_fopen\" directive."
 msgstr "\"allow_url_fopen\"ディレクティブを有効にしてください。"
 
@@ -13812,7 +13814,7 @@ msgstr "ポルトガル語 (pt_PT)"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:249
 msgid "Position"
-msgstr ""
+msgstr "位置"
 
 #: app/views/popup.httpstep.php:90
 msgid "Post fields"
@@ -13831,7 +13833,7 @@ msgid "Power value"
 msgstr "指数"
 
 #: include/classes/setup/CSetupWizard.php:70
-#: include/classes/setup/CSetupWizard.php:739
+#: include/classes/setup/CSetupWizard.php:751
 msgid "Pre-installation summary"
 msgstr "インストール事前準備概要"
 
@@ -14036,10 +14038,7 @@ msgid "Problem update"
 msgstr "障害更新"
 
 #: app/controllers/CControllerProblemView.php:151
-#: app/partials/monitoring.host.view.html.php:33
-#: app/partials/monitoring.host.view.html.php:36
-#: app/partials/monitoring.host.view.html.php:115
-#: app/partials/monitoring.host.view.html.php:122
+#: app/partials/monitoring.host.view.html.php:40
 #: app/partials/monitoring.problem.filter.php:30
 #: app/views/monitoring.problem.view.php:94 app/views/search.php:83
 #: app/views/search.php:89 app/views/search.php:247 app/views/search.php:253
@@ -14728,7 +14727,7 @@ msgstr "リクエストを送信しました"
 msgid "Request type"
 msgstr "リクエストメソッド"
 
-#: include/classes/setup/CSetupWizard.php:409
+#: include/classes/setup/CSetupWizard.php:421
 #: include/views/configuration.httpconf.edit.php:205
 msgid "Required"
 msgstr "要求文字列"
@@ -15294,7 +15293,7 @@ msgstr "保存する"
 msgid "Save changes"
 msgstr "変更を保存"
 
-#: include/classes/setup/CSetupWizard.php:857
+#: include/classes/setup/CSetupWizard.php:883
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "\"%1$s\"として保存しました"
@@ -15851,7 +15850,7 @@ msgstr "LDAPリフェラルを「オフ」に設定できませんでした。"
 
 #: app/controllers/CControllerAuditLogList.php:238
 #: include/classes/setup/CSetupWizard.php:66
-#: include/classes/setup/CSetupWizard.php:624
+#: include/classes/setup/CSetupWizard.php:636
 msgid "Settings"
 msgstr "設定"
 
@@ -16341,7 +16340,7 @@ msgstr "Zabbixの書き込みキャッシュの統計。cacheがvaluesならmode
 #: app/partials/administration.ha.nodes.php:28
 #: app/partials/configuration.filter.items.php:184
 #: app/partials/monitoring.host.filter.php:125
-#: app/partials/monitoring.host.view.html.php:34
+#: app/partials/monitoring.host.view.html.php:38
 #: app/partials/monitoring.service.list.edit.php:54
 #: app/partials/monitoring.service.list.php:51
 #: app/partials/scheduledreport.subscription.php:35
@@ -16510,12 +16509,12 @@ msgstr "停止中"
 msgid "Storage period"
 msgstr "保存期間"
 
-#: include/classes/setup/CSetupWizard.php:496
+#: include/classes/setup/CSetupWizard.php:508
 msgid "Store credentials in"
 msgstr "資格情報保存先"
 
-#: include/classes/setup/CSetupWizard.php:642
-#: include/classes/setup/CSetupWizard.php:643
+#: include/classes/setup/CSetupWizard.php:654
+#: include/classes/setup/CSetupWizard.php:655
 msgid "Stored in HashiCorp Vault secret"
 msgstr "HashiCorp Vaultのシークレット内に保存"
 
@@ -16604,11 +16603,11 @@ msgstr "サポート"
 
 #: include/classes/widgets/views/widget.geomap.form.view.php:70
 msgid "Supported formats:"
-msgstr ""
+msgstr "サポートしているフォーマット："
 
 #: include/classes/widgets/views/widget.item.form.view.php:59
 msgid "Supported macros:"
-msgstr ""
+msgstr "サポートしているマクロ："
 
 #: include/html.inc.php:972
 #, c-format
@@ -16760,7 +16759,7 @@ msgstr "タグの値"
 #: app/partials/configuration.filter.items.php:166
 #: app/partials/configuration.host.edit.html.php:524
 #: app/partials/monitoring.host.filter.php:133
-#: app/partials/monitoring.host.view.html.php:32
+#: app/partials/monitoring.host.view.html.php:37
 #: app/partials/monitoring.latest.view.html.php:58
 #: app/partials/monitoring.latest.view.html.php:71
 #: app/partials/monitoring.problem.filter.php:231
@@ -17145,7 +17144,7 @@ msgstr "ディスカバリされたアイテムが見つかりませんでした
 #: include/classes/widgets/views/widget.geomap.form.view.php:76
 #, c-format
 msgid "The maximum zoom level is \"%1$s\"."
-msgstr ""
+msgstr "最大ズームレベルは\"%1$s\"です。"
 
 #: include/classes/data/CItemData.php:1024
 msgid "The number of processes. Returns integer"
@@ -17722,7 +17721,7 @@ msgstr "2つのマップ要素を選択する必要があります"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:442
 msgid "Two or more fields cannot occupy same space."
-msgstr ""
+msgstr "2つ以上のフィールドを同じスペースに配置できません。"
 
 #: app/controllers/CControllerPopupGeneric.php:233
 #: app/controllers/CControllerPopupGeneric.php:284
@@ -18264,7 +18263,7 @@ msgstr "イベントのステータスの文字色を変更"
 
 #: jsLoader.php:398
 msgid "Use default"
-msgstr ""
+msgstr "デフォルトを使用"
 
 #: app/views/administration.user.edit.php:294 app/views/popup.media.php:88
 msgid "Use if severity"
@@ -18288,7 +18287,7 @@ msgstr "アクションで使用"
 #: app/views/administration.user.edit.php:284
 #: app/views/reports.auditlog.list.php:90 httpconf.php:65
 #: include/actions.inc.php:1700 include/actions.inc.php:1754
-#: include/actions.inc.php:1976 include/classes/setup/CSetupWizard.php:522
+#: include/actions.inc.php:1976 include/classes/setup/CSetupWizard.php:534
 #: include/hosts.inc.php:61 include/users.inc.php:52
 #: include/views/configuration.httpconf.edit.php:165
 msgid "User"
@@ -18450,7 +18449,7 @@ msgstr "自身のユーザーアカウントは削除できません。"
 
 #: include/classes/widgets/views/widget.item.form.view.php:64
 msgid "User macros"
-msgstr ""
+msgstr "ユーザーマクロ"
 
 #: app/partials/layout.htmlpage.aside.php:94
 msgid "User menu"
@@ -18582,8 +18581,8 @@ msgstr "ユーザー名"
 msgid "Username and password"
 msgstr "ユーザー名とパスワード"
 
-#: include/classes/setup/CSetupWizard.php:194
-#: include/classes/setup/CSetupWizard.php:774
+#: include/classes/setup/CSetupWizard.php:206
+#: include/classes/setup/CSetupWizard.php:800
 msgid "Username and password must be stored in Vault secret keys \"username\" and \"password\"."
 msgstr "ユーザー名とパスワードはVaultのシークレットキー内の\"username\"と\"password\"として保存してください。"
 
@@ -19036,18 +19035,18 @@ msgstr "変数"
 msgid "Various information about specific process(es). Returns float"
 msgstr "特定のプロセスに関する様々な情報。浮動小数点値を返す"
 
-#: include/classes/setup/CSetupWizard.php:502
-#: include/classes/setup/CSetupWizard.php:682
+#: include/classes/setup/CSetupWizard.php:514
+#: include/classes/setup/CSetupWizard.php:694
 msgid "Vault API endpoint"
 msgstr "VaultのAPIエンドポイント"
 
-#: include/classes/setup/CSetupWizard.php:515
-#: include/classes/setup/CSetupWizard.php:690
+#: include/classes/setup/CSetupWizard.php:527
+#: include/classes/setup/CSetupWizard.php:702
 msgid "Vault authentication token"
 msgstr "Vaultの認証トークン"
 
 #: include/classes/core/ZBase.php:231
-#: include/classes/setup/CSetupWizard.php:191 include/config.inc.php:53
+#: include/classes/setup/CSetupWizard.php:203 include/config.inc.php:53
 msgid "Vault connection failed."
 msgstr "Vaultへの接続に失敗しました。"
 
@@ -19055,8 +19054,8 @@ msgstr "Vaultへの接続に失敗しました。"
 msgid "Vault secret"
 msgstr "Vaultのシークレット"
 
-#: include/classes/setup/CSetupWizard.php:508
-#: include/classes/setup/CSetupWizard.php:686
+#: include/classes/setup/CSetupWizard.php:520
+#: include/classes/setup/CSetupWizard.php:698
 msgid "Vault secret path"
 msgstr "Vaultのシークレットパス"
 
@@ -19068,7 +19067,7 @@ msgstr "ベンダー"
 msgid "Verbose"
 msgstr "Verbose"
 
-#: include/classes/setup/CSetupWizard.php:546
+#: include/classes/setup/CSetupWizard.php:558
 msgid "Verify database certificate"
 msgstr "データベースの証明書確認"
 
@@ -19099,7 +19098,7 @@ msgstr "縦位置"
 #: include/classes/widgets/forms/CWidgetFormItem.php:186
 #: include/classes/widgets/forms/CWidgetFormItem.php:309
 msgid "Vertical position"
-msgstr ""
+msgstr "垂直の位置"
 
 #: include/locales.inc.php:78
 msgid "Vietnamese (vi_VN)"
@@ -19154,7 +19153,7 @@ msgstr "警"
 msgid "Warning"
 msgstr "警告"
 
-#: include/classes/setup/CSetupWizard.php:421
+#: include/classes/setup/CSetupWizard.php:433
 msgctxt "setup"
 msgid "Warning"
 msgstr "警告"
@@ -19172,9 +19171,9 @@ msgstr "警告！データベースサーバーのバージョン%1$sはサポ�
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr "要素を保存できる最大値に達しました"
 
-#: app/partials/monitoring.host.view.html.php:39
-#: app/partials/monitoring.host.view.html.php:148
-#: app/partials/monitoring.host.view.html.php:156
+#: app/partials/monitoring.host.view.html.php:43
+#: app/partials/monitoring.host.view.html.php:152
+#: app/partials/monitoring.host.view.html.php:160
 #: app/views/configuration.host.list.php:188
 #: app/views/configuration.host.list.php:461 app/views/search.php:110
 #: app/views/search.php:116 app/views/search.php:158 app/views/search.php:163
@@ -19274,7 +19273,7 @@ msgstr "重み"
 msgid "Welcome"
 msgstr "ようこそ"
 
-#: include/classes/setup/CSetupWizard.php:353
+#: include/classes/setup/CSetupWizard.php:365
 msgid "Welcome to"
 msgstr "ようこそ"
 
@@ -19588,7 +19587,7 @@ msgstr "\"%1$s\"としてログインしています。"
 
 #: app/views/administration.gui.edit.php:66
 #: app/views/administration.user.edit.php:233
-#: include/classes/setup/CSetupWizard.php:391
+#: include/classes/setup/CSetupWizard.php:403
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Webサーバーにロケールがインストールされていないため、いくつかの言語は利用できません。"
 
@@ -19699,8 +19698,8 @@ msgstr "Zabbixサーバーが動作していません (画面のリフレッシ�
 msgid "Zabbix server is running"
 msgstr "Zabbixサーバーの起動"
 
-#: include/classes/setup/CSetupWizard.php:602
-#: include/classes/setup/CSetupWizard.php:733
+#: include/classes/setup/CSetupWizard.php:614
+#: include/classes/setup/CSetupWizard.php:745
 msgid "Zabbix server name"
 msgstr "Zabbixサーバー名"
 
@@ -20196,11 +20195,11 @@ msgstr "空白は指定できません"
 #: include/classes/api/services/CTemplate.php:1019
 #, c-format
 msgid "cannot be specified the value of parameter \"%1$s\""
-msgstr ""
+msgstr "パラメーター\"%1$s\"の値を指定できません"
 
 #: include/classes/api/services/CHostBase.php:111
 msgid "cannot be unlinked"
-msgstr ""
+msgstr "リンクを削除できません"
 
 #: include/classes/api/services/CItemGeneral.php:2602
 msgid "cannot convert to JSON, result value too long"
@@ -20326,7 +20325,7 @@ msgstr "日"
 #: app/controllers/CControllerMapView.php:123
 #: app/partials/js/configuration.valuemap.js.php:156
 #: app/views/popup.generic.php:600 app/views/popup.valuemap.edit.php:83
-#: include/classes/setup/CSetupWizard.php:639
+#: include/classes/setup/CSetupWizard.php:651
 #: include/classes/widgets/CWidgetHelper.php:69
 msgid "default"
 msgstr "デフォルト"
@@ -20631,7 +20630,7 @@ msgstr "アドレスの範囲 \"%1$s\"が正しくありません"
 
 #: include/classes/api/services/CItemGeneral.php:1526
 msgid "invalid aggregation method"
-msgstr ""
+msgstr "集計方法が正しくありません"
 
 #: include/classes/validators/CApiInputValidator.php:354
 msgid "invalid byte sequence in UTF-8"
@@ -20749,7 +20748,7 @@ msgstr "kurtosis() - 確率分布の\"tailedness\"を測定する"
 
 #: include/forms.inc.php:1353 include/views/js/item.preprocessing.js.php:119
 msgid "label"
-msgstr ""
+msgstr "ラベル"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1377
 #: include/classes/graphdraw/CPieGraphDraw.php:296 include/graphs.inc.php:88
@@ -21142,7 +21141,7 @@ msgstr "その他"
 msgid "output"
 msgstr "出力"
 
-#: include/classes/setup/CSetupWizard.php:510
+#: include/classes/setup/CSetupWizard.php:522
 msgid "path/to/secret"
 msgstr "path/to/secret"
 
@@ -21672,7 +21671,7 @@ msgstr "関数\"%1$s\"が不明です"
 
 #: include/classes/api/services/CItemGeneral.php:1557
 msgid "unsupported Prometheus function"
-msgstr ""
+msgstr "サポートされていないPrometheusの関数です"
 
 #: app/controllers/CControllerPopupItemTestSend.php:192
 msgid "unsupported time suffix"
