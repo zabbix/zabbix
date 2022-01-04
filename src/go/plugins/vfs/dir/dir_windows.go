@@ -22,16 +22,24 @@ package dir
 import (
 	"io/fs"
 	"os"
+	"syscall"
 )
 
 func (cp *common) osSkip(path string, d fs.DirEntry) bool {
-	if d.Type() == fs.ModeSymlink {
-		return true
-	}
 
 	i, err := d.Info()
 	if err != nil {
 		impl.Logger.Errf("failed to get file info for path %s, %s", path, err.Error())
+		return true
+	}
+
+	if attr, ok := i.Sys().(*syscall.Win32FileAttributeData); ok {
+		if attr.FileAttributes&syscall.FILE_ATTRIBUTE_REPARSE_POINT != 0 &&
+			attr.FileAttributes&syscall.FILE_ATTRIBUTE_DIRECTORY != 0 {
+			return true
+		}
+	} else {
+		impl.Logger.Errf("failed to get system file attribute data")
 		return true
 	}
 
