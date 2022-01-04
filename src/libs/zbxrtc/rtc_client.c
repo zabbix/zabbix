@@ -76,7 +76,7 @@ finish:
 
 /******************************************************************************
  *                                                                            *
- * Function: parse_rtc_options                                                *
+ * Function: rtc_parse_options                                                *
  *                                                                            *
  * Purpose: parse runtime control options and create a runtime control        *
  *          message                                                           *

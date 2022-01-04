@@ -131,9 +131,10 @@ int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data, char 
  *                                                                            *
  * Purpose: process loglevel runtime control option                           *
  *                                                                            *
- * Parameters: code   - [IN] the runtime control request code                 *
- *             data   - [IN] the runtime control parameter (optional)         *
- *             result - [OUT] the runtime control result                      *
+ * Parameters: direction - [IN] the loglevel change direction:                *
+ *                               (1) - increase, (-1) - decrease              *
+ *             data      - [IN] the runtime control parameter (optional)      *
+ *             result    - [OUT] the runtime control result                   *
  *                                                                            *
  * Return value: SUCCEED - the loglevel command was processed                 *
  *               FAIL    - the loglevel command must be processed by the      *
@@ -338,7 +339,7 @@ static void	rtc_ha_status(char **out)
 
 /******************************************************************************
  *                                                                            *
- * Function: rtc_remove_node                                                  *
+ * Function: rtc_ha_remove_node                                               *
  *                                                                            *
  * Purpose: process ha_remove_node runtime command                            *
  *                                                                            *

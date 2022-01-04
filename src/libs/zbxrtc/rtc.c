@@ -37,6 +37,7 @@
  *             pid       - [OUT] the target pid (if specified)                *
  *             proc_type - [OUT] the target process type (if specified)       *
  *             proc_num  - [OUT] the target process num (if specified)        *
+ *             error     - [OUT] the error message                            *
  *                                                                            *
  * Return value: SUCCEED - the runtime control option was processed           *
  *               FAIL    - otherwise                                          *
