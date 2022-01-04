@@ -126,11 +126,13 @@ class CPage {
 		$this->resetViewport();
 
 		if (self::$cookie !== null) {
-			$cookie = $this->driver->manage()->getCookieNamed('zbx_session');
-
-			if ($cookie === null
-					|| $cookie->getValue() !== self::$cookie['value']) {
-				self::$cookie = null;
+			foreach ($this->driver->manage()->getCookies() as $cookie) {
+				if ($cookie->getName() === 'zbx_session') {
+					if ($cookie->getValue() !== self::$cookie['value']) {
+						self::$cookie = null;
+					}
+					break;
+				}
 			}
 		}
 
@@ -236,9 +238,19 @@ class CPage {
 			// Before logout open page without any scripts, otherwise session might be restored and logout won't work.
 			$this->open('setup.php');
 
-			$session = (self::$cookie === null)
-					? CTestArrayHelper::get($this->driver->manage()->getCookieNamed('zbx_session'), 'value')
-					: self::$cookie['value'];
+			$session = null;
+
+			if (self::$cookie === null) {
+				foreach ($this->driver->manage()->getCookies() as $cookie) {
+					if ($cookie->getName() === 'zbx_session') {
+						$session = $cookie->getValue();
+						break;
+					}
+				}
+			}
+			else {
+				$session = self::$cookie['value'];
+			}
 
 			if ($session !== null) {
 				DBExecute('DELETE FROM sessions WHERE sessionid='.zbx_dbstr($session));

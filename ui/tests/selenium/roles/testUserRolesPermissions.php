@@ -1197,7 +1197,7 @@ class testUserRolesPermissions extends CWebTest {
 			$this->query('button:Go to "'.$page.'"')->one()->waitUntilClickable()->click();
 
 			if ($page === 'Dashboard') {
-				$this->assertContains('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
+				$this->assertStringContainsString('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
 			}
 		}
 	}

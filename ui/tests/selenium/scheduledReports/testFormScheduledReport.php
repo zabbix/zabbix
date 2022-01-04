@@ -914,7 +914,7 @@ class testFormScheduledReport extends CWebTest {
 						'Description' => '',
 						'Enabled' => false
 					],
-					'Start time' => '0:0',
+					'Start time' => '00:00',
 					'Subscriptions' => [
 						[
 							'action' => USER_ACTION_REMOVE,

@@ -526,7 +526,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 					$message = CMessageElement::find()->one();
 					$this->assertEquals('msg-bad msg-global', $message->getAttribute('class'));
 					$message_title= $message->getText();
-					$this->assertContains($check['error'], $message_title);
+					$this->assertStringContainsString($check['error'], $message_title);
 				}
 
 				continue;
