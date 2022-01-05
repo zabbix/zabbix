@@ -121,7 +121,7 @@ out:
  * Comments: Throws an error:                                                 *
  *               - if the top value at ctx value stack cannot be converted to *
  *                 unsigned integer                                           *
- *               - if the sleep duration is 0 or longer than timeout          *
+ *               - if the sleep duration is longer than timeout               *
  *               - if the sleep duration is longer than time left for JS      *
  *                 execution before timeout occurs                            *
  *                                                                            *
@@ -133,12 +133,19 @@ static duk_ret_t	es_zabbix_sleep(duk_context *ctx)
 	struct timespec		ts_sleep;
 	zbx_uint64_t		timeout, duration;
 	unsigned int		sleep_ms;
+	double			sleep_dbl;
 	duk_idx_t		err_idx = -1;
 
-	sleep_ms = duk_to_uint(ctx, 0);
+	/* use duk_to_number() instead of duk_to_uint() to distinguish between zero value and error */
+	sleep_dbl = duk_to_number(ctx, 0);
 
-	if (0 == sleep_ms)
+	if (0 != DUK_ISNAN((float)sleep_dbl) || 0.0 > sleep_dbl)
 		return duk_error(ctx, DUK_ERR_EVAL_ERROR, "invalid Zabbix.sleep() duration");
+
+	if (DUK_UINT_MAX < sleep_dbl)
+		sleep_ms = DUK_UINT_MAX;
+	else
+		sleep_ms = (unsigned int)sleep_dbl;
 
 	duk_get_memory_functions(ctx, &out_funcs);
 	env = (zbx_es_env_t *)out_funcs.udata;
@@ -161,7 +168,7 @@ static duk_ret_t	es_zabbix_sleep(duk_context *ctx)
 	if (sleep_ms > timeout)
 	{
 		err_idx = duk_push_error_object(ctx, DUK_ERR_RANGE_ERROR, "execution timeout");
-		sleep_ms = timeout;
+		sleep_ms = (unsigned int)timeout;
 	}
 
 	ts_sleep.tv_sec = sleep_ms / 1000;
