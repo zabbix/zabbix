@@ -407,6 +407,16 @@ if (array_key_exists('render_html', $data)) {
 			}
 		});
 
+		// Tag related filter fields must be disabled when tag showing is disabled.
+		$('[name="show_tags"]', container)
+			.on('change', () => {
+				let disabled = ($('[name="show_tags"]:checked', container).val() == <?= PROBLEMS_SHOW_TAGS_NONE ?>);
+
+				$('[name="tag_priority"]', container).prop('disabled', disabled);
+				$('[name="tag_name_format"]', container).prop('disabled', disabled);
+			})
+			.trigger('change');
+
 		// Initialize src_url.
 		this.resetUnsavedState();
 	}

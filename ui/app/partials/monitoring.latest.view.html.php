@@ -44,6 +44,27 @@ $col_name = make_sorting_header(_('Name'), 'name', $data['sort_field'], $data['s
 $simple_interval_parser = new CSimpleIntervalParser();
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 
+if ($data['filter']['show_tags'] == PROBLEMS_SHOW_TAGS_NONE) {
+	$tags_header = null;
+}
+else {
+	$tags_header = new CColHeader(_('Tags'));
+
+	switch ($data['filter']['show_tags']) {
+		case PROBLEMS_SHOW_TAGS_1:
+			$tags_header->addClass(ZBX_STYLE_COLUMN_TAGS_1);
+			break;
+
+		case PROBLEMS_SHOW_TAGS_2:
+			$tags_header->addClass(ZBX_STYLE_COLUMN_TAGS_2);
+			break;
+
+		case PROBLEMS_SHOW_TAGS_3:
+			$tags_header->addClass(ZBX_STYLE_COLUMN_TAGS_3);
+			break;
+	}
+}
+
 if ($data['filter']['show_details']) {
 	$table->setHeader([
 		$col_check_all->addStyle('width: 15px;'),
@@ -56,7 +77,7 @@ if ($data['filter']['show_details']) {
 		(new CColHeader(_('Last check')))->addStyle('width: 14%'),
 		(new CColHeader(_('Last value')))->addStyle('width: 14%'),
 		(new CColHeader(_x('Change', 'noun')))->addStyle('width: 10%'),
-		(new CColHeader(_('Tags')))->addClass(ZBX_STYLE_COLUMN_TAGS_3),
+		$tags_header,
 		(new CColHeader())->addStyle('width: 6%'),
 		(new CColHeader(_('Info')))->addStyle('width: 35px')
 	]);
@@ -69,7 +90,7 @@ else {
 		(new CColHeader(_('Last check')))->addStyle('width: 14%'),
 		(new CColHeader(_('Last value')))->addStyle('width: 14%'),
 		(new CColHeader(_x('Change', 'noun')))->addStyle('width: 10%'),
-		(new CColHeader(_('Tags')))->addClass(ZBX_STYLE_COLUMN_TAGS_3),
+		$tags_header,
 		(new CColHeader())->addStyle('width: 6%'),
 		(new CColHeader(_('Info')))->addStyle('width: 35px')
 	]);
@@ -221,7 +242,7 @@ foreach ($data['items'] as $itemid => $item) {
 			(new CCol($last_check))->addClass($state_css),
 			(new CCol($last_value))->addClass($state_css),
 			(new CCol($change))->addClass($state_css),
-			$data['tags'][$itemid],
+			($data['filter']['show_tags'] != PROBLEMS_SHOW_TAGS_NONE) ? $data['tags'][$itemid] : null,
 			$actions,
 			makeInformationList($item_icons)
 		]);
@@ -234,7 +255,7 @@ foreach ($data['items'] as $itemid => $item) {
 			(new CCol($last_check))->addClass($state_css),
 			(new CCol($last_value))->addClass($state_css),
 			(new CCol($change))->addClass($state_css),
-			$data['tags'][$itemid],
+			($data['filter']['show_tags'] != PROBLEMS_SHOW_TAGS_NONE) ? $data['tags'][$itemid] : null,
 			$actions,
 			makeInformationList($item_icons)
 		]);
