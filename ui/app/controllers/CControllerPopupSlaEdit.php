@@ -100,7 +100,7 @@ class CControllerPopupSlaEdit extends CController {
 				'slaid' => $this->sla['slaid'],
 				'form' => [
 					'name' => $this->sla['name'],
-					'slo' => $this->sla['slo'],
+					'slo' => (string) round((float) $this->sla['slo'], 4),
 					'period' => $this->sla['period'],
 					'timezone' => $this->sla['timezone'],
 					'schedule_mode' => $this->sla['schedule']
