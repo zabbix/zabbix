@@ -45,9 +45,11 @@ func getListener(socket string) (listener net.Listener, err error) {
 }
 
 func cleanUpExternal() {
-	err := syscall.Unlink(pluginsocket)
-	if err != nil {
-		log.Critf("failed to clean up after plugins, %s", err)
+	if pluginsocket != "" {
+		err := syscall.Unlink(pluginsocket)
+		if err != nil {
+			log.Critf("failed to clean up after plugins, %s", err)
+		}
 	}
 }
 
