@@ -1504,7 +1504,7 @@ out:
 
 static void	services_times_convert_downtime(zbx_vector_services_times_t *services_times)
 {
-	int				i, j;
+	int				i, j, uptime_count = 0;
 	zbx_vector_services_times_t	services_times_downtime;
 
 	zbx_vector_services_times_create(&services_times_downtime);
@@ -1513,13 +1513,19 @@ static void	services_times_convert_downtime(zbx_vector_services_times_t *service
 	{
 		services_times_t	service_time = services_times->values[i];
 
-		if (SERVICE_TIME_TYPE_DOWNTIME != service_time.type)
-			continue;
+		if (SERVICE_TIME_TYPE_DOWNTIME == service_time.type)
+		{
 
-		zbx_vector_services_times_append(&services_times_downtime, service_time);
-		zbx_vector_services_times_remove(services_times, i);
-		i--;
+			zbx_vector_services_times_append(&services_times_downtime, service_time);
+			zbx_vector_services_times_remove(services_times, i);
+			i--;
+		}
+		else if (SERVICE_TIME_TYPE_UPTIME == service_time.type)
+			uptime_count++;
 	}
+
+	if (0 != uptime_count && 0 != services_times_downtime.values_num)
+		goto out;
 
 	for (i = 0; i < services_times_downtime.values_num; i++)
 	{
@@ -1584,7 +1590,7 @@ static void	services_times_convert_downtime(zbx_vector_services_times_t *service
 			zbx_vector_services_times_append(services_times, service_time_new);
 		}
 	}
-
+out:
 	zbx_vector_services_times_clear_ext(&services_times_downtime, services_time_clean);
 	zbx_vector_services_times_destroy(&services_times_downtime);
 }
