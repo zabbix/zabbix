@@ -2112,6 +2112,7 @@ AC_OUTPUT([
 	src/libs/zbxservice/Makefile
 	src/libs/zbxxml/Makefile
 	src/libs/zbxha/Makefile
+	src/libs/zbxrtc/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_agent/logfiles/Makefile
 	src/zabbix_get/Makefile

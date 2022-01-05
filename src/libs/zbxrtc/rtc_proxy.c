@@ -17,34 +17,38 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxipcservice.h"
+#include "zbxrtc.h"
+#include "rtc.h"
+#include "proxy.h"
 
-#ifndef ZABBIX_ZBXDIAG_H
-#define ZABBIX_ZBXDIAG_H
+extern int	CONFIG_PROXYMODE;
 
-#include "common.h"
-#include "zbxjson.h"
-
-typedef enum
+int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data, char **error)
 {
-	ZBX_DIAGINFO_UNDEFINED = -1,
-	ZBX_DIAGINFO_ALL,
-	ZBX_DIAGINFO_HISTORYCACHE,
-	ZBX_DIAGINFO_VALUECACHE,
-	ZBX_DIAGINFO_PREPROCESSING,
-	ZBX_DIAGINFO_LLD,
-	ZBX_DIAGINFO_ALERTING,
-	ZBX_DIAGINFO_LOCKS
+	ZBX_UNUSED(opt);
+	ZBX_UNUSED(code);
+	ZBX_UNUSED(data);
+	ZBX_UNUSED(error);
+
+	return SUCCEED;
 }
-zbx_diaginfo_section_t;
 
-#define ZBX_DIAG_HISTORYCACHE	"historycache"
-#define ZBX_DIAG_VALUECACHE	"valuecache"
-#define ZBX_DIAG_PREPROCESSING	"preprocessing"
-#define ZBX_DIAG_LLD		"lld"
-#define ZBX_DIAG_ALERTING	"alerting"
-#define ZBX_DIAG_LOCKS		"locks"
+int	rtc_process_request_ex(int code, const unsigned char *data, char **result)
+{
+	ZBX_UNUSED(data);
 
-int	zbx_diag_get_info(const struct zbx_json_parse *jp, char **info);
-void	zbx_diag_log_info(unsigned int flags, char **result);
+	switch (code)
+	{
+		case ZBX_RTC_CONFIG_CACHE_RELOAD:
+			if (ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE)
+			{
+				*result = zbx_strdup(NULL, "Cannot perform configuration cache reloading on passive"
+						" proxy\n");
+				return SUCCEED;
+			}
+			return FAIL;
+	}
 
-#endif
+	return FAIL;
+}

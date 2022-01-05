@@ -22,7 +22,7 @@
 #include "preproc.h"
 #include "zbxlld.h"
 #include "checks_internal.h"
-#include "../ha/ha.h"
+#include "zbxha.h"
 
 /******************************************************************************
  *                                                                            *

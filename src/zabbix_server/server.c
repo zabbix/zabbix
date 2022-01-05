@@ -80,7 +80,8 @@
 #include "zbxtrends.h"
 #include "ha/ha.h"
 #include "sighandler.h"
-#include "rtc.h"
+#include "zbxrtc.h"
+#include "zbxha.h"
 
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"
@@ -178,7 +179,7 @@ int		threads_num = 0;
 pid_t		*threads = NULL;
 static int	*threads_flags;
 
-static int	ha_status = ZBX_NODE_STATUS_UNINITIALIZED;
+static int	ha_status = ZBX_NODE_STATUS_UNKNOWN;
 static int	ha_status_old;
 zbx_cuid_t	ha_sessionid;
 
@@ -353,8 +354,6 @@ int	CONFIG_DOUBLE_PRECISION		= ZBX_DB_DBL_PRECISION_ENABLED;
 char	*CONFIG_WEBSERVICE_URL	= NULL;
 
 int	CONFIG_SERVICEMAN_SYNC_FREQUENCY	= 60;
-
-static volatile sig_atomic_t	zbx_rtc_command;
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
@@ -1035,9 +1034,7 @@ int	main(int argc, char **argv)
 				break;
 			case 'R':
 				opt_r++;
-				if (SUCCEED != parse_rtc_options(zbx_optarg, program_type, &t.data))
-					exit(EXIT_FAILURE);
-
+				t.opts = zbx_strdup(t.opts, zbx_optarg);
 				t.task = ZBX_TASK_RUNTIME_CONTROL;
 				break;
 			case 'h':
@@ -1090,14 +1087,27 @@ int	main(int argc, char **argv)
 	zbx_load_config(&t);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
-		exit(SUCCEED == zbx_sigusr_send(t.data) ? EXIT_SUCCESS : EXIT_FAILURE);
+	{
+		int	ret;
+		char	*error = NULL;
+
+		if (FAIL == zbx_ipc_service_init_env(CONFIG_SOCKET_PATH, &error))
+		{
+			zbx_error("cannot initialize IPC services: %s", error);
+			zbx_free(error);
+			exit(EXIT_FAILURE);
+		}
+
+		if (SUCCEED != (ret = zbx_rtc_process(t.opts, &error)))
+		{
+			zbx_error("Cannot perform runtime control command: %s", error);
+			zbx_free(error);
+		}
+
+		exit(SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE);
+	}
 
 	return daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
-}
-
-static void	zbx_main_sigusr_handler(int flags)
-{
-	zbx_rtc_command = flags;
 }
 
 static void	zbx_check_db(void)
@@ -1186,33 +1196,12 @@ static void	zbx_check_db(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: server_update_ha_status                                          *
- *                                                                            *
- * Purpose: check for queued status message and update HA status              *
- *                                                                            *
- ******************************************************************************/
-static int	server_update_ha_status(void)
-{
-	char	*error = NULL;
-
-	if (SUCCEED != zbx_ha_recv_status(0, &ha_status, &error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot check HA manager status: %s", error);
-		zbx_free(error);
-		return FAIL;
-	}
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: server_startup                                                   *
  *                                                                            *
  * Purpose: initialize shared resources and start processes                   *
  *                                                                            *
  ******************************************************************************/
-static int	server_startup(zbx_socket_t *listen_sock)
+static int	server_startup(zbx_socket_t *listen_sock, zbx_rtc_t *rtc)
 {
 	int	i, ret = SUCCEED;
 	char	*error = NULL;
@@ -1307,11 +1296,12 @@ static int	server_startup(zbx_socket_t *listen_sock)
 				break;
 			case ZBX_PROCESS_TYPE_CONFSYNCER:
 				zbx_thread_start(dbconfig_thread, &thread_args, &threads[i]);
-				DCconfig_wait_sync();
+				zbx_rtc_wait_config_sync(rtc);
 
-				if (SUCCEED != server_update_ha_status())
+				if (SUCCEED != (ret = zbx_ha_get_status(&ha_status, &error)))
 				{
-					ret = FAIL;
+					zabbix_log(LOG_LEVEL_CRIT, "cannot obtain HA status: %s", error);
+					zbx_free(error);
 					goto out;
 				}
 
@@ -1445,8 +1435,11 @@ static int	server_startup(zbx_socket_t *listen_sock)
 	}
 
 	/* startup/postinit tasks can take a long time, update status */
-	if (SUCCEED != server_update_ha_status())
-		ret = FAIL;
+	if (SUCCEED != (ret = zbx_ha_get_status(&ha_status, &error)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot obtain HA status: %s", error);
+		zbx_free(error);
+	}
 out:
 	zbx_unset_exit_on_terminate();
 
@@ -1474,7 +1467,7 @@ static int	server_restart_logger(char **error)
  * Purpose: terminate processes and destroy shared resources                  *
  *                                                                            *
  ******************************************************************************/
-static void	server_teardown(zbx_socket_t *listen_sock)
+static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 {
 	int	i;
 	char	*error = NULL;
@@ -1535,7 +1528,7 @@ static void	server_teardown(zbx_socket_t *listen_sock)
 	zbx_locks_enable();
 #endif
 
-	if (SUCCEED != zbx_ha_start(&error, ZBX_NODE_STATUS_STANDBY))
+	if (SUCCEED != zbx_ha_start(rtc, ZBX_NODE_STATUS_STANDBY, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start HA manager: %s", error);
 		zbx_free(error);
@@ -1549,6 +1542,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	int		i, db_type, ret;
 	zbx_socket_t	listen_sock;
 	time_t		standby_warning_time;
+	zbx_rtc_t	rtc;
+	zbx_timespec_t	rtc_timeout = {1, 0};
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
@@ -1660,6 +1655,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_free_config();
 
+	if (SUCCEED != zbx_rtc_init(&rtc, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize runtime control service: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
 	if (SUCCEED != zbx_vault_init_token_from_env(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault token: %s", error);
@@ -1724,7 +1726,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_unset_exit_on_terminate();
 
-	if (SUCCEED != zbx_ha_start(&error, ZBX_NODE_STATUS_UNKNOWN))
+	if (SUCCEED != zbx_ha_start(&rtc, ZBX_NODE_STATUS_UNKNOWN, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start HA manager: %s", error);
 		zbx_free(error);
@@ -1740,21 +1742,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_TRENDS))
 		zbx_trends_export_init("main-process", 0);
 
-	zbx_set_sigusr_handler(zbx_main_sigusr_handler);
-
-	if (SUCCEED == zbx_ha_get_status(&error))
-	{
-		while (ZBX_IS_RUNNING() && ZBX_NODE_STATUS_UNINITIALIZED == ha_status)
-		{
-			if (SUCCEED != zbx_ha_recv_status(ZBX_IPC_WAIT_FOREVER, &ha_status, &error))
-			{
-				zabbix_log(LOG_LEVEL_CRIT, "cannot start server: %s", error);
-				zbx_free(error);
-				sig_exiting = ZBX_EXIT_FAILURE;
-			}
-		}
-	}
-	else
+	if (SUCCEED != zbx_ha_get_status(&ha_status, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start server: %s", error);
 		zbx_free(error);
@@ -1763,7 +1751,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
 	{
-		if (SUCCEED != server_startup(&listen_sock))
+		if (SUCCEED != server_startup(&listen_sock, &rtc))
 		{
 			sig_exiting = ZBX_EXIT_FAILURE;
 			ha_status = ZBX_NODE_STATUS_ERROR;
@@ -1772,7 +1760,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		{
 			/* check if the HA status has not been changed during startup process */
 			if (ZBX_NODE_STATUS_ACTIVE != ha_status)
-				server_teardown(&listen_sock);
+				server_teardown(&rtc, &listen_sock);
 		}
 	}
 
@@ -1798,28 +1786,52 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	while (ZBX_IS_RUNNING())
 	{
-		time_t	now;
+		time_t			now;
+		zbx_ipc_client_t	*client;
+		zbx_ipc_message_t	*message;
 
-		if (SUCCEED != zbx_ha_recv_status(1, &ha_status, &error))
+		(void)zbx_ipc_service_recv(&rtc.service, &rtc_timeout, &client, &message);
+
+		if (NULL == message || ZBX_IPC_SERVICE_HA_RTC_FIRST <= message->code)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot receive HA manager status: %s", error);
-			zbx_free(error);
-			sig_exiting = ZBX_EXIT_FAILURE;
-			break;
+			if (SUCCEED != zbx_ha_dispatch_message(message, &ha_status, &error))
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "HA manager error: %s", error);
+				sig_exiting = ZBX_EXIT_FAILURE;
+			}
 		}
+		else
+		{
+			if (ZBX_NODE_STATUS_ACTIVE == ha_status || ZBX_RTC_LOG_LEVEL_DECREASE == message->code ||
+					ZBX_RTC_LOG_LEVEL_INCREASE == message->code)
+			{
+				zbx_rtc_dispatch(client, message);
+			}
+			else
+			{
+				const char	*result = "Runtime commands can be executed only in active mode\n";
+				zbx_ipc_client_send(client, message->code, (const unsigned char *)result,
+						(zbx_uint32_t)strlen(result) + 1);
+			}
+		}
+
+		zbx_ipc_message_free(message);
+
+		if (NULL != client)
+			zbx_ipc_client_release(client);
 
 		now = time(NULL);
 
 		if (ZBX_NODE_STATUS_UNKNOWN != ha_status && ha_status != ha_status_old)
 		{
 			ha_status_old = ha_status;
-			zabbix_log(LOG_LEVEL_INFORMATION, "\"%s\" node switched to \"%s\" mode", CONFIG_HA_NODE_NAME,
-							zbx_ha_status_str(ha_status));
+			zabbix_log(LOG_LEVEL_INFORMATION, "\"%s\" node switched to \"%s\" mode",
+					ZBX_NULL2EMPTY_STR(CONFIG_HA_NODE_NAME), zbx_ha_status_str(ha_status));
 
 			switch (ha_status)
 			{
 				case ZBX_NODE_STATUS_ACTIVE:
-					if (SUCCEED != server_startup(&listen_sock))
+					if (SUCCEED != server_startup(&listen_sock, &rtc))
 					{
 						sig_exiting = ZBX_EXIT_FAILURE;
 						ha_status = ZBX_NODE_STATUS_ERROR;
@@ -1827,11 +1839,11 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 					}
 
 					if (ZBX_NODE_STATUS_ACTIVE != ha_status)
-						server_teardown(&listen_sock);
+						server_teardown(&rtc, &listen_sock);
 
 					break;
 				case ZBX_NODE_STATUS_STANDBY:
-					server_teardown(&listen_sock);
+					server_teardown(&rtc, &listen_sock);
 					standby_warning_time = now;
 					break;
 				default:
@@ -1863,16 +1875,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
 			break;
-		}
-
-		if (0 != zbx_rtc_command)
-		{
-			if (ZBX_NODE_STATUS_ACTIVE == ha_status)
-				zbx_rtc_process_command((unsigned int)zbx_rtc_command);
-			else
-				zabbix_log(LOG_LEVEL_INFORMATION, "runtime commands can be executed only in active mode");
-
-			zbx_rtc_command = 0;
 		}
 	}
 
