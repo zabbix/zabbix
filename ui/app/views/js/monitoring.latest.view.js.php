@@ -39,7 +39,7 @@
 		_popup_message_box: null,
 
 		init({refresh_url, refresh_data, refresh_interval, filter_options}) {
-			this.refresh_url = refresh_url;
+			this.refresh_url = new Curl(refresh_url, false);;
 			this.refresh_data = refresh_data;
 			this.refresh_interval = refresh_interval;
 
@@ -48,6 +48,11 @@
 			this.refresh_simple_url = url.getUrl();
 
 			this.initTabFilter(filter_options);
+
+			if (this.refresh_interval != 0) {
+				this.running = true;
+				this.scheduleRefresh();
+			}
 		},
 
 		initTabFilter(filter_options) {
