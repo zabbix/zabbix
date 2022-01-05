@@ -1505,53 +1505,64 @@ out:
 static void	services_times_convert_downtime(zbx_vector_services_times_t *services_times)
 {
 	int				i;
-	zbx_vector_services_times_t	services_times_converted;
+	zbx_vector_services_times_t	services_times_downtime;
 
-	zbx_vector_services_times_create(&services_times_converted);
+	zbx_vector_services_times_create(&services_times_downtime);
 
 	for (i = 0; i < services_times->values_num; i++)
 	{
-		services_times_t	*service_time = &services_times->values[i];
+		services_times_t	service_time = services_times->values[i];
 
-		if (SERVICE_TIME_TYPE_DOWNTIME != service_time->type)
+		if (SERVICE_TIME_TYPE_DOWNTIME != service_time.type)
 			continue;
 
-		if (0 != service_time->from)
-		{
-			services_times_t	service_time_new;
-
-			service_time_new.type = SERVICE_TIME_TYPE_UPTIME;
-			service_time_new.from = 0;
-			service_time_new.to = service_time->from;
-			service_time_new.note = zbx_strdup(NULL, "");
-
-			zbx_vector_services_times_append(&services_times_converted, service_time_new);
-		}
-
-		if (SEC_PER_WEEK != service_time->to)
-		{
-			services_times_t	service_time_new;
-
-			service_time_new.type = SERVICE_TIME_TYPE_UPTIME;
-			service_time_new.from = service_time->to;
-			service_time_new.to = SEC_PER_WEEK;
-			service_time_new.note = zbx_strdup(NULL, "");
-
-			zbx_vector_services_times_append(&services_times_converted, service_time_new);
-		}
-
-		services_time_clean(*service_time);
+		zbx_vector_services_times_append(&services_times_downtime, service_time);
 		zbx_vector_services_times_remove(services_times, i);
 		i--;
 	}
 
-	if (0 != services_times_converted.values_num)
+	zbx_vector_services_times_sort(&services_times_downtime, compare_services_time);
+	for (i = 0; i < services_times_downtime.values_num; i++)
 	{
-		zbx_vector_services_times_append_array(services_times, services_times_converted.values,
-				services_times_converted.values_num);
+		services_times_t	*service_time_downtime = &services_times_downtime.values[i];
+
+		if (0 != service_time_downtime->from)
+		{
+			services_times_t	service_time_new;
+
+			service_time_new.type = SERVICE_TIME_TYPE_UPTIME;
+
+			if (0 != i)
+				service_time_new.from = services_times_downtime.values[i - 1].to;
+			else
+				service_time_new.from = 0;
+
+			service_time_new.to = service_time_downtime->from;
+			service_time_new.note = zbx_strdup(NULL, "");
+
+			zbx_vector_services_times_append(services_times, service_time_new);
+		}
 	}
 
-	zbx_vector_services_times_destroy(&services_times_converted);
+	if (0 != i)
+	{
+		services_times_t	*service_time_downtime = &services_times_downtime.values[i - 1];
+
+		if (SEC_PER_WEEK != service_time_downtime->to)
+		{
+			services_times_t	service_time_new;
+
+			service_time_new.type = SERVICE_TIME_TYPE_UPTIME;
+			service_time_new.from = service_time_downtime->to;
+			service_time_new.to = SEC_PER_WEEK;
+			service_time_new.note = zbx_strdup(NULL, "");
+
+			zbx_vector_services_times_append(services_times, service_time_new);
+		}
+	}
+
+	zbx_vector_services_times_clear_ext(&services_times_downtime, services_time_clean);
+	zbx_vector_services_times_destroy(&services_times_downtime);
 }
 
 static int	DBpatch_5050127(void)
