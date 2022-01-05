@@ -43,7 +43,7 @@ class CControllerLatestView extends CControllerLatest {
 			'tag_priority' =>			'string',
 
 			// table sorting inputs
-			'sort' =>					'in name,status',
+			'sort' =>					'in host,name',
 			'sortorder' =>				'in '.ZBX_SORT_UP.','.ZBX_SORT_DOWN,
 			'page' =>					'ge 1',
 
