@@ -50,11 +50,7 @@ elseif (!$data['has_serviceid']) {
 
 	$num_rows_displayed = 0;
 
-	foreach ($data['services'] as $serviceid => $service) {
-		if (!array_key_exists($serviceid, $service_index)) {
-			continue;
-		}
-
+	foreach (array_intersect_key($data['services'], $service_index) as $serviceid => $service) {
 		$row = [
 			(new CCol($data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA]
 				? new CLink(
@@ -87,8 +83,8 @@ elseif (!$data['has_serviceid']) {
 
 	$report->setFooter(
 		(new CCol(_s('Displaying %1$s of %2$s found', $num_rows_displayed,
-			count($data['services']) > $data['rows_per_page']
-				? $data['rows_per_page'].'+'
+			count($data['services']) > $data['search_limit']
+				? $data['search_limit'].'+'
 				: count($data['services'])
 		)))
 			->setColSpan($report->getNumCols())

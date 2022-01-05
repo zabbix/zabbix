@@ -125,11 +125,7 @@ elseif ($data['service'] === null) {
 
 	$service_index = array_flip($data['sli']['serviceids']);
 
-	foreach ($data['services'] as $serviceid => $service) {
-		if (!array_key_exists($serviceid, $service_index)) {
-			continue;
-		}
-
+	foreach (array_intersect_key($data['services'], $service_index) as $serviceid => $service) {
 		$row = [
 			(new CCol($data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA]
 				? new CLink(

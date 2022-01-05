@@ -45,15 +45,18 @@ class CControllerWidgetSlaReportView extends CControllerWidget {
 			'has_serviceid' => (bool) $fields['serviceid'],
 			'has_permissions_error' => false,
 			'rows_per_page' => CWebUser::$data['rows_per_page'],
+			'search_limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
 		];
 
-		$db_slas = API::Sla()->get([
-			'output' => ['slaid', 'name', 'period', 'slo', 'timezone', 'status'],
-			'slaids' => $fields['slaid']
-		]);
+		$db_slas = $fields['slaid']
+			? API::Sla()->get([
+				'output' => ['slaid', 'name', 'period', 'slo', 'timezone', 'status'],
+				'slaids' => $fields['slaid']
+			])
+			: [];
 
 		if ($db_slas) {
 			$data['sla'] = $db_slas[0];
@@ -62,9 +65,10 @@ class CControllerWidgetSlaReportView extends CControllerWidget {
 				$data['services'] = API::Service()->get([
 					'output' => ['name'],
 					'serviceids' => $fields['serviceid'] ?: null,
+					'slaids' => $data['sla']['slaid'],
 					'sortfield' => 'name',
 					'sortorder' => ZBX_SORT_UP,
-					'limit' => CWebUser::$data['rows_per_page'] + 1,
+					'limit' => $data['search_limit'] + 1,
 					'preservekeys' => true
 				]);
 
@@ -92,7 +96,7 @@ class CControllerWidgetSlaReportView extends CControllerWidget {
 
 					$data['sli'] = API::Sla()->getSli([
 						'slaid' => $data['sla']['slaid'],
-						'serviceids' => array_keys($data['services']),
+						'serviceids' => array_slice(array_keys($data['services']), 0, $data['rows_per_page']),
 						'periods' => $fields['show_periods'] !== '' ? $fields['show_periods'] : null,
 						'period_from' => $period_from,
 						'period_to' => $period_to
