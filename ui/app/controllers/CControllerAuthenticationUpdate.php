@@ -398,7 +398,7 @@ class CControllerAuthenticationUpdate extends CController {
 			}
 		}
 		else {
-			$this->response->setMessageOk(_('Authentication settings updated'));
+			CMessageHelper::setSuccessTitle(_('Authentication settings updated'));
 		}
 
 		$this->setResponse($this->response);
