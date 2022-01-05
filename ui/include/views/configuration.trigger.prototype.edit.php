@@ -594,7 +594,7 @@ foreach ($data['db_dependencies'] as $dependency) {
 	$row = new CRow([$description,
 		(new CCol(
 			(new CButton('remove', _('Remove')))
-				->onClick('javascript: removeDependency("'.$dependency['triggerid'].'");')
+				->onClick('view.removeDependency('.json_encode($dependency['triggerid']).')')
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->removeId()
 		))->addClass(ZBX_STYLE_NOWRAP)
