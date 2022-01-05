@@ -1505,9 +1505,9 @@ out:
 static void	services_times_convert_downtime(zbx_vector_services_times_t *services_times)
 {
 	int				i, j, uptime_count = 0;
-	zbx_vector_services_times_t	services_times_downtime;
+	zbx_vector_services_times_t	services_downtimes;
 
-	zbx_vector_services_times_create(&services_times_downtime);
+	zbx_vector_services_times_create(&services_downtimes);
 
 	for (i = 0; i < services_times->values_num; i++)
 	{
@@ -1516,7 +1516,7 @@ static void	services_times_convert_downtime(zbx_vector_services_times_t *service
 		if (SERVICE_TIME_TYPE_DOWNTIME == service_time.type)
 		{
 
-			zbx_vector_services_times_append(&services_times_downtime, service_time);
+			zbx_vector_services_times_append(&services_downtimes, service_time);
 			zbx_vector_services_times_remove(services_times, i);
 			i--;
 		}
@@ -1524,7 +1524,7 @@ static void	services_times_convert_downtime(zbx_vector_services_times_t *service
 			uptime_count++;
 	}
 
-	if (0 == uptime_count && 0 != services_times_downtime.values_num)
+	if (0 == uptime_count && 0 != services_downtimes.values_num)
 	{
 		services_times_t	service_time_new;
 
@@ -1536,9 +1536,9 @@ static void	services_times_convert_downtime(zbx_vector_services_times_t *service
 		zbx_vector_services_times_append(services_times, service_time_new);
 	}
 
-	for (i = 0; i < services_times_downtime.values_num; i++)
+	for (i = 0; i < services_downtimes.values_num; i++)
 	{
-		services_times_t	*service_downtime = &services_times_downtime.values[i];
+		services_times_t	*service_downtime = &services_downtimes.values[i];
 
 		for (j = 0; j < services_times->values_num; j++)
 		{
@@ -1580,8 +1580,8 @@ static void	services_times_convert_downtime(zbx_vector_services_times_t *service
 		}
 	}
 
-	zbx_vector_services_times_clear_ext(&services_times_downtime, services_time_clean);
-	zbx_vector_services_times_destroy(&services_times_downtime);
+	zbx_vector_services_times_clear_ext(&services_downtimes, services_time_clean);
+	zbx_vector_services_times_destroy(&services_downtimes);
 }
 
 static int	DBpatch_5050127(void)
