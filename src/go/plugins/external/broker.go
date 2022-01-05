@@ -29,7 +29,7 @@ import (
 	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/log"
 	"zabbix.com/pkg/plugin"
-	"zabbix.com/pkg/shared"
+	"zabbix.com/pkg/plugin/comms"
 )
 
 const queSize = 100
@@ -49,8 +49,8 @@ type pluginBroker struct {
 }
 
 type RequestWrapper struct {
-	shared.Common
-	shared.LogRequest
+	comms.Common
+	comms.LogRequest
 }
 
 type request struct {
@@ -82,7 +82,7 @@ func New(conn net.Conn, timeout time.Duration, socket string) *pluginBroker {
 
 func (b *pluginBroker) handleConnection() {
 	for {
-		t, data, err := shared.Read(b.conn)
+		t, data, err := comms.Read(b.conn)
 		if err != nil {
 			return
 		}
@@ -91,8 +91,8 @@ func (b *pluginBroker) handleConnection() {
 		var resp interface{}
 
 		switch t {
-		case shared.RegisterResponseType:
-			var reg shared.RegisterResponse
+		case comms.RegisterResponseType:
+			var reg comms.RegisterResponse
 			err := json.Unmarshal(data, &reg)
 			if err != nil {
 				panic(
@@ -107,8 +107,8 @@ func (b *pluginBroker) handleConnection() {
 			id = reg.Id
 			resp = reg
 
-		case shared.LogRequestType:
-			var log shared.LogRequest
+		case comms.LogRequestType:
+			var log comms.LogRequest
 			err := json.Unmarshal(data, &log)
 			if err != nil {
 				panic(
@@ -123,8 +123,8 @@ func (b *pluginBroker) handleConnection() {
 			// plugin notifications don't have responses, so use 0 id
 			resp = log
 
-		case shared.ValidateResponseType:
-			var valid shared.ValidateResponse
+		case comms.ValidateResponseType:
+			var valid comms.ValidateResponse
 			err := json.Unmarshal(data, &valid)
 			if err != nil {
 				panic(
@@ -138,8 +138,8 @@ func (b *pluginBroker) handleConnection() {
 
 			id = valid.Id
 			resp = valid
-		case shared.ExportResponseType:
-			var export shared.ExportResponse
+		case comms.ExportResponseType:
+			var export comms.ExportResponse
 			err := json.Unmarshal(data, &export)
 			if err != nil {
 				panic(
@@ -200,25 +200,25 @@ func (b *pluginBroker) runBackground() {
 			} else {
 				lastid++
 				switch v := r.data.(type) {
-				case *shared.ExportRequest:
+				case *comms.ExportRequest:
 					go b.timeoutRequest(lastid)
 					v.Id = lastid
-				case *shared.RegisterRequest:
+				case *comms.RegisterRequest:
 					go b.timeoutRequest(lastid)
 					v.Id = lastid
-				case *shared.ValidateRequest:
+				case *comms.ValidateRequest:
 					go b.timeoutRequest(lastid)
 					v.Id = lastid
-				case *shared.TerminateRequest:
+				case *comms.TerminateRequest:
 					v.Id = lastid
-				case *shared.ConfigureRequest:
+				case *comms.ConfigureRequest:
 					v.Id = lastid
-				case *shared.StartRequest:
+				case *comms.StartRequest:
 					v.Id = lastid
 				}
 
 				b.requests[lastid] = r.out
-				err := shared.Write(b.conn, r.data)
+				err := comms.Write(b.conn, r.data)
 				if err != nil {
 					panic(
 						fmt.Errorf(
@@ -236,7 +236,7 @@ func (b *pluginBroker) runBackground() {
 func (b *pluginBroker) handleLogs() {
 	for u := range b.log {
 		switch v := u.(type) {
-		case shared.LogRequest:
+		case comms.LogRequest:
 			b.handleLog(v)
 		default:
 			log.Errf(`Failed to log message from plugins, unknown request type "%T"`, u)
@@ -244,7 +244,7 @@ func (b *pluginBroker) handleLogs() {
 	}
 }
 
-func (b *pluginBroker) handleLog(l shared.LogRequest) {
+func (b *pluginBroker) handleLog(l comms.LogRequest) {
 	msg := l.Message
 	if b.pluginName != "" {
 		msg = fmt.Sprintf("[%s] %s", b.pluginName, msg)
@@ -274,9 +274,9 @@ func (b *pluginBroker) run() {
 
 func (b *pluginBroker) start() {
 	r := request{
-		data: &shared.StartRequest{
-			Common: shared.Common{
-				Type: shared.StartRequestType,
+		data: &comms.StartRequest{
+			Common: comms.Common{
+				Type: comms.StartRequestType,
 			},
 		},
 	}
@@ -289,10 +289,10 @@ func (b *pluginBroker) stop() {
 	b.tx <- &r
 }
 
-func (b *pluginBroker) export(key string, params []string) (*shared.ExportResponse, error) {
-	data := shared.ExportRequest{
-		Common: shared.Common{
-			Type: shared.ExportRequestType,
+func (b *pluginBroker) export(key string, params []string) (*comms.ExportResponse, error) {
+	data := comms.ExportRequest{
+		Common: comms.Common{
+			Type: comms.ExportRequestType,
 		},
 		Key:    key,
 		Params: params,
@@ -307,7 +307,7 @@ func (b *pluginBroker) export(key string, params []string) (*shared.ExportRespon
 	u := <-r.out
 
 	switch v := u.(type) {
-	case shared.ExportResponse:
+	case comms.ExportResponse:
 		return &v, nil
 	case error:
 		return nil, v
@@ -316,13 +316,13 @@ func (b *pluginBroker) export(key string, params []string) (*shared.ExportRespon
 	return nil, errors.New("unknown response")
 }
 
-func (b *pluginBroker) register() (*shared.RegisterResponse, error) {
+func (b *pluginBroker) register() (*comms.RegisterResponse, error) {
 	r := request{
-		data: &shared.RegisterRequest{
-			Common: shared.Common{
-				Type: shared.RegisterRequestType,
+		data: &comms.RegisterRequest{
+			Common: comms.Common{
+				Type: comms.RegisterRequestType,
 			},
-			Version: shared.Version,
+			Version: comms.Version,
 		},
 		out: make(chan interface{}),
 	}
@@ -331,7 +331,7 @@ func (b *pluginBroker) register() (*shared.RegisterResponse, error) {
 	u := <-r.out
 
 	switch v := u.(type) {
-	case shared.RegisterResponse:
+	case comms.RegisterResponse:
 		return &v, nil
 	case error:
 		return nil, v
@@ -342,9 +342,9 @@ func (b *pluginBroker) register() (*shared.RegisterResponse, error) {
 
 func (b *pluginBroker) configure(globalOptions *plugin.GlobalOptions, privateOptions interface{}) {
 	r := request{
-		data: &shared.ConfigureRequest{
-			Common: shared.Common{
-				Type: shared.ConfigureRequestType,
+		data: &comms.ConfigureRequest{
+			Common: comms.Common{
+				Type: comms.ConfigureRequestType,
 			},
 			GlobalOptions:  globalOptions,
 			PrivateOptions: privateOptions,
@@ -354,15 +354,15 @@ func (b *pluginBroker) configure(globalOptions *plugin.GlobalOptions, privateOpt
 	b.tx <- &r
 }
 
-func (b *pluginBroker) validate(privateOptions interface{}) (*shared.ValidateResponse, error) {
+func (b *pluginBroker) validate(privateOptions interface{}) (*comms.ValidateResponse, error) {
 	opts, ok := privateOptions.(*conf.Node)
 	if !ok {
 		return nil, fmt.Errorf("unsupported plugin options type %T", privateOptions)
 	}
 	r := request{
-		data: &shared.ValidateRequest{
-			Common: shared.Common{
-				Type: shared.ValidateRequestType,
+		data: &comms.ValidateRequest{
+			Common: comms.Common{
+				Type: comms.ValidateRequestType,
 			},
 			PrivateOptions: opts,
 		},
@@ -373,7 +373,7 @@ func (b *pluginBroker) validate(privateOptions interface{}) (*shared.ValidateRes
 	u := <-r.out
 
 	switch v := u.(type) {
-	case shared.ValidateResponse:
+	case comms.ValidateResponse:
 		return &v, nil
 	case error:
 		return nil, v

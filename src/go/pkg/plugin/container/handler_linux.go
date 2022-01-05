@@ -17,13 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package external
+package container
 
 import (
 	"net"
 	"time"
-
-	"github.com/natefinch/npipe"
 )
 
 func (h *handler) setConnection(path string, timeout time.Duration) (err error) {
@@ -37,8 +35,9 @@ func (h *handler) setConnection(path string, timeout time.Duration) (err error) 
 		}
 
 		var conn net.Conn
-		if conn, err = npipe.DialTimeout(path, timeout); err != nil {
-			return
+		conn, err = net.DialTimeout("unix", path, timeout)
+		if err != nil {
+			continue
 		}
 
 		h.connection = conn

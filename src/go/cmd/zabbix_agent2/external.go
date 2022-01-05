@@ -29,7 +29,7 @@ import (
 	"zabbix.com/internal/agent"
 	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/plugin"
-	"zabbix.com/pkg/shared"
+	"zabbix.com/pkg/plugin/comms"
 	"zabbix.com/plugins/external"
 )
 
@@ -85,7 +85,7 @@ func initExternalPlugin(name string, p *external.Plugin, options *agent.AgentOpt
 
 	go listenOnPluginFail(p, name)
 
-	var resp *shared.RegisterResponse
+	var resp *comms.RegisterResponse
 	resp, err = p.Register()
 	if err != nil {
 		return
@@ -114,7 +114,7 @@ func initExternalPlugin(name string, p *external.Plugin, options *agent.AgentOpt
 }
 
 func validate(p *external.Plugin, options interface{}) error {
-	if !shared.ImplementsConfigurator(p.Interfaces) {
+	if !comms.ImplementsConfigurator(p.Interfaces) {
 		return nil
 	}
 

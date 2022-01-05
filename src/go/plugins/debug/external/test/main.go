@@ -17,33 +17,23 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package external
+package main
 
 import (
-	"net"
-	"time"
+	"fmt"
+
+	"zabbix.com/pkg/plugin/container"
 )
 
-func (h *handler) setConnection(path string, timeout time.Duration) (err error) {
-	var i int
-
-	for start := time.Now(); ; {
-		if i%5 == 0 {
-			if time.Since(start) > timeout {
-				break
-			}
-		}
-
-		var conn net.Conn
-		conn, err = net.DialTimeout("unix", path, timeout)
-		if err != nil {
-			continue
-		}
-
-		h.connection = conn
-
-		return
+func main() {
+	h, err := container.NewHandler(impl.Name())
+	if err != nil {
+		panic(fmt.Sprintf("failed to create plugin handler %s", err.Error()))
 	}
+	impl.Logger = &h
 
-	return
+	err = h.Execute()
+	if err != nil {
+		panic(fmt.Sprintf("failed to execute plugin handler %s", err.Error()))
+	}
 }
