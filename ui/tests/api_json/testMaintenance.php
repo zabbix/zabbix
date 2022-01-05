@@ -63,6 +63,16 @@ class testMaintenance extends CAPITest {
 				'request_data' => [
 					'name' => 'M'.++$n,
 					'tags' => [
+						'tag' => 'tag'
+					]
+				] + $def_options,
+				'expected_error' => null
+			],
+			// Success. Created maintenance with one tag.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'tags' => [
 						[
 							'tag' => 'tag'
 						]
@@ -298,6 +308,16 @@ class testMaintenance extends CAPITest {
 				'request_data' => [
 					'name' => 'M'.++$n,
 					'tags' => [
+						'abcd' => ''
+					]
+				] + $def_options,
+				'expected_error' => 'Invalid parameter "/1/tags/1": unexpected parameter "abcd".'
+			],
+			// Fail. Unexpected parameter.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'tags' => [
 						[
 							999 => 'aaa'
 						]
@@ -430,6 +450,132 @@ class testMaintenance extends CAPITest {
 				] + $def_options,
 				'expected_error' => 'Invalid parameter "/1/active_till": cannot be less than or equal to the value of parameter "/1/active_since".'
 			],
+			// Success. Created maintenance with one group.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'groups' => [
+						'groupid' => 2
+					],
+				] + $def_options,
+				'expected_error' => null
+			],
+			// Success. Created maintenance with one group.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'groups' => [
+						['groupid' => 2]
+					],
+				] + $def_options,
+				'expected_error' => null
+			],
+			// Success. Created maintenance with multiple groups.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'groups' => [
+						['groupid' => 2],
+						['groupid' => 4]
+					],
+				] + $def_options,
+				'expected_error' => null
+			],
+			// Fail. Unexpected parameter in groups.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'groups' => [
+						'abcd' => '1234'
+					]
+				] + $def_options,
+				'expected_error' => 'Invalid parameter "/1/groups/1": unexpected parameter "abcd".'
+			],
+			// Fail. Wrong group.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'groups' => [
+						['groupid' => 999]
+					],
+				] + $def_options,
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			// Fail. Duplicate group.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'groups' => [
+						['groupid' => 999],
+						['groupid' => 1000],
+						['groupid' => 999]
+					],
+				] + $def_options,
+				'expected_error' => 'Invalid parameter "/1/groups/3": value (groupid)=(999) already exists.'
+			],
+			// Success. Created maintenance with one host.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'hosts' => [
+						'hostid' => 90020
+					],
+				] + $def_options,
+				'expected_error' => null
+			],
+			// Success. Created maintenance with one host.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'hosts' => [
+						['hostid' => 90020]
+					],
+				] + $def_options,
+				'expected_error' => null
+			],
+			// Success. Created maintenance with multiple hosts.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'hosts' => [
+						['hostid' => 90020],
+						['hostid' => 90021]
+					],
+				] + $def_options,
+				'expected_error' => null
+			],
+			// Fail. Unexpected parameter in hosts.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'hosts' => [
+						'abcd' => '1234'
+					]
+				] + $def_options,
+				'expected_error' => 'Invalid parameter "/1/hosts/1": unexpected parameter "abcd".'
+			],
+			// Fail. Wrong host.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'hosts' => [
+						['hostid' => 999]
+					]
+				] + array_diff_key($def_options, array_flip(['groups'])),
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			// Fail. Duplicate host.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'hosts' => [
+						['hostid' => 999],
+						['hostid' => 1000],
+						['hostid' => 999]
+					],
+				] + $def_options,
+				'expected_error' => 'Invalid parameter "/1/hosts/3": value (hostid)=(999) already exists.'
+			],
 			// Fail. Empty groups.
 			[
 				'request_data' => [
@@ -473,50 +619,6 @@ class testMaintenance extends CAPITest {
 				],
 				'expected_error' => 'At least one host group or host must be selected.'
 			],
-			// Fail. Wrong group.
-			[
-				'request_data' => [
-					'name' => 'M'.++$n,
-					'groups' => [
-						['groupid' => 999]
-					],
-				] + $def_options,
-				'expected_error' => 'No permissions to referred object or it does not exist!'
-			],
-			// Fail. Duplicate group.
-			[
-				'request_data' => [
-					'name' => 'M'.++$n,
-					'groups' => [
-						['groupid' => 999],
-						['groupid' => 1000],
-						['groupid' => 999]
-					],
-				] + $def_options,
-				'expected_error' => 'Invalid parameter "/1/groups/3": value (groupid)=(999) already exists.'
-			],
-			// Fail. Wrong hosts.
-			[
-				'request_data' => [
-					'name' => 'M'.++$n,
-					'hosts' => [
-						['hostid' => 999]
-					]
-				] + array_diff_key($def_options, array_flip(['groups'])),
-				'expected_error' => 'No permissions to referred object or it does not exist!'
-			],
-			// Fail. Duplicate host.
-			[
-				'request_data' => [
-					'name' => 'M'.++$n,
-					'hosts' => [
-						['hostid' => 999],
-						['hostid' => 1000],
-						['hostid' => 999]
-					],
-				] + $def_options,
-				'expected_error' => 'Invalid parameter "/1/hosts/3": value (hostid)=(999) already exists.'
-			],
 			// Fail. Same name.
 			[
 				'request_data' => [[
@@ -539,6 +641,21 @@ class testMaintenance extends CAPITest {
 					'timeperiods' => [
 						[
 						]
+					]
+				],
+				'expected_error' => null
+			],
+			// Success. One time period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						'timeperiod_type' => 0
 					]
 				],
 				'expected_error' => null
@@ -627,6 +744,21 @@ class testMaintenance extends CAPITest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/timeperiods/1/timeperiod_type": value must be one of 0, 2, 3, 4.'
+			],
+			// Fail. One time period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+							'abcd' => 0
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1": unexpected parameter "abcd".'
 			],
 			// Fail. One time period.
 			[
