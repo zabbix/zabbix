@@ -167,10 +167,13 @@ $subfilter = (new CTableInfo())
 		]]
 		: null
 	)
-	->addRow([[
-		new CTag('h3', true, _('Data')),
-		$subfilter_options['data']
-	]])
+	->addRow(
+		$subfilter_options['data'] ? [[
+			new CTag('h3', true, _('Data')),
+			$subfilter_options['data']
+		]]
+		: null
+	)
 	->addClass('tabfilter-subfilter')
 	->setId('latest-data-subfilter')
 	->show();

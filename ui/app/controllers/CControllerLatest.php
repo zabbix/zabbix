@@ -450,6 +450,11 @@ abstract class CControllerLatest extends CController {
 			}
 		}
 
+		// No need to show data subfilter if all selected items fits into same group.
+		if (!$subfilter_options['data'][0]['count'] || !$subfilter_options['data'][1]['count']) {
+			$subfilter_options['data'] = [];
+		}
+
 		return $subfilter_options;
 	}
 
