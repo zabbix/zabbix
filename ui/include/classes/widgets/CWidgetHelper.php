@@ -54,6 +54,7 @@ class CWidgetHelper {
 			->setFocusableElementId('label-type')
 			->setId('type')
 			->setValue($type)
+			->setAttribute('autofocus', 'autofocus')
 			->addOptions(CSelect::createOptionsFromArray($known_widget_types));
 
 		if (!CSettingsHelper::get(CSettingsHelper::HIDE_DEPRECATED_WIDGETS)) {
@@ -65,11 +66,9 @@ class CWidgetHelper {
 		else if (array_key_exists($type, $deprecated_types)) {
 			$types_select
 				->addOption(new CSelectOption($type, $deprecated_types[$type]))
-				->setReadonly(true);
-		}
-
-		if (!$types_select->getAttribute('readonly')) {
-			$types_select->setAttribute('autofocus', 'autofocus');
+				->setReadonly(true)
+				->removeAttribute('autofocus');
+			$types_select = [$types_select, ' ', makeWarningIcon(_('Widget is deprecated.'))];
 		}
 
 		$form_list = (new CFormList())
