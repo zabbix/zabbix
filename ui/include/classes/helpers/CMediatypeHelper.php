@@ -101,8 +101,8 @@ class CMediatypeHelper {
 						'<b>Service problem name:</b> {EVENT.NAME}<br>'.
 						'<b>Service:</b> {SERVICE.NAME}<br>'.
 						'<b>Severity:</b> {EVENT.SEVERITY}<br>'.
-						'<b>Description:</b> {SERVICE.DESCRIPTION}<br>'.
-						'<b>Original problem ID:</b> {EVENT.ID}<br><br>'.
+						'<b>Original problem ID:</b> {EVENT.ID}<br>'.
+						'<b>Service description:</b> {SERVICE.DESCRIPTION}<br><br>'.
 						'{SERVICE.ROOTCAUSE}',
 					'sms' => "{EVENT.NAME}\n{EVENT.DATE} {EVENT.TIME}",
 					'text' =>
@@ -110,8 +110,8 @@ class CMediatypeHelper {
 						"Service problem name: {EVENT.NAME}\n".
 						"Service: {SERVICE.NAME}\n".
 						"Severity: {EVENT.SEVERITY}\n".
-						"Description: {SERVICE.DESCRIPTION}\n".
-						"Original problem ID: {EVENT.ID}\n\n".
+						"Original problem ID: {EVENT.ID}\n".
+						"Service description: {SERVICE.DESCRIPTION}\n\n".
 						"{SERVICE.ROOTCAUSE}"
 				]
 			],
@@ -126,16 +126,16 @@ class CMediatypeHelper {
 						'<b>Problem name:</b> {EVENT.NAME}<br>'.
 						'<b>Problem duration:</b> {EVENT.DURATION}<br>'.
 						'<b>Severity:</b> {EVENT.SEVERITY}<br>'.
-						'<b>Description:</b> {SERVICE.DESCRIPTION}<br>'.
-						'<b>Original problem ID:</b> {EVENT.ID}',
+						'<b>Original problem ID:</b> {EVENT.ID}<br>'.
+						'<b>Service description:</b> {SERVICE.DESCRIPTION}',
 					'sms' => "{EVENT.NAME}\n{EVENT.DATE} {EVENT.TIME}",
 					'text' =>
 						"Service \"{SERVICE.NAME}\" has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}\n".
 						"Problem name: {EVENT.NAME}\n".
 						"Problem duration: {EVENT.DURATION}\n".
 						"Severity: {EVENT.SEVERITY}\n".
-						"Description: {SERVICE.DESCRIPTION}\n".
-						"Original problem ID: {EVENT.ID}"
+						"Original problem ID: {EVENT.ID}\n".
+						"Service description: {SERVICE.DESCRIPTION}"
 				]
 			],
 			self::MSG_TYPE_SERVICE_UPDATE => [
