@@ -145,7 +145,7 @@ void	zbx_signal_process_by_type(int proc_type, int proc_num, int flags, char **o
 	}
 	else
 	{
-		if (0 != failed_num)
+		if (0 != failed_num && NULL != out)
 			*out = zbx_strdup(*out, "failed to redirect remote control signal(s)");
 	}
 }
@@ -184,7 +184,7 @@ void	zbx_signal_process_by_pid(int pid, int flags, char **out)
 	}
 	else
 	{
-		if (0 != failed_num)
+		if (0 != failed_num && NULL != out)
 			*out = zbx_strdup(*out, "failed to redirect remote control signal(s)");
 	}
 }
