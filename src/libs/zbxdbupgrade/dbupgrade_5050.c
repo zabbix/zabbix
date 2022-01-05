@@ -1538,7 +1538,7 @@ static void	services_times_convert_downtime(zbx_vector_services_times_t *service
 
 	for (i = 0; i < services_times_downtime.values_num; i++)
 	{
-		services_times_t	*service_time_downtime = &services_times_downtime.values[i];
+		services_times_t	*service_downtime = &services_times_downtime.values[i];
 
 		for (j = 0; j < services_times->values_num; j++)
 		{
@@ -1547,35 +1547,34 @@ static void	services_times_convert_downtime(zbx_vector_services_times_t *service
 			if (SERVICE_TIME_TYPE_UPTIME != service_time->type)
 				continue;
 
-			if (service_time->from <= service_time_downtime->to &&
-					service_time->to >= service_time_downtime->from)
+			if (service_time->from <= service_downtime->to && service_time->to >= service_downtime->from)
 			{
-				if (service_time->from < service_time_downtime->from)
+				if (service_time->from < service_downtime->from)
 				{
-					if (service_time->to > service_time_downtime->to)
+					if (service_time->to > service_downtime->to)
 					{
 						services_times_t	service_time_new;
 
 						service_time_new.type = SERVICE_TIME_TYPE_UPTIME;
-						service_time_new.from = service_time_downtime->to;
+						service_time_new.from = service_downtime->to;
 						service_time_new.to = service_time->to;
 						service_time_new.note = zbx_strdup(NULL, "");
 
 						zbx_vector_services_times_append(services_times, service_time_new);
 					}
 
-					service_time->to = service_time_downtime->from;
+					service_time->to = service_downtime->from;
 				}
 				else
 				{
-					if (service_time->to <= service_time_downtime->to)
+					if (service_time->to <= service_downtime->to)
 					{
 						services_time_clean(*service_time);
 						zbx_vector_services_times_remove(services_times, j);
 						j--;
 					}
 					else
-						service_time->from = service_time_downtime->to;
+						service_time->from = service_downtime->to;
 				}
 			}
 		}
