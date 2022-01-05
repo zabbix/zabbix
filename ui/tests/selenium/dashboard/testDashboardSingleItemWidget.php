@@ -157,7 +157,7 @@ class testDashboardSingleItemWidget extends CWebTest {
 				[ // Min fields. 0
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Type' => 'Item',
+						'Type' => 'Item value',
 						'Name' => 'Some name',
 						'Item' => [
 							'values' => 'Available memory in %',
@@ -173,7 +173,7 @@ class testDashboardSingleItemWidget extends CWebTest {
 				[ // 1
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Type' => 'Item',
+						'Type' => 'Item value',
 						'Name' => 'Имя виджета',
 						'Refresh interval' => '10 seconds',
 						'Item' => [
@@ -202,7 +202,7 @@ class testDashboardSingleItemWidget extends CWebTest {
 				[ // 2
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Type' => 'Item',
+						'Type' => 'Item value',
 						'id:show_header' => false,
 						'Name' => '#$%^&*()!@{}[]<>,.?/\|',
 						'Refresh interval' => '10 minutes',
@@ -226,10 +226,10 @@ class testDashboardSingleItemWidget extends CWebTest {
 				]
 			],
 			[
-				[ // All fields, default colors. 3
+				[ // 3 All fields, default colors.
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Type' => 'Item',
+						'Type' => 'Item value',
 						'Name' => 'New Single Item Widget',
 						'Refresh interval' => '2 minutes',
 						'Item' => [
@@ -271,7 +271,7 @@ class testDashboardSingleItemWidget extends CWebTest {
 				[ // 4
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Item',
+						'Type' => 'Item value',
 						'Item' => [
 							'values' => '',
 							'context' => [
@@ -287,7 +287,7 @@ class testDashboardSingleItemWidget extends CWebTest {
 				[ // 5
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Item',
+						'Type' => 'Item value',
 						'Item' => [
 							'values' => 'Available memory in %',
 							'context' => [
@@ -315,7 +315,7 @@ class testDashboardSingleItemWidget extends CWebTest {
 				[ // 6
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Item',
+						'Type' => 'Item value',
 						'Item' => [
 							'values' => 'Available memory in %',
 							'context' => [
@@ -343,7 +343,7 @@ class testDashboardSingleItemWidget extends CWebTest {
 				[ // 7
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Item',
+						'Type' => 'Item value',
 						'Item' => [
 							'values' => 'Available memory in %',
 							'context' => [
@@ -363,7 +363,7 @@ class testDashboardSingleItemWidget extends CWebTest {
 				[ // 8
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Item',
+						'Type' => 'Item value',
 						'Item' => [
 							'values' => 'Available memory in %',
 							'context' => [
@@ -379,6 +379,60 @@ class testDashboardSingleItemWidget extends CWebTest {
 						]
 				]
 			],
+			[
+				[ // 9
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Type' => 'Item value',
+						'id:show_header' => false,
+						'Name' => 'Color pick',
+						'Refresh interval' => '10 minutes',
+						'Item' => [
+							'values' => 'Response code for step "testFormWeb1" of scenario "testFormWeb1".',
+							'context' => [
+								'values' => 'Simple form test host',
+								'context' => 'Zabbix servers'
+							]
+						],
+						'id:show_1' => true,
+						'id:show_2' => true,
+						'id:show_3' => true,
+						'id:show_4' => true,
+						'Advanced configuration' => true,
+						'id:units' => 'B',
+						'id:units_pos' => 'Below value',
+						'id:units_size' => '99',
+						'id:units_bold' => true
+					],
+					'colors' => [
+						'id:lbl_desc_color' => 'AABBCC',
+						'id:lbl_value_color' => 'CC11CC',
+						'id:lbl_units_color' => 'BBCC55',
+						'id:lbl_time_color' => '11AA00',
+						'id:lbl_up_color' => '00FF00',
+						'id:lbl_down_color' => 'FF0000',
+						'id:lbl_updown_color' => '0000FF',
+						'id:lbl_bg_color' => 'FFAAAA'
+					]
+				]
+			],
+			[
+				[ // 10
+					'expected' => '3',
+					'fields' => [
+						'Type' => 'Item value',
+						'Name' => 'Widget to cancel',
+						'Item' => [
+							'values' => 'Available memory in %',
+							'context' => [
+								'values' => 'ЗАББИКС Сервер',
+								'context' => 'Zabbix servers'
+							]
+						]
+					],
+					's_update-cancel' => ''
+				]
+			]
 		];
 	}
 
@@ -395,10 +449,24 @@ class testDashboardSingleItemWidget extends CWebTest {
 		$header = self::$old_name;
 		$widget = $dashboard->getWidget($header);
 		$form = $widget->edit()->asForm();
-		$form->fill($data['fields']);
-		COverlayDialogElement::find()->waitUntilReady()->one();
+		$original_values = $form->getFields()->asValues();
+		if (!array_key_exists('s_update-cancel', $data)) {
+			$form->fill($data['fields']);
+		}
 
+		if (array_key_exists('colors', $data)) {
+			foreach ($data['colors'] as $fieldid => $color) {
+				$form->query($fieldid)->one()->click()->waitUntilReady();
+				$this->query('xpath://div[@class="overlay-dialogue"]')->asColorPicker()->one()->fill($color);
+			}
+		}
+		COverlayDialogElement::find()->waitUntilReady()->one();
 		$form->submit();
+
+		if (array_key_exists('s_update-cancel', $data)) {
+			$new_values = $widget->edit()->getFields()->asValues();
+			$this->assertEquals($original_values, $new_values);
+		}
 		$this->page->waitUntilReady();
 
 		switch ($data['expected']) {
@@ -434,8 +502,19 @@ class testDashboardSingleItemWidget extends CWebTest {
 		$dialogue = $dashboard->edit()->addWidget();
 		$form = $dialogue->asForm();
 		$form->fill($data['fields']);
+		if (array_key_exists('colors', $data)) {
+			foreach ($data['colors'] as $fieldid => $color) {
+				$form->query($fieldid)->one()->click()->waitUntilReady();
+				$this->query('xpath://div[@class="overlay-dialogue"]')->asColorPicker()->one()->fill($color);
+			}
+		}
 		COverlayDialogElement::find()->waitUntilReady()->one();
-		$form->submit();
+		if (array_key_exists('s_update-cancel', $data)) {
+			$dialogue->query('button', 'Cancel')->one()->click();
+			$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
+		} else {
+			$form->submit();
+		}
 		$this->page->waitUntilReady();
 
 		switch ($data['expected']) {
@@ -448,13 +527,15 @@ class testDashboardSingleItemWidget extends CWebTest {
 				// Check that Dashboard has been saved and that widget has been added.
 				$this->checkDashboardUpdateMessage();
 				$this->assertEquals($old_widget_count + 1, $dashboard->getWidgets()->count());
-
 				// Check that widget has been added.
 				$this->checkRefreshInterval($data, $header);
 				break;
-		case TEST_BAD:
+			case TEST_BAD:
 				$this->assertMessage($data['expected'], null, $data['error']);
 				break;
+			default:
+				break;
+
 		}
 	}
 
