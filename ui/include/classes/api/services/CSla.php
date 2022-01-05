@@ -1033,8 +1033,8 @@ class CSla extends CApiService {
 			' WHERE sst.tag=st.tag'.
 				' AND ('.
 					'(sst.operator='.ZBX_SLA_SERVICE_TAG_OPERATOR_EQUAL.' AND st.value=sst.value)'.
-					' OR (sst.operator='.ZBX_SLA_SERVICE_TAG_OPERATOR_LIKE.' AND UPPER(st.value) LIKE CONCAT('.
-						"'%', REPLACE(REPLACE(REPLACE(UPPER(sst.value), '%', '!%'), '_', '!_'), '!', '!!'), '%'".
+					' OR (sst.operator='.ZBX_SLA_SERVICE_TAG_OPERATOR_LIKE." AND UPPER(st.value) LIKE CONCAT('%', ".
+						"CONCAT(REPLACE(REPLACE(REPLACE(UPPER(sst.value), '%', '!%'), '_', '!_'), '!', '!!'), '%')".
 					") ESCAPE '!')".
 				')'.
 				($limit_slaids !== null ? ' AND '.dbConditionId('sst.slaid', $limit_slaids) : '').
