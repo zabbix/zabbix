@@ -936,8 +936,9 @@ ret:
  *                                                                            *
  * Purpose: Buffer new value or send the whole buffer to the server           *
  *                                                                            *
- * Parameters: addrs       - vector with a pair of Zabbix server IP or        *
- *                           Hostname and port number                         *
+ * Parameters: addrs       - in C agent - vector with a pair of Zabbix server *
+ *                           IP or Hostname and port number. In Agent2 it is  *
+ *                           not used (NULL).                                 *
  *             agent2_result - NULL in C agent. In Agent2 it is used for      *
  *                             passing address of buffer where to store       *
  *                             matching log records. It is here to have the   *
