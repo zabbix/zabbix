@@ -2775,6 +2775,7 @@ int	zbx_strcmp_null(const char *s1, const char *s2)
  *                          CONDITION_OPERATOR_EQUAL                          *
  *                          CONDITION_OPERATOR_REGEXP                         *
  *                                                                            *
+ * Return value:                                                              *
  *     SUCCEED - the macro was parsed successfully.                           *
  *     FAIL    - the macro parsing failed, the content of output variables    *
  *               is not defined.                                              *
@@ -2885,6 +2886,7 @@ int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *c
  *                          CONDITION_OPERATOR_EQUAL                          *
  *                          CONDITION_OPERATOR_REGEXP                         *
  *                                                                            *
+ * Return value:                                                              *
  *     SUCCEED - the macro was parsed successfully                            *
  *     FAIL    - the macro parsing failed, invalid parameter syntax           *
  *                                                                            *
