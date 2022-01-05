@@ -1504,7 +1504,7 @@ out:
 
 static void	services_times_convert_downtime(zbx_vector_services_times_t *services_times)
 {
-	int				i;
+	int				i, j;
 	zbx_vector_services_times_t	services_times_downtime;
 
 	zbx_vector_services_times_create(&services_times_downtime);
@@ -1519,6 +1519,30 @@ static void	services_times_convert_downtime(zbx_vector_services_times_t *service
 		zbx_vector_services_times_append(&services_times_downtime, service_time);
 		zbx_vector_services_times_remove(services_times, i);
 		i--;
+	}
+
+	for (i = 0; i < services_times_downtime.values_num; i++)
+	{
+		services_times_t	*service_time_downtime = &services_times_downtime.values[i];
+
+		for (j = 0; j < services_times_downtime.values_num; j++)
+		{
+			services_times_t	*service_time_downtime_next = &services_times_downtime.values[j];
+
+			if (service_time_downtime_next->from <= service_time_downtime->to &&
+					service_time_downtime_next->to >= service_time_downtime->from && i != j)
+			{
+				service_time_downtime_next->from = MIN(service_time_downtime_next->from,
+						service_time_downtime->from);
+				service_time_downtime_next->to = MAX(service_time_downtime_next->to,
+						service_time_downtime->to);
+
+				services_time_clean(*service_time_downtime);
+				zbx_vector_services_times_remove(&services_times_downtime, i);
+				i--;
+				break;
+			}
+		}
 	}
 
 	zbx_vector_services_times_sort(&services_times_downtime, compare_services_time);
