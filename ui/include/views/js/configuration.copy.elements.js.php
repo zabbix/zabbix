@@ -31,7 +31,7 @@
 		init({form_name, copy_targetids}) {
 			this.form_name = form_name;
 
-			$('#copy_type').on('change', this.changeTargetType);
+			$('[name="copy_type"]').on('change', this.changeTargetType);
 
 			this.changeTargetType(copy_targetids);
 		},
@@ -54,7 +54,7 @@
 					},
 					popup: {
 						parameters: {
-							dstfrm: this.form_name,
+							dstfrm: view.form_name,
 							dstfld1: 'copy_targetids',
 							writeonly: 1,
 							multiselect: 1
