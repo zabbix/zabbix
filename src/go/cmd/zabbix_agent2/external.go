@@ -43,7 +43,8 @@ func initExternalPlugins(options *agent.AgentOptions) (string, error) {
 	for name, p := range options.Plugins {
 		var o pluginOptions
 		if err := conf.Unmarshal(p, &o, false); err != nil {
-			return "", fmt.Errorf(`Invalid plugin '%s' configuration: %s`, name, err)
+			// not an external plugin, just ignore the error
+			continue
 		}
 		paths[name] = o.Path
 	}
