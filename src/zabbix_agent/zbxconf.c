@@ -150,10 +150,6 @@ int	load_key_access_rule(const char *value, const struct cfg_line *cfg)
  * Parameters: def_lines - array of PerfCounter configuration entries         *
  *             eng_lines - array of PerfCounterEn configuration entries       *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 void	load_perf_counters(const char **def_lines, const char **eng_lines)
 {

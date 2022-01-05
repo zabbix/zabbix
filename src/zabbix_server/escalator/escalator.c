@@ -3420,10 +3420,6 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
  *                                                                            *
  * Purpose: periodically check table escalations and generate alerts          *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/

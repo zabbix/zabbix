@@ -625,12 +625,6 @@ out:
  *                                                                            *
  * Purpose: process single scenario of http test                              *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 {

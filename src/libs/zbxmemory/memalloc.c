@@ -28,7 +28,6 @@
  *                     Some information on memory layout                      *
  *                  ---------------------------------------                   *
  *                                                                            *
- *                                                                            *
  * (*) chunk: a contiguous piece of memory that is either free or used        *
  *                                                                            *
  *                    +-------- size of + --------------+                     *
@@ -62,7 +61,6 @@
  * (*) free chunks are stored in doubly-linked lists according to their sizes *
  *                                                                            *
  *     a typical situation is thus as follows (1 used chunk, 2 free chunks)   *
- *                                                                            *
  *                                                                            *
  *  +--------------------------- shared memory ----------------------------+  *
  *  |                         (can be misaligned)                          |  *

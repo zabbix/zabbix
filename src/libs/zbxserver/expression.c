@@ -822,8 +822,6 @@ int	DBget_trigger_value(const DB_TRIGGER *trigger, char **replace_to, int N_func
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static int	DBget_trigger_event_count(zbx_uint64_t triggerid, char **replace_to, int problem_only, int acknowledged)
 {
@@ -871,8 +869,6 @@ static int	DBget_trigger_event_count(zbx_uint64_t triggerid, char **replace_to, 
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	DBget_dhost_value_by_event(const DB_EVENT *event, char **replace_to, const char *fieldname)
@@ -964,12 +960,8 @@ static int	DBget_dchecks_value_by_event(const DB_EVENT *event, char **replace_to
  *                                                                            *
  * Purpose: retrieve discovered service value by event and field name         *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	DBget_dservice_value_by_event(const DB_EVENT *event, char **replace_to, const char *fieldname)
@@ -1004,12 +996,8 @@ static int	DBget_dservice_value_by_event(const DB_EVENT *event, char **replace_t
  *                                                                            *
  * Purpose: retrieve discovery rule value by event and field name             *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	DBget_drule_value_by_event(const DB_EVENT *event, char **replace_to, const char *fieldname)
@@ -1131,8 +1119,6 @@ out:
  *                                                                            *
  * Purpose: retrieve item value by item id                                    *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
  *                                                                            *
@@ -1215,8 +1201,6 @@ static int	DBitem_value(const DB_TRIGGER *trigger, char **value, int N_functioni
  *                                                                            *
  * Purpose: retrieve item lastvalue by trigger expression                     *
  *          and number of function                                            *
- *                                                                            *
- * Parameters:                                                                *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
@@ -1395,10 +1379,6 @@ static void	get_escalation_history(zbx_uint64_t actionid, const DB_EVENT *event,
  *                                                                            *
  * Purpose: retrieve event acknowledges history                               *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static void	get_event_update_history(const DB_EVENT *event, char **replace_to, const zbx_uint64_t *recipient_userid,
 		const char *tz)
@@ -1471,12 +1451,8 @@ static void	get_event_update_history(const DB_EVENT *event, char **replace_to, c
  *                                                                            *
  * Purpose: request value from autoreg_host table by event                    *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, const char *fieldname)

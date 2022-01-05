@@ -151,10 +151,6 @@ out:
  *                                                                            *
  * Purpose: periodically request config data                                  *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/

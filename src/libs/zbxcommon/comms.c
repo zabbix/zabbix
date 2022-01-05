@@ -123,8 +123,6 @@ int	comms_parse_response(char *xml, char *host, size_t host_len, char *key, size
  *                                                                            *
  * Return value: unsigned integer 64 bit in little-endian byte order format   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data)
 {
@@ -155,8 +153,6 @@ zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data)
  * Parameters:                                                                *
  *                                                                            *
  * Return value: unsigned integer 64 bit in host byte order                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 zbx_uint64_t	zbx_letoh_uint64(zbx_uint64_t data)

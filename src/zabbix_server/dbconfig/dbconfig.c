@@ -67,10 +67,6 @@ static void	zbx_dbconfig_sigusr_handler(int flags)
  *                                                                            *
  * Purpose: periodically synchronises database data with memory cache         *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/

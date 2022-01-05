@@ -505,12 +505,6 @@ out:
  *                                                                            *
  * Purpose: retrieve values of metrics from monitored hosts                   *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static int	process_proxy(void)
 {

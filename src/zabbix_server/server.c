@@ -741,10 +741,6 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
  *                                                                            *
  * Purpose: parse config file and update configuration parameters             *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Comments: will terminate process if parsing fails                          *
  *                                                                            *
  ******************************************************************************/

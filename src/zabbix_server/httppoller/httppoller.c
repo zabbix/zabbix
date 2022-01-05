@@ -80,10 +80,6 @@ static int	get_minnextcheck(void)
  *                                                                            *
  * Purpose: main loop of processing of httptests                              *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/

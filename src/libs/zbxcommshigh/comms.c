@@ -224,8 +224,6 @@ out:
  * Return value: SUCCEED - data successfully transmitted                      *
  *               NETWORK_ERROR - network related error occurred               *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	zbx_send_response_ext(zbx_socket_t *sock, int result, const char *info, const char *version, int protocol,
 		int timeout)

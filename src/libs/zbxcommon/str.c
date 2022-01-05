@@ -149,8 +149,6 @@ void	help(void)
  *                                                                            *
  * Parameters: fmt - format of message                                        *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  ******************************************************************************/
 void	zbx_error(const char *fmt, ...)
 {
@@ -177,8 +175,6 @@ void	zbx_error(const char *fmt, ...)
  *             count - size of destination buffer                             *
  *             fmt - format                                                   *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  ******************************************************************************/
 size_t	zbx_snprintf(char *str, size_t count, const char *fmt, ...)
 {
@@ -204,8 +200,6 @@ size_t	zbx_snprintf(char *str, size_t count, const char *fmt, ...)
  *             alloc_len - [IN/OUT] already allocated memory                  *
  *             offset    - [IN/OUT] offset for writing                        *
  *             fmt       - [IN] format                                        *
- *                                                                            *
- * Return value:                                                              *
  *                                                                            *
  ******************************************************************************/
 void	zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const char *fmt, ...)
@@ -547,8 +541,6 @@ int	zbx_rtrim(char *str, const char *charlist)
  * Parameters: str - string for processing                                    *
  *             charlist - null terminated list of characters                  *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  ******************************************************************************/
 void	zbx_ltrim(char *str, const char *charlist)
 {
@@ -594,8 +586,6 @@ void	zbx_lrtrim(char *str, const char *charlist)
  *                                                                            *
  * Parameters: str - string for processing                                    *
  *             charlist - null terminated list of characters                  *
- *                                                                            *
- * Return value:                                                              *
  *                                                                            *
  ******************************************************************************/
 void	zbx_remove_chars(char *str, const char *charlist)
@@ -2604,8 +2594,6 @@ char	*str_linefeed(const char *src, size_t maxline, const char *delim)
  *                                                                            *
  * Parameters: arr - a pointer to array of strings                            *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Comments: allocates memory, calls assert() if that fails                   *
  *                                                                            *
  ******************************************************************************/
@@ -2623,8 +2611,6 @@ void	zbx_strarr_init(char ***arr)
  *                                                                            *
  * Parameters: arr - a pointer to array of strings                            *
  *             entry - string to add                                          *
- *                                                                            *
- * Return value:                                                              *
  *                                                                            *
  * Comments: allocates memory, calls assert() if that fails                   *
  *                                                                            *
@@ -2651,8 +2637,6 @@ void	zbx_strarr_add(char ***arr, const char *entry)
  * Purpose: free dynamic string array memory                                  *
  *                                                                            *
  * Parameters: arr - array of strings                                         *
- *                                                                            *
- * Return value:                                                              *
  *                                                                            *
  ******************************************************************************/
 void	zbx_strarr_free(char ***arr)
@@ -2791,7 +2775,6 @@ int	zbx_strcmp_null(const char *s1, const char *s2)
  *                          CONDITION_OPERATOR_EQUAL                          *
  *                          CONDITION_OPERATOR_REGEXP                         *
  *                                                                            *
- * Return value:                                                              *
  *     SUCCEED - the macro was parsed successfully.                           *
  *     FAIL    - the macro parsing failed, the content of output variables    *
  *               is not defined.                                              *
@@ -2902,7 +2885,6 @@ int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *c
  *                          CONDITION_OPERATOR_EQUAL                          *
  *                          CONDITION_OPERATOR_REGEXP                         *
  *                                                                            *
- * Return value:                                                              *
  *     SUCCEED - the macro was parsed successfully                            *
  *     FAIL    - the macro parsing failed, invalid parameter syntax           *
  *                                                                            *
@@ -5388,8 +5370,6 @@ clean:
  * Parameters:                                                                *
  *      param  - parameter list                                               *
  *      num    - requested parameter index                                    *
- *                                                                            *
- * Return value:                                                              *
  *                                                                            *
  * Comments: delimiter for parameters is ','                                  *
  *                                                                            *

@@ -47,12 +47,6 @@ extern ZBX_THREAD_LOCAL int		server_num, process_num;
  *                                                                            *
  * Purpose: process new item value                                            *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double *value_dbl,	zbx_timespec_t *ts,
 		int ping_result, char *error)
@@ -108,12 +102,6 @@ clean:
  * Function: process_values                                                   *
  *                                                                            *
  * Purpose: process new item values                                           *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	process_values(icmpitem_t *items, int first_index, int last_index, ZBX_FPING_HOST *hosts,
@@ -394,12 +382,8 @@ static void	add_icmpping_item(icmpitem_t **items, int *items_alloc, int *items_c
  *                                                                            *
  * Purpose: creates buffer which contains list of hosts to ping               *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: SUCCEED - the file was created successfully                  *
  *               FAIL - otherwise                                             *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int *icmp_items_count)
@@ -498,19 +482,6 @@ static void	add_pinger_host(ZBX_FPING_HOST **hosts, int *hosts_alloc, int *hosts
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: process_pinger_hosts                                             *
- *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
 static void	process_pinger_hosts(icmpitem_t *items, int items_count)
 {
 	int			i, first_index = 0, ping_result;
@@ -556,10 +527,6 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count)
  * Function: main_pinger_loop                                                 *
  *                                                                            *
  * Purpose: periodically perform ICMP pings                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
  *                                                                            *
  * Comments: never returns                                                    *
  *                                                                            *

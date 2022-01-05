@@ -64,11 +64,6 @@ void	zbx_set_json_strerror(const char *fmt, ...)
 	va_end(args);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: __zbx_json_realloc                                               *
- *                                                                            *
- ******************************************************************************/
 static void	__zbx_json_realloc(struct zbx_json *j, size_t need)
 {
 	int	realloc = 0;
