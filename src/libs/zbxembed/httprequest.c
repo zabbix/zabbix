@@ -257,6 +257,8 @@ static duk_ret_t	es_httprequest_clear_header(duk_context *ctx)
 	return 0;
 }
 
+
+
 /******************************************************************************
  *                                                                            *
  * Function: es_httprequest_query                                             *
@@ -277,10 +279,22 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 	zbx_es_env_t		*env;
 	zbx_uint64_t		timeout_ms, elapsed_ms;
 
-	duk_get_memory_functions(ctx, &out_funcs);
+	duk_push_global_stash(ctx);
 
-	env = (zbx_es_env_t *)out_funcs.udata;
+	if (1 != duk_get_prop_string(ctx, -1, "\xff""\xff""zbx_env"))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
+
+	env = (zbx_es_env_t *)duk_to_pointer(ctx, -1);
+	duk_pop(ctx);
+
+	elapsed_ms = zbx_get_duration_ms(&env->start_time);
 	timeout_ms = (zbx_uint64_t)env->timeout * 1000;
+
+	if (0 >= timeout_ms - elapsed_ms)
+	{
+		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "timeout cannot be zero");
+		goto out;
+	}
 
 	if (SUCCEED != zbx_cesu8_to_utf8(duk_to_string(ctx, 0), &url))
 	{
@@ -330,8 +344,6 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 				request->headers = curl_slist_append(NULL, "Content-Type: text/plain");
 		}
 	}
-
-	elapsed_ms = zbx_get_duration_ms(&env->start_time);
 
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HTTPHEADER, request->headers, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_CUSTOMREQUEST, http_request, err);
