@@ -142,6 +142,7 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			url.setArgument('tags', options.tags);
 			url.setArgument('evaltype', options.evaltype);
 		}
+		url.setArgument('filter_name', '');
 		url.setArgument('hostids[]', options.hostid);
 		latest_data.url = url.getUrl();
 
