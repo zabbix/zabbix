@@ -178,7 +178,6 @@ static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_WRITEDATA, request, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_PRIVATE, request, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_SSL_VERIFYPEER, 0L, err);
-	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_TIMEOUT, (long)env->timeout, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_SSL_VERIFYHOST, 0L, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HEADERFUNCTION, curl_header_cb, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HEADERDATA, request, err);
@@ -274,6 +273,15 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 	char			*url = NULL, *contents = NULL;
 	CURLcode		err;
 	int			err_index = -1;
+	duk_memory_functions	out_funcs;
+	zbx_es_env_t		*env;
+	zbx_uint64_t		timeout_ms, elapsed_ms;
+
+	duk_get_memory_functions(ctx, &out_funcs);
+
+	env = (zbx_es_env_t *)out_funcs.udata;
+	timeout_ms = (zbx_uint64_t)env->timeout * 1000;
+	elapsed_ms = zbx_get_duration_ms(&env->start_time);
 
 	if (SUCCEED != zbx_cesu8_to_utf8(duk_to_string(ctx, 0), &url))
 	{
@@ -320,6 +328,7 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HTTPHEADER, request->headers, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_CUSTOMREQUEST, http_request, err);
+	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_TIMEOUT_MS, timeout_ms - elapsed_ms, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_POSTFIELDS, ZBX_NULL2EMPTY_STR(contents), err);
 
 	request->data_offset = 0;
