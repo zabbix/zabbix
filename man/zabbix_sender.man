@@ -33,7 +33,7 @@
 .
 .  hy \\n(HY
 ..
-.TH ZABBIX_SENDER 1 "2021\-06\-01" Zabbix
+.TH ZABBIX_SENDER 1 "2022\-01\-06" Zabbix
 .if n .ad l
 .SH NAME
 zabbix_sender \- Zabbix sender utility

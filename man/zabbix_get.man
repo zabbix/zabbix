@@ -33,7 +33,7 @@
 .
 .  hy \\n(HY
 ..
-.TH ZABBIX_GET 1 "2021\-06\-01" Zabbix
+.TH ZABBIX_GET 1 "2022\-01\-06" Zabbix
 .SH NAME
 zabbix_get \- Zabbix get utility
 .SH SYNOPSIS
