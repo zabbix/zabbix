@@ -1584,9 +1584,15 @@ static void	services_times_convert_downtime(zbx_vector_services_times_t *service
 	{
 		services_times_t	*service_time = &services_times->values[i];
 
+		if (SERVICE_TIME_TYPE_UPTIME != service_time->type)
+			continue;
+
 		for (j = 0; j < services_times->values_num; j++)
 		{
 			services_times_t	*service_time_next = &services_times->values[j];
+
+			if (SERVICE_TIME_TYPE_UPTIME != service_time_next->type)
+				continue;
 
 			if (service_time_next->from <= service_time->to &&
 					service_time_next->to >= service_time->from && i != j)
