@@ -24,7 +24,7 @@
 #include "zbxalgo.h"
 #include "zbxdb.h"
 #include "dbschema.h"
-#include "zbxeval.h"
+//#include "zbxeval.h"
 
 extern char	*CONFIG_DBHOST;
 extern char	*CONFIG_DBNAME;
@@ -65,7 +65,7 @@ typedef enum
 }
 zbx_graph_item_type;
 
-struct	_DC_TRIGGER;
+//struct	_DC_TRIGGER;
 
 #define ZBX_DB_CONNECT_NORMAL	0
 #define ZBX_DB_CONNECT_EXIT	1

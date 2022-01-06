@@ -21,9 +21,9 @@
 
 #include "common.h"
 #include "log.h"
-#include "threads.h"
+//#include "threads.h"
 #include "dbcache.h"
-#include "ipc.h"
+//#include "ipc.h"
 #include "mutexs.h"
 #include "memalloc.h"
 #include "zbxserver.h"

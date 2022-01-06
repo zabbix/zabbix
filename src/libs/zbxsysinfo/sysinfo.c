@@ -21,7 +21,7 @@
 #include "module.h"
 #include "sysinfo.h"
 #include "log.h"
-#include "cfg.h"
+//#include "cfg.h"
 #include "alias.h"
 #include "threads.h"
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
@@ -29,6 +29,8 @@
 #endif
 #include "zbxalgo.h"
 #include "zbxregexp.h"
+
+extern int	CONFIG_TIMEOUT;
 
 #ifdef WITH_AGENT_METRICS
 #	include "agent/agent.h"

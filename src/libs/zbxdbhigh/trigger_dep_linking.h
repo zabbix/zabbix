@@ -20,7 +20,7 @@
 #ifndef ZABBIX_TRIGGER_DEP_LINKING_H
 #define ZABBIX_TRIGGER_DEP_LINKING_H
 
-#include "log.h"
+//#include "log.h"
 #include "common.h"
 #include "zbxalgo.h"
 #include "../../libs/zbxalgo/vectorimpl.h"

@@ -18,7 +18,7 @@
 **/
 
 #include "common.h"
-#include "log.h"
+//#include "log.h"
 #include "zbxjson.h"
 #include "zbxhttp.h"
 #include "zbxembed.h"

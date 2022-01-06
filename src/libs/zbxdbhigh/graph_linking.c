@@ -18,6 +18,7 @@
 **/
 
 #include "db.h"
+#include "../../libs/zbxaudit/audit.h"
 #include "../../libs/zbxaudit/audit_graph.h"
 #include "graph_linking.h"
 

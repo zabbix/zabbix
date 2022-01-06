@@ -20,12 +20,12 @@ Released into the Public Domain by Ulrich Drepper <drepper@redhat.com>.  */
 #endif
 
 #if !(defined(_WINDOWS) || defined(__MINGW32__))
-	#include <errno.h>
-	#include <limits.h>
+//#include <errno.h>
+//#include <limits.h>
 	#include <stdio.h>
 	#include <string.h>
-	#include <sys/param.h>
-	#include <sys/types.h>
+//#include <sys/param.h>
+//#include <sys/types.h>
 #endif
 
 #if __BYTE_ORDER == __LITTLE_ENDIAN

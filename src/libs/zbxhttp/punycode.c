@@ -19,7 +19,7 @@
 
 #include "common.h"
 #include "punycode.h"
-#include "zbxhttp.h"
+//#include "zbxhttp.h"
 
 /******************************************************************************
  *                                                                            *

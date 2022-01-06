@@ -26,6 +26,7 @@
 #include "zbxprometheus.h"
 #include "zbxvariant.h"
 
+#include "../../libs/zbxaudit/audit.h"
 #include "../../libs/zbxaudit/audit_item.h"
 
 typedef zbx_lld_item_full_t	zbx_lld_item_t;

@@ -20,7 +20,7 @@
 #include "common.h"
 #include "db.h"
 #include "dbupgrade.h"
-#include "log.h"
+//#include "log.h"
 
 extern unsigned char	program_type;
 

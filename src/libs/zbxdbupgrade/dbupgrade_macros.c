@@ -19,7 +19,7 @@
 
 #include "common.h"
 #include "db.h"
-#include "dbupgrade.h"
+//#include "dbupgrade.h"
 #include "dbupgrade_macros.h"
 #include "log.h"
 #include "zbxalgo.h"

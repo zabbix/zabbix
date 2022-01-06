@@ -16,14 +16,14 @@ Released into the Public Domain by Ulrich Drepper <drepper@redhat.com>.  */
 		#include <machine/endian.h>
 	#endif
 #endif
-#include <errno.h>
-#include <limits.h>
+//#include <errno.h>
+//#include <limits.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <stdlib.h>
+//#include <stdlib.h>
 #include <string.h>
-#include <sys/param.h>
-#include <sys/types.h>
+//#include <sys/param.h>
+//#include <sys/types.h>
 
 #include "common.h"
 

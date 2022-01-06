@@ -21,7 +21,7 @@
 #define ZABBIX_AUDIT_GRAPH_H
 
 #include "common.h"
-#include "audit.h"
+//#include "audit.h"
 
 #include "../zbxdbhigh/template.h"
 

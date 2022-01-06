@@ -19,8 +19,8 @@
 
 #include "common.h"
 #include "db.h"
-#include "log.h"
-#include "dbcache.h"
+//#include "log.h"
+//#include "dbcache.h"
 
 /******************************************************************************
  *                                                                            *

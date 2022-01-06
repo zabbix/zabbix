@@ -18,7 +18,7 @@
 **/
 
 #include "common.h"
-#include "zbxserialize.h"
+//#include "zbxserialize.h"
 /******************************************************************************
  *                                                                            *
  * Function: zbx_serialize_uint31_compact                                     *

@@ -19,7 +19,7 @@
 
 #include "common.h"
 #include "db.h"
-#include "sysinfo.h"
+//#include "sysinfo.h"
 #include "dbupgrade.h"
 #include "log.h"
 #include "sysinfo.h"

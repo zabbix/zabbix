@@ -19,11 +19,11 @@
 
 #include "common.h"
 
-#include "zbxjson.h"
+//#include "zbxjson.h"
 #include "json_parser.h"
 #include "json.h"
 
-#include "log.h"
+//#include "log.h"
 
 static zbx_int64_t	json_parse_object(const char *start, char **error);
 

@@ -20,7 +20,7 @@
 #include "common.h"
 #include "log.h"
 #include "memalloc.h"
-#include "ipc.h"
+//#include "ipc.h"
 #include "dbcache.h"
 #include "zbxhistory.h"
 

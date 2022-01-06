@@ -18,8 +18,8 @@
 **/
 
 #include "common.h"
-#include "log.h"
-#include "zbxnix.h"
+//#include "log.h"
+//#include "zbxnix.h"
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************

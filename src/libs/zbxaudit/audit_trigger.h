@@ -21,9 +21,9 @@
 #define ZABBIX_AUDIT_TRIGGER_H
 
 #include "common.h"
-#include "audit.h"
+//#include "audit.h"
 
-#include "../zbxdbhigh/template.h"
+//#include "../zbxdbhigh/template.h"
 
 void	zbx_audit_trigger_create_entry(int audit_action, zbx_uint64_t triggerid, const char *name, int flags);
 

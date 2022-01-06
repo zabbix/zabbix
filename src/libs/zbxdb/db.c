@@ -33,7 +33,7 @@
 #	include <sqlite3.h>
 #endif
 
-#include "dbschema.h"
+//#include "dbschema.h"
 #include "log.h"
 #if defined(HAVE_SQLITE3)
 #	include "mutexs.h"

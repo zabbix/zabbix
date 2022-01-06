@@ -18,13 +18,13 @@
 **/
 
 #include "common.h"
-#include "log.h"
+//#include "log.h"
 
-#include "zbxalgo.h"
+//#include "zbxalgo.h"
 #include "../zbxalgo/vectorimpl.h"
 #include "zbxvariant.h"
-#include "zbxserialize.h"
-#include "zbxserver.h"
+//#include "zbxserialize.h"
+//#include "zbxserver.h"
 #include "eval.h"
 
 ZBX_VECTOR_IMPL(eval_token, zbx_eval_token_t)

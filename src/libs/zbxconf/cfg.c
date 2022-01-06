@@ -20,7 +20,7 @@
 #include "common.h"
 #include "cfg.h"
 #include "log.h"
-#include "comms.h"
+//#include "comms.h"
 
 extern unsigned char	program_type;
 

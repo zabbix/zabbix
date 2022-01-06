@@ -28,6 +28,7 @@
 #include "../../libs/zbxaudit/audit_trigger.h"
 #include "../../libs/zbxaudit/audit_httptest.h"
 #include "../../libs/zbxaudit/audit_graph.h"
+#include "../../libs/zbxaudit/audit.h"
 #include "trigger_linking.h"
 #include "graph_linking.h"
 #include "../zbxalgo/vectorimpl.h"

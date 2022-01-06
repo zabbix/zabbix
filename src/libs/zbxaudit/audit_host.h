@@ -21,8 +21,8 @@
 #define ZABBIX_AUDIT_HOST_H
 
 #include "common.h"
-#include "dbcache.h"
-#include "audit.h"
+//#include "dbcache.h"
+//#include "audit.h"
 
 #define PREPARE_AUDIT_SNMP_INTERFACE_H(funcname)								\
 void	zbx_audit_##funcname##_update_json_add_snmp_interface(zbx_uint64_t hostid, zbx_uint64_t version,	\

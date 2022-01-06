@@ -21,6 +21,7 @@
 #include "log.h"
 #include "db.h"
 
+#include "../../libs/zbxaudit/audit.h"
 #include "../../libs/zbxaudit/audit_item.h"
 #include "../../libs/zbxaudit/audit_graph.h"
 #include "../../libs/zbxaudit/audit_trigger.h"

@@ -22,6 +22,7 @@
 #include "log.h"
 #include "zbxalgo.h"
 #include "zbxserver.h"
+#include "../../libs/zbxaudit/audit.h"
 #include "../../libs/zbxaudit/audit_graph.h"
 
 typedef struct

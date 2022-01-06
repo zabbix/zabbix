@@ -18,7 +18,7 @@
 **/
 
 #include "control.h"
-#include "zbxdiag.h"
+//#include "zbxdiag.h"
 
 static int	parse_log_level_options(const char *opt, size_t len, unsigned int *scope, unsigned int *data)
 {

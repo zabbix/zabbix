@@ -18,6 +18,7 @@
 **/
 
 #include "common.h"
+#include "zbxeval.h"
 #include "log.h"
 #include "db.h"
 #include "dbupgrade.h"
