@@ -115,14 +115,14 @@ class CWidgetFormProblems extends CWidgetForm {
 
 		// Show tags.
 		$field_show_tags = (new CWidgetFieldRadioButtonList('show_tags', _('Show tags'), [
-			PROBLEMS_SHOW_TAGS_NONE => _('None'),
-			PROBLEMS_SHOW_TAGS_1 => PROBLEMS_SHOW_TAGS_1,
-			PROBLEMS_SHOW_TAGS_2 => PROBLEMS_SHOW_TAGS_2,
-			PROBLEMS_SHOW_TAGS_3 => PROBLEMS_SHOW_TAGS_3
+			SHOW_TAGS_NONE => _('None'),
+			SHOW_TAGS_1 => SHOW_TAGS_1,
+			SHOW_TAGS_2 => SHOW_TAGS_2,
+			SHOW_TAGS_3 => SHOW_TAGS_3
 		]))
-			->setDefault(PROBLEMS_SHOW_TAGS_NONE)
+			->setDefault(SHOW_TAGS_NONE)
 			->setModern(true)
-			->setAction('var disabled = jQuery(this).filter("[value=\''.PROBLEMS_SHOW_TAGS_NONE.'\']").is(":checked");'.
+			->setAction('var disabled = jQuery(this).filter("[value=\''.SHOW_TAGS_NONE.'\']").is(":checked");'.
 				'jQuery("#tag_priority").prop("disabled", disabled);'.
 				'jQuery("#tag_name_format input").prop("disabled", disabled)'
 			);
@@ -135,11 +135,11 @@ class CWidgetFormProblems extends CWidgetForm {
 
 		// Tag name.
 		$tag_format_line = (new CWidgetFieldRadioButtonList('tag_name_format', _('Tag name'), [
-			PROBLEMS_TAG_NAME_FULL => _('Full'),
-			PROBLEMS_TAG_NAME_SHORTENED => _('Shortened'),
-			PROBLEMS_TAG_NAME_NONE => _('None')
+			TAG_NAME_FULL => _('Full'),
+			TAG_NAME_SHORTENED => _('Shortened'),
+			TAG_NAME_NONE => _('None')
 		]))
-			->setDefault(PROBLEMS_TAG_NAME_FULL)
+			->setDefault(TAG_NAME_FULL)
 			->setModern(true);
 
 		if (array_key_exists('tag_name_format', $this->data)) {

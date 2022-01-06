@@ -38,8 +38,8 @@ class CControllerLatestView extends CControllerLatest {
 			'show_details' =>			'in 1,0',
 			'evaltype' =>				'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
 			'tags' =>					'array',
-			'show_tags' =>				'in '.PROBLEMS_SHOW_TAGS_NONE.','.PROBLEMS_SHOW_TAGS_1.','.PROBLEMS_SHOW_TAGS_2.','.PROBLEMS_SHOW_TAGS_3,
-			'tag_name_format' =>		'in '.PROBLEMS_TAG_NAME_FULL.','.PROBLEMS_TAG_NAME_SHORTENED.','.PROBLEMS_TAG_NAME_NONE,
+			'show_tags' =>				'in '.SHOW_TAGS_NONE.','.SHOW_TAGS_1.','.SHOW_TAGS_2.','.SHOW_TAGS_3,
+			'tag_name_format' =>		'in '.TAG_NAME_FULL.','.TAG_NAME_SHORTENED.','.TAG_NAME_NONE,
 			'tag_priority' =>			'string',
 
 			// table sorting inputs
@@ -101,9 +101,9 @@ class CControllerLatestView extends CControllerLatest {
 		if ($ret && $this->hasInput('subfilter_data')) {
 			$data = $this->getInput('subfilter_data', []);
 			$valid = array_filter($data, function ($val) {
-				return $val === '0' || $val === '1';
+				return ($val === '0' || $val === '1');
 			});
-			$ret = count($data) === count($valid);
+			$ret = (count($data) === count($valid));
 		}
 
 		if (!$ret) {

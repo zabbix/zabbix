@@ -487,21 +487,24 @@ class CTabFilterItem extends CBaseComponent {
 	/**
 	 * Shorthand function to check if subfilter has given value.
 	 *
-	 * @param {string} key
-	 * @param {string} value
+	 * @param {string} key   Subfilter parameter name.
+	 * @param {string} value Subfilter parameter value.
+	 *
+	 * @return {bool}
 	 */
 	hasSubfilter(key, value) {
-		return Boolean([...this.getForm().elements].filter(el => el.name === key && el.value === value).length);
+		return Boolean([...this.getForm().elements].filter(el => (el.name === key && el.value === value)).length);
 	}
 
 	/**
 	 * Set new subfilter field.
 	 *
-	 * @param {string} key
-	 * @param {string} value
+	 * @param {string} key    Subfilter parameter name.
+	 * @param {string} value  Subfilter parameter value.
 	 */
 	setSubfilter(key, value) {
 		value = String(value);
+
 		if (!this.hasSubfilter(key, value)) {
 			const el = document.createElement('input');
 			el.type = 'hidden';
@@ -514,14 +517,15 @@ class CTabFilterItem extends CBaseComponent {
 	/**
 	 * Remove some of existing subfilter field.
 	 *
-	 * @param {string} key
-	 * @param {string} value
+	 * @param {string} key    Subfilter parameter name.
+	 * @param {string} value  Subfilter parameter value.
 	 */
 	unsetSubfilter(key, value) {
 		value = String(value);
+
 		if (this.hasSubfilter(key, value)) {
 			[...this.getForm().elements]
-				.filter(el => el.name === key && el.value === value)
+				.filter(el => (el.name === key && el.value === value))
 				.forEach(el => el.remove());
 		}
 	}

@@ -34,8 +34,8 @@ abstract class CControllerLatest extends CController {
 		'name' => '',
 		'evaltype' => TAG_EVAL_TYPE_AND_OR,
 		'tags' => [],
-		'show_tags' => PROBLEMS_SHOW_TAGS_3,
-		'tag_name_format' => PROBLEMS_TAG_NAME_FULL,
+		'show_tags' => SHOW_TAGS_3,
+		'tag_name_format' => TAG_NAME_FULL,
 		'tag_priority' => '',
 		'show_without_data' => 1,
 		'show_details' => 1,
@@ -175,11 +175,13 @@ abstract class CControllerLatest extends CController {
 	/**
 	 * Get additional data for filters. Selected groups for multiselect, etc.
 	 *
-	 * @param array $filter  Filter fields values array.
+	 * @param array $filter
+	 * @param array $filter['groupids']  Groupids from filter to select additional data.
+	 * @param array $filter['hostids']   Hostids from filter to select additional data.
 	 *
 	 * @return array
 	 */
-	protected function getAdditionalData($filter): array {
+	protected function getAdditionalData(array $filter): array {
 		$data = [];
 
 		if ($filter['groupids']) {
@@ -202,9 +204,13 @@ abstract class CControllerLatest extends CController {
 	}
 
 	/**
-	 * Clean passed filter fields in input from default values required for HTML presentation. Convert field
+	 * Clean and convert passed filter input fields from default values required for HTML presentation.
 	 *
-	 * @param array $input  Filter fields values.
+	 * @param array $input
+	 * @param int   $input['filter_reset']     Either the reset button was pressed.
+	 * @param array $input['tags']             Filter field tags.
+	 * @param array $input['tags'][]['tag']    Filter field tag name.
+	 * @param array $input['tags'][]['value']  Filter field tag value.
 	 *
 	 * @return array
 	 */
@@ -282,11 +288,10 @@ abstract class CControllerLatest extends CController {
 		}
 
 		$subfilter_data = -1;
-		if ($filter['show_without_data']) {
-			if (array_key_exists('subfilter_data', $filter)
-					&& $filter['subfilter_data'] && count($filter['subfilter_data']) != 2) {
-				$subfilter_data = reset($filter['subfilter_data']);
-			}
+		if ($filter['show_without_data']
+				&& array_key_exists('subfilter_data', $filter)
+				&& $filter['subfilter_data'] && count($filter['subfilter_data']) != 2) {
+			$subfilter_data = reset($filter['subfilter_data']);
 		}
 
 		$search_limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
@@ -317,11 +322,13 @@ abstract class CControllerLatest extends CController {
 				$items_having_values = Manager::History()->getItemsHavingValues($host_items, $history_period);
 
 				switch ($subfilter_data) {
-					case 0: // items without data only
+					// Items without data only.
+					case 0:
 						$host_items = array_diff_key($host_items, $items_having_values);
 						break;
 
-					case 1: // items having data only
+					// Items having data only.
+					case 1:
 						$host_items = $items_having_values;
 						break;
 				}
@@ -337,10 +344,10 @@ abstract class CControllerLatest extends CController {
 	 * Prepare subfilter fields from filter.
 	 *
 	 * @param array  $filter
-	 * @param array  $filter['subfilter_hostids']
-	 * @param array  $filter['subfilter_tagnames']
-	 * @param array  $filter['subfilter_tags']
-	 * @param array  $filter['subfilter_data']
+	 * @param array  $filter['subfilter_hostids']   Selected host subfilter parameters.
+	 * @param array  $filter['subfilter_tagnames']  Selected tagname subfilter parameters.
+	 * @param array  $filter['subfilter_tags']      Selected tags subfilter parameters.
+	 * @param array  $filter['subfilter_data']      Selected data subfilter parameters.
 	 *
 	 * @return array
 	 */
@@ -376,18 +383,14 @@ abstract class CControllerLatest extends CController {
 	/**
 	 * Find what subfilters are available based on items selected using the main filter.
 	 *
-	 * @param array  $subfilters
-	 * @param array  $subfilters['subfilter_hostids']
-	 * @param array  $subfilters['subfilter_tagnames']
-	 * @param array  $subfilters['subfilter_tags']
-	 * @param array  $subfilters['subfilter_data']
-	 * @param array  $prepared_data
-	 * @param array  $prepared_data['hosts']
-	 * @param string $prepared_data['hosts'][]['name']
-	 * @param array  $prepared_data['items']
-	 * @param int    $prepared_data['items'][]['hostid']
-	 * @param array  $filter
-	 * @param int    $filter['show_without_data']
+	 * @param array  $subfilters                          Selected subfilters.
+	 * @param array  $prepared_data                       Results of items matching primary filter.
+	 * @param array  $prepared_data['hosts']              Selected hosts from database.
+	 * @param string $prepared_data['hosts'][]['name']    Host name.
+	 * @param array  $prepared_data['items']              Selected items from database.
+	 * @param string $prepared_data['items'][]['hostid']  Item hostid.
+	 * @param array  $filter                              Filter parameters.
+	 * @param int    $filter['show_without_data']         "Show items without data" filter checkbox value.
 	 *
 	 * @return array
 	 */
@@ -413,7 +416,7 @@ abstract class CControllerLatest extends CController {
 				$subfilter_options['hostids'][$item['hostid']]['count']++;
 			}
 
-			// Calculate the counters of tag existance subfilter options.
+			// Calculate the counters of tag existence subfilter options.
 			foreach ($item['tags'] as $tag) {
 				$item_matches = true;
 				foreach ($item['matching_subfilters'] as $filter_name => $match) {
@@ -462,13 +465,17 @@ abstract class CControllerLatest extends CController {
 	 * Collect available options of subfilter from existing items and hosts selected by primary filter.
 	 *
 	 * @param array $data
-	 * @param array $data['hosts']            Hosts selected by primary filter.
-	 * @param array $data['items']            Items selected by primary filter.
+	 * @param array $data['hosts']                         Hosts selected by primary filter.
+	 * @param array $data['hosts'][<hostid>]['name']       Name of the host selected by primary filter.
+	 * @param array $data['items']                         Items selected by primary filter.
+	 * @param array $data['items'][]['tags']               Item tags.
+	 * @param array $data['items'][]['tags'][]['tag']      Item tag name.
+	 * @param array $data['items'][]['tags'][]['value']    Item tag value.
 	 * @param array $subfilter
-	 * @param array $subfilter['hostids']     Selected subfilter hosts.
-	 * @param array $subfilter['tagnames']    Selected subfilter names.
-	 * @param array $subfilter['tags']        Selected subfilter tags.
-	 * @param array $subfilter['data']        Selected subfilter data options.
+	 * @param array $subfilter['hostids']                  Selected subfilter hosts.
+	 * @param array $subfilter['tagnames']                 Selected subfilter names.
+	 * @param array $subfilter['tags']                     Selected subfilter tags.
+	 * @param array $subfilter['data']                     Selected subfilter data options.
 	 *
 	 * @return array
 	 */
@@ -502,8 +509,8 @@ abstract class CControllerLatest extends CController {
 
 				$subfilter_options['tags'][$tag['tag']][$tag['value']] = [
 					'name' => $tag['value'],
-					'selected' => array_key_exists($tag['tag'], $subfilter['tags'])
-						&& array_key_exists($tag['value'], $subfilter['tags'][$tag['tag']]),
+					'selected' => (array_key_exists($tag['tag'], $subfilter['tags'])
+										&& array_key_exists($tag['value'], $subfilter['tags'][$tag['tag']])),
 					'count' => 0
 				];
 			}
@@ -536,15 +543,22 @@ abstract class CControllerLatest extends CController {
 	/**
 	 * Calculate which items retrieved using the primary filter matches selected subfilter options.
 	 *
-	 * @param array $items
-	 * @param int   $items[]['hostid']        Item hostid.
-	 * @param array $items[]['tags']          Items tags.
-	 * @param int   $items[]['has_data']      Flag indicating if item has data.
-	 * @param array $subfilter
-	 * @param array $subfilter['hostids']     Selected subfilter hosts.
-	 * @param array $subfilter['tagnames']    Selected subfilter names.
-	 * @param array $subfilter['tags']        Selected subfilter tags.
-	 * @param array $subfilter['data']        Selected subfilter data options.
+	 * @param array  $items
+	 * @param string $items[]['hostid']                           Item hostid.
+	 * @param array  $items[]['tags']                             Items tags.
+	 * @param array  $items[]['tags'][]['tag']                    Items tag name.
+	 * @param array  $items[]['tags'][]['value']                  Items tag value.
+	 * @param bool   $items[]['has_data']                         [OUT] Flag, either item has data.
+	 * @param array  $items[]['matching_subfilters']
+	 * @param bool   $items[]['matching_subfilters']['hostids']   [OUT] Either item matches host subfilter.
+	 * @param bool   $items[]['matching_subfilters']['tagnames']  [OUT] Either item matches tagname subfilter.
+	 * @param bool   $items[]['matching_subfilters']['tags']      [OUT] Either item matches tags subfilter.
+	 * @param bool   $items[]['matching_subfilters']['data']      [OUT] Either item matches data subfilter.
+	 * @param array  $subfilter
+	 * @param array  $subfilter['hostids']                        Selected subfilter hosts.
+	 * @param array  $subfilter['tagnames']                       Selected subfilter tagnames.
+	 * @param array  $subfilter['tags']                           Selected subfilter tags.
+	 * @param array  $subfilter['data']                           Selected subfilter data options.
 	 *
 	 * @return array
 	 */

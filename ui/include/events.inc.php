@@ -499,15 +499,15 @@ function orderEventTagsByPriority(array $event_tags, array $priorities) {
  * @param int    $filter_tags[]['operator']
  * @param string $filter_tags[]['value']
  * @param int    $tag_name_format            Tag name format. Possible values:
- *                                            - PROBLEMS_TAG_NAME_FULL (default);
- *                                            - PROBLEMS_TAG_NAME_SHORTENED;
- *                                            - PROBLEMS_TAG_NAME_NONE.
+ *                                            - TAG_NAME_FULL (default);
+ *                                            - TAG_NAME_SHORTENED;
+ *                                            - TAG_NAME_NONE.
  * @param string $tag_priority               A list of comma-separated tag names.
  *
  * @return array
  */
 function makeTags(array $list, bool $html = true, string $key = 'eventid', int $list_tag_count = ZBX_TAG_COUNT_DEFAULT,
-		array $filter_tags = [], ?array $subfilter_tags = null, int $tag_name_format = PROBLEMS_TAG_NAME_FULL,
+		array $filter_tags = [], ?array $subfilter_tags = null, int $tag_name_format = TAG_NAME_FULL,
 		string $tag_priority = ''): array {
 	$tags = [];
 
@@ -621,12 +621,12 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
  *
  * @return string
  */
-function getTagString(array $tag, $tag_name_format = PROBLEMS_TAG_NAME_FULL) {
+function getTagString(array $tag, $tag_name_format = TAG_NAME_FULL) {
 	switch ($tag_name_format) {
-		case PROBLEMS_TAG_NAME_NONE:
+		case TAG_NAME_NONE:
 			return $tag['value'];
 
-		case PROBLEMS_TAG_NAME_SHORTENED:
+		case TAG_NAME_SHORTENED:
 			return substr($tag['tag'], 0, 3).(($tag['value'] === '') ? '' : ': '.$tag['value']);
 
 		default:

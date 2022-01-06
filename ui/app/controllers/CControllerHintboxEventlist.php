@@ -35,9 +35,9 @@ class CControllerHintboxEventlist extends CController {
 			'triggerid' =>			'required|db triggers.triggerid',
 			'eventid_till' =>		'required|db events.eventid',
 			'show_timeline' =>		'required|in 0,1',
-			'show_tags' =>			'required|in '.implode(',', [PROBLEMS_SHOW_TAGS_NONE, PROBLEMS_SHOW_TAGS_1, PROBLEMS_SHOW_TAGS_2, PROBLEMS_SHOW_TAGS_3]),
+			'show_tags' =>			'required|in '.implode(',', [SHOW_TAGS_NONE, SHOW_TAGS_1, SHOW_TAGS_2, SHOW_TAGS_3]),
 			'filter_tags' =>		'array',
-			'tag_name_format' =>	'required|in '.implode(',', [PROBLEMS_TAG_NAME_FULL, PROBLEMS_TAG_NAME_SHORTENED, PROBLEMS_TAG_NAME_NONE]),
+			'tag_name_format' =>	'required|in '.implode(',', [TAG_NAME_FULL, TAG_NAME_SHORTENED, TAG_NAME_NONE]),
 			'tag_priority' =>		'required|string'
 		];
 
@@ -115,7 +115,7 @@ class CControllerHintboxEventlist extends CController {
 			'limit' => ZBX_WIDGET_ROWS
 		];
 
-		if ($this->getInput('show_tags') != PROBLEMS_SHOW_TAGS_NONE) {
+		if ($this->getInput('show_tags') != SHOW_TAGS_NONE) {
 			$options['selectTags'] = ['tag', 'value'];
 		}
 

@@ -44,22 +44,22 @@ $col_name = make_sorting_header(_('Name'), 'name', $data['sort_field'], $data['s
 $simple_interval_parser = new CSimpleIntervalParser();
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 
-if ($data['filter']['show_tags'] == PROBLEMS_SHOW_TAGS_NONE) {
+if ($data['filter']['show_tags'] == SHOW_TAGS_NONE) {
 	$tags_header = null;
 }
 else {
 	$tags_header = new CColHeader(_('Tags'));
 
 	switch ($data['filter']['show_tags']) {
-		case PROBLEMS_SHOW_TAGS_1:
+		case SHOW_TAGS_1:
 			$tags_header->addClass(ZBX_STYLE_COLUMN_TAGS_1);
 			break;
 
-		case PROBLEMS_SHOW_TAGS_2:
+		case SHOW_TAGS_2:
 			$tags_header->addClass(ZBX_STYLE_COLUMN_TAGS_2);
 			break;
 
-		case PROBLEMS_SHOW_TAGS_3:
+		case SHOW_TAGS_3:
 			$tags_header->addClass(ZBX_STYLE_COLUMN_TAGS_3);
 			break;
 	}
@@ -242,7 +242,7 @@ foreach ($data['items'] as $itemid => $item) {
 			(new CCol($last_check))->addClass($state_css),
 			(new CCol($last_value))->addClass($state_css),
 			(new CCol($change))->addClass($state_css),
-			($data['filter']['show_tags'] != PROBLEMS_SHOW_TAGS_NONE) ? $data['tags'][$itemid] : null,
+			($data['filter']['show_tags'] != SHOW_TAGS_NONE) ? $data['tags'][$itemid] : null,
 			$actions,
 			makeInformationList($item_icons)
 		]);
@@ -255,7 +255,7 @@ foreach ($data['items'] as $itemid => $item) {
 			(new CCol($last_check))->addClass($state_css),
 			(new CCol($last_value))->addClass($state_css),
 			(new CCol($change))->addClass($state_css),
-			($data['filter']['show_tags'] != PROBLEMS_SHOW_TAGS_NONE) ? $data['tags'][$itemid] : null,
+			($data['filter']['show_tags'] != SHOW_TAGS_NONE) ? $data['tags'][$itemid] : null,
 			$actions,
 			makeInformationList($item_icons)
 		]);
