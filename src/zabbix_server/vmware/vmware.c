@@ -3675,14 +3675,15 @@ static int	vmware_v4mask2pefix(const char *mask)
 {
 #	define	V4MASK_MAX	32
 
-	int n, p = 0;
+	struct in_addr	inaddr;
+	int		p = 0;
 
-	if (-1 == inet_pton(AF_INET, mask, &n))
+	if (-1 == inet_pton(AF_INET, mask, &inaddr))
 		return V4MASK_MAX;
 
-	while (n > 0)
+	while (inaddr.s_addr > 0)
 	{
-		n = n >> 1;
+		inaddr.s_addr = inaddr.s_addr >> 1;
 		p++;
 	}
 
@@ -3733,6 +3734,8 @@ static char	*vmware_hv_ip_search(xmlDoc *xdoc)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	zbx_vector_str_create(&selected_ifs);
+	zbx_vector_str_create(&selected_ips);
 	xpathCtx = xmlXPathNewContext(xdoc);
 
 	if (NULL == (xpathObj = xmlXPathEvalExpression(
@@ -3745,9 +3748,6 @@ static char	*vmware_hv_ip_search(xmlDoc *xdoc)
 		goto out;
 
 	node = xpathObj->nodesetval->nodeTab[0];
-
-	zbx_vector_str_create(&selected_ifs);
-	zbx_vector_str_create(&selected_ips);
 
 	if (SUCCEED != zbx_xml_node_read_values(xdoc, node, ZBX_XNN("VirtualNicManagerNetConfig")
 			"[" ZBX_XNN("nicType") "[text()='management']]/" ZBX_XNN("selectedVnic"),
@@ -3775,7 +3775,7 @@ static char	*vmware_hv_ip_search(xmlDoc *xdoc)
 	for (i = 0; i < selected_ifs.values_num; i++)
 	{
 		char	*ip_hv = NULL, *mask = NULL, buff[MAX_STRING_LEN];
-		int	ssf;
+		int	ipv6 = 0;
 
 		zbx_snprintf(buff, sizeof(buff), ZBX_XPATH_HV_NIC_IPV4("management"), selected_ifs.values[i]);
 
@@ -3783,16 +3783,14 @@ static char	*vmware_hv_ip_search(xmlDoc *xdoc)
 		{
 			zbx_snprintf(buff, sizeof(buff), ZBX_XPATH_HV_NIC_IPV6("management"), selected_ifs.values[i]);
 			ip_hv = zbx_xml_node_read_value(xdoc, node, buff);
-			ssf = 6;
+			ipv6 = 1;
 		}
-		else
-			ssf = 4;
 
 		if (NULL == ip_hv)
 			continue;
 
 
-		if (4 == ssf)
+		if (0 == ipv6)
 			zbx_snprintf(buff, sizeof(buff), ZBX_XPATH_HV_NIC_V4MASK("management"), selected_ifs.values[i]);
 		else
 			zbx_snprintf(buff, sizeof(buff), ZBX_XPATH_HV_NIC_V6MASK("management"), selected_ifs.values[i]);
@@ -3803,7 +3801,7 @@ static char	*vmware_hv_ip_search(xmlDoc *xdoc)
 			continue;
 		}
 
-		if (4 == ssf)
+		if (0 == ipv6)
 			zbx_snprintf(buff, sizeof(buff), "%s/%d", ip_hv, vmware_v4mask2pefix(mask));
 		else
 			zbx_snprintf(buff, sizeof(buff), "%s/%s", ip_hv, mask);
@@ -3818,7 +3816,8 @@ static char	*vmware_hv_ip_search(xmlDoc *xdoc)
 		}
 
 		zbx_free(ip_hv);
-		zabbix_log(LOG_LEVEL_TRACE, "%s() managementServerIp fail; ip_vc:%s ip_hv:%s", __func__, ip_vc, buff);
+		zabbix_log(LOG_LEVEL_TRACE, "%s() managementServerIp fail; ip_vc:%s ip_hv:%s", __func__,
+				ZBX_NULL2EMPTY_STR(ip_vc), buff);
 	}
 
 	if (0 == selected_ips.values)
