@@ -432,15 +432,15 @@ static zbx_vmware_propmap_t	vm_propmap[] = {
 /* hypervisor hashset support */
 static zbx_hash_t	vmware_hv_hash(const void *data)
 {
-	zbx_vmware_hv_t	*hv = (zbx_vmware_hv_t *)data;
+	const zbx_vmware_hv_t	*hv = (const zbx_vmware_hv_t *)data;
 
 	return ZBX_DEFAULT_STRING_HASH_ALGO(hv->uuid, strlen(hv->uuid), ZBX_DEFAULT_HASH_SEED);
 }
 
 static int	vmware_hv_compare(const void *d1, const void *d2)
 {
-	zbx_vmware_hv_t	*hv1 = (zbx_vmware_hv_t *)d1;
-	zbx_vmware_hv_t	*hv2 = (zbx_vmware_hv_t *)d2;
+	const zbx_vmware_hv_t	*hv1 = (const zbx_vmware_hv_t *)d1;
+	const zbx_vmware_hv_t	*hv2 = (const zbx_vmware_hv_t *)d2;
 
 	return strcmp(hv1->uuid, hv2->uuid);
 }
@@ -448,15 +448,15 @@ static int	vmware_hv_compare(const void *d1, const void *d2)
 /* virtual machine index support */
 static zbx_hash_t	vmware_vm_hash(const void *data)
 {
-	zbx_vmware_vm_index_t	*vmi = (zbx_vmware_vm_index_t *)data;
+	const zbx_vmware_vm_index_t	*vmi = (const zbx_vmware_vm_index_t *)data;
 
 	return ZBX_DEFAULT_STRING_HASH_ALGO(vmi->vm->uuid, strlen(vmi->vm->uuid), ZBX_DEFAULT_HASH_SEED);
 }
 
 static int	vmware_vm_compare(const void *d1, const void *d2)
 {
-	zbx_vmware_vm_index_t	*vmi1 = (zbx_vmware_vm_index_t *)d1;
-	zbx_vmware_vm_index_t	*vmi2 = (zbx_vmware_vm_index_t *)d2;
+	const zbx_vmware_vm_index_t	*vmi1 = (const zbx_vmware_vm_index_t *)d1;
+	const zbx_vmware_vm_index_t	*vmi2 = (const zbx_vmware_vm_index_t *)d2;
 
 	return strcmp(vmi1->vm->uuid, vmi2->vm->uuid);
 }
@@ -469,12 +469,12 @@ static int	vmware_vm_compare(const void *d1, const void *d2)
 
 static zbx_hash_t	vmware_strpool_hash_func(const void *data)
 {
-	return ZBX_DEFAULT_STRING_HASH_FUNC((char *)data + REFCOUNT_FIELD_SIZE);
+	return ZBX_DEFAULT_STRING_HASH_FUNC((const char *)data + REFCOUNT_FIELD_SIZE);
 }
 
 static int	vmware_strpool_compare_func(const void *d1, const void *d2)
 {
-	return strcmp((char *)d1 + REFCOUNT_FIELD_SIZE, (char *)d2 + REFCOUNT_FIELD_SIZE);
+	return strcmp((const char *)d1 + REFCOUNT_FIELD_SIZE, (const char *)d2 + REFCOUNT_FIELD_SIZE);
 }
 
 static int	vmware_shared_strsearch(const char *str)
@@ -730,15 +730,15 @@ static int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *re
  ******************************************************************************/
 static zbx_hash_t	vmware_counter_hash_func(const void *data)
 {
-	zbx_vmware_counter_t	*counter = (zbx_vmware_counter_t *)data;
+	const zbx_vmware_counter_t	*counter = (const zbx_vmware_counter_t *)data;
 
 	return ZBX_DEFAULT_STRING_HASH_ALGO(counter->path, strlen(counter->path), ZBX_DEFAULT_HASH_SEED);
 }
 
 static int	vmware_counter_compare_func(const void *d1, const void *d2)
 {
-	zbx_vmware_counter_t	*c1 = (zbx_vmware_counter_t *)d1;
-	zbx_vmware_counter_t	*c2 = (zbx_vmware_counter_t *)d2;
+	const zbx_vmware_counter_t	*c1 = (const zbx_vmware_counter_t *)d1;
+	const zbx_vmware_counter_t	*c2 = (const zbx_vmware_counter_t *)d2;
 
 	return strcmp(c1->path, c2->path);
 }
@@ -752,7 +752,7 @@ static zbx_hash_t	vmware_perf_entity_hash_func(const void *data)
 {
 	zbx_hash_t	seed;
 
-	zbx_vmware_perf_entity_t	*entity = (zbx_vmware_perf_entity_t *)data;
+	const zbx_vmware_perf_entity_t	*entity = (const zbx_vmware_perf_entity_t *)data;
 
 	seed = ZBX_DEFAULT_STRING_HASH_ALGO(entity->type, strlen(entity->type), ZBX_DEFAULT_HASH_SEED);
 
@@ -763,8 +763,8 @@ static int	vmware_perf_entity_compare_func(const void *d1, const void *d2)
 {
 	int	ret;
 
-	zbx_vmware_perf_entity_t	*e1 = (zbx_vmware_perf_entity_t *)d1;
-	zbx_vmware_perf_entity_t	*e2 = (zbx_vmware_perf_entity_t *)d2;
+	const zbx_vmware_perf_entity_t	*e1 = (const zbx_vmware_perf_entity_t *)d1;
+	const zbx_vmware_perf_entity_t	*e2 = (const zbx_vmware_perf_entity_t *)d2;
 
 	if (0 == (ret = strcmp(e1->type, e2->type)))
 		ret = strcmp(e1->id, e2->id);
@@ -3543,8 +3543,8 @@ out:
  ******************************************************************************/
 int	vmware_ds_name_compare(const void *d1, const void *d2)
 {
-	const zbx_vmware_datastore_t	*ds1 = *(const zbx_vmware_datastore_t **)d1;
-	const zbx_vmware_datastore_t	*ds2 = *(const zbx_vmware_datastore_t **)d2;
+	const zbx_vmware_datastore_t	*ds1 = *(const zbx_vmware_datastore_t * const *)d1;
+	const zbx_vmware_datastore_t	*ds2 = *(const zbx_vmware_datastore_t * const *)d2;
 
 	return strcmp(ds1->name, ds2->name);
 }
@@ -3558,8 +3558,8 @@ int	vmware_ds_name_compare(const void *d1, const void *d2)
  ******************************************************************************/
 static int	vmware_ds_id_compare(const void *d1, const void *d2)
 {
-	const zbx_vmware_datastore_t	*ds1 = *(const zbx_vmware_datastore_t **)d1;
-	const zbx_vmware_datastore_t	*ds2 = *(const zbx_vmware_datastore_t **)d2;
+	const zbx_vmware_datastore_t	*ds1 = *(const zbx_vmware_datastore_t * const *)d1;
+	const zbx_vmware_datastore_t	*ds2 = *(const zbx_vmware_datastore_t * const *)d2;
 
 	return strcmp(ds1->id, ds2->id);
 }
@@ -3573,8 +3573,8 @@ static int	vmware_ds_id_compare(const void *d1, const void *d2)
  ******************************************************************************/
 static int	vmware_dc_id_compare(const void *d1, const void *d2)
 {
-	const zbx_vmware_datacenter_t	*dc1 = *(const zbx_vmware_datacenter_t **)d1;
-	const zbx_vmware_datacenter_t	*dc2 = *(const zbx_vmware_datacenter_t **)d2;
+	const zbx_vmware_datacenter_t	*dc1 = *(const zbx_vmware_datacenter_t * const *)d1;
+	const zbx_vmware_datacenter_t	*dc2 = *(const zbx_vmware_datacenter_t * const *)d2;
 
 	return strcmp(dc1->id, dc2->id);
 }
@@ -3877,8 +3877,8 @@ out:
  ******************************************************************************/
 int	vmware_dsname_compare(const void *d1, const void *d2)
 {
-	const zbx_vmware_dsname_t	*ds1 = *(const zbx_vmware_dsname_t **)d1;
-	const zbx_vmware_dsname_t	*ds2 = *(const zbx_vmware_dsname_t **)d2;
+	const zbx_vmware_dsname_t	*ds1 = *(const zbx_vmware_dsname_t * const *)d1;
+	const zbx_vmware_dsname_t	*ds2 = *(const zbx_vmware_dsname_t * const *)d2;
 
 	return strcmp(ds1->name, ds2->name);
 }
