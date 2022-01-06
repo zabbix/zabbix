@@ -20,7 +20,7 @@
 #ifndef ZABBIX_REPORT_PROTOCOL_H
 #define ZABBIX_REPORT_PROTOCOL_H
 
-#include "common.h"
+//#include "common.h"
 #include "zbxalgo.h"
 #include "db.h"
 

@@ -22,6 +22,7 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
+#include "sysinfo.h"
 #include "file.h"
 
 #define TEST_NAME "VFS_FILE_EXISTS"

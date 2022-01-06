@@ -21,6 +21,7 @@
 
 #include "log.h"
 //#include "zbxalgo.h"
+#include "db.h"
 #include "audit.h"
 #include "audit_graph.h"
 

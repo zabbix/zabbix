@@ -22,7 +22,7 @@
 
 #include "comms.h"
 #include "log.h"
-#include "cfg.h"
+//#include "cfg.h"
 
 #include "dns.h"
 #include "zbxalgo.h"

@@ -30,7 +30,7 @@
 #include "scripts.h"
 #include "zbxjson.h"
 #include "zbxembed.h"
-#include "../events.h"
+//#include "../events.h"
 
 extern int	CONFIG_TRAPPER_TIMEOUT;
 extern int	CONFIG_IPMIPOLLER_FORKS;

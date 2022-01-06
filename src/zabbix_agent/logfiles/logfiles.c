@@ -23,6 +23,7 @@
 #include "sysinfo.h"
 #include "persistent_state.h"
 #include "cfg.h"
+#include "zbxregexp.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #	include "symbols.h"

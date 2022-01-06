@@ -30,6 +30,7 @@
 #include "zbxjson.h"
 #include "alias.h"
 #include "metrics.h"
+#include "zbxregexp.h"
 
 extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;

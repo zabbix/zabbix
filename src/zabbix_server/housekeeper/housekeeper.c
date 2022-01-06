@@ -26,7 +26,7 @@
 #include "zbxalgo.h"
 #include "zbxserver.h"
 
-#include "zbxhistory.h"
+//#include "zbxhistory.h"
 #include "history_compress.h"
 #include "housekeeper.h"
 #include "../../libs/zbxdbcache/valuecache.h"

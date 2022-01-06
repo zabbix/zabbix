@@ -17,14 +17,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxipcservice.h"
-#include "daemon.h"
+//#include "zbxipcservice.h"
 #include "log.h"
 #include "zbxdiag.h"
 #include "zbxjson.h"
 #include "zbxha.h"
-#include "zbxrtc.h"
-#include "rtc.h"
+//#include "zbxrtc.h"
+//#include "rtc.h"
+#include "zbxtypes.h"
+#include "common.h"
+#include "daemon.h"
 
 int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data, char **error)
 {

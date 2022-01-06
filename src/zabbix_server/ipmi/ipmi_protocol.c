@@ -21,7 +21,7 @@
 
 #ifdef HAVE_OPENIPMI
 
-#include "log.h"
+//#include "log.h"
 #include "zbxserialize.h"
 
 #include "ipmi_protocol.h"

@@ -19,9 +19,10 @@
 
 #include "common.h"
 #include "valuecache.h"
-#include "preproc.h"
+//#include "preproc.h"
 #include "zbxlld.h"
-#include "checks_internal.h"
+//#include "checks_internal.h"
+#include "dbcache.h"
 #include "zbxha.h"
 
 /******************************************************************************

@@ -19,10 +19,10 @@
 
 #include "common.h"
 
-#include "threads.h"
+//#include "threads.h"
 #include "comms.h"
-#include "cfg.h"
-#include "log.h"
+//#include "cfg.h"
+//#include "log.h"
 #include "zbxgetopt.h"
 #include "zbxcrypto.h"
 

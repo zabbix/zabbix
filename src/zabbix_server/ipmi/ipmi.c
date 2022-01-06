@@ -22,7 +22,7 @@
 #ifdef HAVE_OPENIPMI
 
 #include "log.h"
-#include "zbxserialize.h"
+//#include "zbxserialize.h"
 #include "dbcache.h"
 
 #include "zbxipcservice.h"

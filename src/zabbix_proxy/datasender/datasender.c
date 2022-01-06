@@ -27,7 +27,7 @@
 #include "zbxself.h"
 #include "dbcache.h"
 #include "zbxtasks.h"
-#include "dbcache.h"
+//#include "dbcache.h"
 
 #include "datasender.h"
 #include "zbxcrypto.h"

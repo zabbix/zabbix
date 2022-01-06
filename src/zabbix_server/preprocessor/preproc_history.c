@@ -18,7 +18,7 @@
 **/
 
 #include "common.h"
-#include "log.h"
+//#include "log.h"
 
 #include "preproc_history.h"
 

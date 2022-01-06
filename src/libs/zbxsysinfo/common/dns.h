@@ -20,7 +20,8 @@
 #ifndef ZABBIX_SYSINFO_COMMON_DNS_H
 #define ZABBIX_SYSINFO_COMMON_DNS_H
 
-#include "sysinfo.h"
+#include "config.h"
+//#include "sysinfo.h"
 
 #if defined(HAVE_RES_QUERY) || defined(_WINDOWS) || defined(__MINGW32__)
 

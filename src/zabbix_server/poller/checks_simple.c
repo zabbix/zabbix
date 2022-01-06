@@ -17,6 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "common.h"
+
 #include "checks_simple_vmware.h"
 #include "checks_simple.h"
 #include "simple.h"

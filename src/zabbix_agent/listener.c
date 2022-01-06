@@ -23,7 +23,7 @@
 #include "comms.h"
 #include "cfg.h"
 #include "zbxconf.h"
-#include "stats.h"
+//#include "stats.h"
 #include "sysinfo.h"
 #include "log.h"
 

@@ -22,7 +22,7 @@
 #include "common.h"
 #include "events.h"
 #include "threads.h"
-#include "zbxserver.h"
+//#include "zbxserver.h"
 #include "dbcache.h"
 #include "zbxalgo.h"
 #include "cfg.h"

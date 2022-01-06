@@ -20,7 +20,7 @@
 #include "common.h"
 #include "log.h"
 
-#include "zbxmedia.h"
+//#include "zbxmedia.h"
 
 #include <termios.h>
 

@@ -21,7 +21,7 @@
 #define ZABBIX_CHECKS_JAVA_H
 
 #include "dbcache.h"
-#include "sysinfo.h"
+//#include "sysinfo.h"
 
 #define ZBX_JAVA_GATEWAY_REQUEST_INTERNAL	0
 #define ZBX_JAVA_GATEWAY_REQUEST_JMX		1

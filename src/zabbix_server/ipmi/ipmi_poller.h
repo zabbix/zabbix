@@ -20,7 +20,7 @@
 #ifndef ZABBIX_IPMI_POLLER_H
 #define ZABBIX_IPMI_POLLER_H
 
-#include "common.h"
+//#include "common.h"
 
 #ifdef HAVE_OPENIPMI
 

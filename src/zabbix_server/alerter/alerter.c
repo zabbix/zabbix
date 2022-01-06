@@ -19,19 +19,20 @@
 
 #include "common.h"
 
-#include "cfg.h"
-#include "db.h"
+//#include "cfg.h"
+//#include "db.h"
 #include "log.h"
 #include "daemon.h"
 #include "zbxmedia.h"
-#include "zbxserver.h"
+//#include "zbxserver.h"
 #include "zbxself.h"
 #include "zbxexec.h"
 #include "zbxipcservice.h"
 
+#include "dbcache.h"
 #include "alerter.h"
 #include "alerter_protocol.h"
-#include "alert_manager.h"
+//#include "alert_manager.h"
 #include "zbxembed.h"
 
 #define	ALARM_ACTION_TIMEOUT	40

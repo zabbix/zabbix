@@ -23,9 +23,9 @@
 #include "daemon.h"
 #include "zbxself.h"
 #include "log.h"
-#include "zbxserver.h"
+//#include "zbxserver.h"
 #include "sysinfo.h"
-#include "zbxserialize.h"
+//#include "zbxserialize.h"
 #include "zbxipcservice.h"
 #include "zbxlld.h"
 

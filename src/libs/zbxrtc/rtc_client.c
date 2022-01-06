@@ -19,7 +19,7 @@
 
 #include "zbxipcservice.h"
 #include "zbxjson.h"
-#include "zbxrtc.h"
+//#include "zbxrtc.h"
 #include "rtc.h"
 
 extern int	CONFIG_TIMEOUT;

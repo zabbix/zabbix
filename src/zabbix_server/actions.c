@@ -23,7 +23,7 @@
 #include "zbxserver.h"
 
 #include "operations.h"
-#include "events.h"
+//#include "events.h"
 #include "zbxregexp.h"
 
 #include "../../libs/zbxaudit/audit.h"

@@ -18,14 +18,15 @@
 **/
 
 #include "common.h"
-#include "sysinfo.h"
+//#include "sysinfo.h"
+#include "module.h"
 
 #include "comms.h"
 #include "log.h"
 #include "cfg.h"
 
 #include "net.h"
-#include "zbxalgo.h"
+//#include "zbxalgo.h"
 
 int	tcp_expect(const char *host, unsigned short port, int timeout, const char *request,
 		int (*validate_func)(const char *), const char *sendtoclose, int *value_int)

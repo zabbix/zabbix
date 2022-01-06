@@ -23,7 +23,7 @@
 #include "log.h"
 #include "zbxserver.h"
 #include "postinit.h"
-#include "valuecache.h"
+//#include "valuecache.h"
 
 #define ZBX_HIST_MACRO_NONE		(-1)
 #define ZBX_HIST_MACRO_ITEM_VALUE	0

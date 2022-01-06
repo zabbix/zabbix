@@ -20,7 +20,8 @@
 #ifndef ZABBIX_SYSINFO_COMMON_FILE_H
 #define ZABBIX_SYSINFO_COMMON_FILE_H
 
-#include "sysinfo.h"
+#include "module.h"
+//#include "sysinfo.h"
 
 #define MAX_FILE_LEN (1024 * 1024)
 

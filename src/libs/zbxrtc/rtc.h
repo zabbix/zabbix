@@ -20,6 +20,8 @@
 #ifndef ZABBIX_RTC_H
 #define ZABBIX_RTC_H
 
+#include "zbxtypes.h"
+
 #define ZBX_IPC_SERVICE_RTC	"rtc"
 
 int	zbx_rtc_parse_loglevel_option(const char *opt, size_t len, pid_t *pid, int *proc_type, int *proc_num,

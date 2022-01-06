@@ -17,8 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-//#include "zbxserialize.h"
+#include "string.h"
+#include "zbxtypes.h"
+/* #include "common.h"
+#include "zbxserialize.h" */
 /******************************************************************************
  *                                                                            *
  * Function: zbx_serialize_uint31_compact                                     *

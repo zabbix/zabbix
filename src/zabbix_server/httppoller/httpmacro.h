@@ -20,6 +20,8 @@
 #ifndef ZABBIX_HTTPMACRO_H
 #define ZABBIX_HTTPMACRO_H
 
+#include "db.h"
+
 typedef struct
 {
 	DB_HTTPTEST		httptest;

@@ -27,7 +27,7 @@
 #ifdef _WINDOWS
 #	include "perfstat.h"
 #endif
-#include "comms.h"
+//#include "comms.h"
 
 /******************************************************************************
  *                                                                            *

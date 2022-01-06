@@ -18,7 +18,7 @@
 **/
 
 #include "common.h"
-#include "zbxreport.h"
+//#include "zbxreport.h"
 #include "report_protocol.h"
 #include "zbxipcservice.h"
 #include "zbxserialize.h"
@@ -123,7 +123,7 @@ void	report_deserialize_test_report(const unsigned char *data, char **name, zbx_
 	}
 }
 
-#include "log.h"
+//#include "log.h"
 
 /******************************************************************************
  *                                                                            *

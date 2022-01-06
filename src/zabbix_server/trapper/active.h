@@ -20,8 +20,8 @@
 #ifndef ZABBIX_TRAPPER_ACTIVE_H
 #define ZABBIX_TRAPPER_ACTIVE_H
 
-#include "common.h"
-#include "db.h"
+//#include "common.h"
+//#include "db.h"
 #include "comms.h"
 #include "zbxjson.h"
 

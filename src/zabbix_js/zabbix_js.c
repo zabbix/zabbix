@@ -19,7 +19,7 @@
 
 #include "common.h"
 
-#include "cfg.h"
+//#include "cfg.h"
 #include "log.h"
 #include "zbxgetopt.h"
 #include "zbxembed.h"

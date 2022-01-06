@@ -19,8 +19,8 @@
 
 #include "common.h"
 #include "zbxalgo.h"
-#include "zbxeval.h"
-#include "log.h"
+//#include "zbxeval.h"
+//#include "log.h"
 #include "../../libs/zbxalgo/vectorimpl.h"
 
 typedef struct

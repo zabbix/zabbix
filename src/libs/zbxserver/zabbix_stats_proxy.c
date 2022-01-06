@@ -19,7 +19,7 @@
 
 #include "common.h"
 #include "zbxjson.h"
-#include "zabbix_stats.h"
+//#include "zabbix_stats.h"
 
 /******************************************************************************
  *                                                                            *

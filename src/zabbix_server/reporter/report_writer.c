@@ -22,7 +22,7 @@
 #include "zbxself.h"
 #include "log.h"
 #include "zbxipcservice.h"
-#include "zbxserialize.h"
+//#include "zbxserialize.h"
 #include "zbxjson.h"
 #include "zbxalert.h"
 #include "db.h"

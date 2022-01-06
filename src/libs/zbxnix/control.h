@@ -20,7 +20,7 @@
 #ifndef ZABBIX_CONTROL_H
 #define ZABBIX_CONTROL_H
 
-#include "common.h"
+//#include "common.h"
 
 #define ZBX_RTC_LOG_SCOPE_FLAG	0x80
 #define ZBX_RTC_LOG_SCOPE_PROC	0

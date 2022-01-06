@@ -18,12 +18,13 @@
 **/
 
 #include "common.h"
-#include "sysinfo.h"
+//#include "sysinfo.h"
 #include "zbxregexp.h"
 #include "zbxhttp.h"
 
 #include "comms.h"
-#include "cfg.h"
+//#include "cfg.h"
+extern int	CONFIG_TIMEOUT;
 
 #include "http.h"
 

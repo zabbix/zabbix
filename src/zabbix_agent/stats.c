@@ -20,12 +20,12 @@
 #include "common.h"
 #include "stats.h"
 #include "log.h"
-#include "zbxconf.h"
+//#include "zbxconf.h"
 
 #ifndef _WINDOWS
 #	include "diskdevices.h"
 #endif
-#include "cfg.h"
+//#include "cfg.h"
 #include "mutexs.h"
 
 #ifdef _WINDOWS

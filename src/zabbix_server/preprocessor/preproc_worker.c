@@ -22,11 +22,11 @@
 #include "zbxself.h"
 #include "log.h"
 #include "zbxipcservice.h"
-#include "zbxserialize.h"
+//#include "zbxserialize.h"
 #include "preprocessing.h"
 #include "zbxembed.h"
 
-#include "sysinfo.h"
+//#include "sysinfo.h"
 #include "preproc_worker.h"
 #include "item_preproc.h"
 #include "preproc_history.h"

@@ -23,10 +23,10 @@
 #include "log.h"
 #include "zbxself.h"
 #include "zbxservice.h"
-#include "zbxipcservice.h"
+//#include "zbxipcservice.h"
 #include "daemon.h"
-#include "sighandler.h"
-#include "dbcache.h"
+//#include "sighandler.h"
+//#include "dbcache.h"
 #include "zbxalgo.h"
 #include "service_protocol.h"
 

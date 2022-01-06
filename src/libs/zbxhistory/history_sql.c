@@ -18,7 +18,7 @@
 **/
 
 #include "common.h"
-#include "log.h"
+//#include "log.h"
 #include "zbxalgo.h"
 #include "db.h"
 #include "dbcache.h"

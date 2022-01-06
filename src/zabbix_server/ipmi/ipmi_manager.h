@@ -20,7 +20,7 @@
 #ifndef ZABBIX_IPMI_MANAGER_H
 #define ZABBIX_IPMI_MANAGER_H
 
-#include "common.h"
+//#include "common.h"
 
 #ifdef HAVE_OPENIPMI
 

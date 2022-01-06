@@ -19,8 +19,8 @@
 
 #include "common.h"
 #include "log.h"
-#include "proxy.h"
-#include "zbxserver.h"
+//#include "proxy.h"
+//#include "zbxserver.h"
 #include "zbxserialize.h"
 #include "zbxipcservice.h"
 

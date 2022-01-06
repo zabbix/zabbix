@@ -22,6 +22,7 @@
 #include "log.h"
 #include "../../libs/zbxaudit/audit.h"
 #include "../../libs/zbxaudit/audit_trigger.h"
+#include "../../libs/zbxalgo/vectorimpl.h"
 #include "trigger_dep_linking.h"
 #include "trigger_linking.h"
 

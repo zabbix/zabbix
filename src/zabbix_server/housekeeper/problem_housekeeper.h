@@ -20,7 +20,7 @@
 #ifndef ZABBIX_TRIGGER_HOUSEKEEPER_H
 #define ZABBIX_TRIGGER_HOUSEKEEPER_H
 
-#include "common.h"
+//#include "common.h"
 #include "threads.h"
 
 ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args);
