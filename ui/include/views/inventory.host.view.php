@@ -146,6 +146,7 @@ $overviewFormList->addRow(_('Monitoring'),
 				->setArgument('action', 'latest.view')
 				->setArgument('hostids[]', $data['host']['hostid'])
 				->setArgument('show_details', '1')
+				->setArgument('filter_name', '')
 			)
 			: _('Latest data'),
 		$data['allowed_ui_problems']
