@@ -25,6 +25,15 @@
 
 #define ZBX_ES_LOG_MEMORY_LIMIT	(ZBX_MEBIBYTE * 8)
 
+#define ZBX_ES_CHECK_TIMEOUT(env) \
+	do { \
+		zbx_uint64_t	elapsed_ms; \
+		elapsed_ms = zbx_get_duration_ms(&env->start_time); \
+		if (elapsed_ms >= env->timeout * 1000) \
+			return duk_throw(ctx); \
+	} \
+	while (0);
+
 struct zbx_es_env
 {
 	duk_context	*ctx;
