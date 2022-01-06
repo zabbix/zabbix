@@ -20,21 +20,22 @@
 package main
 
 import (
-	"fmt"
-
-	"zabbix.com/external"
+	"zabbix.com/pkg/plugin"
 )
 
-func main() {
-	h, err := external.NewHandler(impl.Name())
-	if err != nil {
-		panic(fmt.Sprintf("failed to create plugin handler %s", err.Error()))
-	}
+// Plugin -
+type Plugin struct {
+	plugin.Base
+}
 
-	impl.Logger = &h
+var impl Plugin
 
-	err = h.Execute()
-	if err != nil {
-		panic(fmt.Sprintf("failed to execute plugin handler %s", err.Error()))
-	}
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	p.Debugf("export %s%v", key, params)
+
+	return "debug empty test response", nil
+}
+
+func init() {
+	plugin.RegisterMetrics(&impl, "DebugEmpty", "debug.container.test", "Returns test string.")
 }

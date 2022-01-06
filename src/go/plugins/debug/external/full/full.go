@@ -80,5 +80,5 @@ func (p *Plugin) Stop() {
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "DebugFull", "debug.external.full", "Returns test value.")
+	plugin.RegisterMetrics(&impl, "DebugFull", "debug.container.full", "Returns test value.")
 }
