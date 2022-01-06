@@ -19,7 +19,7 @@ This template was tested on:
 1\. Create PostgreSQL user for monitoring (`<password>` at your discretion):
 
 ```bash
-CREATE USER 'zbx_monitor' WITH PASSWORD '<PASSWORD>' INHERIT;
+CREATE USER zbx_monitor WITH PASSWORD '<PASSWORD>' INHERIT;
 GRANT EXECUTE ON FUNCTION pg_catalog.pg_ls_dir(text) TO zbx_monitor;
 GRANT EXECUTE ON FUNCTION pg_catalog.pg_stat_file(text) TO zbx_monitor;
 GRANT EXECUTE ON FUNCTION pg_catalog.pg_ls_waldir() TO zbx_monitor;
