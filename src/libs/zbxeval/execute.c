@@ -21,7 +21,7 @@
 #include "log.h"
 #include "zbxalgo.h"
 //#include "zbxserver.h"
-//#include "eval.h"
+#include "eval.h"
 #include "zbxeval.h"
 #include "zbxvariant.h"
 

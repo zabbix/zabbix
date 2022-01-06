@@ -23,7 +23,7 @@
 #include "log.h"
 #include "fatal.h"
 #include "sigcommon.h"
-//#include "zbxcrypto.h"
+#include "zbxcrypto.h"
 #include "daemon.h"
 
 int			sig_parent_pid = -1;
