@@ -793,8 +793,6 @@ void	zbx_clean_items(DC_ITEM *items, int num, AGENT_RESULT *results)
  *                                                                            *
  * Return value: number of items processed                                    *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  * Comments: processes single item at a time except for Java, SNMP items,     *
  *           see DCconfig_get_poller_items()                                  *
  *                                                                            *

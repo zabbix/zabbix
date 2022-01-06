@@ -63,8 +63,6 @@ zbx_mutex_t		diskstats_lock = ZBX_MUTEX_NULL;
  *                                                                            *
  * Return value: number of CPUs                                               *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
  ******************************************************************************/
 static int	zbx_get_cpu_num(void)
 {
@@ -133,8 +131,6 @@ return_one:
  * Function: init_collector_data                                              *
  *                                                                            *
  * Purpose: Allocate memory for collector                                     *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: Unix version allocates memory as shared.                         *
  *                                                                            *
@@ -226,8 +222,6 @@ out:
  * Function: free_collector_data                                              *
  *                                                                            *
  * Purpose: Free memory allocated for collector                               *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: Unix version allocated memory as shared.                         *
  *                                                                            *
@@ -420,8 +414,6 @@ void	diskstat_shm_extend(void)
  * Function: collector_thread                                                 *
  *                                                                            *
  * Purpose: Collect system information                                        *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
 ZBX_THREAD_ENTRY(collector_thread, args)

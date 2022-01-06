@@ -641,8 +641,6 @@ static const char	*get_string(const char *p, char *buf, size_t bufsize)
  *                SUCCEED_PARTIAL - the sending operation was completed       *
  *                successfully, but processing of at least one value failed   *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  * Comments: active agent has almost the same function!                       *
  *                                                                            *
  ******************************************************************************/

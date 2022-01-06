@@ -324,8 +324,6 @@ static void	set_daemon_signal_handlers(void)
  *                          privileges                                        *
  *             flags      - daemon startup flags                              *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  * Comments: it doesn't allow running under 'root' if allow_root is zero      *
  *                                                                            *
  ******************************************************************************/
