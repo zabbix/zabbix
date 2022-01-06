@@ -146,12 +146,14 @@ class CMediatypeHelper {
 					'subject' => 'Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} in {EVENT.AGE}',
 					'html' =>
 						'<b>Changed "{SERVICE.NAME}" service status</b> to {EVENT.UPDATE.SEVERITY} at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.<br>'.
-						'<b>Current problem age</b> is {EVENT.AGE}.<br><br>'.
+						'<b>Current problem age</b> is {EVENT.AGE}.<br>'.
+						'<b>Service description:</b> {SERVICE.DESCRIPTION}<br><br>'.
 						'{SERVICE.ROOTCAUSE}',
 					'sms' => "{EVENT.NAME}\n{EVENT.DATE} {EVENT.TIME}",
 					'text' =>
 						"Changed \"{SERVICE.NAME}\" service status to {EVENT.UPDATE.SEVERITY} at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.\n".
-						"Current problem age is {EVENT.AGE}.\n\n".
+						"Current problem age is {EVENT.AGE}.\n".
+						"Service description: {SERVICE.DESCRIPTION}\n\n".
 						"{SERVICE.ROOTCAUSE}"
 				]
 			],
