@@ -1580,6 +1580,28 @@ static void	services_times_convert_downtime(zbx_vector_services_times_t *service
 		}
 	}
 
+	for (i = 0; i < services_times->values_num; i++)
+	{
+		services_times_t	*service_time = &services_times->values[i];
+
+		for (j = 0; j < services_times->values_num; j++)
+		{
+			services_times_t	*service_time_next = &services_times->values[j];
+
+			if (service_time_next->from <= service_time->to &&
+					service_time_next->to >= service_time->from && i != j)
+			{
+				service_time_next->from = MIN(service_time_next->from, service_time->from);
+				service_time_next->to = MAX(service_time_next->to, service_time->to);
+
+				services_time_clean(*service_time);
+				zbx_vector_services_times_remove(services_times, i);
+				i--;
+				break;
+			}
+		}
+	}
+
 	zbx_vector_services_times_clear_ext(&services_downtimes, services_time_clean);
 	zbx_vector_services_times_destroy(&services_downtimes);
 }
