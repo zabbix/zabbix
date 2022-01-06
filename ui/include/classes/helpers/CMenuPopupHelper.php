@@ -162,7 +162,7 @@ class CMenuPopupHelper {
 	}
 
 	/**
-	 * Prepare data for item popup menu.
+	 * Prepare data for item configuration popup menu.
 	 *
 	 * @param array  $data
 	 * @param string $data['itemid']   Item ID.
@@ -170,9 +170,9 @@ class CMenuPopupHelper {
 	 *
 	 * @return array
 	 */
-	public static function getItem(array $data): array {
+	public static function getItemConfiguration(array $data): array {
 		return [
-			'type' => 'item',
+			'type' => 'item_configuration',
 			'data' => [
 				'itemid' => $data['itemid']
 			],
@@ -188,9 +188,9 @@ class CMenuPopupHelper {
 	 *
 	 * @return array
 	 */
-	public static function getItemData(array $data): array {
+	public static function getItem(array $data): array {
 		return [
-			'type' => 'item_data',
+			'type' => 'item',
 			'data' => [
 				'itemid' => $data['itemid']
 			]
@@ -198,7 +198,7 @@ class CMenuPopupHelper {
 	}
 
 	/**
-	 * Prepare data for item prototype popup menu.
+	 * Prepare data for item prototype configuration popup menu.
 	 *
 	 * @param array  $data
 	 * @param string $data['itemid']   Item ID.
@@ -206,9 +206,9 @@ class CMenuPopupHelper {
 	 *
 	 * @return array
 	 */
-	public static function getItemPrototype(array $data): array {
+	public static function getItemPrototypeConfiguration(array $data): array {
 		return [
-			'type' => 'item_prototype',
+			'type' => 'item_prototype_configuration',
 			'data' => [
 				'itemid' => $data['itemid']
 			],

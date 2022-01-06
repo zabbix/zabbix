@@ -23,7 +23,7 @@ class CControllerMenuPopup extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'type' => 'required|in history,host,item,item_data,item_prototype,map_element,refresh,trigger,trigger_macro,widget_actions',
+			'type' => 'required|in history,host,item_configuration,item,item_prototype_configuration,map_element,refresh,trigger,trigger_macro,widget_actions',
 			'data' => 'array'
 		];
 
@@ -223,14 +223,14 @@ class CControllerMenuPopup extends CController {
 	}
 
 	/**
-	 * Prepare data for item context menu popup.
+	 * Prepare data for item configuration context menu popup.
 	 *
 	 * @param array  $data
 	 * @param string $data['itemid']
 	 *
 	 * @return mixed
 	 */
-	private static function getMenuDataItem(array $data) {
+	private static function getMenuDataItemConfiguration(array $data) {
 		$db_items = API::Item()->get([
 			'output' => ['hostid', 'key_', 'name', 'flags'],
 			'selectHosts' => ['host'],
@@ -241,7 +241,7 @@ class CControllerMenuPopup extends CController {
 		if ($db_items) {
 			$db_item = $db_items[0];
 			$menu_data = [
-				'type' => 'item',
+				'type' => 'item_configuration',
 				'itemid' => $data['itemid'],
 				'hostid' => $db_item['hostid'],
 				'host' => $db_item['hosts'][0]['host'],
@@ -281,7 +281,7 @@ class CControllerMenuPopup extends CController {
 	 *
 	 * @return mixed
 	 */
-	private static function getMenuDataItemData(array $data) {
+	private static function getMenuDataItem(array $data) {
 		$db_items = API::Item()->get([
 				'output' => ['hostid', 'type', 'value_type', 'history', 'trends'],
 				'itemids' => $data['itemid'],
@@ -301,7 +301,7 @@ class CControllerMenuPopup extends CController {
 			}
 
 			return [
-				'type' => 'item_data',
+				'type' => 'item',
 				'itemid' => $data['itemid'],
 				'hostid' => $db_item['hostid'],
 				'showGraph' => ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT
@@ -320,14 +320,14 @@ class CControllerMenuPopup extends CController {
 	}
 
 	/**
-	 * Prepare data for item prototype context menu popup.
+	 * Prepare data for item prototype configuration context menu popup.
 	 *
 	 * @param array  $data
 	 * @param string $data['itemid']
 	 *
 	 * @return mixed
 	 */
-	private static function getMenuDataItemPrototype(array $data) {
+	private static function getMenuDataItemPrototypeConfiguration(array $data) {
 		$db_item_prototypes = API::ItemPrototype()->get([
 			'output' => ['name', 'key_'],
 			'selectDiscoveryRule' => ['itemid'],
@@ -339,7 +339,7 @@ class CControllerMenuPopup extends CController {
 			$db_item_prototype = $db_item_prototypes[0];
 
 			$menu_data = [
-				'type' => 'item_prototype',
+				'type' => 'item_prototype_configuration',
 				'itemid' => $data['itemid'],
 				'name' => $db_item_prototype['name'],
 				'key' => $db_item_prototype['key_'],
@@ -791,16 +791,16 @@ class CControllerMenuPopup extends CController {
 				$menu_data = self::getMenuDataHost($data);
 				break;
 
+			case 'item_configuration':
+				$menu_data = self::getMenuDataItemConfiguration($data);
+				break;
+
 			case 'item':
 				$menu_data = self::getMenuDataItem($data);
 				break;
 
-			case 'item_data':
-				$menu_data = self::getMenuDataItemData($data);
-				break;
-
-			case 'item_prototype':
-				$menu_data = self::getMenuDataItemPrototype($data);
+			case 'item_prototype_configuration':
+				$menu_data = self::getMenuDataItemPrototypeConfiguration($data);
 				break;
 
 			case 'map_element':

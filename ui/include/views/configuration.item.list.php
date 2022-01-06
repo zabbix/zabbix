@@ -231,7 +231,7 @@ foreach ($data['items'] as $item) {
 
 	$wizard = (new CButton(null))
 		->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
-		->setMenuPopup(CMenuPopupHelper::getItem(['itemid' => $item['itemid'], 'context' => $data['context']]));
+		->setMenuPopup(CMenuPopupHelper::getItemConfiguration(['itemid' => $item['itemid'], 'context' => $data['context']]));
 
 	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
 		$item['trends'] = '';

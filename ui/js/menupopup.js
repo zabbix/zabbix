@@ -694,7 +694,7 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
  *
  * @return array
  */
-function getMenuPopupItem(options, trigger_elmnt) {
+function getMenuPopupItemConfiguration(options, trigger_elmnt) {
 	const items = [];
 	let url;
 
@@ -791,7 +791,7 @@ function getMenuPopupItem(options, trigger_elmnt) {
  *
  * @return array
  */
-function getMenuPopupItemData(options) {
+function getMenuPopupItem(options) {
 	const items = [];
 	let url;
 
@@ -878,7 +878,7 @@ function getMenuPopupItemData(options) {
  *
  * @return array
  */
-function getMenuPopupItemPrototype(options) {
+function getMenuPopupItemPrototypeConfiguration(options) {
 	const items = [];
 	let url;
 

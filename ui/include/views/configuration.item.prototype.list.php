@@ -143,7 +143,7 @@ foreach ($data['items'] as $item) {
 		$item['delay'] = $update_interval_parser->getDelay();
 	}
 
-	$item_menu = CMenuPopupHelper::getItemPrototype(['itemid' => $item['itemid'], 'context' => $data['context']]);
+	$item_menu = CMenuPopupHelper::getItemPrototypeConfiguration(['itemid' => $item['itemid'], 'context' => $data['context']]);
 
 	$wizard = (new CButton(null))
 		->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
