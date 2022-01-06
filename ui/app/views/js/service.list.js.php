@@ -48,6 +48,7 @@
 			this.refresh_url = refresh_url;
 			this.refresh_interval = refresh_interval;
 			this.back_url = back_url;
+
 			this.initViewModeSwitcher();
 			this.initTagFilter();
 			this.initActionButtons();
