@@ -85,4 +85,8 @@ void		zbx_handle_log(void);
 int		zbx_get_log_type(const char *logtype);
 int		zbx_validate_log_parameters(ZBX_TASK_EX *task);
 
+void	zbx_strlog_alloc(int level, char **out, size_t *out_alloc, size_t *out_offset, const char *format,
+		...) __zbx_attr_format_printf(5, 6);
+
+
 #endif

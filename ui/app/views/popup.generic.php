@@ -392,8 +392,8 @@ switch ($data['popup_type']) {
 				$host = reset($item['hosts']);
 				$item['hostname'] = $host['name'];
 
-				$description = new CLink($item['name_expanded'], 'javascript:void(0);');
-				$item['name'] = $item['hostname'].NAME_DELIMITER.$item['name_expanded'];
+				$description = new CLink($item['name'], 'javascript:void(0);');
+				$item['name'] = $item['hostname'].NAME_DELIMITER.$item['name'];
 
 				$checkbox_key = is_numeric($item[$options['srcfld1']])
 					? $item[$options['srcfld1']]
@@ -457,7 +457,7 @@ switch ($data['popup_type']) {
 					$data['multiselect']
 						? new CCheckBox('item['.$item[$options['srcfld1']].']', $item['itemid'])
 						: null,
-					(new CLink($item['name_expanded'], 'javascript:void(0);'))
+					(new CLink($item['name'], 'javascript:void(0);'))
 						->onClick('javascript: addValue('.
 							json_encode($options['reference']).', '.
 							json_encode($item['itemid']).', '.
@@ -477,8 +477,7 @@ switch ($data['popup_type']) {
 					'itemid' => $item['itemid'],
 					'name' => $options['patternselect']
 						? $item['name']
-						: $host['name'].NAME_DELIMITER.$item['name_expanded'],
-					'name_expanded' => $item['name_expanded'],
+						: $host['name'].NAME_DELIMITER.$item['name'],
 					'key_' => $item['key_'],
 					'flags' => $item['flags'],
 					'type' => $item['type'],

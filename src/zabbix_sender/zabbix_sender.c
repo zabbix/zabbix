@@ -450,7 +450,6 @@ static void	zbx_thread_handle_pipe_response(ZBX_THREAD_SENDVAL_ARGS *sendval_arg
 }
 #endif
 
-
 /******************************************************************************
  *                                                                            *
  * Function: sender_threads_wait                                              *
@@ -641,8 +640,6 @@ static const char	*get_string(const char *p, char *buf, size_t bufsize)
  *                FAIL - an error occurred                                    *
  *                SUCCEED_PARTIAL - the sending operation was completed       *
  *                successfully, but processing of at least one value failed   *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: active agent has almost the same function!                       *
  *                                                                            *

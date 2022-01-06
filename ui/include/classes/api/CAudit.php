@@ -127,19 +127,21 @@ class CAudit {
 		self::RESOURCE_SCRIPT => 'scripts',
 		self::RESOURCE_SETTINGS => 'config',
 		self::RESOURCE_SLA => 'sla',
+		self::RESOURCE_TEMPLATE => 'hosts',
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'dashboard',
 		self::RESOURCE_USER => 'users',
 		self::RESOURCE_USER_GROUP => 'usrgrp'
 	];
 
 	/**
-	 * Table primary keys of audit resources.
-	 * resource => table key
+	 * ID field names of audit resources.
+	 * resource => ID field name
 	 *
 	 * @var array
 	 */
-	private const TABLE_PKS = [
-		self::RESOURCE_PROXY => 'proxyid'
+	private const ID_FIELD_NAMES = [
+		self::RESOURCE_PROXY => 'proxyid',
+		self::RESOURCE_TEMPLATE => 'templateid'
 	];
 
 	/**
@@ -170,6 +172,7 @@ class CAudit {
 		self::RESOURCE_SCRIPT => 'name',
 		self::RESOURCE_SETTINGS => null,
 		self::RESOURCE_SLA => 'name',
+		self::RESOURCE_TEMPLATE => 'host',
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'name',
 		self::RESOURCE_USER => 'username',
 		self::RESOURCE_USER_GROUP => 'name'
@@ -203,6 +206,7 @@ class CAudit {
 		self::RESOURCE_SCRIPT => 'script',
 		self::RESOURCE_SETTINGS => 'settings',
 		self::RESOURCE_SLA => 'sla',
+		self::RESOURCE_TEMPLATE => 'template',
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'templatedashboard',
 		self::RESOURCE_USER => 'user',
 		self::RESOURCE_USER_GROUP => 'usergroup'
@@ -221,11 +225,15 @@ class CAudit {
 		],
 		self::RESOURCE_MACRO => [
 			'paths' => ['usermacro.value'],
-			'conditions' => ['usermacro.type' => ZBX_MACRO_TYPE_SECRET]
+			'conditions' => ['type' => ZBX_MACRO_TYPE_SECRET]
 		],
 		self::RESOURCE_MEDIA_TYPE => ['paths' => ['mediatype.passwd']],
 		self::RESOURCE_PROXY => ['paths' => ['proxy.tls_psk_identity', 'proxy.tls_psk']],
 		self::RESOURCE_SCRIPT => ['paths' => ['script.password']],
+		self::RESOURCE_TEMPLATE => [
+			'paths' => ['template.macros.value'],
+			'conditions' => ['type' => ZBX_MACRO_TYPE_SECRET]
+		],
 		self::RESOURCE_USER => ['paths' => ['user.passwd']]
 	];
 
@@ -290,6 +298,11 @@ class CAudit {
 		'sla.schedule' => 'sla_schedule',
 		'sla.excluded_downtimes' => 'sla_excluded_downtime',
 		'script.parameters' => 'script_param',
+		'template.groups' => 'hosts_groups',
+		'template.macros' => 'hostmacro',
+		'template.tags' => 'host_tag',
+		'template.templates' => 'hosts_templates',
+		'template.templates_clear' => 'hosts_templates',
 		'templatedashboard.pages' => 'dashboard_page',
 		'templatedashboard.pages.widgets' => 'widget',
 		'templatedashboard.pages.widgets.fields' => 'widget_field',
@@ -351,6 +364,11 @@ class CAudit {
 		'sla.service_tags' => 'sla_service_tagid',
 		'sla.schedule' => 'sla_scheduleid',
 		'sla.excluded_downtimes' => 'sla_excluded_downtimeid',
+		'template.groups' => 'hostgroupid',
+		'template.macros' => 'hostmacroid',
+		'template.tags' => 'hosttagid',
+		'template.templates' => 'hosttemplateid',
+		'template.templates_clear' => 'hosttemplateid',
 		'templatedashboard.pages' => 'dashboard_pageid',
 		'templatedashboard.pages.widgets' => 'widgetid',
 		'templatedashboard.pages.widgets.fields' => 'widget_fieldid',
@@ -391,6 +409,11 @@ class CAudit {
 	 * @var array
 	 */
 	private const BLOB_FIELDS = ['image.image'];
+
+	/**
+	 * Array of paths that can only contain a data to delete.
+	 */
+	private const DELETE_ONLY_FIELDS = ['template.templates_clear'];
 
 	/**
 	 * Add audit records.
@@ -434,8 +457,8 @@ class CAudit {
 				break;
 
 			default:
-				$table_key = array_key_exists($resource, self::TABLE_PKS)
-					? self::TABLE_PKS[$resource]
+				$table_key = array_key_exists($resource, self::ID_FIELD_NAMES)
+					? self::ID_FIELD_NAMES[$resource]
 					: DB::getPk(self::TABLE_NAMES[$resource]);
 
 				foreach ($objects as $object) {
@@ -581,14 +604,13 @@ class CAudit {
 	 *
 	 * @return bool
 	 */
-	private static function isValueToMask(int $resource, string $path, array $object): bool {
+	private static function isValueToMask(int $resource, string $real_path, array $object): bool {
 		if (!array_key_exists($resource, self::MASKED_PATHS)) {
 			return false;
 		}
 
-		if (strpos($path, '[') !== false) {
-			$path = preg_replace('/\[[0-9]+\]/', '', $path);
-		}
+		$object_path = self::getLastObjectPath($real_path);
+		$path = preg_replace('/\[[0-9]+\]/', '', $real_path);
 
 		if (!in_array($path, self::MASKED_PATHS[$resource]['paths'])) {
 			return false;
@@ -598,16 +620,18 @@ class CAudit {
 			return true;
 		}
 
-		$all_counditions = count(self::MASKED_PATHS[$resource]['conditions']);
+		$all_conditions = count(self::MASKED_PATHS[$resource]['conditions']);
 		$true_conditions = 0;
 
-		foreach (self::MASKED_PATHS[$resource]['conditions'] as $condition_path => $value) {
+		foreach (self::MASKED_PATHS[$resource]['conditions'] as $condition_key => $value) {
+			$condition_path = $object_path.'.'.$condition_key;
+
 			if (array_key_exists($condition_path, $object) && $object[$condition_path] == $value) {
 				$true_conditions++;
 			}
 		}
 
-		return ($true_conditions == $all_counditions);
+		return ($true_conditions == $all_conditions);
 	}
 
 	/**
@@ -800,9 +824,26 @@ class CAudit {
 			}
 		}
 
-		foreach ($nested_objects_paths as $path) {
-			if (!in_array($path, $db_nested_objects_paths)) {
-				$result[$path] = [self::DETAILS_ACTION_ADD];
+		foreach ($nested_objects_paths as $real_path) {
+			if (!in_array($real_path, $db_nested_objects_paths)) {
+				$path = $real_path;
+
+				if (strpos($real_path, '[') !== false) {
+					$path = preg_replace('/\[[0-9]+\]/', '', $real_path);
+				}
+
+				if (in_array($path, self::DELETE_ONLY_FIELDS)) {
+					$result[$real_path] = [self::DETAILS_ACTION_DELETE];
+
+					foreach ($object as $object_path => $value) {
+						if (substr($object_path, 0, strlen($real_path)) === $real_path) {
+							unset($object[$object_path]);
+						}
+					}
+				}
+				else {
+					$result[$real_path] = [self::DETAILS_ACTION_ADD];
+				}
 			}
 		}
 
@@ -824,20 +865,25 @@ class CAudit {
 					];
 				}
 			}
-			elseif ($value != $db_value) {
-				if (self::isNestedObjectProperty($path)) {
-					$result[self::getLastObjectPath($path)] = [self::DETAILS_ACTION_UPDATE];
-				}
+			else {
+				$is_mask_value = self::isValueToMask($resource, $path, $object);
+				$is_mask_db_value = self::isValueToMask($resource, $path, $db_object);
 
-				if (in_array($path, self::BLOB_FIELDS)) {
-					$result[$path] = [self::DETAILS_ACTION_UPDATE];
-				}
-				else {
-					$result[$path] = [
-						self::DETAILS_ACTION_UPDATE,
-						self::isValueToMask($resource, $path, $object) ? ZBX_SECRET_MASK : $value,
-						self::isValueToMask($resource, $path, $db_object) ? ZBX_SECRET_MASK : $db_value
-					];
+				if ($value != $db_value || $is_mask_value || $is_mask_db_value) {
+					if (self::isNestedObjectProperty($path)) {
+						$result[self::getLastObjectPath($path)] = [self::DETAILS_ACTION_UPDATE];
+					}
+
+					if (in_array($path, self::BLOB_FIELDS)) {
+						$result[$path] = [self::DETAILS_ACTION_UPDATE];
+					}
+					else {
+						$result[$path] = [
+							self::DETAILS_ACTION_UPDATE,
+							$is_mask_value ? ZBX_SECRET_MASK : $value,
+							$is_mask_db_value ? ZBX_SECRET_MASK : $db_value
+						];
+					}
 				}
 			}
 		}

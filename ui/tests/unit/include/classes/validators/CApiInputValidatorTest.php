@@ -2696,6 +2696,108 @@ class CApiInputValidatorTest extends TestCase {
 				'/folder1/folder2/'
 			],
 			[
+				['type' => API_USER_MACROS],
+				[],
+				'/macros',
+				[]
+			],
+			[
+				['type' => API_USER_MACROS],
+				['{$MACRO}', '{$MACRO: "context"}', '{$MACRO:regex:"regular expression"}'],
+				'/macros',
+				['{$MACRO}', '{$MACRO: "context"}', '{$MACRO:regex:"regular expression"}']
+			],
+			[
+				['type' => API_USER_MACROS, 'flags' => API_NORMALIZE],
+				'{$MACRO}',
+				'/macros',
+				['{$MACRO}']
+			],
+			[
+				['type' => API_USER_MACROS, 'length' => 8],
+				['{$MACRO}'],
+				'/macros',
+				['{$MACRO}']
+			],
+			[
+				['type' => API_USER_MACROS, 'flags' => API_NORMALIZE, 'length' => 8],
+				'{$MACRO}',
+				'/macros',
+				['{$MACRO}']
+			],
+			[
+				['type' => API_USER_MACROS],
+				'',
+				'/macros',
+				'Invalid parameter "/macros": an array is expected.'
+			],
+			[
+				['type' => API_USER_MACROS],
+				true,
+				'/macros',
+				'Invalid parameter "/macros": an array is expected.'
+			],
+			[
+				['type' => API_USER_MACROS],
+				null,
+				'/macros',
+				'Invalid parameter "/macros": an array is expected.'
+			],
+			[
+				['type' => API_USER_MACROS],
+				'{$MACRO}',
+				'/macros',
+				'Invalid parameter "/macros": an array is expected.'
+			],
+			[
+				['type' => API_USER_MACROS, 'flags' => API_NORMALIZE],
+				'',
+				'/macros',
+				'Invalid parameter "/macros": an array is expected.'
+			],
+			[
+				['type' => API_USER_MACROS, 'flags' => API_NORMALIZE],
+				true,
+				'/macros',
+				'Invalid parameter "/macros": an array is expected.'
+			],
+			[
+				['type' => API_USER_MACROS, 'flags' => API_NORMALIZE],
+				null,
+				'/macros',
+				'Invalid parameter "/macros": an array is expected.'
+			],
+			[
+				['type' => API_USER_MACROS, 'flags' => API_NORMALIZE],
+				'abcdefg',
+				'/macros',
+				'Invalid parameter "/macros": an array is expected.'
+			],
+			[
+				['type' => API_USER_MACROS],
+				['{$MACRO}', ''],
+				'/macros',
+				'Invalid parameter "/macros/2": cannot be empty.'
+			],
+			[
+				['type' => API_USER_MACROS],
+				['{$MACRO}', '{$MACRo}'],
+				'/macros',
+				'Invalid parameter "/macros/2": incorrect syntax near "o}".'
+			],
+			[
+				['type' => API_USER_MACROS],
+				['{$MACRO}', '{$MACRO2'],
+				'/macros',
+				'Invalid parameter "/macros/2": unexpected end of macro.'
+			],
+			[
+				['type' => API_USER_MACROS, 'length' => 8],
+				['{$MACRO}', '{$MACRO2}'],
+				'/macros',
+				'Invalid parameter "/macros/2": value is too long.'
+			],
+			[
 				['type' => API_USER_MACRO, 'length' => 8],
 				'{$MACRO}',
 				'/1/macro',
@@ -5075,6 +5177,69 @@ class CApiInputValidatorTest extends TestCase {
 				'/',
 				false,
 				'Invalid parameter "/5": value (dashboardid) already exists.'
+			],
+			[
+				['type' => API_USER_MACROS, 'uniq' => true],
+				['{$MACRO1}', '{$MACRO2}', '{$MACRO3}'],
+				'/',
+				true,
+				''
+			],
+			[
+				['type' => API_USER_MACROS],
+				['{$MACRO1}', '{$MACRO2}', '{$MACRO3}', '{$MACRO1}'],
+				'/',
+				true,
+				''
+			],
+			[
+				['type' => API_USER_MACROS, 'uniq' => true],
+				['{$MACRO: abc}', '{$MACRO:" abc"}', '{$MACRO:def}'],
+				'/',
+				true,
+				''
+			],
+			[
+				['type' => API_USER_MACROS],
+				['{$MACRO: abc}', '{$MACRO:" abc"}', '{$MACRO:def}', '{$MACRO:abc}'],
+				'/',
+				true,
+				''
+			],
+			[
+				['type' => API_USER_MACROS, 'uniq' => true],
+				['{$MACRO:regex:"^/tmp$"}', '{$MACRO:"regex:^/tmp$"}'],
+				'/',
+				true,
+				''
+			],
+			[
+				['type' => API_USER_MACROS],
+				['{$MACRO:regex:"^/tmp$"}', '{$MACRO:"regex:^/tmp$"}', '{$MACRO:regex:^/tmp$}'],
+				'/',
+				true,
+				''
+			],
+			[
+				['type' => API_USER_MACROS, 'uniq' => true],
+				['{$MACRO1}', '{$MACRO2}', '{$MACRO3}', '{$MACRO1}'],
+				'/',
+				false,
+				'Invalid parameter "/4": value ({$MACRO1}) already exists.'
+			],
+			[
+				['type' => API_USER_MACROS, 'uniq' => true],
+				['{$MACRO: abc}', '{$MACRO:" abc"}', '{$MACRO:def}', '{$MACRO:abc}'],
+				'/',
+				false,
+				'Invalid parameter "/4": value ({$MACRO:abc}) already exists.'
+			],
+			[
+				['type' => API_USER_MACROS, 'uniq' => true],
+				['{$MACRO:regex:"^/tmp$"}', '{$MACRO:"regex:^/tmp$"}', '{$MACRO:regex:^/tmp$}'],
+				'/',
+				false,
+				'Invalid parameter "/3": value ({$MACRO:regex:^/tmp$}) already exists.'
 			],
 			[
 				['type' => API_OBJECTS, 'uniq' => [['applicationid'], ['hostid', 'name']], 'fields' => [

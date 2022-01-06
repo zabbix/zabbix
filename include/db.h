@@ -561,8 +561,6 @@ char	*zbx_db_get_schema_esc(void);
  *                                                                            *
  * Purpose: represent graph item data                                         *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
  ******************************************************************************/
 typedef struct
 {

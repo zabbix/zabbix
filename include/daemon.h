@@ -45,4 +45,7 @@ void	zbx_set_sigusr_handler(void (*handler)(int flags));
 
 #define START_MAIN_ZABBIX_ENTRY(allow_root, user, flags)	daemon_start(allow_root, user, flags)
 
+void	zbx_signal_process_by_type(int proc_type, int proc_num, int flags, char **out);
+void	zbx_signal_process_by_pid(int pid, int flags, char **out);
+
 #endif	/* ZABBIX_DAEMON_H */

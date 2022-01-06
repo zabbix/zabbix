@@ -444,7 +444,6 @@ class CControllerPopupGeneric extends CController {
 			'disable_names' =>						'array',
 			'numeric' =>							'in 1',
 			'reference' =>							'string',
-			'orig_names' =>							'in 1',
 			'writeonly' =>							'in 1',
 			'noempty' =>							'in 1',
 			'submit_parent' =>						'in 1',
@@ -902,9 +901,9 @@ class CControllerPopupGeneric extends CController {
 				break;
 
 			case 'items':
-				foreach ($records as $itmeid => $row) {
-					$records[$row['name_expanded']] = ['itemid' => $row['name_expanded']] + $row;
-					unset($records[$itmeid]);
+				foreach ($records as $itemid => $row) {
+					$records[$row['name']] = ['itemid' => $row['name']] + $row;
+					unset($records[$itemid]);
 				}
 				break;
 
@@ -1132,8 +1131,8 @@ class CControllerPopupGeneric extends CController {
 			case 'items':
 			case 'item_prototypes':
 				$options += [
-					'output' => ['itemid', 'hostid', 'name', 'key_', 'flags', 'type', 'value_type', 'status'],
-					'selectHosts' => ['name', 'host'],
+					'output' => ['itemid', 'name', 'key_', 'flags', 'type', 'value_type', 'status'],
+					'selectHosts' => ['name'],
 					'templated' => $this->hasInput('templated_hosts') ? true : null
 				];
 
@@ -1177,12 +1176,7 @@ class CControllerPopupGeneric extends CController {
 						: [];
 				}
 
-				// Resolve item names by default.
-				$records = $this->hasInput('orig_names')
-					? CArrayHelper::copyObjectsKeys($records, ['name' => 'name_expanded'])
-					: CMacrosResolverHelper::resolveItemNames($records);
-
-				CArrayHelper::sort($records, ['name_expanded']);
+				CArrayHelper::sort($records, ['name']);
 				break;
 
 			case 'graphs':

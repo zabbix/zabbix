@@ -57,7 +57,6 @@ const char	*help_message[] = {
 	NULL	/* end of text */
 };
 
-
 /* long options */
 struct zbx_option	longopts[] =
 {
@@ -102,7 +101,6 @@ char	*CONFIG_TLS_CIPHER_CMD		= NULL;
 
 int	CONFIG_PASSIVE_FORKS		= 0;	/* not used in zabbix_js, just for linking with tls.c */
 int	CONFIG_ACTIVE_FORKS		= 0;	/* not used in zabbix_js, just for linking with tls.c */
-
 
 char	*CONFIG_SOURCE_IP 		= NULL;
 char	*CONFIG_SSL_CA_LOCATION		= NULL;
@@ -202,7 +200,6 @@ int	main(int argc, char **argv)
 		zbx_error("cannot open log: %s", error);
 		goto clean;
 	}
-
 
 	if (NULL == script_file || (NULL == input_file && NULL == param))
 	{

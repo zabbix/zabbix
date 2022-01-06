@@ -1664,6 +1664,7 @@ static int	jsonpath_regexp_match(const char *text, const char *pattern, double *
 	if (FAIL == zbx_regexp_compile(pattern, &rxp, &error))
 	{
 		zbx_set_json_strerror("invalid regular expression in JSON path: %s", error);
+		zbx_regexp_err_msg_free(error);
 		return FAIL;
 	}
 	*result = (0 == zbx_regexp_match_precompiled(text, rxp) ? 1.0 : 0.0);

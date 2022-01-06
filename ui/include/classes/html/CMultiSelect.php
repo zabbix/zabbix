@@ -251,7 +251,7 @@ class CMultiSelect extends CTag {
 					'with_monitored_triggers', 'noempty', 'editable', 'templated_hosts', 'hostid', 'parent_discoveryid',
 					'webitems', 'normal_only', 'numeric', 'with_graphs', 'with_graph_prototypes', 'with_items',
 					'with_simple_graph_items', 'with_simple_graph_item_prototypes', 'with_triggers', 'value_types',
-					'excludeids', 'disableids', 'enrich_parent_groups', 'orig_names', 'with_monitored_items',
+					'excludeids', 'disableids', 'enrich_parent_groups', 'with_monitored_items',
 					'with_httptests', 'with_hosts_and_templates', 'user_type', 'disable_selected', 'hostids',
 					'with_inherited', 'context', 'enabled_only'
 				];
@@ -388,10 +388,6 @@ class CMultiSelect extends CTag {
 				if (array_key_exists('enrich_parent_groups', $parameters) && $parameters['enrich_parent_groups']) {
 					$popup_parameters['enrich_parent_groups'] = '1';
 					$autocomplete_parameters['enrich_parent_groups'] = true;
-				}
-
-				if (array_key_exists('orig_names', $parameters) && $parameters['orig_names']) {
-					$popup_parameters['orig_names'] = '1';
 				}
 
 				if (array_key_exists('user_type', $parameters) && $parameters['user_type']) {

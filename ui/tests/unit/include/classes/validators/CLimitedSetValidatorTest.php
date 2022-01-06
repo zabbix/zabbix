@@ -19,8 +19,6 @@
 **/
 
 
-use PHPUnit\Framework\TestCase;
-
 class CLimitedSetValidatorTest extends CValidatorTest {
 
 	public function dataProviderValidParam() {

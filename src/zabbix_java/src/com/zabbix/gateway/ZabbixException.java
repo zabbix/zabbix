@@ -53,7 +53,7 @@ class ZabbixException extends Exception
 
 		return result;
 	}
-	
+
 	static String getRootCauseMessage(Throwable e)
 	{
 		if (e != null)

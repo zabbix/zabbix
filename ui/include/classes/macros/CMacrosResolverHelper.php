@@ -512,27 +512,6 @@ class CMacrosResolverHelper {
 	}
 
 	/**
-	 * Resolve item name macros to "name_expanded" field.
-	 *
-	 * @static
-	 *
-	 * @param array  $items
-	 * @param string $items[n]['itemid']
-	 * @param string $items[n]['hostid']
-	 * @param string $items[n]['name']
-	 * @param string $items[n]['key_']				item key (optional)
-	 *												but is (mandatory) if macros exist and "key_expanded" is not present
-	 * @param string $items[n]['key_expanded']		expanded item key (optional)
-	 *
-	 * @return array
-	 */
-	public static function resolveItemNames(array $items) {
-		self::init();
-
-		return self::$macrosResolver->resolveItemNames($items);
-	}
-
-	/**
 	 * Resolve item key macros to "key_expanded" field.
 	 *
 	 * @static
@@ -551,7 +530,7 @@ class CMacrosResolverHelper {
 	}
 
 	/**
-	 * Resolve macros in item description.
+	 * Resolve item description macros to "description_expanded" field.
 	 *
 	 * @static
 	 *
@@ -565,6 +544,24 @@ class CMacrosResolverHelper {
 		self::init();
 
 		return self::$macrosResolver->resolveItemDescriptions($items);
+	}
+
+	/**
+	 * Resolve single item widget description macros.
+	 *
+	 * @static
+	 *
+	 * @param array  $items
+	 * @param string $items[n]['hostid']
+	 * @param string $items[n]['itemid']
+	 * @param string $items[n]['name']    Field to resolve. Required.
+	 *
+	 * @return array                      Returns array of items with macros resolved.
+	 */
+	public static function resolveWidgetItemNames(array $items) {
+		self::init();
+
+		return self::$macrosResolver->resolveWidgetItemNames($items);
 	}
 
 	/**

@@ -249,19 +249,17 @@ class CControllerDashboardWidgetEdit extends CController {
 
 		if ($ids['item']) {
 			$db_items = API::Item()->get([
-				'output' => ['itemid', 'hostid', 'name', 'key_'],
+				'output' => ['name'],
 				'selectHosts' => ['name'],
 				'itemids' => array_keys($ids['item']),
 				'webitems' => true,
 				'preservekeys' => true
 			]);
 
-			$items = CMacrosResolverHelper::resolveItemNames($db_items);
-
-			foreach ($items as $itemid => $item) {
+			foreach ($db_items as $itemid => $item) {
 				foreach ($ids['item'][$itemid] as $field_name) {
 					$captions['ms']['items'][$field_name][$itemid] += [
-						'name' => $item['name_expanded'],
+						'name' => $item['name'],
 						'prefix' => $item['hosts'][0]['name'].NAME_DELIMITER
 					];
 				}
@@ -288,18 +286,16 @@ class CControllerDashboardWidgetEdit extends CController {
 
 		if ($ids['prototype_item']) {
 			$db_item_prototypes = API::ItemPrototype()->get([
-				'output' => ['itemid', 'hostid', 'name', 'key_'],
+				'output' => ['name'],
 				'selectHosts' => ['name'],
 				'itemids' => array_keys($ids['prototype_item']),
 				'preservekeys' => true
 			]);
 
-			$item_prototypes = CMacrosResolverHelper::resolveItemNames($db_item_prototypes);
-
-			foreach ($item_prototypes as $itemid => $item) {
+			foreach ($db_item_prototypes as $itemid => $item) {
 				foreach ($ids['prototype_item'][$itemid] as $field_name) {
 					$captions['ms']['item_prototypes'][$field_name][$itemid] += [
-						'name' => $item['name_expanded'],
+						'name' => $item['name'],
 						'prefix' => $item['hosts'][0]['name'].NAME_DELIMITER
 					];
 				}

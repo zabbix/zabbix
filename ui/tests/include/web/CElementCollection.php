@@ -380,7 +380,7 @@ class CElementCollection implements Iterator {
 			}
 
 			if (array_key_exists($key, $elements)) {
-				CTest::addWarning('Element attribute "'.$name.'" values are not unique in element collection.');
+				CTest::zbxAddWarning('Element attribute "'.$name.'" values are not unique in element collection.');
 			}
 
 			$elements[$key] = $element;

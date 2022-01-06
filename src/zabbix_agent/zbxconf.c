@@ -85,8 +85,6 @@ void	load_aliases(char **lines)
  * Return value: SUCCEED - successfully loaded user parameters                *
  *               FAIL    - failed to load user parameters                     *
  *                                                                            *
- * Author: Vladimir Levijev                                                   *
- *                                                                            *
  * Comments: calls add_user_parameter() for each entry                        *
  *                                                                            *
  ******************************************************************************/
@@ -127,8 +125,6 @@ int	load_user_parameters(char **lines, char **err)
  * Return value: SUCCEED - successful execution                               *
  *               FAIL    - failed to add rule                                 *
  *                                                                            *
- * Author: Andrejs Tumilovics                                                 *
- *                                                                            *
  ******************************************************************************/
 int	load_key_access_rule(const char *value, const struct cfg_line *cfg)
 {
@@ -153,12 +149,6 @@ int	load_key_access_rule(const char *value, const struct cfg_line *cfg)
  *                                                                            *
  * Parameters: def_lines - array of PerfCounter configuration entries         *
  *             eng_lines - array of PerfCounterEn configuration entries       *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Vladimir Levijev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	load_perf_counters(const char **def_lines, const char **eng_lines)
@@ -270,9 +260,9 @@ static int	load_config_user_params(void)
  ******************************************************************************/
 void	reload_user_parameters(unsigned char process_type, int process_num)
 {
-	char	*error = NULL;
+	char		*error = NULL;
+	ZBX_METRIC	*metrics_fallback = NULL;
 
-	remove_user_parameters();
 	zbx_strarr_init(&CONFIG_USER_PARAMETERS);
 
 	if (FAIL == load_config_user_params())
@@ -282,14 +272,19 @@ void	reload_user_parameters(unsigned char process_type, int process_num)
 		goto out;
 	}
 
+	get_metrics_copy(&metrics_fallback);
+	remove_user_parameters();
+
 	if (FAIL == load_user_parameters(CONFIG_USER_PARAMETERS, &error))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot reload user parameters [%s #%d], stopped at: %s",
+		set_metrics(metrics_fallback);
+		zabbix_log(LOG_LEVEL_ERR, "cannot reload user parameters [%s #%d], %s",
 				get_process_type_string(process_type), process_num, error);
 		zbx_free(error);
 		goto out;
 	}
 
+	free_metrics_ext(&metrics_fallback);
 	zabbix_log(LOG_LEVEL_INFORMATION, "user parameters reloaded [%s #%d]", get_process_type_string(process_type),
 			process_num);
 out:

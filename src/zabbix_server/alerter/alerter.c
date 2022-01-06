@@ -161,7 +161,6 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 	int		ret;
 	char		error[MAX_STRING_LEN];
 
-
 	zbx_alerter_deserialize_email(ipc_message->data, &alertid, &mediatypeid, &eventid, &sendto, &subject, &message,
 			&smtp_server, &smtp_port, &smtp_helo, &smtp_email, &smtp_security, &smtp_verify_peer,
 			&smtp_verify_host, &smtp_authentication, &username, &password, &content_type);
@@ -301,8 +300,6 @@ static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
  * Function: main_alerter_loop                                                *
  *                                                                            *
  * Purpose: periodically check table alerts and send notifications if needed  *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
 ZBX_THREAD_ENTRY(alerter_thread, args)

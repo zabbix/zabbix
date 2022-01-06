@@ -685,7 +685,6 @@ static int	DBpatch_5050068_calc_services_write_value(zbx_uint64_t roleid, int *v
 		if (0 == strcmp("services.write", row[0]))
 			goto out;
 
-
 		if (0 == strcmp("actions.default_access", row[0]))
 			default_access = atoi(row[1]);
 	}
@@ -1202,8 +1201,58 @@ static int	DBpatch_5050113(void)
 	return DBmodify_field_type("actions", &new_field, &old_field);
 }
 
-
 static int	DBpatch_5050114(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*sql = NULL, *params = NULL;
+	const char	*output;
+	size_t		sql_alloc = 0, sql_offset = 0, params_alloc = 0, params_offset = 0;
+	int		ret = SUCCEED;
+
+	/* 22 - ZBX_PREPROC_PROMETHEUS_PATTERN */
+	result = DBselect("select item_preprocid,params from item_preproc where type=22");
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	{
+		char	*params_esc;
+
+		if (NULL == (output = strchr(row[1], '\n')))
+			continue;
+
+		zbx_strncpy_alloc(&params, &params_alloc, &params_offset, row[1], (size_t)(output - row[1] + 1));
+		zbx_strcpy_alloc(&params, &params_alloc, &params_offset, '\0' == output[1] ? "value" : "label");
+		zbx_strcpy_alloc(&params, &params_alloc, &params_offset, output);
+
+		params_esc = DBdyn_escape_field("item_preproc", "params", params);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update item_preproc set params='%s' where item_preprocid=%s;\n", params_esc, row[0]);
+		ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+
+		zbx_free(params_esc);
+		params_offset = 0;
+	}
+
+	DBfree_result(result);
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (SUCCEED == ret && 16 < sql_offset)
+	{
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			ret = FAIL;
+	}
+
+	zbx_free(params);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_5050115(void)
 {
 	const ZBX_TABLE	table =
 		{"sla", "slaid", 0,
@@ -1224,12 +1273,12 @@ static int	DBpatch_5050114(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5050115(void)
+static int	DBpatch_5050116(void)
 {
 	return DBcreate_index("sla", "sla_1", "name", 1);
 }
 
-static int	DBpatch_5050116(void)
+static int	DBpatch_5050117(void)
 {
 	const ZBX_TABLE	table =
 		{"sla_service_tag", "sla_service_tagid", 0,
@@ -1247,19 +1296,19 @@ static int	DBpatch_5050116(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5050117(void)
+static int	DBpatch_5050118(void)
 {
 	return DBcreate_index("sla_service_tag", "sla_service_tag_1", "slaid", 0);
 }
 
-static int	DBpatch_5050118(void)
+static int	DBpatch_5050119(void)
 {
 	const ZBX_FIELD	field = {"slaid", NULL, "sla", "slaid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("sla_service_tag", 1, &field);
 }
 
-static int	DBpatch_5050119(void)
+static int	DBpatch_5050120(void)
 {
 	const ZBX_TABLE	table =
 		{"sla_schedule", "sla_scheduleid", 0,
@@ -1276,19 +1325,19 @@ static int	DBpatch_5050119(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5050120(void)
+static int	DBpatch_5050121(void)
 {
 	return DBcreate_index("sla_schedule", "sla_schedule_1", "slaid", 0);
 }
 
-static int	DBpatch_5050121(void)
+static int	DBpatch_5050122(void)
 {
 	const ZBX_FIELD	field = {"slaid", NULL, "sla", "slaid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("sla_schedule", 1, &field);
 }
 
-static int	DBpatch_5050122(void)
+static int	DBpatch_5050123(void)
 {
 	const ZBX_TABLE table =
 		{"sla_excluded_downtime", "sla_excluded_downtimeid", 0,
@@ -1306,26 +1355,26 @@ static int	DBpatch_5050122(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5050123(void)
+static int	DBpatch_5050124(void)
 {
 	return DBcreate_index("sla_excluded_downtime", "sla_excluded_downtime_1", "slaid", 0);
 }
 
-static int	DBpatch_5050124(void)
+static int	DBpatch_5050125(void)
 {
 	const ZBX_FIELD	field = {"slaid", NULL, "sla", "slaid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("sla_excluded_downtime", 1, &field);
 }
 
-static int	DBpatch_5050125(void)
+static int	DBpatch_5050126(void)
 {
 	const ZBX_FIELD	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("services", &field);
 }
 
-static int	DBpatch_5050126(void)
+static int	DBpatch_5050127(void)
 {
 	const ZBX_FIELD	field = {"uuid", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
@@ -1617,7 +1666,7 @@ static void	services_times_convert_downtime(zbx_vector_services_times_t *service
 	zbx_vector_services_times_destroy(&services_downtimes);
 }
 
-static int	DBpatch_5050127(void)
+static int	DBpatch_5050128(void)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -1718,22 +1767,22 @@ static int	DBpatch_5050127(void)
 	return ret;
 }
 
-static int	DBpatch_5050128(void)
+static int	DBpatch_5050129(void)
 {
 	return DBdrop_table("services_times");
 }
 
-static int	DBpatch_5050129(void)
+static int	DBpatch_5050130(void)
 {
 	return DBdrop_field("services", "showsla");
 }
 
-static int	DBpatch_5050130(void)
+static int	DBpatch_5050131(void)
 {
 	return DBdrop_field("services", "goodsla");
 }
 
-static int	DBpatch_5050131(void)
+static int	DBpatch_5050132(void)
 {
 	int		ret = SUCCEED;
 	char		*uuid, *sql = NULL;
@@ -1767,7 +1816,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_5050132(void)
+static int	DBpatch_5050133(void)
 {
 	if (ZBX_DB_OK > DBexecute("update role_rule set name='ui.services.services' where name='ui.monitoring.services'"))
 		return FAIL;
@@ -1775,19 +1824,19 @@ static int	DBpatch_5050132(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_5050133(void)
+static int	DBpatch_5050134(void)
 {
 	const ZBX_FIELD	field = {"value_serviceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("widget_field", &field);
 }
 
-static int	DBpatch_5050134(void)
+static int	DBpatch_5050135(void)
 {
 	return DBcreate_index("widget_field", "widget_field_7", "value_serviceid", 0);
 }
 
-static int	DBpatch_5050135(void)
+static int	DBpatch_5050136(void)
 {
 	const ZBX_FIELD	field = {"value_serviceid", NULL, "services", "serviceid", 0, ZBX_TYPE_ID, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -1795,33 +1844,33 @@ static int	DBpatch_5050135(void)
 	return DBadd_foreign_key("widget_field", 7, &field);
 }
 
-static int	DBpatch_5050136(void)
+static int	DBpatch_5050137(void)
 {
 	const ZBX_FIELD	field = {"value_slaid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("widget_field", &field);
 }
 
-static int	DBpatch_5050137(void)
+static int	DBpatch_5050138(void)
 {
 	return DBcreate_index("widget_field", "widget_field_8", "value_slaid", 0);
 }
 
-static int	DBpatch_5050138(void)
+static int	DBpatch_5050139(void)
 {
 	const ZBX_FIELD	field = {"value_slaid", NULL, "sla", "slaid", 0, ZBX_TYPE_ID, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("widget_field", 8, &field);
 }
 
-static int	DBpatch_5050139(void)
+static int	DBpatch_5050140(void)
 {
 	const ZBX_FIELD	field = {"created_at", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("services", &field);
 }
 
-static int	DBpatch_5050140(void)
+static int	DBpatch_5050141(void)
 {
 	if (ZBX_DB_OK <= DBexecute("update services set created_at=%d", SERVICE_INITIAL_EFFECTIVE_DATE))
 		return SUCCEED;
@@ -1962,5 +2011,6 @@ DBPATCH_ADD(5050137, 0, 1)
 DBPATCH_ADD(5050138, 0, 1)
 DBPATCH_ADD(5050139, 0, 1)
 DBPATCH_ADD(5050140, 0, 1)
+DBPATCH_ADD(5050141, 0, 1)
 
 DBPATCH_END()

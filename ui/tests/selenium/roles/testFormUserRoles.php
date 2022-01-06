@@ -27,6 +27,7 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
  * @backup role, module, users
  * @onBefore prepareRoleData
  * @onBefore prepareUserData
+ * @onBefore prepareServiceData
  */
 class testFormUserRoles extends CWebTest {
 
@@ -102,6 +103,41 @@ class testFormUserRoles extends CWebTest {
 				'usrgrps' => [
 					[
 						'usrgrpid' => '7'
+					]
+				]
+			]
+		]);
+	}
+
+	public function prepareServiceData() {
+		CDataHelper::call('service.create', [
+			[
+				'name' => 'Service 1',
+				'algorithm' => 1,
+				'showsla' => 0,
+				'sortorder' => 1
+			],
+			[
+				'name' => 'Service 2',
+				'algorithm' => 2,
+				'showsla' => 0,
+				'sortorder' => 2,
+				'problem_tags' => [
+					[
+						'tag' => 'tag1',
+						'value' => 'value1'
+					],
+					[
+						'tag' => 'tag2',
+						'value' => 'value2'
+					],
+					[
+						'tag' => 'tag3',
+						'value' => 'value3'
+					],
+					[
+						'tag' => 'tag4',
+						'value' => 'value4'
 					]
 				]
 			]
@@ -350,6 +386,44 @@ class testFormUserRoles extends CWebTest {
 					],
 					'message_header' => 'Cannot create user role',
 					'message_details' => 'At least one UI element must be enabled for user role "super_admin_everything_removed".'
+				]
+			],
+			// Read-write service tag name not specified.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Missing Read-write service tag name',
+						'User type' => 'Admin',
+						'Read-write access to services' => 'Service list'
+					],
+					'write_services' => [
+						'Read-write access to services with tag' => [
+							'service_write_tag_value' => 'value'
+						]
+					],
+					'message_header' => 'Cannot create user role',
+					'message_details' => 'Cannot have non-empty tag value while having empty tag in rule "services.write.tag"'
+							.' for user role "Missing Read-write service tag name".'
+				]
+			],
+			// Read-only service tag name not specified.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Missing Read-write service tag name',
+						'User type' => 'Admin',
+						'Read-only access to services' => 'Service list'
+					],
+					'write_services' => [
+						'Read-only access to services with tag' => [
+							'service_read_tag_value' => 'value'
+						]
+					],
+					'message_header' => 'Cannot create user role',
+					'message_details' => 'Cannot have non-empty tag value while having empty tag in rule "services.read.tag"'
+							.' for user role "Missing Read-write service tag name".'
 				]
 			],
 			// Special symbols in the name.
@@ -642,6 +716,88 @@ class testFormUserRoles extends CWebTest {
 					],
 					'message_header' => 'User role created'
 				]
+			],
+			// Access to services set to None.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'No access to services',
+						'User type' => 'Admin',
+						'Read-write access to services' => 'None',
+						'Read-write access to services' => 'None'
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			// Access to services set to All in both cases.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'All access to services',
+						'User type' => 'Admin',
+						'Read-write access to services' => 'All',
+						'Read-write access to services' => 'All'
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			// Access to services set to Service list.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Access to specific services',
+						'User type' => 'Admin',
+						'Read-write access to services' => 'Service list',
+						'Read-only access to services' => 'Service list'
+					],
+					'write_services' => [
+						'xpath:(//div[@class="multiselect-control"])[1]' => 'Service 1',
+						'Read-write access to services with tag' => [
+							'service-write-tag-tag' => 'tag-write',
+							'service_write_tag_value' => 'value-write'
+						]
+					],
+					'read_services' => [
+						'xpath:(//div[@class="multiselect-control"])[2]' => ['Service 1', 'Service 2'],
+						'Read-only access to services with tag' => [
+							'service-read-tag-tag' => 'tag-read',
+							'service_read_tag_value' => 'value-read'
+						]
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			// Access to services set to Service list.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Only read-only services',
+						'User type' => 'Super admin',
+						'Read-only access to services' => 'Service list'
+					],
+					'read_services' => [
+						'xpath:(//div[@class="multiselect-control"])[2]' => ['Service 1', 'Service 2']
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			// Access to services set to Service list but the list is empty.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Services access with empty list and tags',
+						'User type' => 'User',
+						'Read-write access to services' => 'Service list',
+						'Read-only access to services' => 'Service list'
+					],
+					'override_service_access' => 'None',
+					'message_header' => 'User role created'
+				]
 			]
 		];
 	}
@@ -678,6 +834,13 @@ class testFormUserRoles extends CWebTest {
 		$screenshot_area = $this->query('id:user_role_tab')->one();
 		foreach ($roles as $role) {
 			$this->query('id:user-type')->one()->asZDropdown()->select($role);
+
+			if ($role === 'Super admin') {
+				$form->invalidate();
+				foreach (['Read-write access to services', 'Read-only access to services'] as $field) {
+					$form->getField($field)->fill('Service list');
+				}
+			}
 			$this->assertScreenshotExcept($screenshot_area, ['query' => 'xpath://input[@id="name"]'], $role);
 		}
 
@@ -831,6 +994,7 @@ class testFormUserRoles extends CWebTest {
 		$sql_api = 'SELECT * FROM role_rule WHERE type=1 and roleid in (SELECT roleid FROM role WHERE name='
 				.zbx_dbstr($data['fields']['Name']).')'.' ORDER BY value_str ASC';
 		$role_rules = CDBHelper::getColumn($sql_api, 'value_str');
+		sort($role_rules);
 		$this->assertEquals($data['api_list'], $role_rules);
 	}
 
@@ -890,6 +1054,40 @@ class testFormUserRoles extends CWebTest {
 					],
 					'message_header' => 'Cannot update user role',
 					'message_details' => 'At least one UI element must be enabled for user role "role_for_update".'
+				]
+			],
+			// Read-write service tag name not specified.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Read-write access to services' => 'Service list'
+					],
+					'write_services' => [
+						'Read-write access to services with tag' => [
+							'service_write_tag_value' => 'value'
+						]
+					],
+					'message_header' => 'Cannot update user role',
+					'message_details' => 'Cannot have non-empty tag value while having empty tag in rule "services.write.tag"'
+							.' for user role "role_for_update".'
+				]
+			],
+			// Read-only service tag name not specified.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Read-only access to services' => 'Service list'
+					],
+					'write_services' => [
+						'Read-only access to services with tag' => [
+							'service_read_tag_value' => 'value'
+						]
+					],
+					'message_header' => 'Cannot update user role',
+					'message_details' => 'Cannot have non-empty tag value while having empty tag in rule "services.read.tag"'
+							.' for user role "role_for_update".'
 				]
 			],
 			// Change name.
@@ -979,6 +1177,78 @@ class testFormUserRoles extends CWebTest {
 						'Execute scripts' => false,
 						'Manage API tokens' => false,
 						'Default access to new actions' => false
+					],
+					'message_header' => 'User role updated'
+				]
+			],
+			// Access to services set to None.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Read-write access to services' => 'None',
+						'Read-only access to services' => 'None'
+					],
+					'message_header' => 'User role updated'
+				]
+			],
+			// Access to services set to All in both cases.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Read-write access to services' => 'All',
+						'Read-only access to services' => 'All'
+					],
+					'message_header' => 'User role updated'
+				]
+			],
+			// Access to services set to Service list but the list is empty.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Read-write access to services' => 'Service list',
+						'Read-only access to services' => 'Service list'
+					],
+					'override_service_access' => 'None',
+					'message_header' => 'User role updated'
+				]
+			],
+			// Access to services set to Service list.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Read-only access to services' => 'Service list'
+					],
+					'read_services' => [
+						'xpath:(//div[@class="multiselect-control"])[2]' => ['Service 1', 'Service 2']
+					],
+					'message_header' => 'User role updated'
+				]
+			],
+			// Access to services set to Service list.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Read-write access to services' => 'Service list',
+						'Read-only access to services' => 'Service list'
+					],
+					'write_services' => [
+						'xpath:(//div[@class="multiselect-control"])[1]' => ['Service 1', 'Service 2'],
+						'Read-write access to services with tag' => [
+							'service-write-tag-tag' => 'tag-write',
+							'service_write_tag_value' => 'value-write'
+						]
+					],
+					'read_services' => [
+						'xpath:(//div[@class="multiselect-control"])[2]' => 'Service 1',
+						'Read-only access to services with tag' => [
+							'service-read-tag-tag' => 'tag-read',
+							'service_read_tag_value' => 'value-read'
+						]
 					],
 					'message_header' => 'User role updated'
 				]
@@ -1096,6 +1366,115 @@ class testFormUserRoles extends CWebTest {
 	}
 
 	/**
+	 *  Checking layout with opened Add services dialog.
+	 */
+	public function testFormUserRoles_ServicesLayout() {
+		$services_table = [
+			[
+				'Name' => 'Service 1',
+				'Status calculation rule' => 'Most critical if all children have problems',
+				'Problem tags' => ''
+			],
+			[
+				'Name' => 'Service 2',
+				'Status calculation rule' => 'Most critical of child services',
+				'Problem tags' => ['tag1: value1', 'tag2: value2', 'tag3: value3', 'tag4: value4']
+			]
+		];
+
+		$this->page->login();
+		$this->page->open('zabbix.php?action=userrole.edit&roleid=2')->waitUntilReady();
+		$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
+
+		foreach (['Read-write' => '[1]', 'Read-only' => '[2]'] as $field => $i) {
+			$form->getField($field.' access to services')->fill('Service list');
+			$multiselect = $this->query('xpath:(//div[@class="multiselect-control"])'.$i)->asMultiselect()->one();
+			$this->assertTrue($multiselect->isVisible());
+			$multiselect->edit();
+
+			$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+			$this->assertEquals('Add services', $dialog->getTitle());
+
+			// Check filter form.
+			$filter_form = $dialog->query('name:services_filter_form')->one();
+			$this->assertEquals('Name', $filter_form->query('xpath:.//label')->one()->getText());
+			$this->assertEquals(255, $filter_form->query('name:filter_name')->one()->getAttribute('maxlength'));
+			$this->assertEquals(4, $dialog->query('button', ['Filter', 'Reset', 'Select', 'Cancel'])->all()
+					->filter(new CElementFilter(CElementFilter::CLICKABLE))->count());
+
+			$table = $dialog->query('class:list-table')->asTable()->one();
+			$this->assertEquals(['', 'Name', 'Status calculation rule', 'Problem tags'], $table->getHeadersText());
+
+			// Check problem tags in hint if there are more than 3 problem tags for service.
+			foreach ($services_table as &$service) {
+				if (is_array($service['Problem tags'])) {
+					if (count($service['Problem tags']) > 3) {
+						$table->findRow('Name', $service['Name'])->getColumn('Problem tags')
+								->query('class:icon-wzrd-action')->one()->click();
+						$popup = $this->query('xpath://div[@data-hintboxid]')->one()->waitUntilReady();
+						foreach ($service['Problem tags'] as $tag) {
+							$this->assertTrue($popup->query("xpath:.//div[text()=".CXPathHelper::escapeQuotes($tag)."]")
+									->one(false)->isValid()
+							);
+						}
+						$popup->query('class:overlay-close-btn')->one()->click();
+
+						// Leave only 3 tags in array as it is the maximal number of tags displayed in table per row.
+						array_splice($service['Problem tags'], 3);
+					}
+					// Combine all problem tags into a single string so that it would be valid for comparison.
+					$service['Problem tags'] = implode('',$service['Problem tags']);
+				}
+			}
+			// Check the content of the services list with modified expected value in tags column.
+			$this->assertTableData($services_table);
+
+			// Check filtering of services by name.
+			$searches = [
+				'ice ' => ['Service 1', 'Service 2'],
+				'1' => ['Service 1'],
+				'Service 123' => null
+			];
+			$filter_button = $filter_form->query('button:Filter')->one();
+			foreach ($searches as $string => $result) {
+				$filter_form->query('name:filter_name')->one()->fill($string);
+				$filter_button->click();
+				$dialog->waitUntilReady();
+
+				/**
+				 * After the filter is submitted, check that the expected services are returned in the list,
+				 * or that 'No data found.' message is returned.
+				 */
+				if ($result !== null) {
+					$this->assertTableDataColumn($result);
+				}
+				else {
+					$this->assertTableData();
+				}
+			}
+
+			// Select one of the Services and make sure its not displayed in the list anymore.
+			$filter_form->query('button:Reset')->one()->click();
+			$dialog->invalidate();
+			$dialog->query('link:Service 1')->waitUntilClickable()->one()->click();
+			$dialog->ensureNotPresent();
+
+			$multiselect->edit();
+			$dialog->invalidate();
+			$this->assertTableDataColumn(['Service 2']);
+			$dialog->close();
+
+			// Check the layout of tag related fields in Service section of user role config form.
+			$tag_field = $form->getField($field.' access to services with tag');
+			foreach (['tag', 'value'] as $input_type) {
+				$input = $tag_field->query('xpath:.//input[contains(@name, '.CXPathHelper::escapeQuotes('tag_'.$input_type).')]')->one();
+				$this->assertEquals($input_type, $input->getAttribute('placeholder'));
+				$this->assertEquals(255, $input->getAttribute('maxlength'));
+			}
+		}
+	}
+
+	/**
 	 * Create or update role.
 	 *
 	 * @param array $data		given data provider
@@ -1110,6 +1489,13 @@ class testFormUserRoles extends CWebTest {
 		}
 		$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
 		$form->fill($data['fields']);
+
+		if (array_key_exists('write_services', $data) || array_key_exists('read_services', $data)) {
+			$services = array_merge(CTestArrayHelper::get($data, 'write_services', []),
+					CTestArrayHelper::get($data,'read_services', [])
+			);
+			$form->fill($services);
+		}
 
 		if (array_key_exists('api_methods', $data)) {
 			$this->query('xpath:(//div[@class="multiselect-control"])[3]')->asMultiselect()->one()->fill($data['api_methods']);
@@ -1142,7 +1528,18 @@ class testFormUserRoles extends CWebTest {
 			if (array_key_exists('space', $data)) {
 				$data['fields']['Name'] = trim($data['fields']['Name']);
 			}
+
+			if (array_key_exists('override_service_access', $data)) {
+				foreach (['Read-write', 'Read-only'] as $field) {
+					$data['fields'][$field.' access to services'] = $data['override_service_access'];
+				}
+			}
+
 			$form->checkValue($data['fields']);
+
+			if (array_key_exists('write_services', $data) || array_key_exists('read_services', $data)) {
+				$form->checkValue($services);
+			}
 
 			if (array_key_exists('api_methods', $data)) {
 				$api_methods = $this->query('xpath:(//div[@class="multiselect-control"])[3]')->asMultiselect()->one()->getValue();

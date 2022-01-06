@@ -1020,15 +1020,18 @@ static void	add_sentusers_msg_esc_cancel(ZBX_USER_MSG **user_msg, zbx_uint64_t a
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select distinct userid,mediatypeid,subject,message,esc_step"
+			"select userid,mediatypeid,subject,message,esc_step"
 			" from alerts"
-			" where actionid=" ZBX_FS_UI64
-				" and mediatypeid is not null"
-				" and alerttype=%d"
-				" and acknowledgeid is null"
-				" and eventid=" ZBX_FS_UI64
-				" order by userid,mediatypeid,esc_step desc",
-				actionid, ALERT_TYPE_MESSAGE, event->eventid);
+			" where alertid in (select max(alertid)"
+				" from alerts"
+				" where actionid=" ZBX_FS_UI64
+					" and mediatypeid is not null"
+					" and alerttype=%d"
+					" and acknowledgeid is null"
+					" and eventid=" ZBX_FS_UI64
+					" group by userid,mediatypeid,esc_step)"
+			" order by userid,mediatypeid,esc_step desc",
+			actionid, ALERT_TYPE_MESSAGE, event->eventid);
 
 	result = DBselect("%s", sql);
 
@@ -1782,8 +1785,6 @@ err_alert:
  *                                                                            *
  * Return value: SUCCEED - matches, FAIL - otherwise                          *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  ******************************************************************************/
 static int	check_operation_conditions(const DB_EVENT *event, zbx_uint64_t operationid, unsigned char evaltype)
 {
@@ -2402,7 +2403,6 @@ out:
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s error:'%s'", __func__, check_escalation_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
-
 
 	return ret;
 }
@@ -3420,12 +3420,6 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
  * Function: main_escalator_loop                                              *
  *                                                                            *
  * Purpose: periodically check table escalations and generate alerts          *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: never returns                                                    *
  *                                                                            *

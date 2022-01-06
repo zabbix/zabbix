@@ -133,17 +133,6 @@ class CControllerProfileUpdate extends CController {
 		switch ($idx) {
 			// PROFILE_TYPE_STR
 			case 'web.dashboard.widget.geomap.default_view':
-				$value_str = $this->getInput('value_str');
-				if ($value_str === '') { // default value
-					CProfile::delete($idx, $this->getInput('idx2'));
-				}
-				else {
-					foreach ($this->getInput('idx2') as $idx2) {
-						CProfile::update($idx, $value_str, PROFILE_TYPE_STR, $idx2);
-					}
-				}
-				break;
-
 			case 'web.dashboard.widget.geomap.severity_filter':
 				$value_str = $this->getInput('value_str');
 				if ($value_str === '') { // default value
