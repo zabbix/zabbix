@@ -89,8 +89,6 @@ static size_t	curl_ignore_cb(void *ptr, size_t size, size_t nmemb, void *userdat
  *                                                                            *
  * Parameters: httptest - [IN] the http test data                             *
  *                                                                            *
- * Author: Andris Zeila                                                       *
- *                                                                            *
  ******************************************************************************/
 static void	httptest_remove_macros(zbx_httptest_t *httptest)
 {
@@ -613,14 +611,6 @@ out:
  *                                                                            *
  * Purpose: process single scenario of http test                              *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 {
@@ -1046,8 +1036,6 @@ httptest_error:
  * Parameters: now - current timestamp                                        *
  *                                                                            *
  * Return value: number of processed httptests                                *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: always SUCCEED                                                   *
  *                                                                            *

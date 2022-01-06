@@ -153,8 +153,6 @@ out:
  * Return value:  SUCCEED - host is found                                     *
  *                FAIL - an error occurred or host not found                  *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  * Comments: NB! adds host to the database if it does not exist or if it      *
  *           exists but metadata, interface, interface type or port has       *
  *           changed                                                          *
@@ -519,8 +517,6 @@ out:
  *                                                                            *
  * Return value:  SUCCEED - list of active checks sent successfully           *
  *                FAIL - an error occurred                                    *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *jp)

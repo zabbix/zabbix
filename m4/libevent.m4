@@ -1,6 +1,5 @@
 # LIBEVENT_CHECK_CONFIG ([DEFAULT-ACTION])
 # ----------------------------------------------------------
-#    Andris Zeila                             Dec-13-2016
 #
 # Checks for libevent.  DEFAULT-ACTION is the string yes or no to
 # specify whether to default to --with-libevent or --without-libevent.

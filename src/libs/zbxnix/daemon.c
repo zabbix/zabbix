@@ -143,7 +143,7 @@ void	zbx_signal_process_by_type(int proc_type, int proc_num, int flags, char **o
 	}
 	else
 	{
-		if (0 != failed_num)
+		if (0 != failed_num && NULL != out)
 			*out = zbx_strdup(*out, "failed to redirect remote control signal(s)");
 	}
 }
@@ -182,7 +182,7 @@ void	zbx_signal_process_by_pid(int pid, int flags, char **out)
 	}
 	else
 	{
-		if (0 != failed_num)
+		if (0 != failed_num && NULL != out)
 			*out = zbx_strdup(*out, "failed to redirect remote control signal(s)");
 	}
 }
@@ -313,8 +313,6 @@ static void	set_daemon_signal_handlers(void)
  *             user       - user on the system to which to drop the           *
  *                          privileges                                        *
  *             flags      - daemon startup flags                              *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: it doesn't allow running under 'root' if allow_root is zero      *
  *                                                                            *

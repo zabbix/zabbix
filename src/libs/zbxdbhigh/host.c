@@ -244,8 +244,6 @@ static void	DBget_sysmapelements_by_element_type_ids(zbx_vector_uint64_t *seleme
  *                                                                            *
  * Return value: SUCCEED if no collisions found                               *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
@@ -447,8 +445,6 @@ out:
  *                                                                            *
  * Return value: SUCCEED if no collisions found                               *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
@@ -535,8 +531,6 @@ out:
  *             templateids - [IN] array of template IDs                       *
  *                                                                            *
  * Return value: SUCCEED if no collisions found                               *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
@@ -636,8 +630,6 @@ static void	zbx_graph_valid_free(zbx_template_graph_valid_t *graph)
  *             templateids - [IN] array of template IDs                       *
  *                                                                            *
  * Return value: SUCCEED if no collisions found                               *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
@@ -888,8 +880,6 @@ out:
  *                                                                            *
  * Purpose: delete action conditions by condition type and id                 *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  ******************************************************************************/
 static void	DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid)
 {
@@ -962,8 +952,6 @@ static void	DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
  *             field     - [IN] field name from table                         *
  *             tables_hk - [IN] table name to delete information from         *
  *             count     - [IN] number of tables in tables array              *
- *                                                                            *
- * Author: Eugene Grigorjev, Alexander Vladishev                              *
  *                                                                            *
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
@@ -1097,8 +1085,6 @@ out:
  *                                                                            *
  * Parameters: itemids - [IN] item identifiers from database                  *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
@@ -1222,8 +1208,6 @@ out:
 /******************************************************************************
  *                                                                            *
  * Parameters: itemids - [IN] item identifiers from database                  *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 static void	DBdelete_graphs_by_itemids(const zbx_vector_uint64_t *itemids)
@@ -1388,8 +1372,6 @@ out:
  * Purpose: delete web tests from database                                    *
  *                                                                            *
  * Parameters: httptestids - [IN] array of httptest id's from database        *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
@@ -1600,8 +1582,6 @@ clean:
  * Parameters: hostid      - [IN] host identifier from database               *
  *             templateids - [IN] array of template IDs                       *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
@@ -1642,8 +1622,6 @@ static void	DBdelete_template_graphs(zbx_uint64_t hostid, const zbx_vector_uint6
  *                                                                            *
  * Parameters: hostid      - [IN] host identifier from database               *
  *             templateids - [IN] array of template IDs                       *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
@@ -1729,8 +1707,6 @@ clean:
  * Parameters: hostid      - [IN] host identifier from database               *
  *             templateids - [IN] array of template IDs                       *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
@@ -1771,8 +1747,6 @@ clean:
  * Parameters: hostid      - [IN] host identifier from database               *
  *             templateids - [IN/OUT] array of template IDs                   *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  ******************************************************************************/
 static void	get_templates_by_hostid(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
 {
@@ -1802,8 +1776,6 @@ static void	get_templates_by_hostid(zbx_uint64_t hostid, zbx_vector_uint64_t *te
  *             hostname        - [IN] name of the host                        *
  *             del_templateids - [IN] array of template IDs                   *
  *             error           - [OUT] error message                          *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
@@ -5901,10 +5873,6 @@ clean:
  *             flags  - [IN] the used connection type                         *
  *                                                                            *
  * Return value: upon successful completion return interface identifier       *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned char useip,

@@ -298,8 +298,6 @@ static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
  * Return value: returns SUCCEED on successful parsing,                       *
  *               FAIL on an incorrect format of string                        *
  *                                                                            *
- * Author: Eugene Grigorjev, Alexei Vladishev (new json protocol)             *
- *                                                                            *
  * Comments:                                                                  *
  *    String represented as "ZBX_EOF" termination list                        *
  *    With '\n' delimiter between elements.                                   *
@@ -592,10 +590,6 @@ static void process_config_item(struct zbx_json *json, char *config, size_t leng
  * Return value: returns SUCCEED on successful parsing,                       *
  *               FAIL on other cases                                          *
  *                                                                            *
- * Author: Eugene Grigorjev, Alexei Vladishev (new json protocol)             *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static int	refresh_active_checks(zbx_vector_ptr_t *addrs)
 {
@@ -708,8 +702,6 @@ static int	refresh_active_checks(zbx_vector_ptr_t *addrs)
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  * Comments: zabbix_sender has almost the same function!                      *
  *                                                                            *
  ******************************************************************************/
@@ -752,8 +744,6 @@ static int	check_response(char *response)
  *                      free elements, or recently sent)                      *
  *                    - data successfully sent to server (proxy)              *
  *               FAIL - error when sending data                               *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
 static int	send_buffer(zbx_vector_ptr_t *addrs, zbx_vector_pre_persistent_t *prep_vec)
@@ -941,8 +931,6 @@ ret:
  *                                                                            *
  * Return value: returns SUCCEED on successful parsing,                       *
  *               FAIL on other cases                                          *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: ATTENTION! This function's address and pointers to arguments     *
  *           are described in Zabbix defined type "zbx_process_value_func_t"  *

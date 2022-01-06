@@ -1460,8 +1460,6 @@ static	void	get_graph_info(const void *object, zbx_uint64_t *id, int *discovery_
  *                         adding/updating was not necessary                  *
  *               FAIL    - graphs cannot be added/updated                     *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  ******************************************************************************/
 int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 		const zbx_vector_ptr_t *lld_macro_paths, char **error, int lifetime, int lastcheck)

@@ -493,14 +493,6 @@ out:
  *                                                                            *
  * Purpose: retrieve values of metrics from monitored hosts                   *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static int	process_proxy(void)
 {

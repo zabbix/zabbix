@@ -62,8 +62,6 @@ function authentication2str($type) {
  *
  * Comments:
  *		return true if permission is positive
- *
- * Author: Aly
  */
 function check_perm2system($userid) {
 	$sql = 'SELECT g.usrgrpid'.

@@ -41,8 +41,6 @@ extern unsigned char	program_type;
  *               AGENT_ERROR - uncritical error on agent side occurred        *
  *               FAIL - otherwise                                             *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  * Comments: error will contain error message                                 *
  *                                                                            *
  ******************************************************************************/

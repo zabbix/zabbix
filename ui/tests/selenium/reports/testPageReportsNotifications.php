@@ -37,7 +37,7 @@ class testPageReportsNotifications extends CLegacyWebTest {
 		$dropdowns = [
 			'media_type' => array_merge(['all'], $all_media),
 			'period' => ['Daily', 'Weekly', 'Monthly', 'Yearly'],
-			'year' => ['2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021']
+			'year' => ['2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022']
 		];
 		$default_selected = [
 			'media_type' => 'all',

@@ -1042,8 +1042,6 @@ static int	zbx_oid_is_new(zbx_hashset_t *hs, size_t root_len, const oid *p_oid, 
  *               CONFIG_ERROR - item configuration error                      *
  *               SUCCEED - if function successfully completed                 *
  *                                                                            *
- * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
- *                                                                            *
  ******************************************************************************/
 static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const char *snmp_oid, char *error,
 		size_t max_error_len, int *max_succeed, int *min_fail, int max_vars, int bulk,
@@ -1557,8 +1555,6 @@ out:
 /******************************************************************************
  *                                                                            *
  * Purpose: translate well-known object identifiers into numeric form         *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_snmp_translate(char *oid_translated, const char *snmp_oid, size_t max_oid_len)

@@ -33,8 +33,6 @@
  * Purpose: send configuration tables to the proxy from server                *
  *          (for active proxies)                                              *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  ******************************************************************************/
 void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
@@ -124,8 +122,6 @@ out:
 /******************************************************************************
  *                                                                            *
  * Purpose: receive configuration tables from server (passive proxies)        *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 void	recv_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)

@@ -555,8 +555,6 @@ out:
  *                                                                            *
  * Purpose: set configuration defaults                                        *
  *                                                                            *
- * Author: Vladimir Levijev, Rudolfs Kreicbergs                               *
- *                                                                            *
  ******************************************************************************/
 static void	set_defaults(void)
 {
@@ -646,8 +644,6 @@ static void	zbx_validate_config_hostnames(zbx_vector_str_t *hostnames)
 /******************************************************************************
  *                                                                            *
  * Purpose: validate configuration parameters                                 *
- *                                                                            *
- * Author: Vladimir Levijev                                                   *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_validate_config(ZBX_TASK_EX *task)
@@ -997,8 +993,6 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 /******************************************************************************
  *                                                                            *
  * Purpose: free configuration memory                                         *
- *                                                                            *
- * Author: Vladimir Levijev                                                   *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_free_config(void)

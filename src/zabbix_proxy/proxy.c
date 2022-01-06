@@ -451,8 +451,6 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
  *                                                                            *
  * Purpose: set configuration defaults                                        *
  *                                                                            *
- * Author: Rudolfs Kreicbergs                                                 *
- *                                                                            *
  ******************************************************************************/
 static void	zbx_set_defaults(void)
 {
@@ -556,8 +554,6 @@ static void	zbx_set_defaults(void)
 /******************************************************************************
  *                                                                            *
  * Purpose: validate configuration parameters                                 *
- *                                                                            *
- * Author: Alexei Vladishev, Rudolfs Kreicbergs                               *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_validate_config(ZBX_TASK_EX *task)
@@ -684,8 +680,6 @@ static int	proxy_add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vec
 /******************************************************************************
  *                                                                            *
  * Purpose: parse config file and update configuration parameters             *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: will terminate process if parsing fails                          *
  *                                                                            *
@@ -941,8 +935,6 @@ static void	zbx_free_config(void)
 /******************************************************************************
  *                                                                            *
  * Purpose: executes proxy processes                                          *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
 int	main(int argc, char **argv)

@@ -25,11 +25,6 @@
 #include "../../libs/zbxaudit/audit_graph.h"
 #include "../../libs/zbxaudit/audit_trigger.h"
 
-/******************************************************************************
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
 void	lld_field_str_rollback(char **field, char **field_orig, zbx_uint64_t *flags, zbx_uint64_t flag)
 {
 	if (0 == (*flags & flag))
@@ -41,11 +36,6 @@ void	lld_field_str_rollback(char **field, char **field_orig, zbx_uint64_t *flags
 	*flags &= ~flag;
 }
 
-/******************************************************************************
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
 void	lld_field_uint64_rollback(zbx_uint64_t *field, zbx_uint64_t *field_orig, zbx_uint64_t *flags, zbx_uint64_t flag)
 {
 	if (0 == (*flags & flag))

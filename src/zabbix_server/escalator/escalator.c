@@ -1765,8 +1765,6 @@ err_alert:
  *                                                                            *
  * Return value: SUCCEED - matches, FAIL - otherwise                          *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  ******************************************************************************/
 static int	check_operation_conditions(const DB_EVENT *event, zbx_uint64_t operationid, unsigned char evaltype)
 {
@@ -3374,12 +3372,6 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 /******************************************************************************
  *                                                                            *
  * Purpose: periodically check table escalations and generate alerts          *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: never returns                                                    *
  *                                                                            *

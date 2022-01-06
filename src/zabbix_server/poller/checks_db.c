@@ -34,8 +34,6 @@
  * Return value: SUCCEED - data successfully retrieved and stored in result   *
  *               NOTSUPPORTED - requested item is not supported               *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
  ******************************************************************************/
 int	get_value_db(const DC_ITEM *item, AGENT_RESULT *result)
 {
