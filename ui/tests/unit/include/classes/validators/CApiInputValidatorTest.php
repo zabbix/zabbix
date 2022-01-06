@@ -1344,6 +1344,12 @@ class CApiInputValidatorTest extends TestCase {
 			],
 			[
 				['type' => API_ID],
+				9223372036854775808,
+				'/1/id',
+				'Invalid parameter "/1/id": a number is expected.'
+			],
+			[
+				['type' => API_ID],
 				0.0,
 				'/1/id',
 				'Invalid parameter "/1/id": a number is expected.'
@@ -1598,6 +1604,12 @@ class CApiInputValidatorTest extends TestCase {
 				[0, 1, 2, 3, '4', '9223372036854775807', '9223372036854775808'],
 				'/',
 				'Invalid parameter "/7": a number is too large.'
+			],
+			[
+				['type' => API_IDS],
+				[0, 1, 2, 3, '4', '9223372036854775807', 9223372036854775808],
+				'/',
+				'Invalid parameter "/7": a number is expected.'
 			],
 			[
 				['type' => API_IDS, 'uniq' => true],
@@ -5128,6 +5140,12 @@ class CApiInputValidatorTest extends TestCase {
 				'9223372036854775808',
 				'/',
 				'Invalid parameter "/": a timestamp is too large.'
+			],
+			[
+				['type' => API_TIMESTAMP],
+				9223372036854775808,
+				'/',
+				'Invalid parameter "/": an unsigned integer is expected.'
 			],
 			[
 				['type' => API_TIMESTAMP, 'in' => '0,1,2'],
