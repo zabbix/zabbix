@@ -114,10 +114,20 @@ final class CSlaHelper {
 		$tag = new CSpan();
 
 		try {
-			$datetime_from = (new DateTime('@'.$period_from))->setTimezone(new DateTimeZone($timezone));
-			$datetime_to = (new DateTime('@'.($period_to - 1)))->setTimezone(new DateTimeZone($timezone));
+			$datetime_from = (new DateTime('@'.$period_from))
+				->setTimezone(new DateTimeZone($timezone !== ZBX_DEFAULT_TIMEZONE
+					? $timezone
+					: CTimezoneHelper::getSystemTimezone()
+				));
+
+			$datetime_to = (new DateTime('@'.($period_to - 1)))
+				->setTimezone(new DateTimeZone($timezone !== ZBX_DEFAULT_TIMEZONE
+					? $timezone
+					: CTimezoneHelper::getSystemTimezone()
+				));
 		}
 		catch (Exception $e) {
+			echo $period_from;
 			return $tag;
 		}
 
