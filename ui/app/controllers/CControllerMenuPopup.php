@@ -290,10 +290,10 @@ class CControllerMenuPopup extends CController {
 
 		if ($db_items) {
 			$db_item = $db_items[0];
-			$rw_hosts = false;
+			$rw_items = false;
 
 			if ($db_item['type'] != ITEM_TYPE_HTTPTEST && CWebUser::getType() > USER_TYPE_ZABBIX_USER) {
-				$rw_hosts = (bool) API::Host()->get([
+				$rw_items = (bool) API::Host()->get([
 					'output' => [],
 					'hostids' => $db_item['hostid'],
 					'editable' => true
@@ -309,7 +309,7 @@ class CControllerMenuPopup extends CController {
 				),
 				'history' => $db_item['history'] != 0,
 				'trends' => $db_item['trends'] != 0,
-				'isWriteable' => $rw_hosts,
+				'isWriteable' => $rw_items,
 				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 			];
 		}

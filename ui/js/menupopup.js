@@ -711,7 +711,6 @@ function getMenuPopupItemConfiguration(options, trigger_elmnt) {
 		});
 	}
 
-	// create
 	url = new Curl('triggers.php', false);
 	url.setArgument('form', 'create');
 	url.setArgument('hostid', options.hostid);
@@ -724,7 +723,6 @@ function getMenuPopupItemConfiguration(options, trigger_elmnt) {
 		url: url.getUrl()
 	});
 
-	// edit
 	if (options.triggers.length > 0) {
 		const triggers = [];
 
@@ -783,11 +781,11 @@ function getMenuPopupItemConfiguration(options, trigger_elmnt) {
  *
  * @param string options['itemid']
  * @param string options['hostid']
- * @param bool options['showGraph']                   Link to Monitoring->Items->Graphs page.
- * @param bool options['history']                     Is history available.
- * @param bool options['trends']                      Are trends available.
- * @param bool options['allowed_ui_conf_hosts']       Whether user has access to configuration hosts pages.
- * @param bool options['isWriteable']                 Whether user has read and write access to host and its items.
+ * @param bool   options['showGraph']                   Link to Monitoring->Items->Graphs page.
+ * @param bool   options['history']                     Is history available.
+ * @param bool   options['trends']                      Are trends available.
+ * @param bool   options['allowed_ui_conf_hosts']       Whether user has access to configuration hosts pages.
+ * @param bool   options['isWriteable']                 Whether user has read and write access to host and its items.
  *
  * @return array
  */
@@ -799,14 +797,11 @@ function getMenuPopupItem(options) {
 	url.setArgument('action', 'showgraph');
 	url.setArgument('itemids[]', options.itemid);
 
-	const graph = {
+	items.push({
 		label: t('Graph'),
-		url: url.getUrl()
-	}
-	if (!options.showGraph) {
-		graph.disabled = true;
-	}
-	items.push(graph);
+		url: url.getUrl(),
+		disabled: !options.showGraph
+	});
 
 	url = new Curl('history.php', false);
 	url.setArgument('action', 'showvalues');
@@ -826,11 +821,7 @@ function getMenuPopupItem(options) {
 		url: url.getUrl()
 	}
 
-	if (options.history || options.trends) {
-		values.disabled = false;
-		latest.disabled = false;
-	}
-	else {
+	if (!options.history && !options.trends) {
 		values.disabled = true;
 		latest.disabled = true;
 	}
