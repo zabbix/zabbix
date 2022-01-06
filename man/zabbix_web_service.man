@@ -70,5 +70,3 @@ Documentation
 .BR zabbix_server (8),
 .BR zabbix_js (1),
 .BR zabbix_agent2 (8)
-.SH AUTHOR
-Zabbix LLC
