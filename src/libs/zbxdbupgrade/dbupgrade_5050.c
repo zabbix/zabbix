@@ -1341,8 +1341,8 @@ typedef struct
 }
 services_times_t;
 
-ZBX_PTR_VECTOR_DECL(services_times, services_times_t)
-ZBX_PTR_VECTOR_IMPL(services_times, services_times_t)
+ZBX_VECTOR_DECL(services_times, services_times_t)
+ZBX_VECTOR_IMPL(services_times, services_times_t)
 
 typedef struct
 {
@@ -1395,14 +1395,18 @@ static int	compare_sla(const void *d1, const void *d2)
 	return 0;
 }
 
-static void	services_time_clean(services_times_t services_time)
+static void	services_time_clean(services_times_t *services_time)
 {
-	zbx_free(services_time.note);
+	zbx_free(services_time->note);
 }
 
 static void	sla_clean(sla_t *sla)
 {
-	zbx_vector_services_times_clear_ext(&sla->services_times, services_time_clean);
+	int	i;
+
+	for (i = 0; i < sla->services_times.values_num; i++)
+		services_time_clean(&sla->services_times.values[i]);
+
 	zbx_vector_services_times_destroy(&sla->services_times);
 	zbx_vector_uint64_destroy(&sla->serviceids);
 	zbx_free(sla);
@@ -1515,7 +1519,6 @@ static void	services_times_convert_downtime(zbx_vector_services_times_t *service
 
 		if (SERVICE_TIME_TYPE_DOWNTIME == service_time.type)
 		{
-
 			zbx_vector_services_times_append(&services_downtimes, service_time);
 			zbx_vector_services_times_remove(services_times, i);
 			i--;
@@ -1569,7 +1572,7 @@ static void	services_times_convert_downtime(zbx_vector_services_times_t *service
 				{
 					if (service_time->to <= service_downtime->to)
 					{
-						services_time_clean(*service_time);
+						services_time_clean(service_time);
 						zbx_vector_services_times_remove(services_times, j);
 						j--;
 					}
@@ -1600,7 +1603,7 @@ static void	services_times_convert_downtime(zbx_vector_services_times_t *service
 				service_time_next->from = MIN(service_time_next->from, service_time->from);
 				service_time_next->to = MAX(service_time_next->to, service_time->to);
 
-				services_time_clean(*service_time);
+				services_time_clean(service_time);
 				zbx_vector_services_times_remove(services_times, i);
 				i--;
 				break;
@@ -1608,7 +1611,9 @@ static void	services_times_convert_downtime(zbx_vector_services_times_t *service
 		}
 	}
 
-	zbx_vector_services_times_clear_ext(&services_downtimes, services_time_clean);
+	for (i = 0; i < services_downtimes.values_num; i++)
+		services_time_clean(&services_downtimes.values[i]);
+
 	zbx_vector_services_times_destroy(&services_downtimes);
 }
 
