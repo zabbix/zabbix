@@ -2707,13 +2707,13 @@ void	zbx_strarr_add(char ***arr, const char *entry)
  * Author: Vladimir Levijev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_strarr_free(char **arr)
+void	zbx_strarr_free(char ***arr)
 {
 	char	**p;
 
-	for (p = arr; NULL != *p; p++)
+	for (p = *arr; NULL != *p; p++)
 		zbx_free(*p);
-	zbx_free(arr);
+	zbx_free(*arr);
 }
 
 /******************************************************************************
@@ -3862,7 +3862,6 @@ static int	token_parse_objectid(const char *expression, const char *macro, zbx_t
 	/* empty object id */
 	if (1 == ptr - macro)
 		return FAIL;
-
 
 	offset = macro - expression;
 

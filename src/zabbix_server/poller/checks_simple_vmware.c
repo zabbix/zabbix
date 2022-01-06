@@ -1142,6 +1142,8 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, con
 				NULL != cluster ? cluster->name : "", ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "{#PARENT.NAME}", hv->parent_name, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "{#PARENT.TYPE}", hv->parent_type, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "{#HV.NETNAME}",
+				ZBX_NULL2EMPTY_STR(hv->props[ZBX_VMWARE_HVPROP_NET_NAME]), ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&json_data);
 	}
 
@@ -1714,7 +1716,6 @@ int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *use
 	{
 		zbx_vmware_dsname_t	*dsname = hv->dsnames.values[i];
 		int			j, total = 0;
-
 
 		for (j = 0; j < dsname->hvdisks.values_num; j++)
 			total += dsname->hvdisks.values[j].multipath_total;
@@ -2384,7 +2385,6 @@ int	check_vcenter_datastore_hv_list(AGENT_REQUEST *request, const char *username
 	zbx_vmware_datastore_t	*datastore = NULL;
 	zbx_vmware_hv_t		*hv;
 
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (2 != request->nparam )
@@ -2956,7 +2956,6 @@ int	check_vcenter_vm_hv_name(AGENT_REQUEST *request, const char *username, const
 
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
-
 
 	if (NULL == (hv = service_hv_get_by_vm_uuid(service, uuid)))
 	{
@@ -4366,6 +4365,5 @@ out:
 
 	return ret;
 }
-
 
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */

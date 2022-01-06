@@ -24,7 +24,6 @@ ZBX_METRIC	parameter_hostname =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 	{"system.hostname",     CF_HAVEPARAMS,  SYSTEM_HOSTNAME,        NULL};
 
-
 static void	retrieve_hostname(char *buffer, int len, char **error)
 {
 	if (SUCCEED != gethostname(buffer, len))

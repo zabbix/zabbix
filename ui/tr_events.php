@@ -134,11 +134,10 @@ if ($trigger['opdata'] !== '') {
 }
 else {
 	$db_items = API::Item()->get([
-		'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units'],
+		'output' => ['itemid', 'name', 'value_type', 'units'],
 		'selectValueMap' => ['mappings'],
 		'triggerids' => $event['objectid']
 	]);
-	$db_items = CMacrosResolverHelper::resolveItemNames($db_items);
 	$event['opdata'] = (new CCol(CScreenProblem::getLatestValues($db_items)))->addClass('latest-values');
 }
 

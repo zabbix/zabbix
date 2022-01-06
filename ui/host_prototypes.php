@@ -555,6 +555,16 @@ if (hasRequest('form')) {
 		'add_templates' => array_map('strval', array_keys($data['host_prototype']['add_templates']))
 	];
 
+	$data['groups_ms'] = [];
+
+	foreach ($data['groups'] as $group) {
+		$data['groups_ms'][] = [
+			'id' => $group['groupid'],
+			'name' => $group['name'],
+			'inaccessible' => (array_key_exists('inaccessible', $group) && $group['inaccessible'])
+		];
+	}
+
 	// Render view.
 	echo (new CView('configuration.host.prototype.edit', $data))->getOutput();
 }

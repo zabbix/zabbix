@@ -314,13 +314,13 @@ double	zbx_current_time(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: is_leap_year                                                     *
+ * Function: zbx_is_leap_year                                                 *
  *                                                                            *
  * Return value:  SUCCEED - year is a leap year                               *
  *                FAIL    - year is not a leap year                           *
  *                                                                            *
  ******************************************************************************/
-static int	is_leap_year(int year)
+int	zbx_is_leap_year(int year)
 {
 	return 0 == year % 4 && (0 != year % 100 || 0 == year % 400) ? SUCCEED : FAIL;
 }
@@ -410,10 +410,10 @@ long	zbx_get_timezone_offset(time_t t, struct tm *tm)
 			(tm->tm_min - tm_utc.tm_min) * SEC_PER_MIN;	/* assuming seconds are equal */
 
 	while (tm->tm_year > tm_utc.tm_year)
-		offset += (SUCCEED == is_leap_year(tm_utc.tm_year++) ? SEC_PER_YEAR + SEC_PER_DAY : SEC_PER_YEAR);
+		offset += (SUCCEED == zbx_is_leap_year(tm_utc.tm_year++) ? SEC_PER_YEAR + SEC_PER_DAY : SEC_PER_YEAR);
 
 	while (tm->tm_year < tm_utc.tm_year)
-		offset -= (SUCCEED == is_leap_year(--tm_utc.tm_year) ? SEC_PER_YEAR + SEC_PER_DAY : SEC_PER_YEAR);
+		offset -= (SUCCEED == zbx_is_leap_year(--tm_utc.tm_year) ? SEC_PER_YEAR + SEC_PER_DAY : SEC_PER_YEAR);
 #endif
 
 	return offset;
@@ -529,7 +529,7 @@ int	zbx_day_in_month(int year, int mon)
 	static const unsigned char	month[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
 	if (1 <= mon && mon <= 12)	/* add one day in February of a leap year */
-		return month[mon - 1] + (2 == mon && SUCCEED == is_leap_year(year) ? 1 : 0);
+		return month[mon - 1] + (2 == mon && SUCCEED == zbx_is_leap_year(year) ? 1 : 0);
 
 	return 30;
 }
@@ -3571,6 +3571,9 @@ zbx_function_type_t	zbx_get_function_type(const char *func)
 	if (0 == strncmp(func, "trend", 5))
 		return ZBX_FUNCTION_TYPE_TRENDS;
 
+	if (0 == strncmp(func, "baseline", 8))
+		return ZBX_FUNCTION_TYPE_TRENDS;
+
 	if (0 == strcmp(func, "nodata"))
 		return ZBX_FUNCTION_TYPE_TIMER;
 
@@ -3821,7 +3824,6 @@ char	*zbx_create_token(zbx_uint64_t seed)
 	return token;
 }
 
-
 #if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
 /******************************************************************************
  *                                                                            *
@@ -3883,7 +3885,7 @@ void	zbx_update_env(double time_now)
  *                                                                            *
  * Function: zbx_dc_get_agent_item_nextcheck                                  *
  *                                                                            *
- * Purpose: calculate item nextcheck for zabix agent type items               *
+ * Purpose: calculate item nextcheck for Zabbix agent type items              *
  *                                                                            *
  ******************************************************************************/
 int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now,
@@ -3982,4 +3984,83 @@ void	zbx_free_tag(zbx_tag_t *tag)
 	zbx_free(tag->tag);
 	zbx_free(tag->value);
 	zbx_free(tag);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_md5buf2str                                                   *
+ *                                                                            *
+ * Purpose: get a textual representation of md5 sum                           *
+ *                                                                            *
+ * Parameters:                                                                *
+ *          md5 - [IN] buffer with md5 sum                                    *
+ *          str - [OUT] preallocated string with a text representation of MD5 *
+ *                     sum. String size must be at least                      *
+ *                     ZBX_MD5_PRINT_BUF_LEN bytes.                           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_md5buf2str(const md5_byte_t *md5, char *str)
+{
+	const char	*hex = "0123456789abcdef";
+	char		*p = str;
+	int		i;
+
+	for (i = 0; i < MD5_DIGEST_SIZE; i++)
+	{
+		*p++ = hex[md5[i] >> 4];
+		*p++ = hex[md5[i] & 15];
+	}
+
+	*p = '\0';
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_hex2bin                                                      *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     convert ASCII hex digit string to a binary representation (byte        *
+ *     string)                                                                *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     p_hex   - [IN] null-terminated input string                            *
+ *     buf     - [OUT] output buffer                                          *
+ *     buf_len - [IN] output buffer size                                      *
+ *                                                                            *
+ * Return value:                                                              *
+ *     Number of bytes written into 'buf' on successful conversion.           *
+ *     -1 - an error occurred.                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *     In case of error incomplete useless data may be written into 'buf'.    *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_hex2bin(const unsigned char *p_hex, unsigned char *buf, int buf_len)
+{
+	unsigned char	*q = buf;
+	int		len = 0;
+
+	while ('\0' != *p_hex)
+	{
+		if (0 != isxdigit(*p_hex) && 0 != isxdigit(*(p_hex + 1)) && buf_len > len)
+		{
+			unsigned char	hi = *p_hex & 0x0f;
+			unsigned char	lo;
+
+			if ('9' < *p_hex++)
+				hi = (unsigned char)(hi + 9u);
+
+			lo = *p_hex & 0x0f;
+
+			if ('9' < *p_hex++)
+				lo = (unsigned char)(lo + 9u);
+
+			*q++ = (unsigned char)(hi << 4 | lo);
+			len++;
+		}
+		else
+			return -1;
+	}
+
+	return len;
 }

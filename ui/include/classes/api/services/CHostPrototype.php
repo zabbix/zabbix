@@ -395,7 +395,7 @@ class CHostPrototype extends CHostBase {
 	 * @return array
 	 */
 	public function create(array $host_prototypes) {
-		self::validateCreate($host_prototypes);
+		$this->validateCreate($host_prototypes);
 
 		$this->createReal($host_prototypes);
 		$this->inherit($host_prototypes);
@@ -410,7 +410,7 @@ class CHostPrototype extends CHostBase {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private static function validateCreate(array &$host_prototypes): void {
+	private function validateCreate(array &$host_prototypes): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['ruleid', 'host'], ['ruleid', 'name']], 'fields' => [
 			'uuid' =>				['type' => API_UUID],
 			'ruleid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
@@ -454,14 +454,16 @@ class CHostPrototype extends CHostBase {
 		self::checkHostGroupsPermissions($host_prototypes);
 		self::checkAndAddUuid($host_prototypes);
 		self::checkMainInterfaces($host_prototypes);
+		$this->checkTemplates($host_prototypes);
 	}
 
 	/**
 	 * Creates the host prototypes and inherits them to linked hosts and templates.
 	 *
 	 * @param array $host_prototypes
+	 * @param bool  $inherited
 	 */
-	protected function createReal(array &$host_prototypes): void {
+	protected function createReal(array &$host_prototypes, bool $inherited = false): void {
 		foreach ($host_prototypes as &$host_prototype) {
 			$host_prototype['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 		}
@@ -474,11 +476,15 @@ class CHostPrototype extends CHostBase {
 		}
 		unset($host_prototype);
 
+		if (!$inherited) {
+			$this->checkTemplatesLinks($host_prototypes);
+		}
+
 		self::createHostDiscoveries($host_prototypes);
 
 		self::updateGroupLinks($host_prototypes, 'create');
 		self::updateGroupPrototypes($host_prototypes, 'create');
-		$this->updateTemplates($host_prototypes, 'create');
+		$this->updateTemplates($host_prototypes);
 		self::updateHostInventories($host_prototypes, 'create');
 
 		$this->updateTagsNew($host_prototypes, 'create');
@@ -571,6 +577,8 @@ class CHostPrototype extends CHostBase {
 		self::checkHostGroupsPermissions($host_prototypes, $db_host_prototypes);
 		self::validateSnmpInterfaces($host_prototypes, $db_host_prototypes);
 		self::checkMainInterfaces($host_prototypes);
+		$this->checkTemplates($host_prototypes, $db_host_prototypes);
+		$this->checkTemplatesLinks($host_prototypes, $db_host_prototypes);
 		$host_prototypes = parent::validateHostMacros($host_prototypes, $db_host_prototypes);
 	}
 
@@ -603,7 +611,7 @@ class CHostPrototype extends CHostBase {
 
 		self::updateGroupLinks($host_prototypes, 'update', $db_host_prototypes);
 		self::updateGroupPrototypes($host_prototypes, 'update', $db_host_prototypes);
-		$this->updateTemplates($host_prototypes, 'update', $db_host_prototypes);
+		$this->updateTemplates($host_prototypes, $db_host_prototypes);
 		self::updateHostInventories($host_prototypes, 'update', $db_host_prototypes);
 
 		$this->updateTagsNew($host_prototypes, 'update', $db_host_prototypes);
@@ -647,7 +655,7 @@ class CHostPrototype extends CHostBase {
 
 		// save the new host prototypes
 		if ($ins_host_prototypes) {
-			$this->createReal($ins_host_prototypes);
+			$this->createReal($ins_host_prototypes, true);
 		}
 
 		if ($upd_host_prototypes) {
@@ -752,6 +760,7 @@ class CHostPrototype extends CHostBase {
 			'selectDiscoveryRule' => ['itemid'],
 			'selectMacros' => ['hostmacroid', 'macro', 'type', 'value', 'description'],
 			'discoveryids' => array_keys($child_discovery_rules),
+			'nopermissions' => true
 		]);
 
 		foreach ($child_host_prototypes as $child_host_prototype) {
@@ -937,7 +946,8 @@ class CHostPrototype extends CHostBase {
 	public function syncTemplates(array $data): void {
 		$db_discovery_rules = API::DiscoveryRule()->get([
 			'output' => ['itemid'],
-			'hostids' => $data['templateids']
+			'hostids' => $data['templateids'],
+			'nopermissions' => true
 		]);
 
 		$db_host_prototypes = $this->get([
@@ -949,7 +959,8 @@ class CHostPrototype extends CHostBase {
 			'selectDiscoveryRule' => ['itemid'],
 			'selectInterfaces' => ['main', 'type', 'useip', 'ip', 'dns', 'port', 'details'],
 			'discoveryids' => array_column($db_discovery_rules, 'itemid'),
-			'preservekeys' => true
+			'preservekeys' => true,
+			'nopermissions' => true
 		]);
 
 		$db_host_prototypes = $this->getHostMacros($db_host_prototypes);
@@ -1723,43 +1734,6 @@ class CHostPrototype extends CHostBase {
 	 * @param string     $method
 	 * @param array|null $db_host_prototypes
 	 */
-	private function updateTemplates(array &$host_prototypes, string $method, array $db_host_prototypes = null): void {
-		foreach ($host_prototypes as &$host_prototype) {
-			if (!array_key_exists('templates', $host_prototype)) {
-				continue;
-			}
-
-			$templateids = array_column($host_prototype['templates'], 'templateid');
-			$db_templates = ($method === 'update')
-				? array_column($db_host_prototypes[$host_prototype['hostid']]['templates'], null, 'templateid')
-				: [];
-			$db_templateids = array_keys($db_templates);
-
-			foreach ($host_prototype['templates'] as &$template) {
-				if (array_key_exists($template['templateid'], $db_templates)) {
-					$template['hosttemplateid'] = $db_templates[$template['templateid']]['hosttemplateid'];
-				}
-			}
-			unset($template);
-
-			if ($method === 'update') {
-				$this->unlink(array_diff($db_templateids, $templateids), [$host_prototype['hostid']]);
-			}
-
-			$templates = $this->link(array_diff($templateids, $db_templateids), [$host_prototype['hostid']]);
-
-			if ($templates) {
-				$host_prototype['templates'] = $templates;
-			}
-		}
-		unset($host_prototype);
-	}
-
-	/**
-	 * @param array      $host_prototypes
-	 * @param string     $method
-	 * @param array|null $db_host_prototypes
-	 */
 	private static function updateHostInventories(array $host_prototypes, string $method,
 			array $db_host_prototypes = null): void {
 		$ins_inventories = [];
@@ -2173,7 +2147,7 @@ class CHostPrototype extends CHostBase {
 			}
 		}
 
-		self::addAffectedObjects($host_prototypes, $db_host_prototypes);
+		$this->addAffectedObjects($host_prototypes, $db_host_prototypes);
 
 		return $db_host_prototypes;
 	}
@@ -2204,151 +2178,131 @@ class CHostPrototype extends CHostBase {
 	 * @param array $host_prototypes
 	 * @param array $db_host_prototypes
 	 */
-	private static function addAffectedObjects(array $host_prototypes, array &$db_host_prototypes): void {
-		$hostids = ['interfaces' => [], 'groupLinks' => [], 'groupPrototypes' => [], 'templates' => [], 'tags' => [],
-			'macros' => []
-		];
+	protected function addAffectedObjects(array $host_prototypes, array &$db_host_prototypes): void {
+		foreach ($host_prototypes as $host_prototype) {
+			$hostid = $host_prototype['hostid'];
+
+			$db_host_prototypes[$hostid]['ruleid'] = $db_host_prototypes[$hostid]['discoveryRule']['itemid'];
+			unset($db_host_prototypes[$hostid]['discoveryRule']);
+		}
+
+		$this->addAffectedInterfaces($host_prototypes, $db_host_prototypes);
+		$this->addAffectedGroupLinks($host_prototypes, $db_host_prototypes);
+		$this->addAffectedGroupPrototypes($host_prototypes, $db_host_prototypes);
+		parent::addAffectedObjects($host_prototypes, $db_host_prototypes);
+	}
+
+	/**
+	 * @param array $host_prototypes
+	 * @param array $db_host_prototypes
+	 */
+	private function addAffectedInterfaces(array $host_prototypes, array &$db_host_prototypes): void {
+		$hostids = [];
 
 		foreach ($host_prototypes as $host_prototype) {
 			$hostid = $host_prototype['hostid'];
 
 			if (array_key_exists('interfaces', $host_prototype)
 					|| $db_host_prototypes[$hostid]['custom_interfaces'] == HOST_PROT_INTERFACES_CUSTOM) {
-				$hostids['interfaces'][] = $hostid;
+				$hostids[] = $hostid;
 				$db_host_prototypes[$hostid]['interfaces'] = [];
 			}
+		}
 
+		if (!$hostids) {
+			return;
+		}
+
+		$hostid_by_interfaceid = [];
+		$options = [
+			'output' => ['interfaceid', 'hostid', 'main', 'type', 'useip', 'ip', 'dns', 'port'],
+			'filter' => ['hostid' => $hostids]
+		];
+		$db_interfaces = DBselect(DB::makeSql('interface', $options));
+
+		while ($db_interface = DBfetch($db_interfaces)) {
+			$db_host_prototypes[$db_interface['hostid']]['interfaces'][$db_interface['interfaceid']] =
+				array_diff_key($db_interface, array_flip(['hostid']));
+
+			if ($db_interface['type'] == INTERFACE_TYPE_SNMP) {
+				$hostid_by_interfaceid[$db_interface['interfaceid']] = $db_interface['hostid'];
+			}
+		}
+
+		if ($hostid_by_interfaceid) {
+			$options = [
+				'output' => ['interfaceid', 'version', 'bulk', 'community', 'securityname', 'securitylevel',
+					'authpassphrase', 'privpassphrase', 'authprotocol', 'privprotocol', 'contextname'
+				],
+				'filter' => ['interfaceid' => array_keys($hostid_by_interfaceid)]
+			];
+			$db_snmps = DBselect(DB::makeSql('interface_snmp', $options));
+
+			while ($db_snmp = DBfetch($db_snmps)) {
+				$hostid = $hostid_by_interfaceid[$db_snmp['interfaceid']];
+				$db_host_prototypes[$hostid]['interfaces'][$db_snmp['interfaceid']]['details'] =
+					self::trimInterfaceDetails($db_snmp);
+			}
+		}
+	}
+
+	/**
+	 * @param array $host_prototypes
+	 * @param array $db_host_prototypes
+	 */
+	private function addAffectedGroupLinks(array $host_prototypes, array &$db_host_prototypes): void {
+		$hostids = [];
+
+		foreach ($host_prototypes as $host_prototype) {
 			if (array_key_exists('groupLinks', $host_prototype)) {
-				$hostids['groupLinks'][] = $hostid;
-				$db_host_prototypes[$hostid]['groupLinks'] = [];
+				$hostids[] = $host_prototype['hostid'];
+				$db_host_prototypes[$host_prototype['hostid']]['groupLinks'] = [];
 			}
+		}
 
+		if (!$hostids) {
+			return;
+		}
+
+		$options = [
+			'output' => ['group_prototypeid', 'hostid', 'groupid', 'templateid'],
+			'filter' => ['hostid' => $hostids, 'name' => '']
+		];
+		$db_links = DBselect(DB::makeSql('group_prototype', $options));
+
+		while ($db_link = DBfetch($db_links)) {
+			$db_host_prototypes[$db_link['hostid']]['groupLinks'][$db_link['group_prototypeid']] =
+				array_diff_key($db_link, array_flip(['hostid']));
+		}
+	}
+
+	/**
+	 * @param array $host_prototypes
+	 * @param array $db_host_prototypes
+	 */
+	private function addAffectedGroupPrototypes(array $host_prototypes, array &$db_host_prototypes): void {
+		$hostids = [];
+
+		foreach ($host_prototypes as $host_prototype) {
 			if (array_key_exists('groupPrototypes', $host_prototype)) {
-				$hostids['groupPrototypes'][] = $hostid;
-				$db_host_prototypes[$hostid]['groupPrototypes'] = [];
-			}
-
-			if (array_key_exists('templates', $host_prototype)) {
-				$hostids['templates'][] = $hostid;
-				$db_host_prototypes[$hostid]['templates'] = [];
-			}
-
-			if (array_key_exists('tags', $host_prototype)) {
-				$hostids['tags'][] = $hostid;
-				$db_host_prototypes[$hostid]['tags'] = [];
-			}
-
-			if (array_key_exists('macros', $host_prototype)) {
-				$hostids['macros'][] = $hostid;
-				$db_host_prototypes[$hostid]['macros'] = [];
-			}
-
-			$db_host_prototypes[$hostid]['ruleid'] = $db_host_prototypes[$hostid]['discoveryRule']['itemid'];
-			unset($db_host_prototypes[$hostid]['discoveryRule']);
-		}
-
-		if ($hostids['interfaces']) {
-			$hostid_by_interfaceid = [];
-			$options = [
-				'output' => ['interfaceid', 'hostid', 'main', 'type', 'useip', 'ip', 'dns', 'port'],
-				'filter' => ['hostid' => $hostids['interfaces']]
-			];
-			$db_interfaces = DBselect(DB::makeSql('interface', $options));
-
-			while ($db_interface = DBfetch($db_interfaces)) {
-				$db_host_prototypes[$db_interface['hostid']]['interfaces'][$db_interface['interfaceid']]
-					= array_diff_key($db_interface, array_flip(['hostid'])
-				);
-
-				if ($db_interface['type'] == INTERFACE_TYPE_SNMP) {
-					$hostid_by_interfaceid[$db_interface['interfaceid']] = $db_interface['hostid'];
-				}
-			}
-
-			if ($hostid_by_interfaceid) {
-				$options = [
-					'output' => ['interfaceid', 'version', 'bulk', 'community', 'securityname', 'securitylevel',
-						'authpassphrase', 'privpassphrase', 'authprotocol', 'privprotocol', 'contextname'],
-					'filter' => ['interfaceid' => array_keys($hostid_by_interfaceid)]
-				];
-				$db_snmps = DBselect(DB::makeSql('interface_snmp', $options));
-
-				while ($db_snmp = DBfetch($db_snmps)) {
-					$hostid = $hostid_by_interfaceid[$db_snmp['interfaceid']];
-					$db_host_prototypes[$hostid]['interfaces'][$db_snmp['interfaceid']]['details']
-						= self::trimInterfaceDetails($db_snmp);
-				}
+				$hostids[] = $host_prototype['hostid'];
+				$db_host_prototypes[$host_prototype['hostid']]['groupPrototypes'] = [];
 			}
 		}
 
-		if ($hostids['groupLinks']) {
-			$options = [
-				'output' => ['group_prototypeid', 'hostid', 'groupid', 'templateid'],
-				'filter' => ['hostid' => $hostids['groupLinks'], 'name' => '']
-			];
-			$db_links = DBselect(DB::makeSql('group_prototype', $options));
-
-			while ($db_link = DBfetch($db_links)) {
-				$db_host_prototypes[$db_link['hostid']]['groupLinks'][$db_link['group_prototypeid']]
-					= array_diff_key($db_link, array_flip(['hostid'])
-				);
-			}
+		if (!$hostids) {
+			return;
 		}
 
-		if ($hostids['groupPrototypes']) {
-			$options = [
-				'output' => ['group_prototypeid', 'hostid', 'name', 'templateid'],
-				'filter' => ['hostid' => $hostids['groupPrototypes'], 'groupid' => '0']
-			];
-			$db_groups = DBselect(DB::makeSql('group_prototype', $options));
+		$options = [
+			'output' => ['group_prototypeid', 'hostid', 'name', 'templateid'],
+			'filter' => ['hostid' => $hostids, 'groupid' => '0']
+		];
+		$db_groups = DBselect(DB::makeSql('group_prototype', $options));
 
-			while ($db_link = DBfetch($db_groups)) {
-				$db_host_prototypes[$db_link['hostid']]['groupPrototypes'][$db_link['group_prototypeid']]
-					= array_diff_key($db_link, array_flip(['hostid'])
-				);
-			}
-		}
-
-		if ($hostids['templates']) {
-			$options = [
-				'output' => ['hosttemplateid', 'hostid', 'templateid'],
-				'filter' => ['hostid' => $hostids['templates']]
-			];
-			$db_templates = DBselect(DB::makeSql('hosts_templates', $options));
-
-			while ($db_template = DBfetch($db_templates)) {
-				$db_host_prototypes[$db_template['hostid']]['templates'][$db_template['hosttemplateid']]
-					= array_diff_key($db_template, array_flip(['hostid'])
-				);
-			}
-		}
-
-		if ($hostids['tags']) {
-			$options = [
-				'output' => ['hosttagid', 'hostid', 'tag', 'value'],
-				'filter' => ['hostid' => $hostids['tags']]
-			];
-			$db_tags = DBselect(DB::makeSql('host_tag', $options));
-
-			while ($db_tag = DBfetch($db_tags)) {
-				$db_host_prototypes[$db_tag['hostid']]['tags'][$db_tag['hosttagid']] = array_diff_key($db_tag,
-					array_flip(['hostid'])
-				);
-			}
-		}
-
-		if ($hostids['macros']) {
-			$options = [
-				'output' => ['hostmacroid', 'hostid', 'macro', 'value', 'description', 'type'],
-				'filter' => ['hostid' => $hostids['macros']]
-			];
-			$db_macros = DBselect(DB::makeSql('hostmacro', $options));
-
-			while ($db_macro = DBfetch($db_macros)) {
-				$db_host_prototypes[$db_macro['hostid']]['macros'][$db_macro['hostmacroid']] = array_diff_key($db_macro,
-					array_flip(['hostid'])
-				);
-			}
+		while ($db_link = DBfetch($db_groups)) {
+			$db_host_prototypes[$db_link['hostid']]['groupPrototypes'][$db_link['group_prototypeid']] =
+				array_diff_key($db_link, array_flip(['hostid']));
 		}
 	}
 }

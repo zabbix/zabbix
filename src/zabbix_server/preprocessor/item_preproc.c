@@ -34,7 +34,6 @@
 #include "item_preproc.h"
 
 extern zbx_es_t	es_engine;
-
 /******************************************************************************
  *                                                                            *
  * Function: item_preproc_numeric_type_hint                                   *
@@ -807,6 +806,7 @@ static int	item_preproc_regsub_op(zbx_variant_t *value, const char *params, char
 	if (FAIL == zbx_regexp_compile_ext(pattern, &regex, 0, &regex_error))	/* PCRE_MULTILINE is not used here */
 	{
 		*errmsg = zbx_dsprintf(*errmsg, "invalid regular expression: %s", regex_error);
+		zbx_regexp_err_msg_free(regex_error);
 		return FAIL;
 	}
 
@@ -1069,6 +1069,7 @@ static int	item_preproc_validate_regex(const zbx_variant_t *value, const char *p
 	if (FAIL == zbx_regexp_compile(params, &regex, &errptr))
 	{
 		errmsg = zbx_dsprintf(NULL, "invalid regular expression pattern: %s", errptr);
+		zbx_regexp_err_msg_free(errptr);
 		goto out;
 	}
 
@@ -1125,6 +1126,7 @@ static int	item_preproc_validate_not_regex(const zbx_variant_t *value, const cha
 	if (FAIL == zbx_regexp_compile(params, &regex, &errptr))
 	{
 		errmsg = zbx_dsprintf(NULL, "invalid regular expression pattern: %s", errptr);
+		zbx_regexp_err_msg_free(errptr);
 		goto out;
 	}
 
@@ -1533,25 +1535,61 @@ fail:
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-static int	item_preproc_prometheus_pattern(zbx_variant_t *value, const char *params, char **errmsg)
+static int	item_preproc_prometheus_pattern(zbx_preproc_cache_t *cache, zbx_variant_t *value, const char *params,
+		char **errmsg)
 {
-	char	pattern[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *output, *value_out = NULL,
+	char	pattern[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *request, *output, *value_out = NULL,
 		*err = NULL;
-
-	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
-		return FAIL;
+	int	ret = FAIL;
 
 	zbx_strlcpy(pattern, params, sizeof(pattern));
 
-	if (NULL == (output = strchr(pattern, '\n')))
+	if (NULL == (request = strchr(pattern, '\n')))
 	{
 		*errmsg = zbx_strdup(*errmsg, "cannot find second parameter");
 		return FAIL;
 	}
+	*request++ = '\0';
 
+	if (NULL == (output = strchr(request, '\n')))
+	{
+		*errmsg = zbx_strdup(*errmsg, "cannot find third parameter");
+		return FAIL;
+	}
 	*output++ = '\0';
 
-	if (FAIL == zbx_prometheus_pattern(value->data.str, pattern, output, &value_out, &err))
+	if (NULL == cache)
+	{
+		if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
+			return FAIL;
+
+		ret = zbx_prometheus_pattern(value->data.str, pattern, request, output, &value_out, &err);
+	}
+	else
+	{
+		zbx_prometheus_t	*prom_cache;
+
+		if (NULL == (prom_cache = (zbx_prometheus_t *)zbx_preproc_cache_get(cache,
+				ZBX_PREPROC_PROMETHEUS_PATTERN)))
+		{
+			prom_cache = (zbx_prometheus_t *)zbx_malloc(NULL, sizeof(zbx_prometheus_t));
+
+			if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
+				return FAIL;
+
+			if (SUCCEED != zbx_prometheus_init(prom_cache, value->data.str, &err))
+			{
+				zbx_free(prom_cache);
+				goto out;
+			}
+
+			zbx_preproc_cache_put(cache, ZBX_PREPROC_PROMETHEUS_PATTERN, prom_cache);
+		}
+
+		ret = zbx_prometheus_pattern_ex(prom_cache, pattern, request, output, &value_out, &err);
+	}
+out:
+	if (FAIL == ret)
 	{
 		*errmsg = zbx_dsprintf(*errmsg, "cannot apply Prometheus pattern: %s", err);
 		zbx_free(err);
@@ -2019,7 +2057,8 @@ static int	item_preproc_str_replace(zbx_variant_t *value, const char *params, ch
  *                                                                            *
  * Purpose: execute preprocessing operation                                   *
  *                                                                            *
- * Parameters: value_type    - [IN] the item value type                       *
+ * Parameters: cache         - [IN/OUT] the preprocessing cache               *
+ *             value_type    - [IN] the item value type                       *
  *             value         - [IN/OUT] the value to process                  *
  *             ts            - [IN] the value timestamp                       *
  *             op            - [IN] the preprocessing operation to execute    *
@@ -2035,8 +2074,9 @@ static int	item_preproc_str_replace(zbx_variant_t *value, const char *params, ch
  *           returned with error set.                                         *
  *                                                                            *
  ******************************************************************************/
-int	zbx_item_preproc(unsigned char value_type, zbx_variant_t *value, const zbx_timespec_t *ts,
-		const zbx_preproc_op_t *op, zbx_variant_t *history_value, zbx_timespec_t *history_ts, char **error)
+int	zbx_item_preproc(zbx_preproc_cache_t *cache, unsigned char value_type, zbx_variant_t *value,
+		const zbx_timespec_t *ts, const zbx_preproc_op_t *op, zbx_variant_t *history_value,
+		zbx_timespec_t *history_ts, char **error)
 {
 	int	ret;
 
@@ -2107,7 +2147,7 @@ int	zbx_item_preproc(unsigned char value_type, zbx_variant_t *value, const zbx_t
 			ret = item_preproc_script(value, op->params, history_value, error);
 			break;
 		case ZBX_PREPROC_PROMETHEUS_PATTERN:
-			ret = item_preproc_prometheus_pattern(value, op->params, error);
+			ret = item_preproc_prometheus_pattern(cache, value, op->params, error);
 			break;
 		case ZBX_PREPROC_PROMETHEUS_TO_JSON:
 			ret = item_preproc_prometheus_to_json(value, op->params, error);
@@ -2205,7 +2245,8 @@ int	zbx_item_preproc_test(unsigned char value_type, zbx_variant_t *value, const 
 
 		zbx_preproc_history_pop_value(history_in, i, &history_value, &history_ts);
 
-		if (FAIL == (ret = zbx_item_preproc(value_type, value, ts, op, &history_value, &history_ts, error)))
+		if (FAIL == (ret = zbx_item_preproc(NULL, value_type, value, ts, op, &history_value, &history_ts,
+				error)))
 		{
 			results[i].action = op->error_handler;
 			results[i].error = zbx_strdup(NULL, *error);

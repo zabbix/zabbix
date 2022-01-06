@@ -1020,15 +1020,18 @@ static void	add_sentusers_msg_esc_cancel(ZBX_USER_MSG **user_msg, zbx_uint64_t a
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select distinct userid,mediatypeid,subject,message,esc_step"
+			"select userid,mediatypeid,subject,message,esc_step"
 			" from alerts"
-			" where actionid=" ZBX_FS_UI64
-				" and mediatypeid is not null"
-				" and alerttype=%d"
-				" and acknowledgeid is null"
-				" and eventid=" ZBX_FS_UI64
-				" order by userid,mediatypeid,esc_step desc",
-				actionid, ALERT_TYPE_MESSAGE, event->eventid);
+			" where alertid in (select max(alertid)"
+				" from alerts"
+				" where actionid=" ZBX_FS_UI64
+					" and mediatypeid is not null"
+					" and alerttype=%d"
+					" and acknowledgeid is null"
+					" and eventid=" ZBX_FS_UI64
+					" group by userid,mediatypeid,esc_step)"
+			" order by userid,mediatypeid,esc_step desc",
+			actionid, ALERT_TYPE_MESSAGE, event->eventid);
 
 	result = DBselect("%s", sql);
 
@@ -1070,7 +1073,7 @@ static void	add_sentusers_msg_esc_cancel(ZBX_USER_MSG **user_msg, zbx_uint64_t a
 				user_timezone = get_user_timezone(userid);
 		}
 
-		message_dyn = zbx_dsprintf(NULL, "NOTE: Escalation cancelled: %s\nLast message sent:\n%s", error,
+		message_dyn = zbx_dsprintf(NULL, "NOTE: Escalation canceled: %s\nLast message sent:\n%s", error,
 				row[3]);
 
 		tz = NULL == user_timezone || 0 == strcmp(user_timezone, "default") ? default_timezone : user_timezone;
@@ -2403,7 +2406,6 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s error:'%s'", __func__, check_escalation_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
 
-
 	return ret;
 }
 
@@ -2420,7 +2422,7 @@ out:
 static void	escalation_log_cancel_warning(const DB_ESCALATION *escalation, const char *error)
 {
 	if (0 != escalation->esc_step)
-		zabbix_log(LOG_LEVEL_WARNING, "escalation cancelled: %s", error);
+		zabbix_log(LOG_LEVEL_WARNING, "escalation canceled: %s", error);
 }
 
 /******************************************************************************
@@ -2443,8 +2445,9 @@ static void	escalation_cancel(DB_ESCALATION *escalation, const DB_ACTION *action
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
 			__func__, escalation->escalationid, zbx_escalation_status_string(escalation->status));
 
-	/* the cancellation notification can be sent if no objects are deleted */
-	if (NULL != action && NULL != event && 0 != event->trigger.triggerid && 0 != escalation->esc_step)
+	/* the cancellation notification can be sent if no objects are deleted and notification is not disabled */
+	if (NULL != action && NULL != event && 0 != event->trigger.triggerid && 0 != escalation->esc_step &&
+			ACTION_NOTIFY_IF_CANCELED_FALSE != action->notify_if_canceled)
 	{
 		add_sentusers_msg_esc_cancel(&user_msg, action->actionid, event, ZBX_NULL2EMPTY_STR(error),
 				default_timezone, service, roles);

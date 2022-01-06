@@ -83,8 +83,8 @@
 	&.form-grid-1-1,
 	&.form-grid-3-1 {
 		.form-field:not(.field-fluid) {
-				grid-column-start: initial;
-				grid-column-end: span 1;
+			grid-column-start: initial;
+			grid-column-end: span 1;
 		}
 	}
 

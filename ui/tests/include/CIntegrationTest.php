@@ -262,7 +262,7 @@ class CIntegrationTest extends CAPITest {
 				self::stopComponent($component);
 			}
 			catch (Exception $e) {
-				self::addWarning($e->getMessage());
+				self::zbxAddWarning($e->getMessage());
 			}
 		}
 
@@ -293,7 +293,7 @@ class CIntegrationTest extends CAPITest {
 				self::stopComponent($component);
 			}
 			catch (Exception $e) {
-				self::addWarning($e->getMessage());
+				self::zbxAddWarning($e->getMessage());
 			}
 		}
 
@@ -811,7 +811,7 @@ class CIntegrationTest extends CAPITest {
 	protected static function getPidPath($component) {
 		self::validateComponent($component);
 
-		return self::getConfigurationValue($component, 'PidFile', '/tmp/zabbix_'.$component.'.log');
+		return self::getConfigurationValue($component, 'PidFile', '/tmp/zabbix_'.$component.'.pid');
 	}
 
 	/**

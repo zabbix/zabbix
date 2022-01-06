@@ -1,0 +1,1 @@
+.......PS. [ZBXNEXT-7109] changed runtime control options to connecto to zabbix server/proxy using socket rather than sending signals (wiper)

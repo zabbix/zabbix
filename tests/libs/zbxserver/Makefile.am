@@ -1,6 +1,8 @@
 if SERVER
 SERVER_tests = \
 	evaluate_function \
+	evaluate_stl \
+	evaluate_percentage_deviations_in_remainder \
 	substitute_lld_macros \
 	macro_fmttime \
 	valuemaps
@@ -35,6 +37,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/zabbix_server/preprocessor/libpreprocessor.a \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxdbcache/libzbxdbcache.a \
+	$(top_srcdir)/src/libs/zbxtrends/libzbxtrends_baseline.a \
 	$(top_srcdir)/src/libs/zbxtrends/libzbxtrends.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
@@ -71,6 +74,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxdbcache/libzbxdbcache.a \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
+	$(top_srcdir)/src/libs/zbxtrends/libzbxtrends_baseline.a \
 	$(top_srcdir)/src/libs/zbxtrends/libzbxtrends.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
@@ -153,6 +157,32 @@ evaluate_function_LDADD += @SERVER_LIBS@
 
 evaluate_function_LDFLAGS = @SERVER_LDFLAGS@ $(VALUECACHE_WRAP_FUNCS)
 
+evaluate_stl_SOURCES = \
+	evaluate_stl.c \
+	$(COMMON_SRC_FILES)
+
+evaluate_stl_LDADD = \
+	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a
+
+evaluate_stl_LDADD += $(COMMON_LIB_FILES)
+
+evaluate_stl_LDADD += @SERVER_LIBS@
+
+evaluate_stl_LDFLAGS = @SERVER_LDFLAGS@ $(VALUECACHE_WRAP_FUNCS)
+
+evaluate_percentage_deviations_in_remainder_SOURCES = \
+	evaluate_percentage_deviations_in_remainder.c \
+	$(COMMON_SRC_FILES)
+
+evaluate_percentage_deviations_in_remainder_LDADD = \
+	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a
+
+evaluate_percentage_deviations_in_remainder_LDADD += $(COMMON_LIB_FILES)
+
+evaluate_percentage_deviations_in_remainder_LDADD += @SERVER_LIBS@
+
+evaluate_percentage_deviations_in_remainder_LDFLAGS = @SERVER_LDFLAGS@ $(VALUECACHE_WRAP_FUNCS)
+
 valuemaps_SOURCES = \
 	valuemaps.c \
 	$(COMMON_SRC_FILES)
@@ -183,6 +213,16 @@ VALUECACHE_WRAP_FUNCS = \
 	-Wl,--wrap=zbx_timespec
 
 evaluate_function_CFLAGS = $(COMMON_COMPILER_FLAGS) \
+	-I@top_srcdir@/src/libs/zbxalgo \
+	-I@top_srcdir@/src/libs/zbxdbcache \
+	-I@top_srcdir@/src/libs/zbxhistory
+
+evaluate_stl_CFLAGS = $(COMMON_COMPILER_FLAGS) \
+	-I@top_srcdir@/src/libs/zbxalgo \
+	-I@top_srcdir@/src/libs/zbxdbcache \
+	-I@top_srcdir@/src/libs/zbxhistory
+
+evaluate_percentage_deviations_in_remainder_CFLAGS = $(COMMON_COMPILER_FLAGS) \
 	-I@top_srcdir@/src/libs/zbxalgo \
 	-I@top_srcdir@/src/libs/zbxdbcache \
 	-I@top_srcdir@/src/libs/zbxhistory

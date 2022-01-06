@@ -52,6 +52,10 @@
 
 #define ZBX_SNMPTRAP_LOGGING_ENABLED	1
 
+#define ZBX_IPC_SERVICE_CONFIG		"config"
+#define ZBX_IPC_CONFIG_RELOAD_REQUEST	1
+#define ZBX_IPC_CONFIG_RELOAD_RESPONSE	2
+
 extern int	CONFIG_TIMEOUT;
 
 extern zbx_uint64_t	CONFIG_CONF_CACHE_SIZE;
@@ -64,10 +68,8 @@ extern int	CONFIG_UNREACHABLE_POLLER_FORKS;
 extern int	CONFIG_IPMIPOLLER_FORKS;
 extern int	CONFIG_JAVAPOLLER_FORKS;
 extern int	CONFIG_PINGER_FORKS;
-extern int	CONFIG_UNAVAILABLE_DELAY;
 extern int	CONFIG_UNREACHABLE_PERIOD;
 extern int	CONFIG_UNREACHABLE_DELAY;
-extern int	CONFIG_HISTSYNCER_FORKS;
 extern int	CONFIG_PROXYCONFIG_FREQUENCY;
 extern int	CONFIG_PROXYDATA_FREQUENCY;
 extern int	CONFIG_HISTORYPOLLER_FORKS;
@@ -668,7 +670,8 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num);
 
 #define ZBX_ITEM_GET_PROCESS		(ZBX_ITEM_GET_MAINTENANCE|ZBX_ITEM_GET_MISC|ZBX_ITEM_GET_LOGTIMEFMT)
 
-void	DCsync_configuration(unsigned char mode, const struct zbx_json_parse *jp_kvs_paths);
+void	DCsync_configuration(unsigned char mode);
+void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths);
 int	init_configuration_cache(char **error);
 void	free_configuration_cache(void);
 
@@ -742,7 +745,6 @@ int	DCget_host_inventory_value_by_hostid(zbx_uint64_t hostid, char **replace_to,
 void	*DCconfig_get_stats(int request);
 
 int	DCconfig_get_last_sync_time(void);
-void	DCconfig_wait_sync(void);
 int	DCconfig_get_proxypoller_hosts(DC_PROXY *proxies, int max_hosts);
 int	DCconfig_get_proxypoller_nextcheck(void);
 

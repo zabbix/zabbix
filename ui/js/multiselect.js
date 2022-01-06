@@ -264,6 +264,28 @@
 			});
 
 			return ret;
+		},
+
+		/**
+		 * @param array entries  IDs to mark disabled.
+		 */
+		setDisabledEntries: function (entries) {
+			this.each(function() {
+				const $obj = $(this);
+				const ms_parameters = $obj.data('multiSelect');
+
+				if (typeof ms_parameters === 'undefined') {
+					return;
+				}
+
+				const link = new Curl(ms_parameters.options.url, false);
+				link.setArgument('disabledids', entries);
+
+				ms_parameters.options.url = link.getUrl();
+				ms_parameters.options.popup.parameters.disableids = entries;
+
+				$obj.data('multiSelect', ms_parameters);
+			});
 		}
 	};
 
@@ -853,7 +875,6 @@
 		var ms = $obj.data('multiSelect'),
 			is_new = item.isNew || false,
 			prefix = item.prefix || '',
-			search = ms.values.search.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/[*]/g, '\\\*?'),
 			$li = $('<li>', {
 				'data-id': item.id,
 				'data-label': prefix + item.name
@@ -871,11 +892,38 @@
 		}
 
 		// Highlight matched.
-		$li
-			.append(item.name.replace(new RegExp(search, 'gi'), function(match) {
-				return '<span' + (!is_new ? ' class="suggest-found"' : '') + '>' + match + '</span>';
-			}))
-			.toggleClass('suggest-new', is_new);
+		if (ms.values.search !== item.name) {
+			var text = item.name.toLowerCase(),
+				search = ms.values.search.toLowerCase().replace(/[*]+/g, ''),
+				start = 0,
+				end = 0;
+
+			while (search !== '' && text.indexOf(search, end) > -1) {
+				end = text.indexOf(search, end);
+
+				if (end > start) {
+					$li.append(document.createTextNode(item.name.substring(start, end)));
+				}
+
+				$li.append($('<span>', {
+					class: !is_new ? 'suggest-found' : '',
+					text: item.name.substring(end, end + search.length)
+				})).toggleClass('suggest-new', is_new);
+
+				end += search.length;
+				start = end;
+			}
+
+			if (end < item.name.length) {
+				$li.append(document.createTextNode(item.name.substring(end, item.name.length)));
+			}
+		}
+		else {
+			$li.append($('<span>', {
+				class: !is_new ? 'suggest-found' : '',
+				text: item.name
+			})).toggleClass('suggest-new', is_new);
+		}
 
 		$('ul', ms.values.available_div).append($li);
 	}

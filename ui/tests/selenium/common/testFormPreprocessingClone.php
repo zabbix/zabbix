@@ -172,7 +172,7 @@ class testFormPreprocessingClone extends CWebTest {
 			],
 			[
 				'type' => '22',
-				'params' => "cpu_usage_system\nlabel_name",
+				'params' => "cpu_usage_system\nlabel\nlabel_name",
 				'error_handler' => 3,
 				'error_handler_params' => 'error2'
 			]

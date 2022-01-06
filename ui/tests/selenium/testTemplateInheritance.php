@@ -53,7 +53,6 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->filterEntriesAndOpenObjects($this->hostName, 'Name', $this->hostName);
 		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
-		$form->selectTab('Templates');
 		$this->zbxTestClickButtonMultiselect('add_templates_');
 		$this->zbxTestLaunchOverlayDialog('Templates');
 		COverlayDialogElement::find()->all()->last()->setDataContext('Templates');
@@ -179,8 +178,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->filterEntriesAndOpenObjects($this->hostName, 'Name', $this->hostName);
 		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
-		$form->selectTab('Templates');
-		$table = $form->query('id:linked-template')->asTable()->one()->waitUntilVisible();
+		$table = $form->query('id:linked-templates')->asTable()->one()->waitUntilVisible();
 		$table->findRow('Name', $template)
 				->getColumn('Action')->query('button:Unlink and clear')->one()->click();
 		$this->assertFalse($table->findRow('Name', $template)->isValid());
@@ -278,9 +276,9 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->assertFalse($this->zbxTestCheckboxSelected('show_work_period'));
 		$this->assertFalse($this->zbxTestCheckboxSelected('show_triggers'));
 		$this->assertTrue($this->zbxTestCheckboxSelected('visible_percent_left'));
-		$this->zbxTestAssertElementValue('percent_left', '4.00');
+		$this->zbxTestAssertElementValue('percent_left', '4');
 		$this->assertTrue($this->zbxTestCheckboxSelected('visible_percent_right'));
-		$this->zbxTestAssertElementValue('percent_right', '5.00');
+		$this->zbxTestAssertElementValue('percent_right', '5');
 		$this->zbxTestDropdownAssertSelected('ymin_type', 'Calculated');
 		$this->zbxTestDropdownAssertSelected('ymax_type', 'Calculated');
 		$this->zbxTestTextPresent('Parent graphs');
@@ -515,9 +513,9 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->assertFalse($this->zbxTestCheckboxSelected('show_work_period'));
 		$this->assertFalse($this->zbxTestCheckboxSelected('show_triggers'));
 		$this->assertTrue($this->zbxTestCheckboxSelected('visible_percent_left'));
-		$this->zbxTestAssertElementValue('percent_left', '4.00');
+		$this->zbxTestAssertElementValue('percent_left', '4');
 		$this->assertTrue($this->zbxTestCheckboxSelected('visible_percent_right'));
-		$this->zbxTestAssertElementValue('percent_right', '5.00');
+		$this->zbxTestAssertElementValue('percent_right', '5');
 		$this->zbxTestDropdownAssertSelected('ymin_type', 'Calculated');
 		$this->zbxTestDropdownAssertSelected('ymax_type', 'Calculated');
 		$this->zbxTestTextPresent($this->hostName.': itemDiscovery');

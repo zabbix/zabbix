@@ -423,7 +423,7 @@ class CLineGraphDraw extends CGraphDraw {
 			return;
 		}
 
-		$number_parser = new CNumberParser(['with_suffix' => true]);
+		$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
 
 		$max = 3;
 		$cnt = 0;
@@ -1415,8 +1415,8 @@ class CLineGraphDraw extends CGraphDraw {
 
 			// caption
 			$itemCaption = $this->itemsHost
-				? $this->items[$i]['name_expanded']
-				: $this->items[$i]['hostname'].NAME_DELIMITER.$this->items[$i]['name_expanded'];
+				? $this->items[$i]['name']
+				: $this->items[$i]['hostname'].NAME_DELIMITER.$this->items[$i]['name'];
 
 			// draw legend of an item with data
 			$data = array_key_exists($this->items[$i]['itemid'], $this->data)
@@ -2015,11 +2015,7 @@ class CLineGraphDraw extends CGraphDraw {
 				$graph_item['delay'] = $master_item['delay'];
 			}
 
-			$graph_items = CMacrosResolverHelper::resolveItemNames([$graph_item]);
-			$graph_items = CMacrosResolverHelper::resolveTimeUnitMacros($graph_items, ['delay']);
-			$graph_item = reset($graph_items);
-
-			$graph_item['name'] = $graph_item['name_expanded'];
+			$graph_item = CMacrosResolverHelper::resolveTimeUnitMacros([$graph_item], ['delay'])[0];
 
 			$update_interval_parser->parse($graph_item['delay']);
 			$graph_item['delay'] = getItemDelay($update_interval_parser->getDelay(),

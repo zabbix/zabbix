@@ -75,7 +75,7 @@ class CControllerHintboxEventlist extends CController {
 		foreach ($filter_tags as $filter_tag) {
 			$fields = [
 				'tag' =>		'required|string',
-				'operator' =>	'required|in '.implode(',', [TAG_OPERATOR_EQUAL, TAG_OPERATOR_LIKE]),
+				'operator' =>	'required|in '.implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS]),
 				'value' =>		'required|string'
 			];
 

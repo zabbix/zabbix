@@ -1,18 +1,13 @@
-WITH T AS (
-	SELECT
-		age(relfrozenxid),
-		current_setting('autovacuum_freeze_max_age')::integer fma
-	FROM pg_class
-	WHERE relkind IN ('r', 't'))
-SELECT row_to_json(T2)
+SELECT row_to_json(T)
 FROM (
-	SELECT extract(epoch FROM now())::integer ts,
-	(
-		SELECT ((1 - max(age)::double precision / current_setting('autovacuum_freeze_max_age')::integer) * 100)::numeric(9,6)
-		FROM T
-	) prc_before_av,
-	(
-		SELECT ((1 - max(age)::double precision / -((1 << 31) + 1)) * 100)::numeric(9,6)
-		FROM T
-	) prc_before_stop
-) T2
+	SELECT
+		extract(epoch FROM now())::integer AS ts,
+		((1 - max(age(d.datfrozenxid))::double precision /
+		current_setting('autovacuum_freeze_max_age')::bigint) * 100)::numeric(9,6)
+		AS prc_before_av,
+		((1 - abs(max(age(d.datfrozenxid))::double precision /
+		(1::bigint << (min(t.typlen)*8)))) * 100)::numeric(9,6)
+		AS prc_before_stop
+	FROM pg_database d CROSS JOIN pg_type t
+	WHERE t.typname = 'xid'
+) T;
