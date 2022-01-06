@@ -1524,7 +1524,7 @@ static void	services_times_convert_downtime(zbx_vector_services_times_t *service
 			uptime_count++;
 	}
 
-	if (0 == uptime_count)
+	if (0 == uptime_count && 0 != services_downtimes.values_num)
 	{
 		services_times_t	service_time_new;
 
