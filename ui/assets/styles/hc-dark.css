@@ -5259,14 +5259,9 @@ a.link-action {
   .input-color-picker div {
     width: 18px;
     height: 18px;
-<<<<<<< HEAD
-    border: 1px solid #666666;
     background: url("../img/icon-sprite.svg?20211222") no-repeat -323px -411px;
-=======
-    background: url("../img/icon-sprite.svg?20200407") no-repeat -323px -411px;
     border: 1px solid #666666;
     margin: 1px;
->>>>>>> a7043a2c2c26d4d97b6eb4413ece3695d8222e6b
     cursor: pointer; }
     .input-color-picker div:focus {
       border-color: #bbbbbb;
