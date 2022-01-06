@@ -118,19 +118,16 @@ class testUserRolesPermissions extends CWebTest {
 			[
 				'name' => 'Parent 1',
 				'algorithm' => 1,
-				'showsla' => 0,
 				'sortorder' => 1
 			],
 			[
 				'name' => 'Parent 2',
 				'algorithm' => 2,
-				'showsla' => 0,
 				'sortorder' => 2
 			],
 			[
 				'name' => 'Child of parent 1',
 				'algorithm' => 2,
-				'showsla' => 0,
 				'sortorder' => 1,
 				'tags' => [
 					[
@@ -142,13 +139,11 @@ class testUserRolesPermissions extends CWebTest {
 			[
 				'name' => 'Child of child 1',
 				'algorithm' => 2,
-				'showsla' => 0,
 				'sortorder' => 1
 			],
 			[
 				'name' => 'Child of parent 2',
 				'algorithm' => 2,
-				'showsla' => 0,
 				'sortorder' => 1
 			]
 		]);

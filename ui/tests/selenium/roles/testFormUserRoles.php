@@ -114,13 +114,11 @@ class testFormUserRoles extends CWebTest {
 			[
 				'name' => 'Service 1',
 				'algorithm' => 1,
-				'showsla' => 0,
 				'sortorder' => 1
 			],
 			[
 				'name' => 'Service 2',
 				'algorithm' => 2,
-				'showsla' => 0,
 				'sortorder' => 2,
 				'problem_tags' => [
 					[
