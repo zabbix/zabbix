@@ -135,6 +135,21 @@ class testDashboardCopyWidgets extends CWebTest {
 										'value' => 700016
 									]
 								]
+							],
+							[
+								'type' => 'item',
+								'name' => 'Single item widget',
+								'x' => 13,
+								'y' => 4,
+								'width' => 4,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'itemid',
+										'value' => 40041
+									]
+								]
 							]
 						]
 					],
@@ -374,6 +389,12 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
+					'name' => 'Single item widget',
+					'copy to' => 'same page'
+				]
+			],
+			[
+				[
 					'name' => 'Clock widget',
 					'copy to' => 'another page'
 				]
@@ -404,6 +425,12 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
+					'name' => 'Single item widget',
+					'copy to' => 'another page'
+				]
+			],
+			[
+				[
 					'name' => 'Clock widget',
 					'copy to' => 'another dashboard'
 				]
@@ -429,6 +456,12 @@ class testDashboardCopyWidgets extends CWebTest {
 			[
 				[
 					'name' => 'URL widget',
+					'copy to' => 'another dashboard'
+				]
+			],
+			[
+				[
+					'name' => 'Single item widget',
 					'copy to' => 'another dashboard'
 				]
 			],
