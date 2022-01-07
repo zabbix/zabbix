@@ -25,6 +25,8 @@
 #include "log.h"
 #include "zbxdiag.h"
 
+#if defined(HAVE_SIGQUEUE)
+
 /******************************************************************************
  *                                                                            *
  * Function: rtc_change_service_loglevel                                      *
@@ -131,6 +133,7 @@ static void	rtc_process_loglevel(int code, const char *data, char **result)
 
 	zbx_signal_process_by_type(process_type, process_num, ZBX_RTC_MAKE_MESSAGE(code, 0, 0), result);
 }
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -201,6 +204,7 @@ static void	rtc_process_request(int code, const unsigned char *data, char **resu
 
 	switch (code)
 	{
+#if defined(HAVE_SIGQUEUE)
 		case ZBX_RTC_LOG_LEVEL_INCREASE:
 		case ZBX_RTC_LOG_LEVEL_DECREASE:
 			rtc_process_loglevel(code, (const char *)data, result);
@@ -234,6 +238,7 @@ static void	rtc_process_request(int code, const unsigned char *data, char **resu
 			*result = zbx_strdup(NULL, "Invalid runtime control option: no SNMP support enabled\n");
 #endif
 			return;
+#endif
 		case ZBX_RTC_DIAGINFO:
 			rtc_process_diaginfo((const char *)data, result);
 			return;
