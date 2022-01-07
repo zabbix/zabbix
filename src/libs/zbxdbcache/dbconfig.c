@@ -414,11 +414,8 @@ static void	DCitem_poller_type_update(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *d
 
 	if (0 != (flags & ZBX_HOST_UNREACHABLE))
 	{
-		if (ZBX_POLLER_TYPE_NORMAL == poller_type || ZBX_POLLER_TYPE_JAVA == poller_type ||
-				ZBX_POLLER_TYPE_ODBC == poller_type)
-		{
+		if (ZBX_POLLER_TYPE_NORMAL == poller_type || ZBX_POLLER_TYPE_JAVA == poller_type)
 			poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
-		}
 
 		dc_item->poller_type = poller_type;
 		return;
@@ -431,8 +428,7 @@ static void	DCitem_poller_type_update(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *d
 	}
 
 	if (ZBX_POLLER_TYPE_UNREACHABLE != dc_item->poller_type ||
-			(ZBX_POLLER_TYPE_NORMAL != poller_type && ZBX_POLLER_TYPE_JAVA != poller_type &&
-			ZBX_POLLER_TYPE_ODBC != poller_type))
+			(ZBX_POLLER_TYPE_NORMAL != poller_type && ZBX_POLLER_TYPE_JAVA != poller_type))
 	{
 		dc_item->poller_type = poller_type;
 	}
@@ -9516,17 +9512,6 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM **items)
 		zbx_binary_heap_remove_min(queue);
 		dc_item->location = ZBX_LOC_NOWHERE;
 
-		if (ZBX_POLLER_TYPE_ODBC == poller_type)
-		{
-			if (ITEM_TYPE_DB_MONITOR != dc_item->type)
-				continue;
-		}
-		else
-		{
-			if (ITEM_TYPE_DB_MONITOR == dc_item->type)
-				continue;
-		}
-
 		if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
 			continue;
 
@@ -9560,7 +9545,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM **items)
 				/* postpone checks on hosts that have been checked recently and */
 				/* are still unreachable                                        */
 				if (ZBX_POLLER_TYPE_NORMAL == poller_type || ZBX_POLLER_TYPE_JAVA == poller_type ||
-						ZBX_POLLER_TYPE_ODBC == poller_type || disable_until > now)
+						disable_until > now)
 				{
 					dc_requeue_item(dc_item, dc_host, dc_interface,
 							ZBX_ITEM_COLLECTED | ZBX_HOST_UNREACHABLE, now);

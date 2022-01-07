@@ -1172,7 +1172,14 @@ in:
     key: k
     poller: ZBX_POLLER_TYPE_UNREACHABLE
     flags: 0
-    result: ZBX_POLLER_TYPE_UNREACHABLE
+    result: ZBX_POLLER_TYPE_ODBC
+  - ref: 2151
+    access: DIRECT
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_ODBC
   - ref: 216
     access: DIRECT
     type: ITEM_TYPE_DB_MONITOR
