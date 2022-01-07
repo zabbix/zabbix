@@ -109,11 +109,15 @@ const char	*help_message[] = {
 	"                                 http poller, icmp pinger, ipmi manager,",
 	"                                 ipmi poller, java poller, poller,",
 	"                                 self-monitoring, snmp trapper, task manager,",
+<<<<<<< HEAD
 	"                                 trapper, unreachable poller, vmware collector,"
 	"                                 history poller, availability manager, odbc poller)",
+=======
+	"                                 trapper, unreachable poller, vmware collector,",
+	"                                 history poller, availability manager)",
+>>>>>>> master
 	"        process-type,N           Process type and number (e.g., poller,3)",
-	"        pid                      Process identifier, up to 65535. For larger",
-	"                                 values specify target as \"process-type,N\"",
+	"        pid                      Process identifier",
 	"",
 	"  -h --help                      Display this help message",
 	"  -V --version                   Display version number",

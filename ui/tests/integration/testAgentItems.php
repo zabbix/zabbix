@@ -133,14 +133,14 @@ class testAgentItems extends CIntegrationTest {
 			'type' => ITEM_TYPE_ZABBIX,
 			'component' => self::COMPONENT_AGENT,
 			'valueType' => ITEM_VALUE_TYPE_TEXT,
-			'result_exec' => 'stat -c %a '.self::TEST_FILE_NAME
+			'result_exec' => 'stat -c %04a '.self::TEST_FILE_NAME
 		],
 		[
 			'key' => 'vfs.file.permissions['.self::TEST_FILE_NAME.']',
 			'type' => ITEM_TYPE_ZABBIX,
 			'component' => self::COMPONENT_AGENT2,
 			'valueType' => ITEM_VALUE_TYPE_TEXT,
-			'result_exec' => 'stat -c %a '.self::TEST_FILE_NAME
+			'result_exec' => 'stat -c %04a '.self::TEST_FILE_NAME
 		],
 		[
 			'key' => 'agent.hostmetadata',
@@ -215,7 +215,7 @@ class testAgentItems extends CIntegrationTest {
 				],
 			'result' => [
 					'type' => 'file',
-					'permissions' => 'stat -c %a '.self::TEST_FILE_NAME,
+					'permissions' => 'stat -c %04a '.self::TEST_FILE_NAME,
 					'user' => 'stat -c %U '.self::TEST_FILE_NAME,
 					'group' => 'stat -c %G '.self::TEST_FILE_NAME,
 					'uid' => 'stat -c %u '.self::TEST_FILE_NAME,
@@ -248,7 +248,7 @@ class testAgentItems extends CIntegrationTest {
 				],
 			'result' => [
 					'type' => 'file',
-					'permissions' => 'stat -c %a '.self::TEST_FILE_NAME,
+					'permissions' => 'stat -c %04a '.self::TEST_FILE_NAME,
 					'user' => 'stat -c %U '.self::TEST_FILE_NAME,
 					'group' => 'stat -c %G '.self::TEST_FILE_NAME,
 					'uid' => 'stat -c %u '.self::TEST_FILE_NAME,
@@ -281,7 +281,7 @@ class testAgentItems extends CIntegrationTest {
 				],
 			'result' => [
 					'type' => 'sym',
-					'permissions' => 'stat -c %a '.self::TEST_LINK_NAME,
+					'permissions' => 'stat -c %04a '.self::TEST_LINK_NAME,
 					'user' => 'stat -c %U '.self::TEST_LINK_NAME,
 					'group' => 'stat -c %G '.self::TEST_LINK_NAME,
 					'uid' => 'stat -c %u '.self::TEST_LINK_NAME,
@@ -314,7 +314,7 @@ class testAgentItems extends CIntegrationTest {
 				],
 			'result' => [
 					'type' => 'sym',
-					'permissions' => 'stat -c %a '.self::TEST_LINK_NAME,
+					'permissions' => 'stat -c %04a '.self::TEST_LINK_NAME,
 					'user' => 'stat -c %U '.self::TEST_LINK_NAME,
 					'group' => 'stat -c %G '.self::TEST_LINK_NAME,
 					'uid' => 'stat -c %u '.self::TEST_LINK_NAME,
@@ -393,7 +393,7 @@ class testAgentItems extends CIntegrationTest {
 					'pathname' =>  self::TEST_DIR_FILE_NAME,
 					'dirname' => self::TEST_DIR_NAME,
 					'type' => 'file',
-					'permissions' => 'stat -c %a '.self::TEST_DIR_FILE_NAME,
+					'permissions' => 'stat -c %04a '.self::TEST_DIR_FILE_NAME,
 					'user' => 'stat -c %U '.self::TEST_DIR_FILE_NAME,
 					'group' => 'stat -c %G '.self::TEST_DIR_FILE_NAME,
 					'uid' => 'stat -c %u '.self::TEST_DIR_FILE_NAME,
@@ -413,7 +413,7 @@ class testAgentItems extends CIntegrationTest {
 					'pathname' =>  self::TEST_DIR_DIR1_NAME,
 					'dirname' => self::TEST_DIR_NAME,
 					'type' => 'dir',
-					'permissions' => 'stat -c %a '.self::TEST_DIR_DIR1_NAME,
+					'permissions' => 'stat -c %04a '.self::TEST_DIR_DIR1_NAME,
 					'user' => 'stat -c %U '.self::TEST_DIR_DIR1_NAME,
 					'group' => 'stat -c %G '.self::TEST_DIR_DIR1_NAME,
 					'uid' => 'stat -c %u '.self::TEST_DIR_DIR1_NAME,
@@ -433,7 +433,7 @@ class testAgentItems extends CIntegrationTest {
 					'pathname' =>  self::TEST_DIR_FILE_NAME,
 					'dirname' => self::TEST_DIR_NAME,
 					'type' => 'sym',
-					'permissions' => 'stat -c %a '.self::TEST_DIR_LINK_NAME,
+					'permissions' => 'stat -c %04a '.self::TEST_DIR_LINK_NAME,
 					'user' => 'stat -c %U '.self::TEST_DIR_LINK_NAME,
 					'group' => 'stat -c %G '.self::TEST_DIR_LINK_NAME,
 					'uid' => 'stat -c %u '.self::TEST_DIR_LINK_NAME,
@@ -471,7 +471,7 @@ class testAgentItems extends CIntegrationTest {
 					'pathname' =>  self::TEST_DIR_FILE_NAME,
 					'dirname' => self::TEST_DIR_NAME,
 					'type' => 'file',
-					'permissions' => 'stat -c %a '.self::TEST_DIR_FILE_NAME,
+					'permissions' => 'stat -c %04a '.self::TEST_DIR_FILE_NAME,
 					'user' => 'stat -c %U '.self::TEST_DIR_FILE_NAME,
 					'group' => 'stat -c %G '.self::TEST_DIR_FILE_NAME,
 					'uid' => 'stat -c %u '.self::TEST_DIR_FILE_NAME,
@@ -491,7 +491,7 @@ class testAgentItems extends CIntegrationTest {
 					'pathname' =>  self::TEST_DIR_DIR1_NAME,
 					'dirname' => self::TEST_DIR_NAME,
 					'type' => 'dir',
-					'permissions' => 'stat -c %a '.self::TEST_DIR_DIR1_NAME,
+					'permissions' => 'stat -c %04a '.self::TEST_DIR_DIR1_NAME,
 					'user' => 'stat -c %U '.self::TEST_DIR_DIR1_NAME,
 					'group' => 'stat -c %G '.self::TEST_DIR_DIR1_NAME,
 					'uid' => 'stat -c %u '.self::TEST_DIR_DIR1_NAME,
@@ -511,7 +511,7 @@ class testAgentItems extends CIntegrationTest {
 					'pathname' =>  self::TEST_DIR_FILE_NAME,
 					'dirname' => self::TEST_DIR_NAME,
 					'type' => 'sym',
-					'permissions' => 'stat -c %a '.self::TEST_DIR_LINK_NAME,
+					'permissions' => 'stat -c %04a '.self::TEST_DIR_LINK_NAME,
 					'user' => 'stat -c %U '.self::TEST_DIR_LINK_NAME,
 					'group' => 'stat -c %G '.self::TEST_DIR_LINK_NAME,
 					'uid' => 'stat -c %u '.self::TEST_DIR_LINK_NAME,

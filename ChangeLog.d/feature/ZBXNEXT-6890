@@ -1,0 +1,1 @@
+A......... [ZBXNEXT-6470,ZBXNEXT-6890] implemented complete audit logging of maintenance API object; added strict validation for maintenance.create, maintenance.update, maintenance.delete API methods (rlataria, vmaksimovs)

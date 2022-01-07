@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package external
+package container
 
 import (
 	"encoding/json"
@@ -31,7 +31,7 @@ import (
 	"time"
 
 	"zabbix.com/pkg/plugin"
-	"zabbix.com/pkg/shared"
+	"zabbix.com/pkg/plugin/comms"
 )
 
 const defaultTimeout = 3
@@ -114,37 +114,37 @@ func (h *handler) run() {
 }
 
 func (h *handler) handle() error {
-	reqType, data, err := shared.Read(h.connection)
+	reqType, data, err := comms.Read(h.connection)
 	if err != nil {
 		return err
 	}
 
-	h.Tracef("plugin %s executing %s", h.name, shared.GetRequestName(reqType))
+	h.Tracef("plugin %s executing %s", h.name, comms.GetRequestName(reqType))
 
 	switch reqType {
-	case shared.RegisterRequestType:
+	case comms.RegisterRequestType:
 		err = h.register(data)
 		if err != nil {
 			return err
 		}
-	case shared.StartRequestType:
+	case comms.StartRequestType:
 		err = h.start()
 		if err != nil {
 			return err
 		}
-	case shared.TerminateRequestType:
+	case comms.TerminateRequestType:
 		h.terminate()
-	case shared.ValidateRequestType:
+	case comms.ValidateRequestType:
 		err = h.validate(data)
 		if err != nil {
 			return err
 		}
-	case shared.ExportRequestType:
+	case comms.ExportRequestType:
 		err = h.export(data)
 		if err != nil {
 			return err
 		}
-	case shared.ConfigureRequestType:
+	case comms.ConfigureRequestType:
 		err = h.configure(data)
 		if err != nil {
 			return err
@@ -153,7 +153,7 @@ func (h *handler) handle() error {
 		return fmt.Errorf("unknown request recivied: %d", reqType)
 	}
 
-	h.Tracef("plugin %s executed %s", h.name, shared.GetRequestName(reqType))
+	h.Tracef("plugin %s executed %s", h.name, comms.GetRequestName(reqType))
 
 	return nil
 }
@@ -183,7 +183,7 @@ func (h *handler) stop() {
 }
 
 func (h *handler) register(data []byte) error {
-	var req shared.RegisterRequest
+	var req comms.RegisterRequest
 	err := json.Unmarshal(data, &req)
 	if err != nil {
 		return err
@@ -195,7 +195,7 @@ func (h *handler) register(data []byte) error {
 	if err != nil {
 		response.Error = err.Error()
 
-		return shared.Write(h.connection, response)
+		return comms.Write(h.connection, response)
 	}
 
 	var metrics []string
@@ -210,7 +210,7 @@ func (h *handler) register(data []byte) error {
 	response.Metrics = metrics
 	response.Interfaces = interfaces
 
-	return shared.Write(h.connection, response)
+	return comms.Write(h.connection, response)
 }
 
 func checkVersion(version string) error {
@@ -222,7 +222,7 @@ func checkVersion(version string) error {
 }
 
 func (h *handler) validate(data []byte) error {
-	var req shared.ValidateRequest
+	var req comms.ValidateRequest
 	err := json.Unmarshal(data, &req)
 	if err != nil {
 		return err
@@ -240,11 +240,11 @@ func (h *handler) validate(data []byte) error {
 		response.Error = err.Error()
 	}
 
-	return shared.Write(h.connection, response)
+	return comms.Write(h.connection, response)
 }
 
 func (h *handler) configure(data []byte) error {
-	var req shared.ConfigureRequest
+	var req comms.ConfigureRequest
 	err := json.Unmarshal(data, &req)
 	if err != nil {
 		return err
@@ -261,7 +261,7 @@ func (h *handler) configure(data []byte) error {
 }
 
 func (h *handler) export(data []byte) error {
-	var req shared.ExportRequest
+	var req comms.ExportRequest
 	err := json.Unmarshal(data, &req)
 	if err != nil {
 		return err
@@ -278,7 +278,7 @@ func (h *handler) export(data []byte) error {
 		response.Error = err.Error()
 	}
 
-	return shared.Write(h.connection, response)
+	return comms.Write(h.connection, response)
 }
 
 func (h *handler) terminate() {
@@ -291,17 +291,17 @@ func (h *handler) getInterfaces() uint32 {
 
 	_, ok := h.accessor.(plugin.Exporter)
 	if ok {
-		interfaces |= shared.Exporter
+		interfaces |= comms.Exporter
 	}
 
 	_, ok = h.accessor.(plugin.Configurator)
 	if ok {
-		interfaces |= shared.Configurator
+		interfaces |= comms.Configurator
 	}
 
 	_, ok = h.accessor.(plugin.Runner)
 	if ok {
-		interfaces |= shared.Runner
+		interfaces |= comms.Runner
 	}
 
 	return interfaces
@@ -331,36 +331,36 @@ func (h *handler) Critf(format string, args ...interface{}) {
 	h.sendLog(createLogRequest(Crit, fmt.Sprintf(format, args...)))
 }
 
-func createLogRequest(severity uint32, message string) shared.LogRequest {
-	return shared.LogRequest{
-		Common: shared.Common{
-			Id:   shared.NonRequiredID,
-			Type: shared.LogRequestType,
+func createLogRequest(severity uint32, message string) comms.LogRequest {
+	return comms.LogRequest{
+		Common: comms.Common{
+			Id:   comms.NonRequiredID,
+			Type: comms.LogRequestType,
 		},
 		Severity: severity,
 		Message:  message,
 	}
 }
 
-func createEmptyRegisterResponse(id uint32) shared.RegisterResponse {
-	return shared.RegisterResponse{
-		Common: shared.Common{
+func createEmptyRegisterResponse(id uint32) comms.RegisterResponse {
+	return comms.RegisterResponse{
+		Common: comms.Common{
 			Id:   id,
-			Type: shared.RegisterResponseType,
+			Type: comms.RegisterResponseType,
 		},
 	}
 }
 
-func createEmptyExportResponse(id uint32) shared.ExportResponse {
-	return shared.ExportResponse{Common: shared.Common{Id: id, Type: shared.ExportResponseType}}
+func createEmptyExportResponse(id uint32) comms.ExportResponse {
+	return comms.ExportResponse{Common: comms.Common{Id: id, Type: comms.ExportResponseType}}
 }
 
-func createEmptyValidateResponse(id uint32) shared.ValidateResponse {
-	return shared.ValidateResponse{Common: shared.Common{Id: id, Type: shared.ValidateResponseType}}
+func createEmptyValidateResponse(id uint32) comms.ValidateResponse {
+	return comms.ValidateResponse{Common: comms.Common{Id: id, Type: comms.ValidateResponseType}}
 }
 
-func (h *handler) sendLog(request shared.LogRequest) {
-	err := shared.Write(h.connection, request)
+func (h *handler) sendLog(request comms.LogRequest) {
+	err := comms.Write(h.connection, request)
 	if err != nil {
 		panic(fmt.Sprintf("failed to log message %s", err.Error()))
 	}
@@ -376,5 +376,5 @@ func ignoreSIGINTandSIGTERM() {
 
 func init() {
 	supportedVersion = map[string]bool{}
-	supportedVersion[shared.Version] = true
+	supportedVersion[comms.Version] = true
 }
