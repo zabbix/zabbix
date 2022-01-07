@@ -221,7 +221,7 @@ int	CONFIG_REPORTMANAGER_FORKS	= 0;
 int	CONFIG_REPORTWRITER_FORKS	= 0;
 int	CONFIG_SERVICEMAN_FORKS		= 1;
 int	CONFIG_PROBLEMHOUSEKEEPER_FORKS = 1;
-int	CONFIG_ODBCPOLLER_FORKS		= 5;
+int	CONFIG_ODBCPOLLER_FORKS		= 0;
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
@@ -1253,6 +1253,14 @@ static int	server_startup(zbx_socket_t *listen_sock, zbx_rtc_t *rtc)
 		}
 	}
 
+#ifndef HAVE_UNIXODBC
+	if (0 < CONFIG_ODBCPOLLER_FORKS)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "ODBC support is not compiled in, but ODBC polling is enabled.");
+		return FAIL;
+	}
+#endif
+
 	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_POLLER_FORKS
 			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS
 			+ CONFIG_ALERTER_FORKS + CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS
@@ -1429,11 +1437,13 @@ static int	server_startup(zbx_socket_t *listen_sock, zbx_rtc_t *rtc)
 			case ZBX_PROCESS_TYPE_PROBLEMHOUSEKEEPER:
 				zbx_thread_start(trigger_housekeeper_thread, &thread_args, &threads[i]);
 				break;
+#ifdef HAVE_UNIXODBC
 			case ZBX_PROCESS_TYPE_ODBCPOLLER:
 				poller_type = ZBX_POLLER_TYPE_ODBC;
 				thread_args.args = &poller_type;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
+#endif
 		}
 	}
 
