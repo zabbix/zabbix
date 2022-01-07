@@ -21,19 +21,26 @@
 
 class CWidgetFieldDatePicker extends CWidgetField {
 
-	private $date_time_format;
+	/**
+	 * @var array
+	 */
+	private $date_time_formats;
+
+	/**
+	 * @var bool
+	 */
 	private $is_date_only;
 
 	/**
 	 * @param string $name
 	 * @param string $label
-	 * @param string $date_time_format
+	 * @param array  $date_time_formats
 	 * @param bool   $is_date_only
 	 */
-	public function __construct(string $name, string $label, string $date_time_format, bool $is_date_only) {
+	public function __construct(string $name, string $label, array $date_time_formats, bool $is_date_only) {
 		parent::__construct($name, $label);
 
-		$this->date_time_format = $date_time_format;
+		$this->date_time_formats = $date_time_formats;
 		$this->is_date_only = $is_date_only;
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
@@ -68,10 +75,10 @@ class CWidgetFieldDatePicker extends CWidgetField {
 	}
 
 	/**
-	 * @return string
+	 * @return array
 	 */
-	public function getDateTimeFormat(): string {
-		return $this->date_time_format;
+	public function getDateTimeFormats(): array {
+		return $this->date_time_formats;
 	}
 
 	/**
@@ -100,13 +107,15 @@ class CWidgetFieldDatePicker extends CWidgetField {
 			return [];
 		}
 
-		$datetime = DateTime::createFromFormat('!'.$this->getDateTimeFormat(), $value);
-		$last_errors = DateTime::getLastErrors();
+		foreach ($this->getDateTimeFormats() as $datetime_format) {
+			$datetime = DateTime::createFromFormat('!'.$datetime_format, $value);
+			$last_errors = DateTime::getLastErrors();
 
-		if ($datetime !== false && $last_errors['warning_count'] == 0 && $last_errors['error_count'] == 0) {
-			$this->setValue($value);
+			if ($datetime !== false && $last_errors['warning_count'] == 0 && $last_errors['error_count'] == 0) {
+				$this->setValue($value);
 
-			return [];
+				return [];
+			}
 		}
 
 		$relative_time_parser = new CRelativeTimeParser();
