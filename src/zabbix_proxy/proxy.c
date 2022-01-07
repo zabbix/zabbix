@@ -213,7 +213,7 @@ int	CONFIG_VMWARE_FREQUENCY		= 60;
 int	CONFIG_VMWARE_PERF_FREQUENCY	= 60;
 int	CONFIG_VMWARE_TIMEOUT		= 10;
 
-int	CONFIG_ODBCPOLLER_FORKS		= 0;
+int	CONFIG_ODBCPOLLER_FORKS		= 5;
 
 zbx_uint64_t	CONFIG_CONF_CACHE_SIZE		= 8 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_HISTORY_CACHE_SIZE	= 16 * ZBX_MEBIBYTE;
@@ -1307,14 +1307,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		}
 	}
 
-#ifndef HAVE_UNIXODBC
-	if (0 < CONFIG_ODBCPOLLER_FORKS)
-	{
-		zabbix_log(LOG_LEVEL_ERR, "ODBC support is not compiled in, but ODBC polling is enabled.");
-		return FAIL;
-	}
-#endif
-
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_parent();
 #endif
@@ -1416,13 +1408,11 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
 				zbx_thread_start(availability_manager_thread, &thread_args, &threads[i]);
 				break;
-#ifdef HAVE_UNIXODBC
 			case ZBX_PROCESS_TYPE_ODBCPOLLER:
 				poller_type = ZBX_POLLER_TYPE_ODBC;
 				thread_args.args = &poller_type;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
-#endif
 		}
 	}
 
