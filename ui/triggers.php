@@ -294,7 +294,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		$result = (bool) API::Trigger()->create($trigger);
 
-		show_messages($result, _('Trigger added'), _('Cannot add trigger'));
+		if ($result) {
+			CMessageHelper::setSuccessTitle(_('Trigger added'));
+		}
+		else {
+			CMessageHelper::setErrorTitle(_('Cannot add trigger'));
+		}
 	}
 	else {
 		$db_triggers = API::Trigger()->get([
@@ -399,31 +404,39 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$result = true;
 		}
 
-		show_messages($result, _('Trigger updated'), _('Cannot update trigger'));
+		if ($result) {
+			CMessageHelper::setSuccessTitle(_('Trigger updated'));
+		}
+		else {
+			CMessageHelper::setErrorTitle(_('Cannot update trigger'));
+		}
 	}
 
 	if ($result) {
 		unset($_REQUEST['form']);
 		uncheckTableRows(getRequest('checkbox_hash'));
-	}
 
-	if (hasRequest('backurl')) {
-		$response = new CControllerResponseRedirect(getRequest('backurl'));
-		$response->redirect();
+		if (hasRequest('backurl')) {
+			$response = new CControllerResponseRedirect(getRequest('backurl'));
+			$response->redirect();
+		}
 	}
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['triggerid'])) {
 	$result = API::Trigger()->delete([getRequest('triggerid')]);
 
 	if ($result) {
+		CMessageHelper::setSuccessTitle(_('Trigger deleted'));
 		unset($_REQUEST['form'], $_REQUEST['triggerid']);
 		uncheckTableRows(getRequest('checkbox_hash'));
-	}
-	show_messages($result, _('Trigger deleted'), _('Cannot delete trigger'));
 
-	if (hasRequest('backurl')) {
-		$response = new CControllerResponseRedirect(getRequest('backurl'));
-		$response->redirect();
+		if (hasRequest('backurl')) {
+			$response = new CControllerResponseRedirect(getRequest('backurl'));
+			$response->redirect();
+		}
+	}
+	else {
+		CMessageHelper::setErrorTitle(_('Cannot delete trigger'));
 	}
 }
 elseif (isset($_REQUEST['add_dependency']) && isset($_REQUEST['new_dependency'])) {
