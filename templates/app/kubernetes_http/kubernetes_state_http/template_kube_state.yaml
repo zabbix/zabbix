@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-31T06:00:45Z'
+  date: '2022-01-07T04:24:22Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -74,7 +74,7 @@ zabbix_export:
                 request: function (query) {
                     var response,
                         request = new CurlHttpRequest(),
-                        url = 'http://' + Kube.params.api_host + ':' + Kube.params.api_port + '/api/' + query;
+                        url = 'https://' + Kube.params.api_host + ':' + Kube.params.api_port + '/api/' + query;
             
                     request.AddHeader('Content-Type: application/json');
                     request.AddHeader('Authorization: Bearer ' + Kube.params.token);
@@ -165,9 +165,6 @@ zabbix_export:
             -
               name: api_port
               value: '{$KUBE.API.PORT}'
-            -
-              name: state_endpoint_name
-              value: '{$KUBE.STATE.ENDPOINT.NAME}'
             -
               name: token
               value: '{$KUBE.API.TOKEN}'
@@ -408,7 +405,7 @@ zabbix_export:
                 apiRequest: function (query) {
                     var response,
                         request = new CurlHttpRequest(),
-                        url = 'http://' + Kube.params.api_host + ':' + Kube.params.api_port + '/api/' + query;
+                        url = 'https://' + Kube.params.api_host + ':' + Kube.params.api_port + '/api/' + query;
             
                     request.AddHeader('Content-Type: application/json');
                     request.AddHeader('Authorization: Bearer ' + Kube.params.token);
@@ -566,6 +563,136 @@ zabbix_export:
             -
               tag: type
               value: gauge
+        -
+          uuid: aae78585c668466da5d0ab8d8b899828
+          name: 'Kubernetes: Worker node LLD'
+          type: SCRIPT
+          key: kube.worker_node.lld
+          delay: 1h
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          params: |
+            var Kube = {
+                params: {},
+            
+                setParams: function (params) {
+                    ['api_host', 'api_port', 'token'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined'
+                            || params[field] === '') {
+                            throw 'Required param is not set: "' + field + '".';
+                        }
+                    });
+            
+                    Kube.params = params;
+                },
+            
+                request: function (query) {
+                    var response,
+                        request = new CurlHttpRequest(),
+                        url = 'https://' + Kube.params.api_host + ':' + Kube.params.api_port + '/api/' + query;
+            
+                    request.AddHeader('Content-Type: application/json');
+                    request.AddHeader('Authorization: Bearer ' + Kube.params.token);
+            
+                    Zabbix.log(4, '[ Kubernetes ] Sending request: ' + url);
+            
+                    response = request.Get(url);
+            
+                    Zabbix.Log(4, '[ Kubernetes ] Received response with status code ' + request.Status() + ': ' + response);
+            
+                    if (request.Status() < 200 || request.Status() >= 300) {
+                        var message = 'Request failed with status code ' + request.Status();
+            
+                        message += ': ' + response;
+                        throw message;
+                    }
+            
+                    if (response !== null) {
+                        try {
+                            response = JSON.parse(response);
+                        }
+                        catch (error) {
+                            throw 'Failed to parse response received from Kubernetes API. Check debug log for more information.';
+                        }
+                    }
+            
+                    return {
+                        status: request.Status(),
+                        response: response
+                    };
+                },
+            
+                getNodes: function () {
+                    var result = Kube.request('v1/nodes');
+            
+                    if (typeof result.response !== 'object'
+                        || typeof result.response.items === 'undefined'
+                        || result.status != 200) {
+                        throw 'Cannot get nodes from Kubernetes API. Check debug log for more information.';
+                    };
+            
+                    return result.response;
+                },
+            };
+            
+            try {
+                Kube.setParams(JSON.parse(value));
+            
+                var nodes = Kube.getNodes(),
+                    workerNodes = [];
+            
+                for (idx in nodes.items) {
+                    for (label in nodes.items[idx].metadata.labels) {
+                        if (label === 'node-role.kubernetes.io/node') {
+                            var internalIP = nodes.items[idx].status.addresses.filter(function (addr) {
+                                return addr.type === 'InternalIP';
+                            })[0].address;
+            
+                            workerNodes.push({
+                                '{#NAME}': nodes.items[idx].metadata.name,
+                                '{#IP}': internalIP,
+                                '{$KUBE.KUBELET.URL}': Kube.params.kubelet_scheme + '://' + internalIP + ':' + Kube.params.kubelet_port,
+                                '{#ROLE.WORKER}' : 'Worker'
+                            });
+            
+                            break;
+                        }
+                    }
+                }
+            
+                return JSON.stringify(workerNodes);
+            }
+            catch (error) {
+                error += (String(error).endsWith('.')) ? '' : '.';
+                Zabbix.Log(3, '[ Kubernetes ] ERROR: ' + error);
+                return JSON.stringify({ error: error });
+            }
+          description: 'Generation of data for Control plane discovery rules.'
+          timeout: 10s
+          parameters:
+            -
+              name: api_host
+              value: '{$KUBE.API.HOST}'
+            -
+              name: api_port
+              value: '{$KUBE.API.PORT}'
+            -
+              name: token
+              value: '{$KUBE.API.TOKEN}'
+            -
+              name: kubelet_scheme
+              value: '{$KUBE.KUBELET.SCHEME}'
+            -
+              name: kubelet_port
+              value: '{$KUBE.KUBELET.PORT}'
+          tags:
+            -
+              tag: data
+              value: raw
+            -
+              tag: resource
+              value: state
       discovery_rules:
         -
           uuid: dbfd8959361f4cdd973ed552eb18eb86
@@ -705,6 +832,18 @@ zabbix_export:
           type: DEPENDENT
           key: kube.daemonset.discovery
           delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAMESPACE}'
+                value: '{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#NAMESPACE}'
+                value: '{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
           item_prototypes:
             -
               uuid: 61a295b5e2ec4e1f91984a74d0695c1b
@@ -898,6 +1037,18 @@ zabbix_export:
           type: DEPENDENT
           key: kube.deployment.discovery
           delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAMESPACE}'
+                value: '{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#NAMESPACE}'
+                value: '{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
           item_prototypes:
             -
               uuid: 943c67dc814e4b06a57fbc4ef609686a
@@ -1161,6 +1312,18 @@ zabbix_export:
           type: DEPENDENT
           key: kube.endpoint.discovery
           delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAMESPACE}'
+                value: '{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#NAMESPACE}'
+                value: '{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
           item_prototypes:
             -
               uuid: d587eb7186dd425ead2c9554825ba20a
@@ -1360,6 +1523,18 @@ zabbix_export:
           type: DEPENDENT
           key: kube.node.discovery
           delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAMESPACE}'
+                value: '{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#NAMESPACE}'
+                value: '{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
           item_prototypes:
             -
               uuid: 4f994219cbe94dfe8d96af1ad5018212
@@ -1575,11 +1750,11 @@ zabbix_export:
             conditions:
               -
                 macro: '{#NAMESPACE}'
-                value: '{$KUBE.LLD.FILTER.POD.NAMESPACE.MATCHES}'
+                value: '{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}'
                 formulaid: A
               -
                 macro: '{#NAMESPACE}'
-                value: '{$KUBE.LLD.FILTER.POD.NAMESPACE.NOT_MATCHES}'
+                value: '{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           item_prototypes:
@@ -2121,6 +2296,18 @@ zabbix_export:
           type: DEPENDENT
           key: kube.pvc.discovery
           delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAMESPACE}'
+                value: '{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#NAMESPACE}'
+                value: '{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
           item_prototypes:
             -
               uuid: 9187144531f145398bfbe7281290533d
@@ -2511,6 +2698,18 @@ zabbix_export:
           type: DEPENDENT
           key: kube.replicaset.discovery
           delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAMESPACE}'
+                value: '{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#NAMESPACE}'
+                value: '{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
           item_prototypes:
             -
               uuid: 928536dae27c4e3497627b9f5642a7a8
@@ -2713,6 +2912,18 @@ zabbix_export:
           type: DEPENDENT
           key: kube.statefulset.discovery
           delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAMESPACE}'
+                value: '{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#NAMESPACE}'
+                value: '{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
           item_prototypes:
             -
               uuid: 9cc34425228f44868f3cd46450d557ca
@@ -2911,6 +3122,53 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
+        -
+          uuid: 11ca82627209443a96693e443d6391c1
+          name: 'Kubelet discovery'
+          type: DEPENDENT
+          key: kube.worker_node.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAME}'
+                value: '{$KUBE.LLD.FILTER.WORKER_NODE.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#NAME}'
+                value: '{$KUBE.LLD.FILTER.WORKER_NODE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          host_prototypes:
+            -
+              uuid: 25de5335c9c0413d80895f3df2798b5d
+              host: 'Kubelet {#NAME}'
+              name: 'Kubelet {#NAME}'
+              group_links:
+                -
+                  group:
+                    name: Templates/Applications
+              group_prototypes:
+                -
+                  name: 'Kubernetes/Nodes/Role: {#ROLE.WORKER}'
+              templates:
+                -
+                  name: 'Kubernetes kubelet by HTTP'
+              macros:
+                -
+                  macro: '{$KUBE.KUBELET.URL}'
+                  value: '{#KUBE.KUBELET.URL}'
+              tags:
+                -
+                  tag: addr
+                  value: '{#IP}'
+              custom_interfaces: 'YES'
+              interfaces:
+                -
+                  ip: '{#IP}'
+          master_item:
+            key: kube.worker_node.lld
       macros:
         -
           macro: '{$KUBE.API.HOST}'
@@ -2936,11 +3194,17 @@ zabbix_export:
           macro: '{$KUBE.CONTROLLER_MANAGER.SCHEME}'
           value: http
         -
-          macro: '{$KUBE.LLD.FILTER.POD.NAMESPACE.MATCHES}'
+          macro: '{$KUBE.KUBELET.PORT}'
+          value: '10250'
+        -
+          macro: '{$KUBE.KUBELET.SCHEME}'
+          value: https
+        -
+          macro: '{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable pods by namespace'
         -
-          macro: '{$KUBE.LLD.FILTER.POD.NAMESPACE.NOT_MATCHES}'
+          macro: '{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Filter to exclude discovered pods by namespace'
         -

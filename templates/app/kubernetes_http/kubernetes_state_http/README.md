@@ -26,12 +26,17 @@ Don't forget change macros {$KUBE.API.HOST}, {$KUBE.API.PORT} and {$KUBE.API.TOK
 Also, see the Macros section for a list of macros used to set trigger values.
 *NOTE.* Some metrics may not be collected depending on your Kubernetes version and configuration.
 
-Set up macros to filter pod metrics by namespace:
+Set up the macros to filter the metrics of discovered worker nodes:
 
-- {$KUBE.LLD.FILTER.POD.NAMESPACE.MATCHES}
-- {$KUBE.LLD.FILTER.POD.NAMESPACE.NOT_MATCHES}
+- {$KUBE.LLD.FILTER.WORKER_NODE.MATCHES}
+- {$KUBE.LLD.FILTER.WORKER_NODE.NOT_MATCHES}
 
-**Note**, If you have a large cluster, it is highly recommended to set a filter for discoverable pods.
+Set up macros to filter metrics by namespace:
+
+- {$KUBE.LLD.FILTER.NAMESPACE.MATCHES}
+- {$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}
+
+**Note**, If you have a large cluster, it is highly recommended to set a filter for discoverable namespaces.
 
 
 
@@ -50,8 +55,10 @@ No specific Zabbix configuration is required.
 |{$KUBE.API_SERVER.SCHEME} | |`https` |
 |{$KUBE.CONTROLLER_MANAGER.PORT} | |`10252` |
 |{$KUBE.CONTROLLER_MANAGER.SCHEME} | |`http` |
-|{$KUBE.LLD.FILTER.POD.NAMESPACE.MATCHES} |<p>Filter of discoverable pods by namespace</p> |`.*` |
-|{$KUBE.LLD.FILTER.POD.NAMESPACE.NOT_MATCHES} |<p>Filter to exclude discovered pods by namespace</p> |`CHANGE_IF_NEEDED` |
+|{$KUBE.KUBELET.PORT} | |`10250` |
+|{$KUBE.KUBELET.SCHEME} | |`https` |
+|{$KUBE.LLD.FILTER.NAMESPACE.MATCHES} |<p>Filter of discoverable pods by namespace</p> |`.*` |
+|{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES} |<p>Filter to exclude discovered pods by namespace</p> |`CHANGE_IF_NEEDED` |
 |{$KUBE.SCHEDULER.PORT} | |`10251` |
 |{$KUBE.SCHEDULER.SCHEME} | |`http` |
 |{$KUBE.STATE.ENDPOINT.NAME} |<p>Kubenetes state endpoint name</p> |`zabbix-kube-state-metrics` |
@@ -67,14 +74,15 @@ There are no template links in this template.
 |API servers discovery |<p>-</p> |DEPENDENT |kube.api_servers.discovery |
 |Controller manager nodes discovery |<p>-</p> |DEPENDENT |kube.controller_manager.discovery |
 |Scheduler servers nodes discovery |<p>-</p> |DEPENDENT |kube.scheduler.discovery |
-|Daemonset discovery |<p>-</p> |DEPENDENT |kube.daemonset.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT |
-|PVC discovery |<p>-</p> |DEPENDENT |kube.pvc.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT |
-|Deployment discovery |<p>-</p> |DEPENDENT |kube.deployment.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT |
-|Endpoint discovery |<p>-</p> |DEPENDENT |kube.endpoint.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT |
-|Node discovery |<p>-</p> |DEPENDENT |kube.node.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT |
-|Pod discovery |<p>-</p> |DEPENDENT |kube.pod.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NAMESPACE} MATCHES_REGEX `{$KUBE.LLD.FILTER.POD.NAMESPACE.MATCHES}`</p><p>- {#NAMESPACE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.POD.NAMESPACE.NOT_MATCHES}`</p> |
-|Replicaset discovery |<p>-</p> |DEPENDENT |kube.replicaset.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT |
-|Statefulset discovery |<p>-</p> |DEPENDENT |kube.statefulset.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT |
+|Kubelet discovery |<p>-</p> |DEPENDENT |kube.worker_node.discovery<p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$KUBE.LLD.FILTER.WORKER_NODE.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.WORKER_NODE.NOT_MATCHES}`</p> |
+|Daemonset discovery |<p>-</p> |DEPENDENT |kube.daemonset.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NAMESPACE} MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}`</p><p>- {#NAMESPACE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}`</p> |
+|PVC discovery |<p>-</p> |DEPENDENT |kube.pvc.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NAMESPACE} MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}`</p><p>- {#NAMESPACE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}`</p> |
+|Deployment discovery |<p>-</p> |DEPENDENT |kube.deployment.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NAMESPACE} MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}`</p><p>- {#NAMESPACE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}`</p> |
+|Endpoint discovery |<p>-</p> |DEPENDENT |kube.endpoint.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NAMESPACE} MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}`</p><p>- {#NAMESPACE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}`</p> |
+|Node discovery |<p>-</p> |DEPENDENT |kube.node.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NAMESPACE} MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}`</p><p>- {#NAMESPACE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}`</p> |
+|Pod discovery |<p>-</p> |DEPENDENT |kube.pod.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NAMESPACE} MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}`</p><p>- {#NAMESPACE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}`</p> |
+|Replicaset discovery |<p>-</p> |DEPENDENT |kube.replicaset.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NAMESPACE} MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}`</p><p>- {#NAMESPACE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}`</p> |
+|Statefulset discovery |<p>-</p> |DEPENDENT |kube.statefulset.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NAMESPACE} MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}`</p><p>- {#NAMESPACE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}`</p> |
 |Component statuses discovery |<p>-</p> |DEPENDENT |kube.componentstatuses.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT |
 |Readyz discovery |<p>-</p> |DEPENDENT |kube.readyz.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT |
 |Livez discovery |<p>-</p> |DEPENDENT |kube.livez.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT |
@@ -85,6 +93,7 @@ There are no template links in this template.
 |-----|----|-----------|----|---------------------|
 |Kubernetes |Kubernetes: Get state metrics |<p>Collecting Kubernetes metrics from kube-state-metrics.</p> |SCRIPT |kube.state.metrics<p>**Expression**:</p>`The text is too long. Please see the template.` |
 |Kubernetes |Kubernetes: Control plane LLD |<p>Generation of data for Control plane discovery rules.</p> |SCRIPT |kube.control_plane.lld<p>**Expression**:</p>`The text is too long. Please see the template.` |
+|Kubernetes |Kubernetes: Worker node LLD |<p>Generation of data for Control plane discovery rules.</p> |SCRIPT |kube.worker_node.lld<p>**Expression**:</p>`The text is too long. Please see the template.` |
 |Kubernetes |Kubernetes: Get component statuses |<p>Description</p> |HTTP_AGENT |kube.componentstatuses |
 |Kubernetes |Kubernetes: Get readyz |<p>Description</p> |HTTP_AGENT |kube.readyz<p>**Preprocessing**:</p><p>- JAVASCRIPT |
 |Kubernetes |Kubernetes: Get livez |<p>Description</p> |HTTP_AGENT |kube.livez<p>**Preprocessing**:</p><p>- JAVASCRIPT |
