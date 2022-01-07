@@ -105,7 +105,7 @@ class testDashboardGraphWidget extends CWebTest {
 		$errors = [];
 
 		$tabs = ['Displaying options', 'Time period', 'Axes', 'Legend', 'Problems', 'Overrides'];
-// TODO: fix hex field - return this array and change screenshot.
+// TODO: wait for DEV-2058 - return this array and change screenshot.
 //		$tabs = ['Data set', 'Displaying options', 'Time period', 'Axes', 'Legend', 'Problems', 'Overrides'];
 		foreach ($tabs as $tab) {
 			$form->selectTab($tab);
@@ -196,7 +196,7 @@ class testDashboardGraphWidget extends CWebTest {
 				]
 			],
 			// Base color field validation.
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 /*			[
 *				[
 *					'Data set' => [
@@ -361,7 +361,7 @@ class testDashboardGraphWidget extends CWebTest {
 					'error' => 'Invalid parameter "Data set/2/items": cannot be empty.'
 				]
 			],
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //			[
 //				[
 //					'Data set' => [
@@ -931,7 +931,7 @@ class testDashboardGraphWidget extends CWebTest {
 					'error' => 'Invalid parameter "Overrides/1/color": cannot be empty.'
 				]
 			],
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //			[
 //				[
 //					'Overrides' => [
@@ -1093,7 +1093,7 @@ class testDashboardGraphWidget extends CWebTest {
 					'error' => 'Invalid parameter "Overrides/2": at least one override option must be specified.'
 				]
 			],
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //			[
 //				[
 //					'Overrides' => [
@@ -1450,7 +1450,7 @@ class testDashboardGraphWidget extends CWebTest {
 						[
 							'host' => 'One host',
 							'item' => 'One item',
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //							'Base color' => '009688',
 							'Draw' => 'Staircase',
 							'Width' => '10',
@@ -1465,7 +1465,7 @@ class testDashboardGraphWidget extends CWebTest {
 						[
 							'host' => 'Two host',
 							'item' => 'Two item',
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //							'Base color' => '000000',
 							'Y-axis' => 'Right',
 							'Draw' => 'Points',
@@ -1512,11 +1512,11 @@ class testDashboardGraphWidget extends CWebTest {
 						[
 							'host' => 'One host',
 							'item' => 'One item',
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //							'color' => '000000',
 							'time_shift' => '-5s',
 							'options' => [
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //								'Base color',
 								['Width', '0'],
 								['Draw', 'Line'],
@@ -1531,11 +1531,11 @@ class testDashboardGraphWidget extends CWebTest {
 						[
 							'host' => 'Two host',
 							'item' => 'Two item',
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //							'color' => 'FFFFFF',
 							'time_shift' => '5s',
 							'options' => [
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //								'Base color',
 								['Width', '1'],
 								['Draw', 'Points'],
@@ -1744,7 +1744,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'host' => 'One host',
 							'item' => 'One item',
 							'Y-axis' => 'Left',
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //							'Base color' => '009688',
 							'Draw' => 'Staircase',
 							'Width' => '10',
@@ -1756,7 +1756,7 @@ class testDashboardGraphWidget extends CWebTest {
 						[
 							'host' => 'Two host',
 							'item' => 'Two item',
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //							'Base color' => '000000',
 							'Y-axis' => 'Right',
 							'Draw' => 'Bar',
@@ -1810,11 +1810,11 @@ class testDashboardGraphWidget extends CWebTest {
 						[
 							'host' => 'One host',
 							'item' => 'One item',
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //							'color' => '000000',
 							'time_shift' => '-5s',
 							'options' => [
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //								'Base color',
 								['Width', '0'],
 								['Draw', 'Line'],
@@ -1829,11 +1829,11 @@ class testDashboardGraphWidget extends CWebTest {
 						[
 							'host' => 'Two host',
 							'item' => 'Two item',
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //							'color' => 'FFFFFF',
 							'time_shift' => '5s',
 							'options' => [
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //								'Base color',
 								['Width', '1'],
 								['Draw', 'Bar'],
