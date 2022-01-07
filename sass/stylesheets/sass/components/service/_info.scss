@@ -21,6 +21,34 @@
 		}
 	}
 
+	.service-info-value {
+		.service-info-value-sla {
+			display: inline-block;
+			word-break: break-word;
+			line-height: 18px;
+
+			&:not(:last-child) {
+				margin-right: 10px;
+			}
+
+			.icon-description {
+				margin: 0 0 -5px 5px;
+				vertical-align: baseline;
+				border-radius: 2px;
+
+				&:link,
+				&:hover,
+				&:focus {
+					border-bottom: none;
+				}
+
+				&:focus {
+					box-shadow: 0 0 0 2px $btn-border-focus-color;
+				}
+			}
+		}
+	}
+
 	.service-name {
 		padding-bottom: 5px;
 		font-size: $font-h2-size;

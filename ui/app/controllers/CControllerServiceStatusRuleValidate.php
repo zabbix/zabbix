@@ -21,7 +21,7 @@
 
 class CControllerServiceStatusRuleValidate extends CController {
 
-	protected function init() {
+	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
@@ -84,7 +84,7 @@ class CControllerServiceStatusRuleValidate extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES);
+		return $this->checkAccess(CRoleHelper::UI_SERVICES_SERVICES);
 	}
 
 	protected function doAction(): void {

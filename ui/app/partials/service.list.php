@@ -21,6 +21,7 @@
 
 /**
  * @var CPartial $this
+ * @var array    $data
  */
 
 $form = (new CForm())
@@ -31,8 +32,8 @@ if ($data['is_filtered']) {
 	$path = null;
 
 	$header = [
-		(new CColHeader(_('Parent services')))->addStyle('width: 15%'),
-		(new CColHeader(_('Name')))->addStyle('width: 10%')
+		(new CColHeader(_('Parent services')))->addStyle('width: 15%;'),
+		(new CColHeader(_('Name')))->addStyle('width: 10%;')
 	];
 }
 else {
@@ -42,15 +43,15 @@ else {
 	}
 
 	$header = [
-		(new CColHeader(_('Name')))->addStyle('width: 25%')
+		(new CColHeader(_('Name')))->addStyle('width: 25%;')
 	];
 }
 
 $table = (new CTableInfo())
 	->setHeader(array_merge($header, [
-		(new CColHeader(_('Status')))->addStyle('width: 14%'),
-		(new CColHeader(_('Root cause')))->addStyle('width: 24%'),
-		(new CColHeader(_('SLA')))->addStyle('width: 14%'),
+		(new CColHeader(_('Status')))->addStyle('width: 14%;'),
+		(new CColHeader(_('Root cause')))->addStyle('width: 25%;'),
+		(new CColHeader(_('Created at')))->addStyle('width: 10%;'),
 		(new CColHeader(_('Tags')))->addClass(ZBX_STYLE_COLUMN_TAGS_3)
 	]));
 
@@ -93,21 +94,19 @@ foreach ($data['services'] as $serviceid => $service) {
 	}
 
 	$table->addRow(new CRow(array_merge($row, [
-		($service['children'] > 0)
-			? [
-				(new CLink($service['name'],
-					(new CUrl('zabbix.php'))
-						->setArgument('action', 'service.list')
-						->setArgument('path', $path)
-						->setArgument('serviceid', $serviceid)
-				))->setAttribute('data-serviceid', $serviceid),
-				CViewHelper::showNum($service['children'])
-			]
-			: $service['name'],
-			(new CCol(CSeverityHelper::getName((int) $service['status'])))
-				->addClass(CSeverityHelper::getStyle((int) $service['status'])),
+		(new CCol([
+			(new CLink($service['name'],
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'service.list')
+					->setArgument('path', $path)
+					->setArgument('serviceid', $serviceid)
+			))->setAttribute('data-serviceid', $serviceid),
+			CViewHelper::showNum($service['children'])
+		]))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol(CSeverityHelper::getName((int) $service['status'])))
+			->addClass(CSeverityHelper::getStyle((int) $service['status'])),
 		$root_cause,
-		($service['showsla'] == SERVICE_SHOW_SLA_ON) ? sprintf('%.4f', $service['goodsla']) : '',
+		zbx_date2str(DATE_FORMAT, $service['created_at']),
 		$data['tags'][$serviceid]
 	])));
 }

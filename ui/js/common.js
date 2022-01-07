@@ -343,7 +343,7 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 			medium_popup_actions = ['popup.maintenance.period', 'popup.condition.actions', 'popup.condition.operations',
 				'popup.condition.event.corr', 'popup.discovery.check', 'popup.mediatypetest.edit',
 				'popup.mediatype.message', 'popup.host.edit', 'popup.scriptexec', 'popup.scheduledreport.test',
-				'popup.service.edit'
+				'popup.service.edit', 'popup.sla.edit'
 			],
 			static_popup_actions = ['popup.massupdate.template', 'popup.massupdate.host', 'popup.massupdate.trigger',
 				'popup.massupdate.triggerprototype', 'popup.massupdate.service'
@@ -1064,7 +1064,7 @@ function uncheckTableRows(page, keepids = []) {
 		// If keepids will not have same key as value, it will create mess, when new checkbox will be checked.
 		let keepids_formatted = {};
 		for (const id of Object.values(keepids)) {
-			keepids_formatted[id] = id;
+			keepids_formatted[id.toString()] = id.toString();
 		}
 
 		sessionStorage.setItem(key, JSON.stringify(keepids_formatted));

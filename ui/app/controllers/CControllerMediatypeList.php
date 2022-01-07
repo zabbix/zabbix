@@ -99,7 +99,7 @@ class CControllerMediatypeList extends CController {
 		if ($data['mediatypes']) {
 			// get media types used in actions
 			$actions = API::Action()->get([
-				'output' => ['actionid', 'name'],
+				'output' => ['actionid', 'name', 'eventsource'],
 				'selectOperations' => ['operationtype', 'opmessage'],
 				'mediatypeids' => array_keys($data['mediatypes'])
 			]);
@@ -116,7 +116,8 @@ class CControllerMediatypeList extends CController {
 
 							$mediaType['listOfActions'][$action['actionid']] = [
 								'actionid' => $action['actionid'],
-								'name' => $action['name']
+								'name' => $action['name'],
+								'eventsource' => $action['eventsource']
 							];
 						}
 					}

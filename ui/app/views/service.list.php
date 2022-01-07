@@ -27,7 +27,7 @@
 $this->addJsFile('layout.mode.js');
 $this->addJsFile('class.tagfilteritem.js');
 
-$this->includeJsFile('monitoring.service.list.js.php');
+$this->includeJsFile('service.list.js.php');
 
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
@@ -123,8 +123,8 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 		$breadcrumbs ? new CList([new CBreadcrumbs($breadcrumbs)]) : null
 	)
 	->addItem($filter)
-	->addItem(new CPartial('monitoring.service.list', array_intersect_key($data, array_flip(['can_monitor_problems',
-		'path', 'is_filtered', 'max_in_table', 'service', 'services', 'events', 'tags', 'paging'
+	->addItem(new CPartial('service.list', array_intersect_key($data, array_flip(['can_monitor_problems', 'path',
+		'is_filtered', 'max_in_table', 'service', 'services', 'events', 'tags', 'paging'
 	]))))
 	->show();
 

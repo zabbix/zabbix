@@ -375,6 +375,13 @@ class API {
 	}
 
 	/**
+	 * @return CSla
+	 */
+	public static function Sla() {
+		return self::getApi('sla');
+	}
+
+	/**
 	 * @return CSettings
 	 */
 	public static function Settings() {

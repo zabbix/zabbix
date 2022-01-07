@@ -21,6 +21,7 @@
 
 /**
  * @var CPartial $this
+ * @var array    $data
  */
 
 $form = (new CForm())
@@ -37,8 +38,8 @@ $header = [
 if ($data['is_filtered']) {
 	$path = null;
 
-	$header[] = (new CColHeader(_('Parent services')))->addStyle('width: 15%');
-	$header[] = (new CColHeader(_('Name')))->addStyle('width: 10%');
+	$header[] = (new CColHeader(_('Parent services')))->addStyle('width: 15%;');
+	$header[] = (new CColHeader(_('Name')))->addStyle('width: 10%;');
 }
 else {
 	$path = $data['path'];
@@ -46,14 +47,14 @@ else {
 		$path[] = $data['service']['serviceid'];
 	}
 
-	$header[] = (new CColHeader(_('Name')))->addStyle('width: 25%');
+	$header[] = (new CColHeader(_('Name')))->addStyle('width: 25%;');
 }
 
 $table = (new CTableInfo())
 	->setHeader(array_merge($header, [
-		(new CColHeader(_('Status')))->addStyle('width: 14%'),
-		(new CColHeader(_('Root cause')))->addStyle('width: 24%'),
-		(new CColHeader(_('SLA')))->addStyle('width: 14%'),
+		(new CColHeader(_('Status')))->addStyle('width: 14%;'),
+		(new CColHeader(_('Root cause')))->addStyle('width: 25%;'),
+		(new CColHeader(_('Created at')))->addStyle('width: 10%;'),
 		(new CColHeader(_('Tags')))->addClass(ZBX_STYLE_COLUMN_TAGS_3),
 		(new CColHeader())
 	]));
@@ -97,21 +98,19 @@ foreach ($data['services'] as $serviceid => $service) {
 	}
 
 	$table->addRow(new CRow(array_merge($row, [
-		($service['children'] > 0)
-			? [
-				(new CLink($service['name'],
-					(new CUrl('zabbix.php'))
-						->setArgument('action', 'service.list.edit')
-						->setArgument('path', $path)
-						->setArgument('serviceid', $serviceid)
-				))->setAttribute('data-serviceid', $serviceid),
-				CViewHelper::showNum($service['children'])
-			]
-			: $service['name'],
+		(new CCol([
+			(new CLink($service['name'],
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'service.list.edit')
+					->setArgument('path', $path)
+					->setArgument('serviceid', $serviceid)
+			))->setAttribute('data-serviceid', $serviceid),
+			CViewHelper::showNum($service['children'])
+		]))->addClass(ZBX_STYLE_WORDBREAK),
 		(new CCol(CSeverityHelper::getName((int) $service['status'])))
 			->addClass(CSeverityHelper::getStyle((int) $service['status'])),
 		$root_cause,
-		($service['showsla'] == SERVICE_SHOW_SLA_ON) ? sprintf('%.4f', $service['goodsla']) : '',
+		zbx_date2str(DATE_FORMAT, $service['created_at']),
 		$data['tags'][$serviceid],
 		(new CCol([
 			(new CButton(null))
@@ -128,7 +127,7 @@ foreach ($data['services'] as $serviceid => $service) {
 				->setEnabled(!$service['readonly']),
 			(new CButton(null))
 				->addClass(ZBX_STYLE_BTN_REMOVE)
-				->addClass('js-remove-service')
+				->addClass('js-delete-service')
 				->setAttribute('data-serviceid', $serviceid)
 				->setTitle(_('Delete'))
 				->setEnabled(!$service['readonly'])
@@ -141,9 +140,15 @@ $action_buttons = new CActionButtonList('action', 'serviceids', [
 		'content' => (new CSimpleButton(_('Mass update')))
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->addClass('js-massupdate-service')
+			->addClass('no-chkbxrange')
 	],
-	'service.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected services?')]
-], 'service');
+	'service.massdelete' => [
+		'content' => (new CSimpleButton(_('Delete')))
+			->addClass(ZBX_STYLE_BTN_ALT)
+			->addClass('js-massdelete-service')
+			->addClass('no-chkbxrange')
+	]
+], $path !== null ? 'service_'.implode('_', $path) : 'service');
 
 $form
 	->addItem([$table, $data['paging'], $action_buttons])

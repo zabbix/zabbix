@@ -1489,6 +1489,7 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 
 #define MVAR_SERVICE				"{SERVICE."
 #define MVAR_SERVICE_NAME			MVAR_SERVICE "NAME}"
+#define MVAR_SERVICE_DESCRIPTION		MVAR_SERVICE "DESCRIPTION}"
 #define MVAR_SERVICE_ROOTCAUSE			MVAR_SERVICE "ROOTCAUSE}"
 #define MVAR_SERVICE_TAGS			MVAR_SERVICE "TAGS}"
 #define MVAR_SERVICE_TAGSJSON			MVAR_SERVICE "TAGSJSON}"
@@ -4086,6 +4087,10 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				else if (0 == strcmp(m, MVAR_SERVICE_NAME))
 				{
 					replace_to = zbx_strdup(replace_to, service->name);
+				}
+				else if (0 == strcmp(m, MVAR_SERVICE_DESCRIPTION))
+				{
+					replace_to = zbx_strdup(replace_to, service->description);
 				}
 				else if (0 == strcmp(m, MVAR_SERVICE_ROOTCAUSE))
 				{

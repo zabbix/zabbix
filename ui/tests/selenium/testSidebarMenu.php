@@ -62,8 +62,26 @@ class testSidebarMenu extends CWebTest {
 			],
 			[
 				[
-					'section' => 'Monitoring',
+					'section' => 'Services',
 					'page' => 'Services'
+				]
+			],
+			[
+				[
+					'section' => 'Services',
+					'page' => 'Service actions'
+				]
+			],
+			[
+				[
+					'section' => 'Services',
+					'page' => 'SLA'
+				]
+			],
+			[
+				[
+					'section' => 'Services',
+					'page' => 'SLA report'
 				]
 			],
 			[
@@ -280,10 +298,14 @@ class testSidebarMenu extends CWebTest {
 				return CElementQuery::getDriver()->executeScript('return arguments[0].clientHeight ==='.
 						' parseInt(arguments[0].style.maxHeight, 10)', [$element]);
 			});
+
+			$submenu = $element->query('link', $data['page'])->one();
+		}
+		else {
+			$submenu = $main_section->one()->parents('tag:li')->query('link', $data['page'])->one();
 		}
 
-		// Second level menu.
-		$submenu = $main_section->one()->parents('tag:li')->query('link', $data['page'])->one();
+		// Open second level menu.
 		$submenu->waitUntilClickable()->click();
 
 		// Checking 3rd level menu.

@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,21 +19,22 @@
 **/
 
 
-/**
- * @var CView $this
- */
+class CWidgetFieldMsSla extends CWidgetFieldMs {
 
-$output = [
-	'body' => (new CPartial('monitoring.service.list.edit', $data))->getOutput()
-];
+	/**
+	 * @var string  (nullable) ID for Multiselect element.
+	 */
+	public $filter_preselect_host_group_field;
 
-if (($messages = getMessages()) !== null) {
-	$output['messages'] = $messages->toString();
+	/**
+	 * Create widget field for SLA selection
+	 *
+	 * @param string      $name     field name in form
+	 * @param string      $label    label for the field in form
+	 */
+	public function __construct($name, $label) {
+		parent::__construct($name, $label);
+
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_SLA);
+	}
 }
-
-if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
-	CProfiler::getInstance()->stop();
-	$output['debug'] = CProfiler::getInstance()->make()->toString();
-}
-
-echo json_encode($output);

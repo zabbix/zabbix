@@ -24,26 +24,22 @@
  */
 ?>
 
-window.service_time_edit_popup = {
+window.sla_excluded_downtime_edit_popup = {
 	overlay: null,
 	dialogue: null,
 	form: null,
 
 	init() {
-		this.overlay = overlays_stack.getById('service_time_edit');
+		this.overlay = overlays_stack.getById('sla_excluded_downtime_edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
-
-		document
-			.getElementById('service-time-type')
-			.addEventListener('change', (e) => this.typeChange(e));
-	},
-
-	typeChange(e) {
-		PopUp('popup.service.time.edit', getFormFields(this.form), 'service_time_edit', e.target);
 	},
 
 	submit() {
+		const fields = getFormFields(this.form);
+
+		fields.name = fields.name.trim();
+
 		for (const el of this.form.parentNode.children) {
 			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
 				el.parentNode.removeChild(el);
@@ -54,12 +50,12 @@ window.service_time_edit_popup = {
 
 		const curl = new Curl('zabbix.php', false);
 
-		curl.setArgument('action', 'service.time.validate');
+		curl.setArgument('action', 'sla.excludeddowntime.validate');
 
 		fetch(curl.getUrl(), {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify(getFormFields(this.form))
+			body: JSON.stringify(fields)
 		})
 			.then((response) => response.json())
 			.then((response) => {
@@ -67,7 +63,7 @@ window.service_time_edit_popup = {
 					throw {html_string: response.errors};
 				}
 
-				overlayDialogueDestroy('service_time_edit');
+				overlayDialogueDestroy('sla_excluded_downtime_edit');
 
 				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.body}));
 			})

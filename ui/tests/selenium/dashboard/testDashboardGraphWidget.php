@@ -557,7 +557,7 @@ class testDashboardGraphWidget extends CWebTest {
 						'To' => '2021-07-04 15:53:07'
 					],
 					'error' => [
-						'Invalid parameter "From": a time range is expected.',
+						'Invalid parameter "From": a time is expected.',
 						'Minimum time period to display is 1 minute.'
 					]
 				]
@@ -569,7 +569,7 @@ class testDashboardGraphWidget extends CWebTest {
 						'From' => '2021-07-04 15:53:07',
 						'To' => 'abc'
 					],
-					'error' => 'Invalid parameter "To": a time range is expected.'
+					'error' => 'Invalid parameter "To": a time is expected.'
 				]
 			],
 			[
@@ -580,7 +580,7 @@ class testDashboardGraphWidget extends CWebTest {
 						'To' => '2021-07-04 15:53:07'
 					],
 					'error' => [
-						'Invalid parameter "From": a time range is expected.',
+						'Invalid parameter "From": a time is expected.',
 						'Minimum time period to display is 1 minute.'
 					]
 				]
@@ -593,7 +593,7 @@ class testDashboardGraphWidget extends CWebTest {
 						'To' => '2021-07-04 15:53:07'
 					],
 					'error' => [
-						'Invalid parameter "From": a time range is expected.',
+						'Invalid parameter "From": a time is expected.',
 						'Minimum time period to display is 1 minute.'
 					]
 				]
@@ -605,7 +605,7 @@ class testDashboardGraphWidget extends CWebTest {
 						'From' => '2021-05-02 00:00:00',
 						'To' => '2021-25-09 00:00:00'
 					],
-					'error' => 'Invalid parameter "To": a time range is expected.'
+					'error' => 'Invalid parameter "To": a time is expected.'
 				]
 			],
 			[
@@ -615,7 +615,7 @@ class testDashboardGraphWidget extends CWebTest {
 						'From' => '2021-05-02 00:00:00',
 						'To' => '2021.07.31 15:53:07'
 					],
-					'error' => 'Invalid parameter "To": a time range is expected.'
+					'error' => 'Invalid parameter "To": a time is expected.'
 				]
 			],
 			[
@@ -625,7 +625,7 @@ class testDashboardGraphWidget extends CWebTest {
 						'From' => '2021-07-04 12:53:00',
 						'To' => 'now-s'
 					],
-					'error' => 'Invalid parameter "To": a time range is expected.'
+					'error' => 'Invalid parameter "To": a time is expected.'
 				]
 			],
 			// Time range validation
@@ -1479,8 +1479,8 @@ class testDashboardGraphWidget extends CWebTest {
 					],
 					'Time period' => [
 						'Set custom time period' => true,
-						'From' => '2018-11-15 08',
-						'To' => '2018-11-15 14:20'
+						'From' => '2018-11-15',
+						'To' => '2018-11-15 14:20:00'
 					],
 					'Axes' => [
 						'id:lefty_min' => '5',
@@ -1773,7 +1773,7 @@ class testDashboardGraphWidget extends CWebTest {
 					],
 					'Time period' => [
 						'Set custom time period' => true,
-						'From' => '2018-11-15 08',
+						'From' => '2018-11-15',
 						'To' => '2018-11-15 14:20'
 					],
 					'Axes' => [

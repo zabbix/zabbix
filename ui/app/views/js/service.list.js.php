@@ -32,15 +32,19 @@
 	const view = {
 		serviceid: null,
 		mode_switch_url: null,
+		parent_url: null,
+		delete_url: null,
 		refresh_url: null,
 		refresh_interval: null,
 		back_url: null,
 		is_refresh_paused: false,
 		is_refresh_pending: false,
 
-		init({serviceid, mode_switch_url, refresh_url, refresh_interval, back_url = null}) {
+		init({serviceid, mode_switch_url, parent_url, delete_url, refresh_url, refresh_interval, back_url = null}) {
 			this.serviceid = serviceid;
 			this.mode_switch_url = mode_switch_url;
+			this.parent_url = parent_url;
+			this.delete_url = delete_url;
 			this.refresh_url = refresh_url;
 			this.refresh_interval = refresh_interval;
 			this.back_url = back_url;
@@ -66,10 +70,11 @@
 				.dynamicRows({template: '#filter-tag-row-tmpl'})
 				.on('afteradd.dynamicRows', function() {
 					const rows = this.querySelectorAll('.form_row');
+
 					new CTagFilterItem(rows[rows.length - 1]);
 				});
 
-			document.querySelectorAll('#filter-tags .form_row').forEach(row => {
+			document.querySelectorAll('#filter-tags .form_row').forEach((row) => {
 				new CTagFilterItem(row);
 			});
 		},
@@ -86,19 +91,14 @@
 				else if (e.target.classList.contains('js-edit-service')) {
 					this.edit({serviceid: e.target.dataset.serviceid});
 				}
-				else if (e.target.classList.contains('js-remove-service')) {
-					if (window.confirm(<?= json_encode(_('Delete selected service?')) ?>)) {
-						const curl = new Curl('zabbix.php', false);
-
-						curl.setArgument('action', 'service.delete');
-						curl.setArgument('serviceids', [e.target.dataset.serviceid]);
-						curl.setArgument('back_url', this.back_url);
-
-						redirect(curl.getUrl(), 'post');
-					}
+				else if (e.target.classList.contains('js-delete-service')) {
+					this.delete(e.target, [e.target.dataset.serviceid]);
 				}
 				else if (e.target.classList.contains('js-massupdate-service')) {
 					openMassupdatePopup(e.target, 'popup.massupdate.service', {location_url: this.back_url});
+				}
+				else if (e.target.classList.contains('js-massdelete-service')) {
+					this.delete(e.target, Object.values(chkbxRange.getSelectedIds()));
 				}
 			});
 		},
@@ -113,8 +113,9 @@
 			this.pauseRefresh();
 
 			const overlay = PopUp('popup.service.edit', options, 'service_edit', document.activeElement);
+			const dialogue = overlay.$dialogue[0];
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+			dialogue.addEventListener('dialogue.submit', (e) => {
 				postMessageOk(e.detail.title);
 
 				if (e.detail.messages !== null) {
@@ -124,7 +125,70 @@
 				location.href = location.href;
 			});
 
-			overlay.$dialogue[0].addEventListener('overlay.close', () => this.resumeRefresh(), {once: true});
+			dialogue.addEventListener('dialogue.delete', (e) => {
+				uncheckTableRows('service');
+
+				postMessageOk(e.detail.title);
+
+				if (e.detail.messages !== null) {
+					postMessageDetails('success', e.detail.messages);
+				}
+
+				location.href = options.serviceid === this.serviceid ? this.parent_url : location.href;
+			});
+
+			dialogue.addEventListener('overlay.close', () => this.resumeRefresh(), {once: true});
+		},
+
+		delete(target, serviceids) {
+			const confirmation = serviceids.length > 1
+				? <?= json_encode(_('Delete selected services?')) ?>
+				: <?= json_encode(_('Delete selected service?')) ?>;
+
+			if (!window.confirm(confirmation)) {
+				return;
+			}
+
+			target.classList.add('is-loading');
+
+			return fetch(this.delete_url, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({serviceids})
+			})
+				.then((response) => response.json())
+				.then((response) => {
+					if ('error' in response) {
+						if ('title' in response.error) {
+							postMessageError(response.error.title);
+						}
+
+						postMessageDetails('error', response.error.messages);
+
+						uncheckTableRows('service', response.error.keepids);
+					}
+					else if ('success' in response) {
+						postMessageOk(response.success.title);
+
+						if ('messages' in response.success) {
+							postMessageDetails('success', response.success.messages);
+						}
+
+						uncheckTableRows('service');
+					}
+
+					location.href = location.href;
+				})
+				.catch(() => {
+					const title = <?= json_encode(_('Unexpected server error.')) ?>;
+					const message_box = makeMessageBox('bad', [], title, true, false)[0];
+
+					clearMessages();
+					addMessage(message_box);
+				})
+				.finally(() => {
+					target.classList.remove('is-loading');
+				});
 		},
 
 		pauseRefresh() {

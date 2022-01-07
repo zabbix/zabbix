@@ -24,27 +24,23 @@
  * @var array $data
  */
 
-if ($data['uncheck']) {
-	uncheckTableRows('service');
-}
-
 $this->addJsFile('layout.mode.js');
 $this->addJsFile('class.tagfilteritem.js');
 $this->addJsFile('class.calendar.js');
 
-$this->includeJsFile('monitoring.service.list.js.php');
+$this->includeJsFile('service.list.js.php');
 
 $breadcrumbs = [];
 $filter = null;
 
 if (count($data['breadcrumbs']) > 1) {
-	while ($path_item = array_shift($data['breadcrumbs'])) {
+	foreach ($data['breadcrumbs'] as $index => $path_item) {
 		$breadcrumbs[] = (new CSpan())
 			->addItem(array_key_exists('curl', $path_item)
 				? new CLink($path_item['name'], $path_item['curl'])
 				: $path_item['name']
 			)
-			->addClass(!$data['breadcrumbs'] ? ZBX_STYLE_SELECTED : null);
+			->addClass($index == count($data['breadcrumbs']) - 1 ? ZBX_STYLE_SELECTED : null);
 	}
 }
 
@@ -116,7 +112,7 @@ $filter->addFilterTab(_('Filter'), [
 				CTagFilterFieldHelper::getTagFilterField([
 					'evaltype' => $data['filter']['evaltype'],
 					'tags' => $data['filter']['tags'] ?: [
-						['tag' => '', 'value' => '', 'operator' => SERVICE_TAG_OPERATOR_LIKE]
+						['tag' => '', 'value' => '', 'operator' => ZBX_SERVICE_PROBLEM_TAG_OPERATOR_LIKE]
 					]
 				])
 			])
@@ -149,7 +145,7 @@ $filter->addFilterTab(_('Filter'), [
 		$breadcrumbs ? new CList([new CBreadcrumbs($breadcrumbs)]) : null
 	)
 	->addItem($filter)
-	->addItem(new CPartial('monitoring.service.list.edit', array_intersect_key($data, array_flip([
+	->addItem(new CPartial('service.list.edit', array_intersect_key($data, array_flip([
 		'can_monitor_problems', 'path', 'is_filtered', 'max_in_table', 'service', 'services', 'events', 'tags',
 		'paging', 'back_url'
 	]))))
@@ -159,6 +155,11 @@ $filter->addFilterTab(_('Filter'), [
 	view.init('.json_encode([
 		'serviceid' => $data['service'] !== null ? $data['service']['serviceid'] : null,
 		'mode_switch_url' => $data['view_mode_url'],
+		'parent_url' => $data['parent_url'],
+		'delete_url' => (new CUrl('zabbix.php'))
+			->setArgument('action', 'service.delete')
+			->setArgumentSID()
+			->getUrl(),
 		'refresh_url' => $data['refresh_url'],
 		'refresh_interval' => $data['refresh_interval'],
 		'back_url' => $data['back_url']

@@ -23,7 +23,7 @@ class CControllerGuiUpdate extends CController {
 
 	protected function checkInput() {
 		$themes = array_keys(APP::getThemes());
-		$timezones = array_keys((new CDateTimeZoneHelper())->getAllDateTimeZones());
+		$timezones = array_keys(CTimezoneHelper::getList());
 
 		$fields = [
 			'default_lang' =>				'db config.default_lang|in '.implode(',', array_keys(getLocales())),

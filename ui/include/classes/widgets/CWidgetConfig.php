@@ -59,6 +59,7 @@ class CWidgetConfig {
 			WIDGET_PROBLEM_HOSTS		=> _('Problem hosts'),
 			WIDGET_PROBLEMS				=> _('Problems'),
 			WIDGET_PROBLEMS_BY_SV		=> _('Problems by severity'),
+			WIDGET_SLA_REPORT			=> _('SLA report'),
 			WIDGET_SVG_GRAPH			=> _('Graph'),
 			WIDGET_SYSTEM_INFO			=> _('System information'),
 			WIDGET_TRIG_OVER			=> _('Trigger overview'),
@@ -102,6 +103,7 @@ class CWidgetConfig {
 			WIDGET_PROBLEM_HOSTS		=> 'CWidget',
 			WIDGET_PROBLEMS				=> 'CWidgetProblems',
 			WIDGET_PROBLEMS_BY_SV		=> 'CWidgetProblemsBySv',
+			WIDGET_SLA_REPORT			=> 'CWidget',
 			WIDGET_SVG_GRAPH			=> 'CWidgetSvgGraph',
 			WIDGET_SYSTEM_INFO			=> 'CWidget',
 			WIDGET_TRIG_OVER			=> 'CWidgetTrigerOver',
@@ -171,6 +173,7 @@ class CWidgetConfig {
 			WIDGET_PROBLEM_HOSTS		=> ['width' => 12,	'height' => 5],
 			WIDGET_PROBLEMS				=> ['width' => 12,	'height' => 5],
 			WIDGET_PROBLEMS_BY_SV		=> ['width' => 12,	'height' => 5],
+			WIDGET_SLA_REPORT			=> ['width' => 12,	'height' => 5],
 			WIDGET_SVG_GRAPH			=> ['width' => 12,	'height' => 5],
 			WIDGET_SYSTEM_INFO			=> ['width' => 12,	'height' => 5],
 			WIDGET_TRIG_OVER			=> ['width' => 12,	'height' => 5],
@@ -276,6 +279,7 @@ class CWidgetConfig {
 			case WIDGET_SYSTEM_INFO:
 				return 15 * SEC_PER_MIN;
 
+			case WIDGET_SLA_REPORT:
 			case WIDGET_URL:
 				return 0;
 		}
@@ -467,6 +471,9 @@ class CWidgetConfig {
 
 			case WIDGET_PROBLEMS_BY_SV:
 				return new CWidgetFormProblemsBySv($data, $templateid);
+
+			case WIDGET_SLA_REPORT:
+				return new CWidgetFormSlaReport($data, $templateid);
 
 			case WIDGET_SVG_GRAPH:
 				return new CWidgetFormSvgGraph($data, $templateid);

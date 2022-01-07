@@ -21,10 +21,11 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $output = [
-	'body' => (new CPartial('monitoring.service.list', $data))->getOutput()
+	'body' => (new CPartial('service.list', $data))->getOutput()
 ];
 
 if (($messages = getMessages()) !== null) {

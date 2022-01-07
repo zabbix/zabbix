@@ -342,6 +342,7 @@ typedef struct
 {
 	zbx_uint64_t		serviceid;
 	char			*name;
+	char			*description;
 	zbx_vector_uint64_t	eventids;
 	zbx_vector_ptr_t	events;
 	zbx_vector_tags_t	service_tags;

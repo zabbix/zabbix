@@ -30,8 +30,8 @@ class CControllerGuiEdit extends CController {
 		$this->disableSIDValidation();
 
 		$this->timezones = [
-			ZBX_DEFAULT_TIMEZONE => CDateTimeZoneHelper::getSystemDateTimeZone()
-		] + (new CDateTimeZoneHelper())->getAllDateTimeZones();
+			ZBX_DEFAULT_TIMEZONE => CTimezoneHelper::getTitle(CTimezoneHelper::getSystemTimezone(), _('System'))
+		] + CTimezoneHelper::getList();
 	}
 
 	protected function checkInput() {
