@@ -305,7 +305,7 @@ class CRoleHelper {
 			self::UI_SECTION_MONITORING => _('Monitoring'),
 			self::UI_SECTION_SERVICES => _('Services'),
 			self::UI_SECTION_INVENTORY => _('Inventory'),
-			self::UI_SECTION_REPORTS => _('Reports'),
+			self::UI_SECTION_REPORTS => _('Reports')
 		];
 
 		if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
@@ -349,7 +349,7 @@ class CRoleHelper {
 			case self::UI_SECTION_SERVICES:
 				$labels = [
 					self::UI_SERVICES_SERVICES => _('Services'),
-					self::UI_SERVICES_ACTIONS => _('Service actions'),
+					self::UI_SERVICES_ACTIONS => _('Service actions')
 				];
 
 				if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {

@@ -206,7 +206,7 @@ abstract class CControllerServiceListGeneral extends CController {
 			],
 			'sortfield' => 'name',
 			'sortorder' => ZBX_SORT_UP,
-			'limit' => $limit + 1,
+			'limit' => $limit + 1
 		]);
 
 		$slas_count = count($slas);
