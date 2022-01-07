@@ -482,15 +482,13 @@ class CHostPrototype extends CHostBase {
 
 		self::createHostDiscoveries($host_prototypes);
 
+		self::updateInterfaces($host_prototypes);
 		self::updateGroupLinks($host_prototypes);
 		self::updateGroupPrototypes($host_prototypes);
 		$this->updateTemplates($host_prototypes);
-		self::updateHostInventories($host_prototypes);
-
 		$this->updateTagsNew($host_prototypes);
-		$this->updateHostMacrosNew($host_prototypes);
-
-		self::updateInterfaces($host_prototypes);
+		$this->updateMacros($host_prototypes);
+		self::updateHostInventories($host_prototypes);
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_HOST_PROTOTYPE, $host_prototypes);
 	}
@@ -609,15 +607,13 @@ class CHostPrototype extends CHostBase {
 			DB::update('hosts', $upd_host_prototypes);
 		}
 
+		self::updateInterfaces($host_prototypes, $db_host_prototypes);
 		self::updateGroupLinks($host_prototypes, $db_host_prototypes);
 		self::updateGroupPrototypes($host_prototypes, $db_host_prototypes);
 		$this->updateTemplates($host_prototypes, $db_host_prototypes);
-		self::updateHostInventories($host_prototypes, $db_host_prototypes);
-
 		$this->updateTagsNew($host_prototypes, $db_host_prototypes);
-		$this->updateHostMacrosNew($host_prototypes, $db_host_prototypes);
-
-		self::updateInterfaces($host_prototypes, $db_host_prototypes);
+		$this->updateMacros($host_prototypes, $db_host_prototypes);
+		self::updateHostInventories($host_prototypes, $db_host_prototypes);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_HOST_PROTOTYPE, $host_prototypes,
 			$db_host_prototypes
@@ -1773,139 +1769,6 @@ class CHostPrototype extends CHostBase {
 		if ($del_hostids) {
 			DB::delete('host_inventory', ['hostid' => $del_hostids]);
 		}
-	}
-
-	/**
-	 * @param array      $hosts
-	 * @param array|null $db_hosts
-	 */
-	protected function updateTagsNew(array &$hosts, array $db_hosts = null): void {
-		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
-
-		$ins_tags = [];
-		$del_hosttagids = [];
-
-		foreach ($hosts as &$host) {
-			if (!array_key_exists('tags', $host)) {
-				continue;
-			}
-
-			$db_tags = ($db_hosts !== null)
-				? $db_hosts[$host[$id_field_name]]['tags']
-				: [];
-
-			$hosttagid_by_tag_value = [];
-			foreach ($db_tags as $db_tag) {
-				$hosttagid_by_tag_value[$db_tag['tag']][$db_tag['value']] = $db_tag['hosttagid'];
-			}
-
-			foreach ($host['tags'] as &$tag) {
-				if (array_key_exists($tag['tag'], $hosttagid_by_tag_value)
-						&& array_key_exists($tag['value'], $hosttagid_by_tag_value[$tag['tag']])) {
-					$tag['hosttagid'] = $hosttagid_by_tag_value[$tag['tag']][$tag['value']];
-					unset($db_tags[$tag['hosttagid']]);
-				}
-				else {
-					$ins_tags[] = ['hostid' => $host[$id_field_name]] + $tag;
-				}
-			}
-			unset($tag);
-
-			$del_hosttagids = array_merge($del_hosttagids, array_keys($db_tags));
-		}
-		unset($host);
-
-		if ($del_hosttagids) {
-			DB::delete('host_tag', ['hosttagid' => $del_hosttagids]);
-		}
-
-		if ($ins_tags) {
-			$hosttagids = DB::insert('host_tag', $ins_tags);
-		}
-
-		foreach ($hosts as &$host) {
-			if (!array_key_exists('tags', $host)) {
-				continue;
-			}
-
-			foreach ($host['tags'] as &$tag) {
-				if (!array_key_exists('hosttagid', $tag)) {
-					$tag['hosttagid'] = array_shift($hosttagids);
-				}
-			}
-			unset($tag);
-		}
-		unset($host);
-	}
-
-	/**
-	 * @param array      $hosts
-	 * @param array|null $db_hosts
-	 */
-	protected function updateHostMacrosNew(array &$hosts, array $db_hosts = null): void {
-		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
-
-		$ins_hostmacros = [];
-		$upd_hostmacros = [];
-		$del_hostmacroids = [];
-
-		foreach ($hosts as &$host) {
-			if (!array_key_exists('macros', $host)) {
-				continue;
-			}
-
-			$db_macros = ($db_hosts !== null)
-				? $db_hosts[$host[$id_field_name]]['macros']
-				: [];
-
-			foreach ($host['macros'] as &$macro) {
-				if (array_key_exists('hostmacroid', $macro) && array_key_exists($macro['hostmacroid'], $db_macros)) {
-					$upd_hostmacro = DB::getUpdatedValues('hostmacro', $macro, $db_macros[$macro['hostmacroid']]);
-
-					if ($upd_hostmacro) {
-						$upd_hostmacros[] = [
-							'values' => $upd_hostmacro,
-							'where' => ['hostmacroid' => $macro['hostmacroid']]
-						];
-					}
-
-					unset($db_macros[$macro['hostmacroid']]);
-				}
-				else {
-					$ins_hostmacros[] = ['hostid' => $host[$id_field_name]] + $macro;
-				}
-			}
-			unset($macro);
-
-			$del_hostmacroids = array_merge($del_hostmacroids, array_keys($db_macros));
-		}
-		unset($host);
-
-		if ($del_hostmacroids) {
-			DB::delete('hostmacro', ['hostmacroid' => $del_hostmacroids]);
-		}
-
-		if ($upd_hostmacros) {
-			DB::update('hostmacro', $upd_hostmacros);
-		}
-
-		if ($ins_hostmacros) {
-			$hostmacroids = DB::insert('hostmacro', $ins_hostmacros);
-		}
-
-		foreach ($hosts as &$host) {
-			if (!array_key_exists('macros', $host)) {
-				continue;
-			}
-
-			foreach ($host['macros'] as &$macro) {
-				if (!array_key_exists('hostmacroid', $macro)) {
-					$macro['hostmacroid'] = array_shift($hostmacroids);
-				}
-			}
-			unset($macro);
-		}
-		unset($host);
 	}
 
 	/**
