@@ -143,7 +143,14 @@ foreach ($data['items'] as $item) {
 		$item['delay'] = $update_interval_parser->getDelay();
 	}
 
-	$item_menu = CMenuPopupHelper::getItemPrototypeConfiguration(['itemid' => $item['itemid'], 'context' => $data['context']]);
+	$item_menu = CMenuPopupHelper::getItemPrototypeConfiguration([
+		'itemid' => $item['itemid'],
+		'context' => $data['context'],
+		'backurl' => (new CUrl('disc_prototypes.php'))
+			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+			->setArgument('context', $data['context'])
+			->getUrl()
+	]);
 
 	$wizard = (new CButton(null))
 		->addClass(ZBX_STYLE_ICON_WZRD_ACTION)

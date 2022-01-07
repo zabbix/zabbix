@@ -766,6 +766,7 @@ function getMenuPopupItemConfiguration(options, trigger_elmnt) {
 	url.setArgument('type', 18);	// ITEM_TYPE_DEPENDENT
 	url.setArgument('master_itemid', options.itemid);
 	url.setArgument('context', options.context);
+	url.setArgument('backurl', options.backurl);
 
 	items.push({
 		label: t('Create dependent discovery rule'),
@@ -860,14 +861,15 @@ function getMenuPopupItem(options) {
 /**
  * Get menu structure for item prototypess.
  *
- * @param array options['name']
- * @param array options['key']                                  Item prototype key.
- * @param array options['host']                                 Host name.
- * @param array options['itemid']
+ * @param array  options['name']
+ * @param string options['backurl']                             Url from where the popup menu was called.
+ * @param array  options['key']                                 Item prototype key.
+ * @param array  options['host']                                Host name.
+ * @param array  options['itemid']
  * @param array  options['trigger_prototypes']                  (optional)
  * @param string options['trigger_prototypes'][n]['triggerid']
  * @param string options['trigger_prototypes'][n]['name']
- * @param array options['parent_discoveryid']
+ * @param array  options['parent_discoveryid']
  * @param string options['context']                             Additional parameter in URL to identify main section.
  *
  * @return array
@@ -882,6 +884,7 @@ function getMenuPopupItemPrototypeConfiguration(options) {
 	url.setArgument('description', options.name);
 	url.setArgument('expression', 'func(/' + options.host + '/' + options.key + ')');
 	url.setArgument('context', options.context);
+	url.setArgument('backurl', options.backurl);
 
 	items.push({
 		label: t('Create trigger prototype'),
@@ -897,6 +900,7 @@ function getMenuPopupItemPrototypeConfiguration(options) {
 			url.setArgument('parent_discoveryid', options.parent_discoveryid);
 			url.setArgument('triggerid', trigger.triggerid)
 			url.setArgument('context', options.context);
+			url.setArgument('backurl', options.backurl);
 
 			trigger_prototypes.push({
 				label: trigger.name,

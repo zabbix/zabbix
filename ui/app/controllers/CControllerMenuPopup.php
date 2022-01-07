@@ -326,6 +326,7 @@ class CControllerMenuPopup extends CController {
 	 *
 	 * @param array  $data
 	 * @param string $data['itemid']
+	 * @param string $data['backurl']
 	 *
 	 * @return mixed
 	 */
@@ -342,6 +343,7 @@ class CControllerMenuPopup extends CController {
 
 			$menu_data = [
 				'type' => 'item_prototype_configuration',
+				'backurl' => $data['backurl'],
 				'itemid' => $data['itemid'],
 				'name' => $db_item_prototype['name'],
 				'key' => $db_item_prototype['key_'],

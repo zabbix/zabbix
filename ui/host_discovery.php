@@ -233,6 +233,7 @@ $fields = [
 	'filter_status' =>			[T_ZBX_INT, O_OPT, null,	IN([-1, ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED]),
 									null
 								],
+	'backurl' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	// sort and sortorder
 	'sort' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"delay","key_","name","status","type"'),	null],
 	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
@@ -711,15 +712,30 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	}
 
 	if (hasRequest('add')) {
-		show_messages($result, _('Discovery rule created'), _('Cannot add discovery rule'));
+		if ($result) {
+			CMessageHelper::setSuccessTitle(_('Discovery rule created'));
+		}
+		else {
+			CMessageHelper::setErrorTitle(_('Cannot add discovery rule'));
+		}
 	}
 	else {
-		show_messages($result, _('Discovery rule updated'), _('Cannot update discovery rule'));
+		if ($result) {
+			CMessageHelper::setSuccessTitle(_('Discovery rule updated'));
+		}
+		else {
+			CMessageHelper::setErrorTitle(_('Cannot update discovery rule'));
+		}
 	}
 
 	if ($result) {
 		unset($_REQUEST['itemid'], $_REQUEST['form']);
 		uncheckTableRows($checkbox_hash);
+
+		if (hasRequest('backurl')) {
+			$response = new CControllerResponseRedirect(getRequest('backurl'));
+			$response->redirect();
+		}
 	}
 }
 elseif (hasRequest('action') && str_in_array(getRequest('action'), ['discoveryrule.massenable', 'discoveryrule.massdisable']) && hasRequest('g_hostdruleid')) {
@@ -825,6 +841,7 @@ if (hasRequest('form')) {
 	$data['display_interfaces'] = ($host['status'] == HOST_STATUS_MONITORED
 		|| $host['status'] == HOST_STATUS_NOT_MONITORED
 	);
+	$data['backurl'] = getRequest('backurl');
 
 	if (!hasRequest('form_refresh')) {
 		foreach ($data['preprocessing'] as &$step) {

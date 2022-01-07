@@ -39,7 +39,8 @@ $form = (new CForm('post', $url))
 	->setName('itemForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
-	->addVar('hostid', $data['hostid']);
+	->addVar('hostid', $data['hostid'])
+	->addVar('backurl', $data['backurl']);
 
 if (!empty($data['itemid'])) {
 	$form->addVar('itemid', $data['itemid']);
@@ -979,7 +980,10 @@ if (!empty($data['itemid'])) {
 else {
 	$tab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[(new CSimpleButton(_('Test')))->setId('test_item'), new CButtonCancel(url_param('context'))]
+		[
+			(new CSimpleButton(_('Test')))->setId('test_item'),
+			new CButtonCancel(url_param('context'), "redirect('".$data['backurl']."');")
+		]
 	));
 }
 
