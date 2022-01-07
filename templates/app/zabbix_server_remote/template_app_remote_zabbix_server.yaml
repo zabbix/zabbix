@@ -581,7 +581,7 @@ zabbix_export:
               name: 'Remote Zabbix server: Utilization of lld worker processes over 75%'
               priority: AVERAGE
         -
-          uuid: f8d593ff5690419f8679a5b8303f3a66
+          uuid: 8a21a0281ae24e0788edc8c9b875a421
           name: 'Remote Zabbix server: Utilization of ODBC poller data collector processes, in %'
           type: DEPENDENT
           key: process.odbc_poller.avg.busy
