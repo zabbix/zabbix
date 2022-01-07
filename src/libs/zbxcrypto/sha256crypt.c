@@ -317,9 +317,9 @@ typedef struct
 
 void*	zbx_sha256_hash_for_hmac(const void* data, const size_t datalen, void* out, const size_t outlen)
 {
-	size_t		sz;
-	sha256_ctx	ctx;
-	SHA256_HASH	hash;
+	size_t			sz;
+	struct sha256_ctx	ctx;
+	SHA256_HASH		hash;
 
 	sha256_init_ctx(&ctx);
 	sha256_process_bytes(data, datalen, &ctx);
