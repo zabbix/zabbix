@@ -19,8 +19,6 @@
 **/
 
 
-use PHPUnit\Framework\TestCase;
-
 class C10ImportConverterTest extends CImportConverterTest {
 
 	public function testTemplateSeparation() {

@@ -645,7 +645,7 @@ class CElement extends CBaseElement implements IWaitable {
 			return $this->asInputGroup($options);
 		}
 
-		CTest::addWarning('No specific element was detected');
+		CTest::zbxAddWarning('No specific element was detected');
 
 		return $this;
 	}

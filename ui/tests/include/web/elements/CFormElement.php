@@ -142,7 +142,7 @@ class CFormElement extends CElement {
 			}
 
 			if ($labels->count() > 1) {
-				CTest::addWarning('Form label "'.$name.'" is not unique.');
+				CTest::zbxAddWarning('Form label "'.$name.'" is not unique.');
 			}
 		}
 

@@ -121,12 +121,12 @@ class CAPITest extends CTest {
 	/**
 	 * @inheritdoc
 	 */
-	protected function onNotSuccessfulTest($e) {
-		if ($e instanceof Exception && CAPIHelper::getDebugInfo()) {
-			CExceptionHelper::setMessage($e, $e->getMessage()."\n\nAPI calls:\n".CAPIHelper::getDebugInfoAsString());
+	protected function onNotSuccessfulTest($t): void {
+		if ($t instanceof Exception && CAPIHelper::getDebugInfo()) {
+			CExceptionHelper::setMessage($t, $t->getMessage()."\n\nAPI calls:\n".CAPIHelper::getDebugInfoAsString());
 		}
 
-		parent::onNotSuccessfulTest($e);
+		parent::onNotSuccessfulTest($t);
 	}
 
 	/**

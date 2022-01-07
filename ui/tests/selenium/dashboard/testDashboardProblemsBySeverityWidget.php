@@ -1664,7 +1664,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 		}
 		foreach ($expected_popup['Tags'] as $tag) {
 			$tag_array = $row->getColumn('Tags')->getText();
-			$this->assertContains($tag, $tag_array);
+			$this->assertStringContainsString($tag, $tag_array);
 		}
 		if (CTestArrayHelper::get($data['fields'], 'Show operational data', 'None') === 'Separately') {
 			$this->assertEquals('*UNKNOWN*', $row->getColumn('Operational data')->getText());
