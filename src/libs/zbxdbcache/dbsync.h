@@ -58,7 +58,6 @@
  * Comments: The row preprocessing can be used to expand user macros in       *
  *           some columns.                                                    *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 typedef char **(*zbx_dbsync_preproc_row_func_t)(char **row);
 

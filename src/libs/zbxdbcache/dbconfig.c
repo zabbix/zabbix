@@ -8961,9 +8961,6 @@ void	zbx_dc_clear_timer_queue(zbx_vector_ptr_t *timers)
 	UNLOCK_CACHE;
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 void	zbx_dc_free_timers(zbx_vector_ptr_t *timers)
 {
 	int	i;

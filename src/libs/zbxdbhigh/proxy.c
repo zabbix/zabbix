@@ -2199,9 +2199,6 @@ out:
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static void	proxy_get_lastid(const char *table_name, const char *lastidfield, zbx_uint64_t *lastid)
 {
 	DB_RESULT	result;
@@ -2221,9 +2218,6 @@ static void	proxy_get_lastid(const char *table_name, const char *lastidfield, zb
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():" ZBX_FS_UI64,	__func__, *lastid);
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static void	proxy_set_lastid(const char *table_name, const char *lastidfield, const zbx_uint64_t lastid)
 {
 	DB_RESULT	result;

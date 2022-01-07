@@ -587,25 +587,16 @@ static size_t	get_string_field_size(unsigned char type)
 }
 #endif
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 char	*DBdyn_escape_string_len(const char *src, size_t length)
 {
 	return zbx_db_dyn_escape_string(src, ZBX_SIZE_T_MAX, length, ESCAPE_SEQUENCE_ON);
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 char	*DBdyn_escape_string(const char *src)
 {
 	return zbx_db_dyn_escape_string(src, ZBX_SIZE_T_MAX, ZBX_SIZE_T_MAX, ESCAPE_SEQUENCE_ON);
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static char	*DBdyn_escape_field_len(const ZBX_FIELD *field, const char *src, zbx_escape_sequence_t flag)
 {
 	size_t	length;
@@ -624,9 +615,6 @@ static char	*DBdyn_escape_field_len(const ZBX_FIELD *field, const char *src, zbx
 #endif
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 char	*DBdyn_escape_field(const char *table_name, const char *field_name, const char *src)
 {
 	const ZBX_TABLE	*table;
@@ -641,9 +629,6 @@ char	*DBdyn_escape_field(const char *table_name, const char *field_name, const c
 	return DBdyn_escape_field_len(field, src, ESCAPE_SEQUENCE_ON);
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 char	*DBdyn_escape_like_pattern(const char *src)
 {
 	return zbx_db_dyn_escape_like_pattern(src);

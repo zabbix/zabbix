@@ -4413,9 +4413,6 @@ typedef struct
 }
 httpfield_t;
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static void	DBget_httptests(const zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids,
 		zbx_vector_ptr_t *httptests)
 {
@@ -4960,9 +4957,6 @@ static void	DBget_httptests(const zbx_uint64_t hostid, const zbx_vector_uint64_t
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httptests)
 {
 	char			*sql;
@@ -5503,9 +5497,6 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 	zbx_vector_uint64_destroy(&deletetagids);
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static void	clean_httptests(zbx_vector_ptr_t *httptests)
 {
 	httptest_t	*httptest;

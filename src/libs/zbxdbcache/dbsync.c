@@ -253,18 +253,12 @@ static char	**dbsync_preproc_row(zbx_dbsync_t *sync, char **row)
 	return sync->row;
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 void	zbx_dbsync_init_env(ZBX_DC_CONFIG *cache)
 {
 	dbsync_env.cache = cache;
 	zbx_hashset_create(&dbsync_env.strpool, 100, dbsync_strpool_hash_func, dbsync_strpool_compare_func);
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 void	zbx_dbsync_free_env(void)
 {
 	zbx_hashset_destroy(&dbsync_env.strpool);

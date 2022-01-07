@@ -48,10 +48,9 @@ static int	is_base64(char c)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: encode a byte into a base64 character                             *
+ * Purpose: encode 6 bits into a base64 character                             *
  *                                                                            *
- * Parameters: uc - character to encode                                       *
- *                                                                            *
+ * Parameters: uc - character to encode. Its value must be 0 ... 63.          *
  * Return value: byte encoded into a base64 character                         *
  *                                                                            *
  ******************************************************************************/

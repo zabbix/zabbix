@@ -194,9 +194,6 @@ static int	sql_writer_flush(void)
 
 typedef void (*add_history_func_t)(const zbx_vector_ptr_t *history);
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static void	add_history_dbl(const zbx_vector_ptr_t *history)
 {
 	int		i;
@@ -218,9 +215,6 @@ static void	add_history_dbl(const zbx_vector_ptr_t *history)
 	sql_writer_add_dbinsert(db_insert);
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static void	add_history_uint(zbx_vector_ptr_t *history)
 {
 	int		i;
@@ -242,9 +236,6 @@ static void	add_history_uint(zbx_vector_ptr_t *history)
 	sql_writer_add_dbinsert(db_insert);
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static void	add_history_str(zbx_vector_ptr_t *history)
 {
 	int		i;
@@ -266,9 +257,6 @@ static void	add_history_str(zbx_vector_ptr_t *history)
 	sql_writer_add_dbinsert(db_insert);
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static void	add_history_text(zbx_vector_ptr_t *history)
 {
 	int		i;
@@ -290,9 +278,6 @@ static void	add_history_text(zbx_vector_ptr_t *history)
 	sql_writer_add_dbinsert(db_insert);
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static void	add_history_log(zbx_vector_ptr_t *history)
 {
 	int			i;
