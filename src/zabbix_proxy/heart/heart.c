@@ -38,9 +38,6 @@ extern char		*CONFIG_SOURCE_IP;
 extern int		CONFIG_TIMEOUT;
 extern unsigned int	configured_tls_connect_mode;
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static int	send_heartbeat(void)
 {
 	zbx_socket_t		sock;

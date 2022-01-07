@@ -1036,9 +1036,6 @@ const char	*zbx_json_next_value(const struct zbx_json_parse *jp, const char *p, 
 	return zbx_json_decodevalue(p, string, len, type);
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 const char	*zbx_json_next_value_dyn(const struct zbx_json_parse *jp, const char *p, char **string,
 		size_t *string_alloc, zbx_json_type_t *type)
 {

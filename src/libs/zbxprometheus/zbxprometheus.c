@@ -297,8 +297,8 @@ static zbx_prometheus_condition_op_t	str_loc_op(const char *data, const zbx_strl
  *                                                                            *
  * Purpose: skips spaces                                                      *
  *                                                                            *
- * Parameters: src - [IN] the source string                                   *
- *             pos - [IN] the starting position                               *
+ * Parameters: data - [IN] the source string                                  *
+ *             pos  - [IN] the starting position                              *
  *                                                                            *
  * Return value: The position of the next non space character.                *
  *                                                                            *
@@ -574,9 +574,6 @@ static int	parse_metric_value(const char *data, size_t pos, zbx_strloc_t *loc)
 	return SUCCEED;
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static void	prometheus_condition_free(zbx_prometheus_condition_t *condition)
 {
 	zbx_free(condition->key);
@@ -820,9 +817,6 @@ out:
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static void	prometheus_label_free(zbx_prometheus_label_t *label)
 {
 	zbx_free(label->name);
@@ -830,9 +824,6 @@ static void	prometheus_label_free(zbx_prometheus_label_t *label)
 	zbx_free(label);
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static void	prometheus_row_free(zbx_prometheus_row_t *row)
 {
 	zbx_free(row->metric);
@@ -1273,7 +1264,7 @@ static int	prometheus_register_hint(zbx_hashset_t *hints, const char *data, char
  *                                                                            *
  * Parameters: filter     - [IN] the prometheus filter                        *
  *             data       - [IN] the prometheus data                          *
- *             pso        - [IN] the position of comments in prometheus data  *
+ *             pos        - [IN] the position of comments in prometheus data  *
  *             hints      - [IN/OUT] the hint registry                        *
  *             error      - [OUT] the error message                           *
  *                                                                            *
@@ -1903,7 +1894,7 @@ static int	prometheus_validate_request(const char *request, const char *output, 
  * Purpose: extract value from prometheus cache by the specified filter       *
  *                                                                            *
  * Parameters: data        - [IN] the prometheus cache                        *
- *             fitler_data - [IN] the filter in text format                   *
+ *             filter_data - [IN] the filter in text format                   *
  *             request     - [IN] the data request - value, label, function   *
  *             output      - [IN] the output template/function name           *
  *             value       - [OUT] the extracted value                        *
@@ -1959,7 +1950,7 @@ out:
  * Purpose: extracts value from prometheus data by the specified filter       *
  *                                                                            *
  * Parameters: data        - [IN] the prometheus data                         *
- *             fitler_data - [IN] the filter in text format                   *
+ *             filter_data - [IN] the filter in text format                   *
  *             request     - [IN] the data request - value, label, function   *
  *             output      - [IN] the output template/function name           *
  *             value       - [OUT] the extracted value                        *
@@ -2017,7 +2008,7 @@ out:
  * Purpose: converts filtered prometheus data to json to be used with LLD     *
  *                                                                            *
  * Parameters: data        - [IN] the prometheus data                         *
- *             fitler_data - [IN] the filter in text format                   *
+ *             filter_data - [IN] the filter in text format                   *
  *             value       - [OUT] the converted data                         *
  *             error       - [OUT] the error message                          *
  *                                                                            *

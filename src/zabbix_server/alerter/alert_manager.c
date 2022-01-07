@@ -352,9 +352,6 @@ static void	shared_str_release(zbx_shared_str_t str)
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static void	am_dispatch_free(zbx_am_dispatch_t *dispatch)
 {
 	zbx_free(dispatch->subject);
@@ -542,9 +539,6 @@ static zbx_am_mediatype_t	*am_pop_mediatype(zbx_am_t *manager)
 	return mediatype;
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static void am_remove_mediatype(zbx_am_t *manager, zbx_am_mediatype_t *mediatype)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() mediatypeid:" ZBX_FS_UI64, __func__, mediatype->mediatypeid);
@@ -565,9 +559,6 @@ static void am_remove_mediatype(zbx_am_t *manager, zbx_am_mediatype_t *mediatype
 	zbx_hashset_remove_direct(&manager->mediatypes, mediatype);
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static int	am_release_mediatype(zbx_am_t *manager, zbx_am_mediatype_t *mediatype)
 {
 	if (0 != --mediatype->refcount)

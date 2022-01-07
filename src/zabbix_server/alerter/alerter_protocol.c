@@ -768,9 +768,6 @@ void	zbx_alerter_deserialize_ids(const unsigned char *data, zbx_uint64_t **ids, 
 		data += zbx_deserialize_value(data, &(*ids)[i]);
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 zbx_uint32_t	zbx_alerter_serialize_diag_stats(unsigned char **data, zbx_uint64_t alerts_num)
 {
 	zbx_uint32_t	data_len = 0;
@@ -782,17 +779,11 @@ zbx_uint32_t	zbx_alerter_serialize_diag_stats(unsigned char **data, zbx_uint64_t
 	return data_len;
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static void	zbx_alerter_deserialize_diag_stats(const unsigned char *data, zbx_uint64_t *alerts_num)
 {
 	(void)zbx_deserialize_value(data, alerts_num);
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static zbx_uint32_t	zbx_alerter_serialize_top_request(unsigned char **data, int limit)
 {
 	zbx_uint32_t	len;
@@ -803,17 +794,11 @@ static zbx_uint32_t	zbx_alerter_serialize_top_request(unsigned char **data, int 
 	return len;
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 void	zbx_alerter_deserialize_top_request(const unsigned char *data, int *limit)
 {
 	(void)zbx_deserialize_value(data, limit);
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 zbx_uint32_t	zbx_alerter_serialize_top_mediatypes_result(unsigned char **data, zbx_am_mediatype_t **mediatypes,
 		int mediatypes_num)
 {
@@ -843,9 +828,6 @@ zbx_uint32_t	zbx_alerter_serialize_top_mediatypes_result(unsigned char **data, z
 	return data_len;
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static void	zbx_alerter_deserialize_top_mediatypes_result(const unsigned char *data,
 		zbx_vector_uint64_pair_t *mediatypes)
 {
@@ -870,9 +852,6 @@ static void	zbx_alerter_deserialize_top_mediatypes_result(const unsigned char *d
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 zbx_uint32_t	zbx_alerter_serialize_top_sources_result(unsigned char **data, zbx_am_source_stats_t **sources,
 		int sources_num)
 {
@@ -906,9 +885,6 @@ zbx_uint32_t	zbx_alerter_serialize_top_sources_result(unsigned char **data, zbx_
 	return data_len;
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static void	zbx_alerter_deserialize_top_sources_result(const unsigned char *data, zbx_vector_ptr_t *sources)
 {
 	int	i, sources_num;

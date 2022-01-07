@@ -86,9 +86,6 @@ static zbx_am_db_alert_t	*am_db_create_alert(zbx_uint64_t alertid, zbx_uint64_t 
 	return alert;
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static int 	am_db_init(zbx_am_db_t *amdb, char **error)
 {
 	zbx_hashset_create(&amdb->mediatypes, 5, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -99,9 +96,6 @@ static int 	am_db_init(zbx_am_db_t *amdb, char **error)
 	return SUCCEED;
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static void	am_db_clear(zbx_am_db_t *amdb)
 {
 	zbx_hashset_iter_t	iter;

@@ -193,9 +193,6 @@ static zbx_expression_query_t*	expression_create_query(const char *itemquery)
 	return query;
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static void	expression_group_free(zbx_expression_group_t *group)
 {
 	zbx_free(group->name);
@@ -271,9 +268,6 @@ static zbx_expression_item_t	*expression_get_item(zbx_expression_eval_t *eval, z
 	return item;
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static void	expression_item_free(zbx_expression_item_t *item)
 {
 	zbx_vector_ptr_clear_ext(&item->tags, (zbx_clean_func_t) zbx_free_item_tag);

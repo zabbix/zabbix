@@ -6588,7 +6588,7 @@ int	substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const DB_EVE
 
 /******************************************************************************
  *                                                                            *
- * substitute_macros_xml with masked secret macros                            *
+ * Purpose: substitute_macros_xml with masked secret macros                   *
  *                                                                            *
  ******************************************************************************/
 int	substitute_macros_xml(char **data, const DC_ITEM *item, const struct zbx_json_parse *jp_row,
@@ -6599,7 +6599,7 @@ int	substitute_macros_xml(char **data, const DC_ITEM *item, const struct zbx_jso
 
 /******************************************************************************
  *                                                                            *
- * substitute_macros_xml with unmasked secret macros                          *
+ * Purpose: substitute_macros_xml with unmasked secret macros                 *
  *                                                                            *
  ******************************************************************************/
 int	substitute_macros_xml_unmasked(char **data, const DC_ITEM *item, const struct zbx_json_parse *jp_row,
@@ -6616,7 +6616,7 @@ int	substitute_macros_xml_unmasked(char **data, const DC_ITEM *item, const struc
 
 /******************************************************************************
  *                                                                            *
- * substitute_key_macros with masked secret macros                            *
+ * Purpose: substitute_key_macros with masked secret macros                   *
  *                                                                            *
  ******************************************************************************/
 int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, const struct zbx_json_parse *jp_row,
@@ -6627,7 +6627,7 @@ int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, c
 
 /******************************************************************************
  *                                                                            *
- * substitute_key_macros with unmasked secret macros                          *
+ * Purpose: substitute_key_macros with unmasked secret macros                 *
  *                                                                            *
  ******************************************************************************/
 int	substitute_key_macros_unmasked(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item,

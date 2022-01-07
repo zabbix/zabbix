@@ -324,17 +324,6 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: main function                                                     *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
 int	main(int argc, char **argv)
 {
 	int		i, ret = SUCCEED;

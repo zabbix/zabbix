@@ -131,9 +131,6 @@ static int	zbx_jsonpath_error(const char *path)
 	return FAIL;
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static char	*jsonpath_strndup(const char *source, size_t len)
 {
 	char	*str;
@@ -253,9 +250,6 @@ static zbx_jsonpath_token_t	*jsonpath_create_token(int type, const char *express
 	return token;
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static void	jsonpath_token_free(zbx_jsonpath_token_t *token)
 {
 	zbx_free(token->data);
@@ -292,9 +286,6 @@ static void	jsonpath_reserve(zbx_jsonpath_t *jsonpath, int num)
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static void	jsonpath_segment_clear(zbx_jsonpath_segment_t *segment)
 {
 	switch (segment->type)
@@ -494,7 +485,7 @@ static int	jsonpath_parse_number(const char *start, int *len)
  *                                                                            *
  * Purpose: get next token in jsonpath expression                             *
  *                                                                            *
- * Parameters: exprsesion - [IN] the jsonpath expression                      *
+ * Parameters: expression - [IN] the jsonpath expression                      *
  *             pos        - [IN] the position of token in the expression      *
  *             prev_group - [IN] the preceding token group, used to determine *
  *                               token type based on context if necessary     *
@@ -2360,9 +2351,6 @@ static int	jsonpath_format_query_result(const zbx_vector_json_t *objects, zbx_js
 	return SUCCEED;
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 void	zbx_jsonpath_clear(zbx_jsonpath_t *jsonpath)
 {
 	int	i;
