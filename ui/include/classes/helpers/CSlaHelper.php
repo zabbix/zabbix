@@ -127,7 +127,6 @@ final class CSlaHelper {
 				));
 		}
 		catch (Exception $e) {
-			echo $period_from;
 			return $tag;
 		}
 
