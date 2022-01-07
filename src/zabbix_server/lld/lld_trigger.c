@@ -2057,9 +2057,6 @@ static void	lld_trigger_tags_make(const zbx_vector_ptr_t *trigger_prototypes, zb
 	zbx_vector_ptr_sort(triggers, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static void	lld_validate_trigger_field(zbx_lld_trigger_t *trigger, char **field, char **field_orig,
 		zbx_uint64_t flag, size_t field_len, char **error)
 {
@@ -2381,9 +2378,6 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static void	lld_validate_trigger_tag_field(zbx_lld_tag_t *tag, const char *field, zbx_uint64_t flag,
 		size_t field_len, char **error)
 {
@@ -3283,7 +3277,7 @@ static int	zbx_lld_trigger_node_compare_func(const void *d1, const void *d2)
  * Purpose: adds a node to trigger cache                                      *
  *                                                                            *
  * Parameters: cache     - [IN] the trigger cache                             *
- *             triggerid - [IN] the trigger id                                *
+ *             triggerid - [IN]                                               *
  *             trigger   - [IN] the trigger data for new triggers             *
  *                                                                            *
  * Return value: the added node                                               *
