@@ -5244,7 +5244,7 @@ class CApiInputValidatorTest extends TestCase {
 				[
 					'active_since' => 1640995200, // 2022-01-01 00:00:00
 					'active_till' => 1643673599 // 2022-01-31 23:59:59
-				],
+				]
 			],
 			[
 				['type' => API_OBJECT, 'fields' => [
@@ -5256,7 +5256,7 @@ class CApiInputValidatorTest extends TestCase {
 					'active_till' => '1640995200' // 2022-01-01 00:00:00
 				],
 				'/',
-				'Invalid parameter "/active_till": cannot be less than or equal to the value of parameter "/active_since".',
+				'Invalid parameter "/active_till": cannot be less than or equal to the value of parameter "/active_since".'
 			]
 		];
 	}

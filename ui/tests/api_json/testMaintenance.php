@@ -456,7 +456,7 @@ class testMaintenance extends CAPITest {
 					'name' => 'M'.++$n,
 					'groups' => [
 						'groupid' => 2
-					],
+					]
 				] + $def_options,
 				'expected_error' => null
 			],
@@ -466,7 +466,7 @@ class testMaintenance extends CAPITest {
 					'name' => 'M'.++$n,
 					'groups' => [
 						['groupid' => 2]
-					],
+					]
 				] + $def_options,
 				'expected_error' => null
 			],
@@ -477,7 +477,7 @@ class testMaintenance extends CAPITest {
 					'groups' => [
 						['groupid' => 2],
 						['groupid' => 4]
-					],
+					]
 				] + $def_options,
 				'expected_error' => null
 			],
@@ -497,7 +497,7 @@ class testMaintenance extends CAPITest {
 					'name' => 'M'.++$n,
 					'groups' => [
 						['groupid' => 999]
-					],
+					]
 				] + $def_options,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
@@ -509,7 +509,7 @@ class testMaintenance extends CAPITest {
 						['groupid' => 999],
 						['groupid' => 1000],
 						['groupid' => 999]
-					],
+					]
 				] + $def_options,
 				'expected_error' => 'Invalid parameter "/1/groups/3": value (groupid)=(999) already exists.'
 			],
@@ -519,7 +519,7 @@ class testMaintenance extends CAPITest {
 					'name' => 'M'.++$n,
 					'hosts' => [
 						'hostid' => 90020
-					],
+					]
 				] + $def_options,
 				'expected_error' => null
 			],
@@ -529,7 +529,7 @@ class testMaintenance extends CAPITest {
 					'name' => 'M'.++$n,
 					'hosts' => [
 						['hostid' => 90020]
-					],
+					]
 				] + $def_options,
 				'expected_error' => null
 			],
@@ -540,7 +540,7 @@ class testMaintenance extends CAPITest {
 					'hosts' => [
 						['hostid' => 90020],
 						['hostid' => 90021]
-					],
+					]
 				] + $def_options,
 				'expected_error' => null
 			],
@@ -572,7 +572,7 @@ class testMaintenance extends CAPITest {
 						['hostid' => 999],
 						['hostid' => 1000],
 						['hostid' => 999]
-					],
+					]
 				] + $def_options,
 				'expected_error' => 'Invalid parameter "/1/hosts/3": value (hostid)=(999) already exists.'
 			],
@@ -622,10 +622,10 @@ class testMaintenance extends CAPITest {
 			// Fail. Same name.
 			[
 				'request_data' => [[
-					'name' => 'Same name',
+					'name' => 'Same name'
 				] + $def_options,
 				[
-					'name' => 'Same name',
+					'name' => 'Same name'
 				] + $def_options],
 				'expected_error' => 'Invalid parameter "/2": value (name)=(Same name) already exists.'
 			],
