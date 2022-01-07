@@ -34,9 +34,9 @@ var impl Plugin
 
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	switch key {
-	case "debug.container.multikeyOne":
+	case "debug.external.multikeyOne":
 		return "debug first test response", nil
-	case "debug.container.multikeyTwo":
+	case "debug.external.multikeyTwo":
 		return "debug second test response", nil
 	default:
 		return "", errors.New("Unsupported metric")
@@ -46,7 +46,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 func init() {
 	plugin.RegisterMetrics(
 		&impl, "DebugMultikey",
-		"debug.container.multikeyOne", "Returns first test value.",
-		"debug.container.multikeyTwo", "Returns second test value.",
+		"debug.external.multikeyOne", "Returns first test value.",
+		"debug.external.multikeyTwo", "Returns second test value.",
 	)
 }
