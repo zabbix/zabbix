@@ -147,7 +147,7 @@ Process type and number (e.g., poller,3)
 .RS 4
 .TP 4
 .I pid
-Process identifier, up to 65535. For larger values specify target as "process\-type,N"
+Process identifier
 .RE
 .RE
 .IP "\fB\-h\fR, \fB\-\-help\fR"
