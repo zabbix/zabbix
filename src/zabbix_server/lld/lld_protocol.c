@@ -26,9 +26,6 @@
 #include "zbxlld.h"
 #include "lld_manager.h"
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 zbx_uint32_t	zbx_lld_serialize_item_value(unsigned char **data, zbx_uint64_t itemid, zbx_uint64_t hostid,
 		const char *value, const zbx_timespec_t *ts, unsigned char meta, zbx_uint64_t lastlogsize, int mtime,
 		const char *error)
@@ -67,9 +64,6 @@ zbx_uint32_t	zbx_lld_serialize_item_value(unsigned char **data, zbx_uint64_t ite
 	return data_len;
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 void	zbx_lld_deserialize_item_value(const unsigned char *data, zbx_uint64_t *itemid, zbx_uint64_t *hostid,
 		char **value, zbx_timespec_t *ts, unsigned char *meta, zbx_uint64_t *lastlogsize, int *mtime,
 		char **error)
@@ -89,9 +83,6 @@ void	zbx_lld_deserialize_item_value(const unsigned char *data, zbx_uint64_t *ite
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 zbx_uint32_t	zbx_lld_serialize_diag_stats(unsigned char **data, zbx_uint64_t items_num, zbx_uint64_t values_num)
 {
 	unsigned char	*ptr;
@@ -109,18 +100,12 @@ zbx_uint32_t	zbx_lld_serialize_diag_stats(unsigned char **data, zbx_uint64_t ite
 	return data_len;
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static void	zbx_lld_deserialize_diag_stats(const unsigned char *data, zbx_uint64_t *items_num, zbx_uint64_t *values_num)
 {
 	data += zbx_deserialize_value(data, items_num);
 	(void)zbx_deserialize_value(data, values_num);
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static zbx_uint32_t	zbx_lld_serialize_top_items_request(unsigned char **data, int limit)
 {
 	zbx_uint32_t	data_len = 0;
@@ -132,17 +117,11 @@ static zbx_uint32_t	zbx_lld_serialize_top_items_request(unsigned char **data, in
 	return data_len;
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 void	zbx_lld_deserialize_top_items_request(const unsigned char *data, int *limit)
 {
 	(void)zbx_deserialize_value(data, limit);
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 zbx_uint32_t	zbx_lld_serialize_top_items_result(unsigned char **data, const zbx_lld_rule_info_t **rule_infos,
 		int num)
 {
@@ -172,9 +151,6 @@ zbx_uint32_t	zbx_lld_serialize_top_items_result(unsigned char **data, const zbx_
 	return data_len;
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static void	zbx_lld_deserialize_top_items_result(const unsigned char *data, zbx_vector_uint64_pair_t *items)
 {
 	int	i, items_num;
@@ -339,8 +315,7 @@ int	zbx_lld_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num, ch
  *                                                                            *
  * Purpose: get the top N items by the number of queued values                *
  *                                                                            *
- * Parameters field - [IN] the sort field                                     *
- *            limit - [IN] the number of top records to retrieve              *
+ * Parameters limit - [IN] the number of top records to retrieve              *
  *            items - [OUT] a vector of top itemid, values_num pairs          *
  *            error - [OUT] the error message                                 *
  *                                                                            *

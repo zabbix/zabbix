@@ -225,10 +225,6 @@ static char	shortopts[] = "s:p:k:I:t:hV";
  *                                                                            *
  * Parameters: sig - signal ID                                                *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static void	get_signal_handler(int sig)
 {

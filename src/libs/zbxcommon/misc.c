@@ -128,8 +128,6 @@ out:
  *                                                                            *
  * Purpose: return program name without path                                  *
  *                                                                            *
- * Parameters: path                                                           *
- *                                                                            *
  * Return value: program name without path                                    *
  *                                                                            *
  ******************************************************************************/
@@ -486,7 +484,7 @@ int	zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec, int *t
  * Purpose: returns number of days in a month                                 *
  *                                                                            *
  * Parameters:                                                                *
- *     year  - [IN] year                                                      *
+ *     year  - [IN]                                                           *
  *     mon   - [IN] month (1-12)                                              *
  *                                                                            *
  * Return value: 28-31 depending on number of days in the month, defaults to  *
@@ -509,7 +507,7 @@ int	zbx_day_in_month(int year, int mon)
  * Purpose: get duration in milliseconds since time stamp till current time   *
  *                                                                            *
  * Parameters:                                                                *
- *     start_time - [IN] time from when duration should be counted            *
+ *     ts - [IN] time from when duration should be counted                    *
  *                                                                            *
  * Return value: duration in milliseconds since time stamp till current time  *
  *                                                                            *
@@ -3372,10 +3370,6 @@ void	make_hostname(char *host)
 }
 
 /******************************************************************************
- *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
  *                                                                            *
  * Return value: Interface type                                               *
  *                                                                            *

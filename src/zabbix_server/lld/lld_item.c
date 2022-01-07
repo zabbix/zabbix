@@ -809,9 +809,6 @@ static int	is_user_macro(const char *str)
 	return SUCCEED;
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static int	lld_validate_item_param(zbx_uint64_t itemid, int type, size_t len, char *param, char **error)
 {
 	if (SUCCEED != zbx_is_utf8(param))
@@ -838,9 +835,6 @@ static int	lld_validate_item_param(zbx_uint64_t itemid, int type, size_t len, ch
 	return SUCCEED;
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static int	lld_validate_item_tag(zbx_uint64_t itemid, int type, char *tag, char **error)
 {
 	size_t	len;
@@ -875,9 +869,6 @@ static int	lld_validate_item_tag(zbx_uint64_t itemid, int type, char *tag, char 
 	return SUCCEED;
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **field_orig, zbx_uint64_t flag,
 		size_t field_len, char **error)
 {

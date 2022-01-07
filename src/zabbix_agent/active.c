@@ -584,9 +584,6 @@ static void process_config_item(struct zbx_json *json, char *config, size_t leng
  *                                                                            *
  * Purpose: Retrieve from Zabbix server list of active checks                 *
  *                                                                            *
- * Parameters: host - IP or Hostname of Zabbix server                         *
- *             port - port of Zabbix server                                   *
- *                                                                            *
  * Return value: returns SUCCEED on successful parsing,                       *
  *               FAIL on other cases                                          *
  *                                                                            *

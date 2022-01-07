@@ -773,9 +773,6 @@ static void	lld_graphs_make(const zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr
 	zbx_vector_ptr_sort(graphs, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static void	lld_validate_graph_field(zbx_lld_graph_t *graph, char **field, char **field_orig, zbx_uint64_t flag,
 		size_t field_len, char **error)
 {

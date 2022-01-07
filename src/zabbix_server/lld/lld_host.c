@@ -1203,9 +1203,6 @@ static void	lld_groups_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *groups)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static zbx_lld_group_t	*lld_group_make(zbx_vector_ptr_t *groups, zbx_uint64_t group_prototypeid,
 		const char *name_proto, const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macros)
 {
@@ -1303,9 +1300,6 @@ out:
 	return group;
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static void	lld_groups_make(zbx_lld_host_t *host, zbx_vector_ptr_t *groups, const zbx_vector_ptr_t *group_prototypes,
 		const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macros)
 {
@@ -1330,8 +1324,6 @@ static void	lld_groups_make(zbx_lld_host_t *host, zbx_vector_ptr_t *groups, cons
 }
 
 /******************************************************************************
- *                                                                            *
- * Purpose: validate group name                                               *
  *                                                                            *
  * Return value: SUCCEED - the group name is valid                            *
  *               FAIL    - otherwise                                          *
@@ -1552,7 +1544,7 @@ static int	lld_group_rights_append(zbx_vector_ptr_t *group_rights, const char *n
 
 /******************************************************************************
  *                                                                            *
- * PUrpose: frees group rights data                                           *
+ * Purpose: frees group rights data                                           *
  *                                                                            *
  ******************************************************************************/
 static void	lld_group_rights_free(zbx_lld_group_rights_t *rights)
@@ -2012,9 +2004,6 @@ static void	lld_hostmacros_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *mas
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static void	lld_hostmacro_make(zbx_vector_ptr_t *hostmacros, zbx_uint64_t hostmacroid, const char *macro,
 		const char *value, const char *description, unsigned char type)
 {
@@ -3513,9 +3502,6 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static void	lld_templates_link(const zbx_vector_ptr_t *hosts, char **error)
 {
 	int		i;
@@ -3888,9 +3874,6 @@ static void	lld_interfaces_get(zbx_uint64_t id, zbx_vector_ptr_t *interfaces, un
 	zbx_vector_ptr_sort(interfaces, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static void	lld_interface_make(zbx_vector_ptr_t *interfaces, zbx_uint64_t parent_interfaceid,
 		zbx_uint64_t interfaceid, unsigned char type, unsigned char main, unsigned char useip, const char *ip,
 		const char *dns, const char *port, unsigned char snmp_type, unsigned char bulk, const char *community,

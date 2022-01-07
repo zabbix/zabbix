@@ -2244,7 +2244,7 @@ static void	substitute_host_interface_macros(ZBX_DC_INTERFACE *interface)
  *                                                                            *
  * Purpose: remove interface from SNMP address -> interfaceid index           *
  *                                                                            *
- * Parameters: interface - [IN] the interface                                 *
+ * Parameters: interface - [IN]                                               *
  *                                                                            *
  ******************************************************************************/
 static void	dc_interface_snmpaddrs_remove(ZBX_DC_INTERFACE *interface)
@@ -2280,7 +2280,7 @@ static void	dc_interface_snmpaddrs_remove(ZBX_DC_INTERFACE *interface)
  *                                                                            *
  * Purpose: setup SNMP attributes for interface with interfaceid index        *
  *                                                                            *
- * Parameters: interface - [IN] the interface                                 *
+ * Parameters: interface - [IN]                                               *
  *             row       - [IN] the row data from DB                          *
  *
  *                                                                            *
@@ -2324,7 +2324,7 @@ static ZBX_DC_SNMPINTERFACE	*dc_interface_snmp_set(zbx_uint64_t interfaceid, con
  *                                                                            *
  * Purpose: remove interface from SNMP address -> interfaceid index           *
  *                                                                            *
- * Parameters: interface - [IN] the interface                                 *
+ * Parameters: interface - [IN] the                                           *
  *                                                                            *
  ******************************************************************************/
 static void	dc_interface_snmp_remove(zbx_uint64_t interfaceid)
@@ -4675,8 +4675,6 @@ static void	DCsync_correlations(zbx_dbsync_t *sync)
  *          its type                                                          *
  *                                                                            *
  * Parameters: type - [IN] the condition type                                 *
- *                                                                            *
- * Return value: the size                                                     *
  *                                                                            *
  ******************************************************************************/
 static size_t	dc_corr_condition_get_size(unsigned char type)
@@ -9152,7 +9150,7 @@ unlock:
  *                                                                            *
  * Purpose: Get nextcheck for selected queue                                  *
  *                                                                            *
- * Parameters: queue - [IN] the queue                                         *
+ * Parameters: queue - [IN]                                                   *
  *                                                                            *
  * Return value: nextcheck or FAIL if no items for the specified queue        *
  *                                                                            *
@@ -9840,7 +9838,7 @@ static int	DCinterface_set_availability(ZBX_DC_INTERFACE *dc_interface, int now,
  * Purpose: initializes interface availability data                           *
  *                                                                            *
  * Parameters: availability - [IN/OUT] interface availability data            *
- *             interfaceid  - [IN] interface id                               *
+ *             interfaceid  - [IN]                                            *
  *                                                                            *
  ******************************************************************************/
 void	zbx_interface_availability_init(zbx_interface_availability_t *availability, zbx_uint64_t interfaceid)
@@ -11662,7 +11660,7 @@ void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name)
  *          would not mind not having data for the item before that time, but *
  *          since that time we expect data to be coming.                      *
  *                                                                            *
- * Parameters: itemid  - [IN] the item id                                     *
+ * Parameters: itemid  - [IN]                                                 *
  *             seconds - [OUT] the time data is expected as a Unix timestamp  *
  *                                                                            *
  ******************************************************************************/
@@ -11699,9 +11697,9 @@ unlock:
  *                                                                            *
  * Purpose: get host identifiers for the specified list of functions          *
  *                                                                            *
- * Parameters: functionids     - [IN] the function ids                        *
- *             functionids_num - [IN] the number of function ids              *
- *             hostids         - [OUT] the host ids                           *
+ * Parameters: functionids     - [IN]                                         *
+ *             functionids_num - [IN]                                         *
+ *             hostids         - [OUT]                                        *
  *                                                                            *
  * Comments: this function must be used only by configuration syncer          *
  *                                                                            *
@@ -11730,8 +11728,8 @@ void	dc_get_hostids_by_functionids(const zbx_uint64_t *functionids, int function
  *                                                                            *
  * Purpose: get function host ids grouped by an object (trigger) id           *
  *                                                                            *
- * Parameters: functionids - [IN] the function ids                            *
- *             hostids     - [OUT] the host ids                               *
+ * Parameters: functionids - [IN]                                             *
+ *             hostids     - [OUT]                                            *
  *                                                                            *
  ******************************************************************************/
 void	DCget_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_uint64_t *hostids)
@@ -11751,9 +11749,9 @@ void	DCget_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_u
  *                                                                            *
  * Purpose: get hosts for the specified list of functions                     *
  *                                                                            *
- * Parameters: functionids     - [IN] the function ids                        *
- *             functionids_num - [IN] the number of function ids              *
- *             hosts           - [OUT] hosts                                  *
+ * Parameters: functionids     - [IN]                                         *
+ *             functionids_num - [IN]                                         *
+ *             hosts           - [OUT]                                        *
  *                                                                            *
  ******************************************************************************/
 static void	dc_get_hosts_by_functionids(const zbx_uint64_t *functionids, int functionids_num, zbx_hashset_t *hosts)
@@ -11784,8 +11782,8 @@ static void	dc_get_hosts_by_functionids(const zbx_uint64_t *functionids, int fun
  *                                                                            *
  * Purpose: get hosts for the specified list of functions                     *
  *                                                                            *
- * Parameters: functionids - [IN] the function ids                            *
- *             hosts       - [OUT] hosts                                      *
+ * Parameters: functionids - [IN]                                             *
+ *             hosts       - [OUT]                                            *
  *                                                                            *
  ******************************************************************************/
 void	DCget_hosts_by_functionids(const zbx_vector_uint64_t *functionids, zbx_hashset_t *hosts)
@@ -13599,7 +13597,7 @@ int	DCget_proxy_delay(zbx_uint64_t hostid, int *delay)
  *                                                                            *
  * Parameters: name  - [IN] proxy host name                                   *
  *             delay - [OUT] proxy delay                                      *
- *             error - [OUT] error                                            *
+ *             error - [OUT]                                                  *
  *                                                                            *
  * Return value: SUCCEED - proxy delay is retrieved                           *
  *               FAIL    - proxy delay cannot be retrieved                    *
@@ -13661,8 +13659,6 @@ const char	*zbx_dc_get_instanceid(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: expand user macros in trigger function parameters                 *
- *                                                                            *
  * Parameters: params - [IN] the function parameters                          *
  *             hostid - [IN] host of the item used in function                *
  *                                                                            *
@@ -13710,9 +13706,7 @@ char	*dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t host
 
 /*********************************************************************************
  *                                                                               *
- * Purpose: get host interfaces availability                                     *
- *                                                                               *
- * Parameters: hostid               - [IN] the host id                           *
+ * Parameters: hostid               - [IN]                                       *
  *             agents               - [OUT] Zabbix agent availability            *
  *                                                                               *
  ********************************************************************************/
