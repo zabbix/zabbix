@@ -110,7 +110,7 @@ const char	*help_message[] = {
 	"                                 ipmi poller, java poller, poller,",
 	"                                 self-monitoring, snmp trapper, task manager,",
 	"                                 trapper, unreachable poller, vmware collector,"
-	"                                 history poller, availability manager)",
+	"                                 history poller, availability manager, odbc poller)",
 	"        process-type,N           Process type and number (e.g., poller,3)",
 	"        pid                      Process identifier, up to 65535. For larger",
 	"                                 values specify target as \"process-type,N\"",
