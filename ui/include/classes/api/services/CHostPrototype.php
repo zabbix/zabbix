@@ -482,15 +482,15 @@ class CHostPrototype extends CHostBase {
 
 		self::createHostDiscoveries($host_prototypes);
 
-		self::updateGroupLinks($host_prototypes, 'create');
-		self::updateGroupPrototypes($host_prototypes, 'create');
+		self::updateGroupLinks($host_prototypes);
+		self::updateGroupPrototypes($host_prototypes);
 		$this->updateTemplates($host_prototypes);
-		self::updateHostInventories($host_prototypes, 'create');
+		self::updateHostInventories($host_prototypes);
 
-		$this->updateTagsNew($host_prototypes, 'create');
-		$this->updateHostMacrosNew($host_prototypes, 'create');
+		$this->updateTagsNew($host_prototypes);
+		$this->updateHostMacrosNew($host_prototypes);
 
-		self::updateInterfaces($host_prototypes, 'create');
+		self::updateInterfaces($host_prototypes);
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_HOST_PROTOTYPE, $host_prototypes);
 	}
@@ -609,15 +609,15 @@ class CHostPrototype extends CHostBase {
 			DB::update('hosts', $upd_host_prototypes);
 		}
 
-		self::updateGroupLinks($host_prototypes, 'update', $db_host_prototypes);
-		self::updateGroupPrototypes($host_prototypes, 'update', $db_host_prototypes);
+		self::updateGroupLinks($host_prototypes, $db_host_prototypes);
+		self::updateGroupPrototypes($host_prototypes, $db_host_prototypes);
 		$this->updateTemplates($host_prototypes, $db_host_prototypes);
-		self::updateHostInventories($host_prototypes, 'update', $db_host_prototypes);
+		self::updateHostInventories($host_prototypes, $db_host_prototypes);
 
-		$this->updateTagsNew($host_prototypes, 'update', $db_host_prototypes);
-		$this->updateHostMacrosNew($host_prototypes, 'update', $db_host_prototypes);
+		$this->updateTagsNew($host_prototypes, $db_host_prototypes);
+		$this->updateHostMacrosNew($host_prototypes, $db_host_prototypes);
 
-		self::updateInterfaces($host_prototypes, 'update', $db_host_prototypes);
+		self::updateInterfaces($host_prototypes, $db_host_prototypes);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_HOST_PROTOTYPE, $host_prototypes,
 			$db_host_prototypes
@@ -1423,17 +1423,15 @@ class CHostPrototype extends CHostBase {
 
 	/**
 	 * @param array      $host_prototypes
-	 * @param string     $method
 	 * @param array|null $db_host_prototypes
 	 */
-	private static function updateInterfaces(array &$host_prototypes, string $method, array $db_host_prototypes = null)
-			: void {
+	private static function updateInterfaces(array &$host_prototypes, array $db_host_prototypes = null): void {
 		$ins_interfaces = [];
 		$upd_interfaces = [];
 		$del_interfaceids = [];
 
 		foreach ($host_prototypes as &$host_prototype) {
-			$db_interfaces = ($method === 'update'
+			$db_interfaces = ($db_host_prototypes !== null
 					&& array_key_exists('interfaces', $db_host_prototypes[$host_prototype['hostid']]))
 				? $db_host_prototypes[$host_prototype['hostid']]['interfaces']
 				: [];
@@ -1578,11 +1576,9 @@ class CHostPrototype extends CHostBase {
 
 	/**
 	 * @param array      $host_prototypes
-	 * @param string     $method
 	 * @param array|null $db_host_prototypes
 	 */
-	private static function updateGroupLinks(array &$host_prototypes, string $method, array $db_host_prototypes = null)
-			: void {
+	private static function updateGroupLinks(array &$host_prototypes, array $db_host_prototypes = null): void {
 		$ins_group_links = [];
 		$upd_group_links = [];
 		$del_group_prototypeids = [];
@@ -1592,7 +1588,7 @@ class CHostPrototype extends CHostBase {
 				continue;
 			}
 
-			$db_group_links = ($method === 'update')
+			$db_group_links = ($db_host_prototypes !== null)
 				? array_column($db_host_prototypes[$host_prototype['hostid']]['groupLinks'], null, 'groupid')
 				: [];
 
@@ -1654,11 +1650,9 @@ class CHostPrototype extends CHostBase {
 
 	/**
 	 * @param array      $host_prototypes
-	 * @param string     $method
 	 * @param array|null $db_host_prototypes
 	 */
-	private static function updateGroupPrototypes(array &$host_prototypes, string $method,
-			array $db_host_prototypes = null): void {
+	private static function updateGroupPrototypes(array &$host_prototypes, array $db_host_prototypes = null): void {
 		$ins_group_prototypes = [];
 		$upd_group_prototypes = [];
 		$del_group_prototypeids = [];
@@ -1668,7 +1662,7 @@ class CHostPrototype extends CHostBase {
 				continue;
 			}
 
-			$db_group_prototypes = ($method === 'update')
+			$db_group_prototypes = ($db_host_prototypes !== null)
 				? array_column($db_host_prototypes[$host_prototype['hostid']]['groupPrototypes'], null, 'name')
 				: [];
 
@@ -1731,11 +1725,9 @@ class CHostPrototype extends CHostBase {
 
 	/**
 	 * @param array      $host_prototypes
-	 * @param string     $method
 	 * @param array|null $db_host_prototypes
 	 */
-	private static function updateHostInventories(array $host_prototypes, string $method,
-			array $db_host_prototypes = null): void {
+	private static function updateHostInventories(array $host_prototypes, array $db_host_prototypes = null): void {
 		$ins_inventories = [];
 		$upd_inventories = [];
 		$del_hostids = [];
@@ -1745,7 +1737,7 @@ class CHostPrototype extends CHostBase {
 				continue;
 			}
 
-			$db_inventory_mode = ($method === 'update')
+			$db_inventory_mode = ($db_host_prototypes !== null)
 				? $db_host_prototypes[$host_prototype['hostid']]['inventory_mode']
 				: HOST_INVENTORY_DISABLED;
 
@@ -1785,10 +1777,9 @@ class CHostPrototype extends CHostBase {
 
 	/**
 	 * @param array      $hosts
-	 * @param string     $method
 	 * @param array|null $db_hosts
 	 */
-	protected function updateTagsNew(array &$hosts, string $method, array $db_hosts = null): void {
+	protected function updateTagsNew(array &$hosts, array $db_hosts = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		$ins_tags = [];
@@ -1799,7 +1790,7 @@ class CHostPrototype extends CHostBase {
 				continue;
 			}
 
-			$db_tags = ($method === 'update')
+			$db_tags = ($db_hosts !== null)
 				? $db_hosts[$host[$id_field_name]]['tags']
 				: [];
 
@@ -1849,10 +1840,9 @@ class CHostPrototype extends CHostBase {
 
 	/**
 	 * @param array      $hosts
-	 * @param string     $method
 	 * @param array|null $db_hosts
 	 */
-	protected function updateHostMacrosNew(array &$hosts, string $method, array $db_hosts = null): void {
+	protected function updateHostMacrosNew(array &$hosts, array $db_hosts = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		$ins_hostmacros = [];
@@ -1864,7 +1854,7 @@ class CHostPrototype extends CHostBase {
 				continue;
 			}
 
-			$db_macros = ($method === 'update')
+			$db_macros = ($db_hosts !== null)
 				? $db_hosts[$host[$id_field_name]]['macros']
 				: [];
 
