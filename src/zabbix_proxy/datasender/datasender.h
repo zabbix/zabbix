@@ -23,6 +23,7 @@
 #include "threads.h"
 
 extern int	CONFIG_PROXYDATA_FREQUENCY;
+extern int	CONFIG_TASK_UPDATE_FREQUENCY;
 
 ZBX_THREAD_ENTRY(datasender_thread, args);
 
