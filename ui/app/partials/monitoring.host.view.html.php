@@ -121,6 +121,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 					(new CUrl('zabbix.php'))
 						->setArgument('action', 'latest.view')
 						->setArgument('hostids', [$host['hostid']])
+						->setArgument('filter_name', '')
 				)
 				: _('Latest data')
 		],
