@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-22 17:24+0200\n"
+"POT-Creation-Date: 2022-01-07 19:55+0200\n"
 "PO-Revision-Date: 2013-01-12 23:52+0300\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -1401,6 +1401,7 @@ msgid "Authentication protocol"
 msgstr "Протокол за автентификация"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:359
+#: app/controllers/CControllerAuthenticationUpdate.php:367
 msgid "Authentication settings updated"
 msgstr ""
 
