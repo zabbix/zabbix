@@ -27,7 +27,7 @@
 #include "zbxtrends.h"
 #include "zbxha.h"
 
-//#include "zabbix_stats.h"
+#include "zabbix_stats.h"
 
 /******************************************************************************
  *                                                                            *

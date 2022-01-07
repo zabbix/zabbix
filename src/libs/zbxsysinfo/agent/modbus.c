@@ -18,7 +18,7 @@
 **/
 
 #include "common.h"
-//#include "modbtype.h"
+#include "modbtype.h"
 //#include "mutexs.h"
 //#include "comms.h"
 

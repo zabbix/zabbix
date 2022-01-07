@@ -19,7 +19,7 @@
 
 //#include "zbxipcservice.h"
 //#include "zbxrtc.h"
-//#include "rtc.h"
+#include "rtc.h"
 #include "zbxtypes.h"
 #include "proxy.h"
 

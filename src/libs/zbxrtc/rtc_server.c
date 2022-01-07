@@ -23,7 +23,7 @@
 #include "zbxjson.h"
 #include "zbxha.h"
 //#include "zbxrtc.h"
-//#include "rtc.h"
+#include "rtc.h"
 #include "zbxtypes.h"
 #include "common.h"
 #include "daemon.h"
