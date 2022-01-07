@@ -570,7 +570,8 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_REPORTWRITER		34
 #define ZBX_PROCESS_TYPE_SERVICEMAN		35
 #define ZBX_PROCESS_TYPE_PROBLEMHOUSEKEEPER	36
-#define ZBX_PROCESS_TYPE_COUNT			37	/* number of process types */
+#define ZBX_PROCESS_TYPE_ODBCPOLLER		37
+#define ZBX_PROCESS_TYPE_COUNT			38	/* number of process types */
 
 /* special processes that are not present worker list */
 #define ZBX_PROCESS_TYPE_EXT_FIRST		126
