@@ -137,6 +137,24 @@ class testFormUserRoles extends CWebTest {
 						'tag' => 'tag4',
 						'value' => 'value4'
 					]
+				],
+				'tags' => [
+					[
+						'tag' => 'Service_tag1',
+						'value' => 'value1s'
+					],
+					[
+						'tag' => 'Service_tag2',
+						'value' => 'value2s'
+					],
+					[
+						'tag' => 'Service_tag3',
+						'value' => 'value3s'
+					],
+					[
+						'tag' => 'Service_tag4',
+						'value' => 'value4s'
+					]
 				]
 			]
 		]);
@@ -1370,12 +1388,12 @@ class testFormUserRoles extends CWebTest {
 		$services_table = [
 			[
 				'Name' => 'Service 1',
-				'Status calculation rule' => 'Most critical if all children have problems',
+				'Tags' => '',
 				'Problem tags' => ''
 			],
 			[
 				'Name' => 'Service 2',
-				'Status calculation rule' => 'Most critical of child services',
+				'Tags' => ['Service_tag1: value1s', 'Service_tag2: value2s', 'Service_tag3: value3s', 'Service_tag4: value4s'],
 				'Problem tags' => ['tag1: value1', 'tag2: value2', 'tag3: value3', 'tag4: value4']
 			]
 		];
@@ -1401,29 +1419,33 @@ class testFormUserRoles extends CWebTest {
 					->filter(new CElementFilter(CElementFilter::CLICKABLE))->count());
 
 			$table = $dialog->query('class:list-table')->asTable()->one();
-			$this->assertEquals(['', 'Name', 'Status calculation rule', 'Problem tags'], $table->getHeadersText());
+			$this->assertEquals(['', 'Name', 'Tags', 'Problem tags'], $table->getHeadersText());
 
-			// Check problem tags in hint if there are more than 3 problem tags for service.
+			// Check problem and service tags in hint if there are more than 3 tags for service.
 			foreach ($services_table as &$service) {
-				if (is_array($service['Problem tags'])) {
-					if (count($service['Problem tags']) > 3) {
-						$table->findRow('Name', $service['Name'])->getColumn('Problem tags')
-								->query('class:icon-wzrd-action')->one()->click();
-						$popup = $this->query('xpath://div[@data-hintboxid]')->one()->waitUntilReady();
-						foreach ($service['Problem tags'] as $tag) {
-							$this->assertTrue($popup->query("xpath:.//div[text()=".CXPathHelper::escapeQuotes($tag)."]")
-									->one(false)->isValid()
-							);
-						}
-						$popup->query('class:overlay-close-btn')->one()->click();
+				foreach (['Problem tags' => &$service['Problem tags'], 'Tags' => &$service['Tags']] as $tag_type => &$tags) {
+					if (is_array($tags)) {
+						if (count($tags) > 3) {
+							$table->findRow('Name', $service['Name'])->getColumn($tag_type)
+									->query('class:icon-wzrd-action')->one()->click();
+							$popup = $this->query('xpath://div[@data-hintboxid]')->one()->waitUntilReady();
+							foreach ($tags as $tag) {
+								$this->assertTrue($popup->query("xpath:.//div[text()=".CXPathHelper::escapeQuotes($tag)."]")
+										->one(false)->isValid()
+								);
+							}
+							$popup->query('class:overlay-close-btn')->one()->click();
 
-						// Leave only 3 tags in array as it is the maximal number of tags displayed in table per row.
-						array_splice($service['Problem tags'], 3);
+							// Leave only 3 tags in array as it is the maximal number of tags displayed in table per row.
+							array_splice($tags, 3);
+						}
+						// Combine all tags into a single string so that it would be valid for comparison.
+						$tags = implode('',$tags);
 					}
-					// Combine all problem tags into a single string so that it would be valid for comparison.
-					$service['Problem tags'] = implode('',$service['Problem tags']);
 				}
+				unset($tags);
 			}
+
 			// Check the content of the services list with modified expected value in tags column.
 			$this->assertTableData($services_table);
 

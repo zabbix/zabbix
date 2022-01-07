@@ -1479,8 +1479,8 @@ class testDashboardGraphWidget extends CWebTest {
 					],
 					'Time period' => [
 						'Set custom time period' => true,
-						'From' => '2018-11-15 08',
-						'To' => '2018-11-15 14:20'
+						'From' => '2018-11-15 08:00:00',
+						'To' => '2018-11-15 14:20:00'
 					],
 					'Axes' => [
 						'id:lefty_min' => '5',
@@ -1773,8 +1773,8 @@ class testDashboardGraphWidget extends CWebTest {
 					],
 					'Time period' => [
 						'Set custom time period' => true,
-						'From' => '2018-11-15 08',
-						'To' => '2018-11-15 14:20'
+						'From' => '2018-11-15 08:00:00',
+						'To' => '2018-11-15 14:20:00'
 					],
 					'Axes' => [
 						'Left Y' => true,
