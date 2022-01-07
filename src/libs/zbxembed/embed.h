@@ -25,6 +25,7 @@
 
 #define ZBX_ES_LOG_MEMORY_LIMIT	(ZBX_MEBIBYTE * 8)
 
+/* check (and fail) if timeout was exceeded in C function */
 #define ZBX_ES_CHECK_TIMEOUT(env) \
 	do { \
 		zbx_uint64_t	elapsed_ms; \

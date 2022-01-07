@@ -147,19 +147,10 @@ static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 {
 	zbx_es_httprequest_t	*request;
 	CURLcode		err;
-	zbx_es_env_t		*env;
 	int			err_index = -1;
 
 	if (!duk_is_constructor_call(ctx))
 		return DUK_RET_TYPE_ERROR;
-
-	duk_push_global_stash(ctx);
-
-	if (1 != duk_get_prop_string(ctx, -1, "\xff""\xff""zbx_env"))
-		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
-
-	env = (zbx_es_env_t *)duk_to_pointer(ctx, -1);
-	duk_pop(ctx);
 
 	duk_push_this(ctx);
 
@@ -257,8 +248,6 @@ static duk_ret_t	es_httprequest_clear_header(duk_context *ctx)
 	return 0;
 }
 
-
-
 /******************************************************************************
  *                                                                            *
  * Function: es_httprequest_query                                             *
@@ -275,7 +264,6 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 	char			*url = NULL, *contents = NULL;
 	CURLcode		err;
 	int			err_index = -1;
-	duk_memory_functions	out_funcs;
 	zbx_es_env_t		*env;
 	zbx_uint64_t		timeout_ms, elapsed_ms;
 
@@ -290,9 +278,9 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 	elapsed_ms = zbx_get_duration_ms(&env->start_time);
 	timeout_ms = (zbx_uint64_t)env->timeout * 1000;
 
-	if (0 >= timeout_ms - elapsed_ms)
+	if (elapsed_ms >= timeout_ms)
 	{
-		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "timeout cannot be zero");
+		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "script execution timeout occurred");
 		goto out;
 	}
 
@@ -315,12 +303,6 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 	if (NULL == (request = es_httprequest(ctx)))
 	{
 		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "internal scripting error: null object");
-		goto out;
-	}
-
-	if (0 == timeout_ms)
-	{
-		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "timeout cannot be zero");
 		goto out;
 	}
 
