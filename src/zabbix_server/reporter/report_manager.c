@@ -705,6 +705,7 @@ static char	*rm_get_report_name(const char *name, int report_time)
  *             report_width  - [IN]                                           *
  *             report_height - [IN]                                           *
  *             params        - [IN] the viewing and processing parameters     *
+ *             error         - [OUT]                                          *
  *                                                                            *
  ******************************************************************************/
 static zbx_rm_job_t	*rm_create_job(zbx_rm_t *manager, const char *report_name, zbx_uint64_t dashboardid,
@@ -818,6 +819,7 @@ static void	rm_update_report(zbx_rm_t *manager, zbx_rm_report_t *report, int sta
  *                                                                            *
  * Parameters: report - [IN]                                                  *
  *             now    - [IN] the current time                                 *
+ *             error  - [OUT]                                                 *
  *                                                                            *
  ******************************************************************************/
 static int	rm_report_calc_nextcheck(const zbx_rm_report_t *report, int now, char **error)
@@ -1536,7 +1538,7 @@ static void	rm_get_report_dimensions(zbx_uint64_t dashboardid, int *width, int *
  *                                                                            *
  * Parameters: writer - [IN]                                                  *
  *             job    - [IN] the view to process                              *
- *             char   - [OUT] the error message                               *
+ *             error  - [OUT] the error message                               *
  *                                                                            *
  ******************************************************************************/
 static int	rm_writer_process_job(zbx_rm_writer_t *writer, zbx_rm_job_t *job, char **error)
@@ -2002,10 +2004,12 @@ static int	rm_schedule_jobs(zbx_rm_t *manager, int now)
  *                                                                            *
  * Purpose: finish job                                                        *
  *                                                                            *
- * Parameters: manager - [IN]                                                 *
- *             job     - [IN]                                                 *
- *             status  - [IN] the job status                                  *
- *             info    - [IN] additional information (errors)                 *
+ * Parameters: manager   - [IN]                                               *
+ *             job       - [IN]                                               *
+ *             status    - [IN] the job status                                *
+ *             error     -                                                    *
+ *             sent_num  -                                                    *
+ *             total_num -                                                    *
  *                                                                            *
  ******************************************************************************/
 static void	rm_finish_job(zbx_rm_t *manager, zbx_rm_job_t *job, int status, const char *error, int sent_num,
@@ -2110,7 +2114,6 @@ static void	rm_send_test_error_result(zbx_ipc_client_t *client, const char *erro
  * Purpose: process queue                                                     *
  *                                                                            *
  * Parameters: manager - [IN]                                                 *
- *             now     - [IN] current time                                    *
  *                                                                            *
  * Return value: The number of started jobs.                                  *
  *                                                                            *
