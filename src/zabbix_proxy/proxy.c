@@ -671,6 +671,10 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	err |= (FAIL == check_cfg_feature_int("StartIPMIPollers", CONFIG_IPMIPOLLER_FORKS, "IPMI support"));
 #endif
 
+#if !defined(HAVE_UNIXODBC)
+	err |= (FAIL == check_cfg_feature_int("StartODBCPollers", CONFIG_ODBCPOLLER_FORKS, "ODBC support"));
+#endif
+
 	err |= (FAIL == zbx_db_validate_config_features());
 
 	if (0 != err)
@@ -1305,14 +1309,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			exit(EXIT_FAILURE);
 		}
 	}
-
-#ifndef HAVE_UNIXODBC
-	if (0 < CONFIG_ODBCPOLLER_FORKS)
-	{
-		zabbix_log(LOG_LEVEL_ERR, "ODBC support is not compiled in, but ODBC polling is enabled.");
-		return FAIL;
-	}
-#endif
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_parent();

@@ -138,7 +138,7 @@ const char	*help_message[] = {
 	"                                  self-monitoring, snmp trapper, task manager,",
 	"                                  timer, trapper, unreachable poller,",
 	"                                  vmware collector, history poller,",
-	"                                  availability manager, service manager)",
+	"                                  availability manager, service manager, odbc poller)",
 	"        process-type,N            Process type and number (e.g., poller,3)",
 	"        pid                       Process identifier, up to 65535. For larger",
 	"                                  values specify target as \"process-type,N\"",
@@ -728,6 +728,11 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 #if !defined(HAVE_OPENIPMI)
 	err |= (FAIL == check_cfg_feature_int("StartIPMIPollers", CONFIG_IPMIPOLLER_FORKS, "IPMI support"));
 #endif
+
+#if !defined(HAVE_UNIXODBC)
+	err |= (FAIL == check_cfg_feature_int("StartODBCPollers", CONFIG_ODBCPOLLER_FORKS, "ODBC support"));
+#endif
+
 	err |= (FAIL == zbx_db_validate_config_features());
 
 	if (0 != CONFIG_REPORTWRITER_FORKS && NULL == CONFIG_WEBSERVICE_URL)
@@ -1252,14 +1257,6 @@ static int	server_startup(zbx_socket_t *listen_sock, zbx_rtc_t *rtc)
 			return FAIL;
 		}
 	}
-
-#ifndef HAVE_UNIXODBC
-	if (0 < CONFIG_ODBCPOLLER_FORKS)
-	{
-		zabbix_log(LOG_LEVEL_ERR, "ODBC support is not compiled in, but ODBC polling is enabled.");
-		return FAIL;
-	}
-#endif
 
 	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_POLLER_FORKS
 			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS
