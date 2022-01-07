@@ -1044,8 +1044,7 @@ class testPasswordComplexity extends CWebTest {
 		$auth_form->fill($data['auth_fields']);
 		$auth_form->submit();
 		$this->page->waitUntilReady();
-		// TODO: Uncomment this when ZBX-19669 is fixed.
-//		$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
+		$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
 		$this->assertEquals($data['db_passwd_check_rules'],
 				CDBHelper::getValue('SELECT passwd_check_rules FROM config')
 		);
