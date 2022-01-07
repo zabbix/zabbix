@@ -45,6 +45,29 @@ class CWidgetFieldDatePicker extends CWidgetField {
 	}
 
 	/**
+	 * @param $flags
+	 *
+	 * @return CWidgetFieldDatePicker
+	 */
+	public function setFlags($flags): self {
+		parent::setFlags($flags);
+
+		$validation_rules = $this->getValidationRules();
+		$validation_rules['flags'] = $validation_rules['flags'] ?? 0x00;
+
+		if (($flags & self::FLAG_NOT_EMPTY) != 0) {
+			$validation_rules['flags'] |= API_NOT_EMPTY;
+		}
+		else {
+			$validation_rules['flags'] &= 0xFF ^ API_NOT_EMPTY;
+		}
+
+		$this->setValidationRules($validation_rules);
+
+		return $this;
+	}
+
+	/**
 	 * @return string
 	 */
 	public function getDateTimeFormat(): string {
