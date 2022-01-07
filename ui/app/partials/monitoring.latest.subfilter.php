@@ -148,35 +148,35 @@ $subfilter = (new CTableInfo())
 	]])
 	->addRow(
 		$subfilter_options['hostids']
-		? [[
-			new CTag('h3', true, _('Hosts')),
-			$subfilter_options['hostids']
-		]]
-		: null
+			? [[
+				new CTag('h3', true, _('Hosts')),
+				$subfilter_options['hostids']
+			]]
+			: null
 	)
 	->addRow(
 		$subfilter_options['tagnames']
-		? [[
-			new CTag('h3', true, _('Tags')),
-			$subfilter_options['tagnames']
-		]]
-		: null
+			? [[
+				new CTag('h3', true, _('Tags')),
+				$subfilter_options['tagnames']
+			]]
+			: null
 	)
 	->addRow(
 		$subfilter_options['tags']
-		? [[
-			new CTag('h3', true, _('Tag values')),
-			$subfilter_options['tags']
-		]]
-		: null
+			? [[
+				new CTag('h3', true, _('Tag values')),
+				$subfilter_options['tags']
+			]]
+			: null
 	)
 	->addRow(
 		$subfilter_options['data']
-		? [[
-			new CTag('h3', true, _('Data')),
-			$subfilter_options['data']
-		]]
-		: null
+			? [[
+				new CTag('h3', true, _('Data')),
+				$subfilter_options['data']
+			]]
+			: null
 	)
 	->addClass('tabfilter-subfilter')
 	->setId('latest-data-subfilter')

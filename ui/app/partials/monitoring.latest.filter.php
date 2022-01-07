@@ -337,7 +337,7 @@ if (array_key_exists('render_html', $data)) {
 				}
 			})
 			.on('afteradd.dynamicRows', function() {
-				let rows = this.querySelectorAll('.form_row');
+				const rows = this.querySelectorAll('.form_row');
 
 				new CTagFilterItem(rows[rows.length - 1]);
 			});

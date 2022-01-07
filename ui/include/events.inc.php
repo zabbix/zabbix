@@ -617,7 +617,7 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
  * @param array  $tag
  * @param string $tag['tag']
  * @param string $tag['value']
- * @param int    $tag_name_format  PROBLEMS_TAG_NAME_*
+ * @param int    $tag_name_format  TAG_NAME_*
  *
  * @return string
  */
