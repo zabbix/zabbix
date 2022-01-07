@@ -1476,8 +1476,17 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.20rc1
 
 New features:
+...G...... [ZBXNEXT-6875] added native support for the system.hw.chassis and system.hw.devices keys in Zabbix agent 2 (esneiders)
 
 Bug fixes:
+..F....... [ZBX-19669] fixed success message not showing when no fields were changed in Administration->Authentication page (Ivo)
+...G...... [ZBX-20269] added handling of performance counter with negative denominator value (arimdjonoks)
+...G...... [ZBX-20143] fixed tcp timeout not working in net.dns.record (dgoloscapov)
+........S. [ZBX-20292] fixed LLD overrides for item for particular corner-case (ssimonenko)
+........S. [ZBX-19351] fixed event correlation query failure on Oracle (ssimonenko)
+........S. [ZBX-20249] fixed escalator query failure on Oracle (ssimonenko)
+........S. [ZBX-20330] added handling of nan/inf values in ipmi discovery (dgoloscapov)
+........S. [ZBX-19012] fixed {HOST.NAME} macros substitution (ssimonenko)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.19
