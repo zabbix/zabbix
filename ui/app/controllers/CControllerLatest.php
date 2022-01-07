@@ -532,7 +532,7 @@ abstract class CControllerLatest extends CController {
 		// Sort subfilters by values.
 		CArrayHelper::sort($subfilter_options['hostids'], ['name']);
 		CArrayHelper::sort($subfilter_options['tagnames'], ['name']);
-		ksort($subfilter_options['tags']);
+		uksort($subfilter_options['tags'], 'strnatcmp');
 		array_walk($subfilter_options['tags'], function (&$tag_values) {
 			CArrayHelper::sort($tag_values, ['name']);
 		});
