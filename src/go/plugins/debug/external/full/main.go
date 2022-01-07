@@ -22,11 +22,11 @@ package main
 import (
 	"fmt"
 
-	"zabbix.com/external"
+	"zabbix.com/pkg/plugin/container"
 )
 
 func main() {
-	h, err := external.NewHandler(impl.Name())
+	h, err := container.NewHandler(impl.Name())
 	if err != nil {
 		panic(fmt.Sprintf("failed to create plugin handler %s", err.Error()))
 	}

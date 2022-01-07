@@ -161,12 +161,6 @@ out:
  *                                                                            *
  * Purpose: periodically request config data                                  *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/

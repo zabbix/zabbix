@@ -59,10 +59,6 @@ static void	zbx_housekeeper_sigusr_handler(int flags)
  *                                                                            *
  * Return value: number of rows records                                       *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static int	delete_history(const char *table, const char *fieldname, int now)
 {
@@ -138,10 +134,6 @@ rollback:
  *                                                                            *
  * Return value: SUCCEED - information removed successfully                   *
  *               FAIL - otherwise                                             *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	housekeeping_history(int now)

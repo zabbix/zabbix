@@ -17,25 +17,34 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package main
+package container
 
 import (
-	"zabbix.com/pkg/plugin"
+	"net"
+	"time"
+
+	"github.com/natefinch/npipe"
 )
 
-// Plugin -
-type Plugin struct {
-	plugin.Base
-}
+func (h *handler) setConnection(path string, timeout time.Duration) (err error) {
+	var i int
 
-var impl Plugin
+	for start := time.Now(); ; {
+		if i%5 == 0 {
+			if time.Since(start) > timeout {
+				break
+			}
+		}
 
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	p.Debugf("export %s%v", key, params)
+		var conn net.Conn
+		if conn, err = npipe.DialTimeout(path, timeout); err != nil {
+			return
+		}
 
-	return "debug empty test response", nil
-}
+		h.connection = conn
 
-func init() {
-	plugin.RegisterMetrics(&impl, "DebugEmpty", "debug.external.test", "Returns test string.")
+		return
+	}
+
+	return
 }

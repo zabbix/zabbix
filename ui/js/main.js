@@ -211,7 +211,6 @@ var AudioControl = {
  * Elements with class 'blink' will blink for 'data-seconds-to-blink' seconds
  * If 'data-seconds-to-blink' is omitted, element will blink forever.
  * For elements with class 'blink' and attribute 'data-toggle-class' class will be toggled.
- * @author Konstantin Buravcov
  */
 var jqBlink = {
 	shown: true, // are objects currently shown or hidden?

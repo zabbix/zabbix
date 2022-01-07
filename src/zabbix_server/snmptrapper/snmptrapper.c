@@ -77,8 +77,6 @@ static void	DBupdate_lastsize(void)
  * Return value: SUCCEED - a matching item was found                          *
  *               FAIL - no matching item was found (including fallback items) *
  *                                                                            *
- * Author: Rudolfs Kreicbergs                                                 *
- *                                                                            *
  ******************************************************************************/
 static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_timespec_t *ts)
 {
@@ -238,8 +236,6 @@ next:
  *             begin - [IN] beginning of the trap message                     *
  *             end - [IN] end of the trap message                             *
  *                                                                            *
- * Author: Rudolfs Kreicbergs                                                 *
- *                                                                            *
  ******************************************************************************/
 static void	process_trap(const char *addr, char *begin, char *end)
 {
@@ -280,8 +276,6 @@ static void	process_trap(const char *addr, char *begin, char *end)
  * Function: parse_traps                                                      *
  *                                                                            *
  * Purpose: split traps and process them with process_trap()                  *
- *                                                                            *
- * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
  ******************************************************************************/
 static void	parse_traps(int flag)
@@ -420,8 +414,6 @@ static void	delay_trap_logs(char *error, int log_level)
  *                                                                            *
  * Purpose: read the traps and then parse them with parse_traps()             *
  *                                                                            *
- * Author: Rudolfs Kreicbergs                                                 *
- *                                                                            *
  ******************************************************************************/
 static int	read_traps(void)
 {
@@ -467,8 +459,6 @@ out:
  *                                                                            *
  * Purpose: close trap file and reset lastsize                                *
  *                                                                            *
- * Author: Rudolfs Kreicbergs                                                 *
- *                                                                            *
  * Comments: !!! do not reset lastsize elsewhere !!!                          *
  *                                                                            *
  ******************************************************************************/
@@ -489,8 +479,6 @@ static void	close_trap_file(void)
  * Purpose: open the trap file and get it's node number                       *
  *                                                                            *
  * Return value: file descriptor of the opened file or -1 otherwise           *
- *                                                                            *
- * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
  ******************************************************************************/
 static int	open_trap_file(void)
@@ -535,8 +523,6 @@ out:
  *                                                                            *
  * Return value: SUCCEED - there are new traps to be parsed                   *
  *               FAIL - there are no new traps or trap file does not exist    *
- *                                                                            *
- * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
  ******************************************************************************/
 static int	get_latest_data(void)
@@ -610,8 +596,6 @@ static int	get_latest_data(void)
  * Function: main_snmptrapper_loop                                            *
  *                                                                            *
  * Purpose: SNMP trap reader's entry point                                    *
- *                                                                            *
- * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
  ******************************************************************************/
 ZBX_THREAD_ENTRY(snmptrapper_thread, args)

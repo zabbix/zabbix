@@ -20,20 +20,33 @@
 package main
 
 import (
-	"fmt"
+	"errors"
 
-	"zabbix.com/external"
+	"zabbix.com/pkg/plugin"
 )
 
-func main() {
-	h, err := external.NewHandler(impl.Name())
-	if err != nil {
-		panic(fmt.Sprintf("failed to create plugin handler %s", err.Error()))
-	}
-	impl.Logger = &h
+// Plugin -
+type Plugin struct {
+	plugin.Base
+}
 
-	err = h.Execute()
-	if err != nil {
-		panic(fmt.Sprintf("failed to execute plugin handler %s", err.Error()))
+var impl Plugin
+
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	switch key {
+	case "debug.container.multikeyOne":
+		return "debug first test response", nil
+	case "debug.container.multikeyTwo":
+		return "debug second test response", nil
+	default:
+		return "", errors.New("Unsupported metric")
 	}
+}
+
+func init() {
+	plugin.RegisterMetrics(
+		&impl, "DebugMultikey",
+		"debug.container.multikeyOne", "Returns first test value.",
+		"debug.container.multikeyTwo", "Returns second test value.",
+	)
 }
