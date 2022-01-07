@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-10-22T20:05:48Z'
+  date: '2022-01-07T13:02:05Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -579,6 +579,37 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix server health/process.lld_worker.avg.busy,10m)<65'
               name: 'Remote Zabbix server: Utilization of lld worker processes over 75%'
+              priority: AVERAGE
+        -
+          uuid: 849f8b11cc984c758c4947fe256e3310
+          name: 'Remote Zabbix server: Utilization of ODBC poller data collector processes, in %'
+          type: DEPENDENT
+          key: process.odbc_poller.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          description: 'Average percentage of time ODBC poller processes have been busy in the last minute'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.data.process[''odbc poller''].busy.avg'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Processes odbc poller not started'
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
+          triggers:
+            -
+              uuid: eadd70080005430c8b11666d7e93a095
+              expression: 'avg(/Remote Zabbix server health/process.odbc_poller.avg.busy,10m)>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/Remote Zabbix server health/process.odbc_poller.avg.busy,10m)<65'
+              name: 'Remote Zabbix server: Utilization of ODBC poller processes over 75%'
               priority: AVERAGE
         -
           uuid: 61df12fa054b46f4b50596807dbc90c3
@@ -2011,6 +2042,12 @@ zabbix_export:
           item:
             host: 'Remote Zabbix server health'
             key: process.history_poller.avg.busy
+        -
+          sortorder: '11'
+          color: 9FA8DA
+          item:
+            host: 'Remote Zabbix server health'
+            key: process.odbc_poller.avg.busy
     -
       uuid: e15b35d8270e4085812b9b74369fb048
       name: 'Remote Zabbix server: Data handling processes'
@@ -2288,6 +2325,12 @@ zabbix_export:
           item:
             host: 'Remote Zabbix server health'
             key: process.history_poller.avg.busy
+        -
+          sortorder: '12'
+          color: 9FA8DA
+          item:
+            host: 'Remote Zabbix server health'
+            key: process.odbc_poller.avg.busy
     -
       uuid: dcf8ef4ebaf54a599aca040a0f6cd722
       name: 'Remote Zabbix server: Zabbix internal process busy %'

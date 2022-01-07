@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-10-22T20:07:03Z'
+  date: '2022-01-07T12:54:03Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -406,6 +406,27 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,lld worker,avg,busy],10m)<65'
               name: 'Zabbix server: Utilization of lld worker processes over 75%'
+              priority: AVERAGE
+        -
+          uuid: f8d593ff5690419f8679a5b8303f3a66
+          name: 'Zabbix server: Utilization of ODBC poller data collector processes, in %'
+          type: INTERNAL
+          key: 'zabbix[process,odbc poller,avg,busy]'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          description: 'Average percentage of time ODBC poller processes have been busy in the last minute'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
+          triggers:
+            -
+              uuid: f536b921e9444c6eb0ac805ab9302af9
+              expression: 'avg(/Zabbix server health/zabbix[process,odbc poller,avg,busy],10m)>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,odbc poller,avg,busy],10m)<65'
+              name: 'Zabbix server: Utilization of ODBC poller processes over 75%'
               priority: AVERAGE
         -
           uuid: cbec202e15be49de93dc0c5f58824ae3
@@ -1507,6 +1528,12 @@ zabbix_export:
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,history poller,avg,busy]'
+        -
+          sortorder: '11'
+          color: 9FA8DA
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,odbc poller,avg,busy]'
     -
       uuid: ee66abf6d914407c8133b00acad77f17
       name: 'Zabbix server: Data handling processes'
@@ -1784,6 +1811,12 @@ zabbix_export:
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,history poller,avg,busy]'
+        -
+          sortorder: '12'
+          color: 9FA8DA
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,odbc poller,avg,busy]'
     -
       uuid: 630f638ad0054d3380f941e72805ea1d
       name: 'Zabbix server: Zabbix internal process busy %'
