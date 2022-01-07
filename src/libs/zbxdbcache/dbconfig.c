@@ -2280,9 +2280,9 @@ static void	dc_interface_snmpaddrs_remove(ZBX_DC_INTERFACE *interface)
  *                                                                            *
  * Purpose: setup SNMP attributes for interface with interfaceid index        *
  *                                                                            *
- * Parameters: interface - [IN]                                               *
- *             row       - [IN] the row data from DB                          *
- *
+ * Parameters: interfaceid  - [IN]                                            *
+ *             row          - [IN] the row data from DB                       *
+ *             bulk_changed - [IN]                                            *
  *                                                                            *
  ******************************************************************************/
 static ZBX_DC_SNMPINTERFACE	*dc_interface_snmp_set(zbx_uint64_t interfaceid, const char **row,
@@ -2324,7 +2324,7 @@ static ZBX_DC_SNMPINTERFACE	*dc_interface_snmp_set(zbx_uint64_t interfaceid, con
  *                                                                            *
  * Purpose: remove interface from SNMP address -> interfaceid index           *
  *                                                                            *
- * Parameters: interface - [IN] the                                           *
+ * Parameters: interfaceid - [IN]                                             *
  *                                                                            *
  ******************************************************************************/
 static void	dc_interface_snmp_remove(zbx_uint64_t interfaceid)

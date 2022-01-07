@@ -285,9 +285,6 @@ static int	vc_history_record_compare_desc_func(const zbx_history_record_t *d1, c
 	return d2->timestamp.sec - d1->timestamp.sec;
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 void	zbx_mock_test_entry(void **state)
 {
 	char				*error = NULL;

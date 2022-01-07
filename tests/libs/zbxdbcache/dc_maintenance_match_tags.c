@@ -115,9 +115,6 @@ static void	get_maintenance(zbx_dc_maintenance_t *maintenance)
 	get_maintenance_tags(zbx_mock_get_parameter_handle("in.maintenance.tags"), &maintenance->tags);
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 void	zbx_mock_test_entry(void **state)
 {
 	zbx_vector_ptr_t	tags;

@@ -1263,6 +1263,7 @@ static void	am_db_update_alert(zbx_am_t *manager, zbx_am_alert_t *alert, int sta
  * Parameters: alerter_service - [IN] the IPC service                         *
  *             alert           - [IN]                                         *
  *             value           - [IN]                                         *
+ *             errcode         - [IN]                                         *
  *             error           - [IN] error message                           *
  *             debug           - [IN] debug message                           *
  *                                                                            *
@@ -1901,9 +1902,8 @@ static void	am_process_external_alert_request(zbx_am_t *manager, zbx_uint64_t id
  *                                                                            *
  * Purpose: begin file dispatch                                               *
  *                                                                            *
- * Parameters: manager - [IN]                                                 *
- *             client  - [IN] the connected worker IPC client data            *
- *             message - [IN] the received message                            *
+ * Parameters: client  - [IN] the connected worker IPC client data            *
+ *             data    - [IN] the received message                            *
  *                                                                            *
  ******************************************************************************/
 static void	am_process_begin_dispatch(zbx_ipc_client_t *client, const unsigned char *data)
@@ -1966,7 +1966,7 @@ static void	am_prepare_dispatch_message(zbx_am_dispatch_t *dispatch, DB_MEDIATYP
  *                                                                            *
  * Parameters: manager - [IN]                                                 *
  *             client  - [IN] the connected worker IPC client                 *
- *             message - [IN] the received message                            *
+ *             data    - [IN] the received message                            *
  *                                                                            *
  ******************************************************************************/
 static void	am_process_send_dispatch(zbx_am_t *manager, zbx_ipc_client_t *client, const unsigned char *data)

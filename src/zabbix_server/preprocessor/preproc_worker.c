@@ -431,9 +431,6 @@ static void	worker_test_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t *messa
 	zbx_vector_ptr_destroy(&history_in);
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 static void	worker_dep_request_clear(zbx_preproc_dep_request_t *request)
 {
 	zbx_variant_clear(&request->value);

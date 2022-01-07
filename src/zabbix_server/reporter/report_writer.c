@@ -387,9 +387,6 @@ static void	rw_send_result(zbx_ipc_socket_t *socket, zbx_alerter_dispatch_t *dis
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 ZBX_THREAD_ENTRY(report_writer_thread, args)
 {
 #define	ZBX_STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */

@@ -87,9 +87,6 @@ static void	get_maintenance(zbx_dc_maintenance_t *maintenance)
 	maintenance->active_until = (int)ts.sec;
 }
 
-/******************************************************************************
- *                                                                            *
- ******************************************************************************/
 void	zbx_mock_test_entry(void **state)
 {
 	zbx_dc_maintenance_period_t	period;
