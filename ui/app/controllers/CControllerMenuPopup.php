@@ -227,6 +227,7 @@ class CControllerMenuPopup extends CController {
 	 *
 	 * @param array  $data
 	 * @param string $data['itemid']
+	 * @param string $data['backurl']
 	 *
 	 * @return mixed
 	 */
@@ -242,6 +243,7 @@ class CControllerMenuPopup extends CController {
 			$db_item = $db_items[0];
 			$menu_data = [
 				'type' => 'item_configuration',
+				'backurl' => $data['backurl'],
 				'itemid' => $data['itemid'],
 				'hostid' => $db_item['hostid'],
 				'host' => $db_item['hosts'][0]['host'],
@@ -791,12 +793,12 @@ class CControllerMenuPopup extends CController {
 				$menu_data = self::getMenuDataHost($data);
 				break;
 
-			case 'item_configuration':
-				$menu_data = self::getMenuDataItemConfiguration($data);
-				break;
-
 			case 'item':
 				$menu_data = self::getMenuDataItem($data);
+				break;
+
+			case 'item_configuration':
+				$menu_data = self::getMenuDataItemConfiguration($data);
 				break;
 
 			case 'item_prototype_configuration':

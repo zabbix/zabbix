@@ -229,9 +229,16 @@ foreach ($data['items'] as $item) {
 		$triggerInfo = '';
 	}
 
+
 	$wizard = (new CButton(null))
 		->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
-		->setMenuPopup(CMenuPopupHelper::getItemConfiguration(['itemid' => $item['itemid'], 'context' => $data['context']]));
+		->setMenuPopup(CMenuPopupHelper::getItemConfiguration([
+			'itemid' => $item['itemid'],
+			'context' => $data['context'],
+			'backurl' => (new CUrl('items.php'))
+				->setArgument('context', $data['context'])
+				->getUrl()
+		]));
 
 	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
 		$item['trends'] = '';

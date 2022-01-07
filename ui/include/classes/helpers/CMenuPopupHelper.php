@@ -167,6 +167,7 @@ class CMenuPopupHelper {
 	 * @param array  $data
 	 * @param string $data['itemid']   Item ID.
 	 * @param string $data['context']  Additional parameter in URL to identify main section.
+	 * @param string $data['backurl']  Url from where the function was called.
 	 *
 	 * @return array
 	 */
@@ -174,7 +175,8 @@ class CMenuPopupHelper {
 		return [
 			'type' => 'item_configuration',
 			'data' => [
-				'itemid' => $data['itemid']
+				'itemid' => $data['itemid'],
+				'backurl' => $data['backurl']
 			],
 			'context' => $data['context']
 		];

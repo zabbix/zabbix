@@ -150,12 +150,12 @@ jQuery(function($) {
 				sections = getMenuPopupDashboard(data, $obj);
 				break;
 
-			case 'item_configuration':
-				sections = getMenuPopupItemConfiguration(data, $obj);
-				break;
-
 			case 'item':
 				sections = getMenuPopupItem(data);
+				break;
+
+			case 'item_configuration':
+				sections = getMenuPopupItemConfiguration(data, $obj);
 				break;
 
 			case 'item_prototype_configuration':

@@ -680,6 +680,7 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 /**
  * Get menu popup item log section data.
  *
+ * @param string options['backurl']                   Url from where the popup menu was called.
  * @param string options['itemid']
  * @param string options['hostid']
  * @param string options['host']                      Host name.
@@ -717,6 +718,7 @@ function getMenuPopupItemConfiguration(options, trigger_elmnt) {
 	url.setArgument('description', options.name);
 	url.setArgument('expression', 'func(/' + options.host + '/' + options.key + ')');
 	url.setArgument('context', options.context);
+	url.setArgument('backurl', options.backurl);
 
 	items.push({
 		label: t('Create trigger'),
@@ -729,8 +731,9 @@ function getMenuPopupItemConfiguration(options, trigger_elmnt) {
 		jQuery.each(options.triggers, function (i, trigger) {
 			url = new Curl('triggers.php', false);
 			url.setArgument('form', 'update');
-			url.setArgument('triggerid', trigger.triggerid)
+			url.setArgument('triggerid', trigger.triggerid);
 			url.setArgument('context', options.context);
+			url.setArgument('backurl', options.backurl);
 
 			triggers.push({
 				label: trigger.name,
