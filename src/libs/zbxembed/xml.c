@@ -54,6 +54,12 @@ static duk_ret_t	es_xml_query(duk_context *ctx)
 	int		err_index = -1;
 	char		*err = NULL;
 	zbx_variant_t	value;
+	zbx_es_env_t	*env;
+
+	if (NULL == (env = zbx_es_get_env(ctx)))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
+
+	ZBX_ES_CHECK_TIMEOUT(ctx, env);
 
 	zbx_variant_set_str(&value, zbx_strdup(NULL, duk_safe_to_string(ctx, 0)));
 

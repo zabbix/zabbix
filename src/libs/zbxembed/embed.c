@@ -666,3 +666,18 @@ failure:
 
 	return ret;
 }
+
+zbx_es_env_t	*zbx_es_get_env(duk_context *ctx)
+{
+	zbx_es_env_t	*env;
+
+	duk_push_global_stash(ctx);
+
+	if (1 != duk_get_prop_string(ctx, -1, "\xff""\xff""zbx_env"))
+		return NULL;
+
+	env = (zbx_es_env_t *)duk_to_pointer(ctx, -1);
+	duk_pop(ctx);
+
+	return env;
+}

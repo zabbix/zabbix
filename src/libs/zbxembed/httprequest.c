@@ -267,13 +267,8 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 	zbx_es_env_t		*env;
 	zbx_uint64_t		timeout_ms, elapsed_ms;
 
-	duk_push_global_stash(ctx);
-
-	if (1 != duk_get_prop_string(ctx, -1, "\xff""\xff""zbx_env"))
+	if (NULL == (env = zbx_es_get_env(ctx)))
 		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
-
-	env = (zbx_es_env_t *)duk_to_pointer(ctx, -1);
-	duk_pop(ctx);
 
 	elapsed_ms = zbx_get_duration_ms(&env->start_time);
 	timeout_ms = (zbx_uint64_t)env->timeout * 1000;

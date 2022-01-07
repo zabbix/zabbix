@@ -50,4 +50,6 @@ struct zbx_es_env
 	jmp_buf		loc;
 };
 
+zbx_es_env_t	*zbx_es_get_env(duk_context *ctx);
+
 #endif /* ZABBIX_EMBED_H */
