@@ -1,12 +1,25 @@
 Changes for 6.0.0beta2
 
 New features:
+A.F.I...S. [ZBXNEXT-6999] implemented SLA, SLA reports and SLA report widget (ashubin, averza, jfreibergs, vso)
+...G...... [ZBXNEXT-6875] added native support for the system.hw.chassis and system.hw.devices keys in Zabbix agent 2 (esneiders)
+.D.....PST [ZBXNEXT-2485] moved odbc poller into separate poller type (dgoloscapov, vso)
+.......PS. [ZBXNEXT-7109] changed runtime control options to connecto to zabbix server/proxy using socket rather than sending signals (wiper)
+A......... [ZBXNEXT-6470,ZBXNEXT-6890] implemented complete audit logging of maintenance API object; added strict validation for maintenance.create, maintenance.update, maintenance.delete API methods (rlataria, vmaksimovs)
+..F.....S. [ZBXNEXT-7115] removed deprecated support of user macros in item names (akozlovs, gcalenko)
 ........S. [ZBXNEXT-3140] added {ITEM.STATE.ERROR},{LLDRULE.STATE.ERROR},{TRIGGER.STATE.ERROR} macros to indicate error messages in internal monitoring alerts (arimdjonoks)
 ...G...... [ZBXNEXT-6958] added external plugin loader for Zabbix agent 2 (esneiders)
 ..F....... [ZBXNEXT-7092] improved usability for Latest data and Hosts views (acikuns)
 ...G...PS. [ZBXNEXT-4922] added support for pcre2 (yurii)
 
 Bug fixes:
+.......PS. [ZBX-20405] improved timeouts in JS (dgoloscapov, wiper)
+..F....... [ZBX-19669] fixed success message not showing when no fields were changed in Administration->Authentication page (Ivo)
+...G...... [ZBX-20269] added handling of performance counter with negative denominator value (arimdjonoks)
+...G...... [ZBX-20143] fixed tcp timeout not working in net.dns.record (dgoloscapov)
+........S. [ZBX-20292] fixed LLD overrides for item for particular corner-case (ssimonenko)
+...G...PS. [ZBX-20236] improved memory consumption in Zabbix proxy trappers by moving configuration sync between database and cache to configuration syncer; improved trappers and listeners memory consumption by freeing received data after it was processed instead of after new data is received (vso)
+........S. [ZBX-20330] added handling of nan/inf values in ipmi discovery (dgoloscapov)
 ...G.....T [ZBX-19185] fixed free bytes calculation for temporary tablespace in Oracle by ODBC and by agent2 template (abiba)
 ........S. [ZBX-20377] implemented hmac-sha256 for server for scheduled reports cookies (arimdjonoks)
 .........T [ZBX-20258] fixed tags processing for Zammad media type (abiba)
