@@ -588,6 +588,18 @@ class CApiInputValidatorTest extends TestCase {
 			],
 			[
 				['type' => API_INT32],
+				'9223372036854775808',
+				'/1/int',
+				'Invalid parameter "/1/int": a number is too large.'
+			],
+			[
+				['type' => API_INT32],
+				9223372036854775808,
+				'/1/int',
+				'Invalid parameter "/1/int": an integer is expected.'
+			],
+			[
+				['type' => API_INT32],
 				'foo',
 				'/1/int',
 				'Invalid parameter "/1/int": an integer is expected.'
@@ -927,6 +939,12 @@ class CApiInputValidatorTest extends TestCase {
 				'18446744073709551616',
 				'/1/int',
 				'Invalid parameter "/1/int": a number is too large.'
+			],
+			[
+				['type' => API_UINT64],
+				18446744073709551616,
+				'/1/int',
+				'Invalid parameter "/1/int": an unsigned integer is expected.'
 			],
 			[
 				['type' => API_UINT64],
