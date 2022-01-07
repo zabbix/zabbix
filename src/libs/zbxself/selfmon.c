@@ -122,6 +122,7 @@ extern int	CONFIG_HISTORYPOLLER_FORKS;
 extern int	CONFIG_AVAILMAN_FORKS;
 extern int	CONFIG_SERVICEMAN_FORKS;
 extern int	CONFIG_PROBLEMHOUSEKEEPER_FORKS;
+extern int	CONFIG_ODBCPOLLER_FORKS;
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern ZBX_THREAD_LOCAL int		process_num;
@@ -211,6 +212,8 @@ int	get_process_type_forks(unsigned char proc_type)
 			return CONFIG_SERVICEMAN_FORKS;
 		case ZBX_PROCESS_TYPE_PROBLEMHOUSEKEEPER:
 			return CONFIG_PROBLEMHOUSEKEEPER_FORKS;
+		case ZBX_PROCESS_TYPE_ODBCPOLLER:
+			return CONFIG_ODBCPOLLER_FORKS;
 	}
 
 	return get_component_process_type_forks(proc_type);
