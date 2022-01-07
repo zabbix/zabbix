@@ -88,8 +88,14 @@ out:
  ******************************************************************************/
 static duk_ret_t	es_xml_from_json(duk_context *ctx)
 {
-	int	err_index = -1;
-	char	*str = NULL, *error = NULL;
+	int		err_index = -1;
+	char		*str = NULL, *error = NULL;
+	zbx_es_env_t	*env;
+
+	if (NULL == (env = zbx_es_get_env(ctx)))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
+
+	ZBX_ES_CHECK_TIMEOUT(ctx, env);
 
 	if (FAIL == zbx_json_to_xml((char *)duk_safe_to_string(ctx, 0), &str, &error))
 	{
@@ -116,8 +122,14 @@ out:
  ******************************************************************************/
 static duk_ret_t	es_xml_to_json(duk_context *ctx)
 {
-	int	err_index = -1;
-	char	*str = NULL, *error = NULL;
+	int		err_index = -1;
+	char		*str = NULL, *error = NULL;
+	zbx_es_env_t	*env;
+
+	if (NULL == (env = zbx_es_get_env(ctx)))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
+
+	ZBX_ES_CHECK_TIMEOUT(ctx, env);
 
 	if (FAIL == zbx_xml_to_json((char *)duk_safe_to_string(ctx, 0), &str, &error))
 	{
