@@ -363,6 +363,9 @@ class CControllerAuthenticationUpdate extends CController {
 				CMessageHelper::setErrorTitle(_('Cannot update authentication'));
 			}
 		}
+		else {
+			CMessageHelper::setSuccessTitle(_('Authentication settings updated'));
+		}
 
 		$this->setResponse($this->response);
 	}
