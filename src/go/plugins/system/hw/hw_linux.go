@@ -270,7 +270,7 @@ func (p *Plugin) exportDevices(params []string) (result interface{}, err error) 
 		return
 	}
 
-	return zbxcmd.ExecuteStrict(cmd, time.Second*time.Duration(p.options.Timeout))
+	return zbxcmd.ExecuteStrict(cmd, time.Second*time.Duration(p.options.Timeout), "")
 }
 
 func getDeviceCmd(params []string) (string, error) {
