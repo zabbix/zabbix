@@ -197,9 +197,11 @@ static void	rtc_process_diaginfo(const char *data, char **result)
  ******************************************************************************/
 static void	rtc_process_request(int code, const unsigned char *data, char **result)
 {
+#if defined(HAVE_SIGQUEUE)
 #ifdef HAVE_NETSNMP
 	int	cmd;
 	char	*tmp = NULL;
+#endif
 #endif
 
 	switch (code)
