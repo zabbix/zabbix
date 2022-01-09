@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ define('DB_VERSION_NOT_SUPPORTED_ERROR',	4);
 define('DB_VERSION_NOT_SUPPORTED_WARNING',	5);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
-define('ZABBIX_COPYRIGHT_TO',	'2021');
+define('ZABBIX_COPYRIGHT_TO',	'2022');
 
 define('ZBX_BCRYPT_COST',		10);
 define('ZBX_MD5_SIZE',			32);
