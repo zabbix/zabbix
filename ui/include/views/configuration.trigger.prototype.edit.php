@@ -641,6 +641,13 @@ $dependenciesFormList->addRow(_('Dependencies'),
 );
 $triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList, TAB_INDICATOR_DEPENDENCY);
 
+if ($data['backurl']) {
+	$cancelButton = new CButtonCancel(null, "redirect('".$data['backurl']."');");
+}
+else {
+	$cancelButton = new CButtonCancel(url_params(['parent_discoveryid', 'context']));
+}
+
 // append buttons to form
 if (!empty($data['triggerid'])) {
 	$deleteButton = new CButtonDelete(_('Delete trigger prototype?'),
@@ -655,15 +662,14 @@ if (!empty($data['triggerid'])) {
 		new CSubmit('update', _('Update')), [
 			new CSubmit('clone', _('Clone')),
 			$deleteButton,
-			new CButtonCancel(url_params(['parent_discoveryid', 'context']), "redirect('".$data['backurl']."');")
+			$cancelButton
 		]
 	));
 }
 else {
 	$triggersTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel(url_params(['parent_discoveryid', 'context']), "redirect('".$data['backurl']."');")]
-	));
+		[$cancelButton]));
 }
 
 // append tabs to form

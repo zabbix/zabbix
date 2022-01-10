@@ -642,6 +642,13 @@ $dependenciesFormList->addRow(_('Dependencies'),
 );
 $triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList, TAB_INDICATOR_DEPENDENCY);
 
+if ($data['backurl']) {
+	$cancelButton = new CButtonCancel(null, "redirect('".$data['backurl']."');");
+}
+else {
+	$cancelButton = new CButtonCancel(url_param('context'));
+}
+
 // Append buttons to form list.
 if (!empty($data['triggerid'])) {
 	$triggersTab->setFooter(makeFormFooter(
@@ -652,14 +659,14 @@ if (!empty($data['triggerid'])) {
 				url_params(['form', 'hostid', 'triggerid', 'context', 'backurl']),
 				'context'
 				))->setEnabled(!$data['limited']),
-			new CButtonCancel(url_param('context'), "redirect('".$data['backurl']."');")
+			$cancelButton
 		]
 	));
 }
 else {
 	$triggersTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel(url_param('context'), "redirect('".$data['backurl']."');")]
+		[$cancelButton]
 	));
 }
 
