@@ -2521,6 +2521,9 @@ div.dashboard-grid-widget-slareport .date-vertical {
   writing-mode: vertical-lr;
   transform: rotate(180deg); }
 
+.overlay-dialogue.modal-popup .dashboard-grid-widget-svggraph .table-forms-container, .overlay-dialogue.modal-popup .dashboard-grid-widget-svggraph .browser-warning-container {
+  border: 1px solid #dfe4e7; }
+
 .link-action {
   border-bottom: 1px dotted;
   cursor: pointer;
