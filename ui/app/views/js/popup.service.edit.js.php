@@ -430,7 +430,6 @@ window.service_edit_popup = {
 		this.removeAllChildren();
 
 		this.overlay.unsetLoading();
-
 		this.overlay.setProperties({title, buttons});
 	},
 
