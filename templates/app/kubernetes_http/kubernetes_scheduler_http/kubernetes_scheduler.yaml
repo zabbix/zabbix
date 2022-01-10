@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-30T16:45:41Z'
+  date: '2022-01-10T15:04:36Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -272,6 +272,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
+          description: 'Get raw metrics from Scheduler instance /metrics endpoint'
           preprocessing:
             -
               type: CHECK_NOT_SUPPORTED
@@ -484,7 +485,7 @@ zabbix_export:
               expression: 'min(/Kubernetes Scheduler by HTTP/kubernetes.scheduler.scheduler_schedule_attempts.error.rate,5m)>{$KUBE.SCHEDULER.ERROR}'
               name: 'Kubernetes Scheduler: Too many schedule attempts with errors (over {$KUBE.SCHEDULER.ERROR} for 5m)'
               priority: WARNING
-              description: '"Number of attempts to schedule pods with ''error'' result is too hight. ''error'' means an internal scheduler problem."'
+              description: '"Number of attempts to schedule pods with ''error'' result is too high. ''error'' means an internal scheduler problem."'
         -
           uuid: d5c901849f134b40b077c50e02415fff
           name: 'Kubernetes Scheduler: Schedule attempts: scheduled'
@@ -551,7 +552,7 @@ zabbix_export:
               expression: 'min(/Kubernetes Scheduler by HTTP/kubernetes.scheduler.scheduler_schedule_attempts.unschedulable.rate,5m)>{$KUBE.SCHEDULER.UNSCHEDULABLE}'
               name: 'Kubernetes Scheduler: Too many unschedulable pods (over {$KUBE.SCHEDULER.UNSCHEDULABLE} for 5m)'
               priority: WARNING
-              description: '"Number of attempts to schedule pods with ''unschedulable'' result is too hight. ''unschedulable'' means a pod could not be scheduled."'
+              description: '"Number of attempts to schedule pods with ''unschedulable'' result is too high. ''unschedulable'' means a pod could not be scheduled."'
         -
           uuid: 3df35ee6e86a424f89f51bb74cb40b9d
           name: 'Kubernetes Scheduler: Scheduling algorithm duration, p50'
@@ -777,7 +778,7 @@ zabbix_export:
             -
               type: PROMETHEUS_TO_JSON
               parameters:
-                - '{__name__=~ "scheduler_e2e_scheduling_duration_*"}'
+                - '{__name__=~ "scheduler_e2e_scheduling_duration_*", result =~ ".*"}'
             -
               type: JAVASCRIPT
               parameters:
@@ -786,7 +787,7 @@ zabbix_export:
                       result = [];
                   
                   JSON.parse(value).forEach(function (item) {
-                      if (item.name == "scheduler_e2e_scheduling_duration_seconds_count"){
+                      if (item.name === "scheduler_e2e_scheduling_duration_seconds_count"){
                           var label_result = item.labels.result;
                   
                           if (lookup[label_result]) {
@@ -798,14 +799,14 @@ zabbix_export:
                               '{#RESULT}': label_result
                           });
                   
-                          };
-                      if  (item.name == "scheduler_e2e_scheduling_duration_seconds_bucket"){
+                        }
+                      else if  (item.name === "scheduler_e2e_scheduling_duration_seconds_bucket"){
                           result.push({
                               '{#TYPE}': 'buckets',
                               '{#RESULT}': item.labels.result,
                               '{#LE}': item.labels.le
                           });
-                      };
+                      }
                   });
                   
                   return JSON.stringify(result);
@@ -891,11 +892,11 @@ zabbix_export:
               type: JAVASCRIPT
               parameters:
                 - |
-                  output = JSON.parse(value).map(function(item){
-                       return {
-                           "{#LE}": item.labels.le,
-                       }})
-                  return JSON.stringify({"data": output})
+                  var output = JSON.parse(value).map(function(item) {
+                      return {'{#LE}': item.labels.le};
+                  });
+                  
+                  return JSON.stringify({'data': output});
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -945,11 +946,11 @@ zabbix_export:
               type: JAVASCRIPT
               parameters:
                 - |
-                  output = JSON.parse(value).map(function(item){
-                       return {
-                           "{#LE}": item.labels.le,
-                       }})
-                  return JSON.stringify({"data": output})
+                  var output = JSON.parse(value).map(function(item) {
+                      return {'{#LE}': item.labels.le};
+                  });
+                  
+                  return JSON.stringify({'data': output});
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -958,7 +959,7 @@ zabbix_export:
         -
           macro: '{$KUBE.SCHEDULER.ERROR}'
           value: '2'
-          description: 'Maximum number of sheduling failures with ''error'' used for trigger'
+          description: 'Maximum number of scheduling failures with ''error'' used for trigger'
         -
           macro: '{$KUBE.SCHEDULER.HTTP.CLIENT.ERROR}'
           value: '2'
@@ -973,7 +974,7 @@ zabbix_export:
         -
           macro: '{$KUBE.SCHEDULER.UNSCHEDULABLE}'
           value: '2'
-          description: 'Maximum number of sheduling failures with ''unschedulable'' used for trigger'
+          description: 'Maximum number of scheduling failures with ''unschedulable'' used for trigger'
   graphs:
     -
       uuid: da572b0ad9a74a2392ad20f9bb2d475b

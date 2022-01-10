@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-30T16:46:07Z'
+  date: '2022-01-10T15:04:15Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -204,6 +204,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
+          description: 'Get raw metrics from Controller instance /metrics endpoint'
           preprocessing:
             -
               type: CHECK_NOT_SUPPORTED
@@ -886,7 +887,7 @@ zabbix_export:
             -
               type: PROMETHEUS_TO_JSON
               parameters:
-                - '{__name__=~ "workqueue_*"}'
+                - '{__name__=~ "workqueue_*", name =~ ".*"}'
             -
               type: JAVASCRIPT
               parameters:
@@ -895,7 +896,7 @@ zabbix_export:
                       result = [];
                   
                   JSON.parse(value).forEach(function (item) {
-                      if (item.name == "workqueue_adds_total"){
+                      if (item.name === "workqueue_adds_total"){
                           var label_name = item.labels.name;
                   
                           if (lookup[label_name]) {
@@ -907,14 +908,14 @@ zabbix_export:
                               '{#NAME}': label_name
                           });
                   
-                          };
-                      if  (item.name == "workqueue_work_duration_seconds_bucket"){
+                        }
+                      else if  (item.name === "workqueue_work_duration_seconds_bucket"){
                           result.push({
                               '{#TYPE}': 'buckets',
                               '{#NAME}': item.labels.name,
                               '{#LE}': item.labels.le
                           });
-                      };
+                      }
                   });
                   
                   return JSON.stringify(result);

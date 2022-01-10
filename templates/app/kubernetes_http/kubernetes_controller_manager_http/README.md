@@ -47,7 +47,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Workqueue metrics discovery |<p>Discovery raw data and percentile items of workqueues.</p> |DEPENDENT |kubernetes.controller.workqueue.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~ "workqueue_*"}`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Overrides:**</p><p>bucket item<br> - {#TYPE} MATCHES_REGEX `buckets`<br>  - ITEM_PROTOTYPE LIKE `bucket` - DISCOVER</p><p>total item<br> - {#TYPE} MATCHES_REGEX `totals`<br>  - ITEM_PROTOTYPE NOT_LIKE `bucket` - DISCOVER</p> |
+|Workqueue metrics discovery |<p>Discovery raw data and percentile items of workqueues.</p> |DEPENDENT |kubernetes.controller.workqueue.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~ "workqueue_*", name =~ ".*"}`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Overrides:**</p><p>bucket item<br> - {#TYPE} MATCHES_REGEX `buckets`<br>  - ITEM_PROTOTYPE LIKE `bucket` - DISCOVER</p><p>total item<br> - {#TYPE} MATCHES_REGEX `totals`<br>  - ITEM_PROTOTYPE NOT_LIKE `bucket` - DISCOVER</p> |
 
 ## Items collected
 
@@ -80,7 +80,7 @@ There are no template links in this template.
 |Kubernetes Controller Manager |Kubernetes Controller Manager: ["{#NAME}"]: Workqueue queue duration, 50p |<p>50 percentile of how long in seconds an item stays in workqueue before being requested. If there are no requests for 5 minute, item value will be discarded.</p> |CALCULATED |kubernetes.controller.workqueue_queue_duration_seconds_p50["{#NAME}"]<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED<p>**Expression**:</p>`bucket_percentile(//kubernetes.controller.queue_duration_seconds_bucket[*,"{#NAME}"],5m,50)` |
 |Kubernetes Controller Manager |Kubernetes Controller Manager: ["{#NAME}"]: Workqueue duration seconds bucket, {#LE} |<p>How long in seconds processing an item from workqueue takes</p> |DEPENDENT |kubernetes.controller.duration_seconds_bucket[{#LE},"{#NAME}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN |
 |Kubernetes Controller Manager |Kubernetes Controller Manager: ["{#NAME}"]: Queue duration seconds bucket, {#LE} |<p>How long in seconds an item stays in workqueue before being requested.</p> |DEPENDENT |kubernetes.controller.queue_duration_seconds_bucket[{#LE},"{#NAME}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN |
-|Zabbix_raw_items |Kubernetes Controller: Get Controller metrics |<p>-</p> |HTTP_AGENT |kubernetes.controller.get_metrics<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED |
+|Zabbix_raw_items |Kubernetes Controller: Get Controller metrics |<p>Get raw metrics from Controller instance /metrics endpoint</p> |HTTP_AGENT |kubernetes.controller.get_metrics<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED |
 
 ## Triggers
 

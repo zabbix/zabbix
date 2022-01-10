@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-30T17:40:15Z'
+  date: '2022-01-10T15:03:58Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -353,6 +353,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
+          description: 'Get raw metrics from API instance /metrics endpoint'
           preprocessing:
             -
               type: CHECK_NOT_SUPPORTED
@@ -802,7 +803,7 @@ zabbix_export:
             -
               type: PROMETHEUS_TO_JSON
               parameters:
-                - apiserver_registered_watchers
+                - 'apiserver_registered_watchers{kind =~ ".*"}'
             -
               type: JAVASCRIPT
               parameters:
@@ -814,9 +815,9 @@ zabbix_export:
                       var kind = item.labels.kind;
                       if (!(lookup[kind])) {
                           lookup[kind] = 1;
-                          result.push({ "{#KIND}": kind });
+                          result.push({ '{#KIND}': kind });
                       }
-                  })
+                  });
                   return JSON.stringify(result);
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -869,7 +870,7 @@ zabbix_export:
             -
               type: PROMETHEUS_TO_JSON
               parameters:
-                - authenticated_user_requests
+                - 'authenticated_user_requests{username =~ ".*"}'
             -
               type: JAVASCRIPT
               parameters:
@@ -881,9 +882,9 @@ zabbix_export:
                       var name = item.labels.username;
                       if (!(lookup[result])) {
                           lookup[name] = 1;
-                          result.push({ "{#NAME}": name });
+                          result.push({ '{#NAME}': name });
                       }
-                  })
+                  });
                   return JSON.stringify(result);
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -936,7 +937,7 @@ zabbix_export:
             -
               type: PROMETHEUS_TO_JSON
               parameters:
-                - authentication_attempts
+                - 'authentication_attempts{result =~ ".*"}'
             -
               type: JAVASCRIPT
               parameters:
@@ -948,9 +949,9 @@ zabbix_export:
                       var result_api = item.labels.result;
                       if (!(lookup[result])) {
                           lookup[result_api] = 1;
-                          result.push({ "{#RESULT}": result_api });
+                          result.push({ '{#RESULT}': result_api });
                       }
-                  })
+                  });
                   return JSON.stringify(result);
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1001,11 +1002,11 @@ zabbix_export:
               type: JAVASCRIPT
               parameters:
                 - |
-                  output = JSON.parse(value).map(function(item){
-                       return {
-                           "{#LE}": item.labels.le,
-                       }})
-                  return JSON.stringify({"data": output})
+                  var output = JSON.parse(value).map(function(item) {
+                      return {'{#LE}': item.labels.le};
+                  });
+                  
+                  return JSON.stringify({'data': output});
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1053,7 +1054,7 @@ zabbix_export:
             -
               type: PROMETHEUS_TO_JSON
               parameters:
-                - etcd_object_counts
+                - 'etcd_object_counts{resource =~ ".*"}'
             -
               type: JAVASCRIPT
               parameters:
@@ -1065,9 +1066,9 @@ zabbix_export:
                       var resource = item.labels.resource;
                       if (!(lookup[resource])) {
                           lookup[resource] = 1;
-                          result.push({ "{#RESOURCE}": resource });
+                          result.push({ '{#RESOURCE}': resource });
                       }
-                  })
+                  });
                   return JSON.stringify(result);
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1120,7 +1121,7 @@ zabbix_export:
             -
               type: PROMETHEUS_TO_JSON
               parameters:
-                - grpc_client_handled_total
+                - 'grpc_client_handled_total{grpc_code =~ ".*"}'
             -
               type: JAVASCRIPT
               parameters:
@@ -1132,9 +1133,9 @@ zabbix_export:
                       var grpc_code = item.labels.grpc_code;
                       if (!(lookup[grpc_code])) {
                           lookup[grpc_code] = 1;
-                          result.push({ "{#GRPC_CODE}": grpc_code });
+                          result.push({ '{#GRPC_CODE}': grpc_code });
                       }
-                  })
+                  });
                   return JSON.stringify(result);
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1183,7 +1184,7 @@ zabbix_export:
             -
               type: PROMETHEUS_TO_JSON
               parameters:
-                - apiserver_current_inflight_requests
+                - 'apiserver_current_inflight_requests{request_kind =~ ".*"}'
             -
               type: JAVASCRIPT
               parameters:
@@ -1195,9 +1196,9 @@ zabbix_export:
                       var request_kind = item.labels.request_kind;
                       if (!(lookup[request_kind])) {
                           lookup[request_kind] = 1;
-                          result.push({ "{#KIND}": request_kind });
+                          result.push({ '{#KIND}': request_kind });
                       }
-                  })
+                  });
                   return JSON.stringify(result);
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1252,7 +1253,7 @@ zabbix_export:
             -
               type: PROMETHEUS_TO_JSON
               parameters:
-                - apiserver_longrunning_gauge
+                - 'apiserver_longrunning_gauge{resource =~ ".*", scope =~ ".*", verb =~ ".*"}'
               error_handler: DISCARD_VALUE
             -
               type: JAVASCRIPT
@@ -1271,7 +1272,7 @@ zabbix_export:
                               '{#VERB}': item.labels.verb
                           });
                       }
-                  })
+                  });
                   return JSON.stringify(result);
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1432,19 +1433,18 @@ zabbix_export:
             -
               type: PROMETHEUS_TO_JSON
               parameters:
-                - '{__name__=~ "apiserver_request_duration_*"}'
+                - '{__name__=~ "apiserver_request_duration_*", verb =~ ".*"}'
             -
               type: JAVASCRIPT
               parameters:
                 - |
                   var lookup = {},
-                      lookup_histo = {},
+                      lookup_histogram = {},
                       result = [];
                   
                   JSON.parse(value).forEach(function (item) {
-                      if (item.name == "apiserver_request_duration_seconds_count"){
+                      if (item.name === "apiserver_request_duration_seconds_count"){
                           var label_verb = item.labels.verb;
-                  
                           if (lookup[label_verb]) {
                               return;
                           }
@@ -1454,20 +1454,20 @@ zabbix_export:
                               '{#VERB}': label_verb
                           });
                   
-                          };
-                      if  (item.name == "apiserver_request_duration_seconds_bucket"){
+                        }
+                      else if  (item.name === "apiserver_request_duration_seconds_bucket"){
                        var labels = item.labels.verb + item.labels.le;
                   
-                          if (lookup_histo[labels]) {
+                          if (lookup_histogram[labels]) {
                               return;
                           }
-                          lookup_histo[labels] = 1;
+                          lookup_histogram[labels] = 1;
                           result.push({
                               '{#TYPE}': 'buckets',
                               '{#VERB}': item.labels.verb,
                               '{#LE}': item.labels.le
                           });
-                      };
+                      }
                   });
                   
                   return JSON.stringify(result);
@@ -1584,7 +1584,7 @@ zabbix_export:
             -
               type: PROMETHEUS_TO_JSON
               parameters:
-                - workqueue_adds_total
+                - 'workqueue_adds_total{name =~ ".*"}'
             -
               type: JAVASCRIPT
               parameters:
@@ -1596,9 +1596,9 @@ zabbix_export:
                       var name = item.labels.name;
                       if (!(lookup[name])) {
                           lookup[name] = 1;
-                          result.push({ "{#NAME}": name });
+                          result.push({ '{#NAME}': name });
                       }
-                  })
+                  });
                   return JSON.stringify(result);
             -
               type: DISCARD_UNCHANGED_HEARTBEAT

@@ -35,11 +35,11 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$KUBE.SCHEDULER.ERROR} |<p>Maximum number of sheduling failures with 'error' used for trigger</p> |`2` |
+|{$KUBE.SCHEDULER.ERROR} |<p>Maximum number of scheduling failures with 'error' used for trigger</p> |`2` |
 |{$KUBE.SCHEDULER.HTTP.CLIENT.ERROR} |<p>Maximum number of HTTP client requests failures used for trigger</p> |`2` |
 |{$KUBE.SCHEDULER.SERVER.URL} |<p>Instance URL</p> |`http://localhost:10251/metrics` |
 |{$KUBE.SCHEDULER.TOKEN} |<p>Scheduler Authorization Token</p> |`` |
-|{$KUBE.SCHEDULER.UNSCHEDULABLE} |<p>Maximum number of sheduling failures with 'unschedulable' used for trigger</p> |`2` |
+|{$KUBE.SCHEDULER.UNSCHEDULABLE} |<p>Maximum number of scheduling failures with 'unschedulable' used for trigger</p> |`2` |
 
 ## Template links
 
@@ -51,7 +51,7 @@ There are no template links in this template.
 |----|-----------|----|----|
 |Scheduling algorithm histogram |<p>Discovery raw data of scheduling algorithm latency.</p> |DEPENDENT |kubernetes.scheduler.scheduling_algorithm.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `scheduler_scheduling_algorithm_duration_seconds_bucket`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Binding histogram |<p>Discovery raw data of binding latency.</p> |DEPENDENT |kubernetes.scheduler.binding.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `scheduler_binding_duration_seconds_bucket`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|e2e scheduling histogram |<p>Discovery raw data and percentile items of e2e scheduling latency.</p> |DEPENDENT |kubernetes.controller.e2e_scheduling.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~ "scheduler_e2e_scheduling_duration_*"}`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Overrides:**</p><p>bucket item<br> - {#TYPE} MATCHES_REGEX `buckets`<br>  - ITEM_PROTOTYPE LIKE `bucket` - DISCOVER</p><p>total item<br> - {#TYPE} MATCHES_REGEX `totals`<br>  - ITEM_PROTOTYPE NOT_LIKE `bucket` - DISCOVER</p> |
+|e2e scheduling histogram |<p>Discovery raw data and percentile items of e2e scheduling latency.</p> |DEPENDENT |kubernetes.controller.e2e_scheduling.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~ "scheduler_e2e_scheduling_duration_*", result =~ ".*"}`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Overrides:**</p><p>bucket item<br> - {#TYPE} MATCHES_REGEX `buckets`<br>  - ITEM_PROTOTYPE LIKE `bucket` - DISCOVER</p><p>total item<br> - {#TYPE} MATCHES_REGEX `totals`<br>  - ITEM_PROTOTYPE NOT_LIKE `bucket` - DISCOVER</p> |
 
 ## Items collected
 
@@ -86,15 +86,15 @@ There are no template links in this template.
 |Kubernetes Scheduler |Kubernetes Scheduler: ["{#RESULT}"]: e2e scheduling, p90 |<p>90 percentile of e2e scheduling latency.</p> |CALCULATED |kubernetes.scheduler.e2e_scheduling_p90["{#RESULT}"]<p>**Expression**:</p>`bucket_percentile(//kubernetes.scheduler.e2e_scheduling_bucket[*,"{#RESULT}"],5m,90)` |
 |Kubernetes Scheduler |Kubernetes Scheduler: ["{#RESULT}"]: e2e scheduling, p90 |<p>95 percentile of e2e scheduling latency.</p> |CALCULATED |kubernetes.scheduler.e2e_scheduling_p95["{#RESULT}"]<p>**Expression**:</p>`bucket_percentile(//kubernetes.scheduler.e2e_scheduling_bucket[*,"{#RESULT}"],5m,95)` |
 |Kubernetes Scheduler |Kubernetes Scheduler: ["{#RESULT}"]: e2e scheduling, p99 |<p>95 percentile of e2e scheduling latency.</p> |CALCULATED |kubernetes.scheduler.e2e_scheduling_p99["{#RESULT}"]<p>**Expression**:</p>`bucket_percentile(//kubernetes.scheduler.e2e_scheduling_bucket[*,"{#RESULT}"],5m,99)` |
-|Zabbix_raw_items |Kubernetes Scheduler: Get Scheduler metrics |<p>-</p> |HTTP_AGENT |kubernetes.scheduler.get_metrics<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED |
+|Zabbix_raw_items |Kubernetes Scheduler: Get Scheduler metrics |<p>Get raw metrics from Scheduler instance /metrics endpoint</p> |HTTP_AGENT |kubernetes.scheduler.get_metrics<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED |
 
 ## Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |Kubernetes Scheduler: Too many REST Client errors (over {$KUBE.SCHEDULER.HTTP.CLIENT.ERROR} for 5m) |<p>"Kubernetes Scheduler REST Client requests is experiencing high error rate (with 5xx HTTP code).</p> |`min(/Kubernetes Scheduler by HTTP/kubernetes.scheduler.client_http_requests_500.rate,5m)>{$KUBE.SCHEDULER.HTTP.CLIENT.ERROR}` |WARNING | |
-|Kubernetes Scheduler: Too many unschedulable pods (over {$KUBE.SCHEDULER.UNSCHEDULABLE} for 5m) |<p>"Number of attempts to schedule pods with 'unschedulable' result is too hight. 'unschedulable' means a pod could not be scheduled."</p> |`min(/Kubernetes Scheduler by HTTP/kubernetes.scheduler.scheduler_schedule_attempts.unschedulable.rate,5m)>{$KUBE.SCHEDULER.UNSCHEDULABLE}` |WARNING | |
-|Kubernetes Scheduler: Too many schedule attempts with errors (over {$KUBE.SCHEDULER.ERROR} for 5m) |<p>"Number of attempts to schedule pods with 'error' result is too hight. 'error' means an internal scheduler problem."</p> |`min(/Kubernetes Scheduler by HTTP/kubernetes.scheduler.scheduler_schedule_attempts.error.rate,5m)>{$KUBE.SCHEDULER.ERROR}` |WARNING | |
+|Kubernetes Scheduler: Too many unschedulable pods (over {$KUBE.SCHEDULER.UNSCHEDULABLE} for 5m) |<p>"Number of attempts to schedule pods with 'unschedulable' result is too high. 'unschedulable' means a pod could not be scheduled."</p> |`min(/Kubernetes Scheduler by HTTP/kubernetes.scheduler.scheduler_schedule_attempts.unschedulable.rate,5m)>{$KUBE.SCHEDULER.UNSCHEDULABLE}` |WARNING | |
+|Kubernetes Scheduler: Too many schedule attempts with errors (over {$KUBE.SCHEDULER.ERROR} for 5m) |<p>"Number of attempts to schedule pods with 'error' result is too high. 'error' means an internal scheduler problem."</p> |`min(/Kubernetes Scheduler by HTTP/kubernetes.scheduler.scheduler_schedule_attempts.error.rate,5m)>{$KUBE.SCHEDULER.ERROR}` |WARNING | |
 
 ## Feedback
 
