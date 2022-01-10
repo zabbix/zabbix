@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-12-24T06:34:03Z</date>
+   <date>2022-01-10T14:11:37Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -538,7 +538,7 @@ return JSON.stringify(data)
                            <expression>{min(5m)}&gt;0</expression>
                            <name>Data region {#JMXNAME}: Node started to evict pages</name>
                            <priority>INFO</priority>
-                           <description>You store more data then region can accommodate. Data started to move to disk it can make requests work slower. Ack to close.</description>
+                           <description>You store more data than region can accommodate. Data started to move to disk it can make requests work slower. Ack to close.</description>
                            <manual_close>YES</manual_close>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -692,18 +692,18 @@ return JSON.stringify(data)
                   </trigger_prototype>
                   <trigger_prototype>
                      <expression>{Template DB GridGain by JMX:jmx["{#JMXOBJ}",OffheapUsedSize].min(5m)}/{Template DB GridGain by JMX:jmx["{#JMXOBJ}",OffHeapSize].last()}*100&gt;{$GRIDGAIN.DATA.REGION.PUSED.MAX.HIGH}</expression>
-                     <name>Data region {#JMXNAME}: Data region utilisation is too high (over {$GRIDGAIN.DATA.REGION.PUSED.MAX.HIGH} in 5m)</name>
+                     <name>Data region {#JMXNAME}: Data region utilization is too high (over {$GRIDGAIN.DATA.REGION.PUSED.MAX.HIGH} in 5m)</name>
                      <priority>HIGH</priority>
                      <description>Data region utilization is high. Increase data region size or delete any data.</description>
                   </trigger_prototype>
                   <trigger_prototype>
                      <expression>{Template DB GridGain by JMX:jmx["{#JMXOBJ}",OffheapUsedSize].min(5m)}/{Template DB GridGain by JMX:jmx["{#JMXOBJ}",OffHeapSize].last()}*100&gt;{$GRIDGAIN.DATA.REGION.PUSED.MAX.WARN}</expression>
-                     <name>Data region {#JMXNAME}: Data region utilisation is too high (over {$GRIDGAIN.DATA.REGION.PUSED.MAX.WARN} in 5m)</name>
+                     <name>Data region {#JMXNAME}: Data region utilization is too high (over {$GRIDGAIN.DATA.REGION.PUSED.MAX.WARN} in 5m)</name>
                      <priority>WARNING</priority>
                      <description>Data region utilization is high. Increase data region size or delete any data.</description>
                      <dependencies>
                         <dependency>
-                           <name>Data region {#JMXNAME}: Data region utilisation is too high (over {$GRIDGAIN.DATA.REGION.PUSED.MAX.HIGH} in 5m)</name>
+                           <name>Data region {#JMXNAME}: Data region utilization is too high (over {$GRIDGAIN.DATA.REGION.PUSED.MAX.HIGH} in 5m)</name>
                            <expression>{Template DB GridGain by JMX:jmx["{#JMXOBJ}",OffheapUsedSize].min(5m)}/{Template DB GridGain by JMX:jmx["{#JMXOBJ}",OffHeapSize].last()}*100&gt;{$GRIDGAIN.DATA.REGION.PUSED.MAX.HIGH}</expression>
                         </dependency>
                      </dependencies>
@@ -732,7 +732,7 @@ return JSON.stringify(data)
                      </graph_items>
                   </graph_prototype>
                   <graph_prototype>
-                     <name>Data region {#JMXNAME}: DataRegion utilisation</name>
+                     <name>Data region {#JMXNAME}: DataRegion utilization</name>
                      <graph_items>
                         <graph_item>
                            <drawtype>BOLD_LINE</drawtype>
@@ -1370,7 +1370,7 @@ return JSON.stringify(data)
                </preprocessing>
             </discovery_rule>
             <discovery_rule>
-               <name>TCP Ccmmunication SPI metrics</name>
+               <name>TCP Communication SPI metrics</name>
                <type>JMX</type>
                <key>jmx.discovery[beans,"org.apache:group=SPIs,name=TcpCommunicationSpi,*"]</key>
                <delay>30m</delay>

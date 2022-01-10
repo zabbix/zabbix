@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-12-23T14:40:03Z</date>
+   <date>2022-01-10T14:11:36Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -2513,8 +2513,8 @@ The rate of double tagged packets transmitted out of the specified interface.</d
 The pause state of the specified interface.&#13;
 none - no pause;&#13;
 txrx - pause all data flow;&#13;
-tx - pause out going data flow;&#13;
-rx - pause in coming data flow.</description>
+tx - pause outgoing data flow;&#13;
+rx - pause incoming data flow.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Interface [{#IF.NAME}]</name>

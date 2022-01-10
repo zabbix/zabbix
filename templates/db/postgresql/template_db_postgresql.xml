@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-12-24T06:24:34Z</date>
+   <date>2022-01-10T14:11:40Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -1410,7 +1410,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()}&lt;{$PG.FROZENXID_PCT_STOP.MIN.HIGH:"{#DBNAME}"}</expression>
-                           <name>DB {#DBNAME}: VACUUM FREEZE is required to prevent wraparound (frozen XID less then {$PG.FROZENXID_PCT_STOP.MIN.HIGH:"{#DBNAME}"} %)</name>
+                           <name>DB {#DBNAME}: VACUUM FREEZE is required to prevent wraparound (frozen XID less than {$PG.FROZENXID_PCT_STOP.MIN.HIGH:"{#DBNAME}"} %)</name>
                            <priority>AVERAGE</priority>
                            <description>Preventing Transaction ID Wraparound Failures&#13;
 https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAROUND</description>

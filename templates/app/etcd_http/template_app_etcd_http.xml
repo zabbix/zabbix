@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-12-21T18:00:04Z</date>
+   <date>2022-01-10T14:11:35Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -498,7 +498,7 @@ return valueArr.reduce(function(acc,obj){
                      <expression>{min(5m)}&gt;{$ETCD.HTTP.FAIL.MAX.WARN}</expression>
                      <name>Etcd: Too many HTTP requests failures (over {$ETCD.HTTP.FAIL.MAX.WARN} for 5m)'</name>
                      <priority>WARNING</priority>
-                     <description>"Too many reqvests failed on etcd instance with 5xx HTTP code"</description>
+                     <description>"Too many requests failed on etcd instance with 5xx HTTP code"</description>
                   </trigger>
                </triggers>
             </item>

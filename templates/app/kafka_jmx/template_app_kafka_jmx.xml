@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-12-21T18:00:06Z</date>
+   <date>2022-01-10T14:11:38Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -736,7 +736,7 @@ Template tooling version used: 0.39</description>
                <value_type>CHAR</value_type>
                <username>{$KAFKA.USER}</username>
                <password>{$KAFKA.PASSWORD}</password>
-               <description>Current version of brocker.</description>
+               <description>Current version of broker.</description>
                <applications>
                   <application>
                      <name>Kafka</name>
@@ -1506,7 +1506,7 @@ Template tooling version used: 0.39</description>
          </graph_items>
       </graph>
       <graph>
-         <name>Kafka: Leader electoin rate</name>
+         <name>Kafka: Leader election rate</name>
          <graph_items>
             <graph_item>
                <color>1A7C11</color>

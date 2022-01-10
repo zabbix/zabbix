@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-12-21T18:00:08Z</date>
+   <date>2022-01-10T14:11:41Z</date>
    <groups>
       <group>
          <name>Templates/Modules</name>
@@ -1158,7 +1158,7 @@ Template tooling version used: 0.39</description>
          </graph_items>
       </graph>
       <graph>
-         <name>Squid: Domain name (FQDN) cache ctatistics</name>
+         <name>Squid: Domain name (FQDN) cache statistics</name>
          <graph_items>
             <graph_item>
                <color>1A7C11</color>

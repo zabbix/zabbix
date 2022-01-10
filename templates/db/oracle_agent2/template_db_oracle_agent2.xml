@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-12-24T06:44:15Z</date>
+   <date>2022-01-10T14:11:39Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -1153,7 +1153,7 @@
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
-               <description>The percentage of concurrency. Concurrency is a DB behaviour when different transactions request to change the same resource - in case of modifying data transactions sequentially block temporarily the right to change data, the rest of the transactions are waiting for access. In the case when access for resource is locked for a long time, then the concurrency grows (like the transaction queue) and this often has an extremely negative impact on performance. A high contention value does not indicate the root cause of the problem, but is a signal to search for it.</description>
+               <description>The percentage of concurrency. Concurrency is a DB behavior when different transactions request to change the same resource - in case of modifying data transactions sequentially block temporarily the right to change data, the rest of the transactions are waiting for access. In the case when access for resource is locked for a long time, then the concurrency grows (like the transaction queue) and this often has an extremely negative impact on performance. A high contention value does not indicate the root cause of the problem, but is a signal to search for it.</description>
                <applications>
                   <application>
                      <name>Oracle</name>

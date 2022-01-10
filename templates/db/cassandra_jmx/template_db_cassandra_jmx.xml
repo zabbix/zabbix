@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-12-24T06:24:27Z</date>
+   <date>2022-01-10T14:11:34Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -957,7 +957,7 @@ MigrationStage:	Runs schema migrations.</description>
                <username>{$CASSANDRA.USER}</username>
                <password>{$CASSANDRA.PASSWORD}</password>
                <description>Number of tasks that are currently blocked due to queue saturation but on retry will become unblocked.&#13;
-MiscStage:	Misceleneous tasks run here.</description>
+MiscStage:	Miscellaneous tasks run here.</description>
                <applications>
                   <application>
                      <name>Cassandra</name>
@@ -973,7 +973,7 @@ MiscStage:	Misceleneous tasks run here.</description>
                <username>{$CASSANDRA.USER}</username>
                <password>{$CASSANDRA.PASSWORD}</password>
                <description>Number of queued tasks queued up on this pool.&#13;
-MiscStage:	Misceleneous tasks run here.</description>
+MiscStage:	Miscellaneous tasks run here.</description>
                <applications>
                   <application>
                      <name>Cassandra</name>
@@ -989,7 +989,7 @@ MiscStage:	Misceleneous tasks run here.</description>
                <username>{$CASSANDRA.USER}</username>
                <password>{$CASSANDRA.PASSWORD}</password>
                <description>Number of tasks that were blocked due to queue saturation.&#13;
-MiscStage:	Misceleneous tasks run here.</description>
+MiscStage:	Miscellaneous tasks run here.</description>
                <applications>
                   <application>
                      <name>Cassandra</name>

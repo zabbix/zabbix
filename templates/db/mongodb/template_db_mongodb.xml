@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-12-24T06:24:30Z</date>
+   <date>2022-01-10T14:11:38Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -2862,7 +2862,7 @@ Note, depending on the number of DBs this discovery operation may be expensive. 
                      <delay>0</delay>
                      <history>7d</history>
                      <discover>NO_DISCOVER</discover>
-                     <description>The number of replucated nodes in current ReplicaSet.</description>
+                     <description>The number of replicated nodes in current ReplicaSet.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>MongoDB Replica Set: {#RS_NAME}</name>
@@ -3329,7 +3329,7 @@ return JSON.stringify(status.set
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{max(5m)}&lt;{$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}</expression>
-                           <name>MongoDB: Available WiredTiger read tickets less then {$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}</name>
+                           <name>MongoDB: Available WiredTiger read tickets less than {$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}</name>
                            <priority>WARNING</priority>
                            <description>"Too few available read tickets.&#13;
 When the number of available read tickets remaining reaches zero, new read requests will be queued until a new read ticket is available."</description>
@@ -3404,7 +3404,7 @@ When the number of available read tickets remaining reaches zero, new read reque
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{max(5m)}&lt;{$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}</expression>
-                           <name>MongoDB: Available WiredTiger write tickets less then {$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}</name>
+                           <name>MongoDB: Available WiredTiger write tickets less than {$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}</name>
                            <priority>WARNING</priority>
                            <description>"Too few available write tickets.&#13;
 When the number of available write tickets remaining reaches zero, new write requests will be queued until a new write ticket is available."</description>
