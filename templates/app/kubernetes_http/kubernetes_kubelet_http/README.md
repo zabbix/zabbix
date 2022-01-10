@@ -47,6 +47,8 @@ There are no template links in this template.
 |----|-----------|----|----|
 |Runtime operations discovery | |DEPENDENT |kube.kubelet.runtime_operations_bucket.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~ "kubelet_runtime_operations_*"}`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Overrides:**</p><p>bucket item<br> - {#TYPE} MATCHES_REGEX `buckets`<br>  - ITEM_PROTOTYPE LIKE `bucket` - DISCOVER</p><p>total item<br> - {#TYPE} MATCHES_REGEX `totals`<br>  - ITEM_PROTOTYPE NOT_LIKE `bucket` - DISCOVER</p> |
 |Pods discovery | |DEPENDENT |kube.kubelet.pods.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
+|REST client requests discovery | |DEPENDENT |kube.kubelet.rest.requests.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
+|Container memory discovery | |DEPENDENT |kube.kubelet.container.memory.cache.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 
 ## Items collected
 
@@ -73,6 +75,13 @@ There are no template links in this template.
 |Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: Load average, 10s |<p>Pods cpu load average over the last 10 seconds.</p> |DEPENDENT |kube.pod.container_cpu_load_average_10s[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN |
 |Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: System seconds, total |<p>The number of cores used for system time.</p> |DEPENDENT |kube.pod.container_cpu_system_seconds_total[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN |
 |Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: User seconds, total |<p>The number of cores used for user time.</p> |DEPENDENT |kube.pod.container_cpu_user_seconds_total[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN |
+|Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: Load average, 10s |<p>Number of HTTP requests, partitioned by status code, method, and host.</p> |DEPENDENT |kube.kubelet.rest.requests["{#CODE}", "{#HOST}", "{#METHOD}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN<p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Memory page cache |<p>Number of bytes of page cache memory.</p> |DEPENDENT |kube.kubelet.container.memory.cache["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN<p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Memory max usage |<p>Maximum memory usage recorded in bytes.</p> |DEPENDENT |kube.kubelet.container.memory.max_usage["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN<p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: RSS |<p>Size of RSS in bytes.</p> |DEPENDENT |kube.kubelet.container.memory.rss["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN<p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Swap |<p>Container swap usage in bytes.</p> |DEPENDENT |kube.kubelet.container.memory.swap["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN<p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Usage |<p>Current memory usage in bytes, including all memory regardless of when it was accessed.</p> |DEPENDENT |kube.kubelet.container.memory.usage["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN<p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Working set |<p>Current working set in bytes.</p> |DEPENDENT |kube.kubelet.container.memory.working_set["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN<p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 
 ## Triggers
 

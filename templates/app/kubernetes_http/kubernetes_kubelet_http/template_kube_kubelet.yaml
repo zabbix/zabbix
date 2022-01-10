@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-07T04:33:30Z'
+  date: '2022-01-10T07:46:50Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -32,9 +32,8 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: Description
           timeout: 10s
-          url: '{$KUBE.KUBELET.URL}/kubelet/kubelet_cadvisor_metrics.json'
+          url: '{$KUBE.KUBELET.URL}/metrics/cadvisor'
           status_codes: '200, 403'
           headers:
             -
@@ -141,9 +140,8 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: Description
           timeout: 10s
-          url: '{$KUBE.KUBELET.URL}/kubelet/kubelet_metrics.json'
+          url: '{$KUBE.KUBELET.URL}/metrics'
           status_codes: '200, 403'
           headers:
             -
@@ -272,9 +270,8 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: Description
           timeout: 10s
-          url: '{$KUBE.KUBELET.URL}/kubelet/kubelet_pods.json'
+          url: '{$KUBE.KUBELET.URL}/pods'
           status_codes: '200, 403'
           headers:
             -
@@ -288,6 +285,255 @@ zabbix_export:
               tag: resource
               value: state
       discovery_rules:
+        -
+          uuid: 5f70768ebe62429a96e17576dd767382
+          name: 'Container memory discovery'
+          type: DEPENDENT
+          key: kube.kubelet.container.memory.cache.discovery
+          delay: '0'
+          item_prototypes:
+            -
+              uuid: 8f8b1df2a801475a92604544b2019b2e
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Memory page cache'
+              type: DEPENDENT
+              key: 'kube.kubelet.container.memory.cache["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'Number of bytes of page cache memory.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'container_memory_cache{container="{#CONTAINER}", namespace="{#NAMESPACE}", pod="{#POD}"}'
+                    - value
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: kube.cadvisor.metrics
+              tags:
+                -
+                  tag: container
+                  value: '{#CONTAINER}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: pod
+                  value: '{#POD}'
+                -
+                  tag: resource
+                  value: memory
+            -
+              uuid: 6dcf948e79b94f3f96677a7948d2dfd4
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Memory max usage'
+              type: DEPENDENT
+              key: 'kube.kubelet.container.memory.max_usage["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'Maximum memory usage recorded in bytes.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'container_memory_max_usage_bytes{container="{#CONTAINER}", namespace="{#NAMESPACE}", pod="{#POD}"}'
+                    - value
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: kube.cadvisor.metrics
+              tags:
+                -
+                  tag: container
+                  value: '{#CONTAINER}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: pod
+                  value: '{#POD}'
+                -
+                  tag: resource
+                  value: memory
+            -
+              uuid: 47d35c31a52643c1b587efcec57f9dff
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: RSS'
+              type: DEPENDENT
+              key: 'kube.kubelet.container.memory.rss["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'Size of RSS in bytes.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'container_memory_rss{container="{#CONTAINER}", namespace="{#NAMESPACE}", pod="{#POD}"}'
+                    - value
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: kube.cadvisor.metrics
+              tags:
+                -
+                  tag: container
+                  value: '{#CONTAINER}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: pod
+                  value: '{#POD}'
+                -
+                  tag: resource
+                  value: memory
+            -
+              uuid: 2cf31296f67947ec85f576773352a25b
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Swap'
+              type: DEPENDENT
+              key: 'kube.kubelet.container.memory.swap["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'Container swap usage in bytes.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'container_memory_swap{container="{#CONTAINER}", namespace="{#NAMESPACE}", pod="{#POD}"}'
+                    - value
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: kube.cadvisor.metrics
+              tags:
+                -
+                  tag: container
+                  value: '{#CONTAINER}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: pod
+                  value: '{#POD}'
+                -
+                  tag: resource
+                  value: memory
+            -
+              uuid: 146d17ecec7149efb20878d7e0466eeb
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Usage'
+              type: DEPENDENT
+              key: 'kube.kubelet.container.memory.usage["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'Current memory usage in bytes, including all memory regardless of when it was accessed.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'container_memory_usage_bytes{container="{#CONTAINER}", namespace="{#NAMESPACE}", pod="{#POD}"}'
+                    - value
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: kube.cadvisor.metrics
+              tags:
+                -
+                  tag: container
+                  value: '{#CONTAINER}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: pod
+                  value: '{#POD}'
+                -
+                  tag: resource
+                  value: memory
+            -
+              uuid: d3a24d207c6d4201a5e7235f246e0c59
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Working set'
+              type: DEPENDENT
+              key: 'kube.kubelet.container.memory.working_set["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'Current working set in bytes.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'container_memory_working_set_bytes{container="{#CONTAINER}", namespace="{#NAMESPACE}", pod="{#POD}"}'
+                    - value
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: kube.cadvisor.metrics
+              tags:
+                -
+                  tag: container
+                  value: '{#CONTAINER}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: pod
+                  value: '{#POD}'
+                -
+                  tag: resource
+                  value: memory
+          master_item:
+            key: kube.cadvisor.metrics
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - container_memory_cache
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var lookup = {},
+                      result = [];
+                  
+                  JSON.parse(value).forEach(function (item) {
+                      var container_labels = item.labels.container + item.labels.namespace + item.labels.pod;
+                      if (!(item.labels.container === "" || item.labels.container === "POD") && !(lookup[container_labels])) {
+                          lookup[container_labels] = 1;
+                          result.push({
+                              '{#CONTAINER}': item.labels.container,
+                              '{#NAMESPACE}': item.labels.namespace,
+                              '{#POD}': item.labels.pod
+                          });
+                      }
+                  })
+                  return JSON.stringify(result);
         -
           uuid: b98223fcf0ee4a558035ed23de0d2616
           name: 'Pods discovery'
@@ -393,6 +639,74 @@ zabbix_export:
                   });
                   
                   return JSON.stringify(output);
+        -
+          uuid: cb42f71e6bfb4661861e3601e31eeaa6
+          name: 'REST client requests discovery'
+          type: DEPENDENT
+          key: kube.kubelet.rest.requests.discovery
+          delay: '0'
+          item_prototypes:
+            -
+              uuid: c569ce73bfb44098be3ceb8d016e3d24
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: Load average, 10s'
+              type: DEPENDENT
+              key: 'kube.kubelet.rest.requests["{#CODE}", "{#HOST}", "{#METHOD}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Number of HTTP requests, partitioned by status code, method, and host.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'rest_client_requests_total{code="{#CODE}", host="{#HOST}", method="{#METHOD}"}'
+                    - value
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: kube.kubelet.metrics
+              tags:
+                -
+                  tag: code
+                  value: '{#CODE}'
+                -
+                  tag: host
+                  value: '{#HOST}'
+                -
+                  tag: method
+                  value: '{#METHOD}'
+                -
+                  tag: resource
+                  value: requests
+          master_item:
+            key: kube.kubelet.metrics
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - rest_client_requests_total
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var lookup = {},
+                      result = [];
+                  
+                  JSON.parse(value).forEach(function (item) {
+                      var request_labels = item.labels.code + item.labels.host + item.labels.method;
+                      if (!(lookup[request_labels])) {
+                          lookup[request_labels] = 1;
+                          result.push({
+                              '{#CODE}': item.labels.code,
+                              '{#HOST}': item.labels.host,
+                              '{#METHOD}': item.labels.method
+                          });
+                      }
+                  })
+                  return JSON.stringify(result);
         -
           uuid: 6feb0006bb364a8f9295495c92741c16
           name: 'Runtime operations discovery'

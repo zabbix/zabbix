@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-07T04:24:22Z'
+  date: '2022-01-10T07:47:39Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -32,7 +32,6 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: Description
           timeout: 10s
           url: 'https://{$KUBE.API.HOST}:{$KUBE.API.PORT}/api/v1/componentstatuses'
           status_codes: '200, 403'
@@ -227,7 +226,6 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: Description
           preprocessing:
             -
               type: JAVASCRIPT
@@ -319,7 +317,6 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: Description
           preprocessing:
             -
               type: JAVASCRIPT
@@ -652,7 +649,7 @@ zabbix_export:
                             workerNodes.push({
                                 '{#NAME}': nodes.items[idx].metadata.name,
                                 '{#IP}': internalIP,
-                                '{$KUBE.KUBELET.URL}': Kube.params.kubelet_scheme + '://' + internalIP + ':' + Kube.params.kubelet_port,
+                                '{#KUBE.KUBELET.URL}': Kube.params.kubelet_scheme + '://' + internalIP + ':' + Kube.params.kubelet_port,
                                 '{#ROLE.WORKER}' : 'Worker'
                             });
             
@@ -1527,12 +1524,12 @@ zabbix_export:
             evaltype: AND
             conditions:
               -
-                macro: '{#NAMESPACE}'
-                value: '{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}'
+                macro: '{#NAME}'
+                value: '{$KUBE.LLD.FILTER.NODE.MATCHES}'
                 formulaid: A
               -
-                macro: '{#NAMESPACE}'
-                value: '{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}'
+                macro: '{#NAME}'
+                value: '{$KUBE.LLD.FILTER.NODE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           item_prototypes:
@@ -3142,7 +3139,7 @@ zabbix_export:
                 formulaid: B
           host_prototypes:
             -
-              uuid: 25de5335c9c0413d80895f3df2798b5d
+              uuid: c1c4807f378a47dfa59e9bbc8e43f5e2
               host: 'Kubelet {#NAME}'
               name: 'Kubelet {#NAME}'
               group_links:
@@ -3207,6 +3204,22 @@ zabbix_export:
           macro: '{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Filter to exclude discovered pods by namespace'
+        -
+          macro: '{$KUBE.LLD.FILTER.NODE.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable nodes by nodename'
+        -
+          macro: '{$KUBE.LLD.FILTER.NODE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered nodes by nodename'
+        -
+          macro: '{$KUBE.LLD.FILTER.WORKER_NODE.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable worker nodes by nodename'
+        -
+          macro: '{$KUBE.LLD.FILTER.WORKER_NODE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered worker nodes by nodename'
         -
           macro: '{$KUBE.SCHEDULER.PORT}'
           value: '10251'
