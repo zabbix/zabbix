@@ -270,13 +270,6 @@ if ($data['slaid'] !== null) {
 			]).');'
 		],
 		[
-			'title' => _('Add'),
-			'class' => implode(' ', [ZBX_STYLE_DISPLAY_NONE, 'js-add']),
-			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'sla_edit_popup.submit();'
-		],
-		[
 			'title' => _('Delete'),
 			'confirmation' => _('Delete selected SLA?'),
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-delete']),
