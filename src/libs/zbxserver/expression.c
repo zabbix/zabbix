@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -751,10 +751,6 @@ int	DBget_trigger_value(const DB_TRIGGER *trigger, char **replace_to, int N_func
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
  *                                                                            *
- * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static int	DBget_trigger_event_count(zbx_uint64_t triggerid, char **replace_to, int problem_only, int acknowledged)
 {
@@ -802,10 +798,6 @@ static int	DBget_trigger_event_count(zbx_uint64_t triggerid, char **replace_to, 
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	DBget_dhost_value_by_event(const DB_EVENT *event, char **replace_to, const char *fieldname)
@@ -897,14 +889,8 @@ static int	DBget_dchecks_value_by_event(const DB_EVENT *event, char **replace_to
  *                                                                            *
  * Purpose: retrieve discovered service value by event and field name         *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	DBget_dservice_value_by_event(const DB_EVENT *event, char **replace_to, const char *fieldname)
@@ -939,14 +925,8 @@ static int	DBget_dservice_value_by_event(const DB_EVENT *event, char **replace_t
  *                                                                            *
  * Purpose: retrieve discovery rule value by event and field name             *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	DBget_drule_value_by_event(const DB_EVENT *event, char **replace_to, const char *fieldname)
@@ -1066,8 +1046,6 @@ out:
  *                                                                            *
  * Purpose: retrieve item value by item id                                    *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
  *                                                                            *
@@ -1150,8 +1128,6 @@ static int	DBitem_value(const DB_TRIGGER *trigger, char **value, int N_functioni
  *                                                                            *
  * Purpose: retrieve item lastvalue by trigger expression                     *
  *          and number of function                                            *
- *                                                                            *
- * Parameters:                                                                *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
@@ -1330,12 +1306,6 @@ static void	get_escalation_history(zbx_uint64_t actionid, const DB_EVENT *event,
  *                                                                            *
  * Purpose: retrieve event acknowledges history                               *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static void	get_event_update_history(const DB_EVENT *event, char **replace_to, const zbx_uint64_t *recipient_userid,
 		const char *tz)
@@ -1408,14 +1378,8 @@ static void	get_event_update_history(const DB_EVENT *event, char **replace_to, c
  *                                                                            *
  * Purpose: request value from autoreg_host table by event                    *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, const char *fieldname)
@@ -1525,6 +1489,7 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 
 #define MVAR_SERVICE				"{SERVICE."
 #define MVAR_SERVICE_NAME			MVAR_SERVICE "NAME}"
+#define MVAR_SERVICE_DESCRIPTION		MVAR_SERVICE "DESCRIPTION}"
 #define MVAR_SERVICE_ROOTCAUSE			MVAR_SERVICE "ROOTCAUSE}"
 #define MVAR_SERVICE_TAGS			MVAR_SERVICE "TAGS}"
 #define MVAR_SERVICE_TAGSJSON			MVAR_SERVICE "TAGSJSON}"
@@ -2764,8 +2729,6 @@ static int	resolve_host_target_macros(const char *m, const DC_HOST *dc_host, DC_
  * Function: substitute_simple_macros_impl                                    *
  *                                                                            *
  * Purpose: substitute simple macros in data string with real values          *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
 static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_EVENT *event,
@@ -4125,6 +4088,10 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				{
 					replace_to = zbx_strdup(replace_to, service->name);
 				}
+				else if (0 == strcmp(m, MVAR_SERVICE_DESCRIPTION))
+				{
+					replace_to = zbx_strdup(replace_to, service->description);
+				}
 				else if (0 == strcmp(m, MVAR_SERVICE_ROOTCAUSE))
 				{
 					get_rootcause(service, &replace_to);
@@ -4875,8 +4842,6 @@ zbx_trigger_func_position_t;
  * Parameters: event - The trigger event structure                            *
  *             trigger - The trigger where to expand macros in                *
  *                                                                            *
- * Author: Andrea Biscuola                                                    *
- *                                                                            *
  ******************************************************************************/
 static int	expand_trigger_macros(zbx_eval_context_t *ctx, const DB_EVENT *event, char *error, size_t maxerrlen)
 {
@@ -5388,8 +5353,6 @@ static void	zbx_substitute_functions_results(zbx_hashset_t *ifuncs, zbx_vector_p
  *             unknown_msgs - vector for storing messages for NOTSUPPORTED    *
  *                            items and failed functions                      *
  *                                                                            *
- * Author: Alexei Vladishev, Alexander Vladishev, Aleksandrs Saveljevs        *
- *                                                                            *
  * Comments: example: "({15}>10) or ({123}=1)" => "(26.416>10) or (0=1)"      *
  *                                                                            *
  ******************************************************************************/
@@ -5496,8 +5459,6 @@ static int	evaluate_expression(zbx_eval_context_t *ctx, const zbx_timespec_t *ts
  *                                                                            *
  * Parameters: triggers - [IN] vector of DC_TRIGGER pointers, sorted by       *
  *                             triggerids                                     *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
 void	evaluate_expressions(zbx_vector_ptr_t *triggers, const zbx_vector_uint64_t *history_itemids,
@@ -6109,8 +6070,6 @@ static int	substitute_func_macro(char **data, zbx_token_t *token, const struct z
  * Return value: Always SUCCEED if numeric flag is not set, otherwise SUCCEED *
  *               if all discovery macros resolved to numeric values,          *
  *               otherwise FAIL with an error message.                        *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 int	substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths,

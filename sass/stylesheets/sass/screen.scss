@@ -6,8 +6,8 @@ $ui-transitions: true !default;
 $ui-transition-duration: .3s !default;
 
 // Sprite path
-$sprite-path: '../img/icon-sprite.svg?20200407';
-$browser-sprite-path: '../img/browser-sprite.png?20200407';
+$sprite-path: '../img/icon-sprite.svg?20211222';
+$browser-sprite-path: '../img/browser-sprite.png?20211222';
 
 @import "utils/mixins";
 
@@ -41,6 +41,8 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 @import "components/tabfilter";
 @import "components/toc";
 @import "components/z-select";
+
+@import "components/dashboard/widget-slareport";
 
 .link-action {
 	border-bottom: 1px dotted;
@@ -596,6 +598,11 @@ form {
 			span {
 				margin: 0;
 			}
+		}
+
+		.vertical {
+			writing-mode: vertical-lr;
+			transform: rotate(180deg);
 		}
 
 		a {
@@ -1461,12 +1468,6 @@ form {
 		}
 	}
 
-	.form-fields-inline {
-		label {
-			margin: 0 8px 0 3px;
-		}
-	}
-
 	h4 {
 		margin-bottom: -5px;
 	}
@@ -1702,6 +1703,12 @@ select {
 		color: $font-color !important;
 		pointer-events: none;
 		@extend %form-disabled;
+	}
+}
+
+.form-fields-inline {
+	label {
+		margin: 0 8px 0 3px;
 	}
 }
 
@@ -2166,7 +2173,7 @@ $icon-widget-btn: (
 		background-image: none;
 
 		&::after {
-			background: url($sprite-path) no-repeat -398px -407px;
+			background: url($sprite-path) no-repeat -431px -621px;
 		}
 	}
 
@@ -2215,7 +2222,7 @@ $icon-widget-btn: (
 
 		.btn-info {
 			&::after {
-				background-position: -398px -430px;
+				background-position: -279px -621px;
 				top: 1px;
 			}
 		}
@@ -4465,6 +4472,23 @@ button {
 	}
 }
 
+.link-action {
+	&.is-loading {
+		position: relative;
+		color: transparent !important;
+		border-bottom-color: transparent;
+
+		&::after {
+			box-shadow: none;
+			background: none;
+			border: 1px solid $preloader-disabled-color;
+			border-bottom-color: $preloader-accent-color;
+			width: 12px;
+			height: 12px;
+		}
+	}
+}
+
 span {
 	&.is-loading {
 		position: relative;
@@ -5428,11 +5452,12 @@ button {
 [data-count][class*='icon-']::after,
 .icon-description::after {
 	position: absolute;
+	top: -2px;
 	content: attr(data-count);
 	text-align: center;
-	margin-top: -2px;
 	font-size: 9px;
 	letter-spacing: -.25px;
+	line-height: 18px;
 	width: 18px;
 }
 
@@ -6517,7 +6542,7 @@ z-select,
 // Geomap widget.
 .geomap-filter-button,
 .navigate-home-button {
-	background-image: url('../img/icon-sprite.svg');
+	background-image: url($sprite-path);
 	background-repeat: no-repeat;
 }
 .geomap-filter-button {

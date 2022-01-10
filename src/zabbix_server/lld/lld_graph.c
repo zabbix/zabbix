@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1481,8 +1481,6 @@ static	void	get_graph_info(const void *object, zbx_uint64_t *id, int *discovery_
  * Return value: SUCCEED - if graphs were successfully added/updated or       *
  *                         adding/updating was not necessary                  *
  *               FAIL    - graphs cannot be added/updated                     *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,

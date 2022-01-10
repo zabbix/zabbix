@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -365,7 +365,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				break;
 #ifndef _WINDOWS
 			case 'R':
-				if (SUCCEED != parse_rtc_options(zbx_optarg, program_type, &t->data))
+				if (SUCCEED != parse_rtc_options(zbx_optarg, &t->data))
 					exit(EXIT_FAILURE);
 
 				t->task = ZBX_TASK_RUNTIME_CONTROL;
@@ -557,8 +557,6 @@ out:
  *                                                                            *
  * Purpose: set configuration defaults                                        *
  *                                                                            *
- * Author: Vladimir Levijev, Rudolfs Kreicbergs                               *
- *                                                                            *
  ******************************************************************************/
 static void	set_defaults(void)
 {
@@ -652,8 +650,6 @@ static void	zbx_validate_config_hostnames(zbx_vector_str_t *hostnames)
  * Function: zbx_validate_config                                              *
  *                                                                            *
  * Purpose: validate configuration parameters                                 *
- *                                                                            *
- * Author: Vladimir Levijev                                                   *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_validate_config(ZBX_TASK_EX *task)
@@ -1009,8 +1005,6 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
  * Function: zbx_free_config                                                  *
  *                                                                            *
  * Purpose: free configuration memory                                         *
- *                                                                            *
- * Author: Vladimir Levijev                                                   *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_free_config(void)

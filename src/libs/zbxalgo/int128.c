@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,8 +33,6 @@
  * Parameters: base   - [IN,OUT] the integer to decrement.                    *
  *             value  - [IN] the value to decrement by.                       *
  *                                                                            *
- * Author: Andris Zeila                                                       *
- *                                                                            *
  ******************************************************************************/
 static void	udec128_128(zbx_uint128_t *base, const zbx_uint128_t *value)
 {
@@ -54,8 +52,6 @@ static void	udec128_128(zbx_uint128_t *base, const zbx_uint128_t *value)
  *                                                                            *
  * Parameters: base  - [IN,OUT] the initial value and result                  *
  *             bits  - [IN] the number of bits to shift for.                  *
- *                                                                            *
- * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
 static void	ushiftr128(zbx_uint128_t *base, unsigned int bits)
@@ -84,8 +80,6 @@ static void	ushiftr128(zbx_uint128_t *base, unsigned int bits)
  *                                                                            *
  * Parameters: base  - [IN,OUT] the initial value and result                  *
  *             bits  - [IN] the number of bits to shift for.                  *
- *                                                                            *
- * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
 static void	ushiftl128(zbx_uint128_t *base, unsigned int bits)
@@ -119,8 +113,6 @@ static void	ushiftl128(zbx_uint128_t *base, unsigned int bits)
  *                0  - value1 = value2                                        *
  *                1  - value1 > value2                                        *
  *                                                                            *
- * Author: Andris Zeila                                                       *
- *                                                                            *
  ******************************************************************************/
 static int	ucmp128_128(const zbx_uint128_t *value1, const zbx_uint128_t *value2)
 {
@@ -146,8 +138,6 @@ static int	ucmp128_128(const zbx_uint128_t *value1, const zbx_uint128_t *value2)
  *                                                                            *
  * Comments: This is a helper function for umul64_64 implementation.          *
  *                                                                            *
- * Author: Andris Zeila                                                       *
- *                                                                            *
  ******************************************************************************/
 static void	umul64_32_shift(zbx_uint128_t *base, zbx_uint64_t value, zbx_uint64_t factor, int shift)
 {
@@ -172,8 +162,6 @@ static void	umul64_32_shift(zbx_uint128_t *base, zbx_uint64_t value, zbx_uint64_
  * Parameters: base   - [IN,OUT] the integer to increment.                    *
  *             value  - [IN] the value to increment by.                       *
  *                                                                            *
- * Author: Andris Zeila                                                       *
- *                                                                            *
  ******************************************************************************/
 void	uinc128_64(zbx_uint128_t *base, zbx_uint64_t value)
 {
@@ -194,8 +182,6 @@ void	uinc128_64(zbx_uint128_t *base, zbx_uint64_t value)
  *                                                                            *
  * Parameters: base   - [IN,OUT] the integer to increment.                    *
  *             value  - [IN] the value to increment by.                       *
- *                                                                            *
- * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
 void	uinc128_128(zbx_uint128_t *base, const zbx_uint128_t *value)
@@ -219,8 +205,6 @@ void	uinc128_128(zbx_uint128_t *base, const zbx_uint128_t *value)
  *             value  - [IN] the value to multiply.                           *
  *             factor - [IN] the factor to multiply by.                       *
  *                                                                            *
- * Author: Andris Zeila                                                       *
- *                                                                            *
  ******************************************************************************/
 void	umul64_64(zbx_uint128_t *result, zbx_uint64_t value, zbx_uint64_t factor)
 {
@@ -241,8 +225,6 @@ void	umul64_64(zbx_uint128_t *result, zbx_uint64_t value, zbx_uint64_t factor)
  * Parameters: result    - [OUT] the resulting quotient value.                *
  *             dividend  - [IN] the dividend.                                 *
  *             value     - [IN] the divisor.                                  *
- *                                                                            *
- * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
 void	udiv128_64(zbx_uint128_t *result, const zbx_uint128_t *dividend, zbx_uint64_t value)

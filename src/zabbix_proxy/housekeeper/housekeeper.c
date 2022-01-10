@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,10 +58,6 @@ static void	zbx_housekeeper_sigusr_handler(int flags)
  * Parameters: now - current timestamp                                        *
  *                                                                            *
  * Return value: number of rows records                                       *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	delete_history(const char *table, const char *fieldname, int now)
@@ -138,10 +134,6 @@ rollback:
  *                                                                            *
  * Return value: SUCCEED - information removed successfully                   *
  *               FAIL - otherwise                                             *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	housekeeping_history(int now)

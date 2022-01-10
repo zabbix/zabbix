@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1986,7 +1986,7 @@ out:
  * Purpose: update configuration                                              *
  *                                                                            *
  ******************************************************************************/
-void	process_proxyconfig(struct zbx_json_parse *jp_data)
+int	process_proxyconfig(struct zbx_json_parse *jp_data, struct zbx_json_parse *jp_kvs_paths)
 {
 	typedef struct
 	{
@@ -1997,7 +1997,7 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 
 	char			buf[ZBX_TABLENAME_LEN_MAX];
 	const char		*p = NULL;
-	struct zbx_json_parse	jp_obj, jp_kvs_paths, *jp_kvs_paths_ptr = NULL;
+	struct zbx_json_parse	jp_obj;
 	char			*error = NULL;
 	int			i, ret = SUCCEED;
 
@@ -2023,8 +2023,7 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 
 		if (0 == strcmp(buf, "macro.secrets"))
 		{
-			jp_kvs_paths = jp_obj;
-			jp_kvs_paths_ptr = &jp_kvs_paths;
+			*jp_kvs_paths = jp_obj;
 			continue;
 		}
 
@@ -2086,20 +2085,17 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 	}
 	zbx_vector_ptr_destroy(&tables_proxy);
 
-	if (SUCCEED != DBend(ret))
+	if (SUCCEED != (ret = DBend(ret)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "failed to update local proxy configuration copy: %s",
 				(NULL == error ? "database error" : error));
-	}
-	else
-	{
-		DCsync_configuration(ZBX_DBSYNC_UPDATE, jp_kvs_paths_ptr);
-		DCupdate_interfaces_availability();
 	}
 
 	zbx_free(error);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
+	return ret;
 }
 
 /******************************************************************************

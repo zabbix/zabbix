@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ $token_from_list = (new CFormList())
 	->addRow((new CLabel(_('Expires at')))->setAsteriskMark(),
 		(new CDateSelector('expires_at', $data['expires_at']))
 			->setDateFormat(DATE_TIME_FORMAT_SECONDS)
-			->setPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
+			->setPlaceholder(DATE_TIME_FORMAT_SECONDS_PLACEHOLDER)
 			->setAriaRequired(),
 		'expires-at-row'
 	)

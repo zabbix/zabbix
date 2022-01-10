@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 
 class CControllerServiceCreate extends CController {
 
-	protected function init() {
+	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
@@ -32,15 +32,13 @@ class CControllerServiceCreate extends CController {
 			'problem_tags' =>				'array',
 			'sortorder' =>					'required|db services.sortorder|ge 0|le 999',
 			'algorithm' =>					'required|db services.algorithm|in '.implode(',', [ZBX_SERVICE_STATUS_CALC_SET_OK, ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL, ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE]),
+			'description' =>				'db services.description',
 			'advanced_configuration' =>		'in 1',
 			'status_rules' =>				'array',
 			'propagation_rule' =>			'in '.implode(',', array_keys(CServiceHelper::getStatusPropagationNames())),
 			'propagation_value_number' =>	'int32',
 			'propagation_value_status' =>	'int32',
 			'weight' =>						'string',
-			'showsla' =>					'in 1',
-			'goodsla' =>					'string',
-			'times' =>						'array',
 			'tags' =>						'array',
 			'child_serviceids' =>			'array_db services.serviceid'
 		];
@@ -103,7 +101,7 @@ class CControllerServiceCreate extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES);
+		return $this->checkAccess(CRoleHelper::UI_SERVICES_SERVICES);
 	}
 
 	/**
@@ -111,16 +109,16 @@ class CControllerServiceCreate extends CController {
 	 */
 	protected function doAction(): void {
 		$service = [
-			'showsla' => $this->hasInput('showsla') ? SERVICE_SHOW_SLA_ON : SERVICE_SHOW_SLA_OFF,
 			'tags' => [],
 			'problem_tags' => [],
 			'parents' => [],
 			'children' => [],
-			'times' => $this->getInput('times', []),
 			'status_rules' => []
 		];
 
-		$this->getInputs($service, ['name', 'algorithm', 'sortorder', 'goodsla']);
+		$fields = ['name', 'algorithm', 'sortorder', 'description'];
+
+		$this->getInputs($service, $fields);
 
 		foreach ($this->getInput('tags', []) as $tag) {
 			if ($tag['tag'] === '' && $tag['value'] === '') {

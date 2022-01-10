@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ define('ZABBIX_VERSION',		'6.0.0beta2');
 define('ZABBIX_API_VERSION',	'6.0.0');
 define('ZABBIX_EXPORT_VERSION',	'6.0');
 
-define('ZABBIX_DB_VERSION',		5050115);
+define('ZABBIX_DB_VERSION',		5050142);
 
 define('DB_VERSION_SUPPORTED',				0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',		1);
@@ -32,7 +32,7 @@ define('DB_VERSION_NOT_SUPPORTED_ERROR',	4);
 define('DB_VERSION_NOT_SUPPORTED_WARNING',	5);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
-define('ZABBIX_COPYRIGHT_TO',	'2021');
+define('ZABBIX_COPYRIGHT_TO',	'2022');
 
 define('ZBX_BCRYPT_COST',		10);
 define('ZBX_MD5_SIZE',			32);
@@ -361,6 +361,14 @@ define('TIMEPERIOD_TYPE_WEEKLY',	3);
 define('TIMEPERIOD_TYPE_MONTHLY',	4);
 define('TIMEPERIOD_TYPE_YEARLY',	5);
 
+define('MONTH_WEEK_FIRST',	1);
+define('MONTH_WEEK_SECOND',	2);
+define('MONTH_WEEK_THIRD',	3);
+define('MONTH_WEEK_FOURTH',	4);
+define('MONTH_WEEK_LAST',	5);
+
+define('MONTH_MAX_DAY',	31);
+
 // report periods
 define('REPORT_PERIOD_TODAY',			0);
 define('REPORT_PERIOD_YESTERDAY',		1);
@@ -654,19 +662,31 @@ define('MAP_LINK_DRAWTYPE_BOLD_LINE',		2);
 define('MAP_LINK_DRAWTYPE_DOT',				3);
 define('MAP_LINK_DRAWTYPE_DASHED_LINE',		4);
 
+define('ZBX_SLA_MAX_REPORTING_PERIODS',		100);
+define('ZBX_SLA_DEFAULT_REPORTING_PERIODS',	20);
+
+define('ZBX_SLA_STATUS_DISABLED',	0);
+define('ZBX_SLA_STATUS_ENABLED',	1);
+
+define('ZBX_SLA_PERIOD_DAILY',		0);
+define('ZBX_SLA_PERIOD_WEEKLY',		1);
+define('ZBX_SLA_PERIOD_MONTHLY',	2);
+define('ZBX_SLA_PERIOD_QUARTERLY',	3);
+define('ZBX_SLA_PERIOD_ANNUALLY',	4);
+
+define('ZBX_SLA_SERVICE_TAG_OPERATOR_EQUAL',	0);
+define('ZBX_SLA_SERVICE_TAG_OPERATOR_LIKE',		2);
+
 define('ZBX_SERVICE_STATUS_CALC_SET_OK',			0);
 define('ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL',	1);
 define('ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE',	2);
-
-define('SERVICE_SHOW_SLA_OFF',	0);
-define('SERVICE_SHOW_SLA_ON',	1);
 
 define('SERVICE_STATUS_ANY', -1);
 define('SERVICE_STATUS_OK', 0);
 define('SERVICE_STATUS_PROBLEM', 1);
 
-define('SERVICE_TAG_OPERATOR_EQUAL',	0);
-define('SERVICE_TAG_OPERATOR_LIKE',		2);
+define('ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL',	0);
+define('ZBX_SERVICE_PROBLEM_TAG_OPERATOR_LIKE',		2);
 
 define('ZBX_SERVICE_FILTER_TAGS_ANY',		0);
 define('ZBX_SERVICE_FILTER_TAGS_SERVICE',	1);
@@ -1348,7 +1368,6 @@ define('API_OUTPUT',				22);
 define('API_TIME_UNIT',				23);
 define('API_URL',					24);
 define('API_H_NAME',				25);
-define('API_RANGE_TIME',			26);
 define('API_COLOR',					27);
 define('API_NUMERIC',				28);
 define('API_LLD_MACRO',				29);
@@ -1375,6 +1394,7 @@ define('API_COND_FORMULAID',		50);
 define('API_UNEXPECTED',			51);
 define('API_INT32_RANGES',			53);
 define('API_LAT_LNG_ZOOM',			54);
+define('API_TIMESTAMP',				55);
 
 // flags
 define('API_REQUIRED',					0x00001);
@@ -1492,7 +1512,6 @@ define('WIDGET_DISCOVERY',			'discovery');
 define('WIDGET_FAV_GRAPHS',			'favgraphs');
 define('WIDGET_FAV_MAPS',			'favmaps');
 define('WIDGET_GEOMAP',				'geomap');
-define('WIDGET_SVG_GRAPH',			'svggraph');
 define('WIDGET_GRAPH',				'graph');
 define('WIDGET_GRAPH_PROTOTYPE',	'graphprototype');
 define('WIDGET_HOST_AVAIL',			'hostavail');
@@ -1502,6 +1521,8 @@ define('WIDGET_PLAIN_TEXT',			'plaintext');
 define('WIDGET_PROBLEM_HOSTS',		'problemhosts');
 define('WIDGET_PROBLEMS',			'problems');
 define('WIDGET_PROBLEMS_BY_SV',		'problemsbysv');
+define('WIDGET_SLA_REPORT',			'slareport');
+define('WIDGET_SVG_GRAPH',			'svggraph');
 define('WIDGET_SYSTEM_INFO',		'systeminfo');
 define('WIDGET_TRIG_OVER',			'trigover');
 define('WIDGET_URL',				'url');
@@ -1565,6 +1586,8 @@ define('ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE',	5);
 define('ZBX_WIDGET_FIELD_TYPE_GRAPH',			6);
 define('ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE',	7);
 define('ZBX_WIDGET_FIELD_TYPE_MAP',				8);
+define('ZBX_WIDGET_FIELD_TYPE_SERVICE',			9);
+define('ZBX_WIDGET_FIELD_TYPE_SLA',				10);
 
 define('ZBX_WIDGET_FIELD_RESOURCE_GRAPH',					0);
 define('ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH',			1);
@@ -1645,36 +1668,36 @@ define('ZBX_POPUP_CONDITION_TYPE_ACTION', 1);
 define('ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION', 2);
 
 // Tab indicator names.
-define('TAB_INDICATOR_MACROS', 'macros');
-define('TAB_INDICATOR_TAGS', 'tags');
 define('TAB_INDICATOR_AUTH_HTTP', 'http');
 define('TAB_INDICATOR_AUTH_LDAP', 'ldap');
 define('TAB_INDICATOR_AUTH_SAML', 'saml');
-define('TAB_INDICATOR_INVENTORY', 'inventory');
-define('TAB_INDICATOR_ENCRYPTION', 'encryption');
-define('TAB_INDICATOR_PREPROCESSING', 'preprocessing');
-define('TAB_INDICATOR_DEPENDENCY', 'dependency');
-define('TAB_INDICATOR_LLD_MACROS', 'lld-macros');
-define('TAB_INDICATOR_FILTERS', 'filters');
-define('TAB_INDICATOR_OVERRIDES', 'overrides');
-define('TAB_INDICATOR_STEPS', 'steps');
-define('TAB_INDICATOR_HTTP_AUTH', 'http-auth');
-define('TAB_INDICATOR_OPERATIONS', 'operations');
-define('TAB_INDICATOR_SLA', 'sla');
 define('TAB_INDICATOR_CHILD_SERVICES', 'child-services');
-define('TAB_INDICATOR_TIME', 'time');
-define('TAB_INDICATOR_TAG_FILTER', 'tag-filter');
+define('TAB_INDICATOR_DEPENDENCY', 'dependency');
+define('TAB_INDICATOR_ENCRYPTION', 'encryption');
+define('TAB_INDICATOR_EXCLUDED_DOWNTIMES', 'excluded-downtimes');
+define('TAB_INDICATOR_FILTERS', 'filters');
+define('TAB_INDICATOR_FRONTEND_MESSAGE', 'frontend-message');
+define('TAB_INDICATOR_GRAPH_DATASET', 'graph-dataset');
+define('TAB_INDICATOR_GRAPH_LEGEND', 'graph-legend');
+define('TAB_INDICATOR_GRAPH_OPTIONS', 'graph-options');
+define('TAB_INDICATOR_GRAPH_OVERRIDES', 'graph-overrides');
+define('TAB_INDICATOR_GRAPH_PROBLEMS', 'graph-problems');
+define('TAB_INDICATOR_GRAPH_TIME', 'graph-time');
+define('TAB_INDICATOR_HTTP_AUTH', 'http-auth');
+define('TAB_INDICATOR_INVENTORY', 'inventory');
+define('TAB_INDICATOR_LLD_MACROS', 'lld-macros');
+define('TAB_INDICATOR_MACROS', 'macros');
 define('TAB_INDICATOR_MEDIA', 'media');
 define('TAB_INDICATOR_MESSAGE_TEMPLATE', 'message-template');
-define('TAB_INDICATOR_FRONTEND_MESSAGE', 'frontend-message');
-define('TAB_INDICATOR_SHARING', 'sharing');
-define('TAB_INDICATOR_GRAPH_DATASET', 'graph-dataset');
-define('TAB_INDICATOR_GRAPH_OPTIONS', 'graph-options');
-define('TAB_INDICATOR_GRAPH_TIME', 'graph-time');
-define('TAB_INDICATOR_GRAPH_LEGEND', 'graph-legend');
-define('TAB_INDICATOR_GRAPH_PROBLEMS', 'graph-problems');
-define('TAB_INDICATOR_GRAPH_OVERRIDES', 'graph-overrides');
+define('TAB_INDICATOR_OPERATIONS', 'operations');
+define('TAB_INDICATOR_OVERRIDES', 'overrides');
 define('TAB_INDICATOR_PERMISSIONS', 'permissions');
+define('TAB_INDICATOR_PREPROCESSING', 'preprocessing');
+define('TAB_INDICATOR_SHARING', 'sharing');
+define('TAB_INDICATOR_STEPS', 'steps');
+define('TAB_INDICATOR_TAG_FILTER', 'tag-filter');
+define('TAB_INDICATOR_TAGS', 'tags');
+define('TAB_INDICATOR_TIME', 'time');
 define('TAB_INDICATOR_VALUEMAPS', 'valuemaps');
 
 // CSS styles
@@ -1922,6 +1945,7 @@ define('ZBX_STYLE_SERVICE_INFO', 'service-info');
 define('ZBX_STYLE_SERVICE_INFO_GRID', 'service-info-grid');
 define('ZBX_STYLE_SERVICE_INFO_LABEL', 'service-info-label');
 define('ZBX_STYLE_SERVICE_INFO_VALUE', 'service-info-value');
+define('ZBX_STYLE_SERVICE_INFO_VALUE_SLA', 'service-info-value-sla');
 define('ZBX_STYLE_SERVICE_NAME', 'service-name');
 define('ZBX_STYLE_SERVICE_STATUS', 'service-status');
 define('ZBX_STYLE_SETUP_CONTAINER', 'setup-container');
@@ -1948,6 +1972,7 @@ define('ZBX_STYLE_STATUS_NA_BG', 'status-na-bg');
 define('ZBX_STYLE_STATUS_RED', 'status-red');
 define('ZBX_STYLE_STATUS_WARNING_BG', 'status-warning-bg');
 define('ZBX_STYLE_STATUS_YELLOW', 'status-yellow');
+define('ZBX_STYLE_STICKED_TO_TOP', 'sticked-to-top');
 define('ZBX_STYLE_SVG_GRAPH', 'svg-graph');
 define('ZBX_STYLE_SVG_GRAPH_PREVIEW', 'svg-graph-preview');
 define('ZBX_STYLE_SUBFILTER', 'subfilter');
