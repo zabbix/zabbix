@@ -25,7 +25,7 @@
 
 $this->addJsFile('class.calendar.js');
 
-$this->includeJsFile('administration.token.edit.js.php');
+$this->includeJsFile('administration.token.edit.html.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('API tokens'))

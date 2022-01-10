@@ -343,7 +343,7 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 			medium_popup_actions = ['popup.maintenance.period', 'popup.condition.actions', 'popup.condition.operations',
 				'popup.condition.event.corr', 'popup.discovery.check', 'popup.mediatypetest.edit',
 				'popup.mediatype.message', 'popup.host.edit', 'popup.scriptexec', 'popup.scheduledreport.test',
-				'popup.service.edit', 'popup.user.token.edit'
+				'popup.service.edit', 'popup.token.edit', 'popup.user.token.edit'
 			],
 			static_popup_actions = ['popup.massupdate.template', 'popup.massupdate.host', 'popup.massupdate.trigger',
 				'popup.massupdate.triggerprototype', 'popup.massupdate.service'
