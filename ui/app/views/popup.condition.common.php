@@ -411,7 +411,7 @@ switch ($data['type']) {
 								'dstfld1' => 'dcheck_new_condition_value',
 								'dstfld2' => 'dcheck',
 								'writeonly' => '1'
-							]).');'
+							]).', {dialogue_class: "modal-popup-generic"});'
 						)
 				];
 

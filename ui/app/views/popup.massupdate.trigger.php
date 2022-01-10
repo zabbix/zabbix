@@ -110,7 +110,7 @@ if ($data['prototype']) {
 			'multiselect' => '1',
 			'objname' => 'triggers',
 			'parent_discoveryid' => $data['parent_discoveryid']
-		]).');'
+		]).', {dialogue_class: "modal-popup-generic"});'
 	)
 	->addClass(ZBX_STYLE_BTN_LINK);
 }
@@ -135,7 +135,7 @@ $dependencies_form_list->addRow(
 						'with_triggers' => '1',
 						'normal_only' => '1',
 						'noempty' => '1'
-					]).');'
+					]).', {dialogue_class: "modal-popup-generic"});'
 				)
 				->addClass(ZBX_STYLE_BTN_LINK),
 			$bttn_prototype

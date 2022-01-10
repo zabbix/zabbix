@@ -91,7 +91,7 @@ if ($data['item_required']) {
 					'dstfld1' => 'itemid',
 					'dstfld2' => 'item_description',
 					'parent_discoveryid' => $data['parent_discoveryid']
-				]).');'
+				]).', {dialogue_class: "modal-popup-generic"});'
 			)
 			->removeId();
 	}

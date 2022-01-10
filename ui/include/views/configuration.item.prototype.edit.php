@@ -94,7 +94,7 @@ if (!$readonly) {
 				'srcfld1' => 'key',
 				'dstfrm' => $form->getName(),
 				'dstfld1' => 'key'
-			]).', {itemtype: jQuery("#type").val()}));'
+			]).', {itemtype: jQuery("#type").val()}), {dialogue_class: "modal-popup-generic"});'
 		);
 }
 
@@ -539,7 +539,7 @@ if (!$readonly) {
 				'excludeids' => [$data['itemid']],
 				'with_webitems' => 1,
 				'normal_only' => 1
-			]).');'
+			]).', {dialogue_class: "modal-popup-generic"});'
 		);
 	$master_item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 	$master_item[] = (new CButton('button', _('Select prototype')))
@@ -555,7 +555,7 @@ if (!$readonly) {
 				'dstfld2' => 'master_itemname',
 				'parent_discoveryid' => $data['parent_discoveryid'],
 				'excludeids' => [$data['itemid']]
-			]).');'
+			]).', {dialogue_class: "modal-popup-generic"});'
 		);
 }
 

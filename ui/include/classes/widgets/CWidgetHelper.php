@@ -450,7 +450,9 @@ class CWidgetHelper {
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('select', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick('return PopUp("popup.generic", '.json_encode($field->getPopupOptions($form_name)).');')
+				->onClick('return PopUp("popup.generic", '.json_encode($field->getPopupOptions($form_name)).',
+					{dialogue_class: "modal-popup-generic"}
+				);')
 		];
 	}
 

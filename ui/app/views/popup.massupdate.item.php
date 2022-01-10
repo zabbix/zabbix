@@ -431,7 +431,7 @@ if ($data['single_host_selected']) {
 					'only_hostid' => $data['hostid'],
 					'with_webitems' => 1,
 					'normal_only' => 1
-				]).');'
+				]).', {dialogue_class: "modal-popup-generic"});'
 			);
 
 		$master_item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
@@ -447,7 +447,7 @@ if ($data['single_host_selected']) {
 					'dstfld1' => 'master_itemid',
 					'dstfld2' => 'master_itemname',
 					'parent_discoveryid' => $data['parent_discoveryid']
-				]).');'
+				]).' {dialogue_class: "modal-popup-generic"});'
 			);
 	}
 

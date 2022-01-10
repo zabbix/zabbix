@@ -206,7 +206,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 					'with_webitems' => '1',
 					'numeric' => '1',
 					'writeonly' => '1'
-				]).', getOnlyHostParam()));'
+				]).', getOnlyHostParam()), {dialogue_class: "modal-popup-generic"});'
 			)
 			->setEnabled(!$readonly);
 
@@ -225,7 +225,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 						'dstfld2' => 'ymin_name',
 						'parent_discoveryid' => $data['parent_discoveryid'],
 						'numeric' => '1'
-					]).');'
+					]).', {dialogue_class: "modal-popup-generic"});'
 				)
 				->setEnabled(!$readonly);
 		}
@@ -281,7 +281,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 					'with_webitems' => '1',
 					'numeric' => '1',
 					'writeonly' => '1'
-				]).', getOnlyHostParam()));'
+				]).', getOnlyHostParam()), {dialogue_class: "modal-popup-generic"});'
 			)
 			->setEnabled(!$readonly);
 
@@ -300,7 +300,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 						'dstfld2' => 'ymax_name',
 						'parent_discoveryid' => $data['parent_discoveryid'],
 						'numeric' => '1'
-					]).');'
+					]).', {dialogue_class: "modal-popup-generic"});'
 				)
 				->setEnabled(!$readonly);
 		}
@@ -405,7 +405,9 @@ $items_table->addRow(
 						->addClass(ZBX_STYLE_BTN_LINK),
 					$data['parent_discoveryid']
 						? (new CButton('add_protoitem', _('Add prototype')))
-							->onClick('return PopUp("popup.generic", '.json_encode($parameters_add_prototype).');')
+							->onClick('return PopUp("popup.generic", '.json_encode($parameters_add_prototype).',
+								{dialogue_class: "modal-popup-generic"}
+							);')
 							->addClass(ZBX_STYLE_BTN_LINK)
 						: null
 				])

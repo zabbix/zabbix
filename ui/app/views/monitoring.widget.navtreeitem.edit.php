@@ -55,7 +55,7 @@ $form_list = (new CFormList())
 					'dstfrm' => $form->getName(),
 					'dstfld1' => 'sysmapid',
 					'dstfld2' => 'sysmapname'
-				]).');'
+				]).', {dialogue_class: "modal-popup-generic"});'
 			)
 	]);
 

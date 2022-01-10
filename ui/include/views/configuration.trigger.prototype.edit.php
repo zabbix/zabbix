@@ -628,7 +628,7 @@ $dependenciesFormList->addRow(_('Dependencies'),
 						'normal_only' => '1',
 						'noempty' => '1',
 						'hostid' => $data['hostid']
-					]).');'
+					]).', {dialogue_class: "modal-popup-generic"});'
 				)
 				->addClass(ZBX_STYLE_BTN_LINK),
 			(new CButton('add_dep_trigger_prototype', _('Add prototype')))
@@ -639,7 +639,7 @@ $dependenciesFormList->addRow(_('Dependencies'),
 						'reference' => 'deptrigger',
 						'multiselect' => '1',
 						'parent_discoveryid' => $data['parent_discoveryid']
-					]).');'
+					]).', {dialogue_class: "modal-popup-generic"});'
 				)
 				->addClass(ZBX_STYLE_BTN_LINK)
 		])

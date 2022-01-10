@@ -41,7 +41,7 @@ $table_user_groups = (new CTable())
 							'srcfld2' => 'name',
 							'dstfrm' => $form->getName(),
 							'multiselect' => '1'
-						]).');'
+						]).', {dialogue_class: "modal-popup-generic"});'
 					)
 					->addClass(ZBX_STYLE_BTN_LINK)
 			))->setColSpan(3)
@@ -62,7 +62,7 @@ $table_users = (new CTable())
 							'srcfld2' => 'fullname',
 							'dstfrm' => $form->getName(),
 							'multiselect' => '1'
-						]).');'
+						]).', {dialogue_class: "modal-popup-generic"});'
 					)
 					->addClass(ZBX_STYLE_BTN_LINK)
 			))->setColSpan(3)

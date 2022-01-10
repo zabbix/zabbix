@@ -109,7 +109,7 @@ if (!$readonly) {
 				'srcfld1' => 'key',
 				'dstfrm' => $form->getName(),
 				'dstfld1' => 'key'
-			]).', {itemtype: jQuery("#type").val()}));'
+			]).', {itemtype: jQuery("#type").val()}), {dialogue_class: "modal-popup-generic"});'
 		);
 }
 

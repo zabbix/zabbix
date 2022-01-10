@@ -223,7 +223,7 @@ function createFontSelect(string $name): CSelect {
 									'dstfrm' => 'selementForm',
 									'dstfld1' => 'sysmapid',
 									'dstfld2' => 'elementNameMap'
-								]).', {excludeids: [#{sysmapid}]}));'
+								]).', {excludeids: [#{sysmapid}]}), {dialogue_class: "modal-popup-generic"});'
 							)
 					], 'mapSelectRow')
 					->addRow(_('Tags'),
@@ -802,7 +802,7 @@ function createFontSelect(string $name): CSelect {
 										'real_hosts' => '1',
 										'with_triggers' => '1',
 										'noempty' => '1'
-									]).');'
+									]).', {dialogue_class: "modal-popup-generic"});'
 								)
 						]))
 							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
