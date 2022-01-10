@@ -270,7 +270,7 @@ int	zbx_trends_parse_range(time_t from, const char *param, int *start, int *end,
 
 	if (0 == period_num)
 	{
-		*error = zbx_strdup(*error, "period can not be zero");
+		*error = zbx_strdup(*error, "period cannot be zero");
 		return FAIL;
 	}
 
