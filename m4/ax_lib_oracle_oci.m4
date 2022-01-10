@@ -49,7 +49,7 @@
 #
 # ADAPTATION
 #
-#   Macro adapted for ZABBIX usage by Eugene Grigorjev
+#   Macro adapted for ZABBIX usage
 #
 
 AC_DEFUN([AX_LIB_ORACLE_OCI],

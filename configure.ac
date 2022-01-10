@@ -1,6 +1,6 @@
 dnl
 dnl Zabbix
-dnl Copyright (C) 2001-2021 Zabbix SIA
+dnl Copyright (C) 2001-2022 Zabbix SIA
 dnl
 dnl This program is free software; you can redistribute it and/or modify
 dnl it under the terms of the GNU General Public License as published by
@@ -2112,6 +2112,7 @@ AC_OUTPUT([
 	src/libs/zbxservice/Makefile
 	src/libs/zbxxml/Makefile
 	src/libs/zbxha/Makefile
+	src/libs/zbxrtc/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_agent/logfiles/Makefile
 	src/zabbix_get/Makefile

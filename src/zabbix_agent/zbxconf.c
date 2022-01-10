@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -85,8 +85,6 @@ void	load_aliases(char **lines)
  * Return value: SUCCEED - successfully loaded user parameters                *
  *               FAIL    - failed to load user parameters                     *
  *                                                                            *
- * Author: Vladimir Levijev                                                   *
- *                                                                            *
  * Comments: calls add_user_parameter() for each entry                        *
  *                                                                            *
  ******************************************************************************/
@@ -127,8 +125,6 @@ int	load_user_parameters(char **lines, char **err)
  * Return value: SUCCEED - successful execution                               *
  *               FAIL    - failed to add rule                                 *
  *                                                                            *
- * Author: Andrejs Tumilovics                                                 *
- *                                                                            *
  ******************************************************************************/
 int	load_key_access_rule(const char *value, const struct cfg_line *cfg)
 {
@@ -153,12 +149,6 @@ int	load_key_access_rule(const char *value, const struct cfg_line *cfg)
  *                                                                            *
  * Parameters: def_lines - array of PerfCounter configuration entries         *
  *             eng_lines - array of PerfCounterEn configuration entries       *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Vladimir Levijev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	load_perf_counters(const char **def_lines, const char **eng_lines)

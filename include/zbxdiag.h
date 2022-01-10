@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,6 +45,6 @@ zbx_diaginfo_section_t;
 #define ZBX_DIAG_LOCKS		"locks"
 
 int	zbx_diag_get_info(const struct zbx_json_parse *jp, char **info);
-void	zbx_diag_log_info(unsigned int flags);
+void	zbx_diag_log_info(unsigned int flags, char **result);
 
 #endif

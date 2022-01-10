@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -105,8 +105,13 @@ foreach ($data['scripts'] as $script) {
 						$actions[] = ', ';
 					}
 
-					if (CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_ACTIONS)) {
+					$has_access = $action['eventsource'] == EVENT_SOURCE_SERVICE
+						? CWebUser::checkAccess(CRoleHelper::UI_SERVICES_ACTIONS)
+						: CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_ACTIONS);
+
+					if ($has_access) {
 						$url = (new CUrl('actionconf.php'))
+							->setArgument('eventsource', $action['eventsource'])
 							->setArgument('form', 'update')
 							->setArgument('actionid', $action['actionid']);
 
@@ -115,8 +120,7 @@ foreach ($data['scripts'] as $script) {
 							->addClass(ZBX_STYLE_GREY);
 					}
 					else {
-						$actions[] = (new CSpan($action['name']))
-							->addClass(ZBX_STYLE_GREY);
+						$actions[] = (new CSpan($action['name']))->addClass(ZBX_STYLE_GREY);
 					}
 				}
 			}

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -665,4 +665,19 @@ failure:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+}
+
+zbx_es_env_t	*zbx_es_get_env(duk_context *ctx)
+{
+	zbx_es_env_t	*env;
+
+	duk_push_global_stash(ctx);
+
+	if (1 != duk_get_prop_string(ctx, -1, "\xff""\xff""zbx_env"))
+		return NULL;
+
+	env = (zbx_es_env_t *)duk_to_pointer(ctx, -1);
+	duk_pop(ctx);
+
+	return env;
 }

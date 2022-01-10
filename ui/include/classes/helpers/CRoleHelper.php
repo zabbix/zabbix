@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,6 @@ class CRoleHelper {
 	public const UI_MONITORING_LATEST_DATA = 'ui.monitoring.latest_data';
 	public const UI_MONITORING_MAPS = 'ui.monitoring.maps';
 	public const UI_MONITORING_DISCOVERY = 'ui.monitoring.discovery';
-	public const UI_MONITORING_SERVICES = 'ui.monitoring.services';
 	public const UI_INVENTORY_OVERVIEW = 'ui.inventory.overview';
 	public const UI_INVENTORY_HOSTS = 'ui.inventory.hosts';
 	public const UI_REPORTS_SYSTEM_INFO = 'ui.reports.system_info';
@@ -40,6 +39,10 @@ class CRoleHelper {
 	public const UI_REPORTS_ACTION_LOG = 'ui.reports.action_log';
 	public const UI_REPORTS_NOTIFICATIONS = 'ui.reports.notifications';
 	public const UI_REPORTS_SCHEDULED_REPORTS = 'ui.reports.scheduled_reports';
+	public const UI_SERVICES_SERVICES = 'ui.services.services';
+	public const UI_SERVICES_ACTIONS = 'ui.services.actions';
+	public const UI_SERVICES_SLA = 'ui.services.sla';
+	public const UI_SERVICES_SLA_REPORT = 'ui.services.sla_report';
 	public const UI_CONFIGURATION_HOST_GROUPS = 'ui.configuration.host_groups';
 	public const UI_CONFIGURATION_TEMPLATES = 'ui.configuration.templates';
 	public const UI_CONFIGURATION_HOSTS = 'ui.configuration.hosts';
@@ -67,8 +70,10 @@ class CRoleHelper {
 	public const ACTIONS_EXECUTE_SCRIPTS = 'actions.execute_scripts';
 	public const ACTIONS_MANAGE_API_TOKENS = 'actions.manage_api_tokens';
 	public const ACTIONS_MANAGE_SCHEDULED_REPORTS = 'actions.manage_scheduled_reports';
+	public const ACTIONS_MANAGE_SLA = 'actions.manage_sla';
 
 	public const UI_SECTION_MONITORING = 'ui.monitoring';
+	public const UI_SECTION_SERVICES = 'ui.services';
 	public const UI_SECTION_INVENTORY = 'ui.inventory';
 	public const UI_SECTION_REPORTS = 'ui.reports';
 	public const UI_SECTION_CONFIGURATION = 'ui.configuration';
@@ -211,27 +216,50 @@ class CRoleHelper {
 	 */
 	public static function getUiElementsByUserType(int $user_type): array {
 		$rules = [
-			self::UI_MONITORING_DASHBOARD, self::UI_MONITORING_PROBLEMS, self::UI_MONITORING_HOSTS,
-			self::UI_MONITORING_LATEST_DATA, self::UI_MONITORING_MAPS, self::UI_MONITORING_SERVICES,
-			self::UI_INVENTORY_OVERVIEW, self::UI_INVENTORY_HOSTS, self::UI_REPORTS_AVAILABILITY_REPORT,
-			self::UI_REPORTS_TOP_TRIGGERS
+			self::UI_INVENTORY_HOSTS,
+			self::UI_INVENTORY_OVERVIEW,
+			self::UI_MONITORING_DASHBOARD,
+			self::UI_MONITORING_HOSTS,
+			self::UI_MONITORING_LATEST_DATA,
+			self::UI_MONITORING_MAPS,
+			self::UI_MONITORING_PROBLEMS,
+			self::UI_REPORTS_AVAILABILITY_REPORT,
+			self::UI_REPORTS_TOP_TRIGGERS,
+			self::UI_SERVICES_SERVICES,
+			self::UI_SERVICES_SLA_REPORT
 		];
 
 		if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
 			$rules = array_merge($rules, [
-				self::UI_MONITORING_DISCOVERY, self::UI_REPORTS_NOTIFICATIONS, self::UI_REPORTS_SCHEDULED_REPORTS,
-				self::UI_CONFIGURATION_HOST_GROUPS, self::UI_CONFIGURATION_TEMPLATES, self::UI_CONFIGURATION_HOSTS,
-				self::UI_CONFIGURATION_MAINTENANCE, self::UI_CONFIGURATION_ACTIONS, self::UI_CONFIGURATION_DISCOVERY
+				self::UI_CONFIGURATION_ACTIONS,
+				self::UI_CONFIGURATION_DISCOVERY,
+				self::UI_CONFIGURATION_HOST_GROUPS,
+				self::UI_CONFIGURATION_HOSTS,
+				self::UI_CONFIGURATION_MAINTENANCE,
+				self::UI_CONFIGURATION_TEMPLATES,
+				self::UI_MONITORING_DISCOVERY,
+				self::UI_REPORTS_NOTIFICATIONS,
+				self::UI_REPORTS_SCHEDULED_REPORTS,
+				self::UI_SERVICES_ACTIONS,
+				self::UI_SERVICES_SLA
 			]);
 		}
 
 		if ($user_type === USER_TYPE_SUPER_ADMIN) {
 			$rules = array_merge($rules, [
-				self::UI_REPORTS_SYSTEM_INFO, self::UI_REPORTS_AUDIT, self::UI_REPORTS_ACTION_LOG,
-				self::UI_CONFIGURATION_EVENT_CORRELATION, self::UI_ADMINISTRATION_GENERAL, self::UI_ADMINISTRATION_PROXIES,
-				self::UI_ADMINISTRATION_AUTHENTICATION, self::UI_ADMINISTRATION_USER_GROUPS,
-				self::UI_ADMINISTRATION_USER_ROLES, self::UI_ADMINISTRATION_USERS, self::UI_ADMINISTRATION_MEDIA_TYPES,
-				self::UI_ADMINISTRATION_SCRIPTS, self::UI_ADMINISTRATION_QUEUE
+				self::UI_ADMINISTRATION_AUTHENTICATION,
+				self::UI_ADMINISTRATION_GENERAL,
+				self::UI_ADMINISTRATION_MEDIA_TYPES,
+				self::UI_ADMINISTRATION_PROXIES,
+				self::UI_ADMINISTRATION_QUEUE,
+				self::UI_ADMINISTRATION_SCRIPTS,
+				self::UI_ADMINISTRATION_USER_GROUPS,
+				self::UI_ADMINISTRATION_USER_ROLES,
+				self::UI_ADMINISTRATION_USERS,
+				self::UI_CONFIGURATION_EVENT_CORRELATION,
+				self::UI_REPORTS_ACTION_LOG,
+				self::UI_REPORTS_AUDIT,
+				self::UI_REPORTS_SYSTEM_INFO
 			]);
 		}
 
@@ -257,6 +285,7 @@ class CRoleHelper {
 		if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
 			$rules[] = self::ACTIONS_EDIT_MAINTENANCE;
 			$rules[] = self::ACTIONS_MANAGE_SCHEDULED_REPORTS;
+			$rules[] = self::ACTIONS_MANAGE_SLA;
 		}
 
 		return $rules;
@@ -274,6 +303,7 @@ class CRoleHelper {
 	public static function getUiSectionsLabels(int $user_type): array {
 		$sections = [
 			self::UI_SECTION_MONITORING => _('Monitoring'),
+			self::UI_SECTION_SERVICES => _('Services'),
 			self::UI_SECTION_INVENTORY => _('Inventory'),
 			self::UI_SECTION_REPORTS => _('Reports')
 		];
@@ -314,9 +344,22 @@ class CRoleHelper {
 					$labels += [self::UI_MONITORING_DISCOVERY => _('Discovery')];
 				}
 
-				$labels += [self::UI_MONITORING_SERVICES => _('Services')];
+				return $labels;
+
+			case self::UI_SECTION_SERVICES:
+				$labels = [
+					self::UI_SERVICES_SERVICES => _('Services'),
+					self::UI_SERVICES_ACTIONS => _('Service actions')
+				];
+
+				if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
+					$labels += [self::UI_SERVICES_SLA => _('SLA')];
+				}
+
+				$labels += [self::UI_SERVICES_SLA_REPORT => _('SLA report')];
 
 				return $labels;
+
 			case self::UI_SECTION_INVENTORY:
 				return [
 					self::UI_INVENTORY_OVERVIEW => _('Overview'),
@@ -424,7 +467,10 @@ class CRoleHelper {
 		];
 
 		if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
-			$labels += [self::ACTIONS_MANAGE_SCHEDULED_REPORTS => _('Manage scheduled reports')];
+			$labels += [
+				self::ACTIONS_MANAGE_SCHEDULED_REPORTS => _('Manage scheduled reports'),
+				self::ACTIONS_MANAGE_SLA => _('Manage SLA')
+			];
 		}
 
 		return $labels;
