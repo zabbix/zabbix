@@ -18,24 +18,56 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testPageLatestData extends CLegacyWebTest {
+class testPageLatestData extends CWebTest {
 	public function testPageLatestData_CheckLayout() {
-		$this->zbxTestLogin('zabbix.php?action=latest.view');
-		$this->zbxTestCheckTitle('Latest data');
-		$this->zbxTestCheckHeader('Latest data');
-		$this->zbxTestTextPresent(['Host groups', 'Hosts', 'Name', 'Show items without data', 'Show details']);
-		$this->zbxTestTextPresent('Filter');
-		$this->zbxTestTextPresent(['Host', 'Name', 'Last check', 'Last value', 'Change']);
+		$this->page->login()->open('zabbix.php?action=latest.view');
+		$this->page->assertTitle('Latest data');
+		$this->page->assertHeader('Latest data');
+		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$this->assertEquals(['Host groups', 'Hosts', 'Name', 'Tags', 'Show details'],
+				$form->getLabels()->asText());
+
+		// Show item without data is checked/disabled without Hosts in filter and checked/enabled with Hosts in filter.
+		foreach ([false, true] as $status) {
+			$form->query('id:filter_show_without_data')->one()->isEnabled($status);
+			$form->query('id:filter_show_without_data')->one()->isAttributePresent('checked');
+			if (!$status) {
+				$form->fill(['Hosts' => 'Host 1 from first group']);
+			}
+		}
+
+		// Check filter buttons.
+		foreach (['Apply', 'Reset'] as $button) {
+			$this->assertTrue($form->query('button', $button)->one()->isPresent());
+		}
+
+		// Check table headers.
+		$table = $this->query('class:list-table')->asTable()->one();
+		$this->assertEquals(['', 'Host', 'Name', 'Last check', 'Last value', 'Change', 'Tags', '', 'Info'],
+				$table->getHeadersText());
+
+		// Check that sortable headers is clickable.
+		foreach (['Host', 'Name'] as $header) {
+			$this->assertTrue($table->query('xpath://th/a[text()="'.$header.'"]')->one()->isValid());
+		}
+
+		// Check filter collapse/expand.
+		$filter_tab = $this->query('xpath://a[contains(@class, "filter-trigger")]')->one();
+		foreach ([true, false] as $status) {
+			$this->assertEquals($status, $this->query('xpath://div[contains(@class, "filter-container")]')->one()->isDisplayed());
+			$filter_tab->click();
+		}
 	}
 
-	// Check that no real host or template names displayed
-	public function testPageLatestData_NoHostNames() {
-		$this->zbxTestLogin('zabbix.php?action=latest.view');
-		$this->zbxTestCheckTitle('Latest data');
-		$this->zbxTestCheckNoRealHostnames();
-	}
+//	// Check that no real host or template names displayed.
+//	public function testPageLatestData_NoHostNames() {
+//		$this->page->login()->open('zabbix.php?action=latest.view');
+//		$this->page->assertTitle('Latest data');
+//		$this->zbxTestCheckNoRealHostnames();
+//	}
 
 	public static function getItemDescription() {
 		return [
