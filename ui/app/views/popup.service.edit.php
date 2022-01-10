@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $form = (new CForm('post'))
@@ -85,10 +86,10 @@ $service_tab = (new CFormGrid())
 							(new CSelect('problem_tags[#{rowNum}][operator]'))
 								->addClass('js-problem-tag-input')
 								->addOptions(CSelect::createOptionsFromArray([
-									SERVICE_TAG_OPERATOR_EQUAL => _('Equals'),
-									SERVICE_TAG_OPERATOR_LIKE => _('Contains')
+									ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL => _('Equals'),
+									ZBX_SERVICE_PROBLEM_TAG_OPERATOR_LIKE => _('Contains')
 								]))
-								->setValue(SERVICE_TAG_OPERATOR_EQUAL),
+								->setValue(ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL),
 							(new CTextBox('problem_tags[#{rowNum}][value]', '#{value}', false,
 								DB::getFieldLength('service_problem_tag', 'value')
 							))
@@ -131,6 +132,26 @@ $service_tab = (new CFormGrid())
 				->addOptions(CSelect::createOptionsFromArray(CServiceHelper::getAlgorithmNames()))
 		)
 	])
+	->addItem([
+		new CLabel(_('Description'), 'description'),
+		new CFormField(
+			(new CTextArea('description', $data['form']['description']))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('services', 'description'))
+		)
+	])
+	->addItem(
+		$data['serviceid'] !== null
+			? [
+				new CLabel(_('Created at'), 'created_at'),
+				new CFormField(
+					(new CTextBox('created_at', zbx_date2str(DATE_FORMAT, $data['form']['created_at'])))
+						->setEnabled(false)
+						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+				)
+			]
+			: null
+	)
 	->addItem(
 		(new CFormField(
 			(new CCheckBox('advanced_configuration'))
@@ -218,44 +239,6 @@ $service_tab
 			->addStyle('display: none;')
 	]);
 
-// SLA tab.
-
-$times = (new CTable())
-	->setId('times')
-	->setHeader(
-		(new CRowHeader([_('Type'), _('Interval'), _('Note'), _('Action')]))->addClass(ZBX_STYLE_GREY)
-	);
-
-$times->addItem(
-	(new CTag('tfoot', true))
-		->addItem(
-			(new CCol(
-				(new CSimpleButton(_('Add')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('js-add')
-			))->setColSpan(4)
-		)
-);
-
-$sla_tab = (new CFormGrid())
-	->addItem([
-		new CLabel(_('SLA'), 'showsla'),
-		new CFormField(
-			new CHorList([
-				(new CCheckBox('showsla'))->setChecked($data['form']['showsla'] == SERVICE_SHOW_SLA_ON),
-				(new CTextBox('goodsla', $data['form']['goodsla'], false, 8))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-			])
-		)
-	])
-	->addItem([
-		new CLabel(_('Service times')),
-		new CFormField([
-			(new CDiv($times))
-				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-		])
-	]);
-
 // Tags tab.
 
 $tags_tab = (new CFormGrid())
@@ -284,7 +267,6 @@ $child_services = (new CTable())
 	->setHeader(
 		(new CRowHeader([
 			_('Service'),
-			_('Status calculation rule'),
 			_('Problem tags'),
 			_('Action')
 		]))->addClass(ZBX_STYLE_GREY)
@@ -304,7 +286,7 @@ $child_services = (new CTable())
 							(new CListItem(null))
 								->addClass(ZBX_STYLE_INLINE_FILTER_STATS)
 						)
-				))->setColSpan(4)
+				))->setColSpan(3)
 			)
 	);
 
@@ -342,7 +324,6 @@ $child_services_tab = [
 $tabs = (new CTabView())
 	->setSelected(0)
 	->addTab('service-tab', _('Service'), $service_tab)
-	->addTab('sla-tab', _('SLA'), $sla_tab, TAB_INDICATOR_SLA)
 	->addTab('tags-tab', _('Tags'), $tags_tab, TAB_INDICATOR_TAGS)
 	->addTab('child-services-tab', _('Child services'), $child_services_tab, TAB_INDICATOR_CHILD_SERVICES);
 
@@ -352,25 +333,23 @@ $form
 	->addItem($tabs)
 	->addItem(
 		(new CScriptTag('
-			const params = '.json_encode([
+			service_edit_popup.init('.json_encode([
 				'serviceid' => $data['serviceid'],
 				'children' => $data['form']['children'],
 				'children_problem_tags_html' => $data['form']['children_problem_tags_html'],
 				'problem_tags' => $data['form']['problem_tags'],
 				'status_rules' => $data['form']['status_rules'],
-				'service_times' => $data['form']['times'],
 				'create_url' => (new CUrl('zabbix.php'))
 					->setArgument('action', 'service.create')
 					->getUrl(),
 				'update_url' => (new CUrl('zabbix.php'))
 					->setArgument('action', 'service.update')
 					->getUrl(),
+				'delete_url' => (new CUrl('zabbix.php'))
+					->setArgument('action', 'service.delete')
+					->getUrl(),
 				'search_limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
-			]).'
-
-			params.algorithm_names = '.json_encode(CServiceHelper::getAlgorithmNames(), JSON_FORCE_OBJECT).';
-
-			service_edit_popup.init(params);
+			]).');
 		'))->setOnDocumentReady()
 	);
 
@@ -388,6 +367,7 @@ if ($data['serviceid'] !== null) {
 			'title' => _('Clone'),
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-clone']),
 			'keepOpen' => true,
+			'isSubmit' => false,
 			'action' => 'service_edit_popup.clone('.json_encode(_('New service')).');'
 		],
 		[
@@ -396,6 +376,14 @@ if ($data['serviceid'] !== null) {
 			'keepOpen' => true,
 			'isSubmit' => true,
 			'action' => 'service_edit_popup.submit();'
+		],
+		[
+			'title' => _('Delete'),
+			'confirmation' => _('Delete selected service?'),
+			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-delete']),
+			'keepOpen' => true,
+			'isSubmit' => false,
+			'action' => 'service_edit_popup.delete();'
 		]
 	];
 }

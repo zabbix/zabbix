@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,9 +42,7 @@ int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_CPU_SWITCHES(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_CPU_INTR(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_HW_CHASSIS(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_HW_CPU(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_HW_DEVICES(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_HW_MACADDR(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_SW_OS(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_SW_PACKAGES(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -89,12 +87,8 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 		cfunc = unsafe.Pointer(C.SYSTEM_CPU_SWITCHES)
 	case "system.cpu.intr":
 		cfunc = unsafe.Pointer(C.SYSTEM_CPU_INTR)
-	case "system.hw.chassis":
-		cfunc = unsafe.Pointer(C.SYSTEM_HW_CHASSIS)
 	case "system.hw.cpu":
 		cfunc = unsafe.Pointer(C.SYSTEM_HW_CPU)
-	case "system.hw.devices":
-		cfunc = unsafe.Pointer(C.SYSTEM_HW_DEVICES)
 	case "system.hw.macaddr":
 		cfunc = unsafe.Pointer(C.SYSTEM_HW_MACADDR)
 	case "system.sw.os":

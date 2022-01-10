@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -82,8 +82,6 @@ class testComplexServiceStatus extends CIntegrationTest {
 		$response = $this->call('service.create', [
 			'name' => 'Parent',
 			'algorithm' => 1,
-			'goodsla' => 99.99,
-			'showsla' => 0,
 			'weight' => 0,
 			'sortorder' => 0
 		]);
@@ -136,8 +134,6 @@ class testComplexServiceStatus extends CIntegrationTest {
 			$response = $this->call('service.create', [
 				'name' => $service_desc,
 				'algorithm' => 1,
-				'goodsla' => 99.99,
-				'showsla' => 0,
 				'weight' => 100,
 				'sortorder' => 0,
 				'parents' => [

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,8 +34,6 @@
  *                                                                            *
  * Purpose: send configuration tables to the proxy from server                *
  *          (for active proxies)                                              *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
@@ -128,8 +126,6 @@ out:
  * Function: recv_proxyconfig                                                 *
  *                                                                            *
  * Purpose: receive configuration tables from server (passive proxies)        *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 void	recv_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)

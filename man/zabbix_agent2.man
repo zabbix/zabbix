@@ -33,7 +33,7 @@
 .
 .  hy \\n(HY
 ..
-.TH ZABBIX_AGENT2 8 "2019\-01\-29" Zabbix
+.TH ZABBIX_AGENT2 8 "2022\-01\-06" Zabbix
 .SH NAME
 zabbix_agent2 \- Zabbix agent 2
 .SH SYNOPSIS
@@ -167,5 +167,3 @@ Documentation
 .BR zabbix_server (8),
 .BR zabbix_js (1),
 .BR zabbix_web_service (8)
-.SH AUTHOR
-Zabbix LLC

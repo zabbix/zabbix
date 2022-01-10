@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,9 +45,11 @@ func getListener(socket string) (listener net.Listener, err error) {
 }
 
 func cleanUpExternal() {
-	err := syscall.Unlink(pluginsocket)
-	if err != nil {
-		log.Critf("failed to clean up after plugins, %s", err)
+	if pluginsocket != "" {
+		err := syscall.Unlink(pluginsocket)
+		if err != nil {
+			log.Critf("failed to clean up after plugins, %s", err)
+		}
 	}
 }
 

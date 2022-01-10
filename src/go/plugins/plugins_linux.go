@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ import (
 	_ "zabbix.com/plugins/redis"
 	_ "zabbix.com/plugins/smart"
 	_ "zabbix.com/plugins/system/cpu"
+	_ "zabbix.com/plugins/system/hw"
 	_ "zabbix.com/plugins/system/sw"
 	_ "zabbix.com/plugins/system/swap"
 	_ "zabbix.com/plugins/system/uname"

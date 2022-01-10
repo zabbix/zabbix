@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,8 +57,6 @@ extern int	CONFIG_TCP_MAX_BACKLOG_SIZE;
  * Purpose: return string describing tcp error                                *
  *                                                                            *
  * Return value: pointer to the null terminated string                        *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
 
@@ -132,8 +130,6 @@ static int	zbx_socket_peer_ip_save(zbx_socket_t *s)
  * Function: zbx_gethost_by_ip                                                *
  *                                                                            *
  * Purpose: retrieve 'hostent' by IP address                                  *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
 #ifdef HAVE_IPV6
@@ -269,8 +265,6 @@ static int zbx_is_win_ver_or_greater(zbx_uint32_t major, zbx_uint32_t minor, zbx
  *                                                                            *
  * Return value: SUCCEED or FAIL - an error occurred                          *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
  ******************************************************************************/
 #ifdef _WINDOWS
 int	zbx_socket_start(char **error)
@@ -294,8 +288,6 @@ int	zbx_socket_start(char **error)
  *                                                                            *
  * Purpose: initialize socket                                                 *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  ******************************************************************************/
 static void	zbx_socket_clean(zbx_socket_t *s)
 {
@@ -309,8 +301,6 @@ static void	zbx_socket_clean(zbx_socket_t *s)
  * Function: zbx_socket_free                                                  *
  *                                                                            *
  * Purpose: free socket's dynamic buffer                                      *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_socket_free(zbx_socket_t *s)
@@ -327,8 +317,6 @@ static void	zbx_socket_free(zbx_socket_t *s)
  *                                                                            *
  * Parameters: s       - [IN] socket descriptor                               *
  *             timeout - [IN] timeout, in seconds                             *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 void	zbx_socket_timeout_set(zbx_socket_t *s, int timeout)
@@ -360,8 +348,6 @@ void	zbx_socket_timeout_set(zbx_socket_t *s, int timeout)
  * Purpose: clean up timeout for socket operations                            *
  *                                                                            *
  * Parameters: s - [OUT] socket descriptor                                    *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_socket_timeout_cleanup(zbx_socket_t *s)
@@ -496,8 +482,6 @@ static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, sock
  *                                                                            *
  * Return value: SUCCEED - connected successfully                             *
  *               FAIL - an error occurred                                     *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
 #ifdef HAVE_IPV6
@@ -800,8 +784,6 @@ static ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len)
  * Return value: SUCCEED - success                                            *
  *               FAIL - an error occurred                                     *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
  * Comments:                                                                  *
  *     RFC 5246 "The Transport Layer Security (TLS) Protocol. Version 1.2"    *
  *     says: "The record layer fragments information blocks into TLSPlaintext *
@@ -955,8 +937,6 @@ cleanup:
  *                                                                            *
  * Purpose: close open TCP socket                                             *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  ******************************************************************************/
 void	zbx_tcp_close(zbx_socket_t *s)
 {
@@ -981,8 +961,6 @@ void	zbx_tcp_close(zbx_socket_t *s)
  *                                                                            *
  * Return value: SUCCEED - success                                            *
  *               FAIL - an error occurred                                     *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 #ifdef HAVE_IPV6
@@ -1027,8 +1005,6 @@ out:
  *                                                                            *
  * Return value: SUCCEED - success                                            *
  *               FAIL - an error occurred                                     *
- *                                                                            *
- * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
  *                                                                            *
  ******************************************************************************/
 #ifdef HAVE_IPV6
@@ -1417,8 +1393,6 @@ void	zbx_tcp_unlisten(zbx_socket_t *s)
  * Return value: SUCCEED - success                                            *
  *               FAIL - an error occurred                                     *
  *                                                                            *
- * Author: Eugene Grigorjev, Aleksandrs Saveljevs                             *
- *                                                                            *
  ******************************************************************************/
 int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept)
 {
@@ -1538,8 +1512,6 @@ out:
  * Function: zbx_tcp_unaccept                                                 *
  *                                                                            *
  * Purpose: close accepted connection                                         *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
 void	zbx_tcp_unaccept(zbx_socket_t *s)
@@ -1774,8 +1746,6 @@ static ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len)
  *                                                                            *
  * Return value: number of bytes received - success,                          *
  *               FAIL - an error occurred                                     *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
 ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout, unsigned char flags)
@@ -2310,8 +2280,6 @@ int	zbx_validate_peer_list(const char *peer_list, char **error)
  *                                                                            *
  * Return value: SUCCEED - connection allowed                                 *
  *               FAIL - connection is not allowed                             *
- *                                                                            *
- * Author: Alexei Vladishev, Dmitry Borovikov                                 *
  *                                                                            *
  * Comments: standard, compatible and IPv4-mapped addresses are treated       *
  *           the same: 127.0.0.1 == ::127.0.0.1 == ::ffff:127.0.0.1           *

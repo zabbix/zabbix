@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1317,8 +1317,6 @@ void	zbx_wildcard_minimize(char *str)
  *                                                                            *
  * Return value: 1 - value match the wildcard                                 *
  *               0 - otherwise                                                *
- *                                                                            *
- * Author: Andrejs Tumilovics                                                 *
  *                                                                            *
  ******************************************************************************/
 int	zbx_wildcard_match(const char *value, const char *wildcard)

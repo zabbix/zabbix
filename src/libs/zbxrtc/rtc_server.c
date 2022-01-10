@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -125,6 +125,8 @@ int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data, char 
 	return SUCCEED;
 }
 
+#if defined(HAVE_SIGQUEUE)
+
 /******************************************************************************
  *                                                                            *
  * Function: rtc_process_loglevel                                             *
@@ -185,6 +187,7 @@ static int	rtc_process_loglevel(int direction, const char *data, char **result)
 	return FAIL;
 }
 
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -435,6 +438,7 @@ int	rtc_process_request_ex(int code, const unsigned char *data, char **result)
 
 	switch (code)
 	{
+#if defined(HAVE_SIGQUEUE)
 		case ZBX_RTC_LOG_LEVEL_INCREASE:
 			return rtc_process_loglevel(1, (const char *)data, result);
 		case ZBX_RTC_LOG_LEVEL_DECREASE:
@@ -455,6 +459,7 @@ int	rtc_process_request_ex(int code, const unsigned char *data, char **result)
 			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_PROBLEMHOUSEKEEPER, 1,
 					ZBX_RTC_MAKE_MESSAGE(code, 0, 0), result);
 			return SUCCEED;
+#endif
 		case ZBX_RTC_DIAGINFO:
 			rtc_process_diaginfo((const char *)data, result);
 			return FAIL;

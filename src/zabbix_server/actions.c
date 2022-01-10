@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -913,8 +913,6 @@ static void	check_condition_event_tag_value(const zbx_vector_ptr_t *esc_events, 
  *                                                                            *
  * Return value: SUCCEED - matches, FAIL - otherwise                          *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  ******************************************************************************/
 static void	check_trigger_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
 {
@@ -1802,8 +1800,6 @@ static int	check_dservice_port_condition(const zbx_vector_ptr_t *esc_events, zbx
  *                                                                            *
  * Return value: SUCCEED - matches, FAIL - otherwise                          *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  ******************************************************************************/
 static void	check_discovery_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
 {
@@ -2026,8 +2022,6 @@ static int	check_areg_proxy_condition(const zbx_vector_ptr_t *esc_events, zbx_co
  *             condition - condition for matching                             *
  *                                                                            *
  * Return value: SUCCEED - matches, FAIL - otherwise                          *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
 static void	check_autoregistration_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
@@ -2577,7 +2571,6 @@ static void	check_internal_condition(const zbx_vector_ptr_t *esc_events, zbx_con
  *             source     - [IN] specific event source that need checking     *
  *             condition  - [IN/OUT] condition for matching, outputs          *
  *                                   event ids that match condition           *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
 static void	check_events_condition(const zbx_vector_ptr_t *esc_events, unsigned char source, zbx_condition_t *condition)
@@ -2619,8 +2612,6 @@ static void	check_events_condition(const zbx_vector_ptr_t *esc_events, unsigned 
  *             condition - condition for matching                             *
  *                                                                            *
  * Return value: SUCCEED - matches, FAIL - otherwise                          *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
 int	check_action_condition(const DB_EVENT *event, zbx_condition_t *condition)
@@ -2763,8 +2754,6 @@ clean:
  * Purpose: execute host, group, template operations linked to the action     *
  *                                                                            *
  * Parameters: action - action to execute operations for                      *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: for message, command operations see                              *
  *           escalation_execute_operations(),                                 *
@@ -3019,7 +3008,6 @@ static int	uniq_conditions_compare_func(const void *d1, const void *d2)
  * Purpose: generate hash based on condition values                           *
  *                                                                            *
  * Parameters: data - [IN] condition structure                                *
- *                                                                            *
  *                                                                            *
  * Return value: hash is generated                                            *
  *                                                                            *
