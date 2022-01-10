@@ -83,8 +83,8 @@
 			});
 		},
 
-		edit(options = {}) {
-			const overlay = PopUp('popup.sla.edit', options, 'sla_edit', document.activeElement);
+		edit(parameters = {}) {
+			const overlay = PopUp('popup.sla.edit', parameters, {dialogue_id: 'sla_edit'});
 
 			overlay.$dialogue[0].classList.add(<?= json_encode(ZBX_STYLE_STICKED_TO_TOP) ?>);
 

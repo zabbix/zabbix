@@ -114,7 +114,8 @@ Overlay.prototype.centerDialog = function() {
 	});
 
 	this.$dialogue.css({
-		'left': Math.max(0, Math.floor((jQuery(window).width() - this.$dialogue.outerWidth(true)) / 2)) + 'px'
+		'left': Math.max(0, Math.floor((jQuery(window).width() - this.$dialogue.outerWidth(true)) / 2)) + 'px',
+		'top': ''
 	});
 
 	if (this.$dialogue.hasClass('position-middle')) {
