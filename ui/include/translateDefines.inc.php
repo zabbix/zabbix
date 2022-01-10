@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,13 +26,27 @@ define('UNRESOLVED_MACRO_STRING', '*'._('UNKNOWN').'*');
 
 /**
  * Date and time formats.
+ * Date formats must be compatible with the CDate class (class.cdate.js).
  */
 define('DATE_TIME_FORMAT_SECONDS', _('Y-m-d H:i:s'));
+define('DATE_TIME_FORMAT_SECONDS_PLACEHOLDER', _('YYYY-MM-DD hh:mm:ss'));
 define('DATE_TIME_FORMAT', _('Y-m-d H:i'));
+define('DATE_TIME_FORMAT_PLACEHOLDER', _('YYYY-MM-DD hh:mm'));
 define('DATE_TIME_FORMAT_SHORT', _('m-d H:i'));
 define('DATE_FORMAT', _('Y-m-d'));
+define('DATE_FORMAT_PLACEHOLDER', _('YYYY-MM-DD'));
+define('DATE_FORMAT_SHORT', _('m-d'));
 define('TIME_FORMAT_SECONDS', _('H:i:s'));
 define('TIME_FORMAT', _('H:i'));
+
 define('SVG_GRAPH_DATE_TIME_FORMAT_SHORT', _('n-d H:i'));
 define('SVG_GRAPH_DATE_FORMAT', _('Y-n-d'));
 define('SVG_GRAPH_DATE_FORMAT_SHORT', _('n-d'));
+
+define('ZBX_SLA_PERIOD_DATE_FORMAT_DAILY', DATE_FORMAT);
+define('ZBX_SLA_PERIOD_DATE_FORMAT_WEEKLY_FROM', DATE_FORMAT);
+define('ZBX_SLA_PERIOD_DATE_FORMAT_WEEKLY_TO', DATE_FORMAT_SHORT);
+define('ZBX_SLA_PERIOD_DATE_FORMAT_MONTHLY', _x('Y-m', DATE_FORMAT_CONTEXT));
+define('ZBX_SLA_PERIOD_DATE_FORMAT_QUARTERLY_FROM', _x('Y-m', DATE_FORMAT_CONTEXT));
+define('ZBX_SLA_PERIOD_DATE_FORMAT_QUARTERLY_TO', _x('m', DATE_FORMAT_CONTEXT));
+define('ZBX_SLA_PERIOD_DATE_FORMAT_ANNUALLY', _x('Y', DATE_FORMAT_CONTEXT));

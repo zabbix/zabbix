@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -134,8 +134,6 @@ out:
  *                                                                            *
  * Return value: program name without path                                    *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
  ******************************************************************************/
 const char	*get_program_name(const char *path)
 {
@@ -155,8 +153,6 @@ const char	*get_program_name(const char *path)
  * Function: zbx_timespec                                                     *
  *                                                                            *
  * Purpose: Gets the current time.                                            *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: Time in seconds since midnight (00:00:00),                       *
  *           January 1, 1970, coordinated universal time (UTC).               *
@@ -281,8 +277,6 @@ void	zbx_timespec(zbx_timespec_t *ts)
  *                                                                            *
  * Return value: Time in seconds                                              *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
  * Comments: Time in seconds since midnight (00:00:00),                       *
  *           January 1, 1970, coordinated universal time (UTC).               *
  *                                                                            *
@@ -303,8 +297,6 @@ double	zbx_time(void)
  * Purpose: Gets the current time including UTC offset                        *
  *                                                                            *
  * Return value: Time in seconds                                              *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
 double	zbx_current_time(void)
@@ -520,8 +512,6 @@ int	zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec, int *t
  * Return value: 28-31 depending on number of days in the month, defaults to  *
  *               30 if the month is outside of allowed range                  *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  ******************************************************************************/
 int	zbx_day_in_month(int year, int mon)
 {
@@ -563,8 +553,6 @@ zbx_uint64_t	zbx_get_duration_ms(const zbx_timespec_t *ts)
  *                                                                            *
  * Return value: returns a pointer to the newly allocated memory              *
  *                                                                            *
- * Author: Eugene Grigorjev, Rudolfs Kreicbergs                               *
- *                                                                            *
  ******************************************************************************/
 void	*zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_t size)
 {
@@ -601,8 +589,6 @@ void	*zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_
  * Purpose: allocates size bytes of memory                                    *
  *                                                                            *
  * Return value: returns a pointer to the newly allocated memory              *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
 void	*zbx_malloc2(const char *filename, int line, void *old, size_t size)
@@ -641,8 +627,6 @@ void	*zbx_malloc2(const char *filename, int line, void *old, size_t size)
  *          to size bytes                                                     *
  *                                                                            *
  * Return value: returns a pointer to the newly allocated memory              *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
 void	*zbx_realloc2(const char *filename, int line, void *old, size_t size)
@@ -713,8 +697,6 @@ void	*zbx_guaranteed_memset(void *v, int c, size_t n)
  *                                                                            *
  * Purpose: set process title                                                 *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
  ******************************************************************************/
 void	zbx_setproctitle(const char *fmt, ...)
 {
@@ -747,8 +729,6 @@ void	zbx_setproctitle(const char *fmt, ...)
  *                                                                            *
  * Return value: FAIL - out of period, SUCCEED - within the period            *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  ******************************************************************************/
 static int	check_time_period(const zbx_time_period_t period, struct tm *tm)
 {
@@ -773,8 +753,6 @@ static int	check_time_period(const zbx_time_period_t period, struct tm *tm)
  *                                                                            *
  * Return value: delay value - either default or minimum delay value          *
  *                             out of all applicable intervals                *
- *                                                                            *
- * Author: Alexei Vladishev, Alexander Vladishev, Aleksandrs Saveljevs        *
  *                                                                            *
  ******************************************************************************/
 static int	get_current_delay(int default_delay, const zbx_flexible_interval_t *flex_intervals, time_t now)
@@ -807,8 +785,6 @@ static int	get_current_delay(int default_delay, const zbx_flexible_interval_t *f
  *                                                                            *
  * Return value: SUCCEED - there is a next interval                           *
  *               FAIL - otherwise (in this case, next_interval is unaffected) *
- *                                                                            *
- * Author: Alexei Vladishev, Alexander Vladishev, Aleksandrs Saveljevs        *
  *                                                                            *
  ******************************************************************************/
 static int	get_next_delay_interval(const zbx_flexible_interval_t *flex_intervals, time_t now, time_t *next_interval)
@@ -2233,8 +2209,6 @@ void	zbx_custom_interval_free(zbx_custom_interval_t *custom_intervals)
  *                                                                            *
  * Return value: nextcheck value                                              *
  *                                                                            *
- * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
- *                                                                            *
  * Comments: if item check is forbidden with delay=0 (default and flexible),  *
  *           a timestamp very far in the future is returned                   *
  *                                                                            *
@@ -2384,8 +2358,6 @@ int	calculate_item_nextcheck_unreachable(int simple_interval, const zbx_custom_i
  *                                                                            *
  * Return value: nextcheck value                                              *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  ******************************************************************************/
 time_t	calculate_proxy_nextcheck(zbx_uint64_t hostid, unsigned int delay, time_t now)
 {
@@ -2409,8 +2381,6 @@ time_t	calculate_proxy_nextcheck(zbx_uint64_t hostid, unsigned int delay, time_t
  *                                                                            *
  * Return value: SUCCEED - is IPv4 address                                    *
  *               FAIL - otherwise                                             *
- *                                                                            *
- * Author: Alexei Vladishev, Alexander Vladishev                              *
  *                                                                            *
  ******************************************************************************/
 int	is_ip4(const char *ip)
@@ -2462,8 +2432,6 @@ int	is_ip4(const char *ip)
  *                                                                            *
  * Return value: SUCCEED - is IPv6 address                                    *
  *               FAIL - otherwise                                             *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 int	is_ip6(const char *ip)
@@ -2529,8 +2497,6 @@ int	is_ip6(const char *ip)
  * Return value: SUCCEED - is IP address                                      *
  *               FAIL - otherwise                                             *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  ******************************************************************************/
 int	is_supported_ip(const char *ip)
 {
@@ -2553,8 +2519,6 @@ int	is_supported_ip(const char *ip)
  *                                                                            *
  * Return value: SUCCEED - is IP address                                      *
  *               FAIL - otherwise                                             *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 int	is_ip(const char *ip)
@@ -2678,8 +2642,6 @@ out:
  *                                                                            *
  * Return value: FAIL - out of period, SUCCEED - within the period            *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  ******************************************************************************/
 int	int_in_list(char *list, int value)
 {
@@ -2748,8 +2710,6 @@ int	zbx_double_compare(double a, double b)
  * Return value:  SUCCEED - the string is double                              *
  *                FAIL - otherwise                                            *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  * Comments: the function automatically processes suffixes K, M, G, T and     *
  *           s, m, h, d, w                                                    *
  *                                                                            *
@@ -2802,8 +2762,6 @@ static int	is_double_valid_syntax(const char *str)
  *                FAIL - the string does not represent a valid 'double' or    *
  *                       its value is outside of valid range                  *
  *                                                                            *
- * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
- *                                                                            *
  ******************************************************************************/
 int	is_double(const char *str, double *value)
 {
@@ -2842,8 +2800,6 @@ int	is_double(const char *str, double *value)
  *                                                                            *
  * Return value: SUCCEED - the string is valid and within reasonable limits   *
  *               FAIL    - otherwise                                          *
- *                                                                            *
- * Author: Aleksandrs Saveljevs, Vladimir Levijev                             *
  *                                                                            *
  * Comments: the function automatically processes suffixes s, m, h, d, w      *
  *                                                                            *
@@ -2948,8 +2904,6 @@ int	_wis_uint(const wchar_t *wide_string)
  * Return value:  SUCCEED - the string is unsigned integer                    *
  *                FAIL - the string is not a number or its value is outside   *
  *                       the specified range                                  *
- *                                                                            *
- * Author: Alexander Vladishev, Andris Zeila                                  *
  *                                                                            *
  ******************************************************************************/
 int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max)
@@ -3067,8 +3021,6 @@ int	is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint
  * Return value:  SUCCEED - the string is boolean                             *
  *                FAIL - otherwise                                            *
  *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
- *                                                                            *
  ******************************************************************************/
 int	is_boolean(const char *str, zbx_uint64_t *value)
 {
@@ -3109,8 +3061,6 @@ int	is_boolean(const char *str, zbx_uint64_t *value)
  * Return value:  SUCCEED - the string is unsigned octal                      *
  *                FAIL - otherwise                                            *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  ******************************************************************************/
 int	is_uoct(const char *str)
 {
@@ -3148,8 +3098,6 @@ int	is_uoct(const char *str)
  * Return value:  SUCCEED - the string is unsigned hexadecimal                *
  *                FAIL - otherwise                                            *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  ******************************************************************************/
 int	is_uhex(const char *str)
 {
@@ -3186,8 +3134,6 @@ int	is_uhex(const char *str)
  *                                                                            *
  * Return value:  SUCCEED - the string is formatted like the example above    *
  *                FAIL - otherwise                                            *
- *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
  ******************************************************************************/
 int	is_hex_string(const char *str)
@@ -3268,8 +3214,6 @@ int	get_nearestindex(const void *p, size_t sz, int num, zbx_uint64_t id)
  *                                                                            *
  * Purpose: add uint64 value to dynamic array                                 *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  ******************************************************************************/
 int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t value, int alloc_step)
 {
@@ -3299,13 +3243,6 @@ int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t v
 	return index;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: uint64_array_exists                                              *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
 int	uint64_array_exists(const zbx_uint64_t *values, int num, zbx_uint64_t value)
 {
 	int	index;
@@ -3322,8 +3259,6 @@ int	uint64_array_exists(const zbx_uint64_t *values, int num, zbx_uint64_t value)
  * Function: uint64_array_remove                                              *
  *                                                                            *
  * Purpose: remove uint64 values from array                                   *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 void	uint64_array_remove(zbx_uint64_t *values, int *num, const zbx_uint64_t *rm_values, int rm_num)
@@ -3380,8 +3315,6 @@ zbx_uint64_t	suffix2factor(char c)
  * Return value:  SUCCEED - the string is unsigned integer                    *
  *                FAIL - otherwise                                            *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  * Comments: the function automatically processes suffixes K, M, G, T         *
  *                                                                            *
  ******************************************************************************/
@@ -3418,8 +3351,6 @@ int	str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value)
  *                                                                            *
  * Return value: converted double value                                       *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  * Comments: the function automatically processes suffixes K, M, G, T and     *
  *           s, m, h, d, w                                                    *
  *                                                                            *
@@ -3439,8 +3370,6 @@ double	str2double(const char *str)
  *                                                                            *
  * Return value:  SUCCEED - the char is allowed in the host name              *
  *                FAIL - otherwise                                            *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: in host name allowed characters: '0-9a-zA-Z. _-'                 *
  *           !!! Don't forget to sync the code with PHP !!!                   *
@@ -3464,8 +3393,6 @@ int	is_hostname_char(unsigned char c)
  * Return value:  SUCCEED - the char is allowed in the item key               *
  *                FAIL - otherwise                                            *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  * Comments: in key allowed characters: '0-9a-zA-Z._-'                        *
  *           !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
@@ -3488,8 +3415,6 @@ int	is_key_char(unsigned char c)
  * Return value:  SUCCEED - the char is allowed in the trigger function       *
  *                FAIL - otherwise                                            *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  * Comments: in trigger function allowed characters: 'a-z'                    *
  *           !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
@@ -3508,8 +3433,6 @@ int	is_function_char(unsigned char c)
  *                                                                            *
  * Return value:  SUCCEED - the char is allowed in the macro name             *
  *                FAIL - otherwise                                            *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: allowed characters in macro names: '0-9A-Z._'                    *
  *           !!! Don't forget to sync the code with PHP !!!                   *
@@ -3588,8 +3511,6 @@ zbx_function_type_t	zbx_get_function_type(const char *func)
  *                                                                            *
  * Parameters: host - the target C-style string                               *
  *                                                                            *
- * Author: Dmitry Borovikov                                                   *
- *                                                                            *
  * Comments: the string must be null-terminated, otherwise not secure!        *
  *                                                                            *
  ******************************************************************************/
@@ -3615,8 +3536,6 @@ void	make_hostname(char *host)
  * Parameters:                                                                *
  *                                                                            *
  * Return value: Interface type                                               *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
@@ -3656,8 +3575,6 @@ unsigned char	get_interface_type_by_item_type(unsigned char type)
  *             max_sleeptime - [IN] maximum sleep time, in seconds            *
  *                                                                            *
  * Return value: sleep time, in seconds                                       *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 int	calculate_sleeptime(int nextcheck, int max_sleeptime)

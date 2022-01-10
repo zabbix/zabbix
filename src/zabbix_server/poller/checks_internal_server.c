@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 #include "preproc.h"
 #include "zbxlld.h"
 #include "checks_internal.h"
-#include "../ha/ha.h"
+#include "zbxha.h"
 
 /******************************************************************************
  *                                                                            *

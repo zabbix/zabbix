@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@
 #include "../../libs/zbxserver/zabbix_stats.h"
 #include "zbxipcservice.h"
 #include "../poller/checks_snmp.h"
+#include "zbxrtc.h"
 
 #include "trapper_auth.h"
 #include "trapper_preproc.h"
@@ -175,8 +176,6 @@ static void	recv_senderhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zb
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 static void	recv_proxy_heartbeat(zbx_socket_t *sock, struct zbx_json_parse *jp)
@@ -1225,13 +1224,6 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
-
-	/* configuration sync is performed by trappers on passive Zabbix proxy */
-	if (1 == process_num && 0 == CONFIG_CONFSYNCER_FORKS)
-	{
-		zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
-		DCsync_configuration(ZBX_DBSYNC_INIT, NULL);
-	}
 
 	zbx_set_sigusr_handler(zbx_trapper_sigusr_handler);
 
