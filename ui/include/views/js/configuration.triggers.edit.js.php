@@ -95,21 +95,16 @@
 		/**
 		 * @see init.js add.popup event
 		 */
-		addPopupValues(list) {
-			if (!isset('object', list)) {
+		addPopupValues(data) {
+			if (!('object' in data) || data.object !== 'deptrigger') {
 				return false;
 			}
 
-			if (list.object === 'deptrigger') {
-				for (let i = 0; i < list.values.length; i++) {
-					create_var('triggersForm', 'new_dependency[' + i + ']', list.values[i].triggerid, false);
-				}
-
-				// Return to the same form after it has been submitted.
-				jQuery('#action').val(<?= json_encode(getRequest('action')) ?>);
-
-				create_var('triggersForm', 'add_dependency', 1, true);
+			for (let i = 0; i < data.values.length; i++) {
+				create_var(this.form_name, 'new_dependency[' + i + ']', data.values[i].triggerid, false);
 			}
+
+			create_var(this.form_name, 'add_dependency', 1, true);
 		},
 
 		removeDependency(triggerid) {
