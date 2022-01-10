@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -554,7 +554,7 @@ class testSID extends CWebTest {
 			else {
 				$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "Admin". You have no permissions to access this page.');
 				$this->query('button:Go to dashboard')->one()->waitUntilClickable()->click();
-				$this->assertContains('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
+				$this->assertStringContainsString('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
 			}
 		}
 	}
@@ -1060,7 +1060,7 @@ class testSID extends CWebTest {
 			$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "Admin". You have no permissions to access this page.');
 			$this->query('button:Go to dashboard')->one()->waitUntilClickable()->click();
 			$this->page->waitUntilReady();
-			$this->assertContains('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
+			$this->assertStringContainsString('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
 		}
 		else {
 			$this->assertMessage(TEST_BAD, 'Zabbix has received an incorrect request.', 'Operation cannot be'.

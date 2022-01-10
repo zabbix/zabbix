@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -713,15 +713,18 @@ static void	add_sentusers_msg_esc_cancel(ZBX_USER_MSG **user_msg, zbx_uint64_t a
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select distinct userid,mediatypeid,subject,message,esc_step"
+			"select userid,mediatypeid,subject,message,esc_step"
 			" from alerts"
-			" where actionid=" ZBX_FS_UI64
-				" and mediatypeid is not null"
-				" and alerttype=%d"
-				" and acknowledgeid is null"
-				" and eventid=" ZBX_FS_UI64
-				" order by userid,mediatypeid,esc_step desc",
-				actionid, ALERT_TYPE_MESSAGE, event->eventid);
+			" where alertid in (select max(alertid)"
+				" from alerts"
+				" where actionid=" ZBX_FS_UI64
+					" and mediatypeid is not null"
+					" and alerttype=%d"
+					" and acknowledgeid is null"
+					" and eventid=" ZBX_FS_UI64
+					" group by userid,mediatypeid,esc_step)"
+			" order by userid,mediatypeid,esc_step desc",
+			actionid, ALERT_TYPE_MESSAGE, event->eventid);
 
 	result = DBselect("%s", sql);
 
@@ -889,7 +892,7 @@ static int	get_dynamic_hostid(const DB_EVENT *event, DC_HOST *host, char *error,
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	offset = zbx_snprintf(sql, sizeof(sql), "select distinct h.hostid,h.proxy_hostid,h.host,h.tls_connect");
+	offset = zbx_snprintf(sql, sizeof(sql), "select distinct h.hostid,h.proxy_hostid,h.host,h.name,h.tls_connect");
 #ifdef HAVE_OPENIPMI
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
 			/* do not forget to update ZBX_IPMI_FIELDS_NUM if number of selected IPMI fields changes */
@@ -971,19 +974,20 @@ static int	get_dynamic_hostid(const DB_EVENT *event, DC_HOST *host, char *error,
 		ZBX_STR2UINT64(host->hostid, row[0]);
 		ZBX_DBROW2UINT64(host->proxy_hostid, row[1]);
 		strscpy(host->host, row[2]);
-		ZBX_STR2UCHAR(host->tls_connect, row[3]);
+		strscpy(host->name, row[3]);
+		ZBX_STR2UCHAR(host->tls_connect, row[4]);
 
 #ifdef HAVE_OPENIPMI
-		host->ipmi_authtype = (signed char)atoi(row[4]);
-		host->ipmi_privilege = (unsigned char)atoi(row[5]);
-		strscpy(host->ipmi_username, row[6]);
-		strscpy(host->ipmi_password, row[7]);
+		host->ipmi_authtype = (signed char)atoi(row[5]);
+		host->ipmi_privilege = (unsigned char)atoi(row[6]);
+		strscpy(host->ipmi_username, row[7]);
+		strscpy(host->ipmi_password, row[8]);
 #endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		strscpy(host->tls_issuer, row[4 + ZBX_IPMI_FIELDS_NUM]);
-		strscpy(host->tls_subject, row[5 + ZBX_IPMI_FIELDS_NUM]);
-		strscpy(host->tls_psk_identity, row[6 + ZBX_IPMI_FIELDS_NUM]);
-		strscpy(host->tls_psk, row[7 + ZBX_IPMI_FIELDS_NUM]);
+		strscpy(host->tls_issuer, row[5 + ZBX_IPMI_FIELDS_NUM]);
+		strscpy(host->tls_subject, row[6 + ZBX_IPMI_FIELDS_NUM]);
+		strscpy(host->tls_psk_identity, row[7 + ZBX_IPMI_FIELDS_NUM]);
+		strscpy(host->tls_psk, row[8 + ZBX_IPMI_FIELDS_NUM]);
 #endif
 	}
 	DBfree_result(result);
@@ -992,10 +996,12 @@ static int	get_dynamic_hostid(const DB_EVENT *event, DC_HOST *host, char *error,
 	{
 		host->hostid = 0;
 		*host->host = '\0';
+		*host->name = '\0';
 	}
 	else if (0 == host->hostid)
 	{
 		*host->host = '\0';
+		*host->name = '\0';
 
 		zbx_strlcpy(error, "Cannot find a corresponding host", max_error_len);
 		ret = FAIL;

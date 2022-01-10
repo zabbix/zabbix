@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1136,7 +1136,8 @@ void	lld_override_graph(const zbx_vector_ptr_t *overrides, const char *name,	uns
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-int	lld_validate_item_override_no_discover(const zbx_vector_ptr_t *overrides, const char *name)
+int	lld_validate_item_override_no_discover(const zbx_vector_ptr_t *overrides, const char *name,
+		unsigned char override_default)
 {
 	int	i, j;
 
@@ -1153,16 +1154,15 @@ int	lld_validate_item_override_no_discover(const zbx_vector_ptr_t *overrides, co
 			override_operation = (const lld_override_operation_t *)override->override_operations.values[j];
 
 			if (OPERATION_OBJECT_ITEM_PROTOTYPE == override_operation->operationtype &&
-					ZBX_PROTOTYPE_NO_DISCOVER == override_operation->discover &&
 					SUCCEED == regexp_strmatch_condition(name, override_operation->value,
 					override_operation->operator))
 			{
-				return FAIL;
+				return ZBX_PROTOTYPE_NO_DISCOVER == override_operation->discover ? FAIL : SUCCEED;
 			}
 		}
 	}
 
-	return SUCCEED;
+	return ZBX_PROTOTYPE_NO_DISCOVER == override_default ? FAIL : SUCCEED;
 }
 
 static int	lld_rows_get(const char *value, lld_filter_t *filter, zbx_vector_ptr_t *lld_rows,
