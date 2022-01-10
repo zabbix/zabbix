@@ -24,7 +24,7 @@
 #include "zbxalgo.h"
 #include "zbxserver.h"
 #include "zbxregexp.h"
-//#include "proxy.h"
+#include "proxy.h"
 
 #include "../../libs/zbxaudit/audit.h"
 
