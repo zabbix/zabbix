@@ -1,0 +1,140 @@
+<?php declare(strict_types = 1);
+/*
+** Zabbix
+** Copyright (C) 2001-2022 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+
+class CControllerSlaExcludedDowntimeValidate extends CController {
+
+	/**
+	 * @var int
+	 */
+	private $period_from;
+
+	/**
+	 * @var int
+	 */
+	private $period_to;
+
+	protected function init(): void {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	protected function checkInput(): bool {
+		$fields = [
+			'row_index' =>			'required|int32',
+			'name' =>				'required|db sla.name|not_empty',
+			'start_time' =>			'required|string|not_empty',
+			'duration_days' =>		'required|ge 0',
+			'duration_hours' =>		'required|in '.implode(',', range(0, 23)),
+			'duration_minutes' =>	'required|in '.implode(',', range(0, 59))
+		];
+
+		$ret = $this->validateInput($fields);
+
+		if ($ret) {
+			$datetime_from = DateTime::createFromFormat('!'.DATE_TIME_FORMAT, $this->getInput('start_time'));
+			$last_errors = DateTime::getLastErrors();
+
+			if ($datetime_from === false || $last_errors['warning_count'] > 0 || $last_errors['error_count'] > 0) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', 'start_time', _('a time is expected')));
+				$ret = false;
+			}
+
+			$this->period_from = $datetime_from->getTimestamp();
+
+			if ($this->period_from < 0 || $this->period_from > ZBX_MAX_DATE) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', 'start_time',
+					_s('a time not later than %1$s is expected', zbx_date2str(DATE_TIME_FORMAT, ZBX_MAX_DATE))
+				));
+
+				$ret = false;
+			}
+
+			if ($ret) {
+				$duration_days = $this->getInput('duration_days');
+				$duration_hours = $this->getInput('duration_hours');
+				$duration_minutes = $this->getInput('duration_minutes');
+
+				try {
+					$duration = new DateInterval("P{$duration_days}DT{$duration_hours}H{$duration_minutes}M");
+
+					$datetime_to = clone $datetime_from;
+					$datetime_to->add($duration);
+
+					$this->period_to = $datetime_to->getTimestamp();
+
+					if ($this->period_to <= $this->period_from || $this->period_to > ZBX_MAX_DATE) {
+						error(_s('Incorrect value for field "%1$s": %2$s.', 'duration',
+							_s('a time not later than %1$s is expected', zbx_date2str(DATE_TIME_FORMAT, ZBX_MAX_DATE))
+						));
+
+						$ret = false;
+					}
+				}
+				catch (Exception $e) {
+					error(_s('Incorrect value for field "%1$s": %2$s.', 'duration',
+						_s('a time not later than %1$s is expected', zbx_date2str(DATE_TIME_FORMAT, ZBX_MAX_DATE))
+					));
+
+					$ret = false;
+				}
+			}
+		}
+
+		if (!$ret) {
+			$this->setResponse(
+				(new CControllerResponseData([
+					'main_block' => json_encode(['errors' => getMessages()->toString()])
+				]))->disableView()
+			);
+		}
+
+		return $ret;
+	}
+
+	protected function checkPermissions(): bool {
+		return $this->checkAccess(CRoleHelper::UI_SERVICES_SLA) && $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SLA);
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	protected function doAction(): void {
+		$data = [
+			'body' => [
+				'row_index' => $this->getInput('row_index'),
+				'name' => $this->getInput('name'),
+				'period_from' => $this->period_from,
+				'period_to' => $this->period_to,
+				'start_time' => zbx_date2str(DATE_TIME_FORMAT, $this->period_from),
+				'duration' => convertUnitsS($this->period_to - $this->period_from, true)
+			]
+		];
+
+		if ($this->getDebugMode() == GROUP_DEBUG_MODE_ENABLED) {
+			CProfiler::getInstance()->stop();
+			$data['debug'] = CProfiler::getInstance()->make()->toString();
+		}
+
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));
+	}
+}

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -234,7 +234,7 @@ void	zbx_eval_set_exception(zbx_eval_context_t *ctx, char *message);
 #define ZBX_EVAL_EXTRACT_VAR_STR	0x0002
 #define ZBX_EVAL_EXTRACT_VAR_MACRO	0x0004
 
-#define ZBX_EVAL_EXCTRACT_ALL	(ZBX_EVAL_EXTRACT_FUNCTIONID | ZBX_EVAL_EXTRACT_VAR_STR | ZBX_EVAL_EXTRACT_VAR_MACRO)
+#define ZBX_EVAL_EXTRACT_ALL	(ZBX_EVAL_EXTRACT_FUNCTIONID | ZBX_EVAL_EXTRACT_VAR_STR | ZBX_EVAL_EXTRACT_VAR_MACRO)
 
 zbx_eval_context_t *zbx_eval_deserialize_dyn(const unsigned char *data, const char *expression,
 		zbx_uint64_t mask);
@@ -279,4 +279,8 @@ int	zbx_eval_calc_varsamp(zbx_vector_dbl_t *values, double *result, char **error
 int	zbx_eval_calc_histogram_quantile(const double q, const zbx_vector_dbl_t *values, const char *err_fn,
 		double *result, char **error);
 
+int	zbx_eval_calc_avg(zbx_vector_dbl_t *values, double *result, char **error);
+int	zbx_eval_calc_min(zbx_vector_dbl_t *values, double *result, char **error);
+int	zbx_eval_calc_max(zbx_vector_dbl_t *values, double *result, char **error);
+void	zbx_eval_calc_sum(zbx_vector_dbl_t *values, double *result);
 #endif

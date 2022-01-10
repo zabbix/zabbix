@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1067,7 +1067,7 @@ class CHostGroup extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateMassAdd(array $data, ?array &$db_groups): void {
+	private function validateMassAdd(array &$data, ?array &$db_groups): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 			'groups' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
 				'groupid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
@@ -1329,7 +1329,7 @@ class CHostGroup extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkObjectsWithoutGroups(string $objects, array $db_objects, array $groupids): void {
+	public static function checkObjectsWithoutGroups(string $objects, array $db_objects, array $groupids): void {
 		$hostids = array_keys($db_objects);
 
 		$objectids_with_groups = DBfetchColumn(DBselect(

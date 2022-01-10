@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -241,61 +241,7 @@ class CControllerPopupMassupdateItem extends CController {
 			}
 
 			if (array_key_exists('preprocessing', $input) && $input['preprocessing']) {
-				foreach ($input['preprocessing'] as &$step) {
-					switch ($step['type']) {
-						case ZBX_PREPROC_MULTIPLIER:
-						case ZBX_PREPROC_PROMETHEUS_TO_JSON:
-							$step['params'] = trim($step['params'][0]);
-							break;
-
-						case ZBX_PREPROC_RTRIM:
-						case ZBX_PREPROC_LTRIM:
-						case ZBX_PREPROC_TRIM:
-						case ZBX_PREPROC_XPATH:
-						case ZBX_PREPROC_JSONPATH:
-						case ZBX_PREPROC_VALIDATE_REGEX:
-						case ZBX_PREPROC_VALIDATE_NOT_REGEX:
-						case ZBX_PREPROC_ERROR_FIELD_JSON:
-						case ZBX_PREPROC_ERROR_FIELD_XML:
-						case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
-						case ZBX_PREPROC_SCRIPT:
-							$step['params'] = $step['params'][0];
-							break;
-
-						case ZBX_PREPROC_VALIDATE_RANGE:
-						case ZBX_PREPROC_PROMETHEUS_PATTERN:
-							foreach ($step['params'] as &$param) {
-								$param = trim($param);
-							}
-							unset($param);
-
-							$step['params'] = implode("\n", $step['params']);
-							break;
-
-						case ZBX_PREPROC_REGSUB:
-						case ZBX_PREPROC_ERROR_FIELD_REGEX:
-						case ZBX_PREPROC_STR_REPLACE:
-							$step['params'] = implode("\n", $step['params']);
-							break;
-
-						// ZBX-16642
-						case ZBX_PREPROC_CSV_TO_JSON:
-							if (!array_key_exists(2, $step['params'])) {
-								$step['params'][2] = ZBX_PREPROC_CSV_NO_HEADER;
-							}
-							$step['params'] = implode("\n", $step['params']);
-							break;
-
-						default:
-							$step['params'] = '';
-					}
-
-					$step += [
-						'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
-						'error_handler_params' => ''
-					];
-				}
-				unset($step);
+				$input['preprocessing'] = normalizeItemPreprocessingSteps($input['preprocessing']);
 			}
 
 			$items_to_update = [];

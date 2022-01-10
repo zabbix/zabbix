@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,12 +28,14 @@ type Accessor interface {
 	Name() string
 	Capacity() int
 	SetCapacity(capactity int)
+	IsExternal() bool
 }
 
 type Base struct {
 	log.Logger
 	name     string
 	capacity int
+	external bool
 }
 
 func (b *Base) Init(name string) {
@@ -52,4 +54,12 @@ func (b *Base) Capacity() int {
 
 func (b *Base) SetCapacity(capacity int) {
 	b.capacity = capacity
+}
+
+func (b *Base) IsExternal() bool {
+	return b.external
+}
+
+func (b *Base) SetExternal(isExternal bool) {
+	b.external = isExternal
 }

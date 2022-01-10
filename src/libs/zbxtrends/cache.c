@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -331,6 +331,56 @@ static zbx_tfc_data_t	*tfc_index_add(zbx_tfc_data_t *data_local)
 
 /******************************************************************************
  *                                                                            *
+ * Function: tfc_function_str                                                 *
+ *                                                                            *
+ * Purpose: return trend function name in readable format                     *
+ *                                                                            *
+ ******************************************************************************/
+static const char	*tfc_function_str(zbx_trend_function_t function)
+{
+	switch (function)
+	{
+		case ZBX_TREND_FUNCTION_AVG:
+			return "avg";
+		case ZBX_TREND_FUNCTION_COUNT:
+			return "count";
+		case ZBX_TREND_FUNCTION_DELTA:
+			return "delta";
+		case ZBX_TREND_FUNCTION_MAX:
+			return "max";
+		case ZBX_TREND_FUNCTION_MIN:
+			return "min";
+		case ZBX_TREND_FUNCTION_SUM:
+			return "sum";
+		default:
+			return "unknown";
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: tfc_state_str                                                    *
+ *                                                                            *
+ * Purpose: return trend cache state in readable format                       *
+ *                                                                            *
+ ******************************************************************************/
+static const char	*tfc_state_str(zbx_trend_state_t state)
+{
+	switch (state)
+	{
+		case ZBX_TREND_STATE_NORMAL:
+			return "cached";
+		case ZBX_TREND_STATE_NODATA:
+			return "nodata";
+		case ZBX_TREND_STATE_OVERFLOW:
+			return "overflow";
+		default:
+			return "unknown";
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_tfc_init                                                     *
  *                                                                            *
  * Purpose: initialize trend function cache                                   *
@@ -442,7 +492,21 @@ int	zbx_tfc_get_value(zbx_uint64_t itemid, int start, int end, zbx_trend_functio
 	if (NULL == cache)
 		return FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " period:%d-%d", __func__, itemid, start, end);
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
+	{
+		time_t		ts_time;
+		struct tm	tm_start, tm_end;
+
+		ts_time = start;
+		localtime_r(&ts_time, &tm_start);
+		ts_time = end;
+		localtime_r(&ts_time, &tm_end);
+
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " %s(%04d.%02d.%02d/%02d, %04d.%02d.%02d/%02d)",
+				__func__, itemid, tfc_function_str(function), tm_start.tm_year + 1900,
+				tm_start.tm_mon + 1, tm_start.tm_mday, tm_start.tm_hour, tm_end.tm_year + 1900,
+				tm_end.tm_mon + 1, tm_end.tm_mday, tm_end.tm_hour);
+	}
 
 	data_local.itemid = itemid;
 	data_local.start = start;
@@ -466,7 +530,18 @@ int	zbx_tfc_get_value(zbx_uint64_t itemid, int start, int end, zbx_trend_functio
 
 	UNLOCK_CACHE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() data:%p", __func__, data);
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
+	{
+		if (NULL != data)
+		{
+			char	buf[ZBX_MAX_DOUBLE_LEN + 1];
+
+			zabbix_log(LOG_LEVEL_DEBUG, "End of %s() state:%s value:%s", __func__,
+					tfc_state_str(data->state), zbx_print_double(buf, sizeof(buf), data->value));
+		}
+		else
+			zabbix_log(LOG_LEVEL_DEBUG, "End of %s():not cached", __func__);
+	}
 
 	return NULL != data ? SUCCEED : FAIL;
 }
@@ -492,6 +567,28 @@ void	zbx_tfc_put_value(zbx_uint64_t itemid, int start, int end, zbx_trend_functi
 
 	if (NULL == cache)
 		return;
+
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
+	{
+		time_t		ts_time;
+		struct tm	tm_start, tm_end;
+		char		buf[ZBX_MAX_DOUBLE_LEN + 1];
+
+		ts_time = start;
+		localtime_r(&ts_time, &tm_start);
+		ts_time = end;
+		localtime_r(&ts_time, &tm_end);
+
+		if (state == ZBX_TREND_STATE_NODATA)
+			zbx_strlcpy(buf, "none", sizeof(buf));
+		else
+			zbx_print_double(buf, sizeof(buf), value);
+
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " %s(%04d.%02d.%02d/%02d, %04d.%02d.%02d/%02d)"
+				"=%s state:%s", __func__, itemid, tfc_function_str(function), tm_start.tm_year + 1900,
+				tm_start.tm_mon + 1, tm_start.tm_mday, tm_start.tm_hour, tm_end.tm_year + 1900,
+				tm_end.tm_mon + 1, tm_end.tm_mday, tm_end.tm_hour, buf, tfc_state_str(state));
+	}
 
 	data_local.itemid = itemid;
 	data_local.start = 0;
@@ -528,6 +625,8 @@ void	zbx_tfc_put_value(zbx_uint64_t itemid, int start, int end, zbx_trend_functi
 	data->state = state;
 
 	UNLOCK_CACHE;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 void	zbx_tfc_invalidate_trends(ZBX_DC_TREND *trends, int trends_num)

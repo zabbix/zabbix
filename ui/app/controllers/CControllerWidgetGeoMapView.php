@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -124,7 +124,11 @@ class CControllerWidgetGeoMapView extends CControllerWidget {
 		]);
 
 		$hosts = array_filter($hosts, function ($host) {
-			return (is_numeric($host['inventory']['location_lat']) && is_numeric($host['inventory']['location_lon']));
+			$lat = $host['inventory']['location_lat'];
+			$lng = $host['inventory']['location_lon'];
+
+			return (is_numeric($lat) && $lat >= GEOMAP_LAT_MIN && $lat <= GEOMAP_LAT_MAX
+				&& is_numeric($lng) && $lng >= GEOMAP_LNG_MIN && $lng <= GEOMAP_LNG_MAX);
 		});
 
 		// Get triggers.
@@ -210,12 +214,21 @@ class CControllerWidgetGeoMapView extends CControllerWidget {
 		if ($user_default_view !== '' && $geoloc_parser->parse($user_default_view) == CParser::PARSE_SUCCESS) {
 			$home_coords['default'] = true;
 			$center = $geoloc_parser->result;
+			$center['zoom'] = min($this->geomap_config['max_zoom'], $center['zoom']);
 		}
 
 		if (array_key_exists('default_view', $this->fields)
 				&& $this->fields['default_view'] !== ''
 				&& $geoloc_parser->parse($this->fields['default_view']) == CParser::PARSE_SUCCESS) {
-			$initial_view = $geoloc_parser->result + ['zoom' => ceil($this->geomap_config['max_zoom'] / 2)];
+			$initial_view = $geoloc_parser->result;
+
+			if (array_key_exists('zoom', $initial_view)) {
+				$initial_view['zoom'] = min($this->geomap_config['max_zoom'], $initial_view['zoom']);
+			}
+			else {
+				$initial_view['zoom'] = ceil($this->geomap_config['max_zoom'] / 2);
+			}
+
 			$home_coords['initial'] = $initial_view;
 			if (!$center) {
 				$center = $home_coords['initial'];

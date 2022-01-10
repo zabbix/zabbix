@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,8 +46,8 @@ require_once dirname(__FILE__).'/testPageHostInterfaces.php';
 require_once dirname(__FILE__).'/testPageHostPrototypes.php';
 require_once dirname(__FILE__).'/testPageHosts.php';
 require_once dirname(__FILE__).'/testPageInventory.php';
-require_once dirname(__FILE__).'/testPageItems.php';
-require_once dirname(__FILE__).'/testPageItemPrototypes.php';
+require_once dirname(__FILE__).'/items/testPageItems.php';
+require_once dirname(__FILE__).'/items/testPageItemPrototypes.php';
 require_once dirname(__FILE__).'/testPageTriggers.php';
 require_once dirname(__FILE__).'/testPageTriggerUrl.php';
 require_once dirname(__FILE__).'/testPageTriggerPrototypes.php';
@@ -57,7 +57,7 @@ require_once dirname(__FILE__).'/testPageMassUpdateItems.php';
 require_once dirname(__FILE__).'/testPageMassUpdateItemPrototypes.php';
 require_once dirname(__FILE__).'/testPageMonitoringHosts.php';
 require_once dirname(__FILE__).'/testPageNetworkDiscovery.php';
-require_once dirname(__FILE__).'/testPageLowLevelDiscovery.php';
+require_once dirname(__FILE__).'/lld/testPageLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/testPasswordComplexity.php';
 /*
 require_once dirname(__FILE__).'/testPageQueueDetails.php';
@@ -69,7 +69,7 @@ require_once dirname(__FILE__).'/testPageStatusOfZabbix.php';
 require_once dirname(__FILE__).'/testPageTemplates.php';
 require_once dirname(__FILE__).'/testPageTriggerDescription.php';
 require_once dirname(__FILE__).'/testPageUserGroups.php';
-require_once dirname(__FILE__).'/testPageUsers.php';
+require_once dirname(__FILE__).'/users/testPageUsers.php';
 require_once dirname(__FILE__).'/testExpandExpressionMacros.php';
 require_once dirname(__FILE__).'/testFormAction.php';
 require_once dirname(__FILE__).'/testFormAdministrationAuthenticationHttp.php';
@@ -102,15 +102,15 @@ require_once dirname(__FILE__).'/hosts/testFormHostStandalone.php';
 require_once dirname(__FILE__).'/testFormHostGroup.php';
 require_once dirname(__FILE__).'/testFormHostLinkTemplates.php';
 require_once dirname(__FILE__).'/testFormHostPrototype.php';
-require_once dirname(__FILE__).'/testFormItem.php';
-require_once dirname(__FILE__).'/testFormItemHttpAgent.php';
-require_once dirname(__FILE__).'/testFormItemPrototype.php';
-require_once dirname(__FILE__).'/testFormTestItem.php';
-require_once dirname(__FILE__).'/testFormTestItemPrototype.php';
-require_once dirname(__FILE__).'/testFormTestLowLevelDiscovery.php';
+require_once dirname(__FILE__).'/items/testFormItem.php';
+require_once dirname(__FILE__).'/items/testFormItemHttpAgent.php';
+require_once dirname(__FILE__).'/items/testFormItemPrototype.php';
+require_once dirname(__FILE__).'/items/testFormTestItem.php';
+require_once dirname(__FILE__).'/items/testFormTestItemPrototype.php';
+require_once dirname(__FILE__).'/lld/testFormTestLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/testFormLogin.php';
-require_once dirname(__FILE__).'/testFormLowLevelDiscovery.php';
-require_once dirname(__FILE__).'/testFormLowLevelDiscoveryOverrides.php';
+require_once dirname(__FILE__).'/lld/testFormLowLevelDiscovery.php';
+require_once dirname(__FILE__).'/lld/testFormLowLevelDiscoveryOverrides.php';
 require_once dirname(__FILE__).'/testFormMacrosHost.php';
 require_once dirname(__FILE__).'/testFormMacrosHostPrototype.php';
 require_once dirname(__FILE__).'/testFormMacrosTemplate.php';
@@ -146,15 +146,16 @@ require_once dirname(__FILE__).'/testFormValueMappingsTemplate.php';
 require_once dirname(__FILE__).'/roles/testFormUserRoles.php';
 require_once dirname(__FILE__).'/testFormWeb.php';
 require_once dirname(__FILE__).'/testFormWebStep.php';
-require_once dirname(__FILE__).'/testFormulaCalculatedItem.php';
-require_once dirname(__FILE__).'/testFormulaCalculatedItemPrototype.php';
+require_once dirname(__FILE__).'/items/testFormulaCalculatedItem.php';
+require_once dirname(__FILE__).'/items/testFormulaCalculatedItemPrototype.php';
 require_once dirname(__FILE__).'/testPageBrowserWarning.php';
-require_once dirname(__FILE__).'/testInheritanceItem.php';
+require_once dirname(__FILE__).'/items/testInheritanceItem.php';
 require_once dirname(__FILE__).'/testInheritanceTrigger.php';
 require_once dirname(__FILE__).'/testInheritanceGraph.php';
 require_once dirname(__FILE__).'/testInheritanceWeb.php';
-require_once dirname(__FILE__).'/testInheritanceDiscoveryRule.php';
-require_once dirname(__FILE__).'/testInheritanceItemPrototype.php';
+require_once dirname(__FILE__).'/lld/testInheritanceDiscoveryRule.php';
+require_once dirname(__FILE__).'/items/testInheritanceItemPrototype.php';
+require_once dirname(__FILE__).'/items/testItemTypeSelection.php';
 require_once dirname(__FILE__).'/testInheritanceTriggerPrototype.php';
 require_once dirname(__FILE__).'/testInheritanceGraphPrototype.php';
 require_once dirname(__FILE__).'/testInheritanceHostPrototype.php';
@@ -192,9 +193,11 @@ require_once dirname(__FILE__).'/reports/testPageScheduledReport.php';
 require_once dirname(__FILE__).'/reports/testScheduledReportPermissions.php';
 require_once dirname(__FILE__).'/testSID.php';
 
+use PHPUnit\Framework\TestSuite;
+
 class SeleniumTests {
 	public static function suite() {
-		$suite = new PHPUnit_Framework_TestSuite('selenium');
+		$suite = new TestSuite('selenium');
 
 		$suite->addTestSuite('testGeneric');
 		$suite->addTestSuite('testGraphAxis');
@@ -340,6 +343,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testInheritanceDiscoveryRule');
 		$suite->addTestSuite('testInheritanceHostPrototype');
 		$suite->addTestSuite('testInheritanceItemPrototype');
+		$suite->addTestSuite('testItemTypeSelection');
 		$suite->addTestSuite('testInheritanceTriggerPrototype');
 		$suite->addTestSuite('testLanguage');
 		$suite->addTestSuite('testMultiselect');

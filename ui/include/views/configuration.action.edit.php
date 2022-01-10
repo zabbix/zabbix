@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -108,7 +108,9 @@ if ($data['action']['filter']['conditions']) {
 	}
 }
 
-$formula = (new CTextBox('formula', $data['action']['filter']['formula']))
+$formula = (new CTextBox('formula', $data['action']['filter']['formula'], false,
+		DB::getFieldLength('actions', 'formula')
+	))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setId('formula')
 	->setAttribute('placeholder', 'A or (B and C) &hellip;');

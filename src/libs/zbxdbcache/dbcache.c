@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -229,8 +229,6 @@ void	DCget_stats_all(zbx_wcache_info_t *wcache_info)
  *                                                                            *
  * Purpose: get statistics of the database cache                              *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  ******************************************************************************/
 void	*DCget_stats(int request)
 {
@@ -348,8 +346,6 @@ void	*DCget_stats(int request)
  * Purpose: find existing or add new structure and return pointer             *
  *                                                                            *
  * Return value: pointer to a trend structure                                 *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 static ZBX_DC_TREND	*DCget_trend(zbx_uint64_t itemid)
@@ -673,8 +669,6 @@ static void	dc_trends_fetch_and_update(ZBX_DC_TREND *trends, int trends_num, zbx
  *                                                                            *
  * Purpose: flush trend to the database                                       *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  ******************************************************************************/
 static void	DBflush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uint64_pair_t *trends_diff)
 {
@@ -797,8 +791,6 @@ static void	DBflush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uin
  *                                                                            *
  * Purpose: move trend to the array of trends for flushing to DB              *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  ******************************************************************************/
 static void	DCflush_trend(ZBX_DC_TREND *trend, ZBX_DC_TREND **trends, int *trends_alloc, int *trends_num)
 {
@@ -823,8 +815,6 @@ static void	DCflush_trend(ZBX_DC_TREND *trend, ZBX_DC_TREND **trends, int *trend
  * Function: DCadd_trend                                                      *
  *                                                                            *
  * Purpose: add new value to the trends                                       *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 static void	DCadd_trend(const ZBX_DC_HISTORY *history, ZBX_DC_TREND **trends, int *trends_alloc, int *trends_num)
@@ -877,8 +867,6 @@ static void	DCadd_trend(const ZBX_DC_HISTORY *history, ZBX_DC_TREND **trends, in
  *             trends          - [OUT] list of trends to flush into database  *
  *             trends_num      - [OUT] number of trends                       *
  *             compression_age - [IN]  history compression age                *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 static void	DCmass_update_trends(const ZBX_DC_HISTORY *history, int history_num, ZBX_DC_TREND **trends,
@@ -1100,7 +1088,7 @@ static void	db_get_items_info_by_itemid(zbx_hashset_t *items_info, const zbx_vec
 			continue;
 		}
 
-		zbx_substitute_item_name_macros(item_info->item, row[1], &item_info->name);
+		item_info->name = zbx_strdup(item_info->name, row[1]);
 	}
 	DBfree_result(result);
 
@@ -1554,8 +1542,6 @@ static void	DCexport_all_trends(const ZBX_DC_TREND *trends, int trends_num)
  * Function: DCsync_trends                                                    *
  *                                                                            *
  * Purpose: flush all trends to the database                                  *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 static void	DCsync_trends(void)
@@ -2176,8 +2162,6 @@ static void	DCmass_proxy_prepare_itemdiff(ZBX_DC_HISTORY *history, int history_n
  *                                                                            *
  * Parameters: item_diff - diff of items to be updated                        *
  *                                                                            *
- * Author: Alexei Vladishev, Eugene Grigorjev, Alexander Vladishev            *
- *                                                                            *
  ******************************************************************************/
 static void	DBmass_proxy_update_items(zbx_vector_ptr_t *item_diff)
 {
@@ -2648,8 +2632,6 @@ static void	dc_add_proxy_history_notsupported(ZBX_DC_HISTORY *history, int histo
  *                                                                            *
  * Parameters: history     - array of history data                            *
  *             history_num - number of history structures                     *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 static void	DBmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
@@ -3928,6 +3910,9 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned
 		return;
 	}
 
+	if (NULL == result)
+		return;
+
 	/* allow proxy to send timestamps of empty (throttled etc) values to update nextchecks for queue */
 	if (!ISSET_VALUE(result) && !ISSET_META(result) && 0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return;
@@ -4625,8 +4610,6 @@ int	hc_get_history_compression_age(void)
  *                                                                            *
  * Purpose: Allocate shared memory for trend cache (part of database cache)   *
  *                                                                            *
- * Author: Vladimir Levijev                                                   *
- *                                                                            *
  * Comments: Is optionally called from init_database_cache()                  *
  *                                                                            *
  ******************************************************************************/
@@ -4675,8 +4658,6 @@ out:
  * Function: init_database_cache                                              *
  *                                                                            *
  * Purpose: Allocate shared memory for database cache                         *
- *                                                                            *
- * Author: Alexei Vladishev, Alexander Vladishev                              *
  *                                                                            *
  ******************************************************************************/
 int	init_database_cache(char **error)
@@ -4755,8 +4736,6 @@ out:
  *                                                                            *
  * Purpose: writes updates and new data from pool and cache data to database  *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  ******************************************************************************/
 static void	DCsync_all(void)
 {
@@ -4774,8 +4753,6 @@ static void	DCsync_all(void)
  * Function: free_database_cache                                              *
  *                                                                            *
  * Purpose: Free memory allocated for database cache                          *
- *                                                                            *
- * Author: Alexei Vladishev, Alexander Vladishev                              *
  *                                                                            *
  ******************************************************************************/
 void	free_database_cache(int sync)
@@ -4810,8 +4787,6 @@ void	free_database_cache(int sync)
  * Function: DCget_nextid                                                     *
  *                                                                            *
  * Purpose: Return next id for requested table                                *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 zbx_uint64_t	DCget_nextid(const char *table_name, int num)
@@ -4998,7 +4973,6 @@ void	zbx_db_trigger_queue_unlock(void)
 {
 	cache->db_trigger_queue_lock = 0;
 }
-
 
 /******************************************************************************
  *                                                                            *

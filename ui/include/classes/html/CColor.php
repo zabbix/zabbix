@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,14 +21,26 @@
 
 class CColor extends CDiv {
 
-	const MAX_LENGTH = 6;
-
 	private $name;
 	private $value;
 	private $is_enabled = true;
 	private $is_required = false;
 	private $append_color_picker_js = true;
 	private $input_id;
+
+	/**
+	 * Either "Use default" is enabled.
+	 *
+	 * @var bool
+	 */
+	private $use_default;
+
+	/**
+	 * jQuery wrapper element selector to append color-picker overlay.
+	 *
+	 * @var string
+	 */
+	private $wrapper_append_to;
 
 	/**
 	 * Creates a color picker form element.
@@ -59,6 +71,30 @@ class CColor extends CDiv {
 	}
 
 	/**
+	 * Enable default color button.
+
+	 * @return CColor
+	 */
+	public function enableUseDefault() {
+		$this->use_default = true;
+
+		return $this;
+	}
+
+	/**
+	 * Set overlay wrapper selector.
+	 *
+	 * @param string $wrapper_selector  Wrapper selector to append colorpicker overlay.
+	 *
+	 * @return CColor
+	 */
+	public function setOverlayWrapper(string $wrapper_selector) {
+		$this->wrapper_append_to = $wrapper_selector;
+
+		return $this;
+	}
+
+	/**
 	 * Set or reset element 'aria-required' attribute.
 	 *
 	 * @param bool $is_required
@@ -78,11 +114,24 @@ class CColor extends CDiv {
 	 *
 	 * @return CColor
 	 */
-	public function appendColorPickerJs($append = true)
-	{
+	public function appendColorPickerJs($append = true) {
 		$this->append_color_picker_js = $append;
 
 		return $this;
+	}
+
+	/**
+	 * Make colorpicker initialization javascript.
+	 *
+	 * @return string
+	 */
+	protected function getInitJavascript(): string {
+		$options = [
+			'use_default' => $this->use_default,
+			'appendTo' => $this->wrapper_append_to
+		];
+
+		return 'jQuery("#'.$this->name.'").colorpicker('.json_encode(array_filter($options)).');';
 	}
 
 	/**
@@ -95,11 +144,7 @@ class CColor extends CDiv {
 	public function toString($destroy = true) {
 		$this->cleanItems();
 
-		$input = (new CTextBox($this->name, $this->value))
-			->setWidth(ZBX_TEXTAREA_COLOR_WIDTH)
-			->setAttribute('maxlength', self::MAX_LENGTH)
-			->setEnabled($this->is_enabled)
-			->setAriaRequired($this->is_required);
+		$input = (new CInput('hidden', $this->name, $this->value))->setEnabled($this->is_enabled);
 
 		if ($this->input_id !== null) {
 			$input->setId($this->input_id);
@@ -109,7 +154,7 @@ class CColor extends CDiv {
 
 		$this->addClass(ZBX_STYLE_INPUT_COLOR_PICKER);
 
-		$init_script = $this->append_color_picker_js ? get_js('jQuery("#'.$this->name.'").colorpicker()') : '';
+		$init_script = $this->append_color_picker_js ? get_js($this->getInitJavascript()) : '';
 
 		return parent::toString($destroy).$init_script;
 	}

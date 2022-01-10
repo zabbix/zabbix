@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -203,6 +203,7 @@ zbx_key_access_rule_type_t;
 void	init_metrics(void);
 int	add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len);
 int	add_metric_local(ZBX_METRIC *metric, char *error, size_t max_error_len);
+void	free_metrics_ext(ZBX_METRIC **metrics);
 void	free_metrics(void);
 
 void	init_key_access_rules(void);
@@ -217,6 +218,8 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result);
 void	set_user_parameter_dir(const char *path);
 int	add_user_parameter(const char *itemkey, char *command, char *error, size_t max_error_len);
 void	remove_user_parameters(void);
+void	get_metrics_copy(ZBX_METRIC **metrics);
+void	set_metrics(ZBX_METRIC *metrics);
 int	add_user_module(const char *key, int (*function)(void));
 void	test_parameters(void);
 void	test_parameter(const char *key);

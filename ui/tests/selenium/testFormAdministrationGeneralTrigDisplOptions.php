@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -85,30 +85,33 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 		'Unacknowledged PROBLEM events' => false,
 		'Acknowledged PROBLEM events' => false,
 		'Unacknowledged RESOLVED events' => false,
-		'Acknowledged RESOLVED events' => false,
-		'id:problem_unack_color' => 'CC0000',
-		'id:problem_ack_color'=> 'CC0000',
-		'id:ok_unack_color'=> '009900',
-		'id:ok_ack_color'=> '009900',
-		// This should be changed to really custom values after DEV-1673 is fixed.
-//		'id:problem_unack_color' => 'D81B60',
-//		'id:problem_ack_color' => 'F8BBD0',
-//		'id:ok_unack_color' => '1A237E',
-//		'id:ok_ack_color' => 'B3E5FC',
-		'Display OK triggers for' => '23h',
-		'On status change triggers blink for' => '17h',
-		'Not classified' => 'Custom Not classified',
-		'Information' => 'Custom Information',
-		'Warning' => 'Custom Warning',
-		'Average' => 'Custom Average',
-		'High' => 'Custom High',
-		'High' => 'Custom Disaster',
-		'id:severity_color_0' => 'E8EAF6',
-		'id:severity_color_1' => 'D1C4E9',
-		'id:severity_color_2' => 'B39DDB' ,
-		'id:severity_color_3' => '9575CD',
-		'id:severity_color_4' => '673AB7',
-		'id:severity_color_5' => '4527A0'
+		'Acknowledged RESOLVED events' => false
+// TODO: wait for DEV-2058
+/*		'id:problem_unack_color' => 'CC0000',
+*		'id:problem_ack_color'=> 'CC0000',
+*		'id:ok_unack_color'=> '009900',
+*		'id:ok_ack_color'=> '009900',
+*		// This should be changed to really custom values after DEV-1673 is fixed.
+*		'id:problem_unack_color' => 'D81B60',
+*		'id:problem_ack_color' => 'F8BBD0',
+*		'id:ok_unack_color' => '1A237E',
+*		'id:ok_ack_color' => 'B3E5FC',
+*		'Display OK triggers for' => '23h',
+*		'On status change triggers blink for' => '17h',
+*		'Not classified' => 'Custom Not classified',
+*		'Information' => 'Custom Information',
+*		'Warning' => 'Custom Warning',
+*		'Average' => 'Custom Average',
+*		'High' => 'Custom High',
+*		'High' => 'Custom Disaster'
+*/
+// TODO: wait for DEV-2058
+//		'id:severity_color_0' => 'E8EAF6',
+//		'id:severity_color_1' => 'D1C4E9',
+//		'id:severity_color_2' => 'B39DDB' ,
+//		'id:severity_color_3' => '9575CD',
+//		'id:severity_color_4' => '673AB7',
+//		'id:severity_color_5' => '4527A0'
 	];
 
 	/**
@@ -121,10 +124,11 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 		$form = $this->query($this->form_selector)->waitUntilReady()->asForm()->one();
 
 		$limits = [
-			'problem_unack_color' => 6,
-			'problem_ack_color' => 6,
-			'ok_unack_color' => 6,
-			'ok_ack_color' => 6,
+// TODO: wait for DEV-2058
+//			'problem_unack_color' => 6,
+//			'problem_ack_color' => 6,
+//			'ok_unack_color' => 6,
+//			'ok_ack_color' => 6,
 			'ok_period' => 32,
 			'blink_period' => 32,
 			'severity_name_0' => 32,
@@ -132,13 +136,14 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			'severity_name_2' => 32,
 			'severity_name_3' => 32,
 			'severity_name_4' => 32,
-			'severity_name_5' => 32,
-			'severity_color_0' => 6,
-			'severity_color_1' => 6,
-			'severity_color_2' => 6,
-			'severity_color_3' => 6,
-			'severity_color_4' => 6,
-			'severity_color_5' => 6
+			'severity_name_5' => 32
+// TODO: wait for DEV-2058
+//			'severity_color_0' => 6,
+//			'severity_color_1' => 6,
+//			'severity_color_2' => 6,
+//			'severity_color_3' => 6,
+//			'severity_color_4' => 6,
+//			'severity_color_5' => 6
 		];
 
 		foreach ($limits as $id => $limit) {
@@ -169,29 +174,29 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			'lbl_severity_color_4',
 			'lbl_severity_color_5'
 		];
-
-		$form->fill(['Use custom event status colors' => true]);
-		foreach ($colorpickers as $colorpicker) {
-			$this->query('id', $colorpicker)->one()->click();
-			$overlay = $this->query('id:color_picker')->waitUntilVisible()->asOverlayDialog()->one();
-			$overlay->close();
-		}
-
-		$event_colors = [
-			'problem_unack_color',
-			'problem_ack_color',
-			'ok_unack_color',
-			'ok_ack_color'
-		];
-
-		foreach ([true, false] as $status) {
-			$form->fill(['Use custom event status colors' => $status]);
-
-			foreach ($event_colors as $input) {
-				$this->assertTrue($this->query('id', $input)->one()->isEnabled($status));
-			}
-		}
-
+// TODO: wait for DEV-2058
+/*		$form->fill(['Use custom event status colors' => true]);
+*		foreach ($colorpickers as $colorpicker) {
+*			$this->query('id', $colorpicker)->one()->click();
+*			$overlay = $this->query('id:color_picker')->waitUntilVisible()->asOverlayDialog()->one();
+*			$overlay->close();
+*		}
+*
+*		$event_colors = [
+*			'problem_unack_color',
+*			'problem_ack_color',
+*			'ok_unack_color',
+*			'ok_ack_color'
+*		];
+*
+*		foreach ([true, false] as $status) {
+*			$form->fill(['Use custom event status colors' => $status]);
+*
+*			foreach ($event_colors as $input) {
+*				$this->assertTrue($this->query('id', $input)->one()->isEnabled($status));
+*			}
+*		}
+*/
 		$this->assertEquals(
 			'Custom severity names affect all locales and require manual translation!',
 			$this->query('class:table-forms-separator')->one()->getText()
@@ -231,10 +236,11 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'Acknowledged PROBLEM events' => true,
 						'Unacknowledged RESOLVED events' => true,
 						'Acknowledged RESOLVED events' => true,
-						'id:problem_unack_color' => 'D81B60',
-						'id:problem_ack_color' => 'F8BBD0',
-						'id:ok_unack_color' => '1A237E',
-						'id:ok_ack_color' => 'B3E5FC',
+// TODO: wait for DEV-2058
+//						'id:problem_unack_color' => 'D81B60',
+//						'id:problem_ack_color' => 'F8BBD0',
+//						'id:ok_unack_color' => '1A237E',
+//						'id:ok_ack_color' => 'B3E5FC',
 						'Display OK triggers for' => '25m',
 						'On status change triggers blink for' => '12m',
 						'Not classified' => 'Test Not classified',
@@ -242,13 +248,14 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'Warning' => 'Test Warning',
 						'Average' => 'Test Average',
 						'High' => 'Test High',
-						'Disaster' => 'Test Disaster',
-						'id:severity_color_0' => 'E8EAF6',
-						'id:severity_color_1' => 'D1C4E9',
-						'id:severity_color_2' => 'B39DDB' ,
-						'id:severity_color_3' => '9575CD',
-						'id:severity_color_4' => '673AB7',
-						'id:severity_color_5' => '4527A0'
+						'Disaster' => 'Test Disaster'
+// TODO: wait for DEV-2058
+//						'id:severity_color_0' => 'E8EAF6',
+//						'id:severity_color_1' => 'D1C4E9',
+//						'id:severity_color_2' => 'B39DDB' ,
+//						'id:severity_color_3' => '9575CD',
+//						'id:severity_color_4' => '673AB7',
+//						'id:severity_color_5' => '4527A0'
 					],
 					'db' => [
 						'custom_color' => 1,
@@ -256,10 +263,11 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'problem_ack_style'=> 1,
 						'ok_unack_style'=> 1,
 						'ok_ack_style'=> 1,
-						'problem_unack_color' => 'D81B60',
-						'problem_ack_color' => 'F8BBD0',
-						'ok_unack_color' => '1A237E',
-						'ok_ack_color' => 'B3E5FC',
+// TODO: wait for DEV-2058
+//						'problem_unack_color' => 'D81B60',
+//						'problem_ack_color' => 'F8BBD0',
+//						'ok_unack_color' => '1A237E',
+//						'ok_ack_color' => 'B3E5FC',
 						'ok_period' => '25m',
 						'blink_period' => '12m',
 						'severity_name_0' => 'Test Not classified',
@@ -267,13 +275,14 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'severity_name_2' => 'Test Warning',
 						'severity_name_3' => 'Test Average',
 						'severity_name_4' => 'Test High',
-						'severity_name_5' => 'Test Disaster',
-						'severity_color_0' => 'E8EAF6',
-						'severity_color_1' => 'D1C4E9',
-						'severity_color_2' => 'B39DDB' ,
-						'severity_color_3' => '9575CD',
-						'severity_color_4' => '673AB7',
-						'severity_color_5' => '4527A0'
+						'severity_name_5' => 'Test Disaster'
+// TODO: wait for DEV-2058
+//						'severity_color_0' => 'E8EAF6',
+//						'severity_color_1' => 'D1C4E9',
+//						'severity_color_2' => 'B39DDB' ,
+//						'severity_color_3' => '9575CD',
+//						'severity_color_4' => '673AB7',
+//						'severity_color_5' => '4527A0'
 					]
 				]
 			],
@@ -302,30 +311,32 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>  [
-						'Use custom event status colors' => true,
-						'id:problem_unack_color' => '000000',
-						'id:problem_ack_color' => '000000',
-						'id:ok_unack_color' => '000000',
-						'id:ok_ack_color' => '000000',
-						'id:severity_color_0' => '000000',
-						'id:severity_color_1' => '000000',
-						'id:severity_color_2' => '000000' ,
-						'id:severity_color_3' => '000000',
-						'id:severity_color_4' => '000000',
-						'id:severity_color_5' => '000000'
+						'Use custom event status colors' => true
+// TODO: wait for DEV-2058
+//						'id:problem_unack_color' => '000000',
+//						'id:problem_ack_color' => '000000',
+//						'id:ok_unack_color' => '000000',
+//						'id:ok_ack_color' => '000000',
+//						'id:severity_color_0' => '000000',
+//						'id:severity_color_1' => '000000',
+//						'id:severity_color_2' => '000000' ,
+//						'id:severity_color_3' => '000000',
+//						'id:severity_color_4' => '000000',
+//						'id:severity_color_5' => '000000'
 					],
 					'db' => [
-						'custom_color' => 1,
-						'problem_unack_color' => '000000',
-						'problem_ack_color' => '000000',
-						'ok_unack_color' => '000000',
-						'ok_ack_color' => '000000',
-						'severity_color_0' => '000000',
-						'severity_color_1' => '000000',
-						'severity_color_2' => '000000' ,
-						'severity_color_3' => '000000',
-						'severity_color_4' => '000000',
-						'severity_color_5' => '000000'
+						'custom_color' => 1
+// TODO: wait for DEV-2058
+//						'problem_unack_color' => '000000',
+//						'problem_ack_color' => '000000',
+//						'ok_unack_color' => '000000',
+//						'ok_ack_color' => '000000',
+//						'severity_color_0' => '000000',
+//						'severity_color_1' => '000000',
+//						'severity_color_2' => '000000' ,
+//						'severity_color_3' => '000000',
+//						'severity_color_4' => '000000',
+//						'severity_color_5' => '000000'
 					]
 				]
 			],
@@ -334,30 +345,32 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>  [
-						'Use custom event status colors' => true,
-						'id:problem_unack_color' => 'AAAAAA',
-						'id:problem_ack_color' => 'BBBBBB',
-						'id:ok_unack_color' => 'CCCCCC',
-						'id:ok_ack_color' => 'ABCDEF',
-						'id:severity_color_0' => 'AAAAAA',
-						'id:severity_color_1' => 'BBBBBB',
-						'id:severity_color_2' => 'CCCCCC' ,
-						'id:severity_color_3' => 'DDDDDD',
-						'id:severity_color_4' => 'EEEEEE',
-						'id:severity_color_5' => 'DEDEDE'
+						'Use custom event status colors' => true
+// TODO: wait for DEV-2058
+//						'id:problem_unack_color' => 'AAAAAA',
+//						'id:problem_ack_color' => 'BBBBBB',
+//						'id:ok_unack_color' => 'CCCCCC',
+//						'id:ok_ack_color' => 'ABCDEF'
+//						'id:severity_color_0' => 'AAAAAA',
+//						'id:severity_color_1' => 'BBBBBB',
+//						'id:severity_color_2' => 'CCCCCC' ,
+//						'id:severity_color_3' => 'DDDDDD',
+//						'id:severity_color_4' => 'EEEEEE',
+//						'id:severity_color_5' => 'DEDEDE'
 					],
 					'db' => [
-						'custom_color' => 1,
-						'problem_unack_color' => 'AAAAAA',
-						'problem_ack_color' => 'BBBBBB',
-						'ok_unack_color' => 'CCCCCC',
-						'ok_ack_color' => 'ABCDEF',
-						'severity_color_0' => 'AAAAAA',
-						'severity_color_1' => 'BBBBBB',
-						'severity_color_2' => 'CCCCCC' ,
-						'severity_color_3' => 'DDDDDD',
-						'severity_color_4' => 'EEEEEE',
-						'severity_color_5' => 'DEDEDE'
+						'custom_color' => 1
+// TODO: wait for DEV-2058
+//						'problem_unack_color' => 'AAAAAA',
+//						'problem_ack_color' => 'BBBBBB',
+//						'ok_unack_color' => 'CCCCCC',
+//						'ok_ack_color' => 'ABCDEF',
+//						'severity_color_0' => 'AAAAAA',
+//						'severity_color_1' => 'BBBBBB',
+//						'severity_color_2' => 'CCCCCC' ,
+//						'severity_color_3' => 'DDDDDD',
+//						'severity_color_4' => 'EEEEEE',
+//						'severity_color_5' => 'DEDEDE'
 					]
 				]
 			],
@@ -367,41 +380,45 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					'expected' => TEST_GOOD,
 					'fields' =>  [
 						'Use custom event status colors' => true,
-						'id:problem_unack_color' => '999999',
-						'id:problem_ack_color' => '999999',
-						'id:ok_unack_color' => '999999',
-						'id:ok_ack_color' => '999999',
+// TODO: wait for DEV-2058
+//						'id:problem_unack_color' => '999999',
+//						'id:problem_ack_color' => '999999',
+//						'id:ok_unack_color' => '999999',
+//						'id:ok_ack_color' => '999999',
 						'Not classified' => 'NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN',
 						'Information' => 'IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII',
 						'Warning' => 'WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW',
 						'Average' => 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
 						'High' => 'HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH',
-						'Disaster' => 'DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD',
-						'id:severity_color_0' => '999999',
-						'id:severity_color_1' => '999999',
-						'id:severity_color_2' => '999999' ,
-						'id:severity_color_3' => '999999',
-						'id:severity_color_4' => '999999',
-						'id:severity_color_5' => '999999'
+						'Disaster' => 'DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD'
+// TODO: wait for DEV-2058
+//						'id:severity_color_0' => '999999',
+//						'id:severity_color_1' => '999999',
+//						'id:severity_color_2' => '999999' ,
+//						'id:severity_color_3' => '999999',
+//						'id:severity_color_4' => '999999',
+//						'id:severity_color_5' => '999999'
 					],
 					'db' => [
 						'custom_color' => 1,
-						'problem_unack_color' => '999999',
-						'problem_ack_color' => '999999',
-						'ok_unack_color' => '999999',
-						'ok_ack_color' => '999999',
+// TODO: wait for DEV-2058
+//						'problem_unack_color' => '999999',
+//						'problem_ack_color' => '999999',
+//						'ok_unack_color' => '999999',
+//						'ok_ack_color' => '999999',
 						'severity_name_0' => 'NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN',
 						'severity_name_1' => 'IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII',
 						'severity_name_2' => 'WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW',
 						'severity_name_3' => 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
 						'severity_name_4' => 'HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH',
-						'severity_name_5' => 'DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD',
-						'severity_color_0' => '999999',
-						'severity_color_1' => '999999',
-						'severity_color_2' => '999999' ,
-						'severity_color_3' => '999999',
-						'severity_color_4' => '999999',
-						'severity_color_5' => '999999'
+						'severity_name_5' => 'DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD'
+// TODO: wait for DEV-2058
+//						'severity_color_0' => '999999',
+//						'severity_color_1' => '999999',
+//						'severity_color_2' => '999999' ,
+//						'severity_color_3' => '999999',
+//						'severity_color_4' => '999999',
+//						'severity_color_5' => '999999'
 					]
 				]
 			],
@@ -677,32 +694,36 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					'expected' => TEST_BAD,
 					'fields' =>  [
 						'Use custom event status colors' => true,
-						'id:problem_unack_color' => 'test',
-						'id:problem_ack_color' => 'test',
-						'id:ok_unack_color' => 'test',
-						'id:ok_ack_color' => 'test',
+// TODO: wait for DEV-2058
+//						'id:problem_unack_color' => 'test',
+//						'id:problem_ack_color' => 'test',
+//						'id:ok_unack_color' => 'test',
+//						'id:ok_ack_color' => 'test',
 						'Display OK triggers for' => 'test',
-						'On status change triggers blink for' => 'test',
-						'id:severity_color_0' => 'test',
-						'id:severity_color_1' => 'test',
-						'id:severity_color_2' => 'test' ,
-						'id:severity_color_3' => 'test',
-						'id:severity_color_4' => 'test',
-						'id:severity_color_5' => 'test'
+						'On status change triggers blink for' => 'test'
+// TODO: wait for DEV-2058
+//						'id:severity_color_0' => 'test',
+//						'id:severity_color_1' => 'test',
+//						'id:severity_color_2' => 'test' ,
+//						'id:severity_color_3' => 'test',
+//						'id:severity_color_4' => 'test',
+//						'id:severity_color_5' => 'test'
 					],
 					'details' => [
-						'Incorrect value for field "problem_unack_color": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "problem_ack_color": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "ok_unack_color": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "ok_ack_color": a hexadecimal color code (6 symbols) is expected.',
+// TODO: wait for DEV-2058
+//						'Incorrect value for field "problem_unack_color": a hexadecimal color code (6 symbols) is expected.',
+//						'Incorrect value for field "problem_ack_color": a hexadecimal color code (6 symbols) is expected.',
+//						'Incorrect value for field "ok_unack_color": a hexadecimal color code (6 symbols) is expected.',
+//						'Incorrect value for field "ok_ack_color": a hexadecimal color code (6 symbols) is expected.',
 						'Incorrect value for field "ok_period": a time unit is expected.',
-						'Incorrect value for field "blink_period": a time unit is expected.',
-						'Incorrect value for field "severity_color_0": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_1": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_2": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_3": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_4": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_5": a hexadecimal color code (6 symbols) is expected.'
+						'Incorrect value for field "blink_period": a time unit is expected.'
+// TODO: wait for DEV-2058
+//						'Incorrect value for field "severity_color_0": a hexadecimal color code (6 symbols) is expected.',
+//						'Incorrect value for field "severity_color_1": a hexadecimal color code (6 symbols) is expected.',
+//						'Incorrect value for field "severity_color_2": a hexadecimal color code (6 symbols) is expected.',
+//						'Incorrect value for field "severity_color_3": a hexadecimal color code (6 symbols) is expected.',
+//						'Incorrect value for field "severity_color_4": a hexadecimal color code (6 symbols) is expected.',
+//						'Incorrect value for field "severity_color_5": a hexadecimal color code (6 symbols) is expected.'
 					]
 				]
 			],
@@ -712,32 +733,36 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					'expected' => TEST_BAD,
 					'fields' =>  [
 						'Use custom event status colors' => true,
-						'id:problem_unack_color' => '!@#$%^&*()_+',
-						'id:problem_ack_color' => '!@#$%^&*()_+',
-						'id:ok_unack_color' => '!@#$%^&*()_+',
-						'id:ok_ack_color' => '!@#$%^&*()_+',
+// TODO: wait for DEV-2058
+//						'id:problem_unack_color' => '!@#$%^&*()_+',
+//						'id:problem_ack_color' => '!@#$%^&*()_+',
+//						'id:ok_unack_color' => '!@#$%^&*()_+',
+//						'id:ok_ack_color' => '!@#$%^&*()_+',
 						'Display OK triggers for' => '!@#$%^&*()_+',
-						'On status change triggers blink for' => '!@#$%^&*()_+',
-						'id:severity_color_0' => '!@#$%^&*()_+',
-						'id:severity_color_1' => '!@#$%^&*()_+',
-						'id:severity_color_2' => '!@#$%^&*()_+' ,
-						'id:severity_color_3' => '!@#$%^&*()_+',
-						'id:severity_color_4' => '!@#$%^&*()_+',
-						'id:severity_color_5' => '!@#$%^&*()_+'
+						'On status change triggers blink for' => '!@#$%^&*()_+'
+// TODO: wait for DEV-2058
+//						'id:severity_color_0' => '!@#$%^&*()_+',
+//						'id:severity_color_1' => '!@#$%^&*()_+',
+//						'id:severity_color_2' => '!@#$%^&*()_+' ,
+//						'id:severity_color_3' => '!@#$%^&*()_+',
+//						'id:severity_color_4' => '!@#$%^&*()_+',
+//						'id:severity_color_5' => '!@#$%^&*()_+'
 					],
 					'details' => [
-						'Incorrect value for field "problem_unack_color": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "problem_ack_color": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "ok_unack_color": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "ok_ack_color": a hexadecimal color code (6 symbols) is expected.',
+// TODO: wait for DEV-2058
+//						'Incorrect value for field "problem_unack_color": a hexadecimal color code (6 symbols) is expected.',
+//						'Incorrect value for field "problem_ack_color": a hexadecimal color code (6 symbols) is expected.',
+//						'Incorrect value for field "ok_unack_color": a hexadecimal color code (6 symbols) is expected.',
+//						'Incorrect value for field "ok_ack_color": a hexadecimal color code (6 symbols) is expected.',
 						'Incorrect value for field "ok_period": a time unit is expected.',
-						'Incorrect value for field "blink_period": a time unit is expected.',
-						'Incorrect value for field "severity_color_0": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_1": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_2": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_3": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_4": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_5": a hexadecimal color code (6 symbols) is expected.'
+						'Incorrect value for field "blink_period": a time unit is expected.'
+// TODO: wait for DEV-2058
+//						'Incorrect value for field "severity_color_0": a hexadecimal color code (6 symbols) is expected.',
+//						'Incorrect value for field "severity_color_1": a hexadecimal color code (6 symbols) is expected.',
+//						'Incorrect value for field "severity_color_2": a hexadecimal color code (6 symbols) is expected.',
+//						'Incorrect value for field "severity_color_3": a hexadecimal color code (6 symbols) is expected.',
+//						'Incorrect value for field "severity_color_4": a hexadecimal color code (6 symbols) is expected.',
+//						'Incorrect value for field "severity_color_5": a hexadecimal color code (6 symbols) is expected.'
 					]
 				]
 			],
@@ -747,10 +772,11 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					'expected' => TEST_BAD,
 					'fields' =>  [
 						'Use custom event status colors' => true,
-						'id:problem_unack_color' => '',
-						'id:problem_ack_color'=> '',
-						'id:ok_unack_color'=> '',
-						'id:ok_ack_color'=> '',
+// TODO: wait for DEV-2058
+//						'id:problem_unack_color' => '',
+//						'id:problem_ack_color'=> '',
+//						'id:ok_unack_color'=> '',
+//						'id:ok_ack_color'=> '',
 						'Display OK triggers for' => '',
 						'On status change triggers blink for' => '',
 						'Not classified' => '',
@@ -758,33 +784,41 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'Warning' => '',
 						'Average' => '',
 						'High' => '',
-						'Disaster' => '',
-						'id:severity_color_0' => '',
-						'id:severity_color_1' => '',
-						'id:severity_color_2' => '' ,
-						'id:severity_color_3' => '',
-						'id:severity_color_4' => '',
-						'id:severity_color_5' => ''
+						'Disaster' => ''
+// TODO: wait for DEV-2058
+//						'id:severity_color_0' => '',
+//						'id:severity_color_1' => '',
+//						'id:severity_color_2' => '' ,
+//						'id:severity_color_3' => '',
+//						'id:severity_color_4' => '',
+//						'id:severity_color_5' => ''
 					],
 					'details' => [
-						'Incorrect value for field "problem_unack_color": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "problem_ack_color": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "ok_unack_color": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "ok_ack_color": a hexadecimal color code (6 symbols) is expected.',
+// TODO: wait for DEV-2058
+//						'Incorrect value for field "problem_unack_color": a hexadecimal color code (6 symbols) is expected.',
+//						'Incorrect value for field "problem_ack_color": a hexadecimal color code (6 symbols) is expected.',
+//						'Incorrect value for field "ok_unack_color": a hexadecimal color code (6 symbols) is expected.',
+//						'Incorrect value for field "ok_ack_color": a hexadecimal color code (6 symbols) is expected.',
 						'Incorrect value for field "ok_period": cannot be empty.',
 						'Incorrect value for field "blink_period": cannot be empty.',
 						'Incorrect value for field "severity_name_0": cannot be empty.',
-						'Incorrect value for field "severity_color_0": a hexadecimal color code (6 symbols) is expected.',
+// TODO: wait for DEV-2058
+//						'Incorrect value for field "severity_color_0": a hexadecimal color code (6 symbols) is expected.',
 						'Incorrect value for field "severity_name_1": cannot be empty.',
-						'Incorrect value for field "severity_color_1": a hexadecimal color code (6 symbols) is expected.',
+// TODO: wait for DEV-2058
+//						'Incorrect value for field "severity_color_1": a hexadecimal color code (6 symbols) is expected.',
 						'Incorrect value for field "severity_name_2": cannot be empty.',
-						'Incorrect value for field "severity_color_2": a hexadecimal color code (6 symbols) is expected.',
+// TODO: wait for DEV-2058
+//						'Incorrect value for field "severity_color_2": a hexadecimal color code (6 symbols) is expected.',
 						'Incorrect value for field "severity_name_3": cannot be empty.',
-						'Incorrect value for field "severity_color_3": a hexadecimal color code (6 symbols) is expected.',
+// TODO: wait for DEV-2058
+//						'Incorrect value for field "severity_color_3": a hexadecimal color code (6 symbols) is expected.',
 						'Incorrect value for field "severity_name_4": cannot be empty.',
-						'Incorrect value for field "severity_color_4": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_name_5": cannot be empty.',
-						'Incorrect value for field "severity_color_5": a hexadecimal color code (6 symbols) is expected.'
+// TODO: wait for DEV-2058
+//						'Incorrect value for field "severity_color_4": a hexadecimal color code (6 symbols) is expected.',
+						'Incorrect value for field "severity_name_5": cannot be empty.'
+// TODO: wait for DEV-2058
+//						'Incorrect value for field "severity_color_5": a hexadecimal color code (6 symbols) is expected.'
 					]
 				]
 			],
@@ -794,32 +828,36 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					'expected' => TEST_BAD,
 					'fields' =>  [
 						'Use custom event status colors' => true,
-						'id:problem_unack_color' => '-1',
-						'id:problem_ack_color'=> '-1',
-						'id:ok_unack_color'=> '-1',
-						'id:ok_ack_color'=> '-1',
+// TODO: wait for DEV-2058
+//						'id:problem_unack_color' => '-1',
+//						'id:problem_ack_color'=> '-1',
+//						'id:ok_unack_color'=> '-1',
+//						'id:ok_ack_color'=> '-1',
 						'Display OK triggers for' => '-1',
-						'On status change triggers blink for' => '-1',
-						'id:severity_color_0' => '-1',
-						'id:severity_color_1' => '-1',
-						'id:severity_color_2' => '-1' ,
-						'id:severity_color_3' => '-1',
-						'id:severity_color_4' => '-1',
-						'id:severity_color_5' => '-1'
+						'On status change triggers blink for' => '-1'
+// TODO: wait for DEV-2058
+//						'id:severity_color_0' => '-1',
+//						'id:severity_color_1' => '-1',
+//						'id:severity_color_2' => '-1' ,
+//						'id:severity_color_3' => '-1',
+//						'id:severity_color_4' => '-1',
+//						'id:severity_color_5' => '-1'
 					],
 					'details' => [
-						'Incorrect value for field "problem_unack_color": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "problem_ack_color": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "ok_unack_color": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "ok_ack_color": a hexadecimal color code (6 symbols) is expected.',
+// TODO: wait for DEV-2058
+//						'Incorrect value for field "problem_unack_color": a hexadecimal color code (6 symbols) is expected.',
+//						'Incorrect value for field "problem_ack_color": a hexadecimal color code (6 symbols) is expected.',
+//						'Incorrect value for field "ok_unack_color": a hexadecimal color code (6 symbols) is expected.',
+//						'Incorrect value for field "ok_ack_color": a hexadecimal color code (6 symbols) is expected.',
 						'Incorrect value for field "ok_period": a time unit is expected.',
-						'Incorrect value for field "blink_period": a time unit is expected.',
-						'Incorrect value for field "severity_color_0": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_1": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_2": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_3": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_4": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_5": a hexadecimal color code (6 symbols) is expected.'
+						'Incorrect value for field "blink_period": a time unit is expected.'
+// TODO: wait for DEV-2058
+//						'Incorrect value for field "severity_color_0": a hexadecimal color code (6 symbols) is expected.',
+//						'Incorrect value for field "severity_color_1": a hexadecimal color code (6 symbols) is expected.',
+//						'Incorrect value for field "severity_color_2": a hexadecimal color code (6 symbols) is expected.',
+//						'Incorrect value for field "severity_color_3": a hexadecimal color code (6 symbols) is expected.',
+//						'Incorrect value for field "severity_color_4": a hexadecimal color code (6 symbols) is expected.',
+//						'Incorrect value for field "severity_color_5": a hexadecimal color code (6 symbols) is expected.'
 					]
 				]
 			]

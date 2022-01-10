@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -87,7 +87,9 @@ void	zbx_mock_test_entry(void **state)
 
 	filter = zbx_mock_get_parameter_string("in.filter");
 
-	ret = zbx_prometheus_filter_parse(filter, &metric, &labels, &value, &error);
+	if (SUCCEED != (ret = zbx_prometheus_filter_parse(filter, &metric, &labels, &value, &error)))
+		printf("filter parsing error: %s\n", error);
+
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 	zbx_mock_assert_result_eq("prometheus filter parsing", expected_ret, ret);
 

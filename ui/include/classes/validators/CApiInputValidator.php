@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -150,11 +150,11 @@ class CApiInputValidator {
 			case API_USER_MACRO:
 				return self::validateUserMacro($rule, $data, $path, $error);
 
+			case API_USER_MACROS:
+				return self::validateUserMacros($rule, $data, $path, $error);
+
 			case API_LLD_MACRO:
 				return self::validateLLDMacro($rule, $data, $path, $error);
-
-			case API_RANGE_TIME:
-				return self::validateRangeTime($rule, $data, $path, $error);
 
 			case API_TIME_PERIOD:
 				return self::validateTimePeriod($rule, $data, $path, $error);
@@ -228,6 +228,9 @@ class CApiInputValidator {
 			case API_LAT_LNG_ZOOM:
 				return self::validateLatLngZoom($rule, $data, $path, $error);
 
+			case API_TIMESTAMP:
+				return self::validateTimestamp($rule, $data, $path, $error);
+
 			case API_MULTIPLIER:
 				return self::validateMultiplier($rule, $data, $path, $error);
 
@@ -279,7 +282,6 @@ class CApiInputValidator {
 			case API_SCRIPT_MENU_PATH:
 			case API_USER_MACRO:
 			case API_LLD_MACRO:
-			case API_RANGE_TIME:
 			case API_TIME_PERIOD:
 			case API_TIME_UNIT:
 			case API_REGEX:
@@ -304,6 +306,7 @@ class CApiInputValidator {
 			case API_EXEC_PARAMS:
 			case API_UNEXPECTED:
 			case API_LAT_LNG_ZOOM:
+			case API_TIMESTAMP:
 			case API_MULTIPLIER:
 			case API_XML:
 			case API_PROMETHEUS_PATTERN:
@@ -334,6 +337,7 @@ class CApiInputValidator {
 			case API_STRINGS_UTF8:
 			case API_INTS32:
 			case API_CUIDS:
+			case API_USER_MACROS:
 				return self::validateStringsUniqueness($rule, $data, $path, $error);
 
 			case API_OBJECTS:
@@ -430,7 +434,7 @@ class CApiInputValidator {
 	 * Color validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_NULL
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -439,6 +443,10 @@ class CApiInputValidator {
 	 */
 	private static function validateColor($rule, &$data, $path, &$error) {
 		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (($flags & API_ALLOW_NULL) && $data === null) {
+			return true;
+		}
 
 		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
 			return false;
@@ -683,7 +691,7 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if ($data < ZBX_MIN_INT32 || $data > ZBX_MAX_INT32) {
+		if (bccomp($data, ZBX_MIN_INT32) == -1 || bccomp($data, ZBX_MAX_INT32) == 1) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
 			return false;
 		}
@@ -1247,6 +1255,11 @@ class CApiInputValidator {
 				$data[$field_name] = $data[$field_rule['default_source']];
 			}
 
+			if (array_key_exists('compare', $field_rule)) {
+				$field_rule['compare']['path'] = ($path === '/' ? $path : $path.'/').$field_rule['compare']['field'];
+				$field_rule['compare']['value'] = $data[$field_rule['compare']['field']];
+			}
+
 			if (array_key_exists($field_name, $data)) {
 				$subpath = ($path === '/' ? $path : $path.'/').$field_name;
 				if (!self::validateData($field_rule, $data[$field_name], $subpath, $error)) {
@@ -1748,6 +1761,49 @@ class CApiInputValidator {
 	}
 
 	/**
+	 * Array of strings validator.
+	 *
+	 * @param array   $rule
+	 * @param int     $rule['flags']   (optional) API_NORMALIZE
+	 * @param integer $rule['length']  (optional)
+	 * @param mixed   $data
+	 * @param string  $path
+	 * @param string  $error
+	 *
+	 * @return bool
+	 */
+	private static function validateUserMacros(array $rule, &$data, string $path, ?string &$error): bool {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (($flags & API_NORMALIZE) && self::validateUserMacro([], $data, '', $e)) {
+			$data = [$data];
+		}
+		unset($e);
+
+		if (!is_array($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an array is expected'));
+			return false;
+		}
+
+		$data = array_values($data);
+		$rules = ['type' => API_USER_MACRO];
+
+		if (array_key_exists('length', $rule)) {
+			$rules['length'] = $rule['length'];
+		}
+
+		foreach ($data as $index => &$value) {
+			$subpath = ($path === '/' ? $path : $path.'/').($index + 1);
+			if (!self::validateData($rules, $value, $subpath, $error)) {
+				return false;
+			}
+		}
+		unset($value);
+
+		return true;
+	}
+
+	/**
 	 * LLD macro validator.
 	 *
 	 * @param array  $rule
@@ -1770,39 +1826,6 @@ class CApiInputValidator {
 
 		if ((new CLLDMacroParser())->parse($data) != CParser::PARSE_SUCCESS) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a low-level discovery macro is expected'));
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * Time period validator like "1-7,00:00-24:00".
-	 *
-	 * @param array  $rule
-	 * @param int    $rule['length']  (optional)
-	 * @param mixed  $data
-	 * @param string $path
-	 * @param string $error
-	 *
-	 * @return bool
-	 */
-	private static function validateRangeTime($rule, &$data, $path, &$error) {
-		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
-
-		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
-			return false;
-		}
-
-		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
-			return false;
-		}
-
-		$range_time_parser = new CRangeTimeParser();
-
-		if ($range_time_parser->parse($data) != CParser::PARSE_SUCCESS) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a time range is expected'));
 			return false;
 		}
 
@@ -1946,11 +1969,12 @@ class CApiInputValidator {
 	/**
 	 * Array of ids, int32 or strings uniqueness validator.
 	 *
-	 * @param array  $rule
-	 * @param bool   $rule['uniq']    (optional)
-	 * @param array  $data
-	 * @param string $path
-	 * @param string $error
+	 * @param array   $rule
+	 * @param integer $rule[type]
+	 * @param bool    $rule['uniq']    (optional)
+	 * @param array   $data
+	 * @param string  $path
+	 * @param string  $error
 	 *
 	 * @return bool
 	 */
@@ -1967,14 +1991,18 @@ class CApiInputValidator {
 		$uniq = [];
 
 		foreach ($data as $index => $value) {
-			if (array_key_exists($value, $uniq)) {
+			$uniq_value = ($rule['type'] == API_USER_MACROS)
+				? self::trimMacro($value)
+				: $value;
+
+			if (array_key_exists($uniq_value, $uniq)) {
 				$subpath = ($path === '/' ? $path : $path.'/').($index + 1);
 				$error = _s('Invalid parameter "%1$s": %2$s.', $subpath,
 					_s('value %1$s already exists', '('.$value.')')
 				);
 				return false;
 			}
-			$uniq[$value] = true;
+			$uniq[$uniq_value] = true;
 		}
 
 		return true;
@@ -2900,12 +2928,148 @@ class CApiInputValidator {
 			return false;
 		}
 
-		$max_zoom = CSettingsHelper::get(CSettingsHelper::GEOMAPS_MAX_ZOOM);
-		if (array_key_exists('zoom', $geoloc_parser->result) && $geoloc_parser->result['zoom'] > $max_zoom) {
+		if (array_key_exists('zoom', $geoloc_parser->result) && $geoloc_parser->result['zoom'] > ZBX_GEOMAP_MAX_ZOOM) {
 			$error = _s('Invalid zoomparameter "%1$s": %2$s.', $path,
-				_s('zoom level must be between "%1$s" and "%2$s"', 0, $max_zoom)
+				_s('zoom level must be between "%1$s" and "%2$s"', 0, ZBX_GEOMAP_MAX_ZOOM)
 			);
 			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Timestamp validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule[flags]    (optional) API_ALLOW_NULL
+	 * @param string $rule[in]       (optional) A comma-delimited character string, for example: '0,60:900'.
+	 * @param array  $rule[compare]  (optional) Data of the object field to compare against.
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateTimestamp(array $rule, &$data, string $path, string &$error): bool {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (($flags & API_ALLOW_NULL) && $data === null) {
+			return true;
+		}
+
+		if (!is_scalar($data) || is_bool($data) || is_double($data) || !ctype_digit(strval($data))) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an unsigned integer is expected'));
+
+			return false;
+		}
+
+		if (bccomp($data, ZBX_MAX_DATE) > 0) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a timestamp is too large'));
+
+			return false;
+		}
+
+		if (!self::checkTimestampIn($rule, $data, $path, $error)) {
+			return false;
+		}
+
+		if (!self::checkCompare($rule, $data, $path, $error)) {
+			return false;
+		}
+
+		if (is_string($data)) {
+			$data = (int) $data;
+		}
+
+		return true;
+	}
+
+	/**
+	 * @param array  $rule
+	 * @param string $rule['in']  (optional)
+	 * @param int    $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function checkTimestampIn(array $rule, $data, string $path, string &$error): bool {
+		if (!array_key_exists('in', $rule)) {
+			return true;
+		}
+
+		$valid = self::isInRange($data, $rule['in']);
+
+		if (!$valid) {
+			$format = array_key_exists('format', $rule) ? $rule['format'] : ZBX_FULL_DATE_TIME;
+			$in = explode(',', $rule['in']);
+			$formatted_in = '';
+
+			if (array_key_exists('timezone', $rule)) {
+				$default_timezone = date_default_timezone_get();
+				date_default_timezone_set('UTC');
+			}
+
+			foreach ($in as $i => $el) {
+				if (strpos($el, ':')) {
+					[$from, $to] = explode(':', $el);
+
+					$formatted_in .= date($format, $from).'-'.date($format, $to);
+				}
+				else {
+					$formatted_in .= date($format, $el);
+				}
+
+				if (array_key_exists($i + 1, $in)) {
+					$formatted_in .= ', ';
+				}
+			}
+
+			if (array_key_exists('timezone', $rule)) {
+				date_default_timezone_set($default_timezone);
+			}
+
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _n('value must be %1$s', 'value must be one of %1$s',
+				$formatted_in, (strpbrk($rule['in'], ',:') === false) ? 1 : 2
+			));
+		}
+
+		return $valid;
+	}
+
+	/**
+	 * @param array  $rule
+	 * @param array  $rule[compare]            (optional)
+	 * @param string $rule[compare][operator]
+	 * @param string $rule[compare][path]
+	 * @param mixed  $rule[compare][value]
+	 * @param int    $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function checkCompare(array $rule, $data, string $path, string &$error): bool {
+		if (!array_key_exists('compare', $rule)) {
+			return true;
+		}
+
+		switch ($rule['compare']['operator']) {
+			case '>':
+				if ($data <= $rule['compare']['value']) {
+					$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+						_s('cannot be less than or equal to the value of parameter "%1$s"', $rule['compare']['path'])
+					);
+
+					return false;
+				}
+				break;
+
+			default:
+				$error = 'Incorrect validation rules.';
+
+				return false;
 		}
 
 		return true;

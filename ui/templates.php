@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -237,15 +237,17 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$templates[] = ['templateid' => $templateid];
 		}
 
+		$template_name = getRequest('template_name', '');
+
 		// create / update template
 		$template = [
-			'host' => getRequest('template_name', ''),
-			'name' => getRequest('visiblename', ''),
+			'host' => $template_name,
+			'name' => (getRequest('visiblename', '') === '') ? $template_name : getRequest('visiblename'),
+			'description' => getRequest('description', ''),
 			'groups' => zbx_toObject($groups, 'groupid'),
 			'templates' => $templates,
-			'macros' => $macros,
 			'tags' => $tags,
-			'description' => getRequest('description', '')
+			'macros' => $macros
 		];
 
 		if ($input_templateid == 0) {
@@ -406,22 +408,56 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	}
 }
 elseif (hasRequest('templateid') && hasRequest('delete')) {
-	DBstart();
+	try {
+		DBstart();
 
-	$result = API::Template()->massUpdate([
-		'templates' => zbx_toObject($_REQUEST['templateid'], 'templateid'),
-		'hosts' => []
-	]);
-	if ($result) {
+		$hosts = API::Host()->get([
+			'output' => [],
+			'templateids' => getRequest('templateid'),
+			'preservekeys' => true
+		]);
+
+		if ($hosts) {
+			$result = API::Host()->massRemove([
+				'hostids' => array_keys($hosts),
+				'templateids' => getRequest('templateid')
+			]);
+
+			if (!$result) {
+				throw new Exception();
+			}
+		}
+
+		$templates = API::Template()->get([
+			'output' => [],
+			'parentTemplateids' => getRequest('templateid'),
+			'preservekeys' => true
+		]);
+
+		if ($templates) {
+			$result = API::Template()->massRemove([
+				'templateids' => array_keys($templates),
+				'templateids_link' => getRequest('templateid')
+			]);
+
+			if (!$result) {
+				throw new Exception();
+			}
+		}
+
 		$result = API::Template()->delete([getRequest('templateid')]);
-	}
 
-	$result = DBend($result);
+		$result = DBend($result);
+	}
+	catch (Exception $e) {
+		DBend(false);
+	}
 
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['templateid']);
 		uncheckTableRows();
 	}
+
 	unset($_REQUEST['delete']);
 	show_messages($result, _('Template deleted'), _('Cannot delete template'));
 }
@@ -440,36 +476,69 @@ elseif (hasRequest('templateid') && hasRequest('delete_and_clear')) {
 	show_messages($result, _('Template deleted'), _('Cannot delete template'));
 }
 elseif (hasRequest('templates') && hasRequest('action') && str_in_array(getRequest('action'), ['template.massdelete', 'template.massdeleteclear'])) {
-	$templates = getRequest('templates');
+	try {
+		DBstart();
 
-	DBstart();
+		$templateids = getRequest('templates');
 
-	$result = true;
+		if (getRequest('action') === 'template.massdelete') {
+			$hosts = API::Host()->get([
+				'output' => [],
+				'templateids' => $templateids,
+				'preservekeys' => true
+			]);
 
-	if (getRequest('action') === 'template.massdelete') {
-		$result = API::Template()->massUpdate([
-			'templates' => zbx_toObject($templates, 'templateid'),
-			'hosts' => []
-		]);
+			if ($hosts) {
+				$result = API::Host()->massRemove([
+					'hostids' => array_keys($hosts),
+					'templateids' => $templateids
+				]);
+
+				if (!$result) {
+					throw new Exception();
+				}
+			}
+
+			$templates = API::Template()->get([
+				'output' => [],
+				'parentTemplateids' => $templateids,
+				'preservekeys' => true
+			]);
+
+			if ($templates) {
+				$result = API::Template()->massRemove([
+					'templateids' => array_keys($templates),
+					'templateids_link' => $templateids
+				]);
+
+				if (!$result) {
+					throw new Exception();
+				}
+			}
+		}
+
+		$result = API::Template()->delete($templateids);
+
+		$result = DBend($result);
 	}
-
-	if ($result) {
-		$result = API::Template()->delete($templates);
+	catch (Exception $e) {
+		DBend(false);
 	}
-
-	$result = DBend($result);
 
 	if ($result) {
 		uncheckTableRows();
 	}
 	else {
-		$templateids = API::Template()->get([
+		$templates = API::Template()->get([
 			'output' => [],
-			'templateids' => $templates,
-			'editable' => true
+			'templateids' => $templateids,
+			'editable' => true,
+			'preservekeys' => true
 		]);
-		uncheckTableRows(null, zbx_objectValues($templateids, 'templateid'));
+
+		uncheckTableRows(null, array_keys($templates));
 	}
+
 	show_messages($result, _('Template deleted'), _('Cannot delete template'));
 }
 

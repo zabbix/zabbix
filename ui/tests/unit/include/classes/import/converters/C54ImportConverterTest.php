@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -154,6 +154,90 @@ class C54ImportConverterTest extends CImportConverterTest {
 								[
 									'subject' => $simple_macros_expected,
 									'message' => $simple_macros_expected
+								]
+							]
+						]
+					]
+				]
+			],
+			[
+				[
+					'hosts' => [
+						[
+							'host' => 'Zabbix server',
+							'groups' => [
+								['name' => 'Zabbix servers']
+							],
+							'items' => [
+								[
+									'name' => 'Item1',
+									'type' => CXmlConstantName::TRAP,
+									'key' => 'item1',
+									'preprocessing' => [
+										[
+											'type' => CXmlConstantName::PROMETHEUS_PATTERN,
+											'parameters' => [
+												'metric',
+												'my_label'
+											]
+										]
+									]
+								],
+								[
+									'name' => 'Item2',
+									'type' => CXmlConstantName::TRAP,
+									'key' => 'item2',
+									'preprocessing' => [
+										[
+											'type' => CXmlConstantName::PROMETHEUS_PATTERN,
+											'parameters' => [
+												'metric',
+												''
+											]
+										]
+									]
+								]
+							]
+						]
+					]
+				],
+				[
+					'hosts' => [
+						[
+							'host' => 'Zabbix server',
+							'groups' => [
+								['name' => 'Zabbix servers']
+							],
+							'items' => [
+								[
+									'name' => 'Item1',
+									'type' => CXmlConstantName::TRAP,
+									'key' => 'item1',
+									'preprocessing' => [
+										[
+											'type' => CXmlConstantName::PROMETHEUS_PATTERN,
+											'parameters' => [
+												'metric',
+												ZBX_PREPROC_PROMETHEUS_LABEL,
+												'my_label'
+											]
+										]
+									]
+								],
+								[
+									'name' => 'Item2',
+									'type' => CXmlConstantName::TRAP,
+									'key' => 'item2',
+									'preprocessing' => [
+										[
+											'type' => CXmlConstantName::PROMETHEUS_PATTERN,
+											'parameters' => [
+												'metric',
+												ZBX_PREPROC_PROMETHEUS_VALUE,
+												''
+											]
+										]
+									]
 								]
 							]
 						]

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -893,10 +893,11 @@ class CHostPrototype extends CHostBase {
 		// Fetch the child discovery rules.
 		$childDiscoveryRules = API::DiscoveryRule()->get([
 			'output' => ['itemid', 'templateid', 'hostid'],
-			'preservekeys' => true,
 			'filter' => [
 				'templateid' => array_keys($discoveryRules)
-			]
+			],
+			'nopermissions' => true,
+			'preservekeys' => true
 		]);
 
 		/*
@@ -908,7 +909,8 @@ class CHostPrototype extends CHostBase {
 			'selectGroupLinks' => API_OUTPUT_EXTEND,
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
 			'selectDiscoveryRule' => ['itemid'],
-			'discoveryids' => zbx_objectValues($childDiscoveryRules, 'itemid')
+			'discoveryids' => zbx_objectValues($childDiscoveryRules, 'itemid'),
+			'nopermissions' => true
 		]);
 		foreach ($childDiscoveryRules as &$childDiscoveryRule) {
 			$childDiscoveryRule['hostPrototypes'] = [];
@@ -1062,18 +1064,20 @@ class CHostPrototype extends CHostBase {
 
 		$discoveryRules = API::DiscoveryRule()->get([
 			'output' => ['itemid'],
-			'hostids' => $data['templateids']
+			'hostids' => $data['templateids'],
+			'nopermissions' => true
 		]);
 		$hostPrototypes = $this->get([
-			'discoveryids' => zbx_objectValues($discoveryRules, 'itemid'),
-			'preservekeys' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'selectGroupLinks' => API_OUTPUT_EXTEND,
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
 			'selectTags' => ['tag', 'value'],
 			'selectTemplates' => ['templateid'],
 			'selectDiscoveryRule' => ['itemid'],
-			'selectInterfaces' => ['main', 'type', 'useip', 'ip', 'dns', 'port', 'details']
+			'selectInterfaces' => ['main', 'type', 'useip', 'ip', 'dns', 'port', 'details'],
+			'discoveryids' => zbx_objectValues($discoveryRules, 'itemid'),
+			'preservekeys' => true,
+			'nopermissions' => true
 		]);
 
 		$hostPrototypes = $this->getHostMacros($hostPrototypes);

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -792,8 +792,6 @@ void	zbx_clean_items(DC_ITEM *items, int num, AGENT_RESULT *results)
  *             nextcheck   - [OUT] item nextcheck                             *
  *                                                                            *
  * Return value: number of items processed                                    *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: processes single item at a time except for Java, SNMP items,     *
  *           see DCconfig_get_poller_items()                                  *

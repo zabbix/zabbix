@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,7 +47,6 @@ void	zbx_get_zabbix_stats_ext(struct zbx_json *json)
 	zbx_uint64_t		queue_size;
 	char			*value, *error = NULL;
 	zbx_tfc_stats_t		tcache_stats;
-
 
 	/* zabbix[lld_queue] */
 	if (SUCCEED == zbx_lld_get_queue_size(&queue_size, &error))

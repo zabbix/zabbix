@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -64,8 +64,12 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 						'Key' => 'wrong-second-parameter-macro'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu_usage_system', 'parameter_2' => '{#LABELNAME}']
-
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => 'cpu_usage_system',
+							'parameter_2' => 'label',
+							'parameter_3' => '{#LABELNAME}'
+						]
 					],
 					'error' => 'Incorrect value for field "params": invalid Prometheus output.'
 				]
@@ -196,5 +200,50 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 		$host_link = 'items.php?filter_set=1&context=host&filter_hostids[0]='.self::INHERITANCE_HOSTID;
 
 		$this->checkPreprocessingInheritance($data, $host_link);
+	}
+
+	/**
+	 * Check Prometheus 3rd parameter editability depending on formula field.
+	 */
+	public function testFormPreprocessingItem_PrometheusParameters() {
+		$this->page->login()->open($this->link);
+		$this->query('button:'.$this->button)->waitUntilPresent()->one()->click();
+
+		// Open preprocessing form and add prometheus step.
+		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+		$form->selectTab('Preprocessing');
+		$this->addPreprocessingSteps([['type' => 'Prometheus pattern', 'parameter_1' => 'pattern']]);
+
+		// Check default values.
+		$fields = [
+			'dropdown' => 'name:preprocessing[0][params][1]',
+			'value' => 'id:preprocessing_0_params_2'
+		];
+
+		$this->assertEquals('value', $form->getField($fields['dropdown'])->getValue());
+		$this->assertEquals('', $form->getField($fields['value'])->getValue());
+
+		// Fill value with text.
+		$form->getField($fields['dropdown'])->asZDropdown()->fill('label');
+		$form->getField($fields['value'])->fill('test');
+
+		$values = [
+			'value' => false,
+			'label' => true,
+			'sum' => false,
+			'min' => false,
+			'max' => false,
+			'avg' => false,
+			'count' => false
+		];
+
+		// Change dropdown values and check label field value and editability.
+		foreach ($values as $value => $enabled) {
+			$form->getField($fields['dropdown'])->asZDropdown()->fill($value);
+			$this->assertTrue($form->getField($fields['value'])->isEnabled($enabled));
+
+			// Check that entered value did not disappear.
+			$this->assertEquals('test', $form->getField($fields['value'])->getValue());
+		}
 	}
 }

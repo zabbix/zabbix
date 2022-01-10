@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -237,7 +237,6 @@ class testFormTrigger extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Name');
 		$this->zbxTestAssertVisibleId('description');
 		$this->zbxTestAssertAttribute("//input[@id='description']", 'maxlength', 255);
-		$this->zbxTestAssertAttribute("//input[@id='description']", 'size', 20);
 
 		if (!isset($data['constructor']) || $data['constructor'] == 'open_close') {
 			$this->zbxTestTextPresent(['Expression', 'Expression constructor']);
@@ -306,7 +305,6 @@ class testFormTrigger extends CLegacyWebTest {
 		$this->zbxTestTextPresent('URL');
 		$this->zbxTestAssertVisibleId('url');
 		$this->zbxTestAssertAttribute("//input[@id='url']", 'maxlength', 255);
-		$this->zbxTestAssertAttribute("//input[@id='url']", 'size', 20);
 
 		$this->zbxTestAssertElementPresentId('priority_0');
 		$this->assertTrue($this->zbxTestCheckboxSelected('priority_0'));
@@ -375,8 +373,10 @@ class testFormTrigger extends CLegacyWebTest {
 
 		$this->zbxTestTabSwitch('Dependencies');
 		$this->zbxTestTextPresent(['Dependencies', 'Name', 'Action']);
-		$this->zbxTestAssertElementPresentId('bnt1');
-		$this->zbxTestAssertElementText("//button[@id='bnt1']", 'Add');
+		if (!isset($data['templatedHost'])) {
+			$this->zbxTestAssertElementPresentId('bnt1');
+			$this->zbxTestAssertElementText("//button[@id='bnt1']", 'Add');
+		}
 	}
 
 	// Returns update data
@@ -913,7 +913,7 @@ class testFormTrigger extends CLegacyWebTest {
 					$this->assertEquals($count, $this->query('xpath://span[@class="icon-info status-red"]')->all()->count());
 					$text = $this->query('xpath://tr[1]//div[@class="hint-box"]')->one()->getText();
 					foreach ($constructor['errors'] as $error) {
-						$this->assertContains($error, $text);
+						$this->assertStringContainsString($error, $text);
 					}
 				}
 				else {

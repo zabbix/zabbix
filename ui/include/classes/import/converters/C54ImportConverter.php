@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -81,6 +81,10 @@ class C54ImportConverter extends CConverter {
 	 */
 	private static function convertHosts(array $hosts): array {
 		foreach ($hosts as &$host) {
+			if (array_key_exists('items', $host)) {
+				$host['items'] = self::convertItems($host['items']);
+			}
+
 			if (array_key_exists('discovery_rules', $host)) {
 				$host['discovery_rules'] = self::convertDiscoveryRules($host['discovery_rules']);
 			}
@@ -101,6 +105,10 @@ class C54ImportConverter extends CConverter {
 	 */
 	private static function convertTemplates(array $templates): array {
 		foreach ($templates as &$template) {
+			if (array_key_exists('items', $template)) {
+				$template['items'] = self::convertItems($template['items']);
+			}
+
 			if (array_key_exists('discovery_rules', $template)) {
 				$template['discovery_rules'] = self::convertDiscoveryRules($template['discovery_rules']);
 			}
@@ -108,6 +116,50 @@ class C54ImportConverter extends CConverter {
 		unset($template);
 
 		return $templates;
+	}
+
+	/**
+	 * Convert items.
+	 *
+	 * @static
+	 *
+	 * @param array       $items
+	 *
+	 * @return array
+	 */
+	private static function convertItems(array $items): array {
+		foreach ($items as &$item) {
+			if (array_key_exists('preprocessing', $item)) {
+				$item['preprocessing'] = self::convertPreprocessingSteps($item['preprocessing']);
+			}
+		}
+		unset($item);
+
+		return $items;
+	}
+
+	/**
+	 * Convert preprocessing steps.
+	 *
+	 * @static
+	 *
+	 * @param array $preprocessing_steps
+	 *
+	 * @return array
+	 */
+	private static function convertPreprocessingSteps(array $preprocessing_steps): array {
+		foreach ($preprocessing_steps as &$preprocessing_step) {
+			if ($preprocessing_step['type'] === CXmlConstantName::PROMETHEUS_PATTERN
+					&& count($preprocessing_step['parameters']) === 2) {
+				$preprocessing_step['parameters'][2] = $preprocessing_step['parameters'][1];
+				$preprocessing_step['parameters'][1] = ($preprocessing_step['parameters'][2] === '')
+					? ZBX_PREPROC_PROMETHEUS_VALUE
+					: ZBX_PREPROC_PROMETHEUS_LABEL;
+			}
+		}
+		unset($preprocessing_step);
+
+		return $preprocessing_steps;
 	}
 
 	/**
@@ -121,6 +173,10 @@ class C54ImportConverter extends CConverter {
 		foreach ($discovery_rules as &$discovery_rule) {
 			if (array_key_exists('graph_prototypes', $discovery_rule)) {
 				$discovery_rule['graph_prototypes'] = self::convertGraphs($discovery_rule['graph_prototypes']);
+			}
+
+			if (array_key_exists('item_prototypes', $discovery_rule)) {
+				$discovery_rule['item_prototypes'] = self::convertItems($discovery_rule['item_prototypes']);
 			}
 		}
 		unset($discovery_rule);

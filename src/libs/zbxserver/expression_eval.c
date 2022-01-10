@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2021 Zabbix SIA
+ ** Copyright (C) 2001-2022 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -1411,7 +1411,7 @@ static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expressi
 	int				i, pos, ret = FAIL;
 	zbx_vector_dbl_t		*results = NULL;
 	double				percentage, result;
-	char				*param = NULL, *backet = NULL;
+	char				*param = NULL;
 	const char			*log_fn = (ZBX_ITEM_FUNC_BPERCENTL == item_func ?
 							"bucket_percentile" : "bucket_rate_foreach");
 
@@ -1510,8 +1510,7 @@ static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expressi
 		DC_ITEM		*dcitem;
 		zbx_variant_t	rate;
 		double		le;
-		const char	*s;
-
+		char		bucket[ZBX_MAX_DOUBLE_LEN + 1];
 
 		if (NULL == (dcitem = get_dcitem(&eval->dcitem_refs, data->itemids.values[i])))
 			continue;
@@ -1525,19 +1524,14 @@ static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expressi
 		if (ITEM_VALUE_TYPE_FLOAT != dcitem->value_type && ITEM_VALUE_TYPE_UINT64 != dcitem->value_type)
 			continue;
 
-		zbx_free(backet);
-
-		for (s = dcitem->key_orig; SUCCEED == is_key_char((unsigned char)*s); s++)
-			;
-
-		if (dcitem->key_orig == s || NULL == (backet = get_param_dyn(s, pos, NULL)))	/* the key is empty */
+		if (0 != get_key_param(dcitem->key_orig, pos, bucket, sizeof(bucket)))
 			continue;
 
-		zbx_strupper(backet);
+		zbx_strupper(bucket);
 
-		if (0 == strcmp(backet, "+INF") || 0 == strcmp(backet, "INF"))
+		if (0 == strcmp(bucket, "+INF") || 0 == strcmp(bucket, "INF"))
 			le = ZBX_INFINITY;
-		else if (SUCCEED != is_double(backet, &le))
+		else if (SUCCEED != is_double(bucket, &le))
 			continue;
 
 		if (SUCCEED != (ret = zbx_evaluate_RATE(&rate, dcitem, param, ts, error)))
@@ -1560,7 +1554,6 @@ static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expressi
 	}
 err:
 	zbx_free(param);
-	zbx_free(backet);
 
 	if (NULL != results)
 	{
@@ -1981,7 +1974,6 @@ typedef struct
 	char	*host;
 }
 zbx_host_index_t;
-
 
 static int	host_index_compare(const void *d1, const void *d2)
 {

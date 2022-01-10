@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,15 +19,18 @@
 **/
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../traits/TableTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
- * @backup role, module, users, report
+ * @backup role, module, users, report, services
  *
- * @onBefore prepareUserData, prepareReportData
+ * @onBefore prepareUserData, prepareReportData, prepareServiceData
  */
 class testUserRolesPermissions extends CWebTest {
+
+	use TableTrait;
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -108,6 +111,68 @@ class testUserRolesPermissions extends CWebTest {
 		]);
 		$this->assertArrayHasKey('reportids', $response);
 		self::$reportid = $response['reportids'][0];
+	}
+
+	public function prepareServiceData() {
+		CDataHelper::call('service.create', [
+			[
+				'name' => 'Parent 1',
+				'algorithm' => 1,
+				'sortorder' => 1
+			],
+			[
+				'name' => 'Parent 2',
+				'algorithm' => 2,
+				'sortorder' => 2
+			],
+			[
+				'name' => 'Child of parent 1',
+				'algorithm' => 2,
+				'sortorder' => 1,
+				'tags' => [
+					[
+						'tag' => 'test',
+						'value' => 'test123'
+					]
+				]
+			],
+			[
+				'name' => 'Child of child 1',
+				'algorithm' => 2,
+				'sortorder' => 1
+			],
+			[
+				'name' => 'Child of parent 2',
+				'algorithm' => 2,
+				'sortorder' => 1
+			]
+		]);
+
+		$services = CDataHelper::getIds('name');
+
+		CDataHelper::call('service.update', [
+			[
+				'serviceid' =>  $services['Child of parent 1'],
+				'parents' => [
+					[
+						'serviceid' => $services['Parent 1']
+					]
+				],
+				'children' => [
+					[
+						'serviceid' => $services['Child of child 1']
+					]
+				]
+			],
+			[
+				'serviceid' => $services['Child of parent 2'],
+				'parents' => [
+					[
+						'serviceid' => $services['Parent 2']
+					]
+				]
+			]
+		]);
 	}
 
 	public static function getPageActionsData() {
@@ -447,6 +512,7 @@ class testUserRolesPermissions extends CWebTest {
 	public function testUserRolesPermissions_Module() {
 		$pages_before = [
 			'Monitoring',
+			'Services',
 			'Inventory',
 			'Reports',
 			'Configuration',
@@ -896,8 +962,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Hosts',
 						'Latest data',
 						'Maps',
-						'Discovery',
-						'Services'
+						'Discovery'
 					],
 					'link' => ['zabbix.php?action=problem.view']
 				]
@@ -911,8 +976,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Problems',
 						'Latest data',
 						'Maps',
-						'Discovery',
-						'Services'
+						'Discovery'
 					],
 					'link' => ['zabbix.php?action=host.view']
 				]
@@ -926,8 +990,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Problems',
 						'Hosts',
 						'Maps',
-						'Discovery',
-						'Services'
+						'Discovery'
 					],
 					'link' => ['zabbix.php?action=latest.view']
 				]
@@ -941,8 +1004,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Problems',
 						'Hosts',
 						'Latest data',
-						'Discovery',
-						'Services'
+						'Discovery'
 					],
 					'link' => ['sysmaps.php']
 				]
@@ -956,25 +1018,57 @@ class testUserRolesPermissions extends CWebTest {
 						'Problems',
 						'Hosts',
 						'Latest data',
-						'Maps',
-						'Services'
+						'Maps'
 					],
 					'link' => ['zabbix.php?action=discovery.view']
 				]
 			],
 			[
 				[
-					'section' => 'Monitoring',
+					'section' => 'Services',
 					'page' => 'Services',
 					'displayed_ui' => [
-						'Dashboard',
-						'Problems',
-						'Hosts',
-						'Latest data',
-						'Maps',
-						'Discovery'
+						'Service actions',
+						'SLA',
+						'SLA report'
 					],
 					'link' => ['zabbix.php?action=service.list']
+				]
+			],
+			[
+				[
+					'section' => 'Services',
+					'page' => 'Service actions',
+					'displayed_ui' => [
+						'Services',
+						'SLA',
+						'SLA report'
+					],
+					'link' => ['actionconf.php?eventsource=4']
+				]
+			],
+			[
+				[
+					'section' => 'Services',
+					'page' => 'SLA',
+					'displayed_ui' => [
+						'Services',
+						'Service actions',
+						'SLA report'
+					],
+					'link' => ['zabbix.php?action=sla.list']
+				]
+			],
+			[
+				[
+					'section' => 'Services',
+					'page' => 'SLA report',
+					'displayed_ui' => [
+						'Services',
+						'Service actions',
+						'SLA'
+					],
+					'link' => ['zabbix.php?action=slareport.list']
 				]
 			]
 		];
@@ -1006,7 +1100,14 @@ class testUserRolesPermissions extends CWebTest {
 				$menu->select($data['section']);
 			}
 
-			$this->assertEquals($action_status, $menu->exists($data['page']));
+			if ($data['page'] === $data['section']) {
+				$submenu = $menu->query("xpath:.//a[text()=".CXPathHelper::escapeQuotes($data['section']).
+						"]/../ul[@class='submenu']")->one();
+				$this->assertEquals($action_status, $submenu->query('link', $data['page'])->one(false)->isValid());
+			}
+			else {
+				$this->assertEquals($action_status, $menu->exists($data['page']));
+			}
 
 			if ($action_status) {
 				if (array_key_exists('user_roles', $data)) {
@@ -1048,8 +1149,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Hosts',
 						'Latest data',
 						'Maps',
-						'Discovery',
-						'Services'
+						'Discovery'
 					]
 				]
 			],
@@ -1060,8 +1160,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Hosts',
 						'Latest data',
 						'Maps',
-						'Discovery',
-						'Services'
+						'Discovery'
 					]
 				]
 			]
@@ -1073,8 +1172,7 @@ class testUserRolesPermissions extends CWebTest {
 //						'Overview',
 //						'Latest data',
 //						'Maps',
-//						'Discovery',
-//						'Services'
+//						'Discovery'
 //					]
 //				]
 //			]
@@ -1102,7 +1200,7 @@ class testUserRolesPermissions extends CWebTest {
 			else {
 				$this->checkLinks(['zabbix.php?action=dashboard.view'], $data['button']);
 				$this->changeRoleRule(['Monitoring' => ['Dashboard', 'Problems', 'Hosts', 'Latest data', 'Maps',
-						'Discovery', 'Services']]
+						'Discovery']]
 				);
 			}
 		}
@@ -1119,25 +1217,222 @@ class testUserRolesPermissions extends CWebTest {
 		$this->checkLinks(['zabbix.php?action=user.token.list']);
 	}
 
-	/**
-	 * Manage services.
-	 */
-	public function testUserRolesPermissions_ManageServices() {
-		$this->page->userLogin('user_for_role', 'zabbixzabbix');
+	public static function getRoleServiceData() {
+		return [
+			[
+				[
+					'role_config' => [
+						'Read-write access to services' => 'None',
+						'Read-only access to services' => 'None'
+					],
+					'services' => null
+				]
+			],
+			[
+				[
+					'role_config' => [
+						'Read-write access to services' => 'All',
+						'Read-only access to services' => 'None'
+					],
+					'services' => [
+						'Child of child 1' => 'write',
+						'Child of parent 1' => 'write',
+						'Child of parent 2' => 'write',
+						'Parent 1' => 'write',
+						'Parent 2' => 'write'
+					]
+				]
+			],
+			[
+				[
+					'role_config' => [
+						'Read-write access to services' => 'None',
+						'Read-only access to services' => 'All'
+					],
+					'services' => [
+						'Child of child 1' => 'read',
+						'Child of parent 1' => 'read',
+						'Child of parent 2' => 'read',
+						'Parent 1' => 'read',
+						'Parent 2' => 'read'
+					]
+				]
+			],
+			[
+				[
+					'role_config' => [
+						'Read-write access to services' => 'All',
+						'Read-only access to services' => 'All'
+					],
+					'services' => [
+						'Child of child 1' => 'write',
+						'Child of parent 1' => 'write',
+						'Child of parent 2' => 'write',
+						'Parent 1' => 'write',
+						'Parent 2' => 'write'
+					]
+				]
+			],
+			[
+				[
+					'role_config' => [
+						'Read-write access to services' => 'Service list',
+						'Read-only access to services' => 'None'
+					],
+					'service_list' => [
+						'Read-write access to services with tag' => [
+							'service-write-tag-tag' => 'test',
+							'service_write_tag_value' => 'test123'
+						]
+					],
+					'services' => [
+						'Child of child 1' => 'write',
+						'Child of parent 1' => 'write'
+					]
+				]
+			],
+			[
+				[
+					'role_config' => [
+						'Read-write access to services' => 'None',
+						'Read-only access to services' => 'Service list'
+					],
+					'service_list' => [
+						'Read-only access to services with tag' => [
+							'service-read-tag-tag' => 'test',
+							'service_read_tag_value' => 'test123'
+						]
+					],
+					'services' => [
+						'Child of child 1' => 'read',
+						'Child of parent 1' => 'read'
+					]
+				]
+			],
+			[
+				[
+					'role_config' => [
+						'Read-write access to services' => 'Service list',
+						'Read-only access to services' => 'None'
+					],
+					'service_list' => [
+						'xpath:(//div[@class="multiselect-control"])[1]' => 'Child of parent 1'
+					],
+					'services' => [
+						'Child of child 1' => 'write',
+						'Child of parent 1' => 'write'
+					]
+				]
+			],
+			[
+				[
+					'role_config' => [
+						'Read-write access to services' => 'None',
+						'Read-only access to services' => 'Service list'
+					],
+					'service_list' => [
+						'xpath:(//div[@class="multiselect-control"])[2]' => 'Child of parent 1'
+					],
+					'services' => [
+						'Child of child 1' => 'read',
+						'Child of parent 1' => 'read'
+					]
+				]
+			],
+			[
+				[
+					'role_config' => [
+						'Read-write access to services' => 'Service list',
+						'Read-only access to services' => 'All'
+					],
+					'service_list' => [
+						'xpath:(//div[@class="multiselect-control"])[1]' => 'Child of parent 1'
+					],
+					'services' => [
+						'Child of child 1' => 'write',
+						'Child of parent 1' => 'write',
+						'Child of parent 2' => 'read',
+						'Parent 1' => 'read',
+						'Parent 2' => 'read'
+					]
+				]
+			]
+		];
+	}
 
-		foreach ([true, false] as $action_status) {
-			$this->page->open('zabbix.php?action=service.list')->waitUntilReady();
-			foreach (['View', 'Edit'] as $radio) {
-				$this->assertEquals($action_status, $this->query('xpath://ul[@id="list_mode"]/li/label[text()='
-						.CXPathHelper::escapeQuotes($radio).']')->asSegmentedRadio()->exists());
+	/**
+	 * Check permissions to services based on user role configuration.
+	 *
+	 * @dataProvider getRoleServiceData
+	 */
+	public function testUserRolesPermissions_ServicePermissions($data) {
+		// Prepare a combination of service name and the number of child services for service for further comparison.
+		if ($data['services'] !== null) {
+			$child_services = [
+				'Child of parent 1' => 1,
+				'Parent 1' => 1,
+				'Parent 2' => 1
+			];
+			$column_content = [];
+
+			foreach (array_keys($data['services']) as $service) {
+				$column_content[] = array_key_exists($service, $child_services)
+					? $service.' '.$child_services[$service]
+					: $service;
 			}
-			if ($action_status) {
-				$this->query('id:list_mode')->asSegmentedRadio()->one()->select('Edit');
-				$this->page->waitUntilReady();
-				$this->changeRoleRule(['Read-write access to services' => 'None']);
+		}
+
+		// Configure the role according to the data provider.
+		$this->page->login()->open('zabbix.php?action=userrole.edit&roleid='.self::$super_roleid)->waitUntilReady();
+		$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
+		$form->fill($data['role_config']);
+
+		if (array_key_exists('service_list', $data)) {
+			$form->fill($data['service_list']);
+		}
+		$form->submit();
+		$this->page->logout();
+
+		// Login as user that belongs to the updated row and check access to services based on applied configuration.
+		$this->page->userLogin('user_for_role', 'zabbixzabbix');
+		$this->page->open('zabbix.php?action=service.list')->waitUntilReady();
+
+		$services_mode = $this->query('id:list_mode')->asSegmentedRadio()->one(false);
+
+		// Check that table service list content and edit mode in not available if the user doest have permissions.
+		if ($data['services'] === null) {
+			$this->assertTableData();
+			$this->assertFalse($services_mode->isValid());
+
+			return;
+		}
+		elseif ($data['role_config']['Read-write access to services'] !== 'None') {
+			// Open edit mode if user has write permissions to at least one service.
+			$services_mode->select('Edit');
+			$this->page->waituntilReady();
+		}
+
+		// Apply filter in order to see the list of available services.
+		$this->query('name:filter_set')->waitUntilClickable()->one()->click();
+		$this->page->waituntilReady();
+
+		$this->assertTableDataColumn($column_content, 'Name');
+		$table = $this->query('class:list-table')->asTable()->one();
+
+		// Check buttons are not visible for user with no permissions, otherwise, check edit permissions per service.
+		if ($data['role_config']['Read-write access to services'] === 'None') {
+			foreach ($table->getRows() as $row) {
+				$this->assertEquals(0, $row->query('xpath:.//button')->all(false)->count());
 			}
-			else {
-				$this->checkLinks(['zabbix.php?action=service.list.edit']);
+		}
+		else {
+			foreach ($data['services'] as $service => $permissions) {
+				$property = ($permissions === 'write') ? CElementFilter::CLICKABLE : CElementFilter::NOT_CLICKABLE;
+				$row = $table->findRow('Name', $service, true);
+				// Check that all three action buttons in the row are clickable.
+				$this->assertEquals(3, $row->query("xpath:.//button")->all()
+						->filter(new CElementFilter($property))->count()
+				);
 			}
 		}
 	}
@@ -1156,7 +1451,7 @@ class testUserRolesPermissions extends CWebTest {
 			$this->query('button:Go to "'.$page.'"')->one()->waitUntilClickable()->click();
 
 			if ($page === 'Dashboard') {
-				$this->assertContains('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
+				$this->assertStringContainsString('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
 			}
 		}
 	}

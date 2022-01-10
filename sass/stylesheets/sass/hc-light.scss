@@ -94,6 +94,7 @@ $menu-main-icons: (
 	dashboard: -570px -664px,
 	problems: -570px -688px,
 	monitoring: -570px -712px,
+	services: -570px -832px,
 	inventory: -570px -736px,
 	reports: -570px -760px,
 	configuration: -570px -784px,
@@ -165,6 +166,7 @@ $msg-warning-border-color: #ffb319;
 $btn-font-color: #ffffff;
 $btn-bg-color: #555555;
 $btn-border-color: #333333;
+$btn-border-focus-color: #000000;
 
 $btn-alt-font-color: #000000;
 $btn-alt-bg-color: transparent;
@@ -225,6 +227,11 @@ $toc-title-color: #ffffff;
 $toc-title-bg-color: #333333;
 $diff-added-bg-color: transparent;
 $diff-removed-bg-color: transparent;
+
+// Change indicators.
+$arrow-fill-up: #000000;
+$arrow-fill-down: #000000;
+$arrow-fill-up-down: #000000;
 
 // Important! @import string should come after variables
 @import 'screen.scss';
@@ -1234,6 +1241,13 @@ td.inactive-bg {
 	}
 }
 
+.problem-icon-link {
+	&:focus {
+		box-shadow: 0 0 0 2px $blue;
+	}
+}
+
+.problem-icon-link,
 .problem-icon-list {
 	.problem-icon-list-item {
 		background: transparent;

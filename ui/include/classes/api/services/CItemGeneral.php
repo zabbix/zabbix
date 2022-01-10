@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -557,6 +557,8 @@ abstract class CItemGeneral extends CApiService {
 				continue;
 			}
 
+			$item['preprocessing'] = self::normalizeItemPreprocessingSteps($item['preprocessing']);
+
 			if (!CApiInputValidator::validate($api_input_rules, $item['preprocessing'], '/'.($i + 1).'/preprocessing',
 					$error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -567,9 +569,7 @@ abstract class CItemGeneral extends CApiService {
 			$prometheus = false;
 			$not_supported = false;
 
-			foreach ($item['preprocessing'] as &$preprocessing) {
-				$preprocessing['params'] = str_replace("\r\n", "\n", $preprocessing['params']);
-
+			foreach ($item['preprocessing'] as $preprocessing) {
 				switch ($preprocessing['type']) {
 					case ZBX_PREPROC_REGSUB:
 					case ZBX_PREPROC_ERROR_FIELD_REGEX:
@@ -669,6 +669,18 @@ abstract class CItemGeneral extends CApiService {
 									'params', _('first parameter is expected')
 								));
 							}
+							elseif (!array_key_exists(1, $params)) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+									'params', _('second parameter is expected')
+								));
+							}
+							elseif ($params[2] === ''
+									&& ($params[1] === ZBX_PREPROC_PROMETHEUS_LABEL
+										|| $params[1] === ZBX_PREPROC_PROMETHEUS_FUNCTION)) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+									'params', _('third parameter is expected')
+								));
+							}
 
 							if ($prometheus_pattern_parser->parse($params[0]) != CParser::PARSE_SUCCESS) {
 								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
@@ -676,11 +688,45 @@ abstract class CItemGeneral extends CApiService {
 								));
 							}
 
-							if (array_key_exists(1, $params) && $params[1] !== ''
-									&& $prometheus_output_parser->parse($params[1]) != CParser::PARSE_SUCCESS) {
+							if (!in_array($params[1], [ZBX_PREPROC_PROMETHEUS_VALUE, ZBX_PREPROC_PROMETHEUS_LABEL,
+									ZBX_PREPROC_PROMETHEUS_FUNCTION])) {
 								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-									'params', _('invalid Prometheus output')
+									'params', _('invalid aggregation method')
 								));
+							}
+
+							switch ($params[1]) {
+								case ZBX_PREPROC_PROMETHEUS_VALUE:
+									if ($params[2] !== '') {
+										self::exception(ZBX_API_ERROR_PARAMETERS,
+											_s('Incorrect value for field "%1$s": %2$s.', 'params',
+												_('invalid Prometheus output')
+											)
+										);
+									}
+									break;
+
+								case ZBX_PREPROC_PROMETHEUS_LABEL:
+									if ($prometheus_output_parser->parse($params[2]) != CParser::PARSE_SUCCESS) {
+										self::exception(ZBX_API_ERROR_PARAMETERS,
+											_s('Incorrect value for field "%1$s": %2$s.', 'params',
+												_('invalid Prometheus output')
+											)
+										);
+									}
+									break;
+
+								case ZBX_PREPROC_PROMETHEUS_FUNCTION:
+									if (!in_array($params[2], [ZBX_PREPROC_PROMETHEUS_SUM, ZBX_PREPROC_PROMETHEUS_MIN,
+											ZBX_PREPROC_PROMETHEUS_MAX, ZBX_PREPROC_PROMETHEUS_AVG,
+											ZBX_PREPROC_PROMETHEUS_COUNT])) {
+										self::exception(ZBX_API_ERROR_PARAMETERS,
+											_s('Incorrect value for field "%1$s": %2$s.', 'params',
+												_('unsupported Prometheus function')
+											)
+										);
+									}
+									break;
 							}
 						}
 						break;
@@ -740,7 +786,6 @@ abstract class CItemGeneral extends CApiService {
 						break;
 				}
 			}
-			unset($preprocessing);
 		}
 		unset($item);
 	}
@@ -2346,5 +2391,34 @@ abstract class CItemGeneral extends CApiService {
 					array_diff_key($db_item_tag, array_flip(['itemid']));
 			}
 		}
+	}
+
+	/**
+	 * Normalize preprocessing step parameters.
+	 *
+	 * @param array  $preprocessing                   Preprocessing steps.
+	 * @param string $preprocessing[<num>]['params']  Preprocessing step parameters.
+	 * @param int    $preprocessing[<num>]['type']    Preprocessing step type.
+	 *
+	 * @return array
+	 */
+	protected static function normalizeItemPreprocessingSteps(array $preprocessing): array {
+		foreach ($preprocessing as &$step) {
+			$step['params'] = str_replace("\r\n", "\n", $step['params']);
+			$params = explode("\n", $step['params']);
+
+			switch ($step['type']) {
+				case ZBX_PREPROC_PROMETHEUS_PATTERN:
+					if (!array_key_exists(2, $params)) {
+						$params[2] = '';
+					}
+					break;
+			}
+
+			$step['params'] = implode("\n", $params);
+		}
+		unset($step);
+
+		return $preprocessing;
 	}
 }

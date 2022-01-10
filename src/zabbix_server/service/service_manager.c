@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2927,7 +2927,6 @@ static void	process_parentlist(const zbx_ipc_message_t *message, zbx_service_man
 	zbx_free(data);
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: service_update_event_severity                                    *
@@ -3496,4 +3495,3 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 	exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL
 }
-

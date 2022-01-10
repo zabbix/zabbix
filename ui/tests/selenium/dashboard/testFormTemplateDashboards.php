@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1111,7 +1111,7 @@ class testFormTemplateDashboards extends CWebTest {
 			$this->assertEquals($display_periods, $form->getField('Default page display period')->getOptions()->asText());
 		}
 		else {
-			$this->assertEquals(['Clock', 'Graph (classic)', 'Graph prototype', 'Plain text', 'URL'],
+			$this->assertEquals(['Clock', 'Graph (classic)', 'Graph prototype', 'Item value', 'Plain text', 'URL'],
 					$form->getField('Type')->getOptions()->asText()
 			);
 		}

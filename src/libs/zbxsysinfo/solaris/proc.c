@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,7 +42,6 @@ typedef struct
 
 	/* process command line in format <arg0> <arg1> ... <argN>\0 */
 	char		*cmdline;
-
 
 #ifdef HAVE_ZONE_H
 	zoneid_t	zoneid;
@@ -704,7 +703,6 @@ out:
 
 	return SYSINFO_RET_OK;
 }
-
 
 /******************************************************************************
  *                                                                            *

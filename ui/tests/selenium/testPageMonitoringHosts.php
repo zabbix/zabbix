@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,8 +46,8 @@ class testPageMonitoringHosts extends CWebTest {
 		// Checking Title, Header and Column names.
 		$this->page->assertTitle('Hosts');
 		$this->page->assertHeader('Hosts');
-		$headers = ['Name', 'Interface', 'Availability', 'Tags', 'Problems', 'Status', 'Latest data', 'Problems',
-			'Graphs', 'Dashboards', 'Web'];
+		$headers = ['Name', 'Interface', 'Availability', 'Tags', 'Status', 'Latest data', 'Problems','Graphs',
+				'Dashboards', 'Web'];
 		$this->assertSame($headers, ($this->query('class:list-table')->asTable()->one())->getHeadersText());
 
 		// Check filter collapse/expand.
@@ -1036,39 +1036,6 @@ class testPageMonitoringHosts extends CWebTest {
 			$query->one()->click();
 			$this->page->waitUntilReady();
 			$this->assertEquals(array_reverse($after_listing), $this->getTableResult($listing));
-		}
-	}
-
-	/**
-	 * Сount problems amount from first column and compare with displayed problems from another Problems column.
-	 */
-	public function testPageMonitoringHosts_CountProblems() {
-		$this->page->login()->open('zabbix.php?action=host.view&filter_rst=1')->waitUntilReady();
-		$table = $this->query('class:list-table')->asTable()->one();
-		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
-		$hosts = [
-			'1_Host_to_check_Monitoring_Overview',
-			'3_Host_to_check_Monitoring_Overview',
-			'4_Host_to_check_Monitoring_Overview',
-			'Host for tag permissions',
-			'Host for triggers filtering',
-			'ЗАББИКС Сервер'
-		];
-		foreach ($hosts as $host) {
-			$form->fill(['Name' => $host]);
-			$this->query('button:Apply')->one()->waitUntilClickable()->click();
-			$this->page->waitUntilReady();
-
-			$row = $table->findRow('Name', $host);
-			$icons = $row->query('xpath://td/div[@class="problem-icon-list"]/span')->all();
-			$result = 0;
-			foreach ($icons as $icon) {
-				$result += intval($icon->getText());
-			}
-
-			// Getting problems amount from second Problems column and then comparing with summarized first column.
-			$problems = $row->query('xpath://td/a[text()="Problems"]/following::sup')->one()->getText();
-			$this->assertEquals((int)$problems, $result);
 		}
 	}
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2919,7 +2919,6 @@ static int	DBpatch_add_widget(uint64_t dashboardid, zbx_db_widget_t *widget, zbx
 
 	zabbix_log(LOG_LEVEL_TRACE, "adding widget id: " ZBX_FS_UI64 ", type: %s", widget->widgetid, widget->type);
 
-
 	if (ZBX_DB_OK > DBexecute("insert into widget (widgetid,dashboard_pageid,type,name,x,y,width,height,view_mode) "
 			"values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s','%s',%d,%d,%d,%d,%d)",
 			widget->widgetid, widget->dashboardid, widget->type, name_esc,
@@ -3036,7 +3035,6 @@ out:
 
 	return ret;
 }
-
 
 static int	DBpatch_delete_screen(uint64_t screenid)
 {
@@ -3159,7 +3157,6 @@ static int	DBpatch_convert_screen_items(DB_RESULT result, uint64_t id)
 		int_array_debug("offsets_x", offsets_x, OFFSET_ARRAY_SIZE, -1);
 		int_array_debug("offsets_y", offsets_y, OFFSET_ARRAY_SIZE, -1);
 	}
-
 
 	for (i = 0; SUCCEED == ret && i < screen_items.values_num; i++)
 	{

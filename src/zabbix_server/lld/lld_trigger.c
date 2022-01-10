@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -227,7 +227,6 @@ typedef struct
 	zbx_lld_trigger_ref_t	*ref_to;
 }
 zbx_lld_trigger_node_iter_t;
-
 
 static void	lld_tag_free(zbx_lld_tag_t *tag)
 {

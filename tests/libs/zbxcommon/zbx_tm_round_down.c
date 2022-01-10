@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@ void	zbx_mock_test_entry(void **state)
 	struct tm	tm;
 	zbx_time_unit_t	base;
 	time_t		time_tmp;
+	const char	*unit;
 
 	ZBX_UNUSED(state);
 
@@ -46,9 +47,15 @@ void	zbx_mock_test_entry(void **state)
 	if (ZBX_MOCK_SUCCESS != zbx_strtime_to_timespec(zbx_mock_get_parameter_string("out.time"), &ts_out))
 		fail_msg("Invalid output time format");
 
-	if (ZBX_TIME_UNIT_UNKNOWN == (base = zbx_tm_str_to_unit(zbx_mock_get_parameter_string("in.base"))))
-		fail_msg("Invalid time unit");
-
+	if ('i' == *(unit = zbx_mock_get_parameter_string("in.base")))
+	{
+		base = ZBX_TIME_UNIT_ISOYEAR;
+	}
+	else
+	{
+		if (ZBX_TIME_UNIT_UNKNOWN == (base = zbx_tm_str_to_unit(unit)))
+			fail_msg("Invalid time unit");
+	}
 
 	time_tmp = ts_in.sec;
 	tm = *localtime(&time_tmp);

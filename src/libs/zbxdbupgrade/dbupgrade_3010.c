@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -214,7 +214,6 @@ typedef struct
 }
 zbx_object_events_t;
 
-
 /* source events hashset support */
 static zbx_hash_t	DBpatch_3010021_trigger_events_hash_func(const void *data)
 {
@@ -240,7 +239,6 @@ static int	DBpatch_3010021_trigger_events_compare_func(const void *d1, const voi
 
 	return 0;
 }
-
 
 /******************************************************************************
  *                                                                            *

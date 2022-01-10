@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -912,7 +912,6 @@ static void	am_db_update_watchdog(zbx_am_db_t *amdb)
 		zbx_vector_uint64_append(&mediatypeids, media->mediatypeid);
 	}
 	DBfree_result(result);
-
 
 	/* update media types used for watchdog alerts */
 

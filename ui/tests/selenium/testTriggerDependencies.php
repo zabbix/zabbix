@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,33 +30,58 @@ class testTriggerDependencies extends CLegacyWebTest {
 	/**
 	* @dataProvider testTriggerDependenciesFromHost_SimpleTestProvider
 	*/
-	public function testTriggerDependenciesFromHost_SimpleTest($hostId, $expected) {
+	public function testTriggerDependenciesFromHost_SimpleTest($hostId, $trigger, $template, $dependencies, $expected) {
 		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
 
 		$this->zbxTestLogin('triggers.php?filter_set=1&context=template&filter_hostids[0]='.$hostId);
 		$this->zbxTestCheckTitle('Configuration of triggers');
 
-		$this->zbxTestClickLinkTextWait('Zabbix agent is not available (for {$AGENT.TIMEOUT})');
+		$this->zbxTestClickLinkTextWait($trigger);
 		$this->zbxTestClickWait('tab_dependenciesTab');
 
 		$this->zbxTestClick('bnt1');
 		$this->zbxTestLaunchOverlayDialog('Triggers');
 		$host = COverlayDialogElement::find()->one()->query('class:multiselect-control')->asMultiselect()->one();
 		$host->fill([
-			'values' => 'FreeBSD',
+			'values' => $template,
 			'context' => 'Templates'
 		]);
-		$this->zbxTestClickLinkTextWait('/etc/passwd has been changed on FreeBSD');
+		$this->zbxTestClickLinkTextWait($dependencies);
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('bnt1'));
-		$this->zbxTestTextPresent('FreeBSD: /etc/passwd has been changed on {HOST.NAME}');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent($expected);
 	}
 
 	public function testTriggerDependenciesFromHost_SimpleTestProvider() {
 		return [
-			['10001', 'Not all templates are linked to'],
-			['10081', 'Trigger updated']
+			[
+				'10050',
+				'Zabbix agent is not available (for {$AGENT.TIMEOUT})',
+				'FreeBSD',
+				'/etc/passwd has been changed on FreeBSD',
+				'Not all templates are linked to'
+			],
+			[
+				'10265',
+				'Apache: Service is down',
+				'Apache by HTTP',
+				'Apache: Service response time is too high (over 10s for 5m)',
+				'Cannot create circular dependencies.'
+			],
+			[
+				'10265',
+				'Apache: has been restarted (uptime < 10m)',
+				'Apache by HTTP',
+				'Apache: has been restarted (uptime < 10m)',
+				'Cannot create dependency on trigger itself.'
+			],
+			[
+				'10265',
+				'Apache: has been restarted (uptime < 10m)',
+				'Apache by HTTP',
+				'Apache: Service is down',
+				'Trigger updated'
+			]
 		];
 	}
 }

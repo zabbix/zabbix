@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,6 +42,7 @@ class CControllerPopupTriggerExpr extends CController {
 	private $functions = [];
 	private $operators = ['=', '<>', '>', '<', '>=', '<='];
 	private $period_optional = [];
+	private $period_seasons = [];
 
 	protected function init() {
 		$this->disableSIDvalidation();
@@ -93,6 +94,36 @@ class CControllerPopupTriggerExpr extends CController {
 			],
 			'period_shift' => [
 				'C' => _('Period shift'),
+				'T' => T_ZBX_INT,
+				'A' => true
+			]
+		];
+
+		$this->period_seasons = [
+			'last' => [
+				'C' => _('Period').' (T)',
+				'T' => T_ZBX_INT,
+				'A' => true
+			],
+			'period_shift' => [
+				'C' => _('Period shift'),
+				'T' => T_ZBX_INT,
+				'A' => true
+			],
+			'season_unit' => [
+				'C' => _('Season'),
+				'T' => T_ZBX_STR,
+				'A' => true,
+				'options' => [
+					'h' => _('Hour'),
+					'd' => _('Day'),
+					'w' => _('Week'),
+					'M' => _("Month"),
+					'y' => _('Year')
+				]
+			],
+			'num_seasons' => [
+				'C' => _('Number of seasons'),
 				'T' => T_ZBX_INT,
 				'A' => true
 			]
@@ -1016,6 +1047,20 @@ class CControllerPopupTriggerExpr extends CController {
 				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => $this->operators
 			],
+			'baselinedev' => [
+				'types' => [ZBX_FUNCTION_TYPE_HISTORY],
+				'description' => _('baselinedev() - Returns the number of deviations between data periods in seasons and the last data period'),
+				'params' => $this->period_seasons,
+				'allowed_types' => $this->allowedTypesNumeric,
+				'operators' => $this->operators
+			],
+			'baselinewma' => [
+				'types' => [ZBX_FUNCTION_TYPE_HISTORY],
+				'description' => _('baselinewma() - Calculates baseline by averaging data periods in seasons'),
+				'params' => $this->period_seasons,
+				'allowed_types' => $this->allowedTypesNumeric,
+				'operators' => $this->operators
+			],
 			'trendcount' => [
 				'types' => [ZBX_FUNCTION_TYPE_HISTORY],
 				'description' => _('trendcount() - Number of successfully retrieved values for period T'),
@@ -1277,7 +1322,7 @@ class CControllerPopupTriggerExpr extends CController {
 						$key = $hist_function_token['data']['parameters'][0]['data']['item'];
 
 						$items = API::Item()->get([
-							'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
+							'output' => ['itemid', 'name', 'key_', 'value_type'],
 							'selectHosts' => ['name'],
 							'webitems' => true,
 							'filter' => [
@@ -1288,7 +1333,7 @@ class CControllerPopupTriggerExpr extends CController {
 
 						if (!$items) {
 							$items = API::ItemPrototype()->get([
-								'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
+								'output' => ['itemid', 'name', 'key_', 'value_type'],
 								'selectHosts' => ['name'],
 								'filter' => [
 									'host' => $host,
@@ -1342,7 +1387,7 @@ class CControllerPopupTriggerExpr extends CController {
 		// Opening an empty form or switching a function.
 		else {
 			$item = API::Item()->get([
-				'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
+				'output' => ['itemid', 'name', 'key_', 'value_type'],
 				'selectHosts' => ['host', 'name'],
 				'itemids' => $itemid,
 				'webitems' => true,
@@ -1353,14 +1398,11 @@ class CControllerPopupTriggerExpr extends CController {
 		}
 
 		if ($item) {
-			$items = CMacrosResolverHelper::resolveItemNames([$item]);
-			$item = $items[0];
-
 			$itemid = $item['itemid'];
 			$item_value_type = $item['value_type'];
 			$item_key = $item['key_'];
 			$item_host_data = reset($item['hosts']);
-			$description = $item_host_data['name'].NAME_DELIMITER.$item['name_expanded'];
+			$description = $item_host_data['name'].NAME_DELIMITER.$item['name'];
 		}
 		else {
 			$item_key = '';
@@ -1442,7 +1484,18 @@ class CControllerPopupTriggerExpr extends CController {
 				}
 				elseif ($data['item_description']) {
 					// Quote function string parameters.
-					$quote_params = ['v', 'o', 'chars', 'fit', 'mode', 'pattern', 'replace', 'string', 'algorithm'];
+					$quote_params = [
+						'algorithm',
+						'chars',
+						'fit',
+						'mode',
+						'o',
+						'pattern',
+						'replace',
+						'season_unit',
+						'string',
+						'v'
+					];
 					$quote_params = array_intersect_key($data['params'], array_fill_keys($quote_params, ''));
 					$quote_params = array_filter($quote_params, 'strlen');
 

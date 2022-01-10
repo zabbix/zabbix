@@ -1,9 +1,76 @@
-Changes for 6.0.0alpha8
+Changes for 6.0.0beta2
 
 New features:
-..F....... [ZBXNEXT-7070] transferred host and template mass update template inputs to main tab (jfreibergs)
+A.F.I...S. [ZBXNEXT-6999] implemented SLA, SLA reports and SLA report widget (ashubin, averza, jfreibergs, vso)
+...G...... [ZBXNEXT-6875] added native support for the system.hw.chassis and system.hw.devices keys in Zabbix agent 2 (esneiders)
+.D.....PST [ZBXNEXT-2485] moved odbc poller into separate poller type (dgoloscapov, vso)
+.......PS. [ZBXNEXT-7109] changed runtime control options to connecto to zabbix server/proxy using socket rather than sending signals (wiper)
+A......... [ZBXNEXT-6470,ZBXNEXT-6890] implemented complete audit logging of maintenance API object; added strict validation for maintenance.create, maintenance.update, maintenance.delete API methods (rlataria, vmaksimovs)
+..F.....S. [ZBXNEXT-7115] removed deprecated support of user macros in item names (akozlovs, gcalenko)
+........S. [ZBXNEXT-3140] added {ITEM.STATE.ERROR},{LLDRULE.STATE.ERROR},{TRIGGER.STATE.ERROR} macros to indicate error messages in internal monitoring alerts (arimdjonoks)
+...G...... [ZBXNEXT-6958] added external plugin loader for Zabbix agent 2 (esneiders)
+..F....... [ZBXNEXT-7092] improved usability for Latest data and Hosts views (acikuns)
+...G...PS. [ZBXNEXT-4922] added support for pcre2 (yurii)
 
 Bug fixes:
+.......PS. [ZBX-20405] improved timeouts in JS (dgoloscapov, wiper)
+..F....... [ZBX-19669] fixed success message not showing when no fields were changed in Administration->Authentication page (Ivo)
+...G...... [ZBX-20269] added handling of performance counter with negative denominator value (arimdjonoks)
+...G...... [ZBX-20143] fixed tcp timeout not working in net.dns.record (dgoloscapov)
+........S. [ZBX-20292] fixed LLD overrides for item for particular corner-case (ssimonenko)
+...G...PS. [ZBX-20236] improved memory consumption in Zabbix proxy trappers by moving configuration sync between database and cache to configuration syncer; improved trappers and listeners memory consumption by freeing received data after it was processed instead of after new data is received (vso)
+........S. [ZBX-20330] added handling of nan/inf values in ipmi discovery (dgoloscapov)
+...G.....T [ZBX-19185] fixed free bytes calculation for temporary tablespace in Oracle by ODBC and by agent2 template (abiba)
+........S. [ZBX-20377] implemented hmac-sha256 for server for scheduled reports cookies (arimdjonoks)
+.........T [ZBX-20258] fixed tags processing for Zammad media type (abiba)
+A.F....... [ZBX-20350] changed hash algo for encrypted cookies (rlataria)
+...G...... [ZBX-20164] fixed agent2 crash caused by wmi metrics (asestakovs)
+........S. [ZBX-20249] fixed escalator query failure on Oracle (ssimonenko)
+........S. [ZBX-19351] fixed event correlation query failure on Oracle (ssimonenko)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.0beta1
+
+New features:
+.........T [ZBXNEXT-7112] added new fields in PROMETHEUS_PATTERN preprocessing in templates Etcd, Vault, Linux (mchudinov)
+A.F.....S. [ZBXNEXT-7049] added aggregation options to prometheus pattern preprocessing step, added bulk preprocessing for dependent items (valdis, wiper)
+.......PS. [ZBXNEXT-7100] added new LLD macro HV.NETNAME to vmware.hv.discovery (MVekslers)
+A......... [ZBXNEXT-6470,ZBXNEXT-6867] implemented complete audit logging of templates; added strict validation for template.create, template.update, template.delete, template.massadd, template.massupdate, template.massremove API methods (vmaksimovs)
+A.F....... [ZBXNEXT-6966] added single item widget (ashubin, averza, Ivo, miks, Sasha, vmurzins)
+..F.I..... [ZBXNEXT-7085] extended 'formula' field in 'actions' table from 255 to 1024 characters (akozlovs, rlataria)
+.........T [ZBXNEXT-7031] upgraded Oracle by ODBC template for using config string in items (abiba)
+..F.....S. [ZBXNEXT-2579,ZBXNEXT-7020] added baseline monitoring functions baslinewma,baselinedev (jfreibergs, wiper)
+A.F.....S. [ZBXNEXT-6250] added option to opt-out of "escalation canceled" messages (miks, ssimonenko)
+..FG...... [ZBXNEXT-6593] added support of persistent files for restoring log item state after agent restart (Andris)
+..F....... [ZBXNEXT-7070] transferred host and template mass update template inputs to main tab (jfreibergs)
+..F....... [ZBXNEXT-7018] transferred template and group input to main tabs (ashubin, jfreibergs)
+
+Bug fixes:
+A.F....... [ZBX-20270] fixed XSS vulnerability, max zoom level validation, inventory field processing and initial view hintbox text in geomap widget (miks)
+A......... [ZBX-20328] fixed incomplete inheritance of items, item prototypes, lld rules, host prototypes, when user with type "Admin" was edited them on template which is linked to non-permitted for him templates or hosts (vmaksimovs)
+........S. [ZBX-20232] added HA node table cleanup on startup (wiper)
+.........T [ZBX-20113] fixed items value map for VMware template (abiba)
+.......PS. [ZBX-20341] moved zbx_ipc_service_init_env() to MAIN_ZABBIX_ENTRY (vso, yurii)
+.......PS. [ZBX-20311] returned the value -1 for bucket_percentile() and histogram_quantile() if bucket[+inf] = 0 (MVekslers)
+.......PS. [ZBX-20276] fixed parameter parsing error in bucket_percentile (MVekslers)
+..F....... [ZBX-20278] fixed XSS attack vulnerability in scheduled report configuration form (agriscenko)
+.........T [ZBX-20060] fixed trigger expression for memory monitoring in F5 Big-IP SNMP template (abakaldin)
+.........T [ZBX-20075] fixed trigger expression for certificate monitoring in F5 Big-IP SNMP template (abakaldin)
+.........T [ZBX-19704] fixed item pattern in "Zabbix server health" dashboard (abakaldin)
+.......... [ZBX-20240] added integration tests for trigger state (ssimonenko)
+.........T [ZBX-18389] fixed sql query for 32 and 64 bit xids postgresql versions in postgresql by user parameters template (vkhaliev)
+.........T [ZBX-18474] fixed regexp in macros in Template Module Windows Services (abiba)
+........S. [ZBX-19651] fixed problem escalation when at least one of the hosts in a trigger expression is not in maintenance (dgoloscapov)
+...G.....T [ZBX-19897] updated postgresql templates and plugin files (vkhaliev)
+A......... [ZBX-20120] fixed import of several hosts assigned to different proxies (Sasha)
+........S. [ZBX-20238] fixed linking templates with trigger prototypes (wiper)
+........S. [ZBX-20178] fixed action webhook failure when return value is not required (dgoloscapov, wiper)
+........S. [ZBX-19806] added support of multiple header fields in JS method getHeaders() (dgoloscapov)
+...G...... [ZBX-20192] fixed quote expansion in command execution in agent2 on windows (dgoloscapov)
+........S. [ZBX-19924] fixed trigger expression and calculated items not allowing to specify timeshift that ends in future even if it starts in the past (vso)
+..F....... [ZBX-19973] fixed event list hintbox field validation (miks)
+..F....... [ZBX-20294] fixed typo in system information table (jfreibergs)
+..F....... [ZBX-20170] fixed trigger expression testing constructor for monoinc and monodec functions (miks)
 ..F....... [ZBX-20268] fixed disabled button issue when cloning a service (averza)
 
 --------------------------------------------------------------------------------
@@ -236,11 +303,65 @@ Bug fixes:
 .........T [ZBX-19395] changed version in links of the templates and the media (mchudinov)
 
 --------------------------------------------------------------------------------
+Changes for 5.4.10rc1
+
+New features:
+...G...... [ZBXNEXT-6875] added native support for the system.hw.chassis and system.hw.devices keys in Zabbix agent 2 (esneiders)
+
+Bug fixes:
+.......PS. [ZBX-20405] improved timeouts in JS (dgoloscapov, wiper)
+..F....... [ZBX-19669] fixed success message not showing when no fields were changed in Administration->Authentication page (Ivo)
+...G...... [ZBX-20269] added handling of performance counter with negative denominator value (arimdjonoks)
+...G...... [ZBX-20143] fixed tcp timeout not working in net.dns.record (dgoloscapov)
+........S. [ZBX-20292] fixed LLD overrides for item for particular corner-case (ssimonenko)
+........S. [ZBX-19351] fixed event correlation query failure on Oracle (ssimonenko)
+...G...PS. [ZBX-20236] improved memory consumption in Zabbix proxy trappers by moving configuration sync between database and cache to configuration syncer; improved trappers and listeners memory consumption by freeing received data after it was processed instead of after new data is received (vso)
+........S. [ZBX-20249] fixed escalator query failure on Oracle (ssimonenko)
+........S. [ZBX-20330] added handling of nan/inf values in ipmi discovery (dgoloscapov)
+
+--------------------------------------------------------------------------------
+Changes for 5.4.9
+
+5.4.9rc2 was released as 5.4.9 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.4.9rc2
+
+Bug fixes:
+..F....... [ZBX-20382] updated jquery version (ashubin)
+.....J.... [ZBX-20383] updated logback-core, logback-classic and slf4j-api jars to the latest stable versions (vso)
+..F.I..... [ZBX-20384] fixed possibility to view setup pages by non-superadmin if config already file exists (averza)
+..F....... [ZBX-20388] fixed XSS vulnerability in multiselect (agriscenko)
+
+--------------------------------------------------------------------------------
 Changes for 5.4.9rc1
 
 New features:
+.......PS. [ZBXNEXT-7100] added new LLD macro HV.NETNAME to vmware.hv.discovery (MVekslers)
+.........T [ZBXNEXT-7031] upgraded Oracle by ODBC template for using config string in items (abiba)
+..FG...... [ZBXNEXT-6593] added support of persistent files for restoring log item state after agent restart (Andris)
 
 Bug fixes:
+A......... [ZBX-20328] fixed incomplete inheritance of items, item prototypes, lld rules, host prototypes, when user with type "Admin" was edited them on template which is linked to non-permitted for him templates or hosts (vmaksimovs)
+.........T [ZBX-20113] fixed items value map for VMware template (abiba)
+.......PS. [ZBX-20341] moved zbx_ipc_service_init_env() to MAIN_ZABBIX_ENTRY (vso, yurii)
+..F....... [ZBX-20278] fixed XSS attack vulnerability in scheduled report configuration form (agriscenko)
+.........T [ZBX-20060] fixed trigger expression for memory monitoring in F5 Big-IP SNMP template (abakaldin)
+.........T [ZBX-20075] fixed trigger expression for certificate monitoring in F5 Big-IP SNMP template (abakaldin)
+.........T [ZBX-19704] fixed item pattern in "Zabbix server health" dashboard (abakaldin)
+.........T [ZBX-18474] fixed regexp in macros Template Module Windows Services (abiba)
+.......... [ZBX-20240] added integration tests for trigger state (ssimonenko)
+.........T [ZBX-18389] fixed sql query for 32 and 64 bit xids postgresql versions in postgresql by user parameters template (vkhaliev)
+........S. [ZBX-19651] fixed problem escalation when at least one of the hosts in a trigger expression is not in maintenance (dgoloscapov)
+...G.....T [ZBX-19897] updated postgresql templates and plugin files (vkhaliev)
+A......... [ZBX-20120] fixed import of several hosts assigned to different proxies (Sasha)
+........S. [ZBX-20178] fixed action webhook failure when return value is not required (dgoloscapov, wiper)
+........S. [ZBX-19806] added support of multiple header fields in JS method getHeaders() (dgoloscapov)
+...G...... [ZBX-20192] fixed quote expansion in command execution in agent2 on windows (dgoloscapov)
+........S. [ZBX-19924] fixed trigger expression and calculated items not allowing to specify timeshift that ends in future even if it starts in the past (vso)
+........S. [ZBX-20238] fixed linking templates with trigger prototypes (wiper)
+..F....... [ZBX-19973] fixed event list hintbox field validation (miks)
+..F....... [ZBX-20350] fixed SAML login data comparing (rlataria)
 
 --------------------------------------------------------------------------------
 Changes for 5.4.8
@@ -1375,11 +1496,55 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
+Changes for 5.0.20rc1
+
+New features:
+...G...... [ZBXNEXT-6875] added native support for the system.hw.chassis and system.hw.devices keys in Zabbix agent 2 (esneiders)
+
+Bug fixes:
+..F....... [ZBX-19669] fixed success message not showing when no fields were changed in Administration->Authentication page (Ivo)
+...G...... [ZBX-20269] added handling of performance counter with negative denominator value (arimdjonoks)
+...G...... [ZBX-20143] fixed tcp timeout not working in net.dns.record (dgoloscapov)
+........S. [ZBX-20292] fixed LLD overrides for item for particular corner-case (ssimonenko)
+........S. [ZBX-19351] fixed event correlation query failure on Oracle (ssimonenko)
+........S. [ZBX-20249] fixed escalator query failure on Oracle (ssimonenko)
+........S. [ZBX-20330] added handling of nan/inf values in ipmi discovery (dgoloscapov)
+........S. [ZBX-19012] fixed {HOST.NAME} macros substitution (ssimonenko)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.19
+
+5.0.19rc2 was released as 5.0.19 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.19rc2
+
+Bug fixes:
+..F....... [ZBX-20382] updated jquery version (ashubin)
+.....J.... [ZBX-20383] updated logback-core, logback-classic and slf4j-api jars to the latest stable versions (vso)
+..F.I..... [ZBX-20384] fixed possibility to view setup pages by non-superadmin if config already file exists (averza)
+..F....... [ZBX-20388] fixed XSS vulnerability in multiselect (agriscenko)
+
+--------------------------------------------------------------------------------
 Changes for 5.0.19rc1
 
 New features:
+.......PS. [ZBXNEXT-7100] added new LLD macro HV.NETNAME to vmware.hv.discovery (MVekslers)
 
 Bug fixes:
+A......... [ZBX-20328] fixed incomplete inheritance of items, item prototypes, lld rules, host prototypes, when user with type "Admin" was edited them on template which is linked to non-permitted for him templates or hosts (vmaksimovs)
+...G...PS. [ZBX-20236] improved memory consumption in Zabbix proxy trappers by moving configuration sync between database and cache to configuration syncer; improved trappers and listeners memory consumption by freeing received data after it was processed instead of after new data is received (vso)
+.......PS. [ZBX-20341] moved zbx_ipc_service_init_env() to MAIN_ZABBIX_ENTRY (vso, yurii)
+.........T [ZBX-20060] fixed trigger expression for memory monitoring in F5 Big-IP SNMP template (abakaldin)
+.........T [ZBX-20075] fixed trigger expression for certificate monitoring in F5 Big-IP SNMP template (abakaldin)
+.........T [ZBX-19704] fixed item pattern in "Zabbix server health" dashboard (abakaldin)
+.......... [ZBX-20240] added integration tests for trigger state (ssimonenko)
+.........T [ZBX-18389] fixed sql query for 32 and 64 bit xids postgresql versions in postgresql by user parameters template (vkhaliev)
+.........T [ZBX-18474] fixed filters regex in OS Windows template (abiba)
+........S. [ZBX-19651] fixed problem escalation when at least one of the hosts in a trigger expression is not in maintenance (dgoloscapov)
+...G.....T [ZBX-19897] updated postgresql templates and plugin files (vkhaliev)
+.........T [ZBX-20212] fixed max columns values for screens in linux templates (vkhaliev)
+...G...... [ZBX-20192] fixed quote expansion in command execution in agent2 on windows (dgoloscapov)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.18
@@ -3697,11 +3862,25 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
-Changes for 4.0.37rc1
+Changes for 4.0.38rc1
 
 New features:
+..F....... [ZBX-19652] fixed JavaScript syntax for Internet Explorer 11 compatibility (jfreibergs)
 
 Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.37
+
+4.0.37rc1 was released as 4.0.37 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.37rc1
+
+Bug fixes:
+..F....... [ZBX-20382] updated jquery version (ashubin)
+.....J.... [ZBX-20383] updated logback-core, logback-classic and slf4j-api jars to the latest stable versions (vso)
+..F.I..... [ZBX-20384] fixed possibility to view setup pages by non-superadmin if config already file exists (averza)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.36

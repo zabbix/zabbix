@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -254,19 +254,6 @@ static zbx_mock_error_t	ts_get_tz(const char *text, int *sec, const char **pnext
 
 /******************************************************************************
  *                                                                            *
- * Function: is_leap_year                                                     *
- *                                                                            *
- * Return value:  SUCCEED - year is a leap year                               *
- *                FAIL    - year is not a leap year                           *
- *                                                                            *
- ******************************************************************************/
-static int	is_leap_year(int year)
-{
-	return 0 == year % 4 && (0 != year % 100 || 0 == year % 400) ? SUCCEED : FAIL;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_time_to_localtime                                            *
  *                                                                            *
  * Purpose: converts timestamp to a broken-down time representation and       *
@@ -295,10 +282,10 @@ static zbx_mock_error_t	zbx_time_to_localtime(time_t timestamp, struct tm *local
 			(tm_local.tm_min - tm_utc.tm_min) * SEC_PER_MIN;
 
 	while (tm_local.tm_year > tm_utc.tm_year)
-		*tz_offset += (SUCCEED == is_leap_year(tm_utc.tm_year++) ? SEC_PER_YEAR + SEC_PER_DAY : SEC_PER_YEAR);
+		*tz_offset += (SUCCEED == zbx_is_leap_year(tm_utc.tm_year++) ? SEC_PER_YEAR + SEC_PER_DAY : SEC_PER_YEAR);
 
 	while (tm_local.tm_year < tm_utc.tm_year)
-		*tz_offset -= (SUCCEED == is_leap_year(--tm_utc.tm_year) ? SEC_PER_YEAR + SEC_PER_DAY : SEC_PER_YEAR);
+		*tz_offset -= (SUCCEED == zbx_is_leap_year(--tm_utc.tm_year) ? SEC_PER_YEAR + SEC_PER_DAY : SEC_PER_YEAR);
 
 	*local = tm_local;
 

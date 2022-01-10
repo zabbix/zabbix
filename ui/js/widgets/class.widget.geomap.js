@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,11 +48,13 @@ class CWidgetGeoMap extends CWidget {
 	_processUpdateResponse(response) {
 		super._processUpdateResponse(response);
 
-		if ('config' in response.geomap) {
-			this._initMap(response.geomap.config);
-		}
+		if ('geomap' in response) {
+			if ('config' in response.geomap) {
+				this._initMap(response.geomap.config);
+			}
 
-		this._addMarkers(response.geomap.hosts);
+			this._addMarkers(response.geomap.hosts);
+		}
 
 		this._initial_load = false;
 	}
@@ -377,7 +379,7 @@ class CWidgetGeoMap extends CWidget {
 			btn.setAttribute('data-menu-popup', data_menu_popup);
 			btn.classList.add('link-action');
 			btn.href = 'javascript:void(0)';
-			btn.innerHTML = name;
+			btn.textContent = name;
 
 			return btn;
 		};

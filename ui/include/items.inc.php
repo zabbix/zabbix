@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1124,7 +1124,7 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
 	}
 
 	$db_items = API::Item()->get([
-		'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
+		'output' => ['itemid', 'hostid', 'name', 'value_type', 'units', 'valuemapid'],
 		'selectHosts' => ['name'],
 		'selectValueMap' => ['mappings'],
 		'hostids' => $hostids,
@@ -1136,10 +1136,8 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
 		'preservekeys' => true
 	]);
 
-	$db_items = CMacrosResolverHelper::resolveItemNames($db_items);
-
 	CArrayHelper::sort($db_items, [
-		['field' => 'name_expanded', 'order' => ZBX_SORT_UP],
+		['field' => 'name', 'order' => ZBX_SORT_UP],
 		['field' => 'itemid', 'order' => ZBX_SORT_UP]
 	]);
 
@@ -1167,7 +1165,7 @@ function getDataOverview(?array $groupids, ?array $hostids, array $filter): arra
 	$db_hosts = [];
 
 	foreach ($db_items as $db_item) {
-		$item_name = $db_item['name_expanded'];
+		$item_name = $db_item['name'];
 		$host_name = $db_item['hosts'][0]['name'];
 		$db_hosts[$db_item['hostid']] = $db_item['hosts'][0];
 
@@ -1975,7 +1973,6 @@ function quoteItemKeyParam($param, $forced = false) {
  * @return array
  */
 function expandItemNamesWithMasterItems($items, $data_source) {
-	$items = CMacrosResolverHelper::resolveItemNames($items);
 	$itemids = [];
 	$master_itemids = [];
 
@@ -1994,7 +1991,7 @@ function expandItemNamesWithMasterItems($items, $data_source) {
 
 	if ($master_itemids) {
 		$options = [
-			'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
+			'output' => ['itemid', 'type', 'name'],
 			'itemids' => $master_itemids,
 			'editable' => true,
 			'preservekeys' => true
@@ -2013,26 +2010,18 @@ function expandItemNamesWithMasterItems($items, $data_source) {
 		}
 		unset($master_item_prototype);
 
-		$master_items = CMacrosResolverHelper::resolveItemNames($master_items + $master_item_prototypes);
+		$master_items += $master_item_prototypes;
 	}
 
 	foreach ($items as &$item) {
 		if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 			$master_itemid = $item['master_itemid'];
 			$items_index = array_search($master_itemid, $itemids);
-
-			$item['master_item'] = [
-				'itemid' => $master_itemid,
-				'name_expanded' => ($items_index === false)
-					? $master_items[$master_itemid]['name_expanded']
-					: $items[$items_index]['name_expanded'],
-				'type' => ($items_index === false)
-					? $master_items[$master_itemid]['type']
-					: $items[$items_index]['type'],
-				'source' => ($items_index === false)
-					? $master_items[$master_itemid]['source']
-					: $items[$items_index]['source']
-			];
+			$item['master_item'] = array_fill_keys(['name', 'type', 'source'], '');
+			$item['master_item'] = ($items_index === false)
+				? array_intersect_key($master_items[$master_itemid], $item['master_item'])
+				: array_intersect_key($items[$items_index], $item['master_item']);
+			$item['master_item']['itemid'] = $master_itemid;
 		}
 	}
 	unset($item);
@@ -2118,4 +2107,88 @@ function validateDelay(CUpdateIntervalParser $parser, $field_name, $value, &$err
 	}
 
 	return true;
+}
+
+/**
+ * Normalizes item preprocessing step parameters after item preprocessing form submit.
+ *
+ * @param array $preprocessing  Array of item preprocessing steps, as received from form submit.
+ *
+ * @return array
+ */
+function normalizeItemPreprocessingSteps(array $preprocessing): array {
+	foreach ($preprocessing as &$step) {
+		switch ($step['type']) {
+			case ZBX_PREPROC_MULTIPLIER:
+			case ZBX_PREPROC_PROMETHEUS_TO_JSON:
+				$step['params'] = trim($step['params'][0]);
+				break;
+
+			case ZBX_PREPROC_RTRIM:
+			case ZBX_PREPROC_LTRIM:
+			case ZBX_PREPROC_TRIM:
+			case ZBX_PREPROC_XPATH:
+			case ZBX_PREPROC_JSONPATH:
+			case ZBX_PREPROC_VALIDATE_REGEX:
+			case ZBX_PREPROC_VALIDATE_NOT_REGEX:
+			case ZBX_PREPROC_ERROR_FIELD_JSON:
+			case ZBX_PREPROC_ERROR_FIELD_XML:
+			case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
+			case ZBX_PREPROC_SCRIPT:
+				$step['params'] = $step['params'][0];
+				break;
+
+			case ZBX_PREPROC_VALIDATE_RANGE:
+				foreach ($step['params'] as &$param) {
+					$param = trim($param);
+				}
+				unset($param);
+
+				$step['params'] = implode("\n", $step['params']);
+				break;
+
+			case ZBX_PREPROC_PROMETHEUS_PATTERN:
+				foreach ($step['params'] as &$param) {
+					$param = trim($param);
+				}
+				unset($param);
+
+				if (in_array($step['params'][1], [ZBX_PREPROC_PROMETHEUS_SUM, ZBX_PREPROC_PROMETHEUS_MIN,
+						ZBX_PREPROC_PROMETHEUS_MAX, ZBX_PREPROC_PROMETHEUS_AVG, ZBX_PREPROC_PROMETHEUS_COUNT])) {
+					$step['params'][2] = $step['params'][1];
+					$step['params'][1] = ZBX_PREPROC_PROMETHEUS_FUNCTION;
+				}
+
+				if (!array_key_exists(2, $step['params'])) {
+					$step['params'][2] = '';
+				}
+
+				$step['params'] = implode("\n", $step['params']);
+				break;
+
+			case ZBX_PREPROC_REGSUB:
+			case ZBX_PREPROC_ERROR_FIELD_REGEX:
+			case ZBX_PREPROC_STR_REPLACE:
+				$step['params'] = implode("\n", $step['params']);
+				break;
+
+			case ZBX_PREPROC_CSV_TO_JSON:
+				if (!array_key_exists(2, $step['params'])) {
+					$step['params'][2] = ZBX_PREPROC_CSV_NO_HEADER;
+				}
+				$step['params'] = implode("\n", $step['params']);
+				break;
+
+			default:
+				$step['params'] = '';
+		}
+
+		$step += [
+			'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+			'error_handler_params' => ''
+		];
+	}
+	unset($step);
+
+	return $preprocessing;
 }

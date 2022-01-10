@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -570,7 +570,8 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_REPORTWRITER		34
 #define ZBX_PROCESS_TYPE_SERVICEMAN		35
 #define ZBX_PROCESS_TYPE_PROBLEMHOUSEKEEPER	36
-#define ZBX_PROCESS_TYPE_COUNT			37	/* number of process types */
+#define ZBX_PROCESS_TYPE_ODBCPOLLER		37
+#define ZBX_PROCESS_TYPE_COUNT			38	/* number of process types */
 
 /* special processes that are not present worker list */
 #define ZBX_PROCESS_TYPE_EXT_FIRST		126
@@ -982,6 +983,8 @@ typedef enum
 }
 zbx_task_t;
 
+/* runtime control commands */
+#define ZBX_RTC_UNKNOWN				0
 #define ZBX_RTC_LOG_LEVEL_INCREASE		1
 #define ZBX_RTC_LOG_LEVEL_DECREASE		2
 #define ZBX_RTC_HOUSEKEEPER_EXECUTE		3
@@ -995,6 +998,11 @@ zbx_task_t;
 #define ZBX_RTC_HA_REMOVE_NODE			15
 #define ZBX_RTC_HA_SET_FAILOVER_DELAY		16
 #define ZBX_RTC_USER_PARAMETERS_RELOAD		17
+
+/* runtime control notifications, must be less than 10000 */
+#define ZBX_RTC_CONFIG_SYNC_NOTIFY		9999
+
+#define ZBX_IPC_RTC_MAX				9999
 
 typedef enum
 {
@@ -1014,6 +1022,7 @@ typedef struct
 	zbx_task_t	task;
 	unsigned int	flags;
 	int		data;
+	char		*opts;
 }
 ZBX_TASK_EX;
 
@@ -1195,6 +1204,7 @@ void	zbx_setproctitle(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 double		zbx_time(void);
 void		zbx_timespec(zbx_timespec_t *ts);
 double		zbx_current_time(void);
+int		zbx_is_leap_year(int year);
 void		zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz);
 long		zbx_get_timezone_offset(time_t t, struct tm *tm);
 struct tm	*zbx_localtime(const time_t *time, const char *tz);
@@ -1689,7 +1699,7 @@ char	*zbx_create_token(zbx_uint64_t seed);
 #define ZBX_PROBLEM_SUPPRESSED_TRUE	1
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
-#define ZBX_PCRE_RECURSION_LIMIT	2000	/* assume ~1 MB stack and ~500 bytes per recursion */
+#define ZBX_REGEXP_RECURSION_LIMIT	2000	/* assume ~1 MB stack and ~500 bytes per recursion */
 #endif
 
 int	zbx_str_extract(const char *text, size_t len, char **value);
@@ -1704,6 +1714,7 @@ typedef enum
 	ZBX_TIME_UNIT_WEEK,
 	ZBX_TIME_UNIT_MONTH,
 	ZBX_TIME_UNIT_YEAR,
+	ZBX_TIME_UNIT_ISOYEAR,
 	ZBX_TIME_UNIT_COUNT
 }
 zbx_time_unit_t;
@@ -1715,6 +1726,8 @@ void	zbx_tm_round_up(struct tm *tm, zbx_time_unit_t base);
 void	zbx_tm_round_down(struct tm *tm, zbx_time_unit_t base);
 
 const char	*zbx_timespec_str(const zbx_timespec_t *ts);
+
+int	zbx_get_week_number(const struct tm *tm);
 
 zbx_time_unit_t	zbx_tm_str_to_unit(const char *text);
 int	zbx_tm_parse_period(const char *period, size_t *len, int *multiplier, zbx_time_unit_t *base, char **error);

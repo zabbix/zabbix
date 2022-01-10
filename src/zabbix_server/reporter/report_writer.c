@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -174,7 +174,6 @@ static int	rw_get_report(const char *url, const char *cookie, int width, int hei
 			goto out;
 		}
 	}
-
 
 	if (CURLE_OK != (err = curl_easy_perform(curl)))
 	{

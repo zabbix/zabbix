@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
+$this->addJsFile('colorpicker.js');
 $this->addJsFile('class.dashboard.js');
 $this->addJsFile('class.dashboard.page.js');
 $this->addJsFile('class.dashboard.widget.placeholder.js');
@@ -33,6 +34,7 @@ $this->addJsFile('class.widget.iterator.js');
 $this->addJsFile('class.widget.clock.js');
 $this->addJsFile('class.widget.graph.js');
 $this->addJsFile('class.widget.graph-prototype.js');
+$this->addJsFile('class.widget.item.js');
 $this->addJsFile('class.widget.map.js');
 $this->addJsFile('class.widget.navtree.js');
 $this->addJsFile('class.widget.paste-placeholder.js');

@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,8 @@ use PHPUnit\Framework\TestCase;
 
 class CApiInputValidatorTest extends TestCase {
 
+	protected $default_timezone;
+
 	protected function setUp(): void {
 		$settings = $this->createMock(CSettings::class);
 		$settings->method('get')
@@ -39,6 +41,13 @@ class CApiInputValidatorTest extends TestCase {
 			->will($this->returnValueMap($instances_map));
 
 		API::setApiServiceFactory($api_service_factory);
+
+		$this->default_timezone = date_default_timezone_get();
+		date_default_timezone_set('UTC');
+	}
+
+	protected function tearDown(): void {
+		date_default_timezone_set($this->default_timezone);
 	}
 
 	public function dataProviderInput() {
@@ -579,6 +588,18 @@ class CApiInputValidatorTest extends TestCase {
 			],
 			[
 				['type' => API_INT32],
+				'9223372036854775808',
+				'/1/int',
+				'Invalid parameter "/1/int": a number is too large.'
+			],
+			[
+				['type' => API_INT32],
+				9223372036854775808,
+				'/1/int',
+				'Invalid parameter "/1/int": an integer is expected.'
+			],
+			[
+				['type' => API_INT32],
 				'foo',
 				'/1/int',
 				'Invalid parameter "/1/int": an integer is expected.'
@@ -960,6 +981,12 @@ class CApiInputValidatorTest extends TestCase {
 				'18446744073709551616',
 				'/1/int',
 				'Invalid parameter "/1/int": a number is too large.'
+			],
+			[
+				['type' => API_UINT64],
+				18446744073709551616,
+				'/1/int',
+				'Invalid parameter "/1/int": an unsigned integer is expected.'
 			],
 			[
 				['type' => API_UINT64],
@@ -1377,6 +1404,12 @@ class CApiInputValidatorTest extends TestCase {
 			],
 			[
 				['type' => API_ID],
+				9223372036854775808,
+				'/1/id',
+				'Invalid parameter "/1/id": a number is expected.'
+			],
+			[
+				['type' => API_ID],
 				0.0,
 				'/1/id',
 				'Invalid parameter "/1/id": a number is expected.'
@@ -1631,6 +1664,12 @@ class CApiInputValidatorTest extends TestCase {
 				[0, 1, 2, 3, '4', '9223372036854775807', '9223372036854775808'],
 				'/',
 				'Invalid parameter "/7": a number is too large.'
+			],
+			[
+				['type' => API_IDS],
+				[0, 1, 2, 3, '4', '9223372036854775807', 9223372036854775808],
+				'/',
+				'Invalid parameter "/7": a number is expected.'
 			],
 			[
 				['type' => API_IDS, 'uniq' => true],
@@ -2738,6 +2777,108 @@ class CApiInputValidatorTest extends TestCase {
 				'/folder1/folder2/'
 			],
 			[
+				['type' => API_USER_MACROS],
+				[],
+				'/macros',
+				[]
+			],
+			[
+				['type' => API_USER_MACROS],
+				['{$MACRO}', '{$MACRO: "context"}', '{$MACRO:regex:"regular expression"}'],
+				'/macros',
+				['{$MACRO}', '{$MACRO: "context"}', '{$MACRO:regex:"regular expression"}']
+			],
+			[
+				['type' => API_USER_MACROS, 'flags' => API_NORMALIZE],
+				'{$MACRO}',
+				'/macros',
+				['{$MACRO}']
+			],
+			[
+				['type' => API_USER_MACROS, 'length' => 8],
+				['{$MACRO}'],
+				'/macros',
+				['{$MACRO}']
+			],
+			[
+				['type' => API_USER_MACROS, 'flags' => API_NORMALIZE, 'length' => 8],
+				'{$MACRO}',
+				'/macros',
+				['{$MACRO}']
+			],
+			[
+				['type' => API_USER_MACROS],
+				'',
+				'/macros',
+				'Invalid parameter "/macros": an array is expected.'
+			],
+			[
+				['type' => API_USER_MACROS],
+				true,
+				'/macros',
+				'Invalid parameter "/macros": an array is expected.'
+			],
+			[
+				['type' => API_USER_MACROS],
+				null,
+				'/macros',
+				'Invalid parameter "/macros": an array is expected.'
+			],
+			[
+				['type' => API_USER_MACROS],
+				'{$MACRO}',
+				'/macros',
+				'Invalid parameter "/macros": an array is expected.'
+			],
+			[
+				['type' => API_USER_MACROS, 'flags' => API_NORMALIZE],
+				'',
+				'/macros',
+				'Invalid parameter "/macros": an array is expected.'
+			],
+			[
+				['type' => API_USER_MACROS, 'flags' => API_NORMALIZE],
+				true,
+				'/macros',
+				'Invalid parameter "/macros": an array is expected.'
+			],
+			[
+				['type' => API_USER_MACROS, 'flags' => API_NORMALIZE],
+				null,
+				'/macros',
+				'Invalid parameter "/macros": an array is expected.'
+			],
+			[
+				['type' => API_USER_MACROS, 'flags' => API_NORMALIZE],
+				'abcdefg',
+				'/macros',
+				'Invalid parameter "/macros": an array is expected.'
+			],
+			[
+				['type' => API_USER_MACROS],
+				['{$MACRO}', ''],
+				'/macros',
+				'Invalid parameter "/macros/2": cannot be empty.'
+			],
+			[
+				['type' => API_USER_MACROS],
+				['{$MACRO}', '{$MACRo}'],
+				'/macros',
+				'Invalid parameter "/macros/2": incorrect syntax near "o}".'
+			],
+			[
+				['type' => API_USER_MACROS],
+				['{$MACRO}', '{$MACRO2'],
+				'/macros',
+				'Invalid parameter "/macros/2": unexpected end of macro.'
+			],
+			[
+				['type' => API_USER_MACROS, 'length' => 8],
+				['{$MACRO}', '{$MACRO2}'],
+				'/macros',
+				'Invalid parameter "/macros/2": value is too long.'
+			],
+			[
 				['type' => API_USER_MACRO, 'length' => 8],
 				'{$MACRO}',
 				'/1/macro',
@@ -2803,61 +2944,6 @@ class CApiInputValidatorTest extends TestCase {
 				'{$MACRO: '."\xd1".'ontext}',
 				'/1/macro',
 				'Invalid parameter "/1/macro": invalid byte sequence in UTF-8.'
-			],
-			[
-				['type' => API_RANGE_TIME, 'length' => 6],
-				'now-1d',
-				'/1/time',
-				'now-1d'
-			],
-			[
-				['type' => API_RANGE_TIME, 'length' => 8],
-				'now-1d-1h',
-				'/1/time',
-				'Invalid parameter "/1/time": value is too long.'
-			],
-			[
-				['type' => API_RANGE_TIME],
-				'{$MACRO}',
-				'/1/time',
-				'Invalid parameter "/1/time": a time range is expected.'
-			],
-			[
-				['type' => API_RANGE_TIME],
-				'',
-				'/1/time',
-				'Invalid parameter "/1/time": cannot be empty.'
-			],
-			[
-				['type' => API_RANGE_TIME],
-				[],
-				'/1/time',
-				'Invalid parameter "/1/time": a character string is expected.'
-			],
-			[
-				['type' => API_RANGE_TIME],
-				true,
-				'/1/time',
-				'Invalid parameter "/1/time": a character string is expected.'
-			],
-			[
-				['type' => API_RANGE_TIME],
-				null,
-				'/1/time',
-				'Invalid parameter "/1/time": a character string is expected.'
-			],
-			[
-				['type' => API_RANGE_TIME],
-				'now-5x',
-				'/1/time',
-				'Invalid parameter "/1/time": a time range is expected.'
-			],
-			[
-				['type' => API_RANGE_TIME],
-				// broken UTF-8 byte sequence
-				'now-'."\xd1".'d',
-				'/1/time',
-				'Invalid parameter "/1/time": invalid byte sequence in UTF-8.'
 			],
 			[
 				['type' => API_TIME_PERIOD, 'length' => 16],
@@ -5169,6 +5255,189 @@ class CApiInputValidatorTest extends TestCase {
 				'abc'."\n"
 			],
 			[
+				['type' => API_TIMESTAMP],
+				0,
+				'/',
+				0
+			],
+			[
+				['type' => API_TIMESTAMP],
+				1234567,
+				'/',
+				1234567
+			],
+			[
+				['type' => API_TIMESTAMP],
+				ZBX_MAX_DATE,
+				'/',
+				ZBX_MAX_DATE
+			],
+			[
+				['type' => API_TIMESTAMP],
+				'01234567',
+				'/',
+				1234567
+			],
+			[
+				['type' => API_TIMESTAMP],
+				[],
+				'/',
+				'Invalid parameter "/": an unsigned integer is expected.'
+			],
+			[
+				['type' => API_TIMESTAMP],
+				true,
+				'/',
+				'Invalid parameter "/": an unsigned integer is expected.'
+			],
+			[
+				['type' => API_TIMESTAMP],
+				null,
+				'/',
+				'Invalid parameter "/": an unsigned integer is expected.'
+			],
+			[
+				['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL],
+				null,
+				'/',
+				null
+			],
+			[
+				['type' => API_TIMESTAMP],
+				'foo',
+				'/',
+				'Invalid parameter "/": an unsigned integer is expected.'
+			],
+			[
+				['type' => API_TIMESTAMP],
+				0.0,
+				'/',
+				'Invalid parameter "/": an unsigned integer is expected.'
+			],
+			[
+				['type' => API_TIMESTAMP],
+				1.23E+11,
+				'/',
+				'Invalid parameter "/": an unsigned integer is expected.'
+			],
+			[
+				['type' => API_TIMESTAMP],
+				'-12345',
+				'/',
+				'Invalid parameter "/": an unsigned integer is expected.'
+			],
+			[
+				['type' => API_TIMESTAMP],
+				ZBX_MAX_DATE + 1,
+				'/',
+				'Invalid parameter "/": a timestamp is too large.'
+			],
+			[
+				['type' => API_TIMESTAMP],
+				'9223372036854775808',
+				'/',
+				'Invalid parameter "/": a timestamp is too large.'
+			],
+			[
+				['type' => API_TIMESTAMP],
+				9223372036854775808,
+				'/',
+				'Invalid parameter "/": an unsigned integer is expected.'
+			],
+			[
+				['type' => API_TIMESTAMP, 'in' => '0,1,2'],
+				1,
+				'/',
+				1
+			],
+			[
+				['type' => API_TIMESTAMP, 'in' => '0,1,2'],
+				3,
+				'/',
+				'Invalid parameter "/": value must be one of 1970-01-01 00:00:00, 1970-01-01 00:00:01, 1970-01-01 00:00:02.'
+			],
+			[
+				['type' => API_TIMESTAMP, 'in' => '0,30:90'],
+				0,
+				'/',
+				0
+			],
+			[
+				['type' => API_TIMESTAMP, 'in' => '0,30:90'],
+				30,
+				'/',
+				30
+			],
+			[
+				['type' => API_TIMESTAMP, 'in' => '0,30:90'],
+				60,
+				'/',
+				60
+			],
+			[
+				['type' => API_TIMESTAMP, 'in' => '0,30:90'],
+				90,
+				'/',
+				90
+			],
+			[
+				['type' => API_TIMESTAMP, 'in' => '0,30:90'],
+				1,
+				'/',
+				'Invalid parameter "/": value must be one of 1970-01-01 00:00:00, 1970-01-01 00:00:30-1970-01-01 00:01:30.'
+			],
+			[
+				['type' => API_TIMESTAMP, 'in' => '0,30:90'],
+				29,
+				'/',
+				'Invalid parameter "/": value must be one of 1970-01-01 00:00:00, 1970-01-01 00:00:30-1970-01-01 00:01:30.'
+			],
+			[
+				['type' => API_TIMESTAMP, 'in' => '0,30:90'],
+				91,
+				'/',
+				'Invalid parameter "/": value must be one of 1970-01-01 00:00:00, 1970-01-01 00:00:30-1970-01-01 00:01:30.'
+			],
+			[
+				['type' => API_TIMESTAMP, 'format' => 'H:i', 'in' => '0,300:3600'],
+				1,
+				'/',
+				'Invalid parameter "/": value must be one of 00:00, 00:05-01:00.'
+			],
+			[
+				['type' => API_TIMESTAMP, 'format' => 'H:i', 'timezone' => 'UTC', 'in' => '0,300:3600'],
+				1,
+				'/',
+				'Invalid parameter "/": value must be one of 00:00, 00:05-01:00.'
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'active_since' => ['type' => API_TIMESTAMP],
+					'active_till' => ['type' => API_TIMESTAMP, 'compare' => ['operator' => '>', 'field' => 'active_since']]
+				]],
+				[
+					'active_since' => '1640995200', // 2022-01-01 00:00:00
+					'active_till' => '1643673599' // 2022-01-31 23:59:59
+				],
+				'/',
+				[
+					'active_since' => 1640995200, // 2022-01-01 00:00:00
+					'active_till' => 1643673599 // 2022-01-31 23:59:59
+				]
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'active_since' => ['type' => API_TIMESTAMP],
+					'active_till' => ['type' => API_TIMESTAMP, 'compare' => ['operator' => '>', 'field' => 'active_since']]
+				]],
+				[
+					'active_since' => '1643673599', // 2022-01-31 23:59:59
+					'active_till' => '1640995200' // 2022-01-01 00:00:00
+				],
+				'/',
+				'Invalid parameter "/active_till": cannot be less than or equal to the value of parameter "/active_since".'
+			],
+			[
 				['type' => API_MULTIPLIER],
 				null,
 				'/1/multiplier',
@@ -5580,6 +5849,69 @@ class CApiInputValidatorTest extends TestCase {
 				'/',
 				false,
 				'Invalid parameter "/5": value (dashboardid) already exists.'
+			],
+			[
+				['type' => API_USER_MACROS, 'uniq' => true],
+				['{$MACRO1}', '{$MACRO2}', '{$MACRO3}'],
+				'/',
+				true,
+				''
+			],
+			[
+				['type' => API_USER_MACROS],
+				['{$MACRO1}', '{$MACRO2}', '{$MACRO3}', '{$MACRO1}'],
+				'/',
+				true,
+				''
+			],
+			[
+				['type' => API_USER_MACROS, 'uniq' => true],
+				['{$MACRO: abc}', '{$MACRO:" abc"}', '{$MACRO:def}'],
+				'/',
+				true,
+				''
+			],
+			[
+				['type' => API_USER_MACROS],
+				['{$MACRO: abc}', '{$MACRO:" abc"}', '{$MACRO:def}', '{$MACRO:abc}'],
+				'/',
+				true,
+				''
+			],
+			[
+				['type' => API_USER_MACROS, 'uniq' => true],
+				['{$MACRO:regex:"^/tmp$"}', '{$MACRO:"regex:^/tmp$"}'],
+				'/',
+				true,
+				''
+			],
+			[
+				['type' => API_USER_MACROS],
+				['{$MACRO:regex:"^/tmp$"}', '{$MACRO:"regex:^/tmp$"}', '{$MACRO:regex:^/tmp$}'],
+				'/',
+				true,
+				''
+			],
+			[
+				['type' => API_USER_MACROS, 'uniq' => true],
+				['{$MACRO1}', '{$MACRO2}', '{$MACRO3}', '{$MACRO1}'],
+				'/',
+				false,
+				'Invalid parameter "/4": value ({$MACRO1}) already exists.'
+			],
+			[
+				['type' => API_USER_MACROS, 'uniq' => true],
+				['{$MACRO: abc}', '{$MACRO:" abc"}', '{$MACRO:def}', '{$MACRO:abc}'],
+				'/',
+				false,
+				'Invalid parameter "/4": value ({$MACRO:abc}) already exists.'
+			],
+			[
+				['type' => API_USER_MACROS, 'uniq' => true],
+				['{$MACRO:regex:"^/tmp$"}', '{$MACRO:"regex:^/tmp$"}', '{$MACRO:regex:^/tmp$}'],
+				'/',
+				false,
+				'Invalid parameter "/3": value ({$MACRO:regex:^/tmp$}) already exists.'
 			],
 			[
 				['type' => API_OBJECTS, 'uniq' => [['applicationid'], ['hostid', 'name']], 'fields' => [

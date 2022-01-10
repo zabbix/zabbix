@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,11 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'6.0.0alpha8');
+define('ZABBIX_VERSION',		'6.0.0beta2');
 define('ZABBIX_API_VERSION',	'6.0.0');
 define('ZABBIX_EXPORT_VERSION',	'6.0');
 
-define('ZABBIX_DB_VERSION',		5050112);
+define('ZABBIX_DB_VERSION',		5050141);
 
 define('DB_VERSION_SUPPORTED',				0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',		1);
@@ -32,7 +32,7 @@ define('DB_VERSION_NOT_SUPPORTED_ERROR',	4);
 define('DB_VERSION_NOT_SUPPORTED_WARNING',	5);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
-define('ZABBIX_COPYRIGHT_TO',	'2021');
+define('ZABBIX_COPYRIGHT_TO',	'2022');
 
 define('ZBX_BCRYPT_COST',		10);
 define('ZBX_MD5_SIZE',			32);
@@ -361,6 +361,14 @@ define('TIMEPERIOD_TYPE_WEEKLY',	3);
 define('TIMEPERIOD_TYPE_MONTHLY',	4);
 define('TIMEPERIOD_TYPE_YEARLY',	5);
 
+define('MONTH_WEEK_FIRST',	1);
+define('MONTH_WEEK_SECOND',	2);
+define('MONTH_WEEK_THIRD',	3);
+define('MONTH_WEEK_FOURTH',	4);
+define('MONTH_WEEK_LAST',	5);
+
+define('MONTH_MAX_DAY',	31);
+
 // report periods
 define('REPORT_PERIOD_TODAY',			0);
 define('REPORT_PERIOD_YESTERDAY',		1);
@@ -616,6 +624,16 @@ define('ZBX_PREPROC_FAIL_SET_ERROR',		3);
 define('ZBX_PREPROC_CSV_NO_HEADER',	0);
 define('ZBX_PREPROC_CSV_HEADER',	1);
 
+define('ZBX_PREPROC_PROMETHEUS_VALUE', 'value');
+define('ZBX_PREPROC_PROMETHEUS_LABEL', 'label');
+define('ZBX_PREPROC_PROMETHEUS_FUNCTION', 'function');
+
+define('ZBX_PREPROC_PROMETHEUS_SUM',   'sum');
+define('ZBX_PREPROC_PROMETHEUS_MIN',   'min');
+define('ZBX_PREPROC_PROMETHEUS_MAX',   'max');
+define('ZBX_PREPROC_PROMETHEUS_AVG',   'avg');
+define('ZBX_PREPROC_PROMETHEUS_COUNT', 'count');
+
 // LLD rule overrides.
 define('ZBX_LLD_OVERRIDE_STOP_NO',	0);
 define('ZBX_LLD_OVERRIDE_STOP_YES',	1);
@@ -644,19 +662,31 @@ define('MAP_LINK_DRAWTYPE_BOLD_LINE',		2);
 define('MAP_LINK_DRAWTYPE_DOT',				3);
 define('MAP_LINK_DRAWTYPE_DASHED_LINE',		4);
 
+define('ZBX_SLA_MAX_REPORTING_PERIODS',		100);
+define('ZBX_SLA_DEFAULT_REPORTING_PERIODS',	20);
+
+define('ZBX_SLA_STATUS_DISABLED',	0);
+define('ZBX_SLA_STATUS_ENABLED',	1);
+
+define('ZBX_SLA_PERIOD_DAILY',		0);
+define('ZBX_SLA_PERIOD_WEEKLY',		1);
+define('ZBX_SLA_PERIOD_MONTHLY',	2);
+define('ZBX_SLA_PERIOD_QUARTERLY',	3);
+define('ZBX_SLA_PERIOD_ANNUALLY',	4);
+
+define('ZBX_SLA_SERVICE_TAG_OPERATOR_EQUAL',	0);
+define('ZBX_SLA_SERVICE_TAG_OPERATOR_LIKE',		2);
+
 define('ZBX_SERVICE_STATUS_CALC_SET_OK',			0);
 define('ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL',	1);
 define('ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE',	2);
-
-define('SERVICE_SHOW_SLA_OFF',	0);
-define('SERVICE_SHOW_SLA_ON',	1);
 
 define('SERVICE_STATUS_ANY', -1);
 define('SERVICE_STATUS_OK', 0);
 define('SERVICE_STATUS_PROBLEM', 1);
 
-define('SERVICE_TAG_OPERATOR_EQUAL',	0);
-define('SERVICE_TAG_OPERATOR_LIKE',		2);
+define('ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL',	0);
+define('ZBX_SERVICE_PROBLEM_TAG_OPERATOR_LIKE',		2);
 
 define('ZBX_SERVICE_FILTER_TAGS_ANY',		0);
 define('ZBX_SERVICE_FILTER_TAGS_SERVICE',	1);
@@ -1232,6 +1262,12 @@ define('ZBX_BYTE_SUFFIX_MULTIPLIERS', [
 	'T' => ZBX_TEBIBYTE
 ]);
 
+// Geographic coordinate system edges.
+define('GEOMAP_LAT_MIN', -90);
+define('GEOMAP_LAT_MAX', 90);
+define('GEOMAP_LNG_MIN', -180);
+define('GEOMAP_LNG_MAX', 180);
+
 // Regular expressions.
 define('ZBX_PREG_PRINT', '^\x00-\x1F');
 define('ZBX_PREG_MACRO_NAME', '([A-Z0-9\._]+)');
@@ -1319,6 +1355,7 @@ define('API_INTS32',				12);
 define('API_FLOATS',				13);
 define('API_UINTS64',				14);
 define('API_CUIDS',					44);
+define('API_USER_MACROS',			52);
 // specific types
 define('API_HG_NAME',				15);
 define('API_SCRIPT_MENU_PATH',		16);
@@ -1331,7 +1368,6 @@ define('API_OUTPUT',				22);
 define('API_TIME_UNIT',				23);
 define('API_URL',					24);
 define('API_H_NAME',				25);
-define('API_RANGE_TIME',			26);
 define('API_COLOR',					27);
 define('API_NUMERIC',				28);
 define('API_LLD_MACRO',				29);
@@ -1356,12 +1392,13 @@ define('API_EXEC_PARAMS',			48);
 define('API_COND_FORMULA',			49);
 define('API_COND_FORMULAID',		50);
 define('API_UNEXPECTED',			51);
-define('API_INT32_RANGES',			52);
-define('API_LAT_LNG_ZOOM',			53);
-define('API_MULTIPLIER',			54);
-define('API_JSON',					55);
-define('API_XML',					56);
-define('API_PROMETHEUS_PATTERN',	57);
+define('API_INT32_RANGES',			53);
+define('API_LAT_LNG_ZOOM',			54);
+define('API_TIMESTAMP',				55);
+define('API_MULTIPLIER',			56);
+define('API_JSON',					57);
+define('API_XML',					58);
+define('API_PROMETHEUS_PATTERN',	59);
 
 // flags
 define('API_REQUIRED',					0x00001);
@@ -1440,7 +1477,6 @@ define('ZBX_TEXTAREA_TAG_WIDTH',				250);
 define('ZBX_TEXTAREA_TAG_VALUE_WIDTH',			300);
 define('ZBX_TEXTAREA_MAPPING_VALUE_WIDTH',		250);
 define('ZBX_TEXTAREA_MAPPING_NEWVALUE_WIDTH',	250);
-define('ZBX_TEXTAREA_COLOR_WIDTH',				96);
 define('ZBX_TEXTAREA_FILTER_SMALL_WIDTH',		150);
 define('ZBX_TEXTAREA_FILTER_STANDARD_WIDTH',	300);
 define('ZBX_TEXTAREA_TINY_WIDTH',				75);
@@ -1470,6 +1506,8 @@ define('ZBX_ACTION_RENAME',		4);
 // Maximum width for popups in Actions column for problems.
 define('ZBX_ACTIONS_POPUP_MAX_WIDTH',			800);
 
+define('ZBX_HINTBOX_CONTENT_LIMIT',				8192);
+
 // dashboard widgets
 define('WIDGET_ACTION_LOG',			'actionlog');
 define('WIDGET_CLOCK',				'clock');
@@ -1478,7 +1516,6 @@ define('WIDGET_DISCOVERY',			'discovery');
 define('WIDGET_FAV_GRAPHS',			'favgraphs');
 define('WIDGET_FAV_MAPS',			'favmaps');
 define('WIDGET_GEOMAP',				'geomap');
-define('WIDGET_SVG_GRAPH',			'svggraph');
 define('WIDGET_GRAPH',				'graph');
 define('WIDGET_GRAPH_PROTOTYPE',	'graphprototype');
 define('WIDGET_HOST_AVAIL',			'hostavail');
@@ -1488,10 +1525,27 @@ define('WIDGET_PLAIN_TEXT',			'plaintext');
 define('WIDGET_PROBLEM_HOSTS',		'problemhosts');
 define('WIDGET_PROBLEMS',			'problems');
 define('WIDGET_PROBLEMS_BY_SV',		'problemsbysv');
+define('WIDGET_SLA_REPORT',			'slareport');
+define('WIDGET_SVG_GRAPH',			'svggraph');
 define('WIDGET_SYSTEM_INFO',		'systeminfo');
 define('WIDGET_TRIG_OVER',			'trigover');
 define('WIDGET_URL',				'url');
 define('WIDGET_WEB',				'web');
+define('WIDGET_ITEM',				'item');
+
+// Item widget object positions.
+define('WIDGET_ITEM_POS_LEFT',		0);
+define('WIDGET_ITEM_POS_CENTER',	1);
+define('WIDGET_ITEM_POS_RIGHT',		2);
+
+define('WIDGET_ITEM_POS_TOP',		0);
+define('WIDGET_ITEM_POS_MIDDLE',	1);
+define('WIDGET_ITEM_POS_BOTTOM',	2);
+
+define('WIDGET_ITEM_POS_BEFORE',	0);
+define('WIDGET_ITEM_POS_ABOVE',		1);
+define('WIDGET_ITEM_POS_AFTER',		2);
+define('WIDGET_ITEM_POS_BELOW',		3);
 
 // sysmap widget source types
 define('WIDGET_SYSMAP_SOURCETYPE_MAP',	1);
@@ -1517,6 +1571,12 @@ define('WIDGET_SEARCH_TEMPLATES',		'search_templates');
 define('WIDGET_SIMPLE_ITEM',	0);
 define('WIDGET_DYNAMIC_ITEM',	1);
 
+// item widget blocks
+define('WIDGET_ITEM_SHOW_DESCRIPTION',		1);
+define('WIDGET_ITEM_SHOW_VALUE',			2);
+define('WIDGET_ITEM_SHOW_TIME',				3);
+define('WIDGET_ITEM_SHOW_CHANGE_INDICATOR',	4);
+
 // widget defaults
 define('ZBX_WIDGET_ROWS', 20);
 
@@ -1530,6 +1590,8 @@ define('ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE',	5);
 define('ZBX_WIDGET_FIELD_TYPE_GRAPH',			6);
 define('ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE',	7);
 define('ZBX_WIDGET_FIELD_TYPE_MAP',				8);
+define('ZBX_WIDGET_FIELD_TYPE_SERVICE',			9);
+define('ZBX_WIDGET_FIELD_TYPE_SLA',				10);
 
 define('ZBX_WIDGET_FIELD_RESOURCE_GRAPH',					0);
 define('ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH',			1);
@@ -1610,36 +1672,36 @@ define('ZBX_POPUP_CONDITION_TYPE_ACTION', 1);
 define('ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION', 2);
 
 // Tab indicator names.
-define('TAB_INDICATOR_MACROS', 'macros');
-define('TAB_INDICATOR_TAGS', 'tags');
 define('TAB_INDICATOR_AUTH_HTTP', 'http');
 define('TAB_INDICATOR_AUTH_LDAP', 'ldap');
 define('TAB_INDICATOR_AUTH_SAML', 'saml');
-define('TAB_INDICATOR_INVENTORY', 'inventory');
-define('TAB_INDICATOR_ENCRYPTION', 'encryption');
-define('TAB_INDICATOR_PREPROCESSING', 'preprocessing');
-define('TAB_INDICATOR_DEPENDENCY', 'dependency');
-define('TAB_INDICATOR_LLD_MACROS', 'lld-macros');
-define('TAB_INDICATOR_FILTERS', 'filters');
-define('TAB_INDICATOR_OVERRIDES', 'overrides');
-define('TAB_INDICATOR_STEPS', 'steps');
-define('TAB_INDICATOR_HTTP_AUTH', 'http-auth');
-define('TAB_INDICATOR_OPERATIONS', 'operations');
-define('TAB_INDICATOR_SLA', 'sla');
 define('TAB_INDICATOR_CHILD_SERVICES', 'child-services');
-define('TAB_INDICATOR_TIME', 'time');
-define('TAB_INDICATOR_TAG_FILTER', 'tag-filter');
+define('TAB_INDICATOR_DEPENDENCY', 'dependency');
+define('TAB_INDICATOR_ENCRYPTION', 'encryption');
+define('TAB_INDICATOR_EXCLUDED_DOWNTIMES', 'excluded-downtimes');
+define('TAB_INDICATOR_FILTERS', 'filters');
+define('TAB_INDICATOR_FRONTEND_MESSAGE', 'frontend-message');
+define('TAB_INDICATOR_GRAPH_DATASET', 'graph-dataset');
+define('TAB_INDICATOR_GRAPH_LEGEND', 'graph-legend');
+define('TAB_INDICATOR_GRAPH_OPTIONS', 'graph-options');
+define('TAB_INDICATOR_GRAPH_OVERRIDES', 'graph-overrides');
+define('TAB_INDICATOR_GRAPH_PROBLEMS', 'graph-problems');
+define('TAB_INDICATOR_GRAPH_TIME', 'graph-time');
+define('TAB_INDICATOR_HTTP_AUTH', 'http-auth');
+define('TAB_INDICATOR_INVENTORY', 'inventory');
+define('TAB_INDICATOR_LLD_MACROS', 'lld-macros');
+define('TAB_INDICATOR_MACROS', 'macros');
 define('TAB_INDICATOR_MEDIA', 'media');
 define('TAB_INDICATOR_MESSAGE_TEMPLATE', 'message-template');
-define('TAB_INDICATOR_FRONTEND_MESSAGE', 'frontend-message');
-define('TAB_INDICATOR_SHARING', 'sharing');
-define('TAB_INDICATOR_GRAPH_DATASET', 'graph-dataset');
-define('TAB_INDICATOR_GRAPH_OPTIONS', 'graph-options');
-define('TAB_INDICATOR_GRAPH_TIME', 'graph-time');
-define('TAB_INDICATOR_GRAPH_LEGEND', 'graph-legend');
-define('TAB_INDICATOR_GRAPH_PROBLEMS', 'graph-problems');
-define('TAB_INDICATOR_GRAPH_OVERRIDES', 'graph-overrides');
+define('TAB_INDICATOR_OPERATIONS', 'operations');
+define('TAB_INDICATOR_OVERRIDES', 'overrides');
 define('TAB_INDICATOR_PERMISSIONS', 'permissions');
+define('TAB_INDICATOR_PREPROCESSING', 'preprocessing');
+define('TAB_INDICATOR_SHARING', 'sharing');
+define('TAB_INDICATOR_STEPS', 'steps');
+define('TAB_INDICATOR_TAG_FILTER', 'tag-filter');
+define('TAB_INDICATOR_TAGS', 'tags');
+define('TAB_INDICATOR_TIME', 'time');
 define('TAB_INDICATOR_VALUEMAPS', 'valuemaps');
 
 // CSS styles
@@ -1887,6 +1949,7 @@ define('ZBX_STYLE_SERVICE_INFO', 'service-info');
 define('ZBX_STYLE_SERVICE_INFO_GRID', 'service-info-grid');
 define('ZBX_STYLE_SERVICE_INFO_LABEL', 'service-info-label');
 define('ZBX_STYLE_SERVICE_INFO_VALUE', 'service-info-value');
+define('ZBX_STYLE_SERVICE_INFO_VALUE_SLA', 'service-info-value-sla');
 define('ZBX_STYLE_SERVICE_NAME', 'service-name');
 define('ZBX_STYLE_SERVICE_STATUS', 'service-status');
 define('ZBX_STYLE_SETUP_CONTAINER', 'setup-container');
@@ -1913,6 +1976,7 @@ define('ZBX_STYLE_STATUS_NA_BG', 'status-na-bg');
 define('ZBX_STYLE_STATUS_RED', 'status-red');
 define('ZBX_STYLE_STATUS_WARNING_BG', 'status-warning-bg');
 define('ZBX_STYLE_STATUS_YELLOW', 'status-yellow');
+define('ZBX_STYLE_STICKED_TO_TOP', 'sticked-to-top');
 define('ZBX_STYLE_SVG_GRAPH', 'svg-graph');
 define('ZBX_STYLE_SVG_GRAPH_PREVIEW', 'svg-graph-preview');
 define('ZBX_STYLE_SUBFILTER', 'subfilter');
@@ -1962,10 +2026,12 @@ define('ZBX_STYLE_YELLOW', 'yellow');
 define('ZBX_STYLE_YELLOW_BG', 'yellow-bg');
 define('ZBX_STYLE_FIELD_LABEL_ASTERISK', 'form-label-asterisk');
 define('ZBX_STYLE_PROBLEM_ICON_LIST' , 'problem-icon-list');
+define('ZBX_STYLE_PROBLEM_ICON_LINK' , 'problem-icon-link');
 define('ZBX_STYLE_PROBLEM_ICON_LIST_ITEM' , 'problem-icon-list-item');
 define('ZBX_STYLE_ZABBIX_LOGO', 'zabbix-logo');
 define('ZBX_STYLE_ZABBIX_SIDEBAR_LOGO', 'zabbix-sidebar-logo');
 define('ZBX_STYLE_ZABBIX_SIDEBAR_LOGO_COMPACT', 'zabbix-sidebar-logo-compact');
+define('ZBX_STYLE_WIDGET_ITEM_LABEL', 'widget-item-label');
 
 // HTML column layout.
 define('ZBX_STYLE_COLUMNS', 'columns-wrapper');

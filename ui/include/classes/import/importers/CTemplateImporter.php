@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,6 +47,9 @@ class CTemplateImporter extends CImporter {
 
 		do {
 			$independent_templates = $this->getIndependentTemplates($templates);
+			$templates_api_params = array_flip(['uuid', 'groups', 'macros', 'templates', 'host', 'status', 'name',
+				'description', 'tags'
+			]);
 
 			$templates_to_create = [];
 			$templates_to_update = [];
@@ -65,21 +68,23 @@ class CTemplateImporter extends CImporter {
 				 *  - save linkages to add in case if 'create new' linkages is checked;
 				 *  - calculate missing linkages in case if 'delete missing' is checked.
 				 */
-				if (array_key_exists('templates', $template)) {
+				if ($template['templates']) {
 					$template_linkage[$template['host']] = $template['templates'];
 				}
 				unset($template['templates']);
 
 				if (array_key_exists('templateid', $template)
 						&& ($this->options['templates']['updateExisting'] || $this->options['process_templates'])) {
-					$templates_to_update[] = $template;
+					$templates_to_update[] = array_intersect_key($template,
+						$templates_api_params + array_flip(['templateid'])
+					);
 				}
 				elseif ($this->options['templates']['createMissing']) {
 					if (array_key_exists('templateid', $template)) {
 						throw new Exception(_s('Template "%1$s" already exists.', $template['host']));
 					}
 
-					$templates_to_create[] = $template;
+					$templates_to_create[] = array_intersect_key($template, $templates_api_params);
 				}
 
 				if (array_key_exists('valuemaps', $template)) {
@@ -140,7 +145,7 @@ class CTemplateImporter extends CImporter {
 					if ($this->options['templateLinkage']['createMissing']
 							&& array_key_exists($template['host'], $template_linkage)) {
 						API::Template()->massAdd([
-							'templates' => $template,
+							'templates' => array_intersect_key($template, array_flip(['templateid'])),
 							'templates_link' => $template_linkage[$template['host']]
 						]);
 					}

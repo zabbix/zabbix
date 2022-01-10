@@ -369,6 +369,7 @@
 	<target name="test-phpunit" depends="init-common">
 		<exec executable="phpunit" dir="ui/tests/unit" failonerror="off">
 			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml"/>
+			<arg line="--do-not-cache-result"/>
 			<arg line="${phpunit_filter}"/>
 			<arg line="include/"/>
 		</exec>
@@ -378,6 +379,8 @@
 		<exec executable="phpunit" dir="ui/tests" failonerror="off">
 			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml"/>
 			<arg line="--bootstrap=bootstrap.php"/>
+			<arg line="--do-not-cache-result"/>
+			<arg line="--dont-report-useless-tests"/>
 			<arg line="${phpunit_filter}"/>
 			<arg line="frontend.php"/>
 		</exec>
@@ -387,6 +390,7 @@
 		<exec executable="phpunit" dir="ui/tests" failonerror="off">
 			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml"/>
 			<arg line="--bootstrap=bootstrap.php"/>
+			<arg line="--do-not-cache-result"/>
 			<arg line="${phpunit_filter}"/>
 			<arg line="api_json/ApiJsonTests.php"/>
 		</exec>
@@ -396,6 +400,7 @@
 		<exec executable="phpunit" dir="ui/tests" failonerror="off">
 			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml"/>
 			<arg line="--bootstrap=bootstrap.php"/>
+			<arg line="--do-not-cache-result"/>
 			<arg line="${phpunit_filter}"/>
 			<arg line="integration/IntegrationTests.php"/>
 		</exec>

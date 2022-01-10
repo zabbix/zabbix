@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -64,7 +64,19 @@ $jq_templates['tag-row-tmpl'] = CWidgetHelper::getTagsTemplate($fields['tags']);
 
 // Default view.
 $form_list->addRow(
-	CWidgetHelper::getLabel($fields['default_view']),
+	CWidgetHelper::getLabel($fields['default_view'], null, [
+		_('Comma separated center coordinates and zoom level to display when the widget is initially loaded.'),
+		BR(),
+		_('Supported formats:'),
+		(new CList([
+			new CListItem((new CSpan('<lat>,<lng>,<zoom>'))->addClass(ZBX_STYLE_MONOSPACE_FONT)),
+			new CListItem((new CSpan('<lat>,<lng>'))->addClass(ZBX_STYLE_MONOSPACE_FONT))
+		]))->addClass(ZBX_STYLE_LIST_DASHED),
+		BR(),
+		_s('The maximum zoom level is "%1$s".', CSettingsHelper::get(CSettingsHelper::GEOMAPS_MAX_ZOOM)),
+		BR(),
+		_('Initial view is ignored if the default view is set.')
+	]),
 	CWidgetHelper::getLatLngZoomBox($fields['default_view'])
 );
 

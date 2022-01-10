@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,6 +26,62 @@ class TagFilter {
 	 * @return array
 	 */
 	public static function load() {
+		// Create templates.
+		$templates = CDataHelper::createTemplates([
+			[
+				'host' => 'Template for tags filtering',
+				'groups' => [
+					'groupid' => 1
+				],
+				'tags' => [
+					[
+						'tag' => 'action',
+						'value' => 'simple'
+					],
+					[
+						'tag' => 'tag',
+						'value' => 'TEMPLATE'
+					],
+					[
+						'tag' => 'test',
+						'value' => 'test_tag'
+					]
+				]
+			],
+			[
+				'host' => 'Template for tags filtering - clone',
+				'groups' => [
+					'groupid' => 1
+				],
+				'tags' => [
+					[
+						'tag' => 'action',
+						'value' => 'clone'
+					],
+					[
+						'tag' => 'tag',
+						'value' => 'template'
+					]
+				]
+			],
+			[
+				'host' => 'Template for tags filtering - update',
+				'groups' => [
+					'groupid' => 1
+				],
+				'tags' => [
+					[
+						'tag' => 'action',
+						'value' => 'update'
+					],
+					[
+						'tag' => 'tag',
+						'value' => 'template'
+					]
+				]
+			]
+		]);
+
 		// Create hosts.
 		$hosts = CDataHelper::createHosts([
 			[
@@ -57,6 +113,9 @@ class TagFilter {
 						'tag' => 'test',
 						'value' => 'test_tag'
 					]
+				],
+				'templates' => [
+					'templateid' => $templates['templateids']['Template for tags filtering']
 				]
 			],
 			[
@@ -110,65 +169,6 @@ class TagFilter {
 					[
 						'tag' => 'tag',
 						'value' => 'host'
-					]
-				]
-			]
-		]);
-
-		// Create templates.
-		$templates = CDataHelper::createTemplates([
-			[
-				'host' => 'Template for tags filtering',
-				'groups' => [
-					'groupid' => 1
-				],
-				'hosts' => [
-					'hostid' => $hosts['hostids']['Host for tags filtering']
-				],
-				'tags' => [
-					[
-						'tag' => 'action',
-						'value' => 'simple'
-					],
-					[
-						'tag' => 'tag',
-						'value' => 'TEMPLATE'
-					],
-					[
-						'tag' => 'test',
-						'value' => 'test_tag'
-					]
-				]
-			],
-			[
-				'host' => 'Template for tags filtering - clone',
-				'groups' => [
-					'groupid' => 1
-				],
-				'tags' => [
-					[
-						'tag' => 'action',
-						'value' => 'clone'
-					],
-					[
-						'tag' => 'tag',
-						'value' => 'template'
-					]
-				]
-			],
-			[
-				'host' => 'Template for tags filtering - update',
-				'groups' => [
-					'groupid' => 1
-				],
-				'tags' => [
-					[
-						'tag' => 'action',
-						'value' => 'update'
-					],
-					[
-						'tag' => 'tag',
-						'value' => 'template'
 					]
 				]
 			]

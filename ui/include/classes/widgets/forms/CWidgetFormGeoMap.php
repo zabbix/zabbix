@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -72,12 +72,7 @@ class CWidgetFormGeoMap extends CWidgetForm {
 		$this->fields[$field_tags->getName()] = $field_tags;
 
 		// Default view.
-		$field_default_view = (new CWidgetFieldLatLng('default_view', _('Initial view')))
-			->setHelpText([
-				_('Comma separated center coordinates to display when the widget is initially loaded.'),
-				BR(),
-				_('Initial view is ignored if the default view is set.')
-			]);
+		$field_default_view = new CWidgetFieldLatLng('default_view', _('Initial view'));
 
 		if (array_key_exists('default_view', $this->data)) {
 			$field_default_view->setValue($this->data['default_view']);

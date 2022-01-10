@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -228,6 +228,28 @@ final class CHistFunctionData {
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND]]]
 		],
+		'baselinedev' => [
+			['rules' => [['type' => 'query']]],
+			['rules' => [[
+				'type' => 'period',
+				'mode' => self::PERIOD_MODE_TREND,
+				'min' => SEC_PER_HOUR,
+				'aligned_shift' => true
+			]]],
+			['rules' => [['type' => 'regexp', 'pattern' => '/^[hdwMy]$/']]],
+			['rules' => [['type' => 'number', 'with_suffix' => false, 'min' => 1, 'with_float' => false]]]
+		],
+		'baselinewma' => [
+			['rules' => [['type' => 'query']]],
+			['rules' => [[
+				'type' => 'period',
+				'mode' => self::PERIOD_MODE_TREND,
+				'min' => SEC_PER_HOUR,
+				'aligned_shift' => true
+			]]],
+			['rules' => [['type' => 'regexp', 'pattern' => '/^[hdwMy]$/']]],
+			['rules' => [['type' => 'number', 'with_suffix' => false, 'min' => 1, 'with_float' => false]]]
+		],
 		'trendcount' => [
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND]]]
@@ -396,6 +418,8 @@ final class CHistFunctionData {
 		'sumofsquares' => self::ITEM_VALUE_TYPES_NUM,
 		'timeleft' => self::ITEM_VALUE_TYPES_NUM,
 		'trendavg' => self::ITEM_VALUE_TYPES_NUM,
+		'baselinedev' => self::ITEM_VALUE_TYPES_NUM,
+		'baselinewma' => self::ITEM_VALUE_TYPES_NUM,
 		'trendcount' => self::ITEM_VALUE_TYPES_NUM,
 		'trendmax' => self::ITEM_VALUE_TYPES_NUM,
 		'trendmin' => self::ITEM_VALUE_TYPES_NUM,

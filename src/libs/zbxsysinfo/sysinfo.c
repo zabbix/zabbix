@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -116,7 +116,6 @@ static int	parse_command_dyn(const char *command, char **cmd, char **param)
 	return ZBX_COMMAND_WITH_PARAMS;
 }
 
-
 static int	add_to_metrics(ZBX_METRIC **metrics, ZBX_METRIC *metric, char *error, size_t max_error_len)
 {
 	int		i = 0;
@@ -230,6 +229,39 @@ void	remove_user_parameters(void)
 		zbx_free(commands);
 	}
 }
+
+void	get_metrics_copy(ZBX_METRIC **metrics)
+{
+	unsigned int	i;
+
+	if (NULL == commands)
+	{
+		*metrics = NULL;
+		return;
+	}
+
+	for (i = 0; NULL != commands[i].key; i++)
+		;
+
+	*metrics = (ZBX_METRIC *)zbx_malloc(*metrics, sizeof(ZBX_METRIC) * (i + 1));
+
+	for (i = 0; NULL != commands[i].key; i++)
+	{
+		(*metrics)[i].key = zbx_strdup(NULL, commands[i].key);
+		(*metrics)[i].flags = commands[i].flags;
+		(*metrics)[i].function = commands[i].function;
+		(*metrics)[i].test_param = (NULL == commands[i].test_param ?
+				NULL : zbx_strdup(NULL, commands[i].test_param));
+	}
+
+	memset(&(*metrics)[i], 0, sizeof(ZBX_METRIC));
+}
+
+void	set_metrics(ZBX_METRIC *metrics)
+{
+	free_metrics_ext(&commands);
+	commands = metrics;
+}
 #endif
 
 void	init_metrics(void)
@@ -317,34 +349,26 @@ void	init_metrics(void)
 #endif
 }
 
+void	free_metrics_ext(ZBX_METRIC **metrics)
+{
+	if (NULL != *metrics)
+	{
+		int	i;
+
+		for (i = 0; NULL != (*metrics)[i].key; i++)
+		{
+			zbx_free((*metrics)[i].key);
+			zbx_free((*metrics)[i].test_param);
+		}
+
+		zbx_free(*metrics);
+	}
+}
+
 void	free_metrics(void)
 {
-	if (NULL != commands)
-	{
-		int	i;
-
-		for (i = 0; NULL != commands[i].key; i++)
-		{
-			zbx_free(commands[i].key);
-			zbx_free(commands[i].test_param);
-		}
-
-		zbx_free(commands);
-	}
-
-	if (NULL != commands_local)
-	{
-		int	i;
-
-		for (i = 0; NULL != commands_local[i].key; i++)
-		{
-			zbx_free(commands_local[i].key);
-			zbx_free(commands_local[i].test_param);
-		}
-
-		zbx_free(commands_local);
-	}
-
+	free_metrics_ext(&commands);
+	free_metrics_ext(&commands_local);
 	free_key_access_rules();
 }
 
@@ -416,7 +440,6 @@ void	finalize_key_access_rules_configuration(void)
 	int			i, j, rules_num, sysrun_index = ZBX_MAX_UINT31_1;
 	zbx_key_access_rule_t	*rule, *sysrun_deny;
 	char			sysrun_pattern[] = "system.run[*]";
-
 
 	rules_num = key_access_rules.values_num;
 
@@ -1486,8 +1509,6 @@ static zbx_log_t	*get_result_log_value(AGENT_RESULT *result)
  *                                                                            *
  * Return value:                                                              *
  *         NULL - if value is missing or can't be converted                   *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments:  better use definitions                                          *
  *                GET_UI64_RESULT                                             *

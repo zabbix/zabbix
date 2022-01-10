@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -188,6 +188,8 @@ class CRouter {
 		'popup.service.statusrule.edit'				=> ['CControllerPopupServiceStatusRuleEdit',			'layout.json',			'popup.service.statusrule.edit'],
 		'popup.service.time.edit'					=> ['CControllerPopupServiceTimeEdit',					'layout.json',			'popup.service.time.edit'],
 		'popup.services'							=> ['CControllerPopupServices',							'layout.json',			'popup.services'],
+		'popup.sla.edit'							=> ['CControllerPopupSlaEdit',							'layout.json',			'popup.sla.edit'],
+		'popup.sla.excludeddowntime.edit'			=> ['CControllerPopupSlaExcludedDowntimeEdit',			'layout.json',			'popup.sla.excludeddowntime.edit'],
 		'popup.tabfilter.delete'					=> ['CControllerPopupTabFilterDelete',					'layout.json',			null],
 		'popup.tabfilter.edit'						=> ['CControllerPopupTabFilterEdit',					'layout.json',			'popup.tabfilter.edit'],
 		'popup.tabfilter.update'					=> ['CControllerPopupTabFilterUpdate',					'layout.json',			null],
@@ -238,14 +240,21 @@ class CRouter {
 		'script.update'								=> ['CControllerScriptUpdate',							null,					null],
 		'search'									=> ['CControllerSearch',								'layout.htmlpage',		'search'],
 		'service.create'							=> ['CControllerServiceCreate',							'layout.json',			null],
-		'service.delete'							=> ['CControllerServiceDelete',							null,					null],
-		'service.list'								=> ['CControllerServiceList',							'layout.htmlpage',		'monitoring.service.list'],
-		'service.list.refresh'						=> ['CControllerServiceListRefresh',					'layout.json',			'monitoring.service.list.refresh'],
-		'service.list.edit'							=> ['CControllerServiceListEdit',						'layout.htmlpage',		'monitoring.service.list.edit'],
-		'service.list.edit.refresh'					=> ['CControllerServiceListEditRefresh',				'layout.json',			'monitoring.service.list.edit.refresh'],
+		'service.delete'							=> ['CControllerServiceDelete',							'layout.json',			null],
+		'service.list'								=> ['CControllerServiceList',							'layout.htmlpage',		'service.list'],
+		'service.list.refresh'						=> ['CControllerServiceListRefresh',					'layout.json',			'service.list.refresh'],
+		'service.list.edit'							=> ['CControllerServiceListEdit',						'layout.htmlpage',		'service.list.edit'],
+		'service.list.edit.refresh'					=> ['CControllerServiceListEditRefresh',				'layout.json',			'service.list.edit.refresh'],
 		'service.statusrule.validate'				=> ['CControllerServiceStatusRuleValidate',				'layout.json',			null],
-		'service.time.validate'						=> ['CControllerServiceTimeValidate',					'layout.json',			null],
 		'service.update'							=> ['CControllerServiceUpdate',							'layout.json',			null],
+		'sla.create'								=> ['CControllerSlaCreate',								'layout.json',			null],
+		'sla.delete'								=> ['CControllerSlaDelete',								'layout.json',			null],
+		'sla.disable'								=> ['CControllerSlaDisable',							'layout.json',			null],
+		'sla.excludeddowntime.validate'				=> ['CControllerSlaExcludedDowntimeValidate',			'layout.json',			null],
+		'sla.list'									=> ['CControllerSlaList',								'layout.htmlpage',		'sla.list'],
+		'sla.enable'								=> ['CControllerSlaEnable',								'layout.json',			null],
+		'sla.update'								=> ['CControllerSlaUpdate',								'layout.json',			null],
+		'slareport.list'							=> ['CControllerSlaReportList',							'layout.htmlpage',		'slareport.list'],
 		'system.warning'							=> ['CControllerSystemWarning',							'layout.warning',		'system.warning'],
 		'tabfilter.profile.update'					=> ['CControllerTabFilterProfileUpdate',				'layout.json',			null],
 		'template.dashboard.delete'					=> ['CControllerTemplateDashboardDelete',				null,					null],
@@ -297,6 +306,7 @@ class CRouter {
 		'widget.geomap.view'						=> ['CControllerWidgetGeoMapView',						'layout.widget',		'monitoring.widget.geomap.view'],
 		'widget.graph.view'							=> ['CControllerWidgetGraphView',						'layout.widget',		'monitoring.widget.graph.view'],
 		'widget.graphprototype.view'				=> ['CControllerWidgetIteratorGraphPrototypeView',		'layout.json',			null],
+		'widget.item.view'							=> ['CControllerWidgetItemView',						'layout.widget',		'monitoring.widget.item.view'],
 		'widget.hostavail.view'						=> ['CControllerWidgetHostAvailView',					'layout.widget',		'monitoring.widget.hostavail.view'],
 		'widget.map.view'							=> ['CControllerWidgetMapView',							'layout.widget',		'monitoring.widget.map.view'],
 		'widget.navtree.item.edit'					=> ['CControllerWidgetNavTreeItemEdit',					'layout.json',			'monitoring.widget.navtreeitem.edit'],
@@ -306,6 +316,7 @@ class CRouter {
 		'widget.problemhosts.view'					=> ['CControllerWidgetProblemHostsView',				'layout.widget',		'monitoring.widget.problemhosts.view'],
 		'widget.problems.view'						=> ['CControllerWidgetProblemsView',					'layout.widget',		'monitoring.widget.problems.view'],
 		'widget.problemsbysv.view'					=> ['CControllerWidgetProblemsBySvView',				'layout.widget',		'monitoring.widget.problemsbysv.view'],
+		'widget.slareport.view'						=> ['CControllerWidgetSlaReportView',					'layout.widget',		'monitoring.widget.slareport.view'],
 		'widget.svggraph.view'						=> ['CControllerWidgetSvgGraphView',					'layout.widget',		'monitoring.widget.svggraph.view'],
 		'widget.systeminfo.view'					=> ['CControllerWidgetSystemInfoView',					'layout.widget',		'monitoring.widget.systeminfo.view'],
 		'widget.trigover.view'						=> ['CControllerWidgetTrigOverView',					'layout.widget',		'monitoring.widget.trigover.view'],

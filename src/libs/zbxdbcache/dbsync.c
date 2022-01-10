@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -441,7 +441,6 @@ static char	*encode_expression(const zbx_eval_context_t *ctx)
 
 	return str;
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -2952,7 +2951,6 @@ int	zbx_dbsync_compare_action_ops(zbx_dbsync_t *sync)
 	return SUCCEED;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: dbsync_compare_action_condition                                  *
@@ -3603,7 +3601,6 @@ int	zbx_dbsync_compare_corr_conditions(zbx_dbsync_t *sync)
 
 	return SUCCEED;
 }
-
 
 /******************************************************************************
  *                                                                            *

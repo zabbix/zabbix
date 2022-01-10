@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,6 @@ $output = [
 	'name' => $data['name'],
 	'body' =>
 		(new CDiv())
-			->addStyle('height: 100%; z-index: 2;')
 			->setId($data['unique_id'])
 			->toString(),
 	'geomap' => array_intersect_key($data, array_flip(['config', 'hosts']))

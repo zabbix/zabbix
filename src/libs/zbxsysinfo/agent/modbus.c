@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -117,7 +117,6 @@ static uint8_t	read_reg_8_less(uint16_t *reg16, modbus_endianness_t endianness)
 	return (uint8_t)(ZBX_MODBUS_ENDIANNESS_BE == endianness ?
 			MODBUS_GET_LOW_BYTE(*reg16) : MODBUS_GET_HIGH_BYTE(*reg16));
 }
-
 
 static void	set_serial_params_default(zbx_modbus_connection_serial *serial_params)
 {
@@ -557,7 +556,6 @@ static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slave
 		dst8 = zbx_malloc(NULL, sizeof(uint8_t) * total_count);
 	else
 		dst16 = zbx_malloc(NULL, sizeof(uint16_t) * total_count);
-
 
 	LOCK_MODBUS;
 

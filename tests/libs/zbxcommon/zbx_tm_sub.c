@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,13 +26,26 @@
 #include "zbxtrends.h"
 #include "log.h"
 
+static void	parse_period(const char *period, int *multiplier, zbx_time_unit_t *base)
+{
+	const char	*unit;
+
+	*multiplier = atoi(period);
+	unit = period + strlen(period) - 1;
+
+	if ('i' == *unit)
+	{
+		*base = ZBX_TIME_UNIT_ISOYEAR;
+	}
+	else if (ZBX_TIME_UNIT_UNKNOWN == (*base = zbx_tm_str_to_unit(unit)))
+		fail_msg("invalid time period '%s'", period);
+
+}
+
 void	zbx_mock_test_entry(void **state)
 {
-	const char	*param;
-	char		*error = NULL;
 	zbx_timespec_t	ts_in, ts_out, ts;
 	struct tm	tm;
-	size_t		len;
 	int		multiplier;
 	zbx_time_unit_t	base;
 	time_t		time_tmp;
@@ -50,12 +63,7 @@ void	zbx_mock_test_entry(void **state)
 	if (ZBX_MOCK_SUCCESS != zbx_strtime_to_timespec(zbx_mock_get_parameter_string("out.time"), &ts_out))
 		fail_msg("Invalid output time format");
 
-	param = zbx_mock_get_parameter_string("in.param");
-	if (SUCCEED != zbx_tm_parse_period(param, &len, &multiplier, &base, &error))
-	{
-		fail_msg("Invalid time period: %s", error);
-		zbx_free(error);
-	}
+	parse_period(zbx_mock_get_parameter_string("in.param"), &multiplier, &base);
 
 	time_tmp = ts_in.sec;
 	tm = *localtime(&time_tmp);

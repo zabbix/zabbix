@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,11 +20,6 @@
 
 
 class CWidgetFieldLatLng extends CWidgetField {
-
-	/**
-	 * @var string
-	 */
-	private $help_text;
 
 	/**
 	 * @var string
@@ -49,28 +44,7 @@ class CWidgetFieldLatLng extends CWidgetField {
 		$this->setValidationRules(['type' => API_LAT_LNG_ZOOM, 'length' => 255]);
 		$this->placeholder = '40.6892494,-74.0466891';
 		$this->width = ZBX_TEXTAREA_MEDIUM_WIDTH;
-		$this->help_text = '';
 		$this->setDefault('');
-	}
-
-	/**
-	 * Set text for an icon with question mark and text in the hint box.
-	 *
-	 * @param string|array|CTag $help_text
-	 *
-	 * @return $this
-	 */
-	public function setHelpText($help_text) {
-		$this->help_text = $help_text;
-
-		return $this;
-	}
-
-	/**
-	 * Returns help text.
-	 */
-	public function getHelpText() {
-		return $this->help_text;
 	}
 
 	public function getPlaceholder() {

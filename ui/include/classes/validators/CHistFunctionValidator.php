@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -222,13 +222,50 @@ class CHistFunctionValidator extends CValidator {
 						return false;
 					}
 
+					// Make sure time shift uses units no less than one used in period.
+					if (array_key_exists('aligned_shift', $rule) && $rule['aligned_shift']) {
+						if (self::hasMacros($param['data']['sec_num'], $options)
+								|| self::hasMacros($param['data']['time_shift'], $options)) {
+							return true;
+						}
+
+						$period_parser = new CNumberParser([
+							'with_time_suffix' => true,
+							'with_year' => true
+						]);
+
+						if ($period_parser->parse($param['data']['sec_num']) != CParser::PARSE_SUCCESS) {
+							return false;
+						}
+
+						$period_unit_length = timeUnitToSeconds('1'.$period_parser->getSuffix(), true);
+						$shift_parser = new CRelativeTimeParser();
+
+						if ($shift_parser->parse($param['data']['time_shift']) != CParser::PARSE_SUCCESS) {
+							return false;
+						}
+
+						foreach ($shift_parser->getTokens() as $token) {
+							if (timeUnitToSeconds('1'.$token['suffix'], true) < $period_unit_length) {
+								return false;
+							}
+						}
+					}
+
 					break;
 
 				case 'number':
 					$with_suffix = (array_key_exists('with_suffix', $rule) && $rule['with_suffix']);
+					$with_float = true;
+
+					if (array_key_exists('with_float', $rule) && $rule['with_float'] === false) {
+						$with_float = false;
+					}
+
 					$parser = new CNumberParser([
-						'with_size_suffix' => $with_suffix,
-						'with_time_suffix' => $with_suffix
+						'with_size_suffix'	=> $with_suffix,
+						'with_time_suffix'	=> $with_suffix,
+						'with_float' 		=> $with_float
 					]);
 
 					if ($parser->parse($param_match_unquoted) != CParser::PARSE_SUCCESS) {

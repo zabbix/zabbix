@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -115,6 +115,17 @@ void	__wrap_zbx_user_free(zbx_user_t *user)
 {
 	zbx_free(user->username);
 }
+
+void	__wrap_init_result(AGENT_RESULT *result)
+{
+	ZBX_UNUSED(result);
+}
+
+void	__wrap_free_result(AGENT_RESULT *result)
+{
+	ZBX_UNUSED(result);
+}
+
 
 void	zbx_mock_test_entry(void **state)
 {

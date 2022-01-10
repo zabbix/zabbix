@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,14 +53,10 @@
 			if (jQuery('[name="preprocessing[' + num + '][params][1]"]', $preprocessing).length) {
 				params.push(jQuery('[name="preprocessing[' + num + '][params][1]"]', $preprocessing).val());
 			}
-			if (jQuery('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).length) {
-				// ZBX-16642
+			if (jQuery('[name="preprocessing[' + num + '][params][2]"]:not(:disabled)', $preprocessing).length) {
 				if (type == <?= ZBX_PREPROC_CSV_TO_JSON ?>) {
 					if (jQuery('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).is(':checked')) {
 						params.push(jQuery('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).val());
-					}
-					else {
-						params.push(0);
 					}
 				}
 				else {
@@ -70,7 +66,7 @@
 
 			steps.push(jQuery.extend({
 				type: type,
-				params: params.join("\n")
+				params: params
 			}, on_fail));
 		});
 

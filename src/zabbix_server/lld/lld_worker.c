@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -171,7 +171,6 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-
 ZBX_THREAD_ENTRY(lld_worker_thread, args)
 {
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
@@ -204,7 +203,6 @@ ZBX_THREAD_ENTRY(lld_worker_thread, args)
 	lld_register_worker(&lld_socket);
 
 	time_stat = zbx_time();
-
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 

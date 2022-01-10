@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,10 +18,15 @@
 **/
 
 
+const ZBX_TEXTAREA_COLOR_WIDTH = 96;
+
 (function($) {
 	var overlay,
 		colorbox,
 		input,
+		$overlay_input,
+		$overlay_colorbox,
+		$button_use_default,
 		defaults = {
 			'palette': [
 				['FF0000','FF0080','BF00FF','4000FF','0040FF','0080FF','00BFFF','00FFFF','00FFBF','00FF00','80FF00','BFFF00','FFFF00','FFBF00','FF8000','FF4000','CC6600','666699'],
@@ -44,12 +49,45 @@
 		},
 		/**
 		 * Click handler for every colorpicker cell.
+		 *
+		 * @param {string} color
 		 */
-		setColorHandler = function() {
-			methods.set_color($(this).attr('title').substr(1));
+		setColorHandler = function (color) {
+			methods.set_color(color);
 			input.trigger('change');
 			methods.hide();
 		},
+
+		/**
+		 * Set color to the overlay input colorbox.
+		 *
+		 * @param {string} color
+		 */
+		setPreviewColor = function (color) {
+			color = $.trim(color).toUpperCase();
+
+			$overlay_input.val(color);
+
+			if (input.data('use_default') && color.length == 0) {
+				$overlay_colorbox
+					.css({'color': '', 'background': ''})
+					.attr('title', t('Use default'))
+					.addClass('use-default');
+			}
+			else if (/^[0-9A-F]{6}$/i.test(color)) {
+				$overlay_colorbox
+					.css({'color': '#' + color, 'background': '#' + color})
+					.attr('title', '#' + color)
+					.removeClass('use-default');
+			}
+			else {
+				$overlay_colorbox
+					.css({'color': '', 'background': ''})
+					.attr('title', t('Use default'))
+					.removeClass('use-default');
+			}
+		},
+
 		/**
 		 * Calculates top and left position for colorpicker overlay element.
 		 */
@@ -95,27 +133,75 @@
 			 * Initialization of colorpicker overlay.
 			 *
 			 * @param object         options
-			 * @param array          options.palette   Array of arrays. Every nested array contains hex color for one
-			 *                                         cell.
+			 * @param array          options.palette   Every nested array contains hex color for one cell.
 			 * @param string|object  options.appendTo  Target element where overlay should be appended.
-			 * @param function       options.onUpdate  Callback function to execute once color has changed.
 			 */
 			init: function(options) {
-				var close = $('<button type="button" class="overlay-close-btn" title="' + t('S_CLOSE') + '"/>')
+				const $close = $('<button>', {
+					type: 'button',
+					class: 'overlay-close-btn',
+					title: t('S_CLOSE')
+				})
 					.click(methods.hide);
-				options = $.extend(defaults, options || {});
-				overlay = $('<div class="overlay-dialogue" id="color_picker"/>')
-					.append(close)
-					.append(
-					$.map(options.palette, function(colors) {
-						return $('<div class="color-picker"/>').append(
-							$.map(colors, function(color) {
-								return $('<div style="background: #%s" title="#%s"/>'.replace(/%s/g, color));
-							})
-						);
+
+				$overlay_input = $('<input>', {
+					type: 'text',
+					autofocus: 'autofocus',
+					maxlength: 6
+				})
+					.css('width', ZBX_TEXTAREA_COLOR_WIDTH + 'px')
+					.on('input keydown paste', e => {
+						const color = e.target.value;
+						if (color.length == 0 || color.length == 6) {
+							setPreviewColor(color);
+						}
 					})
+					.keyup(event => {
+						if (event.keyCode == 13) {
+							const color = event.target.value;
+
+							if (color.length == 0 || color.length == 6) {
+								setColorHandler(color);
+							}
+						}
+					});
+
+				$overlay_colorbox = $('<div>', {'data-use-default': t('D')});
+
+				$button_use_default = $('<button>', {
+					type: 'button',
+					class: 'btn-alt',
+					title: t('Use default'),
+					'aria-label': t('Use default')
+				})
+					.html(t('Use default'))
+					.on('click', () => setColorHandler(''));
+
+				options = $.extend(defaults, options || {});
+				overlay = $('<div>', {
+					class: 'overlay-dialogue',
+					id: 'color_picker'
+				})
+					.append($close)
+					.append($('<div>', {class: 'color-picker-controls'}).append([
+						$('<div>', {class: 'input-color-picker'}).append([$overlay_colorbox, $overlay_input]),
+						$('<div>', {class: 'form-input-margin'}),
+						$button_use_default
+					]))
+					.append(
+						$.map(options.palette, (colors) => {
+							return $('<div>', {class: 'color-picker'}).append(
+								$.map(colors, (color) => {
+									return $('<div>', {'title': '#' + color})
+										.css('background', '#' + color)
+										.data('color', color);
+								})
+							);
+						})
 					)
-					.on('click', '.color-picker div', setColorHandler);
+					.on('click', '.color-picker div', function () {
+						setColorHandler($(this).data('color'));
+					});
 
 				overlay.appendTo($(options.appendTo));
 
@@ -156,6 +242,15 @@
 					'display': 'block'
 				});
 
+				if (input.data('use_default')) {
+					$button_use_default.show();
+				}
+				else {
+					$button_use_default.hide();
+				}
+
+				setPreviewColor(input.val());
+
 				addToOverlaysStack('color_picker', target, 'color_picker');
 
 				Overlay.prototype.recoverFocus.call({'$dialogue': overlay});
@@ -163,19 +258,30 @@
 			},
 			/**
 			 * Set color as background color value of colorbox and as value for input.
-			 * Hides opened colorpicker overlay.
 			 *
 			 * @param string color    Desired hex color.
 			 */
 			set_color: function(color) {
-				var color = $.trim(color).toUpperCase(),
-					background = /[0-9A-F]{6}/.test(color) ? '#' + color : '';
+				color = $.trim(color).toUpperCase();
 
-				colorbox.css({
-					'color': background,
-					'background': background,
-				})
-				.attr('title', background);
+				if (input.data('use_default') && color.length == 0) {
+					colorbox
+						.css({'color': '', 'background': ''})
+						.attr('title', t('Use default'))
+						.addClass('use-default');
+				}
+				else if (/^[0-9A-F]{6}$/i.test(color)) {
+					colorbox
+						.css({'color': '#' + color, 'background': '#' + color})
+						.attr('title', '#' + color)
+						.removeClass('use-default');
+				}
+				else {
+					colorbox
+						.css({'color': '', 'background': ''})
+						.attr('title', t('Use default'))
+						.removeClass('use-default');
+				}
 
 				input.val(color);
 			},
@@ -216,32 +322,49 @@
 			methods.init(options);
 		}
 
-		return this.each(function(_, element) {
-			var id = $(element).attr('id'),
-				callback = (options && 'onUpdate' in options) ? options.onUpdate : null;
+		/*
+		 * Initialization of each separate colorpicker element.
+		 *
+		 * @param {object}    options
+		 * @param {bool}      options.use_default  Target element where overlay should be appended.
+		 * @param {callable}  options.onUpdate     Callback function to execute once color has changed.
+		 */
+		return this.each(function (_, element) {
+			const id = $(element).attr('id');
+			const callback = (options && 'onUpdate' in options) ? options.onUpdate : null;
+
 			if ($('#lbl_' + id).length) {
 				// Prevent multiple initialization on same element.
 				return;
 			}
 
-			$('<div/>').attr({
-				'id': 'lbl_' + id,
-				'title': element.value ? '#' + element.value : ''
-			}).click(function(event) {
-				/**
-				 * Prefix 'lbl_' should be striped out of colorbox id attribute value to get id of associated
-				 * input element.
-				 */
-				methods.show($(this).attr('id').substr(4), event);
-			}).insertAfter(element);
-			$(element).change(function() {
-				/**
-				 * Id attribute value of input element can be changed dynamically, for example when row with colorpicker
-				 * is sorted in graph configuration form.
-				 */
-				methods.set_color_by_id($(element).attr('id'), this.value);
-				callback && callback.call(element, this.value);
-			});
+			$('<div>')
+				.attr({
+					id: 'lbl_' + id,
+					tabindex: 0,
+					title: element.value ? '#' + element.value : '',
+					'data-use-default': t('D')
+				})
+				.on('click', (event) => {
+					/**
+					 * Prefix 'lbl_' should be striped out of colorbox id attribute value to get id of associated input
+					 * element.
+					 */
+					methods.show(id, event);
+				})
+				.insertAfter(element)
+				.keyup(event => (event.keyCode == 32) ? methods.show(id, event) : null);
+
+			$(element)
+				.data('use_default', (options && 'use_default' in options))
+				.change(function () {
+					/**
+					 * Id attribute value of input element can be changed dynamically, for example when row with
+					 * colorpicker is sorted in graph configuration form.
+					 */
+					methods.set_color_by_id($(element).attr('id'), this.value);
+					callback && callback.call(element, this.value);
+				});
 
 			methods.set_color_by_id(id, element.value);
 		});

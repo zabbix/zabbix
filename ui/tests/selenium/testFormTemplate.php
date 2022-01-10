@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@ class testFormTemplate extends CLegacyWebTest {
 					'name' => 'Selenium Test Template',
 					'error_msg' => 'Cannot add template',
 					'errors' => [
-						'Template "Selenium Test Template" already exists.'
+						'Template with the same name "Selenium Test Template" already exists.'
 					]
 
 				]

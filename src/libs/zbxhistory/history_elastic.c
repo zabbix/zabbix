@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -319,8 +319,6 @@ static int	elastic_is_error_present(zbx_httppage_t *page, char **err)
  * common sql service support                                                                                     *
  *                                                                                                                *
  ******************************************************************************************************************/
-
-
 
 /************************************************************************************
  *                                                                                  *
@@ -841,7 +839,6 @@ static int	elastic_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid, in
 			ret = FAIL;
 			goto out;
 		}
-
 
 		zabbix_log(LOG_LEVEL_DEBUG, "elasticsearch closing scroll %s", data->post_url);
 

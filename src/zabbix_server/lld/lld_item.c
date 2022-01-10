@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1331,7 +1331,7 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 	int		ret = SUCCEED;
 	zbx_token_t	token;
 	char		err[MAX_STRING_LEN], *errmsg = NULL;
-	char		param1[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *param2;
+	char		param1[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *param2, *param3;
 	const char	*regexp_err = NULL;
 	zbx_uint64_t	value_ui64;
 	zbx_jsonpath_t	jsonpath;
@@ -1363,6 +1363,7 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 			if (FAIL == (ret = zbx_regexp_compile(param1, NULL, &regexp_err)))
 			{
 				zbx_strlcpy(err, regexp_err, sizeof(err));
+				zbx_regexp_err_msg_free(regexp_err);
 			}
 			break;
 		case ZBX_PREPROC_JSONPATH:
@@ -1433,7 +1434,10 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 			/* break; is not missing here */
 		case ZBX_PREPROC_VALIDATE_NOT_REGEX:
 			if (FAIL == (ret = zbx_regexp_compile(pp->params, NULL, &regexp_err)))
+			{
 				zbx_strlcpy(err, regexp_err, sizeof(err));
+				zbx_regexp_err_msg_free(regexp_err);
+			}
 			break;
 		case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 			if (SUCCEED != str2uint64(pp->params, "smhdw", &value_ui64) || 0 == value_ui64)
@@ -1452,6 +1456,14 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 			}
 			*param2++ = '\0';
 
+			if (NULL == (param3 = strchr(param2, '\n')))
+			{
+				zbx_snprintf(err, sizeof(err), "cannot find third parameter: %s", pp->params);
+				ret = FAIL;
+				break;
+			}
+			*param3++ = '\0';
+
 			if (FAIL == zbx_prometheus_validate_filter(param1, &errmsg))
 			{
 				zbx_snprintf(err, sizeof(err), "invalid pattern: %s", param1);
@@ -1460,9 +1472,17 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 				break;
 			}
 
-			if (FAIL == zbx_prometheus_validate_label(param2))
+			if (0 != strcmp(param2, "value") && 0 != strcmp(param2, "label") &&
+					0 != strcmp(param2, "function"))
 			{
-				zbx_snprintf(err, sizeof(err), "invalid label name: %s", param2);
+				zbx_snprintf(err, sizeof(err), "invalid second parameter: %s", param2);
+				ret = FAIL;
+				break;
+			}
+
+			if (FAIL == zbx_prometheus_validate_label(param3))
+			{
+				zbx_snprintf(err, sizeof(err), "invalid label name: %s", param3);
 				ret = FAIL;
 				break;
 			}
@@ -1917,7 +1937,8 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 
 	item->name = zbx_strdup(NULL, item_prototype->name);
 	item->name_proto = NULL;
-	substitute_lld_macros(&item->name, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&item->name, jp_row, lld_macro_paths, ZBX_TOKEN_LLD_MACRO | ZBX_TOKEN_LLD_FUNC_MACRO,
+			NULL, 0);
 	zbx_lrtrim(item->name, ZBX_WHITESPACE);
 
 	delay = item_prototype->delay;
@@ -2134,7 +2155,8 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	buffer = zbx_strdup(buffer, item_prototype->name);
-	substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_TOKEN_LLD_MACRO | ZBX_TOKEN_LLD_FUNC_MACRO, NULL,
+			0);
 	zbx_lrtrim(buffer, ZBX_WHITESPACE);
 	if (0 != strcmp(item->name, buffer))
 	{
@@ -2526,7 +2548,7 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, zbx_vector_p
 
 			if (0 == strcmp(item->key, buffer) &&
 					SUCCEED == lld_validate_item_override_no_discover(&lld_row->overrides,
-					item->name))
+					item->name, item_prototype->discover))
 			{
 				item_index_local.parent_itemid = item->parent_itemid;
 				item_index_local.lld_row = lld_row;
@@ -3511,7 +3533,6 @@ static void lld_item_discovery_prepare_update(const zbx_lld_item_prototype_t *it
 		DBexecute_overflowed_sql(sql, sql_alloc, sql_offset);
 	}
 }
-
 
 /******************************************************************************
  *                                                                            *

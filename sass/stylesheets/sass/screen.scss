@@ -6,8 +6,8 @@ $ui-transitions: true !default;
 $ui-transition-duration: .3s !default;
 
 // Sprite path
-$sprite-path: '../img/icon-sprite.svg?20200407';
-$browser-sprite-path: '../img/browser-sprite.png?20200407';
+$sprite-path: '../img/icon-sprite.svg?20211222';
+$browser-sprite-path: '../img/browser-sprite.png?20211222';
 
 @import "utils/mixins";
 
@@ -28,7 +28,8 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 @import "layout/form-grid";
 
 @import "components/buttons";
-@import "components/dashboard";
+@import "components/dashboard/dashboard";
+@import "components/dashboard/widget-item";
 @import "components/diff";
 @import "components/form-search";
 @import "components/inline-filter";
@@ -40,6 +41,8 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 @import "components/tabfilter";
 @import "components/toc";
 @import "components/z-select";
+
+@import "components/dashboard/widget-slareport";
 
 .link-action {
 	border-bottom: 1px dotted;
@@ -595,6 +598,11 @@ form {
 			span {
 				margin: 0;
 			}
+		}
+
+		.vertical {
+			writing-mode: vertical-lr;
+			transform: rotate(180deg);
 		}
 
 		a {
@@ -1460,12 +1468,6 @@ form {
 		}
 	}
 
-	.form-fields-inline {
-		label {
-			margin: 0 8px 0 3px;
-		}
-	}
-
 	h4 {
 		margin-bottom: -5px;
 	}
@@ -1701,6 +1703,12 @@ select {
 		color: $font-color !important;
 		pointer-events: none;
 		@extend %form-disabled;
+	}
+}
+
+.form-fields-inline {
+	label {
+		margin: 0 8px 0 3px;
 	}
 }
 
@@ -2165,7 +2173,7 @@ $icon-widget-btn: (
 		background-image: none;
 
 		&::after {
-			background: url($sprite-path) no-repeat -398px -407px;
+			background: url($sprite-path) no-repeat -431px -621px;
 		}
 	}
 
@@ -2214,7 +2222,7 @@ $icon-widget-btn: (
 
 		.btn-info {
 			&::after {
-				background-position: -398px -430px;
+				background-position: -279px -621px;
 				top: 1px;
 			}
 		}
@@ -4313,36 +4321,63 @@ td.inactive-bg {
 }
 
 .input-color-picker {
-	position: relative;
 	display: inline-block;
+	vertical-align: middle;
 
 	div {
-		position: absolute;
-		top: 2px;
-		left: 2px;
 		width: 18px;
 		height: 18px;
-		border: 1px solid $form-border-color;
 		background: url($sprite-path) no-repeat -323px -411px;
+		border: 1px solid $form-border-color;
+		margin: 1px;
 		cursor: pointer;
+
+		&:focus {
+			border-color: $form-border-focus-color;
+			outline: none;
+		}
 	}
 
-	input[readonly],
-	input:disabled {
-		color: $form-disabled-font-color !important;
+	div.use-default {
+		background: none;
+		position: relative;
 
-		+ div {
-			cursor: default;
+		&::after {
+			content: attr(data-use-default);
+			position: absolute;
+			text-align: center;
+			line-height: 18px;
+			right: 0;
+			left: 0;
 		}
 	}
 
 	input:disabled + div {
+		cursor: default;
 		background: $form-disabled-font-color !important;
-		border: 1px solid $form-disabled-font-color;
+		border-color: $form-disabled-font-color;
 	}
 
 	input[type="text"] {
 		padding-left: 25px;
+	}
+}
+
+.color-picker-controls {
+	margin-bottom: 5px;
+
+	.input-color-picker {
+		position: relative;
+		cursor: default;
+		margin-top: -2px;
+
+		div {
+			position: absolute;
+			border-width: 1px;
+			margin: 0px;
+			left: 2px;
+			top: 2px;
+		}
 	}
 }
 
@@ -4415,6 +4450,23 @@ button {
 		&::before {
 			background: none;
 		}
+
+		&::after {
+			box-shadow: none;
+			background: none;
+			border: 1px solid $preloader-disabled-color;
+			border-bottom-color: $preloader-accent-color;
+			width: 12px;
+			height: 12px;
+		}
+	}
+}
+
+.link-action {
+	&.is-loading {
+		position: relative;
+		color: transparent !important;
+		border-bottom-color: transparent;
 
 		&::after {
 			box-shadow: none;
@@ -4525,6 +4577,8 @@ $browser-logos: (
 
 // TODO: Legacy
 %webkit-scrollbar {
+	scrollbar-width: thin;
+
 	&::-webkit-scrollbar {
 		width: 9px;
 	}
@@ -4969,7 +5023,6 @@ svg {
 		min-width: 0; // https://stackoverflow.com/a/43361500
 	}
 
-	input[type=text],
 	.btn-link {
 		&:not(:last-of-type) {
 			margin-right: 10px;
@@ -5005,6 +5058,17 @@ svg {
 
 	.step-parameters {
 		flex: 1;
+
+		z-select {
+			flex: 0 0 auto;
+		}
+
+		> input[type=text],
+		z-select {
+			&:not(:last-child) {
+				margin-right: 5px;
+			}
+		}
 	}
 
 	.step-on-fail {
@@ -5254,25 +5318,39 @@ svg {
 			animation: fadein .5s;
 		}
 	}
+}
 
-	.problem-icon-list {
-		flex-wrap: nowrap;
+.problem-icon-link,
+.problem-icon-list {
+	display: inline-flex;
+	margin: 1px 0;
+
+	.problem-icon-list-item {
+		color: $btn-font-color;
+		font-size: 12px;
+		line-height: 1;
+		padding: 3px 5px 2px;
+	}
+}
+
+.problem-icon-link {
+	overflow: hidden;
+	border-radius: 3px;
+
+	&:link,
+	&:hover,
+	&:focus {
+		border-bottom: none;
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 2px rgba($blue, .35);
 	}
 }
 
 .problem-icon-list {
-	display: flex;
-	flex-wrap: wrap;
-
 	.problem-icon-list-item {
 		border-radius: 3px;
-		color: $btn-font-color;
-		display: inline-block;
-		flex: 0 0 7px;
-		font-size: 12px;
-		line-height: 1;
-		padding: 3px 4px 2px;
-		margin: 1px 0;
 
 		&:not(:last-of-type) {
 			margin-right: 5px;
@@ -5364,11 +5442,12 @@ button {
 [data-count][class*='icon-']::after,
 .icon-description::after {
 	position: absolute;
+	top: -2px;
 	content: attr(data-count);
 	text-align: center;
-	margin-top: -2px;
 	font-size: 9px;
 	letter-spacing: -.25px;
+	line-height: 18px;
 	width: 18px;
 }
 
@@ -6220,7 +6299,7 @@ $range-input-width: 31px;
 	.table-col-function { width: 85px; }
 	.table-col-draw-style { width: 85px; }
 	.table-col-y-axis-side { width: 85px; }
-	.table-col-colour { width: 105px; }
+	.table-col-colour { width: 55px; }
 	.table-col-action { width: 55px; }
 }
 
@@ -6453,7 +6532,7 @@ z-select,
 // Geomap widget.
 .geomap-filter-button,
 .navigate-home-button {
-	background-image: url('../img/icon-sprite.svg');
+	background-image: url($sprite-path);
 	background-repeat: no-repeat;
 }
 .geomap-filter-button {
@@ -6506,4 +6585,8 @@ z-select,
 			opacity: .4;
 		}
 	}
+}
+.leaflet-container {
+	height: 100%;
+	z-index: 1;
 }

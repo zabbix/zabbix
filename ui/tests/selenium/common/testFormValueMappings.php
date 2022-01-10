@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -105,7 +105,7 @@ class testFormValueMappings extends CWebTest {
 
 		// Check types.
 		$value_column = $row->getColumn('Value')->query('xpath:.//input')->one();
-		$dropdown = $row->query('name:mappings[1][type]')->one()->asZDropdown();
+		$dropdown = $row->query('name:mappings[1][type]')->asZDropdown()->one();
 		$types = ['equals', 'is greater than or equals', 'is less than or equals', 'in range', 'regexp', 'default'];
 		$this->assertEquals($types, $dropdown->getOptions()->asText());
 

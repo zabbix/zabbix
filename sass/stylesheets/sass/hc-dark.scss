@@ -100,6 +100,7 @@ $menu-main-icons: (
 	dashboard: -600px -664px,
 	problems: -600px -688px,
 	monitoring: -600px -712px,
+	services: -600px -832px,
 	inventory: -600px -736px,
 	reports: -600px -760px,
 	configuration: -600px -784px,
@@ -172,6 +173,7 @@ $msg-warning-border-color: #ffb319;
 $btn-font-color: #333333;
 $btn-bg-color: #e0e0e0;
 $btn-border-color: #333333;
+$btn-border-focus-color: #ffffff;
 
 $btn-alt-font-color: #ffffff;
 $btn-alt-bg-color: transparent;
@@ -235,6 +237,11 @@ $diff-removed-bg-color: transparent;
 
 // Text
 $text-placeholder-color: #000000;
+
+// Change indicators.
+$arrow-fill-up: #FFFFFF;
+$arrow-fill-down: #FFFFFF;
+$arrow-fill-up-down: #FFFFFF;
 
 // Important! @import string should come after variables.
 @import 'screen.scss';
@@ -1200,6 +1207,12 @@ td.inactive-bg {
 
 // Time selection.
 .ui-tabs-nav {
+	.btn-info {
+		&::after {
+			background-position: -279px -621px;
+		}
+	}
+
 	.btn-time {
 		&::after {
 			background-position: -246px -583px;
@@ -1241,6 +1254,12 @@ td.inactive-bg {
 	}
 
 	.ui-tabs-active {
+		.btn-info {
+			&::after {
+				background-position: -431px -621px;
+			}
+		}
+
 		.btn-time {
 			&::after {
 				background-position: -87px -583px;
@@ -1387,6 +1406,13 @@ td.inactive-bg {
 	}
 }
 
+.problem-icon-link {
+	&:focus {
+		box-shadow: 0 0 0 2px $blue;
+	}
+}
+
+.problem-icon-link,
 .problem-icon-list {
 	.problem-icon-list-item {
 		background: transparent;

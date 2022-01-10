@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -324,7 +324,6 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_send_task_data                                               *
@@ -421,4 +420,3 @@ void	free_proxy_history_lock(void)
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
 		zbx_mutex_destroy(&proxy_lock);
 }
-

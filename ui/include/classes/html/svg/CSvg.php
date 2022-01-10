@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,6 +31,10 @@ class CSvg extends CSvgTag {
 	}
 
 	protected function startToString() {
+		if (!$this->styles) {
+			return parent::startToString();
+		}
+
 		$styles = "\n";
 		$scope = '#'.$this->getAttribute('id').' ';
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -125,13 +125,10 @@ func (p *UserParameterPlugin) Export(key string, params []string, ctx plugin.Con
 }
 
 func InitUserParameterPlugin(userParameterConfig []string, unsafeUserParameters int, userParameterDir string) (keys []string, err error) {
-	userParameter.parameters = make(map[string]*parameterInfo)
-	userParameter.unsafeUserParameters = unsafeUserParameters
-	userParameter.userParameterDir = userParameterDir
+	params := make(map[string]*parameterInfo)
 
 	for i := 0; i < len(userParameterConfig); i++ {
 		s := strings.SplitN(userParameterConfig[i], ",", 2)
-
 		if len(s) != 2 {
 			return nil, fmt.Errorf("cannot add user parameter \"%s\": not comma-separated", userParameterConfig[i])
 		}
@@ -157,9 +154,16 @@ func InitUserParameterPlugin(userParameterConfig []string, unsafeUserParameters 
 			return nil, fmt.Errorf("cannot add user parameter \"%s\": syntax error", userParameterConfig[i])
 		}
 
-		userParameter.parameters[key] = parameter
-		plugin.RegisterMetrics(&userParameter, "UserParameter", key, fmt.Sprintf("User parameter: %s.", s[1]))
+		params[key] = parameter
 		keys = append(keys, key)
+	}
+
+	userParameter.parameters = params
+	userParameter.unsafeUserParameters = unsafeUserParameters
+	userParameter.userParameterDir = userParameterDir
+
+	for _, key := range keys {
+		plugin.RegisterMetrics(&userParameter, "UserParameter", key, fmt.Sprintf("User parameter: %s.", userParameter.parameters[key].cmd))
 	}
 
 	return keys, nil

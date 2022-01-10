@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -99,6 +99,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			 */
 			$steps = $this->getInput('steps', []);
 			if ($ret && $steps) {
+				$steps = normalizeItemPreprocessingSteps($steps);
 				$steps_validation_response = $this->preproc_item->validateItemPreprocessingSteps($steps);
 				if ($steps_validation_response !== true) {
 					error($steps_validation_response);
@@ -136,6 +137,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 
 		// Work with preprocessing steps.
 		$preprocessing_steps_input = $this->getInput('steps', []);
+		$preprocessing_steps_input = normalizeItemPreprocessingSteps($preprocessing_steps_input);
 		$preprocessing_steps = [];
 		foreach ($preprocessing_steps_input as $preproc) {
 			if ($preproc['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {

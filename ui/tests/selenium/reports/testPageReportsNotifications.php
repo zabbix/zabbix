@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,13 +34,24 @@ class testPageReportsNotifications extends CLegacyWebTest {
 		foreach (CDBHelper::getAll('SELECT name FROM media_type ORDER BY LOWER(name) ASC') as $name) {
 			$all_media[] = $name['name'];
 		}
-		$this->zbxTestDropdownHasOptions('media_type', $all_media);
-		$this->zbxTestDropdownHasOptions('period', ['Daily', 'Weekly', 'Monthly', 'Yearly']);
-		$this->zbxTestDropdownHasOptions('year', ['2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020']);
-		// Check default selected dropdown values
-		$this->zbxTestDropdownAssertSelected('media_type', 'all');
-		$this->zbxTestDropdownAssertSelected('period', 'Weekly');
-		$this->zbxTestDropdownAssertSelected('year', date('Y'));
+		$dropdowns = [
+			'media_type' => array_merge(['all'], $all_media),
+			'period' => ['Daily', 'Weekly', 'Monthly', 'Yearly'],
+			'year' => ['2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022']
+		];
+		$default_selected = [
+			'media_type' => 'all',
+			'period' => 'Weekly',
+			'year' => date('Y')
+		];
+
+		foreach ($dropdowns as $name => $options) {
+			$dropdown = $this->query('name', $name)->asZDropdown()->one();
+			// Check dropdown options.
+			$this->assertEquals($options, $dropdown->getOptions()->asText());
+			// Check default selected dropdown values
+			$this->assertEquals($default_selected[$name], $dropdown->getText());
+		}
 
 		// Get users from DB
 		$user_alias = [];
@@ -158,7 +169,7 @@ class testPageReportsNotifications extends CLegacyWebTest {
 
 		// Select period
 		if (array_key_exists('period', $data)) {
-			$this->zbxTestDropdownSelectWait('period', $data['period']);
+			$this->query('name:period')->asZDropdown()->one()->select($data['period']);
 			sleep(3);
 			if ($data['period'] === 'Yearly') {
 				$this->zbxTestAssertElementNotPresentId('year');
@@ -167,12 +178,12 @@ class testPageReportsNotifications extends CLegacyWebTest {
 
 		// Select year
 		if (array_key_exists('year', $data)) {
-			$this->zbxTestDropdownSelectWait('year', $data['year']);
+			$this->query('name:year')->asZDropdown()->one()->select($data['year']);
 		}
 
 		// Select media
 		if (array_key_exists('media_type', $data)) {
-			$this->zbxTestDropdownSelectWait('media_type', $data['media_type']);
+			$this->query('name:media_type')->asZDropdown()->one()->select($data['media_type']);
 			$this->zbxTestAssertElementNotPresentId('year');
 			// Check media links not displayed
 			$media_types = [];

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -102,6 +102,7 @@ if ($data['item_required']) {
 $function_select = (new CSelect('function_select'))
 	->setFocusableElementId('label-function')
 	->setId('function-select')
+	->setAttribute('autofocus', 'autofocus')
 	->setValue($data['function_type'].'_'.$data['function']);
 
 $function_types = [
@@ -181,7 +182,16 @@ if (array_key_exists('params', $data['functions'][$data['selectedFunction']])) {
 				$param_type_element = _('Period');
 			}
 
-			$param_field = (new CTextBox('params['.$param_name.']', $param_value))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
+			if (array_key_exists('options', $param_function)) {
+				$param_field = (new CSelect('params['.$param_name.']'))
+					->setValue($param_value)
+					->addOptions(CSelect::createOptionsFromArray($param_function['options']));
+			}
+			else {
+				$param_field = new CTextBox('params['.$param_name.']', $param_value);
+			}
+
+			$param_field->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 
 			if ($param_name === 'period_shift') {
 				$param_field->setAttribute('placeholder', 'now/h');
@@ -197,9 +207,18 @@ if (array_key_exists('params', $data['functions'][$data['selectedFunction']])) {
 			]);
 		}
 		else {
-			$expression_form_list->addRow($label,
-				(new CTextBox('params['.$param_name.']', $param_value))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			);
+			if (array_key_exists('options', $param_function)) {
+				$param_field = (new CSelect('params['.$param_name.']'))
+					->setValue($param_value)
+					->addOptions(CSelect::createOptionsFromArray($param_function['options']));
+			}
+			else {
+				$param_field = new CTextBox('params['.$param_name.']', $param_value);
+			}
+
+			$param_field->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
+			$expression_form_list->addRow($label, $param_field);
+
 			if ($paramid === 0) {
 				$expression_form->addItem((new CVar('paramtype', PARAM_TYPE_TIME))->removeId());
 			}

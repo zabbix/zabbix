@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,8 +32,6 @@
  * Return value: If the function succeeds, then return SHM ID                 *
  *               -1 on an error                                               *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  ******************************************************************************/
 int	zbx_shm_create(size_t size)
 {
@@ -59,8 +57,6 @@ int	zbx_shm_create(size_t size)
  *                                                                            *
  * Return value: If the function succeeds, then return 0                      *
  *               -1 on an error                                               *
- *                                                                            *
- * Author: Andrea Biscuola                                                    *
  *                                                                            *
  ******************************************************************************/
 int	zbx_shm_destroy(int shmid)

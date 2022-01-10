@@ -2,7 +2,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -141,10 +141,6 @@ class CDataHelper extends CAPIHelper {
 		$items = [];
 		$discoveryrules = [];
 		foreach ($params as &$param) {
-			if ($object === 'template') {
-				$param['status'] = HOST_STATUS_TEMPLATE;
-			}
-
 			if (array_key_exists('items', $param)) {
 				$items[$param['host']] = $param['items'];
 				unset($param['items']);

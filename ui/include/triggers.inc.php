@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1642,6 +1642,8 @@ function get_item_function_info(string $expr) {
 
 	$hist_functions = [
 		'avg' => $rules['numeric_as_float'],
+		'baselinedev' => $rules['numeric_as_float'],
+		'baselinewma' => $rules['numeric_as_float'],
 		'change' => $rules['numeric'] + $rules['string_as_0or1'],
 		'count' => $rules['numeric_as_uint'] + $rules['string_as_uint'],
 		'changecount' => $rules['numeric_as_uint'] + $rules['string_as_uint'],

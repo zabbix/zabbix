@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -110,6 +110,26 @@
 	?>
 </script>
 
+<script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-custom-prometheus-pattern">
+	<?= (new CTextBox('preprocessing[#{rowNum}][params][0]', ''))
+			->setAttribute('placeholder', '#{placeholder_0}').
+		(new CSelect('preprocessing[#{rowNum}][params][1]'))
+			->addOptions(CSelect::createOptionsFromArray([
+				ZBX_PREPROC_PROMETHEUS_VALUE => _('value'),
+				ZBX_PREPROC_PROMETHEUS_LABEL => _('label'),
+				ZBX_PREPROC_PROMETHEUS_SUM => 'sum',
+				ZBX_PREPROC_PROMETHEUS_MIN => 'min',
+				ZBX_PREPROC_PROMETHEUS_MAX => 'max',
+				ZBX_PREPROC_PROMETHEUS_AVG => 'avg',
+				ZBX_PREPROC_PROMETHEUS_COUNT => 'count'
+			]))
+			->addClass('js-preproc-param-prometheus-pattern-function').
+		(new CTextBox('preprocessing[#{rowNum}][params][2]', ''))
+			->setAttribute('placeholder', '#{placeholder_2}')
+			->setEnabled(false)
+	?>
+</script>
+
 <script type="text/javascript">
 	jQuery(function($) {
 		function makeParameterInput(index, type) {
@@ -117,7 +137,10 @@
 				preproc_param_double_tmpl = new Template($('#preprocessing-steps-parameters-double-tmpl').html()),
 				preproc_param_custom_width_chkbox_tmpl =
 					new Template($('#preprocessing-steps-parameters-custom-width-chkbox-tmpl').html()),
-				preproc_param_multiline_tmpl = new Template($('#preprocessing-steps-parameters-multiline-tmpl').html());
+				preproc_param_multiline_tmpl = new Template($('#preprocessing-steps-parameters-multiline-tmpl').html()),
+				preproc_param_prometheus_pattern_tmpl = new Template(
+					$('#preprocessing-steps-parameters-custom-prometheus-pattern').html()
+				);
 
 			switch (type) {
 				case '<?= ZBX_PREPROC_MULTIPLIER ?>':
@@ -189,12 +212,12 @@
 					});
 
 				case '<?= ZBX_PREPROC_PROMETHEUS_PATTERN ?>':
-					return $(preproc_param_double_tmpl.evaluate({
+					return $(preproc_param_prometheus_pattern_tmpl.evaluate({
 						rowNum: index,
 						placeholder_0: <?= json_encode(
 							_('<metric name>{<label name>="<label value>", ...} == <value>')
 						) ?>,
-						placeholder_1: <?= json_encode(_('<label name>')) ?>
+						placeholder_2: <?= json_encode(_('<label name>')) ?>
 					}));
 
 				case '<?= ZBX_PREPROC_PROMETHEUS_TO_JSON ?>':
@@ -426,6 +449,9 @@
 						.attr('placeholder', <?= json_encode(_('error message')) ?>)
 						.show();
 				}
+			})
+			.on('change', '.js-preproc-param-prometheus-pattern-function', function() {
+				$(this).next('input').prop('disabled', $(this).val() !== '<?= ZBX_PREPROC_PROMETHEUS_LABEL ?>');
 			});
 	});
 </script>

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -332,7 +332,7 @@ class CScreenProblem extends CScreenBase {
 
 		if ($show_opdata && $data['triggers']) {
 			$items = API::Item()->get([
-				'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units'],
+				'output' => ['itemid', 'name', 'value_type', 'units'],
 				'selectValueMap' => ['mappings'],
 				'triggerids' => array_keys($data['triggers']),
 				'webitems' => true,
@@ -586,11 +586,6 @@ class CScreenProblem extends CScreenBase {
 			// Sort items.
 			if ($filter['show_opdata'] != OPERATIONAL_DATA_SHOW_NONE) {
 				$data['triggers'] = CMacrosResolverHelper::sortItemsByExpressionOrder($data['triggers']);
-
-				foreach ($data['triggers'] as &$trigger) {
-					$trigger['items'] = CMacrosResolverHelper::resolveItemNames($trigger['items']);
-				}
-				unset($trigger);
 			}
 		}
 
@@ -1292,7 +1287,7 @@ class CScreenProblem extends CScreenBase {
 
 			if ($html) {
 				$hint_table->addRow([
-					new CCol($item['name_expanded']),
+					new CCol($item['name']),
 					new CCol(
 						($last_value['clock'] !== null)
 							? zbx_date2str(DATE_TIME_FORMAT_SECONDS, $last_value['clock'])

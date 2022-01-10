@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,6 +39,7 @@ $available_js_cripts = [
 	'class.widget.geomap.js' => 'widgets/',
 	'class.widget.graph.js' => 'widgets/',
 	'class.widget.graph-prototype.js' => 'widgets/',
+	'class.widget.item.js' => 'widgets/',
 	'class.widget.map.js' => 'widgets/',
 	'class.widget.navtree.js' => 'widgets/',
 	'class.widget.paste-placeholder.js' => 'widgets/',
@@ -392,7 +393,9 @@ $translate_strings = [
 		'Item type does not use interface' => _('Item type does not use interface')
 	],
 	'colorpicker.js' => [
-		'S_CLOSE' => _('Close')
+		'D' => _x('D', 'Default color option'),
+		'S_CLOSE' => _('Close'),
+		'Use default' => _('Use default')
 	],
 	'class.csvggraph.js' => [
 		'S_DISPLAYING_FOUND' => _('Displaying %1$s of %2$s found'),
