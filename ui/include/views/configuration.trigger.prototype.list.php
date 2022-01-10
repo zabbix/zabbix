@@ -200,7 +200,11 @@ $triggersForm->addItem([
 			],
 			'popup.massupdate.triggerprototype' => [
 				'content' => (new CButton('', _('Mass update')))
-					->onClick("return openMassupdatePopup(this, 'popup.massupdate.triggerprototype');")
+					->onClick(
+						"return openMassupdatePopup('popup.massupdate.triggerprototype', {}, {
+							dialogue_class: 'modal-popup-static'
+						});"
+					)
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->removeAttribute('id')
 			],

@@ -420,8 +420,8 @@ if ($data['single_host_selected']) {
 		$master_item[] = (new CButton('button', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->removeId()
-			->onClick('return PopUp("popup.generic",'.
-				json_encode([
+			->onClick(
+				'return PopUp("popup.generic", '.json_encode([
 					'srctbl' => 'items',
 					'srcfld1' => 'itemid',
 					'srcfld2' => 'name',
@@ -431,15 +431,15 @@ if ($data['single_host_selected']) {
 					'only_hostid' => $data['hostid'],
 					'with_webitems' => 1,
 					'normal_only' => 1
-				]).', null, this);'
+				]).', {dialogue_class: "modal-popup-generic"});'
 			);
 
 		$master_item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 		$master_item[] = (new CButton('button', _('Select prototype')))
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->removeId()
-			->onClick('return PopUp("popup.generic",'.
-				json_encode([
+			->onClick(
+				'return PopUp("popup.generic", '.json_encode([
 					'srctbl' => 'item_prototypes',
 					'srcfld1' => 'itemid',
 					'srcfld2' => 'name',
@@ -447,7 +447,7 @@ if ($data['single_host_selected']) {
 					'dstfld1' => 'master_itemid',
 					'dstfld2' => 'master_itemname',
 					'parent_discoveryid' => $data['parent_discoveryid']
-				]).', null, this);'
+				]).' {dialogue_class: "modal-popup-generic"});'
 			);
 	}
 
