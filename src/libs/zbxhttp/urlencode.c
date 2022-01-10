@@ -19,7 +19,7 @@
 
 #include "common.h"
 #include "log.h"
-//#include "zbxhttp.h"
+#include "zbxhttp.h"
 
 /******************************************************************************
  *                                                                            *

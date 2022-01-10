@@ -19,7 +19,7 @@
 
 //#include "zbxself.h"
 #include "common.h"
-//#include "selfmon.h"
+#include "selfmon.h"
 
 /******************************************************************************
  *                                                                            *

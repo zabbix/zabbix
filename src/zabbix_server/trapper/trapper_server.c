@@ -21,7 +21,7 @@
 #include "log.h"
 #include "cfg.h"
 //#include "zbxjson.h"
-//#include "trapper_request.h"
+#include "trapper_request.h"
 #include "comms.h"
 #include "trapper_auth.h"
 #include "zbxreport.h"

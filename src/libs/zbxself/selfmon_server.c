@@ -19,7 +19,7 @@
 
 //#include "zbxself.h"
 #include "common.h"
-//#include "selfmon.h"
+#include "selfmon.h"
 
 extern int	CONFIG_REPORTMANAGER_FORKS;
 extern int	CONFIG_REPORTWRITER_FORKS;
