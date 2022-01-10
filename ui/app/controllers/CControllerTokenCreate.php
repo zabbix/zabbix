@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,18 +20,19 @@
 **/
 
 
-class CControllerTokenCreate extends CController {
+class CControllerTokenCreate extends CController
+{
 
 	protected function checkInput() {
 		$fields = [
-			'name'          => 'db token.name|required|not_empty',
-			'description'   => 'db token.description',
-			'userid'        => 'db users.userid|required',
+			'name' 			=> 'db token.name|required|not_empty',
+			'description'	=> 'db token.description',
+			'userid' 		=> 'db users.userid|required',
 			'expires_state' => 'in 0,1|required',
-			'expires_at'    => 'range_time',
-			'status'        => 'db token.status|required|in '.ZBX_AUTH_TOKEN_ENABLED.','.ZBX_AUTH_TOKEN_DISABLED,
-			'action_src'    => 'fatal|required|in token.edit,user.token.edit',
-			'action_dst'    => 'fatal|required|in token.view,user.token.view'
+			'expires_at'	=> 'range_time',
+			'status' 		=> 'db token.status|required|in ' . ZBX_AUTH_TOKEN_ENABLED . ',' . ZBX_AUTH_TOKEN_DISABLED,
+			'action_src'	=> 'fatal|required|in token.edit,user.token.edit',
+			'action_dst' 	=> 'fatal|required|in token.view,user.token.view'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -62,6 +64,7 @@ class CControllerTokenCreate extends CController {
 	}
 
 	protected function doAction() {
+
 		$this->getInputs($token, ['name', 'description', 'userid', 'expires_at', 'status']);
 
 		$token['expires_at'] = $this->getInput('expires_state')
@@ -73,11 +76,15 @@ class CControllerTokenCreate extends CController {
 		if ($result) {
 			['tokenids' => $tokenids] = $result;
 			[['token' => $auth_token]] = API::Token()->generate($tokenids);
+			$output = [];
 
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgumentSID()
-				->setArgument('action', $this->getInput('action_dst'))
-			);
+			$success = ['title' => _('API token added')];
+
+			if ($messages = get_and_clear_messages()) {
+				$success['messages'] = array_column($messages, 'message');
+			}
+
+			$output['success'] = $success;
 
 			[$user] = (CWebUser::$data['userid'] != $token['userid'])
 				? API::User()->get([
@@ -86,25 +93,25 @@ class CControllerTokenCreate extends CController {
 				])
 				: [CWebUser::$data];
 
-			$response->setFormData([
+			$data = [
 				'name' => $token['name'],
 				'user' => getUserFullname($user),
 				'auth_token' => $auth_token,
 				'expires_at' => $token['expires_at'],
 				'description' => $token['description'],
 				'status' => $token['status']
-			]);
+			];
 
-			CMessageHelper::setSuccessTitle(_('API token added'));
-		}
-		else {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', $this->getInput('action_src'))
-			);
-			$response->setFormData($this->getInputAll());
-			CMessageHelper::setErrorTitle(_('Cannot add API token'));
+			$output['data'] = (new CPartial('administration.user.token.view.html', $data))->getOutput();
+
+		} else {
+			$output['error'] = [
+				'title' => _('Cannot add API token'),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
 		}
 
-		$this->setResponse($response);
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
+
 }

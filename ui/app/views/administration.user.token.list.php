@@ -68,9 +68,7 @@ $widget = (new CWidget())
 	->setTitleSubmenu(getUserSettingsSubmenu())
 	->setControls(
 		(new CTag('nav', true,
-			(new CList())->addItem(new CRedirectButton(_('Create API token'),
-				(new CUrl('zabbix.php'))->setArgument('action', 'user.token.edit'))
-			)
+			(new CList())->addItem((new CSimpleButton(_('Create API token')))->onClick('view.openUserTokenPopup({})'))
 		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem($filter);
@@ -109,10 +107,10 @@ $token_table = (new CTableInfo())
 	]);
 
 foreach ($data['tokens'] as $token) {
-	$name = new CLink($token['name'], (new CUrl('zabbix.php'))
+	$name = (new CLink($token['name'], (new CUrl('zabbix.php'))
 		->setArgument('action', 'user.token.edit')
 		->setArgument('tokenid', $token['tokenid'])
-	);
+	))->onClick('view.editUserToken(event, '.json_decode($token['tokenid']).')');
 
 	$token_table->addRow([
 		new CCheckBox('tokenids['.$token['tokenid'].']', $token['tokenid']),
@@ -150,7 +148,14 @@ $token_form->addItem([
 	new CActionButtonList('action', 'tokenids', [
 		'token.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected API tokens?')],
 		'token.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected API tokens?')],
-		'token.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected API tokens?')]
+		'token.delete' => [
+			'content' => (new CSimpleButton(_('Delete')))
+				->setAttribute('confirm', _('Delete selected API tokens?'))
+				->onClick('view.massDeleteUserToken(this);')
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('no-chkbxrange')
+				->removeAttribute('id')
+		]
 	], 'user.token')
 ]);
 

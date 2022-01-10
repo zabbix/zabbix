@@ -31,3 +31,108 @@
 			.trigger('change');
 	});
 </script>
+
+<script>
+	const view = {
+		editUserToken(e, tokenid) {
+			e.preventDefault();
+			const user_token_data = {tokenid};
+			this.openUserTokenPopup(user_token_data);
+		},
+
+		openUserTokenPopup(user_token_data) {
+			const original_url = location.href;
+
+			const overlay = PopUp('popup.user.token.edit', user_token_data, 'user_token_edit', document.activeElement);
+
+			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.userTokenSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.userTokenDelete, {once: true});
+			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+				history.replaceState({}, '', original_url);
+			}, {once: true});
+		},
+
+		massDeleteUserToken(button) {
+			const confirm_text = button.getAttribute('confirm');
+			if (!confirm(confirm_text)) {
+				return;
+			}
+
+			button.classList.add('is-loading');
+
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'token.delete');
+
+			fetch(curl.getUrl(), {
+				method: 'POST',
+				headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+				body: urlEncodeData({
+					tokenids: chkbxRange.getSelectedIds(),
+					action_src: 'user.token.list'
+				})
+			})
+				.then((response) => response.json())
+				.then((response) => {
+					const keepids = ('keepids' in response) ? response.keepids : [];
+
+					if ('error' in response) {
+						postMessageError(response.error.title);
+						postMessageDetails('error', response.error.messages);
+					}
+					else if('success' in response) {
+						postMessageOk(response.success.title);
+
+						if ('messages' in response.success) {
+							postMessageDetails('success', response.success.messages);
+						}
+					}
+
+					uncheckTableRows('user.token', keepids);
+					location.href = location.href;
+				})
+				.catch(() => {
+					const title = <?= json_encode(_('Unexpected server error.')) ?>;
+					const message_box = makeMessageBox('bad', [], title)[0];
+
+					clearMessages();
+					addMessage(message_box);
+				})
+				.finally(() => {
+					button.classList.remove('is-loading');
+				});
+		},
+
+
+
+		events: {
+			userTokenSuccess(e) {
+				const data = e.detail;
+
+				if ('success' in data) {
+					postMessageOk(data.success.title);
+
+					if ('messages' in data.success) {
+						postMessageDetails('success', data.success.messages);
+					}
+				}
+
+				location.href = location.href;
+			},
+
+			userTokenDelete(e) {
+				const data = e.detail;
+
+				if ('success' in data) {
+					postMessageOk(data.success.title);
+
+					if ('messages' in data.success) {
+						postMessageDetails('success', data.success.messages);
+					}
+				}
+
+				uncheckTableRows('hosts');
+				location.href = location.href;
+			}
+		}
+	}
+</script>

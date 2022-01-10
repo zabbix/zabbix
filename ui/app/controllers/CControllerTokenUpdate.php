@@ -70,22 +70,27 @@ class CControllerTokenUpdate extends CController {
 		$token['expires_at'] = $this->getInput('expires_state')
 			? (new DateTime($token['expires_at']))->getTimestamp()
 			: 0;
-
 		$result = API::Token()->update($token);
 
+		$output = [];
+
 		if ($result) {
+			$success = ['title' => _('API token updated')];
+
+			if ($messages = get_and_clear_messages()) {
+				$success['messages'] = array_column($messages, 'message');
+			}
+
+			$output['success'] = $success;
+
 			if ($this->hasInput('regenerate')) {
+
 				['tokenids' => $tokenids] = $result;
 				[['userid' => $userid]] = API::Token()->get([
 					'output' => ['userid'],
 					'tokenids' => $tokenids
 				]);
 				[['token' => $auth_token]] = API::Token()->generate($tokenids);
-
-				$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-					->setArgumentSID()
-					->setArgument('action', $this->getInput('action_dst'))
-				);
 
 				[$user] = (CWebUser::$data['userid'] != $userid)
 					? API::User()->get([
@@ -94,34 +99,26 @@ class CControllerTokenUpdate extends CController {
 					])
 					: [CWebUser::$data];
 
-				$response->setFormData([
+				$data = [
 					'name' => $token['name'],
 					'user' => getUserFullname($user),
 					'auth_token' => $auth_token,
 					'expires_at' => $token['expires_at'],
 					'description' => $token['description'],
-					'status' => $token['status']
-				]);
-			}
-			else {
-				$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-					->setArgument('action', $this->getInput('action_dst'))
-					->setArgument('page', CPagerHelper::loadPage($this->getInput('action_dst'), null))
-				);
-				$response->setFormData(['uncheck' => '1']);
-			}
+					'status' => $token['status'],
+					'regenerate' => '1'
+				];
 
-			CMessageHelper::setSuccessTitle(_('API token updated'));
+				$output['data'] = (new CPartial('administration.user.token.view.html', $data))->getOutput();
+			}
 		}
 		else {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', $this->getInput('action_src'))
-				->setArgument('tokenid', $this->getInput('tokenid'))
-			);
-			$response->setFormData($this->getInputAll());
-			CMessageHelper::setErrorTitle(_('Cannot update API token'));
+			$output['error'] = [
+				'title' => _('Cannot update API token'),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
 		}
 
-		$this->setResponse($response);
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }
