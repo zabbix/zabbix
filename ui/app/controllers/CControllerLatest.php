@@ -517,7 +517,8 @@ abstract class CControllerLatest extends CController {
 				$subfilter_options['tags'][$tag['tag']][$tag['value']] = [
 					'name' => $tag['value'],
 					'selected' => (array_key_exists($tag['tag'], $subfilter['tags'])
-										&& array_key_exists($tag['value'], $subfilter['tags'][$tag['tag']])),
+							&& array_key_exists($tag['value'], $subfilter['tags'][$tag['tag']])
+					),
 					'count' => 0
 				];
 			}
@@ -548,7 +549,9 @@ abstract class CControllerLatest extends CController {
 	}
 
 	/**
-	 * Calculate which items retrieved using the primary filter matches selected subfilter options.
+	 * Calculate which items retrieved using the primary filter matches selected subfilter options. Results are added to
+	 * the array stored with 'matching_subfilters' key for each retrieved item. Additionally 'has_data' flag is added to
+	 * each of retrieved item to indicate either particular item has data.
 	 *
 	 * @param array  $items
 	 * @param string $items[]['hostid']                           Item hostid.
@@ -556,12 +559,6 @@ abstract class CControllerLatest extends CController {
 	 * @param array  $items[]['tags']                             Items tags.
 	 * @param array  $items[]['tags'][]['tag']                    Items tag name.
 	 * @param array  $items[]['tags'][]['value']                  Items tag value.
-	 * @param bool   $items[]['has_data']                         Flag, either item has data.
-	 * @param array  $items[]['matching_subfilters']
-	 * @param bool   $items[]['matching_subfilters']['hostids']   Either item matches host subfilter.
-	 * @param bool   $items[]['matching_subfilters']['tagnames']  Either item matches tagname subfilter.
-	 * @param bool   $items[]['matching_subfilters']['tags']      Either item matches tags subfilter.
-	 * @param bool   $items[]['matching_subfilters']['data']      Either item matches data subfilter.
 	 * @param array  $subfilter
 	 * @param array  $subfilter['hostids']                        Selected subfilter hosts.
 	 * @param array  $subfilter['tagnames']                       Selected subfilter tagnames.
