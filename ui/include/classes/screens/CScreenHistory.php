@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -128,7 +128,7 @@ class CScreenHistory extends CScreenBase {
 		$output = [];
 
 		$items = API::Item()->get([
-			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'history', 'trends'],
+			'output' => ['itemid', 'name', 'key_', 'value_type'],
 			'selectHosts' => ['name'],
 			'selectValueMap' => ['mappings'],
 			'itemids' => $this->itemids,
@@ -141,8 +141,6 @@ class CScreenHistory extends CScreenBase {
 
 			return;
 		}
-
-		$items = CMacrosResolverHelper::resolveItemNames($items);
 
 		$iv_string = [
 			ITEM_VALUE_TYPE_LOG => 1,
@@ -232,7 +230,7 @@ class CScreenHistory extends CScreenBase {
 
 					if ($is_many_items) {
 						$row .= ' "'.$items[$history_row['itemid']]['hosts'][0]['name'].NAME_DELIMITER.
-							$items[$history_row['itemid']]['name_expanded'].'"';
+							$items[$history_row['itemid']]['name'].'"';
 					}
 					$output[] = $row;
 				}
@@ -345,7 +343,7 @@ class CScreenHistory extends CScreenBase {
 						->addClass($color);
 
 					if ($is_many_items) {
-						$row[] = (new CCol($host['name'].NAME_DELIMITER.$item['name_expanded']))
+						$row[] = (new CCol($host['name'].NAME_DELIMITER.$item['name']))
 							->addClass($color);
 					}
 
@@ -441,7 +439,7 @@ class CScreenHistory extends CScreenBase {
 			 */
 			else {
 				CArrayHelper::sort($items, [
-					['field' => 'name_expanded', 'order' => ZBX_SORT_UP]
+					['field' => 'name', 'order' => ZBX_SORT_UP]
 				]);
 				$table_header = [(new CColHeader(_('Timestamp')))->addClass(ZBX_STYLE_CELL_WIDTH)];
 				$history_data = [];
@@ -456,9 +454,9 @@ class CScreenHistory extends CScreenBase {
 						['field' => 'ns', 'order' => ZBX_SORT_DOWN]
 					]);
 
-					$table_header[] = (new CColHeader($item['name_expanded']))
+					$table_header[] = (new CColHeader($item['name']))
 						->addClass('vertical_rotation')
-						->setTitle($item['name_expanded']);
+						->setTitle($item['name']);
 					$history_data_index = 0;
 
 					foreach ($item_data as $item_data_row) {

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -266,14 +266,13 @@ class CControllerPopupTriggerWizard extends CController {
 			// Resolve item name.
 			if ($page_options['itemid']) {
 				$items = API::Item()->get([
-					'output' => ['itemid', 'hostid', 'key_', 'name'],
+					'output' => ['name'],
 					'selectHosts' => ['name'],
 					'itemids' => $page_options['itemid']
 				]);
 
 				if ($items) {
-					$items = CMacrosResolverHelper::resolveItemNames($items);
-					$page_options['item_name'] = $items[0]['hosts'][0]['name'].NAME_DELIMITER.$items[0]['name_expanded'];
+					$page_options['item_name'] = $items[0]['hosts'][0]['name'].NAME_DELIMITER.$items[0]['name'];
 				}
 			}
 

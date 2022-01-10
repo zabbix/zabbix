@@ -1,8 +1,6 @@
 # GnuTLS LIBGNUTLS_CHECK_CONFIG ([DEFAULT-ACTION])
 # ----------------------------------------------------------
-# Derived from libssh2.m4 written by
-#    Alexander Vladishev                      Oct-26-2009
-#    Dmitry Borovikov                         Feb-13-2010
+# Derived from libssh2.m4
 #
 # Checks for GnuTLS library libgnutls.  DEFAULT-ACTION is the string
 # yes or no to specify whether to default to --with-gnutls or

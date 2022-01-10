@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -640,8 +640,6 @@ static const char	*get_string(const char *p, char *buf, size_t bufsize)
  *                FAIL - an error occurred                                    *
  *                SUCCEED_PARTIAL - the sending operation was completed       *
  *                successfully, but processing of at least one value failed   *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: active agent has almost the same function!                       *
  *                                                                            *

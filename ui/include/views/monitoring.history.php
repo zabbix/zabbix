@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ if ((count($data['items']) == 1 || $same_host) && $data['itemids']) {
 	$header['left'] = [
 		$host_name,
 		NAME_DELIMITER,
-		count($data['items']) == 1 ? $item['name_expanded'] : $header['left']
+		count($data['items']) == 1 ? $item['name'] : $header['left']
 	];
 	$header_row[] = implode('', $header['left']);
 }
@@ -133,7 +133,7 @@ if ($data['action'] == HISTORY_LATEST || $data['action'] == HISTORY_VALUES) {
 				$items_data[] = [
 					'id' => $itemid,
 					'prefix' => $item['hosts'][0]['name'].NAME_DELIMITER,
-					'name' => $item['name_expanded']
+					'name' => $item['name']
 				];
 			}
 			CArrayHelper::sort($items_data, ['prefix', 'name']);

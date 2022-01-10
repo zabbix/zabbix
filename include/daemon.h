@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,5 +44,8 @@ void	zbx_set_sigusr_handler(void (*handler)(int flags));
 #define ZBX_DO_EXIT()
 
 #define START_MAIN_ZABBIX_ENTRY(allow_root, user, flags)	daemon_start(allow_root, user, flags)
+
+void	zbx_signal_process_by_type(int proc_type, int proc_num, int flags, char **out);
+void	zbx_signal_process_by_pid(int pid, int flags, char **out);
 
 #endif	/* ZABBIX_DAEMON_H */

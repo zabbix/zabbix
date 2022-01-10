@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,9 +40,7 @@ class CPieGraphDraw extends CGraphDraw {
 	/* PRE CONFIG: ADD / SET / APPLY
 	/********************************************************************************************************/
 	public function addItem($itemid, $calc_fnc = CALC_FNC_AVG, $color = null, $type = null) {
-		$items = CMacrosResolverHelper::resolveItemNames([get_item_by_itemid($itemid)]);
-
-		$this->items[$this->num] = reset($items);
+		$this->items[$this->num] = get_item_by_itemid($itemid);
 
 		$host = get_host_by_hostid($this->items[$this->num]['hostid']);
 
@@ -266,7 +264,7 @@ class CPieGraphDraw extends CGraphDraw {
 		$functionNameXShift = 0;
 
 		foreach ($this->items as $item) {
-			$name = $displayHostName ? $item['hostname'].': '.$item['name_expanded'] : $item['name_expanded'];
+			$name = $displayHostName ? $item['hostname'].NAME_DELIMITER.$item['name'] : $item['name'];
 			$dims = imageTextSize($fontSize, 0, $name);
 
 			if ($dims['width'] > $functionNameXShift) {
@@ -330,7 +328,7 @@ class CPieGraphDraw extends CGraphDraw {
 				$this->shiftXleft + 15,
 				$this->sizeY + $shiftY + 14 * $i + 5,
 				$this->getColor($this->graphtheme['textcolor'], 0),
-				$displayHostName ? $item['hostname'].': '.$item['name_expanded'] : $item['name_expanded']
+				$displayHostName ? $item['hostname'].NAME_DELIMITER.$item['name'] : $item['name']
 			);
 
 			// function name

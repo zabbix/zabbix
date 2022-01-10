@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,16 @@
 
 #define ZBX_ES_LOG_MEMORY_LIMIT	(ZBX_MEBIBYTE * 8)
 
+/* this macro can be used in time intensive C functions to check for script timeout execution */
+#define ZBX_ES_CHECK_TIMEOUT(ctx, env) \
+	do { \
+		zbx_uint64_t	elapsed_ms; \
+		elapsed_ms = zbx_get_duration_ms(&env->start_time); \
+		if (elapsed_ms >= (zbx_uint64_t)env->timeout * 1000) \
+			return duk_error(ctx, DUK_RET_TYPE_ERROR, "script execution timeout occurred"); \
+	} \
+	while (0);
+
 struct zbx_es_env
 {
 	duk_context	*ctx;
@@ -39,5 +49,7 @@ struct zbx_es_env
 
 	jmp_buf		loc;
 };
+
+zbx_es_env_t	*zbx_es_get_env(duk_context *ctx);
 
 #endif /* ZABBIX_EMBED_H */

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -124,10 +124,10 @@ foreach ($data['items'] as $item) {
 
 	if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 		if ($item['master_item']['type'] == ITEM_TYPE_HTTPTEST) {
-			$description[] = CHtml::encode($item['master_item']['name_expanded']);
+			$description[] = CHtml::encode($item['master_item']['name']);
 		}
 		else {
-			$description[] = (new CLink(CHtml::encode($item['master_item']['name_expanded']),
+			$description[] = (new CLink(CHtml::encode($item['master_item']['name']),
 				(new CUrl('items.php'))
 					->setArgument('form', 'update')
 					->setArgument('hostid', $item['hostid'])
@@ -141,7 +141,7 @@ foreach ($data['items'] as $item) {
 		$description[] = NAME_DELIMITER;
 	}
 
-	$description[] = new CLink(CHtml::encode($item['name_expanded']),
+	$description[] = new CLink(CHtml::encode($item['name']),
 		(new CUrl('items.php'))
 			->setArgument('form', 'update')
 			->setArgument('hostid', $item['hostid'])

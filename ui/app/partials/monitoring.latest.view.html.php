@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -81,7 +81,7 @@ foreach ($data['items'] as $itemid => $item) {
 	$state_css = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? ZBX_STYLE_GREY : null;
 
 	$item_name = (new CDiv([
-		(new CSpan($item['name_expanded']))->addClass('label'),
+		(new CSpan($item['name']))->addClass('label'),
 		($item['description_expanded'] !== '') ? makeDescriptionIcon($item['description_expanded']) : null
 	]))->addClass('action-container');
 

@@ -1642,8 +1642,8 @@ INSERT INTO triggers (triggerid, description, expression, comments) VALUES (5017
 INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50238, 50178, 58738, 'last', '$');
 
 -- services
-INSERT INTO services (serviceid, name) VALUES (1, 'API Service for delete');
-INSERT INTO services (serviceid, name) VALUES (2, 'API Service for update');
+INSERT INTO services (serviceid, name, description) VALUES (1, 'API Service for delete', '');
+INSERT INTO services (serviceid, name, description) VALUES (2, 'API Service for update', '');
 
 -- high availability nodes
 INSERT INTO ha_node (name,address,port,status,ha_nodeid) VALUES ('node1','192.168.1.5','10051','0','ckuo7i1nv00090sajelcon0su');

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1785,8 +1785,6 @@ err_alert:
  *                                                                            *
  * Return value: SUCCEED - matches, FAIL - otherwise                          *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  ******************************************************************************/
 static int	check_operation_conditions(const DB_EVENT *event, zbx_uint64_t operationid, unsigned char evaltype)
 {
@@ -2742,7 +2740,7 @@ static void	db_get_services(const zbx_vector_ptr_t *escalations, zbx_vector_serv
 			serviceids.values_num);
 
 	result = DBselect(
-			"select s.serviceid,s.name,st.tag,st.value"
+			"select s.serviceid,s.name,s.description,st.tag,st.value"
 			" from services s left join service_tag st on s.serviceid=st.serviceid"
 			" where%s order by s.serviceid",
 			sql);
@@ -2761,8 +2759,8 @@ static void	db_get_services(const zbx_vector_ptr_t *escalations, zbx_vector_serv
 
 			last_service = services->values[services->values_num - 1];
 
-			tag->tag = zbx_strdup(NULL, row[2]);
-			tag->value = zbx_strdup(NULL, row[3]);
+			tag->tag = zbx_strdup(NULL, row[3]);
+			tag->value = zbx_strdup(NULL, row[4]);
 
 			zbx_vector_tags_append(&last_service->service_tags, tag);
 			continue;
@@ -2771,16 +2769,17 @@ static void	db_get_services(const zbx_vector_ptr_t *escalations, zbx_vector_serv
 		service = (DB_SERVICE*)zbx_malloc(NULL, sizeof(DB_SERVICE));
 		service->serviceid = serviceid;
 		service->name = zbx_strdup(NULL, row[1]);
+		service->description = zbx_strdup(NULL, row[2]);
 		zbx_vector_uint64_create(&service->eventids);
 		zbx_vector_ptr_create(&service->events);
 		zbx_vector_tags_create(&service->service_tags);
 
-		if (FAIL == DBis_null(row[2]))
+		if (FAIL == DBis_null(row[3]))
 		{
 			zbx_tag_t	*tag = zbx_malloc(NULL, sizeof(zbx_tag_t));
 
-			tag->tag = zbx_strdup(NULL, row[2]);
-			tag->value = zbx_strdup(NULL, row[3]);
+			tag->tag = zbx_strdup(NULL, row[3]);
+			tag->value = zbx_strdup(NULL, row[4]);
 
 			zbx_vector_tags_append(&service->service_tags, tag);
 		}
@@ -2892,6 +2891,7 @@ static void	get_db_service_alarms(zbx_vector_ptr_t *escalations, zbx_vector_serv
 static void	service_clean(DB_SERVICE *service)
 {
 	zbx_free(service->name);
+	zbx_free(service->description);
 	zbx_vector_ptr_destroy(&service->events);
 	zbx_vector_uint64_destroy(&service->eventids);
 	zbx_vector_tags_clear_ext(&service->service_tags, zbx_free_tag);
@@ -3420,12 +3420,6 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
  * Function: main_escalator_loop                                              *
  *                                                                            *
  * Purpose: periodically check table escalations and generate alerts          *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: never returns                                                    *
  *                                                                            *

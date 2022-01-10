@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -408,6 +408,40 @@ class CWidgetHelper {
 		] + $field->getFilterParameters());
 	}
 
+	/**
+	 * @param CWidgetFieldMsService $field
+	 * @param array $captions
+	 * @param string $form_name
+	 *
+	 * @return CMultiSelect
+	 */
+	public static function getService($field, $captions, $form_name) {
+		return (new CMultiSelect([
+			'name' => $field->getName().($field->isMultiple() ? '[]' : ''),
+			'object_name' => 'services',
+			'multiple' => $field->isMultiple(),
+			'data' => $captions,
+			'custom_select' => true,
+			'add_post_js' => false
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired(self::isAriaRequired($field));
+	}
+
+	/**
+	 * @param CWidgetFieldMsSla $field
+	 * @param array $captions
+	 * @param string $form_name
+	 *
+	 * @return CMultiSelect
+	 */
+	public static function getSla($field, $captions, $form_name) {
+		return self::getMultiselectField($field, $captions, $form_name, 'sla', [
+				'srctbl' => 'sla',
+				'srcfld1' => 'slaid'
+			] + $field->getFilterParameters());
+	}
+
 	public static function getSelectResource($field, $caption, $form_name) {
 		return [
 			(new CTextBox($field->getName().'_caption', $caption, true))
@@ -441,8 +475,10 @@ class CWidgetHelper {
 	 *
 	 * @return CNumericBox
 	 */
-	public static function getIntegerBox($field) {
-		return (new CNumericBox($field->getName(), $field->getValue(), $field->getMaxLength()))
+	public static function getIntegerBox(CWidgetFieldIntegerBox $field): CNumericBox {
+		return (new CNumericBox($field->getName(), $field->getValue(), $field->getMaxLength(), false,
+			($field->getFlags() & CWidgetField::FLAG_NOT_EMPTY) == 0
+		))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 			->setAriaRequired(self::isAriaRequired($field));
 	}
@@ -634,10 +670,11 @@ class CWidgetHelper {
 	 *
 	 * @return CDateSelector
 	 */
-	public static function getDatePicker($field) {
+	public static function getDatePicker(CWidgetFieldDatePicker $field): CDateSelector {
 		return (new CDateSelector($field->getName(), $field->getValue()))
 			->setAriaRequired(self::isAriaRequired($field))
-			->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED));
+			->setMaxLength(DB::getFieldLength('widget_field', 'value_str'))
+			->setEnabled(($field->getFlags() & CWidgetField::FLAG_DISABLED) == 0);
 	}
 
 	/**
@@ -706,7 +743,6 @@ class CWidgetHelper {
 									'real_hosts' => 1,
 									'numeric' => 1,
 									'webitems' => 1,
-									'orig_names' => 1,
 									'dstfrm' => $form_name,
 									'dstfld1' => zbx_formatDomId($field->getName().'['.$row_num.'][items][]')
 								]
@@ -1062,7 +1098,6 @@ class CWidgetHelper {
 									'real_hosts' => 1,
 									'numeric' => 1,
 									'webitems' => 1,
-									'orig_names' => 1,
 									'dstfrm' => $form_name,
 									'dstfld1' => zbx_formatDomId($field_name.'['.$row_num.'][items][]')
 								]
