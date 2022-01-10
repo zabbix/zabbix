@@ -20,7 +20,6 @@
 #ifndef ZABBIX_TRAPPER_AUTH_H
 #define ZABBIX_TRAPPER_AUTH_H
 
-//#include "comms.h"
 #include "common.h"
 #include "zbxjson.h"
 

@@ -26,7 +26,6 @@
 #include "zbxjson.h"
 #include "base64.h"
 #include "zbxalgo.h"
-//#include "zbxmedia.h"
 #include "dbcache.h"
 #include "zbxreport.h"
 #include "../../libs/zbxcrypto/hmac_sha256.h"

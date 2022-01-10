@@ -27,11 +27,10 @@
 #include "zbxself.h"
 #include "dbcache.h"
 #include "zbxtasks.h"
-//#include "dbcache.h"
-
-#include "datasender.h"
 #include "zbxcrypto.h"
 #include "zbxcompress.h"
+
+#include "datasender.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;

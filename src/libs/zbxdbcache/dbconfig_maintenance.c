@@ -20,13 +20,11 @@
 #include "log.h"
 #include "zbxalgo.h"
 #include "dbcache.h"
-//#include "mutexs.h"
 
 #define ZBX_DBCONFIG_IMPL
 #include "dbconfig.h"
 
 #include "dbsync.h"
-//#include "zbxserver.h"
 
 extern int		CONFIG_TIMER_FORKS;
 

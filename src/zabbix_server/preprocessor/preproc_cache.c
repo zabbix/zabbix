@@ -17,9 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-//#include "log.h"
 #include "../../libs/zbxalgo/vectorimpl.h"
 #include "zbxprometheus.h"
+
 #include "item_preproc.h"
 
 ZBX_VECTOR_IMPL(ppcache, zbx_preproc_cache_ref_t)

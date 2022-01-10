@@ -27,16 +27,13 @@
 #include "log.h"
 #include "zbxipcservice.h"
 #include "zbxalgo.h"
-//#include "zbxserver.h"
 #include "preproc.h"
-
-#include "ipmi_manager.h"
 #include "ipmi_protocol.h"
-//#include "checks_ipmi.h"
 #include "ipmi.h"
-
 #include "../poller/poller.h"
 #include "zbxavailability.h"
+
+#include "ipmi_manager.h"
 
 #define ZBX_IPMI_MANAGER_DELAY	1
 

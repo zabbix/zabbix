@@ -21,7 +21,6 @@
 #define ZABBIX_SYSINFO_COMMON_DIR_H
 
 #include "module.h"
-//#include "sysinfo.h"
 #include "zbxjson.h"
 
 #define DISK_BLOCK_SIZE			512	/* 512-byte blocks */

@@ -21,7 +21,6 @@
 #define ZABBIX_TEMPLATE_H
 
 #include "common.h"
-
 #include "db.h"
 #include "zbxtypes.h"
 #include "zbxalgo.h"

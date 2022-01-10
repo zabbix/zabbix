@@ -20,9 +20,6 @@
 #ifndef ZABBIX_AUDIT_HOST_H
 #define ZABBIX_AUDIT_HOST_H
 
-//#include "common.h"
-//#include "dbcache.h"
-//#include "audit.h"
 #include "zbxtypes.h"
 #include "zbxalgo.h"
 

@@ -18,8 +18,6 @@
 **/
 
 #include "common.h"
-
-#include "db.h"
 #include "log.h"
 #include "dbcache.h"
 #include "zbxserver.h"
@@ -32,6 +30,8 @@
 #include "trigger_linking.h"
 #include "graph_linking.h"
 #include "../zbxalgo/vectorimpl.h"
+
+#include "db.h"
 
 typedef struct
 {

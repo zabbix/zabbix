@@ -18,16 +18,16 @@
 **/
 
 #include "common.h"
-#include "zbxconf.h"
-
 #include "cfg.h"
 #include "log.h"
 #include "alias.h"
 #include "sysinfo.h"
+
+#include "zbxconf.h"
+
 #ifdef _WINDOWS
 #	include "perfstat.h"
 #endif
-//#include "comms.h"
 
 /******************************************************************************
  *                                                                            *

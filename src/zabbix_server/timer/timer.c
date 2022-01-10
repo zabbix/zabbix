@@ -18,13 +18,8 @@
 **/
 
 #include "common.h"
-
-//#include "cfg.h"
-//#include "pid.h"
-//#include "db.h"
 #include "log.h"
 #include "dbcache.h"
-//#include "zbxserver.h"
 #include "daemon.h"
 #include "zbxself.h"
 #include "db.h"

@@ -22,13 +22,12 @@
 #ifdef HAVE_OPENIPMI
 
 #include "log.h"
-//#include "zbxserialize.h"
 #include "dbcache.h"
-
 #include "zbxipcservice.h"
 #include "ipmi_protocol.h"
 #include "checks_ipmi.h"
 #include "zbxserver.h"
+
 #include "ipmi.h"
 
 /******************************************************************************

@@ -21,7 +21,6 @@
 #define ZABBIX_SYSINFO_COMMON_NET_H
 
 #include "module.h"
-//#include "sysinfo.h"
 
 extern char	*CONFIG_SOURCE_IP;
 

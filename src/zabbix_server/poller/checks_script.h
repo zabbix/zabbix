@@ -20,7 +20,6 @@
 #ifndef ZABBIX_CHECKS_SCRIPT_H
 #define ZABBIX_CHECKS_SCRIPT_H
 
-//#include "common.h"
 #include "module.h"
 #include "dbcache.h"
 

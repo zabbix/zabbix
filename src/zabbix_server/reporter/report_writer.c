@@ -22,12 +22,13 @@
 #include "zbxself.h"
 #include "log.h"
 #include "zbxipcservice.h"
-//#include "zbxserialize.h"
 #include "zbxjson.h"
 #include "zbxalert.h"
 #include "db.h"
-#include "report_writer.h"
 #include "report_protocol.h"
+
+#include "report_writer.h"
+
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;

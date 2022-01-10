@@ -20,10 +20,10 @@
 #include "common.h"
 #include "log.h"
 #include "zbxalgo.h"
-//#include "zbxserver.h"
-#include "eval.h"
 #include "zbxeval.h"
 #include "zbxvariant.h"
+
+#include "eval.h"
 
 /* exit code in addition to SUCCEED/FAIL */
 #define UNKNOWN		1

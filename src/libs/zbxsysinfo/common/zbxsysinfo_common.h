@@ -20,7 +20,6 @@
 #ifndef ZABBIX_SYSINFO_COMMON_H
 #define ZABBIX_SYSINFO_COMMON_H
 
-//#include "sysinfo.h"
 #include "module.h"
 
 extern ZBX_METRIC	parameters_common[];

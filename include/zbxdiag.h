@@ -21,7 +21,6 @@
 #ifndef ZABBIX_ZBXDIAG_H
 #define ZABBIX_ZBXDIAG_H
 
-//#include "common.h"
 #include "zbxtypes.h"
 #include "zbxjson.h"
 

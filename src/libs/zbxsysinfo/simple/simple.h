@@ -21,7 +21,6 @@
 #define ZABBIX_SYSINFO_SIMPLE_H
 
 #include "module.h"
-//#include "sysinfo.h"
 
 extern char		*CONFIG_SOURCE_IP;
 extern ZBX_METRIC	parameters_simple[];

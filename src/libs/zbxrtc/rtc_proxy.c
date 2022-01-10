@@ -17,11 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-//#include "zbxipcservice.h"
-//#include "zbxrtc.h"
-#include "rtc.h"
 #include "zbxtypes.h"
 #include "proxy.h"
+
+#include "rtc.h"
 
 extern int	CONFIG_PROXYMODE;
 

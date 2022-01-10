@@ -18,7 +18,6 @@
 **/
 
 #include "common.h"
-#include "active.h"
 #include "zbxconf.h"
 
 #include "cfg.h"
@@ -31,6 +30,8 @@
 #include "alias.h"
 #include "metrics.h"
 #include "zbxregexp.h"
+
+#include "active.h"
 
 extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;

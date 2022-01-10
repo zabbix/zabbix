@@ -19,11 +19,11 @@
 
 #include "common.h"
 #include "db.h"
-//#include "dbupgrade.h"
-#include "dbupgrade_macros.h"
 #include "log.h"
 #include "zbxalgo.h"
 #include "../zbxalgo/vectorimpl.h"
+
+#include "dbupgrade_macros.h"
 
 /* Function argument descriptors.                                                */
 /* Used in varargs list to describe following parameter mapping to old position. */

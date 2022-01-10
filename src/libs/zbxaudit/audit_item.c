@@ -17,8 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-//#include "dbcache.h"
-
 #include "log.h"
 #include "audit.h"
 #include "db.h"

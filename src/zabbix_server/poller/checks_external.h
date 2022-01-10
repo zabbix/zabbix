@@ -22,7 +22,6 @@
 
 #include "dbcache.h"
 #include "module.h"
-//#include "sysinfo.h"
 
 int	get_value_external(const DC_ITEM *item, AGENT_RESULT *result);
 

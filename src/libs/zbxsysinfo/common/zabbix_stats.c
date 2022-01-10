@@ -20,7 +20,6 @@
 #include "comms.h"
 #include "zbxjson.h"
 #include "sysinfo.h"
-
 #include "common.h"
 
 #include "zabbix_stats.h"

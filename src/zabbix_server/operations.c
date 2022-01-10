@@ -22,12 +22,10 @@
 #include "db.h"
 #include "log.h"
 #include "dbcache.h"
-
-#include "operations.h"
-//#include "zbxserver.h"
-
 #include "../../libs/zbxaudit/audit.h"
 #include "../../libs/zbxaudit/audit_host.h"
+
+#include "operations.h"
 
 typedef enum
 {

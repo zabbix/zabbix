@@ -18,8 +18,8 @@
 **/
 
 #include "zbxalgo.h"
-//#include "zbxjson.h"
 #include "audit.h"
+
 #include "audit_settings.h"
 
 void	zbx_audit_settings_create_entry(int audit_action, zbx_uint64_t configid)
