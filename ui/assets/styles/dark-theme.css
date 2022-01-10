@@ -11,7 +11,7 @@
   .timeline-axis::before {
     background-color: #454f55 !important; }
 
-.sidebar .server-name, .dashboard-navigation-tabs .sortable-item > div span, .dashboard-grid-widget-head h4, .dashboard-grid-iterator-head h4, .list-table .action-container .label, .list-table.compact-view .action-container .link-action, .menu-popup .menu-popup-item, .menu-popup h3, .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a {
+.sidebar .server-name, .dashboard-navigation-tabs .sortable-item > div span, .dashboard-grid-widget-head h4, .dashboard-grid-iterator-head h4, .list-table .action-container .link-action, .menu-popup .menu-popup-item, .menu-popup h3, .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; }
@@ -2701,11 +2701,19 @@ form.is-loading {
   border: 1px solid #303030; }
   .list-table .action-container {
     display: flex;
-    width: 100%; }
-    .list-table .action-container .separator {
-      margin-right: 4px; }
+    width: 100%;
+    height: 18px;
+    line-height: 18px; }
+    .list-table .action-container .link-action {
+      height: 16px;
+      min-width: 1em; }
     .list-table .action-container [class*='icon-'] {
       flex-shrink: 0; }
+    .list-table .action-container .rel-container {
+      display: flex; }
+    .list-table .action-container .separator {
+      flex-shrink: 0;
+      margin-right: 4px; }
   .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td {
     color: #000000; }
     .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td sup,
@@ -2794,16 +2802,6 @@ form.is-loading {
       position: relative; }
     .list-table.compact-view td .icon-description {
       margin-left: 2px; }
-  .list-table.compact-view .action-container {
-    height: 18px;
-    line-height: 18px; }
-    .list-table.compact-view .action-container .rel-container {
-      display: flex; }
-    .list-table.compact-view .action-container .link-action {
-      height: 16px;
-      min-width: 1em; }
-    .list-table.compact-view .action-container .separator {
-      flex-shrink: 0; }
   .list-table thead th {
     color: #737373;
     height: 100%;
