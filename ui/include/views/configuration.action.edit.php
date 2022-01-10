@@ -137,7 +137,7 @@ $condition_table->addRow([
 			'return PopUp("popup.condition.actions", '.json_encode([
 				'type' => ZBX_POPUP_CONDITION_TYPE_ACTION,
 				'source' => $data['eventsource']
-			]).', {dialogue_class: "modal-popup-medium");'
+			]).', {dialogue_class: "modal-popup-medium"});'
 		)
 		->addClass(ZBX_STYLE_BTN_LINK)
 ]);
