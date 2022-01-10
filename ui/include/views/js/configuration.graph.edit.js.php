@@ -421,9 +421,10 @@
 				parameters['hostid'] = graphs.hostid;
 			}
 
-			jQuery('#items_' + i + '_name').off('click.select_item').on('click.select_item', function() {
-				PopUp('popup.generic', jQuery.extend(parameters, getOnlyHostParam()), {trigger_element: this});
-			});
+			jQuery('#items_' + i + '_name').attr('onclick', 'PopUp("popup.generic", '
+				+ 'jQuery.extend(' + JSON.stringify(parameters) +',getOnlyHostParam()),'
+				+ '{dialogue_class: "modal-popup-generic", trigger_element: this});'
+			);
 		}
 	}
 
