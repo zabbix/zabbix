@@ -19,9 +19,9 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 class testPageLatestData extends CWebTest {
+
 	public function testPageLatestData_CheckLayout() {
 		$this->page->login()->open('zabbix.php?action=latest.view');
 		$this->page->assertTitle('Latest data');
@@ -62,12 +62,21 @@ class testPageLatestData extends CWebTest {
 		}
 	}
 
-//	// Check that no real host or template names displayed.
-//	public function testPageLatestData_NoHostNames() {
-//		$this->page->login()->open('zabbix.php?action=latest.view');
-//		$this->page->assertTitle('Latest data');
-//		$this->zbxTestCheckNoRealHostnames();
-//	}
+	// Check that no real host or template names displayed.
+	public function testPageLatestData_NoHostNames() {
+		$result = DBselect(
+			'SELECT host'.
+			' FROM hosts'.
+			' WHERE status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
+				' AND name <> host'
+		);
+		$this->page->login()->open('zabbix.php?action=latest.view');
+		$table = $this->query('class:list-table')->asTable()->one();
+		while ($row = DBfetch($result)) {
+			$this->assertFalse($table->query('xpath://td/a[text()='.CXPathHelper::escapeQuotes($row['host']).']')
+					->one(false)->isDisplayed());
+		}
+	}
 
 	public static function getItemDescription() {
 		return [
@@ -195,5 +204,20 @@ class testPageLatestData extends CWebTest {
 		else {
 			$this->assertTrue($row->query('class:icon-description')->count() === 0);
 		}
+	}
+
+	/**
+	 * Maintenance icon hintbox.
+	 */
+	public function testPageLatestData_checkMaintenanceIcon() {
+		$this->page->login()->open('zabbix.php?action=latest.view');
+		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$form->fill(['Hosts' => 'Available host in maintenance']);
+		$form->submit();
+		$this->query('xpath:.//span[contains(@class, "icon-main")]')->one()->forceClick();
+		$hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last()->getText();
+		$hint_text = "Maintenance for Host availability widget [Maintenance with data collection]\n".
+				"Maintenance for checking Show hosts in maintenance option in Host availability widget";
+		$this->assertEquals($hint_text, $hint);
 	}
 }
