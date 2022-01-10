@@ -220,4 +220,23 @@ class testPageLatestData extends CWebTest {
 				"Maintenance for checking Show hosts in maintenance option in Host availability widget";
 		$this->assertEquals($hint_text, $hint);
 	}
+
+	/**
+	 * @backupOnce history_uint
+	 */
+	public function testPageLatestData_checkHints() {
+		$time = time();
+		$itemid = CDBHelper::getValue('SELECT itemid FROM items WHERE name='.zbx_dbstr('4_item'));
+		DBexecute("INSERT INTO history_uint (itemid, clock, value, ns) VALUES (".zbx_dbstr($itemid).
+				", ".zbx_dbstr($time).", 3333, 0)");
+		$true_time = date("Y-m-d H:i:s", $time);
+		$this->page->login()->open('zabbix.php?action=latest.view');
+		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$form->fill(['Name' => '4_item']);
+		$form->submit();
+		$table = $this->query('class:list-table')->asTable()->one();
+		$table->getRow(0)->getColumn('Last check')->query('class:cursor-pointer')->one()->click();
+		$hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last()->getText();
+		$this->assertEquals($true_time, $hint);
+	}
 }
