@@ -421,7 +421,7 @@
 				parameters['hostid'] = graphs.hostid;
 			}
 
-			jQuery('#items_' + i + '_name').on('click', function() {
+			jQuery('#items_' + i + '_name').off('click.select_item').on('click.select_item', function() {
 				PopUp('popup.generic', jQuery.extend(parameters, getOnlyHostParam()), {trigger_element: this});
 			});
 		}
