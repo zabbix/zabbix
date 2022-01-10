@@ -65,7 +65,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Temperature Discovery |<p>ENTITY-SENSORS-MIB::EntitySensorDataType discovery with celsius filter</p> |SNMP |temp.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#SENSOR_TYPE} MATCHES_REGEX `8`</p><p>- {#SENSOR_PRECISION} MATCHES_REGEX `1`</p> |
+|Temperature Discovery |<p>ENTITY-SENSORS-MIB::EntitySensorDataType discovery with temperature filter</p> |SNMP |temp.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#SENSOR_TYPE} MATCHES_REGEX `8`</p><p>- {#SENSOR_PRECISION} MATCHES_REGEX `1`</p> |
 |Fan Discovery |<p>ENTITY-SENSORS-MIB::EntitySensorDataType discovery with rpm filter</p> |SNMP |fan.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>OR <p>- {#SNMPVALUE} MATCHES_REGEX `10`</p> |
 |Entity Discovery |<p>-</p> |SNMP |entity.discovery<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND_OR <p>- {#ENT_CLASS} MATCHES_REGEX `3`</p> |
 |PSU Discovery |<p>-</p> |SNMP |psu.discovery<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND_OR <p>- {#ENT_CLASS} MATCHES_REGEX `6`</p> |

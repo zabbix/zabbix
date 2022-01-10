@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-16T07:08:19Z'
+  date: '2022-01-10T07:41:44Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -2504,7 +2504,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               discover: NO_DISCOVER
-              description: 'The number of replucated nodes in current ReplicaSet.'
+              description: 'The number of replicated nodes in current ReplicaSet.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2904,7 +2904,7 @@ zabbix_export:
                 -
                   uuid: 967928b915f64623b4416ed0dbf6ba98
                   expression: 'max(/MongoDB node by Zabbix agent 2/mongodb.wired_tiger.concurrent_transactions.read.available[{#SINGLETON}],5m)<{$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}'
-                  name: 'MongoDB: Available WiredTiger read tickets less then {$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}'
+                  name: 'MongoDB: Available WiredTiger read tickets less than {$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}'
                   priority: WARNING
                   description: |
                     "Too few available read tickets.
@@ -2970,7 +2970,7 @@ zabbix_export:
                 -
                   uuid: 485e6e846f274b528902b3ffd08f2fc4
                   expression: 'max(/MongoDB node by Zabbix agent 2/mongodb.wired_tiger.concurrent_transactions.write.available[{#SINGLETON}],5m)<{$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}'
-                  name: 'MongoDB: Available WiredTiger write tickets less then {$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}'
+                  name: 'MongoDB: Available WiredTiger write tickets less than {$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}'
                   priority: WARNING
                   description: |
                     "Too few available write tickets.

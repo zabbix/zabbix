@@ -44,7 +44,7 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Temperature Discovery |<p>ENTITY-SENSORS-MIB::EntitySensorDataType discovery with celsius filter</p> |SNMP |temp.precision0.discovery<p>**Filter**:</p>AND <p>- {#SENSOR_TYPE} MATCHES_REGEX `8`</p><p>- {#SENSOR_PRECISION} MATCHES_REGEX `0`</p> |
+|Temperature Discovery |<p>ENTITY-SENSORS-MIB::EntitySensorDataType discovery with temperature filter</p> |SNMP |temp.precision0.discovery<p>**Filter**:</p>AND <p>- {#SENSOR_TYPE} MATCHES_REGEX `8`</p><p>- {#SENSOR_PRECISION} MATCHES_REGEX `0`</p> |
 |Memory Discovery |<p>Discovery of NETSWITCH-MIB::hpLocalMemTable, A table that contains information on all the local memory for each slot.</p> |SNMP |memory.discovery |
 |FAN Discovery |<p>Discovering all entities of hpicfSensorObjectId that ends with: 11.2.3.7.8.3.2 - fans and are present</p> |SNMP |fan.discovery<p>**Filter**:</p>AND <p>- {#ENT_CLASS} MATCHES_REGEX `.+8.3.2$`</p><p>- {#ENT_STATUS} MATCHES_REGEX `(1|2|3|4)`</p> |
 |PSU Discovery |<p>Discovering all entities of hpicfSensorObjectId that ends with: 11.2.3.7.8.3.1 - power supplies and are present</p> |SNMP |psu.discovery<p>**Filter**:</p>AND <p>- {#ENT_CLASS} MATCHES_REGEX `.+8.3.1$`</p><p>- {#ENT_STATUS} MATCHES_REGEX `(1|2|3|4)`</p> |

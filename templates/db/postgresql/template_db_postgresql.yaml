@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-16T07:08:58Z'
+  date: '2022-01-10T07:42:30Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -1252,7 +1252,7 @@ zabbix_export:
                 -
                   uuid: 709df9c1e29a4ff68a3de9423ff7ae58
                   expression: 'last(/PostgreSQL by Zabbix agent/pgsql.frozenxid.prc_before_stop["{#DBNAME}"])<{$PG.FROZENXID_PCT_STOP.MIN.HIGH:"{#DBNAME}"}'
-                  name: 'DB {#DBNAME}: VACUUM FREEZE is required to prevent wraparound (frozen XID less then {$PG.FROZENXID_PCT_STOP.MIN.HIGH:"{#DBNAME}"} %)'
+                  name: 'DB {#DBNAME}: VACUUM FREEZE is required to prevent wraparound (frozen XID less than {$PG.FROZENXID_PCT_STOP.MIN.HIGH:"{#DBNAME}"} %)'
                   priority: AVERAGE
                   description: |
                     Preventing Transaction ID Wraparound Failures

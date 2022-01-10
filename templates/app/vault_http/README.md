@@ -57,7 +57,7 @@ There are no template links in this template.
 |Mountpoint metrics discovery |<p>Mountpoint metrics discovery.</p> |DEPENDENT |vault.mountpoint.discovery |
 |WAL metrics discovery |<p>Discovery for WAL metrics.</p> |DEPENDENT |vault.wal.discovery |
 |Replication metrics discovery |<p>Discovery for replication metrics.</p> |DEPENDENT |vault.replication.discovery |
-|Token metrics discovery |<p>Tokens metrics doscovery.</p> |DEPENDENT |vault.tokens.discovery |
+|Token metrics discovery |<p>Tokens metrics discovery.</p> |DEPENDENT |vault.tokens.discovery |
 
 ## Items collected
 

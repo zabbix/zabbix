@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-16T07:17:06Z'
+  date: '2022-01-10T07:41:32Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -114,7 +114,7 @@ zabbix_export:
                   expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",EvictionRate],5m)>0'
                   name: 'Data region {#JMXNAME}: Node started to evict pages'
                   priority: INFO
-                  description: 'You store more data then region can accommodate. Data started to move to disk it can make requests work slower. Ack to close.'
+                  description: 'You store more data than region can accommodate. Data started to move to disk it can make requests work slower. Ack to close.'
                   manual_close: 'YES'
             -
               uuid: 7fa689749cd64474af294976e4bc7762
@@ -255,18 +255,18 @@ zabbix_export:
             -
               uuid: 736fbc965aa448309d022de34354decf
               expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",OffheapUsedSize],5m)/last(/Ignite by JMX/jmx["{#JMXOBJ}",OffHeapSize])*100>{$IGNITE.DATA.REGION.PUSED.MAX.HIGH}'
-              name: 'Data region {#JMXNAME}: Data region utilisation is too high (over {$IGNITE.DATA.REGION.PUSED.MAX.HIGH} in 5m)'
+              name: 'Data region {#JMXNAME}: Data region utilization is too high (over {$IGNITE.DATA.REGION.PUSED.MAX.HIGH} in 5m)'
               priority: HIGH
               description: 'Data region utilization is high. Increase data region size or delete any data.'
             -
               uuid: 6ded19e7616b45f08e37e716d8256c5e
               expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",OffheapUsedSize],5m)/last(/Ignite by JMX/jmx["{#JMXOBJ}",OffHeapSize])*100>{$IGNITE.DATA.REGION.PUSED.MAX.WARN}'
-              name: 'Data region {#JMXNAME}: Data region utilisation is too high (over {$IGNITE.DATA.REGION.PUSED.MAX.WARN} in 5m)'
+              name: 'Data region {#JMXNAME}: Data region utilization is too high (over {$IGNITE.DATA.REGION.PUSED.MAX.WARN} in 5m)'
               priority: WARNING
               description: 'Data region utilization is high. Increase data region size or delete any data.'
               dependencies:
                 -
-                  name: 'Data region {#JMXNAME}: Data region utilisation is too high (over {$IGNITE.DATA.REGION.PUSED.MAX.HIGH} in 5m)'
+                  name: 'Data region {#JMXNAME}: Data region utilization is too high (over {$IGNITE.DATA.REGION.PUSED.MAX.HIGH} in 5m)'
                   expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",OffheapUsedSize],5m)/last(/Ignite by JMX/jmx["{#JMXOBJ}",OffHeapSize])*100>{$IGNITE.DATA.REGION.PUSED.MAX.HIGH}'
           graph_prototypes:
             -
@@ -287,7 +287,7 @@ zabbix_export:
                     key: 'jmx["{#JMXOBJ}",UsedCheckpointBufferSize]'
             -
               uuid: 330be15755ca4b5dbee88e21b2e58df2
-              name: 'Data region {#JMXNAME}: DataRegion utilisation'
+              name: 'Data region {#JMXNAME}: DataRegion utilization'
               graph_items:
                 -
                   drawtype: BOLD_LINE

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-15T06:57:31Z'
+  date: '2022-01-10T07:39:26Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -667,7 +667,7 @@ zabbix_export:
           value_type: CHAR
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
-          description: 'Current version of brocker.'
+          description: 'Current version of broker.'
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1359,7 +1359,7 @@ zabbix_export:
             key: 'jmx["kafka.server:type=ReplicaManager,name=IsrExpandsPerSec","Count"]'
     -
       uuid: bd0b892058df48d5939f2ab9de9c2768
-      name: 'Kafka: Leader electoin rate'
+      name: 'Kafka: Leader election rate'
       graph_items:
         -
           color: 1A7C11

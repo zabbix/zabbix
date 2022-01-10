@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-15T08:56:37Z'
+  date: '2022-01-10T07:40:33Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -2648,7 +2648,7 @@ zabbix_export:
           type: DEPENDENT
           key: vault.tokens.discovery
           delay: '0'
-          description: 'Tokens metrics doscovery.'
+          description: 'Tokens metrics discovery.'
           item_prototypes:
             -
               uuid: 9a9359e74c3a48b1bbada84d772e665a

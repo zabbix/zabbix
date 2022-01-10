@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-16T07:08:07Z'
+  date: '2022-01-10T07:41:26Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -1571,7 +1571,7 @@ zabbix_export:
               history: 7d
               description: |
                 Whether the replica is in read-only mode.
-                This mode is turned on if the config doesn't have sections with ZooKeeper, if an unknown error occurred when reinitializing sessions in ZooKeeper, and during session reinitialization in ZooKeeper.
+                This mode is turned on if the config doesn't have sections with ZooKeeper, if an unknown error occurred when re-initializing sessions in ZooKeeper, and during session re-initialization in ZooKeeper.
               valuemap:
                 name: 'Replicas state'
               preprocessing:
@@ -1591,7 +1591,7 @@ zabbix_export:
                   expression: 'min(/ClickHouse by HTTP/clickhouse.replica.is_readonly["{#DB}.{#TABLE}"],5m)=1'
                   name: 'ClickHouse: {#DB}.{#TABLE} Replica is readonly'
                   priority: WARNING
-                  description: 'This mode is turned on if the config doesn''t have sections with ZooKeeper, if an unknown error occurred when reinitializing sessions in ZooKeeper, and during session reinitialization in ZooKeeper.'
+                  description: 'This mode is turned on if the config doesn''t have sections with ZooKeeper, if an unknown error occurred when re-initializing sessions in ZooKeeper, and during session re-initialization in ZooKeeper.'
             -
               uuid: a889475b8ddf48109af3dd2b7ed58627
               name: 'ClickHouse: {#DB}.{#TABLE}: Replica session expired'
@@ -1619,7 +1619,7 @@ zabbix_export:
                   expression: 'min(/ClickHouse by HTTP/clickhouse.replica.is_session_expired["{#DB}.{#TABLE}"],5m)=1'
                   name: 'ClickHouse: {#DB}.{#TABLE} Replica session is expired'
                   priority: WARNING
-                  description: 'This mode is turned on if the config doesn''t have sections with ZooKeeper, if an unknown error occurred when reinitializing sessions in ZooKeeper, and during session reinitialization in ZooKeeper.'
+                  description: 'This mode is turned on if the config doesn''t have sections with ZooKeeper, if an unknown error occurred when re-initializing sessions in ZooKeeper, and during session re-initialization in ZooKeeper.'
             -
               uuid: 8acd6e2195064708886d9944af264c32
               name: 'ClickHouse: {#DB}.{#TABLE}: Replica lag'

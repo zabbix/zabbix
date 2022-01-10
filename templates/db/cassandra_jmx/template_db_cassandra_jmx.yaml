@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-16T07:08:03Z'
+  date: '2022-01-10T07:41:19Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -891,7 +891,7 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that are currently blocked due to queue saturation but on retry will become unblocked.
-            MiscStage: Misceleneous tasks run here.
+            MiscStage: Miscellaneous tasks run here.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
@@ -907,7 +907,7 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of queued tasks queued up on this pool.
-            MiscStage: Misceleneous tasks run here.
+            MiscStage: Miscellaneous tasks run here.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
@@ -923,7 +923,7 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that were blocked due to queue saturation.
-            MiscStage: Misceleneous tasks run here.
+            MiscStage: Miscellaneous tasks run here.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-17T08:32:13Z'
+  date: '2022-01-10T07:57:02Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -940,7 +940,7 @@ zabbix_export:
                 macro: '{#SENSOR_PRECISION}'
                 value: '1'
                 formulaid: A
-          description: 'ENTITY-SENSORS-MIB::EntitySensorDataType discovery with celsius filter'
+          description: 'ENTITY-SENSORS-MIB::EntitySensorDataType discovery with temperature filter'
           item_prototypes:
             -
               uuid: 4f298c0f2b6547b7b1827b3faebd1089

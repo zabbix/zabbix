@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-17T08:25:12Z'
+  date: '2022-01-10T07:56:32Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -2286,8 +2286,8 @@ zabbix_export:
                 The pause state of the specified interface.
                 none - no pause;
                 txrx - pause all data flow;
-                tx - pause out going data flow;
-                rx - pause in coming data flow.
+                tx - pause outgoing data flow;
+                rx - pause incoming data flow.
               valuemap:
                 name: 'Pause state'
               preprocessing:
