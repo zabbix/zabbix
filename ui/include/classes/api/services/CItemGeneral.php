@@ -519,10 +519,10 @@ abstract class CItemGeneral extends CApiService {
 	 */
 	protected function validatePreprocessing(array &$items): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'fields' => [
-			'type' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => static::SUPPORTED_PREPROCESSING_TYPES],
+			'type' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', static::SUPPORTED_PREPROCESSING_TYPES)],
 			'params' =>					['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'type', 'in' => ZBX_PREPROC_MULTIPLIER], 'type' => API_MULTIPLIER, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0, 'in' => DB::getFieldLength('item_preproc', 'params')],
-											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_PREPROC_RTRIM, ZBX_PREPROC_LTRIM, ZBX_PREPROC_TRIM, ZBX_PREPROC_XPATH, ZBX_PREPROC_JSONPATH, ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_ERROR_FIELD_XML, ZBX_PREPROC_SCRIPT, ZBX_PREPROC_PROMETHEUS_PATTERN])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => DB::getFieldLength('item_preproc', 'params')],
+											['if' => ['field' => 'type', 'in' => ZBX_PREPROC_MULTIPLIER], 'type' => API_MULTIPLIER, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0, 'length' => DB::getFieldLength('item_preproc', 'params')],
+											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_PREPROC_RTRIM, ZBX_PREPROC_LTRIM, ZBX_PREPROC_TRIM, ZBX_PREPROC_XPATH, ZBX_PREPROC_JSONPATH, ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_ERROR_FIELD_XML, ZBX_PREPROC_SCRIPT, ZBX_PREPROC_PROMETHEUS_PATTERN])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('item_preproc', 'params')],
 											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_PREPROC_VALIDATE_REGEX, ZBX_PREPROC_VALIDATE_NOT_REGEX])], 'type' => API_REGEX, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('item_preproc', 'params')],
 											['if' => ['field' => 'type', 'in' => ZBX_PREPROC_THROTTLE_TIMED_VALUE], 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | ($this instanceof CItemPrototype || $this instanceof CDiscoveryRule) ? API_ALLOW_LLD_MACRO : 0, 'in' => '1:'.ZBX_MAX_TIMESHIFT, 'length' => DB::getFieldLength('item_preproc', 'params')],
 											['if' => ['field' => 'type', 'in' => ZBX_PREPROC_PROMETHEUS_TO_JSON], 'type' => API_PROMETHEUS_PATTERN, 'flags' => API_REQUIRED | $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0, 'length' => DB::getFieldLength('item_preproc', 'params')],
