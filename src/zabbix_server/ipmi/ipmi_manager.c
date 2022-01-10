@@ -27,12 +27,12 @@
 #include "log.h"
 #include "zbxipcservice.h"
 #include "zbxalgo.h"
-#include "zbxserver.h"
+//#include "zbxserver.h"
 #include "preproc.h"
 
 #include "ipmi_manager.h"
 #include "ipmi_protocol.h"
-#include "checks_ipmi.h"
+//#include "checks_ipmi.h"
 #include "ipmi.h"
 
 #include "../poller/poller.h"

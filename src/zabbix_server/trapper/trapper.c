@@ -33,9 +33,9 @@
 #include "daemon.h"
 #include "zbxcrypto.h"
 #include "../../libs/zbxserver/zabbix_stats.h"
-#include "zbxipcservice.h"
+//#include "zbxipcservice.h"
 #include "../poller/checks_snmp.h"
-#include "zbxrtc.h"
+//#include "zbxrtc.h"
 
 #include "trapper_auth.h"
 #include "trapper_preproc.h"

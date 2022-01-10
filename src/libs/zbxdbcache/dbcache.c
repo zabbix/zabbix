@@ -29,7 +29,7 @@
 #include "proxy.h"
 #include "events.h"
 #include "memalloc.h"
-#include "zbxalgo.h"
+//#include "zbxalgo.h"
 #include "valuecache.h"
 #include "zbxmodules.h"
 #include "module.h"

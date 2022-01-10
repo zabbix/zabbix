@@ -20,7 +20,7 @@
 #include "common.h"
 #include "module.h"
 //#include "sysinfo.h"
-#include "zbxlld.h"
+//#include "zbxlld.h"
 
 void	zbx_lld_process_agent_result(zbx_uint64_t itemid, zbx_uint64_t hostid, AGENT_RESULT *result, zbx_timespec_t *ts, char *error)
 {

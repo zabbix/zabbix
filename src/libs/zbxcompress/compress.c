@@ -21,7 +21,6 @@
 #include "common.h"
 #include "log.h"
 //#include <errno.h>
-//#include "log.h"
 #include "zbxcompress.h"
 
 #ifdef HAVE_ZLIB

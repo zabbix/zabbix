@@ -17,7 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+//#include "common.h"
+#include "zbxtrends.h"
+#include "zbxtypes.h"
 
 #ifndef ZABBIX_TRENDS_H
 #define ZABBIX_TRENDS_H

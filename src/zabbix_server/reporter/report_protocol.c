@@ -18,7 +18,7 @@
 **/
 
 #include "common.h"
-#include "zbxreport.h"
+//#include "zbxreport.h"
 #include "report_protocol.h"
 #include "zbxipcservice.h"
 #include "zbxserialize.h"

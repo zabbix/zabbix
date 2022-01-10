@@ -26,7 +26,7 @@
 #	include <libxml/xpath.h>
 #endif
 
-#include "ipc.h"
+//#include "ipc.h"
 #include "memalloc.h"
 #include "log.h"
 #include "zbxalgo.h"

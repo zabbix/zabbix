@@ -22,7 +22,8 @@
 
 //#include "common.h"
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
-#include "sysinfo.h"
+//#include "sysinfo.h"
+#include "module.h"
 #include "zbxalgo.h"
 #include "dbcache.h"
 

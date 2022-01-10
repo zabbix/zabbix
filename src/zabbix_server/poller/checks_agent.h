@@ -21,7 +21,8 @@
 #define ZABBIX_CHECKS_AGENT_H
 
 #include "dbcache.h"
-#include "sysinfo.h"
+//#include "sysinfo.h"
+#include "module.h"
 
 extern char	*CONFIG_SOURCE_IP;
 

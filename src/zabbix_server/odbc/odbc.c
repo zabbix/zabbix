@@ -23,7 +23,7 @@
 
 #include <sql.h>
 #include <sqlext.h>
-#include <sqltypes.h>
+//#include <sqltypes.h>
 
 #include "odbc.h"
 #include "log.h"
