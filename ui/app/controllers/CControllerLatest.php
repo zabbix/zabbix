@@ -383,14 +383,21 @@ abstract class CControllerLatest extends CController {
 	/**
 	 * Find what subfilters are available based on items selected using the main filter.
 	 *
-	 * @param array  $subfilters                          Selected subfilters.
-	 * @param array  $prepared_data                       Results of items matching primary filter.
-	 * @param array  $prepared_data['hosts']              Selected hosts from database.
-	 * @param string $prepared_data['hosts'][]['name']    Host name.
-	 * @param array  $prepared_data['items']              Selected items from database.
-	 * @param string $prepared_data['items'][]['hostid']  Item hostid.
-	 * @param array  $filter                              Filter parameters.
-	 * @param int    $filter['show_without_data']         "Show items without data" filter checkbox value.
+	 * @param array  $subfilters                                       Selected subfilters.
+	 * @param array  $prepared_data                                    [IN/OUT] Result of items matching primary filter.
+	 * @param array  $prepared_data['hosts']                           [IN] Selected hosts from database.
+	 * @param string $prepared_data['hosts'][]['name']                 [IN] Host name.
+	 * @param array  $prepared_data['items']                           [IN/OUT] Selected items from database.
+	 * @param string $prepared_data['items'][]['hostid']               [IN] Item hostid.
+	 * @param string $prepared_data['items'][]['itemid']               [IN] Item itemid.
+	 * @param array  $prepared_data['items'][]['tags']                 [IN] Item tags array.
+	 * @param string $prepared_data['items'][]['tags'][]['tag']        [IN] Tag name.
+	 * @param string $prepared_data['items'][]['tags'][]['value']      [IN] Tag value.
+	 * @param array  $prepared_data['items'][]['matching_subfilters']  [OUT] Flag for each of subfilter group showing
+	 *                                                                 either item fits its subfilter requirements.
+	 * @param bool   $prepared_data['items'][]['has_data']             [OUT] Flag either item has data.
+	 * @param array  $filter                                           Filter parameters.
+	 * @param int    $filter['show_without_data']                      "Show items without data" filter checkbox value.
 	 *
 	 * @return array
 	 */
@@ -545,15 +552,16 @@ abstract class CControllerLatest extends CController {
 	 *
 	 * @param array  $items
 	 * @param string $items[]['hostid']                           Item hostid.
+	 * @param string $items[]['itemid']                           Item itemid.
 	 * @param array  $items[]['tags']                             Items tags.
 	 * @param array  $items[]['tags'][]['tag']                    Items tag name.
 	 * @param array  $items[]['tags'][]['value']                  Items tag value.
-	 * @param bool   $items[]['has_data']                         [OUT] Flag, either item has data.
+	 * @param bool   $items[]['has_data']                         Flag, either item has data.
 	 * @param array  $items[]['matching_subfilters']
-	 * @param bool   $items[]['matching_subfilters']['hostids']   [OUT] Either item matches host subfilter.
-	 * @param bool   $items[]['matching_subfilters']['tagnames']  [OUT] Either item matches tagname subfilter.
-	 * @param bool   $items[]['matching_subfilters']['tags']      [OUT] Either item matches tags subfilter.
-	 * @param bool   $items[]['matching_subfilters']['data']      [OUT] Either item matches data subfilter.
+	 * @param bool   $items[]['matching_subfilters']['hostids']   Either item matches host subfilter.
+	 * @param bool   $items[]['matching_subfilters']['tagnames']  Either item matches tagname subfilter.
+	 * @param bool   $items[]['matching_subfilters']['tags']      Either item matches tags subfilter.
+	 * @param bool   $items[]['matching_subfilters']['data']      Either item matches data subfilter.
 	 * @param array  $subfilter
 	 * @param array  $subfilter['hostids']                        Selected subfilter hosts.
 	 * @param array  $subfilter['tagnames']                       Selected subfilter tagnames.
