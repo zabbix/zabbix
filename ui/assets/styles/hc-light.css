@@ -2175,14 +2175,6 @@ div.dashboard-grid-widget-item a:link {
     line-height: 18px; }
     .service-info .service-info-value .service-info-value-sla:not(:last-child) {
       margin-right: 10px; }
-    .service-info .service-info-value .service-info-value-sla .icon-description {
-      margin: 0 0 -5px 5px;
-      vertical-align: baseline;
-      border-radius: 2px; }
-      .service-info .service-info-value .service-info-value-sla .icon-description:link, .service-info .service-info-value .service-info-value-sla .icon-description:hover, .service-info .service-info-value .service-info-value-sla .icon-description:focus {
-        border-bottom: none; }
-      .service-info .service-info-value .service-info-value-sla .icon-description:focus {
-        box-shadow: 0 0 0 2px #000000; }
   .service-info .service-name {
     padding-bottom: 5px;
     font-size: 1.5em; }
@@ -4139,6 +4131,10 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   height: 11px;
   cursor: pointer;
   margin: -12px 0 -4px; }
+  .icon-info:link, .icon-info:hover, .icon-info:focus {
+    border-bottom: none; }
+  .icon-info:focus {
+    box-shadow: 0 0 0 2px #000000; }
   .icon-info::before {
     content: '';
     display: inline-block;
@@ -6145,7 +6141,13 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
   background-position: -524px -245px; }
 
 .icon-description {
-  margin: 0 0 0 5px; }
+  margin: 0 0 -5px 5px;
+  vertical-align: baseline;
+  border-radius: 2px; }
+  .icon-description:link, .icon-description:hover, .icon-description:focus {
+    border-bottom: none; }
+  .icon-description:focus {
+    box-shadow: 0 0 0 2px #000000; }
   .icon-description::after {
     content: '?';
     color: #ffffff; }
