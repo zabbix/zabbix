@@ -269,7 +269,7 @@ window.service_edit_popup = {
 			parameters = {row_index};
 		}
 
-		const overlay = PopUp('popup.service.statusrule.edit', parameters, {dialogue_id: 'service_status_rule_edit'});
+		const overlay = PopUp('popup.service.statusrule.edit', parameters, {dialogueid: 'service_status_rule_edit'});
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 			if (row !== null) {
@@ -379,7 +379,7 @@ window.service_edit_popup = {
 		const overlay = PopUp('popup.services', {
 			title: <?= json_encode(_('Add child services')) ?>,
 			exclude_serviceids
-		}, {dialogue_id: 'services'});
+		}, {dialogueid: 'services'});
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 			for (const service of e.detail) {
@@ -409,7 +409,7 @@ window.service_edit_popup = {
 		const overlay = PopUp('popup.services', {
 			title: <?= json_encode(_('Add parent services')) ?>,
 			exclude_serviceids
-		}, {dialogue_id: 'services'});
+		}, {dialogueid: 'services'});
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 			const data = [];

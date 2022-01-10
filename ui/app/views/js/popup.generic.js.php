@@ -49,7 +49,7 @@ window.popup_generic = {
 				const parameters = groups.length ? {groupid: groups[0]} : {filter_groupid_rst: 1, groupid: []};
 
 				PopUp(e.data.overlay.action, {...e.data.overlay.options, ...parameters}, {
-					dialogue_id: e.data.overlay.dialogueid
+					dialogueid: e.data.overlay.dialogueid
 				});
 			});
 		});
@@ -64,7 +64,7 @@ window.popup_generic = {
 				const parameters = hosts.length ? {hostid: hosts[0]} : {filter_hostid_rst: 1, hostid: []};
 
 				PopUp(e.data.overlay.action, {...e.data.overlay.options, ...parameters}, {
-					dialogue_id: e.data.overlay.dialogueid
+					dialogueid: e.data.overlay.dialogueid
 				});
 			});
 		});

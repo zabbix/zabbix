@@ -98,7 +98,10 @@ window.host_edit_popup = {
 		parameters.clone = 1;
 
 		this.removeEventListeners();
-		PopUp('popup.host.edit', parameters, {dialogue_id: 'host_edit', dialogue_class: 'modal-popup-large'});
+		PopUp('popup.host.edit', parameters, {
+			dialogueid: 'host_edit',
+			dialogue_class: 'modal-popup-large'
+		});
 	},
 
 	fullClone() {
@@ -108,7 +111,10 @@ window.host_edit_popup = {
 		parameters.full_clone = 1;
 
 		this.removeEventListeners();
-		PopUp('popup.host.edit', parameters, {dialogue_id: 'host_edit', dialogue_class: 'modal-popup-large'});
+		PopUp('popup.host.edit', parameters, {
+			dialogueid: 'host_edit',
+			dialogue_class: 'modal-popup-large'
+		});
 	},
 
 	delete(hostid) {

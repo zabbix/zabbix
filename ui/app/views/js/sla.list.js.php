@@ -85,11 +85,9 @@
 
 		edit(parameters = {}) {
 			const overlay = PopUp('popup.sla.edit', parameters, {
-				dialogue_id: 'sla_edit',
+				dialogueid: 'sla_edit',
 				dialogue_class: 'modal-popup-static'
 			});
-
-			overlay.$dialogue[0].classList.add(<?= json_encode(ZBX_STYLE_STICKED_TO_TOP) ?>);
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 				postMessageOk(e.detail.title);

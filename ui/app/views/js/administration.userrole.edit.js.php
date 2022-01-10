@@ -209,7 +209,7 @@
 			const overlay = PopUp('popup.services', {
 				title: <?= json_encode(_('Add services')) ?>,
 				exclude_serviceids
-			}, {dialogue_id: 'services'});
+			}, {dialogueid: 'services'});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 				const data = [];

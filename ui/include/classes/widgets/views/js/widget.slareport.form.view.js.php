@@ -45,7 +45,7 @@ window.widget_slareport = {
 				title: <?= json_encode(_('Service')) ?>,
 				exclude_serviceids,
 				multiple: 0
-			}, {dialogue_id: 'services'});
+			}, {dialogueid: 'services'});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 				const data = [];

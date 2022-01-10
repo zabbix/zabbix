@@ -44,7 +44,7 @@ window.services_popup = {
 			e.preventDefault();
 
 			PopUp('popup.services', getFormFields(filter_form), {
-				dialogue_id: 'services',
+				dialogueid: 'services',
 				trigger_element: e.target
 			});
 		}, {passive: false});
@@ -55,7 +55,7 @@ window.services_popup = {
 			filter_form.elements.filter_name.value = '';
 
 			PopUp('popup.services', getFormFields(filter_form), {
-				dialogue_id: 'services',
+				dialogueid: 'services',
 				trigger_element: e.target
 			});
 		}, {passive: false});

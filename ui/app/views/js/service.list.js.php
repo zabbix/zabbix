@@ -116,7 +116,7 @@
 			this.pauseRefresh();
 
 			const overlay = PopUp('popup.service.edit', parameters, {
-				dialogue_id: 'service_edit',
+				dialogueid: 'service_edit',
 				dialogue_class: 'modal-popup-medium'
 			});
 			const dialogue = overlay.$dialogue[0];

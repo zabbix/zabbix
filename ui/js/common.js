@@ -335,21 +335,21 @@ function getPosition(obj) {
  * @returns {Overlay}
  */
 function PopUp(action, parameters, {
-	dialogue_id = null,
+	dialogueid = null,
 	dialogue_class = '',
 	trigger_element = document.activeElement
 } = {}) {
-	var overlay = overlays_stack.getById(dialogue_id);
+	var overlay = overlays_stack.getById(dialogueid);
 
 	if (!overlay) {
 		overlay = overlayDialogue({
-			'dialogueid': dialogue_id,
-			'title': '',
-			'content': jQuery('<div>', {'height': '68px', class: 'is-loading'}),
-			'class': 'modal-popup ' + dialogue_class,
-			'buttons': [],
-			'element': trigger_element,
-			'type': 'popup'
+			dialogueid,
+			title: '',
+			content: jQuery('<div>', {'height': '68px', class: 'is-loading'}),
+			class: 'modal-popup ' + dialogue_class,
+			buttons: [],
+			element: trigger_element,
+			type: 'popup'
 		});
 	}
 
@@ -545,7 +545,7 @@ function removeFromOverlaysStack(dialogueid, return_focus) {
  * @param {string} action	(optional) action value that is used in CRouter. Default value is 'popup.generic'.
  */
 function reloadPopup(form, action) {
-	var dialogue_id = form.closest('[data-dialogueid]').dataset.dialogueid,
+	var dialogueid = form.closest('[data-dialogueid]').dataset.dialogueid,
 		dialogue_class = jQuery(form).closest('[data-dialogueid]').prop('class'),
 		action = action || 'popup.generic',
 		parameters = {};
@@ -554,7 +554,7 @@ function reloadPopup(form, action) {
 		parameters[input.name] = input.value;
 	};
 
-	PopUp(action, parameters, {dialogue_id, dialogue_class});
+	PopUp(action, parameters, {dialogueid, dialogue_class});
 }
 
 /**

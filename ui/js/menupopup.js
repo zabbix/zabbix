@@ -499,7 +499,7 @@ function getMenuPopupDashboard(options, trigger_element) {
 						jQuery(this).closest('.menu-popup').menuPopup('close', null);
 
 						PopUp('popup.dashboard.share.edit', parameters, {
-							dialogue_id: 'dashboard_share_edit',
+							dialogueid: 'dashboard_share_edit',
 							dialogue_class: 'modal-popup-generic',
 							trigger_element
 						});

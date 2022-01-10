@@ -154,7 +154,7 @@ window.sla_edit_popup = {
 		}
 
 		const overlay = PopUp('popup.sla.excludeddowntime.edit', popup_params, {
-			dialogue_id: 'sla_excluded_downtime_edit'
+			dialogueid: 'sla_excluded_downtime_edit'
 		});
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {

@@ -935,7 +935,7 @@ class CDashboard extends CBaseComponent {
 		};
 
 		PopUp('dashboard.properties.edit', properties, {
-			dialogue_id: 'dashboard_properties',
+			dialogueid: 'dashboard_properties',
 			dialogue_class: 'modal-popup-generic'
 		});
 	}
@@ -1004,7 +1004,7 @@ class CDashboard extends CBaseComponent {
 		properties.dashboard_display_period = this._data.display_period;
 
 		PopUp('dashboard.page.properties.edit', properties, {
-			dialogue_id: 'dashboard_page_properties',
+			dialogueid: 'dashboard_page_properties',
 			dialogue_class: 'modal-popup-generic'
 		});
 	}
@@ -1093,7 +1093,10 @@ class CDashboard extends CBaseComponent {
 		const overlay = PopUp('dashboard.widget.edit', {
 			templateid: this._data.templateid ?? undefined,
 			...properties
-		}, {dialogue_id: 'widget_properties', dialogue_class: 'modal-popup-generic'});
+		}, {
+			dialogueid: 'widget_properties',
+			dialogue_class: 'modal-popup-generic'
+		});
 
 		overlay.xhr.then(() => {
 			const form = overlay.$dialogue.$body[0].querySelector('form');

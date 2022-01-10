@@ -280,6 +280,6 @@
 			show_final_result: show_final_result ? 1 : 0,
 			get_value: get_value ? 1 : 0,
 			data: cached_values
-		}), {dialogue_id: 'item-test', trigger_element});
+		}), {dialogueid: 'item-test', trigger_element});
 	}
 </script>
