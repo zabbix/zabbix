@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,9 +28,8 @@ import (
 	"sync"
 	"time"
 
-	"zabbix.com/pkg/shared"
-
 	"zabbix.com/pkg/plugin"
+	"zabbix.com/pkg/plugin/comms"
 )
 
 var startLock sync.Mutex
@@ -53,7 +52,7 @@ func (p *Plugin) SetBrokerName(name string) {
 	p.broker.pluginName = name
 }
 
-func (p *Plugin) Register() (response *shared.RegisterResponse, err error) {
+func (p *Plugin) Register() (response *comms.RegisterResponse, err error) {
 	return p.broker.register()
 }
 
@@ -78,7 +77,7 @@ func (p *Plugin) ExecutePlugin() {
 }
 
 func (p *Plugin) Start() {
-	if shared.ImplementsRunner(p.Interfaces) {
+	if comms.ImplementsRunner(p.Interfaces) {
 		p.broker.start()
 	}
 }
@@ -89,12 +88,12 @@ func (p *Plugin) Stop() {
 	}
 	p.cmd = nil
 
-	err := shared.Write(
+	err := comms.Write(
 		p.broker.conn,
-		shared.TerminateRequest{
-			Common: shared.Common{
-				Id:   shared.NonRequiredID,
-				Type: shared.TerminateRequestType},
+		comms.TerminateRequest{
+			Common: comms.Common{
+				Id:   comms.NonRequiredID,
+				Type: comms.TerminateRequestType},
 		},
 	)
 
@@ -109,7 +108,7 @@ func (p *Plugin) Configure(globalOptions *plugin.GlobalOptions, privateOptions i
 	p.ExecutePlugin()
 	p.SetBrokerName(p.Name())
 
-	if shared.ImplementsConfigurator(p.Interfaces) {
+	if comms.ImplementsConfigurator(p.Interfaces) {
 		p.broker.configure(globalOptions, privateOptions)
 	}
 }

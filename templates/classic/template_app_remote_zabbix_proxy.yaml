@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-11T08:05:29Z'
+  date: '2022-01-07T13:02:24Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -364,6 +364,33 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix proxy health/process.java_poller.avg.busy,10m)<65'
               name: 'Zabbix java poller processes more than 75% busy'
+              priority: AVERAGE
+        -
+          uuid: 7c0d7d097e004d0db25eab55ceb6b87c
+          name: 'Utilization of ODBC poller data collector processes, in %'
+          type: DEPENDENT
+          key: process.odbc_poller.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.data.process[''odbc poller''].busy.avg'
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix proxy'
+          triggers:
+            -
+              uuid: 7f83ff01200c4862aa22057b079da6f8
+              expression: 'avg(/Remote Zabbix proxy health/process.odbc_poller.avg.busy,10m)>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/Remote Zabbix proxy health/process.odbc_poller.avg.busy,10m)<65'
+              name: 'Zabbix ODBC poller processes more than 75% busy'
               priority: AVERAGE
         -
           uuid: e44b8cc43d5c49c5a81ed33c5cc44c82
@@ -1081,6 +1108,12 @@ zabbix_export:
           item:
             host: 'Remote Zabbix proxy health'
             key: process.history_poller.avg.busy
+        -
+          sortorder: '12'
+          color: 9FA8DA
+          item:
+            host: 'Remote Zabbix proxy health'
+            key: process.odbc_poller.avg.busy
     -
       uuid: 87379405c456407ebab6e033c3cae37a
       name: 'Zabbix internal process busy %'

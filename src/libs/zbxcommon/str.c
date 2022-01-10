@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 #endif
 
 static const char	copyright_message[] =
-	"Copyright (C) 2021 Zabbix SIA\n"
+	"Copyright (C) 2022 Zabbix SIA\n"
 	"License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.\n"
 	"This is free software: you are free to change and redistribute it according to\n"
 	"the license. There is NO WARRANTY, to the extent permitted by law.";
@@ -1371,6 +1371,8 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "problem housekeeper";
 		case ZBX_PROCESS_TYPE_HA_MANAGER:
 			return "ha manager";
+		case ZBX_PROCESS_TYPE_ODBCPOLLER:
+			return "odbc poller";
 		case ZBX_PROCESS_TYPE_MAIN:
 			return "main";
 	}

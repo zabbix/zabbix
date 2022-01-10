@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -176,6 +176,21 @@ foreach ($data['items'] as $itemid => $item) {
 		->addClass($host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_RED : null)
 		->setMenuPopup(CMenuPopupHelper::getHost($item['hostid']));
 
+	$maintenance_icon = '';
+
+	if ($host['status'] == HOST_STATUS_MONITORED && $host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+		if (array_key_exists($host['maintenanceid'], $data['maintenances'])) {
+			$maintenance = $data['maintenances'][$host['maintenanceid']];
+			$maintenance_icon = makeMaintenanceIcon($host['maintenance_type'], $maintenance['name'],
+				$maintenance['description']
+			);
+		}
+		else {
+			$maintenance_icon = makeMaintenanceIcon($host['maintenance_type'],
+				_('Inaccessible maintenance'), ''
+			);
+		}
+	}
 
 	$item_icons = [];
 	if ($item['status'] == ITEM_STATUS_ACTIVE && $item['error'] !== '') {
@@ -211,7 +226,7 @@ foreach ($data['items'] as $itemid => $item) {
 
 		$table_row = new CRow([
 			$checkbox,
-			$host_name,
+			[$host_name, $maintenance_icon],
 			(new CCol([$item_name, $item_key]))->addClass($state_css),
 			(new CCol($item_delay))->addClass($state_css),
 			(new CCol($item_history))->addClass($state_css),
@@ -228,7 +243,7 @@ foreach ($data['items'] as $itemid => $item) {
 	else {
 		$table_row = new CRow([
 			$checkbox,
-			$host_name,
+			[$host_name, $maintenance_icon],
 			(new CCol($item_name))->addClass($state_css),
 			(new CCol($last_check))->addClass($state_css),
 			(new CCol($last_value))->addClass($state_css),

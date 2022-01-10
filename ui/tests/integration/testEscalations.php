@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -236,18 +236,11 @@ class testEscalations extends CIntegrationTest {
 			'hostids' => [self::$hostid],
 			'active_since' => self::$maint_start_tm,
 			'active_till' => $maint_end_tm,
-			'tags_evaltype' => 0,
+			'tags_evaltype' => MAINTENANCE_TAG_EVAL_TYPE_AND_OR,
 			'timeperiods' => [
-				[
-					'day' => '1',
-					'dayofweek' => '0',
-					'every' => '1',
-					'month' => '0',
-					'period' => '300',
-					'start_date' => self::$maint_start_tm,
-					'start_time' => '0',
-					'timeperiod_type' => '0'
-				]
+				'timeperiod_type' => TIMEPERIOD_TYPE_ONETIME,
+				'period' => 300,
+				'start_date' => self::$maint_start_tm
 			]
 		]);
 		$this->assertArrayHasKey('maintenanceids', $response['result']);
@@ -302,18 +295,11 @@ class testEscalations extends CIntegrationTest {
 			'hostids' => [self::$hostid],
 			'active_since' => self::$maint_start_tm,
 			'active_till' => $maint_end_tm,
-			'tags_evaltype' => 0,
+			'tags_evaltype' => MAINTENANCE_TAG_EVAL_TYPE_AND_OR,
 			'timeperiods' => [
-				[
-					'day' => '1',
-					'dayofweek' => '0',
-					'every' => '1',
-					'month' => '0',
-					'period' => '300',
-					'start_date' => self::$maint_start_tm,
-					'start_time' => '0',
-					'timeperiod_type' => '0'
-				]
+				'timeperiod_type' => TIMEPERIOD_TYPE_ONETIME,
+				'period' => 300,
+				'start_date' => self::$maint_start_tm
 			]
 		]);
 		$this->assertArrayHasKey('maintenanceids', $response['result']);
@@ -372,18 +358,11 @@ class testEscalations extends CIntegrationTest {
 			'hostids' => [self::$hostid],
 			'active_since' => self::$maint_start_tm,
 			'active_till' => $maint_end_tm,
-			'tags_evaltype' => 0,
+			'tags_evaltype' => MAINTENANCE_TAG_EVAL_TYPE_AND_OR,
 			'timeperiods' => [
-				[
-					'day' => '1',
-					'dayofweek' => '0',
-					'every' => '1',
-					'month' => '0',
-					'period' => '300',
-					'start_date' => self::$maint_start_tm,
-					'start_time' => '0',
-					'timeperiod_type' => '0'
-				]
+				'timeperiod_type' => TIMEPERIOD_TYPE_ONETIME,
+				'period' => 300,
+				'start_date' => self::$maint_start_tm
 			]
 		]);
 		$this->assertArrayHasKey('maintenanceids', $response['result']);

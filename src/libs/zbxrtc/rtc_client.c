@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -192,6 +192,21 @@ int	zbx_rtc_process(const char *option, char **error)
 			return FAIL;
 		}
 	}
+
+#if !defined(HAVE_SIGQUEUE)
+	switch (code)
+	{
+		/* allow only socket based runtime control options */
+		case ZBX_RTC_DIAGINFO:
+		case ZBX_RTC_HA_STATUS:
+		case ZBX_RTC_HA_REMOVE_NODE:
+		case ZBX_RTC_HA_SET_FAILOVER_DELAY:
+			break;
+		default:
+			*error = zbx_dsprintf(NULL, "operation is not supported on the given operating system");
+			return FAIL;
+	}
+#endif
 
 	if (NULL != data)
 		size = (zbx_uint32_t)strlen(data) + 1;
