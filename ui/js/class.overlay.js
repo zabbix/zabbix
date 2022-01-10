@@ -68,6 +68,13 @@ function Overlay(type, dialogueid) {
 	this.$dialogue.append(this.$dialogue.$body);
 	this.$dialogue.append(this.$dialogue.$footer);
 
+	this.$dialogue.$body.on('submit', 'form', function(e) {
+		if (this.$btn_submit) {
+			e.preventDefault();
+			this.$btn_submit.trigger('click');
+		}
+	}.bind(this));
+
 	this.center_dialog_animation_frame = null;
 	this.center_dialog_function = () => {
 		if (this.center_dialog_animation_frame !== null) {
@@ -488,10 +495,4 @@ Overlay.prototype.setProperties = function(obj) {
 				break;
 		}
 	}
-
-	// Hijack form.
-	this.$btn_submit && this.$dialogue.$body.find('form').on('submit', function(e) {
-		e.preventDefault();
-		this.$btn_submit.trigger('click');
-	}.bind(this));
 };
