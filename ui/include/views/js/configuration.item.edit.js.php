@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 include __DIR__.'/common.item.edit.js.php';

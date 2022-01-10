@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 include dirname(__FILE__).'/common.item.edit.js.php';
@@ -28,7 +29,7 @@ include dirname(__FILE__).'/item.preprocessing.js.php';
 include dirname(__FILE__).'/editabletable.js.php';
 include dirname(__FILE__).'/itemtest.js.php';
 ?>
-<script type="text/javascript">
+<script>
 	const view = {
 		form_name: null,
 
@@ -102,7 +103,7 @@ include dirname(__FILE__).'/itemtest.js.php';
 					&& type != <?= ITEM_TYPE_SNMPTRAP ?>
 					&& type != <?= ITEM_TYPE_JMX ?>
 					&& type != <?= ITEM_TYPE_IPMI ?>
-			)
+			);
 
 			if (type == <?= ITEM_TYPE_SSH ?> || type == <?= ITEM_TYPE_TELNET ?>) {
 				$('label[for=username]').addClass(asterisk);
