@@ -39,7 +39,6 @@
 
 			// Refresh field visibility on document load.
 			this.changeRecoveryMode();
-			this.changeCorrelationMode();
 
 			$('input[name=recovery_mode]').change(() => view.changeRecoveryMode());
 			$('input[name=correlation_mode]').change(() => view.changeCorrelationMode());
