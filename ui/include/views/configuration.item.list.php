@@ -170,6 +170,10 @@ foreach ($data['items'] as $item) {
 	// triggers info
 	$triggerHintTable = (new CTableInfo())->setHeader([_('Severity'), _('Name'), _('Expression'), _('Status')]);
 
+	$backurl = (new CUrl('items.php'))
+		->setArgument('context', $data['context'])
+		->getUrl();
+
 	foreach ($item['triggers'] as $num => &$trigger) {
 		$trigger = $data['itemTriggers'][$trigger['triggerid']];
 
@@ -179,6 +183,7 @@ foreach ($data['items'] as $item) {
 		);
 
 		$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
+
 
 		if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 			$trigger_description[] = new CSpan(CHtml::encode($trigger['description']));
@@ -191,6 +196,7 @@ foreach ($data['items'] as $item) {
 					->setArgument('hostid', key($trigger['hosts']))
 					->setArgument('triggerid', $trigger['triggerid'])
 					->setArgument('context', $data['context'])
+					->setArgument('backurl', $backurl)
 			);
 		}
 
@@ -235,9 +241,7 @@ foreach ($data['items'] as $item) {
 		->setMenuPopup(CMenuPopupHelper::getItemConfiguration([
 			'itemid' => $item['itemid'],
 			'context' => $data['context'],
-			'backurl' => (new CUrl('items.php'))
-				->setArgument('context', $data['context'])
-				->getUrl()
+			'backurl' => $backurl
 		]));
 
 	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
