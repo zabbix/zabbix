@@ -188,7 +188,7 @@ int	CONFIG_HISTORYPOLLER_FORKS	= 1;	/* for zabbix[proxy_history] internal check 
 int	CONFIG_AVAILMAN_FORKS		= 1;
 int	CONFIG_SERVICEMAN_FORKS		= 0;
 int	CONFIG_PROBLEMHOUSEKEEPER_FORKS	= 0;
-int	CONFIG_ODBCPOLLER_FORKS		= 0;
+int	CONFIG_ODBCPOLLER_FORKS		= 1;
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
@@ -668,10 +668,6 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 
 #if !defined(HAVE_OPENIPMI)
 	err |= (FAIL == check_cfg_feature_int("StartIPMIPollers", CONFIG_IPMIPOLLER_FORKS, "IPMI support"));
-#endif
-
-#if !defined(HAVE_UNIXODBC)
-	err |= (FAIL == check_cfg_feature_int("StartODBCPollers", CONFIG_ODBCPOLLER_FORKS, "ODBC support"));
 #endif
 
 	err |= (FAIL == zbx_db_validate_config_features());
