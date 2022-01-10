@@ -1429,13 +1429,11 @@ static int	server_startup(zbx_socket_t *listen_sock, zbx_rtc_t *rtc)
 			case ZBX_PROCESS_TYPE_PROBLEMHOUSEKEEPER:
 				zbx_thread_start(trigger_housekeeper_thread, &thread_args, &threads[i]);
 				break;
-#ifdef HAVE_UNIXODBC
 			case ZBX_PROCESS_TYPE_ODBCPOLLER:
 				poller_type = ZBX_POLLER_TYPE_ODBC;
 				thread_args.args = &poller_type;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
-#endif
 		}
 	}
 
