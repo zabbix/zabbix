@@ -545,7 +545,7 @@ function removeFromOverlaysStack(dialogueid, return_focus) {
  * @param {string} action	(optional) action value that is used in CRouter. Default value is 'popup.generic'.
  */
 function reloadPopup(form, action) {
-	var dialogue_id = jQuery(form).closest('[data-dialogueid]').prop('data-dialogueid'),
+	var dialogue_id = form.closest('[data-dialogueid]').dataset.dialogueid,
 		dialogue_class = jQuery(form).closest('[data-dialogueid]').prop('class'),
 		action = action || 'popup.generic',
 		parameters = {};
