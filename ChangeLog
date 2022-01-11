@@ -1,3 +1,10 @@
+Changes for 6.0.0rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 6.0.0beta2
 
 New features:
@@ -15,6 +22,10 @@ A......... [ZBXNEXT-6470,ZBXNEXT-6890] implemented complete audit logging of mai
 ...G...PS. [ZBXNEXT-4922] added support for pcre2 (yurii)
 
 Bug fixes:
+..F....... [ZBX-20382] updated jquery version (ashubin)
+.....J.... [ZBX-20383] updated logback-core, logback-classic and slf4j-api jars to the latest stable versions (vso)
+..F.I..... [ZBX-20384] fixed possibility to view setup pages by non-superadmin if config already file exists (averza)
+..F....... [ZBX-20388] fixed XSS vulnerability in multiselect (agriscenko)
 A......... [ZBX-19815] fixed multiple data convertion issues in import between versions 1.8/2.0 and 5.0 (Ivo)
 .......PS. [ZBX-20405] improved timeouts in JS (dgoloscapov, wiper)
 ..F....... [ZBX-19669] fixed success message not showing when no fields were changed in Administration->Authentication page (Ivo)
