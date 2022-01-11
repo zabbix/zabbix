@@ -1,6 +1,8 @@
 Changes for 6.0.0beta2
 
 New features:
+..F....... [ZBXNEXT-7033] anchored modal dialogues to avoid their repositioning during interactions (ashubin, jfreibergs)
+..F....... [ZBXNEXT-669] added maintenance status icon to Latest Data page (acikuns)
 A.F.I...S. [ZBXNEXT-6999] implemented SLA, SLA reports and SLA report widget (ashubin, averza, jfreibergs, vso)
 ...G...... [ZBXNEXT-6875] added native support for the system.hw.chassis and system.hw.devices keys in Zabbix agent 2 (esneiders)
 .D.....PST [ZBXNEXT-2485] moved odbc poller into separate poller type (dgoloscapov, vso)
@@ -13,6 +15,7 @@ A......... [ZBXNEXT-6470,ZBXNEXT-6890] implemented complete audit logging of mai
 ...G...PS. [ZBXNEXT-4922] added support for pcre2 (yurii)
 
 Bug fixes:
+A......... [ZBX-19815] fixed multiple data convertion issues in import between versions 1.8/2.0 and 5.0 (Ivo)
 .......PS. [ZBX-20405] improved timeouts in JS (dgoloscapov, wiper)
 ..F....... [ZBX-19669] fixed success message not showing when no fields were changed in Administration->Authentication page (Ivo)
 ...G...... [ZBX-20269] added handling of performance counter with negative denominator value (arimdjonoks)
