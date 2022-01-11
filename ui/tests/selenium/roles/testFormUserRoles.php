@@ -848,10 +848,7 @@ class testFormUserRoles extends CWebTest {
 		$this->page->open('zabbix.php?action=userrole.edit')->waitUntilReady();
 		$this->page->removeFocus();
 
-		$skip_fields = [
-			'query' => 'xpath://footer',
-			'query' => 'xpath://input[@id="name"]'
-		];
+		$screenshot_area = $this->query('xpath://main')->one();
 		foreach ($roles as $role) {
 			$this->query('id:user-type')->one()->asZDropdown()->select($role);
 
@@ -861,13 +858,13 @@ class testFormUserRoles extends CWebTest {
 					$form->getField($field)->fill('Service list');
 				}
 			}
-			$this->assertScreenshotExcept(null, $skip_fields, $role);
+			$this->assertScreenshotExcept($screenshot_area, ['query' => 'xpath://input[@id="name"]'], $role);
 		}
 
 		// Screens for super admin.
 		$this->page->open('zabbix.php?action=userrole.edit&roleid=3');
 		$this->page->removeFocus();
-		$this->assertScreenshotExcept(null, $skip_fields);
+		$this->assertScreenshotExcept($screenshot_area, ['query' => 'xpath://input[@id="name"]']);
 		foreach (['Clone' => true, 'Cancel' => true, 'Update' => false, 'Delete' => false] as $button => $clickable) {
 			$this->assertEquals($clickable, $this->query('button', $button)->one()->isClickable());
 		}
