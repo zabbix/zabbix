@@ -1,5 +1,5 @@
 
-# Morningstar TriStar PWM SNMP
+# Template Net Morningstar TriStar PWM SNMP
 
 ## Overview
 
@@ -43,12 +43,12 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Battery voltage discovery |<p>Discovery for battery voltage triggers</p> |DEPENDENT |battery.voltage.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
+|Battery voltage discovery |<p>Discovery for battery voltage triggers</p> |DEPENDENT |battery.voltage.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |Charge mode discovery |<p>Discovery for device in charge mode</p> |DEPENDENT |controlmode.charge.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return JSON.stringify(parseInt(value) === 0 ? [{'{#SINGLETON}': ''}] : []);`</p> |
 |Load mode discovery |<p>Discovery for device in load mode</p> |DEPENDENT |controlmode.load.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return JSON.stringify(parseInt(value) === 1 ? [{'{#SINGLETON}': ''}] : []);`</p> |
 |Diversion mode discovery |<p>Discovery for device in diversion mode</p> |DEPENDENT |controlmode.diversion.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return JSON.stringify(parseInt(value) === 2 ? [{'{#SINGLETON}': ''}] : []);`</p> |
-|Charge + Diversion mode discovery |<p>Discovery for device in charge and diversion modes</p> |DEPENDENT |controlmode.charge_diversion.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
-|Load + Diversion mode discovery |<p>Discovery for device in load and diversion modes</p> |DEPENDENT |controlmode.load_diversion.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
+|Charge + Diversion mode discovery |<p>Discovery for device in charge and diversion modes</p> |DEPENDENT |controlmode.charge_diversion.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
+|Load + Diversion mode discovery |<p>Discovery for device in load and diversion modes</p> |DEPENDENT |controlmode.load_diversion.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 
 ## Items collected
 
@@ -67,8 +67,8 @@ There are no template links in this template.
 |Load |Load: Voltage{#SINGLETON} |<p>MIB: TRISTAR</p><p>Description:Array/Load Voltage</p><p>Scaling Factor:0.00424652099609375</p><p>Units:V</p><p>Range:[0, 80]</p><p>Modbus address:0x000A</p> |SNMP |load.voltage[arrayloadVoltage.0{#SINGLETON}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.004246520996`</p><p>- REGEX: `^(\d+)(\.\d{1,2})? \1\2`</p> |
 |Status |Status: Uptime |<p>Device uptime in seconds</p> |SNMP |status.uptime<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.01`</p> |
 |Status |Status: Control Mode |<p>MIB: TRISTAR</p><p>Description:Control Mode</p><p>Modbus address:0x001A</p><p>0: charge</p><p>1: loadControl</p><p>2: diversion</p><p>3: lighting</p> |SNMP |control.mode[controlMode.0] |
-|Status |Status: Faults |<p>MIB: TRISTAR</p><p>Description:Battery voltage</p><p>Scaling Factor:0.002950042724609375</p><p>Units:V</p><p>Range:[0.0, 80.0]</p><p>Modbus address:0x0008</p> |SNMP |status.faults[faults.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
-|Status |Status: Alarms |<p>MIB: TRISTAR</p><p>Description:Alarms</p><p>Modbus addresses:H=0x001D L=0x0017</p> |SNMP |status.alarms[alarms.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
+|Status |Status: Faults |<p>MIB: TRISTAR</p><p>Description:Battery voltage</p><p>Scaling Factor:0.002950042724609375</p><p>Units:V</p><p>Range:[0.0, 80.0]</p><p>Modbus address:0x0008</p> |SNMP |status.faults[faults.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
+|Status |Status: Alarms |<p>MIB: TRISTAR</p><p>Description:Alarms</p><p>Modbus addresses:H=0x001D L=0x0017</p> |SNMP |status.alarms[alarms.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |Temperature |Temperature: Battery |<p>MIB: TRISTAR</p><p>Description:Battery Temperature</p><p>Scaling Factor:1.0</p><p>Units:deg C</p><p>Range:[-40, 120]</p><p>Modbus address:0x000F</p> |SNMP |temp.battery[batteryTemperature.0] |
 |Temperature |Temperature: Heatsink |<p>MIB: TRISTAR</p><p>Description:Heatsink Temperature</p><p>Scaling Factor:1.0</p><p>Units:deg C</p><p>Range:[-40, 120]</p><p>Modbus address:0x000E</p> |SNMP |temp.heatsink[heatsinkTemperature.0] |
 |Zabbix_raw_items |Battery: Battery Voltage discovery |<p>MIB: TRISTAR</p><p>Description:Battery voltage</p><p>Scaling Factor:0.002950042724609375</p><p>Units:V</p><p>Range:[0.0, 80.0]</p><p>Modbus address:0x0008</p> |SNMP |battery.voltage.discovery[batteryVoltage.0]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.002950042725`</p> |

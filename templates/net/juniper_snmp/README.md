@@ -1,5 +1,5 @@
 
-# Juniper SNMP
+# Template Net Juniper SNMP
 
 ## Overview
 

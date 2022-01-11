@@ -78,7 +78,7 @@ There are no template links in this template.
 |----|-----------|----|----|----|
 |Tomcat: Version has been changed |<p>Tomcat version has changed. Ack to close.</p> |`{TEMPLATE_NAME:jmx["Catalina:type=Server",serverInfo].diff()}=1 and {TEMPLATE_NAME:jmx["Catalina:type=Server",serverInfo].strlen()}>0` |INFO |<p>Manual close: YES</p> |
 |{#JMXVALUE}: Gzip compression is disabled |<p>gzip compression is disabled for connector {#JMXVALUE}.</p> |`{TEMPLATE_NAME:jmx[{#JMXOBJ},compression].str(off)} = 1` |INFO |<p>Manual close: YES</p> |
-|{#JMXNAME}: Busy worker threads count are more than {$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}% of the limit for {$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"} |<p>When current threads busy counter reaches the limit, no more requests could be handled, and the application chokes.</p> |`{TEMPLATE_NAME:jmx[{#JMXOBJ},currentThreadsBusy].min({$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"})}>{Template App Apache Tomcat JMX:jmx[{#JMXOBJ},maxThreads].last()}*{$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}/100` |HIGH | |
+|{#JMXNAME}: Busy worker threads count are more than {$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}% of the limit for {$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"} |<p>When current threads busy counter reaches the limit, no more requests could be handled, and the application chokes.</p> |`{TEMPLATE_NAME:jmx[{#JMXOBJ},currentThreadsBusy].min({$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"})}>{TEMPLATE_NAME:jmx[{#JMXOBJ},maxThreads].last()}*{$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}/100` |HIGH | |
 
 ## Feedback
 

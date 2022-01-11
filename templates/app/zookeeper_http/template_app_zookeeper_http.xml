@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-11-16T15:38:49Z</date>
+   <date>2021-12-21T18:00:09Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -17,7 +17,7 @@
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -847,17 +847,17 @@ return metrics.snapshottime_count || metrics.cnt_snapshottime</params>
                </master_item>
                <triggers>
                   <trigger>
-                     <expression>{last()}&lt;10m</expression>
-                     <name>Zookeeper: has been restarted (uptime &lt; 10m)</name>
-                     <priority>INFO</priority>
-                     <description>Uptime is less than 10 minutes</description>
-                     <manual_close>YES</manual_close>
-                  </trigger>
-                  <trigger>
                      <expression>{nodata(10m)}=1</expression>
                      <name>Zookeeper: Failed to fetch info data (or no data for 10m)</name>
                      <priority>WARNING</priority>
                      <description>Zabbix has not received data for items for the last 10 minutes</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+                  <trigger>
+                     <expression>{last()}&lt;10m</expression>
+                     <name>Zookeeper: has been restarted (uptime &lt; 10m)</name>
+                     <priority>INFO</priority>
+                     <description>Uptime is less than 10 minutes</description>
                      <manual_close>YES</manual_close>
                   </trigger>
                </triggers>
@@ -1112,7 +1112,6 @@ Note, depending on the number of client connections this operation may be expens
                      </master_item>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>Zookeeper client {#TYPE} [{#CLIENT}]: Latency</name>
@@ -1335,7 +1334,6 @@ return JSON.stringify(data);</params>
                      </master_item>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template App Zookeeper by HTTP:zookeeper.synced_followers[{#SINGLETON}].last()} &lt; {Template App Zookeeper by HTTP:zookeeper.quorum_size[{#SINGLETON}].last()}-1</expression>

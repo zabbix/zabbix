@@ -1,5 +1,5 @@
 
-# Morningstar TriStar MPPT 600V SNMP
+# Template Net Morningstar TriStar MPPT 600V SNMP
 
 ## Overview
 
@@ -43,7 +43,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Battery voltage discovery |<p>Discovery for battery voltage triggers</p> |DEPENDENT |battery.voltage.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
+|Battery voltage discovery |<p>Discovery for battery voltage triggers</p> |DEPENDENT |battery.voltage.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 
 ## Items collected
 
@@ -62,8 +62,8 @@ There are no template links in this template.
 |Counter |Counter: Charge Amp-hours |<p>MIB: TRISTAR-MPPT</p><p>Description:Ah Charge Resettable</p><p>Scaling Factor:1.0</p><p>Units:Ah</p><p>Range:[0.0, 5000]</p><p>Modbus addresses:H=0x0034 L=0x0035</p> |SNMP |counter.charge_amp_hours[ahChargeResetable.0] |
 |Counter |Counter: Charge KW-hours |<p>MIB: TRISTAR-MPPT</p><p>Description:kWh Charge Resettable</p><p>Scaling Factor:1.0</p><p>Units:kWh</p><p>Range:[0.0, 65535.0]</p><p>Modbus address:0x0038</p> |SNMP |counter.charge_kw_hours[kwhChargeResetable.0] |
 |Status |Status: Uptime |<p>Device uptime in seconds</p> |SNMP |status.uptime<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.01`</p> |
-|Status |Status: Faults |<p>MIB: TRISTAR-MPPT</p><p>Description:Faults</p><p>Modbus addresses:H=0x002c L=0x002d</p> |SNMP |status.faults[faults.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
-|Status |Status: Alarms |<p>MIB: TRISTAR-MPPT</p><p>Description:Alarms</p><p>Modbus addresses:H=0x002e L=0x002f</p> |SNMP |status.alarms[alarms.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
+|Status |Status: Faults |<p>MIB: TRISTAR-MPPT</p><p>Description:Faults</p><p>Modbus addresses:H=0x002c L=0x002d</p> |SNMP |status.faults[faults.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
+|Status |Status: Alarms |<p>MIB: TRISTAR-MPPT</p><p>Description:Alarms</p><p>Modbus addresses:H=0x002e L=0x002f</p> |SNMP |status.alarms[alarms.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |Temperature |Temperature: Battery |<p>MIB: TRISTAR-MPPT</p><p>Description:Batt. Temp</p><p>Scaling Factor:1.0</p><p>Units:C</p><p>Range:[-40, 80]</p><p>Modbus address:0x0025</p> |SNMP |temp.battery[batteryTemperature.0] |
 |Temperature |Temperature: Heatsink |<p>MIB: TRISTAR-MPPT</p><p>Description:HS Temp</p><p>Scaling Factor:1.0</p><p>Units:C</p><p>Range:[-40, 80]</p><p>Modbus address:0x0023</p> |SNMP |temp.heatsink[heatsinkTemperature.0] |
 |Zabbix_raw_items |Battery: Battery Voltage discovery |<p>MIB: TRISTAR-MPPT</p><p>Description:Battery voltage</p><p>Scaling Factor:1.0</p><p>Units:V</p><p>Range:[-10, 80]</p><p>Modbus address:0x0018</p> |SNMP |battery.voltage.discovery[batteryVoltage.0] |
