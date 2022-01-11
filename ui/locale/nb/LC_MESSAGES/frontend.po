@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-13 14:04+0200\n"
+"POT-Creation-Date: 2022-01-07 19:55+0200\n"
 "PO-Revision-Date: 2021-03-19 18:13+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: none\n"
@@ -1098,7 +1098,7 @@ msgstr "Tillatte verter"
 msgid "Allowed methods"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:682
+#: include/classes/setup/CSetupWizard.php:696
 msgid "Alternatively, you can install it manually:"
 msgstr "Alternativt kan du installere det manuelt:"
 
@@ -1405,6 +1405,7 @@ msgid "Authentication protocol"
 msgstr "Autentiseringsprotokoll"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:359
+#: app/controllers/CControllerAuthenticationUpdate.php:367
 msgid "Authentication settings updated"
 msgstr ""
 
@@ -2038,7 +2039,7 @@ msgstr "Kan ikke opprette ikonskart"
 msgid "Cannot create scheduled report"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:678
+#: include/classes/setup/CSetupWizard.php:692
 msgid "Cannot create the configuration file."
 msgstr "Kan ikke opprette konfigurasjonsfil."
 
@@ -3592,7 +3593,7 @@ msgstr "Konfigurasjon"
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "Konfigurasjonsbufferstatistikk. Cache - buffer (moduser: pfree, totalt, brukt, gratis)."
 
-#: include/classes/setup/CSetupWizard.php:700
+#: include/classes/setup/CSetupWizard.php:723
 #, c-format
 msgid "Configuration file \"%1$s\" created."
 msgstr "Konfigurasjonsfilen \"%1$s\" er opprettet."
@@ -3753,7 +3754,7 @@ msgstr "Konfigurer DB-tilkobling"
 msgid "Confirmation text"
 msgstr "Bekreftelsestekst"
 
-#: include/classes/setup/CSetupWizard.php:698
+#: include/classes/setup/CSetupWizard.php:721
 msgid "Congratulations! You have successfully installed Zabbix frontend."
 msgstr "Gratulerer! Du har installert Zabbix frontend."
 
@@ -4511,14 +4512,14 @@ msgstr "Datalagringsperiode"
 
 #: include/classes/setup/CSetupWizard.php:388
 #: include/classes/setup/CSetupWizard.php:534
-#: include/classes/setup/CSetupWizard.php:740
+#: include/classes/setup/CSetupWizard.php:762
 msgid "Database TLS CA file"
 msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:668
 #: include/classes/setup/CSetupWizard.php:400
 #: include/classes/setup/CSetupWizard.php:540
-#: include/classes/setup/CSetupWizard.php:748
+#: include/classes/setup/CSetupWizard.php:770
 msgid "Database TLS certificate file"
 msgstr ""
 
@@ -4538,7 +4539,7 @@ msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:394
 #: include/classes/setup/CSetupWizard.php:537
-#: include/classes/setup/CSetupWizard.php:744
+#: include/classes/setup/CSetupWizard.php:766
 msgid "Database TLS key file"
 msgstr ""
 
@@ -5663,7 +5664,7 @@ msgstr "Ned"
 msgid "Download image"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:684
+#: include/classes/setup/CSetupWizard.php:698
 msgid "Download the configuration file"
 msgstr "Last ned konfigurasjonsfilen"
 
@@ -8677,9 +8678,9 @@ msgstr "Feil felt \"%1$s\" navn eller verdi i hvor setning for tabell \"%2$s\"."
 msgid "Incorrect fields for sysmap."
 msgstr "Feil felt for sysmap."
 
-#: include/classes/setup/CSetupWizard.php:740
-#: include/classes/setup/CSetupWizard.php:744
-#: include/classes/setup/CSetupWizard.php:748
+#: include/classes/setup/CSetupWizard.php:762
+#: include/classes/setup/CSetupWizard.php:766
+#: include/classes/setup/CSetupWizard.php:770
 #, c-format
 msgid "Incorrect file path for \"%1$s\": %2$s."
 msgstr ""
@@ -9451,11 +9452,12 @@ msgid "Insert expression"
 msgstr "Sett inn uttrykk"
 
 #: include/classes/setup/CSetupWizard.php:69
-#: include/classes/setup/CSetupWizard.php:705
+#: include/classes/setup/CSetupWizard.php:704
+#: include/classes/setup/CSetupWizard.php:727
 msgid "Install"
 msgstr "Installer"
 
-#: setup.php:174
+#: setup.php:162
 msgid "Installation"
 msgstr "Installasjon"
 
@@ -10565,7 +10567,7 @@ msgstr ""
 msgid "Length"
 msgstr ""
 
-#: setup.php:197
+#: setup.php:185
 msgid "Licensed under"
 msgstr ""
 
@@ -13771,7 +13773,7 @@ msgstr ""
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
 msgstr "Vennligst opprett database manuelt, og sett konfigurasjonsparametrene for tilkobling til denne databasen. Trykk på \"%1$s\" -knappen når du er ferdig."
 
-#: include/classes/setup/CSetupWizard.php:888
+#: include/classes/setup/CSetupWizard.php:922
 msgid "Please enable \"allow_url_fopen\" directive."
 msgstr ""
 
@@ -15297,7 +15299,7 @@ msgstr ""
 msgid "Save changes"
 msgstr "Lagre endringer"
 
-#: include/classes/setup/CSetupWizard.php:685
+#: include/classes/setup/CSetupWizard.php:699
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "Lagre det som \"%1$s\""
@@ -18476,8 +18478,8 @@ msgstr "Brukernavn"
 msgid "Username and password"
 msgstr "Brukernavn og passord"
 
-#: include/classes/setup/CSetupWizard.php:600
-#: include/classes/setup/CSetupWizard.php:906
+#: include/classes/setup/CSetupWizard.php:614
+#: include/classes/setup/CSetupWizard.php:940
 msgid "Username and password must be stored in Vault secret keys \"username\" and \"password\"."
 msgstr ""
 
@@ -18938,7 +18940,7 @@ msgid "Vault authentication token"
 msgstr ""
 
 #: include/classes/core/ZBase.php:229
-#: include/classes/setup/CSetupWizard.php:902 include/config.inc.php:53
+#: include/classes/setup/CSetupWizard.php:936 include/config.inc.php:53
 msgid "Vault connection failed."
 msgstr ""
 

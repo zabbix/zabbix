@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-13 14:04+0200\n"
+"POT-Creation-Date: 2022-01-07 19:55+0200\n"
 "PO-Revision-Date: 2021-11-08 13:50+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -1072,7 +1072,7 @@ msgstr "許可されたホスト"
 msgid "Allowed methods"
 msgstr "許可されたメソッド"
 
-#: include/classes/setup/CSetupWizard.php:682
+#: include/classes/setup/CSetupWizard.php:696
 msgid "Alternatively, you can install it manually:"
 msgstr "代わりに、手動でインストールすることができます:"
 
@@ -1379,6 +1379,7 @@ msgid "Authentication protocol"
 msgstr "認証プロトコル"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:359
+#: app/controllers/CControllerAuthenticationUpdate.php:367
 msgid "Authentication settings updated"
 msgstr "認証の設定を更新しました"
 
@@ -2008,7 +2009,7 @@ msgstr "アイコンのマッピングを作成できません"
 msgid "Cannot create scheduled report"
 msgstr "定期レポートを作成できません"
 
-#: include/classes/setup/CSetupWizard.php:678
+#: include/classes/setup/CSetupWizard.php:692
 msgid "Cannot create the configuration file."
 msgstr "設定ファイルが作成できません。"
 
@@ -3514,7 +3515,7 @@ msgstr "設定"
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "設定したキャッシュの統計。cache - buffer (mode: pfree, total, used, free)。"
 
-#: include/classes/setup/CSetupWizard.php:700
+#: include/classes/setup/CSetupWizard.php:723
 #, c-format
 msgid "Configuration file \"%1$s\" created."
 msgstr "設定ファイル\"%1$s\"を作成しました。"
@@ -3675,7 +3676,7 @@ msgstr "データベース接続設定"
 msgid "Confirmation text"
 msgstr "確認テキスト"
 
-#: include/classes/setup/CSetupWizard.php:698
+#: include/classes/setup/CSetupWizard.php:721
 msgid "Congratulations! You have successfully installed Zabbix frontend."
 msgstr "おめでとうございます！Webインターフェースのインストールが終了しました。"
 
@@ -4439,14 +4440,14 @@ msgstr "データ保存期間"
 
 #: include/classes/setup/CSetupWizard.php:388
 #: include/classes/setup/CSetupWizard.php:534
-#: include/classes/setup/CSetupWizard.php:740
+#: include/classes/setup/CSetupWizard.php:762
 msgid "Database TLS CA file"
 msgstr "データベースのTLS CAファイル"
 
 #: include/classes/setup/CFrontendSetup.php:668
 #: include/classes/setup/CSetupWizard.php:400
 #: include/classes/setup/CSetupWizard.php:540
-#: include/classes/setup/CSetupWizard.php:748
+#: include/classes/setup/CSetupWizard.php:770
 msgid "Database TLS certificate file"
 msgstr "データベースのTLS証明書ファイル"
 
@@ -4466,7 +4467,7 @@ msgstr "データベースのTLS暗号化"
 
 #: include/classes/setup/CSetupWizard.php:394
 #: include/classes/setup/CSetupWizard.php:537
-#: include/classes/setup/CSetupWizard.php:744
+#: include/classes/setup/CSetupWizard.php:766
 msgid "Database TLS key file"
 msgstr "データベースのTLSキーファイル"
 
@@ -5587,7 +5588,7 @@ msgstr "Down"
 msgid "Download image"
 msgstr "イメージのダウンロード"
 
-#: include/classes/setup/CSetupWizard.php:684
+#: include/classes/setup/CSetupWizard.php:698
 msgid "Download the configuration file"
 msgstr "設定ファイルのダウンロード"
 
@@ -8593,9 +8594,9 @@ msgstr "テーブル\"%2$s\"へのwhereステートメントのフィールド\"
 msgid "Incorrect fields for sysmap."
 msgstr "マップの設定が正しくありません。"
 
-#: include/classes/setup/CSetupWizard.php:740
-#: include/classes/setup/CSetupWizard.php:744
-#: include/classes/setup/CSetupWizard.php:748
+#: include/classes/setup/CSetupWizard.php:762
+#: include/classes/setup/CSetupWizard.php:766
+#: include/classes/setup/CSetupWizard.php:770
 #, c-format
 msgid "Incorrect file path for \"%1$s\": %2$s."
 msgstr "\"%1$s\": %2$sのファイルパスが正しくありません。"
@@ -9367,11 +9368,12 @@ msgid "Insert expression"
 msgstr "条件式の挿入"
 
 #: include/classes/setup/CSetupWizard.php:69
-#: include/classes/setup/CSetupWizard.php:705
+#: include/classes/setup/CSetupWizard.php:704
+#: include/classes/setup/CSetupWizard.php:727
 msgid "Install"
 msgstr "インストール"
 
-#: setup.php:174
+#: setup.php:162
 msgid "Installation"
 msgstr "インストール"
 
@@ -10470,7 +10472,7 @@ msgstr "凡例"
 msgid "Length"
 msgstr "長さ"
 
-#: setup.php:197
+#: setup.php:185
 msgid "Licensed under"
 msgstr "ライセンスは"
 
@@ -13665,7 +13667,7 @@ msgstr "すべての値のマッピングを削除してよいか確認してく
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
 msgstr "データベースを手動で作成してください。そしてデータベースに接続するための設定値を設定してください。終了したら\"%1$s\"ボタンを押してください。"
 
-#: include/classes/setup/CSetupWizard.php:888
+#: include/classes/setup/CSetupWizard.php:922
 msgid "Please enable \"allow_url_fopen\" directive."
 msgstr "\"allow_url_fopen\"ディレクティブを有効にしてください。"
 
@@ -15189,7 +15191,7 @@ msgstr "保存する"
 msgid "Save changes"
 msgstr "変更を保存"
 
-#: include/classes/setup/CSetupWizard.php:685
+#: include/classes/setup/CSetupWizard.php:699
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "\"%1$s\"として保存しました"
@@ -18352,8 +18354,8 @@ msgstr "ユーザー名"
 msgid "Username and password"
 msgstr "ユーザー名とパスワード"
 
-#: include/classes/setup/CSetupWizard.php:600
-#: include/classes/setup/CSetupWizard.php:906
+#: include/classes/setup/CSetupWizard.php:614
+#: include/classes/setup/CSetupWizard.php:940
 msgid "Username and password must be stored in Vault secret keys \"username\" and \"password\"."
 msgstr "ユーザー名とパスワードはVaultのシークレットキー内の\"username\"と\"password\"として保存してください。"
 
@@ -18814,7 +18816,7 @@ msgid "Vault authentication token"
 msgstr "Vaultの認証トークン"
 
 #: include/classes/core/ZBase.php:229
-#: include/classes/setup/CSetupWizard.php:902 include/config.inc.php:53
+#: include/classes/setup/CSetupWizard.php:936 include/config.inc.php:53
 msgid "Vault connection failed."
 msgstr "Vaultへの接続に失敗しました。"
 

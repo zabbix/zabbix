@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-13 14:04+0200\n"
+"POT-Creation-Date: 2022-01-07 19:55+0200\n"
 "PO-Revision-Date: 2021-11-07 10:00+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
@@ -1093,7 +1093,7 @@ msgstr "מארחים מורשים"
 msgid "Allowed methods"
 msgstr "שיטות מורשות"
 
-#: include/classes/setup/CSetupWizard.php:682
+#: include/classes/setup/CSetupWizard.php:696
 msgid "Alternatively, you can install it manually:"
 msgstr "לחלופין, ניתן להתקין ידנית:"
 
@@ -1402,6 +1402,7 @@ msgid "Authentication protocol"
 msgstr "פרוטוקול אימות"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:359
+#: app/controllers/CControllerAuthenticationUpdate.php:367
 msgid "Authentication settings updated"
 msgstr "הגדרות האימות עודכנו"
 
@@ -2035,7 +2036,7 @@ msgstr "לא ניתן ליצור מפת סמלים"
 msgid "Cannot create scheduled report"
 msgstr "לא ניתן ליצור דוח מתוזמן"
 
-#: include/classes/setup/CSetupWizard.php:678
+#: include/classes/setup/CSetupWizard.php:692
 msgid "Cannot create the configuration file."
 msgstr "לא ניתן ליצור קובץ תצורה."
 
@@ -3587,7 +3588,7 @@ msgstr "הגדרות"
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "הגדרות זיכרון מטמון לסטטיסטיקה. זיכרון מטמון - buffer (מצבים: pfree,‏ total,‏ used,‏ free)."
 
-#: include/classes/setup/CSetupWizard.php:700
+#: include/classes/setup/CSetupWizard.php:723
 #, c-format
 msgid "Configuration file \"%1$s\" created."
 msgstr "קובץ ההגדרות „%1$s“ נוצר."
@@ -3748,7 +3749,7 @@ msgstr "הגדרת חיבור למסד הנתונים"
 msgid "Confirmation text"
 msgstr "טקסט אימות"
 
-#: include/classes/setup/CSetupWizard.php:698
+#: include/classes/setup/CSetupWizard.php:721
 msgid "Congratulations! You have successfully installed Zabbix frontend."
 msgstr "ברכותינו! התקנת בהצלחה את מנשק המשתמש של Zabbix."
 
@@ -4516,14 +4517,14 @@ msgstr "תקופת אחסון נתונים"
 
 #: include/classes/setup/CSetupWizard.php:388
 #: include/classes/setup/CSetupWizard.php:534
-#: include/classes/setup/CSetupWizard.php:740
+#: include/classes/setup/CSetupWizard.php:762
 msgid "Database TLS CA file"
 msgstr "קובץ CA ל־TLS של מסד הנתונים"
 
 #: include/classes/setup/CFrontendSetup.php:668
 #: include/classes/setup/CSetupWizard.php:400
 #: include/classes/setup/CSetupWizard.php:540
-#: include/classes/setup/CSetupWizard.php:748
+#: include/classes/setup/CSetupWizard.php:770
 msgid "Database TLS certificate file"
 msgstr "קובץ אישור ל־TLS של מסד הנתונים"
 
@@ -4543,7 +4544,7 @@ msgstr "הצפנת TLS של מסד הנתונים"
 
 #: include/classes/setup/CSetupWizard.php:394
 #: include/classes/setup/CSetupWizard.php:537
-#: include/classes/setup/CSetupWizard.php:744
+#: include/classes/setup/CSetupWizard.php:766
 msgid "Database TLS key file"
 msgstr "קובץ מפתח TLS של מסד הנתונים"
 
@@ -5667,7 +5668,7 @@ msgstr "למטה"
 msgid "Download image"
 msgstr "הורדת תמונה"
 
-#: include/classes/setup/CSetupWizard.php:684
+#: include/classes/setup/CSetupWizard.php:698
 msgid "Download the configuration file"
 msgstr "הורדת קובץ ההגדרות"
 
@@ -8680,9 +8681,9 @@ msgstr "שם או ערך שגוי לשדה „%1$s” בביטוי where בטב�
 msgid "Incorrect fields for sysmap."
 msgstr "שדות שגויים למערכת המפות."
 
-#: include/classes/setup/CSetupWizard.php:740
-#: include/classes/setup/CSetupWizard.php:744
-#: include/classes/setup/CSetupWizard.php:748
+#: include/classes/setup/CSetupWizard.php:762
+#: include/classes/setup/CSetupWizard.php:766
+#: include/classes/setup/CSetupWizard.php:770
 #, c-format
 msgid "Incorrect file path for \"%1$s\": %2$s."
 msgstr "נתיב הקובץ של „%1$s” שגוי: %2$s."
@@ -9454,11 +9455,12 @@ msgid "Insert expression"
 msgstr "הוספת ביטוי"
 
 #: include/classes/setup/CSetupWizard.php:69
-#: include/classes/setup/CSetupWizard.php:705
+#: include/classes/setup/CSetupWizard.php:704
+#: include/classes/setup/CSetupWizard.php:727
 msgid "Install"
 msgstr "התקנה"
 
-#: setup.php:174
+#: setup.php:162
 msgid "Installation"
 msgstr "התקנה"
 
@@ -10567,7 +10569,7 @@ msgstr "מקרא"
 msgid "Length"
 msgstr "אורך"
 
-#: setup.php:197
+#: setup.php:185
 msgid "Licensed under"
 msgstr "כפוף לרישיון"
 
@@ -13772,7 +13774,7 @@ msgstr "נא לאשר שברצונך להסיר את כל מיפויי הערכ�
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
 msgstr "נא ליצור מסד נתונים ידנית ולהגדיר את משתני התצורה לחיבור למסד הנתונים הזה. יש ללחוץ על הכפתור „%1$s” לאחר סיום הפעולה."
 
-#: include/classes/setup/CSetupWizard.php:888
+#: include/classes/setup/CSetupWizard.php:922
 msgid "Please enable \"allow_url_fopen\" directive."
 msgstr "נא להפעיל את ההנחיה „allow_url_fopen” (לאפשר פתיחת קישורים)."
 
@@ -15298,7 +15300,7 @@ msgstr "שמירה בשם"
 msgid "Save changes"
 msgstr "שמירת השינויים"
 
-#: include/classes/setup/CSetupWizard.php:685
+#: include/classes/setup/CSetupWizard.php:699
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "שמירה בתור „%1$s“"
@@ -18477,8 +18479,8 @@ msgstr "שם משתמש"
 msgid "Username and password"
 msgstr "שם משתמש וססמה"
 
-#: include/classes/setup/CSetupWizard.php:600
-#: include/classes/setup/CSetupWizard.php:906
+#: include/classes/setup/CSetupWizard.php:614
+#: include/classes/setup/CSetupWizard.php:940
 msgid "Username and password must be stored in Vault secret keys \"username\" and \"password\"."
 msgstr "יש לאחסן את שם המשתמש והססמה במפתחות הסודיים של הכספת „username” ו־„password” (שם משתמש וססמה)."
 
@@ -18939,7 +18941,7 @@ msgid "Vault authentication token"
 msgstr "אסימון אימות כספת"
 
 #: include/classes/core/ZBase.php:229
-#: include/classes/setup/CSetupWizard.php:902 include/config.inc.php:53
+#: include/classes/setup/CSetupWizard.php:936 include/config.inc.php:53
 msgid "Vault connection failed."
 msgstr "החיבור לכספת נכשל."
 

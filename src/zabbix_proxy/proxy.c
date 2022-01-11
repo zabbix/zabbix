@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -524,7 +524,7 @@ static void	zbx_set_defaults(void)
 
 	if (ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE)
 	{
-		CONFIG_CONFSYNCER_FORKS = CONFIG_DATASENDER_FORKS = 0;
+		CONFIG_DATASENDER_FORKS = 0;
 		program_type = ZBX_PROGRAM_TYPE_PROXY_PASSIVE;
 	}
 
@@ -1240,8 +1240,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			case ZBX_PROCESS_TYPE_TRAPPER:
 				thread_args.args = &listen_sock;
 				zbx_thread_start(trapper_thread, &thread_args, &threads[i]);
-				if (0 == CONFIG_CONFSYNCER_FORKS)
-					DCconfig_wait_sync();
 				break;
 			case ZBX_PROCESS_TYPE_HEARTBEAT:
 				zbx_thread_start(heart_thread, &thread_args, &threads[i]);

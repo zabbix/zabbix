@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-13 14:04+0200\n"
+"POT-Creation-Date: 2022-01-07 19:55+0200\n"
 "PO-Revision-Date: 2014-06-04 11:22+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zetosoftware.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1117,7 +1117,7 @@ msgstr "Dopuszczalne hosty"
 msgid "Allowed methods"
 msgstr "Dopuszczalne metody"
 
-#: include/classes/setup/CSetupWizard.php:682
+#: include/classes/setup/CSetupWizard.php:696
 msgid "Alternatively, you can install it manually:"
 msgstr "Alternatywnie, można zainstalować to ręcznie:"
 
@@ -1424,6 +1424,7 @@ msgid "Authentication protocol"
 msgstr "Protokół uwierzytelniania"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:359
+#: app/controllers/CControllerAuthenticationUpdate.php:367
 msgid "Authentication settings updated"
 msgstr "Ustawienia uwierzytelniania zaktualizowane"
 
@@ -2061,7 +2062,7 @@ msgstr "Nie można utworzyć mapy ikon"
 msgid "Cannot create scheduled report"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:678
+#: include/classes/setup/CSetupWizard.php:692
 msgid "Cannot create the configuration file."
 msgstr "Nie można utworzyć pliku konfiguracyjnego."
 
@@ -3659,7 +3660,7 @@ msgstr "Konfiguracja"
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "Statystyki cache'a konfiguracji. Cache - bufor (tryby: pfree, total, used, free)."
 
-#: include/classes/setup/CSetupWizard.php:700
+#: include/classes/setup/CSetupWizard.php:723
 #, c-format
 msgid "Configuration file \"%1$s\" created."
 msgstr "Utworzono plik konfiguracji \"%1$s\"."
@@ -3820,7 +3821,7 @@ msgstr "Konfiguruj połączenie DB"
 msgid "Confirmation text"
 msgstr "Tekst potwierdzenia"
 
-#: include/classes/setup/CSetupWizard.php:698
+#: include/classes/setup/CSetupWizard.php:721
 msgid "Congratulations! You have successfully installed Zabbix frontend."
 msgstr "Gratulacje! Poprawnie zainstalowano interfejs użytkownika Zabbix."
 
@@ -4592,14 +4593,14 @@ msgstr "Czas przechowywania danych"
 
 #: include/classes/setup/CSetupWizard.php:388
 #: include/classes/setup/CSetupWizard.php:534
-#: include/classes/setup/CSetupWizard.php:740
+#: include/classes/setup/CSetupWizard.php:762
 msgid "Database TLS CA file"
 msgstr "Plik TLS CA bazy danych"
 
 #: include/classes/setup/CFrontendSetup.php:668
 #: include/classes/setup/CSetupWizard.php:400
 #: include/classes/setup/CSetupWizard.php:540
-#: include/classes/setup/CSetupWizard.php:748
+#: include/classes/setup/CSetupWizard.php:770
 msgid "Database TLS certificate file"
 msgstr "Plik certyfikatu TLS bazy danych"
 
@@ -4619,7 +4620,7 @@ msgstr "Szyfrowanie bazy danych TLS"
 
 #: include/classes/setup/CSetupWizard.php:394
 #: include/classes/setup/CSetupWizard.php:537
-#: include/classes/setup/CSetupWizard.php:744
+#: include/classes/setup/CSetupWizard.php:766
 msgid "Database TLS key file"
 msgstr "Plik klucza TLS bazy danych"
 
@@ -5746,7 +5747,7 @@ msgstr "Nie działa"
 msgid "Download image"
 msgstr "Pobierz obraz"
 
-#: include/classes/setup/CSetupWizard.php:684
+#: include/classes/setup/CSetupWizard.php:698
 msgid "Download the configuration file"
 msgstr "Pobranie pliku konfiguracyjnego"
 
@@ -8766,9 +8767,9 @@ msgstr "Błędna nazwa lub wartośc pola \"%1$s\" w warunku WHERE dla tabeli \"%
 msgid "Incorrect fields for sysmap."
 msgstr "Błędne pola dla sysmap."
 
-#: include/classes/setup/CSetupWizard.php:740
-#: include/classes/setup/CSetupWizard.php:744
-#: include/classes/setup/CSetupWizard.php:748
+#: include/classes/setup/CSetupWizard.php:762
+#: include/classes/setup/CSetupWizard.php:766
+#: include/classes/setup/CSetupWizard.php:770
 #, c-format
 msgid "Incorrect file path for \"%1$s\": %2$s."
 msgstr "Błędna ścieżka do pliku \"%1$s\": %2$s."
@@ -9540,11 +9541,12 @@ msgid "Insert expression"
 msgstr "Wprowadź wyrażenie"
 
 #: include/classes/setup/CSetupWizard.php:69
-#: include/classes/setup/CSetupWizard.php:705
+#: include/classes/setup/CSetupWizard.php:704
+#: include/classes/setup/CSetupWizard.php:727
 msgid "Install"
 msgstr "Instalacja"
 
-#: setup.php:174
+#: setup.php:162
 msgid "Installation"
 msgstr "Instalacja"
 
@@ -10663,7 +10665,7 @@ msgstr "Legenda"
 msgid "Length"
 msgstr ""
 
-#: setup.php:197
+#: setup.php:185
 msgid "Licensed under"
 msgstr "Uprawniony do"
 
@@ -13878,7 +13880,7 @@ msgstr ""
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
 msgstr "Proszę ręcznie utworzyć bazę danych i ustawić parametry konfiguracji dla połączenia do tej bazy. Naciśnij przycisk \"%1$s\", gdy skończysz."
 
-#: include/classes/setup/CSetupWizard.php:888
+#: include/classes/setup/CSetupWizard.php:922
 msgid "Please enable \"allow_url_fopen\" directive."
 msgstr "Proszę włącznyć \"allow_url_fopen\" wytyczną."
 
@@ -15406,7 +15408,7 @@ msgstr "Zapisz jako"
 msgid "Save changes"
 msgstr "Zapisz zmiany"
 
-#: include/classes/setup/CSetupWizard.php:685
+#: include/classes/setup/CSetupWizard.php:699
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "Zapisz jako \"%1$s\""
@@ -18601,8 +18603,8 @@ msgstr "Login"
 msgid "Username and password"
 msgstr "Nazwa użytkownika i hasło"
 
-#: include/classes/setup/CSetupWizard.php:600
-#: include/classes/setup/CSetupWizard.php:906
+#: include/classes/setup/CSetupWizard.php:614
+#: include/classes/setup/CSetupWizard.php:940
 msgid "Username and password must be stored in Vault secret keys \"username\" and \"password\"."
 msgstr "Nazwa użytkownika i hasło muszą być przechowywane w tajnych kluczach sejfu \"username\" i \"password\"."
 
@@ -19063,7 +19065,7 @@ msgid "Vault authentication token"
 msgstr "Token autentykacyjny sejfu"
 
 #: include/classes/core/ZBase.php:229
-#: include/classes/setup/CSetupWizard.php:902 include/config.inc.php:53
+#: include/classes/setup/CSetupWizard.php:936 include/config.inc.php:53
 msgid "Vault connection failed."
 msgstr "Nieudane połączenie sejfu"
 

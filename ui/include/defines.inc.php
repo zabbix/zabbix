@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'5.4.9rc1');
-define('ZABBIX_API_VERSION',	'5.4.9');
+define('ZABBIX_VERSION',		'5.4.10rc1');
+define('ZABBIX_API_VERSION',	'5.4.10');
 define('ZABBIX_EXPORT_VERSION',	'5.4');
 
 define('ZABBIX_DB_VERSION',		5040000);
@@ -30,7 +30,7 @@ define('DB_VERSION_HIGHER_THAN_MAXIMUM',	2);
 define('DB_VERSION_FAILED_TO_RETRIEVE',		3);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
-define('ZABBIX_COPYRIGHT_TO',	'2021');
+define('ZABBIX_COPYRIGHT_TO',	'2022');
 
 define('ZBX_BCRYPT_COST',		10);
 define('ZBX_MD5_SIZE',			32);

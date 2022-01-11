@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1796,7 +1796,7 @@ int	get_value_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short port, s
 
 static void add_threshold_ipmi(struct zbx_json *json, const char *tag, zbx_ipmi_sensor_threshold_t *threshold)
 {
-	if (ZBX_IPMI_THRESHOLD_STATUS_ENABLED == threshold->status)
+	if (ZBX_IPMI_THRESHOLD_STATUS_ENABLED == threshold->status && 0 != isfinite(threshold->val))
 		zbx_json_addfloat(json, tag, threshold->val);
 }
 

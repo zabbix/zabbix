@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2131,13 +2131,13 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static int	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
+void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 {
 	zbx_dc_kvs_path_t	*dc_kvs_path;
 	zbx_dc_kv_t		*dc_kv;
 	zbx_hashset_t		kvs;
 	zbx_hashset_iter_t	iter;
-	int			i, j, ret;
+	int			i, j;
 	zbx_vector_ptr_pair_t	diff;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -2152,14 +2152,8 @@ static int	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 
 		dc_kvs_path = (zbx_dc_kvs_path_t *)config->kvs_paths.values[i];
 
-		if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		if (NULL != jp_kvs_paths)
 		{
-			if (NULL == jp_kvs_paths)
-			{
-				ret = FAIL;
-				goto fail;
-			}
-
 			if (FAIL == zbx_vault_json_kvs_get(dc_kvs_path->path, jp_kvs_paths, &kvs, &error))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s",
@@ -2223,13 +2217,10 @@ static int	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 		zbx_vector_ptr_pair_clear(&diff);
 		zbx_hashset_clear(&kvs);
 	}
-	ret = SUCCEED;
-fail:
+
 	zbx_vector_ptr_pair_destroy(&diff);
 	zbx_hashset_destroy(&kvs);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-
-	return ret;
 }
 
 /******************************************************************************
@@ -5931,7 +5922,7 @@ static void	dc_load_trigger_queue(zbx_hashset_t *trend_functions)
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  ******************************************************************************/
-void	DCsync_configuration(unsigned char mode, const struct zbx_json_parse *jp_kvs_paths)
+void	DCsync_configuration(unsigned char mode)
 {
 	int		i, flags;
 	double		sec, csec, hsec, hisec, htsec, gmsec, hmsec, ifsec, isec, tsec, dsec, fsec, expr_sec, csec2,
@@ -5959,12 +5950,6 @@ void	DCsync_configuration(unsigned char mode, const struct zbx_json_parse *jp_kv
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	config->sync_start_ts = time(NULL);
-
-	if (ZBX_SYNC_SECRETS == mode)
-	{
-		DCsync_kvs_paths(NULL);
-		goto skip;
-	}
 
 	zbx_dbsync_init_env(config);
 
@@ -6074,13 +6059,15 @@ void	DCsync_configuration(unsigned char mode, const struct zbx_json_parse *jp_kv
 	sec = zbx_time();
 	DCsync_host_tags(&host_tag_sync);
 	host_tag_sec2 = zbx_time() - sec;
-	FINISH_SYNC;
 
-	if (FAIL == DCsync_kvs_paths(jp_kvs_paths))
+	/* postpone configuration sync until macro secrets are received from Zabbix server */
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER) && 0 != config->kvs_paths.values_num &&
+			ZBX_DBSYNC_INIT == mode)
 	{
-		START_SYNC;
 		goto out;
 	}
+
+	FINISH_SYNC;
 
 	/* sync host data to support host lookups when resolving macros during configuration sync */
 
@@ -6672,7 +6659,7 @@ out:
 		zbx_hashset_destroy(&trend_queue);
 
 	zbx_dbsync_free_env();
-skip:
+
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		DCdump_configuration();
 

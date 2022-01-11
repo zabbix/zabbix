@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,7 +38,9 @@ define('USER_ACTION_REMOVE', 'remove');
 /**
  * Base class of php unit tests.
  */
-class CTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class CTest extends TestCase {
 
 	// Table that should be backed up at the test suite level.
 	protected static $suite_backup = null;
@@ -174,7 +176,7 @@ class CTest extends PHPUnit_Framework_TestCase {
 			if (!$method) {
 				$error = 'Callback "'.$callback.'" is not defined in requested context.';
 				if (!$required) {
-					self::addWarning($error);
+					self::zbxAddWarning($error);
 				}
 				else {
 					throw new Exception($error);
@@ -186,7 +188,7 @@ class CTest extends PHPUnit_Framework_TestCase {
 			} catch (Exception $e) {
 				$error = 'Failed to execute callback "'.$callback.'": '.$e->getMessage();
 				if (!$required) {
-					self::addWarning($error);
+					self::zbxAddWarning($error);
 				}
 				else {
 					throw new Exception($error);
@@ -443,7 +445,7 @@ class CTest extends PHPUnit_Framework_TestCase {
 	 *
 	 * @param string $warning    warning text
 	 */
-	public static function addWarning($warning) {
+	public static function zbxAddWarning($warning) {
 		if (!in_array($warning, self::$warnings)) {
 			self::$warnings[] = $warning;
 		}
