@@ -485,7 +485,7 @@ class CSetupWizard extends CForm {
 			$message = [
 				(new CTag('h1', true, _('Congratulations! You have successfully installed Zabbix frontend.')))
 					->addClass(ZBX_STYLE_GREEN),
-				new CTag('p', true, _s('Configuration file "%1$s" created.', $config_file_name))
+				new CTag('p', true, _s('Configuration file "%1$s" created.', ltrim(CConfigFile::CONFIG_FILE_PATH, '/')))
 			];
 		}
 
