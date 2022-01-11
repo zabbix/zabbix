@@ -1153,12 +1153,9 @@ int	VFS_FILE_OWNER(AGENT_REQUEST *request, AGENT_RESULT *result)
 			grp = getgrgid(st.st_gid);
 
 			if (NULL == grp)
-			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain group name."));
-				goto err;
-			}
-
-			SET_STR_RESULT(result, zbx_strdup(NULL, grp->gr_name));
+				SET_STR_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_UI64, (zbx_uint64_t)st.st_gid));
+			else
+				SET_STR_RESULT(result, zbx_strdup(NULL, grp->gr_name));
 		}
 		else
 		{
@@ -1167,12 +1164,9 @@ int	VFS_FILE_OWNER(AGENT_REQUEST *request, AGENT_RESULT *result)
 			pwd = getpwuid(st.st_uid);
 
 			if (NULL == pwd)
-			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain user name."));
-				goto err;
-			}
-
-			SET_STR_RESULT(result, zbx_strdup(NULL, pwd->pw_name));
+				SET_STR_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_UI64, (zbx_uint64_t)st.st_uid));
+			else
+				SET_STR_RESULT(result, zbx_strdup(NULL, pwd->pw_name));
 		}
 	}
 	else
