@@ -20,7 +20,29 @@
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 
+/**
+ * @onBefore prepareItemData
+ */
 class testPageLatestData extends CWebTest {
+
+	/**
+	 * Updated item id.
+	 *
+	 * @var integer
+	 */
+	protected static $itemid;
+
+	/**
+	 * Update item and add units.
+	 */
+	public function prepareItemData() {
+		self::$itemid = CDBHelper::getValue('SELECT itemid FROM items WHERE name='.zbx_dbstr('4_item'));
+
+		CDataHelper::call('item.update', [
+			'itemid' => self::$itemid,
+			'units' => 'UNIT'
+		]);
+	}
 
 	public function testPageLatestData_CheckLayout() {
 		$this->page->login()->open('zabbix.php?action=latest.view');
@@ -222,21 +244,29 @@ class testPageLatestData extends CWebTest {
 	}
 
 	/**
-	 * @backupOnce history_uint
+	 * Check hint text for Last check and Last value columns
 	 */
 	public function testPageLatestData_checkHints() {
 		$time = time();
-		$itemid = CDBHelper::getValue('SELECT itemid FROM items WHERE name='.zbx_dbstr('4_item'));
-		DBexecute("INSERT INTO history_uint (itemid, clock, value, ns) VALUES (".zbx_dbstr($itemid).
-				", ".zbx_dbstr($time).", 3333, 0)");
+		$value = '15';
+		DBexecute("INSERT INTO history_uint (itemid, clock, value, ns) VALUES (".zbx_dbstr(self::$itemid).
+				", ".zbx_dbstr($time).", ".zbx_dbstr($value).", 0)");
 		$true_time = date("Y-m-d H:i:s", $time);
 		$this->page->login()->open('zabbix.php?action=latest.view');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$form->query('button:Reset')->one()->click();
 		$form->fill(['Name' => '4_item']);
 		$form->submit();
 		$table = $this->query('class:list-table')->asTable()->one();
-		$table->getRow(0)->getColumn('Last check')->query('class:cursor-pointer')->one()->click();
-		$hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last()->getText();
-		$this->assertEquals($true_time, $hint);
+
+		foreach (['Last check', 'Last value'] as $column) {
+			if ($column === 'Last value') {
+				$this->assertEquals('15 UNIT', $table->getRow(0)->getColumn($column)->getText());
+			}
+			$table->getRow(0)->getColumn($column)->query('class:cursor-pointer')->one()->click();
+			$hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last()->getText();
+			$compare_hint = ($column === 'Last check') ? $true_time : $value;
+			$this->assertEquals($compare_hint, $hint);
+		}
 	}
 }
