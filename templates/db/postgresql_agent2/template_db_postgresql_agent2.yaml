@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-11-26T10:20:42Z'
+  date: '2021-12-20T07:18:21Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -10,7 +10,10 @@ zabbix_export:
       uuid: d0ef7d659a8f4beaaabfc4b6134e737a
       template: 'PostgreSQL by Zabbix agent 2'
       name: 'PostgreSQL by Zabbix agent 2'
-      description: 'Template tooling version used: 0.39'
+      description: |
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384190-%C2%A0discussion-thread-for-official-zabbix-template-db-postgresql
+        
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Databases

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-11T08:05:17Z'
+  date: '2021-12-19T15:19:36Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -10,7 +10,7 @@ zabbix_export:
       uuid: 72aab08f7f27406a8f2c291648e5ba95
       template: 'Generic Java JMX'
       name: 'Generic Java JMX'
-      description: 'Template tooling version used: 0.38'
+      description: 'Template tooling version used: 0.40'
       groups:
         -
           name: Templates/Applications
@@ -812,7 +812,7 @@ zabbix_export:
           type: JMX
           key: 'jmx["java.lang:type=OperatingSystem","OpenFileDescriptorCount"]'
           history: 7d
-          description: 'This is the number of opened file descriptors at the moment, if this reaches the MaxFileDescriptorCount, the application will throw an IOException: Too many open files. This could mean you’re are opening file descriptors and never closing them.'
+          description: 'This is the number of opened file descriptors at the moment, if this reaches the MaxFileDescriptorCount, the application will throw an IOException: Too many open files. This could mean you''re are opening file descriptors and never closing them.'
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-07-22T14:29:02Z'
+  date: '2021-12-20T08:19:38Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -27,7 +27,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/422668-discussion-thread-for-official-zabbix-templates-for-zyxel
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: 'Templates/Network devices'
@@ -285,7 +285,6 @@ zabbix_export:
                       outArr.push(item)
                   });
                   return JSON.stringify(outArr);
-                  
         -
           uuid: 1aace4fa8bdc49d28d8785aeadcdc8d4
           name: 'CPU discovery'
@@ -348,7 +347,6 @@ zabbix_export:
                       outArr.push(item)
                   });
                   return JSON.stringify(outArr);
-                  
         -
           uuid: abd64129536e4b43b5718adde7979c18
           name: 'Fan discovery'
@@ -455,7 +453,6 @@ zabbix_export:
                       outArr.push(item)
                   });
                   return JSON.stringify(outArr);
-                  
         -
           uuid: cc124fe17126405f82fd61f248fe1abe
           name: 'ADSL interface discovery'
@@ -524,7 +521,7 @@ zabbix_export:
               description: |
                 MIB: ADSL-LINE-MIB
                 Measured difference in the total power transmitted by
-                the peer ATU and the total power received by this ATU. 
+                the peer ATU and the total power received by this ATU.
                 The Info Atuc fields show data acquired from the ATUC (ADSL Termination Unit – Central), in this case ZYXEL IES-6000, during negotiation/provisioning message interchanges.
               preprocessing:
                 -
@@ -557,7 +554,7 @@ zabbix_export:
               units: dB
               description: |
                 MIB: ADSL-LINE-MIB
-                Measured total output power transmitted by this ATU. 
+                Measured total output power transmitted by this ATU.
                 The Info Atuc fields show data acquired from the ATUC (ADSL Termination Unit – Central), in this case ZYXEL IES-6000, during negotiation/provisioning message interchanges.
               preprocessing:
                 -
@@ -584,7 +581,7 @@ zabbix_export:
               description: |
                 MIB: ADSL-LINE-MIB
                 Noise Margin as seen by this ATU with respect to its
-                received signal in tenth dB. 
+                received signal in tenth dB.
                 The Info Atuc fields show data acquired from the ATUC (ADSL Termination Unit – Central), in this case ZYXEL IES-6000, during negotiation/provisioning message interchanges.
               preprocessing:
                 -
@@ -618,8 +615,8 @@ zabbix_export:
               description: |
                 MIB: ADSL-LINE-MIB
                 Measured difference in the total power transmitted by
-                the peer ATU and the total power received by this ATU. 
-                The Info Atur fields show data acquired from the ATUR (ADSL Termination Unit – Remote), in this case the subscriber’s ADSL modem or router, during negotiation/provisioning message interchanges.
+                the peer ATU and the total power received by this ATU.
+                The Info Atur fields show data acquired from the ATUR (ADSL Termination Unit – Remote), in this case the subscriber's ADSL modem or router, during negotiation/provisioning message interchanges.
               preprocessing:
                 -
                   type: MULTIPLIER
@@ -651,8 +648,8 @@ zabbix_export:
               units: dB
               description: |
                 MIB: ADSL-LINE-MIB
-                Measured total output power transmitted by this ATU. 
-                The Info Atur fields show data acquired from the ATUR (ADSL Termination Unit – Remote), in this case the subscriber’s ADSL modem or router, during negotiation/provisioning message interchanges.
+                Measured total output power transmitted by this ATU.
+                The Info Atur fields show data acquired from the ATUR (ADSL Termination Unit – Remote), in this case the subscriber's ADSL modem or router, during negotiation/provisioning message interchanges.
               preprocessing:
                 -
                   type: MULTIPLIER
@@ -678,8 +675,8 @@ zabbix_export:
               description: |
                 MIB: ADSL-LINE-MIB
                 Noise Margin as seen by this ATU with respect to its
-                received signal in tenth dB. 
-                The Info Atur fields show data acquired from the ATUR (ADSL Termination Unit – Remote), in this case the subscriber’s ADSL modem or router, during negotiation/provisioning message interchanges.
+                received signal in tenth dB.
+                The Info Atur fields show data acquired from the ATUR (ADSL Termination Unit – Remote), in this case the subscriber's ADSL modem or router, during negotiation/provisioning message interchanges.
               preprocessing:
                 -
                   type: MULTIPLIER
@@ -1037,7 +1034,6 @@ zabbix_export:
                       outArr.push(item)
                   });
                   return JSON.stringify(outArr);
-                  
           overrides:
             -
               name: 'Don''t create triggers for matching interface'
@@ -1269,9 +1265,7 @@ zabbix_export:
                 -
                   type: JAVASCRIPT
                   parameters:
-                    - |
-                      return +parseFloat(value).toFixed(0);
-                      
+                    - 'return +parseFloat(value).toFixed(0);'
               tags:
                 -
                   tag: Application
@@ -1452,9 +1446,7 @@ zabbix_export:
                 -
                   type: JAVASCRIPT
                   parameters:
-                    - |
-                      return +parseFloat(value).toFixed(0);
-                      
+                    - 'return +parseFloat(value).toFixed(0);'
               tags:
                 -
                   tag: Application
@@ -1633,7 +1625,6 @@ zabbix_export:
                           if (base2[base2.length - 1 - i] === '1') outArray.push(valueArray[i]);
                       }
                       return outArray.join();
-                      
               tags:
                 -
                   tag: Application
@@ -1986,7 +1977,6 @@ zabbix_export:
                       outArr.push(item);
                   });
                   return JSON.stringify(outArr);
-                  
         -
           uuid: 86ee5ab94e9a49dca526ce6e3d9c95fa
           name: 'Voltage discovery'
@@ -2055,7 +2045,6 @@ zabbix_export:
                       outArr.push(item)
                   });
                   return JSON.stringify(outArr);
-                  
       macros:
         -
           macro: '{$SNMP.TIMEOUT}'
@@ -2070,12 +2059,8 @@ zabbix_export:
           value: '8'
           description: 'Type the minimum signal to noise margin (0-31 dB)'
         -
-          macro: '{$ZYXEL.LLD.FILTER.SLOT.STATUS.NOT_MATCHES}'
-          value: '1'
-          description: 'Filter to exclude discovered slots by status.'
-        -
           macro: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
-          value: 'CHANGE_IF_NEEDED'
+          value: CHANGE_IF_NEEDED
           description: 'Triggers will be created only for interfaces whose description contains the value of this macro'
         -
           macro: '{$ZYXEL.LLD.FILTER.IF.DESC.MATCHES}'
@@ -2097,6 +2082,10 @@ zabbix_export:
           macro: '{$ZYXEL.LLD.FILTER.SLOT.STATUS.MATCHES}'
           value: '.*'
           description: 'Filter by discoverable slot status.'
+        -
+          macro: '{$ZYXEL.LLD.FILTER.SLOT.STATUS.NOT_MATCHES}'
+          value: '1'
+          description: 'Filter to exclude discovered slots by status.'
       valuemaps:
         -
           uuid: 5247e9e5efcd4b29b864e336619eafcf

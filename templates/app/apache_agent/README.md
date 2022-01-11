@@ -110,8 +110,8 @@ There are no template links in this template.
 |Apache |Apache: Service ping |<p>-</p> |ZABBIX_PASSIVE |net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |Apache |Apache: Service response time |<p>-</p> |ZABBIX_PASSIVE |net.tcp.service.perf[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"] |
 |Apache |Apache: Total bytes |<p>Total bytes served</p> |DEPENDENT |apache.bytes<p>**Preprocessing**:</p><p>- JSONPATH: `$["Total kBytes"]`</p><p>- MULTIPLIER: `1024`</p> |
-|Apache |Apache: Bytes per second |<p>Calculated as change rate for 'Total bytes' stat.</p><p>BytesPerSec is not used, as it counts average since last Apache server start.</p> |DEPENDENT |apache.bytes.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$["Total kBytes"]`</p><p>- MULTIPLIER: `1024`</p><p>- CHANGE_PER_SECOND |
-|Apache |Apache: Requests per second |<p>Calculated as change rate for 'Total requests' stat.</p><p>ReqPerSec is not used, as it counts average since last Apache server start.</p> |DEPENDENT |apache.requests.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$["Total Accesses"]`</p><p>- CHANGE_PER_SECOND |
+|Apache |Apache: Bytes per second |<p>Calculated as change rate for 'Total bytes' stat.</p><p>BytesPerSec is not used, as it counts average since last Apache server start.</p> |DEPENDENT |apache.bytes.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$["Total kBytes"]`</p><p>- MULTIPLIER: `1024`</p><p>- CHANGE_PER_SECOND</p> |
+|Apache |Apache: Requests per second |<p>Calculated as change rate for 'Total requests' stat.</p><p>ReqPerSec is not used, as it counts average since last Apache server start.</p> |DEPENDENT |apache.requests.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$["Total Accesses"]`</p><p>- CHANGE_PER_SECOND</p> |
 |Apache |Apache: Total requests |<p>A total number of accesses</p> |DEPENDENT |apache.requests<p>**Preprocessing**:</p><p>- JSONPATH: `$["Total Accesses"]`</p> |
 |Apache |Apache: Uptime |<p>Service uptime in seconds</p> |DEPENDENT |apache.uptime<p>**Preprocessing**:</p><p>- JSONPATH: `$.ServerUptimeSeconds`</p> |
 |Apache |Apache: Version |<p>Service version</p> |DEPENDENT |apache.version<p>**Preprocessing**:</p><p>- JSONPATH: `$.ServerVersion`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
@@ -138,18 +138,18 @@ There are no template links in this template.
 |Apache |Apache: Connections total |<p>Number of total connections</p> |DEPENDENT |apache.connections[total{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.ConnsTotal`</p> |
 |Apache |Apache: Bytes per request |<p>Average number of client requests per second</p> |DEPENDENT |apache.bytes[per_request{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.BytesPerReq`</p> |
 |Apache |Apache: Number of async processes |<p>Number of async processes</p> |DEPENDENT |apache.process[num{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Processes`</p> |
-|Zabbix_raw_items |Apache: Get status |<p>Getting data from a machine-readable version of the Apache status page.</p><p>https://httpd.apache.org/docs/current/mod/mod_status.html</p> |ZABBIX_PASSIVE |web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
+|Zabbix_raw_items |Apache: Get status |<p>Getting data from a machine-readable version of the Apache status page.</p><p>https://httpd.apache.org/docs/current/mod/mod_status.html</p> |ZABBIX_PASSIVE |web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 
 ## Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Apache: Service is down |<p>-</p> |`{TEMPLATE_NAME:net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"].last()}=0` |AVERAGE |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Apache: Process is not running</p> |
-|Apache: Service response time is too high (over {$APACHE.RESPONSE_TIME.MAX.WARN}s for 5m) |<p>-</p> |`{TEMPLATE_NAME:net.tcp.service.perf[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"].min(5m)}>{$APACHE.RESPONSE_TIME.MAX.WARN}` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Apache: Process is not running</p><p>- Apache: Service is down</p> |
-|Apache: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:apache.uptime.last()}<10m` |INFO |<p>Manual close: YES</p> |
-|Apache: Version has changed (new version: {ITEM.VALUE}) |<p>Apache version has changed. Ack to close.</p> |`{TEMPLATE_NAME:apache.version.diff()}=1 and {TEMPLATE_NAME:apache.version.strlen()}>0` |INFO |<p>Manual close: YES</p> |
-|Apache: Process is not running |<p>-</p> |`{TEMPLATE_NAME:proc.num["{$APACHE.PROCESS_NAME}"].last()}=0` |HIGH | |
-|Apache: Failed to fetch status page (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes.</p> |`{TEMPLATE_NAME:web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"].nodata(30m)}=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Apache: Process is not running</p><p>- Apache: Service is down</p> |
+|Apache: Service is down |<p>-</p> |`last(/Apache by Zabbix agent/net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"])=0` |AVERAGE |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Apache: Process is not running</p> |
+|Apache: Service response time is too high (over {$APACHE.RESPONSE_TIME.MAX.WARN}s for 5m) |<p>-</p> |`min(/Apache by Zabbix agent/net.tcp.service.perf[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"],5m)>{$APACHE.RESPONSE_TIME.MAX.WARN}` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Apache: Process is not running</p><p>- Apache: Service is down</p> |
+|Apache: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/Apache by Zabbix agent/apache.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|Apache: Version has changed (new version: {ITEM.VALUE}) |<p>Apache version has changed. Ack to close.</p> |`last(/Apache by Zabbix agent/apache.version,#1)<>last(/Apache by Zabbix agent/apache.version,#2) and length(last(/Apache by Zabbix agent/apache.version))>0` |INFO |<p>Manual close: YES</p> |
+|Apache: Process is not running |<p>-</p> |`last(/Apache by Zabbix agent/proc.num["{$APACHE.PROCESS_NAME}"])=0` |HIGH | |
+|Apache: Failed to fetch status page (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes.</p> |`nodata(/Apache by Zabbix agent/web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"],30m)=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Apache: Process is not running</p><p>- Apache: Service is down</p> |
 
 ## Feedback
 
