@@ -517,7 +517,7 @@ abstract class CControllerLatest extends CController {
 				$subfilter_options['tags'][$tag['tag']][$tag['value']] = [
 					'name' => $tag['value'],
 					'selected' => (array_key_exists($tag['tag'], $subfilter['tags'])
-							&& array_key_exists($tag['value'], $subfilter['tags'][$tag['tag']])
+						&& array_key_exists($tag['value'], $subfilter['tags'][$tag['tag']])
 					),
 					'count' => 0
 				];
