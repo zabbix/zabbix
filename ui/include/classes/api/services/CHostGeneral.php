@@ -39,6 +39,8 @@ abstract class CHostGeneral extends CHostBase {
 	 *
 	 * @param array      $hosts
 	 * @param array|null $db_hosts
+	 *
+	 * @throws APIException if groups are not valid.
 	 */
 	protected function checkGroups(array $hosts, array $db_hosts = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';

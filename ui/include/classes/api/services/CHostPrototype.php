@@ -451,7 +451,7 @@ class CHostPrototype extends CHostBase {
 
 		self::checkDuplicates($host_prototypes);
 		self::checkDiscoveryRules($host_prototypes);
-		self::checkHostGroupsPermissions($host_prototypes);
+		self::checkGroupLinks($host_prototypes);
 		self::checkAndAddUuid($host_prototypes);
 		self::checkMainInterfaces($host_prototypes);
 		$this->checkTemplates($host_prototypes);
@@ -572,7 +572,7 @@ class CHostPrototype extends CHostBase {
 		}
 
 		self::checkDuplicates($host_prototypes, $db_host_prototypes);
-		self::checkHostGroupsPermissions($host_prototypes, $db_host_prototypes);
+		self::checkGroupLinks($host_prototypes, $db_host_prototypes);
 		self::validateSnmpInterfaces($host_prototypes, $db_host_prototypes);
 		self::checkMainInterfaces($host_prototypes);
 		$this->checkTemplates($host_prototypes, $db_host_prototypes);
@@ -1250,42 +1250,48 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * Checks if the current user has access to the given host groups.
+	 * Check for valid host groups.
 	 *
 	 * @param array $host_prototypes
 	 * @param array $db_host_prototypes
 	 *
-	 * @throws APIException if the user doesn't have write permissions for the given host groups
+	 * @throws APIException if groups are not valid.
 	 */
-	private static function checkHostGroupsPermissions(array $host_prototypes, array $db_host_prototypes = null): void {
-		$groupids = [];
+	private static function checkGroupLinks(array $host_prototypes, array $db_host_prototypes = null): void {
+		$edit_groupids = [];
 
 		foreach ($host_prototypes as $host_prototype) {
 			if (!array_key_exists('groupLinks', $host_prototype)) {
 				continue;
 			}
 
-			$db_group_links = ($db_host_prototypes !== null)
-				? array_column($db_host_prototypes[$host_prototype['hostid']]['groupLinks'], null, 'groupid')
-				: [];
+			$groupids = array_column($host_prototype['groupLinks'], 'groupid');
 
-			$groupids += array_diff_key(array_column($host_prototype['groupLinks'], null, 'groupid'), $db_group_links);
+			if ($db_host_prototypes === null) {
+				$edit_groupids += array_flip($groupids);
+			}
+			else {
+				$db_groupids = array_column($db_host_prototypes[$host_prototype['hostid']]['groupLinks'], 'groupid');
+
+				$ins_groupids = array_flip(array_diff($groupids, $db_groupids));
+				$del_groupids = array_flip(array_diff($db_groupids, $groupids));
+
+				$edit_groupids += $ins_groupids + $del_groupids;
+			}
 		}
 
-		if (!$groupids) {
+		if (!$edit_groupids) {
 			return;
 		}
 
-		$groupids = array_keys($groupids);
-
 		$db_groups = API::HostGroup()->get([
 			'output' => ['name', 'flags'],
-			'groupids' => $groupids,
+			'groupids' => array_keys($edit_groupids),
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
-		if (count($db_groups) != count($groupids)) {
+		if (count($db_groups) != count($edit_groupids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
