@@ -1091,49 +1091,6 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * @param array $templateids
-	 * @param array $targetids
-	 *
-	 * @return array|null
-	 */
-	protected function link(array $templateids, array $targetids): ?array {
-		$this->checkHostPrototypePermissions($targetids);
-
-		$links = parent::link($templateids, $targetids);
-
-		foreach ($targetids as $targetid) {
-			$linked_templates = DB::select('hosts', [
-				'output' => ['hostid', 'name'],
-				'hostids' => $targetid
-			]);
-
-			$row = DBfetch(DBselect(
-				'SELECT i.key_,count(*)'.
-				' FROM items i'.
-				' WHERE '.dbConditionInt('i.hostid', array_merge($templateids, [$linked_templates[0]['hostid']])).
-				' GROUP BY i.key_'.
-				' HAVING count(*)>1',
-				1
-			));
-			if ($row) {
-				$target_templates = DB::select('hosts', [
-					'output' => ['name'],
-					'hostids' => $targetid,
-					'limit' => 1
-				]);
-
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Item "%1$s" already exists on "%2$s", inherited from another template.', $row['key_'],
-						$target_templates[0]['name']
-					)
-				);
-			}
-		}
-
-		return $links;
-	}
-
-	/**
 	 * Check for duplicated names and hosts.
 	 *
 	 * @param array      $host_prototypes
@@ -1310,31 +1267,6 @@ class CHostPrototype extends CHostBase {
 			if ($db_group['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Group prototype cannot be based on a discovered host group "%1$s".', $db_group['name'])
-				);
-			}
-		}
-	}
-
-	/**
-	 * Checks if the current user has access to the given host prototypes.
-	 *
-	 * @param array $host_prototypeids
-	 *
-	 * @throws APIException if the user doesn't have write permissions for the host prototypes.
-	 */
-	private static function checkHostPrototypePermissions(array $host_prototypeids): void {
-		if ($host_prototypeids) {
-			$host_prototypeids = array_keys(array_flip($host_prototypeids));
-
-			$count = API::HostPrototype()->get([
-				'countOutput' => true,
-				'hostids' => $host_prototypeids,
-				'editable' => true
-			]);
-
-			if ($count != count($host_prototypeids)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
 				);
 			}
 		}

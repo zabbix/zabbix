@@ -205,6 +205,10 @@ abstract class CHostBase extends CApiService {
 
 			$this->checkTriggerDependenciesOfInsTemplates($ins_templates);
 			$this->checkTriggerExpressionsOfInsTemplates($ins_templates);
+
+			if ($this instanceof CHostPrototype) {
+				$this->checkItemsDuplicatesOfInsTemplates($ins_templates);
+			}
 		}
 	}
 
@@ -378,7 +382,7 @@ abstract class CHostBase extends CApiService {
 						$circular_linkage = $template_name.' -> '.implode(' -> ', $links_path).' -> '.$template_name;
 
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Cannot link template "%1$s" to template "%2$s" due to circular linkage (%3$s) will occurs.',
+							'Cannot link template "%1$s" to template "%2$s" because circular linkage (%3$s) will occurs.',
 							$templates[$templateid]['host'], $templates[$hostid]['host'], $circular_linkage
 						));
 					}
@@ -511,13 +515,13 @@ abstract class CHostBase extends CApiService {
 				]);
 
 				if ($objects[$hostid]['status'] == HOST_STATUS_TEMPLATE) {
-					$error = _('Cannot link template "%1$s" to template "%2$s" due to its parent template "%3$s" will be linked twice.');
+					$error = _('Cannot link template "%1$s" to template "%2$s" because its parent template "%3$s" will be linked twice.');
 				}
 				elseif ($objects[$hostid]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-					$error = _('Cannot link template "%1$s" to host prototype "%2$s" due to its parent template "%3$s" will be linked twice.');
+					$error = _('Cannot link template "%1$s" to host prototype "%2$s" because its parent template "%3$s" will be linked twice.');
 				}
 				else {
-					$error = _('Cannot link template "%1$s" to host "%2$s" due to its parent template "%3$s" will be linked twice.');
+					$error = _('Cannot link template "%1$s" to host "%2$s" because its parent template "%3$s" will be linked twice.');
 				}
 
 				self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $objects[$ins_templateid]['host'],
@@ -836,6 +840,70 @@ abstract class CHostBase extends CApiService {
 						$objects[$row['hostid']]['host'], $objects[$hostid]['host'], $triggers[0]['description']
 					));
 				}
+			}
+		}
+	}
+
+	/**
+	 * Check whether items of linked templates are unique on target host prototypes.
+	 *
+	 * @param array  $ins_templates
+	 * @param string $ins_templates[<templateid>][<hostid>]  Array of IDs of templates to replace on target object.
+	 *
+	 * @throws APIException if duplicate item is found.
+	 */
+	private function checkItemsDuplicatesOfInsTemplates(array $ins_templates): void {
+		$host_templates = [];
+
+		foreach ($ins_templates as $hostids_templateids) {
+			foreach ($hostids_templateids as $hostid => $_templateids) {
+				if (!array_key_exists($hostid, $host_templates) && count($_templateids) > 1) {
+					$host_templates[$hostid] = $_templateids;
+				}
+			}
+		}
+
+		if (!$host_templates) {
+			return;
+		}
+
+		foreach ($host_templates as $hostid => $templateids) {
+			$row = DBfetch(DBselect(
+				'SELECT i.key_,COUNT(*)'.
+				' FROM items i'.
+				' WHERE '.dbConditionInt('i.hostid', $templateids).
+				' GROUP BY i.key_'.
+				' HAVING COUNT(*)>1',
+				1
+			));
+
+			if ($row) {
+				$options = [
+					'output' => ['hostid'],
+					'filter' => [
+						'hostid' => $templateids,
+						'key_' => $row['key_']
+					]
+				];
+				$result = DBselect(DB::makeSql('items', $options));
+
+				$key_templateids = DBfetchColumn($result, 'hostid');
+
+				$ins_templateid = $key_templateids[key(array_intersect($key_templateids, array_keys($ins_templates)))];
+				$templateid = $key_templateids[key(array_diff($key_templateids, [$ins_templateid]))];
+
+				$objects = DB::select('hosts', [
+					'output' => ['host'],
+					'hostids' => [$ins_templateid, $templateid, $hostid],
+					'preservekeys' => true
+				]);
+
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Cannot link template "%1$s" together with template "%2$s" to host prototype "%3$s" because item "%4$s" will be inherited twice.',
+						$objects[$ins_templateid]['host'], $objects[$templateid]['host'], $objects[$hostid]['host'],
+						$row['key_']
+					)
+				);
 			}
 		}
 	}
