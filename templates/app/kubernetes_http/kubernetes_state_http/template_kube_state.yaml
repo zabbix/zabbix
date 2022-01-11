@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-11T17:40:31Z'
+  date: '2022-01-11T19:03:45Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -82,10 +82,10 @@ zabbix_export:
             
                     response = request.get(url);
             
-                    Zabbix.Log(4, '[ Kubernetes ] Received response with status code ' + request.Status() + ': ' + response);
+                    Zabbix.Log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                    if (request.Status() < 200 || request.Status() >= 300) {
-                        throw 'Request failed with status code ' + request.Status() + ': ' + response;
+                    if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
                     }
             
                     if (response !== null) {
@@ -98,7 +98,7 @@ zabbix_export:
                     }
             
                     return {
-                        status: request.Status(),
+                        status: request.getStatus(),
                         response: response
                     };
                 },
@@ -410,10 +410,10 @@ zabbix_export:
             
                     response = request.get(url);
             
-                    Zabbix.Log(4, '[ Kubernetes ] Received response with status code ' + request.Status() + ': ' + response);
+                    Zabbix.Log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                    if (request.Status() < 200 || request.Status() >= 300) {
-                        throw 'Request failed with status code ' + request.Status() + ': ' + response;
+                    if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
                     }
             
                     if (response !== null) {
@@ -426,7 +426,7 @@ zabbix_export:
                     }
             
                     return {
-                        status: request.Status(),
+                        status: request.getStatus(),
                         response: response
                     };
                 },
@@ -476,10 +476,10 @@ zabbix_export:
             
                     response = request.get(url);
             
-                    Zabbix.Log(4, '[ Kubernetes ] Received response with status code ' + request.Status() + ': ' + response);
+                    Zabbix.Log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                    if (request.Status() < 200 || request.Status() >= 300) {
-                        throw 'Request failed with status code ' + request.Status() + ': ' + response;
+                    if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
                     }
             
                     if (response === null) {
@@ -587,10 +587,10 @@ zabbix_export:
             
                     response = request.get(url);
             
-                    Zabbix.Log(4, '[ Kubernetes ] Received response with status code ' + request.Status() + ': ' + response);
+                    Zabbix.Log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                    if (request.Status() < 200 || request.Status() >= 300) {
-                        throw 'Request failed with status code ' + request.Status() + ': ' + response;
+                    if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
                     }
             
                     if (response !== null) {
@@ -603,7 +603,7 @@ zabbix_export:
                     }
             
                     return {
-                        status: request.Status(),
+                        status: request.getStatus(),
                         response: response
                     };
                 },
