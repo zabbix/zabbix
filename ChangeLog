@@ -4,6 +4,9 @@ New features:
 ...G...... [ZBXNEXT-6875] added native support for the system.hw.chassis and system.hw.devices keys in Zabbix agent 2 (esneiders)
 
 Bug fixes:
+...G.....T [ZBX-19185] fixed free bytes calculation for temporary tablespace in Oracle by ODBC and by agent2 template (abiba)
+.........T [ZBX-20258] fixed tags processing for Zammad media type (abiba)
+A......... [ZBX-19815] fixed multiple data convertion issues in import between versions 1.8/2.0 and 5.0 (Ivo)
 .......PS. [ZBX-20405] improved timeouts in JS (dgoloscapov, wiper)
 ..F....... [ZBX-19669] fixed success message not showing when no fields were changed in Administration->Authentication page (Ivo)
 ...G...... [ZBX-20269] added handling of performance counter with negative denominator value (arimdjonoks)
