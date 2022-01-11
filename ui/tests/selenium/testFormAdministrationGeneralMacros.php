@@ -829,9 +829,7 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 	}
 
 	public function testFormAdministrationGeneralMacros_ResolveSecretMacro() {
-		$item_url = 'zabbix.php?action=latest.view&filter_hostids%5B%5D=99134&filter_select=&filter_evaltype=0'.
-				'&filter_tags%5B0%5D%5Btag%5D=&filter_tags%5B0%5D%5Boperator%5D=0&filter_tags%5B0%5D%5Bvalue%5D'.
-				'=&filter_show_details=1&filter_show_without_data=1&filter_set=1';
+		$item_url = 'zabbix.php?show_details=1&show_without_data=1&action=latest.view&hostids%5B%5D=99134';
 		$macro = [
 			'macro' => '{$Z_GLOBAL_MACRO_2_RESOLVE}',
 			'value' => 'Value 2 B resolved'
