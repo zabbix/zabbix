@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,8 +29,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: filename_matches                                                 *
- *                                                                            *
  * Purpose: checks if filename matches the include-regexp and doesn't match   *
  *          the exclude-regexp                                                *
  *                                                                            *
@@ -51,8 +49,6 @@ static int	filename_matches(const char *fname, const zbx_regexp_t *regex_incl, c
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: queue_directory                                                  *
  *                                                                            *
  * Purpose: adds directory to processing queue after checking if current      *
  *          depth is less than 'max_depth'                                    *
@@ -87,8 +83,6 @@ static int	queue_directory(zbx_vector_ptr_t *list, char *path, int depth, int ma
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: compare_descriptors                                              *
  *                                                                            *
  * Purpose: compares two zbx_file_descriptor_t values to perform search       *
  *          within descriptor vector                                          *
@@ -141,6 +135,7 @@ static int	prepare_common_parameters(const AGENT_REQUEST *request, AGENT_RESULT 
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL,
 					"Invalid regular expression in second parameter: %s", error));
+			zbx_regexp_err_msg_free(error);
 			return FAIL;
 		}
 	}
@@ -151,6 +146,7 @@ static int	prepare_common_parameters(const AGENT_REQUEST *request, AGENT_RESULT 
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL,
 					"Invalid regular expression in third parameter: %s", error));
+			zbx_regexp_err_msg_free(error);
 			return FAIL;
 		}
 	}
@@ -161,6 +157,7 @@ static int	prepare_common_parameters(const AGENT_REQUEST *request, AGENT_RESULT 
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid regular expression in %s parameter: %s",
 					(5 == excl_dir_param ? "sixth" : "eleventh"), error));
+			zbx_regexp_err_msg_free(error);
 			return FAIL;
 		}
 	}
@@ -411,8 +408,6 @@ static void	descriptors_vector_destroy(zbx_vector_ptr_t *descriptors)
 #define		FT2UT(ft) 	(time_t)(DW2UI64(ft.dwHighDateTime,ft.dwLowDateTime) / 10000000ULL - 11644473600ULL)
 
 /******************************************************************************
- *                                                                            *
- * Function: has_timed_out                                                    *
  *                                                                            *
  * Purpose: Checks if timeout has occurred. If it is, thread should           *
  *          immediately stop whatever it is doing, clean up everything and    *
@@ -862,8 +857,6 @@ int	VFS_DIR_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vfs_dir_info                                                     *
  *                                                                            *
  * Purpose: counts or lists files in directory, subject to regexp, type and   *
  *          depth filters                                                     *

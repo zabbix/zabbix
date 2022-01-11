@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -100,7 +100,7 @@ function testUserSound(idx) {
  * Converts all HTML symbols into HTML entities.
  */
 jQuery.escapeHtml = function(html) {
-	return jQuery('<div />').text(html).html();
+	return jQuery('<div>').text(html).html();
 }
 
 function validateNumericBox(obj, allowempty, allownegative) {
@@ -501,6 +501,7 @@ function overlayDialogueDestroy(dialogueid) {
  *
  * @param {object} params                                   Modal window params.
  * @param {string} params.title                             Modal window title.
+ * @param {string} params.class                             Modal window CSS class, ofthen based on .modal-popup*.
  * @param {object} params.content                           Window content.
  * @param {object} params.footer                           	Window footer content.
  * @param {object} params.controls                          Window controls.
@@ -517,7 +518,7 @@ function overlayDialogueDestroy(dialogueid) {
  * @param string   params.dialogueid            (optional)  Unique dialogue identifier to reuse existing overlay dialog
  *                                                          or create a new one if value is not set.
  * @param string   params.script_inline         (optional)  Custom javascript code to execute when initializing dialog.
- * @param {object} trigger_elmnt                (optional)  UI element which triggered opening of overlay dialogue.
+ * @param {Node|null} trigger_elmnt                         UI element which triggered opening of overlay dialogue.
  *
  * @return {Overlay}
  */
@@ -546,11 +547,11 @@ function overlayDialogue(params, trigger_elmnt) {
  *
  * @param string scriptid			Script ID.
  * @param string confirmation		Confirmation text.
- * @param {object} trigger_elmnt	UI element that was clicked to open overlay dialogue.
+ * @param {Node} trigger_element	UI element that was clicked to open overlay dialogue.
  * @param string hostid				Host ID.
  * @param string eventid			Event ID.
  */
-function executeScript(scriptid, confirmation, trigger_elmnt, hostid = null, eventid = null) {
+function executeScript(scriptid, confirmation, trigger_element, hostid = null, eventid = null) {
 	var execute = function() {
 		var popup_options = {scriptid: scriptid};
 
@@ -563,7 +564,7 @@ function executeScript(scriptid, confirmation, trigger_elmnt, hostid = null, eve
 		}
 
 		if (Object.keys(popup_options).length === 2) {
-			PopUp('popup.scriptexec', popup_options, null, trigger_elmnt);
+			PopUp('popup.scriptexec', popup_options, {dialogue_class: 'modal-popup-medium', trigger_element});
 		}
 	};
 
@@ -573,7 +574,7 @@ function executeScript(scriptid, confirmation, trigger_elmnt, hostid = null, eve
 			'content': jQuery('<span>')
 				.addClass('confirmation-msg')
 				.text(confirmation),
-			'class': 'modal-popup modal-popup-small',
+			'class': 'modal-popup modal-popup-small position-middle',
 			'buttons': [
 				{
 					'title': t('Cancel'),
@@ -590,7 +591,7 @@ function executeScript(scriptid, confirmation, trigger_elmnt, hostid = null, eve
 					}
 				}
 			]
-		}, trigger_elmnt);
+		}, trigger_element);
 
 		return false;
 	}

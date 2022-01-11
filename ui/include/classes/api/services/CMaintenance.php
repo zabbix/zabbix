@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -256,729 +256,348 @@ class CMaintenance extends CApiService {
 	}
 
 	/**
-	 * Add maintenances.
-	 *
 	 * @param array $maintenances
-	 *
-	 * @throws APIException if no permissions to object, it does no exists or validation errors.
 	 *
 	 * @return array
 	 */
 	public function create(array $maintenances) {
-		$maintenances = zbx_toArray($maintenances);
 		if (self::$userData['type'] == USER_TYPE_ZABBIX_USER) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$hostids = [];
-		$groupids = [];
-		foreach ($maintenances as $maintenance) {
-			if (array_key_exists('hostids', $maintenance)) {
-				$hostids = array_merge($hostids, $maintenance['hostids']);
-			}
-			if (array_key_exists('groupids', $maintenance)) {
-				$groupids = array_merge($groupids, $maintenance['groupids']);
-			}
-		}
+		$this->validateCreate($maintenances);
 
-		// validate hosts & groups
-		if (empty($hostids) && empty($groupids)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one host group or host must be selected.'));
-		}
+		$maintenanceids = DB::insert('maintenances', $maintenances);
 
-		// hosts permissions
-		$options = [
-			'hostids' => $hostids,
-			'editable' => true,
-			'output' => ['hostid'],
-			'preservekeys' => true
-		];
-		$updHosts = API::Host()->get($options);
-		foreach ($hostids as $hostid) {
-			if (!isset($updHosts[$hostid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-			}
-		}
-		// groups permissions
-		$options = [
-			'groupids' => $groupids,
-			'editable' => true,
-			'output' => ['groupid'],
-			'preservekeys' => true
-		];
-		$updGroups = API::HostGroup()->get($options);
-		foreach ($groupids as $groupid) {
-			if (!isset($updGroups[$groupid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-			}
-		}
-
-		$tid = 0;
-		$insert = [];
-		$timeperiods = [];
-		$insertTimeperiods = [];
-		$now = time();
-		$now -= $now % SEC_PER_MIN;
-
-		// check fields
-		foreach ($maintenances as $maintenance) {
-			$dbFields = [
-				'name' => null,
-				'active_since' => null,
-				'active_till' => null
-			];
-
-			if (!check_db_fields($dbFields, $maintenance)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parameters for maintenance.'));
-			}
-		}
-
-		$collectionValidator = new CCollectionValidator([
-			'uniqueField' => 'name',
-			'messageDuplicate' => _('Maintenance "%1$s" already exists.')
-		]);
-		$this->checkValidator($maintenances, $collectionValidator);
-
-		// validate if maintenance name already exists
-		$dbMaintenances = $this->get([
-			'output' => ['name'],
-			'filter' => ['name' => zbx_objectValues($maintenances, 'name')],
-			'nopermissions' => true,
-			'limit' => 1
-		]);
-
-		if ($dbMaintenances) {
-			$dbMaintenance = reset($dbMaintenances);
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Maintenance "%1$s" already exists.', $dbMaintenance['name']));
-		}
-
-		foreach ($maintenances as $mnum => $maintenance) {
-			// validate maintenance active since
-			if (!validateUnixTime($maintenance['active_since'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('"%1$s" must be between 1970.01.01 and 2038.01.18.', 'active_since')
-				);
-			}
-
-			// validate maintenance active till
-			if (!validateUnixTime($maintenance['active_till'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('"%1$s" must be between 1970.01.01 and 2038.01.18.', 'active_till')
-				);
-			}
-
-			// validate maintenance active interval
-			if ($maintenance['active_since'] > $maintenance['active_till']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Maintenance "%1$s" value cannot be bigger than "%2$s".', 'active_since', 'active_till')
-				);
-			}
-
-			// validate timeperiods
-			if (!array_key_exists('timeperiods', $maintenance) || !is_array($maintenance['timeperiods'])
-					|| !$maintenance['timeperiods']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one maintenance period must be created.'));
-			}
-
-			$maintenance['active_since'] -= $maintenance['active_since'] % SEC_PER_MIN;
-			$maintenance['active_till'] -= $maintenance['active_till'] % SEC_PER_MIN;
-
-			foreach ($maintenance['timeperiods'] as $timeperiod) {
-				if (!is_array($timeperiod)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one maintenance period must be created.'));
-				}
-
-				$dbFields = [
-					'timeperiod_type' => TIMEPERIOD_TYPE_ONETIME,
-					'period' => SEC_PER_HOUR,
-					'start_date' =>	$now
-				];
-				check_db_fields($dbFields, $timeperiod);
-
-				if (array_key_exists('every', $timeperiod) && $timeperiod['every'] <= 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value "%1$s" for unsigned int field "%2$s".', $timeperiod['every'], 'every')
-					);
-				}
-
-				if ($timeperiod['timeperiod_type'] != TIMEPERIOD_TYPE_ONETIME) {
-					$timeperiod['start_date'] = DB::getDefault('timeperiods', 'start_date');
-				}
-				else if (!validateUnixTime($timeperiod['start_date'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('"%1$s" must be between 1970.01.01 and 2038.01.18.', 'start_date')
-					);
-				}
-				else {
-					$timeperiod['start_date'] -= $timeperiod['start_date'] % SEC_PER_MIN;
-				}
-
-				$tid++;
-				$insertTimeperiods[$tid] = $timeperiod;
-				$timeperiods[$tid] = $mnum;
-			}
-
-			$insert[$mnum] = $maintenance;
-
-			$this->validateTags($maintenance);
-		}
-
-		$maintenanceids = DB::insert('maintenances', $insert);
-		$timeperiodids = DB::insert('timeperiods', $insertTimeperiods);
-
-		$insertWindows = [];
-		foreach ($timeperiods as $tid => $mnum) {
-			$insertWindows[] = [
-				'timeperiodid' => $timeperiodids[$tid],
-				'maintenanceid' => $maintenanceids[$mnum]
-			];
-		}
-		DB::insertBatch('maintenances_windows', $insertWindows);
-
-		$insertHosts = [];
-		$insertGroups = [];
-		$ins_tags = [];
-		foreach ($maintenances as $mnum => &$maintenance) {
-			$maintenance['maintenanceid'] = $maintenanceids[$mnum];
-
-			if (array_key_exists('hostids', $maintenance)) {
-				foreach ($maintenance['hostids'] as $hostid) {
-					$insertHosts[] = [
-						'hostid' => $hostid,
-						'maintenanceid' => $maintenance['maintenanceid']
-					];
-				}
-			}
-
-			if (array_key_exists('groupids', $maintenance)) {
-				foreach ($maintenance['groupids'] as $groupid) {
-					$insertGroups[] = [
-						'groupid' => $groupid,
-						'maintenanceid' => $maintenance['maintenanceid']
-					];
-				}
-			}
-
-			if (array_key_exists('tags', $maintenance)) {
-				foreach ($maintenance['tags'] as $tag) {
-					$ins_tags[] = [
-						'maintenanceid' => $maintenance['maintenanceid']
-					] + $tag;
-				}
-			}
+		foreach ($maintenances as $index => &$maintenance) {
+			$maintenance['maintenanceid'] = $maintenanceids[$index];
 		}
 		unset($maintenance);
 
-		DB::insertBatch('maintenances_hosts', $insertHosts);
-		DB::insertBatch('maintenances_groups', $insertGroups);
+		self::updateTags($maintenances);
+		self::updateGroups($maintenances);
+		self::updateHosts($maintenances);
+		self::updateTimeperiods($maintenances);
 
-		if ($ins_tags) {
-			DB::insert('maintenance_tag', $ins_tags);
-		}
-
-		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_MAINTENANCE, $maintenances);
+		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_MAINTENANCE, $maintenances);
 
 		return ['maintenanceids' => $maintenanceids];
 	}
 
 	/**
-	 * Validates maintenance problem tags.
+	 * @param array $maintenances
 	 *
-	 * @param array  $maintenance
-	 * @param int    $maintenance['maintenance_type']
-	 * @param int    $maintenance['tags_evaltype']
-	 * @param array  $maintenance['tags']
-	 * @param string $maintenance['tags'][]['tag']
-	 * @param int    $maintenance['tags'][]['operator']
-	 * @param string $maintenance['tags'][]['value']
-	 *
-	 * @throws APIException if the input is invalid.
+	 * @throws APIException if no permissions to object, it does no exists or the input is invalid.
 	 */
-	private function validateTags(array $maintenance) {
-		if (array_key_exists('maintenance_type', $maintenance)
-				&& $maintenance['maintenance_type'] == MAINTENANCE_TYPE_NODATA
-				&& array_key_exists('tags', $maintenance) && $maintenance['tags']) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Incorrect value for field "%1$s": %2$s.', 'tags', _('should be empty'))
-			);
-		}
-
-		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'maintenance_type'	=> ['type' => API_INT32, 'in' => implode(',', [MAINTENANCE_TYPE_NORMAL, MAINTENANCE_TYPE_NODATA])],
-			'tags_evaltype'		=> ['type' => API_INT32, 'in' => implode(',', [MAINTENANCE_TAG_EVAL_TYPE_AND_OR, MAINTENANCE_TAG_EVAL_TYPE_OR])],
-			'tags'				=> ['type' => API_OBJECTS, 'uniq' => [['tag', 'operator', 'value']], 'fields' => [
-				'tag'				=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('maintenance_tag', 'tag')],
-				'operator'			=> ['type' => API_INT32, 'in' => implode(',', [MAINTENANCE_TAG_OPERATOR_EQUAL, MAINTENANCE_TAG_OPERATOR_LIKE]), 'default' => DB::getDefault('maintenance_tag', 'operator')],
-				'value'				=> ['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('maintenance_tag', 'value'), 'default' => DB::getDefault('maintenance_tag', 'value')]
+	protected function validateCreate(array &$maintenances): void {
+		$api_input_rules =		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
+			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('maintenances', 'name')],
+			'maintenance_type' =>	['type' => API_INT32, 'in' => implode(',', [MAINTENANCE_TYPE_NORMAL, MAINTENANCE_TYPE_NODATA]), 'default' => DB::getDefault('maintenances', 'maintenance_type')],
+			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('maintenances', 'description')],
+			'active_since' =>		['type' => API_TIMESTAMP, 'flags' => API_REQUIRED],
+			'active_till' =>		['type' => API_TIMESTAMP, 'flags' => API_REQUIRED, 'compare' => ['operator' => '>', 'field' => 'active_since']],
+			'tags_evaltype' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'maintenance_type', 'in' => implode(',', [MAINTENANCE_TYPE_NORMAL])], 'type' => API_INT32, 'in' => implode(',', [MAINTENANCE_TAG_EVAL_TYPE_AND_OR, MAINTENANCE_TAG_EVAL_TYPE_OR])],
+										['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'tags' =>				['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'maintenance_type', 'in' => implode(',', [MAINTENANCE_TYPE_NORMAL])], 'type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['tag', 'operator', 'value']], 'fields' => [
+				'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('maintenance_tag', 'tag')],
+				'operator' =>				['type' => API_INT32, 'in' => implode(',', [MAINTENANCE_TAG_OPERATOR_EQUAL, MAINTENANCE_TAG_OPERATOR_LIKE]), 'default' => DB::getDefault('maintenance_tag', 'operator')],
+				'value' =>					['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('maintenance_tag', 'value'), 'default' => DB::getDefault('maintenance_tag', 'value')]
+										]],
+										['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'groupids' =>			['type' => API_IDS, 'flags' => API_DEPRECATED, 'uniq' => true],
+			'hostids' =>			['type' => API_IDS, 'flags' => API_DEPRECATED, 'uniq' => true],
+			'groups' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
+				'groupid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+			]],
+			'hosts' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['hostid']], 'fields' => [
+				'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
+			]],
+			'timeperiods' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
+				'period' =>				['type' => API_TIME_UNIT, 'in' => implode(':', [5 * SEC_PER_MIN, ZBX_MAX_INT32]), 'default' => SEC_PER_HOUR],
+				'timeperiod_type' =>	['type' => API_INT32, 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY]), 'default' => DB::getDefault('timeperiods', 'timeperiod_type')],
+				'start_date' =>			['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME])], 'type' => API_TIMESTAMP, 'default' => time()],
+											['else' => true, 'type' => API_UNEXPECTED]
+				]],
+				'start_time' =>			['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_TIMESTAMP, 'format' => 'H:i', 'timezone' => 'UTC', 'in' => implode(':', [0, SEC_PER_DAY - SEC_PER_MIN]), 'default' => DB::getDefault('timeperiods', 'start_time')],
+											['else' => true, 'type' => API_UNEXPECTED]
+				]],
+				'every' =>				['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY])], 'type' => API_INT32, 'in' => implode(':', [1, ZBX_MAX_INT32]), 'default' => DB::getDefault('timeperiods', 'every')],
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => implode(',', [MONTH_WEEK_FIRST, MONTH_WEEK_SECOND, MONTH_WEEK_THIRD, MONTH_WEEK_FOURTH, MONTH_WEEK_LAST]), 'default' => DB::getDefault('timeperiods', 'every')],
+											['else' => true, 'type' => API_UNEXPECTED]
+				]],
+				'day' =>				['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => implode(':', [0, MONTH_MAX_DAY])],
+											['else' => true, 'type' => API_UNEXPECTED]
+				]],
+				'dayofweek' =>			['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_WEEKLY])], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(':', [0b0000001, 0b1111111])],
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => implode(':', [0, 0b1111111])],
+											['else' => true, 'type' => API_UNEXPECTED]
+				]],
+				'month' =>				['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(':', [0b000000000001, 0b111111111111])],
+											['else' => true, 'type' => API_UNEXPECTED]
+				]]
 			]]
 		]];
 
-		// Keep values only for fields with defined validation rules.
-		$maintenance = array_intersect_key($maintenance, $api_input_rules['fields']);
-
-		if (!CApiInputValidator::validate($api_input_rules, $maintenance, '/', $error)) {
+		if (!CApiInputValidator::validate($api_input_rules, $maintenances, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
+
+		foreach ($maintenances as &$maintenance) {
+			if (array_key_exists('groupids', $maintenance)) {
+				if (array_key_exists('groups', $maintenance)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parameter "%1$s" is deprecated.', 'groupids'));
+				}
+
+				$maintenance['groups'] = zbx_toObject($maintenance['groupids'], 'groupid');
+				unset($maintenance['groupids']);
+			}
+
+			if (array_key_exists('hostids', $maintenance)) {
+				if (array_key_exists('hosts', $maintenance)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parameter "%1$s" is deprecated.', 'hostids'));
+				}
+
+				$maintenance['hosts'] = zbx_toObject($maintenance['hostids'], 'hostid');
+				unset($maintenance['hostids']);
+			}
+		}
+		unset($maintenance);
+
+		foreach ($maintenances as &$maintenance) {
+			$maintenance['active_since'] -= $maintenance['active_since'] % SEC_PER_MIN;
+			$maintenance['active_till'] -= $maintenance['active_till'] % SEC_PER_MIN;
+
+			if ((!array_key_exists('groups', $maintenance) || !$maintenance['groups'])
+					&& (!array_key_exists('hosts', $maintenance) || !$maintenance['hosts'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one host group or host must be selected.'));
+			}
+		}
+		unset($maintenance);
+
+		$maintenances = self::validateTimePeriods($maintenances);
+
+		self::checkDuplicates($maintenances);
+		self::checkGroups($maintenances);
+		self::checkHosts($maintenances);
 	}
 
 	/**
-	 * Update maintenances.
-	 *
 	 * @param array $maintenances
-	 *
-	 * @throws APIException if no permissions to object, it does no exists or validation errors
 	 *
 	 * @return array
 	 */
-	public function update(array $maintenances) {
+	public function update(array $maintenances): array {
 		if (self::$userData['type'] == USER_TYPE_ZABBIX_USER) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
-		$maintenances = zbx_toArray($maintenances);
-		$maintenanceids = zbx_objectValues($maintenances, 'maintenanceid');
+		$this->validateUpdate($maintenances, $db_maintenances);
 
-		if (!$maintenances) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
-		}
-
-		$db_fields = [
-			'maintenanceid' => null
-		];
+		$upd_maintenances = [];
 
 		foreach ($maintenances as $maintenance) {
-			// Validate fields.
-			if (!check_db_fields($db_fields, $maintenance)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parameters for maintenance.'));
-			}
+			$upd_maintenance = DB::getUpdatedValues('maintenances', $maintenance,
+				$db_maintenances[$maintenance['maintenanceid']]
+			);
 
-			$this->validateTags($maintenance);
+			if ($upd_maintenance) {
+				$upd_maintenances[] = [
+					'values' => $upd_maintenance,
+					'where' => ['maintenanceid' => $maintenance['maintenanceid']]
+				];
+			}
 		}
 
-		$db_maintenances = $this->get([
-			'output' => API_OUTPUT_EXTEND,
-			'maintenanceids' => $maintenanceids,
-			'selectGroups' => ['groupid'],
-			'selectHosts' => ['hostid'],
-			'selectTimeperiods' => API_OUTPUT_EXTEND,
-			'editable' => true,
-			'preservekeys' => true
-		]);
+		if ($upd_maintenances) {
+			DB::update('maintenances', $upd_maintenances);
+		}
 
-		$changed_names = [];
-		$hostids = [];
-		$groupids = [];
+		self::updateTags($maintenances, $db_maintenances);
+		self::updateGroups($maintenances, $db_maintenances);
+		self::updateHosts($maintenances, $db_maintenances);
+		self::updateTimeperiods($maintenances, $db_maintenances);
+
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_MAINTENANCE, $maintenances, $db_maintenances);
+
+		return ['maintenanceids' => array_column($maintenances, 'maintenanceid')];
+	}
+
+	/**
+	 * @param array      $maintenances
+	 * @param array|null $db_maintenances
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	protected function validateUpdate(array &$maintenances, array &$db_maintenances = null): void {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['maintenanceid']], 'fields' => [
+			'maintenanceid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
+			'groupids' =>		['type' => API_IDS, 'flags' => API_DEPRECATED, 'uniq' => true],
+			'hostids' =>		['type' => API_IDS, 'flags' => API_DEPRECATED, 'uniq' => true]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $maintenances, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 
 		foreach ($maintenances as &$maintenance) {
-			if (!array_key_exists($maintenance['maintenanceid'], $db_maintenances)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-
-			$db_maintenance = $db_maintenances[$maintenance['maintenanceid']];
-
-			// Check maintenances names and collect for unique checking.
-			if (array_key_exists('name', $maintenance) && $maintenance['name'] !== ''
-					&& $db_maintenance['name'] !== $maintenance['name']) {
-				if (array_key_exists($maintenance['name'], $changed_names)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Maintenance "%1$s" already exists.', $maintenance['name'])
-					);
+			if (array_key_exists('groupids', $maintenance)) {
+				if (array_key_exists('groups', $maintenance)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parameter "%1$s" is deprecated.', 'groupids'));
 				}
 
-				$changed_names[$maintenance['name']] = $maintenance['name'];
+				$maintenance['groups'] = zbx_toObject($maintenance['groupids'], 'groupid');
+				unset($maintenance['groupids']);
 			}
 
-			// Validate maintenance active since.
-			if (array_key_exists('active_since', $maintenance)) {
-				$active_since = $maintenance['active_since'];
-
-				if (!validateUnixTime($active_since)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('"%1$s" must be between 1970.01.01 and 2038.01.18.', 'active_since')
-					);
+			if (array_key_exists('hostids', $maintenance)) {
+				if (array_key_exists('hosts', $maintenance)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parameter "%1$s" is deprecated.', 'hostids'));
 				}
 
-				$maintenance['active_since'] -= $maintenance['active_since'] % SEC_PER_MIN;
-			}
-			else {
-				$active_since = $db_maintenance['active_since'];
-			}
-
-			// Validate maintenance active till.
-			if (array_key_exists('active_till', $maintenance)) {
-				$active_till = $maintenance['active_till'];
-
-				if (!validateUnixTime($active_till)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('"%1$s" must be between 1970.01.01 and 2038.01.18.', 'active_till')
-					);
-				}
-
-				$maintenance['active_till'] -= $maintenance['active_till'] % SEC_PER_MIN;
-			}
-			else {
-				$active_till = $db_maintenance['active_till'];
-			}
-
-			// Validate maintenance active interval.
-			if ($active_since > $active_till) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_('Maintenance "Active since" value cannot be bigger than "Active till".')
-				);
-			}
-
-			// Validate timeperiods.
-			if (array_key_exists('timeperiods', $maintenance)) {
-				if (!is_array($maintenance['timeperiods']) || !$maintenance['timeperiods']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one maintenance period must be created.'));
-				}
-
-				$db_timeperiods = zbx_toHash($db_maintenance['timeperiods'], 'timeperiodid');
-
-				foreach ($maintenance['timeperiods'] as &$timeperiod) {
-					if (!is_array($timeperiod)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_('At least one maintenance period must be created.')
-						);
-					}
-
-					$timeperiod_type = array_key_exists('timeperiod_type', $timeperiod)
-						? $timeperiod['timeperiod_type']
-						: null;
-
-					if (array_key_exists('timeperiodid', $timeperiod)) {
-						$timeperiodid = $timeperiod['timeperiodid'];
-
-						// Validate incorrect "timeperiodid".
-						if (!array_key_exists($timeperiodid, $db_timeperiods)) {
-							self::exception(ZBX_API_ERROR_PERMISSIONS,
-								_('No permissions to referred object or it does not exist!')
-							);
-						}
-
-						if ($timeperiod_type === null) {
-							$timeperiod_type = $db_timeperiods[$timeperiodid]['timeperiod_type'];
-						}
-					}
-
-					if (array_key_exists('every', $timeperiod) && $timeperiod['every'] <= 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Incorrect value "%1$s" for unsigned int field "%2$s".', $timeperiod['every'], 'every')
-						);
-					}
-
-					// Without "timeperiod_type" it resolves to default TIMEPERIOD_TYPE_ONETIME. But will it be forever?
-					if ($timeperiod_type === null) {
-						$timeperiod_type = DB::getDefault('timeperiods', 'timeperiod_type');
-					}
-
-					// Reset "start_date" to default value in case "timeperiod_type" is not one time only.
-					if ($timeperiod_type != TIMEPERIOD_TYPE_ONETIME) {
-						$timeperiod['start_date'] = DB::getDefault('timeperiods', 'start_date');
-					}
-					else if (array_key_exists('start_date', $timeperiod)
-							&& !validateUnixTime($timeperiod['start_date'])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('"%1$s" must be between 1970.01.01 and 2038.01.18.', 'start_date')
-						);
-					}
-					else {
-						$timeperiod['start_date'] -= $timeperiod['start_date'] % SEC_PER_MIN;
-					}
-				}
-				unset($timeperiod);
-			}
-
-			// Collect hostids for permission checking.
-			if (array_key_exists('hostids', $maintenance) && is_array($maintenance['hostids'])) {
-				$hostids = array_merge($hostids, $maintenance['hostids']);
-				$has_hosts = (bool) $maintenance['hostids'];
-			}
-			else {
-				$has_hosts = (bool) $db_maintenances[$maintenance['maintenanceid']]['hosts'];
-			}
-
-			// Collect groupids for permission checking.
-			if (array_key_exists('groupids', $maintenance) && is_array($maintenance['groupids'])) {
-				$groupids = array_merge($groupids, $maintenance['groupids']);
-				$has_groups = (bool) $maintenance['groupids'];
-			}
-			else {
-				$has_groups = (bool) $db_maintenances[$maintenance['maintenanceid']]['groups'];
-			}
-
-			if (!$has_hosts && !$has_groups) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one host group or host must be selected.'));
-			}
-
-			// Check if maintenance without data collection has no tags.
-			$db_maintenance_type = $db_maintenances[$maintenance['maintenanceid']]['maintenance_type'];
-			$maintenance_type = array_key_exists('maintenance_type', $maintenance)
-				? $maintenance['maintenance_type']
-				: $db_maintenance_type;
-			if ($db_maintenance_type == MAINTENANCE_TYPE_NODATA && $maintenance_type == $db_maintenance_type
-					&& array_key_exists('tags', $maintenance) && $maintenance['tags']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value for field "%1$s": %2$s.', 'tags', _('should be empty'))
-				);
+				$maintenance['hosts'] = zbx_toObject($maintenance['hostids'], 'hostid');
+				unset($maintenance['hostids']);
 			}
 		}
 		unset($maintenance);
 
-		// Check if maintenance already exists.
-		if ($changed_names) {
-			$db_maintenances_names = $this->get([
-				'output' => ['name'],
-				'filter' => ['name' => $changed_names],
-				'nopermissions' => true,
-				'limit' => 1
-			]);
-
-			if ($db_maintenances_names) {
-				$maintenance = reset($db_maintenances_names);
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Maintenance "%1$s" already exists.', $maintenance['name'])
-				);
-			}
-		}
-
-		// Check hosts permission and availability.
-		if ($hostids) {
-			$db_hosts = API::Host()->get([
-				'output' => [],
-				'hostids' => $hostids,
-				'editable' => true,
-				'preservekeys' => true
-			]);
-
-			foreach ($hostids as $hostid) {
-				if (!array_key_exists($hostid, $db_hosts)) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS,
-						_('No permissions to referred object or it does not exist!')
-					);
-				}
-			}
-		}
-
-		// Check host groups permission and availability.
-		if ($groupids) {
-			$db_groups = API::HostGroup()->get([
-				'output' => [],
-				'groupids' => $groupids,
-				'editable' => true,
-				'preservekeys' => true
-			]);
-
-			foreach ($groupids as $groupid) {
-				if (!array_key_exists($groupid, $db_groups)) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS,
-						_('No permissions to referred object or it does not exist!')
-					);
-				}
-			}
-		}
-
-		$update_maintenances = [];
-		foreach ($maintenances as $mnum => $maintenance) {
-			$update_maintenances[$mnum] = [
-				'values' => $maintenance,
-				'where' => ['maintenanceid' => $maintenance['maintenanceid']]
-			];
-
-			// Update time periods.
-			if (array_key_exists('timeperiods', $maintenance)) {
-				$this->replaceTimePeriods($db_maintenances[$maintenance['maintenanceid']], $maintenance);
-			}
-		}
-		DB::update('maintenances', $update_maintenances);
-
-		// Some of the hosts and groups bound to maintenance must be deleted, other inserted and others left alone.
-		$insert_hosts = [];
-		$insert_groups = [];
-
-		foreach ($maintenances as $maintenance) {
-			if (array_key_exists('hostids', $maintenance)) {
-				// Putting apart those host<->maintenance connections that should be inserted, deleted and not changed:
-				// $hosts_diff['first'] - new hosts, that should be inserted;
-				// $hosts_diff['second'] - hosts, that should be deleted;
-				// $hosts_diff['both'] - hosts, that should not be touched;
-				$hosts_diff = zbx_array_diff(
-					zbx_toObject($maintenance['hostids'], 'hostid'),
-					$db_maintenances[$maintenance['maintenanceid']]['hosts'],
-					'hostid'
-				);
-
-				foreach ($hosts_diff['first'] as $host) {
-					$insert_hosts[] = [
-						'hostid' => $host['hostid'],
-						'maintenanceid' => $maintenance['maintenanceid']
-					];
-				}
-				foreach ($hosts_diff['second'] as $host) {
-					DB::delete('maintenances_hosts', [
-						'hostid' => $host['hostid'],
-						'maintenanceid' => $maintenance['maintenanceid']
-					]);
-				}
-			}
-
-			if (array_key_exists('groupids', $maintenance)) {
-				// Now the same with the groups.
-				$groups_diff = zbx_array_diff(
-					zbx_toObject($maintenance['groupids'], 'groupid'),
-					$db_maintenances[$maintenance['maintenanceid']]['groups'],
-					'groupid'
-				);
-
-				foreach ($groups_diff['first'] as $group) {
-					$insert_groups[] = [
-						'groupid' => $group['groupid'],
-						'maintenanceid' => $maintenance['maintenanceid']
-					];
-				}
-				foreach ($groups_diff['second'] as $group) {
-					DB::delete('maintenances_groups', [
-						'groupid' => $group['groupid'],
-						'maintenanceid' => $maintenance['maintenanceid']
-					]);
-				}
-			}
-		}
-
-		if ($insert_hosts) {
-			DB::insert('maintenances_hosts', $insert_hosts);
-		}
-
-		if ($insert_groups) {
-			DB::insert('maintenances_groups', $insert_groups);
-		}
-
-		$this->updateTags($maintenances, $db_maintenances);
-
-		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_MAINTENANCE, $maintenances, $db_maintenances);
-
-		return ['maintenanceids' => $maintenanceids];
-	}
-
-	/**
-	 * Compares input tags with tags stored in the database and performs tag deleting and inserting.
-	 *
-	 * @param array  $maintenances
-	 * @param int    $maintenances[]['maintenanceid']
-	 * @param int    $maintenances[]['maintenance_type']
-	 * @param array  $maintenances[]['tags']
-	 * @param string $maintenances[]['tags'][]['tag']
-	 * @param int    $maintenances[]['tags'][]['operator']
-	 * @param string $maintenances[]['tags'][]['value']
-	 * @param array  $db_maintenances
-	 * @param int    $db_maintenances[<maintenanceid>]
-	 * @param int    $db_maintenances[<maintenanceid>]['maintenance_type']
-	 */
-	private function updateTags(array $maintenances, array $db_maintenances) {
-		$db_tags = API::getApiService()->select('maintenance_tag', [
-			'output' => ['maintenancetagid', 'maintenanceid', 'tag', 'operator', 'value'],
-			'filter' => ['maintenanceid' => array_keys($db_maintenances)],
+		$db_maintenances = $this->get([
+			'output' => ['maintenanceid', 'name', 'maintenance_type', 'description', 'active_since', 'active_till',
+				'tags_evaltype'
+			],
+			'maintenanceids' => array_column($maintenances, 'maintenanceid'),
+			'editable' => true,
 			'preservekeys' => true
 		]);
-		$relation_map = $this->createRelationMap($db_tags, 'maintenanceid', 'maintenancetagid');
-		$db_maintenances = $relation_map->mapMany($db_maintenances, $db_tags, 'tags');
 
-		$ins_tags = [];
-		$del_maintenancetagids = [];
+		if (count($db_maintenances) != count($maintenances)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
 
-		foreach ($maintenances as $mnum => $maintenance) {
-			$maintenanceid = $maintenance['maintenanceid'];
+		$maintenances = $this->extendObjectsByKey($maintenances, $db_maintenances, 'maintenanceid',
+			['maintenance_type', 'active_since', 'active_till']
+		);
 
-			if (array_key_exists('maintenance_type', $maintenance)
-					&& $maintenance['maintenance_type'] == MAINTENANCE_TYPE_NODATA
-					&& $db_maintenances[$maintenanceid]['tags']) {
-				foreach ($db_maintenances[$maintenanceid]['tags'] as $db_tag) {
-					$del_maintenancetagids[] = $db_tag['maintenancetagid'];
+		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['maintenanceid'], ['name']], 'fields' => [
+			'maintenanceid' =>		['type' => API_ID],
+			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('maintenances', 'name')],
+			'maintenance_type' =>	['type' => API_INT32, 'in' => implode(',', [MAINTENANCE_TYPE_NORMAL, MAINTENANCE_TYPE_NODATA])],
+			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('maintenances', 'description')],
+			'active_since' =>		['type' => API_TIMESTAMP],
+			'active_till' =>		['type' => API_TIMESTAMP, 'compare' => ['operator' => '>', 'field' => 'active_since']],
+			'tags_evaltype' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'maintenance_type', 'in' => implode(',', [MAINTENANCE_TYPE_NORMAL])], 'type' => API_INT32, 'in' => implode(',', [MAINTENANCE_TAG_EVAL_TYPE_AND_OR, MAINTENANCE_TAG_EVAL_TYPE_OR])],
+										['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'tags' =>				['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'maintenance_type', 'in' => implode(',', [MAINTENANCE_TYPE_NORMAL])], 'type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['tag', 'operator', 'value']], 'fields' => [
+				'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('maintenance_tag', 'tag')],
+				'operator' =>				['type' => API_INT32, 'in' => implode(',', [MAINTENANCE_TAG_OPERATOR_EQUAL, MAINTENANCE_TAG_OPERATOR_LIKE]), 'default' => DB::getDefault('maintenance_tag', 'operator')],
+				'value' =>					['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('maintenance_tag', 'value'), 'default' => DB::getDefault('maintenance_tag', 'value')]
+										]],
+										['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'groups' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
+				'groupid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+			]],
+			'hosts' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['hostid']], 'fields' => [
+				'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
+			]],
+			'timeperiods' =>		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
+				'period' =>				['type' => API_TIME_UNIT, 'in' => implode(':', [5 * SEC_PER_MIN, ZBX_MAX_INT32]), 'default' => SEC_PER_HOUR],
+				'timeperiod_type' =>	['type' => API_INT32, 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY]), 'default' => DB::getDefault('timeperiods', 'timeperiod_type')],
+				'start_date' =>			['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME])], 'type' => API_TIMESTAMP, 'default' => time()],
+											['else' => true, 'type' => API_UNEXPECTED]
+				]],
+				'start_time' =>			['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_TIMESTAMP, 'format' => 'H:i', 'timezone' => 'UTC', 'in' => implode(':', [0, SEC_PER_DAY - SEC_PER_MIN]), 'default' => DB::getDefault('timeperiods', 'start_time')],
+											['else' => true, 'type' => API_UNEXPECTED]
+				]],
+				'every' =>				['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY])], 'type' => API_INT32, 'in' => implode(':', [1, ZBX_MAX_INT32]), 'default' => DB::getDefault('timeperiods', 'every')],
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => implode(',', [MONTH_WEEK_FIRST, MONTH_WEEK_SECOND, MONTH_WEEK_THIRD, MONTH_WEEK_FOURTH, MONTH_WEEK_LAST]), 'default' => DB::getDefault('timeperiods', 'every')],
+											['else' => true, 'type' => API_UNEXPECTED]
+				]],
+				'day' =>				['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => implode(':', [0, MONTH_MAX_DAY])],
+											['else' => true, 'type' => API_UNEXPECTED]
+				]],
+				'dayofweek' =>			['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_WEEKLY])], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(':', [0b0000001, 0b1111111])],
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => implode(':', [0, 0b1111111])],
+											['else' => true, 'type' => API_UNEXPECTED]
+				]],
+				'month' =>				['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(':', [0b000000000001, 0b111111111111])],
+											['else' => true, 'type' => API_UNEXPECTED]
+				]]
+			]]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $maintenances, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$maintenances = self::validateTimePeriods($maintenances);
+
+		self::addAffectedObjects($maintenances, $db_maintenances);
+
+		foreach ($maintenances as &$maintenance) {
+			$maintenance['active_since'] -= $maintenance['active_since'] % SEC_PER_MIN;
+			$maintenance['active_till'] -= $maintenance['active_till'] % SEC_PER_MIN;
+
+			if ($maintenance['maintenance_type'] != $db_maintenances[$maintenance['maintenanceid']]['maintenance_type']
+					&& $maintenance['maintenance_type'] == MAINTENANCE_TYPE_NODATA) {
+				$maintenance['tags_evaltype'] = DB::getDefault('maintenances', 'tags_evaltype');
+			}
+
+			if (array_key_exists('groups', $maintenance) || array_key_exists('hosts', $maintenance)) {
+				$groups = array_key_exists('groups', $maintenance)
+					? $maintenance['groups']
+					: $db_maintenances[$maintenance['maintenanceid']]['groups'];
+
+				$hosts = array_key_exists('hosts', $maintenance)
+					? $maintenance['hosts']
+					: $db_maintenances[$maintenance['maintenanceid']]['hosts'];
+
+				if (!$groups && !$hosts) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one host group or host must be selected.'));
 				}
-				unset($maintenances[$mnum], $db_maintenances[$maintenanceid]);
-				continue;
-			}
-
-			if (!array_key_exists('tags', $maintenance)) {
-				unset($maintenances[$mnum], $db_maintenances[$maintenanceid]);
-				continue;
-			}
-
-			foreach ($maintenance['tags'] as $tag_num => $tag) {
-				$tag += [
-					'operator' => MAINTENANCE_TAG_OPERATOR_LIKE,
-					'value' => ''
-				];
-
-				foreach ($db_maintenances[$maintenanceid]['tags'] as $db_tag_num => $db_tag) {
-					if ($tag['tag'] === $db_tag['tag'] && $tag['operator'] == $db_tag['operator']
-							&& $tag['value'] === $db_tag['value']) {
-						unset($maintenances[$mnum]['tags'][$tag_num],
-							$db_maintenances[$maintenanceid]['tags'][$db_tag_num]
-						);
-					}
-				}
 			}
 		}
+		unset($maintenance);
 
-		foreach ($maintenances as $maintenance) {
-			$maintenanceid = $maintenance['maintenanceid'];
-
-			foreach ($maintenance['tags'] as $tag) {
-				$ins_tags[] = ['maintenanceid' => $maintenanceid] + $tag;
-			}
-
-			foreach ($db_maintenances[$maintenanceid]['tags'] as $db_tag) {
-				$del_maintenancetagids[] = $db_tag['maintenancetagid'];
-			}
-		}
-
-		if ($del_maintenancetagids) {
-			DB::delete('maintenance_tag', ['maintenancetagid' => $del_maintenancetagids]);
-		}
-
-		if ($ins_tags) {
-			DB::insert('maintenance_tag', $ins_tags);
-		}
+		self::checkDuplicates($maintenances, $db_maintenances);
+		self::checkGroups($maintenances, $db_maintenances);
+		self::checkHosts($maintenances, $db_maintenances);
 	}
 
 	/**
-	 * Delete Maintenances.
-	 *
 	 * @param array $maintenanceids
 	 *
 	 * @return array
 	 */
-	public function delete(array $maintenanceids) {
+	public function delete(array $maintenanceids): array {
 		if (self::$userData['type'] == USER_TYPE_ZABBIX_USER) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
-		$db_maintenances = $this->get([
-			'output' => ['maintenanceid', 'name'],
-			'maintenanceids' => $maintenanceids,
-			'editable' => true,
-			'preservekeys' => true
+		$this->validateDelete($maintenanceids, $db_maintenances);
+
+		$maintenances_windows = DB::select('maintenances_windows', [
+			'output' => ['timeperiodid'],
+			'filter' => ['maintenanceid' => $maintenanceids]
 		]);
-
-		if (array_diff_key(array_flip($maintenanceids), $db_maintenances)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-		}
-
-		$timeperiodids = [];
-		$dbTimeperiods = DBselect(
-			'SELECT DISTINCT tp.timeperiodid'.
-			' FROM timeperiods tp,maintenances_windows mw'.
-			' WHERE '.dbConditionInt('mw.maintenanceid', $maintenanceids).
-				' AND tp.timeperiodid=mw.timeperiodid'
-		);
-		while ($timeperiod = DBfetch($dbTimeperiods)) {
-			$timeperiodids[] = $timeperiod['timeperiodid'];
-		}
-
-		$midCond = ['maintenanceid' => $maintenanceids];
 
 		// Lock maintenances table before maintenance delete to prevent server from adding host to maintenance.
 		DBselect(
@@ -994,42 +613,627 @@ class CMaintenance extends CApiService {
 			'where' => ['maintenanceid' => $maintenanceids]
 		]);
 
-		DB::delete('timeperiods', ['timeperiodid' => $timeperiodids]);
-		DB::delete('maintenances_windows', $midCond);
-		DB::delete('maintenances_hosts', $midCond);
-		DB::delete('maintenances_groups', $midCond);
-		DB::delete('maintenances', $midCond);
+		DB::delete('maintenances_windows', ['maintenanceid' => $maintenanceids]);
+		DB::delete('timeperiods', ['timeperiodid' => array_column($maintenances_windows, 'timeperiodid')]);
+		DB::delete('maintenances_hosts', ['maintenanceid' => $maintenanceids]);
+		DB::delete('maintenances_groups', ['maintenanceid' => $maintenanceids]);
+		DB::delete('maintenance_tag', ['maintenanceid' => $maintenanceids]);
+		DB::delete('maintenances', ['maintenanceid' => $maintenanceids]);
 
-		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_MAINTENANCE, $db_maintenances);
+		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_MAINTENANCE, $db_maintenances);
 
 		return ['maintenanceids' => $maintenanceids];
 	}
 
 	/**
-	 * Updates maintenance time periods.
+	 * @param array      $maintenanceids
+	 * @param array|null $db_maintenances
 	 *
-	 * @param array $maintenance
-	 * @param array $oldMaintenance
+	 * @throws APIException if the input is invalid.
 	 */
-	protected function replaceTimePeriods(array $oldMaintenance, array $maintenance) {
-		// replace time periods
-		$timePeriods = DB::replace('timeperiods', $oldMaintenance['timeperiods'], $maintenance['timeperiods']);
+	private function validateDelete(array $maintenanceids, array &$db_maintenances = null): void {
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
-		// link new time periods to maintenance
-		$oldTimePeriods = zbx_toHash($oldMaintenance['timeperiods'], 'timeperiodid');
-		$newMaintenanceWindows = [];
-		foreach ($timePeriods as $tp) {
-			if (!isset($oldTimePeriods[$tp['timeperiodid']])) {
-				$newMaintenanceWindows[] = [
-					'maintenanceid' => $maintenance['maintenanceid'],
-					'timeperiodid' => $tp['timeperiodid']
-				];
-			}
+		if (!CApiInputValidator::validate($api_input_rules, $maintenanceids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
-		DB::insert('maintenances_windows', $newMaintenanceWindows);
+
+		$db_maintenances = $this->get([
+			'output' => ['maintenanceid', 'name'],
+			'maintenanceids' => $maintenanceids,
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		if (count($db_maintenances) != count($maintenanceids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
 	}
 
-	protected function addRelatedObjects(array $options, array $result) {
+	/**
+	 * Validate time periods of given maintenances.
+	 *
+	 * @param array $maintenances
+	 *
+	 * @return array Array of validated maintenances.
+	 *
+	 * @throws APIException if time periods are not valid.
+	 */
+	private static function validateTimePeriods(array $maintenances): array {
+		foreach ($maintenances as &$maintenance) {
+			if (!array_key_exists('timeperiods', $maintenance)) {
+				continue;
+			}
+
+			foreach ($maintenance['timeperiods'] as &$timeperiod) {
+				$timeperiod['period'] = timeUnitToSeconds($timeperiod['period'], true);
+				$timeperiod['period'] -= $timeperiod['period'] % SEC_PER_MIN;
+
+				if ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME) {
+					$timeperiod['start_date'] -= $timeperiod['start_date'] % SEC_PER_MIN;
+				}
+				else {
+					$timeperiod['start_time'] -= $timeperiod['start_time'] % SEC_PER_MIN;
+				}
+
+				if ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY) {
+					if ((!array_key_exists('day', $timeperiod) || $timeperiod['day'] == 0)
+							&& (!array_key_exists('dayofweek', $timeperiod) || $timeperiod['dayofweek'] == 0)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_('At least one day of the week or day of the month must be specified.')
+						);
+					}
+					elseif (array_key_exists('day', $timeperiod) && $timeperiod['day'] != 0
+							&& array_key_exists('dayofweek', $timeperiod) && $timeperiod['dayofweek'] != 0) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_('Day of the week and day of the month cannot be specified simultaneously.')
+						);
+					}
+				}
+			}
+			unset($timeperiod);
+		}
+		unset($maintenance);
+
+		return $maintenances;
+	}
+
+	/**
+	 * Check for unique maintenance names.
+	 *
+	 * @param array      $maintenances
+	 * @param array|null $db_maintenances
+	 *
+	 * @throws APIException if maintenance names are not unique.
+	 */
+	protected static function checkDuplicates(array $maintenances, array $db_maintenances = null): void {
+		$names = [];
+
+		foreach ($maintenances as $maintenance) {
+			if (!array_key_exists('name', $maintenance)) {
+				continue;
+			}
+
+			if ($db_maintenances === null
+					|| $maintenance['name'] !== $db_maintenances[$maintenance['maintenanceid']]['name']) {
+				$names[] = $maintenance['name'];
+			}
+		}
+
+		if (!$names) {
+			return;
+		}
+
+		$duplicates = DB::select('maintenances', [
+			'output' => ['name'],
+			'filter' => ['name' => $names],
+			'limit' => 1
+		]);
+
+		if ($duplicates) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Maintenance "%1$s" already exists.', $duplicates[0]['name']));
+		}
+	}
+
+	/**
+	 * Check for valid host groups.
+	 *
+	 * @param array      $maintenances
+	 * @param array|null $db_maintenances
+	 *
+	 * @throws APIException if groups are not valid.
+	 */
+	private static function checkGroups(array $maintenances, array $db_maintenances = null): void {
+		$edit_groupids = [];
+
+		foreach ($maintenances as $maintenance) {
+			if (!array_key_exists('groups', $maintenance)) {
+				continue;
+			}
+
+			$groupids = array_column($maintenance['groups'], 'groupid');
+
+			if ($db_maintenances === null) {
+				$edit_groupids += array_flip($groupids);
+			}
+			else {
+				$db_groupids = array_column($db_maintenances[$maintenance['maintenanceid']]['groups'], 'groupid');
+
+				$ins_groupids = array_flip(array_diff($groupids, $db_groupids));
+				$del_groupids = array_flip(array_diff($db_groupids, $groupids));
+
+				$edit_groupids += $ins_groupids + $del_groupids;
+			}
+		}
+
+		if (!$edit_groupids) {
+			return;
+		}
+
+		$count = API::HostGroup()->get([
+			'countOutput' => true,
+			'groupids' => array_keys($edit_groupids),
+			'editable' => true
+		]);
+
+		if ($count != count($edit_groupids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+	}
+
+	/**
+	 * Check for valid hosts.
+	 *
+	 * @param array      $maintenances
+	 * @param array|null $db_maintenances
+	 *
+	 * @throws APIException if hosts are not valid.
+	 */
+	private static function checkHosts(array $maintenances, array $db_maintenances = null): void {
+		$edit_hostids = [];
+
+		foreach ($maintenances as $maintenance) {
+			if (!array_key_exists('hosts', $maintenance)) {
+				continue;
+			}
+
+			$hostids = array_column($maintenance['hosts'], 'hostid');
+
+			if ($db_maintenances === null) {
+				$edit_hostids += array_flip($hostids);
+			}
+			else {
+				$db_hostids = array_column($db_maintenances[$maintenance['maintenanceid']]['hosts'], 'hostid');
+
+				$ins_hostids = array_flip(array_diff($hostids, $db_hostids));
+				$del_hostids = array_flip(array_diff($db_hostids, $hostids));
+
+				$edit_hostids += $ins_hostids + $del_hostids;
+			}
+		}
+
+		if (!$edit_hostids) {
+			return;
+		}
+
+		$count = API::Host()->get([
+			'countOutput' => true,
+			'hostids' => array_keys($edit_hostids),
+			'editable' => true
+		]);
+
+		if ($count != count($edit_hostids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+	}
+
+
+	/**
+	 * Update table "maintenance_tag".
+	 *
+	 * @param array      $maintenances
+	 * @param array|null $db_maintenances
+	 */
+	private static function updateTags(array &$maintenances, array $db_maintenances = null): void {
+		$ins_maintenance_tags = [];
+		$del_maintenancetagids = [];
+
+		foreach ($maintenances as &$maintenance) {
+			if (($db_maintenances === null && !array_key_exists('tags', $maintenance))
+					|| ($db_maintenances !== null
+						&& !array_key_exists('tags', $db_maintenances[$maintenance['maintenanceid']]))) {
+				continue;
+			}
+
+			if ($db_maintenances !== null && !array_key_exists('tags', $maintenance)) {
+				$maintenance['tags'] = [];
+			}
+
+			$db_tags = ($db_maintenances !== null) ? $db_maintenances[$maintenance['maintenanceid']]['tags'] : [];
+
+			foreach ($maintenance['tags'] as &$tag) {
+				$db_maintenancetagid = key(
+					array_filter($db_tags, static function (array $db_tag) use ($tag): bool {
+						return $tag['tag'] == $db_tag['tag'] && $tag['operator'] == $db_tag['operator']
+							&& $tag['value'] == $db_tag['value'];
+					})
+				);
+
+				if ($db_maintenancetagid !== null) {
+					$tag['maintenancetagid'] = $db_maintenancetagid;
+					unset($db_tags[$db_maintenancetagid]);
+				}
+				else {
+					$ins_maintenance_tags[] = ['maintenanceid' => $maintenance['maintenanceid']] + $tag;
+				}
+			}
+			unset($tag);
+
+			$del_maintenancetagids = array_merge($del_maintenancetagids, array_keys($db_tags));
+		}
+		unset($maintenance);
+
+		if ($del_maintenancetagids) {
+			DB::delete('maintenance_tag', ['maintenancetagid' => $del_maintenancetagids]);
+		}
+
+		if ($ins_maintenance_tags) {
+			$maintenancetagids = DB::insert('maintenance_tag', $ins_maintenance_tags);
+		}
+
+		foreach ($maintenances as &$maintenance) {
+			if (!array_key_exists('tags', $maintenance)) {
+				continue;
+			}
+
+			foreach ($maintenance['tags'] as &$tag) {
+				if (!array_key_exists('maintenancetagid', $tag)) {
+					$tag['maintenancetagid'] = array_shift($maintenancetagids);
+				}
+			}
+			unset($tag);
+		}
+		unset($maintenance);
+	}
+
+	/**
+	 * Update table "maintenances_groups".
+	 *
+	 * @param array      $maintenances
+	 * @param array|null $db_maintenances
+	 */
+	private static function updateGroups(array &$maintenances, array $db_maintenances = null): void {
+		$ins_groups = [];
+		$del_groupids = [];
+
+		foreach ($maintenances as &$maintenance) {
+			if (!array_key_exists('groups', $maintenance)) {
+				continue;
+			}
+
+			$maintenanceid = $maintenance['maintenanceid'];
+
+			$db_groups = ($db_maintenances !== null)
+				? array_column($db_maintenances[$maintenanceid]['groups'], null, 'groupid')
+				: [];
+
+			foreach ($maintenance['groups'] as &$group) {
+				if (array_key_exists($group['groupid'], $db_groups)) {
+					$group['maintenance_groupid'] = $db_groups[$group['groupid']]['maintenance_groupid'];
+					unset($db_groups[$group['groupid']]);
+				}
+				else {
+					$ins_groups[] = [
+						'maintenanceid' => $maintenanceid,
+						'groupid' => $group['groupid']
+					];
+				}
+			}
+			unset($group);
+
+			$del_groupids = array_merge($del_groupids, array_column($db_groups, 'maintenance_groupid'));
+		}
+		unset($maintenance);
+
+		if ($del_groupids) {
+			DB::delete('maintenances_groups', ['maintenance_groupid' => $del_groupids]);
+		}
+
+		if ($ins_groups) {
+			$maintenance_groupids = DB::insertBatch('maintenances_groups', $ins_groups);
+		}
+
+		foreach ($maintenances as &$maintenance) {
+			if (!array_key_exists('groups', $maintenance)) {
+				continue;
+			}
+
+			foreach ($maintenance['groups'] as &$group) {
+				if (!array_key_exists('maintenance_groupid', $group)) {
+					$group['maintenance_groupid'] = array_shift($maintenance_groupids);
+				}
+			}
+			unset($group);
+		}
+		unset($maintenance);
+	}
+
+	/**
+	 * Update table "maintenances_hosts".
+	 *
+	 * @param array      $maintenances
+	 * @param array|null $db_maintenances
+	 */
+	private static function updateHosts(array &$maintenances, array $db_maintenances = null): void {
+		$ins_maintenances_hosts = [];
+		$del_maintenance_hostids = [];
+
+		foreach ($maintenances as &$maintenance) {
+			if (!array_key_exists('hosts', $maintenance)) {
+				continue;
+			}
+
+			$maintenanceid = $maintenance['maintenanceid'];
+
+			$db_hosts = ($db_maintenances !== null)
+				? array_column($db_maintenances[$maintenanceid]['hosts'], null, 'hostid')
+				: [];
+
+			foreach ($maintenance['hosts'] as &$host) {
+				if (array_key_exists($host['hostid'], $db_hosts)) {
+					$host['maintenance_hostid'] = $db_hosts[$host['hostid']]['maintenance_hostid'];
+					unset($db_hosts[$host['hostid']]);
+				}
+				else {
+					$ins_maintenances_hosts[] = [
+						'maintenanceid' => $maintenanceid,
+						'hostid' => $host['hostid']
+					];
+				}
+			}
+			unset($host);
+
+			$del_maintenance_hostids = array_merge($del_maintenance_hostids,
+				array_column($db_hosts, 'maintenance_hostid')
+			);
+		}
+		unset($maintenance);
+
+		if ($del_maintenance_hostids) {
+			DB::delete('maintenances_hosts', ['maintenance_hostid' => $del_maintenance_hostids]);
+		}
+
+		if ($ins_maintenances_hosts) {
+			$maintenance_hostids = DB::insertBatch('maintenances_hosts', $ins_maintenances_hosts);
+		}
+
+		foreach ($maintenances as &$maintenance) {
+			if (!array_key_exists('hosts', $maintenance)) {
+				continue;
+			}
+
+			foreach ($maintenance['hosts'] as &$host) {
+				if (!array_key_exists('maintenance_hostid', $host)) {
+					$host['maintenance_hostid'] = array_shift($maintenance_hostids);
+				}
+			}
+			unset($host);
+		}
+		unset($maintenance);
+	}
+
+	/**
+	 * Update tables "periods" and "maintenances_windows".
+	 *
+	 * @param array      $maintenances
+	 * @param array|null $db_maintenances
+	 */
+	private static function updateTimeperiods(array &$maintenances, array $db_maintenances = null): void {
+		$ins_timeperiods = [];
+		$ins_maintenances_windows = [];
+		$del_timeperiodids = [];
+
+		foreach ($maintenances as &$maintenance) {
+			if (!array_key_exists('timeperiods', $maintenance)) {
+				continue;
+			}
+
+			$db_timeperiods = ($db_maintenances !== null)
+				? $db_maintenances[$maintenance['maintenanceid']]['timeperiods']
+				: [];
+
+			foreach ($maintenance['timeperiods'] as &$timeperiod) {
+				$db_timeperiodid = key(
+					array_filter($db_timeperiods, static function (array $db_timeperiod) use ($timeperiod): bool {
+						return $timeperiod['period'] == $db_timeperiod['period']
+							&& $timeperiod['timeperiod_type'] == $db_timeperiod['timeperiod_type']
+							&& (!array_key_exists('start_date', $timeperiod)
+									|| $timeperiod['start_date'] == $db_timeperiod['start_date'])
+							&& (!array_key_exists('start_time', $timeperiod)
+									|| $timeperiod['start_time'] == $db_timeperiod['start_time'])
+							&& (!array_key_exists('every', $timeperiod)
+									|| $timeperiod['every'] == $db_timeperiod['every'])
+							&& (!array_key_exists('day', $timeperiod) || $timeperiod['day'] == $db_timeperiod['day'])
+							&& (!array_key_exists('dayofweek', $timeperiod)
+									|| $timeperiod['dayofweek'] == $db_timeperiod['dayofweek'])
+							&& (!array_key_exists('month', $timeperiod)
+									|| $timeperiod['month'] == $db_timeperiod['month']);
+					})
+				);
+
+				if ($db_timeperiodid !== null) {
+					$timeperiod['timeperiodid'] = $db_timeperiodid;
+					unset($db_timeperiods[$db_timeperiodid]);
+				}
+				else {
+					$ins_timeperiods[] = $timeperiod;
+					$ins_maintenances_windows[] = ['maintenanceid' => $maintenance['maintenanceid']];
+				}
+			}
+			unset($timeperiod);
+
+			$del_timeperiodids = array_merge($del_timeperiodids, array_keys($db_timeperiods));
+		}
+		unset($maintenance);
+
+		if ($del_timeperiodids) {
+			DB::delete('maintenances_windows', ['timeperiodid' => $del_timeperiodids]);
+			DB::delete('timeperiods', ['timeperiodid' => $del_timeperiodids]);
+		}
+
+		if ($ins_timeperiods) {
+			$timeperiodids = DB::insert('timeperiods', $ins_timeperiods);
+
+			foreach ($ins_maintenances_windows as $i => &$maintenance_window) {
+				$maintenance_window += ['timeperiodid' => $timeperiodids[$i]];
+			}
+			unset($maintenance_window);
+
+			DB::insertBatch('maintenances_windows', $ins_maintenances_windows);
+		}
+
+		foreach ($maintenances as &$maintenance) {
+			if (!array_key_exists('timeperiods', $maintenance)) {
+				continue;
+			}
+
+			foreach ($maintenance['timeperiods'] as &$timeperiod) {
+				if (!array_key_exists('timeperiodid', $timeperiod)) {
+					$timeperiod['timeperiodid'] = array_shift($timeperiodids);
+				}
+			}
+			unset($timeperiod);
+		}
+		unset($maintenance);
+	}
+
+	/**
+	 * @param array $maintenances
+	 * @param array $db_maintenances
+	 */
+	private static function addAffectedObjects(array $maintenances, array &$db_maintenances): void {
+		self::addAffectedTags($maintenances, $db_maintenances);
+		self::addAffectedGroupsAndHosts($maintenances, $db_maintenances);
+		self::addAffectedTimeperiods($maintenances, $db_maintenances);
+	}
+
+	/**
+	 * @param array $maintenances
+	 * @param array $db_maintenances
+	 */
+	private static function addAffectedTags(array $maintenances, array &$db_maintenances): void {
+		$maintenanceids = [];
+
+		foreach ($maintenances as $maintenance) {
+			$db_maintenance_type = $db_maintenances[$maintenance['maintenanceid']]['maintenance_type'];
+
+			if (array_key_exists('tags', $maintenance)
+					|| ($maintenance['maintenance_type'] != $db_maintenance_type
+						&& $maintenance['maintenance_type'] == MAINTENANCE_TYPE_NODATA)) {
+				$maintenanceids[] = $maintenance['maintenanceid'];
+				$db_maintenances[$maintenance['maintenanceid']]['tags'] = [];
+			}
+		}
+
+		if (!$maintenanceids) {
+			return;
+		}
+
+		$options = [
+			'output' => ['maintenancetagid', 'maintenanceid', 'tag', 'operator', 'value'],
+			'filter' => ['maintenanceid' => $maintenanceids]
+		];
+		$db_tags = DBselect(DB::makeSql('maintenance_tag', $options));
+
+		while ($db_tag = DBfetch($db_tags)) {
+			$db_maintenances[$db_tag['maintenanceid']]['tags'][$db_tag['maintenancetagid']] = [
+				'maintenancetagid' => $db_tag['maintenancetagid'],
+				'tag' => $db_tag['tag'],
+				'operator' => $db_tag['operator'],
+				'value' => $db_tag['value']
+			];
+		}
+	}
+
+	/**
+	 * @param array $maintenances
+	 * @param array $db_maintenances
+	 */
+	private static function addAffectedGroupsAndHosts(array $maintenances, array &$db_maintenances): void {
+		$maintenanceids = [];
+
+		foreach ($maintenances as $maintenance) {
+			if (array_key_exists('groups', $maintenance) || array_key_exists('hosts', $maintenance)) {
+				$maintenanceids[] = $maintenance['maintenanceid'];
+				$db_maintenances[$maintenance['maintenanceid']]['groups'] = [];
+				$db_maintenances[$maintenance['maintenanceid']]['hosts'] = [];
+			}
+		}
+
+		if (!$maintenanceids) {
+			return;
+		}
+
+		$options = [
+			'output' => ['maintenance_groupid', 'maintenanceid', 'groupid'],
+			'filter' => ['maintenanceid' => $maintenanceids]
+		];
+		$db_groups = DBselect(DB::makeSql('maintenances_groups', $options));
+
+		while ($db_group = DBfetch($db_groups)) {
+			$db_maintenances[$db_group['maintenanceid']]['groups'][$db_group['maintenance_groupid']] = [
+				'maintenance_groupid' => $db_group['maintenance_groupid'],
+				'groupid' => $db_group['groupid']
+			];
+		}
+
+		$options = [
+			'output' => ['maintenance_hostid', 'maintenanceid', 'hostid'],
+			'filter' => ['maintenanceid' => $maintenanceids]
+		];
+		$db_hosts = DBselect(DB::makeSql('maintenances_hosts', $options));
+
+		while ($db_host = DBfetch($db_hosts)) {
+			$db_maintenances[$db_host['maintenanceid']]['hosts'][$db_host['maintenance_hostid']] = [
+				'maintenance_hostid' => $db_host['maintenance_hostid'],
+				'hostid' => $db_host['hostid']
+			];
+		}
+	}
+
+	/**
+	 * @param array $maintenances
+	 * @param array $db_maintenances
+	 */
+	private static function addAffectedTimeperiods(array $maintenances, array &$db_maintenances): void {
+		$maintenanceids = [];
+
+		foreach ($maintenances as $maintenance) {
+			if (array_key_exists('timeperiods', $maintenance)) {
+				$maintenanceids[] = $maintenance['maintenanceid'];
+				$db_maintenances[$maintenance['maintenanceid']]['timeperiods'] = [];
+			}
+		}
+
+		if (!$maintenanceids) {
+			return;
+		}
+
+		$db_timeperiods = DBselect(
+			'SELECT mw.maintenanceid,mw.timeperiodid,t.timeperiod_type,t.every,t.month,t.dayofweek,t.day,t.start_time,'.
+				't.period,t.start_date'.
+			' FROM maintenances_windows mw,timeperiods t'.
+			' WHERE mw.timeperiodid=t.timeperiodid'.
+				' AND '.dbConditionInt('mw.maintenanceid', $maintenanceids)
+		);
+
+		while ($db_timeperiod = DBfetch($db_timeperiods)) {
+			$db_maintenances[$db_timeperiod['maintenanceid']]['timeperiods'][$db_timeperiod['timeperiodid']] =
+				array_diff_key($db_timeperiod, array_flip(['maintenanceid']));
+		}
+	}
+
+	protected function addRelatedObjects(array $options, array $result): array {
 		$result = parent::addRelatedObjects($options, $result);
 
 		// selectGroups
@@ -1074,7 +1278,7 @@ class CMaintenance extends CApiService {
 				'preservekeys' => true
 			]);
 			$relation_map = $this->createRelationMap($tags, 'maintenanceid', 'maintenancetagid');
-			$tags = $this->unsetExtraFields($tags, ['maintenancetagid', 'maintenanceid'], []);
+			$tags = $this->unsetExtraFields($tags, ['maintenancetagid', 'maintenanceid']);
 			$result = $relation_map->mapMany($result, $tags, 'tags');
 		}
 
@@ -1086,6 +1290,7 @@ class CMaintenance extends CApiService {
 				'filter' => ['timeperiodid' => $relationMap->getRelatedIds()],
 				'preservekeys' => true
 			]);
+			$timeperiods = $this->unsetExtraFields($timeperiods, ['timeperiodid']);
 			$result = $relationMap->mapMany($result, $timeperiods, 'timeperiods');
 		}
 

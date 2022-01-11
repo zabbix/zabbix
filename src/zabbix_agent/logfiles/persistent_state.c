@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,8 +53,6 @@ static int	zbx_persistent_inactive_compare_func(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Function: str2file_name_part                                               *
- *                                                                            *
  * Purpose: for the specified string get the part of persistent storage path  *
  *                                                                            *
  * Parameters:                                                                *
@@ -101,8 +99,6 @@ static char	*str2file_name_part(const char *str)
 
 /******************************************************************************
  *                                                                            *
- * Function: active_server2dir_name_part                                      *
- *                                                                            *
  * Purpose: calculate the part of persistent storage path for the specified   *
  *          server/port pair where the agent is sending active check data     *
  *                                                                            *
@@ -134,8 +130,6 @@ static char	*active_server2dir_name_part(const char *server, unsigned short port
 
 /******************************************************************************
  *                                                                            *
- * Function: make_persistent_server_directory_name                            *
- *                                                                            *
  * Purpose: make the name of persistent storage directory for the specified   *
  *          server/proxy and port                                             *
  *                                                                            *
@@ -162,8 +156,6 @@ static char	*make_persistent_server_directory_name(const char *base_path, const 
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: check_persistent_directory_exists                                *
  *                                                                            *
  * Purpose: check if the directory exists                                     *
  *                                                                            *
@@ -195,8 +187,6 @@ static int	check_persistent_directory_exists(const char *pathname, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Function: create_persistent_directory                                      *
- *                                                                            *
  * Purpose: create directory if it does not exist or check access if it       *
  *          exists                                                            *
  *                                                                            *
@@ -227,8 +217,6 @@ static int	create_persistent_directory(const char *pathname, char **error)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: create_base_path_directories                                     *
  *                                                                            *
  * Purpose: create all subdirectories in the pathname if they do not exist    *
  *                                                                            *
@@ -294,8 +282,6 @@ static int	create_base_path_directories(const char *pathname, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_create_persistent_server_directory                           *
- *                                                                            *
  * Purpose: create directory if it does not exist or check access if it       *
  *          exists. Directory name is derived from host and port.             *
  *                                                                            *
@@ -350,8 +336,6 @@ char	*zbx_create_persistent_server_directory(const char *base_path, const char *
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_make_persistent_file_name                                    *
- *                                                                            *
  * Purpose: make the name of persistent storage directory or file             *
  *                                                                            *
  * Parameters:                                                                *
@@ -373,8 +357,6 @@ char	*zbx_make_persistent_file_name(const char *persistent_server_dir, const cha
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_write_persistent_file                                        *
  *                                                                            *
  * Purpose: write metric info into persistent file                            *
  *                                                                            *
@@ -422,8 +404,6 @@ static int	zbx_write_persistent_file(const char *filename, const char *data, cha
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_read_persistent_file                                         *
- *                                                                            *
  * Purpose: read metric info from persistent file. One line is read.          *
  *                                                                            *
  * Parameters:                                                                *
@@ -467,8 +447,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_remove_persistent_file                                       *
  *                                                                            *
  * Purpose: remove the specified file                                         *
  *                                                                            *
@@ -653,8 +631,6 @@ static int	zbx_pre_persistent_compare_func(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_find_or_create_prep_vec_element                              *
- *                                                                            *
  * Purpose: search preparation vector to find element with the specified key. *
  *          If not found then create the element.                             *
  *                                                                            *
@@ -727,8 +703,6 @@ void	zbx_update_prep_vec_data(const struct st_logfile *logfile, zbx_uint64_t pro
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_restore_file_details                                         *
  *                                                                            *
  * Purpose: create the 'old log file list' and restore log file attributes    *
  *          from JSON string which was read from persistent file              *

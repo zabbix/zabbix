@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -829,7 +829,9 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 	}
 
 	public function testFormAdministrationGeneralMacros_ResolveSecretMacro() {
-		$item_url = 'items.php?filter_set=1&context=host&filter_hostids%5B0%5D=99134';
+		$item_url = 'zabbix.php?action=latest.view&filter_hostids%5B%5D=99134&filter_select=&filter_evaltype=0'.
+				'&filter_tags%5B0%5D%5Btag%5D=&filter_tags%5B0%5D%5Boperator%5D=0&filter_tags%5B0%5D%5Bvalue%5D'.
+				'=&filter_show_details=1&filter_show_without_data=1&filter_set=1';
 		$macro = [
 			'macro' => '{$Z_GLOBAL_MACRO_2_RESOLVE}',
 			'value' => 'Value 2 B resolved'
@@ -837,7 +839,9 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 
 		// Open the list of "Available host" host items and check macro resolution in item name.
 		$this->page->login()->open($item_url)->waitUntilReady();
-		$this->assertTrue($this->query('link', 'Macro value: '.$macro['value'])->exists());
+//		Caused by https://support.zabbix.com/browse/ZBXNEXT-7115
+//		Support of user macros in item names has been dropped.
+		$this->assertTrue($this->query('link', 'trap['.$macro['value'].']')->exists());
 
 		// Change macro type.
 		$this->page->open('zabbix.php?action=macros.edit')->waitUntilReady();
@@ -847,7 +851,9 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 
 		// Open list of items and check that macro value is hidden.
 		$this->page->open($item_url)->waitUntilReady();
-		$this->assertTrue($this->query('link', 'Macro value: ******')->exists());
+//		Caused by https://support.zabbix.com/browse/ZBXNEXT-7115
+//		Support of user macros in item names has been dropped.
+		$this->assertTrue($this->query('link', 'trap[******]')->exists());
 	}
 
 	public function getCreateVaultMacrosData() {

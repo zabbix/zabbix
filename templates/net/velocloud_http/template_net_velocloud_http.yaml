@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-10-19T19:19:20Z'
+  version: '6.0'
+  date: '2021-12-17T06:33:51Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -15,7 +15,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
-        Template tooling version used: 0.39
+        Template tooling version used: 0.40
       groups:
         -
           name: 'Templates/Network devices'

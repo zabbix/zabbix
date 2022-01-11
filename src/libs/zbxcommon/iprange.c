@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@
 #include "common.h"
 
 /******************************************************************************
- *                                                                            *
- * Function: iprange_is_whitespace_character                                  *
  *                                                                            *
  * Purpose: checks if the specified character is allowed whitespace character *
  *          that can be used before or after iprange definition               *
@@ -48,8 +46,6 @@ static int	iprange_is_whitespace_character(unsigned char value)
 
 /******************************************************************************
  *                                                                            *
- * Function: iprange_address_length                                           *
- *                                                                            *
  * Purpose: calculates the length of address data without trailing whitespace *
  *                                                                            *
  ******************************************************************************/
@@ -71,8 +67,6 @@ static size_t	iprange_address_length(const char *address)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: iprange_apply_mask                                               *
  *                                                                            *
  * Purpose: applies a bit mask to the parsed v4 or v6 IP range                *
  *                                                                            *
@@ -118,8 +112,6 @@ static void	iprange_apply_mask(zbx_iprange_t *iprange, int bits)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: iprangev4_parse                                                  *
  *                                                                            *
  * Purpose: parse IPv4 address into IP range structure                        *
  *                                                                            *
@@ -212,8 +204,6 @@ static int	iprangev4_parse(zbx_iprange_t *iprange, const char *address)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: iprangev6_parse                                                  *
  *                                                                            *
  * Purpose: parse IPv6 address into IP range structure                        *
  *                                                                            *
@@ -349,8 +339,6 @@ check_fill:
 
 /******************************************************************************
  *                                                                            *
- * Function: iprange_parse                                                    *
- *                                                                            *
  * Purpose: parse IP address (v4 or v6) into IP range structure               *
  *                                                                            *
  * Parameters: iprange - [OUT] the IP range                                   *
@@ -376,8 +364,6 @@ int	iprange_parse(zbx_iprange_t *iprange, const char *address)
 
 /******************************************************************************
  *                                                                            *
- * Function: iprange_first                                                    *
- *                                                                            *
  * Purpose: gets the first IP address from the specified range                *
  *                                                                            *
  * Parameters: iprange - [IN] the IP range                                    *
@@ -402,8 +388,6 @@ void	iprange_first(const zbx_iprange_t *iprange, int *address)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: iprange_next                                                     *
  *                                                                            *
  * Purpose: gets the next IP address from the specified range                 *
  *                                                                            *
@@ -454,8 +438,6 @@ int	iprange_next(const zbx_iprange_t *iprange, int *address)
 
 /******************************************************************************
  *                                                                            *
- * Function: iprange_validate                                                 *
- *                                                                            *
  * Purpose: checks if the IP address is in specified range                    *
  *                                                                            *
  * Parameters: iprange - [IN] the IP range                                    *
@@ -482,8 +464,6 @@ int	iprange_validate(const zbx_iprange_t *iprange, const int *address)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: iprange_volume                                                   *
  *                                                                            *
  * Purpose: get the number of addresses covered by the specified IP range     *
  *                                                                            *

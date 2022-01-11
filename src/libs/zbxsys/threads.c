@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,13 +45,9 @@ void CALLBACK	ZBXEndThread(ULONG_PTR dwParam)
 #else
 /******************************************************************************
  *                                                                            *
- * Function: zbx_fork                                                         *
- *                                                                            *
  * Purpose: Flush stdout and stderr before forking                            *
  *                                                                            *
  * Return value: same as system fork() function                               *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
 int	zbx_fork(void)
@@ -63,13 +59,9 @@ int	zbx_fork(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_child_fork                                                   *
- *                                                                            *
  * Purpose: fork from master process and set SIGCHLD handler                  *
  *                                                                            *
  * Return value: same as system fork() function                               *
- *                                                                            *
- * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
  * Comments: use this function only for forks from the main process           *
  *                                                                            *
@@ -102,16 +94,12 @@ void	zbx_child_fork(pid_t *pid)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_thread_start                                                 *
- *                                                                            *
  * Purpose: Start the handled function as "thread"                            *
  *                                                                            *
  * Parameters: handler     - [IN] new thread starts execution from this       *
  *                                handler function                            *
  *             thread_args - [IN] arguments for thread function               *
  *             thread      - [OUT] handle to a newly created thread           *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: The zbx_thread_exit must be called from the handler!             *
  *                                                                            *
@@ -150,15 +138,11 @@ void	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread_args_t *thre
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_thread_wait                                                  *
- *                                                                            *
  * Purpose: Waits until the "thread" is in the signalled state                *
  *                                                                            *
  * Parameters: "thread" handle                                                *
  *                                                                            *
  * Return value: process or thread exit code                                  *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
 int	zbx_thread_wait(ZBX_THREAD_HANDLE thread)
@@ -211,8 +195,6 @@ int	zbx_thread_wait(ZBX_THREAD_HANDLE thread)
 
 /******************************************************************************
  *                                                                            *
- * Function: threads_kill                                                     *
- *                                                                            *
  * Purpose: sends termination signal to "threads"                             *
  *                                                                            *
  * Parameters: threads       - [IN] handles to threads or processes           *
@@ -249,12 +231,9 @@ static void	threads_kill(ZBX_THREAD_HANDLE *threads, int threads_num, const int 
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_threads_wait                                                 *
- *                                                                            *
  * Purpose: Waits until the "threads" are in the signalled state              *
  *                                                                            *
  * Parameters: "threads" handles                                              *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 void	zbx_threads_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int threads_num, int ret)

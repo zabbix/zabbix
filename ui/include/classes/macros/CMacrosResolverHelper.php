@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -509,24 +509,6 @@ class CMacrosResolverHelper {
 		unset($graph);
 
 		return $graphs;
-	}
-
-	/**
-	 * Resolve item name macros to "name_expanded" field.
-	 *
-	 * @static
-	 *
-	 * @param array  $items
-	 * @param string $items[n]['itemid']
-	 * @param string $items[n]['hostid']
-	 * @param string $items[n]['name']
-	 *
-	 * @return array
-	 */
-	public static function resolveItemNames(array $items) {
-		self::init();
-
-		return self::$macrosResolver->resolveItemNames($items);
 	}
 
 	/**

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -325,7 +325,6 @@ static zbx_uint64_t	evt_req_chunk_size;
 #	define ZBX_XPATH_LN2(LN1, LN2)		"/" ZBX_XPATH_LN(LN1) ZBX_XPATH_LN(LN2)
 #	define ZBX_XPATH_LN3(LN1, LN2, LN3)	"/" ZBX_XPATH_LN(LN1) ZBX_XPATH_LN(LN2) ZBX_XPATH_LN(LN3)
 
-
 #define ZBX_XPATH_PROP_OBJECTS_ID(type, id)								\
 	"/*/*/*/*/*[local-name()='objects'][*[local-name()='obj'][@type='" type "']" id "][1]"
 
@@ -603,8 +602,6 @@ static size_t	curl_header_cb(void *ptr, size_t size, size_t nmemb, void *userdat
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_str_uint64_pair_free                                         *
- *                                                                            *
  * Purpose: free memory of vector element                                     *
  *                                                                            *
  ******************************************************************************/
@@ -614,8 +611,6 @@ static void	zbx_str_uint64_pair_free(zbx_str_uint64_pair_t data)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_str_uint64_pair_name_compare                                 *
  *                                                                            *
  * Purpose: sorting function to sort zbx_str_uint64_pair_t vector by name     *
  *                                                                            *
@@ -629,8 +624,6 @@ int	zbx_str_uint64_pair_name_compare(const void *p1, const void *p2)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_http_post                                                    *
  *                                                                            *
  * Purpose: abstracts the curl_easy_setopt/curl_easy_perform call pair        *
  *                                                                            *
@@ -679,8 +672,6 @@ static int	zbx_http_post(CURL *easyhandle, const char *request, ZBX_HTTPPAGE **r
 	return SUCCEED;
 }
 /******************************************************************************
- *                                                                            *
- * Function: zbx_soap_post                                                    *
  *                                                                            *
  * Purpose: unification of vmware web service call with SOAP error validation *
  *                                                                            *
@@ -782,8 +773,6 @@ static int	vmware_perf_entity_compare_func(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_free_perfvalue                                            *
- *                                                                            *
  * Purpose: frees perfvalue data structure                                    *
  *                                                                            *
  ******************************************************************************/
@@ -794,8 +783,6 @@ static void	vmware_free_perfvalue(zbx_vmware_perf_value_t *value)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_free_perfdata                                             *
  *                                                                            *
  * Purpose: frees perfdata data structure                                     *
  *                                                                            *
@@ -812,8 +799,6 @@ static void	vmware_free_perfdata(zbx_vmware_perf_data_t *data)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: xml_read_props                                                   *
  *                                                                            *
  * Purpose: reads the vmware object properties by their xpaths from xml data  *
  *                                                                            *
@@ -878,8 +863,6 @@ static char	**xml_read_props(xmlDoc *xdoc, const zbx_vmware_propmap_t *propmap, 
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_counters_shared_copy                                      *
- *                                                                            *
  * Purpose: copies performance counter vector into shared memory hashset      *
  *                                                                            *
  * Parameters: dst - [IN] the destination hashset                             *
@@ -911,8 +894,6 @@ static void	vmware_counters_shared_copy(zbx_hashset_t *dst, const zbx_vector_ptr
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_vector_str_uint64_pair_shared_clean                       *
- *                                                                            *
  * Purpose: frees shared resources allocated to store instance performance    *
  *          counter values                                                    *
  *                                                                            *
@@ -936,8 +917,6 @@ static void	vmware_vector_str_uint64_pair_shared_clean(zbx_vector_str_uint64_pai
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_perf_counter_shared_free                                  *
- *                                                                            *
  * Purpose: frees shared resources allocated to store performance counter     *
  *          data                                                              *
  *                                                                            *
@@ -953,8 +932,6 @@ static void	vmware_perf_counter_shared_free(zbx_vmware_perf_counter_t *counter)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_entities_shared_clean_stats                               *
- *                                                                            *
  * Purpose: removes statistics data from vmware entities                      *
  *                                                                            *
  ******************************************************************************/
@@ -964,7 +941,6 @@ static void	vmware_entities_shared_clean_stats(zbx_hashset_t *entities)
 	zbx_vmware_perf_entity_t	*entity;
 	zbx_vmware_perf_counter_t	*counter;
 	zbx_hashset_iter_t		iter;
-
 
 	zbx_hashset_iter_reset(entities, &iter);
 	while (NULL != (entity = (zbx_vmware_perf_entity_t *)zbx_hashset_iter_next(&iter)))
@@ -984,8 +960,6 @@ static void	vmware_entities_shared_clean_stats(zbx_hashset_t *entities)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_diskextent_shared_free                                    *
- *                                                                            *
  * Purpose: frees shared resources allocated to store diskextent data         *
  *                                                                            *
  * Parameters: diskextent   - [IN] the diskextent                             *
@@ -999,8 +973,6 @@ static void	vmware_diskextent_shared_free(zbx_vmware_diskextent_t *diskextent)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_datastore_shared_free                                     *
  *                                                                            *
  * Purpose: frees shared resources allocated to store datastore data          *
  *                                                                            *
@@ -1026,8 +998,6 @@ static void	vmware_datastore_shared_free(zbx_vmware_datastore_t *datastore)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_datacenter_shared_free                                    *
- *                                                                            *
  * Purpose: frees shared resources allocated to store datacenter data         *
  *                                                                            *
  * Parameters: datacenter   - [IN] the datacenter                             *
@@ -1042,8 +1012,6 @@ static void	vmware_datacenter_shared_free(zbx_vmware_datacenter_t *datacenter)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_props_shared_free                                         *
  *                                                                            *
  * Purpose: frees shared resources allocated to store properties list         *
  *                                                                            *
@@ -1069,8 +1037,6 @@ static void	vmware_props_shared_free(char **props, int props_num)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_dev_shared_free                                           *
- *                                                                            *
  * Purpose: frees shared resources allocated to store vm device data          *
  *                                                                            *
  * Parameters: dev   - [IN] the vm device                                     *
@@ -1089,8 +1055,6 @@ static void	vmware_dev_shared_free(zbx_vmware_dev_t *dev)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_fs_shared_free                                            *
- *                                                                            *
  * Purpose: frees shared resources allocated to store file system object      *
  *                                                                            *
  * Parameters: fs   - [IN] the file system                                    *
@@ -1105,8 +1069,6 @@ static void	vmware_fs_shared_free(zbx_vmware_fs_t *fs)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_vm_shared_free                                            *
  *                                                                            *
  * Purpose: frees shared resources allocated to store virtual machine         *
  *                                                                            *
@@ -1134,8 +1096,6 @@ static void	vmware_vm_shared_free(zbx_vmware_vm_t *vm)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_dsname_shared_free                                        *
- *                                                                            *
  * Purpose: frees shared resources allocated to store datastore names data    *
  *                                                                            *
  * Parameters: dsname  - [IN] the datastore name                              *
@@ -1150,8 +1110,6 @@ static void	vmware_dsname_shared_free(zbx_vmware_dsname_t *dsname)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_hv_shared_clean                                           *
  *                                                                            *
  * Purpose: frees shared resources allocated to store vmware hypervisor       *
  *                                                                            *
@@ -1192,8 +1150,6 @@ static void	vmware_hv_shared_clean(zbx_vmware_hv_t *hv)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_cluster_shared_free                                       *
- *                                                                            *
  * Purpose: frees shared resources allocated to store vmware cluster          *
  *                                                                            *
  * Parameters: cluster   - [IN] the vmware cluster                            *
@@ -1215,8 +1171,6 @@ static void	vmware_cluster_shared_free(zbx_vmware_cluster_t *cluster)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_event_shared_free                                         *
- *                                                                            *
  * Purpose: frees shared resources allocated to store vmware event            *
  *                                                                            *
  * Parameters: event - [IN] the vmware event                                  *
@@ -1231,8 +1185,6 @@ static void	vmware_event_shared_free(zbx_vmware_event_t *event)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_data_shared_free                                          *
  *                                                                            *
  * Purpose: frees shared resources allocated to store vmware service data     *
  *                                                                            *
@@ -1274,8 +1226,6 @@ static void	vmware_data_shared_free(zbx_vmware_data_t *data)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_shared_perf_entity_clean                                  *
- *                                                                            *
  * Purpose: cleans resources allocated by vmware performance entity in vmware *
  *          cache                                                             *
  *                                                                            *
@@ -1295,8 +1245,6 @@ static void	vmware_shared_perf_entity_clean(zbx_vmware_perf_entity_t *entity)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_counter_shared_clean                                      *
- *                                                                            *
  * Purpose: frees resources allocated by vmware performance counter           *
  *                                                                            *
  * Parameters: counter - [IN] the performance counter to free                 *
@@ -1308,8 +1256,6 @@ static void	vmware_counter_shared_clean(zbx_vmware_counter_t *counter)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_service_shared_free                                       *
  *                                                                            *
  * Purpose: frees shared resources allocated to store vmware service          *
  *                                                                            *
@@ -1355,8 +1301,6 @@ static void	vmware_service_shared_free(zbx_vmware_service_t *service)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_cluster_shared_dup                                        *
- *                                                                            *
  * Purpose: copies vmware cluster object into shared memory                   *
  *                                                                            *
  * Parameters: src   - [IN] the vmware cluster object                         *
@@ -1377,8 +1321,6 @@ static zbx_vmware_cluster_t	*vmware_cluster_shared_dup(const zbx_vmware_cluster_
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_event_shared_dup                                          *
  *                                                                            *
  * Purpose: copies vmware event object into shared memory                     *
  *                                                                            *
@@ -1401,8 +1343,6 @@ static zbx_vmware_event_t	*vmware_event_shared_dup(const zbx_vmware_event_t *src
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_diskextent_shared_dup                                     *
- *                                                                            *
  * Purpose: copies vmware hypervisor diskextent object into shared memory     *
  *                                                                            *
  * Parameters: src   - [IN] the vmware diskextent object                      *
@@ -1422,8 +1362,6 @@ static zbx_vmware_diskextent_t	*vmware_diskextent_shared_dup(const zbx_vmware_di
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_datastore_shared_dup                                      *
  *                                                                            *
  * Purpose: copies vmware hypervisor datastore object into shared memory      *
  *                                                                            *
@@ -1470,8 +1408,6 @@ static zbx_vmware_datastore_t	*vmware_datastore_shared_dup(const zbx_vmware_data
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_datacenter_shared_dup                                     *
- *                                                                            *
  * Purpose: copies vmware datacenter object into shared memory                *
  *                                                                            *
  * Parameters: src   - [IN] the vmware datacenter object                      *
@@ -1491,8 +1427,6 @@ static zbx_vmware_datacenter_t	*vmware_datacenter_shared_dup(const zbx_vmware_da
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_dev_shared_dup                                            *
  *                                                                            *
  * Purpose: copies vmware virtual machine device object into shared memory    *
  *                                                                            *
@@ -1514,8 +1448,6 @@ static zbx_vmware_dev_t	*vmware_dev_shared_dup(const zbx_vmware_dev_t *src)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_fs_shared_dup                                             *
  *                                                                            *
  * Purpose: copies vmware virtual machine file system object into shared      *
  *          memory                                                            *
@@ -1539,8 +1471,6 @@ static zbx_vmware_fs_t	*vmware_fs_shared_dup(const zbx_vmware_fs_t *src)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_props_shared_dup                                          *
- *                                                                            *
  * Purpose: copies object properties list into shared memory                  *
  *                                                                            *
  * Parameters: src       - [IN] the properties list                           *
@@ -1563,8 +1493,6 @@ static char	**vmware_props_shared_dup(char ** const src, int props_num)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_vm_shared_dup                                             *
  *                                                                            *
  * Purpose: copies vmware virtual machine object into shared memory           *
  *                                                                            *
@@ -1600,8 +1528,6 @@ static zbx_vmware_vm_t	*vmware_vm_shared_dup(const zbx_vmware_vm_t *src)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_dsname_shared_dup                                         *
- *                                                                            *
  * Purpose: copies vmware hypervisor datastore name object into shared memory *
  *                                                                            *
  * Parameters: src   - [IN] the vmware datastore name object                  *
@@ -1630,8 +1556,6 @@ static zbx_vmware_dsname_t	*vmware_dsname_shared_dup(const zbx_vmware_dsname_t *
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_hv_shared_copy                                            *
  *                                                                            *
  * Purpose: copies vmware hypervisor object into shared memory                *
  *                                                                            *
@@ -1666,8 +1590,6 @@ static	void	vmware_hv_shared_copy(zbx_vmware_hv_t *dst, const zbx_vmware_hv_t *s
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_data_shared_dup                                           *
  *                                                                            *
  * Purpose: copies vmware data object into shared memory                      *
  *                                                                            *
@@ -1743,8 +1665,6 @@ static zbx_vmware_data_t	*vmware_data_shared_dup(zbx_vmware_data_t *src)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_diskextent_free                                           *
- *                                                                            *
  * Purpose: frees resources allocated to store diskextent data                *
  *                                                                            *
  * Parameters: diskextent   - [IN] the diskextent                             *
@@ -1757,8 +1677,6 @@ static void	vmware_diskextent_free(zbx_vmware_diskextent_t *diskextent)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_datastore_free                                            *
  *                                                                            *
  * Purpose: frees resources allocated to store datastore data                 *
  *                                                                            *
@@ -1781,8 +1699,6 @@ static void	vmware_datastore_free(zbx_vmware_datastore_t *datastore)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_datacenter_free                                           *
- *                                                                            *
  * Purpose: frees resources allocated to store datacenter data                *
  *                                                                            *
  * Parameters: datacenter   - [IN] the datacenter                             *
@@ -1796,8 +1712,6 @@ static void	vmware_datacenter_free(zbx_vmware_datacenter_t *datacenter)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_props_free                                                *
  *                                                                            *
  * Purpose: frees shared resources allocated to store properties list         *
  *                                                                            *
@@ -1820,8 +1734,6 @@ static void	vmware_props_free(char **props, int props_num)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_dev_free                                                  *
- *                                                                            *
  * Purpose: frees resources allocated to store vm device object               *
  *                                                                            *
  * Parameters: dev   - [IN] the vm device                                     *
@@ -1836,8 +1748,6 @@ static void	vmware_dev_free(zbx_vmware_dev_t *dev)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_fs_free                                                   *
- *                                                                            *
  * Purpose: frees resources allocated to store vm file system object          *
  *                                                                            *
  * Parameters: fs    - [IN] the file system                                   *
@@ -1850,8 +1760,6 @@ static void	vmware_fs_free(zbx_vmware_fs_t *fs)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_vm_free                                                   *
  *                                                                            *
  * Purpose: frees resources allocated to store virtual machine                *
  *                                                                            *
@@ -1874,8 +1782,6 @@ static void	vmware_vm_free(zbx_vmware_vm_t *vm)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_dsname_free                                               *
- *                                                                            *
  * Purpose: frees resources allocated to store Datastore name data            *
  *                                                                            *
  * Parameters: dsname   - [IN] the Datastore name                             *
@@ -1889,8 +1795,6 @@ static void	vmware_dsname_free(zbx_vmware_dsname_t *dsname)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_hv_clean                                                  *
  *                                                                            *
  * Purpose: frees resources allocated to store vmware hypervisor              *
  *                                                                            *
@@ -1917,8 +1821,6 @@ static void	vmware_hv_clean(zbx_vmware_hv_t *hv)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_cluster_free                                              *
- *                                                                            *
  * Purpose: frees resources allocated to store vmware cluster                 *
  *                                                                            *
  * Parameters: cluster   - [IN] the vmware cluster                            *
@@ -1934,8 +1836,6 @@ static void	vmware_cluster_free(zbx_vmware_cluster_t *cluster)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_event_free                                                *
- *                                                                            *
  * Purpose: frees resources allocated to store vmware event                   *
  *                                                                            *
  * Parameters: event - [IN] the vmware event                                  *
@@ -1948,8 +1848,6 @@ static void	vmware_event_free(zbx_vmware_event_t *event)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_data_free                                                 *
  *                                                                            *
  * Purpose: frees resources allocated to store vmware service data            *
  *                                                                            *
@@ -1985,8 +1883,6 @@ static void	vmware_data_free(zbx_vmware_data_t *data)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_counter_free                                              *
- *                                                                            *
  * Purpose: frees vmware performance counter and the resources allocated by   *
  *          it                                                                *
  *                                                                            *
@@ -2000,8 +1896,6 @@ static void	vmware_counter_free(zbx_vmware_counter_t *counter)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_service_authenticate                                      *
  *                                                                            *
  * Purpose: authenticates vmware service                                      *
  *                                                                            *
@@ -2123,8 +2017,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_service_logout                                            *
- *                                                                            *
  * Purpose: Close unused connection with vCenter                              *
  *                                                                            *
  * Parameters: service    - [IN] the vmware service                           *
@@ -2220,8 +2112,6 @@ static void	zbx_property_collection_free(zbx_property_collection_iter *iter)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_service_get_contents                                      *
- *                                                                            *
  * Purpose: retrieves vmware service instance contents                        *
  *                                                                            *
  * Parameters: easyhandle - [IN] the CURL handle                              *
@@ -2267,8 +2157,6 @@ static	int	vmware_service_get_contents(CURL *easyhandle, char **version, char **
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_service_get_perf_counter_refreshrate                      *
- *                                                                            *
  * Purpose: get the performance counter refreshrate for the specified entity  *
  *                                                                            *
  * Parameters: service      - [IN] the vmware service                         *
@@ -2298,7 +2186,6 @@ static int	vmware_service_get_perf_counter_refreshrate(zbx_vmware_service_t *ser
 	char	tmp[MAX_STRING_LEN], *value = NULL, *id_esc;
 	int	ret = FAIL;
 	xmlDoc	*doc = NULL;
-
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type: %s id: %s", __func__, type, id);
 
@@ -2339,8 +2226,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_service_get_perf_counters                                 *
  *                                                                            *
  * Purpose: get the performance counter ids                                   *
  *                                                                            *
@@ -2519,8 +2404,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_vm_get_nic_devices                                        *
- *                                                                            *
  * Purpose: gets virtual machine network interface devices                    *
  *                                                                            *
  * Parameters: vm      - [OUT] the virtual machine                            *
@@ -2577,8 +2460,6 @@ clean:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_vm_get_disk_devices                                       *
  *                                                                            *
  * Purpose: gets virtual machine virtual disk devices                         *
  *                                                                            *
@@ -2709,8 +2590,6 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_vm_get_file_systems                                       *
- *                                                                            *
  * Purpose: gets the parameters of virtual machine disks                      *
  *                                                                            *
  * Parameters: vm      - [OUT] the virtual machine                            *
@@ -2771,8 +2650,6 @@ clean:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_service_get_vm_data                                       *
  *                                                                            *
  * Purpose: gets the virtual machine data                                     *
  *                                                                            *
@@ -2865,10 +2742,7 @@ out:
 	return ret;
 }
 
-
 /******************************************************************************
- *                                                                            *
- * Function: vmware_service_get_vm_folder                                     *
  *                                                                            *
  * Purpose: convert vm folder id to chain of folder names divided by '/'      *
  *                                                                            *
@@ -2925,8 +2799,6 @@ static int	vmware_service_get_vm_folder(xmlDoc *xdoc, char **vm_folder)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_service_create_vm                                         *
  *                                                                            *
  * Purpose: create virtual machine object                                     *
  *                                                                            *
@@ -2999,8 +2871,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_service_refresh_datastore_info                            *
- *                                                                            *
  * Purpose: Refreshes all storage related information including free-space,   *
  *          capacity, and detailed usage of virtual machines.                 *
  *                                                                            *
@@ -3035,8 +2905,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_service_get_diskextents_list                              *
  *                                                                            *
  * Purpose: retrieves a list of vmware service datastore diskextents          *
  *                                                                            *
@@ -3102,8 +2970,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_service_create_datastore                                  *
  *                                                                            *
  * Purpose: create vmware hypervisor datastore object                         *
  *                                                                            *
@@ -3231,8 +3097,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_service_get_hv_data                                       *
- *                                                                            *
  * Purpose: gets the vmware hypervisor data                                   *
  *                                                                            *
  * Parameters: service      - [IN] the vmware service                         *
@@ -3320,8 +3184,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_hv_get_parent_data                                        *
  *                                                                            *
  * Purpose: gets the vmware hypervisor datacenter, parent folder or cluster   *
  *          name                                                              *
@@ -3462,8 +3324,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_service_hv_get_multipath_data                             *
- *                                                                            *
  * Purpose: gets the vmware hypervisor data about ds multipath                *
  *                                                                            *
  * Parameters: service      - [IN] the vmware service                         *
@@ -3545,8 +3405,6 @@ static int	vmware_service_hv_get_multipath_data(const zbx_vmware_service_t *serv
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_ds_name_compare                                           *
- *                                                                            *
  * Purpose: sorting function to sort Datastore vector by name                 *
  *                                                                            *
  ******************************************************************************/
@@ -3559,8 +3417,6 @@ int	vmware_ds_name_compare(const void *d1, const void *d2)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_ds_id_compare                                             *
  *                                                                            *
  * Purpose: sorting function to sort Datastore vector by id                   *
  *                                                                            *
@@ -3575,8 +3431,6 @@ static int	vmware_ds_id_compare(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_dc_id_compare                                             *
- *                                                                            *
  * Purpose: sorting function to sort Datacenter vector by id                  *
  *                                                                            *
  ******************************************************************************/
@@ -3589,8 +3443,6 @@ static int	vmware_dc_id_compare(const void *d1, const void *d2)
 }
 
 /******************************************************************************
- * Function: vmware_hv_get_ds_access                                          *
- *                                                                            *
  * Purpose: populate array of values from a xml data                          *
  *                                                                            *
  * Parameters: xdoc   - [IN] XML document                                     *
@@ -3609,7 +3461,6 @@ static zbx_uint64_t	vmware_hv_get_ds_access(xmlDoc *xdoc, const char *ds_id)
 	xmlXPathObject		*xpathObj;
 	xmlNode			*xml_node;
 	char			*value;
-
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() for DS:%s", __func__, ds_id);
 
@@ -3672,8 +3523,6 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_dsname_compare                                            *
- *                                                                            *
  * Purpose: sorting function to sort Datastore names vector by name           *
  *                                                                            *
  ******************************************************************************/
@@ -3686,8 +3535,6 @@ int	vmware_dsname_compare(const void *d1, const void *d2)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_service_init_hv                                           *
  *                                                                            *
  * Purpose: initialize vmware hypervisor object                               *
  *                                                                            *
@@ -3861,8 +3708,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_service_get_datacenters_list                              *
- *                                                                            *
  * Purpose: retrieves a list of vmware service datacenters                    *
  *                                                                            *
  * Parameters: doc          - [IN] XML document                               *
@@ -3930,8 +3775,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_service_get_hv_ds_dc_list                                 *
  *                                                                            *
  * Purpose: retrieves a list of all vmware service hypervisor ids             *
  *                                                                            *
@@ -4126,8 +3969,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_service_get_event_session                                 *
- *                                                                            *
  * Purpose: retrieves event session name                                      *
  *                                                                            *
  * Parameters: service        - [IN] the vmware service                       *
@@ -4179,8 +4020,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_service_reset_event_history_collector                     *
- *                                                                            *
  * Purpose: resets "scrollable view" to the latest events                     *
  *                                                                            *
  * Parameters: easyhandle     - [IN] the CURL handle                          *
@@ -4225,8 +4064,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_service_read_previous_events                              *
  *                                                                            *
  * Purpose: reads events from "scrollable view" and moves it back in time     *
  *                                                                            *
@@ -4274,8 +4111,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_service_get_event_latestpage                              *
  *                                                                            *
  * Purpose: reads events from "latest page" and moves it back in time         *
  *                                                                            *
@@ -4336,8 +4171,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_service_destroy_event_session                             *
- *                                                                            *
  * Purpose: destroys event session                                            *
  *                                                                            *
  * Parameters: easyhandle     - [IN] the CURL handle                          *
@@ -4380,8 +4213,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_service_put_event_data                                    *
  *                                                                            *
  * Purpose: read event data by id from xml and put to array of events         *
  *                                                                            *
@@ -4499,8 +4330,6 @@ static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnod
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_service_parse_event_data                                  *
  *                                                                            *
  * Purpose: parse multiple events data                                        *
  *                                                                            *
@@ -4637,8 +4466,6 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_service_get_event_data                                    *
- *                                                                            *
  * Purpose: retrieves event data                                              *
  *                                                                            *
  * Parameters: service      - [IN] the vmware service                         *
@@ -4754,8 +4581,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_service_get_last_event_data                               *
- *                                                                            *
  * Purpose: retrieves data only last event                                    *
  *                                                                            *
  * Parameters: service      - [IN] the vmware service                         *
@@ -4858,8 +4683,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_service_get_clusters                                      *
  *                                                                            *
  * Purpose: retrieves a list of vmware service clusters                       *
  *                                                                            *
@@ -5011,8 +4834,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_service_get_cluster_status                                *
- *                                                                            *
  * Purpose: retrieves status of the specified vmware cluster                  *
  *                                                                            *
  * Parameters: easyhandle   - [IN] the CURL handle                            *
@@ -5072,8 +4893,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_service_get_cluster_list                                  *
  *                                                                            *
  * Purpose: creates list of vmware cluster objects                            *
  *                                                                            *
@@ -5141,8 +4960,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: get_default_maxquerymetrics_for_vcenter                          *
- *                                                                            *
  * Purpose: get statically defined default value for maxquerymetrics for      *
  *          vcenter when it could not be retrieved from soap, depending on    *
  *          vcenter version (https://kb.vmware.com/s/article/2107096)         *
@@ -5163,8 +4980,6 @@ static unsigned int	get_default_maxquerymetrics_for_vcenter(const zbx_vmware_ser
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_service_get_maxquerymetrics                               *
  *                                                                            *
  * Purpose: get vpxd.stats.maxquerymetrics parameter from vcenter only        *
  *                                                                            *
@@ -5241,8 +5056,6 @@ out:
 }
 /******************************************************************************
  *                                                                            *
- * Function: vmware_counters_add_new                                          *
- *                                                                            *
  * Purpose: creates a new performance counter object in shared memory and     *
  *          adds to the specified vector                                      *
  *                                                                            *
@@ -5266,8 +5079,6 @@ static void	vmware_counters_add_new(zbx_vector_ptr_t *counters, zbx_uint64_t cou
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_service_initialize                                        *
  *                                                                            *
  * Purpose: initializes vmware service object                                 *
  *                                                                            *
@@ -5369,8 +5180,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_service_add_perf_entity                                   *
- *                                                                            *
  * Purpose: adds entity to vmware service performance entity list             *
  *                                                                            *
  * Parameters: service  - [IN] the vmware service                             *
@@ -5425,8 +5234,6 @@ static void	vmware_service_add_perf_entity(zbx_vmware_service_t *service, const 
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_service_update_perf_entities                              *
  *                                                                            *
  * Purpose: adds new or remove old entities (hypervisors, virtual machines)   *
  *          from service performance entity list                              *
@@ -5508,8 +5315,6 @@ static void	vmware_service_update_perf_entities(zbx_vmware_service_t *service)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_service_update                                            *
  *                                                                            *
  * Purpose: updates object with a new data from vmware service                *
  *                                                                            *
@@ -5809,8 +5614,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_service_process_perf_entity_data                          *
- *                                                                            *
  * Purpose: updates vmware performance statistics data                        *
  *                                                                            *
  * Parameters: perfdata  - [OUT] the performance counter values               *
@@ -5900,8 +5703,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_service_parse_perf_data                                   *
- *                                                                            *
  * Purpose: updates vmware performance statistics data                        *
  *                                                                            *
  * Parameters: perfdata - [OUT] performance entity data                       *
@@ -5956,8 +5757,6 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_perf_data_add_error                                       *
- *                                                                            *
  * Purpose: adds error for the specified perf entity                          *
  *                                                                            *
  * Parameters: perfdata - [OUT] the collected performance counter data        *
@@ -5986,8 +5785,6 @@ static void	vmware_perf_data_add_error(zbx_vector_ptr_t *perfdata, const char *t
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_service_copy_perf_data                                    *
  *                                                                            *
  * Purpose: copies vmware performance statistics of specified service         *
  *                                                                            *
@@ -6042,8 +5839,6 @@ static void	vmware_service_copy_perf_data(zbx_vmware_service_t *service, zbx_vec
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_service_retrieve_perf_counters                            *
  *                                                                            *
  * Purpose: retrieves performance counter values from vmware service          *
  *                                                                            *
@@ -6132,7 +5927,6 @@ static void	vmware_service_retrieve_perf_counters(zbx_vmware_service_t *service,
 			else
 				start_counter = j;
 
-
 			if (ZBX_VMWARE_PERF_INTERVAL_NONE != entity->refresh)
 			{
 				zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:intervalId>%d</ns0:intervalId>",
@@ -6177,8 +5971,6 @@ static void	vmware_service_retrieve_perf_counters(zbx_vmware_service_t *service,
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_service_update_perf                                       *
  *                                                                            *
  * Purpose: updates vmware statistics data                                    *
  *                                                                            *
@@ -6342,8 +6134,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_service_remove                                            *
- *                                                                            *
  * Purpose: removes vmware service                                            *
  *                                                                            *
  * Parameters: service      - [IN] the vmware service                         *
@@ -6373,8 +6163,6 @@ static void	vmware_service_remove(zbx_vmware_service_t *service)
  */
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_vmware_get_service                                           *
  *                                                                            *
  * Purpose: gets vmware service object                                        *
  *                                                                            *
@@ -6455,10 +6243,7 @@ out:
 	return service;
 }
 
-
 /******************************************************************************
- *                                                                            *
- * Function: zbx_vmware_service_get_counterid                                 *
  *                                                                            *
  * Purpose: gets vmware performance counter id and unit info by the path      *
  *                                                                            *
@@ -6501,8 +6286,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_vmware_service_add_perf_counter                              *
  *                                                                            *
  * Purpose: start monitoring performance counter of the specified entity      *
  *                                                                            *
@@ -6556,8 +6339,6 @@ int	zbx_vmware_service_add_perf_counter(zbx_vmware_service_t *service, const cha
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_vmware_service_get_perf_entity                               *
- *                                                                            *
  * Purpose: gets performance entity by type and id                            *
  *                                                                            *
  * Parameters: service - [IN] the vmware service                              *
@@ -6583,8 +6364,6 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 #endif
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_vmware_init                                                  *
  *                                                                            *
  * Purpose: initializes vmware collector service                              *
  *                                                                            *
@@ -6631,8 +6410,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_vmware_destroy                                               *
- *                                                                            *
  * Purpose: destroys vmware collector service                                 *
  *                                                                            *
  ******************************************************************************/
@@ -6659,8 +6436,6 @@ void	zbx_vmware_destroy(void)
 #define	ZBX_VMWARE_TASK_REMOVE		4
 
 /******************************************************************************
- *                                                                            *
- * Function: main_vmware_loop                                                 *
  *                                                                            *
  * Purpose: the vmware collector main loop                                    *
  *                                                                            *
@@ -6823,8 +6598,6 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_vmware_lock                                                  *
- *                                                                            *
  * Purpose: locks vmware collector                                            *
  *                                                                            *
  ******************************************************************************/
@@ -6835,8 +6608,6 @@ void	zbx_vmware_lock(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_vmware_unlock                                                *
- *                                                                            *
  * Purpose: unlocks vmware collector                                          *
  *                                                                            *
  ******************************************************************************/
@@ -6846,8 +6617,6 @@ void	zbx_vmware_unlock(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_vmware_get_statistics                                        *
  *                                                                            *
  * Purpose: gets vmware collector statistics                                  *
  *                                                                            *
@@ -6879,8 +6648,6 @@ int	zbx_vmware_get_statistics(zbx_vmware_stats_t *stats)
  */
 /******************************************************************************
  *                                                                            *
- * Function: libxml_handle_error                                              *
- *                                                                            *
  * Purpose: libxml2 callback function for error handle                        *
  *                                                                            *
  * Parameters: user_data - [IN/OUT] the user context                          *
@@ -6894,8 +6661,6 @@ static void	libxml_handle_error(void *user_data, xmlErrorPtr err)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_xml_try_read_value                                           *
  *                                                                            *
  * Purpose: retrieve a value from xml data and return status of operation     *
  *                                                                            *
@@ -6967,8 +6732,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_xml_read_node_value                                          *
- *                                                                            *
  * Purpose: retrieve a value from xml data relative to the specified node     *
  *                                                                            *
  * Parameters: doc    - [IN] the XML document                                 *
@@ -7019,8 +6782,6 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_xml_read_doc_value                                           *
- *                                                                            *
  * Purpose: retrieve a value from xml document relative to the root node      *
  *                                                                            *
  * Parameters: xdoc   - [IN] the XML document                                 *
@@ -7039,8 +6800,6 @@ static char	*zbx_xml_read_doc_value(xmlDoc *xdoc, const char *xpath)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_xml_read_doc_num                                             *
  *                                                                            *
  * Purpose: retrieves numeric xpath value                                     *
  *                                                                            *
@@ -7077,8 +6836,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_xml_read_values                                              *
  *                                                                            *
  * Purpose: populate array of values from a xml data                          *
  *                                                                            *

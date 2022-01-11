@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -81,22 +81,6 @@ class CTextArea extends CTag {
 
 	public function setMaxlength($maxlength) {
 		$this->setAttribute('maxlength', $maxlength);
-
-		if (!defined('IS_TEXTAREA_MAXLENGTH_JS_INSERTED')) {
-			define('IS_TEXTAREA_MAXLENGTH_JS_INSERTED', true);
-
-			// firefox and google chrome have own implementations of maxlength validation on textarea
-			insert_js('
-				if (!CR && !GK) {
-					jQuery("textarea[maxlength]").bind("paste contextmenu change keydown keypress keyup", function() {
-						var elem = jQuery(this);
-						if (elem.val().length > elem.attr("maxlength")) {
-							elem.val(elem.val().substr(0, elem.attr("maxlength")));
-						}
-					});
-				}',
-			true);
-		}
 		return $this;
 	}
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,8 +23,6 @@
 #include "log.h"
 
 /******************************************************************************
- *                                                                            *
- * Function: check_perm2system                                                *
  *                                                                            *
  * Purpose: Check user permissions to access system                           *
  *                                                                            *
@@ -74,8 +72,6 @@ char	*get_user_timezone(zbx_uint64_t userid)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_check_user_administration_permissions                        *
  *                                                                            *
  * Purpose: check if the user has specific or default access for              *
  *          administration actions                                            *

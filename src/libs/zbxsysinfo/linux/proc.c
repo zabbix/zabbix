@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,8 +42,6 @@ typedef struct
 zbx_sysinfo_proc_t;
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_sysinfo_proc_free                                            *
  *                                                                            *
  * Purpose: frees process data structure                                      *
  *                                                                            *
@@ -236,8 +234,6 @@ static int	check_procstate(FILE *f_stat, int zbx_proc_stat)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: byte_value_from_proc_file                                        *
  *                                                                            *
  * Purpose: Read amount of memory in bytes from a string in /proc file.       *
  *          For example, reading "VmSize:   176712 kB" from /proc/1/status    *
@@ -833,8 +829,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: proc_get_process_name                                            *
- *                                                                            *
  * Purpose: returns process name                                              *
  *                                                                            *
  * Parameters: pid -      [IN] the process identifier                         *
@@ -877,8 +871,6 @@ static int	proc_get_process_name(pid_t pid, char **procname)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: proc_get_process_cmdline                                         *
  *                                                                            *
  * Purpose: returns process command line                                      *
  *                                                                            *
@@ -945,8 +937,6 @@ static int	proc_get_process_cmdline(pid_t pid, char **cmdline, size_t *cmdline_n
 
 /******************************************************************************
  *                                                                            *
- * Function: proc_get_process_uid                                             *
- *                                                                            *
  * Purpose: returns process user identifier                                   *
  *                                                                            *
  * Parameters: pid - [IN] the process identifier                              *
@@ -972,8 +962,6 @@ static int	proc_get_process_uid(pid_t pid, uid_t *uid)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: proc_read_value                                                  *
  *                                                                            *
  * Purpose: read 64 bit unsigned space or zero character terminated integer   *
  *          from a text string                                                *
@@ -1001,8 +989,6 @@ static int	proc_read_value(const char *ptr, zbx_uint64_t *value)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: proc_read_cpu_util                                               *
  *                                                                            *
  * Purpose: reads process cpu utilization values from /proc/[pid]/stat file   *
  *                                                                            *
@@ -1085,8 +1071,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: proc_match_name                                                  *
- *                                                                            *
  * Purpose: checks if the process name matches filter                         *
  *                                                                            *
  ******************************************************************************/
@@ -1106,8 +1090,6 @@ static int	proc_match_name(const zbx_sysinfo_proc_t *proc, const char *procname)
 
 /******************************************************************************
  *                                                                            *
- * Function: proc_match_user                                                  *
- *                                                                            *
  * Purpose: checks if the process user matches filter                         *
  *                                                                            *
  ******************************************************************************/
@@ -1124,8 +1106,6 @@ static int	proc_match_user(const zbx_sysinfo_proc_t *proc, const struct passwd *
 
 /******************************************************************************
  *                                                                            *
- * Function: proc_match_cmdline                                               *
- *                                                                            *
  * Purpose: checks if the process command line matches filter                 *
  *                                                                            *
  ******************************************************************************/
@@ -1141,8 +1121,6 @@ static int	proc_match_cmdline(const zbx_sysinfo_proc_t *proc, const char *cmdlin
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_proc_get_process_stats                                       *
  *                                                                            *
  * Purpose: get process cpu utilization data                                  *
  *                                                                            *
@@ -1163,8 +1141,6 @@ void	zbx_proc_get_process_stats(zbx_procstat_util_t *procs, int procs_num)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: proc_create                                                      *
  *                                                                            *
  * Purpose: create process object with the specified properties               *
  *                                                                            *
@@ -1238,8 +1214,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_proc_get_processes                                           *
- *                                                                            *
  * Purpose: get system processes                                              *
  *                                                                            *
  * Parameters: processes - [OUT] the system processes                         *
@@ -1286,8 +1260,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_proc_free_processes                                          *
- *                                                                            *
  * Purpose: frees process vector read by zbx_proc_get_processes function      *
  *                                                                            *
  * Parameters: processes - [IN/OUT] the process vector to free                *
@@ -1299,8 +1271,6 @@ void	zbx_proc_free_processes(zbx_vector_ptr_t *processes)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_proc_get_matching_pids                                       *
  *                                                                            *
  * Purpose: get pids matching the specified process name, user name and       *
  *          command line                                                      *

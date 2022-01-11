@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -215,8 +215,6 @@ PREPARE_AUDIT_TRIGGER_UPDATE(recovery_expression, const char*, string)
 #undef TR_OR_TRP
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_audit_DBselect_delete_for_trigger                            *
  *                                                                            *
  * Parameters: sql - [IN] sql statement                                       *
  *             ids - [OUT] sorted list of selected uint64 values              *

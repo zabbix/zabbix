@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,11 +25,15 @@
 ?>
 
 window.services_popup = {
+	is_multiple: null,
+
 	overlay: null,
 	dialogue: null,
 	form: null,
 
-	init() {
+	init({is_multiple}) {
+		this.is_multiple = is_multiple;
+
 		this.overlay = overlays_stack.getById('services');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
@@ -39,7 +43,10 @@ window.services_popup = {
 		filter_form.addEventListener('submit', (e) => {
 			e.preventDefault();
 
-			PopUp('popup.services', getFormFields(filter_form), 'services', e.target);
+			PopUp('popup.services', getFormFields(filter_form), {
+				dialogueid: 'services',
+				trigger_element: e.target
+			});
 		}, {passive: false});
 
 		filter_form.addEventListener('reset', (e) => {
@@ -47,17 +54,20 @@ window.services_popup = {
 
 			filter_form.elements.filter_name.value = '';
 
-			PopUp('popup.services', getFormFields(filter_form), 'services', e.target);
+			PopUp('popup.services', getFormFields(filter_form), {
+				dialogueid: 'services',
+				trigger_element: e.target
+			});
 		}, {passive: false});
 
 		this.form.addEventListener('click', (e) => {
-			if (e.target.matches('input[name="serviceid_all"]')) {
+			if (this.is_multiple && e.target.matches('input[name="serviceid_all"]')) {
 				for (const checkbox of this.form.querySelectorAll('input[name="serviceid"]')) {
 					checkbox.checked = e.target.checked;
 					checkbox.closest('tr').classList.toggle('row-selected', e.target.checked);
 				}
 			}
-			else if (e.target.matches('input[name="serviceid"]')) {
+			else if (this.is_multiple && e.target.matches('input[name="serviceid"]')) {
 				e.target.closest('tr').classList.toggle('row-selected', e.target.checked);
 
 				const has_all_checked = this.form.querySelector('input[name="serviceid"]:not(:checked)') === null;
@@ -73,20 +83,19 @@ window.services_popup = {
 	submit(serviceid = null) {
 		const services = [];
 
-		const checkboxes = serviceid === null
+		const serviceid_inputs = serviceid === null
 			? this.form.querySelectorAll(`input[name="serviceid"]:checked`)
 			: this.form.querySelectorAll(`input[name="serviceid"][value="${serviceid}"]`);
 
-		for (const checkbox of checkboxes) {
-			const service = {serviceid: checkbox.value};
+		for (const serviceid_input of serviceid_inputs) {
+			const service = {};
 
-			for (const input of checkbox.parentElement.querySelectorAll('input[type="hidden"]')) {
+			for (const input of serviceid_input.closest('tr').querySelectorAll('input')) {
 				service[input.name] = input.value;
 			}
 
 			services.push(service);
 		}
-
 		this.overlay.unsetLoading();
 
 		overlayDialogueDestroy('services');

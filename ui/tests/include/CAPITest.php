@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -121,12 +121,12 @@ class CAPITest extends CTest {
 	/**
 	 * @inheritdoc
 	 */
-	protected function onNotSuccessfulTest($e) {
-		if ($e instanceof Exception && CAPIHelper::getDebugInfo()) {
-			CExceptionHelper::setMessage($e, $e->getMessage()."\n\nAPI calls:\n".CAPIHelper::getDebugInfoAsString());
+	protected function onNotSuccessfulTest($t): void {
+		if ($t instanceof Exception && CAPIHelper::getDebugInfo()) {
+			CExceptionHelper::setMessage($t, $t->getMessage()."\n\nAPI calls:\n".CAPIHelper::getDebugInfoAsString());
 		}
 
-		parent::onNotSuccessfulTest($e);
+		parent::onNotSuccessfulTest($t);
 	}
 
 	/**

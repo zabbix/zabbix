@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,8 +44,6 @@ static ZBX_METRIC keys[] =
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_module_api_version                                           *
- *                                                                            *
  * Purpose: returns version number of the module interface                    *
  *                                                                            *
  * Return value: ZBX_MODULE_API_VERSION - version of module.h module is       *
@@ -60,8 +58,6 @@ int	zbx_module_api_version(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_module_item_timeout                                          *
- *                                                                            *
  * Purpose: set timeout value for processing of items                         *
  *                                                                            *
  * Parameters: timeout - timeout in seconds, 0 - no timeout set               *
@@ -73,8 +69,6 @@ void	zbx_module_item_timeout(int timeout)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_module_item_list                                             *
  *                                                                            *
  * Purpose: returns list of item keys supported by the module                 *
  *                                                                            *
@@ -112,8 +106,6 @@ static int	dummy_echo(AGENT_REQUEST *request, AGENT_RESULT *result)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: dummy_random                                                     *
  *                                                                            *
  * Purpose: a main entry point for processing of an item                      *
  *                                                                            *
@@ -171,8 +163,6 @@ static int	dummy_random(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_module_init                                                  *
- *                                                                            *
  * Purpose: the function is called on agent startup                           *
  *          It should be used to call any initialization routines             *
  *                                                                            *
@@ -191,8 +181,6 @@ int	zbx_module_init(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_module_uninit                                                *
  *                                                                            *
  * Purpose: the function is called on agent shutdown                          *
  *          It should be used to cleanup used resources if there are any      *
@@ -272,8 +260,6 @@ static void	dummy_history_log_cb(const ZBX_HISTORY_LOG *history, int history_num
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_module_history_write_cbs                                     *
  *                                                                            *
  * Purpose: returns a set of module functions Zabbix will call to export      *
  *          different types of historical data                                *

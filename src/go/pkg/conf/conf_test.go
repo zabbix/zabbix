@@ -3,7 +3,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 package conf
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"sort"
@@ -534,5 +535,63 @@ func Test_checkGlobPattern(t *testing.T) {
 				t.Errorf("checkGlobPattern() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
+	}
+}
+
+func Test_jsonMarshaling(t *testing.T) {
+	type Options struct {
+		LogFile  string
+		LogLevel int
+		Timeout  int
+		Plugins  map[string]interface{}
+	}
+
+	type RedisSession struct {
+		Address string
+		Port    int `conf:"default=10001"`
+	}
+	type RedisOptions struct {
+		Enable   int
+		Sessions map[string]RedisSession
+	}
+
+	input := `
+		LogFile = /tmp/log
+		LogLevel = 3
+		Timeout = 10
+		Plugins.Log.MaxLinesPerSecond = 25
+		Plugins.Redis.Enable = 1
+		Plugins.Redis.Sessions.Server1.Address = 127.0.0.1
+		Plugins.Redis.Sessions.Server2.Address = 127.0.0.2
+		Plugins.Redis.Sessions.Server2.Port = 10002
+		Plugins.Redis.Sessions.Server3.Address = 127.0.0.3
+		Plugins.Redis.Sessions.Server3.Port = 10003
+	`
+
+	var o Options
+	if err := Unmarshal([]byte(input), &o); err != nil {
+		t.Errorf("Failed unmarshaling options: %s", err)
+	}
+
+	dataOut, _ := json.Marshal(o.Plugins["Redis"])
+	var dataIn map[string]interface{}
+	_ = json.Unmarshal(dataOut, &dataIn)
+
+	var returnedOpts RedisOptions
+	if err := Unmarshal(dataIn, &returnedOpts); err != nil {
+		t.Error(err)
+	}
+
+	expectedOpts := RedisOptions{
+		Enable: 1,
+		Sessions: map[string]RedisSession{
+			"Server1": {"127.0.0.1", 10001},
+			"Server2": {"127.0.0.2", 10002},
+			"Server3": {"127.0.0.3", 10003},
+		},
+	}
+
+	if !reflect.DeepEqual(expectedOpts, returnedOpts) {
+		t.Errorf("Expected %+v while got %+v", expectedOpts, returnedOpts)
 	}
 }

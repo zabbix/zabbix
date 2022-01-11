@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ class CControllerQueueDetails extends CController {
 		else {
 			$queue_data = array_column($queue_data, null, 'itemid');
 			$items = API::Item()->get([
-				'output' => ['itemid', 'hostid', 'name', 'key_'],
+				'output' => ['hostid', 'name'],
 				'selectHosts' => ['name'],
 				'itemids' => array_keys($queue_data),
 				'webitems' => true,
@@ -66,14 +66,12 @@ class CControllerQueueDetails extends CController {
 
 			if (count($queue_data) != count($items)) {
 				$items += API::DiscoveryRule()->get([
-					'output' => ['itemid', 'hostid', 'name', 'key_'],
+					'output' => ['hostid', 'name'],
 					'selectHosts' => ['name'],
 					'itemids' => array_diff(array_keys($queue_data), array_keys($items)),
 					'preservekeys' => true
 				]);
 			}
-
-			$items = CMacrosResolverHelper::resolveItemNames($items);
 
 			$hosts = API::Host()->get([
 				'output' => ['proxy_hostid'],

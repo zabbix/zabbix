@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:45Z'
+  version: '6.0'
+  date: '2021-12-15T15:01:55Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -15,7 +15,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/SAN
@@ -1215,7 +1215,7 @@ zabbix_export:
                 taken_over - Node has been taken over by its HA partner and is not yet waiting for giveback.
                 waiting_for_giveback - Node has been taken over by its HA partner and is waiting for the HA partner to giveback disks.
                 degraded - Node has one or more critical services offline.
-                unknown - Node or its HA partner cannot be contacted and there is no information on the node’s state.
+                unknown - Node or its HA partner cannot be contacted and there is no information on the node's state.
               preprocessing:
                 -
                   type: JSONPATH
@@ -1244,7 +1244,7 @@ zabbix_export:
                     taken_over - Node has been taken over by its HA partner and is not yet waiting for giveback.
                     waiting_for_giveback - Node has been taken over by its HA partner and is waiting for the HA partner to giveback disks.
                     degraded - Node has one or more critical services offline.
-                    unknown - Node or its HA partner cannot be contacted and there is no information on the node’s state.
+                    unknown - Node or its HA partner cannot be contacted and there is no information on the node's state.
             -
               uuid: 56e0b6df4dbd456880c2481bec40b41e
               name: '{#NODENAME}: Uptime'
@@ -1638,7 +1638,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'Volume state. A volume can only be brought online if it is offline. Taking a volume offline removes its junction path. The ‘mixed’ state applies to FlexGroup volumes only and cannot be specified as a target state. An ‘error’ state implies that the volume is not in a state to serve data.'
+              description: 'Volume state. A volume can only be brought online if it is offline. Taking a volume offline removes its junction path. The ''mixed'' state applies to FlexGroup volumes only and cannot be specified as a target state. An ''error'' state implies that the volume is not in a state to serve data.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1662,7 +1662,7 @@ zabbix_export:
                   recovery_expression: '(last(/NetApp AFF A700 by HTTP/netapp.volume.state[{#VOLUMENAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.volume.state[{#VOLUMENAME}],#2) and last(/NetApp AFF A700 by HTTP/netapp.volume.state[{#VOLUMENAME}])="online")'
                   name: '{#VOLUMENAME}: Volume state is abnormal'
                   priority: AVERAGE
-                  description: 'A volume can only be brought online if it is offline. Taking a volume offline removes its junction path. The ‘mixed’ state applies to FlexGroup volumes only and cannot be specified as a target state. An ‘error’ state implies that the volume is not in a state to serve data.'
+                  description: 'A volume can only be brought online if it is offline. Taking a volume offline removes its junction path. The ''mixed'' state applies to FlexGroup volumes only and cannot be specified as a target state. An ''error'' state implies that the volume is not in a state to serve data.'
                   manual_close: 'YES'
             -
               uuid: cb4cfb0ce84f405ebfbf2e4a64c12ca2
@@ -2128,9 +2128,9 @@ zabbix_export:
               value_type: CHAR
               description: |
                 Type of the volume.
-                rw ‐ read-write volume.
-                dp ‐ data-protection volume.
-                ls ‐ load-sharing dp volume.
+                rw - read-write volume.
+                dp - data-protection volume.
+                ls - load-sharing dp volume.
               preprocessing:
                 -
                   type: JSONPATH

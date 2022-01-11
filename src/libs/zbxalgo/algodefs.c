@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -387,8 +387,6 @@ int	next_prime(int n)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_isqrt32                                                      *
- *                                                                            *
  * Purpose: calculate integer part of square root of a 32 bit integer value   *
  *                                                                            *
  * Parameters: value     - [IN] the value to calculate square root for        *
@@ -421,8 +419,6 @@ unsigned int	zbx_isqrt32(unsigned int value)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_gen_uuid4                                                    *
  *                                                                            *
  * Purpose: calculate UUID version 4 as string of 32 symbols                  *
  *                                                                            *
@@ -461,4 +457,3 @@ char	*zbx_gen_uuid4(const char *seed)
 
 	return uuid;
 }
-

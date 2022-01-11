@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 The template to monitor IIS (Internet Information Services) by Zabbix that works without any external scripts.
 
 
@@ -43,7 +43,7 @@ No specific Zabbix configuration is required.
 |{$IIS.PORT} |<p>Listening port.</p> |`80` |
 |{$IIS.QUEUE.MAX.TIME} |<p>The time during which the queue length may exceed the threshold.</p> |`5m` |
 |{$IIS.QUEUE.MAX.WARN} |<p>Maximum application pool's request queue length for trigger expression.</p> |`` |
-|{$IIS.SERVICE} |<p>The service (http/https/etc) for port check. See "net.tcp.service" documentation page for more information.</p> |`http` |
+|{$IIS.SERVICE} |<p>The service (http/https/etc) for port check. See "net.tcp.service" documentation page for more information: https://www.zabbix.com/documentation/6.0/manual/config/items/itemtypes/simple_checks</p> |`http` |
 
 ## Template links
 
@@ -53,7 +53,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Application pools discovery |<p>-</p> |ZABBIX_ACTIVE |wmi.getall[root\webAdministration, select Name from ApplicationPool]<p>**Filter**:</p>AND <p>- A: {#APPPOOL} NOT_MATCHES_REGEX `{$IIS.APPPOOL.NOT_MATCHES}`</p><p>- B: {#APPPOOL} MATCHES_REGEX `{$IIS.APPPOOL.MATCHES}`</p> |
+|Application pools discovery |<p>-</p> |ZABBIX_ACTIVE |wmi.getall[root\webAdministration, select Name from ApplicationPool]<p>**Filter**:</p>AND <p>- {#APPPOOL} NOT_MATCHES_REGEX `{$IIS.APPPOOL.NOT_MATCHES}`</p><p>- {#APPPOOL} MATCHES_REGEX `{$IIS.APPPOOL.MATCHES}`</p> |
 
 ## Items collected
 
@@ -110,7 +110,7 @@ There are no template links in this template.
 |IIS: Port {$IIS.PORT} is down |<p>-</p> |`last(/IIS by Zabbix agent active/net.tcp.service[{$IIS.SERVICE},,{$IIS.PORT}])=0` |AVERAGE |<p>Manual close: YES</p><p>**Depends on**:</p><p>- IIS: The World Wide Web Publishing Service (W3SVC) is not running</p> |
 |IIS: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/IIS by Zabbix agent active/perf_counter_en["\Web Service(_Total)\Service Uptime"])<10m` |INFO |<p>Manual close: YES</p> |
 |IIS: {#APPPOOL} has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/IIS by Zabbix agent active/perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool Uptime"])<10m` |INFO |<p>Manual close: YES</p> |
-|IIS: Application pool {#APPPOOL} is not in Running state |<p>-</p> |`last(/IIS by Zabbix agent active/perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool State"])<>3 and {$IIS.APPPOOL.MONITORED:"{#APPPOOL}"}=1` |HIGH | |
+|IIS: Application pool {#APPPOOL} is not in Running state |<p>-</p> |`last(/IIS by Zabbix agent active/perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool State"])<>3 and {$IIS.APPPOOL.MONITORED:"{#APPPOOL}"}=1` |HIGH |<p>**Depends on**:</p><p>- IIS: The World Wide Web Publishing Service (W3SVC) is not running</p> |
 |IIS: Application pool {#APPPOOL} has been recycled |<p>-</p> |`last(/IIS by Zabbix agent active/perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Total Application Pool Recycles"],#1)<>last(/IIS by Zabbix agent active/perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Total Application Pool Recycles"],#2) and {$IIS.APPPOOL.MONITORED:"{#APPPOOL}"}=1` |INFO | |
 |IIS: Request queue of {#APPPOOL} is too large (over {$IIS.QUEUE.MAX.WARN}) |<p>-</p> |`min(/IIS by Zabbix agent active/perf_counter_en["\HTTP Service Request Queues({#APPPOOL})\CurrentQueueSize"],{$IIS.QUEUE.MAX.TIME})>{$IIS.QUEUE.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- IIS: Application pool {#APPPOOL} is not in Running state</p> |
 

@@ -1314,7 +1314,7 @@ in:
     some_user{country="lv",addr="user1@domain.com"} 1
     some_user{country="lv",addr="user2@domain.org"} 2
     some_user{country="lv",addr="no_valid_addr"} 2
-  params: some_user{country="lv",addr=~"[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}"} == 1
+  params: some_user{country="lv",addr=~"[-\\w\\.]+@([\\w-]+\\.)+[\\w-]{2,4}"} == 1
   request: label
   output: addr
 out:
@@ -1327,7 +1327,7 @@ in:
     some_user{country="lv",addr="user1@domain.com"} 1
     some_user{country="lv",addr="user2@domain.org"} 2
     some_user{country="lv",addr="no_valid_addr"} 2
-  params: some_user{country="lv",addr=~"^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$"} == 2
+  params: some_user{country="lv",addr=~"^[-\\w\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$"} == 2
   request: label
   output: addr
 out:
@@ -1340,7 +1340,7 @@ in:
     some_user{country="lv",addr="user1@domain.com"} 1
     some_user{country="lv",addr="user2@domain.org"} 2
     some_user{country="lv",addr="no_valid_addr"} 3
-  params: some_user{country="lv",addr=~"^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$"} == 3
+  params: some_user{country="lv",addr=~"^[-\\w\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$"} == 3
   request: label
   output: addr
 out:
@@ -1352,7 +1352,7 @@ in:
     some_user{country="lv",addr="user1@domain.com"} 1
     some_user{country="lv",addr="user2@domain.org"} 2
     some_user{country="lv",addr="no_valid_addr"} 3
-  params: some_user{country="lv",addr=~"^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$"}
+  params: some_user{country="lv",addr=~"^[-\\w\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$"}
   request: value
   output: ""
 out:
