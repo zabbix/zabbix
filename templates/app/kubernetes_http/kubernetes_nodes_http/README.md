@@ -76,10 +76,10 @@ No specific Zabbix configuration is required.
 |{$KUBE.LLD.FILTER.NODE.NOT_MATCHES} |<p>Filter to exclude discovered nodes</p> |`CHANGE_IF_NEEDED` |
 |{$KUBE.LLD.FILTER.NODE.ROLE.MATCHES} |<p>Filter of discoverable nodes by role</p> |`.*` |
 |{$KUBE.LLD.FILTER.NODE.ROLE.NOT_MATCHES} |<p>Filter to exclude discovered node by role</p> |`CHANGE_IF_NEEDED` |
-|{$KUBE.LLD.FILTER.NODE_HOST.MATCHES} |<p>Filter of discoverable node hosts</p> |`.*` |
-|{$KUBE.LLD.FILTER.NODE_HOST.NOT_MATCHES} |<p>Filter to exclude discovered node hosts</p> |`CHANGE_IF_NEEDED` |
+|{$KUBE.LLD.FILTER.NODE_HOST.MATCHES} |<p>Filter of discoverable cluster nodes</p> |`.*` |
+|{$KUBE.LLD.FILTER.NODE_HOST.NOT_MATCHES} |<p>Filter to exclude discovered cluster nodes</p> |`CHANGE_IF_NEEDED` |
 |{$KUBE.LLD.FILTER.NODE_HOST.ROLE.MATCHES} |<p>Filter of discoverable nodes hosts by role</p> |`.*` |
-|{$KUBE.LLD.FILTER.NODE_HOST.ROLE.NOT_MATCHES} |<p>Filter to exclude discovered node hosts by role</p> |`CHANGE_IF_NEEDED` |
+|{$KUBE.LLD.FILTER.NODE_HOST.ROLE.NOT_MATCHES} |<p>Filter to exclude discovered cluster nodes by role</p> |`CHANGE_IF_NEEDED` |
 |{$KUBE.LLD.FILTER.POD.NAMESPACE.MATCHES} |<p>Filter of discoverable pods by namespace</p> |`.*` |
 |{$KUBE.LLD.FILTER.POD.NAMESPACE.NOT_MATCHES} |<p>Filter to exclude discovered pods by namespace</p> |`CHANGE_IF_NEEDED` |
 |{$KUBE.NODE.FILTER.ANNOTATIONS} |<p>Annotations to filter nodes (regex in values are supported)</p> |`` |
@@ -96,7 +96,7 @@ There are no template links in this template.
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |Node discovery |<p>-</p> |DEPENDENT |kube.node.discovery<p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE.NOT_MATCHES}`</p><p>- {#ROLES} MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE.ROLE.MATCHES}`</p><p>- {#ROLES} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE.ROLE.NOT_MATCHES}`</p> |
-|Node host discovery |<p>-</p> |DEPENDENT |kube.node_host.discovery<p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE_HOST.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE_HOST.NOT_MATCHES}`</p><p>- {#ROLES} MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE_HOST.ROLE.MATCHES}`</p><p>- {#ROLES} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE_HOST.ROLE.NOT_MATCHES}`</p> |
+|Cluster node discovery |<p>-</p> |DEPENDENT |kube.node_host.discovery<p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE_HOST.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE_HOST.NOT_MATCHES}`</p><p>- {#ROLES} MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE_HOST.ROLE.MATCHES}`</p><p>- {#ROLES} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE_HOST.ROLE.NOT_MATCHES}`</p> |
 |Pod discovery |<p>-</p> |DEPENDENT |kube.pod.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NODE} MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE.MATCHES}`</p><p>- {#NODE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE.NOT_MATCHES}`</p><p>- {#NAMESPACE} MATCHES_REGEX `{$KUBE.LLD.FILTER.POD.NAMESPACE.MATCHES}`</p><p>- {#NAMESPACE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.POD.NAMESPACE.NOT_MATCHES}`</p> |
 
 ## Items collected
@@ -104,7 +104,7 @@ There are no template links in this template.
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
 |Kubernetes |Kubernetes: Get nodes |<p>Collecting and processing cluster nodes data via Kubernetes API.</p> |SCRIPT |kube.nodes<p>**Expression**:</p>`The text is too long. Please see the template.` |
-|Kubernetes |Get nodes check |<p>Generation data for node discovery rules.</p> |DEPENDENT |kube.nodes.check<p>**Preprocessing**:</p><p>- JSONPATH<p>- DISCARD_UNCHANGED_HEARTBEAT |
+|Kubernetes |Get nodes check |<p>Data collection check.</p> |DEPENDENT |kube.nodes.check<p>**Preprocessing**:</p><p>- JSONPATH<p>- DISCARD_UNCHANGED_HEARTBEAT |
 |Kubernetes |Node LLD |<p>Generation of data for node discovery rules.</p> |DEPENDENT |kube.nodes.lld<p>**Preprocessing**:</p><p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT |
 |Kubernetes |Node [{#NAME}] Addresses: External IP |<p>Typically the IP address of the node that is externally routable (available from outside the cluster).</p> |DEPENDENT |kube.node.addresses.external_ip[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH<p>- DISCARD_UNCHANGED_HEARTBEAT |
 |Kubernetes |Node [{#NAME}] Addresses: Internal IP |<p>Typically the IP address of the node that is routable only within the cluster.</p> |DEPENDENT |kube.node.addresses.internal_ip[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH<p>- DISCARD_UNCHANGED_HEARTBEAT |

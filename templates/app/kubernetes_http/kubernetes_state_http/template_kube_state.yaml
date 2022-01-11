@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-10T07:47:39Z'
+  date: '2022-01-11T17:40:31Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -28,7 +28,7 @@ zabbix_export:
           name: 'Kubernetes: Get component statuses'
           type: HTTP_AGENT
           key: kube.componentstatuses
-          delay: 1m;s00
+          delay: 0;s00
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -72,23 +72,20 @@ zabbix_export:
             
                 request: function (query) {
                     var response,
-                        request = new CurlHttpRequest(),
+                        request = new HttpRequest(),
                         url = 'https://' + Kube.params.api_host + ':' + Kube.params.api_port + '/api/' + query;
             
-                    request.AddHeader('Content-Type: application/json');
-                    request.AddHeader('Authorization: Bearer ' + Kube.params.token);
+                    request.addHeader('Content-Type: application/json');
+                    request.addHeader('Authorization: Bearer ' + Kube.params.token);
             
                     Zabbix.log(4, '[ Kubernetes ] Sending request: ' + url);
             
-                    response = request.Get(url);
+                    response = request.get(url);
             
                     Zabbix.Log(4, '[ Kubernetes ] Received response with status code ' + request.Status() + ': ' + response);
             
                     if (request.Status() < 200 || request.Status() >= 300) {
-                        var message = 'Request failed with status code ' + request.Status();
-            
-                        message += ': ' + response;
-                        throw message;
+                        throw 'Request failed with status code ' + request.Status() + ': ' + response;
                     }
             
                     if (response !== null) {
@@ -127,10 +124,12 @@ zabbix_export:
             
                 for (idx in nodes.items) {
                     for (label in nodes.items[idx].metadata.labels) {
-                        if (label === 'node-role.kubernetes.io/control-plane') {
-                            var internalIP = nodes.items[idx].status.addresses.filter(function (addr) {
+                        if (label === 'node-role.kubernetes.io/control-plane') {                          
+                            var internalIPs = nodes.items[idx].status.addresses.filter(function (addr) {
                                 return addr.type === 'InternalIP';
-                            })[0].address;
+                            });
+            
+                            var internalIP = internalIPs.length && internalIPs[0].address;
             
                             controlPlaneNodes.push({
                                 '{#NAME}': nodes.items[idx].metadata.name,
@@ -222,7 +221,7 @@ zabbix_export:
           name: 'Kubernetes: Get livez'
           type: HTTP_AGENT
           key: kube.livez
-          delay: 1m;s00
+          delay: 0;s00
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -313,7 +312,7 @@ zabbix_export:
           name: 'Kubernetes: Get readyz'
           type: HTTP_AGENT
           key: kube.readyz
-          delay: 1m;s00
+          delay: 0;s00
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -323,7 +322,7 @@ zabbix_export:
               parameters:
                 - |
                   var output = [],
-                      conponent;
+                      component;
                   
                   value.split(/\n/).forEach(function (entry) {
                       if (component = entry.match(/^\[.+\](.+)\s(\w+)$/)) {
@@ -379,7 +378,7 @@ zabbix_export:
           name: 'Kubernetes: Get state metrics'
           type: SCRIPT
           key: kube.state.metrics
-          delay: 1m;s00
+          delay: 0;s00
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -401,23 +400,20 @@ zabbix_export:
             
                 apiRequest: function (query) {
                     var response,
-                        request = new CurlHttpRequest(),
+                        request = new HttpRequest(),
                         url = 'https://' + Kube.params.api_host + ':' + Kube.params.api_port + '/api/' + query;
             
-                    request.AddHeader('Content-Type: application/json');
-                    request.AddHeader('Authorization: Bearer ' + Kube.params.token);
+                    request.addHeader('Content-Type: application/json');
+                    request.addHeader('Authorization: Bearer ' + Kube.params.token);
             
                     Zabbix.log(4, '[ Kubernetes ] Sending request: ' + url);
             
-                    response = request.Get(url);
+                    response = request.get(url);
             
                     Zabbix.Log(4, '[ Kubernetes ] Received response with status code ' + request.Status() + ': ' + response);
             
                     if (request.Status() < 200 || request.Status() >= 300) {
-                        var message = 'Request failed with status code ' + request.Status();
-            
-                        message += ': ' + response;
-                        throw message;
+                        throw 'Request failed with status code ' + request.Status() + ': ' + response;
                     }
             
                     if (response !== null) {
@@ -446,17 +442,15 @@ zabbix_export:
                     };
             
                     result.response.items.forEach(function (ep) {
-                        if (ep.metadata.name === Kube.params.state_endpoint_name) {
-                            if (typeof ep.subsets !== 'undefined') {
-                                if (typeof ep.subsets[0].addresses !== 'undefined') {
-                                    var subset = ep.subsets[0];
+                        if (ep.metadata.name === Kube.params.state_endpoint_name && Array.isArray(ep.subsets)) {
+                            if (typeof ep.subsets[0].addresses !== 'undefined') {
+                                var subset = ep.subsets[0];
             
-                                    endpoint = {
-                                        address: subset.addresses[0].ip,
-                                        port: port = subset.ports.filter(function (port) {
-                                            return port.name === 'http';
-                                        })[0].port || 8080
-                                    }
+                                endpoint = {
+                                    address: subset.addresses[0].ip,
+                                    port: port = subset.ports.filter(function (port) {
+                                        return port.name === 'http';
+                                    })[0].port || 8080
                                 }
                             }
                         }
@@ -472,23 +466,20 @@ zabbix_export:
                     }
             
                     var response,
-                        request = new CurlHttpRequest(),
+                        request = new HttpRequest(),
                         url = 'http://' + Kube.metrics_endpoint.address + ':' + Kube.metrics_endpoint.port + '/metrics';
             
-                    request.AddHeader('Content-Type: application/json');
-                    request.AddHeader('Authorization: Bearer ' + Kube.params.token);
+                    request.addHeader('Content-Type: application/json');
+                    request.addHeader('Authorization: Bearer ' + Kube.params.token);
             
                     Zabbix.log(4, '[ Kubernetes ] Sending request: ' + url);
             
-                    response = request.Get(url);
+                    response = request.get(url);
             
                     Zabbix.Log(4, '[ Kubernetes ] Received response with status code ' + request.Status() + ': ' + response);
             
                     if (request.Status() < 200 || request.Status() >= 300) {
-                        var message = 'Request failed with status code ' + request.Status();
-            
-                        message += ': ' + response;
-                        throw message;
+                        throw 'Request failed with status code ' + request.Status() + ': ' + response;
                     }
             
                     if (response === null) {
@@ -586,23 +577,20 @@ zabbix_export:
             
                 request: function (query) {
                     var response,
-                        request = new CurlHttpRequest(),
+                        request = new HttpRequest(),
                         url = 'https://' + Kube.params.api_host + ':' + Kube.params.api_port + '/api/' + query;
             
-                    request.AddHeader('Content-Type: application/json');
-                    request.AddHeader('Authorization: Bearer ' + Kube.params.token);
+                    request.addHeader('Content-Type: application/json');
+                    request.addHeader('Authorization: Bearer ' + Kube.params.token);
             
                     Zabbix.log(4, '[ Kubernetes ] Sending request: ' + url);
             
-                    response = request.Get(url);
+                    response = request.get(url);
             
                     Zabbix.Log(4, '[ Kubernetes ] Received response with status code ' + request.Status() + ': ' + response);
             
                     if (request.Status() < 200 || request.Status() >= 300) {
-                        var message = 'Request failed with status code ' + request.Status();
-            
-                        message += ': ' + response;
-                        throw message;
+                        throw 'Request failed with status code ' + request.Status() + ': ' + response;
                     }
             
                     if (response !== null) {
@@ -641,20 +629,18 @@ zabbix_export:
             
                 for (idx in nodes.items) {
                     for (label in nodes.items[idx].metadata.labels) {
-                        if (label === 'node-role.kubernetes.io/node') {
-                            var internalIP = nodes.items[idx].status.addresses.filter(function (addr) {
-                                return addr.type === 'InternalIP';
-                            })[0].address;
+                        var internalIPs = nodes.items[idx].status.addresses.filter(function (addr) {
+                            return addr.type === 'InternalIP';
+                        });
             
-                            workerNodes.push({
-                                '{#NAME}': nodes.items[idx].metadata.name,
-                                '{#IP}': internalIP,
-                                '{#KUBE.KUBELET.URL}': Kube.params.kubelet_scheme + '://' + internalIP + ':' + Kube.params.kubelet_port,
-                                '{#ROLE.WORKER}' : 'Worker'
-                            });
+                        var internalIP = internalIPs.length && internalIPs[0].address;
             
-                            break;
-                        }
+                        workerNodes.push({
+                            '{#NAME}': nodes.items[idx].metadata.name,
+                            '{#IP}': internalIP,
+                            '{#KUBE.KUBELET.URL}': Kube.params.kubelet_scheme + '://' + internalIP + ':' + Kube.params.kubelet_port,
+                            '{#ROLE.WORKER}' : 'Worker'
+                        });
                     }
                 }
             
@@ -764,7 +750,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 58828a692aa2418ba98c6d66a23f1506
-                  expression: 'count(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}],3m,,"True")>2'
+                  expression: 'count(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}],3m,,"True")<2'
                   name: 'Kubernetes: Component [{#NAME}] is unhealthy'
                   priority: WARNING
           master_item:
@@ -779,7 +765,7 @@ zabbix_export:
                   
                   input.items.forEach(function (component) {
                       output.push({
-                          '{#NAME}': component.metadata.name,
+                          '{#NAME}': component.metadata.name
                       });
                   });
                   
@@ -1019,7 +1005,7 @@ zabbix_export:
                   input.forEach(function (metric) {
                       output.push({
                           '{#NAME}': metric.labels.daemonset,
-                          '{#NAMESPACE}': metric.labels.namespace,
+                          '{#NAMESPACE}': metric.labels.namespace
                       });
                   });
                   
@@ -1294,7 +1280,7 @@ zabbix_export:
                   input.forEach(function (metric) {
                       output.push({
                           '{#NAME}': metric.labels.deployment,
-                          '{#NAMESPACE}': metric.labels.namespace,
+                          '{#NAMESPACE}': metric.labels.namespace
                       });
                   });
                   
@@ -1444,7 +1430,7 @@ zabbix_export:
                   input.forEach(function (metric) {
                       output.push({
                           '{#NAME}': metric.labels.endpoint,
-                          '{#NAMESPACE}': metric.labels.namespace,
+                          '{#NAMESPACE}': metric.labels.namespace
                       });
                   });
                   
@@ -1490,7 +1476,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 9fcb23d29ac3481a8613515cc2cccfcf
-                  expression: 'count(/Kubernetes cluster state by HTTP/kube.livez.helthcheck[{#NAME}],3m,,"ok")>2'
+                  expression: 'count(/Kubernetes cluster state by HTTP/kube.livez.helthcheck[{#NAME}],3m,,"ok")<2'
                   name: 'Kubernetes: Livez [{#NAME}] is unhealthy'
                   priority: WARNING
           master_item:
@@ -1505,7 +1491,7 @@ zabbix_export:
                   
                   input.forEach(function (component) {
                       output.push({
-                          '{#NAME}': component.name,
+                          '{#NAME}': component.name
                       });
                   });
                   
@@ -1727,7 +1713,7 @@ zabbix_export:
                   
                   input.forEach(function (metric) {
                       output.push({
-                          '{#NAME}': metric.labels.node,
+                          '{#NAME}': metric.labels.node
                       });
                   });
                   
@@ -2278,7 +2264,7 @@ zabbix_export:
                   input.forEach(function (metric) {
                       output.push({
                           '{#NAME}': metric.labels.pod,
-                          '{#NAMESPACE}': metric.labels.namespace,
+                          '{#NAMESPACE}': metric.labels.namespace
                       });
                   });
                   
@@ -2618,7 +2604,7 @@ zabbix_export:
                   input.forEach(function (metric) {
                       output.push({
                           '{#NAME}': metric.labels.persistentvolumeclaim,
-                          '{#NAMESPACE}': metric.labels.namespace,
+                          '{#NAMESPACE}': metric.labels.namespace
                   
                       });
                   });
@@ -2665,7 +2651,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 1a88c2cf94d3444c9e5320776b323ce6
-                  expression: 'count(/Kubernetes cluster state by HTTP/kube.readyz.helthcheck[{#NAME}],3m,,"ok")>2'
+                  expression: 'count(/Kubernetes cluster state by HTTP/kube.readyz.helthcheck[{#NAME}],3m,,"ok")<2'
                   name: 'Kubernetes: Readyz [{#NAME}] is unhealthy'
                   priority: WARNING
           master_item:
@@ -2680,7 +2666,7 @@ zabbix_export:
                   
                   input.forEach(function (component) {
                       output.push({
-                          '{#NAME}': component.name,
+                          '{#NAME}': component.name
                       });
                   });
                   
@@ -2859,7 +2845,7 @@ zabbix_export:
                   input.forEach(function (metric) {
                       output.push({
                           '{#NAME}': metric.labels.replicaset,
-                          '{#NAMESPACE}': metric.labels.namespace,
+                          '{#NAMESPACE}': metric.labels.namespace
                       });
                   });
                   
@@ -3110,7 +3096,7 @@ zabbix_export:
                   input.forEach(function (metric) {
                       output.push({
                           '{#NAME}': metric.labels.statefulset,
-                          '{#NAMESPACE}': metric.labels.namespace,
+                          '{#NAMESPACE}': metric.labels.namespace
                       });
                   });
                   

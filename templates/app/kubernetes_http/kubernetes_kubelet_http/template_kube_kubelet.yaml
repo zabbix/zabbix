@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-10T07:46:50Z'
+  date: '2022-01-11T17:40:34Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -28,10 +28,11 @@ zabbix_export:
           name: 'Kubernetes: Get cadvisor metrics'
           type: HTTP_AGENT
           key: kube.cadvisor.metrics
-          delay: 1m;s00
+          delay: 0;s00
           history: '0'
           trends: '0'
           value_type: TEXT
+          description: 'Collecting raw Kubelet metrics from /metrics/cadvisor endpoint.'
           timeout: 10s
           url: '{$KUBE.KUBELET.URL}/metrics/cadvisor'
           status_codes: '200, 403'
@@ -136,10 +137,11 @@ zabbix_export:
           name: 'Kubernetes: Get kubelet metrics'
           type: HTTP_AGENT
           key: kube.kubelet.metrics
-          delay: 1m;s00
+          delay: 0;s00
           history: '0'
           trends: '0'
           value_type: TEXT
+          description: 'Collecting raw Kubelet metrics from /metrics endpoint.'
           timeout: 10s
           url: '{$KUBE.KUBELET.URL}/metrics'
           status_codes: '200, 403'
@@ -266,10 +268,11 @@ zabbix_export:
           name: 'Kubernetes: Get pods'
           type: HTTP_AGENT
           key: kube.pods
-          delay: 1m;s00
+          delay: 0;s00
           history: '0'
           trends: '0'
           value_type: TEXT
+          description: 'Collecting raw Kubelet metrics from /pods endpoint.'
           timeout: 10s
           url: '{$KUBE.KUBELET.URL}/pods'
           status_codes: '200, 403'
@@ -514,7 +517,7 @@ zabbix_export:
             -
               type: PROMETHEUS_TO_JSON
               parameters:
-                - container_memory_cache
+                - 'container_memory_cache{container =~ ".*", namespace =~ ".*", pod =~ "POD"}'
             -
               type: JAVASCRIPT
               parameters:
@@ -524,7 +527,7 @@ zabbix_export:
                   
                   JSON.parse(value).forEach(function (item) {
                       var container_labels = item.labels.container + item.labels.namespace + item.labels.pod;
-                      if (!(item.labels.container === "" || item.labels.container === "POD") && !(lookup[container_labels])) {
+                      if (!(item.labels.container === "") && !(lookup[container_labels])) {
                           lookup[container_labels] = 1;
                           result.push({
                               '{#CONTAINER}': item.labels.container,
@@ -634,7 +637,7 @@ zabbix_export:
                   input.items.forEach(function (pod) {
                       output.push({
                           '{#NAME}': pod.metadata.name,
-                          '{#NAMESPACE}': pod.metadata.namespace,
+                          '{#NAMESPACE}': pod.metadata.namespace
                       });
                   });
                   
@@ -687,7 +690,7 @@ zabbix_export:
             -
               type: PROMETHEUS_TO_JSON
               parameters:
-                - rest_client_requests_total
+                - 'rest_client_requests_total{code =~ ".*", host =~ ".*", method =~ ".*"}'
             -
               type: JAVASCRIPT
               parameters:
@@ -716,9 +719,9 @@ zabbix_export:
           item_prototypes:
             -
               uuid: 13de106611a347e0907dda9ff52f3a20
-              name: 'Kubernetes: [{#OP_TYPE}] Runtime operations bucket: le={#LE}'
+              name: 'Kubernetes: [{#OP_TYPE}] Runtime operations bucket: {#LE}'
               type: DEPENDENT
-              key: 'kube.kublet.runtime_ops_duration_seconds_bucket["{#OP_TYPE}",{#LE}]'
+              key: 'kube.kublet.runtime_ops_duration_seconds_bucket[{#LE},"{#OP_TYPE}"]'
               delay: '0'
               history: 7d
               discover: NO_DISCOVER
@@ -741,12 +744,12 @@ zabbix_export:
               uuid: 3d9545d396b24ef6b87eb730ad93cda7
               name: 'Kubernetes: [{#OP_TYPE}] Operations, p50'
               type: CALCULATED
-              key: 'kube.kublet.runtime_ops_duration_seconds_p50[{#OP_TYPE}]'
+              key: 'kube.kublet.runtime_ops_duration_seconds_p50["{#OP_TYPE}"]'
               history: 7d
               discover: NO_DISCOVER
               value_type: FLOAT
               units: s
-              params: 'bucket_percentile(//kube.kublet.runtime_ops_duration_seconds_bucket["{#OP_TYPE}",*],5m,50)'
+              params: 'bucket_percentile(//kube.kublet.runtime_ops_duration_seconds_bucket[*,"{#OP_TYPE}"],5m,50)'
               description: '50 percentile of operation latency distribution in seconds for each verb.'
               tags:
                 -
@@ -756,12 +759,12 @@ zabbix_export:
               uuid: 039a47a0b20741e79701fecb924e6a08
               name: 'Kubernetes: [{#OP_TYPE}] Operations, p90'
               type: CALCULATED
-              key: 'kube.kublet.runtime_ops_duration_seconds_p90[{#OP_TYPE}]'
+              key: 'kube.kublet.runtime_ops_duration_seconds_p90["{#OP_TYPE}"]'
               history: 7d
               discover: NO_DISCOVER
               value_type: FLOAT
               units: s
-              params: 'bucket_percentile(//kube.kublet.runtime_ops_duration_seconds_bucket["{#OP_TYPE}",*],5m,90)'
+              params: 'bucket_percentile(//kube.kublet.runtime_ops_duration_seconds_bucket[*,"{#OP_TYPE}"],5m,90)'
               description: '90 percentile of operation latency distribution in seconds for each verb.'
               tags:
                 -
@@ -771,12 +774,12 @@ zabbix_export:
               uuid: e846265636ac433ba2bce034aca1e394
               name: 'Kubernetes: [{#OP_TYPE}] Operations, p95'
               type: CALCULATED
-              key: 'kube.kublet.runtime_ops_duration_seconds_p95[{#OP_TYPE}]'
+              key: 'kube.kublet.runtime_ops_duration_seconds_p95["{#OP_TYPE}"]'
               history: 7d
               discover: NO_DISCOVER
               value_type: FLOAT
               units: s
-              params: 'bucket_percentile(//kube.kublet.runtime_ops_duration_seconds_bucket["{#OP_TYPE}",*],5m,95)'
+              params: 'bucket_percentile(//kube.kublet.runtime_ops_duration_seconds_bucket[*,"{#OP_TYPE}"],5m,95)'
               description: '95 percentile of operation latency distribution in seconds for each verb.'
               tags:
                 -
@@ -786,12 +789,12 @@ zabbix_export:
               uuid: 68f17a6132dd48deb3825efd2b83b6ce
               name: 'Kubernetes: [{#OP_TYPE}] Operations, p99'
               type: CALCULATED
-              key: 'kube.kublet.runtime_ops_duration_seconds_p99[{#OP_TYPE}]'
+              key: 'kube.kublet.runtime_ops_duration_seconds_p99["{#OP_TYPE}"]'
               history: 7d
               discover: NO_DISCOVER
               value_type: FLOAT
               units: s
-              params: 'bucket_percentile(//kube.kublet.runtime_ops_duration_seconds_bucket["{#OP_TYPE}",*],5m,99)'
+              params: 'bucket_percentile(//kube.kublet.runtime_ops_duration_seconds_bucket[*,"{#OP_TYPE}"],5m,99)'
               description: '99 percentile of operation latency distribution in seconds for each verb.'
               tags:
                 -
@@ -834,38 +837,38 @@ zabbix_export:
                   color: 1A7C11
                   item:
                     host: 'Kubernetes kubelet by HTTP'
-                    key: 'kube.kublet.runtime_ops_duration_seconds_p90[{#OP_TYPE}]'
+                    key: 'kube.kublet.runtime_ops_duration_seconds_p90["{#OP_TYPE}"]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
                     host: 'Kubernetes kubelet by HTTP'
-                    key: 'kube.kublet.runtime_ops_duration_seconds_p95[{#OP_TYPE}]'
+                    key: 'kube.kublet.runtime_ops_duration_seconds_p95["{#OP_TYPE}"]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
                     host: 'Kubernetes kubelet by HTTP'
-                    key: 'kube.kublet.runtime_ops_duration_seconds_p99[{#OP_TYPE}]'
+                    key: 'kube.kublet.runtime_ops_duration_seconds_p99["{#OP_TYPE}"]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
                     host: 'Kubernetes kubelet by HTTP'
-                    key: 'kube.kublet.runtime_ops_duration_seconds_p50[{#OP_TYPE}]'
+                    key: 'kube.kublet.runtime_ops_duration_seconds_p50["{#OP_TYPE}"]'
           master_item:
             key: kube.kubelet.metrics
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
               parameters:
-                - '{__name__=~ "kubelet_runtime_operations_*"}'
+                - '{__name__=~ "kubelet_runtime_operations_*", operation_type =~ ".*"}'
             -
               type: JAVASCRIPT
               parameters:
                 - |
                   var lookup = {},
-                      lookup_histo = {},
+                      lookup_histogram = {},
                       result = [];
                   
                   JSON.parse(value).forEach(function (item) {
@@ -885,10 +888,10 @@ zabbix_export:
                       if  (item.name == "kubelet_runtime_operations_duration_seconds_bucket"){
                        var labels = item.labels.operation_type + item.labels.le;
                   
-                          if (lookup_histo[labels]) {
+                          if (lookup_histogram[labels]) {
                               return;
                           }
-                          lookup_histo[labels] = 1;
+                          lookup_histogram[labels] = 1;
                           result.push({
                               '{#TYPE}': 'buckets',
                               '{#OP_TYPE}': item.labels.operation_type,

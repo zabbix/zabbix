@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-31T05:34:53Z'
+  date: '2022-01-11T17:40:37Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -28,7 +28,7 @@ zabbix_export:
           name: 'Kubernetes: Get nodes'
           type: SCRIPT
           key: kube.nodes
-          delay: 1m;s00
+          delay: 0;s00
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -37,7 +37,7 @@ zabbix_export:
                   params: {},
                   pods_limit: 1000,
                   endpoint_name: 'zabbix-agent',
-              
+            
                   setParams: function (params) {
                       ['api_endpoint', 'token'].forEach(function (field) {
                           if (typeof params !== 'object' || typeof params[field] === 'undefined'
@@ -45,36 +45,31 @@ zabbix_export:
                               throw 'Required param is not set: "' + field + '".';
                           }
                       });
-              
+            
                       Kube.params = params;
-                      if (typeof Kube.params.api_endpoint === 'string') {
-                          if (!Kube.params.api_endpoint.endsWith('/')) {
-                              Kube.params.api_endpoint += '/';
-                          }
+                      if (typeof Kube.params.api_endpoint === 'string' && !Kube.params.api_endpoint.endsWith('/')) {
+                          Kube.params.api_endpoint += '/';
                       }
                   },
-              
+            
                   request: function (query) {
                       var response,
-                          request = new CurlHttpRequest(),
+                          request = new HttpRequest(),
                           url = Kube.params.api_endpoint + query;
-              
-                      request.AddHeader('Content-Type: application/json');
-                      request.AddHeader('Authorization: Bearer ' + Kube.params.token);
-              
+            
+                      request.addHeader('Content-Type: application/json');
+                      request.addHeader('Authorization: Bearer ' + Kube.params.token);
+            
                       Zabbix.log(4, '[ Kubernetes ] Sending request: ' + url);
-              
-                      response = request.Get(url);
-              
+            
+                      response = request.get(url);
+            
                       Zabbix.Log(4, '[ Kubernetes ] Received response with status code ' + request.Status() + ': ' + response);
-              
+            
                       if (request.Status() < 200 || request.Status() >= 300) {
-                          var message = 'Request failed with status code ' + request.Status();
-              
-                          message += ': ' + response;
-                          throw message;
+                          throw 'Request failed with status code ' + request.Status() + ': ' + response;
                       }
-              
+            
                       if (response !== null) {
                           try {
                               response = JSON.parse(response);
@@ -83,74 +78,72 @@ zabbix_export:
                               throw 'Failed to parse response received from Kubernetes API. Check debug log for more information.';
                           }
                       }
-              
+            
                       return {
                           status: request.Status(),
                           response: response
                       };
                   },
-              
+            
                   getNodes: function () {
                       var result = Kube.request('v1/nodes');
-              
+            
                       if (typeof result.response !== 'object'
                           || typeof result.response.items === 'undefined'
                           || result.status != 200) {
                           throw 'Cannot get nodes from Kubernetes API. Check debug log for more information.';
                       };
-              
+            
                       return result.response;
                   },
-              
+            
                   getPods: function () {
                       var result = [],
                           continue_token;
-              
+            
                       while (continue_token !== '') {
                           var data = Kube.request('v1/pods?limit=' + Kube.pods_limit
                               + ((typeof continue_token !== 'undefined') ? '&continue=' + continue_token : ''));
-              
+            
                           if (typeof data.response !== 'object'
                               || typeof data.response.items === 'undefined'
                               || data.status != 200) {
                               throw 'Cannot get pods from Kubernetes API. Check debug log for more information.';
                           };
-              
+            
                           result.push.apply(result, data.response.items);
                           continue_token = data.response.metadata.continue || '';
                       }
-              
+            
                       return result;
                   },
-              
+            
                   getEndpointIPs: function () {
                       var result = Kube.request('v1/endpoints'),
                           epIPs = {};
-              
+            
                       if (typeof result.response !== 'object'
                           || typeof result.response.items === 'undefined'
                           || result.status != 200) {
                           throw 'Cannot get endpoints from Kubernetes API. Check debug log for more information.';
                       };
-              
+            
                       result.response.items.forEach(function (ep) {
-                          if (ep.metadata.name === Kube.endpoint_name) {
-                              if (typeof ep.subsets !== 'undefined') {
-                                  ep.subsets.forEach(function (subset) {
-                                      if (typeof subset.addresses !== 'undefined') {
-                                          subset.addresses.forEach(function (addr) {
-                                              epIPs[addr.ip] = '';
-                                          });
-                                      }
-                                  });
-                              }
+                          if (ep.metadata.name === Kube.endpoint_name && Array.isArray(ep.subsets)) {
+                              ep.subsets.forEach(function (subset) {
+                                  if (Array.isArray(subset.addresses)) {
+                                      subset.addresses.forEach(function (addr) {
+                                          epIPs[addr.ip] = '';
+                                      });
+                                  }
+                              });
                           }
                       });
-              
+            
                       return epIPs;
                   }
               },
-              
+            
                   Fmt = {
                       factors: {
                           Ki: 1024, K: 1000,
@@ -158,94 +151,96 @@ zabbix_export:
                           Gi: 1024 ** 3, G: 1000 ** 3,
                           Ti: 1024 ** 4, T: 1000 ** 4,
                       },
-              
+            
                       cpuFormat: function (cpu) {
                           if (typeof cpu === 'undefined') {
                               return 0;
                           }
-              
+            
                           if (cpu.indexOf('m') > -1) {
                               return parseInt(cpu) / 1000;
                           }
-              
+            
                           return parseInt(cpu);
                       },
-              
+            
                       memoryFormat: function (mem) {
                           if (typeof mem === 'undefined') {
                               return 0;
                           }
-              
+            
                           var pair,
                               factor;
-              
+            
                           if (pair = mem.match(/(\d+)(\w*)/)) {
                               if (factor = Fmt.factors[pair[2]]) {
                                   return parseInt(pair[1]) * factor;
                               }
-              
-                              return 0;
+            
+                              return mem;
                           }
-              
+            
                           return parseInt(mem);
                       }
-              
+            
                   }
-              
+            
               try {
                   Kube.setParams(JSON.parse(value));
-              
+            
                   var nodes = Kube.getNodes(),
                       pods = Kube.getPods(),
                       epIPs = Kube.getEndpointIPs();
-              
+            
                   for (idx in nodes.items) {
                       var internalIP,
                           nodePodsCount = 0,
                           nodePods = [],
                           roles = [];
-              
+            
                       Object.keys(nodes.items[idx].metadata.labels).forEach(function (label) {
-                          var splitLabel;
-              
-                          if (splitLabel = label.match(/^node-role.kubernetes.io\/([\w\.-]+)/)) {
+                          var splitLabel = label.match(/^node-role.kubernetes.io\/([\w\.-]+)/);
+            
+                          if (splitLabel) {
                               roles.push(splitLabel[1]);
                           }
                       });
-              
-                      internalIP = nodes.items[idx].status.addresses.filter(function (addr) {
+            
+                      var internalIPs = nodes.items[idx].status.addresses.filter(function (addr) {
                           return addr.type === 'InternalIP';
-                      })[0].address;
-              
+                      });
+            
+                      var internalIP = internalIPs.length && internalIPs[0].address;
+            
                       pods.forEach(function (pod) {
                           var containers = {
                               limits: { cpu: 0, memory: 0 },
                               requests: { cpu: 0, memory: 0 },
                               restartCount: 0
                           }
-              
+            
                           if (pod.status.hostIP === internalIP) {
                               pod.spec.containers.forEach(function (container) {
                                   var limits = container.resources.limits,
                                       requests = container.resources.requests;
-              
+            
                                   nodePodsCount++;
-              
+            
                                   if (typeof limits !== 'undefined') {
                                       containers.limits.cpu += Fmt.cpuFormat(limits.cpu);
                                       containers.limits.memory += Fmt.memoryFormat(limits.memory);
                                   }
-              
+            
                                   if (typeof requests !== 'undefined') {
                                       containers.requests.cpu += Fmt.cpuFormat(requests.cpu);
                                       containers.requests.memory += Fmt.memoryFormat(requests.memory);
                                   }
                               });
-              
+            
                               pod.status.containerStatuses.forEach(function (container) {
                                   containers.restartCount += container.restartCount;
                               });
-              
+            
                               nodePods.push({
                                   name: pod.metadata.name,
                                   namespace: pod.metadata.namespace,
@@ -260,19 +255,19 @@ zabbix_export:
                       })
                       delete nodes.items[idx].metadata.managedFields;
                       delete nodes.items[idx].status.images;
-              
+            
                       nodes.items[idx].status.capacity.cpu = Fmt.cpuFormat(nodes.items[idx].status.capacity.cpu);
                       nodes.items[idx].status.capacity.memory = Fmt.memoryFormat(nodes.items[idx].status.capacity.memory);
                       nodes.items[idx].status.allocatable.cpu = Fmt.cpuFormat(nodes.items[idx].status.allocatable.cpu);
                       nodes.items[idx].status.allocatable.memory = Fmt.memoryFormat(nodes.items[idx].status.allocatable.memory);
-              
+            
                       nodes.items[idx].status.podsCount = nodePodsCount;
                       nodes.items[idx].status.roles = roles.join(', ');
                       nodes.items[idx].pods = nodePods;
                   }
-              
+            
                   nodes.endpointIPs = epIPs;
-              
+            
                   return JSON.stringify(nodes);
               }
               catch (error) {
@@ -305,7 +300,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'Generation data for node discovery rules.'
+          description: 'Data collection check.'
           preprocessing:
             -
               type: JSONPATH
@@ -343,96 +338,85 @@ zabbix_export:
               type: JAVASCRIPT
               parameters:
                 - |
-                  if (!String.prototype.format) {
-                        String.prototype.format = function () {
-                            var args = arguments;
-                    
-                            return this.replace(/{(\d+)}/g, function (match, number) {
-                                return number in args
-                                    ? args[number]
-                                    : match
-                                    ;
-                            });
-                        };
-                    }
-                    
-                    function parseFilters(filter) {
-                        var pairs = {};
-                    
-                        filter.split(/\s*,\s*/).forEach(function (kv) {
-                            if (/([\w\.-]+\/[\w\.-]+):\s*.+/.test(kv)) {
-                                var pair = kv.split(/\s*:\s*/);
-                                pairs[pair[0]] = pair[1];
-                            }
-                        });
-                    
-                        return pairs;
-                    }
-                    
-                    function filter(name, data, filters) {
-                        var filtered = true;
-                    
-                        if (typeof data !== 'undefined') {
-                            Object.keys(filters).some(function (filter) {
-                                var exclude = filter.match(/^!(.+)/);
-                                if (filter in data || (exclude && exclude[1] in data)) {
-                                    if ((exclude && new RegExp(filters[filter]).test(data[exclude[1]]))
-                                        || (!exclude && !(new RegExp(filters[filter]).test(data[filter])))) {
-                                        Zabbix.Log(4, '[ Kubernetes discovery ] Discarded "{0}" by filter "{1}: {2}"'.format(name, filter, filters[filter]));
-                    
-                                        filtered = false;
-                                        return true;
-                                    }
-                                };
-                            });
-                        }
-                    
-                        return filtered;
-                    }
-                    
-                    try {
-                        var input = JSON.parse(value),
-                            output = [];
-                    
-                        if (typeof input !== 'object' || typeof input.items === 'undefined') {
-                            Zabbix.Log(4, '[ Kubernetes ] Recieved incorrect JSON: {0}'.format(input));
-                            throw 'Incorrect JSON. Check debug log for more information.';
-                        }
-                    
-                        var filterLabels = parseFilters('{$KUBE.NODE.FILTER.LABELS}'),
-                            filterAnnotations = parseFilters('{$KUBE.NODE.FILTER.ANNOTATIONS}');
-                    
-                        input.items.forEach(function (node) {
-                            if (filter(node.metadata.name, node.metadata.labels, filterLabels)
-                                && filter(node.metadata.name, node.metadata.annotations, filterAnnotations)) {
-                                Zabbix.Log(4, '[ Kubernetes discovery ] Filtered node "{0}"'.format(node.metadata.name));
-                    
-                                var internalIP = node.status.addresses.filter(function (addr) {
-                                    return addr.type === 'InternalIP';
-                                })[0].address;
-                    
-                                if (internalIP in input.endpointIPs) {
-                                    output.push({
-                                        '{#NAME}': node.metadata.name,
-                                        '{#IP}': internalIP,
-                                        '{#ROLES}': node.status.roles,
-                                        '{#ARCH}': node.metadata.labels['kubernetes.io/arch'] || '',
-                                        '{#OS}': node.metadata.labels['kubernetes.io/os'] || '',
-                                    });
-                                }
-                                else {
-                                    Zabbix.Log(4, '[ Kubernetes discovery ] Node "{0}" is not included in the list of endpoint IPs'.format(node.metadata.name));
-                                }
-                            }
-                        });
-                    
-                        return JSON.stringify(output);
-                    }
-                    catch (error) {
-                        error += (String(error).endsWith('.')) ? '' : '.';
-                        Zabbix.Log(3, '[ Kubernetes discovery ] ERROR: ' + error);
-                        throw 'Discovery error: ' + error;
-                    }
+                  function parseFilters(filter) {
+                      var pairs = {};
+                  
+                      filter.split(/\s*,\s*/).forEach(function (kv) {
+                          if (/([\w\.-]+\/[\w\.-]+):\s*.+/.test(kv)) {
+                              var pair = kv.split(/\s*:\s*/);
+                              pairs[pair[0]] = pair[1];
+                          }
+                      });
+                  
+                      return pairs;
+                  }
+                  
+                  function filter(name, data, filters) {
+                      var filtered = true;
+                  
+                      if (typeof data === 'object') {
+                          Object.keys(filters).some(function (filter) {
+                              var exclude = filter.match(/^!(.+)/);
+                              if (filter in data || (exclude && exclude[1] in data)) {
+                                  if ((exclude && new RegExp(filters[filter]).test(data[exclude[1]]))
+                                      || (!exclude && !(new RegExp(filters[filter]).test(data[filter])))) {
+                                      Zabbix.Log(4, '[ Kubernetes discovery ] Discarded "' + name + '" by filter "' + filter + ': ' + filters[filter] + '"');
+                  
+                                      filtered = false;
+                                      return true;
+                                  }
+                              };
+                          });
+                      }
+                  
+                      return filtered;
+                  }
+                  
+                  try {
+                      var input = JSON.parse(value),
+                          output = [];
+                  
+                      if (typeof input !== 'object' || typeof input.items === 'undefined') {
+                          Zabbix.Log(4, '[ Kubernetes ] Recieved incorrect JSON: ' + input;
+                          throw 'Incorrect JSON. Check debug log for more information.';
+                      }
+                  
+                      var filterLabels = parseFilters('{$KUBE.NODE.FILTER.LABELS}'),
+                          filterAnnotations = parseFilters('{$KUBE.NODE.FILTER.ANNOTATIONS}');
+                  
+                      input.items.forEach(function (node) {
+                          if (filter(node.metadata.name, node.metadata.labels, filterLabels)
+                              && filter(node.metadata.name, node.metadata.annotations, filterAnnotations)) {
+                              Zabbix.Log(4, '[ Kubernetes discovery ] Filtered node "' + node.metadata.name + '"');
+                  
+                              var internalIPs = node.status.addresses.filter(function (addr) {
+                                  return addr.type === 'InternalIP';
+                              });
+                  
+                              var internalIP = internalIPs.length && internalIPs[0].address;
+                  
+                              if (internalIP in input.endpointIPs) {
+                                  output.push({
+                                      '{#NAME}': node.metadata.name,
+                                      '{#IP}': internalIP,
+                                      '{#ROLES}': node.status.roles,
+                                      '{#ARCH}': node.metadata.labels['kubernetes.io/arch'] || '',
+                                      '{#OS}': node.metadata.labels['kubernetes.io/os'] || ''
+                                  });
+                              }
+                              else {
+                                  Zabbix.Log(4, '[ Kubernetes discovery ] Node "' + node.metadata.name + '" is not included in the list of endpoint IPs');
+                              }
+                          }
+                      });
+                  
+                      return JSON.stringify(output);
+                  }
+                  catch (error) {
+                      error += (String(error).endsWith('.')) ? '' : '.';
+                      Zabbix.Log(3, '[ Kubernetes discovery ] ERROR: ' + error);
+                      throw 'Discovery error: ' + error;
+                  }
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -721,19 +705,7 @@ zabbix_export:
                 -
                   type: JAVASCRIPT
                   parameters:
-                    - |
-                      var result,
-                          statuses = [
-                              'True',
-                              'False',
-                              'Unknown'
-                          ];
-                      
-                      if (result = statuses.indexOf(value) + 1) {
-                          return result;
-                      }
-                      
-                      return 'Problem with status processing in JS';
+                    - 'return [''True'', ''False'', ''Unknown''].indexOf(value) + 1 || ''Problem with status processing in JS'';'
               master_item:
                 key: kube.nodes
               tags:
@@ -772,19 +744,7 @@ zabbix_export:
                 -
                   type: JAVASCRIPT
                   parameters:
-                    - |
-                      var result,
-                          statuses = [
-                              'True',
-                              'False',
-                              'Unknown'
-                          ];
-                      
-                      if (result = statuses.indexOf(value) + 1) {
-                          return result;
-                      }
-                      
-                      return 'Problem with status processing in JS';
+                    - 'return [''True'', ''False'', ''Unknown''].indexOf(value) + 1 || ''Problem with status processing in JS'';'
               master_item:
                 key: kube.nodes
               tags:
@@ -823,19 +783,7 @@ zabbix_export:
                 -
                   type: JAVASCRIPT
                   parameters:
-                    - |
-                      var result,
-                          statuses = [
-                              'True',
-                              'False',
-                              'Unknown'
-                          ];
-                      
-                      if (result = statuses.indexOf(value) + 1) {
-                          return result;
-                      }
-                      
-                      return 'Problem with status processing in JS';
+                    - 'return [''True'', ''False'', ''Unknown''].indexOf(value) + 1 || ''Problem with status processing in JS'';'
               master_item:
                 key: kube.nodes
               tags:
@@ -874,19 +822,7 @@ zabbix_export:
                 -
                   type: JAVASCRIPT
                   parameters:
-                    - |
-                      var result,
-                          statuses = [
-                              'True',
-                              'False',
-                              'Unknown'
-                          ];
-                      
-                      if (result = statuses.indexOf(value) + 1) {
-                          return result;
-                      }
-                      
-                      return 'Problem with status processing in JS';
+                    - 'return [''True'', ''False'', ''Unknown''].indexOf(value) + 1 || ''Problem with status processing in JS'';'
               master_item:
                 key: kube.nodes
               tags:
@@ -925,19 +861,7 @@ zabbix_export:
                 -
                   type: JAVASCRIPT
                   parameters:
-                    - |
-                      var result,
-                          statuses = [
-                              'True',
-                              'False',
-                              'Unknown'
-                          ];
-                      
-                      if (result = statuses.indexOf(value) + 1) {
-                          return result;
-                      }
-                      
-                      return 'Problem with status processing in JS';
+                    - 'return [''True'', ''False'', ''Unknown''].indexOf(value) + 1 || ''Problem with status processing in JS'';'
               master_item:
                 key: kube.nodes
               tags:
@@ -1490,7 +1414,7 @@ zabbix_export:
             key: kube.nodes.lld
         -
           uuid: 0cf35d7efd2045c2b22d3dd660ebe210
-          name: 'Node host discovery'
+          name: 'Cluster node discovery'
           type: DEPENDENT
           key: kube.node_host.discovery
           delay: '0'
@@ -1608,19 +1532,7 @@ zabbix_export:
                 -
                   type: JAVASCRIPT
                   parameters:
-                    - |
-                      var result,
-                          statuses = [
-                              'True',
-                              'False',
-                              'Unknown'
-                          ];
-                      
-                      if (result = statuses.indexOf(value) + 1) {
-                          return result;
-                      }
-                      
-                      return 'Problem with status processing in JS';
+                    - 'return [''True'', ''False'', ''Unknown''].indexOf(value) + 1 || ''Problem with status processing in JS'';'
               master_item:
                 key: kube.nodes
               tags:
@@ -1658,19 +1570,7 @@ zabbix_export:
                 -
                   type: JAVASCRIPT
                   parameters:
-                    - |
-                      var result,
-                          statuses = [
-                              'True',
-                              'False',
-                              'Unknown'
-                          ];
-                      
-                      if (result = statuses.indexOf(value) + 1) {
-                          return result;
-                      }
-                      
-                      return 'Problem with status processing in JS';
+                    - 'return [''True'', ''False'', ''Unknown''].indexOf(value) + 1 || ''Problem with status processing in JS'';'
               master_item:
                 key: kube.nodes
               tags:
@@ -1708,19 +1608,7 @@ zabbix_export:
                 -
                   type: JAVASCRIPT
                   parameters:
-                    - |
-                      var result,
-                          statuses = [
-                              'True',
-                              'False',
-                              'Unknown'
-                          ];
-                      
-                      if (result = statuses.indexOf(value) + 1) {
-                          return result;
-                      }
-                      
-                      return 'Problem with status processing in JS';
+                    - 'return [''True'', ''False'', ''Unknown''].indexOf(value) + 1 || ''Problem with status processing in JS'';'
               master_item:
                 key: kube.nodes
               tags:
@@ -1758,19 +1646,7 @@ zabbix_export:
                 -
                   type: JAVASCRIPT
                   parameters:
-                    - |
-                      var result,
-                          statuses = [
-                              'True',
-                              'False',
-                              'Unknown'
-                          ];
-                      
-                      if (result = statuses.indexOf(value) + 1) {
-                          return result;
-                      }
-                      
-                      return 'Problem with status processing in JS';
+                    - 'return [''True'', ''False'', ''Unknown''].indexOf(value) + 1 || ''Problem with status processing in JS'';'
               master_item:
                 key: kube.nodes
               tags:
@@ -1844,21 +1720,7 @@ zabbix_export:
                 -
                   type: JAVASCRIPT
                   parameters:
-                    - |
-                      var result,
-                          statuses = [
-                              'Pending',
-                              'Running',
-                              'Succeeded',
-                              'Failed',
-                              'Unknown'
-                          ];
-                      
-                      if (result = statuses.indexOf(value) + 1) {
-                          return result;
-                      }
-                      
-                      return 'Problem with status processing in JS';
+                    - 'return [''Pending'', ''Running'', ''Succeeded'', ''Failed'', ''Unknown''].indexOf(value) + 1 || ''Problem with status processing in JS'';'
               master_item:
                 key: kube.nodes
               tags:
@@ -1922,19 +1784,6 @@ zabbix_export:
               type: JAVASCRIPT
               parameters:
                 - |
-                  if (!String.prototype.format) {
-                      String.prototype.format = function () {
-                          var args = arguments;
-                  
-                          return this.replace(/{(\d+)}/g, function (match, number) {
-                              return number in args
-                                  ? args[number]
-                                  : match
-                                  ;
-                          });
-                      };
-                  }
-                  
                   function parseFilters(filter) {
                       var pairs = {};
                   
@@ -1957,7 +1806,7 @@ zabbix_export:
                               if (filter in data || (exclude && exclude[1] in data)) {
                                   if ((exclude && new RegExp(filters[filter]).test(data[exclude[1]]))
                                       || (!exclude && !(new RegExp(filters[filter]).test(data[filter])))) {
-                                      Zabbix.Log(4, '[ Kubernetes discovery ] Discarded "{0}" by filter "{1}: {2}"'.format(name, filter, filters[filter]));
+                                      Zabbix.Log(4, '[ Kubernetes discovery ] Discarded "' + name + '" by filter "' + filter + ': ' + filters[filter] + '"');
                   
                                       filtered = false;
                                       return true;
@@ -1974,7 +1823,7 @@ zabbix_export:
                           output = [];
                   
                       if (typeof input !== 'object' || typeof input.items === 'undefined') {
-                          Zabbix.Log(4, '[ Kubernetes ] Recieved incorrect JSON: {0}'.format(input));
+                          Zabbix.Log(4, '[ Kubernetes ] Recieved incorrect JSON: ' + {0});
                           throw 'Incorrect JSON. Check debug log for more information.';
                       }
                   
@@ -1989,12 +1838,12 @@ zabbix_export:
                               node.pods.forEach(function (pod) {
                                   if (filter(pod.name, pod.labels, filterPodLabels)
                                       && filter(pod.name, pod.annotations, filterPodAnnotations)) {
-                                      Zabbix.Log(4, '[ Kubernetes discovery ] Filtered pod "{0}"'.format(pod.name));
+                                      Zabbix.Log(4, '[ Kubernetes discovery ] Filtered pod "' + pod.name + '"');
                   
                                       output.push({
                                           '{#POD}': pod.name,
                                           '{#NAMESPACE}': pod.namespace,
-                                          '{#NODE}': node.metadata.name,
+                                          '{#NODE}': node.metadata.name
                                       });
                                   }
                               });
@@ -2039,11 +1888,11 @@ zabbix_export:
         -
           macro: '{$KUBE.LLD.FILTER.NODE_HOST.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable node hosts'
+          description: 'Filter of discoverable cluster nodes'
         -
           macro: '{$KUBE.LLD.FILTER.NODE_HOST.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered node hosts'
+          description: 'Filter to exclude discovered cluster nodes'
         -
           macro: '{$KUBE.LLD.FILTER.NODE_HOST.ROLE.MATCHES}'
           value: '.*'
@@ -2051,7 +1900,7 @@ zabbix_export:
         -
           macro: '{$KUBE.LLD.FILTER.NODE_HOST.ROLE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered node hosts by role'
+          description: 'Filter to exclude discovered cluster nodes by role'
         -
           macro: '{$KUBE.LLD.FILTER.POD.NAMESPACE.MATCHES}'
           value: '.*'

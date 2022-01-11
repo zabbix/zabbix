@@ -36,6 +36,11 @@ Set up macros to filter metrics by namespace:
 - {$KUBE.LLD.FILTER.NAMESPACE.MATCHES}
 - {$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}
 
+Set up macros to filter node metrics by nodename:
+
+- {$KUBE.LLD.FILTER.NODE.MATCHES}
+- {$KUBE.LLD.FILTER.NODE.NOT_MATCHES}
+
 **Note**, If you have a large cluster, it is highly recommended to set a filter for discoverable namespaces.
 
 
@@ -59,6 +64,10 @@ No specific Zabbix configuration is required.
 |{$KUBE.KUBELET.SCHEME} | |`https` |
 |{$KUBE.LLD.FILTER.NAMESPACE.MATCHES} |<p>Filter of discoverable pods by namespace</p> |`.*` |
 |{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES} |<p>Filter to exclude discovered pods by namespace</p> |`CHANGE_IF_NEEDED` |
+|{$KUBE.LLD.FILTER.NODE.MATCHES} |<p>Filter of discoverable nodes by nodename</p> |`.*` |
+|{$KUBE.LLD.FILTER.NODE.NOT_MATCHES} |<p>Filter to exclude discovered nodes by nodename</p> |`CHANGE_IF_NEEDED` |
+|{$KUBE.LLD.FILTER.WORKER_NODE.MATCHES} |<p>Filter of discoverable worker nodes by nodename</p> |`.*` |
+|{$KUBE.LLD.FILTER.WORKER_NODE.NOT_MATCHES} |<p>Filter to exclude discovered worker nodes by nodename</p> |`CHANGE_IF_NEEDED` |
 |{$KUBE.SCHEDULER.PORT} | |`10251` |
 |{$KUBE.SCHEDULER.SCHEME} | |`http` |
 |{$KUBE.STATE.ENDPOINT.NAME} |<p>Kubenetes state endpoint name</p> |`zabbix-kube-state-metrics` |
@@ -79,7 +88,7 @@ There are no template links in this template.
 |PVC discovery |<p>-</p> |DEPENDENT |kube.pvc.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NAMESPACE} MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}`</p><p>- {#NAMESPACE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}`</p> |
 |Deployment discovery |<p>-</p> |DEPENDENT |kube.deployment.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NAMESPACE} MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}`</p><p>- {#NAMESPACE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}`</p> |
 |Endpoint discovery |<p>-</p> |DEPENDENT |kube.endpoint.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NAMESPACE} MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}`</p><p>- {#NAMESPACE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}`</p> |
-|Node discovery |<p>-</p> |DEPENDENT |kube.node.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NAMESPACE} MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}`</p><p>- {#NAMESPACE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}`</p> |
+|Node discovery |<p>-</p> |DEPENDENT |kube.node.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE.NOT_MATCHES}`</p> |
 |Pod discovery |<p>-</p> |DEPENDENT |kube.pod.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NAMESPACE} MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}`</p><p>- {#NAMESPACE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}`</p> |
 |Replicaset discovery |<p>-</p> |DEPENDENT |kube.replicaset.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NAMESPACE} MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}`</p><p>- {#NAMESPACE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}`</p> |
 |Statefulset discovery |<p>-</p> |DEPENDENT |kube.statefulset.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NAMESPACE} MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}`</p><p>- {#NAMESPACE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}`</p> |
@@ -94,9 +103,9 @@ There are no template links in this template.
 |Kubernetes |Kubernetes: Get state metrics |<p>Collecting Kubernetes metrics from kube-state-metrics.</p> |SCRIPT |kube.state.metrics<p>**Expression**:</p>`The text is too long. Please see the template.` |
 |Kubernetes |Kubernetes: Control plane LLD |<p>Generation of data for Control plane discovery rules.</p> |SCRIPT |kube.control_plane.lld<p>**Expression**:</p>`The text is too long. Please see the template.` |
 |Kubernetes |Kubernetes: Worker node LLD |<p>Generation of data for Control plane discovery rules.</p> |SCRIPT |kube.worker_node.lld<p>**Expression**:</p>`The text is too long. Please see the template.` |
-|Kubernetes |Kubernetes: Get component statuses |<p>Description</p> |HTTP_AGENT |kube.componentstatuses |
-|Kubernetes |Kubernetes: Get readyz |<p>Description</p> |HTTP_AGENT |kube.readyz<p>**Preprocessing**:</p><p>- JAVASCRIPT |
-|Kubernetes |Kubernetes: Get livez |<p>Description</p> |HTTP_AGENT |kube.livez<p>**Preprocessing**:</p><p>- JAVASCRIPT |
+|Kubernetes |Kubernetes: Get component statuses |<p>-</p> |HTTP_AGENT |kube.componentstatuses |
+|Kubernetes |Kubernetes: Get readyz |<p>-</p> |HTTP_AGENT |kube.readyz<p>**Preprocessing**:</p><p>- JAVASCRIPT |
+|Kubernetes |Kubernetes: Get livez |<p>-</p> |HTTP_AGENT |kube.livez<p>**Preprocessing**:</p><p>- JAVASCRIPT |
 |Kubernetes |Kubernetes: Namespace count |<p>The number of namespaces</p> |DEPENDENT |kube.namespace.count<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN |
 |Kubernetes |Kubernetes: Deployment count |<p>The number of deployments</p> |DEPENDENT |kube.deployment.count<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN |
 |Kubernetes |Kubernetes: Deployment count |<p>The number of deployments</p> |DEPENDENT |kube.deployment.count<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN |
@@ -174,9 +183,9 @@ There are no template links in this template.
 |Kubernetes: Namespace [{#NAMESPACE}] RS [{#NAME}]: ReplicasSet mismatch |<p>-</p> |`(last(/Kubernetes cluster state by HTTP/kube.replicaset.replicas[{#NAMESPACE}/{#NAME}])-last(/Kubernetes cluster state by HTTP/kube.replicaset.ready[{#NAMESPACE}/{#NAME}]))<>0` |WARNING | |
 |Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: StatfulSet is down |<p>-</p> |`(last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_ready[{#NAMESPACE}/{#NAME}]) / last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_current[{#NAMESPACE}/{#NAME}]))<>1` |HIGH | |
 |Kubernetes: Namespace [{#NAMESPACE}] RS [{#NAME}]: Statefulset replicas mismatch |<p>-</p> |`(last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas[{#NAMESPACE}/{#NAME}])-last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_ready[{#NAMESPACE}/{#NAME}]))<>0` |WARNING | |
-|Kubernetes: Component [{#NAME}] is unhealthy |<p>-</p> |`count(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}],3m,,"True")>2` |WARNING | |
-|Kubernetes: Readyz [{#NAME}] is unhealthy |<p>-</p> |`count(/Kubernetes cluster state by HTTP/kube.readyz.helthcheck[{#NAME}],3m,,"ok")>2` |WARNING | |
-|Kubernetes: Livez [{#NAME}] is unhealthy |<p>-</p> |`count(/Kubernetes cluster state by HTTP/kube.livez.helthcheck[{#NAME}],3m,,"ok")>2` |WARNING | |
+|Kubernetes: Component [{#NAME}] is unhealthy |<p>-</p> |`count(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}],3m,,"True")<2` |WARNING | |
+|Kubernetes: Readyz [{#NAME}] is unhealthy |<p>-</p> |`count(/Kubernetes cluster state by HTTP/kube.readyz.helthcheck[{#NAME}],3m,,"ok")<2` |WARNING | |
+|Kubernetes: Livez [{#NAME}] is unhealthy |<p>-</p> |`count(/Kubernetes cluster state by HTTP/kube.livez.helthcheck[{#NAME}],3m,,"ok")<2` |WARNING | |
 
 ## Feedback
 
