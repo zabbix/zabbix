@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:09Z'
+  version: '6.0'
+  date: '2021-12-17T06:33:04Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -23,7 +23,7 @@ zabbix_export:
           Version: 1910-48 Switch Software Version 5.20.99, Release 1116 Copyright(c)2010-2016 Hewlett Packard Enterprise Development LP
           Device: HP 1910-48
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       templates:
         -
           name: 'EtherLike-MIB SNMP'

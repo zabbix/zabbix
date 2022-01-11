@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:38Z'
+  version: '6.0'
+  date: '2021-12-17T06:14:04Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -34,7 +34,7 @@ zabbix_export:
           Version: IMM1
           Device: IMM1 servers (M2,M3 generations)
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       templates:
         -
           name: 'Generic SNMP'

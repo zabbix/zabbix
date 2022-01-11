@@ -49,9 +49,9 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Edges metrics discovery |<p>Metrics for edges statistics.</p> |DEPENDENT |velocloud.edges.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.edges`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Filter**:</p>AND <p>- A: {#NAME} NOT_MATCHES_REGEX `{$VELOCLOUD.LLD.EDGES.FILTER.NOT_MATCHES}`</p><p>- B: {#NAME} MATCHES_REGEX `{$VELOCLOUD.LLD.EDGES.FILTER.MATCHES}`</p> |
-|Gateways metrics discovery |<p>Metrics for gateways statistics.</p> |DEPENDENT |velocloud.gateways.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.gateways`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Filter**:</p>AND <p>- A: {#NAME} NOT_MATCHES_REGEX `{$VELOCLOUD.LLD.GATEWAYS.FILTER.NOT_MATCHES}`</p><p>- B: {#NAME} MATCHES_REGEX `{$VELOCLOUD.LLD.GATEWAYS.FILTER.MATCHES}`</p> |
-|Links metrics discovery |<p>Metrics for links statistics.</p> |DEPENDENT |velocloud.links.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.links`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Filter**:</p>AND <p>- A: {#ID} NOT_MATCHES_REGEX `{$VELOCLOUD.LLD.LINKS.FILTER.NOT_MATCHES}`</p><p>- B: {#ID} MATCHES_REGEX `{$VELOCLOUD.LLD.LINKS.FILTER.MATCHES}`</p> |
+|Edges metrics discovery |<p>Metrics for edges statistics.</p> |DEPENDENT |velocloud.edges.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.edges`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Filter**:</p>AND <p>- {#NAME} NOT_MATCHES_REGEX `{$VELOCLOUD.LLD.EDGES.FILTER.NOT_MATCHES}`</p><p>- {#NAME} MATCHES_REGEX `{$VELOCLOUD.LLD.EDGES.FILTER.MATCHES}`</p> |
+|Gateways metrics discovery |<p>Metrics for gateways statistics.</p> |DEPENDENT |velocloud.gateways.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.gateways`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Filter**:</p>AND <p>- {#NAME} NOT_MATCHES_REGEX `{$VELOCLOUD.LLD.GATEWAYS.FILTER.NOT_MATCHES}`</p><p>- {#NAME} MATCHES_REGEX `{$VELOCLOUD.LLD.GATEWAYS.FILTER.MATCHES}`</p> |
+|Links metrics discovery |<p>Metrics for links statistics.</p> |DEPENDENT |velocloud.links.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.links`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Filter**:</p>AND <p>- {#ID} NOT_MATCHES_REGEX `{$VELOCLOUD.LLD.LINKS.FILTER.NOT_MATCHES}`</p><p>- {#ID} MATCHES_REGEX `{$VELOCLOUD.LLD.LINKS.FILTER.MATCHES}`</p> |
 |SDWAN peers metrics discovery |<p>Metrics for SDWAN peers.</p> |DEPENDENT |velocloud.sdwanpeers.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.edgeSDWan`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |SDWAN peers path metrics discovery |<p>Metrics for SDWAN peers path.</p> |DEPENDENT |velocloud.sdwanpath.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.edgeSDWanPath`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 
@@ -59,7 +59,7 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Velocloud |Velocloud: Clear metrics for aggregated data |<p>Clear metrics for aggregated data without errors.</p> |DEPENDENT |velocloud.get.clear_metrics<p>**Preprocessing**:</p><p>- CHECK_JSON_ERROR: `$.error`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Velocloud |Velocloud: Clear data |<p>Clear metrics for data without errors.</p> |DEPENDENT |velocloud.get.clear_metrics<p>**Preprocessing**:</p><p>- CHECK_JSON_ERROR: `$.error`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Velocloud |Velocloud: Orchestrator API version |<p>Version of VMware SD-WAN Orchestrator API.</p> |DEPENDENT |velocloud.orchestrator.api_version<p>**Preprocessing**:</p><p>- JSONPATH: `$.info.apiVersion`</p> |
 |Velocloud |Velocloud: Orchestrator build |<p>Build of VMware SD-WAN Orchestrator API.</p> |DEPENDENT |velocloud.orchestrator.build<p>**Preprocessing**:</p><p>- JSONPATH: `$.info.build`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
 |Velocloud |Velocloud: Orchestrator version |<p>Version of VMware SD-WAN Orchestrator API.</p> |DEPENDENT |velocloud.orchestrator.version<p>**Preprocessing**:</p><p>- JSONPATH: `$.info.version`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
@@ -108,7 +108,7 @@ There are no template links in this template.
 |Velocloud |Path [{#NAME}]:[{#SOURCE} => {#DESTINATION}]: Total packets |<p>Total packets of SDWAN peer path.</p> |DEPENDENT |velocloud.sdwanpath.total_packets[{#NAME}/{#SOURCE}/{#DESTINATION}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.edgeSDWanPath[?(@.source.linkName=='{#NAME}' && @.source.deviceName=='{#SOURCE}' && @.destination.deviceName=='{#DESTINATION}')].metrics.totalPackets.first()`</p> |
 |Velocloud |Path [{#NAME}]:[{#SOURCE} => {#DESTINATION}]: Packet Loss in |<p>Received packet loss of SDWAN peer path.</p> |DEPENDENT |velocloud.sdwanpath.packet_loss_rx[{#NAME}/{#SOURCE}/{#DESTINATION}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.edgeSDWanPath[?(@.source.linkName=='{#NAME}' && @.source.deviceName=='{#SOURCE}' && @.destination.deviceName=='{#DESTINATION}')].metrics.packetLossRx.first()`</p> |
 |Velocloud |Path [{#NAME}]:[{#SOURCE} => {#DESTINATION}]: Packet Loss out |<p>Transmitted packet loss of SDWAN peer path.</p> |DEPENDENT |velocloud.sdwanpath.packet_loss_tx[{#NAME}/{#SOURCE}/{#DESTINATION}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.edgeSDWanPath[?(@.source.linkName=='{#NAME}' && @.source.deviceName=='{#SOURCE}' && @.destination.deviceName=='{#DESTINATION}')].metrics.packetLossTx.first()`</p> |
-|Zabbix_raw_items |Velocloud: Get aggregated data |<p>The JSON with result of Velocloud API requests.</p> |SCRIPT |velocloud.get<p>**Expression**:</p>`The text is too long. Please see the template.` |
+|Zabbix_raw_items |Velocloud: Get data |<p>The JSON with result of Velocloud API requests.</p> |SCRIPT |velocloud.get<p>**Expression**:</p>`The text is too long. Please see the template.` |
 
 ## Triggers
 
@@ -120,10 +120,10 @@ There are no template links in this template.
 |Velocloud: There are errors in aggregate script item |<p>There are errors in aggregate script item.</p> |`length(last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.get.error))>0` |WARNING | |
 |Velocloud: System properties have changed |<p>System properties have changed.</p> |`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.system.properties,#1)<>last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.system.properties,#2)` |INFO |<p>Manual close: YES</p> |
 |Edge [{#NAME}]: HA state is in "FAILED" state |<p>High availability state is "FAILED".</p> |`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.ha_state[{#ID}])=3` |WARNING | |
-|Edge [{#NAME}]: Edge is in "OFFLINE" state |<p>Edge state is "OFFLINE".</p> |`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.state[{#ID}])=0` |AVERAGE | |
-|Edge [{#NAME}]: Edge uptime is less than 10m |<p>Edge was restarted.</p> |`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.system_uptime[{#ID}])>0 and last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.system_uptime[{#ID}])<600` |WARNING | |
+|Edge [{#NAME}]: Edge is in "OFFLINE" state |<p>Edge state is "OFFLINE".</p> |`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.state[{#ID}])=0` |WARNING | |
+|Edge [{#NAME}]: Edge has been restarted (uptime < 10m) |<p>Edge was restarted.</p> |`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.system_uptime[{#ID}])>0 and last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.system_uptime[{#ID}])<600` |WARNING | |
 |Gateway [{#NAME}]: The number of connected edges is changed |<p>The number of connected edges is changed.</p> |`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.gateway.connected_edges[{#ID}],#1)<>last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.gateway.connected_edges[{#ID}],#2)` |WARNING |<p>Manual close: YES</p> |
-|Gateway [{#NAME}]: Gateway uptime is less that 10m |<p>Gateway was restarted.</p> |`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.gateway.system_uptime[{#ID}])>0 and last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.gateway.system_uptime[{#ID}])<600` |WARNING | |
+|Gateway [{#NAME}]: Gateway has been restarted (uptime < 10m) |<p>Gateway was restarted.</p> |`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.gateway.system_uptime[{#ID}])>0 and last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.gateway.system_uptime[{#ID}])<600` |WARNING | |
 |Link [{#NAME}]:[{#IP}]: Link state is not "STABLE" |<p>Link state is not "STABLE".</p> |`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.link.state[{#ID}])<>1` |WARNING | |
 
 ## Feedback

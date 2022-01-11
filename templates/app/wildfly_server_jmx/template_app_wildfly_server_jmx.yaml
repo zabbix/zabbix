@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:26Z'
+  version: '6.0'
+  date: '2021-12-15T06:58:37Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -18,7 +18,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Applications
@@ -537,9 +537,9 @@ zabbix_export:
               username: '{$WILDFLY.USER}'
               password: '{$WILDFLY.PASSWORD}'
               description: |
-                The current runtime status of a deployment. 
-                Possible status modes are OK, FAILED, and STOPPED. 
-                FAILED indicates a dependency is missing or a service could not start. 
+                The current runtime status of a deployment.
+                Possible status modes are OK, FAILED, and STOPPED.
+                FAILED indicates a dependency is missing or a service could not start.
                 STOPPED indicates that the deployment was not enabled or was manually stopped.
               preprocessing:
                 -

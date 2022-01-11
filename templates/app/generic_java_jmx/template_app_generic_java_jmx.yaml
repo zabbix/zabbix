@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:17Z'
+  version: '6.0'
+  date: '2021-12-15T06:57:03Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -10,7 +10,7 @@ zabbix_export:
       uuid: 72aab08f7f27406a8f2c291648e5ba95
       template: 'Generic Java JMX'
       name: 'Generic Java JMX'
-      description: 'Template tooling version used: 0.38'
+      description: 'Template tooling version used: 0.40'
       groups:
         -
           name: Templates/Applications
