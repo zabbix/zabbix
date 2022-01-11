@@ -447,7 +447,7 @@ if ($data['single_host_selected']) {
 					'dstfld1' => 'master_itemid',
 					'dstfld2' => 'master_itemname',
 					'parent_discoveryid' => $data['parent_discoveryid']
-				]).' {dialogue_class: "modal-popup-generic"});'
+				]).', {dialogue_class: "modal-popup-generic"});'
 			);
 	}
 
