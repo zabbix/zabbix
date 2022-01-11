@@ -1091,49 +1091,76 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * Check for duplicated names and hosts.
+	 * Check for unique host prototype names.
 	 *
 	 * @param array      $host_prototypes
 	 * @param array|null $db_host_prototypes
 	 *
-	 * @throws APIException  if host prototype with same host or name already exists.
+	 * @throws APIException if host prototype names are not unique.
 	 */
 	private static function checkDuplicates(array $host_prototypes, array $db_host_prototypes = null): void {
-		$names_by_field = [];
-		$messages = [
-			'host' => _('Host prototype with host name "%1$s" already exists in discovery rule "%2$s".'),
-			'name' => _('Host prototype with visible name "%1$s" already exists in discovery rule "%2$s".')
-		];
+		$h_names = [];
+		$v_names = [];
 
 		foreach ($host_prototypes as $host_prototype) {
-			$db_host_prototype = ($db_host_prototypes !== null) ? $db_host_prototypes[$host_prototype['hostid']] : null;
+			if (array_key_exists('host', $host_prototype)) {
+				if ($db_host_prototypes === null
+						|| $host_prototype['host'] !== $db_host_prototypes[$host_prototype['hostid']]['host']) {
+					$h_names[$host_prototype['ruleid']][] = $host_prototype['host'];
+				}
+			}
 
-			foreach (['host', 'name'] as $field) {
-				if ($db_host_prototype === null || $host_prototype[$field] !== $db_host_prototype[$field]) {
-					$names_by_field[$field][$host_prototype['ruleid']][] = $host_prototype[$field];
+			if (array_key_exists('name', $host_prototype)) {
+				if ($db_host_prototypes === null
+						|| $host_prototype['name'] !== $db_host_prototypes[$host_prototype['hostid']]['name']) {
+					$v_names[$host_prototype['ruleid']][] = $host_prototype['name'];
 				}
 			}
 		}
 
-		foreach ($names_by_field as $field => $names_by_ruleid) {
-			$sql_where = [];
-			foreach ($names_by_ruleid as $ruleid => $names) {
-				$sql_where[] = '(i.itemid='.$ruleid.' AND '.dbConditionString('h.'.$field, $names).')';
+		if ($h_names) {
+			$where = [];
+			foreach ($h_names as $ruleid => $names) {
+				$where[] = '('.dbConditionInt('i.itemid', [$ruleid]).' AND '.dbConditionString('h.host', $names).')';
 			}
 
 			$duplicates = DBfetchArray(DBselect(
-					'SELECT i.name AS rule,h.'.$field.
-					' FROM items i,host_discovery hd,hosts h'.
-					' WHERE i.itemid=hd.parent_itemid'.
-						' AND hd.hostid=h.hostid'.
-						' AND ('.implode(' OR ', $sql_where).')',
-					1
+				'SELECT i.name AS rule,h.host'.
+				' FROM items i,host_discovery hd,hosts h'.
+				' WHERE i.itemid=hd.parent_itemid'.
+					' AND hd.hostid=h.hostid'.
+					' AND ('.implode(' OR ', $where).')',
+				1
 			));
 
 			if ($duplicates) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_params($messages[$field], [$duplicates[0][$field], $duplicates[0]['rule']])
-				);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Host prototype with host name "%1$s" already exists in discovery rule "%2$s".',
+					$duplicates[0]['host'], $duplicates[0]['rule']
+				));
+			}
+		}
+
+		if ($v_names) {
+			$where = [];
+			foreach ($v_names as $ruleid => $names) {
+				$where[] = '('.dbConditionInt('i.itemid', [$ruleid]).' AND '.dbConditionString('h.name', $names).')';
+			}
+
+			$duplicates = DBfetchArray(DBselect(
+				'SELECT i.name AS rule,h.name'.
+				' FROM items i,host_discovery hd,hosts h'.
+				' WHERE i.itemid=hd.parent_itemid'.
+					' AND hd.hostid=h.hostid'.
+					' AND ('.implode(' OR ', $where).')',
+				1
+			));
+
+			if ($duplicates) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Host prototype with visible name "%1$s" already exists in discovery rule "%2$s".',
+					$duplicates[0]['host'], $duplicates[0]['rule']
+				));
 			}
 		}
 	}
