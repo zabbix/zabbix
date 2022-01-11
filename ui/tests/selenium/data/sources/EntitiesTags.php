@@ -845,6 +845,21 @@ class EntitiesTags {
 						'tag' => 'test',
 						'value' => 'update'
 					]
+				],
+				'problem_tags' => [
+					[
+						'tag' => 'problem action',
+						'operator' => 2,
+						'value' => 'problem update'
+					],
+					[
+						'tag' => 'problem tag without value'
+					],
+					[
+						'tag' => 'problem test',
+						'operator' => 0,
+						'value' => 'problem update'
+					]
 				]
 			],
 			[
@@ -862,11 +877,32 @@ class EntitiesTags {
 						'value' => 'clone'
 					],
 					[
-						'tag' => 'web tag without value'
+						'tag' => 'tag without value'
 					],
 					[
 						'tag' => 'common tag on host and element',
 						'value' => 'common value'
+					]
+				],
+				'problem_tags' => [
+					[
+						'tag' => 'problem a',
+						'operator' => 2,
+						'value' => ':problem a'
+					],
+					[
+						'tag' => 'problem action',
+						'operator' => 0,
+						'value' => 'problem clone'
+					],
+					[
+						'tag' => 'problem tag without value',
+						'operator' => 2
+					],
+					[
+						'tag' => 'problem common tag on host and element',
+						'operator' => 0,
+						'value' => 'problem common value'
 					]
 				]
 			],
@@ -886,6 +922,22 @@ class EntitiesTags {
 					],
 					[
 						'tag' => 'tag'
+					]
+				],
+				'problem_tags' => [
+					[
+						'tag' => 'problem remove',
+						'operator' => 0,
+						'value' => 'problem remove'
+					],
+					[
+						'tag' => 'problem tag',
+						'operator' => 2,
+						'value' => 'problem remove'
+					],
+					[
+						'tag' => 'problem tag',
+						'operator' => 2
 					]
 				]
 			]
