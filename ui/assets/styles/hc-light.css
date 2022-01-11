@@ -2614,6 +2614,10 @@ z-select[disabled] button,
   height: 11px;
   cursor: pointer;
   margin: -12px 0 -4px; }
+  .icon-info:link, .icon-info:hover, .icon-info:focus {
+    border-bottom: none; }
+  .icon-info:focus {
+    box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35); }
   .icon-info::before {
     content: '';
     display: inline-block;
@@ -5286,7 +5290,13 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
   background-position: -524px -245px; }
 
 .icon-description {
-  margin: 0 0 0 5px; }
+  margin: 0 0 -5px 5px;
+  vertical-align: baseline;
+  border-radius: 2px; }
+  .icon-description:link, .icon-description:hover, .icon-description:focus {
+    border-bottom: none; }
+  .icon-description:focus {
+    box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35); }
   .icon-description::after {
     content: '?';
     color: #ffffff; }

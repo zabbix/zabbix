@@ -2765,6 +2765,16 @@ $form-icon-btn: (
 	cursor: pointer;
 	margin: -12px 0 -4px;
 
+	&:link,
+	&:hover,
+	&:focus {
+		border-bottom: none;
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 2px $btn-border-focus-color;
+	}
+
 	&::before {
 		content: '';
 		display: inline-block;
@@ -6677,7 +6687,19 @@ button {
 }
 
 .icon-description {
-	margin: 0 0 0 5px;
+	margin: 0 0 -5px 5px;
+	vertical-align: baseline;
+	border-radius: 2px;
+
+	&:link,
+	&:hover,
+	&:focus {
+		border-bottom: none;
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 2px $btn-border-focus-color;
+	}
 
 	&::after {
 		content: '?';

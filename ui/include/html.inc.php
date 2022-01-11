@@ -1041,7 +1041,7 @@ function makeActionIcon(array $icon_data): CTag {
  * @return CSpan
  */
 function makeDescriptionIcon($description) {
-	return (new CSpan())
+	return (new CLink())
 		->addClass(ZBX_STYLE_ICON_DESCRIPTION)
 		->addClass(ZBX_STYLE_CURSOR_POINTER)
 		->setHint(zbx_str2links($description), ZBX_STYLE_HINTBOX_WRAP);
@@ -1055,7 +1055,7 @@ function makeDescriptionIcon($description) {
  * @return CSpan
  */
 function makeErrorIcon($error) {
-	return (new CSpan())
+	return (new CLink())
 		->addClass(ZBX_STYLE_ICON_INFO)
 		->addClass(ZBX_STYLE_STATUS_RED)
 		->setHint($error, ZBX_STYLE_HINTBOX_WRAP." ".ZBX_STYLE_RED);
@@ -1083,7 +1083,7 @@ function makeUnknownIcon($error) {
  * @return CSpan
  */
 function makeWarningIcon($error) {
-	return (new CSpan())
+	return (new CLink())
 		->addClass(ZBX_STYLE_ICON_INFO)
 		->addClass(ZBX_STYLE_STATUS_YELLOW)
 		->setHint($error, ZBX_STYLE_HINTBOX_WRAP);
