@@ -24,16 +24,26 @@
  */
 ?>
 
-<script type="text/javascript">
-	$(() => {
-		$('#filter-expires-state')
-			.on('change', ({target: {checked}}) => $('#filter-expires-days').prop('disabled', !checked))
-			.trigger('change');
-	});
-</script>
-
 <script>
 	const view = {
+		filter_expires_state: null,
+		filter_expires_days: null,
+
+		init() {
+			this.filter_expires_state = document.getElementById('filter-expires-state');
+			this.filter_expires_days = document.getElementById('filter-expires-days');
+			this.expiresDaysHandler();
+		},
+
+		expiresDaysHandler() {
+			if (this.filter_expires_state.checked) {
+				this.filter_expires_days.disabled = false;
+			}
+			else {
+				this.filter_expires_days.disabled = true;
+			}
+		},
+
 		editUserToken(e, tokenid) {
 			e.preventDefault();
 			const user_token_data = {tokenid};

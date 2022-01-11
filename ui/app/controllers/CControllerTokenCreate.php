@@ -95,10 +95,11 @@ class CControllerTokenCreate extends CController
 				'auth_token' => $auth_token,
 				'expires_at' => $token['expires_at'],
 				'description' => $token['description'],
-				'status' => $token['status']
+				'status' => $token['status'],
+				'action_dst' => $this->getInput('action_dst')
 			];
 
-			$output['data'] = (new CPartial('administration.user.token.view.html', $data))->getOutput();
+			$output['data'] = (new CPartial('administration.token.view.html', $data))->getOutput();
 
 		} else {
 			$output['error'] = [

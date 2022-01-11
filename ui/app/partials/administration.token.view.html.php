@@ -42,8 +42,16 @@ $token_from_grid = (new CFormGrid())
 	->addItem([
 		(new CDiv(_('Name') . ':'))->addClass(ZBX_STYLE_RIGHT),
 		new CDiv($data['name'])
-	])
-	->addItem([
+	]);
+
+if ($data['action_dst'] === 'token.view') {
+	$token_from_grid->addItem([
+		(new CDiv(_('User') . ':'))->addClass(ZBX_STYLE_RIGHT),
+		new CDiv($data['user'])
+	]);
+}
+
+$token_from_grid->addItem([
 		(new CDiv(_('Auth token') . ':'))->addClass(ZBX_STYLE_RIGHT),
 		new CDiv([
 			$data['auth_token'],

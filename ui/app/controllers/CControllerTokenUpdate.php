@@ -100,10 +100,11 @@ class CControllerTokenUpdate extends CController {
 					'expires_at' => $token['expires_at'],
 					'description' => $token['description'],
 					'status' => $token['status'],
-					'regenerate' => '1'
+					'regenerate' => '1',
+					'action_dst' => $this->getInput('action_dst')
 				];
 
-				$output['data'] = (new CPartial('administration.user.token.view.html', $data))->getOutput();
+				$output['data'] = (new CPartial('administration.token.view.html', $data))->getOutput();
 			}
 		}
 		else {

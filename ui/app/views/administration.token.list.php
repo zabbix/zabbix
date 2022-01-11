@@ -61,7 +61,8 @@ $filter = (new CFilter())
 			->addRow(_('Expires in less than'), [
 				(new CCheckBox('filter_expires_state'))
 					->setChecked($data['filter']['expires_state'])
-					->setId('filter-expires-state'),
+					->setId('filter-expires-state')
+					->onClick('javascript: view.expiresDaysHandler()'),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CNumericBox('filter_expires_days', $data['filter']['expires_days'], 3, false, false, false))
 					->setId('filter-expires-days')
@@ -210,4 +211,8 @@ $token_form->addItem([
 
 $widget
 	->addItem($token_form)
+	->show();
+
+(new CScriptTag('view.init();'))
+	->setOnDocumentReady()
 	->show();
