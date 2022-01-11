@@ -42,14 +42,14 @@ class testPageLatestData extends CLegacyWebTest {
 			// Item without description.
 			[
 				[
-					'host group' => '15003',
+					'hostid' => '15003',
 					'Item name' => 'item_testPageHistory_CheckLayout_Log'
 				]
 			],
 			// Item with plain text in the description.
 			[
 				[
-					'host group' => '15003',
+					'hostid' => '15003',
 					'Item name' => 'item_testPageHistory_CheckLayout_Log_2',
 					'description' => 'Non-clickable description'
 				]
@@ -57,7 +57,7 @@ class testPageLatestData extends CLegacyWebTest {
 			// Item with only 1 url in description.
 			[
 				[
-					'host group' => '15003',
+					'hostid' => '15003',
 					'Item name' => 'item_testPageHistory_CheckLayout_Eventlog',
 					'description' => 'https://zabbix.com'
 				]
@@ -65,7 +65,7 @@ class testPageLatestData extends CLegacyWebTest {
 			// Item with text and url in description.
 			[
 				[
-					'host group' => '15003',
+					'hostid' => '15003',
 					'Item name' => 'item_testPageHistory_CheckLayout_Eventlog_2',
 					'description' => 'The following url should be clickable: https://zabbix.com'
 				]
@@ -73,7 +73,7 @@ class testPageLatestData extends CLegacyWebTest {
 			// Item with multiple urls in description.
 			[
 				[
-					'host group' => '15003',
+					'hostid' => '15003',
 					'Item name' => 'item_testPageHistory_CheckLayout_Character',
 					'description' => 'http://zabbix.com https://www.zabbix.com/career https://www.zabbix.com/contact'
 				]
@@ -81,7 +81,7 @@ class testPageLatestData extends CLegacyWebTest {
 			// Item with text and 2 urls in description.
 			[
 				[
-					'host group' => '15003',
+					'hostid' => '15003',
 					'Item name' => 'item_testPageHistory_CheckLayout_Text',
 					'description' => 'These urls should be clickable: https://zabbix.com https://www.zabbix.com/career'
 				]
@@ -89,7 +89,7 @@ class testPageLatestData extends CLegacyWebTest {
 			// Item with underscore in macros name and one non existing macros  in description .
 			[
 				[
-					'host group' => '50010',
+					'hostid' => '50010',
 					'Item name' => 'Http agent item form',
 					'description' => 'Underscore {$NONEXISTING}'
 				]
@@ -97,7 +97,7 @@ class testPageLatestData extends CLegacyWebTest {
 			// Item with 2 macros in description.
 			[
 				[
-					'host group' => '50010',
+					'hostid' => '50010',
 					'Item name' => 'Http agent item for update',
 					'description' => '127.0.0.1 Some text'
 				]
@@ -105,7 +105,7 @@ class testPageLatestData extends CLegacyWebTest {
 			// Item with 2 macros and text in description.
 			[
 				[
-					'host group' => '50010',
+					'hostid' => '50010',
 					'Item name' => 'Http agent item for delete',
 					'description' => 'Some text and IP number 127.0.0.1'
 				]
@@ -113,7 +113,7 @@ class testPageLatestData extends CLegacyWebTest {
 			// Item with macros inside curly brackets.
 			[
 				[
-					'host group' => '50007',
+					'hostid' => '50007',
 					'Item name' => 'Item-layout-test-002',
 					'description' => '{Some text}'
 				]
@@ -121,7 +121,7 @@ class testPageLatestData extends CLegacyWebTest {
 			// Item with macros in description.
 			[
 				[
-					'host group' => '99027',
+					'hostid' => '99027',
 					'Item name' => 'Item to check graph',
 					'description' => 'Some text'
 				]
@@ -134,8 +134,9 @@ class testPageLatestData extends CLegacyWebTest {
 	 */
 	public function testPageLatestData_checkItemDescription($data) {
 		// Open Latest data for host 'testPageHistory_CheckLayout'
-		$this->page->login()->open('zabbix.php?action=latest.view&filter_hostids%5B%5D='.$data['host group'].'&filter_select=&filter_show_without_data=1&filter_set=1');
-		$table = $this->query('class:list-table')->asTable()->one();
+		$this->page->login()->open('zabbix.php?&action=latest.view&show_details=0&hostids%5B%5D='.$data['hostid']);
+		$table_path = '//table['.CXPathHelper::fromClass('overflow-ellipsis').']';
+		$table = $this->query('xpath', $table_path)->asTable()->one();
 
 		// Find rows from the data provider and click on the description icon if such should persist.
 		$row = $table->findRow('Name', $data['Item name'], true);
