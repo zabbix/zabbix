@@ -33,8 +33,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_ipmi_port_expand_macros                                      *
- *                                                                            *
  * Purpose: expands user macros in IPMI port value and converts the result to *
  *          to unsigned short value                                           *
  *                                                                            *
@@ -68,8 +66,6 @@ int	zbx_ipmi_port_expand_macros(zbx_uint64_t hostid, const char *port_orig, unsi
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_ipmi_execute_command                                         *
  *                                                                            *
  * Purpose: executes IPMI command                                             *
  *                                                                            *
@@ -160,8 +156,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_ipmi_test_item                                               *
  *                                                                            *
  * Purpose: test IPMI item                                                    *
  *                                                                            *

@@ -38,8 +38,6 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 
 /******************************************************************************
  *                                                                            *
- * Function: match_glob                                                       *
- *                                                                            *
  * Purpose: see whether a file (e.g., "parameter.conf")                       *
  *          matches a pattern (e.g., "p*.conf")                               *
  *                                                                            *
@@ -127,8 +125,6 @@ static int	match_glob(const char *file, const char *pattern)
 
 /******************************************************************************
  *                                                                            *
- * Function: parse_glob                                                       *
- *                                                                            *
  * Purpose: parse a glob like "/usr/local/etc/zabbix_agentd.conf.d/p*.conf"   *
  *          into "/usr/local/etc/zabbix_agentd.conf.d" and "p*.conf" parts    *
  *                                                                            *
@@ -198,8 +194,6 @@ trim:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: parse_cfg_dir                                                    *
  *                                                                            *
  * Purpose: parse directory with configuration files                          *
  *                                                                            *
@@ -307,8 +301,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: parse_cfg_object                                                 *
- *                                                                            *
  * Purpose: parse "Include=..." line in configuration file                    *
  *                                                                            *
  * Parameters: cfg_file - full name of config file                            *
@@ -357,8 +349,6 @@ clean:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: parse_cfg_file                                                   *
  *                                                                            *
  * Purpose: parse configuration file                                          *
  *                                                                            *
@@ -635,8 +625,6 @@ static int	addr_compare_func(const void *d1, const void *d2)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_set_data_destination_hosts                                   *
  *                                                                            *
  * Purpose: parse "ServerActive' parameter value and set destination servers  *
  *          using a callback function                                         *

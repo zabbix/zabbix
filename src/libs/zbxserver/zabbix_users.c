@@ -24,8 +24,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: check_perm2system                                                *
- *                                                                            *
  * Purpose: Check user permissions to access system                           *
  *                                                                            *
  * Parameters: userid - user ID                                               *
@@ -74,8 +72,6 @@ char	*get_user_timezone(zbx_uint64_t userid)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_check_user_administration_permissions                        *
  *                                                                            *
  * Purpose: check if the user has specific or default access for              *
  *          administration actions                                            *

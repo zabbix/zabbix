@@ -221,15 +221,9 @@ static char	shortopts[] = "s:p:k:I:t:hV";
 
 /******************************************************************************
  *                                                                            *
- * Function: get_signal_handler                                               *
- *                                                                            *
  * Purpose: process signals                                                   *
  *                                                                            *
  * Parameters: sig - signal ID                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	get_signal_handler(int sig)
@@ -250,8 +244,6 @@ static void	get_signal_handler(int sig)
 #endif /* not WINDOWS */
 
 /******************************************************************************
- *                                                                            *
- * Function: get_value                                                        *
  *                                                                            *
  * Purpose: connect to Zabbix agent, receive and print value                  *
  *                                                                            *
@@ -328,19 +320,6 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: main                                                             *
- *                                                                            *
- * Purpose: main function                                                     *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
 int	main(int argc, char **argv)
 {
 	int		i, ret = SUCCEED;

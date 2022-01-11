@@ -26,8 +26,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: get_value_db                                                     *
- *                                                                            *
  * Purpose: retrieve data from database                                       *
  *                                                                            *
  * Parameters: item   - [IN] item we are interested in                        *

@@ -23,8 +23,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: baseline_get_common_data                                         *
- *                                                                            *
  * Purpose: get baseline data for common period/season combinations           *
  *                                                                            *
  * Parameters: itemid      - [IN] the item identifier                         *
@@ -96,8 +94,6 @@ static int	baseline_get_common_data(zbx_uint64_t itemid, const char *table, time
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: baseline_get_isoyear_data                                        *
  *                                                                            *
  * Purpose: get baseline data for week based periods in a year                *
  *                                                                            *
@@ -185,8 +181,6 @@ static int	baseline_get_isoyear_data(zbx_uint64_t itemid, const char *table, tim
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_baseline_get_data                                            *
  *                                                                            *
  * Purpose: get baseline data for the specified period                        *
  *                                                                            *

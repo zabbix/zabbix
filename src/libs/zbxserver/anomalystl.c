@@ -33,8 +33,6 @@ ZBX_PTR_VECTOR_IMPL(VV, zbx_vector_history_record_t *)
 
 /*******************************************************************************
  *                                                                             *
- * Function: zbx_get_percentage_of_deviations_in_remainder                     *
- *                                                                             *
  * Purpose: finds how many values in stl remainder are outliers                *
  *                                                                             *
  * Parameters:  remainder        - [IN] stl remainder values vector            *

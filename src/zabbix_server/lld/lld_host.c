@@ -331,8 +331,6 @@ static int	zbx_ids_names_compare_func(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_hosts_get_tags                                               *
- *                                                                            *
  * Purpose: retrieves tags of the existing hosts                              *
  *                                                                            *
  * Parameters: hosts - [IN/OUT] list of hosts                                 *
@@ -399,8 +397,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_hosts_get                                                    *
  *                                                                            *
  * Purpose: retrieves existing hosts for the specified host prototype         *
  *                                                                            *
@@ -550,8 +546,6 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, z
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_hosts_validate                                               *
  *                                                                            *
  * Parameters: hosts - [IN] list of hosts; should be sorted by hostid         *
  *                                                                            *
@@ -973,8 +967,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_simple_groups_get                                            *
- *                                                                            *
  * Purpose: retrieve list of host groups which should be present on the each  *
  *          discovered host                                                   *
  *                                                                            *
@@ -1006,8 +998,6 @@ static void	lld_simple_groups_get(zbx_uint64_t parent_hostid, zbx_vector_uint64_
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_hostgroups_make                                              *
  *                                                                            *
  * Parameters: groupids         - [IN] sorted list of host group ids which    *
  *                                     should be present on the each          *
@@ -1128,8 +1118,6 @@ static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_group_prototypes_get                                         *
- *                                                                            *
  * Purpose: retrieve list of group prototypes                                 *
  *                                                                            *
  * Parameters: parent_hostid    - [IN] host prototype identifier              *
@@ -1168,8 +1156,6 @@ static void	lld_group_prototypes_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_groups_get                                                   *
  *                                                                            *
  * Purpose: retrieves existing groups for the specified host prototype        *
  *                                                                            *
@@ -1217,11 +1203,6 @@ static void	lld_groups_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *groups)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: lld_group_make                                                   *
- *                                                                            *
- ******************************************************************************/
 static zbx_lld_group_t	*lld_group_make(zbx_vector_ptr_t *groups, zbx_uint64_t group_prototypeid,
 		const char *name_proto, const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macros)
 {
@@ -1319,11 +1300,6 @@ out:
 	return group;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: lld_groups_make                                                  *
- *                                                                            *
- ******************************************************************************/
 static void	lld_groups_make(zbx_lld_host_t *host, zbx_vector_ptr_t *groups, const zbx_vector_ptr_t *group_prototypes,
 		const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macros)
 {
@@ -1348,10 +1324,6 @@ static void	lld_groups_make(zbx_lld_host_t *host, zbx_vector_ptr_t *groups, cons
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_validate_group_name                                          *
- *                                                                            *
- * Purpose: validate group name                                               *
  *                                                                            *
  * Return value: SUCCEED - the group name is valid                            *
  *               FAIL    - otherwise                                          *
@@ -1383,8 +1355,6 @@ static int	lld_validate_group_name(const char *name)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_groups_validate                                              *
  *                                                                            *
  * Parameters: groups - [IN] list of groups; should be sorted by groupid      *
  *                                                                            *
@@ -1540,8 +1510,6 @@ static void	lld_groups_validate(zbx_vector_ptr_t *groups, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_group_rights_compare                                         *
- *                                                                            *
  * Purpose: sorting function to sort group rights vector by name              *
  *                                                                            *
  ******************************************************************************/
@@ -1554,8 +1522,6 @@ static int	lld_group_rights_compare(const void *d1, const void *d2)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_group_rights_append                                          *
  *                                                                            *
  * Purpose: append a new item to group rights vector                          *
  *                                                                            *
@@ -1578,9 +1544,7 @@ static int	lld_group_rights_append(zbx_vector_ptr_t *group_rights, const char *n
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_group_rights_free                                            *
- *                                                                            *
- * PUrpose: frees group rights data                                           *
+ * Purpose: frees group rights data                                           *
  *                                                                            *
  ******************************************************************************/
 static void	lld_group_rights_free(zbx_lld_group_rights_t *rights)
@@ -1591,8 +1555,6 @@ static void	lld_group_rights_free(zbx_lld_group_rights_t *rights)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_groups_save_rights                                           *
  *                                                                            *
  * Parameters: groups - [IN] list of new groups                               *
  *                                                                            *
@@ -1735,8 +1697,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_groups_save                                                  *
  *                                                                            *
  * Parameters: groups           - [IN/OUT] list of groups; should be sorted   *
  *                                         by groupid                         *
@@ -1915,8 +1875,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_masterhostmacros_get                                         *
- *                                                                            *
  * Purpose: retrieve list of host macros which should be present on the each  *
  *          discovered host                                                   *
  *                                                                            *
@@ -1961,8 +1919,6 @@ static void	lld_masterhostmacros_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *
 
 /******************************************************************************
  *                                                                            *
- * Function: macro_str_compare_func                                           *
- *                                                                            *
  * Purpose: compare the name of host macros for search in vector              *
  *                                                                            *
  * Parameters: d1 - [IN] first zbx_lld_hostmacro_t                            *
@@ -1980,8 +1936,6 @@ static int	macro_str_compare_func(const void *d1, const void *d2)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_hostmacros_get                                               *
  *                                                                            *
  * Purpose: retrieve list of host macros which should be present on the each  *
  *          discovered host                                                   *
@@ -2050,11 +2004,6 @@ static void	lld_hostmacros_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *mas
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: lld_hostmacro_make                                               *
- *                                                                            *
- ******************************************************************************/
 static void	lld_hostmacro_make(zbx_vector_ptr_t *hostmacros, zbx_uint64_t hostmacroid, const char *macro,
 		const char *value, const char *description, unsigned char type)
 {
@@ -2104,8 +2053,6 @@ static void	lld_hostmacro_make(zbx_vector_ptr_t *hostmacros, zbx_uint64_t hostma
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_hostmacros_make                                              *
  *                                                                            *
  * Parameters: hostmacros       - [IN] list of host macros which              *
  *                                     should be present on the each          *
@@ -2207,8 +2154,6 @@ static void	lld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector_p
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_tags_get                                                     *
- *                                                                            *
  * Purpose: retrieve list of host tags which should be present on the each    *
  *          discovered host                                                   *
  *                                                                            *
@@ -2243,8 +2188,6 @@ static void	lld_proto_tags_get(zbx_uint64_t parent_hostid, zbx_vector_db_tag_ptr
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_tag_validate_field                                           *
- *                                                                            *
  * Purpose: validate host tag field                                           *
  *                                                                            *
  * Parameters: name      - [IN] the field name (tag, value)                   *
@@ -2277,8 +2220,6 @@ static int	lld_tag_validate_field(const char *name, const char *field, size_t fi
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_tag_validate                                                 *
  *                                                                            *
  * Purpose: validate host tag                                                 *
  *                                                                            *
@@ -2320,8 +2261,6 @@ static int	lld_tag_validate(zbx_db_tag_t **tags, int tags_num, const char *name,
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_host_update_tags                                             *
  *                                                                            *
  * Purpose: update host tags                                                  *
  *                                                                            *
@@ -2427,8 +2366,6 @@ static void	lld_host_update_tags(zbx_lld_host_t *host, const zbx_vector_db_tag_p
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_templates_make                                               *
  *                                                                            *
  * Purpose: gets templates from a host prototype                              *
  *                                                                            *
@@ -2547,8 +2484,6 @@ static void	lld_templates_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hos
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_interface_snmp_prepare_sql                                   *
  *                                                                            *
  * Purpose: prepare sql for update record of interface_snmp table             *
  *                                                                            *
@@ -2670,8 +2605,6 @@ static void	lld_interface_snmp_prepare_sql(zbx_uint64_t hostid, const zbx_uint64
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_hosts_save                                                   *
  *                                                                            *
  * Parameters: parent_hostid    - [IN] parent host id                         *
  *             hosts            - [IN] list of hosts;                         *
@@ -3569,11 +3502,6 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: lld_templates_link                                               *
- *                                                                            *
- ******************************************************************************/
 static void	lld_templates_link(const zbx_vector_ptr_t *hosts, char **error)
 {
 	int		i;
@@ -3613,8 +3541,6 @@ static void	lld_templates_link(const zbx_vector_ptr_t *hosts, char **error)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_hosts_remove                                                 *
  *                                                                            *
  * Purpose: updates host_discovery.lastcheck and host_discovery.ts_delete     *
  *          fields; removes lost resources                                    *
@@ -3749,8 +3675,6 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, int lifetime, int la
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_groups_remove                                                *
- *                                                                            *
  * Purpose: updates group_discovery.lastcheck and group_discovery.ts_delete   *
  *          fields; removes lost resources                                    *
  *                                                                            *
@@ -3852,8 +3776,6 @@ static void	lld_groups_remove(const zbx_vector_ptr_t *groups, int lifetime, int 
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_interfaces_get                                               *
- *                                                                            *
  * Purpose: retrieves either the list of interfaces from the lld rule's host  *
  *          or the list of custom interfaces defined for the host prototype   *
  *                                                                            *
@@ -3952,11 +3874,6 @@ static void	lld_interfaces_get(zbx_uint64_t id, zbx_vector_ptr_t *interfaces, un
 	zbx_vector_ptr_sort(interfaces, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: lld_interface_make                                               *
- *                                                                            *
- ******************************************************************************/
 static void	lld_interface_make(zbx_vector_ptr_t *interfaces, zbx_uint64_t parent_interfaceid,
 		zbx_uint64_t interfaceid, unsigned char type, unsigned char main, unsigned char useip, const char *ip,
 		const char *dns, const char *port, unsigned char snmp_type, unsigned char bulk, const char *community,
@@ -4106,8 +4023,6 @@ static void	lld_interface_make(zbx_vector_ptr_t *interfaces, zbx_uint64_t parent
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_interfaces_make                                              *
  *                                                                            *
  * Parameters: interfaces - [IN] sorted list of interfaces which              *
  *                               should be present on the each                *
@@ -4283,8 +4198,6 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
 
 /******************************************************************************
  *                                                                            *
- * Function: another_main_interface_exists                                    *
- *                                                                            *
  * Return value: SUCCEED if interface with same type exists in the list of    *
  *               interfaces; FAIL - otherwise                                 *
  *                                                                            *
@@ -4318,8 +4231,6 @@ static int	another_main_interface_exists(const zbx_vector_ptr_t *interfaces, con
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_interfaces_validate                                          *
  *                                                                            *
  * Parameters: hosts - [IN/OUT] list of hosts                                 *
  *                                                                            *
@@ -4494,8 +4405,6 @@ static void	lld_interfaces_validate(zbx_vector_ptr_t *hosts, char **error)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_update_hosts                                                 *
  *                                                                            *
  * Purpose: add or update low-level discovered hosts                          *
  *                                                                            *

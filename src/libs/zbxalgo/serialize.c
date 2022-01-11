@@ -21,8 +21,6 @@
 #include "zbxserialize.h"
 /******************************************************************************
  *                                                                            *
- * Function: zbx_serialize_uint31_compact                                     *
- *                                                                            *
  * Purpose: serialize 31 bit unsigned integer into utf-8 like byte stream     *
  *                                                                            *
  * Parameters: ptr   - [OUT] the output buffer                                *
@@ -62,8 +60,6 @@ zbx_uint32_t	zbx_serialize_uint31_compact(unsigned char *ptr, zbx_uint32_t value
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_deserialize_uint31_compact                                   *
  *                                                                            *
  * Purpose: deserialize 31 bit unsigned integer from utf-8 like byte stream   *
  *                                                                            *

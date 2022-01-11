@@ -70,8 +70,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: recv_alert_send                                                  *
- *                                                                            *
  * Purpose: process alert send request that is used to test media types       *
  *                                                                            *
  * Parameters:  sock  - [IN] the request socket                               *

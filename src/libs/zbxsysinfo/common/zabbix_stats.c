@@ -25,8 +25,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: check_response                                                   *
- *                                                                            *
  * Purpose: Check whether JSON response is "success" or "failed"              *
  *                                                                            *
  * Parameters: response - [IN] the request                                    *
@@ -67,8 +65,6 @@ static int	check_response(const char *response, AGENT_RESULT *result)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: get_remote_zabbix_stats                                          *
  *                                                                            *
  * Purpose: send Zabbix stats request and receive the result data             *
  *                                                                            *
@@ -121,8 +117,6 @@ static void	get_remote_zabbix_stats(const struct zbx_json *json, const char *ip,
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_get_remote_zabbix_stats                                      *
- *                                                                            *
  * Purpose: create Zabbix stats request                                       *
  *                                                                            *
  * Parameters: ip     - [IN] external Zabbix instance hostname                *
@@ -148,8 +142,6 @@ int	zbx_get_remote_zabbix_stats(const char *ip, unsigned short port, AGENT_RESUL
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_get_remote_zabbix_stats_queue                                *
  *                                                                            *
  * Purpose: create Zabbix stats queue request                                 *
  *                                                                            *

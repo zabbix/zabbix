@@ -129,8 +129,6 @@ extern ZBX_THREAD_LOCAL int		process_num;
 
 /******************************************************************************
  *                                                                            *
- * Function: get_process_type_forks                                           *
- *                                                                            *
  * Purpose: Returns number of processes depending on process type             *
  *                                                                            *
  * Parameters: proc_type - [IN] process type; ZBX_PROCESS_TYPE_*              *
@@ -222,8 +220,6 @@ int	get_process_type_forks(unsigned char proc_type)
 #ifndef _WINDOWS
 /******************************************************************************
  *                                                                            *
- * Function: init_selfmon_collector                                           *
- *                                                                            *
  * Purpose: Initialize structures and prepare state                           *
  *          for self-monitoring collector                                     *
  *                                                                            *
@@ -293,8 +289,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: free_selfmon_collector                                           *
- *                                                                            *
  * Purpose: Free memory allocated for self-monitoring collector               *
  *                                                                            *
  ******************************************************************************/
@@ -318,8 +312,6 @@ void	free_selfmon_collector(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: update_selfmon_counter                                           *
  *                                                                            *
  * Parameters: state - [IN] new process state; ZBX_PROCESS_STATE_*            *
  *                                                                            *
@@ -386,11 +378,6 @@ void	update_selfmon_counter(unsigned char state)
 	process->cache.ticks = ticks;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: collect_selfmon_stats                                            *
- *                                                                            *
- ******************************************************************************/
 void	collect_selfmon_stats(void)
 {
 	zbx_stat_process_t	*process;
@@ -466,8 +453,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: get_selfmon_stats                                                *
  *                                                                            *
  * Purpose: calculate statistics for selected process                         *
  *                                                                            *
@@ -563,8 +548,6 @@ unlock:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_get_all_process_stats                                        *
  *                                                                            *
  * Purpose: retrieves internal metrics of all running processes based on      *
  *          process type                                                      *
@@ -666,8 +649,6 @@ unlock:
 static int	sleep_remains;
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_sleep_loop                                                   *
  *                                                                            *
  * Purpose: sleeping process                                                  *
  *                                                                            *
