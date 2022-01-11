@@ -30,20 +30,31 @@ $token_form = (new CForm())
 	->setId('token_form')
 	->setName('token')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
-	->addVar('action_src', 'token.edit')
+	->addVar('action_src', $data['action_src'])
 	->addVar('action_dst', ($data['tokenid'] == 0) ? 'token.view' : 'token.list')
 	->addVar('action', ($data['tokenid'] == 0) ? 'token.create' : 'token.update')
 	->addVar('tokenid', $data['tokenid']);
 
+if ($data['action_src'] === 'user.token.edit') {
+	$token_form->addVar('userid', CWebUser::$data['userid']);
+}
+
 $token_from_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
-		(new CTextBox('name', $data['name'], false, DB::getFieldLength('token', 'name')))
+		(new CTextBox(
+			'name',
+			$data['name'],
+			false,
+			DB::getFieldLength('token', 'name'
+			)))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
 			->setAriaRequired()
-	])
-	->addItem([
+	]);
+
+if ($data['action_src'] === 'token.edit') {
+	$token_from_grid->addItem([
 		(new CLabel(_('User'), 'userid_ms'))->setAsteriskMark(),
 		new CFormField(
 			(new CMultiSelect([
@@ -64,8 +75,10 @@ $token_from_grid = (new CFormGrid())
 				]
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		)
-	])
-	->addItem([
+	]);
+}
+
+$token_from_grid->addItem([
 		new CLabel(_('Description'), 'description'),
 		(new CTextArea('description', $data['description']))
 			->addClass(ZBX_STYLE_MONOSPACE_FONT)

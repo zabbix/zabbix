@@ -101,7 +101,7 @@ class CControllerTokenUpdate extends CController {
 					'description' => $token['description'],
 					'status' => $token['status'],
 					'regenerate' => '1',
-					'action_dst' => $this->getInput('action_dst')
+					'action_src' => $this->getInput('action_src')
 				];
 
 				$output['data'] = (new CPartial('administration.token.view.html', $data))->getOutput();

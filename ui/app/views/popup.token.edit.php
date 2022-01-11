@@ -25,6 +25,7 @@
  */
 
 $data['form_name'] = 'token_form';
+$data['action_src'] = 'token.edit';
 $popup_url = (new CUrl('zabbix.php'))
 	->setArgument('action', 'token.edit');
 

@@ -53,7 +53,7 @@
 		openUserTokenPopup(user_token_data) {
 			const original_url = location.href;
 
-			const overlay = PopUp('popup.user.token.edit', user_token_data, 'user_token_edit', document.activeElement);
+			const overlay = PopUp('popup.user.token.edit', user_token_data, 'token_edit', document.activeElement);
 
 			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.userTokenSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.userTokenDelete, {once: true});

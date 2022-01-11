@@ -25,6 +25,7 @@
  */
 
 $data['form_name'] = 'token_form';
+$data['action_src'] = 'user.token.edit';
 $popup_url = (new CUrl('zabbix.php'))
 	->setArgument('action', 'user.token.edit');
 
@@ -37,7 +38,7 @@ if ($data['tokenid'] != 0) {
 			'class' => '',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'user_token_edit_popup.submit();'
+			'action' => 'token_edit_popup.submit();'
 		],
 		[
 			'title' => _('Regenerate'),
@@ -45,7 +46,7 @@ if ($data['tokenid'] != 0) {
 			'class' => 'btn-alt',
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'user_token_edit_popup.regenerate();'
+			'action' => 'token_edit_popup.regenerate();'
 		],
 		[
 			'title' => _('Delete'),
@@ -53,7 +54,7 @@ if ($data['tokenid'] != 0) {
 			'class' => 'btn-alt',
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'user_token_edit_popup.delete('.json_encode($data['tokenid']).');'
+			'action' => 'token_edit_popup.delete('.json_encode($data['tokenid']).');'
 		]
 	];
 }
@@ -64,17 +65,17 @@ else {
 			'class' => '',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'user_token_edit_popup.submit();'
+			'action' => 'token_edit_popup.submit();'
 		]
 	];
 }
 
 $output = [
 	'header' =>($data['tokenid'] == 0) ? _('New API token') : ('API token'),
-	'body' => (new CPartial('administration.user.token.edit.html', $data))->getOutput(),
+	'body' => (new CPartial('administration.token.edit.html', $data))->getOutput(),
 	'script_inline' => getPagePostJs().
-		$this->readJsFile('popup.user.token.edit.js.php').
-		'user_token_edit_popup.init('.json_encode([
+		$this->readJsFile('popup.token.edit.js.php').
+		'token_edit_popup.init('.json_encode([
 			'popup_url' => $popup_url->getUrl(),
 			'form_name' => $data['form_name']
 		]).');',
