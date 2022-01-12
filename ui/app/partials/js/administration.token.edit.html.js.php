@@ -45,7 +45,7 @@
 			this.expires_at_label = this.expires_at_row.previousSibling;
 			this.expires_at = document.getElementById('expires_at');
 			this.expires_state = document.getElementById('expires_state');
-			this.showHide();
+			this.expiresAtHandler();
 		},
 
 		trimFields(fields) {
@@ -58,7 +58,7 @@
 			return fields;
 		},
 
-		showHide() {
+		expiresAtHandler() {
 			if (this.expires_state.checked == false) {
 				let expires_state_hidden = document.createElement('input');
 				expires_state_hidden.setAttribute('type', 'hidden');
