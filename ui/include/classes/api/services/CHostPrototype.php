@@ -1183,15 +1183,13 @@ class CHostPrototype extends CHostBase {
 		), 'itemid');
 
 		foreach ($host_prototypes as $index => &$host_prototype) {
-			if (!in_array($host_prototype['ruleid'], $templated_ruleids)
-					&& array_key_exists('uuid', $host_prototype)) {
+			if (!in_array($host_prototype['ruleid'], $templated_ruleids) && array_key_exists('uuid', $host_prototype)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Invalid parameter "%1$s": %2$s.', '/' . ($index + 1), _s('unexpected parameter "%1$s"', 'uuid'))
 				);
 			}
 
-			if (in_array($host_prototype['ruleid'], $templated_ruleids)
-					&& !array_key_exists('uuid', $host_prototype)) {
+			if (in_array($host_prototype['ruleid'], $templated_ruleids) && !array_key_exists('uuid', $host_prototype)) {
 				$host_prototype['uuid'] = generateUuidV4();
 			}
 		}
