@@ -104,7 +104,7 @@ $widget = (new CWidget())
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())
-				->addItem((new CSimpleButton(_('Create API token')))->onClick('view.openTokenPopup({})'))
+				->addItem((new CSimpleButton(_('Create API token')))->onClick('view.createToken()'))
 		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem($filter);

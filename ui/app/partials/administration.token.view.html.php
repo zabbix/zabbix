@@ -29,7 +29,7 @@ $token_form = (new CForm())
 	->setName('token')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
 
-$success_message = $data['regenerate']
+$success_message = (array_key_exists('regenerate', $data))
 	? makeMessageBox(ZBX_STYLE_MSG_GOOD, [[
 		'message' => _('API token updated')
 	]])

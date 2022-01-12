@@ -44,16 +44,21 @@
 			}
 		},
 
+		createUserToken() {
+			const action_src = {action_src: 'user.token.list'};
+			this.openUserTokenPopup(action_src);
+		},
+
 		editUserToken(e, tokenid) {
 			e.preventDefault();
-			const user_token_data = {tokenid};
+			const user_token_data = {tokenid, action_src: 'user.token.list'};
 			this.openUserTokenPopup(user_token_data);
 		},
 
 		openUserTokenPopup(user_token_data) {
 			const original_url = location.href;
 
-			const overlay = PopUp('popup.user.token.edit', user_token_data, {
+			const overlay = PopUp('popup.token.edit', user_token_data, {
 				dialogueid: 'token_edit',
 				dialogue_class: 'modal-popup-generic'
 			});

@@ -69,7 +69,7 @@ $widget = (new CWidget())
 	->setTitleSubmenu(getUserSettingsSubmenu())
 	->setControls(
 		(new CTag('nav', true,
-			(new CList())->addItem((new CSimpleButton(_('Create API token')))->onClick('view.openUserTokenPopup({})'))
+			(new CList())->addItem((new CSimpleButton(_('Create API token')))->onClick('view.createUserToken()'))
 		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem($filter);

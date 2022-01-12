@@ -25,9 +25,16 @@
  */
 
 $data['form_name'] = 'token_form';
-$data['action_src'] = 'token.edit';
-$popup_url = (new CUrl('zabbix.php'))
-	->setArgument('action', 'token.edit');
+$popup_url = (new CUrl('zabbix.php'));
+
+if ($data['action_src'] === 'token.list') {
+	$data['action_src'] = 'token.edit';
+	$popup_url->setArgument('action', 'token.edit');
+}
+else {
+	$data['action_src'] = 'user.token.edit';
+	$popup_url->setArgument('action', 'user.token.edit');
+}
 
 if ($data['tokenid'] != 0) {
 	$popup_url->setArgument('tokenid', $data['tokenid']);

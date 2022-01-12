@@ -33,7 +33,8 @@ class CControllerTokenEdit extends CController {
 			'userid'        => 'db users.userid',
 			'expires_state' => 'in 0,1',
 			'expires_at'    => 'string',
-			'status'        => 'db token.status|in '.ZBX_AUTH_TOKEN_ENABLED.','.ZBX_AUTH_TOKEN_DISABLED
+			'status'        => 'db token.status|in '.ZBX_AUTH_TOKEN_ENABLED.','.ZBX_AUTH_TOKEN_DISABLED,
+			'action_src'    => 'fatal|required|in token.list,user.token.list'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -101,6 +102,10 @@ class CControllerTokenEdit extends CController {
 				: [CWebUser::$data];
 
 			$data['ms_user'] = [['id' => $user['userid'], 'name' => getUserFullname($user)]];
+		}
+
+		if ($this->hasInput('action_src')) {
+			$data['action_src'] = $this->getInput('action_src');
 		}
 
 		$response = new CControllerResponseData($data);

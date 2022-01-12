@@ -45,9 +45,14 @@
 			}
 		},
 
+		createToken() {
+			const action_src = {action_src: 'token.list'};
+			this.openTokenPopup(action_src);
+		},
+
 		editToken(e, tokenid) {
 			e.preventDefault();
-			const token_data = {tokenid};
+			const token_data = {tokenid, action_src: 'token.list'};
 			this.openTokenPopup(token_data);
 		},
 
