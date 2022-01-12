@@ -46,16 +46,10 @@ void	zbx_vc_test_check_result(zbx_uint64_t *cache_hits, zbx_uint64_t *cache_miss
 
 void	zbx_vc_common_test_func(
 		void **state,
-		void (*zbx_vc_test_add_values_setup)(zbx_mock_handle_t *handle, zbx_vector_ptr_t *history, int *err,
-				const char **data, int *ret_flush),
-		void (*zbx_vc_test_get_value_setup)(zbx_mock_handle_t *handle, zbx_uint64_t *itemid,
-				unsigned char *value_type, zbx_timespec_t *ts, int *err,
-				zbx_vector_history_record_t *expected, zbx_vector_history_record_t *returned),
-		void (*zbx_vc_test_check_result)(zbx_uint64_t *cache_hits, zbx_uint64_t *cache_misses),
-		void (*zbx_vc_test_get_values_setup)(zbx_mock_handle_t *handle, zbx_uint64_t *itemid,
-				unsigned char *value_type, zbx_timespec_t *ts, int *err,
-				zbx_vector_history_record_t *expected, zbx_vector_history_record_t *returned,
-				int *seconds, int *count))
+		zbx_vc_test_add_values_setup_cb add_values_cb,
+		zbx_vc_test_get_value_setup_cb get_value_cb,
+		zbx_vc_test_check_result_cb check_result_cb,
+		zbx_vc_test_get_values_setup_cb get_values_cb)
 {
 	int				err, seconds, count, item_status, item_active_range, item_db_cached_from,
 					item_values_total, cache_mode, ret_flush;
@@ -100,17 +94,17 @@ void	zbx_vc_common_test_func(
 		}
 	}
 
-	if (NULL != zbx_vc_test_add_values_setup)
+	if (NULL != add_values_cb)
 	{
-		zbx_vc_test_add_values_setup(&handle, &history, &err, &data, &ret_flush);
+		add_values_cb(&handle, &history, &err, &data, &ret_flush);
 	}
-	else if (NULL != zbx_vc_test_get_value_setup)
+	else if (NULL != get_value_cb)
 	{
-		zbx_vc_test_get_value_setup(&handle, &itemid, &value_type, &ts, &err, &expected, &returned);
+		get_value_cb(&handle, &itemid, &value_type, &ts, &err, &expected, &returned);
 	}
-	else if (NULL != zbx_vc_test_get_values_setup)
+	else if (NULL != get_values_cb)
 	{
-		zbx_vc_test_get_values_setup(&handle, &itemid, &value_type, &ts, &err, &expected, &returned, &seconds,
+		get_values_cb(&handle, &itemid, &value_type, &ts, &err, &expected, &returned, &seconds,
 				&count);
 	}
 
@@ -174,8 +168,8 @@ void	zbx_vc_common_test_func(
 	zbx_mock_assert_int_eq("cache.mode",
 			zbx_vcmock_str_to_cache_mode(zbx_mock_get_parameter_string("out.cache.mode")), cache_mode);
 
-	if (NULL != zbx_vc_test_check_result)
-		zbx_vc_test_check_result(&cache_hits, &cache_misses);
+	if (NULL != check_result_cb)
+		check_result_cb(&cache_hits, &cache_misses);
 
 	/* cleanup */
 
