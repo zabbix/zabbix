@@ -295,6 +295,11 @@ elseif ($hostid) {
 	}
 }
 
+// Validate backurl.
+if (hasRequest('backurl') && !CHtmlUrlValidator::validateSameSite(getRequest('backurl'))) {
+	access_deny();
+}
+
 $prefix = (getRequest('context') === 'host') ? 'web.hosts.' : 'web.templates.';
 
 /**

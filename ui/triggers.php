@@ -184,6 +184,11 @@ if (getRequest('hostid') && !isWritableHostTemplates([getRequest('hostid')])) {
 	access_deny();
 }
 
+// Validate backurl.
+if (hasRequest('backurl') && !CHtmlUrlValidator::validateSameSite(getRequest('backurl'))) {
+	access_deny();
+}
+
 $tags = getRequest('tags', []);
 
 // Unset empty and inherited tags.

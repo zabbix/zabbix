@@ -117,4 +117,31 @@ class CHtmlUrlValidator {
 			return (array_key_exists('path', $url_parts) && $url_parts['path'] !== '');
 		}
 	}
+
+	/**
+	 * Verifies that URL will not lead to third party pages.
+	 *
+	 * @param string $url
+	 * @param array  $options
+	 * @param bool   $options[allow_same_page]  If set to FALSE will fail the link to same php file.
+	 *
+	 * @return bool
+	 */
+	public static function validateSameSite(string $url, $options = []): bool {
+		$options += [
+			'allow_same_page' => true
+		];
+
+		preg_match('/^\/?(?<filename>[a-z0-9\_\.]+\.php)(\?.*)?$/i', $url, $url_parts);
+
+		if (!array_key_exists('filename', $url_parts) || !file_exists('./'.$url_parts['filename'])) {
+			return false;
+		}
+
+		if (!$options['allow_same_page'] && $url_parts['filename'] == basename(__FILE__)) {
+			return false;
+		}
+
+		return true;
+	}
 }
