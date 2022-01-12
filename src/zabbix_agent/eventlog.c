@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -173,8 +173,6 @@ static void	zbx_close_eventlog(HANDLE eventlog_handle)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_get_message_files                                            *
- *                                                                            *
  * Purpose: gets event message and parameter translation files from registry  *
  *                                                                            *
  * Parameters: szLogName         - [IN] the log name                          *
@@ -221,8 +219,6 @@ static void	zbx_get_message_files(const wchar_t *szLogName, const wchar_t *szSou
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_load_message_file                                            *
- *                                                                            *
  * Purpose: load the specified message file, expanding environment variables  *
  *          in the file name if necessary                                     *
  *                                                                            *
@@ -259,8 +255,6 @@ static HINSTANCE	zbx_load_message_file(const wchar_t *szFileName)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_format_message                                               *
- *                                                                            *
  * Purpose: extracts the specified message from a message file                *
  *                                                                            *
  * Parameters: hLib           - [IN] the message file handle                  *
@@ -295,8 +289,6 @@ static char	*zbx_format_message(HINSTANCE hLib, DWORD dwMessageId, wchar_t **pIn
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_translate_message_params                                     *
  *                                                                            *
  * Purpose: translates message by replacing parameters %%<id> with translated *
  *          values                                                            *
@@ -700,8 +692,6 @@ cleanup:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_parse_eventlog_message6                                      *
- *                                                                            *
  * Purpose: details parse of a single EventLog record                         *
  *                                                                            *
  * Parameters: wsource        - [IN] EventLog file name                       *
@@ -845,8 +835,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: process_eventslog6                                               *
  *                                                                            *
  * Purpose:  batch processing of Event Log file                               *
  *                                                                            *
@@ -1135,8 +1123,6 @@ int	finalize_eventlog6(EVT_HANDLE *render_context, EVT_HANDLE *query)
 
 /******************************************************************************
  *                                                                            *
- * Function: seek_eventlog                                                    *
- *                                                                            *
  * Purpose: try to set reading position in event log                          *
  *                                                                            *
  * Parameters: eventlog_handle - [IN] the handle to the event log to be read  *
@@ -1266,8 +1252,6 @@ static int	seek_eventlog(HANDLE *eventlog_handle, zbx_uint64_t FirstID, DWORD Re
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_parse_eventlog_message                                       *
- *                                                                            *
  * Purpose: details parse of a single Event Log record                        *
  *                                                                            *
  * Parameters: wsource       - [IN] EventLog file name                        *
@@ -1376,8 +1360,6 @@ static void	zbx_parse_eventlog_message(const wchar_t *wsource, const EVENTLOGREC
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: process_eventslog                                                *
  *                                                                            *
  * Purpose:  batch processing of Event Log file                               *
  *                                                                            *

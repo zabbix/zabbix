@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,8 +30,8 @@ class CControllerGuiEdit extends CController {
 		$this->disableSIDValidation();
 
 		$this->timezones = [
-			ZBX_DEFAULT_TIMEZONE => CDateTimeZoneHelper::getSystemDateTimeZone()
-		] + (new CDateTimeZoneHelper())->getAllDateTimeZones();
+			ZBX_DEFAULT_TIMEZONE => CTimezoneHelper::getTitle(CTimezoneHelper::getSystemTimezone(), _('System'))
+		] + CTimezoneHelper::getList();
 	}
 
 	protected function checkInput() {

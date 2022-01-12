@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -442,7 +442,7 @@ class CLegacyWebTest extends CWebTest {
 		$caller = $trace[2];
 
 		if ($caller['class'] !== __CLASS__) {
-			self::addWarning('Web driver selector should not be used in test cases.');
+			self::zbxAddWarning('Web driver selector should not be used in test cases.');
 		}
 
 		return $this->query($type, $locator);
@@ -694,7 +694,7 @@ class CLegacyWebTest extends CWebTest {
 
 	public function __get($attribute) {
 		if ($attribute === 'webDriver') {
-			self::addWarning('Web driver should not be accessed directly from test cases.');
+			self::zbxAddWarning('Web driver should not be accessed directly from test cases.');
 			return CElementQuery::getDriver();
 		}
 

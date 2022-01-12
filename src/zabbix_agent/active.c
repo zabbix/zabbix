@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -255,8 +255,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: mode_parameter_is_skip                                           *
- *                                                                            *
  * Purpose: test log[] or log.count[] item key if <mode> parameter is set to  *
  *          'skip'                                                            *
  *                                                                            *
@@ -291,8 +289,6 @@ static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
 
 /******************************************************************************
  *                                                                            *
- * Function: parse_list_of_checks                                             *
- *                                                                            *
  * Purpose: Parse list of active checks received from server                  *
  *                                                                            *
  * Parameters: str  - NULL terminated string received from server             *
@@ -301,8 +297,6 @@ static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
  *                                                                            *
  * Return value: returns SUCCEED on successful parsing,                       *
  *               FAIL on an incorrect format of string                        *
- *                                                                            *
- * Author: Eugene Grigorjev, Alexei Vladishev (new json protocol)             *
  *                                                                            *
  * Comments:                                                                  *
  *    String represented as "ZBX_EOF" termination list                        *
@@ -526,8 +520,6 @@ out:
 
 /*********************************************************************************
  *                                                                               *
- * Function: process_config_item                                                 *
- *                                                                               *
  * Purpose: process configuration item and set it value to respective parameter  *
  *                                                                               *
  * Parameters: json   - pointer to JSON structure where to put resulting value   *
@@ -590,19 +582,10 @@ static void process_config_item(struct zbx_json *json, char *config, size_t leng
 
 /******************************************************************************
  *                                                                            *
- * Function: refresh_active_checks                                            *
- *                                                                            *
  * Purpose: Retrieve from Zabbix server list of active checks                 *
- *                                                                            *
- * Parameters: host - IP or Hostname of Zabbix server                         *
- *             port - port of Zabbix server                                   *
  *                                                                            *
  * Return value: returns SUCCEED on successful parsing,                       *
  *               FAIL on other cases                                          *
- *                                                                            *
- * Author: Eugene Grigorjev, Alexei Vladishev (new json protocol)             *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	refresh_active_checks(zbx_vector_ptr_t *addrs)
@@ -709,16 +692,12 @@ static int	refresh_active_checks(zbx_vector_ptr_t *addrs)
 
 /******************************************************************************
  *                                                                            *
- * Function: check_response                                                   *
- *                                                                            *
  * Purpose: Check whether JSON response is SUCCEED                            *
  *                                                                            *
  * Parameters: JSON response from Zabbix trapper                              *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: zabbix_sender has almost the same function!                      *
  *                                                                            *
@@ -750,8 +729,6 @@ static int	check_response(char *response)
 
 /******************************************************************************
  *                                                                            *
- * Function: send_buffer                                                      *
- *                                                                            *
  * Purpose: Send value stored in the buffer to Zabbix server                  *
  *                                                                            *
  * Parameters: addrs    - [IN] vector with a pair of Zabbix server IP or      *
@@ -764,8 +741,6 @@ static int	check_response(char *response)
  *                      free elements, or recently sent)                      *
  *                    - data successfully sent to server (proxy)              *
  *               FAIL - error when sending data                               *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
 static int	send_buffer(zbx_vector_ptr_t *addrs, zbx_vector_pre_persistent_t *prep_vec)
@@ -932,8 +907,6 @@ ret:
 
 /******************************************************************************
  *                                                                            *
- * Function: process_value                                                    *
- *                                                                            *
  * Purpose: Buffer new value or send the whole buffer to the server           *
  *                                                                            *
  * Parameters: addrs       - vector with a pair of Zabbix server IP or        *
@@ -955,8 +928,6 @@ ret:
  *                                                                            *
  * Return value: returns SUCCEED on successful parsing,                       *
  *               FAIL on other cases                                          *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: ATTENTION! This function's address and pointers to arguments     *
  *           are described in Zabbix defined type "zbx_process_value_func_t"  *
@@ -1176,8 +1147,6 @@ out:
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 /******************************************************************************
  *                                                                            *
- * Function: zbx_minimal_init_prep_vec_data                                   *
- *                                                                            *
  * Purpose: initialize an element of preparation vector with available data   *
  *                                                                            *
  * Parameters: lastlogsize   - [IN] lastlogize value to write into persistent *
@@ -1343,8 +1312,6 @@ static void	process_active_checks(zbx_vector_ptr_t *addrs)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: update_schedule                                                  *
  *                                                                            *
  * Purpose: update active check and send buffer schedule by the specified     *
  *          time delta                                                        *

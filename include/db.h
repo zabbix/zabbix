@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -342,6 +342,7 @@ typedef struct
 {
 	zbx_uint64_t		serviceid;
 	char			*name;
+	char			*description;
 	zbx_vector_uint64_t	eventids;
 	zbx_vector_ptr_t	events;
 	zbx_vector_tags_t	service_tags;
@@ -559,8 +560,6 @@ char	*zbx_db_get_schema_esc(void);
  * Type: ZBX_GRAPH_ITEMS                                                      *
  *                                                                            *
  * Purpose: represent graph item data                                         *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
 typedef struct

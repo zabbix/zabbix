@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -69,8 +69,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: recv_alert_send                                                  *
  *                                                                            *
  * Purpose: process alert send request that is used to test media types       *
  *                                                                            *

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1067,8 +1067,6 @@ static int	DBpatch_5030065(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: DBpatch_5030066 (part of ZBXNEXT-6368)                           *
- *                                                                            *
  * Purpose: set value for 'scripts' table column 'scope' for existing global  *
  *          scripts                                                           *
  *                                                                            *
@@ -1120,8 +1118,6 @@ static char	*zbx_rename_host_macros(const char *command)
 
 /******************************************************************************
  *                                                                            *
- * Function: DBpatch_5030067 (part of ZBXNEXT-6368)                           *
- *                                                                            *
  * Purpose: rename some {HOST.*} macros to {HOST.TARGET.*} in existing global *
  *          scripts which are used in actions                                 *
  *                                                                            *
@@ -1171,8 +1167,6 @@ static int	DBpatch_5030067(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_split_name  (part of ZBXNEXT-6368)                           *
- *                                                                            *
  * Purpose: helper function to split script name into menu_path and name      *
  *                                                                            *
  * Parameters:                                                                *
@@ -1200,8 +1194,6 @@ static void	zbx_split_name(const char *name, char **menu_path, const char **name
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_make_script_name_unique  (part of ZBXNEXT-6368)              *
  *                                                                            *
  * Purpose: helper function to assist in making unique script names           *
  *                                                                            *
@@ -1263,8 +1255,6 @@ static int	zbx_make_script_name_unique(const char *name, int *suffix, char **uni
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: DBpatch_5030068 (part of ZBXNEXT-6368)                           *
  *                                                                            *
  * Purpose: split script name between 'menu_path' and 'name' columns for      *
  *          existing global scripts                                           *
@@ -1359,8 +1349,6 @@ ZBX_VECTOR_IMPL(opcommands, zbx_opcommand_rec_t)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_pack_record (part of ZBXNEXT-6368)                           *
- *                                                                            *
  * Purpose: helper function, packs parts of remote command into one memory    *
  *          chunk for efficient storing and comparing                         *
  *                                                                            *
@@ -1399,8 +1387,6 @@ static size_t	zbx_pack_record(const zbx_opcommand_parts_t *parts, char **packed_
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_check_duplicate (part of ZBXNEXT-6368)                       *
  *                                                                            *
  * Purpose: checking if this remote command is a new one or a duplicate one   *
  *          and storing the assigned new global script id                     *
@@ -1450,8 +1436,6 @@ static int	zbx_check_duplicate(zbx_vector_opcommands_t *opcommands,
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: DBpatch_5030069   (part of ZBXNEXT-6368)                         *
  *                                                                            *
  * Purpose: migrate remote commands from table 'opcommand' to table 'scripts' *
  *          and convert them into global scripts                              *
@@ -4530,8 +4514,6 @@ static void	dbpatch_trigger_clear(zbx_dbpatch_trigger_t *trigger)
 
 /******************************************************************************
  *                                                                            *
- * Function: dbpatch_update_expression                                        *
- *                                                                            *
  * Purpose: replace {functionid} occurrences in expression with the specified *
  *          replacement string                                                *
  *                                                                            *
@@ -4585,8 +4567,6 @@ static int	dbpatch_update_expression(char **expression, zbx_uint64_t functionid,
 
 /******************************************************************************
  *                                                                            *
- * Function: dbpatch_update_trigger                                           *
- *                                                                            *
  * Purpose: replace {functionid} occurrences in trigger expression and        *
  *          recovery expression with the specified replacement string         *
  *                                                                            *
@@ -4607,8 +4587,6 @@ static void	dbpatch_update_trigger(zbx_dbpatch_trigger_t *trigger, zbx_uint64_t 
 #define ZBX_DBPATCH_RECOVERY_EXPRESSION		0x02
 
 /******************************************************************************
- *                                                                            *
- * Function: dbpatch_find_function                                            *
  *                                                                            *
  * Purpose: check if the expression contains specified functionid             *
  *                                                                            *
@@ -4646,8 +4624,6 @@ static int	dbpatch_find_function(const char *expression, zbx_uint64_t functionid
 
 /******************************************************************************
  *                                                                            *
- * Function: dbpatch_get_function_location                                    *
- *                                                                            *
  * Purpose: return function location mask (expression | recovery expression)  *
  *                                                                            *
  ******************************************************************************/
@@ -4668,8 +4644,6 @@ static unsigned char	dbpatch_get_function_location(const zbx_dbpatch_trigger_t *
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: dbpatch_convert_trigger                                          *
  *                                                                            *
  * Purpose: convert trigger and its functions to use new expression syntax    *
  *                                                                            *
@@ -4991,8 +4965,6 @@ static int	DBpatch_5030166(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: dbpatch_convert_expression_macro                                 *
  *                                                                            *
  * Purpose: convert simple macros in expression macro {? } to function calls  *
  *          using new expression syntax                                       *

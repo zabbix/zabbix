@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,7 +54,10 @@
 		openTokenPopup(token_data) {
 			const original_url = location.href;
 
-			const overlay = PopUp('popup.token.edit', token_data, 'token_edit', document.activeElement);
+			const overlay = PopUp('popup.token.edit', token_data, {
+				dialogueid: 'token_edit',
+				dialogue_class: 'modal-popup-generic'
+			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.tokenSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.tokenDelete, {once: true});

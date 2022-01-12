@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -108,7 +108,7 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 
 $widget->addItem(new CPartial('monitoring.latest.view.html', array_intersect_key($data,
 	array_flip(['filter', 'sort_field', 'sort_order', 'view_curl', 'paging', 'hosts', 'items', 'history', 'config',
-		'tags'
+		'tags', 'maintenances'
 	])
 )));
 

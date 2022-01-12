@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,10 +30,12 @@ require_once dirname(__FILE__).'/dbConditionStringTest.php';
 require_once dirname(__FILE__).'/testHistoryManager.php';
 require_once dirname(__FILE__).'/urlParamTest.php';
 
+use PHPUnit\Framework\TestSuite;
+
 class GeneralTests {
 
 	public static function suite() {
-		$suite = new PHPUnit_Framework_TestSuite('general');
+		$suite = new TestSuite('general');
 
 		$suite->addTestSuite('function_DBconnect');
 		$suite->addTestSuite('function_DBclose');

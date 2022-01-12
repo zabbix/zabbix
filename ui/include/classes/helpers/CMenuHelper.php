@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,11 +60,6 @@ class CMenuHelper {
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_MONITORING_DISCOVERY)
 				? (new CMenuItem(_('Discovery')))->setAction('discovery.view')
-				: null,
-			CWebUser::checkAccess(CRoleHelper::UI_MONITORING_SERVICES)
-				? (new CMenuItem(_('Services')))
-					->setAction('service.list')
-					->setAliases(['service.list.edit'])
 				: null
 		];
 		$submenu_monitoring = array_filter($submenu_monitoring);
@@ -75,6 +70,40 @@ class CMenuHelper {
 					->setId('view')
 					->setIcon('icon-monitoring')
 					->setSubMenu(new CMenu($submenu_monitoring))
+			);
+		}
+
+		$submenu_services = [
+			CWebUser::checkAccess(CRoleHelper::UI_SERVICES_SERVICES)
+				? (new CMenuItem(_('Services')))
+					->setAction('service.list')
+					->setAliases(['service.list.edit'])
+				: null,
+			CWebUser::checkAccess(CRoleHelper::UI_SERVICES_ACTIONS)
+				? (new CMenuItem(_('Service actions')))
+					->setUrl(
+						(new CUrl('actionconf.php'))->setArgument('eventsource', EVENT_SOURCE_SERVICE),
+						'actionconf.php?eventsource='.EVENT_SOURCE_SERVICE
+					)
+				: null,
+			CWebUser::checkAccess(CRoleHelper::UI_SERVICES_SLA)
+				? (new CMenuItem(_('SLA')))
+					->setAction('sla.list')
+				: null,
+			CWebUser::checkAccess(CRoleHelper::UI_SERVICES_SLA_REPORT)
+				? (new CMenuItem(_('SLA report')))
+					->setAction('slareport.list')
+				: null
+		];
+
+		$submenu_services = array_filter($submenu_services);
+
+		if ($submenu_services) {
+			$menu->add(
+				(new CMenuItem(_('Services')))
+					->setId('services')
+					->setIcon('icon-services')
+					->setSubMenu(new CMenu($submenu_services))
 			);
 		}
 
@@ -171,11 +200,6 @@ class CMenuHelper {
 							->setUrl(
 								(new CUrl('actionconf.php'))->setArgument('eventsource', EVENT_SOURCE_TRIGGERS),
 								'actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS
-							),
-						(new CMenuItem(_('Service actions')))
-							->setUrl(
-								(new CUrl('actionconf.php'))->setArgument('eventsource', EVENT_SOURCE_SERVICE),
-								'actionconf.php?eventsource='.EVENT_SOURCE_SERVICE
 							),
 						(new CMenuItem(_('Discovery actions')))
 							->setUrl(

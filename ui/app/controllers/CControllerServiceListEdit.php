@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,6 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'uncheck' =>						'in 1',
 			'serviceid' =>						'db services.serviceid',
 			'path' =>							'array',
 			'filter_name' =>					'string',
@@ -54,7 +53,7 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 	 * @throws APIException
 	 */
 	protected function checkPermissions(): bool {
-		if (!$this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES) || !$this->canEdit()) {
+		if (!$this->checkAccess(CRoleHelper::UI_SERVICES_SERVICES) || !$this->canEdit()) {
 			return false;
 		}
 
@@ -66,14 +65,6 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 	 */
 	protected function doAction(): void {
 		parent::doAction();
-
-		$profile_serviceid = $this->service !== null
-			? $this->service['serviceid']
-			: (string) self::WITHOUT_PARENTS_SERVICEID;
-
-		$uncheck = $this->hasInput('uncheck') || CProfile::get('web.service.list.serviceid') !== $profile_serviceid;
-
-		CProfile::update('web.service.list.serviceid', $profile_serviceid, PROFILE_TYPE_ID);
 
 		$path = $this->getPath();
 
@@ -100,6 +91,12 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 			}
 			$filter['tags'][] = $tag;
 		}
+
+		$breadcrumbs = $this->getBreadcrumbs($path, $filter['filter_set']);
+
+		$parent_url = count($breadcrumbs) > 1
+			? $breadcrumbs[count($breadcrumbs) - 2]['curl']->getUrl()
+			: $breadcrumbs[0]['curl']->getUrl();
 
 		$reset_curl = (new CUrl('zabbix.php'))
 			->setArgument('action', 'service.list.edit')
@@ -136,9 +133,9 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 
 		$data = [
 			'can_monitor_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
-			'uncheck' => $uncheck,
 			'path' => $path,
-			'breadcrumbs' => $this->getBreadcrumbs($path, $filter['filter_set']),
+			'breadcrumbs' => $breadcrumbs,
+			'parent_url' => $parent_url,
 			'filter' => $filter,
 			'is_filtered' => $filter['filter_set'],
 			'active_tab' => CProfile::get('web.service.filter.active', 1),
@@ -151,14 +148,18 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 			'service' => $this->service
 		];
 
-		$db_serviceids = $this->prepareData($filter, $filter['filter_set']);
+		if ($this->service !== null && !$filter['filter_set']) {
+			$data += $this->getSlas();
+		}
+
+		$db_serviceids = self::getServiceIds($filter, $filter['filter_set']);
 
 		$page_num = $this->getInput('page', 1);
 		CPagerHelper::savePage('service.list.edit', $page_num);
 		$data['paging'] = CPagerHelper::paginate($page_num, $db_serviceids, ZBX_SORT_UP, $paging_curl);
 
 		$data['services'] = API::Service()->get([
-			'output' => ['serviceid', 'name', 'status', 'goodsla', 'showsla', 'readonly'],
+			'output' => ['serviceid', 'name', 'status', 'created_at', 'readonly'],
 			'selectParents' => $filter['filter_set'] ? ['serviceid', 'name'] : null,
 			'selectChildren' => API_OUTPUT_COUNT,
 			'selectProblemTags' => API_OUTPUT_COUNT,

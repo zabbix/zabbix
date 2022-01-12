@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,8 +36,6 @@ extern ZBX_THREAD_LOCAL int		server_num, process_num;
 static sigset_t				orig_mask;
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_db_flush_timer_queue                                         *
  *                                                                            *
  * Purpose: flush timer queue to the database                                 *
  *                                                                            *
@@ -81,11 +79,7 @@ static void	db_trigger_queue_cleanup(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: main_dbsyncer_loop                                               *
- *                                                                            *
  * Purpose: periodically synchronises data in memory cache with database      *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: never returns                                                    *
  *                                                                            *

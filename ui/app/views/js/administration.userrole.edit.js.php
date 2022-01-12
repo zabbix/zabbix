@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -84,7 +84,10 @@
 				CRoleHelper::UI_MONITORING_LATEST_DATA => USER_TYPE_ZABBIX_USER,
 				CRoleHelper::UI_MONITORING_MAPS => USER_TYPE_ZABBIX_USER,
 				CRoleHelper::UI_MONITORING_DISCOVERY => USER_TYPE_ZABBIX_ADMIN,
-				CRoleHelper::UI_MONITORING_SERVICES => USER_TYPE_ZABBIX_USER,
+				CRoleHelper::UI_SERVICES_SERVICES => USER_TYPE_ZABBIX_USER,
+				CRoleHelper::UI_SERVICES_ACTIONS => USER_TYPE_ZABBIX_ADMIN,
+				CRoleHelper::UI_SERVICES_SLA => USER_TYPE_ZABBIX_ADMIN,
+				CRoleHelper::UI_SERVICES_SLA_REPORT => USER_TYPE_ZABBIX_USER,
 				CRoleHelper::UI_INVENTORY_OVERVIEW => USER_TYPE_ZABBIX_USER,
 				CRoleHelper::UI_INVENTORY_HOSTS => USER_TYPE_ZABBIX_USER,
 				CRoleHelper::UI_REPORTS_SYSTEM_INFO => USER_TYPE_SUPER_ADMIN,
@@ -119,7 +122,8 @@
 				CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS => USER_TYPE_ZABBIX_USER,
 				CRoleHelper::ACTIONS_EXECUTE_SCRIPTS => USER_TYPE_ZABBIX_USER,
 				CRoleHelper::ACTIONS_MANAGE_API_TOKENS => USER_TYPE_ZABBIX_USER,
-				CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS => USER_TYPE_ZABBIX_ADMIN
+				CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS => USER_TYPE_ZABBIX_ADMIN,
+				CRoleHelper::ACTIONS_MANAGE_SLA => USER_TYPE_ZABBIX_ADMIN
 			], JSON_FORCE_OBJECT) ?>;
 
 			for (const [id, value] of Object.entries(access)) {
@@ -205,7 +209,7 @@
 			const overlay = PopUp('popup.services', {
 				title: <?= json_encode(_('Add services')) ?>,
 				exclude_serviceids
-			}, 'services', document.activeElement);
+			}, {dialogueid: 'services'});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 				const data = [];

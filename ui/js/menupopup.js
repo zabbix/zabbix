@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -102,11 +102,11 @@ function getMenuPopupHistory(options) {
  * @param {bool}   options['allowed_ui_problems']     Whether user has access to problems page.
  * @param {bool}   options['allowed_ui_hosts']        Whether user has access to monitoring hosts pages.
  * @param {bool}   options['allowed_ui_conf_hosts']   Whether user has access to configuration hosts page.
- * @param {object} trigger_elmnt                      UI element which triggered opening of overlay dialogue.
+ * @param {Node}   trigger_element                    UI element which triggered opening of overlay dialogue.
  *
  * @return array
  */
-function getMenuPopupHost(options, trigger_elmnt) {
+function getMenuPopupHost(options, trigger_element) {
 	var sections = [];
 
 	// go to section
@@ -267,7 +267,7 @@ function getMenuPopupHost(options, trigger_elmnt) {
 	if (typeof options.scripts !== 'undefined') {
 		sections.push({
 			label: t('Scripts'),
-			items: getMenuPopupScriptData(options.scripts, trigger_elmnt, options.hostid)
+			items: getMenuPopupScriptData(options.scripts, trigger_element, options.hostid)
 		});
 	}
 
@@ -468,15 +468,13 @@ function getMenuPopupMapElementImage(options) {
  * @param {bool}   options['can_edit_dashboards']
  * @param {bool}   options['can_view_reports']
  * @param {bool}   options['can_create_reports']
- * @param {object} trigger_elmnt                   UI element which triggered opening of overlay dialogue.
+ * @param {object} trigger_element                   UI element which triggered opening of overlay dialogue.
  *
  * @return array
  */
-function getMenuPopupDashboard(options, trigger_elmnt) {
+function getMenuPopupDashboard(options, trigger_element) {
 	const sections = [];
-	const popup_options = {
-		dashboardid: options.dashboardid
-	};
+	const parameters = {dashboardid: options.dashboardid};
 
 	// Dashboard actions.
 	if (options.can_edit_dashboards) {
@@ -500,7 +498,11 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
 					clickCallback: function () {
 						jQuery(this).closest('.menu-popup').menuPopup('close', null);
 
-						PopUp('popup.dashboard.share.edit', popup_options, 'dashboard_share_edit', trigger_elmnt);
+						PopUp('popup.dashboard.share.edit', parameters, {
+							dialogueid: 'dashboard_share_edit',
+							dialogue_class: 'modal-popup-generic',
+							trigger_element
+						});
 					},
 					disabled: !options.editable
 				},
@@ -537,7 +539,7 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
 				clickCallback: function () {
 					jQuery(this).closest('.menu-popup').menuPopup('close', null);
 
-					PopUp('popup.scheduledreport.list', popup_options, null, trigger_elmnt);
+					PopUp('popup.scheduledreport.list', parameters, {trigger_element});
 				},
 				disabled: !options.has_related_reports
 			}
@@ -549,7 +551,7 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
 				clickCallback: function () {
 					jQuery(this).closest('.menu-popup').menuPopup('close', null);
 
-					PopUp('popup.scheduledreport.edit', popup_options, null, trigger_elmnt);
+					PopUp('popup.scheduledreport.edit', parameters, {trigger_element});
 				}
 			});
 		}
@@ -575,11 +577,11 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
  * @param {object} options['configuration']           Link to trigger configuration page (optional).
  * @param {bool}   options['showEvents']              Show Problems item enabled. Default: false.
  * @param {string} options['url']                     Trigger URL link (optional).
- * @param {object} trigger_elmnt                      UI element which triggered opening of overlay dialogue.
+ * @param {object} trigger_element                      UI element which triggered opening of overlay dialogue.
  *
  * @return array
  */
-function getMenuPopupTrigger(options, trigger_elmnt) {
+function getMenuPopupTrigger(options, trigger_element) {
 	var sections = [],
 		items = [];
 
@@ -611,7 +613,7 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 			clickCallback: function() {
 				jQuery(this).closest('.menu-popup-top').menuPopup('close', null);
 
-				acknowledgePopUp({eventids: [options.eventid]}, trigger_elmnt);
+				acknowledgePopUp({eventids: [options.eventid]}, trigger_element);
 			}
 		};
 	}
@@ -670,7 +672,7 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 	if (typeof options.scripts !== 'undefined') {
 		sections.push({
 			label: t('Scripts'),
-			items: getMenuPopupScriptData(options.scripts, trigger_elmnt, null, options.eventid)
+			items: getMenuPopupScriptData(options.scripts, trigger_element, null, options.eventid)
 		});
 	}
 
@@ -688,11 +690,11 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
  * @param string options['triggers'][n]['triggerid']
  * @param string options['triggers'][n]['name']
  * @param string options['context']                   Additional parameter in URL to identify main section.
- * @param {object} trigger_elmnt                      UI element that was clicked to open overlay dialogue.
+ * @param {object} trigger_element                      UI element that was clicked to open overlay dialogue.
  *
  * @return array
  */
-function getMenuPopupItem(options, trigger_elmnt) {
+function getMenuPopupItem(options, trigger_element) {
 	var items = [];
 
 	if (typeof options.show_triggers !== 'undefined' && options.show_triggers) {
@@ -702,9 +704,10 @@ function getMenuPopupItem(options, trigger_elmnt) {
 			clickCallback: function() {
 				jQuery(this).closest('.menu-popup').menuPopup('close', null);
 
-				return PopUp('popup.triggerwizard', {
-					itemid: options.itemid
-				}, null, trigger_elmnt);
+				return PopUp('popup.triggerwizard', {itemid: options.itemid}, {
+					dialogue_class: 'modal-popup-generic',
+					trigger_element
+				});
 			}
 		});
 
@@ -723,9 +726,10 @@ function getMenuPopupItem(options, trigger_elmnt) {
 						jQuery(this).closest('.menu-popup-top').menuPopup('close', null);
 
 						return PopUp('popup.triggerwizard', {
-							itemid: options.itemid,
-							triggerid: trigger.triggerid
-						}, null, trigger_elmnt);
+								itemid: options.itemid,
+								triggerid: trigger.triggerid
+							}, {dialogue_class: 'modal-popup-generic', trigger_element}
+						);
 					}
 				});
 			});
@@ -944,13 +948,13 @@ function getMenuPopupTriggerMacro(options) {
  * Build script menu tree.
  *
  * @param array scripts           Script names amd nenu paths.
- * @param {object} trigger_elmnt  UI element which triggered opening of overlay dialogue.
+ * @param {Node} trigger_element  UI element which triggered opening of overlay dialogue.
  * @param array hostid            Host ID.
  * @param array eventid           Event ID.
  *
  * @returns array
  */
-function getMenuPopupScriptData(scripts, trigger_elmnt, hostid, eventid) {
+function getMenuPopupScriptData(scripts, trigger_element, hostid, eventid) {
 	var tree = {};
 
 	var appendTreeItem = function(tree, name, items, params) {
@@ -1022,7 +1026,7 @@ function getMenuPopupScriptData(scripts, trigger_elmnt, hostid, eventid) {
 		return items;
 	};
 
-	return getMenuPopupScriptItems(tree, trigger_elmnt);
+	return getMenuPopupScriptItems(tree, trigger_element);
 }
 
 jQuery(function($) {

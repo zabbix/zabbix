@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@ import (
 	"zabbix.com/pkg/itemutil"
 	"zabbix.com/pkg/log"
 	"zabbix.com/pkg/plugin"
+	"zabbix.com/plugins/external"
 )
 
 const (
@@ -530,7 +531,15 @@ func (m *Manager) init() {
 				interfaces += "configurator, "
 			}
 			interfaces = interfaces[:len(interfaces)-2]
-			log.Infof("using plugin '%s' providing following interfaces: %s", metric.Plugin.Name(), interfaces)
+
+			if metric.Plugin.IsExternal() {
+				ext := metric.Plugin.(*external.Plugin)
+				log.Infof("using plugin '%s' (%s) providing following interfaces: %s", metric.Plugin.Name(),
+					ext.Path, interfaces)
+			} else {
+				log.Infof("using plugin '%s' (built-in) providing following interfaces: %s", metric.Plugin.Name(),
+					interfaces)
+			}
 		}
 		m.plugins[metric.Key] = pagent
 	}
