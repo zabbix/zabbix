@@ -34,7 +34,7 @@ $widget = (new CWidget())
 			->addItem(new CRedirectButton(_('Create media type'), 'zabbix.php?action=mediatype.edit'))
 			->addItem(
 				(new CButton('', _('Import')))
-					->onClick('return PopUp("popup.import", {rules_preset: "mediatype"}, null, this);')
+					->onClick('return PopUp("popup.import", {rules_preset: "mediatype"});')
 					->removeId()
 			)
 		))
@@ -147,9 +147,12 @@ foreach ($data['mediatypes'] as $mediaType) {
 		->addClass(ZBX_STYLE_BTN_LINK)
 		->removeId()
 		->setEnabled(MEDIA_TYPE_STATUS_ACTIVE == $mediaType['status'])
-		->onClick('return PopUp("popup.mediatypetest.edit",'.json_encode([
-			'mediatypeid' => $mediaType['mediatypeid']
-		]).', "mediatypetest_edit", this);');
+		->onClick('
+			return PopUp("popup.mediatypetest.edit", '.json_encode(['mediatypeid' => $mediaType['mediatypeid']]).', {
+				dialogue_id: "mediatypetest_edit",
+				dialogue_class: "modal-popup-medium"
+			});'
+		);
 
 	$name = new CLink($mediaType['name'], '?action=mediatype.edit&mediatypeid='.$mediaType['mediatypeid']);
 

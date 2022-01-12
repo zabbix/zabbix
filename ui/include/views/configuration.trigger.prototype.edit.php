@@ -111,9 +111,11 @@ if ($data['hostid']) {
 }
 $add_expression_button = (new CButton('insert', ($data['expression_constructor'] == IM_TREE) ? _('Edit') : _('Add')))
 	->addClass(ZBX_STYLE_BTN_GREY)
-	->onClick('return PopUp("popup.triggerexpr",jQuery.extend('.
-		json_encode($popup_options).
-			',{expression: jQuery(\'[name="'.$data['expression_field_name'].'"]\').val()}), null, this);'
+	->onClick(
+		'return PopUp("popup.triggerexpr", jQuery.extend('.json_encode($popup_options).', {
+				expression: jQuery(\'[name="'.$data['expression_field_name'].'"]\').val()
+			}), {dialogue_class: "modal-popup-generic"}
+		);'
 	)
 	->removeId();
 if ($data['limited']) {
@@ -263,8 +265,11 @@ if ($data['expression_constructor'] == IM_TREE) {
 	}
 
 	$testButton = (new CButton('test_expression', _('Test')))
-		->onClick('return PopUp("popup.testtriggerexpr",{expression: this.form.elements["expression"].value}, null,'.
-					'this);')
+		->onClick(
+			'return PopUp("popup.testtriggerexpr", {expression: this.form.elements["expression"].value}, {
+				dialogue_class: "modal-popup-generic"
+			});'
+		)
 		->addClass(ZBX_STYLE_BTN_LINK)
 		->removeId();
 	if (!$allowed_testing) {
@@ -306,15 +311,16 @@ $add_recovery_expression_button = (new CButton('insert',
 		($data['recovery_expression_constructor'] == IM_TREE) ? _('Edit') : _('Add'))
 	)
 	->addClass(ZBX_STYLE_BTN_GREY)
-	->onClick('return PopUp("popup.triggerexpr",jQuery.extend('.
-		json_encode([
+	->onClick(
+		'return PopUp("popup.triggerexpr", jQuery.extend('.json_encode([
 			'srctbl' => $data['recovery_expression_field_name'],
 			'srcfld1' => $data['recovery_expression_field_name'],
 			'dstfrm' => $triggersForm->getName(),
 			'dstfld1' => $data['recovery_expression_field_name'],
 			'parent_discoveryid' => $data['parent_discoveryid']
-		]).
-			',{expression: jQuery(\'[name="'.$data['recovery_expression_field_name'].'"]\').val()}), null, this);'
+		]).', {expression: jQuery(\'[name="'.$data['recovery_expression_field_name'].'"]\').val()}),
+			{dialogue_class: "modal-popup-generic"}
+		);'
 	);
 
 if ($data['limited']) {
@@ -459,8 +465,11 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 	}
 
 	$testButton = (new CButton('test_expression', _('Test')))
-		->onClick('return PopUp("popup.testtriggerexpr",'.
-			'{expression: this.form.elements["recovery_expression"].value}, null, this);')
+		->onClick(
+			'return PopUp("popup.testtriggerexpr", {expression: this.form.elements["recovery_expression"].value}, {
+				dialogue_class: "modal-popup-generic"
+			});'
+		)
 		->addClass(ZBX_STYLE_BTN_LINK)
 		->removeId();
 	if (!$allowed_testing) {
@@ -610,8 +619,8 @@ $dependenciesFormList->addRow(_('Dependencies'),
 		$dependenciesTable,
 		new CHorList([
 			(new CButton('add_dep_trigger', _('Add')))
-				->onClick('return PopUp("popup.generic",'.
-					json_encode([
+				->onClick(
+					'return PopUp("popup.generic", '.json_encode([
 						'srctbl' => 'triggers',
 						'srcfld1' => 'triggerid',
 						'reference' => 'deptrigger',
@@ -620,18 +629,18 @@ $dependenciesFormList->addRow(_('Dependencies'),
 						'normal_only' => '1',
 						'noempty' => '1',
 						'hostid' => $data['hostid']
-					]).', null, this);'
+					]).', {dialogue_class: "modal-popup-generic"});'
 				)
 				->addClass(ZBX_STYLE_BTN_LINK),
 			(new CButton('add_dep_trigger_prototype', _('Add prototype')))
-				->onClick('return PopUp("popup.generic",'.
-					json_encode([
+				->onClick(
+					'return PopUp("popup.generic", '.json_encode([
 						'srctbl' => 'trigger_prototypes',
 						'srcfld1' => 'triggerid',
 						'reference' => 'deptrigger',
 						'multiselect' => '1',
 						'parent_discoveryid' => $data['parent_discoveryid']
-					]).', null, this);'
+					]).', {dialogue_class: "modal-popup-generic"});'
 				)
 				->addClass(ZBX_STYLE_BTN_LINK)
 		])

@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:18Z'
+  version: '6.0'
+  date: '2021-12-15T06:58:41Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -12,12 +12,12 @@ zabbix_export:
       name: 'Zookeeper by HTTP'
       description: |
         Get Apache Zookeeper metrics by HTTP agent.
-          This template works with standalone and cluster instances. Metrics are collected from each Zookeper node by requests to AdminServer.  
+          This template works with standalone and cluster instances. Metrics are collected from each Zookeper node by requests to AdminServer.
           Don't forget to change macros {$ZOOKEEPER.COMMAND_URL}, {$ZOOKEEPER.PORT}, {$ZOOKEEPER.SCHEME}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Applications
@@ -183,8 +183,8 @@ zabbix_export:
               parameters:
                 - |
                   var metrics = JSON.parse(value);
-                  if (metrics.server_state === "standalone") { 
-                      return 0 
+                  if (metrics.server_state === "standalone") {
+                      return 0
                       }
                   else {
                       return metrics.cnt_election_time || metrics.election_time_count

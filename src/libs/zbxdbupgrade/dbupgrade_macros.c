@@ -48,8 +48,6 @@ ZBX_VECTOR_IMPL(strloc, zbx_strloc_t)
 
 /******************************************************************************
  *                                                                            *
- * Function: str_rename_macro                                                 *
- *                                                                            *
  * Purpose: rename macros in the string                                       *
  *                                                                            *
  * Parameters: in        - [IN] the input string                              *
@@ -102,8 +100,6 @@ static int	str_rename_macro(const char *in, const char *oldmacro, const char *ne
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: db_rename_macro                                                  *
  *                                                                            *
  * Purpose: rename macro in the specified database fields                     *
  *                                                                            *
@@ -358,8 +354,6 @@ static void	dbpatch_update_func_bitand(zbx_dbpatch_function_t *function, const z
 
 /******************************************************************************
  *                                                                            *
- * Function: dbpatch_strcpy_alloc_quoted                                      *
- *                                                                            *
  * Purpose: quote and text to a buffer                                        *
  *                                                                            *
  * Parameters: str        - [OUT] the output buffer                           *
@@ -383,8 +377,6 @@ void	dbpatch_strcpy_alloc_quoted(char **str, size_t *str_alloc, size_t *str_offs
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: dbpatch_is_composite_constant                                    *
  *                                                                            *
  * Purpose: check for composite (consisting of macro(s) + text) constant      *
  *                                                                            *
@@ -411,8 +403,6 @@ int	dbpatch_is_composite_constant(const char *str)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: dbpatch_convert_params                                           *
  *                                                                            *
  * Purpose: convert function parameters into new syntax                       *
  *                                                                            *
@@ -577,8 +567,6 @@ void	dbpatch_convert_params(char **out, const char *parameter, const zbx_vector_
 
 /******************************************************************************
  *                                                                            *
- * Function: dbpatch_parse_function_params                                    *
- *                                                                            *
  * Purpose: parse function parameter string into parameter location vector    *
  *                                                                            *
  ******************************************************************************/
@@ -613,8 +601,6 @@ static void	dbpatch_parse_function_params(const char *parameter, zbx_vector_strl
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: dbpatch_convert_function                                         *
  *                                                                            *
  * Purpose: convert function to new parameter syntax/order                    *
  *                                                                            *
@@ -838,8 +824,6 @@ void	dbpatch_convert_function(zbx_dbpatch_function_t *function, char **replace, 
 
 /******************************************************************************
  *                                                                            *
- * Function: dbpatch_replace_functionids                                      *
- *                                                                            *
  * Purpose: replace functionids {<index in functions vector>} in expression   *
  *          with their string format                                          *
  *                                                                            *
@@ -899,8 +883,6 @@ static void	dbpatch_replace_functionids(char **expression, const zbx_vector_ptr_
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: dbpatch_convert_simple_macro                                     *
  *                                                                            *
  * Purpose: convert simple macro {host.key:func(params)} to the new syntax    *
  *          func(/host/key,params)                                            *

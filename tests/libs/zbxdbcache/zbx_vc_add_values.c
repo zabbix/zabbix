@@ -29,11 +29,6 @@
 
 extern zbx_uint64_t	CONFIG_VALUE_CACHE_SIZE;
 
-/******************************************************************************
- *                                                                            *
- * Function: zbx_mock_test_entry                                              *
- *                                                                            *
- ******************************************************************************/
 void	zbx_mock_test_entry(void **state)
 {
 	int				err, seconds, count, item_status, item_active_range, item_db_cached_from,

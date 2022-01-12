@@ -150,8 +150,11 @@ $expression_row = [
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('insert', ($data['expression_constructor'] == IM_TREE) ? _('Edit') : _('Add')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("popup.triggerexpr",jQuery.extend('.json_encode($popup_options).
-			',{expression: jQuery(\'[name="'.$data['expression_field_name'].'"]\').val()}), null, this);'
+		->onClick(
+			'return PopUp("popup.triggerexpr", jQuery.extend('.json_encode($popup_options).',
+					{expression: jQuery(\'[name="'.$data['expression_field_name'].'"]\').val()}
+				), {dialogue_class: "modal-popup-generic"}
+			);'
 		)
 		->setEnabled(!$readonly)
 		->removeId()
@@ -286,8 +289,11 @@ if ($data['expression_constructor'] == IM_TREE) {
 	}
 
 	$testButton = (new CButton('test_expression', _('Test')))
-		->onClick('return PopUp("popup.testtriggerexpr",{expression: this.form.elements["expression"].value}, null,'.
-					'this);')
+		->onClick(
+			'return PopUp("popup.testtriggerexpr", {expression: this.form.elements["expression"].value}, {
+				dialogue_class: "modal-popup-generic"
+			});'
+		)
 		->addClass(ZBX_STYLE_BTN_LINK)
 		->removeId();
 
@@ -350,9 +356,11 @@ $recovery_expression_row = [
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('insert', ($data['recovery_expression_constructor'] == IM_TREE) ? _('Edit') : _('Add')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("popup.triggerexpr",jQuery.extend('.
-			json_encode($popup_options).
-				',{expression: jQuery(\'[name="'.$data['recovery_expression_field_name'].'"]\').val()}), null, this);'
+		->onClick(
+			'return PopUp("popup.triggerexpr", jQuery.extend('.json_encode($popup_options).',
+					{expression: jQuery(\'[name="'.$data['recovery_expression_field_name'].'"]\').val()}
+				), {dialogue_class: "modal-popup-generic"}
+			);'
 		)
 		->setEnabled(!$readonly)
 		->removeId()
@@ -484,8 +492,11 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 	}
 
 	$testButton = (new CButton('test_expression', _('Test')))
-		->onClick('return PopUp("popup.testtriggerexpr",'.
-			'{expression: this.form.elements["recovery_expression"].value}, null, this);')
+		->onClick(
+			'return PopUp("popup.testtriggerexpr", {expression: this.form.elements["recovery_expression"].value}, {
+				dialogue_class: "modal-popup-generic"
+			});'
+		)
 		->addClass(ZBX_STYLE_BTN_LINK)
 		->removeId();
 
@@ -624,8 +635,8 @@ $dependenciesFormList->addRow(_('Dependencies'),
 		$readonly
 			? null
 			: (new CButton('bnt1', _('Add')))
-				->onClick('return PopUp("popup.generic",'.
-					json_encode([
+				->onClick(
+					'return PopUp("popup.generic", '.json_encode([
 						'srctbl' => 'triggers',
 						'srcfld1' => 'triggerid',
 						'reference' => 'deptrigger',
@@ -633,7 +644,7 @@ $dependenciesFormList->addRow(_('Dependencies'),
 						'multiselect' => '1',
 						'with_triggers' => '1',
 						'noempty' => '1'
-					]).', null, this);'
+					]).', {dialogue_class: "modal-popup-generic"});'
 				)
 				->addClass(ZBX_STYLE_BTN_LINK)
 	]))

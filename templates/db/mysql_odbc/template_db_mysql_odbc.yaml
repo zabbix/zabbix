@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:39Z'
+  version: '6.0'
+  date: '2021-12-16T07:08:45Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -15,13 +15,13 @@ zabbix_export:
         1. Create MySQL user for monitoring. For example:
         CREATE USER 'zbx_monitor'@'%' IDENTIFIED BY '<password>';
         GRANT REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW ON *.* TO 'zbx_monitor'@'%';
-        For more information read the MYSQL documentation https://dev.mysql.com/doc/refman/8.0/en/grant.html , please. 
+        For more information read the MYSQL documentation https://dev.mysql.com/doc/refman/8.0/en/grant.html , please.
         2. Set the user name and password in host macros ({$MYSQL.USER} and {$MYSQL.PASSWORD}).
         
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384189-discussion-thread-for-official-zabbix-template-db-mysql
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Databases
@@ -797,7 +797,7 @@ zabbix_export:
           key: mysql.innodb_log_file_size
           history: 7d
           value_type: FLOAT
-          params: '(last(//mysql.innodb_os_log_written) - last(//mysql.innodb_os_log_written)) / {$MYSQL.INNODB_LOG_FILES}'
+          params: '(last(//mysql.innodb_os_log_written) - first(//mysql.innodb_os_log_written,1h)) / {$MYSQL.INNODB_LOG_FILES}'
           description: 'Calculated by (innodb_os_log_written-innodb_os_log_written(time shift -1h))/{$MYSQL.INNODB_LOG_FILES} value of the innodb_log_file_size. Innodb_log_file_size is the size in bytes of the each InnoDB redo log file in the log group. The combined size can be no more than 512GB. Larger values mean less disk I/O due to less flushing checkpoint activity, but also slower recovery from a crash.'
           preprocessing:
             -
@@ -1322,8 +1322,8 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: |
-                Whether the I/O thread for reading the master's binary log is running. 
-                Normally, you want this to be Yes unless you have not yet started a replication or have 
+                Whether the I/O thread for reading the master's binary log is running.
+                Normally, you want this to be Yes unless you have not yet started a replication or have
                 explicitly stopped it with STOP SLAVE.
               preprocessing:
                 -
@@ -1366,7 +1366,7 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: |
-                Whether the SQL thread for executing events in the relay log is running. 
+                Whether the SQL thread for executing events in the relay log is running.
                 As with the I/O thread, this should normally be Yes.
               preprocessing:
                 -

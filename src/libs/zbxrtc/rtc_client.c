@@ -26,8 +26,6 @@ extern int	CONFIG_TIMEOUT;
 
 /******************************************************************************
  *                                                                            *
- * Function: rtc_parse_log_level_parameter                                    *
- *                                                                            *
  * Purpose: parse loglevel runtime control option                             *
  *                                                                            *
  * Parameters: opt   - [IN] the runtime control option                        *
@@ -76,15 +74,8 @@ finish:
 
 /******************************************************************************
  *                                                                            *
- * Function: rtc_parse_options                                                *
- *                                                                            *
  * Purpose: parse runtime control options and create a runtime control        *
  *          message                                                           *
- *                                                                            *
- * Parameters: opt          - [IN] the command line argument                  *
- *             program_type - [IN] the program type                           *
- *             message      - [OUT] the message containing options for log    *
- *                                  level change or cache reload              *
  *                                                                            *
  * Return value: SUCCEED - the message was created successfully               *
  *               FAIL    - an error occurred                                  *
@@ -160,12 +151,10 @@ static int	rtc_parse_options(const char *opt, zbx_uint32_t *code, char **data, c
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_rtc_process                                                  *
- *                                                                            *
  * Purpose: process runtime control option and print result                   *
  *                                                                            *
- * Parameters: opt   - [IN] the runtime control option                        *
- *             error - [OUT] error message                                    *
+ * Parameters: option   - [IN] the runtime control option                     *
+ *             error    - [OUT] error message                                 *
  *                                                                            *
  * Return value: SUCCEED - the runtime control option was processed           *
  *               FAIL    - otherwise                                          *
@@ -238,8 +227,6 @@ int	zbx_rtc_open(zbx_ipc_async_socket_t *asocket, int timeout, char **error)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_rtc_notify_config_sync                                       *
  *                                                                            *
  * Purpose: notify RTC service about finishing initial configuration sync     *
  *                                                                            *

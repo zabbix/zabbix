@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:37Z'
+  version: '6.0'
+  date: '2021-12-16T20:03:01Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -16,7 +16,7 @@ zabbix_export:
         MIBs used:
         IDRAC-MIB-SMIv2
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       templates:
         -
           name: 'Generic SNMP'

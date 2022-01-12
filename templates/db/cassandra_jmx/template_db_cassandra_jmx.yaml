@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:42Z'
+  version: '6.0'
+  date: '2022-01-10T07:41:19Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -19,7 +19,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/410057-discussion-thread-for-official-zabbix-template-apache-cassandra
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Databases
@@ -94,7 +94,7 @@ zabbix_export:
           history: 7d
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
-          description: 'Number of commit log messages written but yet to be fsync’d.'
+          description: 'Number of commit log messages written but yet to be fsync''d.'
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
@@ -699,7 +699,7 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that are currently blocked due to queue saturation but on retry will become unblocked.
-            HintsDispatcher:Performs hinted handoff.
+            HintsDispatcher: Performs hinted handoff.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
@@ -715,7 +715,7 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of queued tasks queued up on this pool.
-            HintsDispatcher:Performs hinted handoff.
+            HintsDispatcher: Performs hinted handoff.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
@@ -731,7 +731,7 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that were blocked due to queue saturation.
-            HintsDispatcher:Performs hinted handoff.
+            HintsDispatcher: Performs hinted handoff.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
@@ -747,7 +747,7 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that are currently blocked due to queue saturation but on retry will become unblocked.
-            MemtableFlushWriter:Writes memtables to disk.
+            MemtableFlushWriter: Writes memtables to disk.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
@@ -763,7 +763,7 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of queued tasks queued up on this pool.
-            MemtableFlushWriter:Writes memtables to disk.
+            MemtableFlushWriter: Writes memtables to disk.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
@@ -779,7 +779,7 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that were blocked due to queue saturation.
-            MemtableFlushWriter:Writes memtables to disk.
+            MemtableFlushWriter: Writes memtables to disk.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
@@ -795,7 +795,7 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that are currently blocked due to queue saturation but on retry will become unblocked.
-            MemtablePostFlush:Cleans up commit log after memtable is written to disk.
+            MemtablePostFlush: Cleans up commit log after memtable is written to disk.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
@@ -811,7 +811,7 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of queued tasks queued up on this pool.
-            MemtablePostFlush:Cleans up commit log after memtable is written to disk.
+            MemtablePostFlush: Cleans up commit log after memtable is written to disk.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
@@ -827,7 +827,7 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that were blocked due to queue saturation.
-            MemtablePostFlush:Cleans up commit log after memtable is written to disk.
+            MemtablePostFlush: Cleans up commit log after memtable is written to disk.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
@@ -843,7 +843,7 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that are currently blocked due to queue saturation but on retry will become unblocked.
-            MigrationStage:Runs schema migrations.
+            MigrationStage: Runs schema migrations.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
@@ -859,7 +859,7 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of queued tasks queued up on this pool.
-            MigrationStage:Runs schema migrations.
+            MigrationStage: Runs schema migrations.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
@@ -875,7 +875,7 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that were blocked due to queue saturation.
-            MigrationStage:Runs schema migrations.
+            MigrationStage: Runs schema migrations.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
@@ -891,7 +891,7 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that are currently blocked due to queue saturation but on retry will become unblocked.
-            MiscStage:Misceleneous tasks run here.
+            MiscStage: Miscellaneous tasks run here.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
@@ -907,7 +907,7 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of queued tasks queued up on this pool.
-            MiscStage:Misceleneous tasks run here.
+            MiscStage: Miscellaneous tasks run here.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
@@ -923,7 +923,7 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that were blocked due to queue saturation.
-            MiscStage:Misceleneous tasks run here.
+            MiscStage: Miscellaneous tasks run here.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
@@ -939,7 +939,7 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that are currently blocked due to queue saturation but on retry will become unblocked.
-            SecondaryIndexManagement:Performs updates to secondary indexes.
+            SecondaryIndexManagement: Performs updates to secondary indexes.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
@@ -955,7 +955,7 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of queued tasks queued up on this pool.
-            SecondaryIndexManagement:Performs updates to secondary indexes.
+            SecondaryIndexManagement: Performs updates to secondary indexes.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
@@ -971,7 +971,7 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that were blocked due to queue saturation.
-            SecondaryIndexManagement:Performs updates to secondary indexes.
+            SecondaryIndexManagement: Performs updates to secondary indexes.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
@@ -987,7 +987,7 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that are currently blocked due to queue saturation but on retry will become unblocked.
-            CounterMutationStage:Responsible for counter writes.
+            CounterMutationStage: Responsible for counter writes.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
@@ -1003,7 +1003,7 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of queued tasks queued up on this pool.
-            CounterMutationStage:Responsible for counter writes.
+            CounterMutationStage: Responsible for counter writes.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
@@ -1019,7 +1019,7 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that were blocked due to queue saturation.
-            CounterMutationStage:Responsible for counter writes.
+            CounterMutationStage: Responsible for counter writes.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
@@ -1035,7 +1035,7 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that are currently blocked due to queue saturation but on retry will become unblocked.
-            MutationStage:Responsible for writes (exclude materialized and counter writes).
+            MutationStage: Responsible for writes (exclude materialized and counter writes).
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
@@ -1051,7 +1051,7 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of queued tasks queued up on this pool.
-            MutationStage:Responsible for writes (exclude materialized and counter writes).
+            MutationStage: Responsible for writes (exclude materialized and counter writes).
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
@@ -1067,7 +1067,7 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that were blocked due to queue saturation.
-            MutationStage:Responsible for writes (exclude materialized and counter writes).
+            MutationStage: Responsible for writes (exclude materialized and counter writes).
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
@@ -1083,7 +1083,7 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that are currently blocked due to queue saturation but on retry will become unblocked.
-            ReadStage:Local reads run on this thread pool.
+            ReadStage: Local reads run on this thread pool.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
@@ -1099,7 +1099,7 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of queued tasks queued up on this pool.
-            ReadStage:Local reads run on this thread pool.
+            ReadStage: Local reads run on this thread pool.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
@@ -1115,7 +1115,7 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that were blocked due to queue saturation.
-            ReadStage:Local reads run on this thread pool.
+            ReadStage: Local reads run on this thread pool.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
@@ -1131,7 +1131,7 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that are currently blocked due to queue saturation but on retry will become unblocked.
-            ViewMutationStage:Responsible for materialized view writes.
+            ViewMutationStage: Responsible for materialized view writes.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
@@ -1147,7 +1147,7 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of queued tasks queued up on this pool.
-            ViewMutationStage:Responsible for materialized view writes.
+            ViewMutationStage: Responsible for materialized view writes.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
@@ -1163,7 +1163,7 @@ zabbix_export:
           password: '{$CASSANDRA.PASSWORD}'
           description: |
             Number of tasks that were blocked due to queue saturation.
-            ViewMutationStage:Responsible for materialized view writes.
+            ViewMutationStage: Responsible for materialized view writes.
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -

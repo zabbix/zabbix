@@ -44,8 +44,6 @@ static int	DBmodify_proxy_table_id_field(const char *table_name)
 
 /*********************************************************************************
  *                                                                               *
- * Function: parse_db_monitor_item_params                                        *
- *                                                                               *
  * Purpose: parse database monitor item params string "user=<user> password=     *
  *          <passsword> DSN=<dsn> sql=<sql>" into parameter values.              *
  *                                                                               *
@@ -1668,8 +1666,6 @@ static int	DBpatch_2010194(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: DBpatch_2010195_replace_key_param_cb                             *
  *                                                                            *
  * Comments: auxiliary function for DBpatch_2010195()                         *
  *                                                                            *

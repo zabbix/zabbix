@@ -30,8 +30,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: httpmacro_cmp_func                                               *
- *                                                                            *
  * Purpose: compare two macros by name                                        *
  *                                                                            *
  * Parameters: d1 - [IN] the first macro                                      *
@@ -51,8 +49,6 @@ static int 	httpmacro_cmp_func(const void *d1, const void *d2)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: httpmacro_append_pair                                            *
  *                                                                            *
  * Purpose: appends key/value pair to the http test macro cache.              *
  *          If the value format is 'regex:<pattern>', then regular expression *
@@ -164,8 +160,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: http_substitute_variables                                        *
- *                                                                            *
  * Purpose: substitute variables in input string with their values from http  *
  *          test config                                                       *
  *                                                                            *
@@ -259,8 +253,6 @@ int	http_substitute_variables(const zbx_httptest_t *httptest, char **data)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: http_process_variables                                           *
  *                                                                            *
  * Purpose: parses http test/step variable string and stores results into     *
  *          httptest macro cache.                                             *

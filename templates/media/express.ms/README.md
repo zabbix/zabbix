@@ -48,4 +48,4 @@ Make sure this user has access to all hosts, for which you would like problem no
 For more information see [Zabbix](https://www.zabbix.com/documentation/6.0/manual/config/notifications) and [Express.ms](https://express.ms/docs) documentations.
 
 ## Supported versions
-Zabbix 5.4 and higher
+Zabbix 6.0 and higher

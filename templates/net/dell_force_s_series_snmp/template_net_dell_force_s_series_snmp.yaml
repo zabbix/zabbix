@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:12Z'
+  version: '6.0'
+  date: '2021-12-17T06:32:48Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -16,7 +16,7 @@ zabbix_export:
         MIBs used:
         F10-S-SERIES-CHASSIS-MIB
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       templates:
         -
           name: 'EtherLike-MIB SNMP'

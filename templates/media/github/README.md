@@ -26,7 +26,7 @@ The configuration consists of a _media type_ in Zabbix, which will invoke the we
 
 2\. Change in the imported media the values of the variable github_token.
 
-Change github_url ony in case if will integrate with Github Enterprise.
+Change github_url only in case if will integrate with Github Enterprise.
 
 For more information about the Zabbix Webhook configuration, please see the [documentation](https://www.zabbix.com/documentation/6.0/manual/config/notifications/media/webhook).
 
