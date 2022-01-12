@@ -22,6 +22,8 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 
 /**
  * @onBefore prepareItemData
+ *
+ * @backup history_uint, items
  */
 class testPageLatestData extends CWebTest {
 
@@ -51,6 +53,7 @@ class testPageLatestData extends CWebTest {
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$this->assertEquals(['Host groups', 'Hosts', 'Name', 'Tags', 'Show details'],
 				$form->getLabels()->asText());
+		$this->assertTrue($form->query('xpath:.//label[text()="Show items without data"]')->one()->isValid());
 
 		// Show item without data is checked/disabled without Hosts in filter and checked/enabled with Hosts in filter.
 		foreach ([false, true] as $status) {
@@ -63,7 +66,7 @@ class testPageLatestData extends CWebTest {
 
 		// Check filter buttons.
 		foreach (['Apply', 'Reset'] as $button) {
-			$this->assertTrue($form->query('button', $button)->one()->isPresent());
+			$this->assertTrue($form->query('button', $button)->one()->isClickable());
 		}
 
 		// Check table headers.
@@ -73,7 +76,7 @@ class testPageLatestData extends CWebTest {
 
 		// Check that sortable headers is clickable.
 		foreach (['Host', 'Name'] as $header) {
-			$this->assertTrue($table->query('xpath://th/a[text()="'.$header.'"]')->one()->isValid());
+			$this->assertTrue($table->query('xpath:.//th/a[text()="'.$header.'"]')->one()->isClickable());
 		}
 
 		// Check filter collapse/expand.
@@ -89,13 +92,13 @@ class testPageLatestData extends CWebTest {
 		$result = DBselect(
 			'SELECT host'.
 			' FROM hosts'.
-			' WHERE status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
+			' WHERE status IN ('.HOST_STATUS_MONITORED.', '.HOST_STATUS_NOT_MONITORED.', '.HOST_STATUS_TEMPLATE.')'.
 				' AND name <> host'
 		);
 		$this->page->login()->open('zabbix.php?action=latest.view');
 		$table = $this->query('class:list-table')->asTable()->one();
-		while ($row = DBfetch($result)) {
-			$this->assertFalse($table->query('xpath://td/a[text()='.CXPathHelper::escapeQuotes($row['host']).']')
+		foreach (DBfetch($result) as $hostname) {
+			$this->assertFalse($table->query('xpath://td/a[text()='.CXPathHelper::escapeQuotes($hostname).']')
 					->one(false)->isDisplayed());
 		}
 	}
@@ -236,6 +239,8 @@ class testPageLatestData extends CWebTest {
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$form->fill(['Hosts' => 'Available host in maintenance']);
 		$form->submit();
+
+		// TODO: change forceClick after ZBX-20426 merge.
 		$this->query('xpath:.//span[contains(@class, "icon-main")]')->one()->forceClick();
 		$hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last()->getText();
 		$hint_text = "Maintenance for Host availability widget [Maintenance with data collection]\n".
@@ -255,8 +260,7 @@ class testPageLatestData extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=latest.view');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$form->query('button:Reset')->one()->click();
-		$form->fill(['Name' => '4_item']);
-		$form->submit();
+		$form->fill(['Name' => '4_item'])->submit();
 		$table = $this->query('class:list-table')->asTable()->one();
 
 		foreach (['Last check', 'Last value'] as $column) {
