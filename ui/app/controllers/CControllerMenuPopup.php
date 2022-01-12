@@ -23,7 +23,7 @@ class CControllerMenuPopup extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'type' => 'required|in history,host,item_configuration,item,item_prototype_configuration,map_element,refresh,trigger,trigger_macro,widget_actions',
+			'type' => 'required|in history,host,item,item_configuration,item_prototype_configuration,map_element,refresh,trigger,trigger_macro,widget_actions',
 			'data' => 'array'
 		];
 
@@ -284,6 +284,7 @@ class CControllerMenuPopup extends CController {
 	 * @return mixed
 	 */
 	private static function getMenuDataItem(array $data) {
+		// TODO VM: change order
 		$db_items = API::Item()->get([
 				'output' => ['hostid', 'type', 'value_type', 'history', 'trends'],
 				'itemids' => $data['itemid'],
@@ -292,10 +293,10 @@ class CControllerMenuPopup extends CController {
 
 		if ($db_items) {
 			$db_item = $db_items[0];
-			$rw_items = false;
+			$is_writable = false;
 
 			if ($db_item['type'] != ITEM_TYPE_HTTPTEST && CWebUser::getType() > USER_TYPE_ZABBIX_USER) {
-				$rw_items = (bool) API::Host()->get([
+				$is_writable = (bool) API::Host()->get([
 					'output' => [],
 					'hostids' => $db_item['hostid'],
 					'editable' => true
@@ -311,7 +312,7 @@ class CControllerMenuPopup extends CController {
 				),
 				'history' => $db_item['history'] != 0,
 				'trends' => $db_item['trends'] != 0,
-				'isWriteable' => $rw_items,
+				'isWriteable' => $is_writable,
 				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 			];
 		}

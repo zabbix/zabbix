@@ -691,11 +691,10 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
  * @param string options['triggers'][n]['name']
  * @param bool   options['allowed_ui_latest_data']    Whether user has access to latest data page.
  * @param string options['context']                   Additional parameter in URL to identify main section.
- * @param {object} trigger_elmnt                      UI element that was clicked to open overlay dialogue.
  *
  * @return array
  */
-function getMenuPopupItemConfiguration(options, trigger_elmnt) {
+function getMenuPopupItemConfiguration(options) {
 	const items = [];
 	let url;
 
@@ -794,6 +793,7 @@ function getMenuPopupItemConfiguration(options, trigger_elmnt) {
  * @return array
  */
 function getMenuPopupItem(options) {
+	// TODO VM: change order
 	const items = [];
 	let url;
 

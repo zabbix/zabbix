@@ -184,7 +184,6 @@ foreach ($data['items'] as $item) {
 
 		$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
 
-
 		if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 			$trigger_description[] = new CSpan(CHtml::encode($trigger['description']));
 		}
@@ -234,7 +233,6 @@ foreach ($data['items'] as $item) {
 	else {
 		$triggerInfo = '';
 	}
-
 
 	$wizard = (new CButton(null))
 		->addClass(ZBX_STYLE_ICON_WZRD_ACTION)

@@ -155,7 +155,7 @@ jQuery(function($) {
 				break;
 
 			case 'item_configuration':
-				sections = getMenuPopupItemConfiguration(data, $obj);
+				sections = getMenuPopupItemConfiguration(data);
 				break;
 
 			case 'item_prototype_configuration':
@@ -168,10 +168,6 @@ jQuery(function($) {
 
 			case 'submenu':
 				sections = getMenuPopupSubmenu(data);
-				break;
-
-			case 'widget_actions':
-				sections = getMenuPopupWidgetActions(data);
 				break;
 
 			default:

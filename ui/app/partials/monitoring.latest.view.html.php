@@ -84,8 +84,7 @@ foreach ($data['items'] as $itemid => $item) {
 		(new CLinkAction($item['name']))
 			->setMenuPopup(CMenuPopupHelper::getItem(['itemid' => $itemid])),
 		($item['description_expanded'] !== '') ? makeDescriptionIcon($item['description_expanded']) : null
-	]))
-		->addClass('action-container');
+	]))->addClass('action-container');
 
 	// Row history data preparation.
 	$last_history = array_key_exists($itemid, $data['history'])

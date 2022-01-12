@@ -642,12 +642,9 @@ $dependenciesFormList->addRow(_('Dependencies'),
 );
 $triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList, TAB_INDICATOR_DEPENDENCY);
 
-if ($data['backurl']) {
-	$cancelButton = new CButtonCancel(null, "redirect('".$data['backurl']."');");
-}
-else {
-	$cancelButton = new CButtonCancel(url_param('context'));
-}
+$cancelButton = ($data['backurl'])
+	? new CButtonCancel(null, "redirect('".$data['backurl']."');")
+	: new CButtonCancel(url_param('context'));
 
 // Append buttons to form list.
 if (!empty($data['triggerid'])) {
@@ -658,7 +655,7 @@ if (!empty($data['triggerid'])) {
 				_('Delete trigger?'),
 				url_params(['form', 'hostid', 'triggerid', 'context', 'backurl']),
 				'context'
-				))->setEnabled(!$data['limited']),
+			))->setEnabled(!$data['limited']),
 			$cancelButton
 		]
 	));

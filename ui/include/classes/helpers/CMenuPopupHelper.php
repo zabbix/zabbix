@@ -191,6 +191,7 @@ class CMenuPopupHelper {
 	 * @return array
 	 */
 	public static function getItem(array $data): array {
+		// TODO VM: change order
 		return [
 			'type' => 'item',
 			'data' => [
