@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-07-27T10:10:26Z'
+  version: '6.0'
+  date: '2021-12-15T06:56:45Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -13,7 +13,7 @@ zabbix_export:
       description: |
         The template to monitor Cloudflare to see your web traffic and DNS metrics. It works without any external scripts and uses Script item.
         
-        Template tooling version used: 0.39
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Applications
@@ -972,14 +972,6 @@ zabbix_export:
                       name: source_type
                       value: '0'
                     -
-                      type: INTEGER
-                      name: columns
-                      value: '1'
-                    -
-                      type: INTEGER
-                      name: rows
-                      value: '1'
-                    -
                       type: GRAPH
                       name: graphid
                       value:
@@ -996,14 +988,6 @@ zabbix_export:
                       name: source_type
                       value: '0'
                     -
-                      type: INTEGER
-                      name: columns
-                      value: '1'
-                    -
-                      type: INTEGER
-                      name: rows
-                      value: '1'
-                    -
                       type: GRAPH
                       name: graphid
                       value:
@@ -1019,14 +1003,6 @@ zabbix_export:
                       type: INTEGER
                       name: source_type
                       value: '0'
-                    -
-                      type: INTEGER
-                      name: columns
-                      value: '1'
-                    -
-                      type: INTEGER
-                      name: rows
-                      value: '1'
                     -
                       type: GRAPH
                       name: graphid
@@ -1045,14 +1021,6 @@ zabbix_export:
                       name: source_type
                       value: '0'
                     -
-                      type: INTEGER
-                      name: columns
-                      value: '1'
-                    -
-                      type: INTEGER
-                      name: rows
-                      value: '1'
-                    -
                       type: GRAPH
                       name: graphid
                       value:
@@ -1068,14 +1036,6 @@ zabbix_export:
                       type: INTEGER
                       name: source_type
                       value: '0'
-                    -
-                      type: INTEGER
-                      name: columns
-                      value: '1'
-                    -
-                      type: INTEGER
-                      name: rows
-                      value: '1'
                     -
                       type: GRAPH
                       name: graphid
@@ -1094,14 +1054,6 @@ zabbix_export:
                       name: source_type
                       value: '0'
                     -
-                      type: INTEGER
-                      name: columns
-                      value: '1'
-                    -
-                      type: INTEGER
-                      name: rows
-                      value: '1'
-                    -
                       type: GRAPH
                       name: graphid
                       value:
@@ -1117,14 +1069,6 @@ zabbix_export:
                       type: INTEGER
                       name: source_type
                       value: '0'
-                    -
-                      type: INTEGER
-                      name: columns
-                      value: '1'
-                    -
-                      type: INTEGER
-                      name: rows
-                      value: '1'
                     -
                       type: GRAPH
                       name: graphid

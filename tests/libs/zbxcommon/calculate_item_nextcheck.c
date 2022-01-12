@@ -27,8 +27,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: get_item_type                                                    *
- *                                                                            *
  * Purpose: get item type from its string representation                      *
  *                                                                            *
  * Parameters: item_type - [IN] the item type                                 *

@@ -140,8 +140,6 @@ static zbx_vmcheck_t	vmchecks[] =
 
 /******************************************************************************
  *                                                                            *
- * Function: get_vmware_function                                              *
- *                                                                            *
  * Purpose: Retrieves a handler of the item key                               *
  *                                                                            *
  * Parameters: key    - [IN] an item key (without parameters)                 *

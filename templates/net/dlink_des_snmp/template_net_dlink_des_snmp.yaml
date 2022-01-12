@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:03Z'
+  version: '6.0'
+  date: '2021-12-17T06:32:57Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -25,7 +25,7 @@ zabbix_export:
           Version: Firmware: 1.73R008,hardware revision: B1
           Device: DGS-3420-26SC Gigabit Ethernet Switch
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       templates:
         -
           name: 'EtherLike-MIB SNMP'

@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 Use this template if you can't find the template for specific vendor or device family.
 
 ## Setup
@@ -17,11 +17,11 @@ No specific Zabbix configuration is required.
 
 ## Template links
 
-| Name                   |
-|------------------------|
-| EtherLike-MIB SNMP     |
-| Generic SNMP           |
-| Interfaces Simple SNMP |
+|Name|
+|----|
+|EtherLike-MIB SNMP |
+|Generic SNMP |
+|Interfaces Simple SNMP |
 
 ## Discovery rules
 

@@ -33,8 +33,6 @@ extern unsigned char	program_type;
 
 /******************************************************************************
  *                                                                            *
- * Function: db_register_host                                                 *
- *                                                                            *
  * Purpose: perform active agent auto registration                            *
  *                                                                            *
  * Parameters: host          - [IN] name of the host to be added or updated   *
@@ -139,8 +137,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: get_hostid_by_host                                               *
  *                                                                            *
  * Purpose: check for host name and return hostid                             *
  *                                                                            *
@@ -339,8 +335,6 @@ static void	get_list_of_active_checks(zbx_uint64_t hostid, zbx_vector_uint64_t *
 
 /******************************************************************************
  *                                                                            *
- * Function: send_list_of_active_checks                                       *
- *                                                                            *
  * Purpose: send list of active checks to the host (older version agent)      *
  *                                                                            *
  * Parameters: sock - open socket of server-agent connection                  *
@@ -450,8 +444,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_vector_str_append_uniq                                       *
- *                                                                            *
  * Purpose: append non duplicate string to the string vector                  *
  *                                                                            *
  * Parameters: vector - [IN/OUT] the string vector                            *
@@ -465,8 +457,6 @@ static void	zbx_vector_str_append_uniq(zbx_vector_str_t *vector, const char *str
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_itemkey_extract_global_regexps                               *
  *                                                                            *
  * Purpose: extract global regular expression names from item key             *
  *                                                                            *
@@ -519,8 +509,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: send_list_of_active_checks_json                                  *
  *                                                                            *
  * Purpose: send list of active checks to the host                            *
  *                                                                            *

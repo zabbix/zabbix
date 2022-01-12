@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:40Z'
+  version: '6.0'
+  date: '2021-12-16T07:40:17Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -15,11 +15,11 @@ zabbix_export:
         Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
         Don't forget to change the macros {$PD.URL}, {$PD.PORT}.
         
-        Template `TiDB PD by HTTP` — collects metrics by HTTP agent from PD /metrics endpoint and from monitoring API.
+        Template `TiDB PD by HTTP` — collects metrics by HTTP agent from PD /metrics endpoint and from monitoring API.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Databases
@@ -555,14 +555,14 @@ zabbix_export:
               parameters:
                 - |
                   var lookup = {},
-                  result = [];
+                      result = [];
                   
                   JSON.parse(value).forEach(function (item) {
-                  var grpc_method = item.labels.grpc_method;
-                  if (!(lookup[grpc_method])) {
-                  lookup[grpc_method] = 1;
-                  result.push({ "{#GRPC_METHOD}": grpc_method });
-                  }
+                      var grpc_method = item.labels.grpc_method;
+                      if (!(lookup[grpc_method])) {
+                          lookup[grpc_method] = 1;
+                          result.push({ "{#GRPC_METHOD}": grpc_method });
+                      }
                   })
                   
                   return JSON.stringify(result);
@@ -694,14 +694,14 @@ zabbix_export:
               parameters:
                 - |
                   var lookup = {},
-                  result = [];
+                      result = [];
                   
                   JSON.parse(value).forEach(function (item) {
-                  var address = item.labels.address;
-                  if (!(lookup[address])) {
-                  lookup[address] = 1;
-                  result.push({ "{#STORE_ADDRESS}": address });
-                  }
+                      var address = item.labels.address;
+                      if (!(lookup[address])) {
+                          lookup[address] = 1;
+                          result.push({ "{#STORE_ADDRESS}": address });
+                      }
                   })
                   
                   return JSON.stringify(result);
@@ -750,10 +750,10 @@ zabbix_export:
               parameters:
                 - |
                   output = JSON.parse(value).map(function(item){
-                  return {
-                  "{#TYPE}": item.labels.type,
-                  }})
-                  return JSON.stringify({"data": output})
+                       return {
+                           "{#TYPE}": item.labels.type,
+                       }})
+                   return JSON.stringify({"data": output})
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -814,10 +814,10 @@ zabbix_export:
               parameters:
                 - |
                   output = JSON.parse(value).map(function(item){
-                  return {
-                  "{#TYPE}": item.labels.type,
-                  }})
-                  return JSON.stringify({"data": output})
+                       return {
+                           "{#TYPE}": item.labels.type,
+                       }})
+                   return JSON.stringify({"data": output})
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -898,10 +898,10 @@ zabbix_export:
               parameters:
                 - |
                   output = JSON.parse(value).map(function(item){
-                  return {
-                  "{#KIND}": item.labels.kind,
-                  }})
-                  return JSON.stringify({"data": output})
+                       return {
+                           "{#KIND}": item.labels.kind,
+                       }})
+                   return JSON.stringify({"data": output})
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:

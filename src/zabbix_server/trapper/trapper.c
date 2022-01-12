@@ -106,8 +106,6 @@ zbx_status_section_t;
 
 /******************************************************************************
  *                                                                            *
- * Function: recv_agenthistory                                                *
- *                                                                            *
  * Purpose: processes the received values from active agents                  *
  *                                                                            *
  ******************************************************************************/
@@ -138,8 +136,6 @@ static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 
 /******************************************************************************
  *                                                                            *
- * Function: recv_senderhistory                                               *
- *                                                                            *
  * Purpose: processes the received values from senders                        *
  *                                                                            *
  ******************************************************************************/
@@ -169,8 +165,6 @@ static void	recv_senderhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zb
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: recv_proxy_heartbeat                                             *
  *                                                                            *
  * Purpose: process heartbeat sent by proxy servers                           *
  *                                                                            *
@@ -236,8 +230,6 @@ zbx_queue_stats_t;
 
 /******************************************************************************
  *                                                                            *
- * Function: queue_stats_update                                               *
- *                                                                            *
  * Purpose: update queue stats with a new item delay                          *
  *                                                                            *
  * Parameters: stats   - [IN] the queue stats                                 *
@@ -261,8 +253,6 @@ static void	queue_stats_update(zbx_queue_stats_t *stats, int delay)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: queue_stats_export                                               *
  *                                                                            *
  * Purpose: export queue stats to JSON format                                 *
  *                                                                            *
@@ -305,8 +295,6 @@ static int	queue_compare_by_nextcheck_asc(zbx_queue_item_t **d1, zbx_queue_item_
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: recv_getqueue                                                    *
  *                                                                            *
  * Purpose: process queue request                                             *
  *                                                                            *
@@ -780,8 +768,6 @@ static void	status_stats_export(struct zbx_json *json, zbx_user_type_t access_le
 
 /******************************************************************************
  *                                                                            *
- * Function: recv_getstatus                                                   *
- *                                                                            *
  * Purpose: process status request                                            *
  *                                                                            *
  * Parameters:  sock  - [IN] the request socket                               *
@@ -871,8 +857,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: send_internal_stats_json                                         *
  *                                                                            *
  * Purpose: process Zabbix stats request                                      *
  *                                                                            *

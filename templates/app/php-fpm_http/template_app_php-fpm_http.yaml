@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-06-18T12:21:11Z'
+  version: '6.0'
+  date: '2021-12-15T06:57:57Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -13,7 +13,7 @@ zabbix_export:
       description: |
         Get PHP-FPM metrics using the Zabbix HTTP agent.
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Applications
@@ -143,7 +143,7 @@ zabbix_export:
           triggers:
             -
               uuid: 1ad5018fb19d4a9cb9e627f964bfd627
-              expression: 'min(/PHP-FPM by HTTP/php-fpm.listen_queue_usage,15m)  > {$PHP_FPM.QUEUE.WARN.MAX}'
+              expression: 'min(/PHP-FPM by HTTP/php-fpm.listen_queue_usage,15m) > {$PHP_FPM.QUEUE.WARN.MAX}'
               name: 'PHP-FPM: Queue utilization is high (over {$PHP_FPM.QUEUE.WARN.MAX}% for 15m)'
               priority: WARNING
               description: 'The queue for this pool reached {$PHP_FPM.QUEUE.WARN.MAX}% of its maximum capacity. Items in queue represent the current number of connections that have been initiated on this pool, but not yet accepted.'

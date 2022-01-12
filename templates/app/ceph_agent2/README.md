@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 The template to monitor Ceph cluster by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
@@ -57,10 +57,10 @@ There are no template links in this template.
 |Ceph |Ceph: Number of Monitors |<p>Number of Monitors configured in Ceph cluster</p> |DEPENDENT |ceph.num_mon<p>**Preprocessing**:</p><p>- JSONPATH: `$.num_mon`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `30m`</p> |
 |Ceph |Ceph: Overall cluster status |<p>Overall Ceph cluster status, eg 0 - HEALTH_OK, 1 - HEALTH_WARN or 2 - HEALTH_ERR</p> |DEPENDENT |ceph.overall_status<p>**Preprocessing**:</p><p>- JSONPATH: `$.overall_status`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |Ceph |Ceph: Minimum Mon release version |<p>min_mon_release_name</p> |DEPENDENT |ceph.min_mon_release_name<p>**Preprocessing**:</p><p>- JSONPATH: `$.min_mon_release_name`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Ceph |Ceph: Ceph Read bandwidth |<p>Global read Bytes per second</p> |DEPENDENT |ceph.rd_bytes.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.rd_bytes`</p><p>- CHANGE_PER_SECOND |
-|Ceph |Ceph: Ceph Write bandwidth |<p>Global write Bytes per second</p> |DEPENDENT |ceph.wr_bytes.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.wr_bytes`</p><p>- CHANGE_PER_SECOND |
+|Ceph |Ceph: Ceph Read bandwidth |<p>Global read Bytes per second</p> |DEPENDENT |ceph.rd_bytes.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.rd_bytes`</p><p>- CHANGE_PER_SECOND</p> |
+|Ceph |Ceph: Ceph Write bandwidth |<p>Global write Bytes per second</p> |DEPENDENT |ceph.wr_bytes.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.wr_bytes`</p><p>- CHANGE_PER_SECOND</p> |
 |Ceph |Ceph: Ceph Read operations per sec |<p>Global read operations per second</p> |DEPENDENT |ceph.rd_ops.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.rd_ops`</p> |
-|Ceph |Ceph: Ceph Write operations per sec |<p>Global write operations per second</p> |DEPENDENT |ceph.wr_ops.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.wr_ops`</p><p>- CHANGE_PER_SECOND |
+|Ceph |Ceph: Ceph Write operations per sec |<p>Global write operations per second</p> |DEPENDENT |ceph.wr_ops.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.wr_ops`</p><p>- CHANGE_PER_SECOND</p> |
 |Ceph |Ceph: Total bytes available |<p>Total bytes available in Ceph cluster</p> |DEPENDENT |ceph.total_avail_bytes<p>**Preprocessing**:</p><p>- JSONPATH: `$.total_avail_bytes`</p> |
 |Ceph |Ceph: Total bytes |<p>Total (RAW) capacity of Ceph cluster in bytes</p> |DEPENDENT |ceph.total_bytes<p>**Preprocessing**:</p><p>- JSONPATH: `$.total_bytes`</p> |
 |Ceph |Ceph: Total bytes used |<p>Total bytes used in Ceph cluster</p> |DEPENDENT |ceph.total_used_bytes<p>**Preprocessing**:</p><p>- JSONPATH: `$.total_used_bytes`</p> |
@@ -111,10 +111,10 @@ There are no template links in this template.
 |Ceph |Ceph: [{#POOLNAME}] Pool RAW Used |<p>Bytes used in pool including copies made.</p> |DEPENDENT |ceph.pool["{#POOLNAME}",stored_raw]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pools["{#POOLNAME}"].stored_raw`</p> |
 |Ceph |Ceph: [{#POOLNAME}] Pool Percent Used |<p>Percentage of storage used per pool</p> |DEPENDENT |ceph.pool["{#POOLNAME}",percent_used]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pools["{#POOLNAME}"].percent_used`</p> |
 |Ceph |Ceph: [{#POOLNAME}] Pool objects |<p>Number of objects in the pool.</p> |DEPENDENT |ceph.pool["{#POOLNAME}",objects]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pools["{#POOLNAME}"].objects`</p> |
-|Ceph |Ceph: [{#POOLNAME}] Pool Read bandwidth |<p>Per-pool read Bytes/second</p> |DEPENDENT |ceph.pool["{#POOLNAME}",rd_bytes.rate]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pools["{#POOLNAME}"].rd_bytes`</p><p>- CHANGE_PER_SECOND |
-|Ceph |Ceph: [{#POOLNAME}] Pool Write bandwidth |<p>Per-pool write Bytes/second</p> |DEPENDENT |ceph.pool["{#POOLNAME}",wr_bytes.rate]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pools["{#POOLNAME}"].wr_bytes`</p><p>- CHANGE_PER_SECOND |
-|Ceph |Ceph: [{#POOLNAME}] Pool Read operations |<p>Per-pool read operations/second</p> |DEPENDENT |ceph.pool["{#POOLNAME}",rd_ops.rate]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pools["{#POOLNAME}"].rd_ops`</p><p>- CHANGE_PER_SECOND |
-|Ceph |Ceph: [{#POOLNAME}] Pool Write operations |<p>Per-pool write operations/second</p> |DEPENDENT |ceph.pool["{#POOLNAME}",wr_ops.rate]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pools["{#POOLNAME}"].wr_ops`</p><p>- CHANGE_PER_SECOND |
+|Ceph |Ceph: [{#POOLNAME}] Pool Read bandwidth |<p>Per-pool read Bytes/second</p> |DEPENDENT |ceph.pool["{#POOLNAME}",rd_bytes.rate]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pools["{#POOLNAME}"].rd_bytes`</p><p>- CHANGE_PER_SECOND</p> |
+|Ceph |Ceph: [{#POOLNAME}] Pool Write bandwidth |<p>Per-pool write Bytes/second</p> |DEPENDENT |ceph.pool["{#POOLNAME}",wr_bytes.rate]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pools["{#POOLNAME}"].wr_bytes`</p><p>- CHANGE_PER_SECOND</p> |
+|Ceph |Ceph: [{#POOLNAME}] Pool Read operations |<p>Per-pool read operations/second</p> |DEPENDENT |ceph.pool["{#POOLNAME}",rd_ops.rate]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pools["{#POOLNAME}"].rd_ops`</p><p>- CHANGE_PER_SECOND</p> |
+|Ceph |Ceph: [{#POOLNAME}] Pool Write operations |<p>Per-pool write operations/second</p> |DEPENDENT |ceph.pool["{#POOLNAME}",wr_ops.rate]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pools["{#POOLNAME}"].wr_ops`</p><p>- CHANGE_PER_SECOND</p> |
 |Zabbix_raw_items |Ceph: Get overall cluster status | |ZABBIX_PASSIVE |ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"] |
 |Zabbix_raw_items |Ceph: Get OSD stats | |ZABBIX_PASSIVE |ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"] |
 |Zabbix_raw_items |Ceph: Get OSD dump | |ZABBIX_PASSIVE |ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"] |
@@ -124,13 +124,13 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Ceph: Can not connect to cluster |<p>Connection to Ceph RESTful module is broken (if there is any error presented including AUTH and configuration issues).</p> |`{TEMPLATE_NAME:ceph.ping["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"].last()}=0` |AVERAGE | |
-|Ceph: Cluster in ERROR state |<p>-</p> |`{TEMPLATE_NAME:ceph.overall_status.last()}=2` |AVERAGE |<p>Manual close: YES</p> |
-|Ceph: Cluster in WARNING state |<p>-</p> |`{TEMPLATE_NAME:ceph.overall_status.last()}=1`<p>Recovery expression:</p>`{TEMPLATE_NAME:ceph.overall_status.last()}=0` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Ceph: Cluster in ERROR state</p> |
-|Ceph: Minimum monitor release version has changed (new version: {ITEM.VALUE}) |<p>Ceph version has changed. Ack to close.</p> |`{TEMPLATE_NAME:ceph.min_mon_release_name.diff()}=1 and {TEMPLATE_NAME:ceph.min_mon_release_name.strlen()}>0` |INFO |<p>Manual close: YES</p> |
-|Ceph: OSD osd.{#OSDNAME} is down |<p>OSD osd.{#OSDNAME} is marked "down" in the osdmap.</p><p>The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OSD over the network.</p> |`{TEMPLATE_NAME:ceph.osd[{#OSDNAME},up].last()} = 0` |AVERAGE | |
-|Ceph: OSD osd.{#OSDNAME} is full |<p>-</p> |`{TEMPLATE_NAME:ceph.osd[{#OSDNAME},fill].min(15m)} > {Ceph by Zabbix Agent2:ceph.osd_full_ratio.last()}*100` |AVERAGE | |
-|Ceph: Ceph OSD osd.{#OSDNAME} is near full |<p>-</p> |`{TEMPLATE_NAME:ceph.osd[{#OSDNAME},fill].min(15m)} > {Ceph by Zabbix Agent2:ceph.osd_nearfull_ratio.last()}*100` |WARNING |<p>**Depends on**:</p><p>- Ceph: OSD osd.{#OSDNAME} is full</p> |
+|Ceph: Can not connect to cluster |<p>Connection to Ceph RESTful module is broken (if there is any error presented including AUTH and configuration issues).</p> |`last(/Ceph by Zabbix agent 2/ceph.ping["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"])=0` |AVERAGE | |
+|Ceph: Cluster in ERROR state |<p>-</p> |`last(/Ceph by Zabbix agent 2/ceph.overall_status)=2` |AVERAGE |<p>Manual close: YES</p> |
+|Ceph: Cluster in WARNING state |<p>-</p> |`last(/Ceph by Zabbix agent 2/ceph.overall_status)=1`<p>Recovery expression:</p>`last(/Ceph by Zabbix agent 2/ceph.overall_status)=0` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Ceph: Cluster in ERROR state</p> |
+|Ceph: Minimum monitor release version has changed (new version: {ITEM.VALUE}) |<p>Ceph version has changed. Ack to close.</p> |`last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name,#1)<>last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name,#2) and length(last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name))>0` |INFO |<p>Manual close: YES</p> |
+|Ceph: OSD osd.{#OSDNAME} is down |<p>OSD osd.{#OSDNAME} is marked "down" in the osdmap.</p><p>The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OSD over the network.</p> |`last(/Ceph by Zabbix agent 2/ceph.osd[{#OSDNAME},up]) = 0` |AVERAGE | |
+|Ceph: OSD osd.{#OSDNAME} is full |<p>-</p> |`min(/Ceph by Zabbix agent 2/ceph.osd[{#OSDNAME},fill],15m) > last(/Ceph by Zabbix agent 2/ceph.osd_full_ratio)*100` |AVERAGE | |
+|Ceph: Ceph OSD osd.{#OSDNAME} is near full |<p>-</p> |`min(/Ceph by Zabbix agent 2/ceph.osd[{#OSDNAME},fill],15m) > last(/Ceph by Zabbix agent 2/ceph.osd_nearfull_ratio)*100` |WARNING |<p>**Depends on**:</p><p>- Ceph: OSD osd.{#OSDNAME} is full</p> |
 
 ## Feedback
 

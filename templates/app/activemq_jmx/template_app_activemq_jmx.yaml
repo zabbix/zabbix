@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:19Z'
+  version: '6.0'
+  date: '2021-12-14T17:43:19Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -18,7 +18,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/411049-discussion-thread-for-official-zabbix-template-amq
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Applications
@@ -551,8 +551,8 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: a498405c5b764c1ea9f0e151adf94ed7
-                  expression: 'last(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},ExpiredCount])>{$ACTIVEMQ.EXPIRIED.WARN:"{#JMXDESTINATIONNAME}"}'
-                  name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Expired messages count higher than {$ACTIVEMQ.EXPIRIED.WARN:"{#JMXDESTINATIONNAME}"}'
+                  expression: 'last(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},ExpiredCount])>{$ACTIVEMQ.EXPIRED.WARN:"{#JMXDESTINATIONNAME}"}'
+                  name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Expired messages count higher than {$ACTIVEMQ.EXPIRED.WARN:"{#JMXDESTINATIONNAME}"}'
                   priority: AVERAGE
                   description: 'This metric represents the number of messages that expired before they could be delivered. If you expect all messages to be delivered and acknowledged within a certain amount of time, you can set an expiration for each message, and investigate if your ExpiredCount metric rises above zero.'
             -
@@ -719,9 +719,9 @@ zabbix_export:
           value: 10m
           description: 'Time during which there may be no producers on destination. Can be used with destination name as context.'
         -
-          macro: '{$ACTIVEMQ.EXPIRIED.WARN}'
+          macro: '{$ACTIVEMQ.EXPIRED.WARN}'
           value: '0'
-          description: 'Threshold for expiried messages count. Can be used with destination name as context.'
+          description: 'Threshold for expired messages count. Can be used with destination name as context.'
         -
           macro: '{$ACTIVEMQ.LLD.FILTER.BROKER.MATCHES}'
           value: '.*'

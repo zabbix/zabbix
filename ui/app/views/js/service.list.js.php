@@ -82,11 +82,11 @@
 		initActionButtons() {
 			document.addEventListener('click', (e) => {
 				if (e.target.matches('.js-create-service, .js-add-child-service')) {
-					const options = e.target.dataset.serviceid !== undefined
+					const parameters = e.target.dataset.serviceid !== undefined
 						? {parent_serviceids: [e.target.dataset.serviceid]}
 						: {};
 
-					this.edit(options);
+					this.edit(parameters);
 				}
 				else if (e.target.classList.contains('js-edit-service')) {
 					this.edit({serviceid: e.target.dataset.serviceid});
@@ -95,7 +95,10 @@
 					this.delete(e.target, [e.target.dataset.serviceid]);
 				}
 				else if (e.target.classList.contains('js-massupdate-service')) {
-					openMassupdatePopup(e.target, 'popup.massupdate.service', {location_url: this.back_url});
+					openMassupdatePopup('popup.massupdate.service', {location_url: this.back_url}, {
+						dialogue_class: 'modal-popup-static',
+						trigger_element: e.target
+					});
 				}
 				else if (e.target.classList.contains('js-massdelete-service')) {
 					this.delete(e.target, Object.values(chkbxRange.getSelectedIds()));
@@ -109,10 +112,13 @@
 			}
 		},
 
-		edit(options = {}) {
+		edit(parameters = {}) {
 			this.pauseRefresh();
 
-			const overlay = PopUp('popup.service.edit', options, 'service_edit', document.activeElement);
+			const overlay = PopUp('popup.service.edit', parameters, {
+				dialogueid: 'service_edit',
+				dialogue_class: 'modal-popup-medium'
+			});
 			const dialogue = overlay.$dialogue[0];
 
 			dialogue.addEventListener('dialogue.submit', (e) => {

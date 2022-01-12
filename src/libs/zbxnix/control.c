@@ -109,8 +109,6 @@ static int	parse_log_level_options(const char *opt, size_t len, unsigned int *sc
 
 /******************************************************************************
  *                                                                            *
- * Function: parse_rtc_options                                                *
- *                                                                            *
  * Purpose: parse runtime control options and create a runtime control        *
  *          message                                                           *
  *                                                                            *

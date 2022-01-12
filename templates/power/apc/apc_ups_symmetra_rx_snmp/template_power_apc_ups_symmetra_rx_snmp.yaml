@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-10-28T08:23:04Z'
+  date: '2021-12-15T17:57:19Z'
   groups:
     -
       uuid: 3dcd5bbe90534f9e8eb5c2d53756af63
@@ -19,7 +19,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/420730-discussion-thread-for-official-zabbix-template-apc-ups
         
-        Template tooling version used: 0.39
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Power
@@ -1433,6 +1433,178 @@ zabbix_export:
           macro: '{$UPS.OUTPUT.MAX.WARN}'
           value: '80'
           description: 'Maximum output load in % for trigger expression.'
+      dashboards:
+        -
+          uuid: b070a774806547ffa7e688b2746c8d58
+          name: 'UPS Summary'
+          pages:
+            -
+              widgets:
+                -
+                  type: PLAIN_TEXT
+                  width: '8'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: show_as_html
+                      value: '0'
+                    -
+                      type: INTEGER
+                      name: show_lines
+                      value: '1'
+                    -
+                      type: ITEM
+                      name: itemids
+                      value:
+                        key: 'system.uptime[sysUpTime.0]'
+                        host: 'APC UPS Symmetra RX SNMP'
+                -
+                  type: PLAIN_TEXT
+                  x: '8'
+                  width: '8'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: show_as_html
+                      value: '0'
+                    -
+                      type: INTEGER
+                      name: show_lines
+                      value: '1'
+                    -
+                      type: ITEM
+                      name: itemids
+                      value:
+                        key: 'input.fail[upsAdvInputLineFailCause]'
+                        host: 'APC UPS Symmetra RX SNMP'
+                -
+                  type: PLAIN_TEXT
+                  x: '16'
+                  width: '8'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: show_as_html
+                      value: '0'
+                    -
+                      type: INTEGER
+                      name: show_lines
+                      value: '1'
+                    -
+                      type: ITEM
+                      name: itemids
+                      value:
+                        key: 'output.status[upsBasicOutputStatus]'
+                        host: 'APC UPS Symmetra RX SNMP'
+                -
+                  type: PLAIN_TEXT
+                  'y': '2'
+                  width: '8'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: show_as_html
+                      value: '0'
+                    -
+                      type: INTEGER
+                      name: show_lines
+                      value: '1'
+                    -
+                      type: ITEM
+                      name: itemids
+                      value:
+                        key: 'battery.status[upsBasicBatteryStatus]'
+                        host: 'APC UPS Symmetra RX SNMP'
+                -
+                  type: PLAIN_TEXT
+                  x: '8'
+                  'y': '2'
+                  width: '8'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: show_as_html
+                      value: '0'
+                    -
+                      type: INTEGER
+                      name: show_lines
+                      value: '1'
+                    -
+                      type: ITEM
+                      name: itemids
+                      value:
+                        key: 'battery.runtime_remaining[upsAdvBatteryRunTimeRemaining]'
+                        host: 'APC UPS Symmetra RX SNMP'
+                -
+                  type: PLAIN_TEXT
+                  x: '16'
+                  'y': '2'
+                  width: '8'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: show_as_html
+                      value: '0'
+                    -
+                      type: INTEGER
+                      name: show_lines
+                      value: '1'
+                    -
+                      type: ITEM
+                      name: itemids
+                      value:
+                        key: 'battery.last_replace_date[upsBasicBatteryLastReplaceDate]'
+                        host: 'APC UPS Symmetra RX SNMP'
+                -
+                  type: GRAPH_CLASSIC
+                  'y': '4'
+                  width: '8'
+                  height: '7'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Capacity of the UPS batteries'
+                        host: 'APC UPS Symmetra RX SNMP'
+                -
+                  type: GRAPH_CLASSIC
+                  x: '8'
+                  'y': '4'
+                  width: '8'
+                  height: '7'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: Voltage
+                        host: 'APC UPS Symmetra RX SNMP'
+                -
+                  type: GRAPH_CLASSIC
+                  x: '16'
+                  'y': '4'
+                  width: '8'
+                  height: '7'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: Output
+                        host: 'APC UPS Symmetra RX SNMP'
       valuemaps:
         -
           uuid: e2877a188bd24918992f8c7878550924

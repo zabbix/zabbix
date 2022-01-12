@@ -38,11 +38,6 @@ extern char		*CONFIG_SOURCE_IP;
 extern int		CONFIG_TIMEOUT;
 extern unsigned int	configured_tls_connect_mode;
 
-/******************************************************************************
- *                                                                            *
- * Function: send_heartbeat                                                   *
- *                                                                            *
- ******************************************************************************/
 static int	send_heartbeat(void)
 {
 	zbx_socket_t		sock;
@@ -88,8 +83,6 @@ clean:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: main_heart_loop                                                  *
  *                                                                            *
  * Purpose: periodically send heartbeat message to the server                 *
  *                                                                            *

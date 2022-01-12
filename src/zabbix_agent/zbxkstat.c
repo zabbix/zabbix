@@ -36,8 +36,6 @@ static zbx_mutex_t	kstat_lock = ZBX_MUTEX_NULL;
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_kstat_refresh                                                *
- *                                                                            *
  * Purpose: refreshes kstat environment                                       *
  *                                                                            *
  * Parameters: error - [OUT] the error message                                *
@@ -69,8 +67,6 @@ static int	zbx_kstat_refresh(char **error)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_kstat_init                                                   *
  *                                                                            *
  * Purpose: initialize kstat environment                                      *
  *                                                                            *
@@ -124,8 +120,6 @@ void	zbx_kstat_destroy(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_kstat_collect                                                *
- *                                                                            *
  * Purpose: collect kstat stats                                               *
  *                                                                            *
  * Comments: This function is called every second to collect statistics.      *
@@ -157,8 +151,6 @@ void	zbx_kstat_collect(zbx_kstat_t *kstat)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_kstat_get_freemem                                            *
  *                                                                            *
  * Purpose: get free memory size                                              *
  *                                                                            *

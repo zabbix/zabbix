@@ -23,8 +23,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_http_url_encode                                              *
- *                                                                            *
  * Purpose: replaces unsafe characters with a '%' followed by two hexadecimal *
  *          digits (the only allowed exception is a space character that can  *
  *          be replaced with a plus (+) sign or with %20).to url encode       *
@@ -62,8 +60,6 @@ void	zbx_http_url_encode(const char *source, char **result)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_http_url_decode                                              *
  *                                                                            *
  * Purpose: replaces URL escape sequences ('+' or '%' followed by two         *
  *          hexadecimal digits) with matching characters.                     *

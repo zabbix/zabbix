@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:04:22Z'
+  version: '6.0'
+  date: '2021-12-16T07:35:55Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -15,7 +15,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/389050-discussion-thread-for-official-zabbix-template-redis
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Databases
@@ -518,7 +518,7 @@ zabbix_export:
           triggers:
             -
               uuid: 324e0e8fac514ba99d67aea7eb0ddf7c
-              expression: last(/Redis by Zabbix agent 2/redis.persistence.aof_last_write_status)=0
+              expression: 'last(/Redis by Zabbix agent 2/redis.persistence.aof_last_write_status)=0'
               name: 'Redis: Last AOF write operation failed'
               priority: WARNING
               description: 'Detailed information about persistence: https://redis.io/topics/persistence'
@@ -670,7 +670,7 @@ zabbix_export:
           triggers:
             -
               uuid: 44e427ae3ce7419dbac3059be11e31ef
-              expression: last(/Redis by Zabbix agent 2/redis.persistence.rdb_last_bgsave_status)=0
+              expression: 'last(/Redis by Zabbix agent 2/redis.persistence.rdb_last_bgsave_status)=0'
               name: 'Redis: Last RDB save operation failed'
               priority: WARNING
               description: 'Detailed information about persistence: https://redis.io/topics/persistence'
@@ -1030,7 +1030,7 @@ zabbix_export:
           triggers:
             -
               uuid: 4961e91eed2a4e83899d135315748b0e
-              expression: last(/Redis by Zabbix agent 2/redis.server.uptime)<10m
+              expression: 'last(/Redis by Zabbix agent 2/redis.server.uptime)<10m'
               name: 'Redis: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
@@ -1303,7 +1303,7 @@ zabbix_export:
           triggers:
             -
               uuid: 5bf0680529ce496b8fe419e2732c69d1
-              expression: last(/Redis by Zabbix agent 2/redis.stats.rejected_connections)>0
+              expression: 'last(/Redis by Zabbix agent 2/redis.stats.rejected_connections)>0'
               name: 'Redis: Connections are rejected'
               priority: HIGH
               description: |
@@ -3041,16 +3041,16 @@ zabbix_export:
                   fields:
                     -
                       type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
                       name: columns
                       value: '1'
                     -
                       type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid

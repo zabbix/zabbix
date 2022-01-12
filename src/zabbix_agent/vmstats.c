@@ -76,8 +76,6 @@ static zbx_uint64_t	last_rblks = 0;			/* 512 bytes blocks read from all disks */
 
 /******************************************************************************
  *                                                                            *
- * Function: update_vmstat                                                    *
- *                                                                            *
  * Purpose: update vmstat values at most once per second                      *
  *                                                                            *
  * Parameters: vmstat - a structure containing vmstat data                    *
