@@ -29,18 +29,18 @@
 
 extern zbx_uint64_t	CONFIG_VALUE_CACHE_SIZE;
 
-void	zbx_vc_common_test_func(void **state,
-				void (*zbx_vc_test_add_values_setup)(zbx_mock_handle_t *handle,
-						zbx_vector_ptr_t *history, int *err, const char **data, int *ret_flush),
-				void (*zbx_vc_test_get_value_setup)(zbx_mock_handle_t *handle, zbx_uint64_t *itemid,
-						unsigned char *value_type, zbx_timespec_t *ts, int *err,
-						zbx_vector_history_record_t *expected,
-						zbx_vector_history_record_t *returned),
-				void (*zbx_vc_test_check_result)(zbx_uint64_t *cache_hits, zbx_uint64_t *cache_misses),
-				void (*zbx_vc_test_get_values_setup)(zbx_mock_handle_t *handle, zbx_uint64_t *itemid,
-						unsigned char *value_type, zbx_timespec_t *ts, int *err,
-						zbx_vector_history_record_t *expected,
-						zbx_vector_history_record_t *returned, int *seconds, int *count))
+void	zbx_vc_common_test_func(
+		void **state,
+		void (*zbx_vc_test_add_values_setup)(zbx_mock_handle_t *handle, zbx_vector_ptr_t *history, int *err,
+				const char **data, int *ret_flush),
+		void (*zbx_vc_test_get_value_setup)(zbx_mock_handle_t *handle, zbx_uint64_t *itemid,
+				unsigned char *value_type, zbx_timespec_t *ts, int *err,
+				zbx_vector_history_record_t *expected, zbx_vector_history_record_t *returned),
+		void (*zbx_vc_test_check_result)(zbx_uint64_t *cache_hits, zbx_uint64_t *cache_misses),
+		void (*zbx_vc_test_get_values_setup)(zbx_mock_handle_t *handle, zbx_uint64_t *itemid,
+				unsigned char *value_type, zbx_timespec_t *ts, int *err,
+				zbx_vector_history_record_t *expected, zbx_vector_history_record_t *returned,
+				int *seconds, int *count))
 {
 	int				err, seconds, count, item_status, item_active_range, item_db_cached_from,
 					item_values_total, cache_mode, ret_flush;
@@ -171,5 +171,17 @@ void	zbx_vc_common_test_func(void **state,
 
 	zbx_vc_reset();
 	zbx_vc_destroy();
+}
 
+void	zbx_vc_test_check_result(zbx_uint64_t *cache_hits, zbx_uint64_t *cache_misses)
+{
+	zbx_uint64_t	expected_hits, expected_misses;
+
+	if (FAIL == is_uint64(zbx_mock_get_parameter_string("out.cache.hits"), &expected_hits))
+		fail_msg("Invalid out.cache.hits value");
+	zbx_mock_assert_uint64_eq("cache.hits", expected_hits, *cache_hits);
+
+	if (FAIL == is_uint64(zbx_mock_get_parameter_string("out.cache.misses"), &expected_misses))
+		fail_msg("Invalid out.cache.misses value");
+	zbx_mock_assert_uint64_eq("cache.misses", expected_misses, *cache_misses);
 }
