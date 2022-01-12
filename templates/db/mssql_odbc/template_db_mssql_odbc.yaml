@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-12-20T07:18:12Z'
+  date: '2022-01-10T13:06:00Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -4028,7 +4028,7 @@ zabbix_export:
     -
       uuid: a1397bd4e9334a24a34dba0687b263e6
       expression: 'last(/MSSQL by ODBC/mssql.forwarded_records_sec.rate) * 100 > 10 * last(/MSSQL by ODBC/mssql.batch_requests_sec.rate)'
-      name: 'MSSQL: Too frequently pointers using'
+      name: 'MSSQL: Too frequently using pointers'
       priority: WARNING
       description: 'Rows with varchar columns can experience expansion when varchar values are updated with a longer string.  In the case where the row cannot fit in the existing page, the row migrates and access to the row will traverse a pointer.  This only happens on heaps (tables without clustered indexes). Evaluate clustered index for heap tables.  In cases where clustered indexes cannot be used, drop non-clustered indexes, build a clustered index to reorg pages and rows, drop the clustered index, then recreate non-clustered indexes.'
     -
