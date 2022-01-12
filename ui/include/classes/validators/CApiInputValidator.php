@@ -300,9 +300,12 @@ class CApiInputValidator {
 				foreach ($rule['fields'] as $field_name => $field_rule) {
 					if ($data !== null && array_key_exists($field_name, $data)) {
 						if ($field_rule['type'] === API_MULTIPLE) {
-							self::unsetNonexistMultipleRules($field_rule['rules'], $data);
-
 							foreach ($field_rule['rules'] as $multiple_rule) {
+								if (array_key_exists('if', $multiple_rule)
+										&& !array_key_exists($multiple_rule['if']['field'], $data)) {
+									continue;
+								}
+
 								if (array_key_exists('else', $multiple_rule)
 										|| self::isInRange($data[$multiple_rule['if']['field']], $multiple_rule['if']['in'])) {
 									$field_rule = $multiple_rule;
@@ -1198,9 +1201,12 @@ class CApiInputValidator {
 		// validation of the values type
 		foreach ($rule['fields'] as $field_name => $field_rule) {
 			if ($field_rule['type'] === API_MULTIPLE) {
-				self::unsetNonexistMultipleRules($field_rule['rules'], $data);
-
 				foreach ($field_rule['rules'] as $multiple_rule) {
+					if (array_key_exists('if', $multiple_rule)
+							&& !array_key_exists($multiple_rule['if']['field'], $data)) {
+						continue;
+					}
+
 					if (array_key_exists('else', $multiple_rule)
 							|| self::isInRange($data[$multiple_rule['if']['field']], $multiple_rule['if']['in'])) {
 						if ($multiple_rule['type'] == API_UNEXPECTED && array_key_exists($field_name, $data)) {
@@ -1253,22 +1259,6 @@ class CApiInputValidator {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Unset nonexists 'if' fields from multiple rules.
-	 *
-	 * @param array $rules
-	 * @param array $data
-	 */
-	private static function unsetNonexistMultipleRules(array &$rules, array $data): void {
-		foreach ($rules as $index => $rule) {
-			if (array_key_exists('if', $rule)) {
-				if (!array_key_exists($rule['if']['field'], $data)) {
-					unset($rules[$index]);
-				}
-			}
-		}
 	}
 
 	/**
@@ -2131,9 +2121,12 @@ class CApiInputValidator {
 			foreach ($rule['fields'] as $field_name => $field_rule) {
 				if (array_key_exists($field_name, $object)) {
 					if ($field_rule['type'] === API_MULTIPLE) {
-						self::unsetNonexistMultipleRules($field_rule['rules'], $object);
-
 						foreach ($field_rule['rules'] as $multiple_rule) {
+							if (array_key_exists('if', $multiple_rule)
+									&& !array_key_exists($multiple_rule['if']['field'], $object)) {
+								continue;
+							}
+
 							if (array_key_exists('else', $multiple_rule)
 									|| self::isInRange($object[$multiple_rule['if']['field']], $multiple_rule['if']['in'])) {
 								$field_rule = $multiple_rule;
