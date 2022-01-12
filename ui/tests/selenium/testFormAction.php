@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -145,7 +145,6 @@ class testFormAction extends CLegacyWebTest {
 			[
 				'name' => 'Reference service',
 				'algorithm' => 1,
-				'showsla' => 0,
 				'sortorder' => 1
 			]
 		]);
@@ -1189,8 +1188,7 @@ class testFormAction extends CLegacyWebTest {
 		}
 		$oldHashActions = CDBHelper::getHash($sqlActions);
 
-		$this->zbxTestLogin('actionconf.php');
-		$this->query('id:page-title-general')->asPopupButton()->one()->select($this->event_sources[$eventsource]);
+		$this->page->login()->open('actionconf.php?eventsource='.$eventsource);
 		$this->zbxTestClickLinkTextWait($name);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of actions');

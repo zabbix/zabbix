@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,7 +16,6 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
 
 #ifndef ZABBIX_NODECOMMAND_H
 #define ZABBIX_NODECOMMAND_H

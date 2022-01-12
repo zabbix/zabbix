@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -393,7 +393,7 @@
 		var size = jQuery('#itemsTable tr.sortable').length;
 
 		for (var i = 0; i < size; i++) {
-			var popup_options = {
+			var parameters = {
 				srcfld1: 'itemid',
 				srcfld2: 'name',
 				dstfrm: 'graphForm',
@@ -404,26 +404,27 @@
 				writeonly: 1
 			};
 			if (jQuery('#items_' + i + '_flags').val() == graphs.ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				popup_options['srctbl'] = 'item_prototypes',
-				popup_options['srcfld3'] = 'flags',
-				popup_options['dstfld3'] = 'items_' + i + '_flags',
-				popup_options['parent_discoveryid'] = graphs.parent_discoveryid;
+				parameters['srctbl'] = 'item_prototypes',
+				parameters['srcfld3'] = 'flags',
+				parameters['dstfld3'] = 'items_' + i + '_flags',
+				parameters['parent_discoveryid'] = graphs.parent_discoveryid;
 			}
 			else {
-				popup_options['srctbl'] = 'items';
+				parameters['srctbl'] = 'items';
 			}
 
 			if (graphs.normal_only !== '') {
-				popup_options['normal_only'] = '1';
+				parameters['normal_only'] = '1';
 			}
 
 			if (!graphs.parent_discoveryid && graphs.hostid) {
-				popup_options['hostid'] = graphs.hostid;
+				parameters['hostid'] = graphs.hostid;
 			}
 
-			var nameLink = 'PopUp("popup.generic",'
-				+ 'jQuery.extend('+ JSON.stringify(popup_options) +',getOnlyHostParam()), null, this);';
-			jQuery('#items_' + i + '_name').attr('onclick', nameLink);
+			jQuery('#items_' + i + '_name').attr('onclick', 'PopUp("popup.generic", '
+				+ 'jQuery.extend(' + JSON.stringify(parameters) +',getOnlyHostParam()),'
+				+ '{dialogue_class: "modal-popup-generic", trigger_element: this});'
+			);
 		}
 	}
 
@@ -591,7 +592,7 @@
 				preview_chart.append($('<div>', {css: {'position': 'relative', 'min-height': '50px'}})
 					.addClass('is-loading'));
 
-				$('<img />')
+				$('<img>')
 					.attr('src', src.getUrl())
 					.on('load', function() {
 						preview_chart.html($(this));
@@ -673,7 +674,7 @@
 
 					item.sortorder = i + 1;
 
-					$form.append($('<input />', {
+					$form.append($('<input>', {
 						type: 'hidden',
 						name: 'items[' + i + ']',
 						value: JSON.stringify(item)

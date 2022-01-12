@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -102,7 +102,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 				]);
 
 				$items = API::Item()->get([
-					'output' => ['itemid', 'hostid', 'name', 'key_'],
+					'output' => ['itemid', 'name'],
 					'selectHosts' => ['name'],
 					'hostids' => $dynamic_hostid,
 					'filter' => [
@@ -252,11 +252,9 @@ class CControllerWidgetGraphView extends CControllerWidget {
 					->setArgument('from', '')
 					->setArgument('to', '');
 
-				$item = CMacrosResolverHelper::resolveItemNames([$item])[0];
-
 				$header_name = $is_template_dashboard
-					? $item['name_expanded']
-					: $item['hosts'][0]['name'].NAME_DELIMITER.$item['name_expanded'];
+					? $item['name']
+					: $item['hosts'][0]['name'].NAME_DELIMITER.$item['name'];
 			}
 			elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
 				$graph_src = '';

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -131,10 +131,10 @@ class CTabFilterItem extends CBaseComponent {
 	/**
 	 * Open tab filter configuration popup.
 	 *
-	 * @param {object}      params    Object of params to be passed to ajax call when opening popup.
-	 * @param {HTMLElement} edit_elm  HTML element to broadcast popup update or delete event.
+	 * @param {object} params    Object of params to be passed to ajax call when opening popup.
+	 * @param {Node}   trigger_element  DOM element to broadcast popup update or delete event.
 	 */
-	openPropertiesDialog(params, edit_elm) {
+	openPropertiesDialog(params, trigger_element) {
 		let defaults = {
 			idx: this._idx_namespace,
 			idx2: this._index,
@@ -150,7 +150,10 @@ class CTabFilterItem extends CBaseComponent {
 		}
 
 		this.updateUnsavedState();
-		return PopUp('popup.tabfilter.edit', {...defaults, ...params}, 'tabfilter_dialogue', edit_elm);
+
+		return PopUp('popup.tabfilter.edit', { ...defaults, ...params },
+			{dialogueid: 'tabfilter_dialogue', trigger_element}
+		);
 	}
 
 	/**

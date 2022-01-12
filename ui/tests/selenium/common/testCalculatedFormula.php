@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -100,6 +100,68 @@ class testCalculatedFormula extends CWebTest {
 			[
 				[
 					'formula' => "atan(last(//trap))"
+				]
+			],
+			// baselinedev() function.
+			[
+				[
+					'formula' => 'baselinedev(/host/key, 1h:now/h-1h, "h", 6)'
+				]
+			],
+			[
+				[
+					'formula' => 'baselinedev(/host/key, 1d:now/d-1d, "d", 5)'
+				]
+			],
+			[
+				[
+					'formula' => 'baselinedev(/host/key, 1w:now/w-1w, "w", 4)'
+				]
+			],
+			[
+				[
+					'formula' => 'baselinedev(/host/key, 1w:now/w, "y", 3)'
+				]
+			],
+			[
+				[
+					'formula' => 'baselinedev(/host/key, 1M:now/M-1M, "M", 2)'
+				]
+			],
+			[
+				[
+					'formula' => 'baselinedev(/host/key, 1y:now/y-1y, "y", 1)'
+				]
+			],
+			// baselinewma() function.
+			[
+				[
+					'formula' => 'baselinewma(/host/key, 1h:now/h-1h, "h", 6)'
+				]
+			],
+			[
+				[
+					'formula' => 'baselinewma(/host/key, 1d:now/d-1d, "d", 5)'
+				]
+			],
+			[
+				[
+					'formula' => 'baselinewma(/host/key, 1w:now/w-1w, "w", 4)'
+				]
+			],
+			[
+				[
+					'formula' => 'baselinewma(/host/key, 1w:now/w, "y", 3)'
+				]
+			],
+			[
+				[
+					'formula' => 'baselinewma(/host/key, 1M:now/M-1M, "M", 2)'
+				]
+			],
+			[
+				[
+					'formula' => 'baselinewma(/host/key, 1y:now/y-1y, "y", 1)'
 				]
 			],
 			// bitand() function.
@@ -1008,6 +1070,204 @@ class testCalculatedFormula extends CWebTest {
 					'expected' => TEST_BAD,
 					'formula' => 'avg(/host/trap,"30s")',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "avg".'
+				]
+			],
+			// baselinedev() function validation.
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'baselinedev(/test/trap,1d:now/d-1d,,3)',
+					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "baselinedev".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'baselinedev(/test/trap,1d:now/d-1d,"d")',
+					'error' => 'Invalid parameter "/1/params": mandatory parameter is missing in function "baselinedev".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'baselinedev(/test/trap,1d:now/d-1d,"d",0)',
+					'error' => 'Invalid parameter "/1/params": invalid fourth parameter in function "baselinedev".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'baselinedev(/test/trap,1m:now/m-1m,"d",3)',
+					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "baselinedev".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'baselinedev(/test/trap,1s:now/s,"h",3)',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "baselinedev(/test/trap,1s:now/s,"h",3)".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'baselinedev(/test/trap,1h:now/h,"m",3)',
+					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "baselinedev".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'baselinedev(/test/trap,1h:now/h,"s",3)',
+					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "baselinedev".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'baselinedev(/test/trap,1h,"h",3)',
+					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "baselinedev".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'baselinedev(/test/trap,1h:now/h,"h",3.6)',
+					'error' => 'Invalid parameter "/1/params": invalid fourth parameter in function "baselinedev".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'baselinedev(/test/trap,1h:now/h,"m",120)',
+					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "baselinedev".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'baselinedev(/test/trap,1h:now/h,"s",120)',
+					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "baselinedev".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'baselinedev(/test/trap,150m:now/h,"h",12)',
+					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "baselinedev".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'baselinedev(/test/trap,1h:now/m,"h",12)',
+					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "baselinedev".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'baselinedev(/host/key,1d:now/d-1d,"d",2,)',
+					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "baselinedev".'
+				]
+			],
+			// baselinewma() function validation.
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'baselinewma(/test/trap,1d:now/d-1d,,3)',
+					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "baselinewma".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'baselinewma(/test/trap,1d:now/d-1d,"d")',
+					'error' => 'Invalid parameter "/1/params": mandatory parameter is missing in function "baselinewma".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'baselinewma(/test/trap,1d:now/d-1d,"d",0)',
+					'error' => 'Invalid parameter "/1/params": invalid fourth parameter in function "baselinewma".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'baselinewma(/test/trap,1m:now/m-1m,"d",3)',
+					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "baselinewma".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'baselinewma(/test/trap,1s:now/s,"h",3)',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "baselinewma(/test/trap,1s:now/s,"h",3)".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'baselinewma(/test/trap,1h:now/h,"m",3)',
+					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "baselinewma".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'baselinewma(/test/trap,1h:now/h,"s",3)',
+					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "baselinewma".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'baselinewma(/test/trap,1h,"h",3)',
+					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "baselinewma".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'baselinewma(/test/trap,1h:now/h,"h",3.6)',
+					'error' => 'Invalid parameter "/1/params": invalid fourth parameter in function "baselinewma".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'baselinewma(/test/trap,1h:now/h,"m",120)',
+					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "baselinewma".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'baselinewma(/test/trap,1h:now/h,"s",120)',
+					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "baselinewma".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'baselinewma(/test/trap,150m:now/h,"h",12)',
+					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "baselinewma".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'baselinewma(/test/trap,1h:now/m,"h",12)',
+					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "baselinewma".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'baselinewma(/host/key,1d:now/d-1d,"d",2,)',
+					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "baselinewma".'
 				]
 			],
 			// bitand() function validation.

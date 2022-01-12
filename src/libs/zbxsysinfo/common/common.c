@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -246,4 +246,3 @@ static int	SYSTEM_RUN_LOCAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return system_run(request, result, LOG_LEVEL_DEBUG);
 }
-

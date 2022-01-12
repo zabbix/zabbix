@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -160,79 +160,12 @@ class testServices extends CAPITest {
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK
 				],
-				'expected_error' => 'Invalid parameter "/1": the parameter "showsla" is missing.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => null
-				],
-				'expected_error' => 'Invalid parameter "/1/showsla": an integer is expected.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => true
-				],
-				'expected_error' => 'Invalid parameter "/1/showsla": an integer is expected.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => []
-				],
-				'expected_error' => 'Invalid parameter "/1/showsla": an integer is expected.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1/showsla": an integer is expected.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => '1.0'
-				],
-				'expected_error' => 'Invalid parameter "/1/showsla": an integer is expected.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => -1
-				],
-				'expected_error' => 'Invalid parameter "/1/showsla": value must be one of '.
-					implode(', ', [SERVICE_SHOW_SLA_OFF, SERVICE_SHOW_SLA_ON]).'.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => 999
-				],
-				'expected_error' => 'Invalid parameter "/1/showsla": value must be one of '.
-					implode(', ', [SERVICE_SHOW_SLA_OFF, SERVICE_SHOW_SLA_ON]).'.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF
-				],
 				'expected_error' => 'Invalid parameter "/1": the parameter "sortorder" is missing.'
 			],
 			[
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => null
 				],
 				'expected_error' => 'Invalid parameter "/1/sortorder": an integer is expected.'
@@ -241,7 +174,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => true
 				],
 				'expected_error' => 'Invalid parameter "/1/sortorder": an integer is expected.'
@@ -250,7 +182,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => []
 				],
 				'expected_error' => 'Invalid parameter "/1/sortorder": an integer is expected.'
@@ -259,7 +190,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => ''
 				],
 				'expected_error' => 'Invalid parameter "/1/sortorder": an integer is expected.'
@@ -268,7 +198,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => '1.0'
 				],
 				'expected_error' => 'Invalid parameter "/1/sortorder": an integer is expected.'
@@ -277,7 +206,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => -1
 				],
 				'expected_error' => 'Invalid parameter "/1/sortorder": value must be one of 0-999.'
@@ -286,72 +214,15 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 9999
 				],
 				'expected_error' => 'Invalid parameter "/1/sortorder": value must be one of 0-999.'
 			],
-
 			// Optional fields.
 			[
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'goodsla' => null
-				],
-				'expected_error' => 'Invalid parameter "/1/goodsla": a floating point value is expected.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'goodsla' => true
-				],
-				'expected_error' => 'Invalid parameter "/1/goodsla": a floating point value is expected.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'goodsla' => []
-				],
-				'expected_error' => 'Invalid parameter "/1/goodsla": a floating point value is expected.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'goodsla' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1/goodsla": a floating point value is expected.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'goodsla' => -1
-				],
-				'expected_error' => 'Invalid parameter "/1/goodsla": value must be within the range of 0-100.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'goodsla' => 999
-				],
-				'expected_error' => 'Invalid parameter "/1/goodsla": value must be within the range of 0-100.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'weight' => null
 				],
@@ -361,7 +232,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'weight' => true
 				],
@@ -371,7 +241,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'weight' => []
 				],
@@ -381,7 +250,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'weight' => ''
 				],
@@ -391,7 +259,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'weight' => '1.0'
 				],
@@ -401,7 +268,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'weight' => -1
 				],
@@ -411,7 +277,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'weight' => 9999999
 				],
@@ -421,7 +286,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'propagation_rule' => null
 				],
@@ -431,7 +295,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'propagation_rule' => true
 				],
@@ -441,7 +304,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'propagation_rule' => []
 				],
@@ -451,8 +313,7 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
+						'sortorder' => 0,
 					'propagation_rule' => ''
 				],
 				'expected_error' => 'Invalid parameter "/1/propagation_rule": an integer is expected.'
@@ -461,7 +322,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'propagation_rule' => '1.0'
 				],
@@ -471,7 +331,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'propagation_rule' => -1
 				],
@@ -488,7 +347,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'propagation_rule' => 999
 				],
@@ -505,7 +363,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'propagation_rule' => ZBX_SERVICE_STATUS_PROPAGATION_AS_IS
 				],
@@ -515,7 +372,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'propagation_value' => null
 				],
@@ -525,7 +381,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'propagation_value' => true
 				],
@@ -535,7 +390,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'propagation_value' => []
 				],
@@ -545,7 +399,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'propagation_value' => ''
 				],
@@ -555,7 +408,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'propagation_value' => '1.0'
 				],
@@ -565,7 +417,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'propagation_value' => -1
 				],
@@ -575,7 +426,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'propagation_value' => 1
 				],
@@ -585,7 +435,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'propagation_value' => 999
 				],
@@ -595,7 +444,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'propagation_value' => ZBX_MAX_INT32 + 1
 				],
@@ -605,7 +453,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'propagation_rule' => ZBX_SERVICE_STATUS_PROPAGATION_INCREASE,
 					'propagation_value' => 0
@@ -616,7 +463,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'propagation_rule' => ZBX_SERVICE_STATUS_PROPAGATION_INCREASE,
 					'propagation_value' => 999
@@ -627,7 +473,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'propagation_rule' => ZBX_SERVICE_STATUS_PROPAGATION_DECREASE,
 					'propagation_value' => 0
@@ -638,7 +483,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'propagation_rule' => ZBX_SERVICE_STATUS_PROPAGATION_DECREASE,
 					'propagation_value' => 999
@@ -649,7 +493,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'propagation_rule' => ZBX_SERVICE_STATUS_PROPAGATION_IGNORE,
 					'propagation_value' => 999
@@ -660,7 +503,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'propagation_rule' => ZBX_SERVICE_STATUS_PROPAGATION_FIXED,
 					'propagation_value' => -2
@@ -671,7 +513,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'propagation_rule' => ZBX_SERVICE_STATUS_PROPAGATION_FIXED,
 					'propagation_value' => 999
@@ -690,7 +531,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status' => ZBX_SEVERITY_OK
 				],
@@ -702,7 +542,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'children' => null
 				],
@@ -712,7 +551,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'children' => true
 				],
@@ -722,7 +560,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'children' => ''
 				],
@@ -732,7 +569,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'children' => -1
 				],
@@ -742,7 +578,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'children' => 999
 				],
@@ -752,7 +587,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'children' => [null]
 				],
@@ -762,7 +596,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'children' => [true]
 				],
@@ -772,7 +605,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'children' => [0]
 				],
@@ -782,7 +614,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'children' => ['']
 				],
@@ -792,7 +623,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'children' => [
 						[]
@@ -804,7 +634,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'children' => [
 						['serviceid' => null]
@@ -816,7 +645,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'children' => [
 						['serviceid' => true]
@@ -828,7 +656,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'children' => [
 						['serviceid' => []]
@@ -840,7 +667,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'children' => [
 						['serviceid' => '']
@@ -852,7 +678,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'children' => [
 						['serviceid' => '1.0']
@@ -864,7 +689,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'children' => [
 						['serviceid' => -1]
@@ -876,7 +700,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'children' => [
 						['serviceid' => 999] // Non-existing service.
@@ -888,7 +711,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'children' => [
 						['serviceid' => 2],
@@ -903,7 +725,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'parents' => null
 				],
@@ -913,7 +734,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'parents' => true
 				],
@@ -923,7 +743,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'parents' => ''
 				],
@@ -933,7 +752,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'parents' => -1
 				],
@@ -943,7 +761,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'parents' => 999
 				],
@@ -953,7 +770,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'parents' => [null]
 				],
@@ -963,7 +779,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'parents' => [true]
 				],
@@ -973,7 +788,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'parents' => [0]
 				],
@@ -983,7 +797,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'parents' => ['']
 				],
@@ -993,7 +806,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'parents' => [
 						[]
@@ -1005,7 +817,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'children' => [
 						['serviceid' => null]
@@ -1017,7 +828,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'parents' => [
 						['serviceid' => true]
@@ -1029,7 +839,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'parents' => [
 						['serviceid' => []]
@@ -1041,7 +850,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'parents' => [
 						['serviceid' => '']
@@ -1053,7 +861,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'parents' => [
 						['serviceid' => '1.0']
@@ -1065,7 +872,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'parents' => [
 						['serviceid' => -1]
@@ -1077,7 +883,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'parents' => [
 						['serviceid' => 999] // Non-existing service.
@@ -1089,7 +894,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'parents' => [
 						['serviceid' => 2],
@@ -1102,7 +906,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'children' => [
 						['serviceid' => 2]
@@ -1119,7 +922,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'tags' => null
 				],
@@ -1129,7 +931,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'tags' => true
 				],
@@ -1139,7 +940,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'tags' => 0
 				],
@@ -1149,7 +949,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'tags' => ''
 				],
@@ -1159,7 +958,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'tags' => [null]
 				],
@@ -1169,7 +967,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'tags' => [true]
 				],
@@ -1179,7 +976,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'tags' => [1]
 				],
@@ -1189,7 +985,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'tags' => ['']
 				],
@@ -1199,7 +994,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'tags' => [
 						[]
@@ -1211,7 +1005,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'tags' => [
 						['tag' => null]
@@ -1223,7 +1016,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'tags' => [
 						['tag' => true]
@@ -1235,7 +1027,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'tags' => [
 						['tag' => []]
@@ -1247,7 +1038,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'tags' => [
 						['tag' => 0]
@@ -1259,7 +1049,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'tags' => [
 						['tag' => '']
@@ -1271,7 +1060,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'tags' => [
 						['tag' => str_repeat('a', DB::getFieldLength('service_tag', 'tag') + 1)]
@@ -1283,7 +1071,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'tags' => [
 						['tag' => 'foo', 'value' => null]
@@ -1295,7 +1082,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'tags' => [
 						['tag' => 'foo', 'value' => true]
@@ -1307,7 +1093,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'tags' => [
 						['tag' => 'foo', 'value' => []]
@@ -1319,7 +1104,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'tags' => [
 						['tag' => 'foo', 'value' => 0]
@@ -1331,7 +1115,6 @@ class testServices extends CAPITest {
 			'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'tags' => [
 						['tag' => 'foo', 'value' => str_repeat('a', DB::getFieldLength('service_tag', 'value') + 1)]
@@ -1343,7 +1126,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'tags' => [
 						['value' => '']
@@ -1355,7 +1137,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'tags' => [
 						['tag' => 'foo', 'value' => 'bar'],
@@ -1365,678 +1146,11 @@ class testServices extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1/tags/2": value (tag, value)=(foo, bar) already exists.'
 			],
 
-			// Times.
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => null
-				],
-				'expected_error' => 'Invalid parameter "/1/times": an array is expected.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => true
-				],
-				'expected_error' => 'Invalid parameter "/1/times": an array is expected.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => 0
-				],
-				'expected_error' => 'Invalid parameter "/1/times": an array is expected.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1/times": an array is expected.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [null]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1": an array is expected.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [true]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1": an array is expected.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [0]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1": an array is expected.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => ['']
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1": an array is expected.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						[]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1": the parameter "type" is missing.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						['type' => null]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1/type": an integer is expected.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						['type' => true]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1/type": an integer is expected.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						['type' => []]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1/type": an integer is expected.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						['type' => '']
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1/type": an integer is expected.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						['type' => '1.0']
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1/type": an integer is expected.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						['type' => -1]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1/type": value must be one of '.
-					implode(', ', [
-						SERVICE_TIME_TYPE_UPTIME,
-						SERVICE_TIME_TYPE_DOWNTIME,
-						SERVICE_TIME_TYPE_ONETIME_DOWNTIME
-					]).'.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						['type' => 999]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1/type": value must be one of '.
-					implode(', ', [
-						SERVICE_TIME_TYPE_UPTIME,
-						SERVICE_TIME_TYPE_DOWNTIME,
-						SERVICE_TIME_TYPE_ONETIME_DOWNTIME
-					]).'.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						[
-							'type' => SERVICE_TIME_TYPE_UPTIME
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1": the parameter "ts_from" is missing.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						[
-							'type' => SERVICE_TIME_TYPE_UPTIME,
-							'ts_from' => null
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1/ts_from": an integer is expected.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						[
-							'type' => SERVICE_TIME_TYPE_UPTIME,
-							'ts_from' => true
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1/ts_from": an integer is expected.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						[
-							'type' => SERVICE_TIME_TYPE_UPTIME,
-							'ts_from' => []
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1/ts_from": an integer is expected.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						[
-							'type' => SERVICE_TIME_TYPE_UPTIME,
-							'ts_from' => ''
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1/ts_from": an integer is expected.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						[
-							'type' => SERVICE_TIME_TYPE_UPTIME,
-							'ts_from' => '1.0'
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1/ts_from": an integer is expected.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						[
-							'type' => SERVICE_TIME_TYPE_UPTIME,
-							'ts_from' => -1
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1/ts_from": value must be one of 0-'.SEC_PER_WEEK.'.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						[
-							'type' => SERVICE_TIME_TYPE_UPTIME,
-							'ts_from' => SEC_PER_WEEK + 1
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1/ts_from": value must be one of 0-'.SEC_PER_WEEK.'.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						[
-							'type' => SERVICE_TIME_TYPE_DOWNTIME,
-							'ts_from' => -1
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1/ts_from": value must be one of 0-'.SEC_PER_WEEK.'.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						[
-							'type' => SERVICE_TIME_TYPE_DOWNTIME,
-							'ts_from' => SEC_PER_WEEK + 1
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1/ts_from": value must be one of 0-'.SEC_PER_WEEK.'.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						[
-							'type' => SERVICE_TIME_TYPE_ONETIME_DOWNTIME,
-							'ts_from' => -1
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1/ts_from": value must be one of 0-'.ZBX_MAX_INT32.'.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						[
-							'type' => SERVICE_TIME_TYPE_ONETIME_DOWNTIME,
-							'ts_from' => ZBX_MAX_INT32 + 1
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1/ts_from": a number is too large.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						[
-							'type' => SERVICE_TIME_TYPE_UPTIME,
-							'ts_from' => 0
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1": the parameter "ts_to" is missing.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						[
-							'type' => SERVICE_TIME_TYPE_UPTIME,
-							'ts_from' => 0,
-							'ts_to' => null
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1/ts_to": an integer is expected.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						[
-							'type' => SERVICE_TIME_TYPE_UPTIME,
-							'ts_from' => 0,
-							'ts_to' => true
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1/ts_to": an integer is expected.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						[
-							'type' => SERVICE_TIME_TYPE_UPTIME,
-							'ts_from' => 0,
-							'ts_to' => []
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1/ts_to": an integer is expected.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						[
-							'type' => SERVICE_TIME_TYPE_UPTIME,
-							'ts_from' => 0,
-							'ts_to' => ''
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1/ts_to": an integer is expected.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						[
-							'type' => SERVICE_TIME_TYPE_UPTIME,
-							'ts_from' => 0,
-							'ts_to' => '1.0'
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1/ts_to": an integer is expected.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						[
-							'type' => SERVICE_TIME_TYPE_UPTIME,
-							'ts_from' => 0,
-							'ts_to' => -1
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1/ts_to": value must be one of 0-'.SEC_PER_WEEK.'.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						[
-							'type' => SERVICE_TIME_TYPE_UPTIME,
-							'ts_from' => 0,
-							'ts_to' => SEC_PER_WEEK + 1
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1/ts_to": value must be one of 0-'.SEC_PER_WEEK.'.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						[
-							'type' => SERVICE_TIME_TYPE_DOWNTIME,
-							'ts_from' => 0,
-							'ts_to' => -1
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1/ts_to": value must be one of 0-'.SEC_PER_WEEK.'.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						[
-							'type' => SERVICE_TIME_TYPE_DOWNTIME,
-							'ts_from' => 0,
-							'ts_to' => SEC_PER_WEEK + 1
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1/ts_to": value must be one of 0-'.SEC_PER_WEEK.'.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						[
-							'type' => SERVICE_TIME_TYPE_ONETIME_DOWNTIME,
-							'ts_from' => 0,
-							'ts_to' => -1
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1/ts_to": value must be one of 0-'.ZBX_MAX_INT32.'.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						[
-							'type' => SERVICE_TIME_TYPE_ONETIME_DOWNTIME,
-							'ts_from' => 0,
-							'ts_to' => ZBX_MAX_INT32 + 1
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1/ts_to": a number is too large.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						[
-							'type' => SERVICE_TIME_TYPE_UPTIME,
-							'ts_from' => 0,
-							'ts_to' => 0,
-							'note' => null
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1/note": a character string is expected.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						[
-							'type' => SERVICE_TIME_TYPE_UPTIME,
-							'ts_from' => 0,
-							'ts_to' => 0,
-							'note' => true
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1/note": a character string is expected.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						[
-							'type' => SERVICE_TIME_TYPE_UPTIME,
-							'ts_from' => 0,
-							'ts_to' => 0,
-							'note' => []
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1/note": a character string is expected.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						[
-							'type' => SERVICE_TIME_TYPE_UPTIME,
-							'ts_from' => 0,
-							'ts_to' => 0,
-							'note' => 0
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1/note": a character string is expected.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						[
-							'type' => SERVICE_TIME_TYPE_UPTIME,
-							'ts_from' => 0,
-							'ts_to' => 0,
-							'note' => str_repeat('a', DB::getFieldLength('services_times', 'note') + 1)
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/1/note": value is too long.'
-			],
-			[
-				'service' => [
-					'name' => 'foo',
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'sortorder' => 0,
-					'times' => [
-						[
-							'type' => SERVICE_TIME_TYPE_UPTIME,
-							'ts_from' => 0,
-							'ts_to' => 0,
-							'note' => ''
-						],
-						[
-							'type' => SERVICE_TIME_TYPE_UPTIME,
-							'ts_from' => 0,
-							'ts_to' => 0,
-							'note' => ''
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/times/2": value (type, ts_from, ts_to)=(0, 0, 0) already exists.'
-			],
-
 			// Problem tags.
 			[
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'problem_tags' => null
 				],
@@ -2046,7 +1160,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'problem_tags' => true
 				],
@@ -2056,7 +1169,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'problem_tags' => 0
 				],
@@ -2066,7 +1178,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'problem_tags' => ''
 				],
@@ -2076,7 +1187,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'problem_tags' => [null]
 				],
@@ -2086,7 +1196,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'problem_tags' => [true]
 				],
@@ -2096,7 +1205,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'problem_tags' => [0]
 				],
@@ -2106,7 +1214,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'problem_tags' => ['']
 				],
@@ -2116,7 +1223,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'problem_tags' => [
 						[]
@@ -2128,7 +1234,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'problem_tags' => [
 						['tag' => null]
@@ -2140,7 +1245,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'problem_tags' => [
 						['tag' => true]
@@ -2152,7 +1256,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'problem_tags' => [
 						['tag' => []]
@@ -2164,7 +1267,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'problem_tags' => [
 						['tag' => 0]
@@ -2176,7 +1278,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'problem_tags' => [
 						['tag' => '']
@@ -2188,7 +1289,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'problem_tags' => [
 						['tag' => str_repeat('a', DB::getFieldLength('service_tag', 'tag') + 1)]
@@ -2200,7 +1300,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'problem_tags' => [
 						['tag' => 'foo', 'operator' => null]
@@ -2212,7 +1311,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'problem_tags' => [
 						['tag' => 'foo', 'operator' => true]
@@ -2224,7 +1322,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'problem_tags' => [
 						['tag' => 'foo', 'operator' => []]
@@ -2236,7 +1333,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'problem_tags' => [
 						['tag' => 'foo', 'operator' => '']
@@ -2248,7 +1344,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'problem_tags' => [
 						['tag' => 'foo', 'operator' => '1.0']
@@ -2260,33 +1355,30 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'problem_tags' => [
 						['tag' => 'foo', 'operator' => -1]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/problem_tags/1/operator": value must be one of '.
-					implode(', ', [SERVICE_TAG_OPERATOR_EQUAL, SERVICE_TAG_OPERATOR_LIKE]).'.'
+					implode(', ', [ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL, ZBX_SERVICE_PROBLEM_TAG_OPERATOR_LIKE]).'.'
 			],
 			[
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'problem_tags' => [
 						['tag' => 'foo', 'operator' => 999]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/problem_tags/1/operator": value must be one of '.
-					implode(', ', [SERVICE_TAG_OPERATOR_EQUAL, SERVICE_TAG_OPERATOR_LIKE]).'.'
+					implode(', ', [ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL, ZBX_SERVICE_PROBLEM_TAG_OPERATOR_LIKE]).'.'
 			],
 			[
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'problem_tags' => [
 						['tag' => 'foo', 'value' => null]
@@ -2298,7 +1390,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'problem_tags' => [
 						['tag' => 'foo', 'value' => true]
@@ -2310,7 +1401,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'problem_tags' => [
 						['tag' => 'foo', 'value' => []]
@@ -2322,7 +1412,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'problem_tags' => [
 						['tag' => 'foo', 'value' => 0]
@@ -2334,7 +1423,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'problem_tags' => [
 						['tag' => 'foo', 'value' => str_repeat('a', DB::getFieldLength('service_tag', 'value') + 1)]
@@ -2346,10 +1434,9 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'problem_tags' => [
-						['operator' => SERVICE_TAG_OPERATOR_EQUAL]
+						['operator' => ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/problem_tags/1": the parameter "tag" is missing.'
@@ -2358,7 +1445,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'problem_tags' => [
 						['value' => '']
@@ -2370,11 +1456,10 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'problem_tags' => [
-						['tag' => 'foo', 'operator' => SERVICE_TAG_OPERATOR_EQUAL, 'value' => 'bar'],
-						['tag' => 'foo', 'operator' => SERVICE_TAG_OPERATOR_EQUAL, 'value' => 'bar']
+						['tag' => 'foo', 'operator' => ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL, 'value' => 'bar'],
+						['tag' => 'foo', 'operator' => ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL, 'value' => 'bar']
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/problem_tags/2": value (tag, value)=(foo, bar) already exists.'
@@ -2383,11 +1468,10 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'problem_tags' => [
-						['tag' => 'foo', 'operator' => SERVICE_TAG_OPERATOR_LIKE, 'value' => 'bar'],
-						['tag' => 'foo', 'operator' => SERVICE_TAG_OPERATOR_LIKE, 'value' => 'bar']
+						['tag' => 'foo', 'operator' => ZBX_SERVICE_PROBLEM_TAG_OPERATOR_LIKE, 'value' => 'bar'],
+						['tag' => 'foo', 'operator' => ZBX_SERVICE_PROBLEM_TAG_OPERATOR_LIKE, 'value' => 'bar']
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/problem_tags/2": value (tag, value)=(foo, bar) already exists.'
@@ -2396,11 +1480,10 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'problem_tags' => [
-						['tag' => 'foo', 'operator' => SERVICE_TAG_OPERATOR_EQUAL, 'value' => 'bar'],
-						['tag' => 'foo', 'operator' => SERVICE_TAG_OPERATOR_LIKE, 'value' => 'bar']
+						['tag' => 'foo', 'operator' => ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL, 'value' => 'bar'],
+						['tag' => 'foo', 'operator' => ZBX_SERVICE_PROBLEM_TAG_OPERATOR_LIKE, 'value' => 'bar']
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/problem_tags/2": value (tag, value)=(foo, bar) already exists.'
@@ -2411,7 +1494,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => null
 				],
@@ -2421,7 +1503,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => true
 				],
@@ -2431,7 +1512,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => 0
 				],
@@ -2441,7 +1521,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => ''
 				],
@@ -2451,7 +1530,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [null]
 				],
@@ -2461,7 +1539,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [true]
 				],
@@ -2471,7 +1548,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [0]
 				],
@@ -2481,7 +1557,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => ['']
 				],
@@ -2491,7 +1566,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[]
@@ -2503,7 +1577,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						['type' => null]
@@ -2515,7 +1588,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						['type' => true]
@@ -2527,7 +1599,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						['type' => []]
@@ -2539,7 +1610,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						['type' => '']
@@ -2551,7 +1621,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						['type' => '1.0']
@@ -2563,7 +1632,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						['type' => -1]
@@ -2585,7 +1653,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						['type' => 999]
@@ -2607,7 +1674,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						['type' => ZBX_SERVICE_STATUS_RULE_TYPE_N_GE]
@@ -2619,7 +1685,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -2634,7 +1699,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -2649,7 +1713,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -2664,7 +1727,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -2679,7 +1741,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -2694,7 +1755,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -2709,7 +1769,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -2724,7 +1783,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -2739,7 +1797,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -2754,7 +1811,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -2769,7 +1825,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -2784,7 +1839,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -2799,7 +1853,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -2814,7 +1867,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -2829,7 +1881,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -2844,7 +1895,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -2859,7 +1909,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -2874,7 +1923,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -2889,7 +1937,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -2904,7 +1951,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -2919,7 +1965,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -2934,7 +1979,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -2949,7 +1993,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -2965,7 +2008,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -2981,7 +2023,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -2997,7 +2038,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -3013,7 +2053,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -3029,7 +2068,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -3049,7 +2087,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -3069,7 +2106,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -3085,7 +2121,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -3102,7 +2137,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -3119,7 +2153,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -3136,7 +2169,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -3153,7 +2185,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -3170,7 +2201,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -3188,7 +2218,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -3206,7 +2235,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'status_rules' => [
 						[
@@ -3235,7 +2263,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0
 				],
 				'expected_error' => null
@@ -3244,8 +2271,6 @@ class testServices extends CAPITest {
 				'service' => [
 					'name' => 'foo',
 					'algorithm' => ZBX_SERVICE_STATUS_CALC_SET_OK,
-					'showsla' => SERVICE_SHOW_SLA_OFF,
-					'goodsla' => 99.9,
 					'sortorder' => 0,
 					'weight' => 0,
 					'propagation_rule' => 0,
@@ -3258,11 +2283,6 @@ class testServices extends CAPITest {
 					'problem_tags' => [
 						['tag' => 'foo', 'value' => 'bar']
 					],
-					'times' => [[
-						'type' => SERVICE_TIME_TYPE_UPTIME,
-						'ts_from' => 0,
-						'ts_to' => 10800
-					]],
 					'status_rules' => []
 				],
 				'expected_error' => null
@@ -4720,208 +3740,155 @@ class testServices extends CAPITest {
 					'result' => []
 				]
 			],
-			[
-				'request' => [
-					'output' => [],
-					'filter' => [
-						'showsla' => true
-					]
-				],
-				'expected' => [
-					'error' => 'Invalid parameter "/filter/showsla": an array is expected.',
-					'result' => []
-				]
-			],
-			[
-				'request' => [
-					'output' => [],
-					'filter' => [
-						'showsla' => ''
-					]
-				],
-				'expected' => [
-					'error' => 'Invalid parameter "/filter/showsla": an array is expected.',
-					'result' => []
-				]
-			],
-			[
-				'request' => [
-					'output' => [],
-					'filter' => [
-						'showsla' => '1.0'
-					]
-				],
-				'expected' => [
-					'error' => 'Invalid parameter "/filter/showsla": an array is expected.',
-					'result' => []
-				]
-			],
-			[
-				'request' => [
-					'output' => [],
-					'filter' => [
-						'showsla' => -1
-					]
-				],
-				'expected' => [
-					'error' => 'Invalid parameter "/filter/showsla/1": value must be one of '.
-						implode(', ', [SERVICE_SHOW_SLA_OFF, SERVICE_SHOW_SLA_ON]).'.',
-					'result' => []
-				]
-			],
-			[
-				'request' => [
-					'output' => [],
-					'filter' => [
-						'showsla' => [null]
-					]
-				],
-				'expected' => [
-					'error' => 'Invalid parameter "/filter/showsla/1": an integer is expected.',
-					'result' => []
-				]
-			],
-			[
-				'request' => [
-					'output' => [],
-					'filter' => [
-						'showsla' => [true]
-					]
-				],
-				'expected' => [
-					'error' => 'Invalid parameter "/filter/showsla/1": an integer is expected.',
-					'result' => []
-				]
-			],
-			[
-				'request' => [
-					'output' => [],
-					'filter' => [
-						'showsla' => ['']
-					]
-				],
-				'expected' => [
-					'error' => 'Invalid parameter "/filter/showsla/1": an integer is expected.',
-					'result' => []
-				]
-			],
-			[
-				'request' => [
-					'output' => [],
-					'filter' => [
-						'showsla' => ['1.0']
-					]
-				],
-				'expected' => [
-					'error' => 'Invalid parameter "/filter/showsla/1": an integer is expected.',
-					'result' => []
-				]
-			],
-			[
-				'request' => [
-					'output' => [],
-					'filter' => [
-						'showsla' => [-1]
-					]
-				],
-				'expected' => [
-					'error' => 'Invalid parameter "/filter/showsla/1": value must be one of '.
-						implode(', ', [SERVICE_SHOW_SLA_OFF, SERVICE_SHOW_SLA_ON]).'.',
-					'result' => []
-				]
-			],
-			[
-				'request' => [
-					'output' => [],
-					'filter' => [
-						'showsla' => [999]
-					]
-				],
-				'expected' => [
-					'error' => 'Invalid parameter "/filter/showsla/1": value must be one of '.
-						implode(', ', [SERVICE_SHOW_SLA_OFF, SERVICE_SHOW_SLA_ON]).'.',
-					'result' => []
-				]
-			],
 
 			// Related objects.
 			[
 				'request' => [
 					'output' => [],
-					'selectAlarms' => true
+					'selectStatusTimeline' => true
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/selectAlarms": an array or a character string is expected.',
+					'error' => 'Invalid parameter "/selectStatusTimeline": an array is expected.',
 					'result' => []
 				]
 			],
 			[
 				'request' => [
 					'output' => [],
-					'selectAlarms' => 0
+					'selectStatusTimeline' => 0
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/selectAlarms": an array or a character string is expected.',
+					'error' => 'Invalid parameter "/selectStatusTimeline": an array is expected.',
 					'result' => []
 				]
 			],
 			[
 				'request' => [
 					'output' => [],
-					'selectAlarms' => ''
+					'selectStatusTimeline' => ''
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/selectAlarms": value must be one of "extend", "count".',
+					'error' => 'Invalid parameter "/selectStatusTimeline": an array is expected.',
 					'result' => []
 				]
 			],
 			[
 				'request' => [
 					'output' => [],
-					'selectAlarms' => [null]
+					'selectStatusTimeline' => [null]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/selectAlarms/1": a character string is expected.',
+					'error' => 'Invalid parameter "/selectStatusTimeline/1": an array is expected.',
 					'result' => []
 				]
 			],
 			[
 				'request' => [
 					'output' => [],
-					'selectAlarms' => [true]
+					'selectStatusTimeline' => [true]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/selectAlarms/1": a character string is expected.',
+					'error' => 'Invalid parameter "/selectStatusTimeline/1": an array is expected.',
 					'result' => []
 				]
 			],
 			[
 				'request' => [
 					'output' => [],
-					'selectAlarms' => [0]
+					'selectStatusTimeline' => [0]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/selectAlarms/1": a character string is expected.',
+					'error' => 'Invalid parameter "/selectStatusTimeline/1": an array is expected.',
 					'result' => []
 				]
 			],
 			[
 				'request' => [
 					'output' => [],
-					'selectAlarms' => [[]]
+					'selectStatusTimeline' => [[]]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/selectAlarms/1": a character string is expected.',
+					'error' => 'Invalid parameter "/selectStatusTimeline/1": the parameter "period_from" is missing.',
 					'result' => []
 				]
 			],
 			[
 				'request' => [
 					'output' => [],
-					'selectAlarms' => ['']
+					'selectStatusTimeline' => ['']
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/selectAlarms/1": value must be one of "clock", "value".',
+					'error' => 'Invalid parameter "/selectStatusTimeline/1": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectStatusTimeline' => [['period_from' => 1638316800]]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectStatusTimeline/1": the parameter "period_to" is missing.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectStatusTimeline' => [
+						[
+							'period_from' => 'yesterday',
+							'period_to' => 1638316900
+						]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectStatusTimeline/1/period_from": an integer is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectStatusTimeline' => [
+						[
+							'period_from' => 1638316800,
+							'period_to' => 'today'
+						]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectStatusTimeline/1/period_to": an integer is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectStatusTimeline' => [
+						[
+							'period_from' => 9638316800,
+							'period_to' => 9638316900
+						]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectStatusTimeline/1/period_from": a number is too large.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'selectStatusTimeline' => [
+						[
+							'period_from' => 1638316800,
+							'period_to' => 9638316900
+						]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/selectStatusTimeline/1/period_to": a number is too large.',
 					'result' => []
 				]
 			],
@@ -5001,7 +3968,7 @@ class testServices extends CAPITest {
 					'selectChildren' => ['']
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/selectChildren/1": value must be one of "serviceid", "name", "status", "algorithm", "showsla", "goodsla", "sortorder", "weight", "propagation_rule", "propagation_value", "readonly".',
+					'error' => 'Invalid parameter "/selectChildren/1": value must be one of "serviceid", "uuid", "name", "status", "algorithm", "sortorder", "weight", "propagation_rule", "propagation_value", "description", "created_at", "readonly".',
 					'result' => []
 				]
 			],
@@ -5081,7 +4048,7 @@ class testServices extends CAPITest {
 					'selectParents' => ['']
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/selectParents/1": value must be one of "serviceid", "name", "status", "algorithm", "showsla", "goodsla", "sortorder", "weight", "propagation_rule", "propagation_value", "readonly".',
+					'error' => 'Invalid parameter "/selectParents/1": value must be one of "serviceid", "uuid", "name", "status", "algorithm", "sortorder", "weight", "propagation_rule", "propagation_value", "description", "created_at", "readonly".',
 					'result' => []
 				]
 			],
@@ -5324,86 +4291,6 @@ class testServices extends CAPITest {
 					'error' => 'Invalid parameter "/selectTags/1": value must be one of "tag", "value".',
 					'result' => []
 				]
-			],
-			[
-				'request' => [
-					'output' => [],
-					'selectTimes' => true
-				],
-				'expected' => [
-					'error' => 'Invalid parameter "/selectTimes": an array or a character string is expected.',
-					'result' => []
-				]
-			],
-			[
-				'request' => [
-					'output' => [],
-					'selectTimes' => 0
-				],
-				'expected' => [
-					'error' => 'Invalid parameter "/selectTimes": an array or a character string is expected.',
-					'result' => []
-				]
-			],
-			[
-				'request' => [
-					'output' => [],
-					'selectTimes' => ''
-				],
-				'expected' => [
-					'error' => 'Invalid parameter "/selectTimes": value must be one of "extend", "count".',
-					'result' => []
-				]
-			],
-			[
-				'request' => [
-					'output' => [],
-					'selectTimes' => [null]
-				],
-				'expected' => [
-					'error' => 'Invalid parameter "/selectTimes/1": a character string is expected.',
-					'result' => []
-				]
-			],
-			[
-				'request' => [
-					'output' => [],
-					'selectTimes' => [true]
-				],
-				'expected' => [
-					'error' => 'Invalid parameter "/selectTimes/1": a character string is expected.',
-					'result' => []
-				]
-			],
-			[
-				'request' => [
-					'output' => [],
-					'selectTimes' => [0]
-				],
-				'expected' => [
-					'error' => 'Invalid parameter "/selectTimes/1": a character string is expected.',
-					'result' => []
-				]
-			],
-			[
-				'request' => [
-					'output' => [],
-					'selectTimes' => [[]]
-				],
-				'expected' => [
-					'error' => 'Invalid parameter "/selectTimes/1": a character string is expected.',
-					'result' => []
-				]
-			],
-			[
-				'request' => [
-					'output' => [],
-					'selectTimes' => ['']
-				],
-				'expected' => [
-					'error' => 'Invalid parameter "/selectTimes/1": value must be one of "type", "ts_from", "ts_to", "note".',
-					'result' => []
-				]
 			]
 		];
 	}
@@ -5413,124 +4300,6 @@ class testServices extends CAPITest {
 	 */
 	public function testServices_Get(array $request, array $expected): void {
 		$response = $this->call('service.get', $request, $expected['error']);
-
-		if ($expected['error'] !== null) {
-			return;
-		}
-
-		$this->assertEquals($response['result'], $expected['error']);
-	}
-
-	public static function service_getsla_data(): array {
-		return [
-			[
-				'request' => [
-					'output' => [],
-					'serviceids' => true
-				],
-				'expected' => [
-					'error' => 'Invalid parameter "/serviceids/1": a number is expected.',
-					'result' => []
-				]
-			],
-			[
-				'request' => [
-					'output' => [],
-					'serviceids' => ''
-				],
-				'expected' => [
-					'error' => 'Invalid parameter "/serviceids/1": a number is expected.',
-					'result' => []
-				]
-			],
-			[
-				'request' => [
-					'output' => [],
-					'serviceids' => '1.0'
-				],
-				'expected' => [
-					'error' => 'Invalid parameter "/serviceids/1": a number is expected.',
-					'result' => []
-				]
-			],
-			[
-				'request' => [
-					'output' => [],
-					'serviceids' => -1
-				],
-				'expected' => [
-					'error' => 'Invalid parameter "/serviceids/1": a number is expected.',
-					'result' => []
-				]
-			],
-			[
-				'request' => [
-					'output' => [],
-					'serviceids' => [null]
-				],
-				'expected' => [
-					'error' => 'Invalid parameter "/serviceids/1": a number is expected.',
-					'result' => []
-				]
-			],
-			[
-				'request' => [
-					'output' => [],
-					'serviceids' => [true]
-				],
-				'expected' => [
-					'error' => 'Invalid parameter "/serviceids/1": a number is expected.',
-					'result' => []
-				]
-			],
-			[
-				'request' => [
-					'output' => [],
-					'serviceids' => [[]]
-				],
-				'expected' => [
-					'error' => 'Invalid parameter "/serviceids/1": a number is expected.',
-					'result' => []
-				]
-			],
-			[
-				'request' => [
-					'output' => [],
-					'serviceids' => ['']
-				],
-				'expected' => [
-					'error' => 'Invalid parameter "/serviceids/1": a number is expected.',
-					'result' => []
-				]
-			],
-			[
-				'request' => [
-					'output' => [],
-					'serviceids' => ['1.0']
-				],
-				'expected' => [
-					'error' => 'Invalid parameter "/serviceids/1": a number is expected.',
-					'result' => []
-				]
-			],
-			[
-				'request' => [
-					'output' => [],
-					'serviceids' => [-1]
-				],
-				'expected' => [
-					'error' => 'Invalid parameter "/serviceids/1": a number is expected.',
-					'result' => []
-				]
-			]
-		];
-	}
-
-	/**
-	 * @dataProvider service_getsla_data
-	 */
-	public function testServices_Getsla(array $request, array $expected): void {
-		$response = $this->call('service.getsla', $request, $expected['error']);
 
 		if ($expected['error'] !== null) {
 			return;
@@ -5580,8 +4349,7 @@ class testServices extends CAPITest {
 		}
 
 		$db_services = CDBHelper::getAll(
-			'SELECT s.serviceid,s.name,s.status,s.algorithm,s.showsla,s.goodsla,s.sortorder,s.weight,'.
-				's.propagation_rule,s.propagation_value'.
+			'SELECT s.serviceid,s.name,s.status,s.algorithm,s.sortorder,s.weight,s.propagation_rule,s.propagation_value'.
 			' FROM services s'.
 			' WHERE '.dbConditionId('s.serviceid', $response['result']['serviceids']).
 			' ORDER BY s.serviceid ASC'

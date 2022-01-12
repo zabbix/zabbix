@@ -113,15 +113,15 @@ There are no template links in this template.
 |PHP-FPM |PHP-FPM: Start time |<p>The time when this pool was started.</p> |DEPENDENT |php-fpm.start_time<p>**Preprocessing**:</p><p>- JSONPATH: `$.['start time']`</p> |
 |PHP-FPM |PHP-FPM: Processes, total |<p>The total number of server processes currently running.</p> |DEPENDENT |php-fpm.processes_total<p>**Preprocessing**:</p><p>- JSONPATH: `$.['total processes']`</p> |
 |PHP-FPM |PHP-FPM: Processes, idle |<p>The total number of idle processes.</p> |DEPENDENT |php-fpm.processes_idle<p>**Preprocessing**:</p><p>- JSONPATH: `$.['idle processes']`</p> |
-|PHP-FPM |PHP-FPM: Queue usage |<p>Queue utilization</p> |CALCULATED |php-fpm.listen_queue_usage<p>**Expression**:</p>`last(php-fpm.listen_queue)/(last(php-fpm.listen_queue_len)+(last(php-fpm.listen_queue_len)=0))*100` |
+|PHP-FPM |PHP-FPM: Queue usage |<p>Queue utilization</p> |CALCULATED |php-fpm.listen_queue_usage<p>**Expression**:</p>`last(//php-fpm.listen_queue)/(last(//php-fpm.listen_queue_len)+(last(//php-fpm.listen_queue_len)=0))*100` |
 |PHP-FPM |PHP-FPM: Process manager |<p>The method used by the process manager to control the number of child processes for this pool.</p> |DEPENDENT |php-fpm.process_manager<p>**Preprocessing**:</p><p>- JSONPATH: `$.['process manager']`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |PHP-FPM |PHP-FPM: Processes, max active |<p>The highest value that 'active processes' has reached since the php-fpm server started.</p> |DEPENDENT |php-fpm.processes_max_active<p>**Preprocessing**:</p><p>- JSONPATH: `$.['max active processes']`</p> |
-|PHP-FPM |PHP-FPM: Accepted connections per second |<p>The number of accepted requests per second.</p> |DEPENDENT |php-fpm.conn_accepted.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.['accepted conn']`</p><p>- CHANGE_PER_SECOND |
-|PHP-FPM |PHP-FPM: Slow requests |<p>The number of requests that exceeded your request_slowlog_timeout value.</p> |DEPENDENT |php-fpm.slow_requests<p>**Preprocessing**:</p><p>- JSONPATH: `$.['slow requests']`</p><p>- SIMPLE_CHANGE |
+|PHP-FPM |PHP-FPM: Accepted connections per second |<p>The number of accepted requests per second.</p> |DEPENDENT |php-fpm.conn_accepted.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.['accepted conn']`</p><p>- CHANGE_PER_SECOND</p> |
+|PHP-FPM |PHP-FPM: Slow requests |<p>The number of requests that exceeded your request_slowlog_timeout value.</p> |DEPENDENT |php-fpm.slow_requests<p>**Preprocessing**:</p><p>- JSONPATH: `$.['slow requests']`</p><p>- SIMPLE_CHANGE</p> |
 |PHP-FPM |PHP-FPM: Listen queue |<p>The current number of connections that have been initiated, but not yet accepted.</p> |DEPENDENT |php-fpm.listen_queue<p>**Preprocessing**:</p><p>- JSONPATH: `$.['listen queue']`</p> |
 |PHP-FPM |PHP-FPM: Listen queue, max |<p>The maximum number of requests in the queue of pending connections since this FPM pool has started.</p> |DEPENDENT |php-fpm.listen_queue_max<p>**Preprocessing**:</p><p>- JSONPATH: `$.['max listen queue']`</p> |
 |PHP-FPM |PHP-FPM: Listen queue, len |<p>Size of the socket queue of pending connections.</p> |DEPENDENT |php-fpm.listen_queue_len<p>**Preprocessing**:</p><p>- JSONPATH: `$.['listen queue len']`</p> |
-|PHP-FPM |PHP-FPM: Max children reached |<p>The number of times that pm.max_children has been reached since the php-fpm pool started </p> |DEPENDENT |php-fpm.max_children<p>**Preprocessing**:</p><p>- JSONPATH: `$.['max children reached']`</p><p>- SIMPLE_CHANGE |
+|PHP-FPM |PHP-FPM: Max children reached |<p>The number of times that pm.max_children has been reached since the php-fpm pool started </p> |DEPENDENT |php-fpm.max_children<p>**Preprocessing**:</p><p>- JSONPATH: `$.['max children reached']`</p><p>- SIMPLE_CHANGE</p> |
 |Zabbix_raw_items |PHP-FPM: php-fpm_ping |<p>-</p> |ZABBIX_PASSIVE |web.page.get["{$PHP_FPM.HOST}","{$PHP_FPM.PING.PAGE}","{$PHP_FPM.PORT}"] |
 |Zabbix_raw_items |PHP-FPM: Get status page |<p>-</p> |ZABBIX_PASSIVE |web.page.get["{$PHP_FPM.HOST}","{$PHP_FPM.STATUS.PAGE}?json","{$PHP_FPM.PORT}"]<p>**Preprocessing**:</p><p>- REGEX: `^[.\s\S]*({.+}) \1`</p> |
 
@@ -129,14 +129,14 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|PHP-FPM: Process is not running |<p>-</p> |`{TEMPLATE_NAME:proc.num["{$PHP_FPM.PROCESS_NAME}"].last()}=0` |HIGH | |
-|PHP-FPM: Service is down |<p>-</p> |`{TEMPLATE_NAME:php-fpm.ping.last()}=0 or {TEMPLATE_NAME:php-fpm.ping.nodata(3m)}=1` |HIGH |<p>Manual close: YES</p><p>**Depends on**:</p><p>- PHP-FPM: Process is not running</p> |
-|PHP-FPM: Version has changed (new version: {ITEM.VALUE}) |<p>PHP-FPM version has changed. Ack to close.</p> |`{TEMPLATE_NAME:php-fpm.version.diff()}=1 and {TEMPLATE_NAME:php-fpm.version.strlen()}>0` |INFO |<p>Manual close: YES</p> |
-|PHP-FPM: Failed to fetch info data (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes</p> |`{TEMPLATE_NAME:php-fpm.uptime.nodata(30m)}=1` |INFO |<p>Manual close: YES</p><p>**Depends on**:</p><p>- PHP-FPM: Process is not running</p> |
-|PHP-FPM: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:php-fpm.uptime.last()}<10m` |INFO |<p>Manual close: YES</p> |
-|PHP-FPM: Queue utilization is high (over {$PHP_FPM.QUEUE.WARN.MAX}% for 15m) |<p>The queue for this pool reached {$PHP_FPM.QUEUE.WARN.MAX}% of its maximum capacity. Items in queue represent the current number of connections that have been initiated on this pool, but not yet accepted.</p> |`{TEMPLATE_NAME:php-fpm.listen_queue_usage.min(15m)}  > {$PHP_FPM.QUEUE.WARN.MAX} ` |WARNING | |
-|PHP-FPM: Manager  changed (new value received: {ITEM.VALUE}) |<p>PHP-FPM manager changed. Ack to close.</p> |`{TEMPLATE_NAME:php-fpm.process_manager.diff()}=1` |INFO |<p>Manual close: YES</p> |
-|PHP-FPM: Detected slow requests |<p>PHP-FPM detected slow request. A slow request means that it took more time to execute than expected (defined in the configuration of your pool).</p> |`{TEMPLATE_NAME:php-fpm.slow_requests.min(#3)}>0 ` |WARNING | |
+|PHP-FPM: Process is not running |<p>-</p> |`last(/PHP-FPM by Zabbix agent/proc.num["{$PHP_FPM.PROCESS_NAME}"])=0` |HIGH | |
+|PHP-FPM: Service is down |<p>-</p> |`last(/PHP-FPM by Zabbix agent/php-fpm.ping)=0 or nodata(/PHP-FPM by Zabbix agent/php-fpm.ping,3m)=1` |HIGH |<p>Manual close: YES</p><p>**Depends on**:</p><p>- PHP-FPM: Process is not running</p> |
+|PHP-FPM: Version has changed (new version: {ITEM.VALUE}) |<p>PHP-FPM version has changed. Ack to close.</p> |`last(/PHP-FPM by Zabbix agent/php-fpm.version,#1)<>last(/PHP-FPM by Zabbix agent/php-fpm.version,#2) and length(last(/PHP-FPM by Zabbix agent/php-fpm.version))>0` |INFO |<p>Manual close: YES</p> |
+|PHP-FPM: Failed to fetch info data (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes</p> |`nodata(/PHP-FPM by Zabbix agent/php-fpm.uptime,30m)=1` |INFO |<p>Manual close: YES</p><p>**Depends on**:</p><p>- PHP-FPM: Process is not running</p> |
+|PHP-FPM: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/PHP-FPM by Zabbix agent/php-fpm.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|PHP-FPM: Queue utilization is high (over {$PHP_FPM.QUEUE.WARN.MAX}% for 15m) |<p>The queue for this pool reached {$PHP_FPM.QUEUE.WARN.MAX}% of its maximum capacity. Items in queue represent the current number of connections that have been initiated on this pool, but not yet accepted.</p> |`min(/PHP-FPM by Zabbix agent/php-fpm.listen_queue_usage,15m) > {$PHP_FPM.QUEUE.WARN.MAX}` |WARNING | |
+|PHP-FPM: Manager  changed (new value received: {ITEM.VALUE}) |<p>PHP-FPM manager changed. Ack to close.</p> |`last(/PHP-FPM by Zabbix agent/php-fpm.process_manager,#1)<>last(/PHP-FPM by Zabbix agent/php-fpm.process_manager,#2)` |INFO |<p>Manual close: YES</p> |
+|PHP-FPM: Detected slow requests |<p>PHP-FPM detected slow request. A slow request means that it took more time to execute than expected (defined in the configuration of your pool).</p> |`min(/PHP-FPM by Zabbix agent/php-fpm.slow_requests,#3)>0` |WARNING | |
 
 ## Feedback
 

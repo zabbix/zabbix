@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-07-22T14:52:56Z'
+  version: '6.0'
+  date: '2021-12-17T06:34:52Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -29,7 +29,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/422668-discussion-thread-for-official-zabbix-templates-for-zyxel
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: 'Templates/Network devices'
@@ -95,7 +95,7 @@ zabbix_export:
           units: '%'
           description: |
             MIB: ZYXEL-ES-COMMON
-            Show device CPU load in %, it's the snapshot of CPU load when 
+            Show device CPU load in %, it's the snapshot of CPU load when
             getting the values.
           tags:
             -
@@ -410,7 +410,6 @@ zabbix_export:
                 value: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'An entry in fanRpmTable.'
           item_prototypes:
             -
               uuid: 43cf7ba65c39475b9614ed4b95e9b398
@@ -808,13 +807,13 @@ zabbix_export:
               history: 7d
               description: |
                 MIB: ZYXEL-PORT-MIB
-                Select The speed and the duplex mode of the Ethernet connection on this port. Selecting Auto 
-                (auto-negotiation) allows one port to negotiate with a peer port automatically to obtain the 
-                connection speed and duplex mode that both ends support. When auto-negotiation is turned on, 
-                a port on the Switch negotiates with the peer automatically to determine the connection speed 
-                and duplex mode. If the peer port does not support auto-negotiation or turns off this feature, 
-                the Switch determines the connection speed by detecting the signal on the cable and using half 
-                duplex mode. Thus requiring you to make sure that the settings of the peer port are the same in 
+                Select The speed and the duplex mode of the Ethernet connection on this port. Selecting Auto
+                (auto-negotiation) allows one port to negotiate with a peer port automatically to obtain the
+                connection speed and duplex mode that both ends support. When auto-negotiation is turned on,
+                a port on the Switch negotiates with the peer automatically to determine the connection speed
+                and duplex mode. If the peer port does not support auto-negotiation or turns off this feature,
+                the Switch determines the connection speed by detecting the signal on the cable and using half
+                duplex mode. Thus requiring you to make sure that the settings of the peer port are the same in
                 order to connect.
               valuemap:
                 name: 'ZYXEL MGS3520-28x operational mode port speed duplex'
@@ -1299,7 +1298,7 @@ zabbix_export:
                   var inArray = JSON.parse(value);
                   var outArr = []
                   inArray.forEach(function(item, i, arr) {
-                  item["{#ZYXEL.VOLT.THRESH.LOW}"] /= 1000; 
+                  item["{#ZYXEL.VOLT.THRESH.LOW}"] /= 1000;
                   outArr.push(item)
                   });
                   return JSON.stringify(outArr);
@@ -1316,12 +1315,18 @@ zabbix_export:
           description: 'The time interval for SNMP agent availability trigger expression.'
         -
           macro: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
-          value: 'CHANGE_IF_NEEDED'
+          value: CHANGE_IF_NEEDED
           description: 'Triggers will be created only for interfaces whose description contains the value of this macro'
         -
           macro: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.MATCHES}'
           value: 1|2|3|4
-          description: 'Filter of discoverable link types. 0 - Down link 1 - Cooper link 2 - Fiber link 3 - XFP 4 - CX4'
+          description: |
+            Filter of discoverable link types.
+            0 - Down link
+            1 - Cooper link
+            2 - Fiber link
+            3 - XFP
+            4 - CX4
         -
           macro: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
@@ -1337,7 +1342,11 @@ zabbix_export:
         -
           macro: '{$ZYXEL.LLD.FILTER.SFP.STATUS.MATCHES}'
           value: 1|2
-          description: 'Filter of discoverable status. 0 - OK with DDM 1 - OK without DDM 2 - nonoperational'
+          description: |
+            Filter of discoverable status.
+            0 - OK with DDM
+            1 - OK without DDM
+            2 - nonoperational
         -
           macro: '{$ZYXEL.LLD.FILTER.SFP.STATUS.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED

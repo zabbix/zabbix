@@ -1,8 +1,5 @@
 # LIBSSH_CHECK_CONFIG ([DEFAULT-ACTION])
 # ----------------------------------------------------------
-#    Alexander Vladishev                      Oct-26-2009
-#    Dmitry Borovikov                         Feb-13-2010
-#          --version control added (1.0.0)
 #
 # Checks for ssh.  DEFAULT-ACTION is the string yes or no to
 # specify whether to default to --with-ssh or --without-ssh.

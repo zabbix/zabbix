@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 The template to monitor TLS/SSL certificate on the website by Zabbix agent 2 that works without any external scripts.
 Zabbix agent 2 with the WebCertificate plugin requests certificate using the web.certificate.get key and returns
 JSON with certificate attributes.
@@ -64,9 +64,9 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Cert: SSL certificate is invalid |<p>SSL certificate has expired or it is issued for another domain.</p> |`find(/TEMPLATE_NAME/cert.validation,,"like","invalid")=1` |HIGH | |
-|Cert: SSL certificate expires soon (less than {$CERT.EXPIRY.WARN} days) |<p>The SSL certificate should be updated or it will become untrusted.</p> |`(last(/TEMPLATE_NAME/cert.not_after) - now()) / 86400 < {$CERT.EXPIRY.WARN}` |WARNING |<p>**Depends on**:</p><p>- Cert: SSL certificate is invalid</p> |
-|Cert: Fingerprint has changed (new version: {ITEM.VALUE}) |<p>The SSL certificate fingerprint has changed. If you did not update the certificate, it may mean your certificate has been hacked. Ack to close.</p><p>There could be multiple valid certificates on some installations. In this case, the trigger will have a false positive. You can ignore it or disable the trigger.</p> |`last(/TEMPLATE_NAME/cert.sha1_fingerprint) <> last(/TEMPLATE_NAME/cert.sha1_fingerprint,#2)` |INFO |<p>Manual close: YES</p> |
+|Cert: SSL certificate is invalid |<p>SSL certificate has expired or it is issued for another domain.</p> |`find(/Website certificate by Zabbix agent 2/cert.validation,,"like","invalid")=1` |HIGH | |
+|Cert: SSL certificate expires soon (less than {$CERT.EXPIRY.WARN} days) |<p>The SSL certificate should be updated or it will become untrusted.</p> |`(last(/Website certificate by Zabbix agent 2/cert.not_after) - now()) / 86400 < {$CERT.EXPIRY.WARN}` |WARNING |<p>**Depends on**:</p><p>- Cert: SSL certificate is invalid</p> |
+|Cert: Fingerprint has changed (new version: {ITEM.VALUE}) |<p>The SSL certificate fingerprint has changed. If you did not update the certificate, it may mean your certificate has been hacked. Ack to close.</p><p>There could be multiple valid certificates on some installations. In this case, the trigger will have a false positive. You can ignore it or disable the trigger.</p> |`last(/Website certificate by Zabbix agent 2/cert.sha1_fingerprint) <> last(/Website certificate by Zabbix agent 2/cert.sha1_fingerprint,#2)` |INFO |<p>Manual close: YES</p> |
 
 ## Feedback
 

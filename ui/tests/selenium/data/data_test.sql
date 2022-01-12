@@ -229,9 +229,6 @@ INSERT INTO maintenances (maintenanceid, name, maintenance_type, description, ac
 INSERT INTO maintenances (maintenanceid, name, maintenance_type, description, active_since, active_till,tags_evaltype) VALUES (2,'Maintenance period 2 (no data collection)',1,'Test description 1',1294760280,1294846680,0);
 INSERT INTO maintenances (maintenanceid, name, maintenance_type, description, active_since, active_till,tags_evaltype) VALUES (3,'Maintenance for update (data collection)',0,'Test description',1534885200,1534971600,2);
 
-INSERT INTO maintenances_hosts (maintenance_hostid, maintenanceid, hostid) VALUES (1,1,20000);
-INSERT INTO maintenances_hosts (maintenance_hostid, maintenanceid, hostid) VALUES (2,2,20000);
-
 INSERT INTO maintenances_groups (maintenance_groupid, maintenanceid, groupid) VALUES (1,1,4);
 INSERT INTO maintenances_groups (maintenance_groupid, maintenanceid, groupid) VALUES (2,2,4);
 INSERT INTO maintenances_groups (maintenance_groupid, maintenanceid, groupid) VALUES (3,3,4);
@@ -2738,7 +2735,7 @@ INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VAL
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99514, 99135, '{$X_SECRET_HOST_MACRO_2_RESOLVE}', 'Value 2 B resolved', 'Host macro to be resolved', 0);
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99515, 99011, '{$SECRET_HOST_MACRO}', 'some secret value', '', 1);
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99516, 99011, '{$TEXT_HOST_MACRO}', 'some text value', '', 0);
-INSERT INTO items (itemid, type, hostid, name, key_, interfaceid, params, description, posts, headers) VALUES (99112, 2, 99135, 'Macro value: {$X_SECRET_HOST_MACRO_2_RESOLVE}', 'trap', NULL, '', '', '', '');
+INSERT INTO items (itemid, type, hostid, name, key_, interfaceid, params, description, posts, headers) VALUES (99112, 2, 99135, 'Macro value', 'trap[{$X_SECRET_HOST_MACRO_2_RESOLVE}]', NULL, '', '', '', '');
 
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99525, 99011, '{$VAULT_HOST_MACRO3}', 'secret/path:key', 'Change name, value, description', 2);
 
@@ -2754,7 +2751,7 @@ INSERT INTO items (itemid, type, hostid, name, key_, interfaceid, params, descri
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99526, 99014, '{$VAULT_HOST_MACRO}', 'secret/path:key', 'Change name, value, description', 2);
 
 -- testFormAdministrationGeneralMacros
-INSERT INTO items (itemid, type, hostid, name, key_, interfaceid, params, description, posts, headers) VALUES (99114, 2, 99134, 'Macro value: {$Z_GLOBAL_MACRO_2_RESOLVE}', 'trap', NULL, '', '', '', '');
+INSERT INTO items (itemid, type, hostid, name, key_, interfaceid, params, description, posts, headers) VALUES (99114, 2, 99134, 'Macro value', 'trap[{$Z_GLOBAL_MACRO_2_RESOLVE}]', NULL, '', '', '', '');
 
 -- testPageHostPrototypes
 INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (450, 90002, 'host_proto_tag_1', 'value1');

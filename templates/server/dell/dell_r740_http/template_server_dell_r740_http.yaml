@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-06-18T08:43:35Z'
+  version: '6.0'
+  date: '2021-12-16T20:03:13Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -15,7 +15,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/426752-discussion-thread-for-official-zabbix-dell-templates
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: 'Templates/Server hardware'
@@ -267,7 +267,6 @@ zabbix_export:
                   result.firmware = getField(response.body, 'FirmwareVersion', '');
                   
                   return JSON.stringify(result);
-                  
           url: '{$API.URL}/redfish/v1/Systems/System.Embedded.1'
           tags:
             -
@@ -455,7 +454,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(result);
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -618,7 +616,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(result);
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -798,7 +795,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(result);
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -962,7 +958,7 @@ zabbix_export:
                     This trigger expression works as follows:
                     1. Can be triggered if operations status is down.
                     2. {$IFCONTROL:"{#IFNAME}"}=1 - user can redefine Context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
-                    3. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)
+                    3. Condition of difference between last and previous value - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
@@ -1069,7 +1065,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(result);
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1357,7 +1352,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(result);
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1531,7 +1525,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(result);
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1726,7 +1719,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(result);
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -2031,7 +2023,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(result);
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:

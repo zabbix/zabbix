@@ -1,6 +1,5 @@
 # LIBNETSNMP_CHECK_CONFIG ([DEFAULT-ACTION])
 # ----------------------------------------------------------
-#    Eugene Grigorjev <eugene@zabbix.com>   Feb-02-2007
 #
 # Checks for net-snmp.  DEFAULT-ACTION is the string yes or no to
 # specify whether to default to --with-net-snmp or --without-net-snmp.

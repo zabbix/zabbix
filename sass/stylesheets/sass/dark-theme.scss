@@ -58,13 +58,14 @@ $menu-main-submenu-next-level-bg: #454545 !default;
 $menu-main-submenu-next-level-shadow: rgba(#2b2b2b, .35) !default;
 
 $menu-main-icons: (
-		dashboard: -570px -664px,
-		problems: -570px -688px,
-		monitoring: -570px -712px,
-		inventory: -570px -736px,
-		reports: -570px -760px,
-		configuration: -570px -784px,
-		administration: -570px -808px
+	dashboard: -570px -664px,
+	problems: -570px -688px,
+	monitoring: -570px -712px,
+	services: -570px -832px,
+	inventory: -570px -736px,
+	reports: -570px -760px,
+	configuration: -570px -784px,
+	administration: -570px -808px
 );
 
 // UI
@@ -357,6 +358,12 @@ $toc-title-bg-color: #4f4f4f;
 // Time selection.
 .ui-tabs-nav {
 	.ui-tabs-active {
+		.btn-info {
+			&::after {
+				background: url($sprite-path) no-repeat -431px -621px;
+			}
+		}
+
 		.btn-time {
 			&::after {
 				background-position: -87px -583px;

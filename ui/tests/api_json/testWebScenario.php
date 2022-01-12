@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1638,7 +1638,7 @@ class testWebScenario extends CAPITest {
 					'Incorrect item count for web scenario [httpstepid='.$httptestid.'].');
 
 				foreach ($db_httptest_items as $db_httptest_item) {
-					$this->assertContains('"'.$db_httptest['name'].'"', $db_httptest_item['name']);
+					$this->assertStringContainsString('"'.$db_httptest['name'].'"', $db_httptest_item['name']);
 					$this->assertRegExp('/\['.preg_quote($db_httptest['name'],'/').'[,\]]/',
 						$db_httptest_item['key_']);
 
@@ -1684,11 +1684,11 @@ class testWebScenario extends CAPITest {
 
 					foreach ($db_httpstep['db_items'] as $db_httpstep_item) {
 						if (array_key_exists('name', $httptests[$key]) || array_key_exists('steps', $httptests[$key])) {
-							$this->assertContains('"'.$db_httptest['name'].'"', $db_httpstep_item['name']);
-							$this->assertContains('"'.$db_httpstep['name'].'"', $db_httpstep_item['name']);
+							$this->assertStringContainsString('"'.$db_httptest['name'].'"', $db_httpstep_item['name']);
+							$this->assertStringContainsString('"'.$db_httpstep['name'].'"', $db_httpstep_item['name']);
 						}
 
-						$this->assertContains('['.$db_httptest['name'].',', $db_httpstep_item['key_']);
+						$this->assertStringContainsString('['.$db_httptest['name'].',', $db_httpstep_item['key_']);
 						$this->assertRegExp('/,'.preg_quote($db_httpstep['name'],'/').'[,\]]/',
 							$db_httpstep_item['key_']);
 

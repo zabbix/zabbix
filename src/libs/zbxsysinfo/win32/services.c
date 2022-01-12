@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,8 +38,6 @@ typedef enum
 zbx_startup_type_t;
 
 /******************************************************************************
- *                                                                            *
- * Function: get_state_code                                                   *
  *                                                                            *
  * Purpose: convert service state code from value used in Microsoft Windows   *
  *          to value used in Zabbix                                           *
@@ -119,8 +117,6 @@ static void	log_if_buffer_too_small(const char *function_name, DWORD sz)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_get_service_config                                           *
- *                                                                            *
  * Purpose: wrapper function around QueryServiceConfig()                      *
  *                                                                            *
  * Parameters:                                                                *
@@ -145,8 +141,6 @@ static int	zbx_get_service_config(SC_HANDLE hService, LPQUERY_SERVICE_CONFIG buf
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_get_service_config2                                          *
  *                                                                            *
  * Purpose: wrapper function around QueryServiceConfig2()                     *
  *                                                                            *

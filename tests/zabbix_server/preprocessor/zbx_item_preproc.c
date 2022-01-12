@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -147,8 +147,6 @@ static void	read_step(const char *path, zbx_preproc_op_t *op)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: is_step_supported                                                *
  *                                                                            *
  * Purpose: checks if the preprocessing step is supported based on build      *
  *          configuration or other settings                                   *

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -134,8 +134,6 @@ void	zbx_variant_set_dbl_vector(zbx_variant_t *value, zbx_vector_dbl_t *dbl_vect
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_variant_copy                                                 *
  *                                                                            *
  * Purpose: copy variant contents from source to value                        *
  *                                                                            *
@@ -412,8 +410,6 @@ int	zbx_validate_value_dbl(double value, int dbl_precision)
 
 /******************************************************************************
  *                                                                            *
- * Function: variant_compare_empty                                            *
- *                                                                            *
  * Purpose: compares two variant values when at least one is empty (having    *
  *          type of ZBX_VARIANT_NONE)                                         *
  *                                                                            *
@@ -432,8 +428,6 @@ static int	variant_compare_empty(const zbx_variant_t *value1, const zbx_variant_
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: variant_compare_bin                                              *
  *                                                                            *
  * Purpose: compare two variant values when at least one contains binary data *
  *                                                                            *
@@ -458,8 +452,6 @@ static int	variant_compare_bin(const zbx_variant_t *value1, const zbx_variant_t 
 
 /******************************************************************************
  *                                                                            *
- * Function: variant_compare_error                                            *
- *                                                                            *
  * Purpose: compare two variant values when at least one contains error       *
  *                                                                            *
  ******************************************************************************/
@@ -477,8 +469,6 @@ static int	variant_compare_error(const zbx_variant_t *value1, const zbx_variant_
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: variant_compare_dbl_vector                                       *
  *                                                                            *
  * Purpose: compare two variant values when at least one contains error       *
  *                                                                            *
@@ -506,8 +496,6 @@ static int	variant_compare_dbl_vector(const zbx_variant_t *value1, const zbx_var
 }
 /******************************************************************************
  *                                                                            *
- * Function: variant_compare_str                                              *
- *                                                                            *
  * Purpose: compare two variant values when at least one is string            *
  *                                                                            *
  ******************************************************************************/
@@ -520,8 +508,6 @@ static int	variant_compare_str(const zbx_variant_t *value1, const zbx_variant_t 
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: variant_compare_dbl                                              *
  *                                                                            *
  * Purpose: compare two variant values when at least one is double and the    *
  *          other is double, uint64 or a string representing a valid double   *
@@ -581,8 +567,6 @@ static int	variant_compare_dbl(const zbx_variant_t *value1, const zbx_variant_t 
 
 /******************************************************************************
  *                                                                            *
- * Function: variant_compare_ui64                                             *
- *                                                                            *
  * Purpose: compare two variant values when both are uint64                   *
  *                                                                            *
  ******************************************************************************/
@@ -593,8 +577,6 @@ static int	variant_compare_ui64(const zbx_variant_t *value1, const zbx_variant_t
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_variant_compare                                              *
  *                                                                            *
  * Purpose: compare two variant values                                        *
  *                                                                            *

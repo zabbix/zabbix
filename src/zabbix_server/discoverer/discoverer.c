@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,8 +47,6 @@ static volatile sig_atomic_t	snmp_cache_reload_requested;
 
 /******************************************************************************
  *                                                                            *
- * Function: proxy_update_service                                             *
- *                                                                            *
  * Purpose: process new service status                                        *
  *                                                                            *
  * Parameters: service - service info                                         *
@@ -74,8 +72,6 @@ static void	proxy_update_service(zbx_uint64_t druleid, zbx_uint64_t dcheckid, co
 
 /******************************************************************************
  *                                                                            *
- * Function: proxy_update_host                                                *
- *                                                                            *
  * Purpose: process new service status                                        *
  *                                                                            *
  * Parameters: service - service info                                         *
@@ -97,8 +93,6 @@ static void	proxy_update_host(zbx_uint64_t druleid, const char *ip, const char *
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: discover_service                                                 *
  *                                                                            *
  * Purpose: check if service is available                                     *
  *                                                                            *
@@ -337,8 +331,6 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **
 
 /******************************************************************************
  *                                                                            *
- * Function: process_check                                                    *
- *                                                                            *
  * Purpose: check if service is available and update database                 *
  *                                                                            *
  * Parameters: service - service info                                         *
@@ -405,11 +397,6 @@ static void	process_check(const DB_DCHECK *dcheck, int *host_status, char *ip, i
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: process_checks                                                   *
- *                                                                            *
- ******************************************************************************/
 static void	process_checks(const DB_DRULE *drule, int *host_status, char *ip, int unique, int now,
 		zbx_vector_ptr_t *services, zbx_vector_uint64_t *dcheckids)
 {
@@ -461,11 +448,6 @@ static void	process_checks(const DB_DRULE *drule, int *host_status, char *ip, in
 	DBfree_result(result);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: process_services                                                 *
- *                                                                            *
- ******************************************************************************/
 static int	process_services(const DB_DRULE *drule, DB_DHOST *dhost, const char *ip, const char *dns, int now,
 		const zbx_vector_ptr_t *services, zbx_vector_uint64_t *dcheckids)
 {
@@ -503,8 +485,6 @@ fail:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: process_rule                                                     *
  *                                                                            *
  * Purpose: process single discovery rule                                     *
  *                                                                            *
@@ -643,8 +623,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: discovery_clean_services                                         *
  *                                                                            *
  * Purpose: clean dservices and dhosts not presenting in drule                *
  *                                                                            *
@@ -875,8 +853,6 @@ static void	zbx_discoverer_sigusr_handler(int flags)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: discoverer_thread                                                *
  *                                                                            *
  * Purpose: periodically try to find new hosts and services                   *
  *                                                                            *

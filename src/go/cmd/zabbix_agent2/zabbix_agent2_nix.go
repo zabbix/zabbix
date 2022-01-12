@@ -1,8 +1,9 @@
+//go:build !windows
 // +build !windows
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +22,38 @@
 
 package main
 
+import (
+	"os"
+	"os/signal"
+	"syscall"
+
+	"zabbix.com/pkg/log"
+)
+
 func loadOSDependentItems() error {
 	return nil
+}
+
+func createSigsChan() chan os.Signal {
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM, syscall.SIGCHLD)
+
+	return sigs
+}
+
+// handleSig() checks received signal and returns true if the signal is handled
+// and can be ignored, false if the program should stop.
+func handleSig(sig os.Signal) bool {
+	switch sig {
+	case syscall.SIGINT, syscall.SIGTERM:
+		sendServiceStop()
+	case syscall.SIGCHLD:
+		if err := checkExternalExits(); err != nil {
+			log.Warningf("Error: %s", err)
+			sendServiceStop()
+		} else {
+			return true
+		}
+	}
+	return false
 }

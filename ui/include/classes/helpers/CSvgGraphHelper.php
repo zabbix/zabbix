@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,10 +49,6 @@ class CSvgGraphHelper {
 		// Find which metrics will be shown in graph and calculate time periods and display options.
 		self::getMetrics($metrics, $options['data_sets']);
 		// Apply overrides for previously selected $metrics.
-
-		$metrics = CMacrosResolverHelper::resolveItemNames($metrics);
-		$metrics = CArrayHelper::renameObjectsKeys($metrics, ['name_expanded' => 'name']);
-
 		self::applyOverrides($metrics, $options['overrides']);
 		// Apply time periods for each $metric, based on graph/dashboard time as well as metric level timeshifts.
 		self::getTimePeriods($metrics, $options['time_period']);
@@ -541,9 +537,8 @@ class CSvgGraphHelper {
 			if ($hosts) {
 				$items = API::Item()->get([
 					'output' => [
-						'itemid', 'hostid', 'name', 'history', 'trends', 'units', 'value_type', 'valuemapid', 'key_'
-					],
-					'selectHosts' => ['hostid', 'name'],
+						'itemid', 'name', 'history', 'trends', 'units', 'value_type'],
+					'selectHosts' => ['name'],
 					'hostids' => array_keys($hosts),
 					'webitems' => true,
 					'filter' => [

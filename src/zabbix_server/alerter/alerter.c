@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,8 +44,6 @@ static zbx_es_t	es_engine;
 
 /******************************************************************************
  *                                                                            *
- * Function: execute_script_alert                                             *
- *                                                                            *
  * Purpose: execute script alert type                                         *
  *                                                                            *
  ******************************************************************************/
@@ -66,8 +64,6 @@ static int	execute_script_alert(const char *command, char *error, size_t max_err
 
 /******************************************************************************
  *                                                                            *
- * Function: alerter_register                                                 *
- *                                                                            *
  * Purpose: registers alerter with alert manager                              *
  *                                                                            *
  * Parameters: socket - [IN] the connections socket                           *
@@ -83,8 +79,6 @@ static void	alerter_register(zbx_ipc_socket_t *socket)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: alerter_send_result                                              *
  *                                                                            *
  * Purpose: sends alert sending result to alert manager                       *
  *                                                                            *
@@ -107,8 +101,6 @@ static void	alerter_send_result(zbx_ipc_socket_t *socket, const char *value, int
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: create_email_inreplyto                                           *
  *                                                                            *
  * Purpose: create email In-Reply_To field value to group related messages    *
  *                                                                            *
@@ -142,8 +134,6 @@ static char	*create_email_inreplyto(zbx_uint64_t mediatypeid, const char *sendto
 
 /******************************************************************************
  *                                                                            *
- * Function: alerter_process_email                                            *
- *                                                                            *
  * Purpose: processes email alert                                             *
  *                                                                            *
  * Parameters: socket      - [IN] the connections socket                      *
@@ -160,7 +150,6 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 	unsigned char	smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication, content_type;
 	int		ret;
 	char		error[MAX_STRING_LEN];
-
 
 	zbx_alerter_deserialize_email(ipc_message->data, &alertid, &mediatypeid, &eventid, &sendto, &subject, &message,
 			&smtp_server, &smtp_port, &smtp_helo, &smtp_email, &smtp_security, &smtp_verify_peer,
@@ -185,8 +174,6 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: alerter_process_sms                                              *
  *                                                                            *
  * Purpose: processes SMS alert                                               *
  *                                                                            *
@@ -215,8 +202,6 @@ static void	alerter_process_sms(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc
 
 /******************************************************************************
  *                                                                            *
- * Function: alerter_process_exec                                             *
- *                                                                            *
  * Purpose: processes script alert                                            *
  *                                                                            *
  * Parameters: socket      - [IN] the connections socket                      *
@@ -240,8 +225,6 @@ static void	alerter_process_exec(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ip
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: alerter_process_webhook                                          *
  *                                                                            *
  * Purpose: processes webhook alert                                           *
  *                                                                            *
@@ -298,11 +281,7 @@ static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 
 /******************************************************************************
  *                                                                            *
- * Function: main_alerter_loop                                                *
- *                                                                            *
  * Purpose: periodically check table alerts and send notifications if needed  *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
 ZBX_THREAD_ENTRY(alerter_thread, args)

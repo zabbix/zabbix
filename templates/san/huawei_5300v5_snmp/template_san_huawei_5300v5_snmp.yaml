@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:45Z'
+  version: '6.0'
+  date: '2021-12-15T14:25:38Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -15,7 +15,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/418855-discussion-thread-for-official-zabbix-template-huawei-oceanstor
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       templates:
         -
           name: 'Generic SNMP'
