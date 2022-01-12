@@ -27,7 +27,22 @@
 #include "valuecache_test.h"
 #include "mocks/valuecache/valuecache_mock.h"
 
+#include "zbx_vc_common.h"
+
 extern zbx_uint64_t	CONFIG_VALUE_CACHE_SIZE;
+
+void	zbx_vc_test_check_result(zbx_uint64_t *cache_hits, zbx_uint64_t *cache_misses)
+{
+	zbx_uint64_t	expected_hits, expected_misses;
+
+	if (FAIL == is_uint64(zbx_mock_get_parameter_string("out.cache.hits"), &expected_hits))
+		fail_msg("Invalid out.cache.hits value");
+	zbx_mock_assert_uint64_eq("cache.hits", expected_hits, *cache_hits);
+
+	if (FAIL == is_uint64(zbx_mock_get_parameter_string("out.cache.misses"), &expected_misses))
+		fail_msg("Invalid out.cache.misses value");
+	zbx_mock_assert_uint64_eq("cache.misses", expected_misses, *cache_misses);
+}
 
 void	zbx_vc_common_test_func(
 		void **state,
@@ -171,17 +186,4 @@ void	zbx_vc_common_test_func(
 
 	zbx_vc_reset();
 	zbx_vc_destroy();
-}
-
-void	zbx_vc_test_check_result(zbx_uint64_t *cache_hits, zbx_uint64_t *cache_misses)
-{
-	zbx_uint64_t	expected_hits, expected_misses;
-
-	if (FAIL == is_uint64(zbx_mock_get_parameter_string("out.cache.hits"), &expected_hits))
-		fail_msg("Invalid out.cache.hits value");
-	zbx_mock_assert_uint64_eq("cache.hits", expected_hits, *cache_hits);
-
-	if (FAIL == is_uint64(zbx_mock_get_parameter_string("out.cache.misses"), &expected_misses))
-		fail_msg("Invalid out.cache.misses value");
-	zbx_mock_assert_uint64_eq("cache.misses", expected_misses, *cache_misses);
 }
