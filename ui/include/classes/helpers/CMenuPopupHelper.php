@@ -162,6 +162,23 @@ class CMenuPopupHelper {
 	}
 
 	/**
+	 * Prepare data for item latest data popup menu.
+	 *
+	 * @param array  $data
+	 * @param string $data['itemid']   Item ID.
+	 *
+	 * @return array
+	 */
+	public static function getItem(array $data): array {
+		return [
+			'type' => 'item',
+			'data' => [
+				'itemid' => $data['itemid']
+			]
+		];
+	}
+
+	/**
 	 * Prepare data for item configuration popup menu.
 	 *
 	 * @param array  $data
@@ -179,24 +196,6 @@ class CMenuPopupHelper {
 				'backurl' => $data['backurl']
 			],
 			'context' => $data['context']
-		];
-	}
-
-	/**
-	 * Prepare data for item latest data popup menu.
-	 *
-	 * @param array  $data
-	 * @param string $data['itemid']   Item ID.
-	 *
-	 * @return array
-	 */
-	public static function getItem(array $data): array {
-		// TODO VM: change order
-		return [
-			'type' => 'item',
-			'data' => [
-				'itemid' => $data['itemid']
-			]
 		];
 	}
 

@@ -223,6 +223,52 @@ class CControllerMenuPopup extends CController {
 	}
 
 	/**
+	 * Prepare data for item latest data context menu popup.
+	 *
+	 * @param array  $data
+	 * @param string $data['itemid']
+	 *
+	 * @return mixed
+	 */
+	private static function getMenuDataItem(array $data) {
+		$db_items = API::Item()->get([
+			'output' => ['hostid', 'type', 'value_type', 'history', 'trends'],
+			'itemids' => $data['itemid'],
+			'webitems' => true
+		]);
+
+		if ($db_items) {
+			$db_item = $db_items[0];
+			$is_writable = false;
+
+			if ($db_item['type'] != ITEM_TYPE_HTTPTEST && CWebUser::getType() > USER_TYPE_ZABBIX_USER) {
+				$is_writable = (bool) API::Host()->get([
+					'output' => [],
+					'hostids' => $db_item['hostid'],
+					'editable' => true
+				]);
+			}
+
+			return [
+				'type' => 'item',
+				'itemid' => $data['itemid'],
+				'hostid' => $db_item['hostid'],
+				'showGraph' => ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT
+					|| $db_item['value_type'] == ITEM_VALUE_TYPE_UINT64
+				),
+				'history' => $db_item['history'] != 0,
+				'trends' => $db_item['trends'] != 0,
+				'isWriteable' => $is_writable,
+				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
+			];
+		}
+
+		error(_('No permissions to referred object or it does not exist!'));
+
+		return null;
+	}
+
+	/**
 	 * Prepare data for item configuration context menu popup.
 	 *
 	 * @param array  $data
@@ -268,53 +314,6 @@ class CControllerMenuPopup extends CController {
 			}
 
 			return $menu_data;
-		}
-
-		error(_('No permissions to referred object or it does not exist!'));
-
-		return null;
-	}
-
-	/**
-	 * Prepare data for item latest data context menu popup.
-	 *
-	 * @param array  $data
-	 * @param string $data['itemid']
-	 *
-	 * @return mixed
-	 */
-	private static function getMenuDataItem(array $data) {
-		// TODO VM: change order
-		$db_items = API::Item()->get([
-				'output' => ['hostid', 'type', 'value_type', 'history', 'trends'],
-				'itemids' => $data['itemid'],
-				'webitems' => true
-			]);
-
-		if ($db_items) {
-			$db_item = $db_items[0];
-			$is_writable = false;
-
-			if ($db_item['type'] != ITEM_TYPE_HTTPTEST && CWebUser::getType() > USER_TYPE_ZABBIX_USER) {
-				$is_writable = (bool) API::Host()->get([
-					'output' => [],
-					'hostids' => $db_item['hostid'],
-					'editable' => true
-				]);
-			}
-
-			return [
-				'type' => 'item',
-				'itemid' => $data['itemid'],
-				'hostid' => $db_item['hostid'],
-				'showGraph' => ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT
-					|| $db_item['value_type'] == ITEM_VALUE_TYPE_UINT64
-				),
-				'history' => $db_item['history'] != 0,
-				'trends' => $db_item['trends'] != 0,
-				'isWriteable' => $is_writable,
-				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
-			];
 		}
 
 		error(_('No permissions to referred object or it does not exist!'));

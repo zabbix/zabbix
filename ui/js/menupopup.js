@@ -678,6 +678,84 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 }
 
 /**
+ * Get menu popup latest data item log section data.
+ *
+ * @param string options['itemid']
+ * @param string options['hostid']
+ * @param bool   options['showGraph']                   Link to Monitoring->Items->Graphs page.
+ * @param bool   options['history']                     Is history available.
+ * @param bool   options['trends']                      Are trends available.
+ * @param bool   options['allowed_ui_conf_hosts']       Whether user has access to configuration hosts pages.
+ * @param bool   options['isWriteable']                 Whether user has read and write access to host and its items.
+ *
+ * @return array
+ */
+function getMenuPopupItem(options) {
+	const items = [];
+	let url;
+
+	url = new Curl('history.php', false);
+	url.setArgument('action', 'showgraph');
+	url.setArgument('itemids[]', options.itemid);
+
+	items.push({
+		label: t('Graph'),
+		url: url.getUrl(),
+		disabled: !options.showGraph
+	});
+
+	url = new Curl('history.php', false);
+	url.setArgument('action', 'showvalues');
+	url.setArgument('itemids[]', options.itemid);
+
+	const values = {
+		label: t('Values'),
+		url: url.getUrl()
+	}
+
+	url = new Curl('history.php', false);
+	url.setArgument('action', 'showlatest');
+	url.setArgument('itemids[]', options.itemid);
+
+	const latest = {
+		label: t('500 latest values'),
+		url: url.getUrl()
+	}
+
+	if (!options.history && !options.trends) {
+		values.disabled = true;
+		latest.disabled = true;
+	}
+
+	items.push(values);
+	items.push(latest);
+
+	if (options.allowed_ui_conf_hosts) {
+		const config = {
+			label: t('Configuration'),
+			disabled: !options.isWriteable
+		};
+
+		if (options.isWriteable) {
+			url = new Curl('items.php', false);
+			url.setArgument('form', 'update');
+			url.setArgument('hostid', options.hostid);
+			url.setArgument('itemid', options.itemid);
+			url.setArgument('context', 'host');
+
+			config.url = url.getUrl();
+		}
+
+		items.push(config);
+	}
+
+	return [{
+		label: t('Item'),
+		items: items
+	}];
+}
+
+/**
  * Get menu popup item log section data.
  *
  * @param string options['backurl']                   Url from where the popup menu was called.
@@ -775,85 +853,6 @@ function getMenuPopupItemConfiguration(options) {
 
 	return [{
 		label: options.name,
-		items: items
-	}];
-}
-
-/**
- * Get menu popup latest data item log section data.
- *
- * @param string options['itemid']
- * @param string options['hostid']
- * @param bool   options['showGraph']                   Link to Monitoring->Items->Graphs page.
- * @param bool   options['history']                     Is history available.
- * @param bool   options['trends']                      Are trends available.
- * @param bool   options['allowed_ui_conf_hosts']       Whether user has access to configuration hosts pages.
- * @param bool   options['isWriteable']                 Whether user has read and write access to host and its items.
- *
- * @return array
- */
-function getMenuPopupItem(options) {
-	// TODO VM: change order
-	const items = [];
-	let url;
-
-	url = new Curl('history.php', false);
-	url.setArgument('action', 'showgraph');
-	url.setArgument('itemids[]', options.itemid);
-
-	items.push({
-		label: t('Graph'),
-		url: url.getUrl(),
-		disabled: !options.showGraph
-	});
-
-	url = new Curl('history.php', false);
-	url.setArgument('action', 'showvalues');
-	url.setArgument('itemids[]', options.itemid);
-
-	const values = {
-		label: t('Values'),
-		url: url.getUrl()
-	}
-
-	url = new Curl('history.php', false);
-	url.setArgument('action', 'showlatest');
-	url.setArgument('itemids[]', options.itemid);
-
-	const latest = {
-		label: t('500 latest values'),
-		url: url.getUrl()
-	}
-
-	if (!options.history && !options.trends) {
-		values.disabled = true;
-		latest.disabled = true;
-	}
-
-		items.push(values);
-		items.push(latest);
-
-	if (options.allowed_ui_conf_hosts) {
-		const config = {
-			label: t('Configuration'),
-			disabled: !options.isWriteable
-		};
-
-		if (options.isWriteable) {
-			url = new Curl('items.php', false);
-			url.setArgument('form', 'update');
-			url.setArgument('hostid', options.hostid);
-			url.setArgument('itemid', options.itemid);
-			url.setArgument('context', 'host');
-
-			config.url = url.getUrl();
-		}
-
-		items.push(config);
-	}
-
-	return [{
-		label: t('Item'),
 		items: items
 	}];
 }
