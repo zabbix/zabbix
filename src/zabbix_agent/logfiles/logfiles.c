@@ -2020,7 +2020,7 @@ static int	zbx_match_log_rec(const zbx_vector_ptr_t *regexps, const char *value,
 static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zbx_uint64_t *lastlogsize,
 		const int *mtime, int *big_rec, const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern,
 		const char *output_template, int *p_count, int *s_count, zbx_process_value_func_t process_value,
-		zbx_vector_ptr_t *addrs, const char *hostname, const char *key,
+		zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *hostname, const char *key,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, const char *persistent_file_name,
 		zbx_vector_pre_persistent_t *prep_vec, char **err_msg)
 {
@@ -2156,8 +2156,8 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 					{
 						if (0 == is_count_item)		/* log[] or logrt[] */
 						{
-							if (SUCCEED == (send_err = process_value(addrs, hostname, key,
-									item_value, ITEM_STATE_NORMAL,
+							if (SUCCEED == (send_err = process_value(addrs, agent2_result,
+									hostname, key, item_value, ITEM_STATE_NORMAL,
 									&processed_size, mtime, NULL, NULL, NULL, NULL,
 									flags | ZBX_METRIC_FLAG_PERSISTENT)))
 							{
@@ -2270,8 +2270,8 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 					{
 						if (0 == is_count_item)		/* log[] or logrt[] */
 						{
-							if (SUCCEED == (send_err = process_value(addrs, hostname, key,
-									item_value, ITEM_STATE_NORMAL,
+							if (SUCCEED == (send_err = process_value(addrs, agent2_result,
+									hostname, key, item_value, ITEM_STATE_NORMAL,
 									&processed_size, mtime, NULL, NULL, NULL, NULL,
 									flags | ZBX_METRIC_FLAG_PERSISTENT)))
 							{
@@ -2385,8 +2385,10 @@ out:
  *     p_count         - [IN/OUT] limit of records to be processed            *
  *     s_count         - [IN/OUT] limit of records to be sent to server       *
  *     process_value   - [IN] pointer to function process_value()             *
- *     server          - [IN] server to send data to                          *
- *     port            - [IN] port to send data to                            *
+ *     addrs           - [IN] vector for passing server and port where to     *
+ *                            send data                                       *
+ *     agent2_result   - [IN] address of buffer where to store matching log   *
+ *                            records (used only in Agent2)                   *
  *     hostname        - [IN] hostname the data comes from                    *
  *     key             - [IN] item key the data belongs to                    *
  *     processed_bytes - [OUT] number of processed bytes in logfile           *
@@ -2410,8 +2412,9 @@ static int	process_log(unsigned char flags, struct st_logfile *logfile, zbx_uint
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, unsigned char *skip_old_data, int *big_rec,
 		const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template,
 		int *p_count, int *s_count, zbx_process_value_func_t process_value, zbx_vector_ptr_t *addrs,
-		const char *hostname, const char *key, zbx_uint64_t *processed_bytes, zbx_uint64_t seek_offset,
-		const char *persistent_file_name, zbx_vector_pre_persistent_t *prep_vec, char **err_msg)
+		zbx_vector_ptr_t *agent2_result, const char *hostname, const char *key, zbx_uint64_t *processed_bytes,
+		zbx_uint64_t seek_offset, const char *persistent_file_name, zbx_vector_pre_persistent_t *prep_vec,
+		char **err_msg)
 {
 	int	f, ret = FAIL;
 
@@ -2428,8 +2431,8 @@ static int	process_log(unsigned char flags, struct st_logfile *logfile, zbx_uint
 		*skip_old_data = 0;
 
 		if (SUCCEED == (ret = zbx_read2(f, flags, logfile, lastlogsize, mtime, big_rec, encoding, regexps,
-				pattern, output_template, p_count, s_count, process_value, addrs, hostname, key,
-				lastlogsize_sent, mtime_sent, persistent_file_name, prep_vec, err_msg)))
+				pattern, output_template, p_count, s_count, process_value, addrs, agent2_result,
+				hostname, key, lastlogsize_sent, mtime_sent, persistent_file_name, prep_vec, err_msg)))
 		{
 			*processed_bytes = *lastlogsize - seek_offset;
 		}
@@ -3247,8 +3250,10 @@ static int	update_new_list_from_old(zbx_log_rotation_options_t rotation_type, st
  *     p_count          - [IN/OUT] limit of records to be processed           *
  *     s_count          - [IN/OUT] limit of records to be sent to server      *
  *     process_value    - [IN] pointer to function process_value()            *
- *     server           - [IN] server to send data to                         *
- *     port             - [IN] port to send data to                           *
+ *     addrs            - [IN] vector for passing server and port where to    *
+ *                             to send data                                   *
+ *     agent2_result    - [IN] address of buffer where to store matching log  *
+ *                             records (used only in Agent2)                  *
  *     hostname         - [IN] hostname the data comes from                   *
  *     key              - [IN] item key the data belongs to                   *
  *     jumped           - [OUT] flag to indicate that a jump took place       *
@@ -3271,10 +3276,10 @@ static int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t
 		int *use_ino, char **err_msg, struct st_logfile **logfiles_old, int logfiles_num_old,
 		struct st_logfile **logfiles_new, int *logfiles_num_new, const char *encoding,
 		zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template, int *p_count, int *s_count,
-		zbx_process_value_func_t process_value, zbx_vector_ptr_t *addrs, const char *hostname,
-		const char *key, int *jumped, float max_delay, double *start_time, zbx_uint64_t *processed_bytes,
-		zbx_log_rotation_options_t rotation_type, const char *persistent_file_name,
-		zbx_vector_pre_persistent_t *prep_vec)
+		zbx_process_value_func_t process_value, zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
+		const char *hostname, const char *key, int *jumped, float max_delay, double *start_time,
+		zbx_uint64_t *processed_bytes, zbx_log_rotation_options_t rotation_type,
+		const char *persistent_file_name, zbx_vector_pre_persistent_t *prep_vec)
 {
 	int			i, start_idx, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, seq = 1,
 				from_first_file = 1, last_processed, limit_reached = 0, res;
@@ -3478,9 +3483,9 @@ static int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t
 			{
 				ret = process_log(flags, logfiles + i, lastlogsize, mtime, lastlogsize_sent,
 						mtime_sent, skip_old_data, big_rec, encoding, regexps, pattern,
-						output_template, p_count, s_count, process_value, addrs, hostname, key,
-						&processed_bytes_tmp, seek_offset, persistent_file_name, prep_vec,
-						err_msg);
+						output_template, p_count, s_count, process_value, addrs, agent2_result,
+						hostname, key, &processed_bytes_tmp, seek_offset, persistent_file_name,
+						prep_vec, err_msg);
 
 				/* process_log() advances 'lastlogsize' only on success therefore */
 				/* we do not check for errors here */
@@ -3817,9 +3822,9 @@ static int	init_persistent_dir_parameter(const char *server, unsigned short port
  *           comments.                                                        *
  *                                                                            *
  ******************************************************************************/
-int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *regexps, ZBX_ACTIVE_METRIC *metric,
-		zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent, int *mtime_sent,
-		char **error, zbx_vector_pre_persistent_t *prep_vec)
+int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_vector_ptr_t *regexps,
+		ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
+		int *mtime_sent, char **error, zbx_vector_pre_persistent_t *prep_vec)
 {
 	AGENT_REQUEST			request;
 	const char			*filename, *regexp, *encoding, *skip, *output_template;
@@ -3915,11 +3920,19 @@ int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *regexps, ZBX_AC
 		goto out;
 
 	/* parameter 'persistent_dir' */
-	if (SUCCEED != init_persistent_dir_parameter(((zbx_addr_t *)addrs->values[0])->ip,
-			((zbx_addr_t *)addrs->values[0])->port, metric->key, is_count_item, &request,
-			&metric->persistent_file_name, error))
+	if (NULL != addrs)	/* When process_log_check() is called in C agent it receives 'addrs' argument with  */
+				/* server hostname or IP address and port number where to send matching records.    */
+				/* When process_log_check() is called in Agent2 (Golang) the 'addrs' argument is    */
+				/* NULL and the 'agent2_result' argument is used to pass an address of buffer where */
+				/* to store the matching records in memory. Currently Agent2 does not support       */
+				/* persistent files therefore skip init_persistent_dir_parameter().                 */
 	{
-		goto out;
+		if (SUCCEED != init_persistent_dir_parameter(((zbx_addr_t *)addrs->values[0])->ip,
+				((zbx_addr_t *)addrs->values[0])->port, metric->key, is_count_item, &request,
+				&metric->persistent_file_name, error))
+		{
+			goto out;
+		}
 	}
 
 	/* jumping over fast growing log files is not supported with 'copytruncate' */
@@ -4038,7 +4051,7 @@ int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *regexps, ZBX_AC
 	ret = process_logrt(metric->flags, filename, &metric->lastlogsize, &metric->mtime, lastlogsize_sent, mtime_sent,
 			&metric->skip_old_data, &metric->big_rec, &metric->use_ino, error, &metric->logfiles,
 			metric->logfiles_num, &logfiles_new, &logfiles_num_new, encoding, regexps, regexp,
-			output_template, &p_count, &s_count, process_value_cb, addrs, CONFIG_HOSTNAME,
+			output_template, &p_count, &s_count, process_value_cb, addrs, agent2_result, CONFIG_HOSTNAME,
 			metric->key_orig, &jumped, max_delay, &metric->start_time, &metric->processed_bytes,
 			rotation_type, metric->persistent_file_name, prep_vec);
 
@@ -4066,7 +4079,7 @@ int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *regexps, ZBX_AC
 
 			zbx_snprintf(buf, sizeof(buf), "%d", match_count);
 
-			if (SUCCEED == process_value_cb(addrs, CONFIG_HOSTNAME, metric->key_orig, buf,
+			if (SUCCEED == process_value_cb(addrs, agent2_result, CONFIG_HOSTNAME, metric->key_orig, buf,
 					ITEM_STATE_NORMAL, &metric->lastlogsize, &metric->mtime, NULL, NULL, NULL, NULL,
 					metric->flags | ZBX_METRIC_FLAG_PERSISTENT) || 0 != jumped)
 			{
