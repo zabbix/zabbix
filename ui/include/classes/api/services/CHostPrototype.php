@@ -1174,23 +1174,23 @@ class CHostPrototype extends CHostBase {
 	 * @throws APIException
 	 */
 	private static function checkAndAddUuid(array &$host_prototypes): void {
-		$db_templated_rules = DBfetchArrayAssoc(DBselect(
-			'SELECT i.itemid,h.status'.
+		$templated_ruleids = DBfetchColumn(DBselect(
+			'SELECT i.itemid'.
 			' FROM items i,hosts h'.
-			' WHERE '.dbConditionInt('i.itemid', array_keys(array_flip(array_column($host_prototypes, 'ruleid')))).
-			' AND i.hostid=h.hostid'.
+			' WHERE i.hostid=h.hostid'.
+			' AND '.dbConditionInt('i.itemid', array_unique(array_column($host_prototypes, 'ruleid'))).
 			' AND h.status='.HOST_STATUS_TEMPLATE
 		), 'itemid');
 
 		foreach ($host_prototypes as $index => &$host_prototype) {
-			if (!array_key_exists($host_prototype['ruleid'], $db_templated_rules)
+			if (!in_array($host_prototype['ruleid'], $templated_ruleids)
 					&& array_key_exists('uuid', $host_prototype)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Invalid parameter "%1$s": %2$s.', '/' . ($index + 1), _s('unexpected parameter "%1$s"', 'uuid'))
 				);
 			}
 
-			if (array_key_exists($host_prototype['ruleid'], $db_templated_rules)
+			if (in_array($host_prototype['ruleid'], $templated_ruleids)
 					&& !array_key_exists('uuid', $host_prototype)) {
 				$host_prototype['uuid'] = generateUuidV4();
 			}
