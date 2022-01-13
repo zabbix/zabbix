@@ -141,7 +141,7 @@ class CHtmlUrlValidatorTest extends TestCase {
 		$this->assertSame($expected, CHtmlUrlValidator::validate($url, $options));
 	}
 
-	public function providerValidateSameSiteURL() {
+	public function dataProviderValidateSameSiteURL() {
 		return [
 			['items.php',								true],
 			['items.php?',								true],
@@ -160,9 +160,9 @@ class CHtmlUrlValidatorTest extends TestCase {
 	}
 
 	/**
-	 * @dataProvider providerValidateSameSiteURL
+	 * @dataProvider dataProviderValidateSameSiteURL
 	 */
-	public function test_validateSameSiteURL($url, $expected) {
+	public function testValidateSameSiteURL($url, $expected) {
 		$this->assertSame($expected, CHtmlUrlValidator::validateSameSite($url));
 	}
 }
