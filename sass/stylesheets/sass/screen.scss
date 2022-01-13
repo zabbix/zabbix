@@ -3119,36 +3119,11 @@ $form-icon-btn: (
 		&.modal-popup-preprocessing {
 			max-width: 900px;
 			width: 100%;
-
-			.preprocessing-list .step-name {
-				flex: 0 0 180px;
-			}
-
-			.preprocessing-list {
-				min-width: unset;
-				max-width: unset;
-			}
 		}
 
 		&.modal-popup-fullscreen {
 			width: calc(100vw - 40px);
 			max-width: calc(100vw - 40px);
-		}
-
-		.table-forms-container {
-			border: none;
-		}
-
-		.ui-tabs-nav {
-			position: sticky;
-			top: 0;
-			background: $header-bg-color;
-			z-index: 3;
-		}
-
-		.textarea-flexible {
-			max-height: 200px;
-			overflow-y: auto;
 		}
 	}
 
