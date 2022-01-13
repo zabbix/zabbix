@@ -1919,7 +1919,7 @@ abstract class CItemGeneral extends CApiService {
 		foreach ($items as $item) {
 			if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 				if ($this instanceof CDiscoveryRule || $this instanceof CItemPrototype
-						|| $item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+						|| (array_key_exists('flags', $item) && $item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL)) {
 					$dep_items[] = $item;
 				}
 

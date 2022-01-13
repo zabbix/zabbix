@@ -721,6 +721,7 @@ class CConfigurationImport {
 
 					$item['interfaceid'] = $interfaceid;
 				}
+				unset($item['interface_ref']);
 
 				if (array_key_exists('valuemap', $item) && $item['valuemap']) {
 					$valuemapid = $this->referencer->findValuemapidByName($hostid, $item['valuemap']['name']);
@@ -735,8 +736,8 @@ class CConfigurationImport {
 					}
 
 					$item['valuemapid'] = $valuemapid;
-					unset($item['valuemap']);
 				}
+				unset($item['valuemap']);
 
 				if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 					if (!array_key_exists('key', $item[$master_item_key])) {
@@ -783,6 +784,87 @@ class CConfigurationImport {
 				$itemid = array_key_exists('uuid', $item)
 					? $this->referencer->findItemidByUuid($item['uuid'])
 					: $this->referencer->findItemidByKey($hostid, $item['key_']);
+
+				unset($item['triggers']);
+
+				if ($item['type'] !== ITEM_TYPE_HTTPAGENT) {
+					unset($item['allow_traps']);
+					unset($item['url']);
+					unset($item['query_fields']);
+					unset($item['post_type']);
+					unset($item['posts']);
+					unset($item['status_codes']);
+					unset($item['follow_redirects']);
+					unset($item['http_proxy']);
+					unset($item['headers']);
+					unset($item['retrieve_mode']);
+					unset($item['request_method']);
+					unset($item['output_format']);
+					unset($item['ssl_cert_file']);
+					unset($item['ssl_key_file']);
+					unset($item['ssl_key_password']);
+					unset($item['verify_peer']);
+					unset($item['verify_host']);
+				}
+
+				if ($item['type'] !== ITEM_TYPE_SNMP) {
+					unset($item['snmp_oid']);
+				}
+
+				if ($item['type'] !== ITEM_TYPE_IPMI) {
+					unset($item['ipmi_sensor']);
+				}
+
+				if ($item['type'] !== ITEM_TYPE_JMX) {
+					unset($item['jmx_endpoint']);
+				}
+
+				if ($item['type'] !== ITEM_TYPE_SSH) {
+					unset($item['publickey']);
+					unset($item['privatekey']);
+				}
+
+				if ($item['type'] !== ITEM_TYPE_SCRIPT) {
+					unset($item['parameters']);
+				}
+
+				if ($item['value_type'] !== ITEM_VALUE_TYPE_LOG) {
+					unset($item['logtimefmt']);
+				}
+
+				if (!in_array($item['type'], [ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SCRIPT,
+							ITEM_TYPE_CALCULATED
+						])) {
+					unset($item['params']);
+				}
+
+				if (!in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
+					unset($item['trends']);
+					unset($item['units']);
+				}
+
+				if ($item['type'] !== ITEM_TYPE_HTTPAGENT && $item['type'] !== ITEM_TYPE_TRAPPER) {
+					unset($item['trapper_hosts']);
+				}
+
+				if ($item['type'] !== ITEM_TYPE_SSH && $item['type'] !== ITEM_TYPE_HTTPAGENT) {
+					unset($item['authtype']);
+				}
+
+				if ($item['type'] !== ITEM_TYPE_HTTPAGENT && $item['type'] !== ITEM_TYPE_SCRIPT) {
+					unset($item['timeout']);
+				}
+
+				if (!in_array($item['type'], [ITEM_TYPE_SIMPLE, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_DB_MONITOR,
+							ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT
+						])) {
+					unset($item['password']);
+				}
+				if (!in_array($item['type'], [ITEM_TYPE_SIMPLE, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_JMX,
+							ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SSH, ITEM_TYPE_TELNET
+						])) {
+					unset($item['username']);
+				}
 
 				if ($itemid !== null) {
 					$item['itemid'] = $itemid;
@@ -881,8 +963,9 @@ class CConfigurationImport {
 			}
 			unset($item);
 
-			$updated_items = $api_service->update(array_map(function($item) {
+			$updated_items = $api_service->update(array_map(function(array $item): array {
 				unset($item['uuid']);
+				unset($item['hostid']);
 				return $item;
 			}, $items_to_update));
 
