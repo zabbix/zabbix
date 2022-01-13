@@ -112,12 +112,16 @@ func (p *Plugin) Collect() (err error) {
 	return nil
 }
 
-func numCPU() int {
+func numCPUConf() int {
 	return int(C.sysconf(C._SC_NPROCESSORS_CONF))
 }
 
+func numCPUOnline() int {
+	return int(C.sysconf(C._SC_NPROCESSORS_ONLN))
+}
+
 func (p *Plugin) Start() {
-	p.cpus = p.newCpus(numCPU())
+	p.cpus = p.newCpus(numCPUConf())
 }
 
 func (p *Plugin) Stop() {
