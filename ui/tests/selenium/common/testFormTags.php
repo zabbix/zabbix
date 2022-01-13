@@ -683,7 +683,6 @@ class testFormTags extends CWebTest {
 				break;
 
 			case 'service':
-			case 'service problem tags':
 				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
 				$form->fill(['Name' => $new_name]);
 				$sql_old_name = 'SELECT NULL FROM services WHERE name='.zbx_dbstr($this->clone_name);
@@ -691,8 +690,14 @@ class testFormTags extends CWebTest {
 				break;
 		}
 
-		$form->selectTab('Tags');
-		$element = $this->query('id:tags-table')->asMultifieldTable()->one();
+		if (!$this->problem_tags) {
+			$form->selectTab('Tags');
+			$tags_table = 'tags-table';
+		}
+		else {
+			$tags_table = 'problem_tags';
+		}
+		$element = $this->query('id', $tags_table)->asMultifieldTable()->one();
 		$tags = $element->getValue();
 
 		// Click Clone or Full Clone button.
@@ -703,7 +708,7 @@ class testFormTags extends CWebTest {
 		$form->invalidate();
 
 		// TODO: after ZBX-20288 is fixed remove this if and change to $form->submit();
-		if ($object === 'service' || $object === 'service problem tags') {
+		if ($object === 'service') {
 			COverlayDialogElement::find()->one()->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
 		}
 		else {
@@ -712,7 +717,7 @@ class testFormTags extends CWebTest {
 
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, (
-				($object === 'service' || $object === 'service problem tags')
+				($object === 'service')
 					? ucfirst($object).' created'
 					: ucfirst($object).' added'
 			)
@@ -723,7 +728,7 @@ class testFormTags extends CWebTest {
 		$this->assertEquals(1, CDBHelper::getCount($sql_new_name));
 
 		// Check created clone.
-		if ($object === 'service' || $object === 'service problem tags') {
+		if ($object === 'service') {
 			$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
 			$table->findRow('Name',  $new_name)->query('xpath:.//button[@title="Edit"]')
 					->waitUntilClickable()->one()->click();
@@ -749,7 +754,6 @@ class testFormTags extends CWebTest {
 			case 'item':
 			case 'web scenario':
 			case 'service':
-			case 'service problem tags':
 				$this->assertEquals($new_name, $form->getField('Name')->getValue());
 				break;
 		}
@@ -1272,10 +1276,11 @@ class testFormTags extends CWebTest {
 	 * @param string   $object   host, template, trigger or prototype
 	 */
 	public function clearTags($object) {
-		$data = [
-			'name' => $this->remove_name,
-			'tags' => [['tag' => '', 'value' => '']]
-		];
+		$tags = (!$this->problem_tags)
+				? [['tag' => '', 'value' => '']]
+				: [['tag' => '', 'operator' => 'Equals', 'value' => '']];
+
+		$data = ['name' => $this->remove_name, 'tags' => $tags];
 
 		switch ($object) {
 			case 'host':
@@ -1323,8 +1328,15 @@ class testFormTags extends CWebTest {
 			? COverlayDialogElement::find()->asForm()->one()->waitUntilVisible()
 			: $this->query($locator)->asForm()->waitUntilPresent()->one();
 
-		$form->selectTab('Tags');
-		$this->query('id:tags-table')->asMultifieldTable()->waitUntilPresent()->one()->clear();
+		if (!$this->problem_tags) {
+			$form->selectTab('Tags');
+			$tags_table = 'tags-table';
+		}
+		else {
+			$tags_table = 'problem_tags';
+		}
+
+		$this->query('id', $tags_table)->asMultifieldTable()->waitUntilPresent()->one()->clear();
 		$form->submit();
 		$this->page->waitUntilReady();
 

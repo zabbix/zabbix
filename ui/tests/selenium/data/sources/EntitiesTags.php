@@ -831,7 +831,6 @@ class EntitiesTags {
 			[
 				'name' => 'Service with tags for updating',
 				'algorithm' => 1,
-				'showsla' => 0,
 				'sortorder' => 0,
 				'tags' => [
 					[
@@ -865,7 +864,6 @@ class EntitiesTags {
 			[
 				'name' => 'Service with tags for cloning',
 				'algorithm' => 1,
-				'showsla' => 0,
 				'sortorder' => 0,
 				'tags' => [
 					[
@@ -909,7 +907,6 @@ class EntitiesTags {
 			[
 				'name' => 'Service for removing tags',
 				'algorithm' => 1,
-				'showsla' => 0,
 				'sortorder' => 0,
 				'tags' => [
 					[

@@ -313,11 +313,25 @@ class testFormTagsServicesProblemTags extends testFormTags {
 	}
 
 	/**
-	 * Test update of Service with tags.
+	 * Test update of Service with problem tags.
 	 *
 	 * @dataProvider getUpdateProblemTagsData
 	 */
 	public function testFormTagsServicesProblemTags_Update($data) {
 		$this->checkTagsUpdate($data, 'service');
+	}
+
+	/**
+	 * Test cloning of Service with problem tags.
+	 */
+	public function testFormTagsServicesProblemTags_Clone() {
+		$this->executeCloning('service', 'Clone');
+	}
+
+	/**
+	 * Test removing problem tags from Service.
+	 */
+	public function testFormTagsServicesProblemTags_RemoveTags() {
+		$this->clearTags('service');
 	}
 }
