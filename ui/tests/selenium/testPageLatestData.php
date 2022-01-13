@@ -234,8 +234,8 @@ class testPageLatestData extends CWebTest {
 		$itemid = CDBHelper::getValue('SELECT itemid FROM items WHERE name='.zbx_dbstr('4_item'));
 		$time = time();
 		$value = '15';
-		DBexecute("INSERT INTO history_uint (itemid, clock, value, ns) VALUES (".zbx_dbstr($itemid).
-				", ".zbx_dbstr($time).", ".zbx_dbstr($value).", 0)");
+		DBexecute('INSERT INTO history_uint (itemid, clock, value, ns) VALUES ('.zbx_dbstr($itemid).
+				', '.zbx_dbstr($time).', '.zbx_dbstr($value).', 0)');
 		$true_time = date("Y-m-d H:i:s", $time);
 		$this->page->login()->open('zabbix.php?action=latest.view');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
