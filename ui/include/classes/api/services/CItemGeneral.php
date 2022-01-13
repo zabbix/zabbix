@@ -312,7 +312,6 @@ abstract class CItemGeneral extends CApiService {
 
 		$api_input_rules = ['type' => API_OBJECTS, 'fields' => [
 			'itemid' =>				['type' => API_ID],
-			'hostid' =>				['type' => API_ID],
 			'type' =>				['type' => API_INT32, 'in' => implode(',', static::SUPPORTED_ITEM_TYPES)],
 			'snmp_oid' =>			['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'type', 'in' => ITEM_TYPE_SNMP], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'snmp_oid')],

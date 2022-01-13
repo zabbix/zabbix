@@ -745,9 +745,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			if ($db_item['type'] == $item['type']) {
 				$item = CArrayHelper::unsetEqualValues($item, $db_item);
 			}
-			else {
-				unset($item['hostid']);
-			}
+
+			unset($item['hostid']);
 
 			$item['itemid'] = $itemid;
 
