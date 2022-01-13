@@ -96,7 +96,9 @@ $widget = (new CWidget())
 			)
 			->addItem(
 				(new CButton('form', _('Import')))
-					->onClick('return PopUp("popup.import", {rules_preset: "template"});')
+					->onClick('return PopUp("popup.import", {rules_preset: "template"},
+						{dialogue_class: "modal-popup-generic"}
+					);')
 					->removeId()
 			)
 		))->setAttribute('aria-label', _('Content controls'))
