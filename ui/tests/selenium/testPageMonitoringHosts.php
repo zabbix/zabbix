@@ -1014,6 +1014,58 @@ class testPageMonitoringHosts extends CWebTest {
 		}
 	}
 
+	public static function getCountProblemsData() {
+		return [
+			[
+				[
+					'Name' => '1_Host_to_check_Monitoring_Overview',
+					'problems' => [
+						'Disaster',
+						'High',
+						'Average',
+						'Warning',
+						'Information',
+						'Not classified'
+					]
+				]
+			],
+			[
+				[
+					'Name' => 'Host for tag permissions',
+					'problems' => [
+						'Not classified'
+					]
+				]
+			],
+			[
+				[
+					'Name' => 'ЗАББИКС Сервер',
+					'problems' => [
+						'Average',
+						'Warning'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getCountProblemsData
+	 *
+	 *
+	 */
+	public function testPageMonitoringHosts_CountProblems($data) {
+		$this->page->login()->open('zabbix.php?action=host.view&filter_rst=1&severities%5B0%5D=0&severities%5B2%5D=2'
+				.'&severities%5B4%5D=4&severities%5B1%5D=1&severities%5B3%5D=3&severities%5B5%5D=5')->waitUntilReady();
+		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+		$form->fill(['Name' => $data['Name']]);
+		$this->query('button:Apply')->one()->waitUntilClickable()->click();
+		$this->page->waitUntilReady();
+		$table = $this->query('class:list-table')->asTable()->one();
+		$row = $table->getRow(0);
+
+	}
+
 	public function prepareUpdateData() {
 		$response = CDataHelper::call('host.update', ['hostid' => '99013', 'status' => 1]);
 		$this->assertArrayHasKey('hostids', $response);
