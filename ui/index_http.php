@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 $redirect_to = (new CUrl('index.php'))->setArgument('form', 'default');
 $request = getRequest('request', '');
 
-if(!CHtmlUrlValidator::validateSameSite($request, ['allow_same_page' => false])) {
+if (!CHtmlUrlValidator::validateSameSite($request, ['allow_same_page' => false])) {
 	$request = '';
 }
 

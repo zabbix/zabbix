@@ -138,7 +138,7 @@ class CHtmlUrlValidator {
 			return false;
 		}
 
-		if (!$options['allow_same_page'] && $url_parts['filename'] == basename(__FILE__)) {
+		if (!$options['allow_same_page'] && $url_parts['filename'] === basename(__FILE__)) {
 			return false;
 		}
 
