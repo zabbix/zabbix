@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-10T15:03:58Z'
+  date: '2022-01-13T15:23:28Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -48,11 +48,8 @@ zabbix_export:
             key: kubernetes.api.get_metrics
           tags:
             -
-              tag: resource
+              tag: component
               value: requests
-            -
-              tag: type
-              value: rate
         -
           uuid: 1ac74141a4b241b196bc47d0dee37a2c
           name: 'Kubernetes API: API server requests: 0'
@@ -78,14 +75,11 @@ zabbix_export:
             key: kubernetes.api.get_metrics
           tags:
             -
-              tag: 'http code'
-              value: '0'
-            -
-              tag: resource
+              tag: component
               value: requests
             -
-              tag: type
-              value: rate
+              tag: http-code
+              value: '0'
         -
           uuid: d7f8363e1bc5424f89c7386fcbe6fb06
           name: 'Kubernetes API: API server requests: 2xx, rate'
@@ -111,14 +105,11 @@ zabbix_export:
             key: kubernetes.api.get_metrics
           tags:
             -
-              tag: 'http code'
-              value: 2XX
-            -
-              tag: resource
+              tag: component
               value: requests
             -
-              tag: type
-              value: rate
+              tag: http-code
+              value: 2XX
         -
           uuid: 453852b621ca4a7cbc4d80e5327c80da
           name: 'Kubernetes API: API server requests: 3xx, rate'
@@ -144,14 +135,11 @@ zabbix_export:
             key: kubernetes.api.get_metrics
           tags:
             -
-              tag: 'http code'
-              value: 3XX
-            -
-              tag: resource
+              tag: component
               value: requests
             -
-              tag: type
-              value: rate
+              tag: http-code
+              value: 3XX
         -
           uuid: 1f72779899f94620bc55870f5e2c2ca0
           name: 'Kubernetes API: API server requests: 4xx, rate'
@@ -177,14 +165,11 @@ zabbix_export:
             key: kubernetes.api.get_metrics
           tags:
             -
-              tag: 'http code'
-              value: 4XX
-            -
-              tag: resource
+              tag: component
               value: requests
             -
-              tag: type
-              value: rate
+              tag: http-code
+              value: 4XX
         -
           uuid: 1c24d58b28bc423e868a965d689cf146
           name: 'Kubernetes API: API server requests: 5xx, rate'
@@ -210,14 +195,11 @@ zabbix_export:
             key: kubernetes.api.get_metrics
           tags:
             -
-              tag: 'http code'
-              value: 5XX
-            -
-              tag: resource
+              tag: component
               value: requests
             -
-              tag: type
-              value: rate
+              tag: http-code
+              value: 5XX
           triggers:
             -
               uuid: 0e1ef1630b5d4cb98270564f324f5382
@@ -225,6 +207,10 @@ zabbix_export:
               name: 'Kubernetes API: Too many server errors (over {$KUBE.API.HTTP.SERVER.ERROR} for 5m)'
               priority: WARNING
               description: '"Kubernetes API server is experiencing high error rate (with 5xx HTTP code).'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 5bd8b2deaf1142369ba67afc7a41ab11
           name: 'Kubernetes API: TLS handshake errors, rate'
@@ -246,11 +232,8 @@ zabbix_export:
             key: kubernetes.api.get_metrics
           tags:
             -
-              tag: resource
+              tag: component
               value: tls
-            -
-              tag: type
-              value: rate
         -
           uuid: 54723f57a20a47a698fbf47cbec0f7a1
           name: 'Kubernetes API: Audit events, total'
@@ -272,11 +255,8 @@ zabbix_export:
             key: kubernetes.api.get_metrics
           tags:
             -
-              tag: resource
+              tag: component
               value: audit
-            -
-              tag: type
-              value: gauge
         -
           uuid: 5b4c8a01ab03480bb7d95ab6e1630d98
           name: 'Kubernetes API: Client certificate expiration, p1'
@@ -289,11 +269,8 @@ zabbix_export:
           description: '1 percentile of of the remaining lifetime on the certificate used to authenticate a request.'
           tags:
             -
-              tag: resource
-              value: 'client certificate'
-            -
-              tag: type
-              value: percentile
+              tag: component
+              value: client-certificate
           triggers:
             -
               uuid: 132d58724bd141afa3f28101326fe922
@@ -305,12 +282,20 @@ zabbix_export:
                 -
                   name: 'Kubernetes API: Kubernetes client certificate expires soon'
                   expression: 'last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1) > 0 and last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1) < 24*60*60'
+              tags:
+                -
+                  tag: scope
+                  value: availability
             -
               uuid: 1371958c0339430b8a333851766c01c0
               expression: 'last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1) > 0 and last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1) < 24*60*60'
               name: 'Kubernetes API: Kubernetes client certificate expires soon'
               priority: WARNING
               description: 'A client certificate used to authenticate to the apiserver is expiring in less than 24.0 hours.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: de87284b8bd644398e4a88a064e206bb
           name: 'Kubernetes API: CPU'
@@ -340,11 +325,8 @@ zabbix_export:
             key: kubernetes.api.get_metrics
           tags:
             -
-              tag: resource
+              tag: component
               value: cpu
-            -
-              tag: type
-              value: gauge
         -
           uuid: e4e3c570a55a48689c145c4a2310c597
           name: 'Kubernetes API: Get API instance metrics'
@@ -367,11 +349,8 @@ zabbix_export:
               value: 'Bearer {$KUBE.API.TOKEN}'
           tags:
             -
-              tag: data
+              tag: component
               value: raw
-            -
-              tag: type
-              value: text
         -
           uuid: 79db985ac8f645999fe8aa73b4073bfb
           name: 'Kubernetes API: Goroutines'
@@ -393,11 +372,8 @@ zabbix_export:
             key: kubernetes.api.get_metrics
           tags:
             -
-              tag: resource
+              tag: component
               value: goroutines
-            -
-              tag: type
-              value: gauge
         -
           uuid: 2022d65c2f7a4f07bc1cba435a2be1e9
           name: 'Kubernetes API: Go threads'
@@ -419,11 +395,8 @@ zabbix_export:
             key: kubernetes.api.get_metrics
           tags:
             -
-              tag: resource
-              value: 'go threads'
-            -
-              tag: type
-              value: gauge
+              tag: component
+              value: go-threads
         -
           uuid: 837c546cb3bc400ab7a62a672792f88b
           name: 'Kubernetes API: gRPCs messages ressived, rate'
@@ -449,11 +422,8 @@ zabbix_export:
             key: kubernetes.api.get_metrics
           tags:
             -
-              tag: resource
+              tag: component
               value: grpc
-            -
-              tag: type
-              value: rate
         -
           uuid: 353559f3b9684647a74bd429d80731b9
           name: 'Kubernetes API: gRPCs messages sent, rate'
@@ -479,11 +449,8 @@ zabbix_export:
             key: kubernetes.api.get_metrics
           tags:
             -
-              tag: resource
+              tag: component
               value: grpc
-            -
-              tag: type
-              value: rate
         -
           uuid: 0850afe759684950be79135ed4f32c79
           name: 'Kubernetes API: gRPCs client started, rate'
@@ -509,11 +476,8 @@ zabbix_export:
             key: kubernetes.api.get_metrics
           tags:
             -
-              tag: resource
+              tag: component
               value: grpc
-            -
-              tag: type
-              value: rate
         -
           uuid: 187702b1c3a24d07aaf9cc07fa359095
           name: 'Kubernetes API: Fds max'
@@ -535,11 +499,8 @@ zabbix_export:
             key: kubernetes.api.get_metrics
           tags:
             -
-              tag: resource
+              tag: component
               value: fds
-            -
-              tag: type
-              value: gauge
         -
           uuid: 41f802305a234b1ab9fb0e89d1e40290
           name: 'Kubernetes API: Fds open'
@@ -561,11 +522,8 @@ zabbix_export:
             key: kubernetes.api.get_metrics
           tags:
             -
-              tag: resource
+              tag: component
               value: fds
-            -
-              tag: type
-              value: gauge
         -
           uuid: 53fd5211b6da47d3b3fc87ab8a2d0c33
           name: 'Kubernetes API: Resident memory, bytes'
@@ -588,11 +546,8 @@ zabbix_export:
             key: kubernetes.api.get_metrics
           tags:
             -
-              tag: resource
+              tag: component
               value: memory
-            -
-              tag: type
-              value: gauge
         -
           uuid: 010a983426c9407eb4b6bf7822b411ce
           name: 'Kubernetes API: Virtual memory, bytes'
@@ -615,11 +570,8 @@ zabbix_export:
             key: kubernetes.api.get_metrics
           tags:
             -
-              tag: resource
+              tag: component
               value: memory
-            -
-              tag: type
-              value: gauge
         -
           uuid: 3f15d60ef7cb4a068424d5835d04a817
           name: 'Kubernetes API: HTTP requests: 2xx, rate'
@@ -645,14 +597,11 @@ zabbix_export:
             key: kubernetes.api.get_metrics
           tags:
             -
-              tag: 'http code'
-              value: 2XX
-            -
-              tag: resource
+              tag: component
               value: requests
             -
-              tag: type
-              value: rate
+              tag: http-code
+              value: 2XX
         -
           uuid: 450607dda045428fb6d4a96ca8888c19
           name: 'Kubernetes API: HTTP requests: 3xx, rate'
@@ -678,14 +627,11 @@ zabbix_export:
             key: kubernetes.api.get_metrics
           tags:
             -
-              tag: 'http code'
-              value: 3XX
-            -
-              tag: resource
+              tag: component
               value: requests
             -
-              tag: type
-              value: rate
+              tag: http-code
+              value: 3XX
         -
           uuid: f11b87e0bc5a41ff956391b6cb7115c5
           name: 'Kubernetes API: HTTP requests: 4xx, rate'
@@ -711,14 +657,11 @@ zabbix_export:
             key: kubernetes.api.get_metrics
           tags:
             -
-              tag: 'http code'
-              value: 4XX
-            -
-              tag: resource
+              tag: component
               value: requests
             -
-              tag: type
-              value: rate
+              tag: http-code
+              value: 4XX
         -
           uuid: 2588c2332fea48f8bae414e8b7c42184
           name: 'Kubernetes API: HTTP requests: 5xx, rate'
@@ -744,14 +687,11 @@ zabbix_export:
             key: kubernetes.api.get_metrics
           tags:
             -
-              tag: 'http code'
-              value: 5XX
-            -
-              tag: resource
+              tag: component
               value: requests
             -
-              tag: type
-              value: rate
+              tag: http-code
+              value: 5XX
           triggers:
             -
               uuid: 4c79888da91448738092c86e5f427a6a
@@ -759,6 +699,10 @@ zabbix_export:
               name: 'Kubernetes API: Too many client errors (over {$KUBE.API.HTTP.CLIENT.ERROR} for 5m)'
               priority: WARNING
               description: '"Kubernetes API client is experiencing high error rate (with 5xx HTTP code).'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: 22c5e2a84d9542c1905d0c20f4ca6700
@@ -789,14 +733,11 @@ zabbix_export:
                 key: kubernetes.api.get_metrics
               tags:
                 -
-                  tag: kind
-                  value: '{#KIND}'
-                -
-                  tag: resource
+                  tag: component
                   value: watchers
                 -
-                  tag: type
-                  value: gauge
+                  tag: kind
+                  value: '{#KIND}'
           master_item:
             key: kubernetes.api.get_metrics
           preprocessing:
@@ -856,14 +797,11 @@ zabbix_export:
                 key: kubernetes.api.get_metrics
               tags:
                 -
-                  tag: name
-                  value: '{#NAME}'
-                -
-                  tag: resource
+                  tag: component
                   value: authentication
                 -
-                  tag: type
-                  value: rate
+                  tag: name
+                  value: '{#NAME}'
           master_item:
             key: kubernetes.api.get_metrics
           preprocessing:
@@ -923,14 +861,11 @@ zabbix_export:
                 key: kubernetes.api.get_metrics
               tags:
                 -
-                  tag: resource
+                  tag: component
                   value: authentication
                 -
                   tag: result
                   value: '{#RESULT}'
-                -
-                  tag: type
-                  value: rate
           master_item:
             key: kubernetes.api.get_metrics
           preprocessing:
@@ -986,11 +921,8 @@ zabbix_export:
                 key: kubernetes.api.get_metrics
               tags:
                 -
-                  tag: resource
-                  value: 'client certificate'
-                -
-                  tag: type
-                  value: histogram
+                  tag: component
+                  value: client-certificate
           master_item:
             key: kubernetes.api.get_metrics
           preprocessing:
@@ -1040,7 +972,7 @@ zabbix_export:
                 key: kubernetes.api.get_metrics
               tags:
                 -
-                  tag: resource
+                  tag: component
                   value: etcd
                 -
                   tag: resource
@@ -1107,14 +1039,11 @@ zabbix_export:
                 key: kubernetes.api.get_metrics
               tags:
                 -
-                  tag: 'grpc code'
-                  value: '{#GRPC_CODE}'
-                -
-                  tag: resource
+                  tag: component
                   value: grpc
                 -
-                  tag: type
-                  value: rate
+                  tag: grpc-code
+                  value: '{#GRPC_CODE}'
           master_item:
             key: kubernetes.api.get_metrics
           preprocessing:
@@ -1170,14 +1099,11 @@ zabbix_export:
                 key: kubernetes.api.get_metrics
               tags:
                 -
-                  tag: kind
-                  value: '{#KIND}'
-                -
-                  tag: resource
+                  tag: component
                   value: requests
                 -
-                  tag: type
-                  value: gauge
+                  tag: kind
+                  value: '{#KIND}'
           master_item:
             key: kubernetes.api.get_metrics
           preprocessing:
@@ -1233,7 +1159,7 @@ zabbix_export:
                 key: kubernetes.api.get_metrics
               tags:
                 -
-                  tag: resource
+                  tag: component
                   value: requests
                 -
                   tag: resource
@@ -1241,9 +1167,6 @@ zabbix_export:
                 -
                   tag: scope
                   value: '{#SCOPE}'
-                -
-                  tag: type
-                  value: gauge
                 -
                   tag: verb
                   value: '{#VERB}'
@@ -1307,11 +1230,8 @@ zabbix_export:
                 key: kubernetes.api.get_metrics
               tags:
                 -
-                  tag: resource
+                  tag: component
                   value: requests
-                -
-                  tag: type
-                  value: histogram
                 -
                   tag: verb
                   value: '{#VERB}'
@@ -1328,11 +1248,8 @@ zabbix_export:
               description: '50 percentile of response latency distribution in seconds for each verb.'
               tags:
                 -
-                  tag: resource
+                  tag: component
                   value: requests
-                -
-                  tag: type
-                  value: percentile
                 -
                   tag: verb
                   value: '{#VERB}'
@@ -1349,7 +1266,7 @@ zabbix_export:
               description: '90 percentile of response latency distribution in seconds for each verb.'
               tags:
                 -
-                  tag: resource
+                  tag: component
                   value: requests
                 -
                   tag: type
@@ -1370,11 +1287,8 @@ zabbix_export:
               description: '95 percentile of response latency distribution in seconds for each verb.'
               tags:
                 -
-                  tag: resource
+                  tag: component
                   value: requests
-                -
-                  tag: type
-                  value: percentile
                 -
                   tag: verb
                   value: '{#VERB}'
@@ -1391,11 +1305,8 @@ zabbix_export:
               description: '99 percentile of response latency distribution in seconds for each verb.'
               tags:
                 -
-                  tag: resource
+                  tag: component
                   value: requests
-                -
-                  tag: type
-                  value: percentile
                 -
                   tag: verb
                   value: '{#VERB}'
@@ -1541,11 +1452,8 @@ zabbix_export:
                 key: kubernetes.api.get_metrics
               tags:
                 -
-                  tag: resource
+                  tag: component
                   value: workqueue
-                -
-                  tag: type
-                  value: rate
                 -
                   tag: workqueue
                   value: '{#NAME}'
@@ -1570,11 +1478,8 @@ zabbix_export:
                 key: kubernetes.api.get_metrics
               tags:
                 -
-                  tag: resource
+                  tag: component
                   value: workqueue
-                -
-                  tag: type
-                  value: gauge
                 -
                   tag: workqueue
                   value: '{#NAME}'
@@ -1604,6 +1509,13 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: kubernetes-api-server
       macros:
         -
           macro: '{$KUBE.API.CERT.EXPIRATION}'

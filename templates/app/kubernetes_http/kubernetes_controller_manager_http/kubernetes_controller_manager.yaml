@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-10T15:04:15Z'
+  date: '2022-01-13T15:24:43Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -48,14 +48,11 @@ zabbix_export:
             key: kubernetes.controller.get_metrics
           tags:
             -
-              tag: 'http code'
-              value: 2XX
-            -
-              tag: resource
+              tag: component
               value: rest
             -
-              tag: type
-              value: rate
+              tag: http-code
+              value: 2XX
         -
           uuid: ace0d156101b481d9f53c3f48e84bd38
           name: 'Kubernetes Controller Manager: REST Client requests: 3xx, rate'
@@ -81,14 +78,11 @@ zabbix_export:
             key: kubernetes.controller.get_metrics
           tags:
             -
-              tag: 'http code'
-              value: 3XX
-            -
-              tag: resource
+              tag: component
               value: rest
             -
-              tag: type
-              value: rate
+              tag: http-code
+              value: 3XX
         -
           uuid: c6b67e4330184ca98281773c69925d98
           name: 'Kubernetes Controller Manager: REST Client requests: 4xx, rate'
@@ -114,14 +108,11 @@ zabbix_export:
             key: kubernetes.controller.get_metrics
           tags:
             -
-              tag: 'http code'
-              value: 4XX
-            -
-              tag: resource
+              tag: component
               value: rest
             -
-              tag: type
-              value: rate
+              tag: http-code
+              value: 4XX
         -
           uuid: ac6397e9f62749199f857e6c859daa59
           name: 'Kubernetes Controller Manager: REST Client requests: 5xx, rate'
@@ -147,14 +138,11 @@ zabbix_export:
             key: kubernetes.controller.get_metrics
           tags:
             -
-              tag: 'http code'
-              value: 5XX
-            -
-              tag: resource
+              tag: component
               value: rest
             -
-              tag: type
-              value: rate
+              tag: http-code
+              value: 5XX
           triggers:
             -
               uuid: 13c32daebddd454bb5908a9a27c3a76f
@@ -162,6 +150,10 @@ zabbix_export:
               name: 'Kubernetes Controller Manager: Too many HTTP client errors (over {$KUBE.CONTROLLER.HTTP.CLIENT.ERROR} for 5m)'
               priority: WARNING
               description: '"Kubernetes Controller manager is experiencing high error rate (with 5xx HTTP code).'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 6bde8365469f47359fcc5716207b8870
           name: 'Kubernetes Controller Manager: CPU'
@@ -191,11 +183,8 @@ zabbix_export:
             key: kubernetes.controller.get_metrics
           tags:
             -
-              tag: resource
+              tag: component
               value: cpu
-            -
-              tag: type
-              value: gauge
         -
           uuid: c684929ea8444a6aa24f1fb80812a6eb
           name: 'Kubernetes Controller: Get Controller metrics'
@@ -218,11 +207,8 @@ zabbix_export:
               value: 'Bearer {$KUBE.CONTROLLER.TOKEN}'
           tags:
             -
-              tag: data
+              tag: component
               value: raw
-            -
-              tag: type
-              value: text
         -
           uuid: 8e4f98354c89410ebad42af485e3f710
           name: 'Kubernetes Controller Manager: Goroutines'
@@ -244,11 +230,8 @@ zabbix_export:
             key: kubernetes.controller.get_metrics
           tags:
             -
-              tag: resource
+              tag: component
               value: goroutines
-            -
-              tag: type
-              value: gauge
         -
           uuid: f30ba3d8679b4ffd86a20427892da228
           name: 'Kubernetes Controller Manager: Go threads'
@@ -270,11 +253,8 @@ zabbix_export:
             key: kubernetes.controller.get_metrics
           tags:
             -
-              tag: resource
-              value: 'go threads'
-            -
-              tag: type
-              value: gauge
+              tag: component
+              value: go-threads
         -
           uuid: b9ef0724331f4f9da830c470b8e2fea1
           name: 'Kubernetes Controller Manager: Leader election status'
@@ -298,11 +278,8 @@ zabbix_export:
             key: kubernetes.controller.get_metrics
           tags:
             -
-              tag: resource
+              tag: component
               value: leader
-            -
-              tag: type
-              value: gauge
         -
           uuid: 5bb0657b329c44e6a7a6dd169551205b
           name: 'Kubernetes Controller Manager: Fds max'
@@ -324,11 +301,8 @@ zabbix_export:
             key: kubernetes.controller.get_metrics
           tags:
             -
-              tag: resource
+              tag: component
               value: fds
-            -
-              tag: type
-              value: gauge
         -
           uuid: 43698df9a76c410792f0fdb9d41ee42c
           name: 'Kubernetes Controller Manager: Fds open'
@@ -350,11 +324,8 @@ zabbix_export:
             key: kubernetes.controller.get_metrics
           tags:
             -
-              tag: resource
+              tag: component
               value: fds
-            -
-              tag: type
-              value: gauge
         -
           uuid: 7497f4f8d1d8422dad301d9d25b42150
           name: 'Kubernetes Controller Manager: Resident memory, bytes'
@@ -377,11 +348,8 @@ zabbix_export:
             key: kubernetes.controller.get_metrics
           tags:
             -
-              tag: resource
+              tag: component
               value: memory
-            -
-              tag: type
-              value: gauge
         -
           uuid: 884a7a4de05548ffbdf14629bbe5d181
           name: 'Kubernetes Controller Manager: Virtual memory, bytes'
@@ -404,11 +372,8 @@ zabbix_export:
             key: kubernetes.controller.get_metrics
           tags:
             -
-              tag: resource
+              tag: component
               value: memory
-            -
-              tag: type
-              value: gauge
       discovery_rules:
         -
           uuid: 3117060c51564c2e897e3194821b137f
@@ -440,11 +405,8 @@ zabbix_export:
                 key: kubernetes.controller.get_metrics
               tags:
                 -
-                  tag: resource
+                  tag: component
                   value: workqueue
-                -
-                  tag: type
-                  value: histogram
                 -
                   tag: workqueue
                   value: '{#NAME}'
@@ -470,11 +432,8 @@ zabbix_export:
                 key: kubernetes.controller.get_metrics
               tags:
                 -
-                  tag: resource
+                  tag: component
                   value: workqueue
-                -
-                  tag: type
-                  value: histogram
                 -
                   tag: workqueue
                   value: '{#NAME}'
@@ -504,11 +463,8 @@ zabbix_export:
                 key: kubernetes.controller.get_metrics
               tags:
                 -
-                  tag: resource
+                  tag: component
                   value: workqueue
-                -
-                  tag: type
-                  value: rate
                 -
                   tag: workqueue
                   value: '{#NAME}'
@@ -534,11 +490,8 @@ zabbix_export:
                 key: kubernetes.controller.get_metrics
               tags:
                 -
-                  tag: resource
+                  tag: component
                   value: workqueue
-                -
-                  tag: type
-                  value: gauge
                 -
                   tag: workqueue
                   value: '{#NAME}'
@@ -565,11 +518,8 @@ zabbix_export:
                 key: kubernetes.controller.get_metrics
               tags:
                 -
-                  tag: resource
+                  tag: component
                   value: workqueue
-                -
-                  tag: type
-                  value: gauge
                 -
                   tag: workqueue
                   value: '{#NAME}'
@@ -591,11 +541,8 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: resource
+                  tag: component
                   value: workqueue
-                -
-                  tag: type
-                  value: percentile
                 -
                   tag: workqueue
                   value: '{#NAME}'
@@ -612,11 +559,8 @@ zabbix_export:
               description: '90 percentile of how long in seconds an item stays in workqueue before being requested, by queue.'
               tags:
                 -
-                  tag: resource
+                  tag: component
                   value: workqueue
-                -
-                  tag: type
-                  value: percentile
                 -
                   tag: workqueue
                   value: '{#NAME}'
@@ -633,11 +577,8 @@ zabbix_export:
               description: '95 percentile of how long in seconds an item stays in workqueue before being requested, by queue.'
               tags:
                 -
-                  tag: resource
+                  tag: component
                   value: workqueue
-                -
-                  tag: type
-                  value: percentile
                 -
                   tag: workqueue
                   value: '{#NAME}'
@@ -654,11 +595,8 @@ zabbix_export:
               description: '99 percentile of how long in seconds an item stays in workqueue before being requested, by queue.'
               tags:
                 -
-                  tag: resource
+                  tag: component
                   value: workqueue
-                -
-                  tag: type
-                  value: percentile
                 -
                   tag: workqueue
                   value: '{#NAME}'
@@ -688,11 +626,8 @@ zabbix_export:
                 key: kubernetes.controller.get_metrics
               tags:
                 -
-                  tag: resource
+                  tag: component
                   value: workqueue
-                -
-                  tag: type
-                  value: rate
                 -
                   tag: workqueue
                   value: '{#NAME}'
@@ -719,11 +654,8 @@ zabbix_export:
                 key: kubernetes.controller.get_metrics
               tags:
                 -
-                  tag: resource
+                  tag: component
                   value: workqueue
-                -
-                  tag: type
-                  value: gauge
                 -
                   tag: workqueue
                   value: '{#NAME}'
@@ -740,11 +672,8 @@ zabbix_export:
               description: '50 percentiles of how long in seconds processing an item from workqueue takes, by queue.'
               tags:
                 -
-                  tag: resource
+                  tag: component
                   value: workqueue
-                -
-                  tag: type
-                  value: percentile
                 -
                   tag: workqueue
                   value: '{#NAME}'
@@ -761,11 +690,8 @@ zabbix_export:
               description: '90 percentile of how long in seconds processing an item from workqueue takes, by queue.'
               tags:
                 -
-                  tag: resource
+                  tag: component
                   value: workqueue
-                -
-                  tag: type
-                  value: percentile
                 -
                   tag: workqueue
                   value: '{#NAME}'
@@ -782,11 +708,8 @@ zabbix_export:
               description: '95 percentile of how long in seconds processing an item from workqueue takes, by queue.'
               tags:
                 -
-                  tag: resource
+                  tag: component
                   value: workqueue
-                -
-                  tag: type
-                  value: percentile
                 -
                   tag: workqueue
                   value: '{#NAME}'
@@ -803,11 +726,8 @@ zabbix_export:
               description: '99 percentile of how long in seconds processing an item from workqueue takes, by queue.'
               tags:
                 -
-                  tag: resource
+                  tag: component
                   value: workqueue
-                -
-                  tag: type
-                  value: percentile
                 -
                   tag: workqueue
                   value: '{#NAME}'
@@ -956,6 +876,13 @@ zabbix_export:
                   value: bucket
                   status: ENABLED
                   discover: DISCOVER
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: kubernetes-controller-manager
       macros:
         -
           macro: '{$KUBE.CONTROLLER.HTTP.CLIENT.ERROR}'
