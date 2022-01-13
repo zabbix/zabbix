@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-05T01:30:24Z</date>
+   <date>2021-12-24T09:16:28Z</date>
    <groups>
       <group>
          <name>Templates/Modules</name>
@@ -16,7 +16,7 @@
 MIBs used:&#13;
 HOST-RESOURCES-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -74,7 +74,7 @@ Implementations may approximate this one minute smoothing period if necessary.</
          <description>MIBs used:&#13;
 HOST-RESOURCES-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -241,7 +241,7 @@ The amount of the storage represented by this entry that is allocated, in units 
          <name>Template Module HOST-RESOURCES-MIB SNMP</name>
          <description>HOST-RESOURCES-MIB: CPU, memory and storage(vfs.fs.file) linked together.&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.39</description>
          <templates>
             <template>
                <name>Template Module HOST-RESOURCES-MIB CPU SNMP</name>
@@ -340,7 +340,7 @@ Template tooling version used: 0.36</description>
          <description>MIBs used:&#13;
 HOST-RESOURCES-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>

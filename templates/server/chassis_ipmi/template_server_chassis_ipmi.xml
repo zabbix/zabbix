@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-08-06T06:08:54Z</date>
+   <date>2021-12-23T06:23:20Z</date>
    <groups>
       <group>
          <name>Templates/Server hardware</name>
@@ -22,7 +22,7 @@ Known Issues:&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/398023-discussion-thread-for-official-zabbix-template-ipmi&#13;
 &#13;
-Template tooling version used: 0.37</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Server hardware</name>
@@ -120,7 +120,6 @@ Template tooling version used: 0.37</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <master_item>
                   <key>ipmi.get</key>
                </master_item>
@@ -199,38 +198,16 @@ Template tooling version used: 0.37</description>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{min(5m)}&lt;{#SENSOR_LO_WARN}</expression>
-                           <name>IPMI: {#SENSOR_ID} value is below non-critical low (less than {#SENSOR_LO_WARN} for 5m)</name>
-                           <priority>WARNING</priority>
-                           <description>The trigger is informing that a value less than the lower non-critical threshold has been reached.</description>
-                           <dependencies>
-                              <dependency>
-                                 <name>IPMI: {#SENSOR_ID} value is below critical low (less than {#SENSOR_LO_CRIT} for 5m)</name>
-                                 <expression>{Template Server Chassis by IPMI:ipmi.value[{#SENSOR_ID}].min(5m)}&lt;{#SENSOR_LO_CRIT}</expression>
-                              </dependency>
-                              <dependency>
-                                 <name>IPMI: {#SENSOR_ID} value is below non-recoverable low (less than {#SENSOR_LO_DISAST} for 5m)</name>
-                                 <expression>{Template Server Chassis by IPMI:ipmi.value[{#SENSOR_ID}].min(5m)}&lt;{#SENSOR_LO_DISAST}</expression>
-                              </dependency>
-                           </dependencies>
-                        </trigger_prototype>
-                        <trigger_prototype>
-                           <expression>{min(5m)}&lt;{#SENSOR_LO_CRIT}</expression>
-                           <name>IPMI: {#SENSOR_ID} value is below critical low (less than {#SENSOR_LO_CRIT} for 5m)</name>
+                           <expression>{min(5m)}&gt;{#SENSOR_HI_CRIT}</expression>
+                           <name>IPMI: {#SENSOR_ID} value is above critical high (greater than {#SENSOR_HI_CRIT} for 5m)</name>
                            <priority>HIGH</priority>
-                           <description>The trigger is informing that a value less than the lower critical threshold has been reached.</description>
+                           <description>The trigger is informing that a value higher than the upper critical threshold has been reached.</description>
                            <dependencies>
                               <dependency>
-                                 <name>IPMI: {#SENSOR_ID} value is below non-recoverable low (less than {#SENSOR_LO_DISAST} for 5m)</name>
-                                 <expression>{Template Server Chassis by IPMI:ipmi.value[{#SENSOR_ID}].min(5m)}&lt;{#SENSOR_LO_DISAST}</expression>
+                                 <name>IPMI: {#SENSOR_ID} value is above non-recoverable high (greater than {#SENSOR_HI_DISAST} for 5m)</name>
+                                 <expression>{Template Server Chassis by IPMI:ipmi.value[{#SENSOR_ID}].min(5m)}&gt;{#SENSOR_HI_DISAST}</expression>
                               </dependency>
                            </dependencies>
-                        </trigger_prototype>
-                        <trigger_prototype>
-                           <expression>{min(5m)}&lt;{#SENSOR_LO_DISAST}</expression>
-                           <name>IPMI: {#SENSOR_ID} value is below non-recoverable low (less than {#SENSOR_LO_DISAST} for 5m)</name>
-                           <priority>DISASTER</priority>
-                           <description>The trigger is informing that a value less than the lower non-recoverable threshold has been reached.</description>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{min(5m)}&gt;{#SENSOR_HI_WARN}</expression>
@@ -249,27 +226,48 @@ Template tooling version used: 0.37</description>
                            </dependencies>
                         </trigger_prototype>
                         <trigger_prototype>
-                           <expression>{min(5m)}&gt;{#SENSOR_HI_CRIT}</expression>
-                           <name>IPMI: {#SENSOR_ID} value is above critical high (greater than {#SENSOR_HI_CRIT} for 5m)</name>
-                           <priority>HIGH</priority>
-                           <description>The trigger is informing that a value higher than the upper critical threshold has been reached.</description>
-                           <dependencies>
-                              <dependency>
-                                 <name>IPMI: {#SENSOR_ID} value is above non-recoverable high (greater than {#SENSOR_HI_DISAST} for 5m)</name>
-                                 <expression>{Template Server Chassis by IPMI:ipmi.value[{#SENSOR_ID}].min(5m)}&gt;{#SENSOR_HI_DISAST}</expression>
-                              </dependency>
-                           </dependencies>
-                        </trigger_prototype>
-                        <trigger_prototype>
                            <expression>{min(5m)}&gt;{#SENSOR_HI_DISAST}</expression>
                            <name>IPMI: {#SENSOR_ID} value is above non-recoverable high (greater than {#SENSOR_HI_DISAST} for 5m)</name>
                            <priority>DISASTER</priority>
                            <description>The trigger is informing that a value higher than the upper non-recoverable threshold has been reached.</description>
                         </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&lt;{#SENSOR_LO_CRIT}</expression>
+                           <name>IPMI: {#SENSOR_ID} value is below critical low (less than {#SENSOR_LO_CRIT} for 5m)</name>
+                           <priority>HIGH</priority>
+                           <description>The trigger is informing that a value less than the lower critical threshold has been reached.</description>
+                           <dependencies>
+                              <dependency>
+                                 <name>IPMI: {#SENSOR_ID} value is below non-recoverable low (less than {#SENSOR_LO_DISAST} for 5m)</name>
+                                 <expression>{Template Server Chassis by IPMI:ipmi.value[{#SENSOR_ID}].min(5m)}&lt;{#SENSOR_LO_DISAST}</expression>
+                              </dependency>
+                           </dependencies>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&lt;{#SENSOR_LO_WARN}</expression>
+                           <name>IPMI: {#SENSOR_ID} value is below non-critical low (less than {#SENSOR_LO_WARN} for 5m)</name>
+                           <priority>WARNING</priority>
+                           <description>The trigger is informing that a value less than the lower non-critical threshold has been reached.</description>
+                           <dependencies>
+                              <dependency>
+                                 <name>IPMI: {#SENSOR_ID} value is below critical low (less than {#SENSOR_LO_CRIT} for 5m)</name>
+                                 <expression>{Template Server Chassis by IPMI:ipmi.value[{#SENSOR_ID}].min(5m)}&lt;{#SENSOR_LO_CRIT}</expression>
+                              </dependency>
+                              <dependency>
+                                 <name>IPMI: {#SENSOR_ID} value is below non-recoverable low (less than {#SENSOR_LO_DISAST} for 5m)</name>
+                                 <expression>{Template Server Chassis by IPMI:ipmi.value[{#SENSOR_ID}].min(5m)}&lt;{#SENSOR_LO_DISAST}</expression>
+                              </dependency>
+                           </dependencies>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&lt;{#SENSOR_LO_DISAST}</expression>
+                           <name>IPMI: {#SENSOR_ID} value is below non-recoverable low (less than {#SENSOR_LO_DISAST} for 5m)</name>
+                           <priority>DISASTER</priority>
+                           <description>The trigger is informing that a value less than the lower non-recoverable threshold has been reached.</description>
+                        </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>IPMI: {#SENSOR_ID}</name>
