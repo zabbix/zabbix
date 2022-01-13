@@ -52,3 +52,7 @@ func (sp *sizeParams) handleHomeDir(path string, d fs.DirEntry) (int64, error) {
 
 	return parentSize, nil
 }
+
+func (cp *common) osSkip(path string, d fs.DirEntry) bool {
+	return false
+}

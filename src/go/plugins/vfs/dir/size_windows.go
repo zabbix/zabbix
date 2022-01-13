@@ -22,6 +22,7 @@ package dir
 import (
 	"fmt"
 	"io/fs"
+	"os"
 	"syscall"
 
 	"zabbix.com/pkg/win32"
@@ -82,4 +83,26 @@ func (sp *sizeParams) getClusterSize(path string) (uint64, error) {
 	}
 
 	return uint64(clusters.LpSectorsPerCluster) * uint64(clusters.LpBytesPerSector), nil
+}
+
+func (cp *common) osSkip(path string, d fs.DirEntry) bool {
+	if d.Type() == fs.ModeSymlink {
+		return true
+	}
+
+	i, err := d.Info()
+	if err != nil {
+		impl.Logger.Errf("failed to get file info for path %s, %s", path, err.Error())
+		return true
+	}
+
+	for _, f := range cp.files {
+		if os.SameFile(f, i) {
+			return true
+		}
+	}
+
+	cp.files = append(cp.files, i)
+
+	return false
 }

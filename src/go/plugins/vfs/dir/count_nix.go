@@ -24,6 +24,14 @@ package dir
 
 import "io/fs"
 
-func (cp *common) osSkip(path string, d fs.DirEntry) bool {
+func (cp *countParams) skipType(path string, d fs.DirEntry) bool {
+	if len(cp.typesInclude) > 0 && !isTypeMatch(cp.typesInclude, d.Type()) {
+		return true
+	}
+
+	if len(cp.typesExclude) > 0 && isTypeMatch(cp.typesExclude, d.Type()) {
+		return true
+	}
+
 	return false
 }
