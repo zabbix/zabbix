@@ -122,26 +122,13 @@ class CHtmlUrlValidator {
 	 * Verifies that URL will not lead to third party pages.
 	 *
 	 * @param string $url
-	 * @param array  $options
-	 * @param bool   $options[allow_same_page]  If set to FALSE will fail the link to same php file.
 	 *
 	 * @return bool
 	 */
-	public static function validateSameSite(string $url, $options = []): bool {
-		$options += [
-			'allow_same_page' => true
-		];
-
+	public static function validateSameSite(string $url): bool {
+		$root_path = __DIR__.'/../../../';
 		preg_match('/^\/?(?<filename>[a-z0-9\_\.]+\.php)(\?.*)?$/i', $url, $url_parts);
 
-		if (!array_key_exists('filename', $url_parts) || !file_exists('./'.$url_parts['filename'])) {
-			return false;
-		}
-
-		if (!$options['allow_same_page'] && $url_parts['filename'] === basename(__FILE__)) {
-			return false;
-		}
-
-		return true;
+		return array_key_exists('filename', $url_parts) && file_exists($root_path.$url_parts['filename']);
 	}
 }
