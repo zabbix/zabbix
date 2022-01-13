@@ -53,7 +53,7 @@ class testPageLatestData extends CWebTest {
 		$this->assertEquals(['', 'Host', 'Name', 'Last check', 'Last value', 'Change', 'Tags', '', 'Info'],
 				$table->getHeadersText());
 
-		// Check that sortable headers is clickable.
+		// Check that sortable headers are clickable.
 		foreach (['Host', 'Name'] as $header) {
 			$this->assertTrue($table->query('xpath:.//th/a[text()="'.$header.'"]')->one()->isClickable());
 		}
