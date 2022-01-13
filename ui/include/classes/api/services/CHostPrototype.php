@@ -174,7 +174,7 @@ class CHostPrototype extends CHostBase {
 					'host_discovery hd,items i,hosts_groups hgg'.
 					' JOIN rights r'.
 						' ON r.id=hgg.groupid'.
-						' AND '.dbConditionInt('r.groupid', getUserGroupsByUserId(self::$userData['userid'])).
+						' AND '.dbConditionId('r.groupid', getUserGroupsByUserId(self::$userData['userid'])).
 				' WHERE h.hostid=hd.hostid'.
 					' AND hd.parent_itemid=i.itemid'.
 					' AND i.hostid=hgg.hostid'.
@@ -253,7 +253,7 @@ class CHostPrototype extends CHostBase {
 			$groupPrototypes = DBFetchArray(DBselect(
 				'SELECT hg.group_prototypeid,hg.hostid'.
 					' FROM group_prototype hg'.
-					' WHERE '.dbConditionInt('hg.hostid', $hostPrototypeIds).
+					' WHERE '.dbConditionId('hg.hostid', $hostPrototypeIds).
 					' AND hg.groupid IS NOT NULL'
 			));
 			$relationMap = $this->createRelationMap($groupPrototypes, 'hostid', 'group_prototypeid');
@@ -274,7 +274,7 @@ class CHostPrototype extends CHostBase {
 			$groupPrototypes = DBFetchArray(DBselect(
 				'SELECT hg.group_prototypeid,hg.hostid'.
 				' FROM group_prototype hg'.
-				' WHERE '.dbConditionInt('hg.hostid', $hostPrototypeIds).
+				' WHERE '.dbConditionId('hg.hostid', $hostPrototypeIds).
 					' AND hg.groupid IS NULL'
 			));
 			$relationMap = $this->createRelationMap($groupPrototypes, 'hostid', 'group_prototypeid');
@@ -297,7 +297,7 @@ class CHostPrototype extends CHostBase {
 			$dbRules = DBselect(
 				'SELECT hd.hostid,i.hostid AS parent_hostid'.
 					' FROM host_discovery hd,items i'.
-					' WHERE '.dbConditionInt('hd.hostid', $hostPrototypeIds).
+					' WHERE '.dbConditionId('hd.hostid', $hostPrototypeIds).
 					' AND hd.parent_itemid=i.itemid'
 			);
 			while ($relation = DBfetch($dbRules)) {
@@ -669,7 +669,7 @@ class CHostPrototype extends CHostBase {
 					' WHERE hd.parent_itemid=i.itemid'.
 						' AND i.hostid=h.hostid'.
 						' AND h.status='.HOST_STATUS_TEMPLATE.
-						' AND '.dbConditionInt('hd.hostid', array_column($host_prototypes, 'hostid'));
+						' AND '.dbConditionId('hd.hostid', array_column($host_prototypes, 'hostid'));
 			$valid_prototypes = DBfetchArrayAssoc(DBselect($sql), 'hostid');
 
 			foreach ($host_prototypes as $key => $host_prototype) {
@@ -1056,7 +1056,7 @@ class CHostPrototype extends CHostBase {
 			'SELECT h.hostid'.
 			' FROM hosts h'.
 			' WHERE h.templateid>0'.
-				' AND '.dbConditionInt('h.hostid', $host_prototypeids),
+				' AND '.dbConditionId('h.hostid', $host_prototypeids),
 			1
 		));
 
@@ -1121,7 +1121,7 @@ class CHostPrototype extends CHostBase {
 		if ($h_names) {
 			$where = [];
 			foreach ($h_names as $ruleid => $names) {
-				$where[] = '('.dbConditionInt('i.itemid', [$ruleid]).' AND '.dbConditionString('h.host', $names).')';
+				$where[] = '('.dbConditionId('i.itemid', [$ruleid]).' AND '.dbConditionString('h.host', $names).')';
 			}
 
 			$duplicates = DBfetchArray(DBselect(
@@ -1144,7 +1144,7 @@ class CHostPrototype extends CHostBase {
 		if ($v_names) {
 			$where = [];
 			foreach ($v_names as $ruleid => $names) {
-				$where[] = '('.dbConditionInt('i.itemid', [$ruleid]).' AND '.dbConditionString('h.name', $names).')';
+				$where[] = '('.dbConditionId('i.itemid', [$ruleid]).' AND '.dbConditionString('h.name', $names).')';
 			}
 
 			$duplicates = DBfetchArray(DBselect(
@@ -1178,7 +1178,7 @@ class CHostPrototype extends CHostBase {
 			'SELECT i.itemid'.
 			' FROM items i,hosts h'.
 			' WHERE i.hostid=h.hostid'.
-			' AND '.dbConditionInt('i.itemid', array_unique(array_column($host_prototypes, 'ruleid'))).
+			' AND '.dbConditionId('i.itemid', array_unique(array_column($host_prototypes, 'ruleid'))).
 			' AND h.status='.HOST_STATUS_TEMPLATE
 		), 'itemid');
 
@@ -1235,7 +1235,7 @@ class CHostPrototype extends CHostBase {
 			'SELECT h.host'.
 			' FROM items i,hosts h'.
 			' WHERE i.hostid=h.hostid'.
-				' AND '.dbConditionInt('i.itemid', $ruleids).
+				' AND '.dbConditionId('i.itemid', $ruleids).
 				' AND h.flags='.ZBX_FLAG_DISCOVERY_CREATED,
 			1
 		));
