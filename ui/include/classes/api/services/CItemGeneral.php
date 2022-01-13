@@ -1101,7 +1101,7 @@ abstract class CItemGeneral extends CApiService {
 				static::validateInventoryLinks($ins_items);
 			}
 
-			$this->createReal($ins_items);
+			$this->createForce($ins_items);
 		}
 
 		if ($upd_items) {
@@ -1111,7 +1111,7 @@ abstract class CItemGeneral extends CApiService {
 
 			$db_items = $this->getAffectedObjects($upd_items, false);
 
-			$this->updateReal($upd_items, $db_items);
+			$this->updateForce($upd_items, $db_items);
 		}
 
 		$new_items = array_merge($upd_items, $ins_items);

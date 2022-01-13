@@ -486,7 +486,7 @@ class CItem extends CItemGeneral {
 		}
 		unset($item);
 
-		$this->createReal($items);
+		$this->createForce($items);
 		$this->inherit($items);
 
 		return ['itemids' => array_column($items, 'itemid')];
@@ -541,7 +541,7 @@ class CItem extends CItemGeneral {
 	/**
 	 * @param array $items
 	 */
-	protected function createReal(array &$items): void {
+	protected function createForce(array &$items): void {
 		$items_rtdata = [];
 
 		foreach ($items as $key => &$item) {
@@ -685,7 +685,7 @@ class CItem extends CItemGeneral {
 		}
 		unset($item);
 
-		$this->updateReal($items, $db_items);
+		$this->updateForce($items, $db_items);
 		$this->inherit($items);
 
 		return ['itemids' => array_column($items, 'itemid')];
@@ -727,7 +727,7 @@ class CItem extends CItemGeneral {
 									['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'interfaceid' =>	['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'type', 'in' => implode(',', [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_SNMP])], 'type' => API_ID],
+									['if' => ['field' => 'type', 'in' => implode(',', [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP])], 'type' => API_ID],
 									['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'inventory_link' =>	['type' => API_ID],
@@ -742,7 +742,7 @@ class CItem extends CItemGeneral {
 	 * @param array $items
 	 * @param array $db_items
 	 */
-	protected function updateReal(array $items, array $db_items): void {
+	protected function updateForce(array $items, array $db_items): void {
 		CArrayHelper::sort($items, ['itemid']);
 
 		$upd_items = [];

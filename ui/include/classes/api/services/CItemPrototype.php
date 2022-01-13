@@ -347,7 +347,7 @@ class CItemPrototype extends CItemGeneral {
 	public function create(array $items): array {
 		$this->validateCreate($items);
 
-		$this->createReal($items);
+		$this->createForce($items);
 		$this->inherit($items);
 
 		return ['itemids' => array_column($items, 'itemid')];
@@ -403,7 +403,7 @@ class CItemPrototype extends CItemGeneral {
 	/**
 	 * @param array $items
 	 */
-	protected function createReal(array &$items): void {
+	protected function createForce(array &$items): void {
 		$itemids = DB::insert('items', $items);
 
 		$ins_item_discovery = [];
@@ -530,7 +530,7 @@ class CItemPrototype extends CItemGeneral {
 		}
 		unset($item);
 
-		$this->updateReal($items, $db_items);
+		$this->updateForce($items, $db_items);
 		$this->inherit($items);
 
 		return ['itemids' => array_column($items, 'itemid')];
@@ -589,7 +589,7 @@ class CItemPrototype extends CItemGeneral {
 	 *
 	 * @throws APIException
 	 */
-	protected function updateReal(array $items, array $db_items): void {
+	protected function updateForce(array $items, array $db_items): void {
 		CArrayHelper::sort($items, ['itemid']);
 
 		$upd_items = [];

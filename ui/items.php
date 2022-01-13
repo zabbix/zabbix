@@ -692,8 +692,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 
 		if ($host['status'] == HOST_STATUS_TEMPLATE || !in_array($item['type'], [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE,
-				ITEM_TYPE_EXTERNAL, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP,
-				ITEM_TYPE_SNMP])) {
+					ITEM_TYPE_EXTERNAL, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX,
+					ITEM_TYPE_SNMPTRAP, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP
+				])) {
 			unset($item['interfaceid']);
 		}
 
