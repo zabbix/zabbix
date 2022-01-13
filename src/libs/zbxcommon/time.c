@@ -69,7 +69,7 @@ int	zbx_tm_parse_period(const char *period, size_t *len, int *multiplier, zbx_ti
 	for (ptr = period; 0 != isdigit(*ptr); ptr++)
 		;
 
-	if (FAIL == is_uint_n_range(period, ptr - period, multiplier, sizeof(*multiplier), 1, UINT32_MAX))
+	if (FAIL == is_uint_n_range(period, ptr - period, multiplier, sizeof(*multiplier), 0, UINT32_MAX))
 	{
 		*error = zbx_strdup(*error, "invalid period multiplier");
 		return FAIL;
