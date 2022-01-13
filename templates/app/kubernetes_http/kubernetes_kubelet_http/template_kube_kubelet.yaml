@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-11T19:03:48Z'
+  date: '2022-01-13T09:16:13Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -42,11 +42,8 @@ zabbix_export:
               value: 'Bearer {$KUBE.API.TOKEN}'
           tags:
             -
-              tag: data
+              tag: component
               value: raw
-            -
-              tag: resource
-              value: state
         -
           uuid: bc395860d45b45cb89401fc7e50bc015
           name: 'Kubernetes: Containers restarts'
@@ -65,7 +62,7 @@ zabbix_export:
             key: kube.pods
           tags:
             -
-              tag: resource
+              tag: component
               value: containers
         -
           uuid: e524234eea87438d9ee2a1db9f24cfbb
@@ -85,7 +82,7 @@ zabbix_export:
             key: kube.pods
           tags:
             -
-              tag: resource
+              tag: component
               value: containers
         -
           uuid: cff44957e9a54d5d887d4f92b3e4da72
@@ -107,7 +104,7 @@ zabbix_export:
             key: kube.cadvisor.metrics
           tags:
             -
-              tag: resource
+              tag: component
               value: containers
         -
           uuid: 6735723da30d41dcb7bd46c954b2998f
@@ -130,7 +127,7 @@ zabbix_export:
             key: kube.kubelet.metrics
           tags:
             -
-              tag: resource
+              tag: component
               value: memory
         -
           uuid: c71fc79a77104ef4a0d6b89d5f7b7bad
@@ -151,11 +148,8 @@ zabbix_export:
               value: 'Bearer {$KUBE.API.TOKEN}'
           tags:
             -
-              tag: data
+              tag: component
               value: raw
-            -
-              tag: resource
-              value: state
         -
           uuid: 46635d3fee04488caa4b07de7709f71e
           name: 'Kubernetes: Pods running'
@@ -174,7 +168,7 @@ zabbix_export:
             key: kube.pods
           tags:
             -
-              tag: resource
+              tag: component
               value: pods
         -
           uuid: d1388216cb384ff08c984919572b0ffb
@@ -196,7 +190,7 @@ zabbix_export:
             key: kube.kubelet.metrics
           tags:
             -
-              tag: resource
+              tag: component
               value: descriptors
         -
           uuid: dc3a6371dcb34ae5b65cbf5224d4712c
@@ -218,7 +212,7 @@ zabbix_export:
             key: kube.kubelet.metrics
           tags:
             -
-              tag: resource
+              tag: component
               value: descriptors
         -
           uuid: c382b67cf7e947fbb9c29e86446ffac5
@@ -241,7 +235,7 @@ zabbix_export:
             key: kube.kubelet.metrics
           tags:
             -
-              tag: resource
+              tag: component
               value: memory
         -
           uuid: 11da04549bd840b0a8d5c70ff0d2b46f
@@ -261,7 +255,7 @@ zabbix_export:
             key: kube.pods
           tags:
             -
-              tag: resource
+              tag: component
               value: containers
         -
           uuid: 7c8cc6c3ed8e412eb69e7ab8e2fe7e12
@@ -282,11 +276,8 @@ zabbix_export:
               value: 'Bearer {$KUBE.API.TOKEN}'
           tags:
             -
-              tag: data
+              tag: component
               value: raw
-            -
-              tag: resource
-              value: state
       discovery_rules:
         -
           uuid: 5f70768ebe62429a96e17576dd767382
@@ -320,6 +311,9 @@ zabbix_export:
                 key: kube.cadvisor.metrics
               tags:
                 -
+                  tag: component
+                  value: memory
+                -
                   tag: container
                   value: '{#CONTAINER}'
                 -
@@ -328,9 +322,6 @@ zabbix_export:
                 -
                   tag: pod
                   value: '{#POD}'
-                -
-                  tag: resource
-                  value: memory
             -
               uuid: 6dcf948e79b94f3f96677a7948d2dfd4
               name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Memory max usage'
@@ -356,6 +347,9 @@ zabbix_export:
                 key: kube.cadvisor.metrics
               tags:
                 -
+                  tag: component
+                  value: memory
+                -
                   tag: container
                   value: '{#CONTAINER}'
                 -
@@ -364,9 +358,6 @@ zabbix_export:
                 -
                   tag: pod
                   value: '{#POD}'
-                -
-                  tag: resource
-                  value: memory
             -
               uuid: 47d35c31a52643c1b587efcec57f9dff
               name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: RSS'
@@ -392,6 +383,9 @@ zabbix_export:
                 key: kube.cadvisor.metrics
               tags:
                 -
+                  tag: component
+                  value: memory
+                -
                   tag: container
                   value: '{#CONTAINER}'
                 -
@@ -400,9 +394,6 @@ zabbix_export:
                 -
                   tag: pod
                   value: '{#POD}'
-                -
-                  tag: resource
-                  value: memory
             -
               uuid: 2cf31296f67947ec85f576773352a25b
               name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Swap'
@@ -428,6 +419,9 @@ zabbix_export:
                 key: kube.cadvisor.metrics
               tags:
                 -
+                  tag: component
+                  value: memory
+                -
                   tag: container
                   value: '{#CONTAINER}'
                 -
@@ -436,9 +430,6 @@ zabbix_export:
                 -
                   tag: pod
                   value: '{#POD}'
-                -
-                  tag: resource
-                  value: memory
             -
               uuid: 146d17ecec7149efb20878d7e0466eeb
               name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Usage'
@@ -464,6 +455,9 @@ zabbix_export:
                 key: kube.cadvisor.metrics
               tags:
                 -
+                  tag: component
+                  value: memory
+                -
                   tag: container
                   value: '{#CONTAINER}'
                 -
@@ -472,9 +466,6 @@ zabbix_export:
                 -
                   tag: pod
                   value: '{#POD}'
-                -
-                  tag: resource
-                  value: memory
             -
               uuid: d3a24d207c6d4201a5e7235f246e0c59
               name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Working set'
@@ -500,6 +491,9 @@ zabbix_export:
                 key: kube.cadvisor.metrics
               tags:
                 -
+                  tag: component
+                  value: memory
+                -
                   tag: container
                   value: '{#CONTAINER}'
                 -
@@ -508,9 +502,6 @@ zabbix_export:
                 -
                   tag: pod
                   value: '{#POD}'
-                -
-                  tag: resource
-                  value: memory
           master_item:
             key: kube.cadvisor.metrics
           preprocessing:
@@ -565,11 +556,11 @@ zabbix_export:
                 key: kube.cadvisor.metrics
               tags:
                 -
+                  tag: component
+                  value: pod
+                -
                   tag: pod
                   value: '{#NAME}'
-                -
-                  tag: resource
-                  value: pod
             -
               uuid: 434c913e7547435bb74c922f81f3ff7a
               name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: System seconds, total'
@@ -592,11 +583,11 @@ zabbix_export:
                 key: kube.cadvisor.metrics
               tags:
                 -
+                  tag: component
+                  value: pod
+                -
                   tag: pod
                   value: '{#NAME}'
-                -
-                  tag: resource
-                  value: pod
             -
               uuid: e0b1c1edcc3c4738a71b46712a085ed0
               name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: User seconds, total'
@@ -619,11 +610,11 @@ zabbix_export:
                 key: kube.cadvisor.metrics
               tags:
                 -
+                  tag: component
+                  value: pod
+                -
                   tag: pod
                   value: '{#NAME}'
-                -
-                  tag: resource
-                  value: pod
           master_item:
             key: kube.pods
           preprocessing:
@@ -676,14 +667,14 @@ zabbix_export:
                   tag: code
                   value: '{#CODE}'
                 -
+                  tag: component
+                  value: requests
+                -
                   tag: host
                   value: '{#HOST}'
                 -
                   tag: method
                   value: '{#METHOD}'
-                -
-                  tag: resource
-                  value: requests
           master_item:
             key: kube.kubelet.metrics
           preprocessing:
@@ -738,8 +729,8 @@ zabbix_export:
                 key: kube.kubelet.metrics
               tags:
                 -
-                  tag: Application
-                  value: Kubernetes
+                  tag: component
+                  value: operations
             -
               uuid: 3d9545d396b24ef6b87eb730ad93cda7
               name: 'Kubernetes: [{#OP_TYPE}] Operations, p50'
@@ -753,8 +744,8 @@ zabbix_export:
               description: '50 percentile of operation latency distribution in seconds for each verb.'
               tags:
                 -
-                  tag: Application
-                  value: Kubernetes
+                  tag: component
+                  value: operations
             -
               uuid: 039a47a0b20741e79701fecb924e6a08
               name: 'Kubernetes: [{#OP_TYPE}] Operations, p90'
@@ -768,8 +759,8 @@ zabbix_export:
               description: '90 percentile of operation latency distribution in seconds for each verb.'
               tags:
                 -
-                  tag: Application
-                  value: Kubernetes
+                  tag: component
+                  value: operations
             -
               uuid: e846265636ac433ba2bce034aca1e394
               name: 'Kubernetes: [{#OP_TYPE}] Operations, p95'
@@ -783,8 +774,8 @@ zabbix_export:
               description: '95 percentile of operation latency distribution in seconds for each verb.'
               tags:
                 -
-                  tag: Application
-                  value: Kubernetes
+                  tag: component
+                  value: operations
             -
               uuid: 68f17a6132dd48deb3825efd2b83b6ce
               name: 'Kubernetes: [{#OP_TYPE}] Operations, p99'
@@ -798,8 +789,8 @@ zabbix_export:
               description: '99 percentile of operation latency distribution in seconds for each verb.'
               tags:
                 -
-                  tag: Application
-                  value: Kubernetes
+                  tag: component
+                  value: operations
             -
               uuid: 736abc78366e44b69234caf56abe8a4a
               name: 'Kubernetes: [{#OP_TYPE}] Runtime operations total, rate'
@@ -826,8 +817,8 @@ zabbix_export:
                 key: kube.kubelet.metrics
               tags:
                 -
-                  tag: Application
-                  value: Kubernetes
+                  tag: component
+                  value: operations
           graph_prototypes:
             -
               uuid: 3a32d1b4253b48078279b24fdf8f3476

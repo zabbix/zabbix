@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-11T19:03:42Z'
+  date: '2022-01-13T09:16:07Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -286,11 +286,8 @@ zabbix_export:
               value: '{$KUBE.API.TOKEN}'
           tags:
             -
-              tag: data
+              tag: component
               value: raw
-            -
-              tag: resource
-              value: node
         -
           uuid: f78df5e88780418b894017086f8d9641
           name: 'Get nodes check'
@@ -315,7 +312,7 @@ zabbix_export:
             key: kube.nodes
           tags:
             -
-              tag: resource
+              tag: component
               value: status
           triggers:
             -
@@ -425,8 +422,8 @@ zabbix_export:
             key: kube.nodes
           tags:
             -
-              tag: resource
-              value: node
+              tag: component
+              value: raw
       discovery_rules:
         -
           uuid: f408d71f02f645f6a7e24047a57860b6
@@ -480,14 +477,11 @@ zabbix_export:
                 key: kube.nodes
               tags:
                 -
-                  tag: node
-                  value: '{#NAME}'
-                -
-                  tag: resource
+                  tag: component
                   value: addresses
                 -
-                  tag: type
-                  value: status
+                  tag: node
+                  value: '{#NAME}'
             -
               uuid: a6bb3067ed44446e9b4831f5be57661b
               name: 'Node [{#NAME}] Addresses: Internal IP'
@@ -512,14 +506,11 @@ zabbix_export:
                 key: kube.nodes
               tags:
                 -
-                  tag: node
-                  value: '{#NAME}'
-                -
-                  tag: resource
+                  tag: component
                   value: addresses
                 -
-                  tag: type
-                  value: status
+                  tag: node
+                  value: '{#NAME}'
             -
               uuid: 57eb59ad6e63466f993cd7064788c75d
               name: 'Node [{#NAME}] Allocatable: CPU'
@@ -541,14 +532,11 @@ zabbix_export:
                 key: kube.nodes
               tags:
                 -
-                  tag: node
-                  value: '{#NAME}'
-                -
-                  tag: resource
+                  tag: component
                   value: allocatable
                 -
-                  tag: type
-                  value: status
+                  tag: node
+                  value: '{#NAME}'
             -
               uuid: 843ecf5ca78148caa49f3b4cca26e4d4
               name: 'Node [{#NAME}] Allocatable: Memory'
@@ -570,14 +558,11 @@ zabbix_export:
                 key: kube.nodes
               tags:
                 -
-                  tag: node
-                  value: '{#NAME}'
-                -
-                  tag: resource
+                  tag: component
                   value: allocatable
                 -
-                  tag: type
-                  value: status
+                  tag: node
+                  value: '{#NAME}'
             -
               uuid: be853c34395643af828e349105e2feba
               name: 'Node [{#NAME}] Allocatable: Pods'
@@ -595,14 +580,11 @@ zabbix_export:
                 key: kube.nodes
               tags:
                 -
-                  tag: node
-                  value: '{#NAME}'
-                -
-                  tag: resource
+                  tag: component
                   value: allocatable
                 -
-                  tag: type
-                  value: status
+                  tag: node
+                  value: '{#NAME}'
             -
               uuid: 96c25644261446afb70ce874ff1c7b7d
               name: 'Node [{#NAME}] Capacity: CPU'
@@ -624,14 +606,11 @@ zabbix_export:
                 key: kube.nodes
               tags:
                 -
-                  tag: node
-                  value: '{#NAME}'
-                -
-                  tag: resource
+                  tag: component
                   value: capacity
                 -
-                  tag: type
-                  value: status
+                  tag: node
+                  value: '{#NAME}'
             -
               uuid: e890e682c3454d20b7cd3becc950279f
               name: 'Node [{#NAME}] Capacity: Memory'
@@ -653,14 +632,11 @@ zabbix_export:
                 key: kube.nodes
               tags:
                 -
-                  tag: node
-                  value: '{#NAME}'
-                -
-                  tag: resource
+                  tag: component
                   value: capacity
                 -
-                  tag: type
-                  value: status
+                  tag: node
+                  value: '{#NAME}'
             -
               uuid: f45997b967964ed29c29b64b94544a48
               name: 'Node [{#NAME}] Capacity: Pods'
@@ -678,14 +654,11 @@ zabbix_export:
                 key: kube.nodes
               tags:
                 -
-                  tag: node
-                  value: '{#NAME}'
-                -
-                  tag: resource
+                  tag: component
                   value: capacity
                 -
-                  tag: type
-                  value: status
+                  tag: node
+                  value: '{#NAME}'
             -
               uuid: ad5f8baa9ff44ca0ba17fc83e197420e
               name: 'Node [{#NAME}] Conditions: Disk pressure'
@@ -710,14 +683,11 @@ zabbix_export:
                 key: kube.nodes
               tags:
                 -
-                  tag: node
-                  value: '{#NAME}'
-                -
-                  tag: resource
+                  tag: component
                   value: conditions
                 -
-                  tag: type
-                  value: status
+                  tag: node
+                  value: '{#NAME}'
               trigger_prototypes:
                 -
                   uuid: 4e283f3f104a4239a0b1c24f0313ab95
@@ -749,14 +719,11 @@ zabbix_export:
                 key: kube.nodes
               tags:
                 -
-                  tag: node
-                  value: '{#NAME}'
-                -
-                  tag: resource
+                  tag: component
                   value: conditions
                 -
-                  tag: type
-                  value: status
+                  tag: node
+                  value: '{#NAME}'
               trigger_prototypes:
                 -
                   uuid: f580b6534bf54281912515874ca46cdf
@@ -788,14 +755,11 @@ zabbix_export:
                 key: kube.nodes
               tags:
                 -
-                  tag: node
-                  value: '{#NAME}'
-                -
-                  tag: resource
+                  tag: component
                   value: conditions
                 -
-                  tag: type
-                  value: status
+                  tag: node
+                  value: '{#NAME}'
               trigger_prototypes:
                 -
                   uuid: 0da0db08077a42668efcc886c155bf4e
@@ -827,14 +791,11 @@ zabbix_export:
                 key: kube.nodes
               tags:
                 -
-                  tag: node
-                  value: '{#NAME}'
-                -
-                  tag: resource
+                  tag: component
                   value: conditions
                 -
-                  tag: type
-                  value: status
+                  tag: node
+                  value: '{#NAME}'
               trigger_prototypes:
                 -
                   uuid: 5f6a7fce910e4cf79e9fc778519ad00f
@@ -866,14 +827,11 @@ zabbix_export:
                 key: kube.nodes
               tags:
                 -
-                  tag: node
-                  value: '{#NAME}'
-                -
-                  tag: resource
+                  tag: component
                   value: conditions
                 -
-                  tag: type
-                  value: status
+                  tag: node
+                  value: '{#NAME}'
               trigger_prototypes:
                 -
                   uuid: 02f873ab69fb4df49578cf5e1cbad1b8
@@ -906,14 +864,11 @@ zabbix_export:
                 key: kube.nodes
               tags:
                 -
-                  tag: node
-                  value: '{#NAME}'
-                -
-                  tag: resource
+                  tag: component
                   value: info
                 -
-                  tag: type
-                  value: status
+                  tag: node
+                  value: '{#NAME}'
             -
               uuid: 405fe8cae9be4ea8888f378dadda8946
               name: 'Node [{#NAME}] Info: Container runtime'
@@ -940,14 +895,11 @@ zabbix_export:
                 key: kube.nodes
               tags:
                 -
-                  tag: node
-                  value: '{#NAME}'
-                -
-                  tag: resource
+                  tag: component
                   value: info
                 -
-                  tag: type
-                  value: status
+                  tag: node
+                  value: '{#NAME}'
             -
               uuid: a14e705e142f4c34bfc9175686b18754
               name: 'Node [{#NAME}] Info: Kernel version'
@@ -971,14 +923,11 @@ zabbix_export:
                 key: kube.nodes
               tags:
                 -
-                  tag: node
-                  value: '{#NAME}'
-                -
-                  tag: resource
+                  tag: component
                   value: info
                 -
-                  tag: type
-                  value: status
+                  tag: node
+                  value: '{#NAME}'
             -
               uuid: f1a1ea522dfd49d09a69b9b014845f7a
               name: 'Node [{#NAME}] Info: Kubelet version'
@@ -1002,14 +951,11 @@ zabbix_export:
                 key: kube.nodes
               tags:
                 -
-                  tag: node
-                  value: '{#NAME}'
-                -
-                  tag: resource
+                  tag: component
                   value: info
                 -
-                  tag: type
-                  value: status
+                  tag: node
+                  value: '{#NAME}'
             -
               uuid: d39865e0754b4280926b89f19dddb740
               name: 'Node [{#NAME}] Info: KubeProxy version'
@@ -1033,14 +979,11 @@ zabbix_export:
                 key: kube.nodes
               tags:
                 -
-                  tag: node
-                  value: '{#NAME}'
-                -
-                  tag: resource
+                  tag: component
                   value: info
                 -
-                  tag: type
-                  value: status
+                  tag: node
+                  value: '{#NAME}'
             -
               uuid: fe06e13c3aec4efc8f7c9539b6600097
               name: 'Node [{#NAME}] Info: Operating system'
@@ -1064,14 +1007,11 @@ zabbix_export:
                 key: kube.nodes
               tags:
                 -
-                  tag: node
-                  value: '{#NAME}'
-                -
-                  tag: resource
+                  tag: component
                   value: info
                 -
-                  tag: type
-                  value: status
+                  tag: node
+                  value: '{#NAME}'
             -
               uuid: 1b25ffe6190c408996b87622b7b87329
               name: 'Node [{#NAME}] Info: OS image'
@@ -1095,14 +1035,11 @@ zabbix_export:
                 key: kube.nodes
               tags:
                 -
-                  tag: node
-                  value: '{#NAME}'
-                -
-                  tag: resource
+                  tag: component
                   value: info
                 -
-                  tag: type
-                  value: status
+                  tag: node
+                  value: '{#NAME}'
             -
               uuid: bcd18bdb8cd1466fa81bbe2e75ba996c
               name: 'Node [{#NAME}] Info: Roles'
@@ -1126,14 +1063,11 @@ zabbix_export:
                 key: kube.nodes
               tags:
                 -
-                  tag: node
-                  value: '{#NAME}'
-                -
-                  tag: resource
+                  tag: component
                   value: info
                 -
-                  tag: type
-                  value: status
+                  tag: node
+                  value: '{#NAME}'
             -
               uuid: 1fb0ebd40fcb4e6c8a22bb646191adb2
               name: 'Node [{#NAME}] Limits: CPU'
@@ -1155,14 +1089,11 @@ zabbix_export:
                 key: kube.nodes
               tags:
                 -
+                  tag: component
+                  value: limits
+                -
                   tag: node
                   value: '{#NAME}'
-                -
-                  tag: resource
-                  value: allocatable
-                -
-                  tag: type
-                  value: status
             -
               uuid: e3ad703e83724cc7a5b918d9efae6e62
               name: 'Node [{#NAME}] Limits: Memory'
@@ -1184,14 +1115,11 @@ zabbix_export:
                 key: kube.nodes
               tags:
                 -
+                  tag: component
+                  value: limits
+                -
                   tag: node
                   value: '{#NAME}'
-                -
-                  tag: resource
-                  value: allocatable
-                -
-                  tag: type
-                  value: status
             -
               uuid: 8ea2954c99cc4e22a82c5a333146d936
               name: 'Node [{#NAME}] Requests: CPU'
@@ -1213,14 +1141,11 @@ zabbix_export:
                 key: kube.nodes
               tags:
                 -
+                  tag: component
+                  value: requests
+                -
                   tag: node
                   value: '{#NAME}'
-                -
-                  tag: resource
-                  value: allocatable
-                -
-                  tag: type
-                  value: status
             -
               uuid: 32f2f1d3ad084c6c9bbb96ad2fe9d98d
               name: 'Node [{#NAME}] Requests: Memory'
@@ -1242,14 +1167,11 @@ zabbix_export:
                 key: kube.nodes
               tags:
                 -
+                  tag: component
+                  value: requests
+                -
                   tag: node
                   value: '{#NAME}'
-                -
-                  tag: resource
-                  value: allocatable
-                -
-                  tag: type
-                  value: status
             -
               uuid: 0e30ed9718a54eb1ac643ac643471ca2
               name: 'Node [{#NAME}] Uptime'
@@ -1273,14 +1195,11 @@ zabbix_export:
                 key: kube.nodes
               tags:
                 -
-                  tag: node
-                  value: '{#NAME}'
-                -
-                  tag: resource
+                  tag: component
                   value: uptime
                 -
-                  tag: type
-                  value: counter
+                  tag: node
+                  value: '{#NAME}'
               trigger_prototypes:
                 -
                   uuid: b322a8c9a4404da49c434e78822d6ac5
@@ -1305,14 +1224,11 @@ zabbix_export:
                 key: kube.nodes
               tags:
                 -
-                  tag: node
-                  value: '{#NAME}'
-                -
-                  tag: resource
+                  tag: component
                   value: used
                 -
-                  tag: type
-                  value: gauge
+                  tag: node
+                  value: '{#NAME}'
           trigger_prototypes:
             -
               uuid: f64efc13be2c4c53a48de40504cf064d
@@ -1537,6 +1453,9 @@ zabbix_export:
                 key: kube.nodes
               tags:
                 -
+                  tag: component
+                  value: conditions
+                -
                   tag: namespace
                   value: '{#NAMESPACE}'
                 -
@@ -1545,12 +1464,6 @@ zabbix_export:
                 -
                   tag: pod
                   value: '{#POD}'
-                -
-                  tag: resource
-                  value: conditions
-                -
-                  tag: type
-                  value: status
             -
               uuid: 647ca68c325742d083e37c05e2826205
               name: 'Node [{#NODE}] Pod [{#POD}] Conditions: Initialized'
@@ -1578,6 +1491,9 @@ zabbix_export:
                 key: kube.nodes
               tags:
                 -
+                  tag: component
+                  value: conditions
+                -
                   tag: namespace
                   value: '{#NAMESPACE}'
                 -
@@ -1586,12 +1502,6 @@ zabbix_export:
                 -
                   tag: pod
                   value: '{#POD}'
-                -
-                  tag: resource
-                  value: conditions
-                -
-                  tag: type
-                  value: status
             -
               uuid: b73a5c5d3b614815be157eb53c6afb1f
               name: 'Node [{#NODE}] Pod [{#POD}] Conditions: Ready'
@@ -1619,6 +1529,9 @@ zabbix_export:
                 key: kube.nodes
               tags:
                 -
+                  tag: component
+                  value: conditions
+                -
                   tag: namespace
                   value: '{#NAMESPACE}'
                 -
@@ -1627,12 +1540,6 @@ zabbix_export:
                 -
                   tag: pod
                   value: '{#POD}'
-                -
-                  tag: resource
-                  value: conditions
-                -
-                  tag: type
-                  value: status
             -
               uuid: 5956cd1780604f0793efd7bbce2559b6
               name: 'Node [{#NODE}] Pod [{#POD}] Conditions: Scheduled'
@@ -1660,6 +1567,9 @@ zabbix_export:
                 key: kube.nodes
               tags:
                 -
+                  tag: component
+                  value: conditions
+                -
                   tag: namespace
                   value: '{#NAMESPACE}'
                 -
@@ -1668,12 +1578,6 @@ zabbix_export:
                 -
                   tag: pod
                   value: '{#POD}'
-                -
-                  tag: resource
-                  value: conditions
-                -
-                  tag: type
-                  value: status
             -
               uuid: 5fd018faebb84462bf8111861795b04e
               name: 'Node [{#NODE}] Pod [{#POD}] Containers: Restarts'
@@ -1692,6 +1596,9 @@ zabbix_export:
                 key: kube.nodes
               tags:
                 -
+                  tag: component
+                  value: container
+                -
                   tag: namespace
                   value: '{#NAMESPACE}'
                 -
@@ -1700,12 +1607,6 @@ zabbix_export:
                 -
                   tag: pod
                   value: '{#POD}'
-                -
-                  tag: resource
-                  value: container
-                -
-                  tag: type
-                  value: counter
               trigger_prototypes:
                 -
                   uuid: 8f1808cd67614cda959ec70e92a59235
@@ -1740,6 +1641,9 @@ zabbix_export:
                 key: kube.nodes
               tags:
                 -
+                  tag: component
+                  value: pod
+                -
                   tag: namespace
                   value: '{#NAMESPACE}'
                 -
@@ -1748,12 +1652,6 @@ zabbix_export:
                 -
                   tag: pod
                   value: '{#POD}'
-                -
-                  tag: resource
-                  value: pod
-                -
-                  tag: type
-                  value: status
               trigger_prototypes:
                 -
                   uuid: e565d243bef84007b09addb22ea3d759
@@ -1784,6 +1682,9 @@ zabbix_export:
                 key: kube.nodes
               tags:
                 -
+                  tag: component
+                  value: uptime
+                -
                   tag: namespace
                   value: '{#NAMESPACE}'
                 -
@@ -1792,12 +1693,6 @@ zabbix_export:
                 -
                   tag: pod
                   value: '{#POD}'
-                -
-                  tag: resource
-                  value: uptime
-                -
-                  tag: type
-                  value: counter
           master_item:
             key: kube.nodes
           preprocessing:
