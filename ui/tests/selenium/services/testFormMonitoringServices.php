@@ -33,7 +33,7 @@ class testFormMonitoringServices extends CWebTest {
 
 	const UPDATE = true;
 
-	const CHILDREN_COUNT = 13;
+	const CHILDREN_COUNT = 16;
 
 	private static $service_sql = 'SELECT * FROM services ORDER BY serviceid';
 	private static $update_service = 'Update service';
@@ -57,29 +57,21 @@ class testFormMonitoringServices extends CWebTest {
 			[
 				'name' => 'Update service',
 				'algorithm' => 1,
-				'showsla' => 0,
-				'goodsla' => 99.99,
 				'sortorder' => 0
 			],
 			[
 				'name' => 'Parent1',
 				'algorithm' => 1,
-				'showsla' => 1,
-				'goodsla' => 99.99,
 				'sortorder' => 0
 			],
 			[
 				'name' => 'Parent2',
 				'algorithm' => 1,
-				'showsla' => 1,
-				'goodsla' => 50,
 				'sortorder' => 0
 			],
 			[
 				'name' => 'Parent3 with problem tags',
 				'algorithm' => 1,
-				'showsla' => 1,
-				'goodsla' => 49.5,
 				'sortorder' => 0,
 				'problem_tags' => [
 					[
@@ -95,29 +87,21 @@ class testFormMonitoringServices extends CWebTest {
 			[
 				'name' => 'Parent4',
 				'algorithm' => 1,
-				'showsla' => 1,
-				'goodsla' => 99.99,
 				'sortorder' => 0
 			],
 			[
 				'name' => 'Parent5',
 				'algorithm' => 1,
-				'showsla' => 0,
-				'goodsla' => 99.99,
 				'sortorder' => 0
 			],
 			[
 				'name' => 'Child1',
 				'algorithm' => 1,
-				'showsla' => 1,
-				'goodsla' => 20,
 				'sortorder' => 0
 			],
 			[
 				'name' => 'Child2 with tags',
 				'algorithm' => 1,
-				'showsla' => 1,
-				'goodsla' => 20,
 				'sortorder' => 0,
 				'problem_tags' => [
 					[
@@ -133,29 +117,21 @@ class testFormMonitoringServices extends CWebTest {
 			[
 				'name' => 'Child3',
 				'algorithm' => 1,
-				'showsla' => 1,
-				'goodsla' => 20,
 				'sortorder' => 0
 			],
 			[
 				'name' => 'Child4',
 				'algorithm' => 1,
-				'showsla' => 1,
-				'goodsla' => 20,
 				'sortorder' => 0
 			],
 			[
 				'name' => 'Clone_parent',
 				'algorithm' => 1,
-				'showsla' => 1,
-				'goodsla' => 20,
 				'sortorder' => 0
 			],
 			[
 				'name' => 'Clone1',
 				'algorithm' => 0,
-				'showsla' => 0,
-				'goodsla' => 99.9,
 				'weight' => 56,
 				'propagation_rule' => 1,
 				'propagation_value' => 3,
@@ -176,8 +152,6 @@ class testFormMonitoringServices extends CWebTest {
 			[
 				'name' => 'Clone2',
 				'algorithm' => 1,
-				'showsla' => 1,
-				'goodsla' => 20,
 				'sortorder' => 0
 			]
 		]);
@@ -237,7 +211,7 @@ class testFormMonitoringServices extends CWebTest {
 		$form = $dialog->query('id:service-form')->asForm()->one();
 
 		// Check tabs available in the form.
-		$form->checkTabs(['Service', 'SLA', 'Tags', 'Child services']);
+		$form->checkTabs(['Service', 'Tags', 'Child services']);
 
 		$service_tabs_labels = [
 			'Name',
@@ -245,6 +219,7 @@ class testFormMonitoringServices extends CWebTest {
 			'Problem tags',
 			'Sort order (0->999)',
 			'Status calculation rule',
+			'Description',
 			'Advanced configuration'
 		];
 
@@ -304,31 +279,6 @@ class testFormMonitoringServices extends CWebTest {
 		// Check advanced configuration default value.
 		$this->assertFalse($form->query('id:advanced_configuration')->asCheckbox()->one()->isChecked());
 
-		// Check layout at SLA tab.
-		$form->selectTab('SLA');
-
-		// Check SLA tab labels.
-		$sla_tab_labels = ['SLA', 'Service times'];
-		foreach ($sla_tab_labels as $label) {
-			$this->assertTrue($form->query("xpath:.//label[text()=".CXPathHelper::escapeQuotes($label)."]")
-					->one()->isValid());
-		}
-
-		// Check SLA checkbox.
-		$sla_checkbox = $form->getField('SLA')->asCheckbox();
-		$this->assertTrue($sla_checkbox->isEnabled());
-		$this->assertFalse($sla_checkbox->isChecked());
-
-		// Check SLA value field.
-		$sla_input_field = $form->query('id:sla-tab')->one()->query('id:goodsla')->one();
-		$this->assertFalse($sla_input_field->isEnabled());
-		$this->assertEquals(99.9, $sla_input_field->getValue());
-
-		// Check Service times table labels.
-		$this->assertSame(['Type', 'Interval', 'Note', 'Action'],
-				$form->query('id:sla-tab')->one()->query('id:times')->asTable()->one()->getHeadersText()
-		);
-
 		// Check layout at Tags tab.
 		$form->selectTab('Tags');
 		$tags_tab = $form->query('id:tags-tab')->one();
@@ -360,7 +310,7 @@ class testFormMonitoringServices extends CWebTest {
 		$this->assertTrue($service_tab->query('xpath:.//label[text()="Child services"]')->one()->isValid());
 
 		// Check Child services table header labels.
-		$this->assertSame(['Service', 'Status calculation rule', 'Problem tags', 'Action'],
+		$this->assertSame(['Service', 'Problem tags', 'Action'],
 				$service_tab->query('id:children')->asTable()->one()->getHeadersText()
 		);
 
@@ -387,7 +337,6 @@ class testFormMonitoringServices extends CWebTest {
 		$result = [
 			[
 				'Name' => 'Parent1',
-				'Status calculation rule' => 'Most critical if all children have problems',
 				'Problem tags' => ''
 			]
 		];
@@ -397,8 +346,8 @@ class testFormMonitoringServices extends CWebTest {
 		$children_dialog->query('button:Reset')->one()->waitUntilClickable()->click();
 		$children_dialog->invalidate();
 
-		$this->assertEquals(self::CHILDREN_COUNT, count($children_dialog->query('class:list-table')->asTable()->waitUntilReady()->one()
-				->getRows()->asArray())
+		$this->assertEquals(self::CHILDREN_COUNT, count($children_dialog->query('class:list-table')->asTable()
+				->waitUntilReady()->one()->getRows()->asArray())
 		);
 
 		foreach (['Add', 'Cancel'] as $button) {
@@ -450,163 +399,33 @@ class testFormMonitoringServices extends CWebTest {
 			],
 			[
 				[
-					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Negative SLA'
-					],
-					'sla' => [
-						'SLA' => [
-							'checked' => true,
-							'value' => '-1'
-						]
-					],
-					'error' => 'Invalid parameter "/1/goodsla": value must be within the range of 0-100.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Letters in SLA'
-					],
-					'sla' => [
-						'SLA' => [
-							'checked' => true,
-							'value' => 'aaa'
-						]
-					],
-					'error' => 'Invalid parameter "/1/goodsla": a floating point value is expected.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Symbols in SLA'
-					],
-					'sla' => [
-						'SLA' => [
-							'checked' => true,
-							'value' => '!@#$%^'
-						]
-					],
-					'error' => 'Invalid parameter "/1/goodsla": a floating point value is expected.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Symbols in time'
-					],
-					'sla' => [
-						'Service times' => [
-							'Period type' => 'Downtime',
-							'id:service-time-from-week' => 'Monday',
-							'id:service-time-from-hour' => 'te',
-							'id:service-time-from-minute' => 'st',
-							'id:service-time-till-week' => 'Saturday',
-							'id:service-time-till-hour' => 'ab',
-							'id:service-time-till-minute' => 'cd'
-						]
-					],
-					// Please pay attention, that we also can assert two or more errors in one array.
-					'error' => [
-						'Incorrect service start time.',
-						'Incorrect service end time.'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Empty time'
-					],
-					'sla' => [
-						'Service times' => [
-							'Period type' => 'Downtime',
-							'id:service-time-from-week' => 'Tuesday',
-							'id:service-time-from-hour' => '',
-							'id:service-time-from-minute' => '',
-							'id:service-time-till-week' => 'Thursday',
-							'id:service-time-till-hour' => '',
-							'id:service-time-till-minute' => ''
-						]
-					],
-					'error' => [
-						'Incorrect service start time.',
-						'Incorrect service end time.'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Wrong end time'
-					],
-					'sla' => [
-						'Service times' => [
-							'Period type' => 'Downtime',
-							'id:service-time-from-week' => 'Wednesday',
-							'id:service-time-from-hour' => '01',
-							'id:service-time-from-minute' => '30',
-							'id:service-time-till-week' => 'Friday',
-							'id:service-time-till-hour' => '',
-							'id:service-time-till-minute' => ''
-						]
-					],
-					'error' => 'Incorrect service end time.'
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'Min sort order and SLA',
+						'Name' => 'Min sort order',
 						'Sort order (0->999)' => '0'
-					],
-					'sla' => [
-						'SLA' => [
-							'checked' => true,
-							'value' => '0'
-						]
 					]
 				]
 			],
 			[
 				[
 					'fields' => [
-						'Name' => 'Max sort order, SLA, weight, etc',
+						'Name' => 'Max sort order, weight, etc',
 						'Sort order (0->999)' => '999',
 						'id:advanced_configuration' => true,
 						'Status propagation rule' => 'Increase by',
 						'id:propagation_value_number' => '5',
 						'Weight' => '1000000'
-					],
-					'sla' => [
-						'SLA' => [
-							'checked' => true,
-							'value' => '100'
-						]
 					]
 				]
 			],
 			[
 				[
 					'fields' => [
-						'Name' => 'Intermediate values in sort order and SLA',
+						'Name' => 'Intermediate values in sort order',
 						'Sort order (0->999)' => '10',
 						'id:advanced_configuration' => true,
 						'Status propagation rule' => 'Fixed status',
 						'id:propagation_value_status' => 'OK',
 						'Weight' => '5'
-					],
-					'sla' => [
-						'SLA' => [
-							'checked' => true,
-							'value' => '95.99'
-						]
 					]
 				]
 			],
@@ -621,44 +440,6 @@ class testFormMonitoringServices extends CWebTest {
 					]
 				]
 			],
-//			 TODO: uncomment this when SLA task is ready.
-//			[
-//				[
-//					'expected' => TEST_GOOD,
-//					'fields' => [
-//						'Name' => 'With SLA service intervals'
-//					],
-//					'sla' => [
-//						'Service times' => [
-//							'Period type' => 'Downtime',
-//							'id:service-time-from-week' => 'Wednesday',
-//							'id:service-time-from-hour' => '01',
-//							'id:service-time-from-minute' => '30',
-//							'id:service-time-till-week' => 'Friday',
-//							'id:service-time-till-hour' => '17',
-//							'id:service-time-till-minute' => '56'
-//						]
-//					]
-//				]
-//			],
-			[
-				[
-					'fields' => [
-						'Name' => 'With SLA service intervals 2'
-					],
-					'sla' => [
-						'Service times' => [
-							'Period type' => 'Downtime',
-							'id:service-time-from-week' => 'Monday',
-							'id:service-time-from-hour' => '01',
-							'id:service-time-from-minute' => '02',
-							'id:service-time-till-week' => 'Tuesday',
-							'id:service-time-till-hour' => '03',
-							'id:service-time-till-minute' => '04'
-						]
-					]
-				]
-			],
 			[
 				[
 					'fields' => [
@@ -667,7 +448,6 @@ class testFormMonitoringServices extends CWebTest {
 					'children' => [
 						'Child services' => [
 							'Service' => 'Child4',
-							'Status calculation rule' => 'Most critical if all children have problems',
 							'Problem tags' => '',
 							'Action' => 'Remove'
 						]
@@ -740,54 +520,7 @@ class testFormMonitoringServices extends CWebTest {
 		$form = $this->query('id:service-form')->asForm()->one()->waitUntilReady();
 		$form->fill($data['fields']);
 
-		if (array_key_exists('sla', $data)) {
-			$form->selectTab('SLA');
-
-			if (array_key_exists('SLA', $data['sla'])) {
-				$sla = $form->getFieldContainer('SLA');
-				$sla->query('id:showsla')->asCheckbox()->one()->set(CTestArrayHelper::get($data['sla'], 'SLA.checked'));
-				$sla->query('id:goodsla')->one()->overwrite(CTestArrayHelper::get($data['sla'], 'SLA.value'));
-			}
-
-			if (array_key_exists('Service times', $data['sla'])) {
-				$service = $form->getFieldContainer('Service times');
-				$service->query('button:Add')->waitUntilClickable()->one()->click();
-
-				$service_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-				$service_form = $service_dialog->query('id:service-time-form')->waitUntilReady()->one()->asForm();
-
-				// Check default values in popup.
-				$this->assertEquals('Uptime', $service_form->query('id:service-time-type-focusable')->one()->getText());
-				$this->assertEquals('Sunday', $service_form->query('id:service-time-from-week-focusable')->one()->getText());
-				$this->assertEquals('Sunday', $service_form->query('id:service-time-till-week-focusable')->one()->getText());
-
-				$service_form_defaults = [
-						'id:service-time-from-hour' => [255, 'hh'],
-						'id:service-time-from-minute' => [255, 'mm'],
-						'id:service-time-till-hour' => [255, 'hh'],
-						'id:service-time-till-minute' => [255, 'mm']
-				];
-
-				// Check input fields maxlength.
-				foreach ($service_form_defaults as $field => $max_length) {
-					$this->assertEquals($max_length[0], $service_form->query($field)->one()->getAttribute('maxlength'));
-				}
-
-				// Check input fields placeholders.
-				foreach ($service_form_defaults as $field => $placeholder) {
-					$this->assertEquals($placeholder[1], $service_form->query($field)->one()->getAttribute('placeholder'));
-				}
-
-				$service_form->fill($data['sla']['Service times']);
-				$service_form->submit();
-
-				if ($expected === TEST_BAD) {
-					$this->assertMessage(TEST_BAD, null, $data['error']);
-					return;
-				}
-			}
-		}
-		elseif (array_key_exists('children', $data)) {
+		if (array_key_exists('children', $data)) {
 			$form->selectTab('Child services');
 
 			$service = $form->getFieldContainer('Child services');
@@ -852,33 +585,6 @@ class testFormMonitoringServices extends CWebTest {
 			}
 			$form->invalidate();
 			$form->checkValue($data['fields']);
-
-			// Check that fields in frontend are the same as in data provider.
-			if (array_key_exists('sla', $data)) {
-				$form->selectTab('SLA');
-				if (array_key_exists('SLA', $data['sla'])) {
-					$form->query('id:showsla')->asCheckbox()->one()->isChecked($data['sla']['SLA']['checked']);
-					$form->query('id:goodsla')->one()->checkValue($data['sla']['SLA']['value']);
-				}
-
-				if (array_key_exists('Service times', $data['sla'])) {
-					$interval = $data['sla']['Service times']['id:service-time-from-week'].' '.
-							$data['sla']['Service times']['id:service-time-from-hour'].':'.
-							$data['sla']['Service times']['id:service-time-from-minute'].' - '.
-							$data['sla']['Service times']['id:service-time-till-week'].' '.
-							$data['sla']['Service times']['id:service-time-till-hour'].':'.
-							$data['sla']['Service times']['id:service-time-till-minute'];
-
-					$this->assertTableData([
-							[
-								'Type' => $data['sla']['Service times']['Period type'],
-								'Interval' => $interval,
-								'Note' => ''
-							]
-						], 'id:times'
-					);
-				}
-			}
 		}
 	}
 
@@ -892,13 +598,11 @@ class testFormMonitoringServices extends CWebTest {
 						'Child services' => [
 							[
 								'Service' => 'Clone1',
-								'Status calculation rule' => 'Set status to OK',
 								'Problem tags' => 'problem_tag_clone: problem_value_clone',
 								'Action' => 'Remove'
 							],
 							[
 								'Service' => 'Clone2',
-								'Status calculation rule' => 'Most critical if all children have problems',
 								'Problem tags' => '',
 								'Action' => 'Remove'
 							]
