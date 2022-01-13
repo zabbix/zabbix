@@ -149,7 +149,7 @@ static duk_ret_t	es_zabbix_sleep(duk_context *ctx)
 
 	duk_get_memory_functions(ctx, &out_funcs);
 	env = (zbx_es_env_t *)out_funcs.udata;
-	timeout = (unsigned int)env->timeout * 1000;
+	timeout = env->timeout <= 0 ? 0 : (zbx_uint64_t)env->timeout * 1000;
 
 	if (sleep_ms > timeout)
 	{
