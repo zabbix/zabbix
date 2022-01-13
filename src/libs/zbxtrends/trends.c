@@ -270,6 +270,12 @@ int	zbx_trends_parse_range(time_t from, const char *param, int *start, int *end,
 		return FAIL;
 	}
 
+	if (0 == period_num)
+	{
+		*error = zbx_strdup(*error, "period cannot be zero");
+		return FAIL;
+	}
+
 	if (period_hours[period_unit] * period_num > 24 * 366)
 	{
 		*error = zbx_strdup(*error, "period is too large");
