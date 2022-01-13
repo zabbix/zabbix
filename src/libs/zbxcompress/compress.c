@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,8 +29,6 @@
 static int	zbx_zlib_errno = 0;
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_compress_strerror                                            *
  *                                                                            *
  * Purpose: returns last conversion error message                             *
  *                                                                            *
@@ -62,8 +60,6 @@ const char	*zbx_compress_strerror(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_compress                                                     *
  *                                                                            *
  * Purpose: compress data                                                     *
  *                                                                            *
@@ -100,8 +96,6 @@ int	zbx_compress(const char *in, size_t size_in, char **out, size_t *size_out)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_uncompress                                                   *
  *                                                                            *
  * Purpose: uncompress data                                                   *
  *                                                                            *

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,8 +60,6 @@ static int	vmware_set_powerstate_result(AGENT_RESULT *result)
 
 /******************************************************************************
  *                                                                            *
- * Function: hv_get                                                           *
- *                                                                            *
  * Purpose: return pointer to Hypervisor data from hashset with uuid          *
  *                                                                            *
  * Parameters: hvs  - [IN] the hashset with all Hypervisors                   *
@@ -85,8 +83,6 @@ static zbx_vmware_hv_t	*hv_get(zbx_hashset_t *hvs, const char *uuid)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ds_get                                                           *
  *                                                                            *
  * Purpose: return pointer to Datastore data from vector with id              *
  *                                                                            *
@@ -192,8 +188,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_service_get_counter_value_by_id                           *
  *                                                                            *
  * Purpose: gets vmware performance counter value by its identifier           *
  *                                                                            *
@@ -334,8 +328,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_service_get_counter_value_by_path                         *
- *                                                                            *
  * Purpose: gets vmware performance counter value by the path                 *
  *                                                                            *
  * Parameters: service  - [IN] the vmware service                             *
@@ -400,8 +392,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: get_vmware_service                                               *
- *                                                                            *
  * Purpose: gets vmware service object                                        *
  *                                                                            *
  * Parameters: url       - [IN] the vmware service URL                        *
@@ -459,8 +449,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: get_vcenter_vmprop                                               *
  *                                                                            *
  * Purpose: retrieves data from virtual machine details                       *
  *                                                                            *
@@ -527,8 +515,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: get_vcenter_hvprop                                               *
  *                                                                            *
  * Purpose: retrieves hypervisor property                                     *
  *                                                                            *

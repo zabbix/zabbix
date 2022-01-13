@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,8 +33,6 @@
 		(ZBX_FLAGS_TRIGGER_CREATE_TRIGGER_EVENT | ZBX_FLAGS_TRIGGER_CREATE_INTERNAL_EVENT)
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_process_trigger                                              *
  *                                                                            *
  * Purpose: 1) calculate changeset of trigger fields to be updated            *
  *          2) generate events                                                *
@@ -145,8 +143,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_save_trigger_changes                                      *
- *                                                                            *
  * Purpose: save the trigger changes to database                              *
  *                                                                            *
  * Parameters: trigger_diff - [IN] the trigger changeset                      *
@@ -218,8 +214,6 @@ void	zbx_db_save_trigger_changes(const zbx_vector_ptr_t *trigger_diff)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_trigger_diff_free                                            *
- *                                                                            *
  * Purpose: frees trigger changeset                                           *
  *                                                                            *
  ******************************************************************************/
@@ -245,8 +239,6 @@ static int	zbx_trigger_topoindex_compare(const void *d1, const void *d2)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_process_triggers                                             *
  *                                                                            *
  * Purpose: process triggers - calculates property changeset and generates    *
  *          events                                                            *
@@ -279,8 +271,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_append_trigger_diff                                          *
  *                                                                            *
  * Purpose: Adds a new trigger diff to trigger changeset vector               *
  *                                                                            *
@@ -326,8 +316,6 @@ typedef enum
 zbx_trigger_cache_state_t;
 
 /******************************************************************************
- *                                                                            *
- * Function: db_trigger_get_cache                                             *
  *                                                                            *
  * Purpose: get trigger cache with the requested data cached                  *
  *                                                                            *
@@ -403,8 +391,6 @@ static zbx_trigger_cache_t	*db_trigger_get_cache(const DB_TRIGGER *trigger, zbx_
 
 /******************************************************************************
  *                                                                            *
- * Function: trigger_cache_free                                               *
- *                                                                            *
  * Purpose: free trigger cache                                                *
  *                                                                            *
  * Parameters: cache - [IN] the trigger cache                                 *
@@ -425,8 +411,6 @@ static void	trigger_cache_free(zbx_trigger_cache_t *cache)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_db_trigger_get_all_functionids                               *
  *                                                                            *
  * Purpose: get functionids from trigger expression and recovery expression   *
  *                                                                            *
@@ -452,8 +436,6 @@ void	zbx_db_trigger_get_all_functionids(const DB_TRIGGER *trigger, zbx_vector_ui
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_trigger_get_functionids                                   *
- *                                                                            *
  * Purpose: get functionids from trigger expression                           *
  *                                                                            *
  * Parameters: trigger     - [IN] the trigger                                 *
@@ -473,8 +455,6 @@ void	zbx_db_trigger_get_functionids(const DB_TRIGGER *trigger, zbx_vector_uint64
 	zbx_vector_uint64_uniq(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 /******************************************************************************
- *                                                                            *
- * Function: zbx_db_trigger_get_constant                                      *
  *                                                                            *
  * Purpose: get trigger expression constant at the specified location         *
  *                                                                            *
@@ -502,8 +482,6 @@ int	zbx_db_trigger_get_constant(const DB_TRIGGER *trigger, int index, char **out
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_db_trigger_get_itemid                                        *
  *                                                                            *
  * Purpose: get the Nth function item from trigger expression                 *
  *                                                                            *
@@ -566,8 +544,6 @@ int	zbx_db_trigger_get_itemid(const DB_TRIGGER *trigger, int index, zbx_uint64_t
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_db_trigger_get_itemids                                       *
  *                                                                            *
  * Purpose: get unique itemids of trigger functions in the order at they are  *
  *          written in expression                                             *
@@ -636,8 +612,6 @@ void	zbx_db_trigger_get_itemids(const DB_TRIGGER *trigger, zbx_vector_uint64_t *
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_trigger_get_all_hostids                                   *
- *                                                                            *
  * Purpose: get hostids from trigger expression and recovery expression       *
  *                                                                            *
  * Parameters: trigger - [IN] the trigger                                     *
@@ -662,8 +636,6 @@ int	zbx_db_trigger_get_all_hostids(const DB_TRIGGER *trigger, const zbx_vector_u
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_trigger_clean                                             *
- *                                                                            *
  * Purpose: frees resources allocated to store trigger data                   *
  *                                                                            *
  * Parameters: trigger -                                                      *
@@ -684,8 +656,6 @@ void	zbx_db_trigger_clean(DB_TRIGGER *trigger)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: db_trigger_get_expression                                        *
  *                                                                            *
  * Purpose: get original trigger expression/recovery expression with expanded *
  *          functions                                                         *
@@ -780,8 +750,6 @@ static void	db_trigger_get_expression(const zbx_eval_context_t *ctx, char **expr
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_trigger_get_expression                                    *
- *                                                                            *
  * Purpose: get original trigger expression with expanded functions           *
  *                                                                            *
  * Parameters: trigger    - [IN] the trigger                                  *
@@ -799,8 +767,6 @@ void	zbx_db_trigger_get_expression(const DB_TRIGGER *trigger, char **expression)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_db_trigger_get_recovery_expression                           *
  *                                                                            *
  * Purpose: get original trigger recovery expression with expanded functions  *
  *                                                                            *

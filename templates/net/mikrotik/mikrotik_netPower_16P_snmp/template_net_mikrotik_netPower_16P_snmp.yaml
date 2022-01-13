@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-11-29T15:38:10Z'
+  date: '2021-12-17T18:09:34Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -18,7 +18,7 @@ zabbix_export:
         HOST-RESOURCES-MIB
         MIKROTIK-MIB
         
-        Template tooling version used: 0.39
+        Template tooling version used: 0.40
       templates:
         -
           name: 'Generic SNMP'

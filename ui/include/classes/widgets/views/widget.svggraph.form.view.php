@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -215,8 +215,18 @@ $tab_displaying_opt = (new CFormList())
 // Create 'Time period' tab.
 $tab_time_period = (new CFormList())
 	->addRow(CWidgetHelper::getLabel($fields['graph_time']), CWidgetHelper::getCheckBox($fields['graph_time']))
-	->addRow(CWidgetHelper::getLabel($fields['time_from']), CWidgetHelper::getDatePicker($fields['time_from']))
-	->addRow(CWidgetHelper::getLabel($fields['time_to']), CWidgetHelper::getDatePicker($fields['time_to']));
+	->addRow(
+		CWidgetHelper::getLabel($fields['time_from']),
+		CWidgetHelper::getDatePicker($fields['time_from'])
+			->setDateFormat(DATE_TIME_FORMAT_SECONDS)
+			->setPlaceholder(DATE_TIME_FORMAT_SECONDS_PLACEHOLDER)
+	)
+	->addRow(
+		CWidgetHelper::getLabel($fields['time_to']),
+		CWidgetHelper::getDatePicker($fields['time_to'])
+			->setDateFormat(DATE_TIME_FORMAT_SECONDS)
+			->setPlaceholder(DATE_TIME_FORMAT_SECONDS_PLACEHOLDER)
+	);
 
 // Create 'Axes' tab.
 $tab_axes = (new CFormList())->addRow('',

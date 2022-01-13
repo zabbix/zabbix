@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 The template to monitor SAN Huawei OceanStor 5300 V5 by Zabbix SNMP agent.
 
 
@@ -12,9 +12,10 @@ The template to monitor SAN Huawei OceanStor 5300 V5 by Zabbix SNMP agent.
 This template was tested on:
 
 - Huawei OceanStor 5300 V5
-- Zabbix, version 5.4
 
 ## Setup
+
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
 
 1\. Create a host for Huawei OceanStor 5300 V5 with controller management IP as SNMPv2 interface.
 
@@ -74,21 +75,21 @@ No specific Zabbix configuration is required.
 |Huawei |OceanStor 5300 V5: Status |<p>System running status.</p> |SNMP |huawei.5300.v5[status]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Huawei |OceanStor 5300 V5: Version |<p>The device version.</p> |SNMP |huawei.5300.v5[version]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Huawei |OceanStor 5300 V5: Capacity total |<p>Total capacity of a device.</p> |SNMP |huawei.5300.v5[totalCapacity]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1048576`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
-|Huawei |OceanStor 5300 V5: Capacity used |<p>Used capacity of a device.</p> |SNMP |huawei.5300.v5[usedCapacity]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1048576`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|Huawei |OceanStor 5300 V5: Capacity used |<p>Used capacity of a device.</p> |SNMP |huawei.5300.v5[usedCapacity]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1048576`</p> |
 |Huawei |Controller {#ID}: Memory utilization |<p>Memory usage of a controller {#ID}.</p> |SNMP |huawei.5300.v5[hwInfoControllerMemoryUsage, "{#ID}"] |
 |Huawei |Controller {#ID}: Health status |<p>Controller health status. For details, see definition of Enum Values (HEALTH_STATUS_E).</p><p>https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference</p> |SNMP |huawei.5300.v5[hwInfoControllerHealthStatus, "{#ID}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Huawei |Controller {#ID}: Running status |<p>Controller running status. For details, see definition of Enum Values (RUNNING_STATUS_E).</p><p>https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference</p> |SNMP |huawei.5300.v5[hwInfoControllerRunningStatus, "{#ID}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Huawei |Controller {#ID}: Role |<p>Controller role..</p> |SNMP |huawei.5300.v5[hwInfoControllerRole, "{#ID}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Huawei |Enclosure {#NAME}: Health status |<p>Enclosure health status. For details, see definition of Enum Values (HEALTH_STATUS_E).</p><p>https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference</p> |SNMP |huawei.5300.v5[hwInfoEnclosureHealthStatus, "{#NAME}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Huawei |Enclosure {#NAME}: Running status |<p>Enclosure running status. For details, see definition of Enum Values (RUNNING_STATUS_E).</p><p>https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference</p> |SNMP |huawei.5300.v5[hwInfoEnclosureRunningStatus, "{#NAME}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
-|Huawei |Enclosure {#NAME}: Temperature |<p>Enclosure temperature.</p> |SNMP |huawei.5300.v5[hwInfoEnclosureTemperature, "{#NAME}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|Huawei |Enclosure {#NAME}: Temperature |<p>Enclosure temperature.</p> |SNMP |huawei.5300.v5[hwInfoEnclosureTemperature, "{#NAME}"] |
 |Huawei |FAN {#ID} on {#LOCATION}: Health status |<p>Health status of a fan. For details, see definition of Enum Values (HEALTH_STATUS_E).</p><p>https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference</p> |SNMP |huawei.5300.v5[hwInfoFanHealthStatus, "{#ID}:{#LOCATION}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Huawei |FAN {#ID} on {#LOCATION}: Running status |<p>Operating status of a fan. For details, see definition of Enum Values (RUNNING_STATUS_E).</p><p>https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference</p> |SNMP |huawei.5300.v5[hwInfoFanRunningStatus, "{#ID}:{#LOCATION}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Huawei |BBU {#ID} on {#LOCATION}: Health status |<p>Health status of a BBU. For details, see definition of Enum Values (HEALTH_STATUS_E).</p><p>https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference</p> |SNMP |huawei.5300.v5[hwInfoBBUHealthStatus, "{#ID}:{#LOCATION}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Huawei |BBU {#ID} on {#LOCATION}: Running status |<p>Running status of a BBU. For details, see definition of Enum Values (RUNNING_STATUS_E).</p><p>https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference</p> |SNMP |huawei.5300.v5[hwInfoBBURunningStatus, "{#ID}:{#LOCATION}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Huawei |Disk {#MODEL} on {#LOCATION}: Health status |<p>Disk health status. For details, see definition of Enum Values (HEALTH_STATUS_E).</p><p>https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference</p> |SNMP |huawei.5300.v5[hwInfoDiskHealthStatus, "{#ID}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Huawei |Disk {#MODEL} on {#LOCATION}: Running status |<p>Disk running status. For details, see definition of Enum Values (RUNNING_STATUS_E).</p><p>https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference</p> |SNMP |huawei.5300.v5[hwInfoDiskRunningStatus, "{#ID}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
-|Huawei |Disk {#MODEL} on {#LOCATION}: Temperature |<p>Disk temperature.</p> |SNMP |huawei.5300.v5[hwInfoDiskTemperature, "{#ID}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|Huawei |Disk {#MODEL} on {#LOCATION}: Temperature |<p>Disk temperature.</p> |SNMP |huawei.5300.v5[hwInfoDiskTemperature, "{#ID}"] |
 |Huawei |Disk {#MODEL} on {#LOCATION}: Health score |<p>Health score of a disk. If the value is 255, indicating invalid.</p> |SNMP |huawei.5300.v5[hwInfoDiskHealthMark, "{#ID}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Huawei |Node {#NODE}: Average I/O latency |<p>Average I/O latency of the node.</p> |SNMP |huawei.5300.v5[hwPerfNodeDelay, "{#NODE}"] |
 |Huawei |Node {#NODE}: Total I/O per second |<p>Total IOPS of the node.</p> |SNMP |huawei.5300.v5[hwPerfNodeTotalIOPS, "{#NODE}"] |
@@ -113,35 +114,35 @@ No specific Zabbix configuration is required.
 |Huawei |Pool {#NAME}: Capacity total |<p>Total capacity of a storage pool.</p> |SNMP |huawei.5300.v5[hwInfoStoragePoolTotalCapacity, "{#NAME}"]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1048576`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |Huawei |Pool {#NAME}: Capacity free |<p>Available capacity of a storage pool.</p> |SNMP |huawei.5300.v5[hwInfoStoragePoolFreeCapacity, "{#NAME}"]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1048576`</p> |
 |Huawei |Pool {#NAME}: Capacity used |<p>Used capacity of a storage pool.</p> |SNMP |huawei.5300.v5[hwInfoStoragePoolSubscribedCapacity, "{#NAME}"]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1048576`</p> |
-|Huawei |Pool {#NAME}: Capacity used percentage |<p>Used capacity of a storage pool in percents.</p> |CALCULATED |huawei.5300.v5[hwInfoStoragePoolFreeCapacityPct, "{#NAME}"]<p>**Expression**:</p>`last("huawei.5300.v5[hwInfoStoragePoolSubscribedCapacity, \"{#NAME}\"]")/last("huawei.5300.v5[hwInfoStoragePoolTotalCapacity, \"{#NAME}\"]")*100` |
+|Huawei |Pool {#NAME}: Capacity used percentage |<p>Used capacity of a storage pool in percents.</p> |CALCULATED |huawei.5300.v5[hwInfoStoragePoolFreeCapacityPct, "{#NAME}"]<p>**Expression**:</p>`last(//huawei.5300.v5[hwInfoStoragePoolSubscribedCapacity, "{#NAME}"])/last(//huawei.5300.v5[hwInfoStoragePoolTotalCapacity, "{#NAME}"])*100` |
 
 ## Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Controller {#ID}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m) |<p>CPU utilization is too high. The system might be slow to respond.</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoControllerCPUUsage, "{#ID}"].min(5m)}>{$CPU.UTIL.CRIT}` |WARNING | |
-|Node {#NODE}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m) |<p>CPU utilization is too high. The system might be slow to respond.</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwPerfNodeCPUUsage, "{#NODE}"].min(5m)}>{$CPU.UTIL.CRIT}` |WARNING | |
-|OceanStor 5300 V5: Storage version has been changed |<p>OceanStor 5300 V5 version has changed. Ack to close.</p> |`{TEMPLATE_NAME:huawei.5300.v5[version].diff()}=1 and {TEMPLATE_NAME:huawei.5300.v5[version].strlen()}>0` |INFO |<p>Manual close: YES</p> |
-|Controller {#ID}: Memory usage is too high (over {$HUAWEI.5300.MEM.MAX.WARN} for {$HUAWEI.5300.MEM.MAX.TIME}) |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoControllerMemoryUsage, "{#ID}"].min({$HUAWEI.5300.MEM.MAX.TIME})}>{$HUAWEI.5300.MEM.MAX.WARN}` |AVERAGE | |
-|Controller {#ID}: Health status is not Normal |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoControllerHealthStatus, "{#ID}"].last()}<>1` |HIGH | |
-|Controller {#ID}: Running status is not Online |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoControllerRunningStatus, "{#ID}"].last()}<>27` |AVERAGE | |
-|Controller {#ID}: Role has been changed |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoControllerRole, "{#ID}"].diff()}=1` |WARNING |<p>Manual close: YES</p> |
-|Enclosure {#NAME}: Health status is not Normal |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoEnclosureHealthStatus, "{#NAME}"].last()}<>1` |HIGH | |
-|Enclosure {#NAME}: Running status is not Online |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoEnclosureRunningStatus, "{#NAME}"].last()}<>27` |AVERAGE | |
-|Enclosure {#NAME}: Temperature is too high (over {$HUAWEI.5300.TEMP.MAX.WARN} for {$HUAWEI.5300.TEMP.MAX.TIME}) |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoEnclosureTemperature, "{#NAME}"].min({$HUAWEI.5300.TEMP.MAX.TIME})}>{$HUAWEI.5300.TEMP.MAX.WARN}` |HIGH | |
-|FAN {#ID} on {#LOCATION}: Health status is not Normal |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoFanHealthStatus, "{#ID}:{#LOCATION}"].last()}<>1` |HIGH | |
-|FAN {#ID} on {#LOCATION}: Running status is not Running |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoFanRunningStatus, "{#ID}:{#LOCATION}"].last()}<>2` |AVERAGE | |
-|BBU {#ID} on {#LOCATION}: Health status is not Normal |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoBBUHealthStatus, "{#ID}:{#LOCATION}"].last()}<>1` |HIGH | |
-|BBU {#ID} on {#LOCATION}: Running status is not Online |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoBBURunningStatus, "{#ID}:{#LOCATION}"].last()}<>2` |AVERAGE | |
-|Disk {#MODEL} on {#LOCATION}: Health status is not Normal |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoDiskHealthStatus, "{#ID}"].last()}<>1` |HIGH | |
-|Disk {#MODEL} on {#LOCATION}: Running status is not Online |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoDiskRunningStatus, "{#ID}"].last()}<>27` |AVERAGE | |
-|Disk {#MODEL} on {#LOCATION}: Temperature is too high (over {$HUAWEI.5300.DISK.TEMP.MAX.WARN:"{#MODEL}"} for {$HUAWEI.5300.DISK.TEMP.MAX.TIME}) |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoDiskTemperature, "{#ID}"].min({$HUAWEI.5300.DISK.TEMP.MAX.TIME})}>{$HUAWEI.5300.DISK.TEMP.MAX.WARN:"{#MODEL}"}` |HIGH | |
-|Node {#NODE}: Average I/O latency is too high (over {$HUAWEI.5300.NODE.IO.DELAY.MAX.WARN}ms for {$HUAWEI.5300.NODE.IO.DELAY.MAX.TIME}) |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwPerfNodeDelay, "{#NODE}"].min({$HUAWEI.5300.NODE.IO.DELAY.MAX.TIME})}>{$HUAWEI.5300.NODE.IO.DELAY.MAX.WARN}` |WARNING | |
-|LUN {#NAME}: Status is not Normal |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwStorageLunStatus, "{#NAME}"].last()}<>1` |AVERAGE | |
-|LUN {#NAME}: Average I/O response time is too high (over {$HUAWEI.5300.LUN.IO.TIME.MAX.WARN}ms for {$HUAWEI.5300.LUN.IO.TIME.MAX.TIME}) |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwPerfLunAverageIOResponseTime, "{#NAME}"].min({$HUAWEI.5300.LUN.IO.TIME.MAX.TIME})}>{$HUAWEI.5300.LUN.IO.TIME.MAX.WARN}` |WARNING | |
-|Pool {#NAME}: Health status is not Normal |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoStoragePoolHealthStatus, "{#NAME}"].last()}<>1` |HIGH | |
-|Pool {#NAME}: Running status is not Online |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoStoragePoolRunningStatus, "{#NAME}"].last()}<>27` |AVERAGE | |
-|Pool {#NAME}: Used capacity is too high (over {#THRESHOLD}%) |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoStoragePoolFreeCapacityPct, "{#NAME}"].min({$HUAWEI.5300.POOL.CAPACITY.THRESH.TIME})}>{#THRESHOLD}` |AVERAGE | |
+|Controller {#ID}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m) |<p>CPU utilization is too high. The system might be slow to respond.</p> |`min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerCPUUsage, "{#ID}"],5m)>{$CPU.UTIL.CRIT}` |WARNING | |
+|Node {#NODE}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m) |<p>CPU utilization is too high. The system might be slow to respond.</p> |`min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwPerfNodeCPUUsage, "{#NODE}"],5m)>{$CPU.UTIL.CRIT}` |WARNING | |
+|OceanStor 5300 V5: Storage version has been changed |<p>OceanStor 5300 V5 version has changed. Ack to close.</p> |`last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[version],#1)<>last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[version],#2) and length(last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[version]))>0` |INFO |<p>Manual close: YES</p> |
+|Controller {#ID}: Memory usage is too high (over {$HUAWEI.5300.MEM.MAX.WARN} for {$HUAWEI.5300.MEM.MAX.TIME}) |<p>-</p> |`min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerMemoryUsage, "{#ID}"],{$HUAWEI.5300.MEM.MAX.TIME})>{$HUAWEI.5300.MEM.MAX.WARN}` |AVERAGE | |
+|Controller {#ID}: Health status is not Normal |<p>-</p> |`last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerHealthStatus, "{#ID}"])<>1` |HIGH | |
+|Controller {#ID}: Running status is not Online |<p>-</p> |`last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerRunningStatus, "{#ID}"])<>27` |AVERAGE | |
+|Controller {#ID}: Role has been changed |<p>-</p> |`last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerRole, "{#ID}"],#1)<>last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerRole, "{#ID}"],#2)` |WARNING |<p>Manual close: YES</p> |
+|Enclosure {#NAME}: Health status is not Normal |<p>-</p> |`last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoEnclosureHealthStatus, "{#NAME}"])<>1` |HIGH | |
+|Enclosure {#NAME}: Running status is not Online |<p>-</p> |`last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoEnclosureRunningStatus, "{#NAME}"])<>27` |AVERAGE | |
+|Enclosure {#NAME}: Temperature is too high (over {$HUAWEI.5300.TEMP.MAX.WARN} for {$HUAWEI.5300.TEMP.MAX.TIME}) |<p>-</p> |`min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoEnclosureTemperature, "{#NAME}"],{$HUAWEI.5300.TEMP.MAX.TIME})>{$HUAWEI.5300.TEMP.MAX.WARN}` |HIGH | |
+|FAN {#ID} on {#LOCATION}: Health status is not Normal |<p>-</p> |`last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoFanHealthStatus, "{#ID}:{#LOCATION}"])<>1` |HIGH | |
+|FAN {#ID} on {#LOCATION}: Running status is not Running |<p>-</p> |`last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoFanRunningStatus, "{#ID}:{#LOCATION}"])<>2` |AVERAGE | |
+|BBU {#ID} on {#LOCATION}: Health status is not Normal |<p>-</p> |`last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoBBUHealthStatus, "{#ID}:{#LOCATION}"])<>1` |HIGH | |
+|BBU {#ID} on {#LOCATION}: Running status is not Online |<p>-</p> |`last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoBBURunningStatus, "{#ID}:{#LOCATION}"])<>2` |AVERAGE | |
+|Disk {#MODEL} on {#LOCATION}: Health status is not Normal |<p>-</p> |`last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoDiskHealthStatus, "{#ID}"])<>1` |HIGH | |
+|Disk {#MODEL} on {#LOCATION}: Running status is not Online |<p>-</p> |`last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoDiskRunningStatus, "{#ID}"])<>27` |AVERAGE | |
+|Disk {#MODEL} on {#LOCATION}: Temperature is too high (over {$HUAWEI.5300.DISK.TEMP.MAX.WARN:"{#MODEL}"} for {$HUAWEI.5300.DISK.TEMP.MAX.TIME}) |<p>-</p> |`min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoDiskTemperature, "{#ID}"],{$HUAWEI.5300.DISK.TEMP.MAX.TIME})>{$HUAWEI.5300.DISK.TEMP.MAX.WARN:"{#MODEL}"}` |HIGH | |
+|Node {#NODE}: Average I/O latency is too high (over {$HUAWEI.5300.NODE.IO.DELAY.MAX.WARN}ms for {$HUAWEI.5300.NODE.IO.DELAY.MAX.TIME}) |<p>-</p> |`min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwPerfNodeDelay, "{#NODE}"],{$HUAWEI.5300.NODE.IO.DELAY.MAX.TIME})>{$HUAWEI.5300.NODE.IO.DELAY.MAX.WARN}` |WARNING | |
+|LUN {#NAME}: Status is not Normal |<p>-</p> |`last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwStorageLunStatus, "{#NAME}"])<>1` |AVERAGE | |
+|LUN {#NAME}: Average I/O response time is too high (over {$HUAWEI.5300.LUN.IO.TIME.MAX.WARN}ms for {$HUAWEI.5300.LUN.IO.TIME.MAX.TIME}) |<p>-</p> |`min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwPerfLunAverageIOResponseTime, "{#NAME}"],{$HUAWEI.5300.LUN.IO.TIME.MAX.TIME})>{$HUAWEI.5300.LUN.IO.TIME.MAX.WARN}` |WARNING | |
+|Pool {#NAME}: Health status is not Normal |<p>-</p> |`last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoStoragePoolHealthStatus, "{#NAME}"])<>1` |HIGH | |
+|Pool {#NAME}: Running status is not Online |<p>-</p> |`last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoStoragePoolRunningStatus, "{#NAME}"])<>27` |AVERAGE | |
+|Pool {#NAME}: Used capacity is too high (over {#THRESHOLD}%) |<p>-</p> |`min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoStoragePoolFreeCapacityPct, "{#NAME}"],{$HUAWEI.5300.POOL.CAPACITY.THRESH.TIME})>{#THRESHOLD}` |AVERAGE | |
 
 ## Feedback
 

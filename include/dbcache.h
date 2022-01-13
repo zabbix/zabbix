@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,7 +38,8 @@
 #define	ZBX_POLLER_TYPE_PINGER		3
 #define	ZBX_POLLER_TYPE_JAVA		4
 #define	ZBX_POLLER_TYPE_HISTORY		5
-#define	ZBX_POLLER_TYPE_COUNT		6	/* number of poller types */
+#define	ZBX_POLLER_TYPE_ODBC		6
+#define	ZBX_POLLER_TYPE_COUNT		7	/* number of poller types */
 
 #define MAX_JAVA_ITEMS		32
 #define MAX_SNMP_ITEMS		128
@@ -73,6 +74,7 @@ extern int	CONFIG_UNREACHABLE_DELAY;
 extern int	CONFIG_PROXYCONFIG_FREQUENCY;
 extern int	CONFIG_PROXYDATA_FREQUENCY;
 extern int	CONFIG_HISTORYPOLLER_FORKS;
+extern int	CONFIG_ODBCPOLLER_FORKS;
 
 typedef struct
 {
@@ -745,7 +747,6 @@ int	DCget_host_inventory_value_by_hostid(zbx_uint64_t hostid, char **replace_to,
 void	*DCconfig_get_stats(int request);
 
 int	DCconfig_get_last_sync_time(void);
-void	DCconfig_wait_sync(void);
 int	DCconfig_get_proxypoller_hosts(DC_PROXY *proxies, int max_hosts);
 int	DCconfig_get_proxypoller_nextcheck(void);
 

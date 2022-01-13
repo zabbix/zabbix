@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -194,7 +194,11 @@ $itemForm->addItem([
 			],
 			'popup.massupdate.itemprototype' => [
 				'content' => (new CButton('', _('Mass update')))
-					->onClick("return openMassupdatePopup(this, 'popup.massupdate.itemprototype');")
+					->onClick(
+						"return openMassupdatePopup('popup.massupdate.itemprototype', {}, {
+							dialogue_class: 'modal-popup-preprocessing'
+						});"
+					)
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->removeAttribute('id')
 			],

@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T14:36:37Z'
+  version: '6.0'
+  date: '2022-01-10T07:41:44Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: 81aa8c5ab5594f77a2b26fb7f5094048
-      template: 'MongoDB node by Zabbix Agent 2'
-      name: 'MongoDB node by Zabbix Agent 2'
+      template: 'MongoDB node by Zabbix agent 2'
+      name: 'MongoDB node by Zabbix agent 2'
       description: |
         Get MongoDB metrics from plugin for the zabbix-agent2.
           1. Setup and configure zabbix-agent2 compiled with the MongoDB monitoring plugin.
@@ -18,7 +18,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/420659-discussion-thread-for-official-zabbix-template-db-mongodb
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Databases
@@ -452,7 +452,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: |
-            The number of operations that are currently queued and waiting for the write lock. 
+            The number of operations that are currently queued and waiting for the write lock.
              A consistently small write-queue, particularly of shorter operations, is no cause for concern.
           preprocessing:
             -
@@ -506,7 +506,7 @@ zabbix_export:
           triggers:
             -
               uuid: ed4a0c66c76d4ca699d0f2188cc8e71f
-              expression: 'min(/MongoDB node by Zabbix Agent 2/mongodb.cursor.open.total,5m)>{$MONGODB.CURSOR.OPEN.MAX.WARN}'
+              expression: 'min(/MongoDB node by Zabbix agent 2/mongodb.cursor.open.total,5m)>{$MONGODB.CURSOR.OPEN.MAX.WARN}'
               name: 'MongoDB: Too many cursors opened by MongoDB for clients (over {$MONGODB.CURSOR.OPEN.MAX.WARN} in 5m)'
               priority: WARNING
         -
@@ -536,7 +536,7 @@ zabbix_export:
           triggers:
             -
               uuid: 41d37791111b461d94da779e4b2c7e46
-              expression: 'min(/MongoDB node by Zabbix Agent 2/mongodb.cursor.timed_out.rate,5m)>{$MONGODB.CURSOR.TIMEOUT.MAX.WARN}'
+              expression: 'min(/MongoDB node by Zabbix agent 2/mongodb.cursor.timed_out.rate,5m)>{$MONGODB.CURSOR.TIMEOUT.MAX.WARN}'
               name: 'MongoDB: Too many cursors are timing out (over {$MONGODB.CURSOR.TIMEOUT.MAX.WARN} per second in 5m)'
               priority: WARNING
         -
@@ -814,7 +814,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: |
-            The number of “getmore” operations since the mongod instance per second. This counter can be high even if the query count is low. 
+            The number of “getmore” operations since the mongod instance per second. This counter can be high even if the query count is low.
             Secondary nodes send getMore operations as part of the replication process.
           preprocessing:
             -
@@ -936,7 +936,7 @@ zabbix_export:
           triggers:
             -
               uuid: c4ab9bfdd6d14634870f8ebb44081655
-              expression: 'last(/MongoDB node by Zabbix Agent 2/mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"])=0'
+              expression: 'last(/MongoDB node by Zabbix agent 2/mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"])=0'
               name: 'MongoDB: Connection to MongoDB is unavailable'
               priority: HIGH
               description: 'Connection to MongoDB instance is currently unavailable.'
@@ -959,7 +959,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Returns a database’s state.'
+          description: 'Returns a database''s state.'
           tags:
             -
               tag: Application
@@ -988,7 +988,7 @@ zabbix_export:
           triggers:
             -
               uuid: 166444342def4adc954aa35f3dc22dba
-              expression: 'nodata(/MongoDB node by Zabbix Agent 2/mongodb.uptime,10m)=1'
+              expression: 'nodata(/MongoDB node by Zabbix agent 2/mongodb.uptime,10m)=1'
               name: 'MongoDB: Failed to fetch info data (or no data for 10m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 10 minutes'
@@ -996,10 +996,10 @@ zabbix_export:
               dependencies:
                 -
                   name: 'MongoDB: Connection to MongoDB is unavailable'
-                  expression: 'last(/MongoDB node by Zabbix Agent 2/mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"])=0'
+                  expression: 'last(/MongoDB node by Zabbix agent 2/mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"])=0'
             -
               uuid: 992590e47a7f42dda0e074c2f7a3e5ba
-              expression: 'last(/MongoDB node by Zabbix Agent 2/mongodb.uptime)<10m'
+              expression: 'last(/MongoDB node by Zabbix agent 2/mongodb.uptime)<10m'
               name: 'MongoDB: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
@@ -1032,7 +1032,7 @@ zabbix_export:
           triggers:
             -
               uuid: 0856e13b7e7644c5b353fcfa577acb51
-              expression: 'last(/MongoDB node by Zabbix Agent 2/mongodb.version,#1)<>last(/MongoDB node by Zabbix Agent 2/mongodb.version,#2) and length(last(/MongoDB node by Zabbix Agent 2/mongodb.version))>0'
+              expression: 'last(/MongoDB node by Zabbix agent 2/mongodb.version,#1)<>last(/MongoDB node by Zabbix agent 2/mongodb.version,#2) and length(last(/MongoDB node by Zabbix agent 2/mongodb.version))>0'
               name: 'MongoDB: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'MongoDB version has changed. Ack to close.'
@@ -1700,13 +1700,13 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'MongoDB node by Zabbix Agent 2'
+                    host: 'MongoDB node by Zabbix agent 2'
                     key: 'mongodb.collection.read_lock.rate["{#DBNAME}","{#COLLECTION}"]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'MongoDB node by Zabbix Agent 2'
+                    host: 'MongoDB node by Zabbix agent 2'
                     key: 'mongodb.collection.write_lock.rate["{#DBNAME}","{#COLLECTION}"]'
             -
               uuid: ab97504abcc844d5a408d4b7cf85e5a5
@@ -1715,13 +1715,13 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'MongoDB node by Zabbix Agent 2'
+                    host: 'MongoDB node by Zabbix agent 2'
                     key: 'mongodb.collection.read_lock.ms["{#DBNAME}","{#COLLECTION}"]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'MongoDB node by Zabbix Agent 2'
+                    host: 'MongoDB node by Zabbix agent 2'
                     key: 'mongodb.collection.write_lock.ms["{#DBNAME}","{#COLLECTION}"]'
             -
               uuid: dcfc8fcc0b484c8baea14525aa212dc2
@@ -1730,44 +1730,44 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'MongoDB node by Zabbix Agent 2'
+                    host: 'MongoDB node by Zabbix agent 2'
                     key: 'mongodb.collection.ops.queries.rate["{#DBNAME}","{#COLLECTION}"]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'MongoDB node by Zabbix Agent 2'
+                    host: 'MongoDB node by Zabbix agent 2'
                     key: 'mongodb.collection.ops.getmore.rate["{#DBNAME}","{#COLLECTION}"]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
-                    host: 'MongoDB node by Zabbix Agent 2'
+                    host: 'MongoDB node by Zabbix agent 2'
                     key: 'mongodb.collection.ops.insert.rate["{#DBNAME}","{#COLLECTION}"]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
-                    host: 'MongoDB node by Zabbix Agent 2'
+                    host: 'MongoDB node by Zabbix agent 2'
                     key: 'mongodb.collection.ops.update.rate["{#DBNAME}","{#COLLECTION}"]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   item:
-                    host: 'MongoDB node by Zabbix Agent 2'
+                    host: 'MongoDB node by Zabbix agent 2'
                     key: 'mongodb.collection.ops.remove.rate["{#DBNAME}","{#COLLECTION}"]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   item:
-                    host: 'MongoDB node by Zabbix Agent 2'
+                    host: 'MongoDB node by Zabbix agent 2'
                     key: 'mongodb.collection.ops.commands.rate["{#DBNAME}","{#COLLECTION}"]'
                 -
                   sortorder: '6'
                   drawtype: BOLD_LINE
                   color: AC8C14
                   item:
-                    host: 'MongoDB node by Zabbix Agent 2'
+                    host: 'MongoDB node by Zabbix agent 2'
                     key: 'mongodb.collection.ops.total.rate["{#DBNAME}","{#COLLECTION}"]'
             -
               uuid: 554ac3ac477c47cfbaaba3d6419109f0
@@ -1776,44 +1776,44 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'MongoDB node by Zabbix Agent 2'
+                    host: 'MongoDB node by Zabbix agent 2'
                     key: 'mongodb.collection.ops.queries.ms["{#DBNAME}","{#COLLECTION}"]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'MongoDB node by Zabbix Agent 2'
+                    host: 'MongoDB node by Zabbix agent 2'
                     key: 'mongodb.collection.ops.getmore.ms["{#DBNAME}","{#COLLECTION}"]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
-                    host: 'MongoDB node by Zabbix Agent 2'
+                    host: 'MongoDB node by Zabbix agent 2'
                     key: 'mongodb.collection.ops.insert.ms["{#DBNAME}","{#COLLECTION}"]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
-                    host: 'MongoDB node by Zabbix Agent 2'
+                    host: 'MongoDB node by Zabbix agent 2'
                     key: 'mongodb.collection.ops.update.ms["{#DBNAME}","{#COLLECTION}"]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   item:
-                    host: 'MongoDB node by Zabbix Agent 2'
+                    host: 'MongoDB node by Zabbix agent 2'
                     key: 'mongodb.collection.ops.remove.ms["{#DBNAME}","{#COLLECTION}"]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   item:
-                    host: 'MongoDB node by Zabbix Agent 2'
+                    host: 'MongoDB node by Zabbix agent 2'
                     key: 'mongodb.collection.ops.commands.ms["{#DBNAME}","{#COLLECTION}"]'
                 -
                   sortorder: '6'
                   drawtype: BOLD_LINE
                   color: AC8C14
                   item:
-                    host: 'MongoDB node by Zabbix Agent 2'
+                    host: 'MongoDB node by Zabbix agent 2'
                     key: 'mongodb.collection.ops.total.ms["{#DBNAME}","{#COLLECTION}"]'
         -
           uuid: a2a57b40d12944ae8ee21c166706b132
@@ -1983,7 +1983,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Returns statistics reflecting the database system’s state.'
+              description: 'Returns statistics reflecting the database system''s state.'
               tags:
                 -
                   tag: Application
@@ -2016,13 +2016,13 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'MongoDB node by Zabbix Agent 2'
+                    host: 'MongoDB node by Zabbix agent 2'
                     key: 'mongodb.db.collections["{#DBNAME}"]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'MongoDB node by Zabbix Agent 2'
+                    host: 'MongoDB node by Zabbix agent 2'
                     key: 'mongodb.db.objects["{#DBNAME}"]'
             -
               uuid: 5dc13b4aebf24a1b8448c26d93b42d7a
@@ -2031,25 +2031,25 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'MongoDB node by Zabbix Agent 2'
+                    host: 'MongoDB node by Zabbix agent 2'
                     key: 'mongodb.db.index_size["{#DBNAME}"]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'MongoDB node by Zabbix Agent 2'
+                    host: 'MongoDB node by Zabbix agent 2'
                     key: 'mongodb.db.storage_size["{#DBNAME}"]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
-                    host: 'MongoDB node by Zabbix Agent 2'
+                    host: 'MongoDB node by Zabbix agent 2'
                     key: 'mongodb.db.file_size["{#DBNAME}"]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
-                    host: 'MongoDB node by Zabbix Agent 2'
+                    host: 'MongoDB node by Zabbix agent 2'
                     key: 'mongodb.db.data_size["{#DBNAME}"]'
         -
           uuid: eaa4b8fc535143f887673834987ce7be
@@ -2215,7 +2215,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 778d0b15affe4867b3e7f3e396c2a700
-                  expression: 'min(/MongoDB node by Zabbix Agent 2/mongodb.rs.lag[{#RS_NAME}],5m)>{$MONGODB.REPL.LAG.MAX.WARN}'
+                  expression: 'min(/MongoDB node by Zabbix agent 2/mongodb.rs.lag[{#RS_NAME}],5m)>{$MONGODB.REPL.LAG.MAX.WARN}'
                   name: 'MongoDB: Replication lag with primary is too high (over {$MONGODB.REPL.LAG.MAX.WARN} in 5m)'
                   priority: WARNING
             -
@@ -2490,7 +2490,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: f9f29647a3db426c9c303fc47cfc48eb
-                  expression: 'last(/MongoDB node by Zabbix Agent 2/mongodb.rs.state[{#RS_NAME}],#1)<>last(/MongoDB node by Zabbix Agent 2/mongodb.rs.state[{#RS_NAME}],#2)'
+                  expression: 'last(/MongoDB node by Zabbix agent 2/mongodb.rs.state[{#RS_NAME}],#1)<>last(/MongoDB node by Zabbix agent 2/mongodb.rs.state[{#RS_NAME}],#2)'
                   recovery_mode: NONE
                   name: 'MongoDB: Node in ReplicaSet changed the state (new state: {ITEM.VALUE})'
                   priority: WARNING
@@ -2504,7 +2504,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               discover: NO_DISCOVER
-              description: 'The number of replucated nodes in current ReplicaSet.'
+              description: 'The number of replicated nodes in current ReplicaSet.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2579,7 +2579,7 @@ zabbix_export:
           trigger_prototypes:
             -
               uuid: 975c5e5817b148ba8a8d551ac42053d0
-              expression: 'last(/MongoDB node by Zabbix Agent 2/mongodb.rs.unhealthy_count[{#RS_NAME}])>0  and length(last(/MongoDB node by Zabbix Agent 2/mongodb.rs.unhealthy[{#RS_NAME}]))>0'
+              expression: 'last(/MongoDB node by Zabbix agent 2/mongodb.rs.unhealthy_count[{#RS_NAME}])>0 and length(last(/MongoDB node by Zabbix agent 2/mongodb.rs.unhealthy[{#RS_NAME}]))>0'
               name: 'MongoDB: There are unhealthy replicas in ReplicaSet'
               priority: AVERAGE
           graph_prototypes:
@@ -2591,7 +2591,7 @@ zabbix_export:
                   drawtype: BOLD_LINE
                   color: 1A7C11
                   item:
-                    host: 'MongoDB node by Zabbix Agent 2'
+                    host: 'MongoDB node by Zabbix agent 2'
                     key: 'mongodb.rs.lag[{#RS_NAME}]'
           master_item:
             key: 'mongodb.rs.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
@@ -2609,6 +2609,22 @@ zabbix_export:
               parameters:
                 - 1h
           overrides:
+            -
+              name: 'Arbiter metrics'
+              step: '2'
+              filter:
+                conditions:
+                  -
+                    macro: '{#NODE_STATE}'
+                    value: '7'
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
+                  value: 'Replication lag'
+                  status: ENABLED
+                  discover: NO_DISCOVER
             -
               name: 'Primary metrics'
               step: '1'
@@ -2637,22 +2653,6 @@ zabbix_export:
                   value: 'Number of unhealthy replicas'
                   status: ENABLED
                   discover: DISCOVER
-                -
-                  operationobject: ITEM_PROTOTYPE
-                  operator: LIKE
-                  value: 'Replication lag'
-                  status: ENABLED
-                  discover: NO_DISCOVER
-            -
-              name: 'Arbiter metrics'
-              step: '2'
-              filter:
-                conditions:
-                  -
-                    macro: '{#NODE_STATE}'
-                    value: '7'
-                    formulaid: A
-              operations:
                 -
                   operationobject: ITEM_PROTOTYPE
                   operator: LIKE
@@ -2811,7 +2811,7 @@ zabbix_export:
               key: 'mongodb.wired_tiger.cache.pages_written[{#SINGLETON}]'
               delay: '0'
               history: 7d
-              description: 'Number of pages writtent from the cache.'
+              description: 'Number of pages written from the cache.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2903,8 +2903,8 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 967928b915f64623b4416ed0dbf6ba98
-                  expression: 'max(/MongoDB node by Zabbix Agent 2/mongodb.wired_tiger.concurrent_transactions.read.available[{#SINGLETON}],5m)<{$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}'
-                  name: 'MongoDB: Available WiredTiger read tickets less then {$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}'
+                  expression: 'max(/MongoDB node by Zabbix agent 2/mongodb.wired_tiger.concurrent_transactions.read.available[{#SINGLETON}],5m)<{$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}'
+                  name: 'MongoDB: Available WiredTiger read tickets less than {$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}'
                   priority: WARNING
                   description: |
                     "Too few available read tickets.
@@ -2969,8 +2969,8 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 485e6e846f274b528902b3ffd08f2fc4
-                  expression: 'max(/MongoDB node by Zabbix Agent 2/mongodb.wired_tiger.concurrent_transactions.write.available[{#SINGLETON}],5m)<{$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}'
-                  name: 'MongoDB: Available WiredTiger write tickets less then {$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}'
+                  expression: 'max(/MongoDB node by Zabbix agent 2/mongodb.wired_tiger.concurrent_transactions.write.available[{#SINGLETON}],5m)<{$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}'
+                  name: 'MongoDB: Available WiredTiger write tickets less than {$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}'
                   priority: WARNING
                   description: |
                     "Too few available write tickets.
@@ -3021,7 +3021,7 @@ zabbix_export:
               parameters:
                 - |
                   return JSON.stringify(JSON.parse(value).wiredTiger
-                  ? [{'{#SINGLETON}': ''}] : []);
+                    ? [{'{#SINGLETON}': ''}] : []);
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -3131,7 +3131,7 @@ zabbix_export:
   triggers:
     -
       uuid: 58142b2a76114e69af259ea1b5c19bbc
-      expression: 'min(/MongoDB node by Zabbix Agent 2/mongodb.connections.current,5m)/(last(/MongoDB node by Zabbix Agent 2/mongodb.connections.available)+last(/MongoDB node by Zabbix Agent 2/mongodb.connections.current))*100>{$MONGODB.CONNS.PCT.USED.MAX.WARN}'
+      expression: 'min(/MongoDB node by Zabbix agent 2/mongodb.connections.current,5m)/(last(/MongoDB node by Zabbix agent 2/mongodb.connections.available)+last(/MongoDB node by Zabbix agent 2/mongodb.connections.current))*100>{$MONGODB.CONNS.PCT.USED.MAX.WARN}'
       name: 'MongoDB: Total number of open connections is too high (over {$MONGODB.CONNS.PCT.USED.MAX.WARN%} in 5m)'
       priority: WARNING
       description: 'Too few available connections. If MongoDB runs low on connections, in may not be able to handle incoming requests in a timely manner.'
@@ -3144,19 +3144,19 @@ zabbix_export:
           drawtype: BOLD_LINE
           color: 1A7C11
           item:
-            host: 'MongoDB node by Zabbix Agent 2'
+            host: 'MongoDB node by Zabbix agent 2'
             key: mongodb.active_clients.total
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'MongoDB node by Zabbix Agent 2'
+            host: 'MongoDB node by Zabbix agent 2'
             key: mongodb.active_clients.readers
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'MongoDB node by Zabbix Agent 2'
+            host: 'MongoDB node by Zabbix agent 2'
             key: mongodb.active_clients.writers
     -
       uuid: 815c7f2a6dd941df9bc10bc9153e0e97
@@ -3165,13 +3165,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'MongoDB node by Zabbix Agent 2'
+            host: 'MongoDB node by Zabbix agent 2'
             key: mongodb.connections.rate
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'MongoDB node by Zabbix Agent 2'
+            host: 'MongoDB node by Zabbix agent 2'
             key: mongodb.network.numRequests.rate
     -
       uuid: d7787063a8614cb4afdf41811a8ade59
@@ -3180,19 +3180,19 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'MongoDB node by Zabbix Agent 2'
+            host: 'MongoDB node by Zabbix agent 2'
             key: mongodb.connections.available
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'MongoDB node by Zabbix Agent 2'
+            host: 'MongoDB node by Zabbix agent 2'
             key: mongodb.connections.active
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'MongoDB node by Zabbix Agent 2'
+            host: 'MongoDB node by Zabbix agent 2'
             key: mongodb.connections.current
     -
       uuid: 230bda1ddd4a45b6a2f11dbea252276e
@@ -3201,19 +3201,19 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'MongoDB node by Zabbix Agent 2'
+            host: 'MongoDB node by Zabbix agent 2'
             key: mongodb.cursor.open.total
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'MongoDB node by Zabbix Agent 2'
+            host: 'MongoDB node by Zabbix agent 2'
             key: mongodb.cursor.open.pinned
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'MongoDB node by Zabbix Agent 2'
+            host: 'MongoDB node by Zabbix agent 2'
             key: mongodb.metrics.cursor.open.no_timeout
     -
       uuid: 509211f5f33d4c57a49c5416b2f33937
@@ -3222,25 +3222,25 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'MongoDB node by Zabbix Agent 2'
+            host: 'MongoDB node by Zabbix agent 2'
             key: mongod.document.deleted.rate
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'MongoDB node by Zabbix Agent 2'
+            host: 'MongoDB node by Zabbix agent 2'
             key: mongod.document.inserted.rate
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'MongoDB node by Zabbix Agent 2'
+            host: 'MongoDB node by Zabbix agent 2'
             key: mongod.document.returned.rate
         -
           sortorder: '3'
           color: A54F10
           item:
-            host: 'MongoDB node by Zabbix Agent 2'
+            host: 'MongoDB node by Zabbix agent 2'
             key: mongod.document.updated.rate
     -
       uuid: f47175a50c6f488b993d3b04ecb28af4
@@ -3249,25 +3249,25 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'MongoDB node by Zabbix Agent 2'
+            host: 'MongoDB node by Zabbix agent 2'
             key: mongodb.mem.mapped
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'MongoDB node by Zabbix Agent 2'
+            host: 'MongoDB node by Zabbix agent 2'
             key: mongodb.mem.resident
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'MongoDB node by Zabbix Agent 2'
+            host: 'MongoDB node by Zabbix agent 2'
             key: mongodb.mem.virtual
         -
           sortorder: '3'
           color: A54F10
           item:
-            host: 'MongoDB node by Zabbix Agent 2'
+            host: 'MongoDB node by Zabbix agent 2'
             key: mongodb.mem.mapped_with_journal
     -
       uuid: f1311a6b0d5f4564898d6679a45c438d
@@ -3276,13 +3276,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'MongoDB node by Zabbix Agent 2'
+            host: 'MongoDB node by Zabbix agent 2'
             key: mongodb.network.bytes_out.rate
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'MongoDB node by Zabbix Agent 2'
+            host: 'MongoDB node by Zabbix agent 2'
             key: mongodb.network.bytes_in.rate
     -
       uuid: 27c36a56bdca436d8a0fe43c9ee8233b
@@ -3291,37 +3291,37 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'MongoDB node by Zabbix Agent 2'
+            host: 'MongoDB node by Zabbix agent 2'
             key: mongodb.opcounters.query.rate
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'MongoDB node by Zabbix Agent 2'
+            host: 'MongoDB node by Zabbix agent 2'
             key: mongodb.opcounters.insert.rate
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'MongoDB node by Zabbix Agent 2'
+            host: 'MongoDB node by Zabbix agent 2'
             key: mongodb.opcounters.getmore.rate
         -
           sortorder: '3'
           color: A54F10
           item:
-            host: 'MongoDB node by Zabbix Agent 2'
+            host: 'MongoDB node by Zabbix agent 2'
             key: mongodb.opcounters.update.rate
         -
           sortorder: '4'
           color: FC6EA3
           item:
-            host: 'MongoDB node by Zabbix Agent 2'
+            host: 'MongoDB node by Zabbix agent 2'
             key: mongodb.opcounters.delete.rate
         -
           sortorder: '5'
           color: 6C59DC
           item:
-            host: 'MongoDB node by Zabbix Agent 2'
+            host: 'MongoDB node by Zabbix agent 2'
             key: mongodb.opcounters.command.rate
     -
       uuid: e228af86d0a34bd4b494cb6b8cda2ad8
@@ -3331,19 +3331,19 @@ zabbix_export:
           drawtype: BOLD_LINE
           color: 1A7C11
           item:
-            host: 'MongoDB node by Zabbix Agent 2'
+            host: 'MongoDB node by Zabbix agent 2'
             key: mongodb.current_queue.total
         -
           sortorder: '1'
           drawtype: BOLD_LINE
           color: 2774A4
           item:
-            host: 'MongoDB node by Zabbix Agent 2'
+            host: 'MongoDB node by Zabbix agent 2'
             key: mongodb.current_queue.readers
         -
           sortorder: '2'
           drawtype: BOLD_LINE
           color: F63100
           item:
-            host: 'MongoDB node by Zabbix Agent 2'
+            host: 'MongoDB node by Zabbix agent 2'
             key: mongodb.current_queue.writers

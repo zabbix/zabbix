@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,62 +49,65 @@ class TabIndicators {
 	 * @return {HTMLElement} Main form
 	 */
 	getForm() {
-		const TEMPLATE = document.querySelector('#templates-form');
-		const HOST = document.querySelector('#host-form');
+		const ACTION = document.querySelector('#action-form');
 		const AUTHENTICATION = document.querySelector('#authentication-form');
+		const GRAPH = document.querySelector('#widget-dialogue-form');
+		const HOST = document.querySelector('#host-form');
+		const HOST_DISCOVERY = document.querySelector('#host-discovery-form');
 		const HOST_PROTOTYPE = document.querySelector('#host-prototype-form');
 		const ITEM = document.querySelector('#item-form');
 		const ITEM_PROTOTYPE = document.querySelector('#item-prototype-form');
+		const MAP = document.querySelector('#sysmap-form');
+		const MEDIA_TYPE = document.querySelector('#media-type-form');
+		const PROXY = document.querySelector('#proxy-form');
+		const SERVICE = document.querySelector('#service-form');
+		const SLA = document.querySelector('#sla-form');
+		const TEMPLATE = document.querySelector('#templates-form');
 		const TRIGGER = document.querySelector('#triggers-form');
 		const TRIGGER_PROTOTYPE = document.querySelector('#triggers-prototype-form');
-		const HOST_DISCOVERY = document.querySelector('#host-discovery-form');
-		const WEB_SCENARIO = document.querySelector('#http-form');
-		const ACTION = document.querySelector('#action-form');
-		const SERVICE = document.querySelector('#service-form');
-		const PROXY = document.querySelector('#proxy-form');
-		const USER_GROUP = document.querySelector('#user-group-form');
 		const USER = document.querySelector('#user-form');
-		const MEDIA_TYPE = document.querySelector('#media-type-form');
-		const MAP = document.querySelector('#sysmap-form');
-		const GRAPH = document.querySelector('#widget-dialogue-form');
+		const USER_GROUP = document.querySelector('#user-group-form');
+		const WEB_SCENARIO = document.querySelector('#http-form');
 
 		switch (true) {
-			case !!TEMPLATE:
-				return TEMPLATE;
-			case !!HOST:
-				return HOST;
+			case !!ACTION:
+				return ACTION;
 			case !!AUTHENTICATION:
 				return AUTHENTICATION;
+			case !!GRAPH:
+				return GRAPH;
+			case !!HOST:
+				return HOST;
+			case !!HOST_DISCOVERY:
+				return HOST_DISCOVERY;
 			case !!HOST_PROTOTYPE:
 				return HOST_PROTOTYPE;
 			case !!ITEM:
 				return ITEM;
 			case !!ITEM_PROTOTYPE:
 				return ITEM_PROTOTYPE;
+			case !!MAP:
+				return MAP;
+			case !!MEDIA_TYPE:
+				return MEDIA_TYPE;
+			case !!PROXY:
+				return PROXY;
+			case !!SERVICE:
+				return SERVICE;
+			case !!SLA:
+				return SLA;
+			case !!TEMPLATE:
+				return TEMPLATE;
 			case !!TRIGGER:
 				return TRIGGER;
 			case !!TRIGGER_PROTOTYPE:
 				return TRIGGER_PROTOTYPE;
-			case !!HOST_DISCOVERY:
-				return HOST_DISCOVERY;
-			case !!WEB_SCENARIO:
-				return WEB_SCENARIO;
-			case !!ACTION:
-				return ACTION;
-			case !!SERVICE:
-				return SERVICE;
-			case !!PROXY:
-				return PROXY;
-			case !!USER_GROUP:
-				return USER_GROUP;
 			case !!USER:
 				return USER;
-			case !!MEDIA_TYPE:
-				return MEDIA_TYPE;
-			case !!MAP:
-				return MAP;
-			case !!GRAPH:
-				return GRAPH;
+			case !!USER_GROUP:
+				return USER_GROUP;
+			case !!WEB_SCENARIO:
+				return WEB_SCENARIO;
 			default:
 				throw 'Form not found.';
 		}
@@ -171,66 +174,66 @@ class TabIndicatorFactory {
 	 */
 	static createTabIndicator(name) {
 		switch (name) {
-			case 'Macros':
-				return new MacrosTabIndicatorItem;
-			case 'Tags':
-				return new TagsTabIndicatorItem;
-			case 'Http':
-				return new HttpTabIndicatorItem;
-			case 'Ldap':
-				return new LdapTabIndicatorItem;
-			case 'Saml':
-				return new SamlTabIndicatorItem;
-			case 'Inventory':
-				return new InventoryTabIndicatorItem;
-			case 'Encryption':
-				return new EncryptionTabIndicatorItem;
-			case 'Preprocessing':
-				return new PreprocessingTabIndicatorItem;
-			case 'Dependency':
-				return new DependencyTabIndicatorItem;
-			case 'LldMacros':
-				return new LldMacrosTabIndicatorItem;
-			case 'Filters':
-				return new FiltersTabIndicatorItem;
-			case 'Overrides':
-				return new OverridesTabIndicatorItem;
-			case 'Steps':
-				return new StepsTabIndicatorItem;
-			case 'HttpAuth':
-				return new HttpAuthTabIndicatorItem;
-			case 'Operations':
-				return new OperationsTabIndicatorItem;
-			case 'Sla':
-				return new SlaTabIndicatorItem;
 			case 'ChildServices':
 				return new ChildServicesTabIndicatorItem;
-			case 'Time':
-				return new TimeTabIndicatorItem;
-			case 'TagFilter':
-				return new TagFilterTabIndicatorItem;
+			case 'Dependency':
+				return new DependencyTabIndicatorItem;
+			case 'Encryption':
+				return new EncryptionTabIndicatorItem;
+			case 'Filters':
+				return new FiltersTabIndicatorItem;
+			case 'FrontendMessage':
+				return new FrontendMessageTabIndicatorItem;
+			case 'GraphDataset':
+				return new GraphDatasetTabIndicatorItem;
+			case 'GraphLegend':
+				return new GraphLegendTabIndicatorItem;
+			case 'GraphOptions':
+				return new GraphOptionsTabIndicatorItem;
+			case 'GraphOverrides':
+				return new GraphOverridesTabIndicatorItem;
+			case 'GraphProblems':
+				return new GraphProblemsTabIndicatorItem;
+			case 'GraphTime':
+				return new GraphTimeTabIndicatorItem;
+			case 'HttpAuth':
+				return new HttpAuthTabIndicatorItem;
 			case 'Media':
 				return new MediaTabIndicatorItem;
 			case 'MessageTemplate':
 				return new MessageTemplateTabIndicatorItem;
-			case 'FrontendMessage':
-				return new FrontendMessageTabIndicatorItem;
-			case 'Sharing':
-				return new SharingTabIndicatorItem;
-			case 'GraphDataset':
-				return new GraphDatasetTabIndicatorItem;
-			case 'GraphOptions':
-				return new GraphOptionsTabIndicatorItem;
-			case 'GraphTime':
-				return new GraphTimeTabIndicatorItem;
-			case 'GraphLegend':
-				return new GraphLegendTabIndicatorItem;
-			case 'GraphProblems':
-				return new GraphProblemsTabIndicatorItem;
-			case 'GraphOverrides':
-				return new GraphOverridesTabIndicatorItem;
+			case 'Http':
+				return new HttpTabIndicatorItem;
+			case 'Inventory':
+				return new InventoryTabIndicatorItem;
+			case 'Ldap':
+				return new LdapTabIndicatorItem;
+			case 'LldMacros':
+				return new LldMacrosTabIndicatorItem;
+			case 'Macros':
+				return new MacrosTabIndicatorItem;
+			case 'Overrides':
+				return new OverridesTabIndicatorItem;
+			case 'Operations':
+				return new OperationsTabIndicatorItem;
 			case 'Permissions':
 				return new PermissionsTabIndicatorItem;
+			case 'Preprocessing':
+				return new PreprocessingTabIndicatorItem;
+			case 'Saml':
+				return new SamlTabIndicatorItem;
+			case 'Sharing':
+				return new SharingTabIndicatorItem;
+			case 'ExcludedDowntimes':
+				return new ExcludedDowntimesTabIndicatorItem;
+			case 'Steps':
+				return new StepsTabIndicatorItem;
+			case 'TagFilter':
+				return new TagFilterTabIndicatorItem;
+			case 'Tags':
+				return new TagsTabIndicatorItem;
+			case 'Time':
+				return new TimeTabIndicatorItem;
 			case 'Valuemaps':
 				return new ValuemapsTabIndicatorItem;
 		}
@@ -795,28 +798,29 @@ class OperationsTabIndicatorItem extends TabIndicatorItem {
 	}
 }
 
-class SlaTabIndicatorItem extends TabIndicatorItem {
+class ExcludedDowntimesTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
-		super(TAB_INDICATOR_TYPE_MARK);
+		super(TAB_INDICATOR_TYPE_COUNT);
 	}
 
 	getValue() {
-		const element = document.querySelector('#showsla');
-
-		if (element !== null) {
-			return element.checked;
-		}
-
-		return false;
+		return document
+			.querySelectorAll('#excluded-downtimes tbody tr')
+			.length;
 	}
 
 	initObserver(element) {
-		const target_node = document.querySelector('#showsla');
+		const target_node = document.querySelector('#excluded-downtimes tbody');
 
 		if (target_node !== null) {
-			target_node.addEventListener('click', () => {
+			const observer = new MutationObserver(() => {
 				this.addAttributes(element);
+			});
+
+			observer.observe(target_node, {
+				childList: true,
+				subtree: true
 			});
 		}
 	}

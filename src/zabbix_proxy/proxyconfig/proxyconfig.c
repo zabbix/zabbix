@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@
 #include "proxyconfig.h"
 #include "zbxcrypto.h"
 #include "zbxcompress.h"
+#include "zbxrtc.h"
 #include "zbxipcservice.h"
 
 #define CONFIG_PROXYCONFIG_RETRY	120	/* seconds */
@@ -54,11 +55,6 @@ static void	zbx_proxyconfig_sigusr_handler(int flags)
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: process_configuration_sync                                       *
- *                                                                            *
- ******************************************************************************/
 static void	process_configuration_sync(size_t *data_size)
 {
 	zbx_socket_t		sock;
@@ -156,15 +152,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: main_proxyconfig_loop                                            *
- *                                                                            *
  * Purpose: periodically request config data                                  *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: never returns                                                    *
  *                                                                            *
@@ -175,6 +163,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 	double			sec;
 	zbx_ipc_service_t	config_service;
 	char			*error = NULL;
+	zbx_timespec_t		timeout = {1, 0};
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -202,6 +191,13 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 	zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
 	DCsync_configuration(ZBX_DBSYNC_INIT);
 
+	if (SUCCEED != zbx_rtc_notify_config_sync(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot send configuration syncer notification: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
 	while (ZBX_IS_RUNNING())
 	{
 		if (ZBX_PROGRAM_TYPE_PROXY_PASSIVE == program_type)
@@ -210,7 +206,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 			zbx_ipc_message_t	*message;
 
 			update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
-			zbx_ipc_service_recv(&config_service, 1, &client, &message);
+			zbx_ipc_service_recv(&config_service, &timeout, &client, &message);
 			update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 			sec = zbx_time();

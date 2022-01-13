@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -215,16 +215,15 @@ function createFontSelect(string $name): CSelect {
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 						(new CButton(null, _('Select')))
 							->addClass(ZBX_STYLE_BTN_GREY)
-							->onClick('return PopUp("popup.generic",jQuery.extend('.
-								json_encode([
+							->onClick(
+								'return PopUp("popup.generic", jQuery.extend('.json_encode([
 									'srctbl' => 'sysmaps',
 									'srcfld1' => 'sysmapid',
 									'srcfld2' => 'name',
 									'dstfrm' => 'selementForm',
 									'dstfld1' => 'sysmapid',
 									'dstfld2' => 'elementNameMap'
-								]).
-									',{excludeids: [#{sysmapid}]}), null, this);'
+								]).', {excludeids: [#{sysmapid}]}), {dialogue_class: "modal-popup-generic"});'
 							)
 					], 'mapSelectRow')
 					->addRow(_('Tags'),
@@ -794,8 +793,8 @@ function createFontSelect(string $name): CSelect {
 								->setId('linkTriggerscontainer'),
 							(new CButton(null, _('Add')))
 								->addClass(ZBX_STYLE_BTN_LINK)
-								->onClick('return PopUp("popup.generic",'.
-									json_encode([
+								->onClick(
+									'return PopUp("popup.generic", '.json_encode([
 										'srctbl' => 'triggers',
 										'srcfld1' => 'triggerid',
 										'reference' => 'linktrigger',
@@ -803,7 +802,7 @@ function createFontSelect(string $name): CSelect {
 										'real_hosts' => '1',
 										'with_triggers' => '1',
 										'noempty' => '1'
-									]).', null, this);'
+									]).', {dialogue_class: "modal-popup-generic"});'
 								)
 						]))
 							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)

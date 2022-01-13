@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,8 +27,6 @@
 #include "zbxtasks.h"
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_tm_get_remote_tasks                                          *
  *                                                                            *
  * Purpose: get tasks scheduled to be executed on a proxy                     *
  *                                                                            *

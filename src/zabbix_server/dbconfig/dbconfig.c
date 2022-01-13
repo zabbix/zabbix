@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 #include "log.h"
 #include "dbconfig.h"
 #include "dbcache.h"
+#include "zbxrtc.h"
 
 extern int		CONFIG_CONFSYNCER_FREQUENCY;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
@@ -63,15 +64,7 @@ static void	zbx_dbconfig_sigusr_handler(int flags)
 
 /******************************************************************************
  *                                                                            *
- * Function: main_dbconfig_loop                                               *
- *                                                                            *
  * Purpose: periodically synchronises database data with memory cache         *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: never returns                                                    *
  *                                                                            *
@@ -80,6 +73,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 {
 	double	sec = 0.0;
 	int	nextcheck = 0;
+	char	*error = NULL;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -102,6 +96,14 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 	DCsync_kvs_paths(NULL);
 	zbx_setproctitle("%s [synced configuration in " ZBX_FS_DBL " sec, idle %d sec]",
 			get_process_type_string(process_type), (sec = zbx_time() - sec), CONFIG_CONFSYNCER_FREQUENCY);
+
+	if (SUCCEED != zbx_rtc_notify_config_sync(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot send configuration syncer notification: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
 	zbx_sleep_loop(CONFIG_CONFSYNCER_FREQUENCY);
 
 	while (ZBX_IS_RUNNING())

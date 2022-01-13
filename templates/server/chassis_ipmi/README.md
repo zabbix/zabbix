@@ -3,15 +3,11 @@
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
-Template for monitoring servers with BMC over IPMI that work without any external scripts.  
-All metrics are collected at once, thanks to Zabbix's bulk data collection. The template is available starting from Zabbix version 5.0.  
+For Zabbix version: 6.0 and higher  
+Template for monitoring servers with BMC over IPMI that work without any external scripts.
+All metrics are collected at once, thanks to Zabbix's bulk data collection.
 It collects metrics by polling BMC remotely using an IPMI agent.
 
-
-This template was tested on:
-
-- Zabbix, version 5.0
 
 ## Setup
 
@@ -26,12 +22,12 @@ No specific Zabbix configuration is required.
 
 ### Macros used
 
-| Name                            | Description                                                                                                | Default   |
-|---------------------------------|------------------------------------------------------------------------------------------------------------|-----------|
-| {$IPMI.PASSWORD}                | <p>This macro is used for access to BMC. It can be overridden on the host or linked template level.</p>    | ``        |
-| {$IPMI.SENSOR_TYPE.MATCHES}     | <p>This macro is used in sensors discovery. It can be overridden on the host or linked template level.</p> | `.*`      |
-| {$IPMI.SENSOR_TYPE.NOT_MATCHES} | <p>This macro is used in sensors discovery. It can be overridden on the host or linked template level.</p> | `invalid` |
-| {$IPMI.USER}                    | <p>This macro is used for access to BMC. It can be overridden on the host or linked template level.</p>    | ``        |
+|Name|Description|Default|
+|----|-----------|-------|
+|{$IPMI.PASSWORD} |<p>This macro is used for access to BMC. It can be overridden on the host or linked template level.</p> |`` |
+|{$IPMI.SENSOR_TYPE.MATCHES} |<p>This macro is used in sensors discovery. It can be overridden on the host or linked template level.</p> |`.*` |
+|{$IPMI.SENSOR_TYPE.NOT_MATCHES} |<p>This macro is used in sensors discovery. It can be overridden on the host or linked template level.</p> |`invalid` |
+|{$IPMI.USER} |<p>This macro is used for access to BMC. It can be overridden on the host or linked template level.</p> |`` |
 
 ## Template links
 
@@ -39,30 +35,30 @@ There are no template links in this template.
 
 ## Discovery rules
 
-| Name                        | Description                                     | Type      | Key and additional info                                                                                                                                                                                                                                           |
-|-----------------------------|-------------------------------------------------|-----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Discrete sensors discovery  | <p>Discovery of the discrete IPMI sensors.</p>  | DEPENDENT | ipmi.discrete.discovery<p>**Filter**:</p>AND <p>- A: {#SENSOR_READING_TYPE} NOT_MATCHES_REGEX `threshold`</p><p>- B: {#SENSOR_TYPE} MATCHES_REGEX `{$IPMI.SENSOR_TYPE.MATCHES}`</p><p>- C: {#SENSOR_TYPE} NOT_MATCHES_REGEX `{$IPMI.SENSOR_TYPE.NOT_MATCHES}`</p> |
-| Threshold sensors discovery | <p>Discovery of the threshold IPMI sensors.</p> | DEPENDENT | ipmi.sensors.discovery<p>**Filter**:</p>AND <p>- A: {#SENSOR_READING_TYPE} MATCHES_REGEX `threshold`</p><p>- B: {#SENSOR_TYPE} MATCHES_REGEX `{$IPMI.SENSOR_TYPE.MATCHES}`</p><p>- C: {#SENSOR_TYPE} NOT_MATCHES_REGEX `{$IPMI.SENSOR_TYPE.NOT_MATCHES}`</p>      |
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|----|
+|Discrete sensors discovery |<p>Discovery of the discrete IPMI sensors.</p> |DEPENDENT |ipmi.discrete.discovery<p>**Filter**:</p>AND <p>- {#SENSOR_READING_TYPE} NOT_MATCHES_REGEX `threshold`</p><p>- {#SENSOR_TYPE} MATCHES_REGEX `{$IPMI.SENSOR_TYPE.MATCHES}`</p><p>- {#SENSOR_TYPE} NOT_MATCHES_REGEX `{$IPMI.SENSOR_TYPE.NOT_MATCHES}`</p> |
+|Threshold sensors discovery |<p>Discovery of the threshold IPMI sensors.</p> |DEPENDENT |ipmi.sensors.discovery<p>**Filter**:</p>AND <p>- {#SENSOR_READING_TYPE} MATCHES_REGEX `threshold`</p><p>- {#SENSOR_TYPE} MATCHES_REGEX `{$IPMI.SENSOR_TYPE.MATCHES}`</p><p>- {#SENSOR_TYPE} NOT_MATCHES_REGEX `{$IPMI.SENSOR_TYPE.NOT_MATCHES}`</p><p>**Overrides:**</p><p>trigger SENSOR_LO_WARN<br><br>  - TRIGGER_PROTOTYPE LIKE `{#SENSOR_LO_WARN}` - NO_DISCOVER</p><p>trigger SENSOR_LO_CRIT<br><br>  - TRIGGER_PROTOTYPE LIKE `{#SENSOR_LO_CRIT}` - NO_DISCOVER</p><p>trigger SENSOR_LO_DISAST<br><br>  - TRIGGER_PROTOTYPE LIKE `{#SENSOR_LO_DISAST}` - NO_DISCOVER</p><p>trigger SENSOR_HI_WARN<br><br>  - TRIGGER_PROTOTYPE LIKE `{#SENSOR_HI_WARN}` - NO_DISCOVER</p><p>trigger SENSOR_HI_CRIT<br><br>  - TRIGGER_PROTOTYPE LIKE `{#SENSOR_HI_CRIT}` - NO_DISCOVER</p><p>trigger SENSOR_HI_DISAST<br><br>  - TRIGGER_PROTOTYPE LIKE `{#SENSOR_HI_DISAST}` - NO_DISCOVER</p> |
 
 ## Items collected
 
-| Group            | Name                               | Description                                                                                           | Type      | Key and additional info                                                                                                                                             |
-|------------------|------------------------------------|-------------------------------------------------------------------------------------------------------|-----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| General          | IPMI: {#SENSOR_ID}                 | <p>It is a state of the discrete IPMI sensor.</p>                                                     | DEPENDENT | ipmi.state_text[{#SENSOR_ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.id=='{#SENSOR_ID}')].state.text.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
-| General          | IPMI: {#SENSOR_ID}, {#SENSOR_UNIT} | <p>It is a state of the threshold IPMI sensor.</p>                                                    | DEPENDENT | ipmi.value[{#SENSOR_ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.id=='{#SENSOR_ID}')].value.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p>           |
-| Zabbix_raw_items | Get IPMI sensors                   | <p>The master item that receives all sensors with values for LLD and dependent elements from BMC.</p> | IPMI      | ipmi.get                                                                                                                                                            |
+|Group|Name|Description|Type|Key and additional info|
+|-----|----|-----------|----|---------------------|
+|General |IPMI: {#SENSOR_ID} |<p>It is a state of the discrete IPMI sensor.</p> |DEPENDENT |ipmi.state_text[{#SENSOR_ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.id=='{#SENSOR_ID}')].state.text.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
+|General |IPMI: {#SENSOR_ID}, {#SENSOR_UNIT} |<p>It is a state of the threshold IPMI sensor.</p> |DEPENDENT |ipmi.value[{#SENSOR_ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.id=='{#SENSOR_ID}')].value.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Zabbix_raw_items |Get IPMI sensors |<p>The master item that receives all sensors with values for LLD and dependent elements from BMC.</p> |IPMI |ipmi.get |
 
 ## Triggers
 
-| Name                                                                                             | Description                                                                                                                                       | Expression                                                             | Severity | Dependencies and additional info                                                                                                                                                                                                |
-|--------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------|----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| IPMI: {#SENSOR_ID} value has changed                                                             | <p>The trigger is informing about changes in a state of the discrete IPMI sensor. A problem generated by this trigger can be manually closed.</p> | `{TEMPLATE_NAME:ipmi.state_text[{#SENSOR_ID}].diff()}=1`               | INFO     | <p>Manual close: YES</p>                                                                                                                                                                                                        |
-| IPMI: {#SENSOR_ID} value is below non-critical low (less than {#SENSOR_LO_WARN} for 5m)          | <p>The trigger is informing that a value less than the lower non-critical threshold has been reached.</p>                                         | `{TEMPLATE_NAME:ipmi.value[{#SENSOR_ID}].min(5m)}<{#SENSOR_LO_WARN}`   | WARNING  | <p>**Depends on**:</p><p>- IPMI: {#SENSOR_ID} value is below critical low (less than {#SENSOR_LO_CRIT} for 5m)</p><p>- IPMI: {#SENSOR_ID} value is below non-recoverable low (less than {#SENSOR_LO_DISAST} for 5m)</p>         |
-| IPMI: {#SENSOR_ID} value is below critical low (less than {#SENSOR_LO_CRIT} for 5m)              | <p>The trigger is informing that a value less than the lower critical threshold has been reached.</p>                                             | `{TEMPLATE_NAME:ipmi.value[{#SENSOR_ID}].min(5m)}<{#SENSOR_LO_CRIT}`   | HIGH     | <p>**Depends on**:</p><p>- IPMI: {#SENSOR_ID} value is below non-recoverable low (less than {#SENSOR_LO_DISAST} for 5m)</p>                                                                                                     |
-| IPMI: {#SENSOR_ID} value is below non-recoverable low (less than {#SENSOR_LO_DISAST} for 5m)     | <p>The trigger is informing that a value less than the lower non-recoverable threshold has been reached.</p>                                      | `{TEMPLATE_NAME:ipmi.value[{#SENSOR_ID}].min(5m)}<{#SENSOR_LO_DISAST}` | DISASTER |                                                                                                                                                                                                                                 |
-| IPMI: {#SENSOR_ID} value is above non-critical high (greater than {#SENSOR_HI_WARN} for 5m)      | <p>The trigger is informing that a value higher than the upper non-critical threshold has been reached.</p>                                       | `{TEMPLATE_NAME:ipmi.value[{#SENSOR_ID}].min(5m)}>{#SENSOR_HI_WARN}`   | WARNING  | <p>**Depends on**:</p><p>- IPMI: {#SENSOR_ID} value is above critical high (greater than {#SENSOR_HI_CRIT} for 5m)</p><p>- IPMI: {#SENSOR_ID} value is above non-recoverable high (greater than {#SENSOR_HI_DISAST} for 5m)</p> |
-| IPMI: {#SENSOR_ID} value is above critical high (greater than {#SENSOR_HI_CRIT} for 5m)          | <p>The trigger is informing that a value higher than the upper critical threshold has been reached.</p>                                           | `{TEMPLATE_NAME:ipmi.value[{#SENSOR_ID}].min(5m)}>{#SENSOR_HI_CRIT}`   | HIGH     | <p>**Depends on**:</p><p>- IPMI: {#SENSOR_ID} value is above non-recoverable high (greater than {#SENSOR_HI_DISAST} for 5m)</p>                                                                                                 |
-| IPMI: {#SENSOR_ID} value is above non-recoverable high (greater than {#SENSOR_HI_DISAST} for 5m) | <p>The trigger is informing that a value higher than the upper non-recoverable threshold has been reached.</p>                                    | `{TEMPLATE_NAME:ipmi.value[{#SENSOR_ID}].min(5m)}>{#SENSOR_HI_DISAST}` | DISASTER |                                                                                                                                                                                                                                 |
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----|----|----|
+|IPMI: {#SENSOR_ID} value has changed |<p>The trigger is informing about changes in a state of the discrete IPMI sensor. A problem generated by this trigger can be manually closed.</p> |`last(/Chassis by IPMI/ipmi.state_text[{#SENSOR_ID}],#1)<>last(/Chassis by IPMI/ipmi.state_text[{#SENSOR_ID}],#2)` |INFO |<p>Manual close: YES</p> |
+|IPMI: {#SENSOR_ID} value is below non-critical low (less than {#SENSOR_LO_WARN} for 5m) |<p>The trigger is informing that a value less than the lower non-critical threshold has been reached.</p> |`min(/Chassis by IPMI/ipmi.value[{#SENSOR_ID}],5m)<{#SENSOR_LO_WARN}` |WARNING |<p>**Depends on**:</p><p>- IPMI: {#SENSOR_ID} value is below critical low (less than {#SENSOR_LO_CRIT} for 5m)</p><p>- IPMI: {#SENSOR_ID} value is below non-recoverable low (less than {#SENSOR_LO_DISAST} for 5m)</p> |
+|IPMI: {#SENSOR_ID} value is below critical low (less than {#SENSOR_LO_CRIT} for 5m) |<p>The trigger is informing that a value less than the lower critical threshold has been reached.</p> |`min(/Chassis by IPMI/ipmi.value[{#SENSOR_ID}],5m)<{#SENSOR_LO_CRIT}` |HIGH |<p>**Depends on**:</p><p>- IPMI: {#SENSOR_ID} value is below non-recoverable low (less than {#SENSOR_LO_DISAST} for 5m)</p> |
+|IPMI: {#SENSOR_ID} value is below non-recoverable low (less than {#SENSOR_LO_DISAST} for 5m) |<p>The trigger is informing that a value less than the lower non-recoverable threshold has been reached.</p> |`min(/Chassis by IPMI/ipmi.value[{#SENSOR_ID}],5m)<{#SENSOR_LO_DISAST}` |DISASTER | |
+|IPMI: {#SENSOR_ID} value is above non-critical high (greater than {#SENSOR_HI_WARN} for 5m) |<p>The trigger is informing that a value higher than the upper non-critical threshold has been reached.</p> |`min(/Chassis by IPMI/ipmi.value[{#SENSOR_ID}],5m)>{#SENSOR_HI_WARN}` |WARNING |<p>**Depends on**:</p><p>- IPMI: {#SENSOR_ID} value is above critical high (greater than {#SENSOR_HI_CRIT} for 5m)</p><p>- IPMI: {#SENSOR_ID} value is above non-recoverable high (greater than {#SENSOR_HI_DISAST} for 5m)</p> |
+|IPMI: {#SENSOR_ID} value is above critical high (greater than {#SENSOR_HI_CRIT} for 5m) |<p>The trigger is informing that a value higher than the upper critical threshold has been reached.</p> |`min(/Chassis by IPMI/ipmi.value[{#SENSOR_ID}],5m)>{#SENSOR_HI_CRIT}` |HIGH |<p>**Depends on**:</p><p>- IPMI: {#SENSOR_ID} value is above non-recoverable high (greater than {#SENSOR_HI_DISAST} for 5m)</p> |
+|IPMI: {#SENSOR_ID} value is above non-recoverable high (greater than {#SENSOR_HI_DISAST} for 5m) |<p>The trigger is informing that a value higher than the upper non-recoverable threshold has been reached.</p> |`min(/Chassis by IPMI/ipmi.value[{#SENSOR_ID}],5m)>{#SENSOR_HI_DISAST}` |DISASTER | |
 
 ## Feedback
 
@@ -77,6 +73,6 @@ You can also provide a feedback, discuss the template or ask for help with it at
 
 ## References
 
-https://www.intel.com/content/www/us/en/products/docs/servers/ipmi/ipmi-second-gen-interface-spec-v2-rev1-1.html  
+https://www.intel.com/content/www/us/en/products/docs/servers/ipmi/ipmi-second-gen-interface-spec-v2-rev1-1.html
 https://www.zabbix.com/documentation/5.0/manual/config/items/itemtypes/ipmi
 
