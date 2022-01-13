@@ -23,6 +23,8 @@
 
 #ifdef HAVE_LIBMODBUS
 
+#include "mutexs.h"
+
 #ifdef _WINDOWS
 #	include "inttypes.h"
 #	ifdef HAVE_LIBMODBUS_STATIC
