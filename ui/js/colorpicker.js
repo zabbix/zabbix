@@ -68,8 +68,6 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 		setPreviewColor = function (color) {
 			color = $.trim(color).toUpperCase();
 
-			$overlay_input.val(color);
-
 			if (input.data('use_default') && color.length == 0) {
 				$overlay_colorbox
 					.css({'background': ''})
@@ -260,6 +258,8 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 				else {
 					$button_use_default.hide();
 				}
+
+				$overlay_input.val(input.val());
 
 				setPreviewColor(input.val());
 
