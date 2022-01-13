@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@
 #include "zbxserver.h"
 #include "zbxself.h"
 #include "preproc.h"
-#include "../events.h"
 
 #include "poller.h"
 
@@ -45,6 +44,7 @@
 #include "zbxjson.h"
 #include "zbxhttp.h"
 #include "avail_protocol.h"
+#include "log.h"
 #include "zbxavailability.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
@@ -56,8 +56,6 @@ static volatile sig_atomic_t	snmp_cache_reload_requested;
 #endif
 
 /******************************************************************************
- *                                                                            *
- * Function: update_interface_availability                                    *
  *                                                                            *
  * Purpose: write interface availability changes into database                *
  *                                                                            *
@@ -83,8 +81,6 @@ static int	update_interface_availability(unsigned char **data, size_t *data_allo
 
 /******************************************************************************
  *                                                                            *
- * Function: interface_get_availability                                       *
- *                                                                            *
  * Purpose: get interface availability data                                   *
  *                                                                            *
  * Parameters: dc_interface - [IN] the interface                              *
@@ -106,8 +102,6 @@ static void	interface_get_availability(const DC_INTERFACE *dc_interface, zbx_int
 }
 
 /********************************************************************************
- *                                                                              *
- * Function: interface_set_availability                                         *
  *                                                                              *
  * Purpose: sets interface availability data                                    *
  *                                                                              *
@@ -152,8 +146,6 @@ static int	interface_availability_by_item_type(unsigned char item_type, unsigned
 }
 
 /********************************************************************************
- *                                                                              *
- * Function: zbx_activate_item_interface                                        *
  *                                                                              *
  * Purpose: activate item interface                                             *
  *                                                                              *
@@ -207,8 +199,6 @@ out:
 }
 
 /********************************************************************************
- *                                                                              *
- * Function: zbx_deactivate_item_interface                                      *
  *                                                                              *
  * Purpose: deactivate item interface                                           *
  *                                                                              *
@@ -784,16 +774,12 @@ void	zbx_clean_items(DC_ITEM *items, int num, AGENT_RESULT *results)
 
 /******************************************************************************
  *                                                                            *
- * Function: get_values                                                       *
- *                                                                            *
  * Purpose: retrieve values of metrics from monitored hosts                   *
  *                                                                            *
  * Parameters: poller_type - [IN] poller type (ZBX_POLLER_TYPE_...)           *
  *             nextcheck   - [OUT] item nextcheck                             *
  *                                                                            *
  * Return value: number of items processed                                    *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: processes single item at a time except for Java, SNMP items,     *
  *           see DCconfig_get_poller_items()                                  *

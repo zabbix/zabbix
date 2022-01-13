@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:44Z'
+  version: '6.0'
+  date: '2021-12-16T07:08:49Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -10,7 +10,7 @@ zabbix_export:
       uuid: d670c32f007d438c9dcd32db57d2b691
       template: 'Oracle by Zabbix agent 2'
       name: 'Oracle by Zabbix agent 2'
-      description: 'Template tooling version used: 0.38'
+      description: 'Template tooling version used: 0.40'
       groups:
         -
           name: Templates/Databases
@@ -174,7 +174,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Get info about CDB and  No-CDB databases on instansce.'
+          description: 'Get info about CDB and  No-CDB databases on instance.'
           tags:
             -
               tag: Application
@@ -684,7 +684,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Get info about PDB databases on instansce.'
+          description: 'Get info about PDB databases on instance.'
           tags:
             -
               tag: Application
@@ -1131,7 +1131,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Count of the prolongely locked sessions. (You can change maximum session lock duration in seconds for query by {$ORACLE.SESSION.LOCK.MAX.TIME} macro. Default 600 sec)'
+          description: 'Count of the prolongedly locked sessions. (You can change maximum session lock duration in seconds for query by {$ORACLE.SESSION.LOCK.MAX.TIME} macro. Default 600 sec)'
           preprocessing:
             -
               type: JSONPATH
@@ -1606,11 +1606,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[''{#DEST_NAME}''].status.first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 1h
+                    - '$..[''{#DEST_NAME}''].log_sequence.first()'
               master_item:
                 key: 'oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
               tags:
@@ -1624,14 +1620,18 @@ zabbix_export:
               key: 'oracle.archivelog_log_status["{#DEST_NAME}"]'
               delay: '0'
               history: 7d
-              description: 'Identifies the current status of the destination: 1 - ''Valid'', 2 - ''Dederred'',3 - ''Error'', 0 - ''Unknown'''
+              description: 'Identifies the current status of the destination: 1 - ''Valid'', 2 - ''Deferred'',3 - ''Error'', 0 - ''Unknown'''
               valuemap:
                 name: 'Oracle Archivelog status'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[''{#DEST_NAME}''].log_sequence.first()'
+                    - '$..[''{#DEST_NAME}''].status.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: 'oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
               tags:
@@ -2058,6 +2058,12 @@ zabbix_export:
                   value: 'Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}'
               trigger_prototypes:
                 -
+                  uuid: 832f908ca3b84a3c9a030b5d33b96016
+                  expression: 'last(/Oracle by Zabbix agent 2/oracle.tbs_status["{#TABLESPACE}"])=2'
+                  name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace is OFFLINE'
+                  priority: WARNING
+                  description: 'The tablespace is in the offline state.'
+                -
                   uuid: 2e84836974b340b5b916eed08e1fcdf4
                   expression: 'last(/Oracle by Zabbix agent 2/oracle.tbs_status["{#TABLESPACE}"],#1)<>last(/Oracle by Zabbix agent 2/oracle.tbs_status["{#TABLESPACE}"],#2)'
                   name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace status has changed (new value received: {ITEM.VALUE})'
@@ -2066,14 +2072,8 @@ zabbix_export:
                   manual_close: 'YES'
                   dependencies:
                     -
-                      name: 'Oracle TBS ''{#TABLESPACE}'': Tablespase is OFFLINE'
+                      name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace is OFFLINE'
                       expression: 'last(/Oracle by Zabbix agent 2/oracle.tbs_status["{#TABLESPACE}"])=2'
-                -
-                  uuid: 832f908ca3b84a3c9a030b5d33b96016
-                  expression: 'last(/Oracle by Zabbix agent 2/oracle.tbs_status["{#TABLESPACE}"])=2'
-                  name: 'Oracle TBS ''{#TABLESPACE}'': Tablespase is OFFLINE'
-                  priority: WARNING
-                  description: 'The tablespase is in the offline state.'
             -
               uuid: ab56fee407e143db912dffcf24fb0106
               name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace used, bytes'
@@ -2243,11 +2243,11 @@ zabbix_export:
         -
           macro: '{$ORACLE.SESSION.LOCK.MAX.TIME}'
           value: '600'
-          description: 'Maximum session lock duration in seconds for count the session as a prolongely locked query.'
+          description: 'Maximum session lock duration in seconds for count the session as a prolongedly locked query.'
         -
           macro: '{$ORACLE.SESSION.LONG.LOCK.MAX.WARN}'
           value: '3'
-          description: 'Maximum number of the prolongely locked sessions alert threshold (for trigger expression).'
+          description: 'Maximum number of the prolongedly locked sessions alert threshold (for trigger expression).'
         -
           macro: '{$ORACLE.SESSIONS.LOCK.MAX.WARN}'
           value: '20'

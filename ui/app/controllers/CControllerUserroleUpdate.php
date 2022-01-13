@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,7 +37,10 @@ class CControllerUserroleUpdate extends CControllerUserroleEditGeneral {
 			'ui_monitoring_latest_data' => 				'in 0,1',
 			'ui_monitoring_maps' => 					'in 0,1',
 			'ui_monitoring_discovery' => 				'in 0,1',
-			'ui_monitoring_services' => 				'in 0,1',
+			'ui_services_services' => 					'in 0,1',
+			'ui_services_actions' => 					'in 0,1',
+			'ui_services_sla' => 						'in 0,1',
+			'ui_services_sla_report' => 				'in 0,1',
 			'ui_inventory_overview' => 					'in 0,1',
 			'ui_inventory_hosts' => 					'in 0,1',
 			'ui_reports_system_info' => 				'in 0,1',
@@ -73,6 +76,7 @@ class CControllerUserroleUpdate extends CControllerUserroleEditGeneral {
 			'actions_execute_scripts' => 				'in 0,1',
 			'actions_manage_api_tokens' => 				'in 0,1',
 			'actions_manage_scheduled_reports' => 		'in 0,1',
+			'actions_manage_sla' => 					'in 0,1',
 			'ui_default_access' => 						'in 0,1',
 			'modules_default_access' => 				'in 0,1',
 			'actions_default_access' => 				'in 0,1',

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,14 +18,12 @@
 **/
 
 #include "common.h"
-#include "sysinfo.h"
-
+#include "module.h"
 #include "comms.h"
 #include "log.h"
 #include "cfg.h"
 
 #include "net.h"
-#include "zbxalgo.h"
 
 int	tcp_expect(const char *host, unsigned short port, int timeout, const char *request,
 		int (*validate_func)(const char *), const char *sendtoclose, int *value_int)

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,11 +21,10 @@
 
 #ifdef HAVE_OPENIPMI
 
-#include "log.h"
 #include "zbxserialize.h"
+#include "zbxserver.h"
 
 #include "ipmi_protocol.h"
-#include "zbxserver.h"
 
 zbx_uint32_t	zbx_ipmi_serialize_request(unsigned char **data, zbx_uint64_t hostid, zbx_uint64_t objectid,
 		const char *addr, unsigned short port, signed char authtype, unsigned char privilege,

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -819,10 +819,8 @@ function getItemFormData(array $item = [], array $options = []) {
 
 	// Dependent item initialization by master_itemid.
 	if (array_key_exists('master_item', $item)) {
-		$expanded = CMacrosResolverHelper::resolveItemNames([$item['master_item']]);
-		$master_item = reset($expanded);
-		$data['master_itemid'] = $master_item['itemid'];
-		$data['master_itemname'] = $master_item['name_expanded'];
+		$data['master_itemid'] = $item['master_item']['itemid'];
+		$data['master_itemname'] = $item['master_item']['name'];
 		// Do not initialize item data if only master_item array was passed.
 		unset($item['master_item']);
 	}

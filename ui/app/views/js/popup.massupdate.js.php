@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -334,17 +334,17 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 		}
 	}
 
-	function openAddfromPopup(elm) {
+	function openAddfromPopup(element) {
 		let disable_names = [];
-		let valuemap_table = elm.closest('table');
+		let valuemap_table = element.closest('table');
 
-		valuemap_table.querySelectorAll('[name$="[name]"]').forEach((elm) => disable_names.push(elm.value));
+		valuemap_table.querySelectorAll('[name$="[name]"]').forEach((element) => disable_names.push(element.value));
 		PopUp('popup.generic', {
 			srctbl: 'valuemaps',
 			srcfld1: 'valuemapid',
 			disable_names: disable_names,
 			editable: true
-		}, null, elm);
+		}, {dialogue_class: 'modal-popup-generic', trigger_element: element});
 	}
 
 	function toggleVisible(obj, data_type) {
@@ -421,7 +421,7 @@ function submitPopup(overlay) {
 		overlayDialogue({
 			'title': <?= json_encode(_('Warning')) ?>,
 			'type': 'popup',
-			'class': 'modal-popup modal-popup-medium',
+			'class': 'position-middle',
 			'content': $('<span>').text(warning_message),
 			'buttons': [
 				{

@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:14Z'
+  version: '6.0'
+  date: '2021-12-17T06:32:35Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -18,7 +18,7 @@ zabbix_export:
         TIMETRA-SYSTEM-MIB
         SNMPv2-MIB
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       templates:
         -
           name: 'EtherLike-MIB SNMP'
@@ -291,7 +291,7 @@ zabbix_export:
               trends: 0d
               description: |
                 MIB: TIMETRA-SYSTEM-MIB
-                The overall status of an equipped power supply. 
+                The overall status of an equipped power supply.
                 For AC multiple powersupplies, this represents the overall status of the first power supplyin the tray (or shelf).
                 For any other type, this represents the overall status of the power supply.
                 If tmnxChassisPowerSupply1Status is'deviceStateOk', then all monitored statuses are 'deviceStateOk'.

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,9 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "dbcache.h"
-
 #include "log.h"
+#include "audit.h"
+#include "db.h"
+#include "zbxdb.h"
+
 #include "audit_item.h"
 
 static int	item_flag_to_resource_type(int flag)
@@ -366,8 +368,6 @@ PREPARE_AUDIT_ITEM_UPDATE(key,			const char*,	string)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_audit_item_create_entry_for_delete                           *
- *                                                                            *
  * Parameters: id   - [IN] resource id                                        *
  *             name - [IN] resource name                                      *
  *             flag - [IN] resource flag                                      *
@@ -401,8 +401,6 @@ void	zbx_audit_item_create_entry_for_delete(zbx_uint64_t id, const char *name, i
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_audit_DBselect_delete_for_item                               *
  *                                                                            *
  * Parameters: sql - [IN] sql statement                                       *
  *             ids - [OUT] sorted list of selected uint64 values              *

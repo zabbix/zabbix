@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1327,48 +1327,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		unset($graph);
 
 		return $graphs;
-	}
-
-	/**
-	 * Resolve item name macros to "name_expanded" field.
-	 *
-	 * @param array  $items
-	 * @param string $items[n]['itemid']
-	 * @param string $items[n]['hostid']
-	 * @param string $items[n]['name']
-	 *
-	 * @return array
-	 */
-	public function resolveItemNames(array $items) {
-		$types = ['usermacros' => true];
-		$usermacros = [];
-
-		foreach ($items as $key => &$item) {
-			$item['name_expanded'] = $item['name'];
-			$matched_macros = self::extractMacros([$item['name_expanded']], $types);
-
-			if ($matched_macros['usermacros']) {
-				$usermacros[$key] = ['hostids' => [$item['hostid']], 'macros' => $matched_macros['usermacros']];
-			}
-		}
-		unset($item);
-
-		$macro_values = array_combine(array_keys($usermacros),
-			array_column($this->getUserMacros($usermacros), 'macros')
-		);
-		$types = $this->transformToPositionTypes($types);
-
-		// Replace macros to value.
-		foreach (array_keys($macro_values) as $key) {
-			$matched_macros = $this->getMacroPositions($items[$key]['name_expanded'], $types);
-
-			foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-				$items[$key]['name_expanded'] =
-					substr_replace($items[$key]['name_expanded'], $macro_values[$key][$macro], $pos, strlen($macro));
-			}
-		}
-
-		return $items;
 	}
 
 	/**

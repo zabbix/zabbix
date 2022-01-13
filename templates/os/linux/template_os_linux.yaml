@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-10-27T15:21:05Z'
+  date: '2021-12-14T17:44:10Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -13,7 +13,7 @@ zabbix_export:
       uuid: 45486dbbf5bf49f28866fcb212731cf0
       template: 'Linux block devices by Zabbix agent'
       name: 'Linux block devices by Zabbix agent'
-      description: 'Template tooling version used: 0.39'
+      description: 'Template tooling version used: 0.40'
       groups:
         -
           name: Templates/Modules
@@ -341,7 +341,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387225-discussion-thread-for-official-zabbix-template-for-linux
         
-        Template tooling version used: 0.39
+        Template tooling version used: 0.40
       templates:
         -
           name: 'Linux block devices by Zabbix agent'
@@ -555,7 +555,7 @@ zabbix_export:
       uuid: d4e080814aad467dbf6b95c46b862c28
       template: 'Linux CPU by Zabbix agent'
       name: 'Linux CPU by Zabbix agent'
-      description: 'Template tooling version used: 0.39'
+      description: 'Template tooling version used: 0.40'
       groups:
         -
           name: Templates/Modules
@@ -804,7 +804,7 @@ zabbix_export:
       uuid: fdcdd5810fba49928922a683d32aa76f
       template: 'Linux filesystems by Zabbix agent'
       name: 'Linux filesystems by Zabbix agent'
-      description: 'Template tooling version used: 0.39'
+      description: 'Template tooling version used: 0.40'
       groups:
         -
           name: Templates/Modules
@@ -996,7 +996,7 @@ zabbix_export:
       uuid: 38f973ee1556494fadeacb2f6b1ec987
       template: 'Linux generic by Zabbix agent'
       name: 'Linux generic by Zabbix agent'
-      description: 'Template tooling version used: 0.39'
+      description: 'Template tooling version used: 0.40'
       groups:
         -
           name: Templates/Modules
@@ -1288,7 +1288,7 @@ zabbix_export:
       uuid: 06c211e947414638bd00e555e206d03d
       template: 'Linux memory by Zabbix agent'
       name: 'Linux memory by Zabbix agent'
-      description: 'Template tooling version used: 0.39'
+      description: 'Template tooling version used: 0.40'
       groups:
         -
           name: Templates/Modules
@@ -1414,7 +1414,7 @@ zabbix_export:
         
           Description: High interface utilization trigger is removed since currently it is not possible to retrieve interface speed to determine the max bandwidth.
         
-        Template tooling version used: 0.39
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Modules
@@ -1554,7 +1554,7 @@ zabbix_export:
                     - |
                       var newvalue;
                       switch(value) {
-                        case "unkonwn":
+                        case "unknown":
                           newvalue = 0;
                           break;
                         case "notpresent":

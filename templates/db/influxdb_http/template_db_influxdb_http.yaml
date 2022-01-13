@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-10-01T08:33:52Z'
+  date: '2021-12-14T17:43:46Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -19,7 +19,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.39
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Applications
@@ -657,7 +657,7 @@ zabbix_export:
                 macro: '{#ORG_NAME}'
                 value: '{$INFLUXDB.ORG_NAME.MATCHES}'
                 formulaid: B
-          description: 'Discovery of organizations merics.'
+          description: 'Discovery of organizations metrics.'
           item_prototypes:
             -
               uuid: c84ae278bd7c4387873bc8bbf6d8ba8f

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -971,8 +971,6 @@ static int	DBpatch_2030094(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: parse_function                                                   *
- *                                                                            *
  * Purpose: return function and function parameters                           *
  *          func(param,...)                                                   *
  *                                                                            *
@@ -985,8 +983,6 @@ static int	DBpatch_2030094(void)
  *                                                                            *
  * Return value: return SUCCEED and move exp to the next char after right ')' *
  *               or FAIL and move exp to incorrect character                  *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: This function is outdated and should be used in this upgrade     *
  *           only. For other applications consider zbx_function_find() or     *

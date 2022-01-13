@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -102,8 +102,6 @@ void	__wrap_zbx_clean_events(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_vcmock_history_dump                                          *
- *                                                                            *
  * Purpose: dumps history record vector contents to standard output           *
  *                                                                            *
  ******************************************************************************/
@@ -124,8 +122,6 @@ static void	zbx_vcmock_history_dump(unsigned char value_type, const zbx_vector_h
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_vcmock_read_history_value                                    *
  *                                                                            *
  * Purpose: reads history value and timestamp from input data                 *
  *                                                                            *
@@ -190,8 +186,6 @@ static void	zbx_vcmock_read_history_value(zbx_mock_handle_t hvalue, unsigned cha
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_vcmock_read_values                                           *
- *                                                                            *
  * Purpose: reads historical values from input data                           *
  *                                                                            *
  * Parameters: hdata      - [IN] handle to the history values in input data   *
@@ -213,8 +207,6 @@ void	zbx_vcmock_read_values(zbx_mock_handle_t hdata, unsigned char value_type, z
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_vcmock_check_records                                         *
  *                                                                            *
  * Purpose: Compares two history record vectors and throw assertion if either *
  *          values or timestamps don't match                                  *
@@ -272,8 +264,6 @@ void	zbx_vcmock_check_records(const char *prefix, unsigned char value_type,
 
 /******************************************************************************
  *                                                                            *
- * Function: vc_history_record_compare_desc_func                              *
- *                                                                            *
  * Purpose: compares two cache values by their timestamps                     *
  *                                                                            *
  * Parameters: d1   - [IN] the first value                                    *
@@ -295,11 +285,6 @@ static int	vc_history_record_compare_desc_func(const zbx_history_record_t *d1, c
 	return d2->timestamp.sec - d1->timestamp.sec;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: zbx_mock_test_entry                                              *
- *                                                                            *
- ******************************************************************************/
 void	zbx_mock_test_entry(void **state)
 {
 	char				*error = NULL;

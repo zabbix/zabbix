@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:36Z'
+  version: '6.0'
+  date: '2021-12-16T08:28:18Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -16,7 +16,7 @@ zabbix_export:
         MIBs used:
         HOST-RESOURCES-MIB
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Modules
@@ -63,7 +63,7 @@ zabbix_export:
         MIBs used:
         HOST-RESOURCES-MIB
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Modules
@@ -202,7 +202,7 @@ zabbix_export:
       description: |
         HOST-RESOURCES-MIB: CPU, memory and storage(vfs.fs.file) linked together.
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       templates:
         -
           name: 'HOST-RESOURCES-MIB CPU SNMP'
@@ -222,7 +222,7 @@ zabbix_export:
               widgets:
                 -
                   type: GRAPH_CLASSIC
-                  width: '24'
+                  width: '12'
                   height: '5'
                   fields:
                     -
@@ -238,9 +238,13 @@ zabbix_export:
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '5'
-                  width: '24'
+                  width: '12'
                   height: '5'
                   fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
                     -
                       type: INTEGER
                       name: columns
@@ -249,10 +253,6 @@ zabbix_export:
                       type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -262,9 +262,13 @@ zabbix_export:
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '10'
-                  width: '24'
+                  width: '12'
                   height: '5'
                   fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
                     -
                       type: INTEGER
                       name: columns
@@ -273,10 +277,6 @@ zabbix_export:
                       type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -291,7 +291,7 @@ zabbix_export:
         MIBs used:
         HOST-RESOURCES-MIB
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Modules

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -410,7 +410,7 @@ class CControllerHostEdit extends CController {
 		// Select inventory items.
 		$inventory_items = $this->host['hostid']
 			? API::Item()->get([
-				'output' => ['inventory_link', 'itemid', 'hostid', 'name', 'key_'],
+				'output' => ['inventory_link', 'itemid', 'name'],
 				'hostids' => $this->host['hostid'],
 				'filter' => [
 					'inventory_link' => array_keys($inventory_fields)
@@ -419,7 +419,6 @@ class CControllerHostEdit extends CController {
 			: [];
 
 		$inventory_items = zbx_toHash($inventory_items, 'inventory_link');
-		$inventory_items = CMacrosResolverHelper::resolveItemNames($inventory_items);
 	}
 
 	/**

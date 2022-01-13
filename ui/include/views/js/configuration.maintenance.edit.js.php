@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -66,19 +66,17 @@
 
 		// Maintenance periods.
 		$('#maintenance_periods').on('click', '[data-action]', function() {
-			var btn = $(this),
-				rows = $('#maintenance_periods table > tbody > tr'),
-				params;
+			var button = $(this),
+				rows = $('#maintenance_periods table > tbody > tr');
 
-			switch (btn.data('action')) {
+			switch (button.data('action')) {
 				case 'remove':
-					btn.closest('tr').remove();
+					button.closest('tr').remove();
 					break;
 
 				case 'edit':
-					var row = btn.closest('tr');
-
-					params = {
+					var row = button.closest('tr');
+					var parameters = {
 						update: 1,
 						index: row.find('[type="hidden"]:first').attr('name').match(/\[(\d+)\]/)[1]
 					};
@@ -88,11 +86,14 @@
 							name = $input.attr('name').match(/\[([^\]]+)]$/);
 
 						if (name) {
-							params[name[1]] = $input.val();
+							parameters[name[1]] = $input.val();
 						}
 					});
 
-					PopUp("popup.maintenance.period", params, null, btn);
+					PopUp('popup.maintenance.period', parameters, {
+						dialogue_class: 'modal-popup-medium',
+						trigger_element: this
+					});
 					break;
 
 				case 'add':
@@ -104,11 +105,10 @@
 						);
 					});
 
-					params = {
-						index: index + 1
-					}
-
-					PopUp("popup.maintenance.period", params, null, btn);
+					PopUp('popup.maintenance.period', {index: index + 1}, {
+						dialogue_class: 'modal-popup-medium',
+						trigger_element: this
+					});
 					break;
 			}
 		});

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -100,8 +100,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: get_function_parameter_hist_range                                *
  *                                                                            *
  * Purpose: get the value of sec|num + timeshift trigger function parameter   *
  *                                                                            *

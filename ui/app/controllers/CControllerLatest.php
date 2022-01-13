@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ abstract class CControllerLatest extends CController {
 
 		// Select hosts for subsequent selection of items.
 		$hosts = API::Host()->get([
-			'output' => ['hostid', 'name', 'status'],
+			'output' => ['hostid', 'name', 'status', 'maintenanceid', 'maintenance_status', 'maintenance_type'],
 			'groupids' => $groupids,
 			'hostids' => $filter['hostids'] ? $filter['hostids'] : null,
 			'monitored_hosts' => true,
@@ -147,7 +147,6 @@ abstract class CControllerLatest extends CController {
 	 */
 	protected function extendData(array &$prepared_data) {
 		$items = CMacrosResolverHelper::resolveItemKeys($prepared_data['items']);
-		$items = CMacrosResolverHelper::resolveItemNames($items);
 		$items = CMacrosResolverHelper::resolveItemDescriptions($items);
 		$items = CMacrosResolverHelper::resolveTimeUnitMacros($items, ['delay', 'history', 'trends']);
 
@@ -155,6 +154,29 @@ abstract class CControllerLatest extends CController {
 			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD))
 		);
 
+		$hosts_on_page = array_intersect_key($prepared_data['hosts'],
+			array_column($prepared_data['items'], 'hostid', 'hostid')
+		);
+
+		$maintenanceids = [];
+
+		foreach ($hosts_on_page as $host) {
+			if ($host['status'] == HOST_STATUS_MONITORED &&	$host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+				$maintenanceids[$host['maintenanceid']] = true;
+			}
+		}
+
+		$db_maintenances = [];
+
+		if ($maintenanceids) {
+			$db_maintenances = API::Maintenance()->get([
+				'output' => ['name', 'description'],
+				'maintenanceids' => array_keys($maintenanceids),
+				'preservekeys' => true
+			]);
+		}
+
+		$prepared_data['maintenances'] = $db_maintenances;
 		$prepared_data['items'] = $items;
 		$prepared_data['history'] = $history;
 	}

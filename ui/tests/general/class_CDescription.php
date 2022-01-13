@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,7 +32,9 @@ function error($error) {
 	return true;
 }
 
-class class_CDescription extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class class_CDescription extends TestCase {
 
 	public static function setUpBeforeClass() {
 		$app = new App();

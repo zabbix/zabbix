@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -678,3 +678,51 @@ char	*strerror_from_module(unsigned long error, const wchar_t *module)
 	return utf8_string;
 }
 #endif	/* _WINDOWS */
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: log the message optionally appending to a string buffer           *
+ *                                                                            *
+ * Parameters: lebel      - [IN] the log level                                *
+ *             out        - [OUT] the output buffer (optional)                *
+ *             out_alloc  - [OUT] the output buffer size                      *
+ *             out_offset - [OUT] the output buffer offset                    *
+ *             format     - [IN] the format string                            *
+ *                                                                            *
+ * Return value: SUCCEED - the socket was successfully opened                 *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_strlog_alloc(int level, char **out, size_t *out_alloc, size_t *out_offset, const char *format, ...)
+{
+	va_list	args;
+	size_t	len;
+	char	*buf;
+
+	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(level) && NULL == out)
+		return;
+
+	va_start(args, format);
+	len = (size_t)vsnprintf(NULL, 0, format, args) + 2;
+	va_end(args);
+
+	buf = (char *)zbx_malloc(NULL, len);
+
+	va_start(args, format);
+	len = (size_t)vsnprintf(buf, len, format, args);
+	va_end(args);
+
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(level))
+		zabbix_log(level, "%s", buf);
+
+	if (NULL != out)
+	{
+		buf[0] = (char)toupper((unsigned char)buf[0]);
+		buf[len++] = '\n';
+		buf[len] = '\0';
+
+		zbx_strcpy_alloc(out, out_alloc, out_offset, buf);
+	}
+
+	zbx_free(buf);
+}

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -70,10 +70,9 @@ class CLegacyAction extends CAction {
 		}
 
 		if ($user_type < USER_TYPE_ZABBIX_ADMIN) {
-			$denied = array_merge($denied, ['actionconf.php',
-				'disc_prototypes.php', 'graphs.php', 'host_discovery.php', 'host_prototypes.php', 'hostgroups.php',
-				'host.list',  'httpconf.php', 'items.php', 'maintenance.php', 'report4.php', 'templates.php',
-				'trigger_prototypes.php', 'triggers.php'
+			$denied = array_merge($denied, ['actionconf.php', 'disc_prototypes.php', 'graphs.php', 'host_discovery.php',
+				'host_prototypes.php', 'hostgroups.php', 'host.list',  'httpconf.php', 'items.php', 'maintenance.php',
+				'report4.php', 'templates.php', 'trigger_prototypes.php', 'triggers.php'
 			]);
 		}
 
@@ -89,12 +88,12 @@ class CLegacyAction extends CAction {
 
 		if (in_array($user_type, [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])) {
 			$rule_actions = [
-				CRoleHelper::UI_MONITORING_PROBLEMS => ['tr_events.php'],
 				CRoleHelper::UI_MONITORING_HOSTS => ['httpdetails.php'],
 				CRoleHelper::UI_MONITORING_LATEST_DATA => ['history.php'],
 				CRoleHelper::UI_MONITORING_MAPS => ['image.php', 'map.php', 'sysmap.php', 'sysmaps.php'],
-				CRoleHelper::UI_INVENTORY_OVERVIEW => ['hostinventoriesoverview.php'],
+				CRoleHelper::UI_MONITORING_PROBLEMS => ['tr_events.php'],
 				CRoleHelper::UI_INVENTORY_HOSTS => ['hostinventories.php'],
+				CRoleHelper::UI_INVENTORY_OVERVIEW => ['hostinventoriesoverview.php'],
 				CRoleHelper::UI_REPORTS_AVAILABILITY_REPORT => ['report2.php'],
 				CRoleHelper::UI_REPORTS_TOP_TRIGGERS => ['toptriggers.php']
 			];
@@ -102,13 +101,23 @@ class CLegacyAction extends CAction {
 
 		if ($user_type == USER_TYPE_ZABBIX_ADMIN || $user_type == USER_TYPE_SUPER_ADMIN) {
 			$rule_actions += [
-				CRoleHelper::UI_REPORTS_NOTIFICATIONS => ['report4.php'],
 				CRoleHelper::UI_CONFIGURATION_HOST_GROUPS => ['hostgroups.php'],
-				CRoleHelper::UI_CONFIGURATION_TEMPLATES => ['templates.php'],
 				CRoleHelper::UI_CONFIGURATION_HOSTS => ['host.list'],
 				CRoleHelper::UI_CONFIGURATION_MAINTENANCE => ['maintenance.php'],
-				CRoleHelper::UI_CONFIGURATION_ACTIONS => ['actionconf.php']
+				CRoleHelper::UI_CONFIGURATION_TEMPLATES => ['templates.php'],
+				CRoleHelper::UI_REPORTS_NOTIFICATIONS => ['report4.php']
 			];
+
+			if ($action === 'actionconf.php' && getRequest('eventsource') === (string) EVENT_SOURCE_SERVICE) {
+				$rule_actions += [
+					CRoleHelper::UI_SERVICES_ACTIONS => ['actionconf.php']
+				];
+			}
+			else {
+				$rule_actions += [
+					CRoleHelper::UI_CONFIGURATION_ACTIONS => ['actionconf.php']
+				];
+			}
 		}
 
 		if ($user_type == USER_TYPE_SUPER_ADMIN) {
