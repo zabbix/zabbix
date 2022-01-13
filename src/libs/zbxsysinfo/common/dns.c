@@ -19,13 +19,11 @@
 
 #include "common.h"
 #include "sysinfo.h"
-
 #include "comms.h"
 #include "log.h"
-#include "cfg.h"
+#include "zbxalgo.h"
 
 #include "dns.h"
-#include "zbxalgo.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #	include <windns.h>

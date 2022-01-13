@@ -18,16 +18,15 @@
 **/
 
 #include "common.h"
-#include "log.h"
 #include "zbxalgo.h"
 #include "zbxregexp.h"
 #include "zbxjson.h"
 #include "json.h"
 #include "json_parser.h"
-#include "jsonpath.h"
 #include "zbxvariant.h"
-
 #include "../zbxalgo/vectorimpl.h"
+
+#include "jsonpath.h"
 
 typedef struct
 {
