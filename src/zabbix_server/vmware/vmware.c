@@ -3644,7 +3644,6 @@ static char	*vmware_hv_ip_search(xmlDoc *xdoc)
 		if (NULL == ip_hv)
 			continue;
 
-
 		if (0 == ipv6)
 			zbx_snprintf(buff, sizeof(buff), ZBX_XPATH_HV_NIC_V4MASK("management"), selected_ifs.values[i]);
 		else
@@ -3675,7 +3674,7 @@ static char	*vmware_hv_ip_search(xmlDoc *xdoc)
 				ZBX_NULL2EMPTY_STR(ip_vc), buff);
 	}
 
-	if (0 == selected_ips.values)
+	if (0 == selected_ips.values_num)
 		goto out;
 
 	/* prefer IP from IP-subnet with default gateway */
