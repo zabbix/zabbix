@@ -21,30 +21,9 @@
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 
 /**
- * @onBefore prepareItemData
- *
- * @backup history_uint, items
+ * @backup history_uint
  */
 class testPageLatestData extends CWebTest {
-
-	/**
-	 * Updated item id.
-	 *
-	 * @var integer
-	 */
-	protected static $itemid;
-
-	/**
-	 * Update item and add units.
-	 */
-	public function prepareItemData() {
-		self::$itemid = CDBHelper::getValue('SELECT itemid FROM items WHERE name='.zbx_dbstr('4_item'));
-
-		CDataHelper::call('item.update', [
-			'itemid' => self::$itemid,
-			'units' => 'UNIT'
-		]);
-	}
 
 	public function testPageLatestData_CheckLayout() {
 		$this->page->login()->open('zabbix.php?action=latest.view');
@@ -89,7 +68,7 @@ class testPageLatestData extends CWebTest {
 
 	// Check that no real host or template names displayed.
 	public function testPageLatestData_NoHostNames() {
-		$result = DBselect(
+		$result = CDBHelper::getAll(
 			'SELECT host'.
 			' FROM hosts'.
 			' WHERE status IN ('.HOST_STATUS_MONITORED.', '.HOST_STATUS_NOT_MONITORED.', '.HOST_STATUS_TEMPLATE.')'.
@@ -97,8 +76,8 @@ class testPageLatestData extends CWebTest {
 		);
 		$this->page->login()->open('zabbix.php?action=latest.view');
 		$table = $this->query('class:list-table')->asTable()->one();
-		foreach (DBfetch($result) as $hostname) {
-			$this->assertFalse($table->query('xpath://td/a[text()='.CXPathHelper::escapeQuotes($hostname).']')
+		foreach ($result as $hostname) {
+			$this->assertFalse($table->query('xpath://td/a[text()='.CXPathHelper::escapeQuotes($hostname['host']).']')
 					->one(false)->isDisplayed());
 		}
 	}
@@ -241,7 +220,7 @@ class testPageLatestData extends CWebTest {
 		$form->submit();
 
 		// TODO: change forceClick after ZBX-20426 merge.
-		$this->query('xpath:.//span[contains(@class, "icon-main")]')->one()->forceClick();
+		$this->query('xpath://span[contains(@class, "icon-maint")]')->one()->forceClick();
 		$hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last()->getText();
 		$hint_text = "Maintenance for Host availability widget [Maintenance with data collection]\n".
 				"Maintenance for checking Show hosts in maintenance option in Host availability widget";
@@ -252,9 +231,10 @@ class testPageLatestData extends CWebTest {
 	 * Check hint text for Last check and Last value columns
 	 */
 	public function testPageLatestData_checkHints() {
+		$itemid = CDBHelper::getValue('SELECT itemid FROM items WHERE name='.zbx_dbstr('4_item'));
 		$time = time();
 		$value = '15';
-		DBexecute("INSERT INTO history_uint (itemid, clock, value, ns) VALUES (".zbx_dbstr(self::$itemid).
+		DBexecute("INSERT INTO history_uint (itemid, clock, value, ns) VALUES (".zbx_dbstr($itemid).
 				", ".zbx_dbstr($time).", ".zbx_dbstr($value).", 0)");
 		$true_time = date("Y-m-d H:i:s", $time);
 		$this->page->login()->open('zabbix.php?action=latest.view');
