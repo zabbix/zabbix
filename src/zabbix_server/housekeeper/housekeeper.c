@@ -25,6 +25,8 @@
 #include "zbxself.h"
 #include "zbxalgo.h"
 #include "zbxserver.h"
+#include "zbxipcservice.h"
+#include "zbxrtc.h"
 
 #include "zbxhistory.h"
 #include "history_compress.h"
@@ -185,20 +187,6 @@ static zbx_hk_history_rule_t	hk_history_rules[] = {
 			.type = ITEM_VALUE_TYPE_UINT64},
 	{NULL}
 };
-
-static void	zbx_housekeeper_sigusr_handler(int flags)
-{
-	if (ZBX_RTC_HOUSEKEEPER_EXECUTE == ZBX_RTC_GET_MSG(flags))
-	{
-		if (0 < zbx_sleep_get_remainder())
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "forced execution of the housekeeper");
-			zbx_wakeup();
-		}
-		else
-			zabbix_log(LOG_LEVEL_WARNING, "housekeeping procedure is already in progress");
-	}
-}
 
 /******************************************************************************
  *                                                                            *
@@ -1085,10 +1073,11 @@ static int	get_housekeeping_period(double time_slept)
 
 ZBX_THREAD_ENTRY(housekeeper_thread, args)
 {
-	int	now, d_history_and_trends, d_cleanup, d_events, d_problems, d_sessions, d_services, d_audit, sleeptime,
-		records;
-	double	sec, time_slept, time_now;
-	char	sleeptext[25];
+	int			now, d_history_and_trends, d_cleanup, d_events, d_problems, d_sessions, d_services,
+				d_audit, sleeptime, records;
+	double			sec, time_slept, time_now, time_exec = 0;
+	char			sleeptext[25];
+	zbx_ipc_async_socket_t	rtc;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -1114,16 +1103,37 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 	hk_history_compression_init();
 
-	zbx_set_sigusr_handler(zbx_housekeeper_sigusr_handler);
+	zbx_rtc_subscribe(&rtc);
 
 	while (ZBX_IS_RUNNING())
 	{
+		zbx_uint32_t	rtc_cmd;
+		unsigned char	*rtc_data;
+
 		sec = zbx_time();
 
 		if (0 == CONFIG_HOUSEKEEPING_FREQUENCY)
-			zbx_sleep_forever();
+			sleeptime = ZBX_IPC_WAIT_FOREVER;
 		else
-			zbx_sleep_loop(sleeptime);
+			sleeptime = CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR;
+
+		while (SUCCEED == zbx_rtc_wait(&rtc, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
+		{
+			if (ZBX_RTC_HOUSEKEEPER_EXECUTE == rtc_cmd)
+			{
+				if (ZBX_DOUBLE_EPSILON < time_exec)
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "forced execution of the housekeeper");
+					time_exec = 0;
+				}
+				else
+					zabbix_log(LOG_LEVEL_WARNING, "housekeeping procedure is already in progress");
+			}
+			else if (ZBX_RTC_SHUTDOWN == rtc_cmd)
+				break;
+
+			sleeptime = 0;
+		}
 
 		if (!ZBX_IS_RUNNING())
 			break;
@@ -1131,6 +1141,11 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		time_now = zbx_time();
 		time_slept = time_now - sec;
 		zbx_update_env(time_now);
+
+		if (0 != CONFIG_HOUSEKEEPING_FREQUENCY && time_exec + CONFIG_HOUSEKEEPING_FREQUENCY > time_now)
+			continue;
+
+		time_exec = time_now;
 
 		hk_period = get_housekeeping_period(time_slept);
 
@@ -1193,9 +1208,6 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 				" %d audit items, %d records in " ZBX_FS_DBL " sec, %s]",
 				get_process_type_string(process_type), d_history_and_trends, d_cleanup, d_events,
 				d_sessions, d_services, d_audit, records, sec, sleeptext);
-
-		if (0 != CONFIG_HOUSEKEEPING_FREQUENCY)
-			sleeptime = CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR;
 	}
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);

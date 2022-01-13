@@ -1415,7 +1415,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 		if (NULL != message)
 		{
-			zbx_rtc_dispatch(client, message);
+			zbx_rtc_dispatch(&rtc, client, message);
 			zbx_ipc_message_free(message);
 		}
 
@@ -1436,6 +1436,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			break;
 		}
 	}
+
+	zbx_rtc_shutdown_subs(&rtc);
 
 	zbx_on_exit(ZBX_EXIT_STATUS());
 

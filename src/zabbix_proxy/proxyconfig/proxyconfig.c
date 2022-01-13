@@ -161,9 +161,8 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 {
 	size_t			data_size;
 	double			sec;
-	zbx_ipc_service_t	config_service;
-	char			*error = NULL;
-	zbx_timespec_t		timeout = {1, 0};
+	zbx_ipc_async_socket_t	rtc;
+	int			sleeptime;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -177,12 +176,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 	zbx_tls_init_child();
 #endif
 
-	if (FAIL == zbx_ipc_service_start(&config_service, ZBX_IPC_SERVICE_CONFIG, &error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot start configuration syncer service: %s", error);
-		zbx_free(error);
-		exit(EXIT_FAILURE);
-	}
+	zbx_rtc_subscribe(&rtc);
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
@@ -191,49 +185,49 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 	zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
 	DCsync_configuration(ZBX_DBSYNC_INIT);
 
-	if (SUCCEED != zbx_rtc_notify_config_sync(&error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot send configuration syncer notification: %s", error);
-		zbx_free(error);
-		exit(EXIT_FAILURE);
-	}
+	zbx_rtc_notify_config_sync(&rtc);
+
+	sleeptime = (ZBX_PROGRAM_TYPE_PROXY_PASSIVE == program_type ? SEC_PER_YEAR : CONFIG_PROXYCONFIG_FREQUENCY);
 
 	while (ZBX_IS_RUNNING())
 	{
+		zbx_uint32_t	rtc_cmd;
+		unsigned char	*rtc_data;
+		int		config_cache_reload = 0;
+
+		while (SUCCEED == zbx_rtc_wait(&rtc, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
+		{
+			if (ZBX_RTC_CONFIG_CACHE_RELOAD == rtc_cmd)
+				config_cache_reload = 1;
+			else if (ZBX_RTC_SHUTDOWN == rtc_cmd)
+				goto stop;
+
+			sleeptime = 0;
+		}
+
+		sec = zbx_time();
+		zbx_update_env(sec);
+
 		if (ZBX_PROGRAM_TYPE_PROXY_PASSIVE == program_type)
 		{
-			zbx_ipc_client_t	*client;
-			zbx_ipc_message_t	*message;
-
-			update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
-			zbx_ipc_service_recv(&config_service, &timeout, &client, &message);
-			update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
-
-			sec = zbx_time();
-			zbx_update_env(sec);
-
-			if (NULL != message)
+			if (0 != config_cache_reload)
 			{
 				zbx_setproctitle("%s [loading configuration]", get_process_type_string(process_type));
 
 				DCsync_configuration(ZBX_DBSYNC_UPDATE);
 				DCupdate_interfaces_availability();
+				zbx_rtc_notify_config_sync(&rtc);
 
 				zbx_setproctitle("%s [synced config in " ZBX_FS_DBL " sec]",
 						get_process_type_string(process_type), zbx_time() - sec);
-				zbx_ipc_client_send(client, ZBX_IPC_CONFIG_RELOAD_RESPONSE, NULL, 0);
 			}
 
-			zbx_ipc_message_free(message);
-
-			if (NULL != client)
-				zbx_ipc_client_release(client);
-
+			sleeptime = SEC_PER_YEAR;
 			continue;
 		}
 
-		sec = zbx_time();
-		zbx_update_env(sec);
+		if (1 == config_cache_reload)
+			zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the configuration cache");
 
 		zbx_setproctitle("%s [loading configuration]", get_process_type_string(process_type));
 
@@ -244,9 +238,10 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 				get_process_type_string(process_type), (zbx_fs_size_t)data_size, sec,
 				CONFIG_PROXYCONFIG_FREQUENCY);
 
-		zbx_sleep_loop(CONFIG_PROXYCONFIG_FREQUENCY);
+		if (0 > (sleeptime = CONFIG_PROXYCONFIG_FREQUENCY - (int)sec))
+			sleeptime = 0;
 	}
-
+stop:
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
 	while (1)

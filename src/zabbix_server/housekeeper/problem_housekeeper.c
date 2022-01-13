@@ -29,6 +29,8 @@
 #include "dbcache.h"
 #include "zbxalgo.h"
 #include "service_protocol.h"
+#include "zbxipcservice.h"
+#include "zbxrtc.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
@@ -92,24 +94,11 @@ static int	housekeep_problems_without_triggers(void)
 	return deleted;
 }
 
-static void	zbx_trigger_housekeeper_sigusr_handler(int flags)
-{
-	if (ZBX_RTC_TRIGGER_HOUSEKEEPER_EXECUTE == ZBX_RTC_GET_MSG(flags))
-	{
-		if (0 < zbx_sleep_get_remainder())
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "forced execution of the trigger housekeeper");
-			zbx_wakeup();
-		}
-		else
-			zabbix_log(LOG_LEVEL_WARNING, "trigger housekeeping procedure is already in progress");
-	}
-}
-
 ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 {
-	int	deleted;
-	double	sec;
+	int		deleted;
+	double		sec;
+	zbx_ipc_async_socket_t	rtc;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -126,11 +115,24 @@ ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 	zbx_setproctitle("%s [startup idle for %d second(s)]", get_process_type_string(process_type),
 			CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY);
 
-	zbx_set_sigusr_handler(zbx_trigger_housekeeper_sigusr_handler);
+	zbx_rtc_subscribe(&rtc);
 
 	while (ZBX_IS_RUNNING())
 	{
-		zbx_sleep_loop(CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY);
+		zbx_uint32_t	rtc_cmd;
+		unsigned char	*rtc_data;
+
+		if (SUCCEED == zbx_rtc_wait(&rtc, &rtc_cmd, &rtc_data, CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY) &&
+				0 != rtc_cmd)
+		{
+			if (ZBX_RTC_SHUTDOWN == rtc_cmd)
+				break;
+
+			if (ZBX_RTC_TRIGGER_HOUSEKEEPER_EXECUTE == rtc_cmd)
+				zabbix_log(LOG_LEVEL_WARNING, "forced execution of the problem housekeeper");
+			else
+				continue;
+		}
 
 		if (!ZBX_IS_RUNNING())
 			break;
