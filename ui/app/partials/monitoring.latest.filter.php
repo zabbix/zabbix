@@ -189,7 +189,6 @@ $right_column = (new CFormGrid())
 				(new CLabel(_('Show items without data'), 'show_without_data'))
 					->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
 				(new CCheckBox('show_without_data'))
-					->setAttribute('disabled', 'disabled')
 					->setChecked($data['show_without_data'] == 1)
 					->setUncheckedValue(0)
 					->removeId()

@@ -352,7 +352,7 @@ class CTabFilterItem extends CBaseComponent {
 
 			for (const checkbox of form.querySelectorAll('input[type="checkbox"][unchecked-value]')) {
 				if (!checkbox.checked) {
-					params.set(checkbox.getAttribute('name'), checkbox.getAttribute('unchecked-value'))
+					params.set(checkbox.getAttribute('name'), checkbox.getAttribute('unchecked-value'));
 				}
 			}
 
