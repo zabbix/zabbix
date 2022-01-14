@@ -192,12 +192,8 @@ int	zbx_rtc_process(const char *option, char **error)
 	switch (code)
 	{
 		/* allow only socket based runtime control options */
-		case ZBX_RTC_DIAGINFO:
-		case ZBX_RTC_HA_STATUS:
-		case ZBX_RTC_HA_REMOVE_NODE:
-		case ZBX_RTC_HA_SET_FAILOVER_DELAY:
-			break;
-		default:
+		case ZBX_RTC_LOG_LEVEL_DECREASE:
+		case ZBX_RTC_LOG_LEVEL_INCREASE:
 			*error = zbx_dsprintf(NULL, "operation is not supported on the given operating system");
 			return FAIL;
 	}
