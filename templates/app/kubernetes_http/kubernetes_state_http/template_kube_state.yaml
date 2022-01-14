@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-13T09:16:10Z'
+  date: '2022-01-14T14:27:47Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -720,6 +720,10 @@ zabbix_export:
                   expression: 'count(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}],3m,,"True")<2'
                   name: 'Kubernetes: Component [{#NAME}] is unhealthy'
                   priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           master_item:
             key: kube.componentstatuses
           preprocessing:
@@ -1194,6 +1198,10 @@ zabbix_export:
               expression: '(last(/Kubernetes cluster state by HTTP/kube.deployment.replicas[{#NAMESPACE}/{#NAME}])-last(/Kubernetes cluster state by HTTP/kube.deployment.replicas_available[{#NAMESPACE}/{#NAME}]))<>0'
               name: 'Kubernetes: Namespace [{#NAMESPACE}] Deployment [{#NAME}]: Deployment replicas mismatch'
               priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: availability
           master_item:
             key: kube.state.metrics
           preprocessing:
@@ -1398,6 +1406,10 @@ zabbix_export:
                   expression: 'count(/Kubernetes cluster state by HTTP/kube.livez.helthcheck[{#NAME}],3m,,"ok")<2'
                   name: 'Kubernetes: Livez [{#NAME}] is unhealthy'
                   priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           master_item:
             key: kube.livez
           preprocessing:
@@ -1806,6 +1818,10 @@ zabbix_export:
                   expression: '(last(/Kubernetes cluster state by HTTP/kube.pod.containers_restarts[{#NAMESPACE}/{#NAME}])-min(/Kubernetes cluster state by HTTP/kube.pod.containers_restarts[{#NAMESPACE}/{#NAME}],3m))>2'
                   name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}]: Pod is crash looping'
                   priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: b96149f7a44d4a49903421fbc38c0101
               name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}]: Containers running'
@@ -2097,6 +2113,10 @@ zabbix_export:
               expression: 'min(/Kubernetes cluster state by HTTP/kube.pod.phase.failed[{#NAMESPACE}/{#NAME}],10m)>0 or min(/Kubernetes cluster state by HTTP/kube.pod.phase.pending[{#NAMESPACE}/{#NAME}],10m)>0 or min(/Kubernetes cluster state by HTTP/kube.pod.phase.unknown[{#NAMESPACE}/{#NAME}],10m)>0'
               name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}]: Pod is not healthy'
               priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: availability
           master_item:
             key: kube.state.metrics
           preprocessing:
@@ -2410,6 +2430,10 @@ zabbix_export:
                   expression: 'min(/Kubernetes cluster state by HTTP/kube.pvc.status_phase.pending[{#NAMESPACE}/{#NAME}],2m)>0'
                   name: 'Kubernetes: NS [{#NAMESPACE}] PVC [{#NAME}]: PVC is pending'
                   priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           master_item:
             key: kube.state.metrics
           preprocessing:
@@ -2474,6 +2498,10 @@ zabbix_export:
                   expression: 'count(/Kubernetes cluster state by HTTP/kube.readyz.helthcheck[{#NAME}],3m,,"ok")<2'
                   name: 'Kubernetes: Readyz [{#NAME}] is unhealthy'
                   priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           master_item:
             key: kube.readyz
           preprocessing:
@@ -2636,6 +2664,10 @@ zabbix_export:
               expression: '(last(/Kubernetes cluster state by HTTP/kube.replicaset.replicas[{#NAMESPACE}/{#NAME}])-last(/Kubernetes cluster state by HTTP/kube.replicaset.ready[{#NAMESPACE}/{#NAME}]))<>0'
               name: 'Kubernetes: Namespace [{#NAMESPACE}] RS [{#NAME}]: ReplicasSet mismatch'
               priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: availability
           master_item:
             key: kube.state.metrics
           preprocessing:
@@ -2867,11 +2899,19 @@ zabbix_export:
               expression: '(last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas[{#NAMESPACE}/{#NAME}])-last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_ready[{#NAMESPACE}/{#NAME}]))<>0'
               name: 'Kubernetes: Namespace [{#NAMESPACE}] RS [{#NAME}]: Statefulset replicas mismatch'
               priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: availability
             -
               uuid: c29a27fe5a0345c8af9e0d4e99b22dcb
               expression: '(last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_ready[{#NAMESPACE}/{#NAME}]) / last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_current[{#NAMESPACE}/{#NAME}]))<>1'
               name: 'Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: StatfulSet is down'
               priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: availability
           master_item:
             key: kube.state.metrics
           preprocessing:
@@ -2945,6 +2985,13 @@ zabbix_export:
                   ip: '{#IP}'
           master_item:
             key: kube.worker_node.lld
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: 'kubernetes state'
       macros:
         -
           macro: '{$KUBE.API.HOST}'

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-13T09:16:07Z'
+  date: '2022-01-14T14:27:43Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -320,6 +320,10 @@ zabbix_export:
               expression: 'length(last(/Kubernetes nodes by HTTP/kube.nodes.check))>0'
               name: 'Kubernetes: Failed to get nodes'
               priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: e0b213a441a740e98b8405fd303e0683
           name: 'Node LLD'
@@ -695,6 +699,10 @@ zabbix_export:
                   name: 'Node [{#NAME}] Conditions: Pressure exists on the disk size (state: {ITEM.VALUE})'
                   priority: WARNING
                   description: 'True — pressure exists on the disk size — that is, if the disk capacity is low; otherwise False.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 44b60c111e2a4d0bae0de443394d0add
               name: 'Node [{#NAME}] Conditions: Memory pressure'
@@ -731,6 +739,10 @@ zabbix_export:
                   name: 'Node [{#NAME}] Conditions: Pressure exists on the node memory (state: {ITEM.VALUE})'
                   priority: WARNING
                   description: 'True — pressure exists on the node memory — that is, if the node memory is low; otherwise False'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 8c77db54e90d474a8ff35a98c67772d5
               name: 'Node [{#NAME}] Conditions: Network unavailable'
@@ -767,6 +779,10 @@ zabbix_export:
                   name: 'Node [{#NAME}] Conditions: Network is not correctly configured (state: {ITEM.VALUE})'
                   priority: WARNING
                   description: 'True — the network for the node is not correctly configured, otherwise False'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 31f02b4517e24571962fefd61e09e2a5
               name: 'Node [{#NAME}] Conditions: PID pressure'
@@ -803,6 +819,10 @@ zabbix_export:
                   name: 'Node [{#NAME}] Conditions: Pressure exists on the processes (state: {ITEM.VALUE})'
                   priority: WARNING
                   description: 'True — pressure exists on the processes — that is, if there are too many processes on the node; otherwise False'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 9341a018a45848feae0f61660ca5f849
               name: 'Node [{#NAME}] Conditions: Ready'
@@ -841,6 +861,10 @@ zabbix_export:
                   description: |
                     False — if the node is not healthy and is not accepting pods.
                     Unknown — if the node controller has not heard from the node in the last node-monitor-grace-period (default is 40 seconds).
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 8f9152074e2041d7b5cd2c6215e06832
               name: 'Node [{#NAME}] Info: Architecture'
@@ -1207,6 +1231,10 @@ zabbix_export:
                   name: 'Node [{#NAME}]: Has been restarted (uptime < 10m)'
                   priority: INFO
                   description: 'Uptime is less than 10 minutes'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 0203ec4fb37a4eb180edcba398bf470d
               name: 'Node [{#NAME}] Used: Pods'
@@ -1240,6 +1268,10 @@ zabbix_export:
                 -
                   name: 'Node [{#NAME}] Limits: Total CPU limits are too high (more than 100% of allocatable)'
                   expression: 'last(/Kubernetes nodes by HTTP/kube.node.limits.cpu[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.cpu[{#NAME}]) > 1'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 4c035b6c85574141832691e7ad264f40
               expression: 'last(/Kubernetes nodes by HTTP/kube.node.limits.cpu[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.cpu[{#NAME}]) > 1'
@@ -1255,6 +1287,10 @@ zabbix_export:
                 -
                   name: 'Node [{#NAME}] Limits: Total memory limits are too high (more than 100% of allocatable)'
                   expression: 'last(/Kubernetes nodes by HTTP/kube.node.limits.memory[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.memory[{#NAME}]) > 1'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 4fa15174194c476899a96fcf233a5aea
               expression: 'last(/Kubernetes nodes by HTTP/kube.node.limits.memory[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.memory[{#NAME}]) > 1'
@@ -1271,6 +1307,10 @@ zabbix_export:
                 -
                   name: 'Node [{#NAME}] Requests:  Total CPU requests are too high (more than 80% of allocatable)'
                   expression: 'last(/Kubernetes nodes by HTTP/kube.node.requests.cpu[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.cpu[{#NAME}]) > 0.8'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 7fa6901f620c4b388d550c669089dde2
               expression: 'last(/Kubernetes nodes by HTTP/kube.node.requests.cpu[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.cpu[{#NAME}]) > 0.8'
@@ -1287,6 +1327,10 @@ zabbix_export:
                 -
                   name: 'Node [{#NAME}] Requests: Total memory requests are too high (more than 80% of allocatable)'
                   expression: 'last(/Kubernetes nodes by HTTP/kube.node.requests.memory[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.memory[{#NAME}]) > 0.8'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: ad9a65c4786e48b9a4b77c1214fa2e1f
               expression: 'last(/Kubernetes nodes by HTTP/kube.node.requests.memory[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.memory[{#NAME}]) > 0.8'
@@ -1300,6 +1344,10 @@ zabbix_export:
               opdata: 'Used: {ITEM.LASTVALUE1}, Capacity: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'Kubelet is running at capacity.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
           graph_prototypes:
             -
               uuid: 646efb7b19f5408dba2f3fe2d6a92213
@@ -1614,6 +1662,10 @@ zabbix_export:
                   name: 'Node [{#NODE}] Pod [{#POD}]: Pod is crash looping'
                   priority: WARNING
                   description: 'Pos restarts more than 2 times in the last 3 minutes.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 6862be81e52b4abcb319a8847b022634
               name: 'Node [{#NODE}] Pod [{#POD}] Status: Phase'
@@ -1659,6 +1711,10 @@ zabbix_export:
                   name: 'Node [{#NODE}] Pod [{#POD}] Status: Kubernetes Pod not healthy'
                   priority: HIGH
                   description: 'Pod has been in a non-ready state for longer than 10 minutes.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: abb0b84204164301bb9fc6ab14284631
               name: 'Node [{#NODE}] Pod [{#POD}] Uptime'
@@ -1716,7 +1772,7 @@ zabbix_export:
                   function filter(name, data, filters) {
                       var filtered = true;
                   
-                      if (typeof data !== 'undefined') {
+                      if (typeof data === 'object') {
                           Object.keys(filters).some(function (filter) {
                               var exclude = filter.match(/^!(.+)/);
                               if (filter in data || (exclude && exclude[1] in data)) {
@@ -1777,6 +1833,13 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: 'kubernetes nodes'
       macros:
         -
           macro: '{$KUBE.API.ENDPOINT}'
