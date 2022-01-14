@@ -43,11 +43,11 @@ const (
 	defaultIndex = 60
 )
 
-func (p *Plugin) numCPUOnline() int {
+func numCPUOnline() int {
 	return numCPU()
 }
 
-func (p *Plugin) numCPUConf() int {
+func numCPUConf() int {
 	// unsupported on Windows
 	return 0
 }
