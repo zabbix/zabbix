@@ -83,7 +83,7 @@ foreach ($data['items'] as $itemid => $item) {
 	$item_name = (new CDiv([
 		(new CSpan($item['name']))->addClass('label'),
 		($item['description_expanded'] !== '') ? makeDescriptionIcon($item['description_expanded']) : null
-	]))->addClass('action-container');
+	]))->addClass(ZBX_STYLE_ACTION_CONTAINER);
 
 	// Row history data preparation.
 	$last_history = array_key_exists($itemid, $data['history'])
@@ -172,9 +172,6 @@ foreach ($data['items'] as $itemid => $item) {
 	}
 
 	$host = $data['hosts'][$item['hostid']];
-	$host_name = (new CLinkAction($host['name']))
-		->addClass($host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_RED : null)
-		->setMenuPopup(CMenuPopupHelper::getHost($item['hostid']));
 
 	$maintenance_icon = '';
 
@@ -191,6 +188,13 @@ foreach ($data['items'] as $itemid => $item) {
 			);
 		}
 	}
+
+	$host_name_container = (new CDiv([
+		(new CLinkAction($host['name']))
+			->addClass($host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_RED : null)
+			->setMenuPopup(CMenuPopupHelper::getHost($item['hostid'])),
+		$maintenance_icon
+	]))->addClass(ZBX_STYLE_ACTION_CONTAINER);
 
 	$item_icons = [];
 	if ($item['status'] == ITEM_STATUS_ACTIVE && $item['error'] !== '') {
@@ -226,7 +230,7 @@ foreach ($data['items'] as $itemid => $item) {
 
 		$table_row = new CRow([
 			$checkbox,
-			[$host_name, $maintenance_icon],
+			$host_name_container,
 			(new CCol([$item_name, $item_key]))->addClass($state_css),
 			(new CCol($item_delay))->addClass($state_css),
 			(new CCol($item_history))->addClass($state_css),
@@ -243,7 +247,7 @@ foreach ($data['items'] as $itemid => $item) {
 	else {
 		$table_row = new CRow([
 			$checkbox,
-			[$host_name, $maintenance_icon],
+			$host_name_container,
 			(new CCol($item_name))->addClass($state_css),
 			(new CCol($last_check))->addClass($state_css),
 			(new CCol($last_value))->addClass($state_css),

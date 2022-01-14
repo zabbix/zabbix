@@ -1107,10 +1107,10 @@ class CScreenProblem extends CScreenBase {
 					$show_recovery_data ? $cell_status : null,
 					$cell_info,
 					$this->data['filter']['compact_view']
-						? (new CDiv($triggers_hosts[$trigger['triggerid']]))->addClass('action-container')
+						? (new CDiv($triggers_hosts[$trigger['triggerid']]))->addClass(ZBX_STYLE_ACTION_CONTAINER)
 						: $triggers_hosts[$trigger['triggerid']],
 					$this->data['filter']['compact_view']
-						? (new CDiv($description))->addClass('action-container')
+						? (new CDiv($description))->addClass(ZBX_STYLE_ACTION_CONTAINER)
 						: $description,
 					($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) ? $opdata : null,
 					($problem['r_eventid'] != 0)

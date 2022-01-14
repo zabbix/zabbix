@@ -298,7 +298,8 @@ form {
 		display: flex;
 		width: 100%;
 
-		.label {
+		.label,
+		.link-action {
 			@extend %overflow-ellipsis;
 		}
 
