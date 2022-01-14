@@ -41,7 +41,8 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxexec/libzbxexec.a
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxalgo/libzbxalgo.a
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxjson/libzbxjson.a
-#cgo LDFLAGS: -lz -lpcre -lresolv
+#cgo pcre3 LDFLAGS: -lz -lpcre -lresolv
+#cgo pcre2 LDFLAGS: -lz -lpcre2-8 -lresolv
 #cgo LDFLAGS: -Wl,--end-group
 
 #include "common.h"
