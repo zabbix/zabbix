@@ -1914,8 +1914,8 @@ else
 fi
 fi
 
-AM_CONDITIONAL([HAVE_PCRE], [test "x$have_pcre" = x1])
-AM_CONDITIONAL([HAVE_PCRE2], [test "x$have_pcre2" = x1])
+AM_CONDITIONAL([HAVE_PCRE], [test "x$have_pcre" = "x1"])
+AM_CONDITIONAL([HAVE_PCRE2], [test "x$have_pcre2" = "x1"])
 
 found_iconv="no"
 dnl Check for libiconv [by default - skip]
