@@ -1014,56 +1014,53 @@ class testPageMonitoringHosts extends CWebTest {
 		}
 	}
 
-	public static function getCountProblemsData() {
-		return [
-			[
-				[
-					'Name' => '1_Host_to_check_Monitoring_Overview',
-					'problems' => [
-						'Disaster',
-						'High',
-						'Average',
-						'Warning',
-						'Information',
-						'Not classified'
-					]
-				]
-			],
-			[
-				[
-					'Name' => 'Host for tag permissions',
-					'problems' => [
-						'Not classified'
-					]
-				]
-			],
-			[
-				[
-					'Name' => 'ЗАББИКС Сервер',
-					'problems' => [
-						'Average',
-						'Warning'
-					]
-				]
-			]
-		];
-	}
-
 	/**
-	 * @dataProvider getCountProblemsData
-	 *
-	 *
+	 * Check problem amount displayed on Hosts and Problems page.
 	 */
-	public function testPageMonitoringHosts_CountProblems($data) {
-		$this->page->login()->open('zabbix.php?action=host.view&filter_rst=1&severities%5B0%5D=0&severities%5B2%5D=2'
-				.'&severities%5B4%5D=4&severities%5B1%5D=1&severities%5B3%5D=3&severities%5B5%5D=5')->waitUntilReady();
-		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
-		$form->fill(['Name' => $data['Name']]);
-		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$this->page->waitUntilReady();
-		$table = $this->query('class:list-table')->asTable()->one();
-		$row = $table->getRow(0);
+	public function testPageMonitoringHosts_CountProblems() {
+		$hosts_names = ['1_Host_to_check_Monitoring_Overview', 'ЗАББИКС Сервер', 'Host for tag permissions', 'Empty host'];
+		foreach ($hosts_names as $host) {
+			$this->page->login()->open('zabbix.php?action=host.view&name='.$host)->waitUntilReady();
+			$table = $this->query('class:list-table')->asTable()->one();
 
+			// Get number of problems displayed on icon and it severity level.
+			if ($host !== 'Empty host') {
+				$selector = 'xpath:.//*[contains(@class, "problem-icon-list-item")]';
+				$icons = $table->query($selector)->all()->count();
+
+				for ($i = 1; $i <= $icons; $i++) {
+					$amount = $table->query($selector.'['.$i.']')->one()->getText();
+					$severity = $table->query($selector.'['.$i.']')->one()->getAttribute('title');
+					$results[] = [$severity => $amount];
+				}
+			}
+			else {
+				$this->assertEquals('Problems', $table->getRow(0)->getColumn('Problems')->getText());
+			}
+
+			// Navigate to Problems page from Hosts.
+			$table->getRow(0)->getColumn('Problems')->query('xpath:.//a')->one()->click();
+			$this->page->waitUntilReady();
+			$this->page->assertTitle('Problems');
+			$this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one()->checkValue(['Hosts' => $host]);
+
+			// Count problems amount of each severity and compare it with problem amount from Hosts page.
+			if ($host !== 'Empty host') {
+				foreach($results as $result) {
+					foreach ($result as $severity => $amount) {
+						$problem_count = $table->query('xpath:.//td[contains(@class, "-bg") and text()="'.$severity.'"]')
+								->all()->count();
+						$this->assertEquals(strval($problem_count), $amount);
+					}
+				}
+				unset($results);
+			}
+
+			// Check that table is empty and No data found displayed.
+			else {
+				$this->assertTableData();
+			}
+		}
 	}
 
 	public function prepareUpdateData() {
