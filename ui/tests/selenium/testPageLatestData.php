@@ -18,23 +18,68 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../include/CWebTest.php';
 
-class testPageLatestData extends CLegacyWebTest {
+/**
+ * @backup history_uint
+ */
+class testPageLatestData extends CWebTest {
+
 	public function testPageLatestData_CheckLayout() {
-		$this->zbxTestLogin('zabbix.php?action=latest.view');
-		$this->zbxTestCheckTitle('Latest data');
-		$this->zbxTestCheckHeader('Latest data');
-		$this->zbxTestTextPresent(['Host groups', 'Hosts', 'Name', 'Show items without data', 'Show details']);
-		$this->zbxTestTextPresent('Filter');
-		$this->zbxTestTextPresent(['Host', 'Name', 'Last check', 'Last value', 'Change']);
+		$this->page->login()->open('zabbix.php?action=latest.view');
+		$this->page->assertTitle('Latest data');
+		$this->page->assertHeader('Latest data');
+		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$this->assertEquals(['Host groups', 'Hosts', 'Name', 'Tags', 'Show details'],
+				$form->getLabels()->asText());
+		$this->assertTrue($form->query('xpath:.//label[text()="Show items without data"]')->one()->isValid());
+
+		// Show item without data is checked/disabled without Hosts in filter and checked/enabled with Hosts in filter.
+		foreach ([false, true] as $status) {
+			$form->query('id:filter_show_without_data')->one()->isEnabled($status);
+			$form->query('id:filter_show_without_data')->one()->isAttributePresent('checked');
+			if (!$status) {
+				$form->fill(['Hosts' => 'Host 1 from first group']);
+			}
+		}
+
+		// Check filter buttons.
+		foreach (['Apply', 'Reset'] as $button) {
+			$this->assertTrue($form->query('button', $button)->one()->isClickable());
+		}
+
+		// Check table headers.
+		$table = $this->query('class:list-table')->asTable()->one();
+		$this->assertEquals(['', 'Host', 'Name', 'Last check', 'Last value', 'Change', 'Tags', '', 'Info'],
+				$table->getHeadersText());
+
+		// Check that sortable headers are clickable.
+		foreach (['Host', 'Name'] as $header) {
+			$this->assertTrue($table->query('xpath:.//th/a[text()="'.$header.'"]')->one()->isClickable());
+		}
+
+		// Check filter collapse/expand.
+		$filter_tab = $this->query('xpath://a[contains(@class, "filter-trigger")]')->one();
+		foreach ([true, false] as $status) {
+			$this->assertEquals($status, $this->query('xpath://div[contains(@class, "filter-container")]')->one()->isDisplayed());
+			$filter_tab->click();
+		}
 	}
 
-	// Check that no real host or template names displayed
+	// Check that no real host or template names displayed.
 	public function testPageLatestData_NoHostNames() {
-		$this->zbxTestLogin('zabbix.php?action=latest.view');
-		$this->zbxTestCheckTitle('Latest data');
-		$this->zbxTestCheckNoRealHostnames();
+		$result = CDBHelper::getAll(
+			'SELECT host'.
+			' FROM hosts'.
+			' WHERE status IN ('.HOST_STATUS_MONITORED.', '.HOST_STATUS_NOT_MONITORED.', '.HOST_STATUS_TEMPLATE.')'.
+				' AND name <> host'
+		);
+		$this->page->login()->open('zabbix.php?action=latest.view');
+		$table = $this->query('class:list-table')->asTable()->one();
+		foreach ($result as $hostname) {
+			$this->assertFalse($table->query('xpath://td/a[text()='.CXPathHelper::escapeQuotes($hostname['host']).']')
+					->one(false)->isDisplayed());
+		}
 	}
 
 	public static function getItemDescription() {
@@ -162,6 +207,50 @@ class testPageLatestData extends CLegacyWebTest {
 		// If the item has no description the description icon should not be there.
 		else {
 			$this->assertTrue($row->query('class:icon-description')->count() === 0);
+		}
+	}
+
+	/**
+	 * Maintenance icon hintbox.
+	 */
+	public function testPageLatestData_checkMaintenanceIcon() {
+		$this->page->login()->open('zabbix.php?action=latest.view');
+		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$form->fill(['Hosts' => 'Available host in maintenance']);
+		$form->submit();
+
+		// TODO: change forceClick after ZBX-20426 merge.
+		$this->query('xpath://span[contains(@class, "icon-maint")]')->one()->forceClick();
+		$hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last()->getText();
+		$hint_text = "Maintenance for Host availability widget [Maintenance with data collection]\n".
+				"Maintenance for checking Show hosts in maintenance option in Host availability widget";
+		$this->assertEquals($hint_text, $hint);
+	}
+
+	/**
+	 * Check hint text for Last check and Last value columns
+	 */
+	public function testPageLatestData_checkHints() {
+		$itemid = CDBHelper::getValue('SELECT itemid FROM items WHERE name='.zbx_dbstr('4_item'));
+		$time = time();
+		$value = '15';
+		DBexecute('INSERT INTO history_uint (itemid, clock, value, ns) VALUES ('.zbx_dbstr($itemid).
+				', '.zbx_dbstr($time).', '.zbx_dbstr($value).', 0)');
+		$true_time = date("Y-m-d H:i:s", $time);
+		$this->page->login()->open('zabbix.php?action=latest.view');
+		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$form->query('button:Reset')->one()->click();
+		$form->fill(['Name' => '4_item'])->submit();
+		$table = $this->query('class:list-table')->asTable()->one();
+
+		foreach (['Last check', 'Last value'] as $column) {
+			if ($column === 'Last value') {
+				$this->assertEquals('15 UNIT', $table->getRow(0)->getColumn($column)->getText());
+			}
+			$table->getRow(0)->getColumn($column)->query('class:cursor-pointer')->one()->click();
+			$hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last()->getText();
+			$compare_hint = ($column === 'Last check') ? $true_time : $value;
+			$this->assertEquals($compare_hint, $hint);
 		}
 	}
 }
