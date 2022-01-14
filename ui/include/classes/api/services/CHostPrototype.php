@@ -419,7 +419,7 @@ class CHostPrototype extends CHostBase {
 			'custom_interfaces' =>	['type' => API_INT32, 'in' => implode(',', [HOST_PROT_INTERFACES_INHERIT, HOST_PROT_INTERFACES_CUSTOM]), 'default' => DB::getDefault('hosts', 'custom_interfaces')],
 			'status' =>				['type' => API_INT32, 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]), 'default' => DB::getDefault('hosts', 'status')],
 			'discover' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER]), 'default' => DB::getDefault('hosts', 'discover')],
-			'interfaces' =>			self::getInterfacesCreateValidationRules(),
+			'interfaces' =>			self::getInterfacesValidationRules(),
 			'groupLinks' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['groupid']], 'fields' => [
 				'groupid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
@@ -449,11 +449,11 @@ class CHostPrototype extends CHostBase {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		self::checkDuplicates($host_prototypes);
-		self::checkDiscoveryRules($host_prototypes);
-		self::checkGroupLinks($host_prototypes);
 		self::checkAndAddUuid($host_prototypes);
+		self::checkDiscoveryRules($host_prototypes);
+		self::checkDuplicates($host_prototypes);
 		self::checkMainInterfaces($host_prototypes);
+		self::checkGroupLinks($host_prototypes);
 		$this->checkTemplates($host_prototypes);
 	}
 
@@ -518,14 +518,29 @@ class CHostPrototype extends CHostBase {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateUpdate(array &$host_prototypes, array &$db_host_prototypes = null): void {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['hostid']], 'fields' => [
-			'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['hostid']], 'fields' => [
+			'hostid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $host_prototypes, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$db_host_prototypes = $this->getAffectedObjects($host_prototypes);
+
+		$host_prototypes = $this->extendObjectsByKey($host_prototypes, $db_host_prototypes, 'hostid',
+			['ruleid', 'host', 'name', 'custom_interfaces']
+		);
+
+		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['ruleid', 'host'], ['ruleid', 'name']], 'fields' => [
+			'ruleid' =>				['type' => API_ID],
+			'hostid' =>				['type' => API_ID],
 			'host' =>				['type' => API_H_NAME, 'flags' => API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('hosts', 'host')],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'name')],
 			'custom_interfaces' =>	['type' => API_INT32, 'in' => implode(',', [HOST_PROT_INTERFACES_INHERIT, HOST_PROT_INTERFACES_CUSTOM])],
 			'status' =>				['type' => API_INT32, 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])],
 			'discover' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER])],
-			'interfaces' =>			self::getInterfacesUpdateValidationRules(),
+			'interfaces' =>			self::getInterfacesValidationRules(),
 			'groupLinks' =>			['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['groupid']], 'fields' => [
 				'groupid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
@@ -553,28 +568,9 @@ class CHostPrototype extends CHostBase {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_host_prototypes = $this->getAffectedObjects($host_prototypes);
-
-		$host_prototypes = $this->extendObjectsByKey($host_prototypes, $db_host_prototypes, 'hostid',
-			['host', 'name', 'custom_interfaces', 'ruleid']
-		);
-
-		self::populateInterfaces($host_prototypes, $db_host_prototypes);
-
-		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['ruleid', 'host'], ['ruleid', 'name']], 'fields' => [
-			'ruleid' =>	['type' => API_ID],
-			'host' =>	['type' => API_H_NAME],
-			'name' =>	['type' => API_STRING_UTF8]
-		]];
-
-		if (!CApiInputValidator::validateUniqueness($api_input_rules, $host_prototypes, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
 		self::checkDuplicates($host_prototypes, $db_host_prototypes);
-		self::checkGroupLinks($host_prototypes, $db_host_prototypes);
-		self::validateSnmpInterfaces($host_prototypes, $db_host_prototypes);
 		self::checkMainInterfaces($host_prototypes);
+		self::checkGroupLinks($host_prototypes, $db_host_prototypes);
 		$this->checkTemplates($host_prototypes, $db_host_prototypes);
 		$this->checkTemplatesLinks($host_prototypes, $db_host_prototypes);
 		$host_prototypes = parent::validateHostMacros($host_prototypes, $db_host_prototypes);
@@ -1307,18 +1303,18 @@ class CHostPrototype extends CHostBase {
 	 * Check if main interfaces are correctly set for every interface type. Each host must either have only one main
 	 * interface for each interface type, or have no interface of that type at all.
 	 *
-	 * @param array $host_prototype  Host prototype object.
-	 * @param array $interfaces      All single host prototype interfaces including existing ones in DB.
+	 * @param array $host_prototypes
 	 *
-	 * @throws APIException  if two main or no main interfaces are given.
+	 * @throws APIException if two main or no main interfaces are given.
 	 */
 	private static function checkMainInterfaces(array $host_prototypes): void {
-		foreach ($host_prototypes as $host_prototype) {
-			if ($host_prototype['custom_interfaces'] != HOST_PROT_INTERFACES_CUSTOM) {
+		foreach ($host_prototypes as $i => $host_prototype) {
+			if (!array_key_exists('interfaces', $host_prototype)) {
 				continue;
 			}
 
 			$interface_types = [];
+			$path = '/'.($i + 1).'/interfaces';
 
 			foreach ($host_prototype['interfaces'] as $interface) {
 				if (!array_key_exists($interface['type'], $interface_types)) {
@@ -1328,16 +1324,16 @@ class CHostPrototype extends CHostBase {
 				$interface_types[$interface['type']][$interface['main']]++;
 
 				if ($interface_types[$interface['type']][INTERFACE_PRIMARY] > 1) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_('Host prototype cannot have more than one default interface of the same type.')
-					);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path,
+						_s('cannot have more than one default interface of the same type')
+					));
 				}
 			}
 
 			foreach ($interface_types as $type => $counters) {
 				if ($counters[INTERFACE_SECONDARY] > 0 && $counters[INTERFACE_PRIMARY] == 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No default interface for "%1$s" type on "%2$s".',
-						hostInterfaceTypeNumToName($type), $host_prototype['name']
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path,
+						_s('no default interface for "%1$s" type.', hostInterfaceTypeNumToName($type))
 					));
 				}
 			}
@@ -1386,38 +1382,29 @@ class CHostPrototype extends CHostBase {
 	 */
 	private static function updateInterfaces(array &$host_prototypes, array $db_host_prototypes = null): void {
 		$ins_interfaces = [];
-		$upd_interfaces = [];
 		$del_interfaceids = [];
 
 		foreach ($host_prototypes as &$host_prototype) {
-			$db_interfaces = ($db_host_prototypes !== null
-					&& array_key_exists('interfaces', $db_host_prototypes[$host_prototype['hostid']]))
-				? $db_host_prototypes[$host_prototype['hostid']]['interfaces']
-				: [];
-
-			if ($host_prototype['custom_interfaces'] == HOST_PROT_INTERFACES_INHERIT) {
-				$host_prototype['interfaces'] = [];
-			}
-
-			if (!array_key_exists('interfaces', $host_prototype)) {
+			if (($db_host_prototypes === null && !array_key_exists('interfaces', $host_prototype))
+					|| ($db_host_prototypes !== null
+						&& !array_key_exists('interfaces', $db_host_prototypes[$host_prototype['hostid']]))) {
 				continue;
 			}
 
+			if ($db_host_prototypes !== null && !array_key_exists('interfaces', $host_prototype)) {
+				$host_prototype['interfaces'] = [];
+			}
+
+			$db_interfaces = ($db_host_prototypes !== null)
+				? $db_host_prototypes[$host_prototype['hostid']]['interfaces']
+				: [];
+
 			foreach ($host_prototype['interfaces'] as &$interface) {
-				$index = self::compareInterface($interface, $db_interfaces);
-				if ($index != -1) {
-					$interface['interfaceid'] = $db_interfaces[$index]['interfaceid'];
+				$db_interfaceid = self::getInterfaceId($interface, $db_interfaces);
 
-					$upd_interface = DB::getUpdatedValues('interface', $interface, $db_interfaces[$index]);
-
-					if ($upd_interface) {
-						$upd_interfaces[] = [
-							'values' => $upd_interface,
-							'where' => ['interfaceid' => $interface['interfaceid']]
-						];
-					}
-
-					unset($db_interfaces[$index]);
+				if ($db_interfaceid !== null) {
+					$interface['interfaceid'] = $db_interfaceid;
+					unset($db_interfaces[$db_interfaceid]);
 				}
 				else {
 					$ins_interfaces[] = ['hostid' => $host_prototype['hostid']] + $interface;
@@ -1434,103 +1421,72 @@ class CHostPrototype extends CHostBase {
 			DB::delete('interface', ['interfaceid' => $del_interfaceids]);
 		}
 
-		if ($upd_interfaces) {
-			DB::update('interface', $upd_interfaces);
+		if ($ins_interfaces) {
+			$interfaceids = DB::insert('interface', $ins_interfaces);
 		}
 
-		if ($ins_interfaces) {
-			$snmp_interfaces = [];
-			$interfaceids = DB::insert('interface', $ins_interfaces);
+		$ins_interfaces_snmp = [];
 
-			foreach ($host_prototypes as &$host_prototype) {
-				if (!array_key_exists('interfaces', $host_prototype)) {
-					continue;
-				}
+		foreach ($host_prototypes as &$host_prototype) {
+			if (!array_key_exists('interfaces', $host_prototype)) {
+				continue;
+			}
 
-				foreach ($host_prototype['interfaces'] as &$interface) {
-					if (!array_key_exists('interfaceid', $interface)) {
-						$interface['interfaceid'] = array_shift($interfaceids);
+			foreach ($host_prototype['interfaces'] as &$interface) {
+				if (!array_key_exists('interfaceid', $interface)) {
+					$interface['interfaceid'] = array_shift($interfaceids);
 
-						if ($interface['type'] == INTERFACE_TYPE_SNMP) {
-							$snmp_interfaces[] = ['interfaceid' => $interface['interfaceid']] + $interface['details'];
-						}
+					if ($interface['type'] == INTERFACE_TYPE_SNMP) {
+						$ins_interfaces_snmp[] = ['interfaceid' => $interface['interfaceid']] + $interface['details'];
 					}
 				}
-				unset($interface);
 			}
-			unset($host_prototype);
+			unset($interface);
+		}
+		unset($host_prototype);
 
-			if ($snmp_interfaces) {
-				DB::insert('interface_snmp', $snmp_interfaces, false);
-			}
+		if ($ins_interfaces_snmp) {
+			DB::insert('interface_snmp', $ins_interfaces_snmp, false);
 		}
 	}
 
 	/**
-	 * Compare two interface. Return interface index if they are same, return -1 otherwise.
+	 * Get the ID of interface if all fields of given interface are equals to all fields of one of existing interfaces.
 	 *
-	 * @param array $host_interface
+	 * @param array $interface
 	 * @param array $db_interfaces
 	 *
-	 * @return int
+	 * @return string|null
 	 */
-	private static function compareInterface(array $host_interface, array $db_interfaces): int {
-		$interface_fields = ['type', 'ip', 'dns', 'port'];
-
-		foreach ($db_interfaces as $index => $db_interface) {
-			foreach ($interface_fields as $field) {
-				if (array_key_exists($field, $host_interface) && $host_interface[$field] != $db_interface[$field]) {
-					continue 2;
-				}
-			}
-
-			if ($host_interface['type'] == INTERFACE_TYPE_SNMP) {
-				if ($host_interface['details']['version'] != $db_interface['details']['version']) {
-					continue;
-				}
-
-				if ($host_interface['details']['version'] == SNMP_V1
-						|| $host_interface['details']['version'] == SNMP_V2C) {
-					foreach (['community', 'bulk'] as $field) {
-						if (array_key_exists($field, $host_interface['details'])
-								&& $host_interface['details'][$field] != $db_interface['details'][$field]) {
-							continue 2;
-						}
-					}
-				}
-				elseif ($host_interface['details']['version'] == SNMP_V3) {
-					foreach (['bulk', 'securityname', 'securitylevel', 'contextname'] as $field) {
-						if (array_key_exists($field, $host_interface['details'])
-								&& $host_interface['details'][$field] != $db_interface['details'][$field]) {
-							continue 2;
-						}
-					}
-
-					if (array_key_exists('securitylevel', $host_interface['details'])) {
-						if ($host_interface['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV) {
-							foreach (['authprotocol', 'authpassphrase'] as $field) {
-								if (array_key_exists($field, $host_interface['details'])
-										&& $host_interface['details'][$field] != $db_interface['details'][$field]) {
-									continue 2;
-								}
-							}
-						}
-						elseif ($host_interface['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
-							foreach (['authprotocol', 'authpassphrase', 'privprotocol', 'privpassphrase'] as $field) {
-								if (array_key_exists($field, $host_interface['details'])
-										&& $host_interface['details'][$field] != $db_interface['details'][$field]) {
-									continue 2;
-								}
-							}
-						}
-					}
-				}
-			}
-
-			return $index;
-		}
-
-		return -1;
+	private static function getInterfaceId(array $interface, array $db_interfaces): ?string {
+		return key(array_filter($db_interfaces, static function (array $db_interface) use ($interface): bool {
+			return $interface['type'] == $db_interface['type']
+				&& $interface['useip'] == $db_interface['useip']
+				&& (!array_key_exists('ip', $interface) || $interface['ip'] === $db_interface['ip'])
+				&& (!array_key_exists('dns', $interface) || $interface['dns'] === $db_interface['dns'])
+				&& $interface['port'] === $db_interface['port']
+				&& $interface['main'] == $db_interface['main']
+				&& (!array_key_exists('details', $interface)
+					|| ($interface['details']['version'] == $db_interface['details']['version'])
+						&& (!array_key_exists('bulk', $interface['details'])
+							|| $interface['details']['bulk'] == $db_interface['details']['bulk'])
+						&& (!array_key_exists('community', $interface['details'])
+							|| $interface['details']['community'] === $db_interface['details']['community'])
+						&& (!array_key_exists('contextname', $interface['details'])
+							|| $interface['details']['contextname'] === $db_interface['details']['contextname'])
+						&& (!array_key_exists('securityname', $interface['details'])
+							|| $interface['details']['securityname'] === $db_interface['details']['securityname'])
+						&& (!array_key_exists('securitylevel', $interface['details'])
+							|| $interface['details']['securitylevel'] == $db_interface['details']['securitylevel'])
+						&& (!array_key_exists('authprotocol', $interface['details'])
+							|| $interface['details']['authprotocol'] == $db_interface['details']['authprotocol'])
+						&& (!array_key_exists('authpassphrase', $interface['details'])
+							|| $interface['details']['authpassphrase'] === $db_interface['details']['authpassphrase'])
+						&& (!array_key_exists('privprotocol', $interface['details'])
+							|| $interface['details']['privprotocol'] == $db_interface['details']['privprotocol'])
+						&& (!array_key_exists('privpassphrase', $interface['details'])
+							|| $interface['details']['privpassphrase'] === $db_interface['details']['privpassphrase']));
+		}));
 	}
 
 	/**
@@ -1756,30 +1712,21 @@ class CHostPrototype extends CHostBase {
 	 * @return array
 	 */
 	private static function getInterfacesValidationRules(): array {
-		return [
-			'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_IPMI, INTERFACE_TYPE_JMX])],
-			'useip' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [INTERFACE_USE_DNS, INTERFACE_USE_IP])],
-			'ip' =>		['type' => API_MULTIPLE, 'rules' => [
-								['if' => ['field' => 'useip', 'in' => INTERFACE_USE_IP], 'type' => API_IP, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO | API_ALLOW_MACRO, 'length' => DB::getFieldLength('interface', 'ip')],
-								['else' => true, 'type' => API_IP, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO | API_ALLOW_MACRO, 'length' => DB::getFieldLength('interface', 'ip')]
-			]],
-			'dns' =>	['type' => API_MULTIPLE, 'rules' => [
-								['if' => ['field' => 'useip', 'in' => INTERFACE_USE_DNS], 'type' => API_DNS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO | API_ALLOW_MACRO, 'length' => DB::getFieldLength('interface', 'dns')],
-								['else' => true, 'type' => API_DNS, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO | API_ALLOW_MACRO, 'length' => DB::getFieldLength('interface', 'dns')]
-			]],
-			'port' =>	['type' => API_PORT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO, 'length' => DB::getFieldLength('interface', 'port')],
-			'main' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [INTERFACE_SECONDARY, INTERFACE_PRIMARY])]
-		];
-	}
-
-	/**
-	 * @return array
-	 */
-	private static function getInterfacesCreateValidationRules(): array {
 		return ['type' => API_MULTIPLE, 'rules' => [
-			['if' => ['field' => 'custom_interfaces', 'in' => HOST_PROT_INTERFACES_CUSTOM], 'type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NORMALIZE, 'fields' =>
-				self::getInterfacesValidationRules() +
-				['details' =>	['type' => API_MULTIPLE, 'rules' => [
+			['if' => ['field' => 'custom_interfaces', 'in' => HOST_PROT_INTERFACES_CUSTOM], 'type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
+				'type' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_IPMI, INTERFACE_TYPE_JMX])],
+				'useip' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [INTERFACE_USE_DNS, INTERFACE_USE_IP])],
+				'ip' =>			['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'useip', 'in' => INTERFACE_USE_IP], 'type' => API_IP, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO | API_ALLOW_MACRO, 'length' => DB::getFieldLength('interface', 'ip')],
+									['else' => true, 'type' => API_IP, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO | API_ALLOW_MACRO, 'length' => DB::getFieldLength('interface', 'ip')]
+				]],
+				'dns' =>		['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'useip', 'in' => INTERFACE_USE_DNS], 'type' => API_DNS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO | API_ALLOW_MACRO, 'length' => DB::getFieldLength('interface', 'dns')],
+									['else' => true, 'type' => API_DNS, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO | API_ALLOW_MACRO, 'length' => DB::getFieldLength('interface', 'dns')]
+				]],
+				'port' =>		['type' => API_PORT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO, 'length' => DB::getFieldLength('interface', 'port')],
+				'main' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [INTERFACE_SECONDARY, INTERFACE_PRIMARY])],
+				'details' =>	['type' => API_MULTIPLE, 'rules' => [
 					['if' => ['field' => 'type', 'in' => INTERFACE_TYPE_SNMP], 'type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
 						'version' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SNMP_V1, SNMP_V2C, SNMP_V3])],
 						'bulk' =>			['type' => API_INT32, 'in' => implode(',', [SNMP_BULK_DISABLED, SNMP_BULK_ENABLED])],
@@ -1816,128 +1763,11 @@ class CHostPrototype extends CHostBase {
 												['else' => true, 'type' => API_UNEXPECTED]
 						]]
 					]],
-					['else' => true, 'type' => API_OBJECT, 'fields' => []]
-				]]]
-			],
-			['else' => true, 'type' => API_OBJECT, 'fields' => []]
+					['else' => true, 'type' => API_UNEXPECTED]
+				]]
+			]],
+			['else' => true, 'type' => API_UNEXPECTED]
 		]];
-	}
-
-	/**
-	 * @return array
-	 */
-	private static function getInterfacesUpdateValidationRules(): array {
-		return ['type' => API_MULTIPLE, 'rules' => [
-			['if' => ['field' => 'custom_interfaces', 'in' => HOST_PROT_INTERFACES_CUSTOM], 'type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NORMALIZE, 'fields' =>
-				self::getInterfacesValidationRules() +
-				['details' =>	['type' => API_MULTIPLE, 'rules' => [
-					['if' => ['field' => 'type', 'in' => INTERFACE_TYPE_SNMP], 'type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
-						'version' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SNMP_V1, SNMP_V2C, SNMP_V3])],
-						'bulk' =>			['type' => API_INT32, 'in' => implode(',', [SNMP_BULK_DISABLED, SNMP_BULK_ENABLED])],
-						'community' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'community')],
-						'contextname' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'contextname')],
-						'securityname' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'securityname')],
-						'securitylevel' =>	['type' => API_INT32, 'in' => implode(',', [ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV])],
-						'authprotocol' =>	['type' => API_INT32, 'in' => implode(',', array_keys(getSnmpV3AuthProtocols()))],
-						'authpassphrase' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'authpassphrase')],
-						'privprotocol' =>	['type' => API_INT32, 'in' => implode(',', array_keys(getSnmpV3PrivProtocols()))],
-						'privpassphrase' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'privpassphrase')]
-					]],
-					['else' => true, 'type' => API_OBJECT, 'fields' => []]
-				]]]
-			],
-			['else' => true, 'type' => API_OBJECT, 'fields' => []]
-		]];
-	}
-
-	/**
-	 * @param array $host_prototypes
-	 * @param array $db_host_prototypes
-	 */
-	private static function populateInterfaces(array &$host_prototypes, array $db_host_prototypes): void {
-		foreach ($host_prototypes as &$host_prototype) {
-			if ($host_prototype['custom_interfaces'] != HOST_PROT_INTERFACES_CUSTOM) {
-				continue;
-			}
-
-			$db_interfaces = $db_host_prototypes[$host_prototype['hostid']]['interfaces'];
-
-			foreach ($host_prototype['interfaces'] as &$interface) {
-				$index = self::compareInterface($interface, $db_interfaces);
-				if ($index === -1) {
-					continue;
-				}
-
-				$interface = $interface + $db_interfaces[$index];
-
-				// Remove interfaceid.
-				$interface = array_diff_key($interface, array_flip(['interfaceid']));
-
-				if ($interface['type'] == INTERFACE_TYPE_SNMP) {
-					$interface['details'] = $interface['details'] + $db_interfaces[$index]['details'];
-				}
-
-				unset($db_interfaces[$index]);
-			}
-			unset($interface);
-		}
-		unset($host_prototype);
-	}
-
-	private static function validateSnmpInterfaces(array $host_prototypes): void {
-		foreach ($host_prototypes as $host_index => $host_prototype) {
-			if ($host_prototype['custom_interfaces'] != HOST_PROT_INTERFACES_CUSTOM) {
-				continue;
-			}
-
-			foreach ($host_prototype['interfaces'] as $index => $interface) {
-				if ($interface['type'] != INTERFACE_TYPE_SNMP) {
-					continue;
-				}
-
-				$path = '/'.($host_index + 1).'/interfaces/'.($index + 1).'/details';
-				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-					'version' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SNMP_V1, SNMP_V2C, SNMP_V3])],
-					'bulk' =>			['type' => API_INT32, 'in' => implode(',', [SNMP_BULK_DISABLED, SNMP_BULK_ENABLED])],
-					'community' =>		['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'version', 'in' => implode(',', [SNMP_V1, SNMP_V2C])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('interface_snmp', 'community')],
-											['else' => true, 'type' => API_UNEXPECTED]
-					]],
-					'contextname' =>	['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'version', 'in' => SNMP_V3], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'contextname')],
-											['else' => true, 'type' => API_UNEXPECTED]
-					]],
-					'securityname' =>	['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'version', 'in' => SNMP_V3], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'securityname')],
-											['else' => true, 'type' => API_UNEXPECTED]
-					]],
-					'securitylevel' =>	['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'version', 'in' => SNMP_V3], 'type' => API_INT32, 'in' => implode(',', [ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV])],
-											['else' => true, 'type' => API_UNEXPECTED]
-					]],
-					'authprotocol' =>	['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'securitylevel', 'in' => implode(',', [ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV])], 'type' => API_INT32, 'in' => implode(',', array_keys(getSnmpV3AuthProtocols()))],
-											['else' => true, 'type' => API_UNEXPECTED]
-					]],
-					'authpassphrase' =>	['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'securitylevel', 'in' => implode(',', [ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'authpassphrase')],
-											['else' => true, 'type' => API_UNEXPECTED]
-					]],
-					'privprotocol' =>	['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'securitylevel', 'in' => ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV], 'type' => API_INT32, 'in' => implode(',', array_keys(getSnmpV3PrivProtocols()))],
-											['else' => true, 'type' => API_UNEXPECTED]
-					]],
-					'privpassphrase' =>	['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'securitylevel', 'in' => ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'privpassphrase')],
-											['else' => true, 'type' => API_UNEXPECTED]
-					]]
-				]];
-
-				if (!CApiInputValidator::validate($api_input_rules, $interface['details'], $path, $error)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-				}
-			}
-		}
 	}
 
 	/**
@@ -1968,28 +1798,6 @@ class CHostPrototype extends CHostBase {
 		return $db_host_prototypes;
 	}
 
-	private static function trimInterfaceDetails(array $details): array {
-		if ($details['version'] == SNMP_V3) {
-			$details = array_diff_key($details, array_flip(['interfaceid', 'community']));
-
-			if ($details['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
-				$details = array_diff_key($details, array_flip(['authprotocol', 'authpassphrase', 'privprotocol',
-					'privpassphrase'
-				]));
-			}
-			elseif ($details['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV) {
-				$details = array_diff_key($details, array_flip(['privprotocol', 'privpassphrase']));
-			}
-		}
-		else {
-			$details = array_diff_key($details, array_flip(['interfaceid', 'securityname', 'securitylevel',
-				'authpassphrase', 'privpassphrase', 'authprotocol', 'privprotocol', 'contextname'
-			]));
-		}
-
-		return $details;
-	}
-
 	/**
 	 * @param array $host_prototypes
 	 * @param array $db_host_prototypes
@@ -2016,12 +1824,13 @@ class CHostPrototype extends CHostBase {
 		$hostids = [];
 
 		foreach ($host_prototypes as $host_prototype) {
-			$hostid = $host_prototype['hostid'];
+			$db_custom_interfaces = $db_host_prototypes[$host_prototype['hostid']]['custom_interfaces'];
 
 			if (array_key_exists('interfaces', $host_prototype)
-					|| $db_host_prototypes[$hostid]['custom_interfaces'] == HOST_PROT_INTERFACES_CUSTOM) {
-				$hostids[] = $hostid;
-				$db_host_prototypes[$hostid]['interfaces'] = [];
+					|| ($host_prototype['custom_interfaces'] != $db_custom_interfaces
+						&& $db_custom_interfaces == HOST_PROT_INTERFACES_CUSTOM)) {
+				$hostids[] = $host_prototype['hostid'];
+				$db_host_prototypes[$host_prototype['hostid']]['interfaces'] = [];
 			}
 		}
 
@@ -2029,7 +1838,7 @@ class CHostPrototype extends CHostBase {
 			return;
 		}
 
-		$hostid_by_interfaceid = [];
+		$details_interfaces = [];
 		$options = [
 			'output' => ['interfaceid', 'hostid', 'main', 'type', 'useip', 'ip', 'dns', 'port'],
 			'filter' => ['hostid' => $hostids]
@@ -2041,23 +1850,23 @@ class CHostPrototype extends CHostBase {
 				array_diff_key($db_interface, array_flip(['hostid']));
 
 			if ($db_interface['type'] == INTERFACE_TYPE_SNMP) {
-				$hostid_by_interfaceid[$db_interface['interfaceid']] = $db_interface['hostid'];
+				$details_interfaces[$db_interface['interfaceid']] = $db_interface['hostid'];
 			}
 		}
 
-		if ($hostid_by_interfaceid) {
+		if ($details_interfaces) {
 			$options = [
 				'output' => ['interfaceid', 'version', 'bulk', 'community', 'securityname', 'securitylevel',
 					'authpassphrase', 'privpassphrase', 'authprotocol', 'privprotocol', 'contextname'
 				],
-				'filter' => ['interfaceid' => array_keys($hostid_by_interfaceid)]
+				'filter' => ['interfaceid' => array_keys($details_interfaces)]
 			];
-			$db_snmps = DBselect(DB::makeSql('interface_snmp', $options));
+			$result = DBselect(DB::makeSql('interface_snmp', $options));
 
-			while ($db_snmp = DBfetch($db_snmps)) {
-				$hostid = $hostid_by_interfaceid[$db_snmp['interfaceid']];
-				$db_host_prototypes[$hostid]['interfaces'][$db_snmp['interfaceid']]['details'] =
-					self::trimInterfaceDetails($db_snmp);
+			while ($db_details = DBfetch($result)) {
+				$hostid = $details_interfaces[$db_details['interfaceid']];
+				$db_host_prototypes[$hostid]['interfaces'][$db_details['interfaceid']]['details'] =
+					array_diff_key($db_details, array_flip(['interfaceid']));
 			}
 		}
 	}
