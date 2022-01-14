@@ -48,7 +48,6 @@ class testPageMonitoringServicesMassUpdate extends CWebTest {
 			[
 				'name' => '1_Service_Tags_Preprocessing',
 				'algorithm' => 1,
-				'showsla' => 0,
 				'sortorder' => 1,
 				'tags' => [
 					[
@@ -60,7 +59,6 @@ class testPageMonitoringServicesMassUpdate extends CWebTest {
 			[
 				'name' => '2_Service_Tags_Preprocessing',
 				'algorithm' => 1,
-				'showsla' => 0,
 				'sortorder' => 2,
 				'tags' => [
 					[
@@ -76,19 +74,16 @@ class testPageMonitoringServicesMassUpdate extends CWebTest {
 			[
 				'name' => '1_Service_No_Tags_Preprocessing',
 				'algorithm' => 1,
-				'showsla' => 0,
 				'sortorder' => 3
 			],
 			[
 				'name' => '2_Service_No_Tags_Preprocessing',
 				'algorithm' => 1,
-				'showsla' => 0,
 				'sortorder' => 4
 			],
 			[
 				'name' => '1_Service_Tags_replace',
 				'algorithm' => 1,
-				'showsla' => 0,
 				'sortorder' => 5,
 				'tags' => [
 					[
@@ -104,7 +99,6 @@ class testPageMonitoringServicesMassUpdate extends CWebTest {
 			[
 				'name' => '2_Service_Tags_replace',
 				'algorithm' => 1,
-				'showsla' => 0,
 				'sortorder' => 6,
 				'tags' => [
 					[
@@ -116,7 +110,6 @@ class testPageMonitoringServicesMassUpdate extends CWebTest {
 			[
 				'name' => '1_Service_Tags_remove',
 				'algorithm' => 1,
-				'showsla' => 0,
 				'sortorder' => 7,
 				'tags' => [
 					[
@@ -132,7 +125,6 @@ class testPageMonitoringServicesMassUpdate extends CWebTest {
 			[
 				'name' => '2_Service_Tags_remove',
 				'algorithm' => 1,
-				'showsla' => 0,
 				'sortorder' => 8,
 				'tags' => [
 					[
@@ -144,7 +136,6 @@ class testPageMonitoringServicesMassUpdate extends CWebTest {
 			[
 				'name' => '3_Service_Tags_remove',
 				'algorithm' => 1,
-				'showsla' => 0,
 				'sortorder' => 9,
 				'tags' => [
 					[

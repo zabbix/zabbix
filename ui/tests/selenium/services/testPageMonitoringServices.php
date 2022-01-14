@@ -57,22 +57,16 @@ class testPageMonitoringServices extends CWebTest {
 			[
 				'name' => 'Server 1',
 				'algorithm' => 1,
-				'showsla' => 1,
-				'goodsla' => 99.99,
 				'sortorder' => 1
 			],
 			[
 				'name' => 'Server 2',
 				'algorithm' => 1,
-				'showsla' => 0,
-				'goodsla' => 99.99,
 				'sortorder' => 2
 			],
 			[
 				'name' => 'Server 3',
 				'algorithm' => 1,
-				'showsla' => 0,
-				'goodsla' => 99.99,
 				'sortorder' => 3,
 				'tags' => [
 					[
@@ -84,8 +78,6 @@ class testPageMonitoringServices extends CWebTest {
 			[
 				'name' => 'Server 4',
 				'algorithm' => 1,
-				'showsla' => 0,
-				'goodsla' => 99.99,
 				'sortorder' => 4,
 				'tags' => [
 					[
@@ -101,8 +93,6 @@ class testPageMonitoringServices extends CWebTest {
 			[
 				'name' => 'Server 5',
 				'algorithm' => 1,
-				'showsla' => 1,
-				'goodsla' => 99.99,
 				'sortorder' => 5,
 				'problem_tags' => [
 					[
@@ -125,57 +115,41 @@ class testPageMonitoringServices extends CWebTest {
 			[
 				'name' => 'Server 6 for delete by checkbox',
 				'algorithm' => 1,
-				'showsla' => 1,
-				'goodsla' => 99.99,
 				'sortorder' => 6
 			],
 			[
 				'name' => 'Server 7 for delete',
 				'algorithm' => 1,
-				'showsla' => 1,
-				'goodsla' => 99.99,
 				'sortorder' => 7
 			],
 			[
 				'name' => 'Server 8 with child for delete',
 				'algorithm' => 1,
-				'showsla' => 1,
-				'goodsla' => 99.99,
 				'sortorder' => 8
 			],
 			[
 				'name' => 'Server 9 with child for delete',
 				'algorithm' => 1,
-				'showsla' => 1,
-				'goodsla' => 99.99,
 				'sortorder' => 9
 			],
 			[
 				'name' => 'Server 10 child for Server 8',
 				'algorithm' => 1,
-				'showsla' => 1,
-				'goodsla' => 99.99,
 				'sortorder' => 10
 			],
 			[
 				'name' => 'Server 11 child for Server 9',
 				'algorithm' => 1,
-				'showsla' => 1,
-				'goodsla' => 99.99,
 				'sortorder' => 12
 			],
 			[
 				'name' => 'Server for mass delete 1',
 				'algorithm' => 1,
-				'showsla' => 1,
-				'goodsla' => 99.99,
 				'sortorder' => 13
 			],
 			[
 				'name' => 'Server for mass delete 2',
 				'algorithm' => 1,
-				'showsla' => 1,
-				'goodsla' => 99.99,
 				'sortorder' => 14,
 				'problem_tags' => [
 					[
@@ -188,8 +162,6 @@ class testPageMonitoringServices extends CWebTest {
 			[
 				'name' => 'Server for mass delete 3',
 				'algorithm' => 1,
-				'showsla' => 1,
-				'goodsla' => 99.99,
 				'sortorder' => 15,
 				'problem_tags' => [
 					[
@@ -202,85 +174,61 @@ class testPageMonitoringServices extends CWebTest {
 			[
 				'name' => 'Server for mass update 1',
 				'algorithm' => 1,
-				'showsla' => 1,
-				'goodsla' => 99.99,
 				'sortorder' => 16
 			],
 			[
 				'name' => 'Server 12',
 				'algorithm' => 1,
-				'showsla' => 1,
-				'goodsla' => 99.99,
 				'sortorder' => 17
 			],
 			[
 				'name' => 'Child for mass deleting 1',
 				'algorithm' => 1,
-				'showsla' => 1,
-				'goodsla' => 99.99,
 				'sortorder' => 18
 			],
 			[
 				'name' => 'Child for mass deleting 2',
 				'algorithm' => 1,
-				'showsla' => 1,
-				'goodsla' => 99.99,
 				'sortorder' => 19
 			],
 			[
 				'name' => 'Child for mass deleting 3',
 				'algorithm' => 1,
-				'showsla' => 1,
-				'goodsla' => 99.99,
 				'sortorder' => 20
 			],
 			[
 				'name' => 'Server for mass update 2',
 				'algorithm' => 1,
-				'showsla' => 1,
-				'goodsla' => 99.99,
 				'sortorder' => 21
 			],
 			[
 				'name' => 'Server for mass update 3',
 				'algorithm' => 1,
-				'showsla' => 1,
-				'goodsla' => 99.99,
 				'sortorder' => 22
 			],
 			[
 				'name' => 'Server with problem',
 				'algorithm' => 1,
-				'showsla' => 1,
-				'goodsla' => 99.99,
 				'sortorder' => 23
 			],
 			[
 				'name' => 'Test order',
 				'algorithm' => 1,
-				'showsla' => 0,
-				'goodsla' => 99.9,
 				'sortorder' => 0
 			],
 			[
 				'name' => '1',
 				'algorithm' => 1,
-				'showsla' => 0,
-				'goodsla' => 99.9,
 				'sortorder' => 2
 			],
 			[
 				'name' => '2',
 				'algorithm' => 1,
-				'showsla' => 0,
-				'goodsla' => 99.9,
 				'sortorder' => 2
 			],
 			[
 				'name' => '3',
 				'algorithm' => 1,
-				'showsla' => 0,
-				'goodsla' => 99.9,
 				'sortorder' => 2
 			]
 		]);
@@ -380,7 +328,7 @@ class testPageMonitoringServices extends CWebTest {
 
 		// Labels on columns at services list.
 		$table = $this->query(self::TABLE_SELECTOR)->asTable()->one();
-		$this->assertSame(['Name', 'Status', 'Root cause', 'SLA', 'Tags'], $table->getHeadersText());
+		$this->assertSame(['Name', 'Status', 'Root cause', 'Created at', 'Tags'], $table->getHeadersText());
 		$this->assertTableStats(self::SERVICE_COUNT);
 
 		// Check that service buttons are not present in the table row.
@@ -431,7 +379,7 @@ class testPageMonitoringServices extends CWebTest {
 		$this->page->assertHeader('Services');
 
 		$table = $this->query(self::TABLE_SELECTOR)->asTable()->one();
-		$this->assertSame(['', 'Name', 'Status', 'Root cause', 'SLA', 'Tags', ''], $table->getHeadersText());
+		$this->assertSame(['', 'Name', 'Status', 'Root cause', 'Created at', 'Tags', ''], $table->getHeadersText());
 		$this->assertTableStats(self::SERVICE_COUNT);
 
 		// Check that action buttons below the table are not enabled .
@@ -495,7 +443,7 @@ class testPageMonitoringServices extends CWebTest {
 		}
 
 		$info_card = $this->query('id:tab_info')->waitUntilReady()->one();
-		foreach ([$service, 'Parent services', 'Status', 'SLA', 'Tags'] as $text) {
+		foreach ([$service, 'Parent services', 'Status', 'Tags'] as $text) {
 			$this->assertTrue($info_card->query("xpath://div[@class='service-info-grid']//div[text()="
 					.CXPathHelper::escapeQuotes($text)."]")->one()->isVisible()
 			);
@@ -917,8 +865,8 @@ class testPageMonitoringServices extends CWebTest {
 			$this->assertTrue($selector->query('xpath:.//span[@class="selected" and text()="Filter results"]')->exists());
 
 			$headers = ($edit)
-					? ['', 'Parent services', 'Name', 'Status', 'Root cause', 'SLA', 'Tags', '']
-					: ['Parent services', 'Name', 'Status', 'Root cause', 'SLA', 'Tags'];
+					? ['', 'Parent services', 'Name', 'Status', 'Root cause', 'Created at', 'Tags', '']
+					: ['Parent services', 'Name', 'Status', 'Root cause', 'Created at', 'Tags'];
 			$this->assertSame($headers, $table->getHeadersText());
 		}
 
@@ -932,8 +880,8 @@ class testPageMonitoringServices extends CWebTest {
 			$table->invalidate();
 
 			$headers = ($edit)
-					? ['', 'Name', 'Status', 'Root cause', 'SLA', 'Tags', '']
-					: ['Name', 'Status', 'Root cause', 'SLA', 'Tags'];
+					? ['', 'Name', 'Status', 'Root cause', 'Created at', 'Tags', '']
+					: ['Name', 'Status', 'Root cause', 'Created at', 'Tags'];
 			$this->assertSame($headers, $table->getHeadersText());
 		}
 	}
@@ -1038,7 +986,7 @@ class testPageMonitoringServices extends CWebTest {
 		$this->page->waitUntilReady();
 
 		// Check service not disappeared from frontend.
-			$this->assertTrue($table->query("xpath:.//td[text()=".CXPathHelper::escapeQuotes($name)."]")->exists()
+			$this->assertTrue($table->query("xpath:.//td/a[text()=".CXPathHelper::escapeQuotes($name)."]")->exists()
 		);
 
 		// Check database.
@@ -1063,8 +1011,7 @@ class testPageMonitoringServices extends CWebTest {
 
 		// Check service disappeared from frontend.
 		$this->assertTableStats($before_rows_count-1);
-		$this->assertFalse($table->query("xpath://table[@class='list-table']//td[text()=".
-				CXPathHelper::escapeQuotes($name)."]")->exists());
+		$this->assertFalse($table->query("xpath:.//td/a[text()=".CXPathHelper::escapeQuotes($name)."]")->exists());
 
 		// Check database.
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($name))
@@ -1093,8 +1040,7 @@ class testPageMonitoringServices extends CWebTest {
 
 		// Check service disappeared from frontend.
 		$this->assertTableData();
-		$this->assertFalse($table->query("xpath://table[@class='list-table']//td[text()=".
-				CXPathHelper::escapeQuotes($name)."]")->exists()
+		$this->assertFalse($table->query("xpath:.//td/a[text()=".CXPathHelper::escapeQuotes($name)."]")->exists()
 		);
 
 		// Check database.
@@ -1117,8 +1063,7 @@ class testPageMonitoringServices extends CWebTest {
 		$this->assertTrue($table->query('link', $name)->exists());
 
 		// Check that child service is not present in global service table.
-		$this->assertFalse($table->query("xpath://table[@class='list-table']//td[text()=".
-				CXPathHelper::escapeQuotes($child)."]")->exists());
+		$this->assertFalse($table->query("xpath://td/a[text()=".CXPathHelper::escapeQuotes($child)."]")->exists());
 
 		// Delete parent service.
 		$table->findRow('Name', $name, true)->query('xpath:.//button[contains(@class, "btn-remove")]')->one()
@@ -1135,8 +1080,7 @@ class testPageMonitoringServices extends CWebTest {
 		$this->assertFalse($table->query('link', $name)->exists());
 
 		// Child now presents in table.
-		$this->assertTrue($table->query("xpath://table[@class='list-table']//td[text()=".
-				CXPathHelper::escapeQuotes($child)."]")->exists());
+		$this->assertTrue($table->query("xpath:.//td/a[text()=".CXPathHelper::escapeQuotes($child)."]")->exists());
 
 		// Check database.
 		foreach ([$name => 0, $child => 1] as $service => $count) {
@@ -1169,8 +1113,7 @@ class testPageMonitoringServices extends CWebTest {
 
 		// Services disappeared from frontend.
 		foreach ($names as $name) {
-			$this->assertFalse($table->query("xpath://table[@class='list-table']//td[text()=".
-					CXPathHelper::escapeQuotes($name)."]")->exists()
+			$this->assertFalse($table->query("xpath:.//td/a[text()=".CXPathHelper::escapeQuotes($name)."]")->exists()
 			);
 		}
 
@@ -1204,15 +1147,11 @@ class testPageMonitoringServices extends CWebTest {
 		// Services disappeared from frontend.
 		$this->assertEquals($children_count - count($names), $table->getRows()->count());
 		foreach ($names as $name) {
-			$this->assertFalse($table->query("xpath://table[@class='list-table']//td[text()=".
-					CXPathHelper::escapeQuotes($name)."]")->exists()
-			);
+			$this->assertFalse($table->query("xpath:.//td/a[text()=".CXPathHelper::escapeQuotes($name)."]")->exists());
 		}
 
 		// Last child is not deleted.
-		$this->assertTrue($table->query("xpath://table[@class='list-table']//td[text()=".
-				CXPathHelper::escapeQuotes($remained)."]")->exists()
-		);
+		$this->assertTrue($table->query("xpath:.//td/a[text()=".CXPathHelper::escapeQuotes($remained)."]")->exists());
 
 		// Check database.
 		foreach ($names as $name) {

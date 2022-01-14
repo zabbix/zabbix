@@ -33,7 +33,7 @@ class testFormMonitoringServices extends CWebTest {
 
 	const UPDATE = true;
 
-	const CHILDREN_COUNT = 16;
+	const CHILDREN_COUNT = 13;
 
 	private static $service_sql = 'SELECT * FROM services ORDER BY serviceid';
 	private static $update_service = 'Update service';
