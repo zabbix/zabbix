@@ -444,7 +444,7 @@ int	rtc_process_request_ex(zbx_rtc_t *rtc, int code, const unsigned char *data, 
 			rtc_notify(rtc, ZBX_PROCESS_TYPE_CONFSYNCER, 0, ZBX_RTC_SECRETS_RELOAD, NULL, 0);
 			return SUCCEED;
 		case ZBX_RTC_TRIGGER_HOUSEKEEPER_EXECUTE:
-			rtc_notify(rtc, ZBX_PROCESS_TYPE_PROBLEMHOUSEKEEPER, 0, ZBX_RTC_TRIGGER_HOUSEKEEPER_EXECUTE,
+			rtc_notify(rtc, ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER, 0, ZBX_RTC_TRIGGER_HOUSEKEEPER_EXECUTE,
 					NULL, 0);
 			return SUCCEED;
 		case ZBX_RTC_DIAGINFO:

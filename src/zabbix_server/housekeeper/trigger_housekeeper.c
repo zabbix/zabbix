@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "problem_housekeeper.h"
+#include "trigger_housekeeper.h"
 
 #include "common.h"
 #include "log.h"
@@ -129,7 +129,7 @@ ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 				break;
 
 			if (ZBX_RTC_TRIGGER_HOUSEKEEPER_EXECUTE == rtc_cmd)
-				zabbix_log(LOG_LEVEL_WARNING, "forced execution of the problem housekeeper");
+				zabbix_log(LOG_LEVEL_WARNING, "forced execution of the trigger housekeeper");
 			else
 				continue;
 		}
