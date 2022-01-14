@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-11 10:46+0200\n"
-"PO-Revision-Date: 2022-01-10 22:09+0300\n"
+"POT-Creation-Date: 2022-01-14 19:55+0200\n"
+"PO-Revision-Date: 2022-01-13 01:11+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1641845398.000000\n"
+"X-POOTLE-MTIME: 1642029102.000000\n"
 
 #: app/controllers/CControllerSlaReportList.php:181
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:104
@@ -558,7 +558,7 @@ msgstr "Подтвержденные РЕШЕННЫЕ события"
 #: app/views/administration.iconmap.edit.php:58
 #: app/views/administration.mediatype.edit.php:103
 #: app/views/administration.mediatype.edit.php:155
-#: app/views/administration.mediatype.list.php:83
+#: app/views/administration.mediatype.list.php:87
 #: app/views/administration.regex.edit.php:51
 #: app/views/administration.script.edit.php:65
 #: app/views/administration.user.edit.php:294
@@ -683,7 +683,7 @@ msgstr "Действие обновлено"
 #: include/classes/screens/CScreenProblem.php:1158
 #: include/classes/screens/CScreenProblem.php:1219 include/events.inc.php:291
 #: include/forms.inc.php:1220 include/views/configuration.action.edit.php:28
-#: include/views/monitoring.sysmap.list.php:69 jsLoader.php:131
+#: include/views/monitoring.sysmap.list.php:73 jsLoader.php:131
 #: jsLoader.php:162 jsLoader.php:171 jsLoader.php:198 jsLoader.php:212
 #: jsLoader.php:350 tr_events.php:183
 msgid "Actions"
@@ -1031,7 +1031,7 @@ msgstr "Агент"
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
 msgstr "Проверка доступности агента. Ничего не возвращает - недоступен; 1 - доступен"
 
-#: app/views/configuration.host.list.php:194
+#: app/views/configuration.host.list.php:196
 msgid "Agent encryption"
 msgstr "Шифрование агента"
 
@@ -1217,7 +1217,7 @@ msgid "Annually"
 msgstr ""
 
 #: app/partials/monitoring.host.filter.php:127
-#: app/views/administration.mediatype.list.php:55
+#: app/views/administration.mediatype.list.php:59
 #: app/views/administration.module.list.php:52
 #: app/views/administration.proxy.list.php:53
 #: app/views/administration.script.list.php:50
@@ -1226,7 +1226,7 @@ msgstr ""
 #: app/views/administration.user.token.list.php:59
 #: app/views/configuration.correlation.list.php:55
 #: app/views/configuration.discovery.list.php:55
-#: app/views/configuration.host.list.php:129
+#: app/views/configuration.host.list.php:131
 #: app/views/reports.scheduledreport.list.php:60
 #: app/views/service.list.edit.php:79 app/views/service.list.edit.php:107
 #: app/views/service.list.php:82 app/views/sla.list.php:51
@@ -1575,7 +1575,7 @@ msgid "Autoregistration data storage period"
 msgstr "Период хранения данных авторегистрации"
 
 #: app/partials/monitoring.host.view.html.php:36
-#: app/views/configuration.host.list.php:193
+#: app/views/configuration.host.list.php:195
 msgid "Availability"
 msgstr "Доступность"
 
@@ -1765,9 +1765,9 @@ msgstr "По шаблону триггера"
 
 #: app/views/administration.proxy.list.php:141
 #: app/views/administration.proxy.list.php:154
-#: app/views/configuration.host.list.php:381
-#: app/views/configuration.host.list.php:402
-#: app/views/configuration.host.list.php:405
+#: app/views/configuration.host.list.php:383
+#: app/views/configuration.host.list.php:404
+#: app/views/configuration.host.list.php:407
 msgid "CERT"
 msgstr "CERT"
 
@@ -2188,9 +2188,9 @@ msgstr[2] "Не удалось удалить API токены"
 #: app/controllers/CControllerSlaDelete.php:79
 msgid "Cannot delete SLA"
 msgid_plural "Cannot delete SLAs"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не удалось удалить SLA"
+msgstr[1] "Не удалось удалить SLA"
+msgstr[2] "Не удалось удалить SLA"
 
 #: include/classes/api/services/CUser.php:1257
 #, c-format
@@ -2489,9 +2489,9 @@ msgstr[2] "Не удалось деактивировать API токены"
 #: app/controllers/CControllerSlaDisable.php:88
 msgid "Cannot disable SLA"
 msgid_plural "Cannot disable SLAs"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не удалось деактивировать SLA"
+msgstr[1] "Не удалось деактивировать SLA"
+msgstr[2] "Не удалось деактивировать SLA"
 
 #: actionconf.php:499
 msgid "Cannot disable action"
@@ -2585,9 +2585,9 @@ msgstr[2] "Не удалось активировать API токены"
 #: app/controllers/CControllerSlaEnable.php:88
 msgid "Cannot enable SLA"
 msgid_plural "Cannot enable SLAs"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не удалось активировать SLA"
+msgstr[1] "Не удалось активировать SLA"
+msgstr[2] "Не удалось активировать SLA"
 
 #: actionconf.php:498
 msgid "Cannot enable action"
@@ -2698,7 +2698,7 @@ msgstr "Не удалось найти узел сети \"%1$s\" использ
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
 msgstr "Не удалось найти узел сети \"%1$s\" используемый на карте сети \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1206
+#: include/classes/import/CConfigurationImport.php:1212
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Не удалось найти группу узлов сети \"%1$s\" для прототипа узлов сети \"%2$s\" правила обнаружения \"%3$s\" на \"%4$s\"."
@@ -2721,47 +2721,47 @@ msgstr "Не удалось найти иконку \"%1$s\" используе�
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr "Не удалось найти иконку \"%1$s\" используемую на карте сети \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:948
+#: include/classes/import/CConfigurationImport.php:952
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for discovery rule \"%2$s\" on \"%3$s\"."
 msgstr "Не удалось найти интерфейс \"%1$s\" используемый правилом обнаружения \"%2$s\" на \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:717
+#: include/classes/import/CConfigurationImport.php:719
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr "Не удалось найти интерфейс \"%1$s\" используемый элементом данных \"%2$s\" на \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1100
+#: include/classes/import/CConfigurationImport.php:1106
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Не удалось найти интерфейс \"%1$s\" используемый прототипом элементов данных \"%2$s\" правила обнаружения \"%3$s\" на \"%4$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1631
+#: include/classes/import/CConfigurationImport.php:1641
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph \"%3$s\"."
 msgstr "Не удалось найти элемент данных \"%1$s\" у \"%2$s\", используемый как MAX значение оси Y в графике \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1403
+#: include/classes/import/CConfigurationImport.php:1413
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Не удалось найти элемент данных \"%1$s\" у \"%2$s\", используемый как MAX значение оси Y в прототипе графиков \"%3$s\" правила обнаружения \"%4$s\" у \"%5$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1613
+#: include/classes/import/CConfigurationImport.php:1623
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph \"%3$s\"."
 msgstr "Не удалось найти элемент данных \"%1$s\" у \"%2$s\", используемый как MIN значение оси Y в графике \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1382
+#: include/classes/import/CConfigurationImport.php:1392
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Не удалось найти элемент данных \"%1$s\" у \"%2$s\", используемый как MIN значение оси Y в прототипе графиков \"%3$s\" правила обнаружения \"%4$s\" у \"%5$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1651
+#: include/classes/import/CConfigurationImport.php:1661
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
 msgstr "Не удалось найти элемент данных \"%1$s\" у \"%2$s\", используемый в графике \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1424
+#: include/classes/import/CConfigurationImport.php:1434
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Не удалось найти элемент данных \"%1$s\" у \"%2$s\", используемый в прототипе графиков \"%3$s\" правила обнаружения \"%4$s\" у \"%5$s\"."
@@ -2776,12 +2776,12 @@ msgstr "Не удалось найти элемент данных \"%1$s\" ис
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
 msgstr "Не удалось найти карту сети \"%1$s\" используемую на карте сети \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1229
+#: include/classes/import/CConfigurationImport.php:1235
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Не удалось найти шаблон \"%1$s\" для прототипа узлов сети \"%2$s\" правила обнаружения \"%3$s\" на \"%4$s\"."
 
-#: include/classes/import/CConfigurationImport.php:998
+#: include/classes/import/CConfigurationImport.php:1002
 #, c-format
 msgid "Cannot find template \"%1$s\" for override \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Не удалось найти шаблон \"%1$s\" для \"%2$s\" замещения правила обнаружения \"%3$s\" на \"%4$s\"."
@@ -2792,12 +2792,12 @@ msgstr "Не удалось найти шаблон \"%1$s\" для \"%2$s\" з�
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "Не удалось найти триггер \"%1$s\" используемый на карте сети \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:730
+#: include/classes/import/CConfigurationImport.php:732
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr "Не удалось найти преобразование значений \"%1$s\" используемое в элементе данных \"%2$s\" на \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1116
+#: include/classes/import/CConfigurationImport.php:1122
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Не удалось найти преобразование значений \"%1$s\" используемое в прототипу элементов данных \"%2$s\" в правиле обнаружения \"%3$s\" на \"%4$s\"."
@@ -4137,8 +4137,8 @@ msgstr "Подключения к узлу сети"
 msgid "Connections to proxy"
 msgstr "Подключения к прокси"
 
-#: include/views/monitoring.sysmap.list.php:80
-#: include/views/monitoring.sysmap.list.php:81
+#: include/views/monitoring.sysmap.list.php:84
+#: include/views/monitoring.sysmap.list.php:85
 msgid "Constructor"
 msgstr "Конструктор"
 
@@ -4163,7 +4163,7 @@ msgstr "Содержит"
 
 #: app/views/administration.iconmap.list.php:36
 #: app/views/administration.image.list.php:70
-#: app/views/administration.mediatype.list.php:41
+#: app/views/administration.mediatype.list.php:45
 #: app/views/administration.module.list.php:36
 #: app/views/administration.proxy.list.php:39
 #: app/views/administration.regex.list.php:40
@@ -4177,7 +4177,7 @@ msgstr "Содержит"
 #: app/views/configuration.dashboard.edit.php:71
 #: app/views/configuration.dashboard.list.php:81
 #: app/views/configuration.discovery.list.php:41
-#: app/views/configuration.host.list.php:46
+#: app/views/configuration.host.list.php:48
 #: app/views/monitoring.charts.view.php:69
 #: app/views/monitoring.dashboard.list.php:50
 #: app/views/monitoring.dashboard.view.php:133
@@ -4203,11 +4203,11 @@ msgstr "Содержит"
 #: include/views/configuration.item.list.php:46
 #: include/views/configuration.item.prototype.list.php:37
 #: include/views/configuration.maintenance.list.php:35
-#: include/views/configuration.template.list.php:102
+#: include/views/configuration.template.list.php:104
 #: include/views/configuration.trigger.prototype.list.php:36
 #: include/views/configuration.triggers.list.php:160
 #: include/views/monitoring.history.php:240
-#: include/views/monitoring.sysmap.list.php:39 report2.php:175
+#: include/views/monitoring.sysmap.list.php:43 report2.php:175
 #: tr_events.php:201
 msgid "Content controls"
 msgstr "Управление содержимым"
@@ -4337,7 +4337,7 @@ msgstr "Создать API токен"
 
 #: app/views/sla.list.php:188
 msgid "Create SLA"
-msgstr ""
+msgstr "Создать SLA"
 
 #: include/views/configuration.action.list.php:61
 msgid "Create action"
@@ -4689,7 +4689,7 @@ msgid "DD.MM.YY"
 msgstr "DD.MM.YY"
 
 #: app/partials/monitoring.host.filter.php:108
-#: app/views/configuration.host.list.php:106 app/views/search.php:35
+#: app/views/configuration.host.list.php:108 app/views/search.php:35
 msgid "DNS"
 msgstr "DNS"
 
@@ -4781,8 +4781,8 @@ msgstr "Панель с ID \"%1$s\" недоступна."
 #: app/views/monitoring.dashboard.list.php:35
 #: app/views/monitoring.host.dashboard.view.php:32 app/views/search.php:102
 #: app/views/search.php:107 app/views/search.php:329 app/views/search.php:336
-#: include/html.inc.php:371 include/views/configuration.template.list.php:121
-#: include/views/configuration.template.list.php:234
+#: include/html.inc.php:371 include/views/configuration.template.list.php:123
+#: include/views/configuration.template.list.php:236
 #: include/views/inventory.host.view.php:170
 #: include/views/inventory.host.view.php:174 jsLoader.php:358
 msgid "Dashboards"
@@ -5071,7 +5071,7 @@ msgstr "Задерживается на"
 #: app/views/administration.iconmap.edit.php:139
 #: app/views/administration.image.edit.php:79
 #: app/views/administration.mediatype.edit.php:364
-#: app/views/administration.mediatype.list.php:186
+#: app/views/administration.mediatype.list.php:190
 #: app/views/administration.proxy.edit.php:162
 #: app/views/administration.proxy.list.php:189
 #: app/views/administration.regex.edit.php:148
@@ -5094,7 +5094,7 @@ msgstr "Задерживается на"
 #: app/views/configuration.discovery.edit.php:155
 #: app/views/configuration.discovery.list.php:122
 #: app/views/configuration.host.edit.php:49
-#: app/views/configuration.host.list.php:524
+#: app/views/configuration.host.list.php:526
 #: app/views/monitoring.dashboard.list.php:123
 #: app/views/popup.host.edit.php:82 app/views/popup.service.edit.php:381
 #: app/views/popup.sla.edit.php:264 app/views/popup.tabfilter.edit.php:71
@@ -5111,10 +5111,10 @@ msgstr "Задерживается на"
 #: include/views/configuration.item.list.php:318
 #: include/views/configuration.item.prototype.list.php:205
 #: include/views/configuration.maintenance.list.php:124
-#: include/views/configuration.template.list.php:288
+#: include/views/configuration.template.list.php:290
 #: include/views/configuration.trigger.prototype.list.php:211
 #: include/views/configuration.triggers.list.php:354
-#: include/views/monitoring.sysmap.list.php:110 jsLoader.php:135
+#: include/views/monitoring.sysmap.list.php:114 jsLoader.php:135
 #: jsLoader.php:164 jsLoader.php:359
 msgid "Delete"
 msgstr "Удалить"
@@ -5124,11 +5124,11 @@ msgid "Delete all elements that are not present in the import file?"
 msgstr "Удалить все элементы, которые не присутствуют в файле импорта?"
 
 #: include/views/configuration.template.edit.php:224
-#: include/views/configuration.template.list.php:289
+#: include/views/configuration.template.list.php:291
 msgid "Delete and clear"
 msgstr "Удалить и очистить"
 
-#: include/views/configuration.template.list.php:290
+#: include/views/configuration.template.list.php:292
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr "Удалить и очистить выбранные шаблоны? (Внимание: все присоединенные к ним узлы сети будут очищены!)"
 
@@ -5228,11 +5228,11 @@ msgstr "Удалить выбранные API токены?"
 
 #: app/views/js/sla.list.js.php:130 app/views/popup.sla.edit.php:265
 msgid "Delete selected SLA?"
-msgstr ""
+msgstr "Удалить выбранный SLA?"
 
 #: app/views/js/sla.list.js.php:129
 msgid "Delete selected SLAs?"
-msgstr ""
+msgstr "Удалить выбранные SLA?"
 
 #: include/views/configuration.action.list.php:169
 msgid "Delete selected actions?"
@@ -5289,7 +5289,7 @@ msgstr "Удалить выбранные прототипы узлов сети
 msgid "Delete selected host?"
 msgstr "Удалить выбранный узел сети?"
 
-#: app/views/configuration.host.list.php:525
+#: app/views/configuration.host.list.php:527
 msgid "Delete selected hosts?"
 msgstr "Удалить выбранные узлы сети?"
 
@@ -5313,11 +5313,11 @@ msgstr "Удалить выбранные периоды обслуживани�
 msgid "Delete selected map?"
 msgstr "Удалить выбранную карту сети?"
 
-#: include/views/monitoring.sysmap.list.php:110
+#: include/views/monitoring.sysmap.list.php:114
 msgid "Delete selected maps?"
 msgstr "Удалить выбранные карты сети?"
 
-#: app/views/administration.mediatype.list.php:186
+#: app/views/administration.mediatype.list.php:190
 msgid "Delete selected media types?"
 msgstr "Удалить выбранные способы оповещений?"
 
@@ -5361,7 +5361,7 @@ msgstr "Удалить выбранные услуги?"
 msgid "Delete selected shapes?"
 msgstr "Удалить выбранные фигуры?"
 
-#: include/views/configuration.template.list.php:288
+#: include/views/configuration.template.list.php:290
 msgid "Delete selected templates?"
 msgstr "Удалить выбранные шаблоны?"
 
@@ -5496,7 +5496,7 @@ msgid "Description"
 msgstr "Описание"
 
 #: app/partials/administration.system.info.php:30
-#: app/views/administration.mediatype.list.php:82
+#: app/views/administration.mediatype.list.php:86
 #: app/views/js/reports.auditlog.list.js.php:153
 #: app/views/reports.auditlog.list.php:96
 #: app/views/reports.auditlog.list.php:129 include/func.inc.php:1668
@@ -5544,14 +5544,14 @@ msgstr "Директория"
 msgid "Directory size (in bytes). Returns integer"
 msgstr "Размер директории (в байтах). Возвращается целое число"
 
-#: app/views/administration.mediatype.list.php:177
+#: app/views/administration.mediatype.list.php:181
 #: app/views/administration.module.list.php:124
 #: app/views/administration.token.list.php:200
 #: app/views/administration.usergroup.list.php:219
 #: app/views/administration.user.token.list.php:152
 #: app/views/configuration.correlation.list.php:148
 #: app/views/configuration.discovery.list.php:121
-#: app/views/configuration.host.list.php:503
+#: app/views/configuration.host.list.php:505
 #: app/views/reports.scheduledreport.list.php:89 app/views/sla.list.php:169
 #: include/views/configuration.action.list.php:168
 #: include/views/configuration.host.discovery.list.php:325
@@ -5573,7 +5573,7 @@ msgstr "Деактивировать режим отладки у выбранн
 msgid "Disable host"
 msgstr "Деактивировать узел сети"
 
-#: app/views/configuration.host.list.php:275
+#: app/views/configuration.host.list.php:277
 msgid "Disable host?"
 msgstr "Деактивировать узел сети?"
 
@@ -5597,11 +5597,11 @@ msgstr "Деактивировать выбранные API токены?"
 
 #: app/views/js/sla.list.js.php:118
 msgid "Disable selected SLA?"
-msgstr ""
+msgstr "Деактивировать выбранный SLA?"
 
 #: app/views/js/sla.list.js.php:117
 msgid "Disable selected SLAs?"
-msgstr ""
+msgstr "Деактивировать выбранные SLA?"
 
 #: include/views/configuration.action.list.php:168
 msgid "Disable selected actions?"
@@ -5620,7 +5620,7 @@ msgstr "Деактивировать выбранные правила обна�
 msgid "Disable selected groups?"
 msgstr "Деактивировать выбранные группы?"
 
-#: app/views/configuration.host.list.php:504
+#: app/views/configuration.host.list.php:506
 msgid "Disable selected hosts?"
 msgstr "Деактивировать выбранные узлы сети?"
 
@@ -5628,7 +5628,7 @@ msgstr "Деактивировать выбранные узлы сети?"
 msgid "Disable selected items?"
 msgstr "Деактивировать выбранные элементы данных?"
 
-#: app/views/administration.mediatype.list.php:177
+#: app/views/administration.mediatype.list.php:181
 msgid "Disable selected media types?"
 msgstr "Деактивировать выбранные способы оповещения?"
 
@@ -5654,8 +5654,8 @@ msgstr "Деактивировать выбранные веб-сценарии?
 #: app/partials/monitoring.host.filter.php:129
 #: app/partials/monitoring.host.view.html.php:117
 #: app/partials/scheduledreport.table.html.php:80
-#: app/views/administration.mediatype.list.php:57
-#: app/views/administration.mediatype.list.php:141
+#: app/views/administration.mediatype.list.php:61
+#: app/views/administration.mediatype.list.php:145
 #: app/views/administration.miscconfig.edit.php:59
 #: app/views/administration.module.list.php:54
 #: app/views/administration.module.list.php:101
@@ -5675,7 +5675,7 @@ msgstr "Деактивировать выбранные веб-сценарии?
 #: app/views/configuration.correlation.list.php:57
 #: app/views/configuration.correlation.list.php:108
 #: app/views/configuration.discovery.list.php:57
-#: app/views/configuration.host.list.php:280 app/views/popup.generic.php:646
+#: app/views/configuration.host.list.php:282 app/views/popup.generic.php:646
 #: app/views/popup.lldoperation.php:280
 #: app/views/popup.massupdate.host.php:140
 #: app/views/popup.massupdate.host.php:182
@@ -5740,8 +5740,8 @@ msgstr "Обнаружено"
 msgid "Discovered device"
 msgstr "Обнаруженное устройство"
 
-#: app/views/configuration.host.list.php:187
-#: app/views/configuration.host.list.php:452
+#: app/views/configuration.host.list.php:189
+#: app/views/configuration.host.list.php:454
 #: app/views/popup.mediatype.message.php:67 app/views/search.php:149
 #: app/views/search.php:154 app/views/search.php:339 app/views/search.php:344
 #: include/classes/helpers/CMediatypeHelper.php:163
@@ -5749,8 +5749,8 @@ msgstr "Обнаруженное устройство"
 #: include/classes/helpers/CMenuHelper.php:227
 #: include/classes/helpers/CRoleHelper.php:344
 #: include/classes/helpers/CRoleHelper.php:413 include/forms.inc.php:543
-#: include/views/configuration.template.list.php:122
-#: include/views/configuration.template.list.php:243
+#: include/views/configuration.template.list.php:124
+#: include/views/configuration.template.list.php:245
 #: include/views/inventory.host.view.php:200
 #: include/views/inventory.host.view.php:218
 msgid "Discovery"
@@ -6257,14 +6257,14 @@ msgstr "Пустой входной параметр."
 msgid "Empty map ID."
 msgstr "Пустой ID карты сети."
 
-#: app/views/administration.mediatype.list.php:176
+#: app/views/administration.mediatype.list.php:180
 #: app/views/administration.module.list.php:123
 #: app/views/administration.token.list.php:199
 #: app/views/administration.usergroup.list.php:213
 #: app/views/administration.user.token.list.php:151
 #: app/views/configuration.correlation.list.php:147
 #: app/views/configuration.discovery.list.php:120
-#: app/views/configuration.host.list.php:496
+#: app/views/configuration.host.list.php:498
 #: app/views/reports.scheduledreport.list.php:84 app/views/sla.list.php:163
 #: include/views/configuration.action.list.php:167
 #: include/views/configuration.host.discovery.list.php:324
@@ -6310,7 +6310,7 @@ msgstr "Активировать режим отладки для выбранн
 msgid "Enable host"
 msgstr "Активировать узел сети"
 
-#: app/views/configuration.host.list.php:283
+#: app/views/configuration.host.list.php:285
 msgid "Enable host?"
 msgstr "Активировать узел сети?"
 
@@ -6339,11 +6339,11 @@ msgstr "Активировать выбранные API токены?"
 
 #: app/views/js/sla.list.js.php:106
 msgid "Enable selected SLA?"
-msgstr ""
+msgstr "Активировать выбранный SLA?"
 
 #: app/views/js/sla.list.js.php:105
 msgid "Enable selected SLAs?"
-msgstr ""
+msgstr "Активировать выбранные SLA?"
 
 #: include/views/configuration.action.list.php:167
 msgid "Enable selected actions?"
@@ -6362,7 +6362,7 @@ msgstr "Активировать выбранные правила обнару�
 msgid "Enable selected groups?"
 msgstr "Активировать выбранные группы?"
 
-#: app/views/configuration.host.list.php:497
+#: app/views/configuration.host.list.php:499
 #: include/views/configuration.hostgroups.list.php:200
 msgid "Enable selected hosts?"
 msgstr "Активировать выбранные узлы сети?"
@@ -6371,7 +6371,7 @@ msgstr "Активировать выбранные узлы сети?"
 msgid "Enable selected items?"
 msgstr "Активировать выбранные элементы данных?"
 
-#: app/views/administration.mediatype.list.php:176
+#: app/views/administration.mediatype.list.php:180
 msgid "Enable selected media types?"
 msgstr "Активировать выбранные способы оповещения?"
 
@@ -6406,8 +6406,8 @@ msgstr "Активировать трапы"
 #: app/partials/scheduledreport.formgrid.html.php:201
 #: app/partials/scheduledreport.table.html.php:84
 #: app/views/administration.mediatype.edit.php:267
-#: app/views/administration.mediatype.list.php:56
-#: app/views/administration.mediatype.list.php:137
+#: app/views/administration.mediatype.list.php:60
+#: app/views/administration.mediatype.list.php:141
 #: app/views/administration.module.edit.php:45
 #: app/views/administration.module.list.php:53
 #: app/views/administration.module.list.php:95
@@ -6437,7 +6437,7 @@ msgstr "Активировать трапы"
 #: app/views/configuration.correlation.list.php:119
 #: app/views/configuration.discovery.edit.php:130
 #: app/views/configuration.discovery.list.php:56
-#: app/views/configuration.host.list.php:272 app/views/popup.generic.php:645
+#: app/views/configuration.host.list.php:274 app/views/popup.generic.php:645
 #: app/views/popup.massupdate.host.php:139 app/views/popup.media.php:89
 #: app/views/popup.sla.edit.php:175 app/views/popup.triggerwizard.php:137
 #: app/views/reports.scheduledreport.list.php:61 app/views/sla.list.php:52
@@ -7044,7 +7044,7 @@ msgid "Filled region"
 msgstr "Заполнение"
 
 #: app/partials/configuration.filter.items.php:230
-#: app/views/administration.mediatype.list.php:47
+#: app/views/administration.mediatype.list.php:51
 #: app/views/administration.module.list.php:44
 #: app/views/administration.proxy.list.php:45
 #: app/views/administration.script.list.php:42
@@ -7055,7 +7055,7 @@ msgstr "Заполнение"
 #: app/views/administration.user.token.list.php:37
 #: app/views/configuration.correlation.list.php:47
 #: app/views/configuration.discovery.list.php:47
-#: app/views/configuration.host.list.php:56
+#: app/views/configuration.host.list.php:58
 #: app/views/monitoring.charts.view.php:83
 #: app/views/monitoring.dashboard.list.php:59
 #: app/views/monitoring.discovery.view.php:46
@@ -7078,7 +7078,7 @@ msgstr "Заполнение"
 #: include/views/configuration.triggers.list.php:143
 #: include/views/inventory.host.list.php:43
 #: include/views/monitoring.history.php:269
-#: include/views/monitoring.sysmap.list.php:46
+#: include/views/monitoring.sysmap.list.php:50
 #: include/views/reports.toptriggers.php:83 report2.php:501
 msgid "Filter"
 msgstr "Фильтр"
@@ -7250,7 +7250,7 @@ msgid "Function"
 msgstr "Функция"
 
 #: app/views/administration.mediatype.edit.php:127
-#: app/views/administration.mediatype.list.php:100
+#: app/views/administration.mediatype.list.php:104
 msgid "GSM modem"
 msgstr "GSM модем"
 
@@ -7529,8 +7529,8 @@ msgstr "График с именем \"%1$s\" уже существует в г�
 #: app/partials/monitoring.host.view.html.php:41
 #: app/partials/monitoring.host.view.html.php:131
 #: app/partials/monitoring.host.view.html.php:139
-#: app/views/configuration.host.list.php:186
-#: app/views/configuration.host.list.php:443
+#: app/views/configuration.host.list.php:188
+#: app/views/configuration.host.list.php:445
 #: app/views/monitoring.charts.view.php:38
 #: app/views/monitoring.charts.view.php:110
 #: app/views/monitoring.charts.view.php:138 app/views/popup.import.php:38
@@ -7540,8 +7540,8 @@ msgstr "График с именем \"%1$s\" уже существует в г�
 #: include/views/configuration.graph.edit.php:30
 #: include/views/configuration.graph.list.php:44
 #: include/views/configuration.host.discovery.list.php:196
-#: include/views/configuration.template.list.php:120
-#: include/views/configuration.template.list.php:225
+#: include/views/configuration.template.list.php:122
+#: include/views/configuration.template.list.php:227
 #: include/views/inventory.host.view.php:160
 #: include/views/inventory.host.view.php:168
 #: include/views/inventory.host.view.php:194
@@ -7735,7 +7735,7 @@ msgstr "Иврит (he_IL)"
 #: include/views/js/monitoring.sysmaps.js.php:123
 #: include/views/js/monitoring.sysmaps.js.php:468
 #: include/views/monitoring.sysmap.edit.php:105
-#: include/views/monitoring.sysmap.list.php:68 sysmaps.php:40
+#: include/views/monitoring.sysmap.list.php:72 sysmaps.php:40
 msgid "Height"
 msgstr "Высота"
 
@@ -8046,7 +8046,7 @@ msgstr "Группа узлов сети с ID \"%1$s\" недоступна."
 #: app/partials/monitoring.host.filter.php:83
 #: app/partials/monitoring.problem.filter.php:35
 #: app/partials/popup.operations.php:199
-#: app/views/configuration.host.list.php:60
+#: app/views/configuration.host.list.php:62
 #: app/views/monitoring.latest.view.php:50
 #: app/views/monitoring.web.view.php:50
 #: app/views/popup.condition.common.php:101
@@ -8259,9 +8259,9 @@ msgstr "Узел сети с таким же видимым именем \"%1$s\
 #: include/views/configuration.hostgroups.list.php:178
 #: include/views/configuration.httpconf.list.php:50
 #: include/views/configuration.maintenance.edit.php:225
-#: include/views/configuration.template.list.php:117
-#: include/views/configuration.template.list.php:197
-#: include/views/configuration.template.list.php:203
+#: include/views/configuration.template.list.php:119
+#: include/views/configuration.template.list.php:199
+#: include/views/configuration.template.list.php:205
 #: include/views/configuration.triggers.list.php:48
 #: include/views/reports.toptriggers.php:57 report2.php:465
 msgid "Hosts"
@@ -8322,7 +8322,7 @@ msgid "IMAP"
 msgstr "IMAP"
 
 #: app/partials/monitoring.host.filter.php:103
-#: app/views/configuration.host.list.php:112
+#: app/views/configuration.host.list.php:114
 #: app/views/reports.auditlog.list.php:91 app/views/search.php:34
 msgid "IP"
 msgstr "IP"
@@ -8646,7 +8646,7 @@ msgid "Inaccessible dashboard"
 msgstr "Недоступная панель"
 
 #: app/partials/configuration.host.edit.html.php:60
-#: app/views/configuration.host.list.php:234
+#: app/views/configuration.host.list.php:236
 msgid "Inaccessible discovery rule"
 msgstr "Недоступное правило обнаружения"
 
@@ -8677,7 +8677,7 @@ msgstr "Недоступный прототип элементов данных"
 
 #: app/partials/monitoring.host.view.html.php:105
 #: app/partials/monitoring.latest.view.html.php:190
-#: app/views/configuration.host.list.php:267
+#: app/views/configuration.host.list.php:269
 #: include/classes/screens/CScreenProblem.php:386
 #: include/hostgroups.inc.php:293 include/triggers.inc.php:2027
 #: include/views/inventory.host.view.php:42
@@ -9476,18 +9476,18 @@ msgstr "Некорректное значение для \"%1$s\" поля."
 #: include/classes/graphdraw/CPieGraphDraw.php:175
 #: include/classes/helpers/CSvgGraphHelper.php:368
 #: include/classes/helpers/CSvgGraphHelper.php:380
-#: include/classes/import/CConfigurationImport.php:743
-#: include/classes/import/CConfigurationImport.php:838
-#: include/classes/import/CConfigurationImport.php:875
-#: include/classes/import/CConfigurationImport.php:976
-#: include/classes/import/CConfigurationImport.php:1130
-#: include/classes/import/CConfigurationImport.php:2686
-#: include/classes/import/CConfigurationImport.php:2790
+#: include/classes/import/CConfigurationImport.php:745
+#: include/classes/import/CConfigurationImport.php:842
+#: include/classes/import/CConfigurationImport.php:879
+#: include/classes/import/CConfigurationImport.php:980
+#: include/classes/import/CConfigurationImport.php:1136
+#: include/classes/import/CConfigurationImport.php:2696
 #: include/classes/import/CConfigurationImport.php:2800
-#: include/classes/import/CConfigurationImport.php:2827
-#: include/classes/import/CConfigurationImport.php:2842
-#: include/classes/import/CConfigurationImport.php:2851
-#: include/classes/import/CConfigurationImport.php:2857
+#: include/classes/import/CConfigurationImport.php:2810
+#: include/classes/import/CConfigurationImport.php:2837
+#: include/classes/import/CConfigurationImport.php:2852
+#: include/classes/import/CConfigurationImport.php:2861
+#: include/classes/import/CConfigurationImport.php:2867
 #: include/classes/validators/CActionCondValidator.php:66
 #: include/classes/validators/CActionCondValidator.php:72
 #: include/classes/validators/CActionCondValidator.php:83
@@ -9548,7 +9548,7 @@ msgstr "Бесконечно"
 #: app/partials/monitoring.latest.view.html.php:60
 #: app/partials/monitoring.latest.view.html.php:73
 #: app/partials/scheduledreport.table.html.php:45
-#: app/views/configuration.host.list.php:195
+#: app/views/configuration.host.list.php:197
 #: app/views/monitoring.widget.actionlog.view.php:39
 #: app/views/monitoring.widget.problems.view.php:57
 #: app/views/service.list.edit.php:57 app/views/service.list.php:60
@@ -9656,7 +9656,7 @@ msgstr "Интеграции"
 
 #: app/partials/monitoring.host.view.html.php:35
 #: app/views/administration.proxy.edit.php:76
-#: app/views/configuration.host.list.php:189 disc_prototypes.php:40
+#: app/views/configuration.host.list.php:191 disc_prototypes.php:40
 #: host_discovery.php:47 include/classes/html/CHostAvailability.php:76
 #: items.php:38
 msgid "Interface"
@@ -10409,8 +10409,8 @@ msgstr "Элемент данных с ключом \"%1$s\" уже сущест
 #: app/controllers/CControllerPopupImportCompare.php:168
 #: app/partials/dataoverview.table.top.php:29
 #: app/views/administration.queue.overview.php:45
-#: app/views/configuration.host.list.php:184
-#: app/views/configuration.host.list.php:425 app/views/popup.import.php:35
+#: app/views/configuration.host.list.php:186
+#: app/views/configuration.host.list.php:427 app/views/popup.import.php:35
 #: app/views/search.php:120 app/views/search.php:125 app/views/search.php:302
 #: app/views/search.php:307
 #: include/classes/widgets/forms/CWidgetFormPlainText.php:31
@@ -10418,8 +10418,8 @@ msgstr "Элемент данных с ключом \"%1$s\" уже сущест
 #: include/views/configuration.host.discovery.list.php:194
 #: include/views/configuration.item.edit.php:27
 #: include/views/configuration.item.list.php:29
-#: include/views/configuration.template.list.php:118
-#: include/views/configuration.template.list.php:207
+#: include/views/configuration.template.list.php:120
+#: include/views/configuration.template.list.php:209
 #: include/views/inventory.host.view.php:182
 #: include/views/inventory.host.view.php:215 items.php:1157
 msgid "Items"
@@ -10891,11 +10891,11 @@ msgid "Linked map"
 msgstr "Связанная карта"
 
 #: include/views/configuration.template.list.php:64
-#: include/views/configuration.template.list.php:124
+#: include/views/configuration.template.list.php:126
 msgid "Linked templates"
 msgstr "Присоединенные шаблоны"
 
-#: include/views/configuration.template.list.php:125
+#: include/views/configuration.template.list.php:127
 msgid "Linked to templates"
 msgstr "Соединения с шаблонам"
 
@@ -11371,11 +11371,11 @@ msgstr "Маска"
 #: app/controllers/CControllerPopupMassupdateTemplate.php:378
 #: app/controllers/CControllerPopupMassupdateTrigger.php:235
 #: app/partials/service.list.edit.php:140
-#: app/views/configuration.host.list.php:516
+#: app/views/configuration.host.list.php:518
 #: include/classes/screens/CScreenProblem.php:1130
 #: include/views/configuration.item.list.php:309
 #: include/views/configuration.item.prototype.list.php:196
-#: include/views/configuration.template.list.php:279
+#: include/views/configuration.template.list.php:281
 #: include/views/configuration.trigger.prototype.list.php:202
 #: include/views/configuration.triggers.list.php:345
 msgid "Mass update"
@@ -11830,7 +11830,7 @@ msgstr "Пн"
 msgid "Monday"
 msgstr "Понедельник"
 
-#: app/views/configuration.host.list.php:126
+#: app/views/configuration.host.list.php:128
 msgid "Monitored by"
 msgstr "Наблюдение через"
 
@@ -11993,8 +11993,8 @@ msgstr "NTLM"
 #: app/views/administration.image.edit.php:45
 #: app/views/administration.mediatype.edit.php:49
 #: app/views/administration.mediatype.edit.php:153
-#: app/views/administration.mediatype.list.php:48
-#: app/views/administration.mediatype.list.php:78
+#: app/views/administration.mediatype.list.php:52
+#: app/views/administration.mediatype.list.php:82
 #: app/views/administration.module.edit.php:38
 #: app/views/administration.module.list.php:45
 #: app/views/administration.module.list.php:70
@@ -12029,8 +12029,8 @@ msgstr "NTLM"
 #: app/views/configuration.discovery.edit.php:43
 #: app/views/configuration.discovery.list.php:48
 #: app/views/configuration.discovery.list.php:73
-#: app/views/configuration.host.list.php:100
-#: app/views/configuration.host.list.php:173
+#: app/views/configuration.host.list.php:102
+#: app/views/configuration.host.list.php:175
 #: app/views/dashboard.page.properties.edit.php:36
 #: app/views/dashboard.properties.edit.php:63
 #: app/views/monitoring.dashboard.list.php:60
@@ -12103,7 +12103,7 @@ msgstr "NTLM"
 #: include/views/configuration.maintenance.list.php:85
 #: include/views/configuration.template.edit.php:69
 #: include/views/configuration.template.list.php:80
-#: include/views/configuration.template.list.php:114
+#: include/views/configuration.template.list.php:116
 #: include/views/configuration.trigger.prototype.edit.php:70
 #: include/views/configuration.trigger.prototype.edit.php:576
 #: include/views/configuration.trigger.prototype.list.php:58
@@ -12117,8 +12117,8 @@ msgstr "NTLM"
 #: include/views/js/monitoring.sysmaps.js.php:636
 #: include/views/monitoring.sysmap.edit.php:93
 #: include/views/monitoring.sysmap.edit.php:278
-#: include/views/monitoring.sysmap.list.php:47
-#: include/views/monitoring.sysmap.list.php:66 items.php:46 maintenance.php:40
+#: include/views/monitoring.sysmap.list.php:51
+#: include/views/monitoring.sysmap.list.php:70 items.php:46 maintenance.php:40
 #: report2.php:507 sysmaps.php:38 trigger_prototypes.php:37 triggers.php:45
 msgid "Name"
 msgstr "Имя"
@@ -12806,10 +12806,10 @@ msgstr "Не-логические флаги устарели."
 #: app/views/administration.usergroup.edit.php:134
 #: app/views/administration.userrole.edit.php:142
 #: app/views/administration.userrole.edit.php:183
-#: app/views/configuration.host.list.php:369
-#: app/views/configuration.host.list.php:375
-#: app/views/configuration.host.list.php:388
-#: app/views/configuration.host.list.php:391
+#: app/views/configuration.host.list.php:371
+#: app/views/configuration.host.list.php:377
+#: app/views/configuration.host.list.php:390
+#: app/views/configuration.host.list.php:393
 #: include/classes/widgets/CWidgetHelper.php:852
 #: include/classes/widgets/CWidgetHelper.php:927
 #: include/classes/widgets/CWidgetHelper.php:1186
@@ -13741,9 +13741,9 @@ msgstr "Режим генерации событий ПРОБЛЕМА"
 #: app/views/administration.proxy.edit.php:125
 #: app/views/administration.proxy.list.php:138
 #: app/views/administration.proxy.list.php:151
-#: app/views/configuration.host.list.php:378
-#: app/views/configuration.host.list.php:395
-#: app/views/configuration.host.list.php:398
+#: app/views/configuration.host.list.php:380
+#: app/views/configuration.host.list.php:397
+#: app/views/configuration.host.list.php:400
 #: app/views/popup.massupdate.host.php:232
 #: app/views/popup.massupdate.host.php:245
 #: app/views/popup.massupdate.host.php:260
@@ -14113,7 +14113,7 @@ msgstr "Заполнение поля инвентаря узла сети"
 #: app/views/administration.authentication.edit.php:169
 #: app/views/administration.proxy.edit.php:49
 #: app/views/administration.script.edit.php:162
-#: app/views/configuration.host.list.php:118
+#: app/views/configuration.host.list.php:120
 #: app/views/popup.itemtestedit.view.php:112 include/hosts.inc.php:1228
 #: include/views/inventory.host.view.php:81
 msgid "Port"
@@ -14402,8 +14402,8 @@ msgstr "Шаблон Prometheus"
 msgid "Prometheus to JSON"
 msgstr "Prometheus в JSON"
 
-#: include/views/monitoring.sysmap.list.php:77
-#: include/views/monitoring.sysmap.list.php:78 jsLoader.php:143
+#: include/views/monitoring.sysmap.list.php:81
+#: include/views/monitoring.sysmap.list.php:82 jsLoader.php:143
 msgid "Properties"
 msgstr "Свойства"
 
@@ -14430,9 +14430,9 @@ msgstr "Прокси"
 #: app/views/administration.queue.details.php:49
 #: app/views/administration.queue.overview.proxy.php:45
 #: app/views/configuration.discovery.list.php:78
-#: app/views/configuration.host.list.php:131
-#: app/views/configuration.host.list.php:136
-#: app/views/configuration.host.list.php:190
+#: app/views/configuration.host.list.php:133
+#: app/views/configuration.host.list.php:138
+#: app/views/configuration.host.list.php:192
 #: app/views/popup.condition.common.php:520
 #: app/views/popup.itemtestedit.view.php:237 include/actions.inc.php:62
 msgid "Proxy"
@@ -15417,22 +15417,22 @@ msgstr ""
 #: include/classes/api/services/CSla.php:539
 #, c-format
 msgid "SLA \"%1$s\" already exists."
-msgstr ""
+msgstr "SLA \"%1$s\" уже существует."
 
 #: app/controllers/CControllerSlaReportList.php:229
 msgid "SLA Report"
-msgstr ""
+msgstr "Отчет SLA"
 
 #: app/controllers/CControllerSlaCreate.php:123
 msgid "SLA created"
-msgstr ""
+msgstr "SLA создан"
 
 #: app/controllers/CControllerSlaDelete.php:64
 msgid "SLA deleted"
 msgid_plural "SLAs deleted"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "SLA удален"
+msgstr[1] "SLA удалено"
+msgstr[2] "SLA удалены"
 
 #: app/controllers/CControllerSlaDisable.php:73
 msgid "SLA disabled"
@@ -15461,18 +15461,18 @@ msgstr ""
 
 #: app/controllers/CControllerSlaUpdate.php:134
 msgid "SLA updated"
-msgstr ""
+msgstr "SLA обновлен"
 
 #: include/classes/api/services/CDashboardGeneral.php:630
 #, c-format
 msgid "SLA with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "SLA с ID \"%1$s\" недоступен."
 
 #: app/partials/service.info.php:61
 #: app/views/monitoring.widget.slareport.view.php:98
 #: app/views/slareport.list.php:163
 msgid "SLI"
-msgstr ""
+msgstr "SLI"
 
 #: app/partials/service.info.php:61
 #: app/views/monitoring.widget.slareport.view.php:38
@@ -15480,7 +15480,7 @@ msgstr ""
 #: app/views/popup.sla.edit.php:61 app/views/sla.list.php:88
 #: app/views/slareport.list.php:115 app/views/slareport.list.php:162
 msgid "SLO"
-msgstr ""
+msgstr "SLO"
 
 #: app/views/administration.authentication.edit.php:236
 msgid "SLO service URL"
@@ -15495,17 +15495,17 @@ msgid "SMTP"
 msgstr "SMTP"
 
 #: app/views/administration.mediatype.edit.php:74
-#: app/views/administration.mediatype.list.php:92
+#: app/views/administration.mediatype.list.php:96
 msgid "SMTP email"
 msgstr "SMTP email"
 
 #: app/views/administration.mediatype.edit.php:69
-#: app/views/administration.mediatype.list.php:91
+#: app/views/administration.mediatype.list.php:95
 msgid "SMTP helo"
 msgstr "SMTP helo"
 
 #: app/views/administration.mediatype.edit.php:61
-#: app/views/administration.mediatype.list.php:90
+#: app/views/administration.mediatype.list.php:94
 msgid "SMTP server"
 msgstr "SMTP сервер"
 
@@ -15841,7 +15841,7 @@ msgid "Script execution successful."
 msgstr "Скрипт выполнен успешно."
 
 #: app/views/administration.mediatype.edit.php:95
-#: app/views/administration.mediatype.list.php:96
+#: app/views/administration.mediatype.list.php:100
 msgid "Script name"
 msgstr "Имя скрипта"
 
@@ -16078,7 +16078,7 @@ msgstr "Serif"
 #: app/controllers/CControllerQueueOverviewProxy.php:61
 #: app/controllers/CControllerWidgetClockView.php:115
 #: app/views/administration.script.list.php:167
-#: app/views/configuration.host.list.php:130
+#: app/views/configuration.host.list.php:132
 msgid "Server"
 msgstr "Сервер"
 
@@ -16177,7 +16177,7 @@ msgstr "Услуга обновлена"
 #: include/classes/api/services/CDashboardGeneral.php:612
 #, c-format
 msgid "Service with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "Услуга с ID \"%1$s\" недоступна."
 
 #: include/classes/api/services/CRole.php:536
 #, c-format
@@ -16784,8 +16784,8 @@ msgstr "Статистика и доступность кэша записи в 
 #: app/partials/scheduledreport.table.html.php:44
 #: app/partials/service.info.php:115 app/partials/service.list.edit.php:55
 #: app/partials/service.list.php:52
-#: app/views/administration.mediatype.list.php:53
-#: app/views/administration.mediatype.list.php:80
+#: app/views/administration.mediatype.list.php:57
+#: app/views/administration.mediatype.list.php:84
 #: app/views/administration.module.list.php:50
 #: app/views/administration.module.list.php:78
 #: app/views/administration.token.list.php:91
@@ -16800,7 +16800,7 @@ msgstr "Статистика и доступность кэша записи в 
 #: app/views/configuration.correlation.list.php:78
 #: app/views/configuration.discovery.list.php:53
 #: app/views/configuration.discovery.list.php:81
-#: app/views/configuration.host.list.php:176
+#: app/views/configuration.host.list.php:178
 #: app/views/hintbox.eventlist.php:74
 #: app/views/monitoring.widget.actionlog.view.php:38
 #: app/views/monitoring.widget.problems.view.php:56
@@ -17203,8 +17203,8 @@ msgstr "Значение тега"
 #: app/partials/monitoring.latest.view.html.php:71
 #: app/partials/monitoring.problem.filter.php:231
 #: app/partials/service.info.php:126 app/partials/service.list.edit.php:58
-#: app/partials/service.list.php:55 app/views/configuration.host.list.php:156
-#: app/views/configuration.host.list.php:196
+#: app/partials/service.list.php:55 app/views/configuration.host.list.php:158
+#: app/views/configuration.host.list.php:198
 #: app/views/hintbox.eventlist.php:77 app/views/monitoring.latest.view.php:90
 #: app/views/monitoring.web.view.php:87
 #: app/views/monitoring.widget.problems.view.php:68
@@ -17246,7 +17246,7 @@ msgstr "Значение тега"
 #: include/views/configuration.maintenance.edit.php:247
 #: include/views/configuration.template.edit.php:179
 #: include/views/configuration.template.list.php:83
-#: include/views/configuration.template.list.php:126
+#: include/views/configuration.template.list.php:128
 #: include/views/configuration.trigger.prototype.edit.php:560
 #: include/views/configuration.trigger.prototype.list.php:63
 #: include/views/configuration.triggers.edit.php:585
@@ -17378,8 +17378,8 @@ msgstr "Шаблон с таким же видимым именем \"%1$s\" у�
 #: app/partials/configuration.filter.items.php:72
 #: app/partials/configuration.host.edit.html.php:210
 #: app/partials/popup.operations.php:212
-#: app/views/configuration.host.list.php:81
-#: app/views/configuration.host.list.php:191
+#: app/views/configuration.host.list.php:83
+#: app/views/configuration.host.list.php:193
 #: app/views/popup.condition.common.php:357 app/views/popup.import.php:31
 #: app/views/search.php:223 app/views/search.php:227 app/views/search.php:369
 #: include/classes/helpers/CMenuHelper.php:173
@@ -17413,7 +17413,7 @@ msgstr "Шаблоны обновлены"
 #: app/controllers/CControllerPopupTestTriggerExpr.php:212
 #: app/partials/scheduledreport.formgrid.html.php:211
 #: app/views/administration.authentication.edit.php:339
-#: app/views/administration.mediatype.list.php:146
+#: app/views/administration.mediatype.list.php:150
 #: app/views/administration.regex.edit.php:140
 #: app/views/js/popup.itemtestedit.view.js.php:571
 #: app/views/popup.itemtestedit.view.php:432
@@ -17942,7 +17942,7 @@ msgstr "Триггер \"%1$s\" уже существует у \"%2$s\"."
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
 msgstr "Триггер \"%1$s\" принадлежит шаблонам с разными связями."
 
-#: include/classes/import/CConfigurationImport.php:1830
+#: include/classes/import/CConfigurationImport.php:1840
 #, c-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Триггер \"%1$s\" зависит от триггера \"%2$s\", который не существует."
@@ -18052,7 +18052,7 @@ msgstr "Прототип триггера \"%1$s\" принадлежит шаб
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
 msgstr "Прототип триггеров \"%1$s\" содержит прототипы элементов данных из нескольких правил обнаружения."
 
-#: include/classes/import/CConfigurationImport.php:1511
+#: include/classes/import/CConfigurationImport.php:1521
 #, c-format
 msgid "Trigger prototype \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Прототип триггеров \"%1$s\" зависит от триггера \"%2$s\", который не существует."
@@ -18124,16 +18124,16 @@ msgstr "Триггер обновлен"
 #: app/partials/configuration.filter.items.php:191
 #: app/partials/monitoring.problem.filter.php:74
 #: app/partials/trigoverview.table.top.php:29
-#: app/views/configuration.host.list.php:185
-#: app/views/configuration.host.list.php:434
+#: app/views/configuration.host.list.php:187
+#: app/views/configuration.host.list.php:436
 #: app/views/popup.condition.common.php:208 app/views/popup.import.php:37
 #: app/views/search.php:131 app/views/search.php:136 app/views/search.php:312
 #: app/views/search.php:317 include/html.inc.php:341
 #: include/views/configuration.host.discovery.list.php:195
 #: include/views/configuration.item.list.php:86
 #: include/views/configuration.item.list.php:222
-#: include/views/configuration.template.list.php:119
-#: include/views/configuration.template.list.php:216
+#: include/views/configuration.template.list.php:121
+#: include/views/configuration.template.list.php:218
 #: include/views/configuration.triggers.edit.php:28
 #: include/views/configuration.triggers.list.php:146
 #: include/views/inventory.host.view.php:188
@@ -18186,7 +18186,7 @@ msgstr "Два и более полей не могут занимать одн�
 #: app/partials/monitoring.latest.view.html.php:54
 #: app/views/administration.image.list.php:38
 #: app/views/administration.mediatype.edit.php:55
-#: app/views/administration.mediatype.list.php:79
+#: app/views/administration.mediatype.list.php:83
 #: app/views/administration.script.edit.php:112
 #: app/views/administration.script.list.php:77
 #: app/views/administration.user.edit.php:294
@@ -18740,7 +18740,7 @@ msgstr "Использовать, если важность"
 msgid "Use iframe sandboxing"
 msgstr "Использовать sandbox атрибут в iframe"
 
-#: app/views/administration.mediatype.list.php:81
+#: app/views/administration.mediatype.list.php:85
 #: app/views/administration.script.list.php:76
 msgid "Used in actions"
 msgstr "Использование в действиях"
@@ -19651,12 +19651,12 @@ msgstr "Приносим свои извинения, достигнуто ма�
 #: app/partials/monitoring.host.view.html.php:43
 #: app/partials/monitoring.host.view.html.php:152
 #: app/partials/monitoring.host.view.html.php:160
-#: app/views/configuration.host.list.php:188
-#: app/views/configuration.host.list.php:461 app/views/search.php:110
+#: app/views/configuration.host.list.php:190
+#: app/views/configuration.host.list.php:463 app/views/search.php:110
 #: app/views/search.php:116 app/views/search.php:158 app/views/search.php:163
 #: app/views/search.php:255 app/views/search.php:261 app/views/search.php:347
-#: app/views/search.php:352 include/views/configuration.template.list.php:123
-#: include/views/configuration.template.list.php:252
+#: app/views/search.php:352 include/views/configuration.template.list.php:125
+#: include/views/configuration.template.list.php:254
 #: include/views/inventory.host.view.php:138
 #: include/views/inventory.host.view.php:143
 #: include/views/inventory.host.view.php:206
@@ -19792,7 +19792,7 @@ msgstr "Виджет слишком маленький для указанног
 #: include/views/js/monitoring.sysmaps.js.php:417
 #: include/views/js/monitoring.sysmaps.js.php:459
 #: include/views/monitoring.sysmap.edit.php:100
-#: include/views/monitoring.sysmap.list.php:67 sysmaps.php:39
+#: include/views/monitoring.sysmap.list.php:71 sysmaps.php:39
 msgid "Width"
 msgstr "Ширина"
 
@@ -20663,10 +20663,10 @@ msgstr "нельзя изменить"
 #: include/classes/api/services/CUserGroup.php:462
 #: include/classes/api/services/CUser.php:759
 #: include/classes/api/services/CUser.php:919
-#: include/classes/import/CConfigurationImport.php:744
-#: include/classes/import/CConfigurationImport.php:977
-#: include/classes/import/CConfigurationImport.php:1131
-#: include/classes/import/CConfigurationImport.php:2828
+#: include/classes/import/CConfigurationImport.php:746
+#: include/classes/import/CConfigurationImport.php:981
+#: include/classes/import/CConfigurationImport.php:1137
+#: include/classes/import/CConfigurationImport.php:2838
 #: include/classes/validators/CActionCondValidator.php:66
 #: include/classes/validators/CActionCondValidator.php:72
 #: include/classes/validators/CActionCondValidator.php:83
@@ -20757,7 +20757,7 @@ msgid "circular dependency is not allowed"
 msgstr "закольцованная зависимость не разрешена"
 
 #: include/classes/api/services/CItemGeneral.php:2316
-#: include/classes/import/CConfigurationImport.php:2843
+#: include/classes/import/CConfigurationImport.php:2853
 msgid "circular item dependency is not allowed"
 msgstr "закольцованная зависимость элементов данных не разрешена"
 
@@ -21401,8 +21401,8 @@ msgid "maximum dependent items count reached"
 msgstr "достигнуто максимальное количество зависимых элементов данных"
 
 #: include/classes/api/services/CItemGeneral.php:2396
-#: include/classes/import/CConfigurationImport.php:2791
-#: include/classes/import/CConfigurationImport.php:2858
+#: include/classes/import/CConfigurationImport.php:2801
+#: include/classes/import/CConfigurationImport.php:2868
 msgid "maximum number of dependency levels reached"
 msgstr "достигнуто максимальное количество уровней зависимостей"
 
@@ -22237,11 +22237,11 @@ msgstr "значение"
 msgid "value \"%1$s\" already exists"
 msgstr "значение \"%1$s\" уже существует"
 
-#: include/classes/import/CConfigurationImport.php:839
-#: include/classes/import/CConfigurationImport.php:876
-#: include/classes/import/CConfigurationImport.php:2687
-#: include/classes/import/CConfigurationImport.php:2801
-#: include/classes/import/CConfigurationImport.php:2852
+#: include/classes/import/CConfigurationImport.php:843
+#: include/classes/import/CConfigurationImport.php:880
+#: include/classes/import/CConfigurationImport.php:2697
+#: include/classes/import/CConfigurationImport.php:2811
+#: include/classes/import/CConfigurationImport.php:2862
 #, c-format
 msgid "value \"%1$s\" not found"
 msgstr "значение \"%1$s\" не найдено"
