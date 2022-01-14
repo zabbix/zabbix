@@ -45,16 +45,14 @@ struct zbx_mock_IO_FILE
 FILE	*__wrap_fopen(const char *path, const char *mode);
 int	__wrap_fclose(FILE *fp);
 char	*__wrap_fgets(char *s, int size, FILE *stream);
-int	__wrap_connect(int socket, __CONST_SOCKADDR_ARG addr, socklen_t address_len);
+int	__wrap_connect(int socket, void *addr, socklen_t address_len);
 ssize_t	__wrap_read(int fildes, void *buf, size_t nbyte);
 int	__wrap_open(const char *path, int oflag, ...);
 int	__wrap_stat(const char *path, struct stat *buf);
 int	__wrap___xstat(int ver, const char *pathname, struct stat *buf);
-int	__wrap___fxstat(int __ver, int __fildes, struct stat *__stat_buf);
 
 int	__real_open(const char *path, int oflag, ...);
 int	__real_stat(const char *path, struct stat *buf);
-int	__real___fxstat(int __ver, int __fildes, struct stat *__stat_buf);
 
 static int	is_profiler_path(const char *path)
 {
@@ -168,7 +166,7 @@ char	*__wrap_fgets(char *s, int size, FILE *stream)
 	return s;
 }
 
-int	__wrap_connect(int socket, __CONST_SOCKADDR_ARG addr, socklen_t address_len)
+int	__wrap_connect(int socket, void *addr, socklen_t address_len)
 {
 	zbx_mock_error_t	error;
 
@@ -281,14 +279,4 @@ int	__wrap___xstat(int ver, const char *pathname, struct stat *buf)
 		return __real_stat(pathname, buf);
 
 	return __wrap_stat(pathname, buf);
-}
-
-int	__wrap___fxstat(int __ver, int __fildes, struct stat *__stat_buf)
-{
-	if (__fildes != INT_MAX)
-		return __real___fxstat(__ver, __fildes, __stat_buf);
-
-	__stat_buf->st_size = zbx_mock_get_parameter_uint64("in.file_len");
-
-	return 0;
 }

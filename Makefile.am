@@ -141,8 +141,7 @@ WRAP_FS_FUNCS = \
 	-Wl,--wrap=opendir \
 	-Wl,--wrap=readdir \
 	-Wl,--wrap=stat \
-	-Wl,--wrap=__xstat \
-	-Wl,--wrap=__fxstat
+	-Wl,--wrap=__xstat
 
 WRAP_EXIT = \
 	-Wl,--wrap=exit
