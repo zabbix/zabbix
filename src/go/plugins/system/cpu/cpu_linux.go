@@ -112,11 +112,11 @@ func (p *Plugin) Collect() (err error) {
 	return nil
 }
 
-func numCPUConf() int {
+func (p *Plugin) numCPUConf() int {
 	return int(C.sysconf(C._SC_NPROCESSORS_CONF))
 }
 
-func numCPUOnline() int {
+func (p *Plugin) numCPUOnline() int {
 	return int(C.sysconf(C._SC_NPROCESSORS_ONLN))
 }
 

@@ -107,14 +107,14 @@ func (p *Plugin) getCpuNum(params []string) (result interface{}, err error) {
 	case 1:
 		switch params[0] {
 		case "", "online":
-			return numCPUOnline(), nil
+			return p.numCPUOnline(), nil
 		case "max":
-			return numCPUConf(), nil
+			return p.numCPUConf(), nil
 		default:
 			return nil, errors.New("Invalid first parameter.")
 		}
 	case 0:
-		return numCPUOnline(), nil
+		return p.numCPUOnline(), nil
 	default:
 		return nil, zbxerr.ErrorTooManyParameters
 	}
