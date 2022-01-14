@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-07 19:55+0200\n"
+"POT-Creation-Date: 2022-01-14 19:53+0200\n"
 "PO-Revision-Date: 2021-03-19 18:13+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: none\n"
@@ -2497,7 +2497,7 @@ msgstr ""
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
 msgstr "Kan ikke finne verten \"%1$s\" brukt i kart \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1206
+#: include/classes/import/CConfigurationImport.php:1212
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Kan ikke finne vertsgruppe \"%1$s\" for vertsprototype \"%2$s\" av oppdagelsesregelen \"%3$s\" på \"%4$s\"."
@@ -2520,47 +2520,47 @@ msgstr "Kan ikke finne ikon \"%1$s\" brukt i kart \"%2$s\"."
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr "Kan ikke finne ikon kart \"%1$s\" brukt i kart \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:948
+#: include/classes/import/CConfigurationImport.php:952
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for discovery rule \"%2$s\" on \"%3$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:717
+#: include/classes/import/CConfigurationImport.php:719
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:1100
+#: include/classes/import/CConfigurationImport.php:1106
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:1631
+#: include/classes/import/CConfigurationImport.php:1641
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph \"%3$s\"."
 msgstr "Kan ikke finne elementet \"%1$s\" på \"%2$s\" brukt som Y-aksens MAX-verdi for grafen \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1403
+#: include/classes/import/CConfigurationImport.php:1413
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Kan ikke finne elementet \"%1$s\" på \"%2$s\" brukt som Y-aksens MAX-verdi for grafprototypen \"%3$s\" av funnregelen \"%4$s\" på \"%5$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1613
+#: include/classes/import/CConfigurationImport.php:1623
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph \"%3$s\"."
 msgstr "Kan ikke finne elementet \"%1$s\" på \"%2$s\" brukt som Y-aksen MIN-verdien for grafen \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1382
+#: include/classes/import/CConfigurationImport.php:1392
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Kan ikke finne elementet \"%1$s\" på \"%2$s\" brukt som Y-aksen MIN-verdien for grafprototypen \"%3$s\" av funnregelen \"%4$s\" på \"%5$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1651
+#: include/classes/import/CConfigurationImport.php:1661
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
 msgstr "Kan ikke finne elementet \"%1$s\" på \"%2$s\" brukt i grafen \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1424
+#: include/classes/import/CConfigurationImport.php:1434
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Kan ikke finne elementet \"%1$s\" på \"%2$s\" brukt i graf prototype \"%3$s\" av funnregelen \"%4$s\" på \"%5$s\"."
@@ -2575,12 +2575,12 @@ msgstr ""
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
 msgstr "Kan ikke finne kart \"%1$s\" brukt i kart \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1229
+#: include/classes/import/CConfigurationImport.php:1235
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Kan ikke finne mal \"%1$s\" for vertsprototypen \"%2$s\" av oppdagelsesregelen \"%3$s\" på \"%4$s\"."
 
-#: include/classes/import/CConfigurationImport.php:998
+#: include/classes/import/CConfigurationImport.php:1002
 #, c-format
 msgid "Cannot find template \"%1$s\" for override \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr ""
@@ -2591,12 +2591,12 @@ msgstr ""
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "Kan ikke finne utløseren \"%1$s\" brukt i kart \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:730
+#: include/classes/import/CConfigurationImport.php:732
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr "Kan ikke finne verdikart \"%1$s\" brukt for elementet \"%2$s\" på \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1116
+#: include/classes/import/CConfigurationImport.php:1122
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Kan ikke finne verdikart \"%1$s\" brukt til elementprototype \"%2$s\" av oppdagelsesregelen \"%3$s\" på \"%4$s\"."
@@ -9302,18 +9302,18 @@ msgstr ""
 #: include/classes/graphdraw/CPieGraphDraw.php:177
 #: include/classes/helpers/CSvgGraphHelper.php:372
 #: include/classes/helpers/CSvgGraphHelper.php:384
-#: include/classes/import/CConfigurationImport.php:743
-#: include/classes/import/CConfigurationImport.php:838
-#: include/classes/import/CConfigurationImport.php:875
-#: include/classes/import/CConfigurationImport.php:976
-#: include/classes/import/CConfigurationImport.php:1130
-#: include/classes/import/CConfigurationImport.php:2686
-#: include/classes/import/CConfigurationImport.php:2790
+#: include/classes/import/CConfigurationImport.php:745
+#: include/classes/import/CConfigurationImport.php:842
+#: include/classes/import/CConfigurationImport.php:879
+#: include/classes/import/CConfigurationImport.php:980
+#: include/classes/import/CConfigurationImport.php:1136
+#: include/classes/import/CConfigurationImport.php:2696
 #: include/classes/import/CConfigurationImport.php:2800
-#: include/classes/import/CConfigurationImport.php:2827
-#: include/classes/import/CConfigurationImport.php:2842
-#: include/classes/import/CConfigurationImport.php:2851
-#: include/classes/import/CConfigurationImport.php:2857
+#: include/classes/import/CConfigurationImport.php:2810
+#: include/classes/import/CConfigurationImport.php:2837
+#: include/classes/import/CConfigurationImport.php:2852
+#: include/classes/import/CConfigurationImport.php:2861
+#: include/classes/import/CConfigurationImport.php:2867
 #: include/classes/validators/CActionCondValidator.php:65
 #: include/classes/validators/CActionCondValidator.php:71
 #: include/classes/validators/CActionCondValidator.php:82
@@ -17411,7 +17411,7 @@ msgstr "Trigger \"%1$s\" eksisterer allerede på \"%2$s\"."
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
 msgstr "Trigger \"%1$s\" tilhører maler med forskjellige koblinger."
 
-#: include/classes/import/CConfigurationImport.php:1830
+#: include/classes/import/CConfigurationImport.php:1840
 #, c-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Trigger \"%1$s\" avhenger av utløseren \"%2$s\", som ikke eksisterer."
@@ -17521,7 +17521,7 @@ msgstr "Trigger prototype \"%1$s\" tilhører maler med forskjellige koblinger."
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
 msgstr "Trigger prototype \"%1$s\" inneholder element prototyper fra flere funn regler."
 
-#: include/classes/import/CConfigurationImport.php:1511
+#: include/classes/import/CConfigurationImport.php:1521
 #, c-format
 msgid "Trigger prototype \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Trigger prototype \"%1$s\" avhenger av utløseren \"%2$s\", som ikke eksisterer."
@@ -20041,10 +20041,10 @@ msgstr "kan ikke endres"
 #: include/classes/api/services/CUserGroup.php:463
 #: include/classes/api/services/CUser.php:697
 #: include/classes/api/services/CUser.php:857
-#: include/classes/import/CConfigurationImport.php:744
-#: include/classes/import/CConfigurationImport.php:977
-#: include/classes/import/CConfigurationImport.php:1131
-#: include/classes/import/CConfigurationImport.php:2828
+#: include/classes/import/CConfigurationImport.php:746
+#: include/classes/import/CConfigurationImport.php:981
+#: include/classes/import/CConfigurationImport.php:1137
+#: include/classes/import/CConfigurationImport.php:2838
 #: include/classes/validators/CActionCondValidator.php:65
 #: include/classes/validators/CActionCondValidator.php:71
 #: include/classes/validators/CActionCondValidator.php:82
@@ -20116,7 +20116,7 @@ msgid "circular dependency is not allowed"
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:2270
-#: include/classes/import/CConfigurationImport.php:2843
+#: include/classes/import/CConfigurationImport.php:2853
 msgid "circular item dependency is not allowed"
 msgstr "Sirkulær elementavhengighet er ikke tillatt"
 
@@ -20727,8 +20727,8 @@ msgid "maximum dependent items count reached"
 msgstr "Maksimalt avhengige gjenstandstall nås"
 
 #: include/classes/api/services/CItemGeneral.php:2350
-#: include/classes/import/CConfigurationImport.php:2791
-#: include/classes/import/CConfigurationImport.php:2858
+#: include/classes/import/CConfigurationImport.php:2801
+#: include/classes/import/CConfigurationImport.php:2868
 msgid "maximum number of dependency levels reached"
 msgstr "maksimalt antall avhengighetsnivåer nådd"
 
@@ -21473,11 +21473,11 @@ msgstr "verdi"
 msgid "value \"%1$s\" already exists"
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:839
-#: include/classes/import/CConfigurationImport.php:876
-#: include/classes/import/CConfigurationImport.php:2687
-#: include/classes/import/CConfigurationImport.php:2801
-#: include/classes/import/CConfigurationImport.php:2852
+#: include/classes/import/CConfigurationImport.php:843
+#: include/classes/import/CConfigurationImport.php:880
+#: include/classes/import/CConfigurationImport.php:2697
+#: include/classes/import/CConfigurationImport.php:2811
+#: include/classes/import/CConfigurationImport.php:2862
 #, c-format
 msgid "value \"%1$s\" not found"
 msgstr "verdien \"%1$s\" ble ikke funnet"

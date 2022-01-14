@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-07 19:55+0200\n"
+"POT-Creation-Date: 2022-01-14 19:53+0200\n"
 "PO-Revision-Date: 2016-05-11 02:08+0300\n"
 "Last-Translator: 岂几 <tom3000@126.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -2435,7 +2435,7 @@ msgstr ""
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
 msgstr "无法找到主机 \"%1$s\" 用于地图 \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1206
+#: include/classes/import/CConfigurationImport.php:1212
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "在 \"%4$s\"上无法针对自动发现规则 \"%3$s\"上的\"%2$s\"主机模板找到主机组 \"%1$s\""
@@ -2458,47 +2458,47 @@ msgstr "无法找到图标 \"%1$s\" 用于地图 \"%2$s\"."
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr "无法找到地图图标 \"%1$s\" 用于地图 \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:948
+#: include/classes/import/CConfigurationImport.php:952
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for discovery rule \"%2$s\" on \"%3$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:717
+#: include/classes/import/CConfigurationImport.php:719
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:1100
+#: include/classes/import/CConfigurationImport.php:1106
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:1631
+#: include/classes/import/CConfigurationImport.php:1641
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph \"%3$s\"."
 msgstr "无法为数据图\"%3$s\"在\"%2$s\"上找到可以作为最大Y值的监控项目 \"%1$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1403
+#: include/classes/import/CConfigurationImport.php:1413
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "无法在\"%2$s\"上为\"%5$s\"上的自动发现规则\"%4$s\"上的数据图模板\"%3$s\"找到可以作为最大Y值的监控项目\"%1$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1613
+#: include/classes/import/CConfigurationImport.php:1623
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph \"%3$s\"."
 msgstr "无法为数据图 \"%3$s\"在\"%2$s\"上可以作为最小值的监控项目\"%1$s\""
 
-#: include/classes/import/CConfigurationImport.php:1382
+#: include/classes/import/CConfigurationImport.php:1392
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "无法在\"%2$s\"上为\"%5$s\"上的自动发现规则\"%4$s\"上的数据图模板\"%3$s\"找到可以作为最小Y值的监控项目\"%1$s\""
 
-#: include/classes/import/CConfigurationImport.php:1651
+#: include/classes/import/CConfigurationImport.php:1661
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
 msgstr "无法在\"%2$s\"上找到被数据图\"%3$s\"引用的监控项目\"%1$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1424
+#: include/classes/import/CConfigurationImport.php:1434
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "在 \"%5$s\"中无法找到被自动发现规则\"%4$s\"上的数据图模板 \"%3$s\"在\"%2$s\"上所引用的监控项目\"%1$s\"."
@@ -2513,12 +2513,12 @@ msgstr ""
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
 msgstr "无法找到地图 \"%1$s\" 用于地图 \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1229
+#: include/classes/import/CConfigurationImport.php:1235
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "无法在\"%4$s\"上为自动发现规则 \"%3$s\"上的主机模板\"%2$s\"找模板\"%1$s\""
 
-#: include/classes/import/CConfigurationImport.php:998
+#: include/classes/import/CConfigurationImport.php:1002
 #, c-format
 msgid "Cannot find template \"%1$s\" for override \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr ""
@@ -2529,12 +2529,12 @@ msgstr ""
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "无法找到触发器 \"%1$s\" 用于地图 \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:730
+#: include/classes/import/CConfigurationImport.php:732
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr "无法在 \"%3$s\"上找到由监控项目\"%2$s\" 所引用的数据映射\"%1$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1116
+#: include/classes/import/CConfigurationImport.php:1122
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "无法在\"%4$s\"上找到由自动发现规则 \"%3$s\"上的 \"%2$s\"监控项目模板所引用的数据映射 \"%1$s\"."
@@ -9220,18 +9220,18 @@ msgstr "\"%1$s\" 字段的值不正确。"
 #: include/classes/graphdraw/CPieGraphDraw.php:177
 #: include/classes/helpers/CSvgGraphHelper.php:372
 #: include/classes/helpers/CSvgGraphHelper.php:384
-#: include/classes/import/CConfigurationImport.php:743
-#: include/classes/import/CConfigurationImport.php:838
-#: include/classes/import/CConfigurationImport.php:875
-#: include/classes/import/CConfigurationImport.php:976
-#: include/classes/import/CConfigurationImport.php:1130
-#: include/classes/import/CConfigurationImport.php:2686
-#: include/classes/import/CConfigurationImport.php:2790
+#: include/classes/import/CConfigurationImport.php:745
+#: include/classes/import/CConfigurationImport.php:842
+#: include/classes/import/CConfigurationImport.php:879
+#: include/classes/import/CConfigurationImport.php:980
+#: include/classes/import/CConfigurationImport.php:1136
+#: include/classes/import/CConfigurationImport.php:2696
 #: include/classes/import/CConfigurationImport.php:2800
-#: include/classes/import/CConfigurationImport.php:2827
-#: include/classes/import/CConfigurationImport.php:2842
-#: include/classes/import/CConfigurationImport.php:2851
-#: include/classes/import/CConfigurationImport.php:2857
+#: include/classes/import/CConfigurationImport.php:2810
+#: include/classes/import/CConfigurationImport.php:2837
+#: include/classes/import/CConfigurationImport.php:2852
+#: include/classes/import/CConfigurationImport.php:2861
+#: include/classes/import/CConfigurationImport.php:2867
 #: include/classes/validators/CActionCondValidator.php:65
 #: include/classes/validators/CActionCondValidator.php:71
 #: include/classes/validators/CActionCondValidator.php:82
@@ -17305,7 +17305,7 @@ msgstr "触发器\"%1$s\"已存在于\"%2$s\"."
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
 msgstr "触发器\"%1$s\"属于不同的联系，以模板。"
 
-#: include/classes/import/CConfigurationImport.php:1830
+#: include/classes/import/CConfigurationImport.php:1840
 #, c-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "触发器\"%1$s\"相依于一个不存在的触发器\"%2$s\"."
@@ -17412,7 +17412,7 @@ msgstr "触发器原型模板\"%1$s\"属于不同的联系，以模板。"
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
 msgstr "触发器模板\"%1$s\"中包含了来自多个自动发现规则的项目模板."
 
-#: include/classes/import/CConfigurationImport.php:1511
+#: include/classes/import/CConfigurationImport.php:1521
 #, c-format
 msgid "Trigger prototype \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "触发器模板 \"%1$s\" 依赖于触发器 \"%2$s\" ,但它不存在。"
@@ -19923,10 +19923,10 @@ msgstr "不能变更"
 #: include/classes/api/services/CUserGroup.php:463
 #: include/classes/api/services/CUser.php:697
 #: include/classes/api/services/CUser.php:857
-#: include/classes/import/CConfigurationImport.php:744
-#: include/classes/import/CConfigurationImport.php:977
-#: include/classes/import/CConfigurationImport.php:1131
-#: include/classes/import/CConfigurationImport.php:2828
+#: include/classes/import/CConfigurationImport.php:746
+#: include/classes/import/CConfigurationImport.php:981
+#: include/classes/import/CConfigurationImport.php:1137
+#: include/classes/import/CConfigurationImport.php:2838
 #: include/classes/validators/CActionCondValidator.php:65
 #: include/classes/validators/CActionCondValidator.php:71
 #: include/classes/validators/CActionCondValidator.php:82
@@ -19998,7 +19998,7 @@ msgid "circular dependency is not allowed"
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:2270
-#: include/classes/import/CConfigurationImport.php:2843
+#: include/classes/import/CConfigurationImport.php:2853
 msgid "circular item dependency is not allowed"
 msgstr "不允许循环项依赖"
 
@@ -20608,8 +20608,8 @@ msgid "maximum dependent items count reached"
 msgstr "达到最大依赖项数"
 
 #: include/classes/api/services/CItemGeneral.php:2350
-#: include/classes/import/CConfigurationImport.php:2791
-#: include/classes/import/CConfigurationImport.php:2858
+#: include/classes/import/CConfigurationImport.php:2801
+#: include/classes/import/CConfigurationImport.php:2868
 msgid "maximum number of dependency levels reached"
 msgstr "达到最大数量的依赖关系"
 
@@ -21354,11 +21354,11 @@ msgstr "值"
 msgid "value \"%1$s\" already exists"
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:839
-#: include/classes/import/CConfigurationImport.php:876
-#: include/classes/import/CConfigurationImport.php:2687
-#: include/classes/import/CConfigurationImport.php:2801
-#: include/classes/import/CConfigurationImport.php:2852
+#: include/classes/import/CConfigurationImport.php:843
+#: include/classes/import/CConfigurationImport.php:880
+#: include/classes/import/CConfigurationImport.php:2697
+#: include/classes/import/CConfigurationImport.php:2811
+#: include/classes/import/CConfigurationImport.php:2862
 #, c-format
 msgid "value \"%1$s\" not found"
 msgstr "值 \"%1$s\" 未找到"

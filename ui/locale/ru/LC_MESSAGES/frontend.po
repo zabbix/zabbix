@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-07 19:55+0200\n"
+"POT-Creation-Date: 2022-01-14 19:53+0200\n"
 "PO-Revision-Date: 2021-11-13 21:56+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -2559,7 +2559,7 @@ msgstr "Не удалось найти узел сети \"%1$s\" использ
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
 msgstr "Не удалось найти узел сети \"%1$s\" используемый на карте сети \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1206
+#: include/classes/import/CConfigurationImport.php:1212
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Не удалось найти группу узлов сети \"%1$s\" для прототипа узлов сети \"%2$s\" правила обнаружения \"%3$s\" на \"%4$s\"."
@@ -2582,47 +2582,47 @@ msgstr "Не удалось найти иконку \"%1$s\" используе�
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr "Не удалось найти иконку \"%1$s\" используемую на карте сети \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:948
+#: include/classes/import/CConfigurationImport.php:952
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for discovery rule \"%2$s\" on \"%3$s\"."
 msgstr "Не удалось найти интерфейс \"%1$s\" используемый правилом обнаружения \"%2$s\" на \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:717
+#: include/classes/import/CConfigurationImport.php:719
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr "Не удалось найти интерфейс \"%1$s\" используемый элементом данных \"%2$s\" на \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1100
+#: include/classes/import/CConfigurationImport.php:1106
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Не удалось найти интерфейс \"%1$s\" используемый прототипом элементов данных \"%2$s\" правила обнаружения \"%3$s\" на \"%4$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1631
+#: include/classes/import/CConfigurationImport.php:1641
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph \"%3$s\"."
 msgstr "Не удалось найти элемент данных \"%1$s\" у \"%2$s\", используемый как MAX значение оси Y в графике \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1403
+#: include/classes/import/CConfigurationImport.php:1413
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Не удалось найти элемент данных \"%1$s\" у \"%2$s\", используемый как MAX значение оси Y в прототипе графиков \"%3$s\" правила обнаружения \"%4$s\" у \"%5$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1613
+#: include/classes/import/CConfigurationImport.php:1623
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph \"%3$s\"."
 msgstr "Не удалось найти элемент данных \"%1$s\" у \"%2$s\", используемый как MIN значение оси Y в графике \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1382
+#: include/classes/import/CConfigurationImport.php:1392
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Не удалось найти элемент данных \"%1$s\" у \"%2$s\", используемый как MIN значение оси Y в прототипе графиков \"%3$s\" правила обнаружения \"%4$s\" у \"%5$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1651
+#: include/classes/import/CConfigurationImport.php:1661
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
 msgstr "Не удалось найти элемент данных \"%1$s\" у \"%2$s\", используемый в графике \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1424
+#: include/classes/import/CConfigurationImport.php:1434
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Не удалось найти элемент данных \"%1$s\" у \"%2$s\", используемый в прототипе графиков \"%3$s\" правила обнаружения \"%4$s\" у \"%5$s\"."
@@ -2637,12 +2637,12 @@ msgstr "Не удалось найти элемент данных \"%1$s\" ис
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
 msgstr "Не удалось найти карту сети \"%1$s\" используемую на карте сети \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1229
+#: include/classes/import/CConfigurationImport.php:1235
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Не удалось найти шаблон \"%1$s\" для прототипа узлов сети \"%2$s\" правила обнаружения \"%3$s\" на \"%4$s\"."
 
-#: include/classes/import/CConfigurationImport.php:998
+#: include/classes/import/CConfigurationImport.php:1002
 #, c-format
 msgid "Cannot find template \"%1$s\" for override \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Не удалось найти шаблон \"%1$s\" для \"%2$s\" замещения правила обнаружения \"%3$s\" на \"%4$s\"."
@@ -2653,12 +2653,12 @@ msgstr "Не удалось найти шаблон \"%1$s\" для \"%2$s\" з�
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "Не удалось найти триггер \"%1$s\" используемый на карте сети \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:730
+#: include/classes/import/CConfigurationImport.php:732
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr "Не удалось найти преобразование значений \"%1$s\" используемое в элементе данных \"%2$s\" на \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1116
+#: include/classes/import/CConfigurationImport.php:1122
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Не удалось найти преобразование значений \"%1$s\" используемое в прототипу элементов данных \"%2$s\" в правиле обнаружения \"%3$s\" на \"%4$s\"."
@@ -9394,18 +9394,18 @@ msgstr "Некорректное значение для \"%1$s\" поля."
 #: include/classes/graphdraw/CPieGraphDraw.php:177
 #: include/classes/helpers/CSvgGraphHelper.php:372
 #: include/classes/helpers/CSvgGraphHelper.php:384
-#: include/classes/import/CConfigurationImport.php:743
-#: include/classes/import/CConfigurationImport.php:838
-#: include/classes/import/CConfigurationImport.php:875
-#: include/classes/import/CConfigurationImport.php:976
-#: include/classes/import/CConfigurationImport.php:1130
-#: include/classes/import/CConfigurationImport.php:2686
-#: include/classes/import/CConfigurationImport.php:2790
+#: include/classes/import/CConfigurationImport.php:745
+#: include/classes/import/CConfigurationImport.php:842
+#: include/classes/import/CConfigurationImport.php:879
+#: include/classes/import/CConfigurationImport.php:980
+#: include/classes/import/CConfigurationImport.php:1136
+#: include/classes/import/CConfigurationImport.php:2696
 #: include/classes/import/CConfigurationImport.php:2800
-#: include/classes/import/CConfigurationImport.php:2827
-#: include/classes/import/CConfigurationImport.php:2842
-#: include/classes/import/CConfigurationImport.php:2851
-#: include/classes/import/CConfigurationImport.php:2857
+#: include/classes/import/CConfigurationImport.php:2810
+#: include/classes/import/CConfigurationImport.php:2837
+#: include/classes/import/CConfigurationImport.php:2852
+#: include/classes/import/CConfigurationImport.php:2861
+#: include/classes/import/CConfigurationImport.php:2867
 #: include/classes/validators/CActionCondValidator.php:65
 #: include/classes/validators/CActionCondValidator.php:71
 #: include/classes/validators/CActionCondValidator.php:82
@@ -17529,7 +17529,7 @@ msgstr "Триггер \"%1$s\" уже существует у \"%2$s\"."
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
 msgstr "Триггер \"%1$s\" принадлежит шаблонам с разными связями."
 
-#: include/classes/import/CConfigurationImport.php:1830
+#: include/classes/import/CConfigurationImport.php:1840
 #, c-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Триггер \"%1$s\" зависит от триггера \"%2$s\", который не существует."
@@ -17642,7 +17642,7 @@ msgstr "Прототип триггера \"%1$s\" принадлежит шаб
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
 msgstr "Прототип триггеров \"%1$s\" содержит прототипы элементов данных из нескольких правил обнаружения."
 
-#: include/classes/import/CConfigurationImport.php:1511
+#: include/classes/import/CConfigurationImport.php:1521
 #, c-format
 msgid "Trigger prototype \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Прототип триггеров \"%1$s\" зависит от триггера \"%2$s\", который не существует."
@@ -20174,10 +20174,10 @@ msgstr "нельзя изменить"
 #: include/classes/api/services/CUserGroup.php:463
 #: include/classes/api/services/CUser.php:697
 #: include/classes/api/services/CUser.php:857
-#: include/classes/import/CConfigurationImport.php:744
-#: include/classes/import/CConfigurationImport.php:977
-#: include/classes/import/CConfigurationImport.php:1131
-#: include/classes/import/CConfigurationImport.php:2828
+#: include/classes/import/CConfigurationImport.php:746
+#: include/classes/import/CConfigurationImport.php:981
+#: include/classes/import/CConfigurationImport.php:1137
+#: include/classes/import/CConfigurationImport.php:2838
 #: include/classes/validators/CActionCondValidator.php:65
 #: include/classes/validators/CActionCondValidator.php:71
 #: include/classes/validators/CActionCondValidator.php:82
@@ -20249,7 +20249,7 @@ msgid "circular dependency is not allowed"
 msgstr "закольцованная зависимость не разрешена"
 
 #: include/classes/api/services/CItemGeneral.php:2270
-#: include/classes/import/CConfigurationImport.php:2843
+#: include/classes/import/CConfigurationImport.php:2853
 msgid "circular item dependency is not allowed"
 msgstr "закольцованная зависимость элементов данных не разрешена"
 
@@ -20859,8 +20859,8 @@ msgid "maximum dependent items count reached"
 msgstr "достигнуто максимальное количество зависимых элементов данных"
 
 #: include/classes/api/services/CItemGeneral.php:2350
-#: include/classes/import/CConfigurationImport.php:2791
-#: include/classes/import/CConfigurationImport.php:2858
+#: include/classes/import/CConfigurationImport.php:2801
+#: include/classes/import/CConfigurationImport.php:2868
 msgid "maximum number of dependency levels reached"
 msgstr "достигнуто максимальное количество уровней зависимостей"
 
@@ -21605,11 +21605,11 @@ msgstr "значение"
 msgid "value \"%1$s\" already exists"
 msgstr "значение \"%1$s\" уже существует"
 
-#: include/classes/import/CConfigurationImport.php:839
-#: include/classes/import/CConfigurationImport.php:876
-#: include/classes/import/CConfigurationImport.php:2687
-#: include/classes/import/CConfigurationImport.php:2801
-#: include/classes/import/CConfigurationImport.php:2852
+#: include/classes/import/CConfigurationImport.php:843
+#: include/classes/import/CConfigurationImport.php:880
+#: include/classes/import/CConfigurationImport.php:2697
+#: include/classes/import/CConfigurationImport.php:2811
+#: include/classes/import/CConfigurationImport.php:2862
 #, c-format
 msgid "value \"%1$s\" not found"
 msgstr "значение \"%1$s\" не найдено"
