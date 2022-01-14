@@ -37,6 +37,7 @@ else {
 }
 
 $url = (new CUrl('graphs.php'))
+	->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 	->setArgument('context', $data['context'])
 	->getUrl();
 

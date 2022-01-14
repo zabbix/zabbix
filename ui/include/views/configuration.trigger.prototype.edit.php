@@ -30,6 +30,7 @@ $triggersWidget = (new CWidget())
 	->setNavigation(getHostNavigation('triggers', $data['hostid'], $data['parent_discoveryid']));
 
 $url = (new CUrl('trigger_prototypes.php'))
+	->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 	->setArgument('context', $data['context'])
 	->getUrl();
 

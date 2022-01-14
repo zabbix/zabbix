@@ -31,6 +31,7 @@ if (!empty($data['hostid'])) {
 }
 
 $url = (new CUrl('disc_prototypes.php'))
+	->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 	->setArgument('context', $data['context'])
 	->getUrl();
 
