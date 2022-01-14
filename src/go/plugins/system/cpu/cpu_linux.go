@@ -121,7 +121,7 @@ func (p *Plugin) numCPUOnline() int {
 }
 
 func (p *Plugin) Start() {
-	p.cpus = p.newCpus(numCPUConf())
+	p.cpus = p.newCpus(p.numCPUConf())
 }
 
 func (p *Plugin) Stop() {
