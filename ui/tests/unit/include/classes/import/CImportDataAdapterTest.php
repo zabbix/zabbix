@@ -2009,9 +2009,7 @@ class CImportDataAdapterTest extends TestCase {
 						]
 					],
 					'templates' => [],
-					'proxy' => [
-						'name' => '0'
-					],
+					'proxy' => [],
 					'description' => '',
 					'name' => 'host',
 					'tags' => [],
@@ -2125,9 +2123,7 @@ class CImportDataAdapterTest extends TestCase {
 						'description' => 'Free disk space on / in %',
 						'inventory_link' => '0',
 						'preprocessing' => [],
-						'valuemap' => [
-							'name' => '0'
-						]
+						'valuemap' => []
 					]
 				],
 				'Template_Simple' => [
@@ -2183,9 +2179,7 @@ class CImportDataAdapterTest extends TestCase {
 						'description' => 'FTP check',
 						'inventory_link' => '0',
 						'preprocessing' => [],
-						'valuemap' => [
-							'name' => '0'
-						]
+						'valuemap' => []
 					],
 					'net.tcp.service[ftp,,{$PORT.FTP}]' => [
 						'uuid' => '37c5c2d56a1c49ecaa7d6d0f70eb8a35',
@@ -2239,9 +2233,7 @@ class CImportDataAdapterTest extends TestCase {
 						'description' => 'FTP check with macro',
 						'inventory_link' => '0',
 						'preprocessing' => [],
-						'valuemap' => [
-							'name' => '0'
-						]
+						'valuemap' => []
 					]
 				]
 			]
@@ -2477,10 +2469,7 @@ class CImportDataAdapterTest extends TestCase {
 							'details' => []
 						]
 					],
-					'proxy' =>
-					[
-						'name' => '0'
-					],
+					'proxy' => [],
 					'inventory_mode' => '-1',
 					'description' => '',
 					'inventory' => [],
@@ -2575,9 +2564,7 @@ class CImportDataAdapterTest extends TestCase {
 						'units' => '',
 						'url' => '',
 						'username' => '',
-						'valuemap' => [
-							'name' => '0'
-						],
+						'valuemap' => [],
 						'key_' => 'net.tcp.service[ftp,,21]',
 						'trapper_hosts' => ''
 					],
@@ -2631,9 +2618,7 @@ class CImportDataAdapterTest extends TestCase {
 						'units' => '',
 						'url' => '',
 						'username' => '',
-						'valuemap' => [
-							'name' => '0'
-						],
+						'valuemap' => [],
 						'key_' => 'net.tcp.service[ftp,,{$PORT.FTP}]',
 						'trapper_hosts' => ''
 					]
