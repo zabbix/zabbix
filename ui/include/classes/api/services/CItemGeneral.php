@@ -888,8 +888,10 @@ abstract class CItemGeneral extends CApiService {
 
 					$data = array_intersect_key($item, $api_input_rules['fields']);
 
-					if (!CApiInputValidator::validate($api_input_rules, $data, '/'.($i + 1), $error)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+					if ($data) {
+						if (!CApiInputValidator::validate($api_input_rules, $data, '/'.($i + 1), $error)) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+						}
 					}
 
 					if (array_key_exists('request_method', $item)

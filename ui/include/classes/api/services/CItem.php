@@ -632,8 +632,11 @@ class CItem extends CItemGeneral {
 			}
 
 			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
+				$authtype = array_key_exists('authtype', $item)
+					? $item['authtype']
+					: $db_items[$item['itemid']]['authtype'];
 				// Clean username and password when authtype is set to HTTPTEST_AUTH_NONE.
-				if ($item['authtype'] == HTTPTEST_AUTH_NONE) {
+				if ($authtype == HTTPTEST_AUTH_NONE) {
 					$item['username'] = '';
 					$item['password'] = '';
 				}
@@ -772,6 +775,17 @@ class CItem extends CItemGeneral {
 		self::updateParameters($items, $db_items);
 		self::updatePreprocessing($items, $db_items);
 		self::updateTags($items, $db_items);
+
+
+		foreach ($db_items as &$item) {
+			if (array_key_exists('query_fields', $item)) {
+				$item['query_fields'] = json_encode($item['query_fields']);
+			}
+			if (array_key_exists('headers', $item)) {
+				$item['headers'] = self::headersArrayToString($item['headers']);
+			}
+		}
+		unset($item);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_ITEM, $items, $db_items);
 	}
