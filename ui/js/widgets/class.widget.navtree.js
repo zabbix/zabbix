@@ -190,7 +190,7 @@ class CWidgetNavTree extends CWidget {
 					srcfld1: 'sysmapid',
 					srcfld2: 'name',
 					multiselect: '1'
-				}, null, e.target);
+				}, {dialogue_class: 'modal-popup-generic', trigger_element: e.target});
 			},
 
 			editItem: (e) => {
@@ -846,6 +846,7 @@ class CWidgetNavTree extends CWidget {
 
 				overlayDialogue({
 					'title': t('Edit tree element'),
+					'class': 'modal-popup',
 					'content': resp.body,
 					'buttons': [
 						{

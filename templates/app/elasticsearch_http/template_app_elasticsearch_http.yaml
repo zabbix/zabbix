@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:18Z'
+  version: '6.0'
+  date: '2021-12-15T06:56:53Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -13,7 +13,7 @@ zabbix_export:
       description: |
         The template to monitor Elasticsearch by Zabbix that work without any external scripts.
         It works with both standalone and cluster instances.
-        The metrics are collected in one pass remotely using an HTTP agent. 
+        The metrics are collected in one pass remotely using an HTTP agent.
         They are getting values from REST API _cluster/health, _cluster/stats, _nodes/stats requests.
         You can set {$ELASTICSEARCH.USERNAME} and {$ELASTICSEARCH.PASSWORD} macros in the template for using on the host level.
         If you use an atypical location ES API, don't forget to change the macros {$ELASTICSEARCH.SCHEME},{$ELASTICSEARCH.PORT}.
@@ -21,7 +21,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/399473-discussion-thread-for-official-zabbix-template-for-elasticsearch
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Applications
@@ -59,7 +59,6 @@ zabbix_export:
           description: 'Returns the health status of a cluster.'
           timeout: 15s
           url: '{$ELASTICSEARCH.SCHEME}://{HOST.CONN}:{$ELASTICSEARCH.PORT}/_cluster/health?timeout=5s'
-          status_codes: ''
           tags:
             -
               tag: Application
@@ -276,7 +275,7 @@ zabbix_export:
               name: 'ES: Health is RED'
               priority: HIGH
               description: |
-                One or more primary shards are unassigned, so some data is unavailable. 
+                One or more primary shards are unassigned, so some data is unavailable.
                 This can occur briefly during cluster startup as primary shards are assigned.
             -
               uuid: 33a6ef13f7b240768841919482709411
@@ -290,7 +289,7 @@ zabbix_export:
               name: 'ES: Health is YELLOW'
               priority: AVERAGE
               description: |
-                All primary shards are assigned, but one or more replica shards are unassigned. 
+                All primary shards are assigned, but one or more replica shards are unassigned.
                 If a node in the cluster fails, some data could be unavailable until that node is repaired.
         -
           uuid: 2295e2ba3d4949feb3519ac85ba6ff86
@@ -477,7 +476,7 @@ zabbix_export:
           units: B
           description: |
             The total number of bytes available to JVM in the file stores across all selected nodes.
-            Depending on OS or process-level restrictions, this number may be less than nodes.fs.free_in_byes. 
+            Depending on OS or process-level restrictions, this number may be less than nodes.fs.free_in_byes.
             This is the actual amount of free disk space the selected Elasticsearch nodes can use.
           preprocessing:
             -
@@ -641,8 +640,8 @@ zabbix_export:
               history: 7d
               units: B
               description: |
-                The total number of bytes available to this Java virtual machine on all file stores. 
-                Depending on OS or process level restrictions, this might appear less than fs.total.free_in_bytes. 
+                The total number of bytes available to this Java virtual machine on all file stores.
+                Depending on OS or process level restrictions, this might appear less than fs.total.free_in_bytes.
                 This is the actual amount of free disk space the Elasticsearch node can utilize.
               preprocessing:
                 -
@@ -752,7 +751,7 @@ zabbix_export:
                   name: 'ES {#ES.NODE}: Flush latency is too high (over {$ELASTICSEARCH.FLUSH_LATENCY.MAX.WARN}ms for 5m)'
                   priority: WARNING
                   description: |
-                    If you see this metric increasing steadily, it may indicate a problem with slow disks; this problem may escalate 
+                    If you see this metric increasing steadily, it may indicate a problem with slow disks; this problem may escalate
                     and eventually prevent you from being able to add new information to your index.
             -
               uuid: 8e270dfff9c84d2a96a134dd6d86533b
@@ -845,7 +844,7 @@ zabbix_export:
                   name: 'ES {#ES.NODE}: Indexing latency is too high (over {$ELASTICSEARCH.INDEXING_LATENCY.MAX.WARN}ms for 5m)'
                   priority: WARNING
                   description: |
-                    If the latency is increasing, it may indicate that you are indexing too many documents at the same time (Elasticsearch’s documentation 
+                    If the latency is increasing, it may indicate that you are indexing too many documents at the same time (Elasticsearch’s documentation
                     recommends starting with a bulk indexing size of 5 to 15 megabytes and increasing slowly from there).
             -
               uuid: f471dad45ff149b09a479963cb616fc2
@@ -1100,8 +1099,8 @@ zabbix_export:
                   name: 'ES {#ES.NODE}: Fetch latency is too high (over {$ELASTICSEARCH.FETCH_LATENCY.MAX.WARN}ms for 5m)'
                   priority: WARNING
                   description: |
-                    The fetch phase should typically take much less time than the query phase. If you notice this metric consistently increasing, 
-                    this could indicate a problem with slow disks, enriching of documents (highlighting the relevant text in search results, etc.), 
+                    The fetch phase should typically take much less time than the query phase. If you notice this metric consistently increasing,
+                    this could indicate a problem with slow disks, enriching of documents (highlighting the relevant text in search results, etc.),
                     or requesting too many results.
             -
               uuid: a10e7dca72c8411a9b7fdcbeb676017e
@@ -1426,8 +1425,8 @@ zabbix_export:
                   name: 'ES {#ES.NODE}: Percent of JVM heap in use is critical (over {$ELASTICSEARCH.HEAP_USED.MAX.CRIT}% for 1h)'
                   priority: HIGH
                   description: |
-                    This indicates that the rate of garbage collection isn’t keeping up with the rate of garbage creation. 
-                    To address this problem, you can either increase your heap size (as long as it remains below the recommended 
+                    This indicates that the rate of garbage collection isn’t keeping up with the rate of garbage creation.
+                    To address this problem, you can either increase your heap size (as long as it remains below the recommended
                     guidelines stated above), or scale out the cluster by adding more nodes.
                 -
                   uuid: bbba4a577a2c4328b2392fdeb1ff9bb4
@@ -1435,8 +1434,8 @@ zabbix_export:
                   name: 'ES {#ES.NODE}: Percent of JVM heap in use is high (over {$ELASTICSEARCH.HEAP_USED.MAX.WARN}% for 1h)'
                   priority: WARNING
                   description: |
-                    This indicates that the rate of garbage collection isn’t keeping up with the rate of garbage creation. 
-                    To address this problem, you can either increase your heap size (as long as it remains below the recommended 
+                    This indicates that the rate of garbage collection isn’t keeping up with the rate of garbage creation.
+                    To address this problem, you can either increase your heap size (as long as it remains below the recommended
                     guidelines stated above), or scale out the cluster by adding more nodes.
                   dependencies:
                     -

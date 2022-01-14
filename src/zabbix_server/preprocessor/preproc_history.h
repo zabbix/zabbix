@@ -21,7 +21,6 @@
 #define ZABBIX_PREPROC_HISTORY_H
 
 #include "common.h"
-#include "dbcache.h"
 #include "zbxvariant.h"
 
 typedef struct

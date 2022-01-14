@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:38Z'
+  version: '6.0'
+  date: '2021-12-16T20:03:53Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -18,7 +18,7 @@ zabbix_export:
         CPQHLTH-MIB
         CPQIDA-MIB
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       templates:
         -
           name: 'Generic SNMP'
@@ -253,7 +253,7 @@ zabbix_export:
                 
                 Cache Module Critical Failure (8)
                  Indicates that the cache module board has encountered a critical failure. The controller is currently operating in Zero Memory Raid mode.
-                
+                 
                 Read Cache Could Not Be Mapped (9)
                  Indicates that the read cache memory in a split cache configuration could not be mapped by the operating system and as a result is not available. This status may be caused by virtual space limitations in certain operating systems and is only applicable to B-Series controllers.
               valuemap:
@@ -463,7 +463,7 @@ zabbix_export:
               description: |
                 MIB: CPQIDA-MIB
                 Drive Array Physical Drive Media Type.The following values are defined:
-                other(1)  The instrument agent is unable to determine the physical drive’s media type.
+                other(1)  The instrument agent is unable to determine the physical drive's media type.
                 rotatingPlatters(2)  The physical drive media is composed of rotating platters.
                 solidState(3)  The physical drive media is composed of solid state electronics.
               valuemap:

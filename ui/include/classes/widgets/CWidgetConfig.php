@@ -204,8 +204,7 @@ class CWidgetConfig {
 				'js_class' => $js_clases[$type],
 				'iterator' => self::isIterator($type),
 				'reference_field' => self::getReferenceField($type),
-				'foreign_reference_fields' => self::getForeignReferenceFields($type),
-				'dialogue_stick_to_top' => self::getDialogueStickToTop($type)
+				'foreign_reference_fields' => self::getForeignReferenceFields($type)
 			];
 		}
 
@@ -338,23 +337,6 @@ class CWidgetConfig {
 	public static function isIterator(string $type): bool {
 		switch ($type) {
 			case WIDGET_GRAPH_PROTOTYPE:
-				return true;
-
-			default:
-				return false;
-		}
-	}
-
-	/**
-	 * Check if widget dialogue should be sticked to top instead of being centered vertically.
-	 *
-	 * @param string $type  Widget type - 'WIDGET_*' constant.
-	 *
-	 * @return bool
-	 */
-	public static function getDialogueStickToTop(string $type): bool {
-		switch ($type) {
-			case WIDGET_SVG_GRAPH:
 				return true;
 
 			default:

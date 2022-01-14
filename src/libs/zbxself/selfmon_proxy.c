@@ -17,13 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxself.h"
 #include "common.h"
+
 #include "selfmon.h"
 
 /******************************************************************************
- *                                                                            *
- * Function: get_component_process_type_forks                                 *
  *                                                                            *
  * Purpose: Returns number of processes depending on process type             *
  *                                                                            *

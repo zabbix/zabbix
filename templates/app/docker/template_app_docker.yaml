@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-09-27T08:22:43Z'
+  version: '6.0'
+  date: '2021-12-15T08:07:14Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -13,9 +13,9 @@ zabbix_export:
       description: |
         Get Docker engine metrics from plugin for the New Zabbix Agent (zabbix-agent2).
         
-        You can discuss this template or leave feedback on our forum 
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/435429-discussion-thread-for-official-zabbix-template-docker
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Applications

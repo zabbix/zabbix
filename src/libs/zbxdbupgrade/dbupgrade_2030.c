@@ -971,8 +971,6 @@ static int	DBpatch_2030094(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: parse_function                                                   *
- *                                                                            *
  * Purpose: return function and function parameters                           *
  *          func(param,...)                                                   *
  *                                                                            *

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-10-25T12:27:46Z'
+  date: '2021-12-16T08:28:15Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -16,7 +16,7 @@ zabbix_export:
         MIBs used:
         SNMPv2-MIB
         
-        Template tooling version used: 0.39
+        Template tooling version used: 0.40
       templates:
         -
           name: 'ICMP Ping'

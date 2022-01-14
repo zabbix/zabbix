@@ -17,17 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxipcservice.h"
-#include "zbxjson.h"
-#include "daemon.h"
-#include "zbxrtc.h"
+#include "common.h"
+
 #include "rtc.h"
-#include "log.h"
-#include "zbxdiag.h"
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_rtc_parse_loglevel_option                                    *
  *                                                                            *
  * Purpose: parse loglevel runtime control option                             *
  *                                                                            *

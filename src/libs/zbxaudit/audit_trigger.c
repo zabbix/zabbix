@@ -17,9 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "dbcache.h"
-
 #include "log.h"
+#include "db.h"
+#include "zbxdb.h"
+#include "audit.h"
+
 #include "audit_trigger.h"
 
 static int	trigger_flag_to_resource_type(int flag)
@@ -215,8 +217,6 @@ PREPARE_AUDIT_TRIGGER_UPDATE(recovery_expression, const char*, string)
 #undef TR_OR_TRP
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_audit_DBselect_delete_for_trigger                            *
  *                                                                            *
  * Parameters: sql - [IN] sql statement                                       *
  *             ids - [OUT] sorted list of selected uint64 values              *

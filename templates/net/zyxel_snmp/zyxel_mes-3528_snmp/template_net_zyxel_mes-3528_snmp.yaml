@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-07-22T14:51:28Z'
+  version: '6.0'
+  date: '2021-12-17T06:34:24Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -27,7 +27,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/422668-discussion-thread-for-official-zabbix-templates-for-zyxel
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: 'Templates/Network devices'
@@ -93,7 +93,7 @@ zabbix_export:
           units: '%'
           description: |
             MIB: ZYXEL-MES3528-MIB
-            Show device CPU load in %, it's the snapshot of CPU load when 
+            Show device CPU load in %, it's the snapshot of CPU load when
             getting the values.
           tags:
             -
@@ -130,7 +130,7 @@ zabbix_export:
                     tmpObj[item["{#SNMPINDEX}"]] = item["{#SNMP.ARRAY}"]
                   });
                   var strOut = 'V' + tmpObj["1.0"] + '.' + tmpObj["2.0"]
-                    + '(' + tmpObj["3.0"] + '.' + tmpObj["4.0"] + ')_' 
+                    + '(' + tmpObj["3.0"] + '.' + tmpObj["4.0"] + ')_'
                     + tmpObj["7.0"] + '.' + tmpObj["6.0"] + '.' + tmpObj["5.0"];
                   return strOut;
             -
@@ -353,7 +353,6 @@ zabbix_export:
                 value: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'An entry in fanRpmTable.'
           item_prototypes:
             -
               uuid: 6dc0efb31738415a884d15020d9e30a9
@@ -1138,12 +1137,16 @@ zabbix_export:
           description: 'The time interval for SNMP agent availability trigger expression.'
         -
           macro: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
-          value: 'CHANGE_IF_NEEDED'
+          value: CHANGE_IF_NEEDED
           description: 'Triggers will be created only for interfaces whose description contains the value of this macro'
         -
           macro: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.MATCHES}'
           value: 1|2
-          description: 'Filter of discoverable link types. 0 - Down link 1 - Cooper link 2 - Fiber link'
+          description: |
+            Filter of discoverable link types.
+            0 - Down link
+            1 - Cooper link
+            2 - Fiber link
         -
           macro: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
@@ -1159,7 +1162,11 @@ zabbix_export:
         -
           macro: '{$ZYXEL.LLD.FILTER.SFP.STATUS.MATCHES}'
           value: 1|2
-          description: 'Filter of discoverable status. 0 - OK with DDM 1 - OK without DDM 2 - nonoperational'
+          description: |
+            Filter of discoverable status.
+            0 - OK with DDM
+            1 - OK without DDM
+            2 - nonoperational
         -
           macro: '{$ZYXEL.LLD.FILTER.SFP.STATUS.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED

@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-28T06:40:44Z'
+  version: '6.0'
+  date: '2021-12-16T20:03:41Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -20,7 +20,7 @@ zabbix_export:
         CPQSINFO-MIB
         CPQIDA-MIB
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: 'Templates/Server hardware'
@@ -305,7 +305,7 @@ zabbix_export:
           history: 2w
           trends: '0'
           value_type: LOG
-          description: 'Item is used to collect all SNMP traps unmatched by other snmptrap items'
+          description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items'
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
             -
@@ -715,7 +715,7 @@ zabbix_export:
               description: |
                 MIB: CPQIDA-MIB
                 Drive Array Physical Drive Media Type. The following values are defined:
-                other(1)  The instrument agent is unable to determine the physical drive’s media type.
+                other(1)  The instrument agent is unable to determine the physical drive's media type.
                 rotatingPlatters(2)  The physical drive media is composed of rotating platters.
                 solidState(3)  The physical drive media is composed of solid state electronics.
               valuemap:

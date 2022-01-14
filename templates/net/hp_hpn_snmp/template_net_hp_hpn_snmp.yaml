@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:04Z'
+  version: '6.0'
+  date: '2022-01-10T07:56:45Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -21,7 +21,7 @@ zabbix_export:
         ENTITY-MIB
         STATISTICS-MIB
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       templates:
         -
           name: 'EtherLike-MIB SNMP'
@@ -415,7 +415,7 @@ zabbix_export:
                 macro: '{#SENSOR_PRECISION}'
                 value: '0'
                 formulaid: A
-          description: 'ENTITY-SENSORS-MIB::EntitySensorDataType discovery with celsius filter'
+          description: 'ENTITY-SENSORS-MIB::EntitySensorDataType discovery with temperature filter'
           item_prototypes:
             -
               uuid: 0f33142de9874eb288d48337becae31a

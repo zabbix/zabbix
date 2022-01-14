@@ -19,14 +19,13 @@
 
 #include "common.h"
 #include "valuecache.h"
-#include "preproc.h"
 #include "zbxlld.h"
-#include "checks_internal.h"
+#include "dbcache.h"
 #include "zbxha.h"
 
+#include "checks_internal.h"
+
 /******************************************************************************
- *                                                                            *
- * Function: zbx_get_value_internal_ext                                       *
  *                                                                            *
  * Purpose: processes program type (server) specific internal checks          *
  *                                                                            *

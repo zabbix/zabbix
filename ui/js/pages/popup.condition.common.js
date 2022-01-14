@@ -97,9 +97,7 @@ function validateConditionPopup(overlay) {
 }
 
 function selectServices() {
-	const overlay = PopUp('popup.services', {
-		title: t('Add parent services'),
-	}, 'services', document.activeElement);
+	const overlay = PopUp('popup.services', {title: t('Add parent services')}, {dialogue_id: 'services'});
 
 	overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 		const data = [];

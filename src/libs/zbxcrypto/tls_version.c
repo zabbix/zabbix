@@ -35,8 +35,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_tls_version                                                  *
- *                                                                            *
  * Purpose: print tls library version on stdout by application request with   *
  *          parameter '-V'                                                    *
  *                                                                            *

@@ -179,11 +179,6 @@ static void	read_test(const zbx_mock_handle_t *handle, test_config_t *test_confi
 	test_config->test_number = (zbx_uint32_t)strtol(str, NULL, 10);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: zbx_mock_test_entry                                              *
- *                                                                            *
- ******************************************************************************/
 void	zbx_mock_test_entry(void **state)
 {
 	zbx_mock_error_t	mock_error;

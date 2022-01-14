@@ -22,19 +22,19 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|High availability cluster node discovery |<p>LLD rule with item and trigger prototypes for node discovery</p> |DEPENDENT |zabbix.nodes.discovery |
+|High availability cluster node discovery |<p>LLD rule with item and trigger prototypes for node discovery.</p> |DEPENDENT |zabbix.nodes.discovery |
 
 ## Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Cluster |Zabbix server: Cluster node [{#NODE.NAME}]: Address |<p>Node IPv4 address</p> |DEPENDENT |zabbix.nodes.address[{#NODE.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.id=="{#NODE.ID}")].address.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
-|Cluster |Zabbix server: Cluster node [{#NODE.NAME}]: Last access time |<p>Last access time</p> |DEPENDENT |zabbix.nodes.lastaccess.time[{#NODE.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.id=="{#NODE.ID}")].lastaccess.first()`</p> |
-|Cluster |Zabbix server: Cluster node [{#NODE.NAME}]: Last access age |<p>Time between database unix_timestamp() and last access time</p> |DEPENDENT |zabbix.nodes.lastaccess.age[{#NODE.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.id=="{#NODE.ID}")].lastaccess_age.first()`</p> |
-|Cluster |Zabbix server: Cluster node [{#NODE.NAME}]: Status |<p>Node status</p> |DEPENDENT |zabbix.nodes.status[{#NODE.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.id=="{#NODE.ID}")].status.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
-|Zabbix_raw_items |Zabbix server: Zabbix stats cluster |<p>Zabbix cluster statistics master item.</p> |INTERNAL |zabbix[cluster,discovery,nodes] |
-|Zabbix_server |Zabbix server: Queue over 10 minutes |<p>Number of monitored items in the queue which are delayed at least by 10 minutes</p> |INTERNAL |zabbix[queue,10m] |
-|Zabbix_server |Zabbix server: Queue |<p>Number of monitored items in the queue which are delayed at least by 6 seconds</p> |INTERNAL |zabbix[queue] |
+|Cluster |Cluster node [{#NODE.NAME}]: Address |<p>Node IPv4 address.</p> |DEPENDENT |zabbix.nodes.address[{#NODE.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.id=="{#NODE.ID}")].address.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
+|Cluster |Cluster node [{#NODE.NAME}]: Last access time |<p>Last access time.</p> |DEPENDENT |zabbix.nodes.lastaccess.time[{#NODE.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.id=="{#NODE.ID}")].lastaccess.first()`</p> |
+|Cluster |Cluster node [{#NODE.NAME}]: Last access age |<p>Time between database unix_timestamp() and last access time.</p> |DEPENDENT |zabbix.nodes.lastaccess.age[{#NODE.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.id=="{#NODE.ID}")].lastaccess_age.first()`</p> |
+|Cluster |Cluster node [{#NODE.NAME}]: Status |<p>Cluster node status.</p> |DEPENDENT |zabbix.nodes.status[{#NODE.ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.id=="{#NODE.ID}")].status.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
+|Zabbix_raw_items |Zabbix stats cluster |<p>Zabbix cluster statistics master item.</p> |INTERNAL |zabbix[cluster,discovery,nodes] |
+|Zabbix_server |Zabbix server: Queue over 10 minutes |<p>Number of monitored items in the queue which are delayed at least by 10 minutes.</p> |INTERNAL |zabbix[queue,10m] |
+|Zabbix_server |Zabbix server: Queue |<p>Number of monitored items in the queue which are delayed at least by 6 seconds.</p> |INTERNAL |zabbix[queue] |
 |Zabbix_server |Zabbix server: Utilization of alert manager internal processes, in % |<p>Average percentage of time alert manager processes have been busy in the last minute</p> |INTERNAL |zabbix[process,alert manager,avg,busy] |
 |Zabbix_server |Zabbix server: Utilization of alert syncer internal processes, in % |<p>Average percentage of time alert syncer processes have been busy in the last minute</p> |INTERNAL |zabbix[process,alert syncer,avg,busy] |
 |Zabbix_server |Zabbix server: Utilization of alerter internal processes, in % |<p>Average percentage of time alerter processes have been busy in the last minute</p> |INTERNAL |zabbix[process,alerter,avg,busy] |
@@ -67,74 +67,74 @@ There are no template links in this template.
 |Zabbix_server |Zabbix server: Utilization of trapper data collector processes, in % |<p>Average percentage of time trapper processes have been busy in the last minute</p> |INTERNAL |zabbix[process,trapper,avg,busy] |
 |Zabbix_server |Zabbix server: Utilization of unreachable poller data collector processes, in % |<p>Average percentage of time unreachable poller processes have been busy in the last minute</p> |INTERNAL |zabbix[process,unreachable poller,avg,busy] |
 |Zabbix_server |Zabbix server: Utilization of vmware data collector processes, in % |<p>Average percentage of time vmware collector processes have been busy in the last minute</p> |INTERNAL |zabbix[process,vmware collector,avg,busy] |
-|Zabbix_server |Zabbix server: Configuration cache, % used |<p>Availability statistics of Zabbix configuration cache. Percentage of used buffer</p> |INTERNAL |zabbix[rcache,buffer,pused] |
+|Zabbix_server |Zabbix server: Configuration cache, % used |<p>Availability statistics of Zabbix configuration cache. Percentage of used buffer.</p> |INTERNAL |zabbix[rcache,buffer,pused] |
 |Zabbix_server |Zabbix server: Trend function cache, % unique requests |<p>Effectiveness statistics of the Zabbix trend function cache. Percentage of cached items from cached items + requests. Low percentage most likely means that the cache size can be reduced.</p> |INTERNAL |zabbix[tcache,cache,pitems] |
-|Zabbix_server |Zabbix server: Trend function cache, % misses |<p>Effectiveness statistics of the Zabbix trend function cache.	Percentage of cache misses</p> |INTERNAL |zabbix[tcache,cache,pmisses] |
-|Zabbix_server |Zabbix server: Value cache, % used |<p>Availability statistics of Zabbix value cache. Percentage of used buffer</p> |INTERNAL |zabbix[vcache,buffer,pused] |
-|Zabbix_server |Zabbix server: Value cache hits |<p>Effectiveness statistics of Zabbix value cache. Number of cache hits (history values taken from the cache)</p> |INTERNAL |zabbix[vcache,cache,hits]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|Zabbix_server |Zabbix server: Value cache misses |<p>Effectiveness statistics of Zabbix value cache. Number of cache misses (history values taken from the database)</p> |INTERNAL |zabbix[vcache,cache,misses]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|Zabbix_server |Zabbix server: Value cache operating mode |<p>Value cache operating mode</p> |INTERNAL |zabbix[vcache,cache,mode] |
+|Zabbix_server |Zabbix server: Trend function cache, % misses |<p>Effectiveness statistics of the Zabbix trend function cache. Percentage of cache misses.</p> |INTERNAL |zabbix[tcache,cache,pmisses] |
+|Zabbix_server |Zabbix server: Value cache, % used |<p>Availability statistics of Zabbix value cache. Percentage of used buffer.</p> |INTERNAL |zabbix[vcache,buffer,pused] |
+|Zabbix_server |Zabbix server: Value cache hits |<p>Effectiveness statistics of Zabbix value cache. Number of cache hits (history values taken from the cache).</p> |INTERNAL |zabbix[vcache,cache,hits]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
+|Zabbix_server |Zabbix server: Value cache misses |<p>Effectiveness statistics of Zabbix value cache. Number of cache misses (history values taken from the database).</p> |INTERNAL |zabbix[vcache,cache,misses]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
+|Zabbix_server |Zabbix server: Value cache operating mode |<p>Value cache operating mode.</p> |INTERNAL |zabbix[vcache,cache,mode] |
 |Zabbix_server |Zabbix server: Version |<p>Version of Zabbix server.</p> |INTERNAL |zabbix[version]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
-|Zabbix_server |Zabbix server: VMware cache, % used |<p>Availability statistics of Zabbix vmware cache. Percentage of used buffer</p> |INTERNAL |zabbix[vmware,buffer,pused] |
+|Zabbix_server |Zabbix server: VMware cache, % used |<p>Availability statistics of Zabbix vmware cache. Percentage of used buffer.</p> |INTERNAL |zabbix[vmware,buffer,pused] |
 |Zabbix_server |Zabbix server: History write cache, % used |<p>Statistics and availability of Zabbix write cache. Percentage of used history buffer.</p><p>History cache is used to store item values. A high number indicates performance problems on the database side.</p> |INTERNAL |zabbix[wcache,history,pused] |
 |Zabbix_server |Zabbix server: History index cache, % used |<p>Statistics and availability of Zabbix write cache. Percentage of used history index buffer.</p><p>History index cache is used to index values stored in history cache.</p> |INTERNAL |zabbix[wcache,index,pused] |
 |Zabbix_server |Zabbix server: Trend write cache, % used |<p>Statistics and availability of Zabbix write cache. Percentage of used trend buffer.</p><p>Trend cache stores aggregate for the current hour for all items that receive data.</p> |INTERNAL |zabbix[wcache,trend,pused] |
-|Zabbix_server |Zabbix server: Number of processed values per second |<p>Statistics and availability of Zabbix write cache.</p><p>Total number of values processed by Zabbix server or Zabbix proxy, except unsupported items.</p> |INTERNAL |zabbix[wcache,values]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|Zabbix_server |Zabbix server: Number of processed numeric (float) values per second |<p>Statistics and availability of Zabbix write cache.</p><p>Number of processed float values.</p> |INTERNAL |zabbix[wcache,values,float]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|Zabbix_server |Zabbix server: Number of processed log values per second |<p>Statistics and availability of Zabbix write cache.</p><p>Number of processed log values.</p> |INTERNAL |zabbix[wcache,values,log]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|Zabbix_server |Zabbix server: Number of processed not supported values per second |<p>Statistics and availability of Zabbix write cache.</p><p>Number of times item processing resulted in item becoming unsupported or keeping that state.</p> |INTERNAL |zabbix[wcache,values,not supported]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|Zabbix_server |Zabbix server: Number of processed character values per second |<p>Statistics and availability of Zabbix write cache.</p><p>Number of processed character/string values.</p> |INTERNAL |zabbix[wcache,values,str]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|Zabbix_server |Zabbix server: Number of processed text values per second |<p>Statistics and availability of Zabbix write cache.</p><p>Number of processed text values.</p> |INTERNAL |zabbix[wcache,values,text]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
+|Zabbix_server |Zabbix server: Number of processed values per second |<p>Statistics and availability of Zabbix write cache.</p><p>Total number of values processed by Zabbix server or Zabbix proxy, except unsupported items.</p> |INTERNAL |zabbix[wcache,values]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
+|Zabbix_server |Zabbix server: Number of processed numeric (float) values per second |<p>Statistics and availability of Zabbix write cache.</p><p>Number of processed float values.</p> |INTERNAL |zabbix[wcache,values,float]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
+|Zabbix_server |Zabbix server: Number of processed log values per second |<p>Statistics and availability of Zabbix write cache.</p><p>Number of processed log values.</p> |INTERNAL |zabbix[wcache,values,log]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
+|Zabbix_server |Zabbix server: Number of processed not supported values per second |<p>Statistics and availability of Zabbix write cache.</p><p>Number of times item processing resulted in item becoming unsupported or keeping that state.</p> |INTERNAL |zabbix[wcache,values,not supported]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
+|Zabbix_server |Zabbix server: Number of processed character values per second |<p>Statistics and availability of Zabbix write cache.</p><p>Number of processed character/string values.</p> |INTERNAL |zabbix[wcache,values,str]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
+|Zabbix_server |Zabbix server: Number of processed text values per second |<p>Statistics and availability of Zabbix write cache.</p><p>Number of processed text values.</p> |INTERNAL |zabbix[wcache,values,text]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
 |Zabbix_server |Zabbix server: LLD queue |<p>Count of values enqueued in the low-level discovery processing queue.</p> |INTERNAL |zabbix[lld_queue] |
 |Zabbix_server |Zabbix server: Preprocessing queue |<p>Count of values enqueued in the preprocessing queue.</p> |INTERNAL |zabbix[preprocessing_queue] |
-|Zabbix_server |Zabbix server: Number of processed numeric (unsigned) values per second |<p>Statistics and availability of Zabbix write cache.</p><p>Number of processed numeric (unsigned) values.</p> |INTERNAL |zabbix[wcache,values,uint]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
+|Zabbix_server |Zabbix server: Number of processed numeric (unsigned) values per second |<p>Statistics and availability of Zabbix write cache.</p><p>Number of processed numeric (unsigned) values.</p> |INTERNAL |zabbix[wcache,values,uint]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
 
 ## Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Zabbix server: Cluster node [{#NODE.NAME}]: Status changed |<p>The state of the node has changed. Confirm to close.</p> |`last(/Zabbix server health/zabbix.nodes.status[{#NODE.ID}],#1)<>last(/Zabbix server health/zabbix.nodes.status[{#NODE.ID}],#2)` |INFO |<p>Manual close: YES</p> |
-|Zabbix server: More than 100 items having missing data for more than 10 minutes |<p>zabbix[stats,{$IP},{$PORT},queue,10m] item is collecting data about how many items are missing data for more than 10 minutes</p> |`-` |WARNING | |
-|Zabbix server: Utilization of alert manager processes over 75% |<p>-</p> |`-` |AVERAGE | |
-|Zabbix server: Utilization of alert syncer processes over 75% |<p>-</p> |`-` |AVERAGE | |
-|Zabbix server: Utilization of alerter processes over 75% |<p>-</p> |`-` |AVERAGE | |
-|Zabbix server: Utilization of availability manager processes over 75% |<p>-</p> |`-` |AVERAGE | |
-|Zabbix server: Utilization of configuration syncer processes over 75% |<p>-</p> |`-` |AVERAGE | |
-|Zabbix server: Utilization of discoverer processes over 75% |<p>-</p> |`-` |AVERAGE | |
-|Zabbix server: Utilization of escalator processes over 75% |<p>-</p> |`-` |AVERAGE | |
-|Zabbix server: Utilization of history poller processes over 75% |<p>-</p> |`-` |AVERAGE | |
-|Zabbix server: Utilization of history syncer processes over 75% |<p>-</p> |`-` |AVERAGE | |
-|Zabbix server: Utilization of housekeeper processes over 75% |<p>-</p> |`-` |AVERAGE | |
-|Zabbix server: Utilization of http poller processes over 75% |<p>-</p> |`-` |AVERAGE | |
-|Zabbix server: Utilization of icmp pinger processes over 75% |<p>-</p> |`-` |AVERAGE | |
-|Zabbix server: Utilization of ipmi manager processes over 75% |<p>-</p> |`-` |AVERAGE | |
-|Zabbix server: Utilization of ipmi poller processes over 75% |<p>-</p> |`-` |AVERAGE | |
-|Zabbix server: Utilization of java poller processes over 75% |<p>-</p> |`-` |AVERAGE | |
-|Zabbix server: Utilization of lld manager processes over 75% |<p>-</p> |`-` |AVERAGE | |
-|Zabbix server: Utilization of lld worker processes over 75% |<p>-</p> |`-` |AVERAGE | |
-|Zabbix server: Utilization of poller processes over 75% |<p>-</p> |`-` |AVERAGE | |
-|Zabbix server: Utilization of preprocessing worker processes over 75% |<p>-</p> |`-` |AVERAGE | |
-|Zabbix server: Utilization of preprocessing manager processes over 75% |<p>-</p> |`-` |AVERAGE | |
-|Zabbix server: Utilization of proxy poller processes over 75% |<p>-</p> |`-` |AVERAGE | |
-|Zabbix server: Utilization of report manager processes over 75% |<p>-</p> |`-` |AVERAGE | |
-|Zabbix server: Utilization of report writer processes over 75% |<p>-</p> |`-` |AVERAGE | |
-|Zabbix server: Utilization of self-monitoring processes over 75% |<p>-</p> |`-` |AVERAGE | |
-|Zabbix server: Utilization of snmp trapper processes over 75% |<p>-</p> |`-` |AVERAGE | |
-|Zabbix server: Utilization of task manager processes over 75% |<p>-</p> |`-` |AVERAGE | |
-|Zabbix server: Utilization of timer processes over 75% |<p>-</p> |`-` |AVERAGE | |
-|Zabbix server: Utilization of service manager processes over 75% |<p>-</p> |`-` |AVERAGE | |
-|Zabbix server: Utilization of trigger housekeeper processes over 75% |<p>-</p> |`-` |AVERAGE | |
-|Zabbix server: Utilization of trapper processes over 75% |<p>-</p> |`-` |AVERAGE | |
-|Zabbix server: Utilization of unreachable poller processes over 75% |<p>-</p> |`-` |AVERAGE | |
-|Zabbix server: Utilization of vmware collector processes over 75% |<p>-</p> |`-` |AVERAGE | |
-|Zabbix server: More than 75% used in the configuration cache |<p>Consider increasing CacheSize in the zabbix_server.conf configuration file</p> |`-` |AVERAGE | |
-|Zabbix server: More than 95% used in the value cache |<p>Consider increasing ValueCacheSize in the zabbix_server.conf configuration file</p> |`-` |AVERAGE | |
-|Zabbix server: Zabbix value cache working in low memory mode |<p>Once the low memory mode has been switched on, the value cache will remain in this state for 24 hours, even if the problem that triggered this mode is resolved sooner.</p> |`-` |HIGH | |
+|Cluster node [{#NODE.NAME}]: Status changed |<p>The state of the node has changed. Confirm to close.</p> |`last(/Zabbix server health/zabbix.nodes.status[{#NODE.ID}],#1)<>last(/Zabbix server health/zabbix.nodes.status[{#NODE.ID}],#2)` |INFO |<p>Manual close: YES</p> |
+|Zabbix server: More than 100 items having missing data for more than 10 minutes |<p>zabbix[stats,{$IP},{$PORT},queue,10m] item is collecting data about how many items are missing data for more than 10 minutes.</p> |`min(/Zabbix server health/zabbix[queue,10m],10m)>100` |WARNING | |
+|Zabbix server: Utilization of alert manager processes over 75% |<p>-</p> |`avg(/Zabbix server health/zabbix[process,alert manager,avg,busy],10m)>75`<p>Recovery expression:</p>`avg(/Zabbix server health/zabbix[process,alert manager,avg,busy],10m)<65` |AVERAGE | |
+|Zabbix server: Utilization of alert syncer processes over 75% |<p>-</p> |`avg(/Zabbix server health/zabbix[process,alert syncer,avg,busy],10m)>75`<p>Recovery expression:</p>`avg(/Zabbix server health/zabbix[process,alert syncer,avg,busy],10m)<65` |AVERAGE | |
+|Zabbix server: Utilization of alerter processes over 75% |<p>-</p> |`avg(/Zabbix server health/zabbix[process,alerter,avg,busy],10m)>75`<p>Recovery expression:</p>`avg(/Zabbix server health/zabbix[process,alerter,avg,busy],10m)<65` |AVERAGE | |
+|Zabbix server: Utilization of availability manager processes over 75% |<p>-</p> |`avg(/Zabbix server health/zabbix[process,availability manager,avg,busy],10m)>75`<p>Recovery expression:</p>`avg(/Zabbix server health/zabbix[process,availability manager,avg,busy],10m)<65` |AVERAGE | |
+|Zabbix server: Utilization of configuration syncer processes over 75% |<p>-</p> |`avg(/Zabbix server health/zabbix[process,configuration syncer,avg,busy],10m)>75`<p>Recovery expression:</p>`avg(/Zabbix server health/zabbix[process,configuration syncer,avg,busy],10m)<65` |AVERAGE | |
+|Zabbix server: Utilization of discoverer processes over 75% |<p>-</p> |`avg(/Zabbix server health/zabbix[process,discoverer,avg,busy],10m)>75`<p>Recovery expression:</p>`avg(/Zabbix server health/zabbix[process,discoverer,avg,busy],10m)<65` |AVERAGE | |
+|Zabbix server: Utilization of escalator processes over 75% |<p>-</p> |`avg(/Zabbix server health/zabbix[process,escalator,avg,busy],10m)>75`<p>Recovery expression:</p>`avg(/Zabbix server health/zabbix[process,escalator,avg,busy],10m)<65` |AVERAGE | |
+|Zabbix server: Utilization of history poller processes over 75% |<p>-</p> |`avg(/Zabbix server health/zabbix[process,history poller,avg,busy],10m)>75`<p>Recovery expression:</p>`avg(/Zabbix server health/zabbix[process,history poller,avg,busy],10m)<65` |AVERAGE | |
+|Zabbix server: Utilization of history syncer processes over 75% |<p>-</p> |`avg(/Zabbix server health/zabbix[process,history syncer,avg,busy],10m)>75`<p>Recovery expression:</p>`avg(/Zabbix server health/zabbix[process,history syncer,avg,busy],10m)<65` |AVERAGE | |
+|Zabbix server: Utilization of housekeeper processes over 75% |<p>-</p> |`avg(/Zabbix server health/zabbix[process,housekeeper,avg,busy],10m)>75`<p>Recovery expression:</p>`avg(/Zabbix server health/zabbix[process,housekeeper,avg,busy],10m)<65` |AVERAGE | |
+|Zabbix server: Utilization of http poller processes over 75% |<p>-</p> |`avg(/Zabbix server health/zabbix[process,http poller,avg,busy],10m)>75`<p>Recovery expression:</p>`avg(/Zabbix server health/zabbix[process,http poller,avg,busy],10m)<65` |AVERAGE | |
+|Zabbix server: Utilization of icmp pinger processes over 75% |<p>-</p> |`avg(/Zabbix server health/zabbix[process,icmp pinger,avg,busy],10m)>75`<p>Recovery expression:</p>`avg(/Zabbix server health/zabbix[process,icmp pinger,avg,busy],10m)<65` |AVERAGE | |
+|Zabbix server: Utilization of ipmi manager processes over 75% |<p>-</p> |`avg(/Zabbix server health/zabbix[process,ipmi manager,avg,busy],10m)>75`<p>Recovery expression:</p>`avg(/Zabbix server health/zabbix[process,ipmi manager,avg,busy],10m)<65` |AVERAGE | |
+|Zabbix server: Utilization of ipmi poller processes over 75% |<p>-</p> |`avg(/Zabbix server health/zabbix[process,ipmi poller,avg,busy],10m)>75`<p>Recovery expression:</p>`avg(/Zabbix server health/zabbix[process,ipmi poller,avg,busy],10m)<65` |AVERAGE | |
+|Zabbix server: Utilization of java poller processes over 75% |<p>-</p> |`avg(/Zabbix server health/zabbix[process,java poller,avg,busy],10m)>75`<p>Recovery expression:</p>`avg(/Zabbix server health/zabbix[process,java poller,avg,busy],10m)<65` |AVERAGE | |
+|Zabbix server: Utilization of lld manager processes over 75% |<p>-</p> |`avg(/Zabbix server health/zabbix[process,lld manager,avg,busy],10m)>75`<p>Recovery expression:</p>`avg(/Zabbix server health/zabbix[process,lld manager,avg,busy],10m)<65` |AVERAGE | |
+|Zabbix server: Utilization of lld worker processes over 75% |<p>-</p> |`avg(/Zabbix server health/zabbix[process,lld worker,avg,busy],10m)>75`<p>Recovery expression:</p>`avg(/Zabbix server health/zabbix[process,lld worker,avg,busy],10m)<65` |AVERAGE | |
+|Zabbix server: Utilization of poller processes over 75% |<p>-</p> |`avg(/Zabbix server health/zabbix[process,poller,avg,busy],10m)>75`<p>Recovery expression:</p>`avg(/Zabbix server health/zabbix[process,poller,avg,busy],10m)<65` |AVERAGE | |
+|Zabbix server: Utilization of preprocessing worker processes over 75% |<p>-</p> |`avg(/Zabbix server health/zabbix[process,preprocessing worker,avg,busy],10m)>75`<p>Recovery expression:</p>`avg(/Zabbix server health/zabbix[process,preprocessing worker,avg,busy],10m)<65` |AVERAGE | |
+|Zabbix server: Utilization of preprocessing manager processes over 75% |<p>-</p> |`avg(/Zabbix server health/zabbix[process,preprocessing manager,avg,busy],10m)>75`<p>Recovery expression:</p>`avg(/Zabbix server health/zabbix[process,preprocessing manager,avg,busy],10m)<65` |AVERAGE | |
+|Zabbix server: Utilization of proxy poller processes over 75% |<p>-</p> |`avg(/Zabbix server health/zabbix[process,proxy poller,avg,busy],10m)>75`<p>Recovery expression:</p>`avg(/Zabbix server health/zabbix[process,proxy poller,avg,busy],10m)<65` |AVERAGE | |
+|Zabbix server: Utilization of report manager processes over 75% |<p>-</p> |`avg(/Zabbix server health/zabbix[process,report manager,avg,busy],10m)>75`<p>Recovery expression:</p>`avg(/Zabbix server health/zabbix[process,report manager,avg,busy],10m)<65` |AVERAGE | |
+|Zabbix server: Utilization of report writer processes over 75% |<p>-</p> |`avg(/Zabbix server health/zabbix[process,report writer,avg,busy],10m)>75`<p>Recovery expression:</p>`avg(/Zabbix server health/zabbix[process,report writer,avg,busy],10m)<65` |AVERAGE | |
+|Zabbix server: Utilization of self-monitoring processes over 75% |<p>-</p> |`avg(/Zabbix server health/zabbix[process,self-monitoring,avg,busy],10m)>75`<p>Recovery expression:</p>`avg(/Zabbix server health/zabbix[process,self-monitoring,avg,busy],10m)<65` |AVERAGE | |
+|Zabbix server: Utilization of snmp trapper processes over 75% |<p>-</p> |`avg(/Zabbix server health/zabbix[process,snmp trapper,avg,busy],10m)>75`<p>Recovery expression:</p>`avg(/Zabbix server health/zabbix[process,snmp trapper,avg,busy],10m)<65` |AVERAGE | |
+|Zabbix server: Utilization of task manager processes over 75% |<p>-</p> |`avg(/Zabbix server health/zabbix[process,task manager,avg,busy],10m)>75`<p>Recovery expression:</p>`avg(/Zabbix server health/zabbix[process,task manager,avg,busy],10m)<65` |AVERAGE | |
+|Zabbix server: Utilization of timer processes over 75% |<p>-</p> |`avg(/Zabbix server health/zabbix[process,timer,avg,busy],10m)>75`<p>Recovery expression:</p>`avg(/Zabbix server health/zabbix[process,timer,avg,busy],10m)<65` |AVERAGE | |
+|Zabbix server: Utilization of service manager processes over 75% |<p>-</p> |`avg(/Zabbix server health/zabbix[process,service manager,avg,busy],10m)>75`<p>Recovery expression:</p>`avg(/Zabbix server health/zabbix[process,service manager,avg,busy],10m)<65` |AVERAGE | |
+|Zabbix server: Utilization of trigger housekeeper processes over 75% |<p>-</p> |`avg(/Zabbix server health/zabbix[process,trigger housekeeper,avg,busy],10m)>75`<p>Recovery expression:</p>`avg(/Zabbix server health/zabbix[process,trigger housekeeper,avg,busy],10m)<65` |AVERAGE | |
+|Zabbix server: Utilization of trapper processes over 75% |<p>-</p> |`avg(/Zabbix server health/zabbix[process,trapper,avg,busy],10m)>75`<p>Recovery expression:</p>`avg(/Zabbix server health/zabbix[process,trapper,avg,busy],10m)<65` |AVERAGE | |
+|Zabbix server: Utilization of unreachable poller processes over 75% |<p>-</p> |`avg(/Zabbix server health/zabbix[process,unreachable poller,avg,busy],10m)>75`<p>Recovery expression:</p>`avg(/Zabbix server health/zabbix[process,unreachable poller,avg,busy],10m)<65` |AVERAGE | |
+|Zabbix server: Utilization of vmware collector processes over 75% |<p>-</p> |`avg(/Zabbix server health/zabbix[process,vmware collector,avg,busy],10m)>75`<p>Recovery expression:</p>`avg(/Zabbix server health/zabbix[process,vmware collector,avg,busy],10m)<65` |AVERAGE | |
+|Zabbix server: More than 75% used in the configuration cache |<p>Consider increasing CacheSize in the zabbix_server.conf configuration file.</p> |`max(/Zabbix server health/zabbix[rcache,buffer,pused],10m)>75` |AVERAGE | |
+|Zabbix server: More than 95% used in the value cache |<p>Consider increasing ValueCacheSize in the zabbix_server.conf configuration file.</p> |`max(/Zabbix server health/zabbix[vcache,buffer,pused],10m)>95` |AVERAGE | |
+|Zabbix server: Zabbix value cache working in low memory mode |<p>Once the low memory mode has been switched on, the value cache will remain in this state for 24 hours, even if the problem that triggered this mode is resolved sooner.</p> |`last(/Zabbix server health/zabbix[vcache,cache,mode])=1` |HIGH | |
 |Zabbix server: Version has changed (new version: {ITEM.VALUE}) |<p>Zabbix server version has changed. Ack to close.</p> |`last(/Zabbix server health/zabbix[version],#1)<>last(/Zabbix server health/zabbix[version],#2) and length(last(/Zabbix server health/zabbix[version]))>0` |INFO |<p>Manual close: YES</p> |
-|Zabbix server: More than 75% used in the vmware cache |<p>Consider increasing VMwareCacheSize in the zabbix_server.conf configuration file</p> |`-` |AVERAGE | |
-|Zabbix server: More than 75% used in the history cache |<p>Consider increasing HistoryCacheSize in the zabbix_server.conf configuration file</p> |`-` |AVERAGE | |
-|Zabbix server: More than 75% used in the history index cache |<p>Consider increasing HistoryIndexCacheSize in the zabbix_server.conf configuration file</p> |`-` |AVERAGE | |
-|Zabbix server: More than 75% used in the trends cache |<p>Consider increasing TrendCacheSize in the zabbix_server.conf configuration file</p> |`-` |AVERAGE | |
+|Zabbix server: More than 75% used in the vmware cache |<p>Consider increasing VMwareCacheSize in the zabbix_server.conf configuration file.</p> |`max(/Zabbix server health/zabbix[vmware,buffer,pused],10m)>75` |AVERAGE | |
+|Zabbix server: More than 75% used in the history cache |<p>Consider increasing HistoryCacheSize in the zabbix_server.conf configuration file.</p> |`max(/Zabbix server health/zabbix[wcache,history,pused],10m)>75` |AVERAGE | |
+|Zabbix server: More than 75% used in the history index cache |<p>Consider increasing HistoryIndexCacheSize in the zabbix_server.conf configuration file.</p> |`max(/Zabbix server health/zabbix[wcache,index,pused],10m)>75` |AVERAGE | |
+|Zabbix server: More than 75% used in the trends cache |<p>Consider increasing TrendCacheSize in the zabbix_server.conf configuration file.</p> |`max(/Zabbix server health/zabbix[wcache,trend,pused],10m)>75` |AVERAGE | |
 
 ## Feedback
 

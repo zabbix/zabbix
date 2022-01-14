@@ -660,8 +660,6 @@ static int	DBpatch_5050067(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: DBpatch_5050068_calc_services_write_value                        *
- *                                                                            *
  * Purpose: calculate services.write value for the specified role             *
  *                                                                            *
  * Parameters: roleid - [IN] the role identifier                              *

@@ -45,8 +45,6 @@ void CALLBACK	ZBXEndThread(ULONG_PTR dwParam)
 #else
 /******************************************************************************
  *                                                                            *
- * Function: zbx_fork                                                         *
- *                                                                            *
  * Purpose: Flush stdout and stderr before forking                            *
  *                                                                            *
  * Return value: same as system fork() function                               *
@@ -60,8 +58,6 @@ int	zbx_fork(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_child_fork                                                   *
  *                                                                            *
  * Purpose: fork from master process and set SIGCHLD handler                  *
  *                                                                            *
@@ -97,8 +93,6 @@ void	zbx_child_fork(pid_t *pid)
 #endif
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_thread_start                                                 *
  *                                                                            *
  * Purpose: Start the handled function as "thread"                            *
  *                                                                            *
@@ -143,8 +137,6 @@ void	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread_args_t *thre
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_thread_wait                                                  *
  *                                                                            *
  * Purpose: Waits until the "thread" is in the signalled state                *
  *                                                                            *
@@ -203,8 +195,6 @@ int	zbx_thread_wait(ZBX_THREAD_HANDLE thread)
 
 /******************************************************************************
  *                                                                            *
- * Function: threads_kill                                                     *
- *                                                                            *
  * Purpose: sends termination signal to "threads"                             *
  *                                                                            *
  * Parameters: threads       - [IN] handles to threads or processes           *
@@ -240,8 +230,6 @@ static void	threads_kill(ZBX_THREAD_HANDLE *threads, int threads_num, const int 
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_threads_wait                                                 *
  *                                                                            *
  * Purpose: Waits until the "threads" are in the signalled state              *
  *                                                                            *
