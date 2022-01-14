@@ -21,10 +21,8 @@
 #include "log.h"
 
 #include "zbxalgo.h"
-#include "../zbxalgo/vectorimpl.h"
 #include "zbxvariant.h"
 #include "zbxserialize.h"
-#include "zbxserver.h"
 #include "eval.h"
 
 #define ZBX_EVAL_STATIC_BUFFER_SIZE	4096

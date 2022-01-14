@@ -62,6 +62,10 @@ const (
 	startupTypeTrigger
 )
 
+const (
+	ZBX_NON_EXISTING_SRV = 255
+)
+
 func startupName(startup int) string {
 	switch startup {
 	case startupTypeAuto:
@@ -159,9 +163,7 @@ func openServiceEx(m *mgr.Mgr, name string) (s *mgr.Service, err error) {
 	if err == nil {
 		return
 	}
-	if err.(syscall.Errno) != windows.ERROR_SERVICE_DOES_NOT_EXIST {
-		return
-	}
+
 	wname, err := win32.GetServiceKeyName(syscall.Handle(m.Handle), name)
 	if err != nil {
 		return
@@ -278,7 +280,11 @@ func (p *Plugin) exportServiceInfo(params []string) (result interface{}, err err
 	defer m.Disconnect()
 
 	service, err := openServiceEx(m, params[0])
+
 	if err != nil {
+		if err.(syscall.Errno) == windows.ERROR_SERVICE_DOES_NOT_EXIST {
+			return ZBX_NON_EXISTING_SRV, nil
+		}
 		return
 	}
 	defer service.Close()
