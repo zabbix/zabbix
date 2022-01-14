@@ -1197,9 +1197,17 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.20rc1
 
 New features:
+........S. [ZBXNEXT-7101] implemented sleep function into JS engine (asestakovs)
+.........T [ZBXNEXT-6861] updated Zabbix proxy templates according to the latest guidelines (abakaldin)
+.........T [ZBXNEXT-7078] added template for pfsense (vkhaliev)
 ...G...... [ZBXNEXT-6875] added native support for the system.hw.chassis and system.hw.devices keys in Zabbix agent 2 (esneiders)
 
 Bug fixes:
+.........T [ZBX-20316] added macro for password and changed conf file in postgresql by user parameters template (vkhaliev)
+.........T [ZBX-20303] fixed trigger name in MSSQL template (vkhaliev)
+...G...... [ZBX-19565] fixed agent2 to return the same 255 code as agent1 when key service.info does not find service (arimdjonoks)
+...G...... [ZBX-20204] fixed range check for perfcounter in agent2 on windows (dgoloscapov)
+.......PS. [ZBX-20405] improved timeouts in JS (dgoloscapov, wiper)
 .........T [ZBX-20258] fixed tags processing for Zammad media type (abiba)
 .........T [ZBX-20113] fixed items value map for VMware template (abiba)
 A......... [ZBX-19815] fixed multiple data convertion issues in import between versions 1.8/2.0 and 5.0 (Ivo)
