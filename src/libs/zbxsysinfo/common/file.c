@@ -1150,9 +1150,7 @@ int	VFS_FILE_OWNER(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			struct group	*grp;
 
-			grp = getgrgid(st.st_gid);
-
-			if (NULL == grp)
+			if (NULL == (grp = getgrgid(st.st_gid)))
 				SET_STR_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_UI64, (zbx_uint64_t)st.st_gid));
 			else
 				SET_STR_RESULT(result, zbx_strdup(NULL, grp->gr_name));
@@ -1161,9 +1159,7 @@ int	VFS_FILE_OWNER(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			struct passwd	*pwd;
 
-			pwd = getpwuid(st.st_uid);
-
-			if (NULL == pwd)
+			if (NULL == (pwd = getpwuid(st.st_uid)))
 				SET_STR_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_UI64, (zbx_uint64_t)st.st_uid));
 			else
 				SET_STR_RESULT(result, zbx_strdup(NULL, pwd->pw_name));
