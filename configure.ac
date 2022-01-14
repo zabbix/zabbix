@@ -1895,7 +1895,7 @@ if test "x$want_libpcre2" = "xyes"; then
 	fi
 
 	AC_DEFINE([HAVE_PCRE2_H], 1, [Define to 1 if you have the 'libpcre2' library (-lpcre2-8)])
-	HAVE_PCRE2_H=1
+	have_pcre2=1
 else
 	if test "x$found_libpcre" != "xyes"; then
 		AC_MSG_ERROR([Unable to use libpcre (libpcre check failed)])
@@ -1910,12 +1910,12 @@ else
 	fi
 
 	AC_DEFINE([HAVE_PCRE_H], 1, [Define to 1 if you have the 'libpcre' library (-lpcre)])
-	HAVE_PCRE_H=1
+	have_pcre=1
 fi
 fi
 
-AM_CONDITIONAL([USE_PCRE], [test "x$HAVE_PCRE_H" = x1])
-AM_CONDITIONAL([USE_PCRE2], [test "x$HAVE_PCRE2_H" = x1])
+AM_CONDITIONAL([HAVE_PCRE], [test "x$have_pcre" = x1])
+AM_CONDITIONAL([HAVE_PCRE2], [test "x$have_pcre2" = x1])
 
 found_iconv="no"
 dnl Check for libiconv [by default - skip]
