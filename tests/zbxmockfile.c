@@ -50,9 +50,15 @@ ssize_t	__wrap_read(int fildes, void *buf, size_t nbyte);
 int	__wrap_open(const char *path, int oflag, ...);
 int	__wrap_stat(const char *path, struct stat *buf);
 int	__wrap___xstat(int ver, const char *pathname, struct stat *buf);
+#ifdef HAVE_FXSTAT
+int	__wrap___fxstat(int __ver, int __fildes, struct stat *__stat_buf);
+#endif
 
 int	__real_open(const char *path, int oflag, ...);
 int	__real_stat(const char *path, struct stat *buf);
+#ifdef HAVE_FXSTAT
+int	__real___fxstat(int __ver, int __fildes, struct stat *__stat_buf);
+#endif
 
 static int	is_profiler_path(const char *path)
 {
@@ -280,3 +286,15 @@ int	__wrap___xstat(int ver, const char *pathname, struct stat *buf)
 
 	return __wrap_stat(pathname, buf);
 }
+
+#ifdef HAVE_FXSTAT
+int	__wrap___fxstat(int __ver, int __fildes, struct stat *__stat_buf)
+{
+	if (__fildes != INT_MAX)
+		return __real___fxstat(__ver, __fildes, __stat_buf);
+
+	__stat_buf->st_size = zbx_mock_get_parameter_uint64("in.file_len");
+
+	return 0;
+}
+#endif
