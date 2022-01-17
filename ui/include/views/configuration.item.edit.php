@@ -971,14 +971,15 @@ $item_tab
 	]);
 
 	// Add link to Latest data.
-if (CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA) && $data['context'] === 'host') {
+if (CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA) && $data['itemid'] != 0
+		&& $data['context'] === 'host') {
 	$item_tab->addItem(
 		(new CFormField((new CLink(_('Latest data'),
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'latest.view')
-				->setArgument('filter_hostids[]', $data['hostid'])
-				->setArgument('filter_select', $data['name'])
-				->setArgument('filter_set', 1)
+				->setArgument('hostids[]', $data['hostid'])
+				->setArgument('name', $data['name'])
+				->setArgument('filter_name', '')
 		))->setTarget('_blank')))
 	);
 }

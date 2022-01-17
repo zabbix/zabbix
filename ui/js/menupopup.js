@@ -139,11 +139,11 @@ function getMenuPopupHost(options, trigger_element) {
 		var url = new Curl('zabbix.php', false);
 		url.setArgument('action', 'latest.view');
 		if (typeof options.tags !== 'undefined') {
-			url.setArgument('filter_tags', options.tags);
-			url.setArgument('filter_evaltype', options.evaltype);
+			url.setArgument('tags', options.tags);
+			url.setArgument('evaltype', options.evaltype);
 		}
-		url.setArgument('filter_hostids[]', options.hostid);
-		url.setArgument('filter_set', '1');
+		url.setArgument('filter_name', '');
+		url.setArgument('hostids[]', options.hostid);
 		latest_data.url = url.getUrl();
 
 		if (!options.showTriggers) {
@@ -781,9 +781,9 @@ function getMenuPopupItemConfiguration(options) {
 	if (options.context === 'host' && options.allowed_ui_latest_data) {
 		url = new Curl('zabbix.php', false);
 		url.setArgument('action', 'latest.view');
-		url.setArgument('filter_hostids[]', options.hostid);
-		url.setArgument('filter_select', options.name);
-		url.setArgument('filter_set', 1);
+		url.setArgument('hostids[]', options.hostid);
+		url.setArgument('name', options.name);
+		url.setArgument('filter_name', '');
 
 		items.push({
 			label: t('Latest data'),

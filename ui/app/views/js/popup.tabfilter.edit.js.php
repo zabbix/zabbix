@@ -52,6 +52,9 @@ function tabFilterDelete(overlay) {
 			else {
 				overlayDialogueDestroy(overlay.dialogueid);
 				overlay.element.dispatchEvent(new CustomEvent(TABFILTERITEM_EVENT_DELETE, properties));
+
+				clearMessages();
+				addMessage(makeMessageBox('good', [], <?= json_encode(_('Filter deleted')) ?>));
 			}
 		})
 		.always(() => {

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -25,6 +25,8 @@
 
 $this->addJsFile('layout.mode.js');
 $this->addJsFile('class.tagfilteritem.js');
+$this->addJsFile('class.tabfilter.js');
+$this->addJsFile('class.tabfilteritem.js');
 
 $this->includeJsFile('monitoring.latest.view.js.php');
 
@@ -40,70 +42,23 @@ $widget = (new CWidget())
 	);
 
 if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
-	$widget->addItem((new CFilter())
-		->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'latest.view'))
-		->setProfile('web.latest.filter')
-		->setActiveTab($data['active_tab'])
-		->addFormItem((new CVar('action', 'latest.view'))->removeId())
-		->addFilterTab(_('Filter'), [
-			(new CFormList())
-				->addRow((new CLabel(_('Host groups'), 'filter_groupids__ms')),
-					(new CMultiSelect([
-						'name' => 'filter_groupids[]',
-						'object_name' => 'hostGroup',
-						'data' => $data['multiselect_hostgroup_data'],
-						'popup' => [
-							'parameters' => [
-								'srctbl' => 'host_groups',
-								'srcfld1' => 'groupid',
-								'dstfrm' => 'zbx_filter',
-								'dstfld1' => 'filter_groupids_',
-								'real_hosts' => true,
-								'enrich_parent_groups' => true
-							]
-						]
-					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-				)
-				->addRow((new CLabel(_('Hosts'), 'filter_hostids__ms')),
-					(new CMultiSelect([
-						'name' => 'filter_hostids[]',
-						'object_name' => 'hosts',
-						'data' => $data['multiselect_host_data'],
-						'popup' => [
-							'filter_preselect_fields' => [
-								'hostgroups' => 'filter_groupids_'
-							],
-							'parameters' => [
-								'srctbl' => 'hosts',
-								'srcfld1' => 'hostid',
-								'dstfrm' => 'zbx_filter',
-								'dstfld1' => 'filter_hostids_'
-							]
-						]
-					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-				)
-				->addRow(_('Name'),
-					(new CTextBox('filter_select', $data['filter']['select']))
-						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-				),
-			(new CFormList())
-				->addRow(_('Tags'), CTagFilterFieldHelper::getTagFilterField([
-					'evaltype' => $data['filter']['evaltype'],
-					'tags' => $data['filter']['tags']
-				]))
-				->addRow(_('Show details'), [
-					(new CCheckBox('filter_show_details'))->setChecked($data['filter']['show_details'] == 1),
-					(new CDiv([
-						(new CLabel(_('Show items without data'), 'filter_show_without_data'))
-							->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
-						(new CCheckBox('filter_show_without_data'))
-							->setChecked($data['filter']['show_without_data'] == 1)
-							->setAttribute('disabled', $data['filter']['hostids'] ? null : 'disabled')
-							->setUncheckedValue(0)
-					]))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
-				])
-		])
-	);
+	$filter = (new CTabFilter())
+		->setId('monitoring_latest_filter')
+		->setOptions($data['tabfilter_options'])
+		->addSubfilter(new CPartial('monitoring.latest.subfilter', $data['subfilters']))
+		->addTemplate(new CPartial($data['filter_view'], $data['filter_defaults']));
+
+	foreach ($data['filter_tabs'] as $tab) {
+		$tab['tab_view'] = $data['filter_view'];
+		$filter->addTemplatedTab($tab['filter_name'], $tab);
+	}
+
+	// Set javascript options for tab filter initialization in monitoring.latest.view.js.php file.
+	$data['filter_options'] = $filter->options;
+	$widget->addItem($filter);
+}
+else {
+	$data['filter_options'] = null;
 }
 
 $widget->addItem(new CPartial('monitoring.latest.view.html', array_intersect_key($data,
@@ -116,6 +71,7 @@ $widget->show();
 
 (new CScriptTag('
 	view.init('.json_encode([
+		'filter_options' => $data['filter_options'],
 		'refresh_url' => $data['refresh_url'],
 		'refresh_data' => $data['refresh_data'],
 		'refresh_interval' => $data['refresh_interval']
