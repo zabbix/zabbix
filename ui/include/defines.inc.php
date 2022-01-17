@@ -1502,7 +1502,7 @@ define('WIDGET_PROBLEM_HOSTS',		'problemhosts');
 define('WIDGET_PROBLEMS',			'problems');
 define('WIDGET_PROBLEMS_BY_SV',		'problemsbysv');
 define('WIDGET_SYSTEM_INFO',		'systeminfo');
-define('WIDGET_TOP_HOSTS_DATA',		'datatable');
+define('WIDGET_TOP_HOSTS_DATA',		'tophostsdata');
 define('WIDGET_TRIG_OVER',			'trigover');
 define('WIDGET_URL',				'url');
 define('WIDGET_WEB',				'web');

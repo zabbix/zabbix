@@ -497,6 +497,9 @@ class CWidgetConfig {
 			case WIDGET_ITEM:
 				return new CWidgetFormItem($data, $templateid);
 
+			case WIDGET_TOP_HOSTS_DATA:
+				return new CWidgetFormTopHostsData($data, $templateid);
+
 			default:
 				return new CWidgetForm($data, $templateid, $type);
 		}

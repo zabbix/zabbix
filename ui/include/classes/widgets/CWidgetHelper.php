@@ -541,6 +541,71 @@ class CWidgetHelper {
 	}
 
 	/**
+	 * @param CWidgetFieldColumnsList $field  Widget columns field.
+	 *
+	 * @return CDiv
+	 */
+	public static function getWidgetColumns(CWidgetFieldColumnsList $field) {
+		$columns = $field->getValue();
+		$header = [
+			'',
+			(new CColHeader(_('Name')))->addStyle('width: 39%'),
+			(new CColHeader(_('Data')))->addStyle('width: 59%'),
+			_('Action')
+		];
+		$row_actions = [
+			(new CButton('edit', _('Edit')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->removeId(),
+			(new CButton('remove', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->removeId()
+		];
+		$table = (new CTable())
+			->setId('list_'.$field->getName())
+			->setHeader((new CRowHeader($header))->addClass($columns ? null : ZBX_STYLE_DISPLAY_NONE));
+		$enabled = !($field->getFlags() & CWidgetField::FLAG_DISABLED);
+		$i = 0;
+
+		foreach ($columns as $column) {
+			$column_data = [new CVar('sortorder['.$field->getName().'][]', $i)];
+
+			foreach ($column as $key => $value) {
+				$column_data[] = new CVar($field->getName().'['.$i.']['.$key.']', $value);
+			}
+
+			$label = array_key_exists('item', $column) ? $column['item'] : '';
+
+			if ($column['data'] == CWidgetFieldColumnsList::DATA_HOST_NAME) {
+				$label = new CTag('em', true, _('Host name'));
+			}
+			else if ($column['data'] == CWidgetFieldColumnsList::DATA_TEXT) {
+				$label = new CTag('em', true, $column['text']);
+			}
+
+			$table->addRow((new CRow([
+				(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+				$column['name'],
+				$label,
+				(new CList(array_merge($row_actions, [$column_data])))->addClass(ZBX_STYLE_HOR_LIST)
+			]))->addClass('sortable'));
+			$i++;
+		}
+
+		$table->addRow(
+			(new CCol(
+				(new CButton('add', _('Add')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->setEnabled($enabled)
+			))->setColSpan(count($header))
+		);
+
+		return (new CDiv($table))
+			->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px')
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR);
+	}
+
+	/**
 	 * @param CWidgetFieldTags $field
 	 *
 	 * @return CTable

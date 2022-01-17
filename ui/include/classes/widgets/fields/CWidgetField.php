@@ -129,6 +129,10 @@ class CWidgetField {
 		$this->ex_validation_rules = $ex_validation_rules;
 	}
 
+	public function getDefault() {
+		return $this->default;
+	}
+
 	/**
 	 * Get field value. If no value is set, will return default value.
 	 *
@@ -207,11 +211,11 @@ class CWidgetField {
 	}
 
 	/**
-	 * Validate field.
+	 * Validate field. Returns array with validation error message.
 	 *
 	 * @param bool $strict  Enables more strict validation of the field.
 	 *
-	 * @return bool
+	 * @return array
 	 */
 	public function validate($strict = false) {
 		$errors = [];
