@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -88,8 +88,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 
 		/*
 		 * Select original item name in several cases: if user is in normal dashboards or in template dashboards when
-		 * user is in view mode to display that item name in widget name. Item name will be resolved using standard
-		 * macro resolving and the "name_expanded" will be used afterwards. Item name should be select only if it is not
+		 * user is in view mode to display that item name in widget name. Item name should be select only if it is not
 		 * overwritten. Host name can be attached to item name with delimiter when user is in normal dashboards.
 		 */
 		if ($this->getInput('name', '') === '') {
@@ -271,8 +270,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 						|| $this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
 						&& $this->hasInput('dynamic_hostid')) {
 					// Resolve original item name when user is in normal dashboards or template dashbods view mode.
-					$items = CMacrosResolverHelper::resolveItemNames($items);
-					$name = $items[$itemid]['name_expanded'];
+					$name = $items[$itemid]['name'];
 				}
 
 				if ($this->getContext() === CWidgetConfig::CONTEXT_DASHBOARD) {

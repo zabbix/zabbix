@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,8 +49,8 @@ class CGeomapCoordinatesParser extends CParser {
 			return self::PARSE_FAIL;
 		}
 
-		if ((float) $matches['latitude'] < -90 || (float) $matches['latitude'] > 90
-				|| (float) $matches['longitude'] < -180 || (float) $matches['longitude'] > 180) {
+		if ((float) $matches['latitude'] < GEOMAP_LAT_MIN || (float) $matches['latitude'] > GEOMAP_LAT_MAX
+				|| (float) $matches['longitude'] < GEOMAP_LNG_MIN || (float) $matches['longitude'] > GEOMAP_LNG_MAX) {
 			return self::PARSE_FAIL;
 		}
 

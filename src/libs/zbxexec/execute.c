@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,16 +29,12 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_get_timediff_ms                                              *
- *                                                                            *
  * Purpose: considers a difference between times in milliseconds              *
  *                                                                            *
  * Parameters: time1         - [IN] first time point                          *
  *             time2         - [IN] second time point                         *
  *                                                                            *
  * Return value: difference between times in milliseconds                     *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 static int	zbx_get_timediff_ms(struct _timeb *time1, struct _timeb *time2)
@@ -56,8 +52,6 @@ static int	zbx_get_timediff_ms(struct _timeb *time1, struct _timeb *time2)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_read_from_pipe                                               *
- *                                                                            *
  * Purpose: read data from pipe                                               *
  *                                                                            *
  * Parameters: hRead         - [IN] a handle to the device                    *
@@ -67,8 +61,6 @@ static int	zbx_get_timediff_ms(struct _timeb *time1, struct _timeb *time2)
  *             timeout_ms    - [IN] timeout in milliseconds                   *
  *                                                                            *
  * Return value: SUCCEED, FAIL or TIMEOUT_ERROR if timeout reached            *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t *buf_size, size_t *offset, int timeout_ms)
@@ -121,8 +113,6 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t *buf_size, size_t
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_popen                                                        *
- *                                                                            *
  * Purpose: this function opens a process by creating a pipe, forking,        *
  *          and invoking the shell                                            *
  *                                                                            *
@@ -134,8 +124,6 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t *buf_size, size_t
  *                                                                            *
  * Return value: on success, reading file descriptor is returned. On error,   *
  *               -1 is returned, and errno is set appropriately               *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 static int	zbx_popen(pid_t *pid, const char *command, const char *dir)
@@ -244,8 +232,6 @@ static int	zbx_popen(pid_t *pid, const char *command, const char *dir)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_waitpid                                                      *
- *                                                                            *
  * Purpose: this function waits for process to change state                   *
  *                                                                            *
  * Parameters: pid     - [IN] child process PID                               *
@@ -253,8 +239,6 @@ static int	zbx_popen(pid_t *pid, const char *command, const char *dir)
  *                                                                            *
  * Return value: on success, PID is returned. On error,                       *
  *               -1 is returned, and errno is set appropriately               *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 static int	zbx_waitpid(pid_t pid, int *status)
@@ -308,8 +292,6 @@ exit:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_execute                                                      *
- *                                                                            *
  * Purpose: this function executes a script and returns result from stdout    *
  *                                                                            *
  * Parameters: command       - [IN] command for execution                     *
@@ -323,8 +305,6 @@ exit:
  *                                                                            *
  * Return value: SUCCEED if processed successfully, TIMEOUT_ERROR if          *
  *               timeout occurred or FAIL otherwise                           *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 int	zbx_execute(const char *command, char **output, char *error, size_t max_error_len, int timeout,
@@ -561,14 +541,10 @@ close:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_execute_nowait                                               *
- *                                                                            *
  * Purpose: this function executes a script in the background and             *
  *          suppresses the std output                                         *
  *                                                                            *
  * Parameters: command - [IN] command for execution                           *
- *                                                                            *
- * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
  ******************************************************************************/
 int	zbx_execute_nowait(const char *command)

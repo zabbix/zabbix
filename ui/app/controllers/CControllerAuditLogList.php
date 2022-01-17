@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -236,6 +236,7 @@ class CControllerAuditLogList extends CController {
 			CAudit::RESOURCE_SCHEDULED_REPORT => _('Scheduled report'),
 			CAudit::RESOURCE_SCRIPT => _('Script'),
 			CAudit::RESOURCE_SETTINGS => _('Settings'),
+			CAudit::RESOURCE_SLA => _('SLA'),
 			CAudit::RESOURCE_TEMPLATE => _('Template'),
 			CAudit::RESOURCE_TEMPLATE_DASHBOARD => _('Template dashboard'),
 			CAudit::RESOURCE_TRIGGER => _('Trigger'),

@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ foreach ($data['queue_data'] as $itemid => $item_queue_data) {
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $item_queue_data['nextcheck']),
 		zbx_date2age($item_queue_data['nextcheck']),
 		$host['name'],
-		$item['name_expanded'],
+		$item['name'],
 		array_key_exists($data['hosts'][$item['hostid']]['proxy_hostid'], $data['proxies'])
 			? $data['proxies'][$data['hosts'][$item['hostid']]['proxy_hostid']]['host']
 			: ''

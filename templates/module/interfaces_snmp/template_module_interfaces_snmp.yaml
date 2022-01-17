@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:34Z'
+  version: '6.0'
+  date: '2021-12-16T08:28:23Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -16,7 +16,7 @@ zabbix_export:
         MIBs used:
         IF-MIB
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Modules
@@ -355,7 +355,7 @@ zabbix_export:
               recovery_expression: |
                 avg(/Interfaces SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Interfaces SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
                 avg(/Interfaces SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Interfaces SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
-              name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}% )'
+              name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'The network interface utilization is close to its estimated maximum bandwidth.'
@@ -494,16 +494,16 @@ zabbix_export:
                   fields:
                     -
                       type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
                       name: columns
                       value: '1'
                     -
                       type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid

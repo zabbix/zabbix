@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-10-27T08:39:23Z'
+  date: '2021-12-14T17:44:19Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -15,8 +15,8 @@ zabbix_export:
         
         Known Issues:
         
-          Description: node_exporter v0.16.0 renamed many metrics. CPU utilization for 'guest' and 'guest_nice' metrics are not supported in this template with node_exporter < 0.16. Disk IO metrics are not supported. Other metrics provided as 'best effort'.  
-         See https://github.com/prometheus/node_exporter/releases/tag/v0.16.0 for details.
+          Description: node_exporter v0.16.0 renamed many metrics. CPU utilization for 'guest' and 'guest_nice' metrics are not supported in this template with node_exporter < 0.16. Disk IO metrics are not supported. Other metrics provided as 'best effort'.
+        See https://github.com/prometheus/node_exporter/releases/tag/v0.16.0 for details.
           Version: below 0.16.0
         
           Description: metric node_network_info with label 'device' cannot be found, so network discovery is not possible.
@@ -24,7 +24,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387225-discussion-thread-for-official-zabbix-template-for-linux
         
-        Template tooling version used: 0.39
+        Template tooling version used: 0.40
       groups:
         -
           name: 'Templates/Operating systems'
@@ -43,6 +43,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - node_exporter_build_info
+                - label
                 - version
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -67,6 +68,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - node_filefd_allocated
+                - value
                 - ''
           master_item:
             key: node_exporter.get
@@ -88,6 +90,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - node_filefd_maximum
+                - value
                 - ''
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -144,6 +147,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - '{__name__=~"^node_boot_time(?:_seconds)?$"}'
+                - value
                 - ''
           master_item:
             key: node_exporter.get
@@ -316,6 +320,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - '{__name__=~"node_intr"}'
+                - value
                 - ''
             -
               type: CHANGE_PER_SECOND
@@ -378,6 +383,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - node_load1
+                - value
                 - ''
           master_item:
             key: node_exporter.get
@@ -398,6 +404,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - node_load5
+                - value
                 - ''
           master_item:
             key: node_exporter.get
@@ -418,6 +425,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - node_load15
+                - value
                 - ''
           master_item:
             key: node_exporter.get
@@ -576,6 +584,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - '{__name__=~"node_context_switches"}'
+                - value
                 - ''
             -
               type: CHANGE_PER_SECOND
@@ -721,7 +730,7 @@ zabbix_export:
               parameters:
                 - |
                   var info = JSON.parse(value)[0];
-                     return info.labels.sysname+' version: '+info.labels.release+' '+info.labels.version
+                  return info.labels.sysname+' version: '+info.labels.release+' '+info.labels.version
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -747,6 +756,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - '{__name__=~"^node_time(?:_seconds)?$"}'
+                - value
                 - ''
           master_item:
             key: node_exporter.get
@@ -778,6 +788,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - node_uname_info
+                - label
                 - nodename
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -812,6 +823,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - node_uname_info
+                - label
                 - machine
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -871,6 +883,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - '{__name__=~"node_memory_SwapFree"}'
+                - value
                 - ''
           master_item:
             key: node_exporter.get
@@ -907,6 +920,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - '{__name__=~"node_memory_SwapTotal"}'
+                - value
                 - ''
           master_item:
             key: node_exporter.get
@@ -929,6 +943,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - '{__name__=~"^node_boot_time(?:_seconds)?$"}'
+                - value
                 - ''
             -
               type: JAVASCRIPT
@@ -948,7 +963,7 @@ zabbix_export:
               expression: 'last(/Linux by Prom/system.uptime[node_exporter])<10m'
               name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
-              description: 'The device uptime is less than 10 minutes'
+              description: 'The device uptime is less than 10 minutes.'
               manual_close: 'YES'
         -
           uuid: 70a75efafbc84cbebd1bb262ec797523
@@ -965,6 +980,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - '{__name__=~"node_memory_MemAvailable"}'
+                - value
                 - ''
           master_item:
             key: node_exporter.get
@@ -987,6 +1003,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - '{__name__=~"node_memory_MemTotal"}'
+                - value
                 - ''
           master_item:
             key: node_exporter.get
@@ -1003,7 +1020,7 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           params: '(last(//vm.memory.total[node_exporter])-last(//vm.memory.available[node_exporter]))/last(//vm.memory.total[node_exporter])*100'
-          description: 'Memory used percentage is calculated as (total-available)/total*100'
+          description: 'Memory used percentage is calculated as (total-available)/total*100.'
           tags:
             -
               tag: Application
@@ -1071,6 +1088,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'node_network_receive_drop_total{device="{#IFNAME}"}'
+                    - value
                     - ''
                 -
                   type: CHANGE_PER_SECOND
@@ -1095,6 +1113,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'node_network_receive_errs_total{device="{#IFNAME}"}'
+                    - value
                     - ''
                 -
                   type: CHANGE_PER_SECOND
@@ -1120,6 +1139,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'node_network_receive_bytes_total{device="{#IFNAME}"}'
+                    - value
                     - ''
                 -
                   type: CHANGE_PER_SECOND
@@ -1148,6 +1168,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'node_network_transmit_drop_total{device="{#IFNAME}"}'
+                    - value
                     - ''
                 -
                   type: CHANGE_PER_SECOND
@@ -1172,6 +1193,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'node_network_transmit_errs_total{device="{#IFNAME}"}'
+                    - value
                     - ''
                 -
                   type: CHANGE_PER_SECOND
@@ -1197,6 +1219,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'node_network_transmit_bytes_total{device="{#IFNAME}"}'
+                    - value
                     - ''
                 -
                   type: CHANGE_PER_SECOND
@@ -1227,6 +1250,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'node_network_speed_bytes{device="{#IFNAME}"}'
+                    - value
                     - ''
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
@@ -1256,6 +1280,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'node_network_info{device="{#IFNAME}"}'
+                    - label
                     - operstate
                 -
                   type: JAVASCRIPT
@@ -1263,7 +1288,7 @@ zabbix_export:
                     - |
                       var newvalue;
                       switch(value) {
-                        case "unkonwn":
+                        case "unknown":
                           newvalue = 0;
                           break;
                         case "notpresent":
@@ -1326,6 +1351,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'node_network_protocol_type{device="{#IFNAME}"}'
+                    - value
                     - ''
               master_item:
                 key: node_exporter.get
@@ -1417,7 +1443,7 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
-              description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
+              description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -1523,6 +1549,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'node_disk_io_time_weighted_seconds_total{device="{#DEVNAME}"}'
+                    - value
                     - ''
                 -
                   type: CHANGE_PER_SECOND
@@ -1563,6 +1590,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'node_disk_reads_completed_total{device="{#DEVNAME}"}'
+                    - value
                     - ''
                 -
                   type: CHANGE_PER_SECOND
@@ -1582,12 +1610,13 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Rate of total read time counter. Used in r_await calculation'
+              description: 'Rate of total read time counter. Used in r_await calculation.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'node_disk_read_time_seconds_total{device="{#DEVNAME}"}'
+                    - value
                     - ''
                 -
                   type: CHANGE_PER_SECOND
@@ -1614,6 +1643,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'node_disk_io_time_seconds_total{device="{#DEVNAME}"}'
+                    - value
                     - ''
                 -
                   type: CHANGE_PER_SECOND
@@ -1658,6 +1688,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'node_disk_writes_completed_total{device="{#DEVNAME}"}'
+                    - value
                     - ''
                 -
                   type: CHANGE_PER_SECOND
@@ -1677,12 +1708,13 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Rate of total write time counter. Used in w_await calculation'
+              description: 'Rate of total write time counter. Used in w_await calculation.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'node_disk_write_time_seconds_total{device="{#DEVNAME}"}'
+                    - value
                     - ''
                 -
                   type: CHANGE_PER_SECOND
@@ -1818,6 +1850,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - '{__name__=~"^node_filesystem_avail(?:_bytes)?$", mountpoint="{#FSNAME}"}'
+                    - value
                     - ''
               master_item:
                 key: node_exporter.get
@@ -1912,6 +1945,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - '{__name__=~"^node_filesystem_size(?:_bytes)?$", mountpoint="{#FSNAME}"}'
+                    - value
                     - ''
               master_item:
                 key: node_exporter.get
@@ -2049,14 +2083,14 @@ zabbix_export:
         -
           macro: '{$NET.IF.IFNAME.NOT_MATCHES}'
           value: '(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9A-z]+$|docker[0-9]+|br-[a-z0-9]{12})'
-          description: 'Filter out loopbacks, nulls, docker veth links and docker0 bridge by default'
+          description: 'Filter out loopbacks, nulls, docker veth links and docker0 bridge by default.'
         -
           macro: '{$NET.IF.IFOPERSTATUS.MATCHES}'
           value: '^.*$'
         -
           macro: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
           value: ^7$
-          description: 'Ignore notPresent(7)'
+          description: 'Ignore notPresent(7).'
         -
           macro: '{$NODE_EXPORTER_PORT}'
           value: '9100'
@@ -2070,43 +2104,43 @@ zabbix_export:
         -
           macro: '{$VFS.DEV.DEVNAME.MATCHES}'
           value: .+
-          description: 'This macro is used in block devices discovery. Can be overridden on the host or linked template level'
+          description: 'This macro is used in block devices discovery. Can be overridden on the host or linked template level.'
         -
           macro: '{$VFS.DEV.DEVNAME.NOT_MATCHES}'
           value: '^(loop[0-9]*|sd[a-z][0-9]+|nbd[0-9]+|sr[0-9]+|fd[0-9]+|dm-[0-9]+|ram[0-9]+|ploop[a-z0-9]+|md[0-9]*|hcp[0-9]*|zram[0-9]*)'
-          description: 'This macro is used in block devices discovery. Can be overridden on the host or linked template level'
+          description: 'This macro is used in block devices discovery. Can be overridden on the host or linked template level.'
         -
           macro: '{$VFS.DEV.READ.AWAIT.WARN}'
           value: '20'
-          description: 'Disk read average response time (in ms) before the trigger would fire'
+          description: 'Disk read average response time (in ms) before the trigger would fire.'
         -
           macro: '{$VFS.DEV.WRITE.AWAIT.WARN}'
           value: '20'
-          description: 'Disk write average response time (in ms) before the trigger would fire'
+          description: 'Disk write average response time (in ms) before the trigger would fire.'
         -
           macro: '{$VFS.FS.FSDEVICE.MATCHES}'
           value: ^.+$
-          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level'
+          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'
         -
           macro: '{$VFS.FS.FSDEVICE.NOT_MATCHES}'
           value: ^\s$
-          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level'
+          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'
         -
           macro: '{$VFS.FS.FSNAME.MATCHES}'
           value: .+
-          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level'
+          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'
         -
           macro: '{$VFS.FS.FSNAME.NOT_MATCHES}'
           value: ^(/dev|/sys|/run|/proc|.+/shm$)
-          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level'
+          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'
         -
           macro: '{$VFS.FS.FSTYPE.MATCHES}'
           value: ^(btrfs|ext2|ext3|ext4|reiser|xfs|ffs|ufs|jfs|jfs2|vxfs|hfs|apfs|refs|ntfs|fat32|zfs)$
-          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level'
+          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'
         -
           macro: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
           value: ^\s$
-          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level'
+          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'
         -
           macro: '{$VFS.FS.INODE.PFREE.MIN.CRIT}'
           value: '10'
@@ -2568,7 +2602,7 @@ zabbix_export:
       name: 'High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)'
       opdata: 'Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: WARNING
-      description: 'This trigger is ignored, if there is no swap configured'
+      description: 'This trigger is ignored, if there is no swap configured.'
       dependencies:
         -
           name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'

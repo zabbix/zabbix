@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,8 +60,6 @@ static int	vmware_set_powerstate_result(AGENT_RESULT *result)
 
 /******************************************************************************
  *                                                                            *
- * Function: hv_get                                                           *
- *                                                                            *
  * Purpose: return pointer to Hypervisor data from hashset with uuid          *
  *                                                                            *
  * Parameters: hvs  - [IN] the hashset with all Hypervisors                   *
@@ -85,8 +83,6 @@ static zbx_vmware_hv_t	*hv_get(zbx_hashset_t *hvs, const char *uuid)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ds_get                                                           *
  *                                                                            *
  * Purpose: return pointer to Datastore data from vector with id              *
  *                                                                            *
@@ -192,8 +188,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: vmware_service_get_counter_value_by_id                           *
  *                                                                            *
  * Purpose: gets vmware performance counter value by its identifier           *
  *                                                                            *
@@ -334,8 +328,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_service_get_counter_value_by_path                         *
- *                                                                            *
  * Purpose: gets vmware performance counter value by the path                 *
  *                                                                            *
  * Parameters: service  - [IN] the vmware service                             *
@@ -400,8 +392,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: get_vmware_service                                               *
- *                                                                            *
  * Purpose: gets vmware service object                                        *
  *                                                                            *
  * Parameters: url       - [IN] the vmware service URL                        *
@@ -459,8 +449,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: get_vcenter_vmprop                                               *
  *                                                                            *
  * Purpose: retrieves data from virtual machine details                       *
  *                                                                            *
@@ -527,8 +515,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: get_vcenter_hvprop                                               *
  *                                                                            *
  * Purpose: retrieves hypervisor property                                     *
  *                                                                            *
@@ -1142,6 +1128,8 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, con
 				NULL != cluster ? cluster->name : "", ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "{#PARENT.NAME}", hv->parent_name, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "{#PARENT.TYPE}", hv->parent_type, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "{#HV.NETNAME}",
+				ZBX_NULL2EMPTY_STR(hv->props[ZBX_VMWARE_HVPROP_NET_NAME]), ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&json_data);
 	}
 
@@ -1714,7 +1702,6 @@ int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *use
 	{
 		zbx_vmware_dsname_t	*dsname = hv->dsnames.values[i];
 		int			j, total = 0;
-
 
 		for (j = 0; j < dsname->hvdisks.values_num; j++)
 			total += dsname->hvdisks.values[j].multipath_total;
@@ -2384,7 +2371,6 @@ int	check_vcenter_datastore_hv_list(AGENT_REQUEST *request, const char *username
 	zbx_vmware_datastore_t	*datastore = NULL;
 	zbx_vmware_hv_t		*hv;
 
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (2 != request->nparam )
@@ -2956,7 +2942,6 @@ int	check_vcenter_vm_hv_name(AGENT_REQUEST *request, const char *username, const
 
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
-
 
 	if (NULL == (hv = service_hv_get_by_vm_uuid(service, uuid)))
 	{
@@ -4366,6 +4351,5 @@ out:
 
 	return ret;
 }
-
 
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */

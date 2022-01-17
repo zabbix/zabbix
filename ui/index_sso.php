@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -204,7 +204,7 @@ try {
 			'nameid_sp_name_qualifier' => $auth->getNameIdSPNameQualifier(),
 			'session_index' => $auth->getSessionIndex()
 		];
-		$saml_data['sign'] = CEncryptHelper::hash(json_encode($saml_data));
+		$saml_data['sign'] = CEncryptHelper::sign(json_encode($saml_data));
 
 		CSessionHelper::set('saml_data', $saml_data);
 
@@ -243,7 +243,7 @@ try {
 		}
 
 		$saml_data_sign = $saml_data['sign'];
-		$saml_data_sign_check = CEncryptHelper::hash(json_encode(array_diff_key($saml_data, array_flip(['sign']))));
+		$saml_data_sign_check = CEncryptHelper::sign(json_encode(array_diff_key($saml_data, array_flip(['sign']))));
 
 		if (!CEncryptHelper::checkSign($saml_data_sign, $saml_data_sign_check)) {
 			throw new Exception(_('Session initialization error.'));

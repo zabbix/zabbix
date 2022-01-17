@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:22Z'
+  version: '6.0'
+  date: '2021-12-10T13:47:40Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -13,7 +13,7 @@ zabbix_export:
       description: |
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       templates:
         -
           name: 'VMware macros'
@@ -271,7 +271,7 @@ zabbix_export:
       uuid: 7942fb93ae3b47cf9ca0ea4beb0675ce
       template: 'VMware Guest'
       name: 'VMware Guest'
-      description: 'Template tooling version used: 0.38'
+      description: 'Template tooling version used: 0.40'
       templates:
         -
           name: 'VMware macros'
@@ -306,6 +306,7 @@ zabbix_export:
           type: SIMPLE
           key: 'vmware.vm.cpu.latency[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
+          value_type: FLOAT
           units: '%'
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
@@ -339,6 +340,7 @@ zabbix_export:
           type: SIMPLE
           key: 'vmware.vm.cpu.readiness[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
+          value_type: FLOAT
           units: '%'
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
@@ -363,7 +365,7 @@ zabbix_export:
               value: VMware
         -
           uuid: 50de05f27f33425cb207a3fdece7ecb1
-          name: 'VMware: CPU swap-in latence in percents'
+          name: 'VMware: CPU swap-in latency in percents'
           type: SIMPLE
           key: 'vmware.vm.cpu.swapwait[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
@@ -381,6 +383,7 @@ zabbix_export:
           type: SIMPLE
           key: 'vmware.vm.cpu.usage.perf[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
+          value_type: FLOAT
           units: '%'
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
@@ -619,6 +622,7 @@ zabbix_export:
           type: SIMPLE
           key: 'vmware.vm.memory.usage[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
+          value_type: FLOAT
           units: '%'
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
@@ -996,7 +1000,7 @@ zabbix_export:
       uuid: 5899b2f0aced4085b5ac25d0461b3425
       template: 'VMware Hypervisor'
       name: 'VMware Hypervisor'
-      description: 'Template tooling version used: 0.38'
+      description: 'Template tooling version used: 0.40'
       templates:
         -
           name: 'VMware macros'
@@ -1057,6 +1061,7 @@ zabbix_export:
           type: SIMPLE
           key: 'vmware.hv.cpu.usage.perf[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           history: 7d
+          value_type: FLOAT
           units: '%'
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
@@ -1085,6 +1090,7 @@ zabbix_export:
           type: SIMPLE
           key: 'vmware.hv.cpu.utilization[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           history: 7d
+          value_type: FLOAT
           units: '%'
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
@@ -1597,7 +1603,7 @@ zabbix_export:
       uuid: 214366d2deb14a0ca6d19d8a54a3b88e
       template: 'VMware macros'
       name: 'VMware macros'
-      description: 'Template tooling version used: 0.38'
+      description: 'Template tooling version used: 0.40'
       groups:
         -
           name: Templates/Applications

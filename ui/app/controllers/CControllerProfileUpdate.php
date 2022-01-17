@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -68,7 +68,10 @@ class CControllerProfileUpdate extends CController {
 				case 'web.search.hats.'.WIDGET_SEARCH_TEMPLATES.'.state':
 				case 'web.search.hats.'.WIDGET_SEARCH_HOSTGROUP.'.state':
 				case 'web.service.filter.active':
+				case 'web.service_actions.filter.active':
 				case 'web.sidebar.mode':
+				case 'web.sla.list.filter.active':
+				case 'web.slareport.list.filter.active':
 				case 'web.sysmapconf.filter.active':
 				case 'web.templates.filter.active':
 				case 'web.templates.graphs.filter.active':
@@ -130,17 +133,6 @@ class CControllerProfileUpdate extends CController {
 		switch ($idx) {
 			// PROFILE_TYPE_STR
 			case 'web.dashboard.widget.geomap.default_view':
-				$value_str = $this->getInput('value_str');
-				if ($value_str === '') { // default value
-					CProfile::delete($idx, $this->getInput('idx2'));
-				}
-				else {
-					foreach ($this->getInput('idx2') as $idx2) {
-						CProfile::update($idx, $value_str, PROFILE_TYPE_STR, $idx2);
-					}
-				}
-				break;
-
 			case 'web.dashboard.widget.geomap.severity_filter':
 				$value_str = $this->getInput('value_str');
 				if ($value_str === '') { // default value

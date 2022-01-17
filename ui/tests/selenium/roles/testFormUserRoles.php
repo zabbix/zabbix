@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
  * @backup role, module, users
  * @onBefore prepareRoleData
  * @onBefore prepareUserData
+ * @onBefore prepareServiceData
  */
 class testFormUserRoles extends CWebTest {
 
@@ -102,6 +103,57 @@ class testFormUserRoles extends CWebTest {
 				'usrgrps' => [
 					[
 						'usrgrpid' => '7'
+					]
+				]
+			]
+		]);
+	}
+
+	public function prepareServiceData() {
+		CDataHelper::call('service.create', [
+			[
+				'name' => 'Service 1',
+				'algorithm' => 1,
+				'sortorder' => 1
+			],
+			[
+				'name' => 'Service 2',
+				'algorithm' => 2,
+				'sortorder' => 2,
+				'problem_tags' => [
+					[
+						'tag' => 'tag1',
+						'value' => 'value1'
+					],
+					[
+						'tag' => 'tag2',
+						'value' => 'value2'
+					],
+					[
+						'tag' => 'tag3',
+						'value' => 'value3'
+					],
+					[
+						'tag' => 'tag4',
+						'value' => 'value4'
+					]
+				],
+				'tags' => [
+					[
+						'tag' => 'Service_tag1',
+						'value' => 'value1s'
+					],
+					[
+						'tag' => 'Service_tag2',
+						'value' => 'value2s'
+					],
+					[
+						'tag' => 'Service_tag3',
+						'value' => 'value3s'
+					],
+					[
+						'tag' => 'Service_tag4',
+						'value' => 'value4s'
 					]
 				]
 			]
@@ -220,6 +272,7 @@ class testFormUserRoles extends CWebTest {
 						'Name' => 'user_ui_checked_out',
 						'User type' => 'User',
 						'Monitoring' => [],
+						'Services' => [],
 						'Inventory' => [],
 						'Reports' => []
 					],
@@ -234,6 +287,7 @@ class testFormUserRoles extends CWebTest {
 						'Name' => 'admin_ui_checked_out',
 						'User type' => 'Admin',
 						'Monitoring' => [],
+						'Services' => [],
 						'Inventory' => [],
 						'Reports' => [],
 						'Configuration' => []
@@ -249,6 +303,7 @@ class testFormUserRoles extends CWebTest {
 						'Name' => 'super_admin_ui_checked_out',
 						'User type' => 'Super admin',
 						'Monitoring' => [],
+						'Services' => [],
 						'Inventory' => [],
 						'Reports' => [],
 						'Configuration' => [],
@@ -266,6 +321,7 @@ class testFormUserRoles extends CWebTest {
 						'Name' => 'user_everything_removed',
 						'User type' => 'User',
 						'Monitoring' => [],
+						'Services' => [],
 						'Inventory' => [],
 						'Reports' => [],
 						'Default access to new UI elements' => false,
@@ -292,6 +348,7 @@ class testFormUserRoles extends CWebTest {
 						'Name' => 'admin_everything_removed',
 						'User type' => 'Admin',
 						'Monitoring' => [],
+						'Services' => [],
 						'Inventory' => [],
 						'Reports' => [],
 						'Configuration' => [],
@@ -308,6 +365,7 @@ class testFormUserRoles extends CWebTest {
 						'Execute scripts' => false,
 						'Manage API tokens' => false,
 						'Manage scheduled reports' => false,
+						'Manage SLA' => false,
 						'Default access to new actions' => false
 					],
 					'message_header' => 'Cannot create user role',
@@ -321,6 +379,7 @@ class testFormUserRoles extends CWebTest {
 						'Name' => 'super_admin_everything_removed',
 						'User type' => 'Super admin',
 						'Monitoring' => [],
+						'Services' => [],
 						'Inventory' => [],
 						'Reports' => [],
 						'Configuration' => [],
@@ -338,10 +397,49 @@ class testFormUserRoles extends CWebTest {
 						'Execute scripts' => false,
 						'Manage API tokens' => false,
 						'Manage scheduled reports' => false,
+						'Manage SLA' => false,
 						'Default access to new actions' => false
 					],
 					'message_header' => 'Cannot create user role',
 					'message_details' => 'At least one UI element must be enabled for user role "super_admin_everything_removed".'
+				]
+			],
+			// Read-write service tag name not specified.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Missing Read-write service tag name',
+						'User type' => 'Admin',
+						'Read-write access to services' => 'Service list'
+					],
+					'write_services' => [
+						'Read-write access to services with tag' => [
+							'service_write_tag_value' => 'value'
+						]
+					],
+					'message_header' => 'Cannot create user role',
+					'message_details' => 'Cannot have non-empty tag value while having empty tag in rule "services.write.tag"'
+							.' for user role "Missing Read-write service tag name".'
+				]
+			],
+			// Read-only service tag name not specified.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Missing Read-write service tag name',
+						'User type' => 'Admin',
+						'Read-only access to services' => 'Service list'
+					],
+					'write_services' => [
+						'Read-only access to services with tag' => [
+							'service_read_tag_value' => 'value'
+						]
+					],
+					'message_header' => 'Cannot create user role',
+					'message_details' => 'Cannot have non-empty tag value while having empty tag in rule "services.read.tag"'
+							.' for user role "Missing Read-write service tag name".'
 				]
 			],
 			// Special symbols in the name.
@@ -425,7 +523,7 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'user_ui_one_left',
 						'User type' => 'User',
-						'Monitoring' => ['Services'],
+						'Services' => ['Services'],
 						'Inventory' => [],
 						'Reports' => []
 					],
@@ -438,7 +536,7 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'admin_ui_one_left',
 						'User type' => 'Admin',
-						'Monitoring' => ['Services'],
+						'Services' => ['Services'],
 						'Inventory' => [],
 						'Reports' => [],
 						'Configuration' => []
@@ -452,7 +550,7 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'super_admin_ui_one_left',
 						'User type' => 'Super admin',
-						'Monitoring' => ['Services'],
+						'Services' => ['Services'],
 						'Inventory' => [],
 						'Reports' => [],
 						'Configuration' => [],
@@ -497,6 +595,7 @@ class testFormUserRoles extends CWebTest {
 						'Execute scripts' => false,
 						'Manage API tokens' => false,
 						'Manage scheduled reports' => false,
+						'Manage SLA' => false,
 						'Default access to new actions' => false
 					],
 					'message_header' => 'User role created'
@@ -518,6 +617,7 @@ class testFormUserRoles extends CWebTest {
 						'Execute scripts' => false,
 						'Manage API tokens' => false,
 						'Manage scheduled reports' => false,
+						'Manage SLA' => false,
 						'Default access to new actions' => false
 					],
 					'message_header' => 'User role created'
@@ -632,6 +732,88 @@ class testFormUserRoles extends CWebTest {
 					],
 					'message_header' => 'User role created'
 				]
+			],
+			// Access to services set to None.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'No access to services',
+						'User type' => 'Admin',
+						'Read-write access to services' => 'None',
+						'Read-write access to services' => 'None'
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			// Access to services set to All in both cases.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'All access to services',
+						'User type' => 'Admin',
+						'Read-write access to services' => 'All',
+						'Read-write access to services' => 'All'
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			// Access to services set to Service list.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Access to specific services',
+						'User type' => 'Admin',
+						'Read-write access to services' => 'Service list',
+						'Read-only access to services' => 'Service list'
+					],
+					'write_services' => [
+						'xpath:(//div[@class="multiselect-control"])[1]' => 'Service 1',
+						'Read-write access to services with tag' => [
+							'service-write-tag-tag' => 'tag-write',
+							'service_write_tag_value' => 'value-write'
+						]
+					],
+					'read_services' => [
+						'xpath:(//div[@class="multiselect-control"])[2]' => ['Service 1', 'Service 2'],
+						'Read-only access to services with tag' => [
+							'service-read-tag-tag' => 'tag-read',
+							'service_read_tag_value' => 'value-read'
+						]
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			// Access to services set to Service list.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Only read-only services',
+						'User type' => 'Super admin',
+						'Read-only access to services' => 'Service list'
+					],
+					'read_services' => [
+						'xpath:(//div[@class="multiselect-control"])[2]' => ['Service 1', 'Service 2']
+					],
+					'message_header' => 'User role created'
+				]
+			],
+			// Access to services set to Service list but the list is empty.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Services access with empty list and tags',
+						'User type' => 'User',
+						'Read-write access to services' => 'Service list',
+						'Read-only access to services' => 'Service list'
+					],
+					'override_service_access' => 'None',
+					'message_header' => 'User role created'
+				]
 			]
 		];
 	}
@@ -665,9 +847,17 @@ class testFormUserRoles extends CWebTest {
 		// New role check with screenshots.
 		$this->page->open('zabbix.php?action=userrole.edit')->waitUntilReady();
 		$this->page->removeFocus();
+
 		$screenshot_area = $this->query('id:user_role_tab')->one();
 		foreach ($roles as $role) {
 			$this->query('id:user-type')->one()->asZDropdown()->select($role);
+
+			if ($role === 'Super admin') {
+				$form->invalidate();
+				foreach (['Read-write access to services', 'Read-only access to services'] as $field) {
+					$form->getField($field)->fill('Service list');
+				}
+			}
 			$this->assertScreenshotExcept($screenshot_area, ['query' => 'xpath://input[@id="name"]'], $role);
 		}
 
@@ -698,8 +888,8 @@ class testFormUserRoles extends CWebTest {
 						'iconmap.get', 'image.get', 'item.get', 'itemprototype.get', 'maintenance.get', 'map.create',
 						'map.delete', 'map.get', 'map.update', 'mediatype.get', 'module.get', 'problem.get', 'proxy.get',
 						'role.get', 'script.execute', 'script.get', 'script.getscriptsbyhosts', 'service.create',
-						'service.delete', 'service.get', 'service.getsla', 'service.update', 'settings.get', 'template.get',
-						'templatedashboard.get', 'token.create', 'token.delete', 'token.generate', 'token.get',
+						'service.delete', 'service.get', 'service.update', 'settings.get', 'sla.get', 'sla.getsli',
+						'template.get', 'templatedashboard.get', 'token.create', 'token.delete', 'token.generate', 'token.get',
 						'token.update', 'trend.get', 'trigger.get', 'triggerprototype.get',
 						'user.get', 'user.logout', 'user.update', 'usergroup.get', 'usermacro.get', 'valuemap.get'
 					]
@@ -729,10 +919,11 @@ class testFormUserRoles extends CWebTest {
 						'itemprototype.update', 'maintenance.create', 'maintenance.delete', 'maintenance.get', 'maintenance.update',
 						'map.create', 'map.delete', 'map.get', 'map.update', 'mediatype.get', 'module.get', 'problem.get', 'proxy.get',
 						'report.create', 'report.delete', 'report.get', 'report.update', 'role.get', 'script.execute', 'script.get',
-						'script.getscriptsbyhosts', 'service.create', 'service.delete', 'service.get', 'service.getsla', 'service.update',
-						'settings.get', 'template.create', 'template.delete', 'template.get', 'template.massadd', 'template.massremove',
-						'template.massupdate', 'template.update', 'templatedashboard.create', 'templatedashboard.delete',
-						'templatedashboard.get', 'templatedashboard.update', 'token.create', 'token.delete', 'token.generate', 'token.get',
+						'script.getscriptsbyhosts', 'service.create', 'service.delete', 'service.get', 'service.update',
+						'settings.get', 'sla.create', 'sla.delete', 'sla.get', 'sla.getsli', 'sla.update', 'template.create',
+						'template.delete', 'template.get', 'template.massadd', 'template.massremove', 'template.massupdate',
+						'template.update', 'templatedashboard.create', 'templatedashboard.delete', 'templatedashboard.get',
+						'templatedashboard.update', 'token.create', 'token.delete', 'token.generate', 'token.get',
 						'token.update', 'trend.get', 'trigger.adddependencies', 'trigger.create', 'trigger.delete', 'trigger.deletedependencies',
 						'trigger.get', 'trigger.update', 'triggerprototype.create', 'triggerprototype.delete', 'triggerprototype.get',
 						'triggerprototype.update', 'user.get', 'user.logout', 'user.update', 'usergroup.get', 'usermacro.create',
@@ -775,12 +966,12 @@ class testFormUserRoles extends CWebTest {
 						'regexp.delete', 'regexp.get', 'regexp.update', 'report.create', 'report.delete', 'report.get',
 						'report.update', 'role.create', 'role.delete', 'role.get', 'role.update', 'script.create',
 						'script.delete', 'script.execute', 'script.get', 'script.getscriptsbyhosts', 'script.update',
-						'service.create', 'service.delete', 'service.get', 'service.getsla', 'service.update',
-						'settings.get', 'settings.update', 'task.create', 'task.get', 'template.create', 'template.delete',
-						'template.get', 'template.massadd', 'template.massremove', 'template.massupdate', 'template.update',
-						'templatedashboard.create', 'templatedashboard.delete', 'templatedashboard.get',
-						'templatedashboard.update', 'token.create', 'token.delete', 'token.generate', 'token.get',
-						'token.update', 'trend.get', 'trigger.adddependencies', 'trigger.create', 'trigger.delete',
+						'service.create', 'service.delete', 'service.get', 'service.update', 'settings.get', 'settings.update',
+						'sla.create', 'sla.delete', 'sla.get', 'sla.getsli', 'sla.update', 'task.create', 'task.get',
+						'template.create', 'template.delete', 'template.get', 'template.massadd', 'template.massremove',
+						'template.massupdate', 'template.update', 'templatedashboard.create', 'templatedashboard.delete',
+						'templatedashboard.get', 'templatedashboard.update', 'token.create', 'token.delete', 'token.generate',
+						'token.get', 'token.update', 'trend.get', 'trigger.adddependencies', 'trigger.create', 'trigger.delete',
 						'trigger.deletedependencies', 'trigger.get', 'trigger.update', 'triggerprototype.create',
 						'triggerprototype.delete', 'triggerprototype.get', 'triggerprototype.update', 'user.create',
 						'user.delete', 'user.get', 'user.logout', 'user.unblock', 'user.update', 'usergroup.create',
@@ -820,6 +1011,7 @@ class testFormUserRoles extends CWebTest {
 		$sql_api = 'SELECT * FROM role_rule WHERE type=1 and roleid in (SELECT roleid FROM role WHERE name='
 				.zbx_dbstr($data['fields']['Name']).')'.' ORDER BY value_str ASC';
 		$role_rules = CDBHelper::getColumn($sql_api, 'value_str');
+		sort($role_rules);
 		$this->assertEquals($data['api_list'], $role_rules);
 	}
 
@@ -873,11 +1065,46 @@ class testFormUserRoles extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Monitoring' => [],
+						'Services' => [],
 						'Inventory' => [],
 						'Reports' => []
 					],
 					'message_header' => 'Cannot update user role',
 					'message_details' => 'At least one UI element must be enabled for user role "role_for_update".'
+				]
+			],
+			// Read-write service tag name not specified.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Read-write access to services' => 'Service list'
+					],
+					'write_services' => [
+						'Read-write access to services with tag' => [
+							'service_write_tag_value' => 'value'
+						]
+					],
+					'message_header' => 'Cannot update user role',
+					'message_details' => 'Cannot have non-empty tag value while having empty tag in rule "services.write.tag"'
+							.' for user role "role_for_update".'
+				]
+			],
+			// Read-only service tag name not specified.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Read-only access to services' => 'Service list'
+					],
+					'write_services' => [
+						'Read-only access to services with tag' => [
+							'service_read_tag_value' => 'value'
+						]
+					],
+					'message_header' => 'Cannot update user role',
+					'message_details' => 'Cannot have non-empty tag value while having empty tag in rule "services.read.tag"'
+							.' for user role "role_for_update".'
 				]
 			],
 			// Change name.
@@ -967,6 +1194,78 @@ class testFormUserRoles extends CWebTest {
 						'Execute scripts' => false,
 						'Manage API tokens' => false,
 						'Default access to new actions' => false
+					],
+					'message_header' => 'User role updated'
+				]
+			],
+			// Access to services set to None.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Read-write access to services' => 'None',
+						'Read-only access to services' => 'None'
+					],
+					'message_header' => 'User role updated'
+				]
+			],
+			// Access to services set to All in both cases.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Read-write access to services' => 'All',
+						'Read-only access to services' => 'All'
+					],
+					'message_header' => 'User role updated'
+				]
+			],
+			// Access to services set to Service list but the list is empty.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Read-write access to services' => 'Service list',
+						'Read-only access to services' => 'Service list'
+					],
+					'override_service_access' => 'None',
+					'message_header' => 'User role updated'
+				]
+			],
+			// Access to services set to Service list.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Read-only access to services' => 'Service list'
+					],
+					'read_services' => [
+						'xpath:(//div[@class="multiselect-control"])[2]' => ['Service 1', 'Service 2']
+					],
+					'message_header' => 'User role updated'
+				]
+			],
+			// Access to services set to Service list.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Read-write access to services' => 'Service list',
+						'Read-only access to services' => 'Service list'
+					],
+					'write_services' => [
+						'xpath:(//div[@class="multiselect-control"])[1]' => ['Service 1', 'Service 2'],
+						'Read-write access to services with tag' => [
+							'service-write-tag-tag' => 'tag-write',
+							'service_write_tag_value' => 'value-write'
+						]
+					],
+					'read_services' => [
+						'xpath:(//div[@class="multiselect-control"])[2]' => 'Service 1',
+						'Read-only access to services with tag' => [
+							'service-read-tag-tag' => 'tag-read',
+							'service_read_tag_value' => 'value-read'
+						]
 					],
 					'message_header' => 'User role updated'
 				]
@@ -1084,6 +1383,119 @@ class testFormUserRoles extends CWebTest {
 	}
 
 	/**
+	 *  Checking layout with opened Add services dialog.
+	 */
+	public function testFormUserRoles_ServicesLayout() {
+		$services_table = [
+			[
+				'Name' => 'Service 1',
+				'Tags' => '',
+				'Problem tags' => ''
+			],
+			[
+				'Name' => 'Service 2',
+				'Tags' => ['Service_tag1: value1s', 'Service_tag2: value2s', 'Service_tag3: value3s', 'Service_tag4: value4s'],
+				'Problem tags' => ['tag1: value1', 'tag2: value2', 'tag3: value3', 'tag4: value4']
+			]
+		];
+
+		$this->page->login();
+		$this->page->open('zabbix.php?action=userrole.edit&roleid=2')->waitUntilReady();
+		$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
+
+		foreach (['Read-write' => '[1]', 'Read-only' => '[2]'] as $field => $i) {
+			$form->getField($field.' access to services')->fill('Service list');
+			$multiselect = $this->query('xpath:(//div[@class="multiselect-control"])'.$i)->asMultiselect()->one();
+			$this->assertTrue($multiselect->isVisible());
+			$multiselect->edit();
+
+			$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+			$this->assertEquals('Add services', $dialog->getTitle());
+
+			// Check filter form.
+			$filter_form = $dialog->query('name:services_filter_form')->one();
+			$this->assertEquals('Name', $filter_form->query('xpath:.//label')->one()->getText());
+			$this->assertEquals(255, $filter_form->query('name:filter_name')->one()->getAttribute('maxlength'));
+			$this->assertEquals(4, $dialog->query('button', ['Filter', 'Reset', 'Select', 'Cancel'])->all()
+					->filter(new CElementFilter(CElementFilter::CLICKABLE))->count());
+
+			$table = $dialog->query('class:list-table')->asTable()->one();
+			$this->assertEquals(['', 'Name', 'Tags', 'Problem tags'], $table->getHeadersText());
+
+			// Check problem and service tags in hint if there are more than 3 tags for service.
+			foreach ($services_table as &$service) {
+				foreach (['Problem tags' => &$service['Problem tags'], 'Tags' => &$service['Tags']] as $tag_type => &$tags) {
+					if (is_array($tags)) {
+						if (count($tags) > 3) {
+							$table->findRow('Name', $service['Name'])->getColumn($tag_type)
+									->query('class:icon-wzrd-action')->one()->click();
+							$popup = $this->query('xpath://div[@data-hintboxid]')->one()->waitUntilReady();
+							foreach ($tags as $tag) {
+								$this->assertTrue($popup->query("xpath:.//div[text()=".CXPathHelper::escapeQuotes($tag)."]")
+										->one(false)->isValid()
+								);
+							}
+							$popup->query('class:overlay-close-btn')->one()->click();
+
+							// Leave only 3 tags in array as it is the maximal number of tags displayed in table per row.
+							array_splice($tags, 3);
+						}
+						// Combine all tags into a single string so that it would be valid for comparison.
+						$tags = implode('',$tags);
+					}
+				}
+				unset($tags);
+			}
+
+			// Check the content of the services list with modified expected value in tags column.
+			$this->assertTableData($services_table);
+
+			// Check filtering of services by name.
+			$searches = [
+				'ice ' => ['Service 1', 'Service 2'],
+				'1' => ['Service 1'],
+				'Service 123' => null
+			];
+			$filter_button = $filter_form->query('button:Filter')->one();
+			foreach ($searches as $string => $result) {
+				$filter_form->query('name:filter_name')->one()->fill($string);
+				$filter_button->click();
+				$dialog->waitUntilReady();
+
+				/**
+				 * After the filter is submitted, check that the expected services are returned in the list,
+				 * or that 'No data found.' message is returned.
+				 */
+				if ($result !== null) {
+					$this->assertTableDataColumn($result);
+				}
+				else {
+					$this->assertTableData();
+				}
+			}
+
+			// Select one of the Services and make sure its not displayed in the list anymore.
+			$filter_form->query('button:Reset')->one()->click();
+			$dialog->invalidate();
+			$dialog->query('link:Service 1')->waitUntilClickable()->one()->click();
+			$dialog->ensureNotPresent();
+
+			$multiselect->edit();
+			$dialog->invalidate();
+			$this->assertTableDataColumn(['Service 2']);
+			$dialog->close();
+
+			// Check the layout of tag related fields in Service section of user role config form.
+			$tag_field = $form->getField($field.' access to services with tag');
+			foreach (['tag', 'value'] as $input_type) {
+				$input = $tag_field->query('xpath:.//input[contains(@name, '.CXPathHelper::escapeQuotes('tag_'.$input_type).')]')->one();
+				$this->assertEquals($input_type, $input->getAttribute('placeholder'));
+				$this->assertEquals(255, $input->getAttribute('maxlength'));
+			}
+		}
+	}
+
+	/**
 	 * Create or update role.
 	 *
 	 * @param array $data		given data provider
@@ -1098,6 +1510,13 @@ class testFormUserRoles extends CWebTest {
 		}
 		$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
 		$form->fill($data['fields']);
+
+		if (array_key_exists('write_services', $data) || array_key_exists('read_services', $data)) {
+			$services = array_merge(CTestArrayHelper::get($data, 'write_services', []),
+					CTestArrayHelper::get($data,'read_services', [])
+			);
+			$form->fill($services);
+		}
 
 		if (array_key_exists('api_methods', $data)) {
 			$this->query('xpath:(//div[@class="multiselect-control"])[3]')->asMultiselect()->one()->fill($data['api_methods']);
@@ -1130,7 +1549,18 @@ class testFormUserRoles extends CWebTest {
 			if (array_key_exists('space', $data)) {
 				$data['fields']['Name'] = trim($data['fields']['Name']);
 			}
+
+			if (array_key_exists('override_service_access', $data)) {
+				foreach (['Read-write', 'Read-only'] as $field) {
+					$data['fields'][$field.' access to services'] = $data['override_service_access'];
+				}
+			}
+
 			$form->checkValue($data['fields']);
+
+			if (array_key_exists('write_services', $data) || array_key_exists('read_services', $data)) {
+				$form->checkValue($services);
+			}
 
 			if (array_key_exists('api_methods', $data)) {
 				$api_methods = $this->query('xpath:(//div[@class="multiselect-control"])[3]')->asMultiselect()->one()->getValue();

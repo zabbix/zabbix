@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 #define ZABBIX_DBSYNC_H
 
 #include "common.h"
+#include "dbconfig.h"
 
 /* no changes */
 #define ZBX_DBSYNC_ROW_NONE	0
@@ -39,7 +40,6 @@
 #define ZBX_DBSYNC_UPDATE_HOST_GROUPS		__UINT64_C(0x0020)
 #define ZBX_DBSYNC_UPDATE_MAINTENANCE_GROUPS	__UINT64_C(0x0040)
 
-
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 #	define ZBX_HOST_TLS_OFFSET	4
 #else
@@ -50,8 +50,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dbsync_preproc_row_func_t                                    *
- *                                                                            *
  * Purpose: applies necessary preprocessing before row is compared/used       *
  *                                                                            *
  * Parameter: row - [IN] the row to preprocess                                *
@@ -60,7 +58,6 @@
  *                                                                            *
  * Comments: The row preprocessing can be used to expand user macros in       *
  *           some columns.                                                    *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 typedef char **(*zbx_dbsync_preproc_row_func_t)(char **row);

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 #include "zbxalgo.h"
 #include "dbcache.h"
 #include "zbxhistory.h"
-#include "zbxself.h"
+
 #include "history.h"
 
 /* curl_multi_wait() is supported starting with version 7.28.0 (0x071c00) */
@@ -220,8 +220,6 @@ static void	elastic_log_error(CURL *handle, CURLcode error, const char *errbuf)
 
 /************************************************************************************
  *                                                                                  *
- * Function: elastic_close                                                          *
- *                                                                                  *
  * Purpose: closes connection and releases allocated resources                      *
  *                                                                                  *
  * Parameters:  hist - [IN] the history storage interface                           *
@@ -245,8 +243,6 @@ static void	elastic_close(zbx_history_iface_t *hist)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: elastic_is_error_present                                         *
  *                                                                            *
  * Purpose: check a error from Elastic json response                          *
  *                                                                            *
@@ -320,11 +316,7 @@ static int	elastic_is_error_present(zbx_httppage_t *page, char **err)
  *                                                                                                                *
  ******************************************************************************************************************/
 
-
-
 /************************************************************************************
- *                                                                                  *
- * Function: elastic_writer_init                                                    *
  *                                                                                  *
  * Purpose: initializes elastic writer for a new batch of history values            *
  *                                                                                  *
@@ -347,8 +339,6 @@ static void	elastic_writer_init(void)
 
 /************************************************************************************
  *                                                                                  *
- * Function: elastic_writer_release                                                 *
- *                                                                                  *
  * Purpose: releases initialized elastic writer by freeing allocated resources and  *
  *          setting its state to uninitialized.                                     *
  *                                                                                  *
@@ -369,8 +359,6 @@ static void	elastic_writer_release(void)
 }
 
 /************************************************************************************
- *                                                                                  *
- * Function: elastic_writer_add_iface                                               *
  *                                                                                  *
  * Purpose: adds history storage interface to be flushed later                      *
  *                                                                                  *
@@ -430,8 +418,6 @@ out:
 }
 
 /************************************************************************************
- *                                                                                  *
- * Function: elastic_writer_flush                                                   *
  *                                                                                  *
  * Purpose: posts historical data to elastic storage                                *
  *                                                                                  *
@@ -602,8 +588,6 @@ end:
 
 /************************************************************************************
  *                                                                                  *
- * Function: elastic_destroy                                                        *
- *                                                                                  *
  * Purpose: destroys history storage interface                                      *
  *                                                                                  *
  * Parameters:  hist - [IN] the history storage interface                           *
@@ -620,8 +604,6 @@ static void	elastic_destroy(zbx_history_iface_t *hist)
 }
 
 /************************************************************************************
- *                                                                                  *
- * Function: elastic_get_values                                                     *
  *                                                                                  *
  * Purpose: gets item history data from history storage                             *
  *                                                                                  *
@@ -842,7 +824,6 @@ static int	elastic_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid, in
 			goto out;
 		}
 
-
 		zabbix_log(LOG_LEVEL_DEBUG, "elasticsearch closing scroll %s", data->post_url);
 
 		page_r.offset = 0;
@@ -869,8 +850,6 @@ out:
 }
 
 /************************************************************************************
- *                                                                                  *
- * Function: elastic_add_values                                                     *
  *                                                                                  *
  * Purpose: sends history data to the storage                                       *
  *                                                                                  *
@@ -956,8 +935,6 @@ static int	elastic_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t 
 
 /************************************************************************************
  *                                                                                  *
- * Function: elastic_flush                                                          *
- *                                                                                  *
  * Purpose: flushes the history data to storage                                     *
  *                                                                                  *
  * Parameters:  hist    - [IN] the history storage interface                        *
@@ -974,8 +951,6 @@ static int	elastic_flush(zbx_history_iface_t *hist)
 }
 
 /************************************************************************************
- *                                                                                  *
- * Function: zbx_history_elastic_init                                               *
  *                                                                                  *
  * Purpose: initializes history storage interface                                   *
  *                                                                                  *
@@ -1017,8 +992,6 @@ int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type
 }
 
 /************************************************************************************
- *                                                                                  *
- * Function: zbx_elastic_version_extract                                            *
  *                                                                                  *
  * Purpose: queries elastic search version and extracts the numeric version from    *
  *          the response string                                                     *

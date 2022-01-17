@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,19 +43,17 @@ class testComplexServiceStatus extends CIntegrationTest {
 	public function prepareData() {
 		// Create host "test_services_alerting"
 		$response = $this->call('host.create', [
-			[
-				'host' => self::HOSTNAME,
-				'interfaces' => [
-					'type' => 1,
-					'main' => 1,
-					'useip' => 1,
-					'ip' => '127.0.0.1',
-					'dns' => '',
-					'port' => $this->getConfigurationValue(self::COMPONENT_AGENT, 'ListenPort')
-				],
-				'groups' => [['groupid' => 4]],
-				'status' => HOST_STATUS_MONITORED
-			]
+			'host' => self::HOSTNAME,
+			'interfaces' => [
+				'type' => 1,
+				'main' => 1,
+				'useip' => 1,
+				'ip' => '127.0.0.1',
+				'dns' => '',
+				'port' => $this->getConfigurationValue(self::COMPONENT_AGENT, 'ListenPort')
+			],
+			'groups' => ['groupid' => 4],
+			'status' => HOST_STATUS_MONITORED
 		]);
 
 		$this->assertArrayHasKey('hostids', $response['result']);
@@ -64,15 +62,13 @@ class testComplexServiceStatus extends CIntegrationTest {
 
 		// Create trapper item
 		$response = $this->call('item.create', [
-			[
-				'name' => self::ITEM_KEY,
-				'key_' => self::ITEM_KEY,
-				'type' => ITEM_TYPE_CALCULATED,
-				'params' => '1',
-				'hostid' => self::$hostid,
-				'delay' => '1s',
-				'value_type' => ITEM_VALUE_TYPE_UINT64
-			]
+			'name' => self::ITEM_KEY,
+			'key_' => self::ITEM_KEY,
+			'type' => ITEM_TYPE_CALCULATED,
+			'params' => '1',
+			'hostid' => self::$hostid,
+			'delay' => '1s',
+			'value_type' => ITEM_VALUE_TYPE_UINT64
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(1, count($response['result']['itemids']));
@@ -82,8 +78,6 @@ class testComplexServiceStatus extends CIntegrationTest {
 		$response = $this->call('service.create', [
 			'name' => 'Parent',
 			'algorithm' => 1,
-			'goodsla' => 99.99,
-			'showsla' => 0,
 			'weight' => 0,
 			'sortorder' => 0
 		]);
@@ -105,9 +99,9 @@ class testComplexServiceStatus extends CIntegrationTest {
 
 		foreach ($triggers_services as $desc => $severity) {
 			$op = (substr($desc, 0, 2) == 'ok' ? '<>' : '=');
-			$expr = 'last(/' . self::HOSTNAME . '/' . self::ITEM_KEY . ')' . $op . '1';
-			$trigger_desc = 'trigger_' . $desc;
-			$service_desc = 'service_' . $desc;
+			$expr = 'last(/'.self::HOSTNAME.'/'.self::ITEM_KEY.')'.$op.'1';
+			$trigger_desc = 'trigger_'.$desc;
+			$service_desc = 'service_'.$desc;
 
 			$response = $this->call('trigger.create', [
 				'description' => $trigger_desc,
@@ -128,7 +122,7 @@ class testComplexServiceStatus extends CIntegrationTest {
 				'tags' => [
 					[
 						'tag' => 'ServiceLink',
-						'value' => $triggerid . ':' . $trigger_desc
+						'value' => $triggerid.':'.$trigger_desc
 					]
 				]
 			]);
@@ -136,8 +130,6 @@ class testComplexServiceStatus extends CIntegrationTest {
 			$response = $this->call('service.create', [
 				'name' => $service_desc,
 				'algorithm' => 1,
-				'goodsla' => 99.99,
-				'showsla' => 0,
 				'weight' => 100,
 				'sortorder' => 0,
 				'parents' => [
@@ -147,7 +139,7 @@ class testComplexServiceStatus extends CIntegrationTest {
 					[
 						'tag' => 'ServiceLink',
 						'operator' => 0,
-						'value' => $triggerid . ':' . $trigger_desc
+						'value' => $triggerid.':'.$trigger_desc
 					]
 				]
 			]);
@@ -162,7 +154,6 @@ class testComplexServiceStatus extends CIntegrationTest {
 	 * Inherit the status from the most critical of child nodes
 	 *
 	 * @backup services
-	 *
 	 */
 	public function testComplexServiceStatus_case1() {
 		$response = $this->call('service.update', [
@@ -186,8 +177,7 @@ class testComplexServiceStatus extends CIntegrationTest {
 	/**
 	 * Additional rule with update of a parent status
 	 *
-	 * @backup services,service_status_rule
-	 *
+	 * @backup services
 	 */
 	public function testComplexServiceStatus_case2() {
 		$response = $this->call('service.update', [
@@ -263,8 +253,7 @@ class testComplexServiceStatus extends CIntegrationTest {
 	/**
 	 * Set status of a parent service to OK, unless additional rules are met
 	 *
-	 * @backup services,service_status_rule
-	 *
+	 * @backup services
 	 */
 	public function testComplexServiceStatus_case5() {
 		$response = $this->call('service.update', [
@@ -309,7 +298,6 @@ class testComplexServiceStatus extends CIntegrationTest {
 	 * Test propagations
 	 *
 	 * @backup services
-	 *
 	 */
 	public function testComplexServiceStatus_case6() {
 		$response = $this->callUntilDataIsPresent('service.get', [

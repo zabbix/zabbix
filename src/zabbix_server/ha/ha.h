@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,14 +21,7 @@
 #define ZABBIX_HA_H
 
 #include "common.h"
-
-#define ZBX_NODE_STATUS_UNINITIALIZED	-3
-#define ZBX_NODE_STATUS_ERROR		-2
-#define ZBX_NODE_STATUS_UNKNOWN		-1
-#define ZBX_NODE_STATUS_STANDBY		0
-#define ZBX_NODE_STATUS_STOPPED		1
-#define ZBX_NODE_STATUS_UNAVAILABLE	2
-#define ZBX_NODE_STATUS_ACTIVE		3
+#include "zbxrtc.h"
 
 typedef struct
 {
@@ -40,20 +33,13 @@ zbx_cuid_t;
 #define zbx_cuid_compare(a, b)	(0 == memcmp((a).str, (b).str, CUID_LEN) ? SUCCEED : FAIL)
 #define zbx_cuid_clear(a)	memset((a).str, 0, CUID_LEN)
 
-int	zbx_ha_start(char **error, int ha_status);
+int	zbx_ha_start(zbx_rtc_t *rtc, int ha_status, char **error);
 int	zbx_ha_pause(char **error);
 int	zbx_ha_stop(char **error);
 void	zbx_ha_kill(void);
-int	zbx_ha_get_status(char **error);
-int	zbx_ha_recv_status(int timeout, int *ha_status, char **error);
-int	zbx_ha_get_nodes(char **nodes, char **error);
-int	zbx_ha_remove_node(int node_num, char **error);
-int	zbx_ha_set_failover_delay(int delay, char **error);
-int	zbx_ha_change_loglevel(int direction, char **error);
+int	zbx_ha_get_status(int *ha_status, char **error);
+int	zbx_ha_dispatch_message(zbx_ipc_message_t *message, int *ha_status, char **error);
 
-const char	*zbx_ha_status_str(int ha_status);
 int	zbx_ha_check_pid(pid_t pid);
 
 #endif
-
-

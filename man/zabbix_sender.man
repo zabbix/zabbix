@@ -33,7 +33,7 @@
 .
 .  hy \\n(HY
 ..
-.TH ZABBIX_SENDER 1 "2021\-06\-01" Zabbix
+.TH ZABBIX_SENDER 1 "2022\-01\-06" Zabbix
 .if n .ad l
 .SH NAME
 zabbix_sender \- Zabbix sender utility
@@ -592,5 +592,3 @@ Documentation
 .BR zabbix_js (1),
 .BR zabbix_agent2 (8),
 .BR zabbix_web_service (8)
-.SH AUTHOR
-Alexei Vladishev <alex@zabbix.com>

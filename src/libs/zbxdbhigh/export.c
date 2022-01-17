@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,8 +44,6 @@ static zbx_export_file_t	*problems_file;
 static char	*export_dir;
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_validate_export_type                                         *
  *                                                                            *
  * Purpose: validate export type                                              *
  *                                                                            *
@@ -113,8 +111,6 @@ int	zbx_validate_export_type(char *export_type, uint32_t *export_mask)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_is_export_enabled                                            *
  *                                                                            *
  * Purpose: checks if export is enabled for given type(s)                     *
  *                                                                            *

@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,7 +50,23 @@ class CGeomapCoordinatesParserTest extends TestCase {
 				'rc' => CParser::PARSE_FAIL,
 				'result' => []
 			]],
-			['51.5285582,181.241,10,10', 0, [
+			['-91.5285582,-0.2416813,10', 0, [
+				'rc' => CParser::PARSE_FAIL,
+				'result' => []
+			]],
+			['90,181,10', 0, [
+				'rc' => CParser::PARSE_FAIL,
+				'result' => []
+			]],
+			['90,-181,10', 0, [
+				'rc' => CParser::PARSE_FAIL,
+				'result' => []
+			]],
+			['90,100,29.9', 0, [
+				'rc' => CParser::PARSE_FAIL,
+				'result' => []
+			]],
+			['51.5285582,180,10,10', 0, [
 				'rc' => CParser::PARSE_FAIL,
 				'result' => []
 			]],

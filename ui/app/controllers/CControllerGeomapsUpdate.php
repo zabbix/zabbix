@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ class CControllerGeomapsUpdate extends CController {
 		$fields = [
 			'geomaps_tile_provider'		=> 'required|db config.geomaps_tile_provider',
 			'geomaps_tile_url'			=> 'required|not_empty|db config.geomaps_tile_url',
-			'geomaps_max_zoom'			=> 'required|not_empty|db config.geomaps_max_zoom|ge 0|le '.ZBX_GEOMAP_MAX_ZOOM,
+			'geomaps_max_zoom'			=> 'required|not_empty|db config.geomaps_max_zoom|ge 1|le '.ZBX_GEOMAP_MAX_ZOOM,
 			'geomaps_attribution'		=> 'db config.geomaps_attribution'
 		];
 

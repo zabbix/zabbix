@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-10-26T11:17:26Z'
+  date: '2021-12-16T20:04:06Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -24,7 +24,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/418396-discussion-thread-for-official-zabbix-templates-for-cisco
         
-        Template tooling version used: 0.39
+        Template tooling version used: 0.40
       groups:
         -
           name: 'Templates/Server hardware'
@@ -1245,21 +1245,9 @@ zabbix_export:
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
                   dependencies:
                     -
-                      name: '{#SENSOR_LOCATION}.Ambient: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
-                      expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
-                      recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
-                    -
-                      name: '{#SENSOR_LOCATION}.Front: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
-                      expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
-                      recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
-                    -
                       name: '{#SENSOR_LOCATION}.IOH: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
                       expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
                       recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
-                    -
-                      name: '{#SENSOR_LOCATION}.Rear: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
-                      expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
-                      recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
             -
               uuid: d5e4b5b7e18c4545853c48db018dc127
               name: '{#SENSOR_LOCATION}.Ambient: Temperature'
@@ -1305,18 +1293,6 @@ zabbix_export:
                       name: '{#SENSOR_LOCATION}.Ambient: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
                       expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
                       recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
-                    -
-                      name: '{#SENSOR_LOCATION}.Front: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
-                      expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
-                      recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
-                    -
-                      name: '{#SENSOR_LOCATION}.IOH: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
-                      expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
-                      recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
-                    -
-                      name: '{#SENSOR_LOCATION}.Rear: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
-                      expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
-                      recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
             -
               uuid: 9980042de8d74353bf4a386bb0f28d30
               name: '{#SENSOR_LOCATION}.Front: Temperature'
@@ -1359,21 +1335,9 @@ zabbix_export:
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
                   dependencies:
                     -
-                      name: '{#SENSOR_LOCATION}.Ambient: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
-                      expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
-                      recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
-                    -
                       name: '{#SENSOR_LOCATION}.Front: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
                       expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
                       recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
-                    -
-                      name: '{#SENSOR_LOCATION}.IOH: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
-                      expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
-                      recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
-                    -
-                      name: '{#SENSOR_LOCATION}.Rear: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
-                      expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
-                      recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
             -
               uuid: e20bfa52f31f4a1a9f08ba02fe27f90c
               name: '{#SENSOR_LOCATION}.Rear: Temperature'
@@ -1415,18 +1379,6 @@ zabbix_export:
                   priority: WARNING
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
                   dependencies:
-                    -
-                      name: '{#SENSOR_LOCATION}.Ambient: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
-                      expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
-                      recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
-                    -
-                      name: '{#SENSOR_LOCATION}.Front: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
-                      expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
-                      recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
-                    -
-                      name: '{#SENSOR_LOCATION}.IOH: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
-                      expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
-                      recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
                     -
                       name: '{#SENSOR_LOCATION}.Rear: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
                       expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'

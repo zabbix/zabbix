@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1671,7 +1671,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 		}
 		foreach ($expected_popup['Tags'] as $tag) {
 			$tag_array = $row->getColumn('Tags')->getText();
-			$this->assertContains($tag, $tag_array);
+			$this->assertStringContainsString($tag, $tag_array);
 		}
 		if (CTestArrayHelper::get($data['fields'], 'Show operational data', 'None') === 'Separately') {
 			$this->assertEquals('*UNKNOWN*', $row->getColumn('Operational data')->getText());

@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 
 ## Setup
 
@@ -46,8 +46,8 @@ There are no template links in this template.
 |CPU |CPU softirq time |<p>The amount of time the CPU has been servicing software interrupts.</p> |ZABBIX_ACTIVE |system.cpu.util[,softirq] |
 |CPU |CPU guest time |<p>Guest  time (time  spent  running  a  virtual  CPU  for  a  guest  operating  system)</p> |ZABBIX_ACTIVE |system.cpu.util[,guest] |
 |CPU |CPU guest nice time |<p>Time spent running a niced guest (virtual CPU for guest operating systems under the control of the Linux kernel)</p> |ZABBIX_ACTIVE |system.cpu.util[,guest_nice] |
-|CPU |Context switches per second |<p>-</p> |ZABBIX_ACTIVE |system.cpu.switches<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|CPU |Interrupts per second |<p>-</p> |ZABBIX_ACTIVE |system.cpu.intr<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
+|CPU |Context switches per second |<p>-</p> |ZABBIX_ACTIVE |system.cpu.switches<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
+|CPU |Interrupts per second |<p>-</p> |ZABBIX_ACTIVE |system.cpu.intr<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
 
 ## Triggers
 
@@ -64,7 +64,7 @@ Please report any issues with the template at https://support.zabbix.com
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 
 ## Setup
 
@@ -95,7 +95,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Mounted filesystem discovery |<p>Discovery of file systems of different types.</p> |ZABBIX_ACTIVE |vfs.fs.discovery<p>**Filter**:</p>AND <p>- A: {#FSTYPE} MATCHES_REGEX `{$VFS.FS.FSTYPE.MATCHES}`</p><p>- B: {#FSTYPE} NOT_MATCHES_REGEX `{$VFS.FS.FSTYPE.NOT_MATCHES}`</p><p>- C: {#FSNAME} MATCHES_REGEX `{$VFS.FS.FSNAME.MATCHES}`</p><p>- D: {#FSNAME} NOT_MATCHES_REGEX `{$VFS.FS.FSNAME.NOT_MATCHES}`</p> |
+|Mounted filesystem discovery |<p>Discovery of file systems of different types.</p> |ZABBIX_ACTIVE |vfs.fs.discovery<p>**Filter**:</p>AND <p>- {#FSTYPE} MATCHES_REGEX `{$VFS.FS.FSTYPE.MATCHES}`</p><p>- {#FSTYPE} NOT_MATCHES_REGEX `{$VFS.FS.FSTYPE.NOT_MATCHES}`</p><p>- {#FSNAME} MATCHES_REGEX `{$VFS.FS.FSNAME.MATCHES}`</p><p>- {#FSNAME} NOT_MATCHES_REGEX `{$VFS.FS.FSNAME.NOT_MATCHES}`</p> |
 
 ## Items collected
 
@@ -123,7 +123,7 @@ Please report any issues with the template at https://support.zabbix.com
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 
 ## Setup
 
@@ -176,7 +176,7 @@ Please report any issues with the template at https://support.zabbix.com
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 
 ## Setup
 
@@ -203,21 +203,21 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Block devices discovery |<p>-</p> |ZABBIX_ACTIVE |vfs.dev.discovery<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Filter**:</p>AND <p>- A: {#DEVTYPE} MATCHES_REGEX `disk`</p><p>- B: {#DEVNAME} MATCHES_REGEX `{$VFS.DEV.DEVNAME.MATCHES}`</p><p>- C: {#DEVNAME} NOT_MATCHES_REGEX `{$VFS.DEV.DEVNAME.NOT_MATCHES}`</p> |
+|Block devices discovery |<p>-</p> |ZABBIX_ACTIVE |vfs.dev.discovery<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Filter**:</p>AND <p>- {#DEVTYPE} MATCHES_REGEX `disk`</p><p>- {#DEVNAME} MATCHES_REGEX `{$VFS.DEV.DEVNAME.MATCHES}`</p><p>- {#DEVNAME} NOT_MATCHES_REGEX `{$VFS.DEV.DEVNAME.NOT_MATCHES}`</p> |
 
 ## Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Storage |{#DEVNAME}: Disk read rate |<p>r/s. The number (after merges) of read requests completed per second for the device.</p> |DEPENDENT |vfs.dev.read.rate[{#DEVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[0]`</p><p>- CHANGE_PER_SECOND |
-|Storage |{#DEVNAME}: Disk write rate |<p>w/s. The number (after merges) of write requests completed per second for the device.</p> |DEPENDENT |vfs.dev.write.rate[{#DEVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[4]`</p><p>- CHANGE_PER_SECOND |
+|Storage |{#DEVNAME}: Disk read rate |<p>r/s. The number (after merges) of read requests completed per second for the device.</p> |DEPENDENT |vfs.dev.read.rate[{#DEVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[0]`</p><p>- CHANGE_PER_SECOND</p> |
+|Storage |{#DEVNAME}: Disk write rate |<p>w/s. The number (after merges) of write requests completed per second for the device.</p> |DEPENDENT |vfs.dev.write.rate[{#DEVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[4]`</p><p>- CHANGE_PER_SECOND</p> |
 |Storage |{#DEVNAME}: Disk read request avg waiting time (r_await) |<p>This formula contains two boolean expressions that evaluates to 1 or 0 in order to set calculated metric to zero and to avoid division by zero exception.</p> |CALCULATED |vfs.dev.read.await[{#DEVNAME}]<p>**Expression**:</p>`(last(//vfs.dev.read.time.rate[{#DEVNAME}])/(last(//vfs.dev.read.rate[{#DEVNAME}])+(last(//vfs.dev.read.rate[{#DEVNAME}])=0)))*1000*(last(//vfs.dev.read.rate[{#DEVNAME}]) > 0)` |
 |Storage |{#DEVNAME}: Disk write request avg waiting time (w_await) |<p>This formula contains two boolean expressions that evaluates to 1 or 0 in order to set calculated metric to zero and to avoid division by zero exception.</p> |CALCULATED |vfs.dev.write.await[{#DEVNAME}]<p>**Expression**:</p>`(last(//vfs.dev.write.time.rate[{#DEVNAME}])/(last(//vfs.dev.write.rate[{#DEVNAME}])+(last(//vfs.dev.write.rate[{#DEVNAME}])=0)))*1000*(last(//vfs.dev.write.rate[{#DEVNAME}]) > 0)` |
-|Storage |{#DEVNAME}: Disk average queue size (avgqu-sz) |<p>Current average disk queue, the number of requests outstanding on the disk at the time the performance data is collected.</p> |DEPENDENT |vfs.dev.queue_size[{#DEVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[10]`</p><p>- CHANGE_PER_SECOND<p>- MULTIPLIER: `0.001`</p> |
-|Storage |{#DEVNAME}: Disk utilization |<p>This item is the percentage of elapsed time that the selected disk drive was busy servicing read or writes requests.</p> |DEPENDENT |vfs.dev.util[{#DEVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[9]`</p><p>- CHANGE_PER_SECOND<p>- MULTIPLIER: `0.1`</p> |
+|Storage |{#DEVNAME}: Disk average queue size (avgqu-sz) |<p>Current average disk queue, the number of requests outstanding on the disk at the time the performance data is collected.</p> |DEPENDENT |vfs.dev.queue_size[{#DEVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[10]`</p><p>- CHANGE_PER_SECOND</p><p>- MULTIPLIER: `0.001`</p> |
+|Storage |{#DEVNAME}: Disk utilization |<p>This item is the percentage of elapsed time that the selected disk drive was busy servicing read or writes requests.</p> |DEPENDENT |vfs.dev.util[{#DEVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[9]`</p><p>- CHANGE_PER_SECOND</p><p>- MULTIPLIER: `0.1`</p> |
 |Zabbix_raw_items |{#DEVNAME}: Get stats |<p>Get contents of /sys/block/{#DEVNAME}/stat for disk stats.</p> |ZABBIX_ACTIVE |vfs.file.contents[/sys/block/{#DEVNAME}/stat]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return JSON.stringify(value.trim().split(/ +/));`</p> |
-|Zabbix_raw_items |{#DEVNAME}: Disk read time (rate) |<p>Rate of total read time counter. Used in r_await calculation</p> |DEPENDENT |vfs.dev.read.time.rate[{#DEVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[3]`</p><p>- CHANGE_PER_SECOND<p>- MULTIPLIER: `0.001`</p> |
-|Zabbix_raw_items |{#DEVNAME}: Disk write time (rate) |<p>Rate of total write time counter. Used in w_await calculation</p> |DEPENDENT |vfs.dev.write.time.rate[{#DEVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[7]`</p><p>- CHANGE_PER_SECOND<p>- MULTIPLIER: `0.001`</p> |
+|Zabbix_raw_items |{#DEVNAME}: Disk read time (rate) |<p>Rate of total read time counter. Used in r_await calculation</p> |DEPENDENT |vfs.dev.read.time.rate[{#DEVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[3]`</p><p>- CHANGE_PER_SECOND</p><p>- MULTIPLIER: `0.001`</p> |
+|Zabbix_raw_items |{#DEVNAME}: Disk write time (rate) |<p>Rate of total write time counter. Used in w_await calculation</p> |DEPENDENT |vfs.dev.write.time.rate[{#DEVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[7]`</p><p>- CHANGE_PER_SECOND</p><p>- MULTIPLIER: `0.001`</p> |
 
 ## Triggers
 
@@ -233,7 +233,7 @@ Please report any issues with the template at https://support.zabbix.com
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 
 ## Setup
 
@@ -260,18 +260,18 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Network interface discovery |<p>Discovery of network interfaces.</p> |ZABBIX_ACTIVE |net.if.discovery<p>**Filter**:</p>AND <p>- A: {#IFNAME} MATCHES_REGEX `{$NET.IF.IFNAME.MATCHES}`</p><p>- B: {#IFNAME} NOT_MATCHES_REGEX `{$NET.IF.IFNAME.NOT_MATCHES}`</p> |
+|Network interface discovery |<p>Discovery of network interfaces.</p> |ZABBIX_ACTIVE |net.if.discovery<p>**Filter**:</p>AND <p>- {#IFNAME} MATCHES_REGEX `{$NET.IF.IFNAME.MATCHES}`</p><p>- {#IFNAME} NOT_MATCHES_REGEX `{$NET.IF.IFNAME.NOT_MATCHES}`</p> |
 
 ## Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Network_interfaces |Interface {#IFNAME}: Bits received | |ZABBIX_ACTIVE |net.if.in["{#IFNAME}"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND<p>- MULTIPLIER: `8`</p> |
-|Network_interfaces |Interface {#IFNAME}: Bits sent | |ZABBIX_ACTIVE |net.if.out["{#IFNAME}"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND<p>- MULTIPLIER: `8`</p> |
-|Network_interfaces |Interface {#IFNAME}: Outbound packets with errors | |ZABBIX_ACTIVE |net.if.out["{#IFNAME}",errors]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|Network_interfaces |Interface {#IFNAME}: Inbound packets with errors | |ZABBIX_ACTIVE |net.if.in["{#IFNAME}",errors]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|Network_interfaces |Interface {#IFNAME}: Outbound packets discarded | |ZABBIX_ACTIVE |net.if.out["{#IFNAME}",dropped]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|Network_interfaces |Interface {#IFNAME}: Inbound packets discarded | |ZABBIX_ACTIVE |net.if.in["{#IFNAME}",dropped]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
+|Network_interfaces |Interface {#IFNAME}: Bits received |<p>-</p> |ZABBIX_ACTIVE |net.if.in["{#IFNAME}"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p><p>- MULTIPLIER: `8`</p> |
+|Network_interfaces |Interface {#IFNAME}: Bits sent |<p>-</p> |ZABBIX_ACTIVE |net.if.out["{#IFNAME}"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p><p>- MULTIPLIER: `8`</p> |
+|Network_interfaces |Interface {#IFNAME}: Outbound packets with errors |<p>-</p> |ZABBIX_ACTIVE |net.if.out["{#IFNAME}",errors]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
+|Network_interfaces |Interface {#IFNAME}: Inbound packets with errors |<p>-</p> |ZABBIX_ACTIVE |net.if.in["{#IFNAME}",errors]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
+|Network_interfaces |Interface {#IFNAME}: Outbound packets discarded |<p>-</p> |ZABBIX_ACTIVE |net.if.out["{#IFNAME}",dropped]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
+|Network_interfaces |Interface {#IFNAME}: Inbound packets discarded |<p>-</p> |ZABBIX_ACTIVE |net.if.in["{#IFNAME}",dropped]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
 |Network_interfaces |Interface {#IFNAME}: Operational status |<p>Reference: https://www.kernel.org/doc/Documentation/networking/operstates.txt</p> |ZABBIX_ACTIVE |vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |Network_interfaces |Interface {#IFNAME}: Interface type |<p>Indicates the interface protocol type as a decimal value.</p><p>See include/uapi/linux/if_arp.h for all possible values.</p><p>Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net</p> |ZABBIX_ACTIVE |vfs.file.contents["/sys/class/net/{#IFNAME}/type"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 
@@ -360,7 +360,7 @@ Please report any issues with the template at https://support.zabbix.com
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 New official Linux template. Requires agent of Zabbix 3.0.14, 3.4.5 and 4.0.0 or newer.
 
 ## Setup

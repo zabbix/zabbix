@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,8 +25,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: es_xml_ctor                                                      *
- *                                                                            *
  * Purpose: XML constructor                                                   *
  *                                                                            *
  ******************************************************************************/
@@ -44,8 +42,6 @@ static duk_ret_t	es_xml_ctor(duk_context *ctx)
 
 /******************************************************************************
  *                                                                            *
- * Function: es_xml_query                                                     *
- *                                                                            *
  * Purpose: XML.query method                                                  *
  *                                                                            *
  ******************************************************************************/
@@ -54,6 +50,12 @@ static duk_ret_t	es_xml_query(duk_context *ctx)
 	int		err_index = -1;
 	char		*err = NULL;
 	zbx_variant_t	value;
+	zbx_es_env_t	*env;
+
+	if (NULL == (env = zbx_es_get_env(ctx)))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
+
+	ZBX_ES_CHECK_TIMEOUT(ctx, env);
 
 	zbx_variant_set_str(&value, zbx_strdup(NULL, duk_safe_to_string(ctx, 0)));
 
@@ -75,15 +77,19 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: es_xml_from_json                                                 *
- *                                                                            *
  * Purpose: XML.fromJson method                                               *
  *                                                                            *
  ******************************************************************************/
 static duk_ret_t	es_xml_from_json(duk_context *ctx)
 {
-	int	err_index = -1;
-	char	*str = NULL, *error = NULL;
+	int		err_index = -1;
+	char		*str = NULL, *error = NULL;
+	zbx_es_env_t	*env;
+
+	if (NULL == (env = zbx_es_get_env(ctx)))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
+
+	ZBX_ES_CHECK_TIMEOUT(ctx, env);
 
 	if (FAIL == zbx_json_to_xml((char *)duk_safe_to_string(ctx, 0), &str, &error))
 	{
@@ -103,15 +109,19 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: es_xml_to_json                                                   *
- *                                                                            *
  * Purpose: XML.toJson method                                                 *
  *                                                                            *
  ******************************************************************************/
 static duk_ret_t	es_xml_to_json(duk_context *ctx)
 {
-	int	err_index = -1;
-	char	*str = NULL, *error = NULL;
+	int		err_index = -1;
+	char		*str = NULL, *error = NULL;
+	zbx_es_env_t	*env;
+
+	if (NULL == (env = zbx_es_get_env(ctx)))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
+
+	ZBX_ES_CHECK_TIMEOUT(ctx, env);
 
 	if (FAIL == zbx_xml_to_json((char *)duk_safe_to_string(ctx, 0), &str, &error))
 	{
@@ -155,8 +165,6 @@ static int	es_xml_create_object(duk_context *ctx)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_es_init_xml                                                  *
  *                                                                            *
  * Purpose: init XML object                                                   *
  *                                                                            *

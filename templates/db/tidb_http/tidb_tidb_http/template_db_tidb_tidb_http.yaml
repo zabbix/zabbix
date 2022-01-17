@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:41Z'
+  version: '6.0'
+  date: '2021-12-16T07:09:48Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -13,13 +13,13 @@ zabbix_export:
       description: |
         The template to monitor TiDB server of TiDB cluster by Zabbix that works without any external scripts.
         Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
-        Don't forget to change the macros {$TIDB.URL}, {$TIDB.PORT}. 
+        Don't forget to change the macros {$TIDB.URL}, {$TIDB.PORT}.
         
-        Template `TiDB by HTTP` — collects metrics by HTTP agent from PD /metrics endpoint and from monitoring API.
+        Template `TiDB by HTTP` — collects metrics by HTTP agent from PD /metrics endpoint and from monitoring API.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Databases
@@ -508,7 +508,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: |
-            The number of schema lease errors per second. 
+            The number of schema lease errors per second.
             "change" means that the schema has changed
           preprocessing:
             -
@@ -535,7 +535,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: |
-            The number of schema lease errors per second. 
+            The number of schema lease errors per second.
             "outdate" errors means that the schema cannot be updated, which is a more serious error and triggers an alert.
           preprocessing:
             -
@@ -915,10 +915,10 @@ zabbix_export:
               parameters:
                 - |
                   output = JSON.parse(value).map(function(item){
-                  return {
-                  "{#TYPE}": item.labels.type,
-                  }})
-                  return JSON.stringify({"data": output})
+                       return {
+                           "{#TYPE}": item.labels.type,
+                       }})
+                   return JSON.stringify({"data": output})
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -993,14 +993,14 @@ zabbix_export:
               parameters:
                 - |
                   var lookup = {},
-                  result = [];
+                      result = [];
                   
                   JSON.parse(value).forEach(function (item) {
-                  var type = item.labels.type;
-                  if (!(lookup[type])) {
-                  lookup[type] = 1;
-                  result.push({ "{#TYPE}": type });
-                  }
+                      var type = item.labels.type;
+                      if (!(lookup[type])) {
+                          lookup[type] = 1;
+                          result.push({ "{#TYPE}": type });
+                      }
                   })
                   
                   return JSON.stringify(result);
@@ -1052,10 +1052,10 @@ zabbix_export:
               parameters:
                 - |
                   output = JSON.parse(value).map(function(item){
-                  return {
-                  "{#TYPE}": item.labels.type,
-                  }})
-                  return JSON.stringify({"data": output})
+                       return {
+                           "{#TYPE}": item.labels.type,
+                       }})
+                   return JSON.stringify({"data": output})
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1106,10 +1106,10 @@ zabbix_export:
               parameters:
                 - |
                   output = JSON.parse(value).map(function(item){
-                  return {
-                  "{#TYPE}": item.labels.type,
-                  }})
-                  return JSON.stringify({"data": output})
+                       return {
+                           "{#TYPE}": item.labels.type,
+                       }})
+                   return JSON.stringify({"data": output})
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1167,10 +1167,10 @@ zabbix_export:
               parameters:
                 - |
                   output = JSON.parse(value).map(function(item){
-                  return {
-                  "{#TYPE}": item.labels.type,
-                  }})
-                  return JSON.stringify({"data": output})
+                       return {
+                           "{#TYPE}": item.labels.type,
+                       }})
+                   return JSON.stringify({"data": output})
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1237,10 +1237,10 @@ zabbix_export:
               parameters:
                 - |
                   output = JSON.parse(value).map(function(item){
-                  return {
-                  "{#TYPE}": item.labels.type,
-                  }})
-                  return JSON.stringify({"data": output})
+                       return {
+                           "{#TYPE}": item.labels.type,
+                       }})
+                   return JSON.stringify({"data": output})
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1307,7 +1307,7 @@ zabbix_export:
       expression: 'min(/TiDB by HTTP/tidb.process_open_fds,5m)/last(/TiDB by HTTP/tidb.process_max_fds)*100>{$TIDB.OPEN.FDS.MAX.WARN}'
       name: 'TiDB: Current number of open files is too high (over {$TIDB.OPEN.FDS.MAX.WARN}% for 5m)'
       priority: WARNING
-      description: '"Heavy file descriptor usage (i.e., near the process’s file descriptor limit) indicates a potential file descriptor exhaustion issue."'
+      description: 'Heavy file descriptor usage (i.e., near the process''s file descriptor limit) indicates a potential file descriptor exhaustion issue.'
   graphs:
     -
       uuid: ee25671d0b5446348341be56967a74b2

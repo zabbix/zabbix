@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:33Z'
+  version: '6.0'
+  date: '2021-12-16T08:28:32Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -13,7 +13,7 @@ zabbix_export:
       description: |
         Use this template for agents reachable from Zabbix server/proxy (passive mode).
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Modules
@@ -118,7 +118,7 @@ zabbix_export:
       description: |
         Use this template instead of 'Template Module Zabbix agent' for agents running in active mode only.
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Modules

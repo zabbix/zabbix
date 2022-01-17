@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -318,8 +318,11 @@ class testFormMacrosHost extends testFormMacros {
 		];
 
 		// Open Hosts items page and check macro resolved text.
-		$this->page->login()->open('items.php?filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host')->waitUntilReady();
-		$this->assertTrue($this->query('link', 'Macro value: '.$macro['value'])->exists());
+		$this->page->login()->open('zabbix.php?show_details=1&show_without_data=1&action=latest.view&hostids%5B%5D='.
+				$hostid)->waitUntilReady();
+//		Caused by https://support.zabbix.com/browse/ZBXNEXT-7115
+//		Support of user macros in item names has been dropped.
+		$this->assertTrue($this->query('link', 'trap['.$macro['value'].']')->exists());
 
 		// Open host form in popup and change macro type.
 		$form = $this->openMacrosTab('zabbix.php?action=host.view', 'hosts', false, $hostname);
@@ -330,8 +333,11 @@ class testFormMacrosHost extends testFormMacros {
 		$this->assertMessage(TEST_GOOD, 'Host updated');
 
 		// Open items page and check secret macro appearance.
-		$this->page->open('items.php?filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host')->waitUntilReady();
-		$this->assertTrue($this->query('link', 'Macro value: ******')->exists());
+		$this->page->open('zabbix.php?show_details=1&show_without_data=1&action=latest.view&hostids%5B%5D='.
+				$hostid)->waitUntilReady();
+//		Caused by https://support.zabbix.com/browse/ZBXNEXT-7115
+//		Support of user macros in item names has been dropped.
+		$this->assertTrue($this->query('link', 'trap[******]')->exists());
 	}
 
 	public function getCreateVaultMacrosData() {

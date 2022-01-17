@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -213,10 +213,10 @@ foreach ($data['discoveries'] as $discovery) {
 
 	if ($discovery['type'] == ITEM_TYPE_DEPENDENT) {
 		if ($discovery['master_item']['type'] == ITEM_TYPE_HTTPTEST) {
-			$description[] = CHtml::encode($discovery['master_item']['name_expanded']);
+			$description[] = CHtml::encode($discovery['master_item']['name']);
 		}
 		else {
-			$description[] = (new CLink(CHtml::encode($discovery['master_item']['name_expanded']),
+			$description[] = (new CLink(CHtml::encode($discovery['master_item']['name']),
 				(new CUrl('items.php'))
 					->setArgument('form', 'update')
 					->setArgument('itemid', $discovery['master_item']['itemid'])
@@ -231,7 +231,7 @@ foreach ($data['discoveries'] as $discovery) {
 	}
 
 	$description[] = new CLink(
-		CHtml::encode($discovery['name_expanded']),
+		CHtml::encode($discovery['name']),
 		(new CUrl('host_discovery.php'))
 			->setArgument('form', 'update')
 			->setArgument('itemid', $discovery['itemid'])

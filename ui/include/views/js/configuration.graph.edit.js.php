@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -318,7 +318,7 @@
 			this.graphs = graphs;
 
 			for (let i = 0; i < items.length; i++) {
-				const name = items[i].host + '<?= NAME_DELIMITER ?>' + items[i].name_expanded;
+				const name = items[i].host + '<?= NAME_DELIMITER ?>' + items[i].name;
 
 				this.loadItem(i, items[i].gitemid, items[i].itemid, name, items[i].type, items[i].calc_fnc,
 					items[i].drawtype, items[i].yaxisside, items[i].color, items[i].flags
@@ -385,7 +385,7 @@
 					$preview_chart.append($('<div>', {css: {'position': 'relative', 'min-height': '50px'}})
 						.addClass('is-loading'));
 
-					$('<img />')
+					$('<img>')
 						.attr('src', src.getUrl())
 						.on('load', function() {
 							$preview_chart.html($(this));
@@ -516,7 +516,7 @@
 				};
 				const $row = $(itemTpl.evaluate(item));
 
-				$row.find('[name="calc_fnc"]').val('<?= CALC_FNC_AVG ?>');
+				$row.find('#items_' + number + '_calc_fnc').val('<?= CALC_FNC_AVG ?>');
 				$('#itemButtonsRow').before($row);
 				$row.find('.input-color-picker input').colorpicker();
 			}
@@ -537,7 +537,7 @@
 			const size = $('#itemsTable tr.sortable').length;
 
 			for (let i = 0; i < size; i++) {
-				const popup_options = {
+				const parameters = {
 					srcfld1: 'itemid',
 					srcfld2: 'name',
 					dstfrm: this.form_name,
@@ -549,26 +549,27 @@
 				};
 
 				if ($('#items_' + i + '_flags').val() == <?= ZBX_FLAG_DISCOVERY_PROTOTYPE ?>) {
-					popup_options['srctbl'] = 'item_prototypes',
-					popup_options['srcfld3'] = 'flags',
-					popup_options['dstfld3'] = 'items_' + i + '_flags',
-					popup_options['parent_discoveryid'] = this.graphs.parent_discoveryid;
+					parameters['srctbl'] = 'item_prototypes',
+					parameters['srcfld3'] = 'flags',
+					parameters['dstfld3'] = 'items_' + i + '_flags',
+					parameters['parent_discoveryid'] = this.graphs.parent_discoveryid;
 				}
 				else {
-					popup_options['srctbl'] = 'items';
+					parameters['srctbl'] = 'items';
 				}
 
 				if (this.graphs.normal_only !== '') {
-					popup_options['normal_only'] = '1';
+					parameters['normal_only'] = '1';
 				}
 
 				if (!this.graphs.parent_discoveryid && this.graphs.hostid) {
-					popup_options['hostid'] = this.graphs.hostid;
+					parameters['hostid'] = this.graphs.hostid;
 				}
 
-				const nameLink = 'PopUp("popup.generic",'
-					+ '$.extend('+ JSON.stringify(popup_options) +',view.getOnlyHostParam()), null, this);';
-				$('#items_' + i + '_name').attr('onclick', nameLink);
+				$('#items_' + i + '_name').attr('onclick', 'PopUp("popup.generic", ' +
+					'$.extend(' + JSON.stringify(parameters) + ', view.getOnlyHostParam()),' +
+					'{dialogue_class: "modal-popup-generic", trigger_element: this});'
+				);
 			}
 		},
 
@@ -587,43 +588,43 @@
 
 			// Rewrite IDs, set "tmp" prefix.
 			$('#itemsTable tr.sortable').find('*[id]').each(function() {
-				const obj = $(this);
+				const $obj = $(this);
 
-				obj.attr('id', 'tmp' + obj.attr('id'));
+				$obj.attr('id', 'tmp' + $obj.attr('id'));
 			});
 
 			$('#itemsTable tr.sortable').each(function() {
-				const obj = $(this);
+				const $obj = $(this);
 
-				obj.attr('id', 'tmp' + obj.attr('id'));
+				$obj.attr('id', 'tmp' + $obj.attr('id'));
 			});
 
 			// Rewrite IDs to new order.
 			$('#itemsTable tr.sortable').each(function() {
-				const obj = $(this);
+				const $obj = $(this);
 
 				// Rewrite IDs in input fields.
-				obj.find('*[id]').each(function() {
-					const obj = $(this);
-					const id = obj.attr('id').substring(3);
+				$obj.find('*[id]').each(function() {
+					const $obj = $(this);
+					const id = $obj.attr('id').substring(3);
 					const part1 = id.substring(0, id.indexOf('items_') + 5);
 					let part2 = id.substring(id.indexOf('items_') + 6);
 
 					part2 = part2.substring(part2.indexOf('_') + 1);
 
-					obj.attr('id', part1 + '_' + i + '_' + part2);
+					$obj.attr('id', part1 + '_' + i + '_' + part2);
 
 					// Set sortorder.
 					if (part2 === 'sortorder') {
-						obj.val(i);
+						$obj.val(i);
 					}
 				});
 
 				// Rewrite IDs in <tr>.
-				const id = obj.attr('id').substring(3);
+				const id = $obj.attr('id').substring(3);
 				const part1 = id.substring(0, id.indexOf('items_') + 5);
 
-				obj.attr('id', part1 + '_' + i);
+				$obj.attr('id', part1 + '_' + i);
 
 				i++;
 			});
@@ -690,7 +691,10 @@
 
 		openHostPopup(host_data) {
 			const original_url = location.href;
-			const overlay = PopUp('popup.host.edit', host_data, 'host_edit', document.activeElement);
+			const overlay = PopUp('popup.host.edit', host_data, {
+				dialogueid: 'host_edit',
+				dialogue_class: 'modal-popup-large'
+			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});

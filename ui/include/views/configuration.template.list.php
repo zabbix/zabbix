@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -96,7 +96,9 @@ $widget = (new CWidget())
 			)
 			->addItem(
 				(new CButton('form', _('Import')))
-					->onClick('return PopUp("popup.import", {rules_preset: "template"}, null, this);')
+					->onClick('return PopUp("popup.import", {rules_preset: "template"},
+						{dialogue_class: "modal-popup-generic"}
+					);')
 					->removeId()
 			)
 		))->setAttribute('aria-label', _('Content controls'))
@@ -277,7 +279,11 @@ $form->addItem([
 			],
 			'popup.massupdate.template' => [
 				'content' => (new CButton('', _('Mass update')))
-					->onClick("return openMassupdatePopup(this, 'popup.massupdate.template');")
+					->onClick(
+						"return openMassupdatePopup('popup.massupdate.template', {}, {
+							dialogue_class: 'modal-popup-static'
+						});"
+					)
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->removeAttribute('id')
 			],

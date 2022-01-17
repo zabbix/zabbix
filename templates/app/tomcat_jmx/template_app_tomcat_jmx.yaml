@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:20Z'
+  version: '6.0'
+  date: '2021-12-15T06:58:14Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: 3cc8c9ae7055458c9a803597007f70bd
-      template: 'Apache Tomcat JMX'
-      name: 'Apache Tomcat JMX'
+      template: 'Apache Tomcat by JMX'
+      name: 'Apache Tomcat by JMX'
       description: |
         The template to monitor Apache Tomcat by Zabbix that work without any external scripts.
         The metrics are collected by JMX.
@@ -17,7 +17,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/411862-discussion-thread-for-official-zabbix-template-tomcat
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Applications
@@ -46,7 +46,7 @@ zabbix_export:
           triggers:
             -
               uuid: 152d235652914aa2af78334385334214
-              expression: 'last(/Apache Tomcat JMX/jmx["Catalina:type=Server",serverInfo],#1)<>last(/Apache Tomcat JMX/jmx["Catalina:type=Server",serverInfo],#2) and length(last(/Apache Tomcat JMX/jmx["Catalina:type=Server",serverInfo]))>0'
+              expression: 'last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo],#1)<>last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo],#2) and length(last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo]))>0'
               name: 'Tomcat: Version has been changed'
               priority: INFO
               description: 'Tomcat version has changed. Ack to close.'
@@ -93,7 +93,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 7d707de73a164f1db6b69e4dcb8c6ae9
-                  expression: 'find(/Apache Tomcat JMX/jmx[{#JMXOBJ},compression],,"like","off") = 1'
+                  expression: 'find(/Apache Tomcat by JMX/jmx[{#JMXOBJ},compression],,"like","off") = 1'
                   name: '{#JMXVALUE}: Gzip compression is disabled'
                   priority: INFO
                   description: 'gzip compression is disabled for connector {#JMXVALUE}.'
@@ -228,14 +228,14 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Apache Tomcat JMX'
+                    host: 'Apache Tomcat by JMX'
                     key: 'jmx[{#JMXOBJ},bytesSent]'
                 -
                   sortorder: '1'
                   drawtype: GRADIENT_LINE
                   color: 2774A4
                   item:
-                    host: 'Apache Tomcat JMX'
+                    host: 'Apache Tomcat by JMX'
                     key: 'jmx[{#JMXOBJ},bytesReceived]'
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
         -
@@ -350,28 +350,28 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Apache Tomcat JMX'
+                    host: 'Apache Tomcat by JMX'
                     key: 'jmx[{#JMXOBJ},maxActive]'
                 -
                   sortorder: '1'
                   drawtype: GRADIENT_LINE
                   color: 2774A4
                   item:
-                    host: 'Apache Tomcat JMX'
+                    host: 'Apache Tomcat by JMX'
                     key: 'jmx[{#JMXOBJ},activeSessions]'
                 -
                   sortorder: '2'
                   drawtype: GRADIENT_LINE
                   color: F63100
                   item:
-                    host: 'Apache Tomcat JMX'
+                    host: 'Apache Tomcat by JMX'
                     key: 'jmx[{#JMXOBJ},rejectedSessions]'
                 -
                   sortorder: '3'
                   drawtype: GRADIENT_LINE
                   color: A54F10
                   item:
-                    host: 'Apache Tomcat JMX'
+                    host: 'Apache Tomcat by JMX'
                     key: 'jmx[{#JMXOBJ},maxActiveSessions]'
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
         -
@@ -451,7 +451,7 @@ zabbix_export:
           trigger_prototypes:
             -
               uuid: 7a15296553a447f6aebf4958631b6704
-              expression: 'min(/Apache Tomcat JMX/jmx[{#JMXOBJ},currentThreadsBusy],{$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"})>last(/Apache Tomcat JMX/jmx[{#JMXOBJ},maxThreads])*{$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}/100'
+              expression: 'min(/Apache Tomcat by JMX/jmx[{#JMXOBJ},currentThreadsBusy],{$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"})>last(/Apache Tomcat by JMX/jmx[{#JMXOBJ},maxThreads])*{$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}/100'
               name: '{#JMXNAME}: Busy worker threads count are more than {$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}% of the limit for {$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"}'
               priority: HIGH
               description: 'When current threads busy counter reaches the limit, no more requests could be handled, and the application chokes.'
@@ -464,21 +464,21 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Apache Tomcat JMX'
+                    host: 'Apache Tomcat by JMX'
                     key: 'jmx[{#JMXOBJ},maxThreads]'
                 -
                   sortorder: '1'
                   drawtype: GRADIENT_LINE
                   color: 2774A4
                   item:
-                    host: 'Apache Tomcat JMX'
+                    host: 'Apache Tomcat by JMX'
                     key: 'jmx[{#JMXOBJ},currentThreadCount]'
                 -
                   sortorder: '2'
                   drawtype: GRADIENT_LINE
                   color: F63100
                   item:
-                    host: 'Apache Tomcat JMX'
+                    host: 'Apache Tomcat by JMX'
                     key: 'jmx[{#JMXOBJ},currentThreadsBusy]'
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
       macros:

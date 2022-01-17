@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@
 
 // Visibility box javascript is already added. It should not be added in popup response.
 define('CVISIBILITYBOX_JAVASCRIPT_INSERTED', 1);
-define('IS_TEXTAREA_MAXLENGTH_JS_INSERTED', 1);
 
 // Create form.
 $form = (new CForm())
@@ -421,8 +420,8 @@ if ($data['single_host_selected']) {
 		$master_item[] = (new CButton('button', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->removeId()
-			->onClick('return PopUp("popup.generic",'.
-				json_encode([
+			->onClick(
+				'return PopUp("popup.generic", '.json_encode([
 					'srctbl' => 'items',
 					'srcfld1' => 'itemid',
 					'srcfld2' => 'name',
@@ -432,15 +431,15 @@ if ($data['single_host_selected']) {
 					'only_hostid' => $data['hostid'],
 					'with_webitems' => 1,
 					'normal_only' => 1
-				]).', null, this);'
+				]).', {dialogue_class: "modal-popup-generic"});'
 			);
 
 		$master_item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 		$master_item[] = (new CButton('button', _('Select prototype')))
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->removeId()
-			->onClick('return PopUp("popup.generic",'.
-				json_encode([
+			->onClick(
+				'return PopUp("popup.generic", '.json_encode([
 					'srctbl' => 'item_prototypes',
 					'srcfld1' => 'itemid',
 					'srcfld2' => 'name',
@@ -448,7 +447,7 @@ if ($data['single_host_selected']) {
 					'dstfld1' => 'master_itemid',
 					'dstfld2' => 'master_itemname',
 					'parent_discoveryid' => $data['parent_discoveryid']
-				]).', null, this);'
+				]).', {dialogue_class: "modal-popup-generic"});'
 			);
 	}
 

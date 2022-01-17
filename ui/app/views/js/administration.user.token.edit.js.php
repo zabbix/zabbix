@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@
 
 		$('#regenerate').on('click', ({target}) => {
 			if (confirm($(target).data('confirmation'))) {
-				$form.append($('<input />', {type: 'hidden', name: 'regenerate', value: '1'}));
+				$form.append($('<input>', {type: 'hidden', name: 'regenerate', value: '1'}));
 				$form.find('#action_dst').val('user.token.view');
 				$form.submit();
 			}

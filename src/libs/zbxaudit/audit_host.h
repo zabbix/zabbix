@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,9 +20,8 @@
 #ifndef ZABBIX_AUDIT_HOST_H
 #define ZABBIX_AUDIT_HOST_H
 
-#include "common.h"
-#include "dbcache.h"
-#include "audit.h"
+#include "zbxtypes.h"
+#include "zbxalgo.h"
 
 #define PREPARE_AUDIT_SNMP_INTERFACE_H(funcname)								\
 void	zbx_audit_##funcname##_update_json_add_snmp_interface(zbx_uint64_t hostid, zbx_uint64_t version,	\

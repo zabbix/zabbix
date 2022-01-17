@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ class testTriggerDependencies extends CLegacyWebTest {
 				'Zabbix agent is not available (for {$AGENT.TIMEOUT})',
 				'FreeBSD',
 				'/etc/passwd has been changed on FreeBSD',
-				'Not all templates are linked to',
+				'Not all templates are linked to'
 			],
 			[
 				'10265',

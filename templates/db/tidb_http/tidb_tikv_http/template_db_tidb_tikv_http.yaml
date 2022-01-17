@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:40Z'
+  version: '6.0'
+  date: '2021-12-16T07:40:23Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -13,13 +13,13 @@ zabbix_export:
       description: |
         The template to monitor TiKV server of TiDB cluster by Zabbix that works without any external scripts.
         Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
-        Don't forget to change the macros {$TIKV.URL}, {$TIKV.PORT}. 
+        Don't forget to change the macros {$TIKV.URL}, {$TIKV.PORT}.
         
-        Template `TiDB TiKV by HTTP` — collects metrics by HTTP agent from TiKV /metrics endpoint.
+        Template `TiDB TiKV by HTTP` — collects metrics by HTTP agent from TiKV /metrics endpoint.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Databases
@@ -814,10 +814,10 @@ zabbix_export:
               parameters:
                 - |
                   output = JSON.parse(value).map(function(item){
-                  return {
-                  "{#REQ_TYPE}": item.labels.req,
-                  }})
-                  return JSON.stringify({"data": output})
+                       return {
+                           "{#REQ_TYPE}": item.labels.req,
+                       }})
+                   return JSON.stringify({"data": output})
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -864,10 +864,10 @@ zabbix_export:
               parameters:
                 - |
                   output = JSON.parse(value).map(function(item){
-                  return {
-                  "{#TYPE}": item.labels.type,
-                  }})
-                  return JSON.stringify({"data": output})
+                       return {
+                           "{#TYPE}": item.labels.type,
+                       }})
+                   return JSON.stringify({"data": output})
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -918,14 +918,14 @@ zabbix_export:
               parameters:
                 - |
                   var lookup = {},
-                  result = [];
+                      result = [];
                   
                   JSON.parse(value).forEach(function (item) {
-                  var stage = item.labels.stage;
-                  if (!(lookup[stage])) {
-                  lookup[stage] = 1;
-                  result.push({ "{#STAGE}": stage });
-                  }
+                      var stage = item.labels.stage;
+                      if (!(lookup[stage])) {
+                          lookup[stage] = 1;
+                          result.push({ "{#STAGE}": stage });
+                      }
                   })
                   
                   return JSON.stringify(result);
@@ -986,12 +986,12 @@ zabbix_export:
               parameters:
                 - |
                   output = JSON.parse(value).map(function(item){
-                  return {
-                  "{#STORE_ID}": item.labels.store_id,
-                  "{#TYPE}": item.labels.type,
+                       return {
+                           "{#STORE_ID}": item.labels.store_id,
+                           "{#TYPE}": item.labels.type,
                   
-                  }})
-                  return JSON.stringify({"data": output})
+                       }})
+                   return JSON.stringify({"data": output})
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:

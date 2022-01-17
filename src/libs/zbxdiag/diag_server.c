@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,8 +29,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: diag_historycache_item_compare_values                            *
- *                                                                            *
  * Purpose: sort itemid,values_num pair by values_num in descending order     *
  *                                                                            *
  ******************************************************************************/
@@ -44,8 +42,6 @@ static int	diag_valuecache_item_compare_values(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Function: diag_valuecache_item_compare_hourly                              *
- *                                                                            *
  * Purpose: sort itemid,values_num pair by hourly_num in descending order     *
  *                                                                            *
  ******************************************************************************/
@@ -58,8 +54,6 @@ static int	diag_valuecache_item_compare_hourly(const void *d1, const void *d2)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: diag_valuecache_add_items                                        *
  *                                                                            *
  * Purpose: add valuecache items diagnostic statistics to json                *
  *                                                                            *
@@ -83,8 +77,6 @@ static void	diag_valuecache_add_items(struct zbx_json *json, const char *field, 
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: diag_add_valuecache_info                                         *
  *                                                                            *
  * Purpose: add requested value cache diagnostic information to json data     *
  *                                                                            *
@@ -203,8 +195,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: diag_add_lld_items                                               *
- *                                                                            *
  * Purpose: add lld item top list to output json                              *
  *                                                                            *
  ******************************************************************************/
@@ -226,8 +216,6 @@ static void	diag_add_lld_items(struct zbx_json *json, const char *field, const z
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: diag_add_lld_info                                                *
  *                                                                            *
  * Purpose: add requested lld manager diagnostic information to json data     *
  *                                                                            *
@@ -325,8 +313,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: diag_add_alerting_mediatypes                                     *
- *                                                                            *
  * Purpose: add mediatype top list to output json                             *
  *                                                                            *
  * Parameters: json  - [OUT] the output json                                  *
@@ -354,8 +340,6 @@ static void	diag_add_alerting_mediatypes(struct zbx_json *json, const char *fiel
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: diag_add_alerting_sources                                        *
  *                                                                            *
  * Purpose: add alert source top list to output json                          *
  *                                                                            *
@@ -387,8 +371,6 @@ static void	diag_add_alerting_sources(struct zbx_json *json, const char *field, 
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: diag_add_alerting_info                                           *
  *                                                                            *
  * Purpose: add requested alert manager diagnostic information to json data   *
  *                                                                            *
@@ -504,8 +486,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: diag_add_section_info                                            *
- *                                                                            *
  * Purpose: add requested section diagnostic information                      *
  *                                                                            *
  * Parameters: section - [IN] the section name                                *
@@ -542,4 +522,3 @@ int	diag_add_section_info(const char *section, const struct zbx_json_parse *jp, 
 
 	return ret;
 }
-

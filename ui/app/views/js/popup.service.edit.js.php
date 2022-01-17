@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,18 +26,14 @@
 
 window.service_edit_popup = {
 	status_rule_template: null,
-	time_template: null,
-	uptime_template: null,
-	downtime_template: null,
-	onetime_downtime_template: null,
 	child_template: null,
 
 	serviceid: null,
 	children: new Map(),
 
-	algorithm_names: null,
 	create_url: null,
 	update_url: null,
+	delete_url: null,
 	search_limit: null,
 
 	overlay: null,
@@ -45,15 +41,15 @@ window.service_edit_popup = {
 	form: null,
 	footer: null,
 
-	init({serviceid, children, children_problem_tags_html, problem_tags, status_rules, service_times, algorithm_names,
-			create_url, update_url, search_limit}) {
+	init({serviceid, children, children_problem_tags_html, problem_tags, status_rules, create_url, update_url,
+			delete_url, search_limit}) {
 		this.initTemplates();
 
 		this.serviceid = serviceid;
 
-		this.algorithm_names = algorithm_names;
 		this.create_url = create_url;
 		this.update_url = update_url;
+		this.delete_url = delete_url;
 		this.search_limit = search_limit;
 
 		this.overlay = overlays_stack.getById('service_edit');
@@ -65,15 +61,10 @@ window.service_edit_popup = {
 			this.addStatusRule(status_rule);
 		}
 
-		for (const service_time of service_times) {
-			this.addTime(service_time);
-		}
-
 		for (const service of children) {
 			this.children.set(service.serviceid, {
 				serviceid: service.serviceid,
 				name: service.name,
-				algorithm: service.algorithm,
 				problem_tags_html: children_problem_tags_html[service.serviceid]
 			});
 		}
@@ -97,7 +88,7 @@ window.service_edit_popup = {
 
 		// Update form field state according to the form data.
 
-		for (const id of ['advanced_configuration', 'propagation_rule', 'algorithm', 'showsla']) {
+		for (const id of ['advanced_configuration', 'propagation_rule', 'algorithm']) {
 			document
 				.getElementById(id)
 				.addEventListener('change', () => this.update());
@@ -124,21 +115,6 @@ window.service_edit_popup = {
 				}
 				else if (e.target.classList.contains('js-edit')) {
 					this.editStatusRule(e.target.closest('tr'));
-				}
-				else if (e.target.classList.contains('js-remove')) {
-					e.target.closest('tr').remove();
-				}
-			});
-
-		// Setup Service times.
-		document
-			.getElementById('times')
-			.addEventListener('click', (e) => {
-				if (e.target.classList.contains('js-add')) {
-					this.editTime();
-				}
-				else if (e.target.classList.contains('js-edit')) {
-					this.editTime(e.target.closest('tr'));
 				}
 				else if (e.target.classList.contains('js-remove')) {
 					e.target.closest('tr').remove();
@@ -204,40 +180,9 @@ window.service_edit_popup = {
 			</tr>
 		`);
 
-		this.time_template = new Template(`
-			<tr data-row_index="#{row_index}">
-				<td>
-					#{*time_type}
-					<input type="hidden" id="times_#{row_index}_type" name="times[#{row_index}][type]" value="#{type}">
-					<input type="hidden" id="times_#{row_index}_ts_from" name="times[#{row_index}][ts_from]" value="#{ts_from}">
-					<input type="hidden" id="times_#{row_index}_ts_to" name="times[#{row_index}][ts_to]" value="#{ts_to}">
-					<input type="hidden" id="times_#{row_index}_note" name="times[#{row_index}][note]" value="#{note}">
-				</td>
-				<td>#{from} - #{till}</td>
-				<td class="wordwrap" style="max-width: 540px;">#{note}</td>
-				<td>
-					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
-						<li>
-							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit"><?= _('Edit') ?></button>
-						</li>
-						<li>
-							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
-						</li>
-					</ul>
-				</td>
-			</tr>
-		`);
-
-		this.uptime_template = `<span class="enabled"><?= _('Uptime') ?></span>`;
-
-		this.downtime_template = `<span class="disabled"><?= _('Downtime') ?></span>`;
-
-		this.onetime_downtime_template = `<span class="disabled"><?= _('One-time downtime') ?></span>`;
-
 		this.child_template = new Template(`
 			<tr data-serviceid="#{serviceid}">
 				<td class="<?= ZBX_STYLE_WORDWRAP ?>" style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;">#{name}</td>
-				<td>#{algorithm}</td>
 				<td class="<?= ZBX_STYLE_WORDWRAP ?>">#{*problem_tags_html}</td>
 				<td>
 					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
@@ -249,8 +194,6 @@ window.service_edit_popup = {
 	update() {
 		const advanced_configuration = document.getElementById('advanced_configuration').checked;
 		const propagation_rule = document.getElementById('propagation_rule').value;
-		const status_enabled = document.getElementById('algorithm').value != <?= ZBX_SERVICE_STATUS_CALC_SET_OK ?>;
-		const showsla = document.getElementById('showsla').checked;
 
 		let has_problem_tags = false;
 
@@ -298,19 +241,16 @@ window.service_edit_popup = {
 				document.getElementById('status_propagation_value_field').style.display = 'none';
 		}
 
-		document.getElementById('showsla').disabled = !status_enabled;
-		document.getElementById('goodsla').disabled = !status_enabled || !showsla;
-
 		document.querySelector('#children .js-add').disabled = has_problem_tags;
 	},
 
 	editStatusRule(row = null) {
-		let popup_params;
+		let parameters;
 
 		if (row !== null) {
 			const row_index = row.dataset.row_index;
 
-			popup_params = {
+			parameters = {
 				edit: '1',
 				row_index,
 				new_status: row.querySelector(`[name="status_rules[${row_index}][new_status]"`).value,
@@ -326,12 +266,10 @@ window.service_edit_popup = {
 				row_index++;
 			}
 
-			popup_params = {row_index};
+			parameters = {row_index};
 		}
 
-		const overlay = PopUp('popup.service.statusrule.edit', popup_params, 'service_status_rule_edit',
-			document.activeElement
-		);
+		const overlay = PopUp('popup.service.statusrule.edit', parameters, {dialogueid: 'service_status_rule_edit'});
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 			if (row !== null) {
@@ -339,43 +277,6 @@ window.service_edit_popup = {
 			}
 			else {
 				this.addStatusRule(e.detail);
-			}
-		});
-	},
-
-	editTime(row = null) {
-		let popup_params;
-
-		if (row !== null) {
-			const row_index = row.dataset.row_index;
-
-			popup_params = {
-				edit: '1',
-				row_index,
-				type: row.querySelector(`[name="times[${row_index}][type]"`).value,
-				ts_from: row.querySelector(`[name="times[${row_index}][ts_from]"`).value,
-				ts_to: row.querySelector(`[name="times[${row_index}][ts_to]"`).value,
-				note: row.querySelector(`[name="times[${row_index}][note]"`).value
-			};
-		}
-		else {
-			let row_index = 0;
-
-			while (document.querySelector(`#times [data-row_index="${row_index}"]`) !== null) {
-				row_index++;
-			}
-
-			popup_params = {row_index};
-		}
-
-		const overlay = PopUp('popup.service.time.edit', popup_params, 'service_time_edit', document.activeElement);
-
-		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-			if (row !== null) {
-				this.updateTime(row, e.detail)
-			}
-			else {
-				this.addTime(e.detail);
 			}
 		});
 	},
@@ -391,41 +292,12 @@ window.service_edit_popup = {
 		row.remove();
 	},
 
-	addTime(time) {
-		document
-			.querySelector('#times tbody')
-			.insertAdjacentHTML('beforeend', this.time_template.evaluate({
-				...time,
-				time_type: this.makeServiceTimeType(parseInt(time.type))
-			}));
-	},
-
-	updateTime(row, time) {
-		row.insertAdjacentHTML('afterend', this.time_template.evaluate({
-			...time,
-			time_type: this.makeServiceTimeType(parseInt(time.type))
-		}));
-		row.remove();
-	},
-
-	makeServiceTimeType(type) {
-		switch (type) {
-			case <?= SERVICE_TIME_TYPE_UPTIME ?>:
-				return this.uptime_template;
-			case <?= SERVICE_TIME_TYPE_DOWNTIME ?>:
-				return this.downtime_template;
-			case <?= SERVICE_TIME_TYPE_ONETIME_DOWNTIME ?>:
-				return this.onetime_downtime_template;
-		}
-	},
-
 	renderChild(service) {
 		document
 			.querySelector('#children tbody')
 			.insertAdjacentHTML('beforeend', this.child_template.evaluate({
 				serviceid: service.serviceid,
 				name: service.name,
-				algorithm: this.algorithm_names[service.algorithm],
 				problem_tags_html: service.problem_tags_html
 			}));
 	},
@@ -507,7 +379,7 @@ window.service_edit_popup = {
 		const overlay = PopUp('popup.services', {
 			title: <?= json_encode(_('Add child services')) ?>,
 			exclude_serviceids
-		}, 'services', document.activeElement);
+		}, {dialogueid: 'services'});
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 			for (const service of e.detail) {
@@ -537,7 +409,7 @@ window.service_edit_popup = {
 		const overlay = PopUp('popup.services', {
 			title: <?= json_encode(_('Add parent services')) ?>,
 			exclude_serviceids
-		}, 'services', document.activeElement);
+		}, {dialogueid: 'services'});
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 			const data = [];
@@ -558,13 +430,64 @@ window.service_edit_popup = {
 		this.overlay.setProperties({title: dialog_title});
 		this.overlay.unsetLoading();
 
-		for (const element of this.footer.querySelectorAll('.js-update, .js-clone')) {
+		for (const element of this.footer.querySelectorAll('.js-update, .js-clone, .js-delete')) {
 			element.classList.add('<?= ZBX_STYLE_DISPLAY_NONE ?>');
 		}
 
 		for (const element of this.footer.querySelectorAll('.js-add')) {
 			element.classList.remove('<?= ZBX_STYLE_DISPLAY_NONE ?>');
 		}
+	},
+
+	delete() {
+		for (const el of this.form.parentNode.children) {
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+				el.parentNode.removeChild(el);
+			}
+		}
+
+		this.overlay.setLoading();
+
+		const curl = new Curl(this.delete_url);
+
+		fetch(curl.getUrl(), {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({serviceids: [this.serviceid]})
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				if ('error' in response) {
+					throw {response_error: response.error};
+				}
+
+				if ('success' in response) {
+					this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {
+						detail: {
+							title: response.success.title,
+							messages: ('messages' in response.success) ? response.success.messages : null
+						}
+					}));
+				}
+			})
+			.catch((error) => {
+				this.overlay.unsetLoading();
+
+				let title, messages;
+
+				if (typeof error === 'object' && 'response_error' in error) {
+					title = error.response_error.title;
+					messages = error.response_error.messages;
+				}
+				else {
+					title = <?= json_encode(_('Unexpected server error.')) ?>;
+					messages = [];
+				}
+
+				const message_box = makeMessageBox('bad', messages, title, true, false)[0];
+
+				this.form.parentNode.insertBefore(message_box, this.form);
+			})
 	},
 
 	submit() {
@@ -576,6 +499,20 @@ window.service_edit_popup = {
 
 		fields.name = fields.name.trim();
 		fields.child_serviceids = [...this.children.keys()];
+
+		if ('tags' in fields) {
+			for (const tag of Object.values(fields.tags)) {
+				tag.tag = tag.tag.trim();
+				tag.value = tag.value.trim();
+			}
+		}
+
+		if ('problem_tags' in fields) {
+			for (const problem_tag of Object.values(fields.problem_tags)) {
+				problem_tag.tag = problem_tag.tag.trim();
+				problem_tag.value = problem_tag.value.trim();
+			}
+		}
 
 		for (const el of this.form.parentNode.children) {
 			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {

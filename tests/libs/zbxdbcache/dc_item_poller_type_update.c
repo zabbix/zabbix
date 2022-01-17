@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -94,7 +94,7 @@ static unsigned char str2pollertype(const char *str)
 		_ZBX_MKMAP(ZBX_NO_POLLER),			_ZBX_MKMAP(ZBX_POLLER_TYPE_NORMAL),
 		_ZBX_MKMAP(ZBX_POLLER_TYPE_UNREACHABLE),	_ZBX_MKMAP(ZBX_POLLER_TYPE_IPMI),
 		_ZBX_MKMAP(ZBX_POLLER_TYPE_PINGER),		_ZBX_MKMAP(ZBX_POLLER_TYPE_JAVA),
-		_ZBX_MKMAP(ZBX_POLLER_TYPE_HISTORY),
+		_ZBX_MKMAP(ZBX_POLLER_TYPE_HISTORY), _ZBX_MKMAP(ZBX_POLLER_TYPE_ODBC),
 		{ 0 }
 	};
 
@@ -179,11 +179,6 @@ static void	read_test(const zbx_mock_handle_t *handle, test_config_t *test_confi
 	test_config->test_number = (zbx_uint32_t)strtol(str, NULL, 10);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: zbx_mock_test_entry                                              *
- *                                                                            *
- ******************************************************************************/
 void	zbx_mock_test_entry(void **state)
 {
 	zbx_mock_error_t	mock_error;

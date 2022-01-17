@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -102,7 +102,10 @@
 
 		openHostPopup(host_data) {
 			const original_url = location.href;
-			const overlay = PopUp('popup.host.edit', host_data, 'host_edit', document.activeElement);
+			const overlay = PopUp('popup.host.edit', host_data, {
+				dialogueid: 'host_edit',
+				dialogue_class: 'modal-popup-large'
+			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
@@ -847,10 +850,10 @@
 	 * Opens step popup - edit or create form.
 	 * Note: a callback this.onStepOverlayReadyCb is called from within popup form once it is parsed.
 	 *
-	 * @param {int}  no       Step index.
-	 * @param {Node} refocus  A node to set focus to, when popup is closed.
+	 * @param {int}  no               Step index.
+	 * @param {Node} trigger_element  A node to set focus to, when popup is closed.
 	 */
-	Step.prototype.open = function(no, refocus) {
+	Step.prototype.open = function(no, trigger_element) {
 		return PopUp('popup.httpstep', {
 			no:               no,
 			httpstepid:       this.data.httpstepid,
@@ -866,7 +869,7 @@
 			retrieve_mode:    this.data.retrieve_mode,
 			follow_redirects: this.data.follow_redirects,
 			steps_names:      httpconf.steps.getStepNames()
-		}, null, refocus);
+		}, {dialogue_class: 'modal-popup-generic', trigger_element});
 	};
 
 	/**
@@ -994,6 +997,7 @@
 	StepEditForm.prototype.errorDialog = function(msg, trigger_elmnt) {
 		overlayDialogue({
 			'title': httpconf.msg.error,
+			'class': 'modal-popup position-middle',
 			'content': jQuery('<span>').html(msg),
 			'buttons': [{
 				title: httpconf.msg.ok,

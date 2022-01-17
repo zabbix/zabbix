@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-06-30T13:54:35Z'
+  version: '6.0'
+  date: '2021-12-15T14:25:45Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -15,10 +15,11 @@ zabbix_export:
         
         MIBs used:
         NETAPP-MIB
+        IF-MIB
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/416694-discussion-thread-for-official-zabbix-template-netapp-fas3220
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       templates:
         -
           name: 'Generic SNMP'
@@ -90,7 +91,9 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'Version string for the software running on this platform.'
+          description: |
+            MIB: NETAPP-MIB
+            Version string for the software running on this platform.
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1084,7 +1087,7 @@ zabbix_export:
                                   elem["{#TYPE}"] = 'undef';
                                   break;
                           };
-                      
+                  
                           out.push(elem);
                       }
                   });

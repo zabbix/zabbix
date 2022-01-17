@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,13 +25,9 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_json_strerror                                                *
- *                                                                            *
  * Purpose: return string describing json error                               *
  *                                                                            *
  * Return value: pointer to the null terminated string                        *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
 #define ZBX_JSON_MAX_STRERROR	255
@@ -66,13 +62,6 @@ void	zbx_set_json_strerror(const char *fmt, ...)
 	va_end(args);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: __zbx_json_realloc                                               *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
 static void	__zbx_json_realloc(struct zbx_json *j, size_t need)
 {
 	int	realloc = 0;
@@ -213,8 +202,6 @@ static size_t	__zbx_json_stringsize(const char *string, zbx_json_type_t type)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_num2hex                                                      *
- *                                                                            *
  * Purpose: convert parameter c (0-15) to hexadecimal value ('0'-'f')         *
  *                                                                            *
  * Parameters:                                                                *
@@ -222,8 +209,6 @@ static size_t	__zbx_json_stringsize(const char *string, zbx_json_type_t type)
  *                                                                            *
  * Return value:                                                              *
  *      '0'-'f'                                                               *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 static char	zbx_num2hex(unsigned char c)
@@ -492,13 +477,9 @@ int	zbx_json_close(struct zbx_json *j)
 
 /******************************************************************************
  *                                                                            *
- * Function: __zbx_json_type                                                  *
- *                                                                            *
  * Purpose: return type of pointed value                                      *
  *                                                                            *
  * Return value: type of pointed value                                        *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 static zbx_json_type_t	__zbx_json_type(const char *p)
@@ -525,14 +506,10 @@ static zbx_json_type_t	__zbx_json_type(const char *p)
 
 /******************************************************************************
  *                                                                            *
- * Function: __zbx_json_rbracket                                              *
- *                                                                            *
  * Purpose: return position of right bracket                                  *
  *                                                                            *
  * Return value: position of right bracket                                    *
  *               NULL - an error occurred                                     *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 static const char	*__zbx_json_rbracket(const char *p)
@@ -585,8 +562,6 @@ static const char	*__zbx_json_rbracket(const char *p)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_json_open                                                    *
- *                                                                            *
  * Purpose: open json buffer and check for brackets                           *
  *                                                                            *
  * Return value: SUCCESS - processed successfully                             *
@@ -629,16 +604,12 @@ int	zbx_json_open(const char *buffer, struct zbx_json_parse *jp)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_json_next                                                    *
- *                                                                            *
  * Purpose: locate next pair or element                                       *
  *                                                                            *
  * Return value: NULL - no more values                                        *
  *               NOT NULL - pointer to pair or element                        *
  *      {"name",...    or  "array":["name", ... ,1,null]                      *
  * p =   ^                                         ^                          *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 const char	*zbx_json_next(const struct zbx_json_parse *jp, const char *p)
@@ -698,8 +669,6 @@ const char	*zbx_json_next(const struct zbx_json_parse *jp, const char *p)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_is_valid_json_hex                                            *
- *                                                                            *
  * Purpose: check if a 4 character sequence is a valid hex number 0000 - FFFF *
  *                                                                            *
  * Parameters:                                                                *
@@ -723,8 +692,6 @@ static int	zbx_is_valid_json_hex(const char *p)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_hex2num                                                      *
- *                                                                            *
  * Purpose: convert hexit c ('0'-'9''a'-'f''A'-'F') to number (0-15)          *
  *                                                                            *
  * Parameters:                                                                *
@@ -732,8 +699,6 @@ static int	zbx_is_valid_json_hex(const char *p)
  *                                                                            *
  * Return value:                                                              *
  *      0-15                                                                  *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 static unsigned int	zbx_hex2num(char c)
@@ -751,8 +716,6 @@ static unsigned int	zbx_hex2num(char c)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_json_decode_character                                        *
  *                                                                            *
  * Purpose: decodes JSON escape character into UTF-8                          *
  *                                                                            *
@@ -871,8 +834,6 @@ static unsigned int	zbx_json_decode_character(const char **p, unsigned char *byt
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_json_copy_string                                             *
- *                                                                            *
  * Purpose: copies json name/string value by omitting leading/trailing " and  *
  *          converting escape sequences                                       *
  *                                                                            *
@@ -927,8 +888,6 @@ static const char	*zbx_json_copy_string(const char *p, char *out, size_t size)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_json_copy_value                                              *
  *                                                                            *
  * Purpose: copies unquoted (numeric, boolean) json value                     *
  *                                                                            *
@@ -1047,15 +1006,11 @@ const char	*zbx_json_pair_next(const struct zbx_json_parse *jp, const char *p, c
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_json_pair_by_name                                            *
- *                                                                            *
  * Purpose: find pair by name and return pointer to value                     *
  *                                                                            *
  * Return value: pointer to value                                             *
  *        {"name":["a","b",...]}                                              *
  *                ^ - returned pointer                                        *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 const char	*zbx_json_pair_by_name(const struct zbx_json_parse *jp, const char *name)
@@ -1072,13 +1027,6 @@ const char	*zbx_json_pair_by_name(const struct zbx_json_parse *jp, const char *n
 	return NULL;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: zbx_json_next_value                                              *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
 const char	*zbx_json_next_value(const struct zbx_json_parse *jp, const char *p, char *string, size_t len,
 		zbx_json_type_t *type)
 {
@@ -1088,11 +1036,6 @@ const char	*zbx_json_next_value(const struct zbx_json_parse *jp, const char *p, 
 	return zbx_json_decodevalue(p, string, len, type);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: zbx_json_next_value_dyn                                          *
- *                                                                            *
- ******************************************************************************/
 const char	*zbx_json_next_value_dyn(const struct zbx_json_parse *jp, const char *p, char **string,
 		size_t *string_alloc, zbx_json_type_t *type)
 {
@@ -1104,13 +1047,9 @@ const char	*zbx_json_next_value_dyn(const struct zbx_json_parse *jp, const char 
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_json_value_by_name                                           *
- *                                                                            *
  * Purpose: return value by pair name                                         *
  *                                                                            *
  * Return value: SUCCEED - if value successfully parsed, FAIL - otherwise     *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 int	zbx_json_value_by_name(const struct zbx_json_parse *jp, const char *name, char *string, size_t len,
@@ -1129,13 +1068,9 @@ int	zbx_json_value_by_name(const struct zbx_json_parse *jp, const char *name, ch
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_json_value_by_name_dyn                                       *
- *                                                                            *
  * Purpose: return value by pair name                                         *
  *                                                                            *
  * Return value: SUCCEED - if value successfully parsed, FAIL - otherwise     *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 int	zbx_json_value_by_name_dyn(const struct zbx_json_parse *jp, const char *name, char **string,
@@ -1154,12 +1089,8 @@ int	zbx_json_value_by_name_dyn(const struct zbx_json_parse *jp, const char *name
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_json_brackets_open                                           *
- *                                                                            *
  * Return value: SUCCESS - processed successfully                             *
  *               FAIL - an error occurred                                     *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 int	zbx_json_brackets_open(const char *p, struct zbx_json_parse *jp)
@@ -1179,12 +1110,8 @@ int	zbx_json_brackets_open(const char *p, struct zbx_json_parse *jp)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_json_brackets_by_name                                        *
- *                                                                            *
  * Return value: SUCCESS - processed successfully                             *
  *               FAIL - an error occurred                                     *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 int	zbx_json_brackets_by_name(const struct zbx_json_parse *jp, const char *name, struct zbx_json_parse *out)
@@ -1202,12 +1129,8 @@ int	zbx_json_brackets_by_name(const struct zbx_json_parse *jp, const char *name,
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_json_object_is_empty                                         *
- *                                                                            *
  * Return value: SUCCESS - if object is empty                                 *
  *               FAIL - if object contains data                               *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 int	zbx_json_object_is_empty(const struct zbx_json_parse *jp)
@@ -1217,11 +1140,7 @@ int	zbx_json_object_is_empty(const struct zbx_json_parse *jp)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_json_count                                                   *
- *                                                                            *
  * Return value: number of elements in zbx_json_parse object                  *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 int	zbx_json_count(const struct zbx_json_parse *jp)
@@ -1236,8 +1155,6 @@ int	zbx_json_count(const struct zbx_json_parse *jp)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_json_open_path                                               *
  *                                                                            *
  * Purpose: opens an object by definite json path                             *
  *                                                                            *

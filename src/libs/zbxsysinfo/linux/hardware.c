@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "../common/common.h"
+#include "../common/zbxsysinfo_common.h"
 #include "sysinfo.h"
 #include <sys/mman.h>
 #include <setjmp.h>
@@ -27,10 +27,8 @@
 #include "zbxregexp.h"
 #include "log.h"
 
-
 static ZBX_THREAD_LOCAL volatile char sigbus_handler_set;
 static ZBX_THREAD_LOCAL sigjmp_buf sigbus_jmp_buf;
-
 
 static void sigbus_handler(int signal)
 {
@@ -123,7 +121,14 @@ static size_t	get_chassis_type(char *buf, int bufsize, int type)
 		"Compact PCI",
 		"Advanced TCA",
 		"Blade",
-		"Blade Enclosure",	/* 0x1d (MAX_CHASSIS_TYPE) */
+		"Blade Enclosure",
+		"Tablet",
+		"Convertible",
+		"Detachable",
+		"IoT Gateway",
+		"Embedded PC",
+		"Mini PC",
+		"Stick PC"		/* 0x24 (MAX_CHASSIS_TYPE) */
 	};
 
 	type = CHASSIS_TYPE_BITS & type;

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,11 +18,12 @@
 **/
 
 #include "common.h"
+
 #include "modbtype.h"
-#include "mutexs.h"
-#include "comms.h"
 
 #ifdef HAVE_LIBMODBUS
+
+#include "mutexs.h"
 
 #ifdef _WINDOWS
 #	include "inttypes.h"
@@ -118,7 +119,6 @@ static uint8_t	read_reg_8_less(uint16_t *reg16, modbus_endianness_t endianness)
 			MODBUS_GET_LOW_BYTE(*reg16) : MODBUS_GET_HIGH_BYTE(*reg16));
 }
 
-
 static void	set_serial_params_default(zbx_modbus_connection_serial *serial_params)
 {
 	serial_params->data_bits = 8;
@@ -127,8 +127,6 @@ static void	set_serial_params_default(zbx_modbus_connection_serial *serial_param
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: result_to_str                                                    *
  *                                                                            *
  * Purpose: converts result to a string                                       *
  *                                                                            *
@@ -228,8 +226,6 @@ end:
 
 /******************************************************************************
  *                                                                            *
- * Function: result_to_str_bit                                                *
- *                                                                            *
  * Purpose: converts bits result to a string                                  *
  *                                                                            *
  * Parameters: buf8       - [IN] modbus data                                  *
@@ -254,8 +250,6 @@ static char	*result_to_str_bit(uint8_t *buf8, unsigned short count)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: set_result                                                       *
  *                                                                            *
  * Purpose: set result                                                        *
  *                                                                            *
@@ -312,8 +306,6 @@ static void	set_result(uint16_t *buf, modbus_datatype_t type, modbus_endianness_
 
 /******************************************************************************
  *                                                                            *
- * Function: get_total_count                                                  *
- *                                                                            *
  * Purpose: get total count of bits/registers plus offset                     *
  *                                                                            *
  * Parameters: count  - [IN] count of sequenced same data type values to      *
@@ -355,8 +347,6 @@ static unsigned int	get_total_count(unsigned short count, unsigned short offset,
 
 /******************************************************************************
  *                                                                            *
- * Function: parse_params                                                     *
- *                                                                            *
  * Purpose: parse serial connection parameters                                *
  *                                                                            *
  * Parameters: params        - [IN] string holding parameters                 *
@@ -394,8 +384,6 @@ static int	parse_params(char *params, zbx_modbus_connection_serial *serial_param
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: endpoint_parse                                                   *
  *                                                                            *
  * Purpose: parse endpoint                                                    *
  *                                                                            *
@@ -484,8 +472,6 @@ static int	endpoint_parse(char *endpoint_str, zbx_modbus_endpoint_t *endpoint)
 
 /******************************************************************************
  *                                                                            *
- * Function: modbus_read_data                                                 *
- *                                                                            *
  * Purpose: request and read modbus data                                      *
  *                                                                            *
  * Parameters: endpoint    - [IN] endpoint                                    *
@@ -557,7 +543,6 @@ static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slave
 		dst8 = zbx_malloc(NULL, sizeof(uint8_t) * total_count);
 	else
 		dst16 = zbx_malloc(NULL, sizeof(uint16_t) * total_count);
-
 
 	LOCK_MODBUS;
 
@@ -857,8 +842,6 @@ err:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_init_modbus                                                  *
  *                                                                            *
  * Purpose: create modbus mutex                                               *
  *                                                                            *

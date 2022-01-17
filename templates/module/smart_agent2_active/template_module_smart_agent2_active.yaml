@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-10-01T14:12:43Z'
+  date: '2021-12-16T11:48:11Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -8,14 +8,14 @@ zabbix_export:
   templates:
     -
       uuid: e518b1340ce44d7389d2cc7c304a97b4
-      template: 'SMART by Zabbix agent active 2'
-      name: 'SMART by Zabbix agent active 2'
+      template: 'SMART by Zabbix agent 2 active'
+      name: 'SMART by Zabbix agent 2 active'
       description: |
         The template for monitoring S.M.A.R.T. attributes of physical disk that works without any external scripts. It collects metrics by Zabbix agent 2 version 5.0 and later with Smartmontools version 7.1 and later. Disk discovery LLD rule finds all HDD, SSD, NVMe disks with S.M.A.R.T. enabled. Attribute discovery LLD rule finds all Vendor Specific Attributes for each disk. If you want to skip some attributes, please set regular expressions with disk names in {$SMART.DISK.NAME.MATCHES} and with attribute IDs in {$SMART.ATTRIBUTE.ID.MATCHES} macros on the host level.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/415662-discussion-thread-for-official-zabbix-smart-disk-monitoring
         
-        Template tooling version used: 0.39
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Modules
@@ -90,7 +90,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 26a3e4a0b79340b1bb753ec23c07c79b
-                  expression: 'last(/SMART by Zabbix agent active 2/smart.disk.error[{#NAME},{#ID}]) <= {#THRESH}'
+                  expression: 'last(/SMART by Zabbix agent 2 active/smart.disk.error[{#NAME},{#ID}]) <= {#THRESH}'
                   name: 'SMART [{#NAME}]: Attribute {#ID} {#ATTRNAME} is failed'
                   priority: WARNING
                   description: 'The value should be greater than THRESH.'
@@ -223,7 +223,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: '%'
-              description: 'Contains a vendor specific estimate of the percentage of NVM subsystem life used based on the actual usage and the manufacturer’s prediction of NVM life. A value of 100 indicates that the estimated endurance of the NVM in the NVM subsystem has been consumed, but may not indicate an NVM subsystem failure. The value is allowed to exceed 100. Percentages greater than 254 shall be represented as 255. This value shall be updated once per power-on hour (when the controller is not in a sleep state).'
+              description: 'Contains a vendor specific estimate of the percentage of NVM subsystem life used based on the actual usage and the manufacturer''s prediction of NVM life. A value of 100 indicates that the estimated endurance of the NVM in the NVM subsystem has been consumed, but may not indicate an NVM subsystem failure. The value is allowed to exceed 100. Percentages greater than 254 shall be represented as 255. This value shall be updated once per power-on hour (when the controller is not in a sleep state).'
               preprocessing:
                 -
                   type: JSONPATH
@@ -242,7 +242,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 68f373252bee4f9e8f3b33d04fc1adbd
-                  expression: 'last(/SMART by Zabbix agent active 2/smart.disk.percentage_used[{#NAME}])>90'
+                  expression: 'last(/SMART by Zabbix agent 2 active/smart.disk.percentage_used[{#NAME}])>90'
                   name: 'SMART [{#NAME}]: NVMe disk percentage using is over 90% of estimated endurance'
                   priority: AVERAGE
             -
@@ -272,7 +272,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 2d5cf100fe094c819d725ee598d37de8
-                  expression: 'last(/SMART by Zabbix agent active 2/smart.disk.sn[{#NAME}],#1)<>last(/SMART by Zabbix agent active 2/smart.disk.sn[{#NAME}],#2) and length(last(/SMART by Zabbix agent active 2/smart.disk.sn[{#NAME}]))>0'
+                  expression: 'last(/SMART by Zabbix agent 2 active/smart.disk.sn[{#NAME}],#1)<>last(/SMART by Zabbix agent 2 active/smart.disk.sn[{#NAME}],#2) and length(last(/SMART by Zabbix agent 2 active/smart.disk.sn[{#NAME}]))>0'
                   name: 'SMART [{#NAME}]: Disk has been replaced (new serial number received)'
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close.'
@@ -304,18 +304,18 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 7f46b24934854866849dd758cb5999d5
-                  expression: 'avg(/SMART by Zabbix agent active 2/smart.disk.temperature[{#NAME}],5m)>{$SMART.TEMPERATURE.MAX.CRIT}'
+                  expression: 'avg(/SMART by Zabbix agent 2 active/smart.disk.temperature[{#NAME}],5m)>{$SMART.TEMPERATURE.MAX.CRIT}'
                   name: 'SMART [{#NAME}]: Average disk temperature is critical (over {$SMART.TEMPERATURE.MAX.CRIT}°C for 5m)'
                   priority: AVERAGE
                 -
                   uuid: c903a37f4b004e1593ef85ac893c3f6c
-                  expression: 'avg(/SMART by Zabbix agent active 2/smart.disk.temperature[{#NAME}],5m)>{$SMART.TEMPERATURE.MAX.WARN}'
+                  expression: 'avg(/SMART by Zabbix agent 2 active/smart.disk.temperature[{#NAME}],5m)>{$SMART.TEMPERATURE.MAX.WARN}'
                   name: 'SMART [{#NAME}]: Average disk temperature is too high (over {$SMART.TEMPERATURE.MAX.WARN}°C for 5m)'
                   priority: WARNING
                   dependencies:
                     -
                       name: 'SMART [{#NAME}]: Average disk temperature is critical (over {$SMART.TEMPERATURE.MAX.CRIT}°C for 5m)'
-                      expression: 'avg(/SMART by Zabbix agent active 2/smart.disk.temperature[{#NAME}],5m)>{$SMART.TEMPERATURE.MAX.CRIT}'
+                      expression: 'avg(/SMART by Zabbix agent 2 active/smart.disk.temperature[{#NAME}],5m)>{$SMART.TEMPERATURE.MAX.CRIT}'
             -
               uuid: 2475415cc95b4103b2933f921e62dd36
               name: 'SMART [{#NAME}]: Self-test passed'
@@ -344,7 +344,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 304bd042b7644a31bb74a1e71808d196
-                  expression: 'last(/SMART by Zabbix agent active 2/smart.disk.test[{#NAME}])="false"'
+                  expression: 'last(/SMART by Zabbix agent 2 active/smart.disk.test[{#NAME}])="false"'
                   name: 'SMART [{#NAME}]: Disk self-test is not passed'
                   priority: HIGH
           overrides:

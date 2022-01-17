@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -404,6 +404,10 @@ class CItemPrototype extends CItemGeneral {
 				$item['query_fields'] = '';
 				$item['headers'] = '';
 			}
+
+			if (array_key_exists('preprocessing', $item)) {
+				$item['preprocessing'] = $this->normalizeItemPreprocessingSteps($item['preprocessing']);
+			}
 		}
 		unset($item);
 
@@ -594,6 +598,10 @@ class CItemPrototype extends CItemGeneral {
 				$item['tags'] = array_map(function ($tag) {
 					return $tag + ['value' => ''];
 				}, $item['tags']);
+			}
+
+			if (array_key_exists('preprocessing', $item)) {
+				$item['preprocessing'] = $this->normalizeItemPreprocessingSteps($item['preprocessing']);
 			}
 		}
 		unset($item);

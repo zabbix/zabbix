@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -359,8 +359,9 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 #define ZBX_VMWARE_HVPROP_STATUS			15
 #define ZBX_VMWARE_HVPROP_MAINTENANCE			16
 #define ZBX_VMWARE_HVPROP_SENSOR			17
+#define ZBX_VMWARE_HVPROP_NET_NAME			18
 
-#define ZBX_VMWARE_HVPROPS_NUM				18
+#define ZBX_VMWARE_HVPROPS_NUM				19
 
 /* virtual machine properties */
 #define ZBX_VMWARE_VMPROP_CPU_NUM			0

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,8 +22,6 @@
 #include "zbxhttp.h"
 
 /******************************************************************************
- *                                                                            *
- * Function: punycode_adapt                                                   *
  *                                                                            *
  * Purpose: after each delta is encoded or decoded, bias should be set for    *
  *          the next delta (should be adapted)                                *
@@ -52,8 +50,6 @@ static zbx_uint32_t	punycode_adapt(zbx_uint32_t delta, int count, int divisor)
 
 /******************************************************************************
  *                                                                            *
- * Function: punycode_encode_digit                                            *
- *                                                                            *
  * Purpose: encodes punycode digit into ansi character [a-z0-9]               *
  *                                                                            *
  * Parameters: digit      - [IN] digit to encode                              *
@@ -73,8 +69,6 @@ static char	punycode_encode_digit(int digit)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: punycode_encode_codepoints                                       *
  *                                                                            *
  * Purpose: encodes array of unicode codepoints into into punycode (RFC 3492) *
  *                                                                            *
@@ -181,8 +175,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: punycode_encode_part                                             *
- *                                                                            *
  * Purpose: encodes unicode domain name part into punycode (RFC 3492)         *
  *          domain is being split in parts by punycode_encode by using        *
  *          character '.' as part separator                                   *
@@ -234,8 +226,6 @@ static int	punycode_encode_part(zbx_uint32_t *codepoints, zbx_uint32_t count, ch
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_http_punycode_encode                                         *
  *                                                                            *
  * Purpose: encodes unicode domain names into punycode (RFC 3492)             *
  *                                                                            *
@@ -311,8 +301,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_http_punycode_encode_url                                     *
- *                                                                            *
  * Purpose: encodes unicode domain name in URL into punycode                  *
  *                                                                            *
  * Parameters: url - [IN/OUT] URL to encode                                   *
@@ -366,4 +354,3 @@ int	zbx_http_punycode_encode_url(char **url)
 
 	return SUCCEED;
 }
-

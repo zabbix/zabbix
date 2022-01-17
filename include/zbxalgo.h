@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,6 +57,7 @@ int	zbx_default_int_compare_func(const void *d1, const void *d2);
 int	zbx_default_uint64_compare_func(const void *d1, const void *d2);
 int	zbx_default_uint64_ptr_compare_func(const void *d1, const void *d2);
 int	zbx_default_str_compare_func(const void *d1, const void *d2);
+int	zbx_natural_str_compare_func(const void *d1, const void *d2);
 int	zbx_default_ptr_compare_func(const void *d1, const void *d2);
 int	zbx_default_uint64_pair_compare_func(const void *d1, const void *d2);
 int	zbx_default_dbl_compare_func(const void *d1, const void *d2);

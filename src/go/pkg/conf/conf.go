@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ package conf
 
 import (
 	"bytes"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"os"
@@ -552,6 +553,75 @@ func parseConfig(root *Node, data []byte) (err error) {
 	return nil
 }
 
+func addObject(parent *Node, v interface{}) error {
+	if attr, ok := v.(map[string]interface{}); ok {
+		if _, ok := attr["Nodes"]; ok {
+			node := &Node{}
+			if err := setObjectNode(node, attr); err != nil {
+				return err
+			}
+			parent.Nodes = append(parent.Nodes, node)
+		} else {
+			value := &Value{}
+			if err := setObjectValue(value, attr); err != nil {
+				return err
+			}
+			parent.Nodes = append(parent.Nodes, value)
+		}
+	} else {
+		return fmt.Errorf("invalid object type %T", v)
+	}
+	return nil
+}
+
+func setObjectValue(value *Value, attr map[string]interface{}) error {
+	var line float64
+	var ok bool
+	if line, ok = attr["Line"].(float64); !ok {
+		return fmt.Errorf("invalid line attribute type %T", attr["Line"])
+	}
+	value.Line = int(line)
+
+	var err error
+	var data string
+	if data, ok = attr["Value"].(string); !ok {
+		return fmt.Errorf("invalid value type %T", attr["Value"])
+	}
+
+	if value.Value, err = base64.StdEncoding.DecodeString(data); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func setObjectNode(node *Node, attr map[string]interface{}) error {
+	var line float64
+	var ok bool
+
+	if line, ok = attr["Line"].(float64); !ok {
+		return fmt.Errorf("invalid line attribute type %T", attr["Line"])
+	}
+	node.Line = int(line)
+
+	if node.Name, ok = attr["Name"].(string); !ok {
+		return fmt.Errorf("invalid node name type %T", attr["Name"])
+	}
+
+	var nodes []interface{}
+	if nodes, ok = attr["Nodes"].([]interface{}); !ok {
+		return fmt.Errorf("invalid node children type %T", attr["u"])
+	}
+
+	for _, a := range nodes {
+		if err := addObject(node, a); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // Unmarshal unmarshals input data into specified structure. The input data can be either
 // a byte array ([]byte) with configuration file or interface{} either returned by Marshal
 // or a configuration file Unmarshaled into interface{} variable before.
@@ -595,8 +665,13 @@ func Unmarshal(data interface{}, v interface{}, args ...interface{}) (err error)
 	case *Node:
 		root = u
 		root.markUsed(false)
+	case map[string]interface{}: // JSON unmarshaling result
+		root = &Node{}
+		if err = setObjectNode(root, u); err != nil {
+			return fmt.Errorf("Cannot unmarshal JSON data: %s", err)
+		}
 	default:
-		return errors.New("Invalid input parameter")
+		return fmt.Errorf("Invalid input parameter of type %T", u)
 	}
 
 	if !strict {

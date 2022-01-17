@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,11 +18,13 @@
 **/
 
 #include "common.h"
-#include "logfiles.h"
 #include "log.h"
 #include "sysinfo.h"
 #include "persistent_state.h"
 #include "cfg.h"
+#include "zbxregexp.h"
+
+#include "logfiles.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #	include "symbols.h"
@@ -48,8 +50,6 @@ extern ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
 
 /******************************************************************************
  *                                                                            *
- * Function: split_string                                                     *
- *                                                                            *
  * Purpose: separates given string to two parts by given delimiter in string  *
  *                                                                            *
  * Parameters:                                                                *
@@ -60,8 +60,6 @@ extern ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
  *                                                                            *
  * Return value: SUCCEED - on splitting without errors                        *
  *               FAIL - on splitting with errors                              *
- *                                                                            *
- * Author: Dmitry Borovikov, Aleksandrs Saveljevs                             *
  *                                                                            *
  * Comments: Memory for "part1" and "part2" is allocated only on SUCCEED.     *
  *                                                                            *
@@ -102,8 +100,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: split_filename                                                   *
- *                                                                            *
  * Purpose: separates full-path file name into directory and file name regexp *
  *          parts                                                             *
  *                                                                            *
@@ -117,8 +113,6 @@ out:
  *                                                                            *
  * Return value: SUCCEED - on successful splitting                            *
  *               FAIL - on unable to split sensibly                           *
- *                                                                            *
- * Author: Dmitry Borovikov                                                   *
  *                                                                            *
  * Comments: Allocates memory for "directory" and "filename_regexp" only on   *
  *           SUCCEED. On FAIL memory, allocated for "directory" and           *
@@ -237,8 +231,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: file_part_md5                                                    *
- *                                                                            *
  * Purpose: calculate the MD5 sum of the specified part of the file           *
  *                                                                            *
  * Parameters:                                                                *
@@ -299,8 +291,6 @@ static int	file_part_md5(int f, size_t offset, int length, md5_byte_t *md5buf, c
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 /******************************************************************************
- *                                                                            *
- * Function: file_id                                                          *
  *                                                                            *
  * Purpose: get Microsoft Windows file device ID, 64-bit FileIndex or         *
  *          128-bit FileId                                                    *
@@ -380,8 +370,6 @@ static int	file_id(int f, int use_ino, zbx_uint64_t *dev, zbx_uint64_t *ino_lo, 
 
 /******************************************************************************
  *                                                                            *
- * Function: set_use_ino_by_fs_type                                           *
- *                                                                            *
  * Purpose: find file system type and set 'use_ino' parameter                 *
  *                                                                            *
  * Parameters:                                                                *
@@ -440,8 +428,6 @@ static int	set_use_ino_by_fs_type(const char *path, int *use_ino, char **err_msg
 
 /******************************************************************************
  *                                                                            *
- * Function: print_logfile_list                                               *
- *                                                                            *
  * Purpose: write logfile list into log for debugging                         *
  *                                                                            *
  * Parameters:                                                                *
@@ -476,8 +462,6 @@ static void	print_logfile_list(const struct st_logfile *logfiles, int logfiles_n
 
 /******************************************************************************
  *                                                                            *
- * Function: compare_file_places                                              *
- *                                                                            *
  * Purpose: compare device numbers and inode numbers of 2 files               *
  *                                                                            *
  * Parameters: old_file - [IN] details of the 1st log file                    *
@@ -509,8 +493,6 @@ static int	compare_file_places(const struct st_logfile *old_file, const struct s
 
 /******************************************************************************
  *                                                                            *
- * Function: open_file_helper                                                 *
- *                                                                            *
  * Purpose: open specified file for reading                                   *
  *                                                                            *
  * Parameters: pathname - [IN] full pathname of file                          *
@@ -530,8 +512,6 @@ static int	open_file_helper(const char *pathname, char **err_msg)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: close_file_helper                                                *
  *                                                                            *
  * Purpose: close specified file                                              *
  *                                                                            *
@@ -556,8 +536,6 @@ static int	close_file_helper(int fd, const char *pathname, char **err_msg)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: examine_md5_and_place                                            *
  *                                                                            *
  * Purpose: from MD5 sums of blocks and places of 2 files make a conclusion   *
  *          is it the same file, a pair 'original/copy' or 2 different files  *
@@ -593,8 +571,6 @@ static int	examine_md5_and_place(const md5_byte_t *buf1, const md5_byte_t *buf2,
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: is_same_file_logcpt                                              *
  *                                                                            *
  * Purpose: find out if a file from the old list and a file from the new list *
  *          could be the same file or copy in case of copy/truncate rotation  *
@@ -811,8 +787,6 @@ clean3:
 
 /******************************************************************************
  *                                                                            *
- * Function: is_same_file_logrt                                               *
- *                                                                            *
  * Purpose: find out if a file from the old list and a file from the new list *
  *          could be the same file in case of simple rotation                 *
  *                                                                            *
@@ -1026,8 +1000,6 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Function: cross_out                                                        *
- *                                                                            *
  * Purpose: fill the given row and column with '0' except the element at the  *
  *          cross point and protected columns and protected rows              *
  *                                                                            *
@@ -1081,8 +1053,6 @@ static void	cross_out(char *arr, int n_rows, int n_cols, int row, int col, const
 
 /******************************************************************************
  *                                                                            *
- * Function: is_uniq_row                                                      *
- *                                                                            *
  * Purpose: check if there is only one element '1' or '2' in the given row    *
  *                                                                            *
  * Parameters:                                                                *
@@ -1122,8 +1092,6 @@ static int	is_uniq_row(const char * const arr, int n_cols, int row)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: is_uniq_col                                                      *
  *                                                                            *
  * Purpose: check if there is only one element '1' or '2' in the given column *
  *                                                                            *
@@ -1166,8 +1134,6 @@ static int	is_uniq_col(const char * const arr, int n_rows, int n_cols, int col)
 
 /******************************************************************************
  *                                                                            *
- * Function: is_old2new_unique_mapping                                        *
- *                                                                            *
  * Purpose: check if 'old2new' array has only unique mappings                 *
  *                                                                            *
  * Parameters:                                                                *
@@ -1204,8 +1170,6 @@ static int	is_old2new_unique_mapping(const char * const old2new, int num_old, in
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: resolve_old2new                                                  *
  *                                                                            *
  * Purpose: resolve non-unique mappings                                       *
  *                                                                            *
@@ -1360,8 +1324,6 @@ static void	resolve_old2new(char *old2new, int num_old, int num_new)
 
 /******************************************************************************
  *                                                                            *
- * Function: create_old2new_and_copy_of                                       *
- *                                                                            *
  * Purpose: allocate and fill an array of possible mappings from the old log  *
  *          files to the new log files                                        *
  *                                                                            *
@@ -1445,8 +1407,6 @@ static char	*create_old2new_and_copy_of(zbx_log_rotation_options_t rotation_type
 
 /******************************************************************************
  *                                                                            *
- * Function: find_old2new                                                     *
- *                                                                            *
  * Purpose: find a mapping from old to new file                               *
  *                                                                            *
  * Parameters:                                                                *
@@ -1476,8 +1436,6 @@ static int	find_old2new(const char * const old2new, int num_new, int i_old)
 
 /******************************************************************************
  *                                                                            *
- * Function: add_logfile                                                      *
- *                                                                            *
  * Purpose: adds information of a logfile to the list of logfiles             *
  *                                                                            *
  * Parameters: logfiles - pointer to the list of logfiles                     *
@@ -1485,8 +1443,6 @@ static int	find_old2new(const char * const old2new, int num_new, int i_old)
  *             logfiles_num - number of already inserted logfiles             *
  *             filename - name of a logfile (with full path)                  *
  *             st - structure returned by stat()                              *
- *                                                                            *
- * Author: Dmitry Borovikov                                                   *
  *                                                                            *
  ******************************************************************************/
 static void	add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num, const char *filename,
@@ -1580,8 +1536,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: destroy_logfile_list                                             *
- *                                                                            *
  * Purpose: release resources allocated to a logfile list                     *
  *                                                                            *
  * Parameters:                                                                *
@@ -1607,8 +1561,6 @@ void	destroy_logfile_list(struct st_logfile **logfiles, int *logfiles_alloc, int
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: pick_logfile                                                     *
  *                                                                            *
  * Purpose: checks if the specified file meets requirements and adds it to    *
  *          the logfile list                                                  *
@@ -1652,8 +1604,6 @@ static void	pick_logfile(const char *directory, const char *filename, int mtime,
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: pick_logfiles                                                    *
  *                                                                            *
  * Purpose: find logfiles in a directory and put them into a list             *
  *                                                                            *
@@ -1754,8 +1704,6 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Function: compile_filename_regexp                                          *
- *                                                                            *
  * Purpose: compile regular expression                                        *
  *                                                                            *
  * Parameters:                                                                *
@@ -1775,6 +1723,7 @@ static int	compile_filename_regexp(const char *filename_regexp, zbx_regexp_t **r
 	{
 		*err_msg = zbx_dsprintf(*err_msg, "Cannot compile a regular expression describing filename pattern: %s",
 				regexp_err);
+		zbx_regexp_err_msg_free(regexp_err);
 		return FAIL;
 	}
 
@@ -1782,8 +1731,6 @@ static int	compile_filename_regexp(const char *filename_regexp, zbx_regexp_t **r
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: fill_file_details                                                *
  *                                                                            *
  * Purpose: fill-in MD5 sums, device and inode numbers for files in the list  *
  *                                                                            *
@@ -1850,8 +1797,6 @@ clean:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: make_logfile_list                                                *
  *                                                                            *
  * Purpose: select log files to be analyzed and make a list, set 'use_ino'    *
  *          parameter                                                         *
@@ -2071,15 +2016,13 @@ static int	zbx_match_log_rec(const zbx_vector_ptr_t *regexps, const char *value,
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_read2                                                        *
- *                                                                            *
  * Comments: Thread-safe                                                      *
  *                                                                            *
  ******************************************************************************/
 static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zbx_uint64_t *lastlogsize,
 		const int *mtime, int *big_rec, const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern,
 		const char *output_template, int *p_count, int *s_count, zbx_process_value_func_t process_value,
-		zbx_vector_ptr_t *addrs, const char *hostname, const char *key,
+		zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *hostname, const char *key,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, const char *persistent_file_name,
 		zbx_vector_pre_persistent_t *prep_vec, char **err_msg)
 {
@@ -2215,8 +2158,8 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 					{
 						if (0 == is_count_item)		/* log[] or logrt[] */
 						{
-							if (SUCCEED == (send_err = process_value(addrs, hostname, key,
-									item_value, ITEM_STATE_NORMAL,
+							if (SUCCEED == (send_err = process_value(addrs, agent2_result,
+									hostname, key, item_value, ITEM_STATE_NORMAL,
 									&processed_size, mtime, NULL, NULL, NULL, NULL,
 									flags | ZBX_METRIC_FLAG_PERSISTENT)))
 							{
@@ -2329,8 +2272,8 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 					{
 						if (0 == is_count_item)		/* log[] or logrt[] */
 						{
-							if (SUCCEED == (send_err = process_value(addrs, hostname, key,
-									item_value, ITEM_STATE_NORMAL,
+							if (SUCCEED == (send_err = process_value(addrs, agent2_result,
+									hostname, key, item_value, ITEM_STATE_NORMAL,
 									&processed_size, mtime, NULL, NULL, NULL, NULL,
 									flags | ZBX_METRIC_FLAG_PERSISTENT)))
 							{
@@ -2417,8 +2360,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: process_log                                                      *
- *                                                                            *
  * Purpose: Match new records in logfile with regexp, transmit matching       *
  *          records to Zabbix server                                          *
  *                                                                            *
@@ -2446,8 +2387,10 @@ out:
  *     p_count         - [IN/OUT] limit of records to be processed            *
  *     s_count         - [IN/OUT] limit of records to be sent to server       *
  *     process_value   - [IN] pointer to function process_value()             *
- *     server          - [IN] server to send data to                          *
- *     port            - [IN] port to send data to                            *
+ *     addrs           - [IN] vector for passing server and port where to     *
+ *                            send data                                       *
+ *     agent2_result   - [IN] address of buffer where to store matching log   *
+ *                            records (used only in Agent2)                   *
  *     hostname        - [IN] hostname the data comes from                    *
  *     key             - [IN] item key the data belongs to                    *
  *     processed_bytes - [OUT] number of processed bytes in logfile           *
@@ -2461,8 +2404,6 @@ out:
  * Return value: returns SUCCEED on successful reading,                       *
  *               FAIL on other cases                                          *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
  * Comments:                                                                  *
  *           This function does not deal with log file rotation.              *
  *                                                                            *
@@ -2473,8 +2414,9 @@ static int	process_log(unsigned char flags, struct st_logfile *logfile, zbx_uint
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, unsigned char *skip_old_data, int *big_rec,
 		const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template,
 		int *p_count, int *s_count, zbx_process_value_func_t process_value, zbx_vector_ptr_t *addrs,
-		const char *hostname, const char *key, zbx_uint64_t *processed_bytes, zbx_uint64_t seek_offset,
-		const char *persistent_file_name, zbx_vector_pre_persistent_t *prep_vec, char **err_msg)
+		zbx_vector_ptr_t *agent2_result, const char *hostname, const char *key, zbx_uint64_t *processed_bytes,
+		zbx_uint64_t seek_offset, const char *persistent_file_name, zbx_vector_pre_persistent_t *prep_vec,
+		char **err_msg)
 {
 	int	f, ret = FAIL;
 
@@ -2491,8 +2433,8 @@ static int	process_log(unsigned char flags, struct st_logfile *logfile, zbx_uint
 		*skip_old_data = 0;
 
 		if (SUCCEED == (ret = zbx_read2(f, flags, logfile, lastlogsize, mtime, big_rec, encoding, regexps,
-				pattern, output_template, p_count, s_count, process_value, addrs, hostname, key,
-				lastlogsize_sent, mtime_sent, persistent_file_name, prep_vec, err_msg)))
+				pattern, output_template, p_count, s_count, process_value, addrs, agent2_result,
+				hostname, key, lastlogsize_sent, mtime_sent, persistent_file_name, prep_vec, err_msg)))
 		{
 			*processed_bytes = *lastlogsize - seek_offset;
 		}
@@ -2612,8 +2554,6 @@ static void	ensure_order_if_mtimes_equal(const struct st_logfile *logfiles_old, 
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: files_have_same_blocks_md5                                       *
  *                                                                            *
  * Purpose: compare MD5 sums of first and last blocks between 2 files. If MD5 *
  *          sums have been calculated for blocks of different sizes or        *
@@ -2818,8 +2758,6 @@ static zbx_uint64_t	max_processed_size_in_copies(const struct st_logfile *logfil
 
 /******************************************************************************
  *                                                                            *
- * Function: calculate_delay                                                  *
- *                                                                            *
  * Purpose: calculate delay based on number of processed and remaining bytes, *
  *          and processing time                                               *
  *                                                                            *
@@ -2901,8 +2839,6 @@ static void	jump_remaining_bytes_logrt(struct st_logfile *logfiles, int logfiles
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: adjust_position_after_jump                                       *
  *                                                                            *
  * Purpose:                                                                   *
  *    After jumping over a number of bytes we "land" most likely somewhere in *
@@ -3073,8 +3009,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: jump_ahead                                                       *
- *                                                                            *
  * Purpose: move forward to a new position in the log file list               *
  *                                                                            *
  * Parameters:                                                                *
@@ -3238,8 +3172,6 @@ static void	transfer_for_copytruncate(const struct st_logfile *logfiles_old, int
 
 /******************************************************************************
  *                                                                            *
- * Function: update_new_list_from_old                                         *
- *                                                                            *
  * Comments: Thread-safe                                                      *
  *                                                                            *
  ******************************************************************************/
@@ -3288,8 +3220,6 @@ static int	update_new_list_from_old(zbx_log_rotation_options_t rotation_type, st
 
 /******************************************************************************
  *                                                                            *
- * Function: process_logrt                                                    *
- *                                                                            *
  * Purpose: Find new records in logfiles                                      *
  *                                                                            *
  * Parameters:                                                                *
@@ -3322,8 +3252,10 @@ static int	update_new_list_from_old(zbx_log_rotation_options_t rotation_type, st
  *     p_count          - [IN/OUT] limit of records to be processed           *
  *     s_count          - [IN/OUT] limit of records to be sent to server      *
  *     process_value    - [IN] pointer to function process_value()            *
- *     server           - [IN] server to send data to                         *
- *     port             - [IN] port to send data to                           *
+ *     addrs            - [IN] vector for passing server and port where to    *
+ *                             to send data                                   *
+ *     agent2_result    - [IN] address of buffer where to store matching log  *
+ *                             records (used only in Agent2)                  *
  *     hostname         - [IN] hostname the data comes from                   *
  *     key              - [IN] item key the data belongs to                   *
  *     jumped           - [OUT] flag to indicate that a jump took place       *
@@ -3346,10 +3278,10 @@ static int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t
 		int *use_ino, char **err_msg, struct st_logfile **logfiles_old, int logfiles_num_old,
 		struct st_logfile **logfiles_new, int *logfiles_num_new, const char *encoding,
 		zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template, int *p_count, int *s_count,
-		zbx_process_value_func_t process_value, zbx_vector_ptr_t *addrs, const char *hostname,
-		const char *key, int *jumped, float max_delay, double *start_time, zbx_uint64_t *processed_bytes,
-		zbx_log_rotation_options_t rotation_type, const char *persistent_file_name,
-		zbx_vector_pre_persistent_t *prep_vec)
+		zbx_process_value_func_t process_value, zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
+		const char *hostname, const char *key, int *jumped, float max_delay, double *start_time,
+		zbx_uint64_t *processed_bytes, zbx_log_rotation_options_t rotation_type,
+		const char *persistent_file_name, zbx_vector_pre_persistent_t *prep_vec)
 {
 	int			i, start_idx, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, seq = 1,
 				from_first_file = 1, last_processed, limit_reached = 0, res;
@@ -3553,9 +3485,9 @@ static int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t
 			{
 				ret = process_log(flags, logfiles + i, lastlogsize, mtime, lastlogsize_sent,
 						mtime_sent, skip_old_data, big_rec, encoding, regexps, pattern,
-						output_template, p_count, s_count, process_value, addrs, hostname, key,
-						&processed_bytes_tmp, seek_offset, persistent_file_name, prep_vec,
-						err_msg);
+						output_template, p_count, s_count, process_value, addrs, agent2_result,
+						hostname, key, &processed_bytes_tmp, seek_offset, persistent_file_name,
+						prep_vec, err_msg);
 
 				/* process_log() advances 'lastlogsize' only on success therefore */
 				/* we do not check for errors here */
@@ -3721,8 +3653,6 @@ static int	check_number_of_parameters(unsigned char flags, const AGENT_REQUEST *
 
 /******************************************************************************
  *                                                                            *
- * Function: init_max_lines_per_sec                                           *
- *                                                                            *
  * Comments: thread-safe if CONFIG_MAX_LINES_PER_SECOND is updated when log   *
  *           checks are not running                                           *
  *                                                                            *
@@ -3887,8 +3817,6 @@ static int	init_persistent_dir_parameter(const char *server, unsigned short port
 
 /******************************************************************************
  *                                                                            *
- * Function: process_log_check                                                *
- *                                                                            *
  * Comments: Function body is thread-safe if CONFIG_HOSTNAME is not updated   *
  *           while log checks are running. Uses callback function             *
  *           process_value_cb, so overall thread-safety depends on caller.    *
@@ -3896,9 +3824,9 @@ static int	init_persistent_dir_parameter(const char *server, unsigned short port
  *           comments.                                                        *
  *                                                                            *
  ******************************************************************************/
-int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *regexps, ZBX_ACTIVE_METRIC *metric,
-		zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent, int *mtime_sent,
-		char **error, zbx_vector_pre_persistent_t *prep_vec)
+int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_vector_ptr_t *regexps,
+		ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
+		int *mtime_sent, char **error, zbx_vector_pre_persistent_t *prep_vec)
 {
 	AGENT_REQUEST			request;
 	const char			*filename, *regexp, *encoding, *skip, *output_template;
@@ -3994,11 +3922,19 @@ int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *regexps, ZBX_AC
 		goto out;
 
 	/* parameter 'persistent_dir' */
-	if (SUCCEED != init_persistent_dir_parameter(((zbx_addr_t *)addrs->values[0])->ip,
-			((zbx_addr_t *)addrs->values[0])->port, metric->key, is_count_item, &request,
-			&metric->persistent_file_name, error))
+	if (NULL != addrs)	/* When process_log_check() is called in C agent it receives 'addrs' argument with  */
+				/* server hostname or IP address and port number where to send matching records.    */
+				/* When process_log_check() is called in Agent2 (Golang) the 'addrs' argument is    */
+				/* NULL and the 'agent2_result' argument is used to pass an address of buffer where */
+				/* to store the matching records in memory. Currently Agent2 does not support       */
+				/* persistent files therefore skip init_persistent_dir_parameter().                 */
 	{
-		goto out;
+		if (SUCCEED != init_persistent_dir_parameter(((zbx_addr_t *)addrs->values[0])->ip,
+				((zbx_addr_t *)addrs->values[0])->port, metric->key, is_count_item, &request,
+				&metric->persistent_file_name, error))
+		{
+			goto out;
+		}
 	}
 
 	/* jumping over fast growing log files is not supported with 'copytruncate' */
@@ -4117,7 +4053,7 @@ int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *regexps, ZBX_AC
 	ret = process_logrt(metric->flags, filename, &metric->lastlogsize, &metric->mtime, lastlogsize_sent, mtime_sent,
 			&metric->skip_old_data, &metric->big_rec, &metric->use_ino, error, &metric->logfiles,
 			metric->logfiles_num, &logfiles_new, &logfiles_num_new, encoding, regexps, regexp,
-			output_template, &p_count, &s_count, process_value_cb, addrs, CONFIG_HOSTNAME,
+			output_template, &p_count, &s_count, process_value_cb, addrs, agent2_result, CONFIG_HOSTNAME,
 			metric->key_orig, &jumped, max_delay, &metric->start_time, &metric->processed_bytes,
 			rotation_type, metric->persistent_file_name, prep_vec);
 
@@ -4145,7 +4081,7 @@ int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *regexps, ZBX_AC
 
 			zbx_snprintf(buf, sizeof(buf), "%d", match_count);
 
-			if (SUCCEED == process_value_cb(addrs, CONFIG_HOSTNAME, metric->key_orig, buf,
+			if (SUCCEED == process_value_cb(addrs, agent2_result, CONFIG_HOSTNAME, metric->key_orig, buf,
 					ITEM_STATE_NORMAL, &metric->lastlogsize, &metric->mtime, NULL, NULL, NULL, NULL,
 					metric->flags | ZBX_METRIC_FLAG_PERSISTENT) || 0 != jumped)
 			{
