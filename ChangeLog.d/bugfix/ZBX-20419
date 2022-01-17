@@ -1,0 +1,1 @@
+........S. [ZBX-20419] fixed MySQL error number calculation to be consistent between logging and recoverability detection logic (akozlovs)

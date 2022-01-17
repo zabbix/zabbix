@@ -292,9 +292,12 @@ static DB_RESULT	zbx_db_select(const char *fmt, ...)
 }
 
 #if defined(HAVE_MYSQL)
-static int	is_recoverable_mysql_error(void)
+static int	is_recoverable_mysql_error(int err_no)
 {
-	switch (mysql_errno(conn))
+	if (0 == err_no)
+		err_no = (int)mysql_errno(conn);
+
+	switch (err_no)
 	{
 		case CR_CONN_HOST_ERROR:
 		case CR_SERVER_GONE_ERROR:
@@ -367,6 +370,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 #else
 	my_bool		mysql_reconnect = 1;
 #endif
+	int		err_no = 0;
 #elif defined(HAVE_ORACLE)
 	char		*connect = NULL;
 	sword		err = OCI_SUCCESS;
@@ -540,7 +544,8 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 			NULL == mysql_real_connect(conn, host, user, password, dbname, port, dbsocket,
 				CLIENT_MULTI_STATEMENTS))
 	{
-		zbx_db_errlog(ERR_Z3001, mysql_errno(conn), mysql_error(conn), dbname);
+		err_no = (int)mysql_errno(conn);
+		zbx_db_errlog(ERR_Z3001, err_no, mysql_error(conn), dbname);
 		ret = ZBX_DB_FAIL;
 	}
 
@@ -559,17 +564,19 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	if (ZBX_DB_OK == ret && 0 != mysql_autocommit(conn, 1))
 	{
-		zbx_db_errlog(ERR_Z3001, mysql_errno(conn), mysql_error(conn), dbname);
+		err_no = (int)mysql_errno(conn);
+		zbx_db_errlog(ERR_Z3001, err_no, mysql_error(conn), dbname);
 		ret = ZBX_DB_FAIL;
 	}
 
 	if (ZBX_DB_OK == ret && 0 != mysql_select_db(conn, dbname))
 	{
-		zbx_db_errlog(ERR_Z3001, mysql_errno(conn), mysql_error(conn), dbname);
+		err_no = (int)mysql_errno(conn);
+		zbx_db_errlog(ERR_Z3001, err_no, mysql_error(conn), dbname);
 		ret = ZBX_DB_FAIL;
 	}
 
-	if (ZBX_DB_FAIL == ret && SUCCEED == is_recoverable_mysql_error())
+	if (ZBX_DB_FAIL == ret && SUCCEED == is_recoverable_mysql_error(err_no))
 		ret = ZBX_DB_DOWN;
 
 #elif defined(HAVE_ORACLE)
@@ -1409,9 +1416,9 @@ out:
  ******************************************************************************/
 int	zbx_db_vexecute(const char *fmt, va_list args)
 {
-	char	*sql = NULL;
-	int	ret = ZBX_DB_OK;
-	double	sec = 0;
+	char		*sql = NULL;
+	int		ret = ZBX_DB_OK;
+	double		sec = 0;
 #if defined(HAVE_MYSQL)
 #elif defined(HAVE_ORACLE)
 	sword		err = OCI_SUCCESS;
@@ -1449,11 +1456,14 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	}
 	else
 	{
+		int	err_no;
+
 		if (0 != mysql_query(conn, sql))
 		{
-			zbx_db_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
+			err_no = (int)mysql_errno(conn);
+			zbx_db_errlog(ERR_Z3005, err_no, mysql_error(conn), sql);
 
-			ret = (SUCCEED == is_recoverable_mysql_error() ? ZBX_DB_DOWN : ZBX_DB_FAIL);
+			ret = (SUCCEED == is_recoverable_mysql_error(err_no) ? ZBX_DB_DOWN : ZBX_DB_FAIL);
 		}
 		else
 		{
@@ -1472,8 +1482,9 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 				/* more results? 0 = yes (keep looping), -1 = no, >0 = error */
 				if (0 < (status = mysql_next_result(conn)))
 				{
-					zbx_db_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
-					ret = (SUCCEED == is_recoverable_mysql_error() ? ZBX_DB_DOWN : ZBX_DB_FAIL);
+					err_no = (int)mysql_errno(conn);
+					zbx_db_errlog(ERR_Z3005, err_no, mysql_error(conn), sql);
+					ret = (SUCCEED == is_recoverable_mysql_error(err_no) ? ZBX_DB_DOWN : ZBX_DB_FAIL);
 				}
 			}
 			while (0 == status);
@@ -1620,10 +1631,13 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 	{
 		if (0 != mysql_query(conn, sql) || NULL == (result->result = mysql_store_result(conn)))
 		{
-			zbx_db_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
+			int err_no;
+
+			err_no = (int)mysql_errno(conn);
+			zbx_db_errlog(ERR_Z3005, err_no, mysql_error(conn), sql);
 
 			DBfree_result(result);
-			result = (SUCCEED == is_recoverable_mysql_error() ? (DB_RESULT)ZBX_DB_DOWN : NULL);
+			result = (SUCCEED == is_recoverable_mysql_error(err_no) ? (DB_RESULT)ZBX_DB_DOWN : NULL);
 		}
 	}
 #elif defined(HAVE_ORACLE)
