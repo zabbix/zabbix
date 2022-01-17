@@ -234,15 +234,13 @@ int	zbx_rtc_open(zbx_ipc_async_socket_t *asocket, int timeout, char **error)
  ******************************************************************************/
 void	zbx_rtc_notify_config_sync(zbx_ipc_async_socket_t *rtc)
 {
-	int	ret;
-
-	if (FAIL == (ret = zbx_ipc_async_socket_send(rtc, ZBX_RTC_CONFIG_SYNC_NOTIFY, NULL, 0)))
+	if (FAIL == zbx_ipc_async_socket_send(rtc, ZBX_RTC_CONFIG_SYNC_NOTIFY, NULL, 0))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot send configuration syncer notification");
 		exit(EXIT_FAILURE);
 	}
 
-	if (FAIL == (ret = zbx_ipc_async_socket_flush(rtc, CONFIG_TIMEOUT)))
+	if (FAIL ==zbx_ipc_async_socket_flush(rtc, CONFIG_TIMEOUT))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot flush configuration syncer notification");
 		exit(EXIT_FAILURE);
