@@ -122,13 +122,15 @@ out:
  ******************************************************************************/
 static duk_ret_t	es_zabbix_sleep(duk_context *ctx)
 {
-	zbx_es_env_t		*env;
-	duk_memory_functions	out_funcs;
-	struct timespec		ts_sleep;
-	zbx_uint64_t		timeout, duration;
-	unsigned int		sleep_ms;
-	double			sleep_dbl;
-	duk_idx_t		err_idx = -1;
+	zbx_es_env_t	*env;
+	struct timespec	ts_sleep;
+	zbx_uint64_t	timeout, duration;
+	unsigned int	sleep_ms;
+	double		sleep_dbl;
+	duk_idx_t	err_idx = -1;
+
+	if (NULL == (env = zbx_es_get_env(ctx)))
+		return duk_error(ctx, DUK_ERR_ERROR, "cannot access internal environment");
 
 	/* use duk_to_number() instead of duk_to_uint() to distinguish between zero value and error */
 	sleep_dbl = duk_to_number(ctx, 0);
@@ -141,9 +143,7 @@ static duk_ret_t	es_zabbix_sleep(duk_context *ctx)
 	else
 		sleep_ms = (unsigned int)sleep_dbl;
 
-	duk_get_memory_functions(ctx, &out_funcs);
-	env = (zbx_es_env_t *)out_funcs.udata;
-	timeout = (unsigned int)env->timeout * 1000;
+	timeout = env->timeout <= 0 ? 0 : (zbx_uint64_t)env->timeout * 1000;
 
 	if (sleep_ms > timeout)
 	{
