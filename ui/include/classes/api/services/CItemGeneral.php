@@ -520,8 +520,8 @@ abstract class CItemGeneral extends CApiService {
 			'type' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', static::SUPPORTED_PREPROCESSING_TYPES)],
 			'params' =>					['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'type', 'in' => ZBX_PREPROC_MULTIPLIER], 'type' => API_MULTIPLIER, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0, 'length' => DB::getFieldLength('item_preproc', 'params')],
-											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_PREPROC_RTRIM, ZBX_PREPROC_LTRIM, ZBX_PREPROC_TRIM, ZBX_PREPROC_XPATH, ZBX_PREPROC_JSONPATH, ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_ERROR_FIELD_XML, ZBX_PREPROC_SCRIPT, ZBX_PREPROC_PROMETHEUS_PATTERN])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('item_preproc', 'params')],
-											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_PREPROC_VALIDATE_REGEX, ZBX_PREPROC_VALIDATE_NOT_REGEX])], 'type' => API_REGEX, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('item_preproc', 'params')],
+											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_PREPROC_RTRIM, ZBX_PREPROC_LTRIM, ZBX_PREPROC_TRIM, ZBX_PREPROC_XPATH, ZBX_PREPROC_JSONPATH, ZBX_PREPROC_VALIDATE_RANGE, ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_ERROR_FIELD_XML, ZBX_PREPROC_SCRIPT, ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_CSV_TO_JSON, ZBX_PREPROC_STR_REPLACE])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('item_preproc', 'params')],
+											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_PREPROC_VALIDATE_REGEX, ZBX_PREPROC_VALIDATE_NOT_REGEX, ZBX_PREPROC_REGSUB, ZBX_PREPROC_ERROR_FIELD_REGEX])], 'type' => API_REGEX, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('item_preproc', 'params')],
 											['if' => ['field' => 'type', 'in' => ZBX_PREPROC_THROTTLE_TIMED_VALUE], 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | ($this instanceof CItemPrototype || $this instanceof CDiscoveryRule) ? API_ALLOW_LLD_MACRO : 0, 'in' => '1:'.ZBX_MAX_TIMESHIFT, 'length' => DB::getFieldLength('item_preproc', 'params')],
 											['if' => ['field' => 'type', 'in' => ZBX_PREPROC_PROMETHEUS_TO_JSON], 'type' => API_PROMETHEUS_PATTERN, 'flags' => API_REQUIRED | $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0, 'length' => DB::getFieldLength('item_preproc', 'params')],
 											['else' => true, 'type' => API_UNEXPECTED]
@@ -2416,6 +2416,26 @@ abstract class CItemGeneral extends CApiService {
 			}
 
 			$step['params'] = implode("\n", $params);
+
+			switch ($step['type']) {
+				case ZBX_PREPROC_BOOL2DEC:
+				case ZBX_PREPROC_OCT2DEC:
+				case ZBX_PREPROC_HEX2DEC:
+				case ZBX_PREPROC_DELTA_VALUE:
+				case ZBX_PREPROC_DELTA_SPEED:
+				case ZBX_PREPROC_THROTTLE_VALUE:
+				case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
+				case ZBX_PREPROC_XML_TO_JSON:
+					unset($step['params']);
+					break;
+			}
+
+			if (!array_key_exists('error_handler', $step)
+					|| !in_array($step['error_handler'], [ZBX_PREPROC_FAIL_SET_VALUE, ZBX_PREPROC_FAIL_SET_ERROR])) {
+				unset($step['error_handler_params']);
+			}
+
+			unset($step['on_fail']);
 		}
 		unset($step);
 
