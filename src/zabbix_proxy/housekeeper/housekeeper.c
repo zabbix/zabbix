@@ -199,7 +199,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 					zabbix_log(LOG_LEVEL_WARNING, "housekeeping procedure is already in progress");
 			}
 			else if (ZBX_RTC_SHUTDOWN == rtc_cmd)
-				break;
+				goto out;
 
 			sleeptime = 0;
 		}
@@ -242,7 +242,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		zbx_setproctitle("%s [deleted %d records in " ZBX_FS_DBL " sec, %s]",
 				get_process_type_string(process_type), records, sec, sleeptext);
 	}
-
+out:
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
 	while (1)
