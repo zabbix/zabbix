@@ -204,14 +204,14 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 	 * Test for checking form update without changing any data.
 	 */
 	public function testFormAdministrationGeneralTrigDisplOptions_SimpleUpdate() {
-		$this->executeSimpleUpdate();
+		$this->executeSimpleUpdate(true);
 	}
 
 	/**
 	 * Test for checking 'Reset defaults' button.
 	 */
 	public function testFormAdministrationGeneralTrigDisplOptions_ResetButton() {
-		$this->executeResetButtonTest();
+		$this->executeResetButtonTest(false, true);
 	}
 
 	/**
@@ -847,6 +847,6 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 	 * @dataProvider getCheckFormData
 	 */
 	public function testFormAdministrationGeneralTrigDisplOptions_CheckForm($data) {
-		$this->executeCheckForm($data);
+		$this->executeCheckForm($data, false, true);
 	}
 }
