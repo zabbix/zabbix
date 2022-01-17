@@ -398,7 +398,7 @@ class CIntegrationTest extends CAPITest {
 			$params = '';
 		}
 
-		$command .= $params.($background ? ' > /dev/null 2>&1 &' : '');
+		$command .= $params.($background ? ' > /dev/null 2>&1 &' : ' 2>&1');
 
 		exec($command, $output, $return);
 
