@@ -176,7 +176,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 	zbx_tls_init_child();
 #endif
 
-	zbx_rtc_subscribe(&rtc);
+	zbx_rtc_subscribe(&rtc, process_type, process_num);
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 

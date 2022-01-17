@@ -54,7 +54,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
-	zbx_rtc_subscribe(&rtc);
+	zbx_rtc_subscribe(&rtc, process_type, process_num);
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 

@@ -172,7 +172,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		zbx_snprintf(sleeptext, sizeof(sleeptext), "idle for %d hour(s)", CONFIG_HOUSEKEEPING_FREQUENCY);
 	}
 
-	zbx_rtc_subscribe(&rtc);
+	zbx_rtc_subscribe(&rtc, process_type, process_num);
 
 	while (ZBX_IS_RUNNING())
 	{

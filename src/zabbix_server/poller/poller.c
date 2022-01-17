@@ -953,7 +953,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 	last_stat_time = time(NULL);
 
-	zbx_rtc_subscribe(&rtc);
+	zbx_rtc_subscribe(&rtc, process_type, process_num);
 
 	while (ZBX_IS_RUNNING())
 	{

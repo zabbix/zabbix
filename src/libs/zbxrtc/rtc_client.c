@@ -27,9 +27,6 @@
 
 extern int	CONFIG_TIMEOUT;
 
-extern unsigned char	process_type;
-extern int		process_num;
-
 /******************************************************************************
  *                                                                            *
  * Purpose: parse loglevel runtime control option                             *
@@ -259,7 +256,7 @@ void	zbx_rtc_notify_config_sync(zbx_ipc_async_socket_t *rtc)
  * Parameters: rtc   - [OUT] the RTC notification subscription socket         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_rtc_subscribe(zbx_ipc_async_socket_t *rtc)
+void	zbx_rtc_subscribe(zbx_ipc_async_socket_t *rtc, unsigned char proc_type, int proc_num)
 {
 	unsigned char		data[sizeof(int) + sizeof(unsigned char)];
 	const zbx_uint32_t	size = (zbx_uint32_t)(sizeof(int) + sizeof(unsigned char));
@@ -272,8 +269,8 @@ void	zbx_rtc_subscribe(zbx_ipc_async_socket_t *rtc)
 		exit(EXIT_FAILURE);
 	}
 
-	(void)zbx_serialize_value(data, process_type);
-	(void)zbx_serialize_value(data + sizeof(process_type), process_num);
+	(void)zbx_serialize_value(data, proc_type);
+	(void)zbx_serialize_value(data + sizeof(proc_type), proc_num);
 
 	if (FAIL == zbx_ipc_async_socket_send(rtc, ZBX_RTC_SUBSCRIBE, data, size))
 	{

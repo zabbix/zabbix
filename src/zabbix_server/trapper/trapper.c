@@ -1200,7 +1200,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 #ifdef HAVE_NETSNMP
-	zbx_rtc_subscribe(&rtc);
+	zbx_rtc_subscribe(&rtc, process_type, process_num);
 #endif
 
 	while (ZBX_IS_RUNNING())

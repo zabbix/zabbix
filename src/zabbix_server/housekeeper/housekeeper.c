@@ -1103,7 +1103,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 	hk_history_compression_init();
 
-	zbx_rtc_subscribe(&rtc);
+	zbx_rtc_subscribe(&rtc, process_type, process_num);
 
 	while (ZBX_IS_RUNNING())
 	{

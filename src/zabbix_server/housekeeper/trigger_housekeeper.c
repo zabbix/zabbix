@@ -115,7 +115,7 @@ ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 	zbx_setproctitle("%s [startup idle for %d second(s)]", get_process_type_string(process_type),
 			CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY);
 
-	zbx_rtc_subscribe(&rtc);
+	zbx_rtc_subscribe(&rtc, process_type, process_num);
 
 	while (ZBX_IS_RUNNING())
 	{

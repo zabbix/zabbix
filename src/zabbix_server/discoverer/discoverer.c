@@ -872,7 +872,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	zbx_rtc_subscribe(&rtc);
+	zbx_rtc_subscribe(&rtc, process_type, process_num);
 
 	while (ZBX_IS_RUNNING())
 	{
