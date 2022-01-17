@@ -44,6 +44,8 @@ class testFormAdministrationGeneral extends CWebTest {
 	public $default;
 	public $db_default;
 	public $custom;
+	public $color_default;
+	public $color_custom;
 
 	/**
 	 * Test for checking form update without changing any data.
@@ -64,6 +66,10 @@ class testFormAdministrationGeneral extends CWebTest {
 		$this->assertEquals($config, CDBHelper::getRow('SELECT * FROM config ORDER BY configid'));
 		// Check that Frontend form is not changed.
 		$this->assertEquals($values, $form->getFields()->asValues());
+		// Check that Frontend colors is not changed.
+		foreach ($this->color_default as $colorid => $value) {
+			$this->assertEquals('#'.$value, $this->query($colorid)->one()->getAttribute('title'));
+		}
 	}
 
 	/**
@@ -82,6 +88,11 @@ class testFormAdministrationGeneral extends CWebTest {
 		foreach (['Cancel', 'Reset defaults'] as $action) {
 			// Fill form with custom data.
 			$form->fill($this->custom);
+			foreach($this->color_custom as $selector => $color) {
+				$form->query($selector)->one()->click()->waitUntilReady();
+				$this->query('xpath://div[@id="color_picker"]')->asColorPicker()->one()->fill($color);
+			}
+
 			$form->submit();
 			$this->assertMessage(TEST_GOOD, 'Configuration updated');
 			$custom_config = CDBHelper::getRow('SELECT * FROM config');
@@ -89,6 +100,10 @@ class testFormAdministrationGeneral extends CWebTest {
 			$this->page->refresh()->waitUntilReady();
 			$form->invalidate();
 			$form->checkValue($this->custom);
+			foreach ($this->color_custom as $colorid => $value) {
+				$this->assertEquals('#'.$value, $this->query($colorid)->one()->getAttribute('title'));
+			}
+
 			$this->resetConfiguration($form, $this->default, $action, $other, $this->custom);
 			$config = ($action === 'Reset defaults') ? $default_config : $custom_config;
 			$this->assertEquals($config, CDBHelper::getRow('SELECT * FROM config'));
@@ -158,6 +173,14 @@ class testFormAdministrationGeneral extends CWebTest {
 			$data['fields']['Default time zone'] = CDateTimeHelper::getTimeZoneFormat($data['fields']['Default time zone']);
 		}
 		$form->fill($data['fields']);
+
+		if (array_key_exists('color', $data)) {
+			foreach($data['color'] as $selector => $color) {
+				$form->query($selector)->one()->click()->waitUntilReady();
+				$this->query('xpath://div[@id="color_picker"]')->asColorPicker()->one()->fill($color);
+			}
+		}
+
 		$form->submit();
 		$this->page->waitUntilReady();
 		$message = (CTestArrayHelper::get($data, 'expected') === TEST_GOOD)
