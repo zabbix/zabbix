@@ -2414,6 +2414,17 @@ div.dashboard-grid-widget-item {
 .toc .toc-sublist .arrow-up {
   border-bottom-color: #4f4f4f; }
 
+z-bar-gauge {
+  position: relative;
+  display: block;
+  height: 24px; }
+  z-bar-gauge::part(bar) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border: 1px solid #4f4f4f;
+    border-radius: 3px; }
+
 z-select,
 .z-select {
   display: inline-grid; }
