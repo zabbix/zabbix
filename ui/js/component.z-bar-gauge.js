@@ -76,8 +76,8 @@ class ZBarGauge extends HTMLElement {
 				break;
 
 			case 'value':
-				if (new_value !== null && this.value !== new_value) {
-					this.value = Math.max(this._min, Math.min(this._max, new_value));
+				if (new_value !== null && old_value !== new_value) {
+					this.value = new_value;
 
 					this.dispatchEvent(new Event('change', {bubbles: true}));
 				}
@@ -153,51 +153,45 @@ class ZBarGauge extends HTMLElement {
 			const ctx = this._canvas.getContext("2d");
 
 			const width = this.offsetWidth - 2;
-			const height = this.offsetHeight - 2;
+			this._canvas.height = this.offsetHeight - 2;
 
+			const value = Math.max(this._min, Math.min(this._max, Number(this.value)));
 
+			if (this._solid) {
+				this._canvas.width = width;
 
-			let thresholds = Object.keys(this._thresholds).sort((a, b) => (a - b));
+				this._drawCell(ctx, 1, width / (this._max - this._min) * value - 2,
+					this._getThresholdColorByValue(value), 1);
+			}
+			else {
+				const cell_count = Math.floor((width - 1) / BAR_GAUGE_BAR_ITEM_WIDTH);
+				const cell_interval = (this._max - this._min) / cell_count;
 
-			const cell_count = Math.floor((width - 1) / BAR_GAUGE_BAR_ITEM_WIDTH);
-			const cell_interval = (this._max - this._min) / cell_count;
+				this._canvas.width = cell_count * BAR_GAUGE_BAR_ITEM_WIDTH + 1;
 
-			this._canvas.width = cell_count * BAR_GAUGE_BAR_ITEM_WIDTH + 1;
-			this._canvas.height = height;
-
-			let alpha = 1;
-
-			for (let i = 0; i < cell_count; i++) {
-				let color = BAR_GAUGE_BAR_DEFAULT_COLOR;
-
-				for (const threshold of thresholds) {
-					if (threshold <= i * cell_interval) {
-						color = this._thresholds[threshold];
-					}
+				for (let i = 0; i < cell_count; i++) {
+					this._drawCell(ctx, i * BAR_GAUGE_BAR_ITEM_WIDTH + 1, BAR_GAUGE_BAR_ITEM_WIDTH - 1,
+						this._getThresholdColorByValue(i * cell_interval), value / cell_interval < i ? .25 : 1);
 				}
-
-				if (this.value / cell_interval < i) {
-					alpha = .25;
-				}
-
-				const rgb = this._hexToRgb(color);
-				const rgb_lighten = this._colorLightenDarken(rgb, .5);
-				const rgb_darken = this._colorLightenDarken(rgb, -.3);
-				const fill = ctx.createLinearGradient(i * BAR_GAUGE_BAR_ITEM_WIDTH, 1,
-					(i + 1) * BAR_GAUGE_BAR_ITEM_WIDTH, height - 2
-				);
-
-				fill.addColorStop(0, `rgba(${rgb_lighten.r}, ${rgb_lighten.g}, ${rgb_lighten.b}, ${alpha}`);
-				fill.addColorStop(.3, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha}`);
-				fill.addColorStop(.8, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha}`);
-				fill.addColorStop(1, `rgba(${rgb_darken.r}, ${rgb_darken.g}, ${rgb_darken.b}, ${alpha}`);
-
-				ctx.fillStyle = fill;
-
-				this._roundRect(ctx, i * BAR_GAUGE_BAR_ITEM_WIDTH + 1, 1, BAR_GAUGE_BAR_ITEM_WIDTH - 1, height - 2, 3);
-				ctx.fill();
 			}
 		});
+	}
+
+	_drawCell(ctx, x, width, color, alpha) {
+		const rgb = this._hexToRgb(color);
+		const rgb_lighten = this._colorLightenDarken(rgb, .5);
+		const rgb_darken = this._colorLightenDarken(rgb, -.3);
+		const fill = ctx.createLinearGradient(x, 1, x, this._canvas.height - 2);
+
+		fill.addColorStop(0, `rgba(${rgb_lighten.r}, ${rgb_lighten.g}, ${rgb_lighten.b}, ${alpha}`);
+		fill.addColorStop(.3, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha}`);
+		fill.addColorStop(.8, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha}`);
+		fill.addColorStop(1, `rgba(${rgb_darken.r}, ${rgb_darken.g}, ${rgb_darken.b}, ${alpha}`);
+
+		ctx.fillStyle = fill;
+
+		this._roundRect(ctx, x, 1, width, this._canvas.height - 2, 3);
+		ctx.fill();
 	}
 
 	_roundRect(ctx, x, y, width, height, radius) {
@@ -208,6 +202,18 @@ class ZBarGauge extends HTMLElement {
 		ctx.arcTo(x, y + height, x, y, radius);
 		ctx.arcTo(x, y, x + width, y, radius);
 		ctx.closePath();
+	}
+
+	_getThresholdColorByValue(value) {
+		let color = BAR_GAUGE_BAR_DEFAULT_COLOR;
+
+		for (const threshold of Object.keys(this._thresholds).sort((a, b) => (a - b))) {
+			if (threshold <= value) {
+				color = this._thresholds[threshold];
+			}
+		}
+
+		return color;
 	}
 
 	_hexToRgb(hex) {
