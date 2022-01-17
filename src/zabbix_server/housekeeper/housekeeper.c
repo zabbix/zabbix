@@ -1075,7 +1075,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 {
 	int			now, d_history_and_trends, d_cleanup, d_events, d_problems, d_sessions, d_services,
 				d_audit, sleeptime, records;
-	double			sec, time_slept, time_now, time_exec = 0;
+	double			sec, time_slept, time_now;
 	char			sleeptext[25];
 	zbx_ipc_async_socket_t	rtc;
 
@@ -1110,23 +1110,29 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 	{
 		zbx_uint32_t	rtc_cmd;
 		unsigned char	*rtc_data;
+		int		hk_execute = 0;
 
 		sec = zbx_time();
 
 		while (SUCCEED == zbx_rtc_wait(&rtc, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
 		{
-			if (ZBX_RTC_HOUSEKEEPER_EXECUTE == rtc_cmd)
+			switch (rtc_cmd)
 			{
-				if (ZBX_DOUBLE_EPSILON < time_exec)
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "forced execution of the housekeeper");
-					time_exec = 0;
-				}
-				else
-					zabbix_log(LOG_LEVEL_WARNING, "housekeeping procedure is already in progress");
+				case ZBX_RTC_HOUSEKEEPER_EXECUTE:
+					if (0 == hk_execute)
+					{
+						zabbix_log(LOG_LEVEL_WARNING, "forced execution of the housekeeper");
+						hk_execute = 1;
+					}
+					else
+						zabbix_log(LOG_LEVEL_WARNING, "housekeeping procedure is already in"
+								" progress");
+					break;
+				case ZBX_RTC_SHUTDOWN:
+					goto out;
+				default:
+					continue;
 			}
-			else if (ZBX_RTC_SHUTDOWN == rtc_cmd)
-				goto out;
 
 			sleeptime = 0;
 		}
@@ -1142,14 +1148,6 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		time_now = zbx_time();
 		time_slept = time_now - sec;
 		zbx_update_env(time_now);
-
-		if (0 != CONFIG_HOUSEKEEPING_FREQUENCY &&
-				time_exec + CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR > time_now)
-		{
-			continue;
-		}
-
-		time_exec = time_now;
 
 		hk_period = get_housekeeping_period(time_slept);
 
