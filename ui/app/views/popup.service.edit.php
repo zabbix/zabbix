@@ -254,7 +254,6 @@ $tags_tab = (new CFormGrid())
 						->setHeader((new CRowHeader([_('Name'), _('Value'), _('Action')]))->addClass(ZBX_STYLE_GREY)),
 					(new CScriptTemplate('tag-row-tmpl'))
 						->addItem(renderTagTableRow('#{rowNum}', '', '', ['add_post_js' => false]))
-
 				])
 		)
 	]);
@@ -334,6 +333,7 @@ $form
 	->addItem(
 		(new CScriptTag('
 			service_edit_popup.init('.json_encode([
+				'tabs_id' => $tabs->getId(),
 				'serviceid' => $data['serviceid'],
 				'children' => $data['form']['children'],
 				'children_problem_tags_html' => $data['form']['children_problem_tags_html'],

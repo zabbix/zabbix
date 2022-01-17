@@ -41,7 +41,7 @@ window.service_edit_popup = {
 	form: null,
 	footer: null,
 
-	init({serviceid, children, children_problem_tags_html, problem_tags, status_rules, create_url, update_url,
+	init({tabs_id, serviceid, children, children_problem_tags_html, problem_tags, status_rules, create_url, update_url,
 			delete_url, search_limit}) {
 		this.initTemplates();
 
@@ -71,30 +71,16 @@ window.service_edit_popup = {
 
 		this.filterChildren();
 
+		// Setup parent services.
+
 		jQuery('#parent_serviceids_')
 			.multiSelect('getSelectButton')
 			.addEventListener('click', () => {
 				this.selectParents();
 			});
 
-		const $tags = jQuery(document.getElementById('tags-table'));
+		// Setup problem tags.
 
-		$tags.dynamicRows({template: '#tag-row-tmpl'});
-		$tags.on('click', '.element-table-add', () => {
-			$tags
-				.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
-				.textareaFlexible();
-		});
-
-		// Update form field state according to the form data.
-
-		for (const id of ['advanced_configuration', 'propagation_rule', 'algorithm']) {
-			document
-				.getElementById(id)
-				.addEventListener('change', () => this.update());
-		}
-
-		// Setup Problem tags.
 		const $problem_tags = jQuery(document.getElementById('problem_tags'));
 
 		$problem_tags.dynamicRows({
@@ -106,7 +92,8 @@ window.service_edit_popup = {
 
 		document.getElementById('problem_tags').addEventListener('change', () => this.update());
 
-		// Setup Service rules.
+		// Setup service rules.
+
 		document
 			.getElementById('status_rules')
 			.addEventListener('click', (e) => {
@@ -121,7 +108,34 @@ window.service_edit_popup = {
 				}
 			});
 
-		// Setup Child services.
+		// Setup tags tab.
+
+		const tabs = jQuery('#' + tabs_id);
+
+		const initialize_tags = (event, ui) => {
+			const $panel = event.type === 'tabscreate' ? ui.panel : ui.newPanel;
+
+			if ($panel.attr('id') === 'tags-tab') {
+				const $tags = jQuery('#tags-table');
+
+				$tags
+					.dynamicRows({template: '#tag-row-tmpl'})
+					.on('afteradd.dynamicRows', () => {
+						$tags
+							.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
+							.textareaFlexible();
+					})
+					.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
+					.textareaFlexible();
+
+					tabs.off('tabscreate tabsactivate', initialize_tags);
+			}
+		};
+
+		tabs.on('tabscreate tabsactivate', initialize_tags);
+
+		// Setup child services.
+
 		document
 			.getElementById('children-filter')
 			.addEventListener('click', (e) => {
@@ -153,6 +167,14 @@ window.service_edit_popup = {
 					this.removeChild(e.target.closest('tr').dataset.serviceid);
 				}
 			});
+
+		// Update form field state according to the form data.
+
+		for (const id of ['advanced_configuration', 'propagation_rule', 'algorithm']) {
+			document
+				.getElementById(id)
+				.addEventListener('change', () => this.update());
+		}
 
 		this.update();
 	},
