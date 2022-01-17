@@ -211,8 +211,11 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		time_slept = time_now - sec;
 		zbx_update_env(time_now);
 
-		if (0 != CONFIG_HOUSEKEEPING_FREQUENCY && time_exec + CONFIG_HOUSEKEEPING_FREQUENCY > time_now)
+		if (0 != CONFIG_HOUSEKEEPING_FREQUENCY &&
+				time_exec + CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR > time_now)
+		{
 			continue;
+		}
 
 		time_exec = time_now;
 
