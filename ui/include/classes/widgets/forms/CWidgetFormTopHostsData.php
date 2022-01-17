@@ -96,12 +96,8 @@ class CWidgetFormTopHostsData extends CWidgetForm {
 
 		// Columns definition table.
 		$field_columns = (new CWidgetFieldColumnsList('columns', _('Columns')))
-			->setFlags(CWidgetField::FLAG_LABEL_ASTERISK);
-
-		if (array_key_exists('columns', $this->data)) {
-			$field_columns->setValue((array) $this->data['columns']);
-		}
-
+			->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
+			->setValue(array_key_exists('columns', $this->data) ? $this->data['columns'] : []);
 		$this->fields[$field_columns->getName()] = $field_columns;
 
 		// Order.

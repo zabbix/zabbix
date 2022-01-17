@@ -117,7 +117,7 @@ window.widget_tophostsdata_form = {
 
 		switch (elm.getAttribute('name')) {
 			case 'edit':
-				let index = 0;
+				let index = elm.closest('tr').querySelector('[name="sortorder[columns][]"]').value;
 				let form_fields = getFormFields(elm.closest('form'));
 
 				PopUp('popup.widget.columnlist.edit', {...form_fields.columns[index], edit: 1}, null, e.target);
