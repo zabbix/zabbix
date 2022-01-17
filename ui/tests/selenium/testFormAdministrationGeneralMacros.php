@@ -841,7 +841,7 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 		$this->page->login()->open($item_url)->waitUntilReady();
 //		Caused by https://support.zabbix.com/browse/ZBXNEXT-7115
 //		Support of user macros in item names has been dropped.
-		$this->assertTrue($this->query('link', 'trap['.$macro['value'].']')->exists());
+		$this->assertTrue($this->query('xpath://span[contains(text(),"Value 2 B resolved")]')->exists());
 
 		// Change macro type.
 		$this->page->open('zabbix.php?action=macros.edit')->waitUntilReady();
@@ -853,7 +853,7 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 		$this->page->open($item_url)->waitUntilReady();
 //		Caused by https://support.zabbix.com/browse/ZBXNEXT-7115
 //		Support of user macros in item names has been dropped.
-		$this->assertTrue($this->query('link', 'trap[******]')->exists());
+		$this->assertTrue($this->query('xpath://span[contains(text(),"trap[******]")]')->exists());
 	}
 
 	public function getCreateVaultMacrosData() {
