@@ -49,7 +49,7 @@ class testFormAdministrationGeneral extends CWebTest {
 
 	/**
 	 * Test for checking form update without changing any data.
-	 * 
+	 *
 	 * @param boolean    $colorpick   If it is Trigger displaying options form
 	 */
 	public function executeSimpleUpdate($colorpick = false) {
