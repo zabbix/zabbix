@@ -28,6 +28,13 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
+const (
+	nvmeType    = "nvme"
+	unknownType = "unknown"
+	ssdType     = "ssd"
+	hddType     = "hdd"
+)
+
 // Options -
 type Options struct {
 	Timeout int    `conf:"optional,range=1:30"`
@@ -127,18 +134,11 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		}
 
 		for _, dev := range r.devices {
-			var t string
-			if dev.RotationRate == 0 {
-				t = "SSD"
-			} else {
-				t = "HDD"
-			}
-
 			for _, attr := range dev.SmartAttributes.Table {
 				out = append(
 					out, attribute{
 						Name:       cutPrefix(dev.Info.Name),
-						DeviceType: t,
+						DeviceType: getAttributeType(dev.Info.DevType, dev.RotationRate),
 						ID:         attr.ID,
 						Attrname:   attr.Attrname,
 						Thresh:     attr.Thresh,
@@ -202,19 +202,34 @@ func setDiskFields(deviceJsons map[string]jsonDevice) (out []interface{}, err er
 	return
 }
 
-func getType(devType string, rate int) (out string) {
-	out = "unknown"
-	if devType == "nvme" {
-		out = "nvme"
-	} else {
-		if rate == 0 {
-			out = "ssd"
-		} else if rate > 0 {
-			out = "hdd"
-		}
+func getAttributeType(devType string, rate int) string {
+	if devType == unknownType {
+		return strings.ToUpper(unknownType)
 	}
 
-	return
+	return strings.ToUpper(getTypeByRate(rate))
+}
+
+func getType(devType string, rate int) string {
+	switch devType {
+	case nvmeType:
+		return nvmeType
+	case unknownType:
+		return unknownType
+	default:
+		return getTypeByRate(rate)
+	}
+}
+
+func getTypeByRate(rate int) string {
+	if rate == 0 {
+		return ssdType
+	}
+	if rate > 0 {
+		return hddType
+	}
+
+	return unknownType
 }
 
 func init() {

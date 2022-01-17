@@ -63,6 +63,30 @@ func Test_setDiskFields(t *testing.T) {
 	}
 }
 
+func Test_getAttributeType(t *testing.T) {
+	type args struct {
+		devType string
+		rate    int
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{"ssd", args{"SAT", 0}, "SSD"},
+		{"hdd", args{"SAT", 12}, "HDD"},
+		{"unknown", args{"unknown", 1000}, "UNKNOWN"},
+		{"unknown_no_rate", args{"unknown", 0}, "UNKNOWN"},
+		{"negative_rate", args{"SAT", -1}, "UNKNOWN"}}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := getAttributeType(tt.args.devType, tt.args.rate); got != tt.want {
+				t.Errorf("getAttributeType() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func Test_getType(t *testing.T) {
 	type args struct {
 		devType string
@@ -75,14 +99,39 @@ func Test_getType(t *testing.T) {
 	}{
 		{"ssd", args{"SAT", 0}, "ssd"},
 		{"hdd", args{"SAT", 12}, "hdd"},
-		{"nvme", args{"nvme", 0}, "nvme"},
-		{"unknown", args{"SAT", -1}, "unknown"},
+		{"nvme", args{"nvme", 1000}, "nvme"},
+		{"nvme_no_rate", args{"nvme", 0}, "nvme"},
+		{"unknown", args{"unknown", 1000}, "unknown"},
+		{"unknown_no_rate", args{"unknown", 0}, "unknown"},
+		{"negative_rate", args{"SAT", -1}, "unknown"},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if gotOut := getType(tt.args.devType, tt.args.rate); gotOut != tt.wantOut {
 				t.Errorf("getType() = %v, want %v", gotOut, tt.wantOut)
+			}
+		})
+	}
+}
+
+func Test_getTypeByRate(t *testing.T) {
+	type args struct {
+		rate int
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{"zero_rate", args{0}, "ssd"},
+		{"positive_rate", args{12}, "hdd"},
+		{"negative_rate", args{-1000}, "unknown"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := getTypeByRate(tt.args.rate); got != tt.want {
+				t.Errorf("getTypeByRate() = %v, want %v", got, tt.want)
 			}
 		})
 	}
