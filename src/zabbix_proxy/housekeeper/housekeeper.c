@@ -241,9 +241,6 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 		zbx_setproctitle("%s [deleted %d records in " ZBX_FS_DBL " sec, %s]",
 				get_process_type_string(process_type), records, sec, sleeptext);
-
-		if (0 != CONFIG_HOUSEKEEPING_FREQUENCY)
-			sleeptime = CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR;
 	}
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
