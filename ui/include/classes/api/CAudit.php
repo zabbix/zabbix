@@ -212,7 +212,7 @@ class CAudit {
 	];
 
 	/**
-	 * Array of paths that should be masked in audit details.
+	 * Array of abstract paths that should be masked in audit details.
 	 *
 	 * @var array
 	 */
@@ -242,7 +242,7 @@ class CAudit {
 
 	/**
 	 * Table names of nested objects to check default values.
-	 * path => table name
+	 * abstract path => table name
 	 *
 	 * @var array
 	 */
@@ -322,12 +322,12 @@ class CAudit {
 	];
 
 	/**
-	 * ID field names for arrays of nested objects.
-	 * path => id field
+	 * ID field names of nested objects that stored in a parent object properties containing an array of nested objects.
+	 * abstract path => id field name
 	 *
 	 * @var array
 	 */
-	private const NESTED_OBJECTS_IDS = [
+	private const NESTED_OBJECTS_ID_FIELD_NAMES = [
 		'action.filter.conditions' => 'conditionid',
 		'action.operations' => 'operationid',
 		'action.operations.opconditions' => 'opconditionid',
@@ -392,38 +392,21 @@ class CAudit {
 	];
 
 	/**
-	 * ID field names for single nested objects.
-	 * path => id field
-	 *
-	 * @var array
-	 */
-	private const NESTED_SINGLE_OBJECTS_IDS = [
-		'action.operations.opmessage' => 'operationid',
-		'action.operations.opcommand' => 'operationid',
-		'action.operations.opinventory' => 'operationid',
-		'action.recovery_operations.opmessage' => 'operationid',
-		'action.recovery_operations.opcommand' => 'operationid',
-		'action.update_operations.opmessage' => 'operationid',
-		'action.update_operations.opcommand' => 'operationid',
-		'proxy.interface' => 'interfaceid'
-	];
-
-	/**
-	 * Array of paths that should be skipped in audit details.
+	 * Array of abstract paths that should be skipped in audit details.
 	 *
 	 * @var array
 	 */
 	private const SKIP_FIELDS = ['token.creator_userid', 'token.created_at'];
 
 	/**
-	 * Array of paths that contain blob fields.
+	 * Array of abstract paths that contain blob fields.
 	 *
 	 * @var array
 	 */
 	private const BLOB_FIELDS = ['image.image'];
 
 	/**
-	 * Array of paths that can only contain a data to delete.
+	 * Array of abstract paths that can only contain a data to delete.
 	 */
 	private const DELETE_ONLY_FIELDS = ['template.templates_clear'];
 
@@ -611,20 +594,19 @@ class CAudit {
 	 * Checks by path, whether the value of the object should be masked.
 	 *
 	 * @param int    $resource
-	 * @param string $real_path
+	 * @param string $path
 	 * @param array  $object
 	 *
 	 * @return bool
 	 */
-	private static function isValueToMask(int $resource, string $real_path, array $object): bool {
+	private static function isValueToMask(int $resource, string $path, array $object): bool {
 		if (!array_key_exists($resource, self::MASKED_PATHS)) {
 			return false;
 		}
 
-		$object_path = self::getLastObjectPath($real_path);
-		$path = preg_replace('/\[[0-9]+\]/', '', $real_path);
+		$object_path = self::getLastObjectPath($path);
 
-		if (!in_array($path, self::MASKED_PATHS[$resource]['paths'])) {
+		if (!in_array(self::getAbstractPath($path), self::MASKED_PATHS[$resource]['paths'])) {
 			return false;
 		}
 
@@ -649,51 +631,49 @@ class CAudit {
 	/**
 	 * Converts the object properties to the one-dimensional array where the key is a path.
 	 *
-	 * @param string $prefix
-	 * @param array  $object
+	 * @param string $path    Path to object or to array of objects.
+	 * @param array  $object  The object or array of objects to convert.
 	 *
 	 * @return array
 	 */
-	private static function convertKeysToPaths(string $prefix, array $object): array {
+	private static function convertKeysToPaths(string $path, array $object): array {
 		$result = [];
 
-		$is_nested_single_object = array_key_exists($prefix, self::NESTED_SINGLE_OBJECTS_IDS);
-		$is_nested_object = false;
+		$is_field_of_another_object = strpos($path, '.') !== false && !preg_match('/\[[0-9]+\]$/', $path);
+		$is_array_of_objects = false;
 
-		if ($is_nested_single_object) {
-			$pk = self::NESTED_SINGLE_OBJECTS_IDS[$prefix];
-		}
-		elseif (!preg_match('/\[[0-9]+\]$/', $prefix)) {
-			$object_prefix = preg_replace('/\[[0-9]+\]/', '', $prefix);
-			$is_nested_object = array_key_exists($object_prefix, self::NESTED_OBJECTS_IDS);
+		if ($is_field_of_another_object) {
+			$abstract_path = self::getAbstractPath($path);
+			$is_array_of_objects = array_key_exists($abstract_path, self::NESTED_OBJECTS_ID_FIELD_NAMES);
 
-			if ($is_nested_object) {
-				$pk = self::NESTED_OBJECTS_IDS[$object_prefix];
+			if ($is_array_of_objects) {
+				$id_field_name = self::NESTED_OBJECTS_ID_FIELD_NAMES[$abstract_path];
 			}
 		}
 
-		foreach ($object as $key => $value) {
-			if ($is_nested_single_object) {
-				$index = '['.$object[$pk].'].'.$key;
-			}
-			elseif ($is_nested_object) {
-				$index = '['.$value[$pk].']';
-			}
-			else {
-				$index = '.'.$key;
-			}
+		if ($is_array_of_objects) {
+			$objects = $object;
 
-			$new_prefix = $prefix.$index;
+			foreach ($objects as $object) {
+				$path_to_object = $path.'['.$object[$id_field_name].']';
 
-			if (in_array($new_prefix, self::SKIP_FIELDS)) {
-				continue;
+				$result += self::convertKeysToPaths($path_to_object, $object);
 			}
+		}
+		else {
+			foreach ($object as $field => $value) {
+				$path_to_field = $path.'.'.$field;
 
-			if (is_array($value)) {
-				$result += self::convertKeysToPaths($new_prefix, $value);
-			}
-			else {
-				$result[$new_prefix] = (string) $value;
+				if (in_array(self::getAbstractPath($path_to_field), self::SKIP_FIELDS)) {
+					continue;
+				}
+
+				if (is_array($value)) {
+					$result += self::convertKeysToPaths($path_to_field, $value);
+				}
+				else {
+					$result[$path_to_field] = (string) $value;
+				}
 			}
 		}
 
@@ -714,11 +694,7 @@ class CAudit {
 		$table_name = self::TABLE_NAMES[$resource];
 
 		if ($object_path !== self::API_NAMES[$resource]) {
-			if (strpos($object_path, '[') !== false) {
-				$object_path = preg_replace('/\[[0-9]+\]/', '', $object_path);
-			}
-
-			$table_name = self::NESTED_OBJECTS_TABLE_NAMES[$object_path];
+			$table_name = self::NESTED_OBJECTS_TABLE_NAMES[self::getAbstractPath($object_path)];
 		}
 
 		$schema_fields = DB::getSchema($table_name)['fields'];
@@ -755,6 +731,21 @@ class CAudit {
 	 */
 	private static function getLastObjectPath(string $path): string {
 		return substr($path, 0, strrpos($path, '.'));
+	}
+
+	/**
+	 * Return the abstract path (without indexes).
+	 *
+	 * @param string $path
+	 *
+	 * @return string
+	 */
+	private static function getAbstractPath(string $path): string {
+		if (strpos($path, '[') !== false) {
+			$path = preg_replace('/\[[0-9]+\]/', '', $path);
+		}
+
+		return $path;
 	}
 
 	/**
@@ -805,7 +796,7 @@ class CAudit {
 			if (self::isValueToMask($resource, $path, $object)) {
 				$result[$path] = [self::DETAILS_ACTION_ADD, ZBX_SECRET_MASK];
 			}
-			elseif (in_array($path, self::BLOB_FIELDS)) {
+			elseif (in_array(self::getAbstractPath($path), self::BLOB_FIELDS)) {
 				$result[$path] = [self::DETAILS_ACTION_ADD];
 			}
 			else {
@@ -836,25 +827,19 @@ class CAudit {
 			}
 		}
 
-		foreach ($nested_objects_paths as $real_path) {
-			if (!in_array($real_path, $db_nested_objects_paths)) {
-				$path = $real_path;
-
-				if (strpos($real_path, '[') !== false) {
-					$path = preg_replace('/\[[0-9]+\]/', '', $real_path);
-				}
-
-				if (in_array($path, self::DELETE_ONLY_FIELDS)) {
-					$result[$real_path] = [self::DETAILS_ACTION_DELETE];
+		foreach ($nested_objects_paths as $path) {
+			if (!in_array($path, $db_nested_objects_paths)) {
+				if (in_array(self::getAbstractPath($path), self::DELETE_ONLY_FIELDS)) {
+					$result[$path] = [self::DETAILS_ACTION_DELETE];
 
 					foreach ($object as $object_path => $value) {
-						if (substr($object_path, 0, strlen($real_path)) === $real_path) {
+						if (substr($object_path, 0, strlen($path)) === $path) {
 							unset($object[$object_path]);
 						}
 					}
 				}
 				else {
-					$result[$real_path] = [self::DETAILS_ACTION_ADD];
+					$result[$path] = [self::DETAILS_ACTION_ADD];
 				}
 			}
 		}
@@ -867,7 +852,7 @@ class CAudit {
 					continue;
 				}
 
-				if (in_array($path, self::BLOB_FIELDS)) {
+				if (in_array(self::getAbstractPath($path), self::BLOB_FIELDS)) {
 					$result[$path] = [self::DETAILS_ACTION_ADD];
 				}
 				else {
@@ -886,7 +871,7 @@ class CAudit {
 						$result[self::getLastObjectPath($path)] = [self::DETAILS_ACTION_UPDATE];
 					}
 
-					if (in_array($path, self::BLOB_FIELDS)) {
+					if (in_array(self::getAbstractPath($path), self::BLOB_FIELDS)) {
 						$result[$path] = [self::DETAILS_ACTION_UPDATE];
 					}
 					else {
