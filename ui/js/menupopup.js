@@ -781,9 +781,9 @@ function getMenuPopupItemConfiguration(options) {
 	if (options.context === 'host' && options.allowed_ui_latest_data) {
 		url = new Curl('zabbix.php', false);
 		url.setArgument('action', 'latest.view');
-		url.setArgument('filter_hostids[]', options.hostid);
-		url.setArgument('filter_select', options.name);
-		url.setArgument('filter_set', 1);
+		url.setArgument('hostids[]', options.hostid);
+		url.setArgument('name', options.name);
+		url.setArgument('filter_name', '');
 
 		items.push({
 			label: t('Latest data'),
