@@ -458,45 +458,45 @@ class testUrlParameters extends CLegacyWebTest {
 				'server_name_on_page' => false,
 				'test_cases' => [
 					[
-						'url' => 'zabbix.php?action=latest.view&filter_groupids[]=4&filter_hostids[]=50009',
+						'url' => 'zabbix.php?action=latest.view&groupids[]=4&hostids[]=50009',
 						'text_present' => 'Latest data'
 					],
 					[
-						'url' => 'zabbix.php?action=latest.view&filter_groupids[]=9999999&filter_hostids[]=50009',
+						'url' => 'zabbix.php?action=latest.view&groupids[]=9999999&hostids[]=50009',
 						'text_present' => 'Latest data'
 					],
 					[
-						'url' => 'zabbix.php?action=latest.view&filter_groupids[]=4&filter_hostids[]=9999999',
+						'url' => 'zabbix.php?action=latest.view&groupids[]=4&hostids[]=9999999',
 						'text_present' => 'Latest data'
 					],
 					[
-						'url' => 'zabbix.php?action=latest.view&filter_groupids[]=abc&filter_hostids[]=abc',
+						'url' => 'zabbix.php?action=latest.view&groupids[]=abc&hostids[]=abc',
 						'text_not_present' => 'Latest data',
 						'fatal_error' => true,
 						'text_present' => [
 							'Fatal error, please report to the Zabbix team',
-							'Incorrect value for "filter_groupids" field.',
-							'Incorrect value for "filter_hostids" field.'
+							'Incorrect value for "groupids" field.',
+							'Incorrect value for "hostids" field.'
 						]
 					],
 					[
-						'url' => 'zabbix.php?action=latest.view&filter_groupids[]=&filter_hostids[]=',
+						'url' => 'zabbix.php?action=latest.view&groupids[]=&hostids[]=',
 						'text_not_present' => 'Latest data',
 						'fatal_error' => true,
 						'text_present' => [
 							'Fatal error, please report to the Zabbix team',
-							'Incorrect value for "filter_groupids" field.',
-							'Incorrect value for "filter_hostids" field.'
+							'Incorrect value for "groupids" field.',
+							'Incorrect value for "hostids" field.'
 						]
 					],
 					[
-						'url' => 'zabbix.php?action=latest.view&filter_groupids[]=-1&filter_hostids[]=-1',
+						'url' => 'zabbix.php?action=latest.view&groupids[]=-1&hostids[]=-1',
 						'text_not_present' => 'Latest data',
 						'fatal_error' => true,
 						'text_present' => [
 							'Fatal error, please report to the Zabbix team',
-							'Incorrect value for "filter_groupids" field.',
-							'Incorrect value for "filter_hostids" field.'
+							'Incorrect value for "groupids" field.',
+							'Incorrect value for "hostids" field.'
 						]
 					],
 					[
