@@ -419,7 +419,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			self::COMPONENT_AGENT2 => [
 				'Hostname' => self::COMPONENT_AGENT2,
 				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
-				'ListenPort' => PHPUNIT_PORT_PREFIX.'53',
+				'ListenPort' => PHPUNIT_PORT_PREFIX.self::AGENT2_PORT_SUFFIX,
 				'AllowKey' => 'system.run[*]',
 				'Plugins.Uptime.Capacity' => '10'
 			]
