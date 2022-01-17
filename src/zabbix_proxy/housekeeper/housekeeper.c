@@ -145,7 +145,7 @@ static int	get_housekeeper_period(double time_slept)
 
 ZBX_THREAD_ENTRY(housekeeper_thread, args)
 {
-	int			records, start, sleeptime;
+	int			records, start, sleeptime = 0;
 	double			sec, time_slept, time_now, time_exec = 0;
 	char			sleeptext[25];
 	zbx_ipc_async_socket_t	rtc;
@@ -161,6 +161,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 	if (0 == CONFIG_HOUSEKEEPING_FREQUENCY)
 	{
+		sleeptime = ZBX_IPC_WAIT_FOREVER;
 		zbx_setproctitle("%s [waiting for user command]", get_process_type_string(process_type));
 		zbx_snprintf(sleeptext, sizeof(sleeptext), "waiting for user command");
 	}
@@ -180,11 +181,6 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		unsigned char	*rtc_data;
 
 		sec = zbx_time();
-
-		if (0 == CONFIG_HOUSEKEEPING_FREQUENCY)
-			sleeptime = ZBX_IPC_WAIT_FOREVER;
-		else
-			sleeptime = CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR;
 
 		while (SUCCEED == zbx_rtc_wait(&rtc, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
 		{
@@ -206,6 +202,11 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 		if (!ZBX_IS_RUNNING())
 			break;
+
+		if (0 != CONFIG_HOUSEKEEPING_FREQUENCY)
+			sleeptime = ZBX_IPC_WAIT_FOREVER;
+		else
+			sleeptime = CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR;
 
 		time_now = zbx_time();
 		time_slept = time_now - sec;
