@@ -527,7 +527,7 @@ class CItem extends CItemGeneral {
 									['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'interfaceid' =>	['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'type', 'in' => implode(',', [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_SNMP])], 'type' => API_ID],
+									['if' => ['field' => 'type', 'in' => implode(',', [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP])], 'type' => API_ID],
 									['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'inventory_link' =>	['type' => API_ID],

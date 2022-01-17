@@ -787,7 +787,7 @@ class CConfigurationImport {
 
 				unset($item['triggers']);
 
-				if ($item['type'] !== ITEM_TYPE_HTTPAGENT) {
+				if ($item['type'] != ITEM_TYPE_HTTPAGENT) {
 					unset($item['allow_traps']);
 					unset($item['url']);
 					unset($item['query_fields']);
@@ -807,28 +807,28 @@ class CConfigurationImport {
 					unset($item['verify_host']);
 				}
 
-				if ($item['type'] !== ITEM_TYPE_SNMP) {
+				if ($item['type'] != ITEM_TYPE_SNMP) {
 					unset($item['snmp_oid']);
 				}
 
-				if ($item['type'] !== ITEM_TYPE_IPMI) {
+				if ($item['type'] != ITEM_TYPE_IPMI) {
 					unset($item['ipmi_sensor']);
 				}
 
-				if ($item['type'] !== ITEM_TYPE_JMX) {
+				if ($item['type'] != ITEM_TYPE_JMX) {
 					unset($item['jmx_endpoint']);
 				}
 
-				if ($item['type'] !== ITEM_TYPE_SSH) {
+				if ($item['type'] != ITEM_TYPE_SSH) {
 					unset($item['publickey']);
 					unset($item['privatekey']);
 				}
 
-				if ($item['type'] !== ITEM_TYPE_SCRIPT) {
+				if ($item['type'] != ITEM_TYPE_SCRIPT) {
 					unset($item['parameters']);
 				}
 
-				if ($item['value_type'] !== ITEM_VALUE_TYPE_LOG) {
+				if ($item['value_type'] != ITEM_VALUE_TYPE_LOG) {
 					unset($item['logtimefmt']);
 				}
 
@@ -843,15 +843,15 @@ class CConfigurationImport {
 					unset($item['units']);
 				}
 
-				if ($item['type'] !== ITEM_TYPE_HTTPAGENT && $item['type'] !== ITEM_TYPE_TRAPPER) {
+				if ($item['type'] != ITEM_TYPE_HTTPAGENT && $item['type'] != ITEM_TYPE_TRAPPER) {
 					unset($item['trapper_hosts']);
 				}
 
-				if ($item['type'] !== ITEM_TYPE_SSH && $item['type'] !== ITEM_TYPE_HTTPAGENT) {
+				if ($item['type'] != ITEM_TYPE_HTTPAGENT && $item['type'] != ITEM_TYPE_SSH) {
 					unset($item['authtype']);
 				}
 
-				if ($item['type'] !== ITEM_TYPE_HTTPAGENT && $item['type'] !== ITEM_TYPE_SCRIPT) {
+				if ($item['type'] != ITEM_TYPE_HTTPAGENT && $item['type'] != ITEM_TYPE_SCRIPT) {
 					unset($item['timeout']);
 				}
 
@@ -859,10 +859,6 @@ class CConfigurationImport {
 							ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT
 						])) {
 					unset($item['password']);
-				}
-				if (!in_array($item['type'], [ITEM_TYPE_SIMPLE, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_JMX,
-							ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SSH, ITEM_TYPE_TELNET
-						])) {
 					unset($item['username']);
 				}
 
