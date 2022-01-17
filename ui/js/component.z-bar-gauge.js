@@ -77,7 +77,7 @@ class ZBarGauge extends HTMLElement {
 
 			case 'value':
 				if (new_value !== null && this.value !== new_value) {
-					this.value = new_value;
+					this.value = Math.max(this._min, Math.min(this._max, new_value));
 
 					this.dispatchEvent(new Event('change', {bubbles: true}));
 				}
@@ -155,14 +155,16 @@ class ZBarGauge extends HTMLElement {
 			const width = this.offsetWidth - 2;
 			const height = this.offsetHeight - 2;
 
+
+
+			let thresholds = Object.keys(this._thresholds).sort((a, b) => (a - b));
+
 			const cell_count = Math.floor((width - 1) / BAR_GAUGE_BAR_ITEM_WIDTH);
+			const cell_interval = (this._max - this._min) / cell_count;
 
 			this._canvas.width = cell_count * BAR_GAUGE_BAR_ITEM_WIDTH + 1;
 			this._canvas.height = height;
 
-			const cell_interval = (this._max - this._min) / cell_count;
-
-			let thresholds = Object.keys(this._thresholds).sort((a, b) => (a - b));
 			let alpha = 1;
 
 			for (let i = 0; i < cell_count; i++) {
