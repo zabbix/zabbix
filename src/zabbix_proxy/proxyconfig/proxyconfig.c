@@ -81,8 +81,12 @@ static void	process_configuration_sync(size_t *data_size)
 	reserved = j.buffer_size;
 	zbx_json_free(&j);
 
+	update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+
 	if (FAIL == connect_to_server(&sock, 600, CONFIG_PROXYCONFIG_RETRY))	/* retry till have a connection */
 		goto out;
+
+	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 	if (SUCCEED != get_data_from_server(&sock, &buffer, buffer_size, reserved, &error))
 	{
@@ -135,6 +139,7 @@ static void	process_configuration_sync(size_t *data_size)
 error:
 	disconnect_server(&sock);
 out:
+	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 	zbx_free(error);
 	zbx_free(buffer);
 	zbx_json_free(&j);
@@ -229,9 +234,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 
 		zbx_setproctitle("%s [loading configuration]", get_process_type_string(process_type));
 
-		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 		process_configuration_sync(&data_size);
-		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 		sec = zbx_time() - sec;
 
 		zbx_setproctitle("%s [synced config " ZBX_FS_SIZE_T " bytes in " ZBX_FS_DBL " sec, idle %d sec]",
