@@ -41,7 +41,7 @@ extern ZBX_THREAD_LOCAL int		server_num, process_num;
  ******************************************************************************/
 ZBX_THREAD_ENTRY(dbconfig_thread, args)
 {
-	double			sec = 0.0, last_sync_time;
+	double			sec = 0.0;
 	int			nextcheck = 0, sleeptime = CONFIG_CONFSYNCER_FREQUENCY, secrets_reload = 0;
 	zbx_ipc_async_socket_t	rtc;
 
@@ -62,7 +62,6 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 
 	sec = zbx_time();
 	zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
-	last_sync_time = zbx_time();
 	DCsync_configuration(ZBX_DBSYNC_INIT);
 	DCsync_kvs_paths(NULL);
 	zbx_setproctitle("%s [synced configuration in " ZBX_FS_DBL " sec, idle %d sec]",
@@ -79,10 +78,10 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 		{
 			if (ZBX_RTC_CONFIG_CACHE_RELOAD == rtc_cmd)
 			{
-				if (ZBX_DOUBLE_EPSILON < last_sync_time)
+				if (0 != nextcheck)
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the configuration cache");
-					last_sync_time = 0;
+					nextcheck = 0;
 				}
 				else
 					zabbix_log(LOG_LEVEL_WARNING, "configuration cache reloading is already in progress");
@@ -109,13 +108,12 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 		sec = zbx_time();
 		zbx_update_env(sec);
 
-		if (sec - last_sync_time >= CONFIG_CONFSYNCER_FREQUENCY)
+		if ((int)sec >= nextcheck)
 		{
 			DCsync_configuration(ZBX_DBSYNC_UPDATE);
 			DCsync_kvs_paths(NULL);
 			DCupdate_interfaces_availability();
 			nextcheck = (int)sec + CONFIG_CONFSYNCER_FREQUENCY;
-			last_sync_time = sec;
 		}
 		else if (1 == secrets_reload)
 		{
