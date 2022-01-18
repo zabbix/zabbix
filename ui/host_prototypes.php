@@ -263,12 +263,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$interfaces[$main_interfaces[$type]]['main'] = INTERFACE_PRIMARY;
 			}
 		}
-	}
-	else {
-		$interfaces = [];
-	}
 
-	$newHostPrototype['interfaces'] = $interfaces;
+		$newHostPrototype['interfaces'] = $interfaces;
+	}
 
 	if ($hostid != 0) {
 		$newHostPrototype['hostid'] = $hostid;
