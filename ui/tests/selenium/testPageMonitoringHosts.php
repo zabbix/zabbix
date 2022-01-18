@@ -1045,7 +1045,7 @@ class testPageMonitoringHosts extends CWebTest {
 			$this->page->assertTitle('Problems');
 			$this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one()->checkValue(['Hosts' => $host]);
 
-			// Count problems of each severity and compare it with problem amount from Hosts page.
+			// Count problems of each severity and compare it with problems count from Hosts page.
 			if ($host !== 'Empty host') {
 				foreach ($results as $severity => $count) {
 					$problem_count = $table->query('xpath:.//td[contains(@class, "-bg") and text()="'.$severity.'"]')
