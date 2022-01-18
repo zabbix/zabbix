@@ -120,7 +120,6 @@ $form_grid->addItem([
 	(new CLabel(_('Aggregation interval'), 'aggregate_interval'))->setAsteriskMark(),
 	new CFormField(
 		(new CTextBox('aggregate_interval', $data['aggregate_interval']))
-			->setAttribute('placeholder', _('none'))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 )]);
 
@@ -235,7 +234,7 @@ $output = [
 			'title'		=> array_key_exists('edit', $data) ? _('Update') : _('Add'),
 			'keepOpen'	=> true,
 			'isSubmit'	=> true,
-			'action'	=> '$(document.forms.top_hosts_data_grid).trigger("submit.form", [overlay])'
+			'action'	=> '$(document.forms.top_hosts_data_grid).trigger("process.form", [overlay])'
 		]
 	]
 ];

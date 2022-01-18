@@ -43,7 +43,7 @@
 		$colorpicker.colorpicker({appendTo: $colorpicker.closest('.input-color-picker')});
 	});
 	$thresholds_table.on('blur afterremove.dynamicRows', 'input[name$="[threshold]"]', sortThresholdsTable);
-	$widget_form.on('submit.form', handleFormSubmit);
+	$widget_form.on('process.form', handleFormSubmit);
 
 	function sortThresholdsTable() {
 		let rows = [];

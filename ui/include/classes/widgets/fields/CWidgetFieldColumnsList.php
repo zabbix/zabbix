@@ -31,9 +31,9 @@ class CWidgetFieldColumnsList extends CWidgetField {
 	const FUNC_MIN = 1;
 	const FUNC_MAX = 2;
 	const FUNC_AVG = 3;
-	const FUNC_LAST = 4;
-	const FUNC_FIRST = 5;
-	const FUNC_COUNT = 6;
+	const FUNC_COUNT = 4;
+	const FUNC_FIRST = 6;
+	const FUNC_LAST = 7;
 
 	// Column value display type.
 	const DISPLAY_AS_IS = 1;
@@ -66,7 +66,12 @@ class CWidgetFieldColumnsList extends CWidgetField {
 			]],
 			'timeshift'				=> ['type' => API_TIME_UNIT, 'in' => implode(':', [ZBX_MIN_TIMESHIFT, ZBX_MAX_TIMESHIFT])],
 			'aggregate_function'	=> ['type' => API_INT32, 'in' => implode(',', [self::FUNC_NONE, self::FUNC_MIN, self::FUNC_MAX, self::FUNC_AVG, self::FUNC_LAST, self::FUNC_FIRST, self::FUNC_COUNT]), 'default' => self::FUNC_NONE],
-			'aggregate_interval'	=> ['type' => API_TIME_UNIT, 'flags' => API_TIME_UNIT_WITH_YEAR, 'in' => implode(':', [1, ZBX_MAX_TIMESHIFT])],
+			'aggregate_interval'	=> ['type' => API_MULTIPLE, 'rules' => [
+						['if' => ['field' => 'aggregate_function', 'in' => implode(',', [self::FUNC_MIN, self::FUNC_MAX, self::FUNC_AVG, self::FUNC_LAST, self::FUNC_FIRST, self::FUNC_COUNT])],
+							'type' => API_TIME_UNIT, 'flags' => API_REQUIRED|API_NOT_EMPTY|API_TIME_UNIT_WITH_YEAR, 'in' => implode(':', [1, ZBX_MAX_TIMESHIFT])],
+						['else' => true,
+							'type' => API_STRING_UTF8]
+			]],
 			'display'				=> ['type' => API_MULTIPLE, 'rules' => [
 						['if' => ['field' => 'data', 'in' => self::DATA_ITEM_VALUE],
 							'type' => API_INT32, 'default' => self::DISPLAY_AS_IS, 'in' => implode(',', [self::DISPLAY_AS_IS, self::DISPLAY_BAR, self::DISPLAY_INDICATORS])],
@@ -138,12 +143,12 @@ class CWidgetFieldColumnsList extends CWidgetField {
 			foreach ($val['thresholds'] as $threshold_index => $threshold) {
 				$widget_fields[] = [
 					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-					'name' => implode('.', ['thresholds.color', $column_index, $threshold_index]),
+					'name' => implode('.', [$this->name.'thresholds.color', $column_index, $threshold_index]),
 					'value' => $threshold['color']
 				];
 				$widget_fields[] = [
 					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-					'name' => implode('.', ['thresholds.threshold', $column_index, $threshold_index]),
+					'name' => implode('.', [$this->name.'thresholds.threshold', $column_index, $threshold_index]),
 					'value' => $threshold['threshold']
 				];
 			}

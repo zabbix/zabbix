@@ -35,8 +35,8 @@ class CWidgetFormTopHostsData extends CWidgetForm {
 
 		$this->data = self::convertDottedKeys($this->data);
 
-		if (array_key_exists('thresholds', $this->data)) {
-			foreach ($this->data['thresholds'] as $column_index => $fields) {
+		if (array_key_exists('columnsthresholds', $this->data)) {
+			foreach ($this->data['columnsthresholds'] as $column_index => $fields) {
 				$this->data['columns'][$column_index]['thresholds'] = [];
 
 				foreach ($fields as $field_key => $field_values) {

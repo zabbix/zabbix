@@ -119,11 +119,11 @@ window.widget_tophostsdata_form = {
 				let index = elm.closest('tr').querySelector('[name="sortorder[columns][]"]').value;
 				let form_fields = getFormFields(elm.closest('form'));
 
-				PopUp('popup.widget.columnlist.edit', {...form_fields.columns[index], edit: 1}, null, e.target);
+				PopUp('popup.widget.columnlist.edit', {...form_fields.columns[index], edit: 1}, null, elm);
 				break;
 
 			case 'add':
-				PopUp('popup.widget.columnlist.edit', {}, null, e.target);
+				PopUp('popup.widget.columnlist.edit', {}, null, elm);
 				break;
 
 			case 'remove':
