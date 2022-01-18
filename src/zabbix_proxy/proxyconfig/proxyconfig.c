@@ -187,7 +187,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 
 	zbx_rtc_notify_config_sync(&rtc);
 
-	sleeptime = (ZBX_PROGRAM_TYPE_PROXY_PASSIVE == program_type ? SEC_PER_YEAR : CONFIG_PROXYCONFIG_FREQUENCY);
+	sleeptime = (ZBX_PROGRAM_TYPE_PROXY_PASSIVE == program_type ? ZBX_IPC_WAIT_FOREVER : CONFIG_PROXYCONFIG_FREQUENCY);
 
 	while (ZBX_IS_RUNNING())
 	{
@@ -222,7 +222,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 						get_process_type_string(process_type), zbx_time() - sec);
 			}
 
-			sleeptime = SEC_PER_YEAR;
+			sleeptime = ZBX_IPC_WAIT_FOREVER;
 			continue;
 		}
 
