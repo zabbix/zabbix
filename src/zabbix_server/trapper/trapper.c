@@ -1222,16 +1222,6 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 		ret = zbx_tcp_accept(&s, ZBX_TCP_SEC_TLS_CERT | ZBX_TCP_SEC_TLS_PSK | ZBX_TCP_SEC_UNENCRYPTED);
 		zbx_update_env(zbx_time());
 
-#ifdef HAVE_NETSNMP
-		while (SUCCEED == zbx_rtc_wait(&rtc, &rtc_cmd, &rtc_data, 0) && 0 != rtc_cmd)
-		{
-			if (ZBX_RTC_SNMP_CACHE_RELOAD == rtc_cmd && 0 == snmp_reload)
-			{
-				zbx_clear_cache_snmp(process_type, process_num);
-				snmp_reload = 1;
-			}
-		}
-#endif
 		if (SUCCEED == ret)
 		{
 			zbx_timespec_t	ts;
@@ -1244,6 +1234,16 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 			zbx_setproctitle("%s #%d [processing data]", get_process_type_string(process_type),
 					process_num);
 
+#ifdef HAVE_NETSNMP
+			while (SUCCEED == zbx_rtc_wait(&rtc, &rtc_cmd, &rtc_data, 0) && 0 != rtc_cmd)
+			{
+				if (ZBX_RTC_SNMP_CACHE_RELOAD == rtc_cmd && 0 == snmp_reload)
+				{
+					zbx_clear_cache_snmp(process_type, process_num);
+					snmp_reload = 1;
+				}
+			}
+#endif
 			sec = zbx_time();
 			process_trapper_child(&s, &ts);
 			sec = zbx_time() - sec;
