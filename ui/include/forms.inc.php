@@ -1022,8 +1022,6 @@ function getItemFormData(array $item = [], array $options = []) {
 		}
 	}
 
-	CArrayHelper::sort($data['preprocessing'], ['sortorder']);
-
 	if (!$data['delay_flex']) {
 		$data['delay_flex'][] = ['delay' => '', 'period' => '', 'type' => ITEM_DELAY_FLEXIBLE];
 	}

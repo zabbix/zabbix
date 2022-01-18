@@ -518,6 +518,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
 				'error_handler_params' => ''
 			];
+
+			unset($step['sortorder']);
 		}
 		unset($step);
 
@@ -827,6 +829,7 @@ if (hasRequest('form')) {
 	);
 
 	if (!hasRequest('form_refresh')) {
+		$i = 0;
 		foreach ($data['preprocessing'] as &$step) {
 			if ($step['type'] == ZBX_PREPROC_SCRIPT) {
 				$step['params'] = [$step['params'], ''];
@@ -834,9 +837,12 @@ if (hasRequest('form')) {
 			else {
 				$step['params'] = explode("\n", $step['params']);
 			}
+			$step['sortorder'] = $i++;
 		}
 		unset($step);
 	}
+
+	CArrayHelper::sort($data['preprocessing'], ['sortorder']);
 
 	// update form
 	if (hasRequest('itemid') && !getRequest('form_refresh')) {
