@@ -1015,23 +1015,24 @@ class testPageMonitoringHosts extends CWebTest {
 	}
 
 	/**
-	 * Check problem amount displayed on Hosts and Problems page.
+	 * Check number of problems displayed on Hosts and Problems page.
 	 */
 	public function testPageMonitoringHosts_CountProblems() {
+		$this->page->login();
 		$hosts_names = ['1_Host_to_check_Monitoring_Overview', 'ЗАББИКС Сервер', 'Host for tag permissions', 'Empty host'];
 		foreach ($hosts_names as $host) {
-			$this->page->login()->open('zabbix.php?action=host.view&name='.$host)->waitUntilReady();
+			$this->page->open('zabbix.php?action=host.view&name='.$host)->waitUntilReady();
 			$table = $this->query('class:list-table')->asTable()->one();
 
 			// Get number of problems displayed on icon and it severity level.
 			if ($host !== 'Empty host') {
-				$selector = 'xpath:.//*[contains(@class, "problem-icon-list-item")]';
-				$icons = $table->query($selector)->all()->count();
+				$icons = $table->query('xpath:.//*[contains(@class, "problem-icon-list-item")]')->all();
+				$results = [];
 
-				for ($i = 1; $i <= $icons; $i++) {
-					$amount = $table->query($selector.'['.$i.']')->one()->getText();
-					$severity = $table->query($selector.'['.$i.']')->one()->getAttribute('title');
-					$results[] = [$severity => $amount];
+				foreach ($icons as $icon) {
+					$amount = $icon->getText();
+					$severity = $icon->getAttribute('title');
+					$results[$severity] = $amount;
 				}
 			}
 			else {
@@ -1046,14 +1047,11 @@ class testPageMonitoringHosts extends CWebTest {
 
 			// Count problems amount of each severity and compare it with problem amount from Hosts page.
 			if ($host !== 'Empty host') {
-				foreach($results as $result) {
-					foreach ($result as $severity => $amount) {
-						$problem_count = $table->query('xpath:.//td[contains(@class, "-bg") and text()="'.$severity.'"]')
-								->all()->count();
-						$this->assertEquals(strval($problem_count), $amount);
-					}
+				foreach ($results as $severity => $amount) {
+					$problem_count = $table->query('xpath:.//td[contains(@class, "-bg") and text()="'.$severity.'"]')
+							->all()->count();
+					$this->assertEquals(strval($problem_count), $amount);
 				}
-				unset($results);
 			}
 
 			// Check that table is empty and No data found displayed.
