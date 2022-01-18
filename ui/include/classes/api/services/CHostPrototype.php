@@ -1523,12 +1523,12 @@ class CHostPrototype extends CHostBase {
 		}
 		unset($host_prototype);
 
-		if ($ins_group_links) {
-			$group_prototypeids = DB::insert('group_prototype', $ins_group_links);
-		}
-
 		if ($del_group_prototypeids) {
 			self::deleteGroupPrototypes($del_group_prototypeids);
+		}
+
+		if ($ins_group_links) {
+			$group_prototypeids = DB::insert('group_prototype', $ins_group_links);
 		}
 
 		foreach ($host_prototypes as &$host_prototype) {
@@ -1581,12 +1581,12 @@ class CHostPrototype extends CHostBase {
 		}
 		unset($host_prototype);
 
-		if ($ins_group_prototypes) {
-			$group_prototypeids = DB::insert('group_prototype', $ins_group_prototypes);
-		}
-
 		if ($del_group_prototypeids) {
 			self::deleteGroupPrototypes($del_group_prototypeids);
+		}
+
+		if ($ins_group_prototypes) {
+			$group_prototypeids = DB::insert('group_prototype', $ins_group_prototypes);
 		}
 
 		foreach ($host_prototypes as &$host_prototype) {
@@ -1643,16 +1643,16 @@ class CHostPrototype extends CHostBase {
 			}
 		}
 
-		if ($ins_inventories) {
-			DB::insertBatch('host_inventory', $ins_inventories, false);
+		if ($del_hostids) {
+			DB::delete('host_inventory', ['hostid' => $del_hostids]);
 		}
 
 		if ($upd_inventories) {
 			DB::update('host_inventory', $upd_inventories);
 		}
 
-		if ($del_hostids) {
-			DB::delete('host_inventory', ['hostid' => $del_hostids]);
+		if ($ins_inventories) {
+			DB::insertBatch('host_inventory', $ins_inventories, false);
 		}
 	}
 
