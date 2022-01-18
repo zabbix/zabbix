@@ -4894,6 +4894,7 @@ typedef struct
 	char		*function;
 	char		*parameter;
 	zbx_timespec_t	timespec;
+	unsigned char	type;
 
 	/* output data */
 	zbx_variant_t	value;
@@ -5011,6 +5012,7 @@ static void	zbx_populate_function_items(const zbx_vector_uint64_t *functionids, 
 			func = (zbx_func_t *)zbx_hashset_insert(funcs, &func_local, sizeof(func_local));
 			func->function = zbx_strdup(NULL, func_local.function);
 			func->parameter = zbx_strdup(NULL, func_local.parameter);
+			func->type = functions[i].type;
 			zbx_variant_set_none(&func->value);
 		}
 
@@ -5096,6 +5098,23 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_u
 			zbx_free(func->error);
 			func->error = zbx_eval_format_function_error(func->function, item->host.host,
 					item->key_orig, func->parameter, "item is disabled");
+			continue;
+		}
+
+		if ((ZBX_FUNCTION_TYPE_HISTORY == func->type || ZBX_FUNCTION_TYPE_TIMER == func->type) &&
+				0 == item->history)
+		{
+			zbx_free(func->error);
+			func->error = zbx_eval_format_function_error(func->function, item->host.host,
+					item->key_orig, func->parameter, "item history is disabled");
+			continue;
+		}
+
+		if (ZBX_FUNCTION_TYPE_TRENDS == func->type && 0 == item->trends)
+		{
+			zbx_free(func->error);
+			func->error = zbx_eval_format_function_error(func->function, item->host.host,
+					item->key_orig, func->parameter, "item trends are disabled");
 			continue;
 		}
 

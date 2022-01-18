@@ -20,7 +20,6 @@
 #ifndef ZABBIX_OPERATIONS_H
 #define ZABBIX_OPERATIONS_H
 
-#include "common.h"
 #include "db.h"
 #include "zbxalgo.h"
 

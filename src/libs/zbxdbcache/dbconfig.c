@@ -21,9 +21,7 @@
 
 #include "common.h"
 #include "log.h"
-#include "threads.h"
 #include "dbcache.h"
-#include "ipc.h"
 #include "mutexs.h"
 #include "memalloc.h"
 #include "zbxserver.h"
@@ -37,13 +35,14 @@
 #include "zbxeval.h"
 
 #define ZBX_DBCONFIG_IMPL
-#include "dbconfig.h"
 #include "dbsync.h"
 #include "proxy.h"
 #include "actions.h"
 #include "zbxtrends.h"
 #include "zbxvault.h"
 #include "zbxserialize.h"
+
+#include "dbconfig.h"
 
 int	sync_in_progress = 0;
 
@@ -7863,6 +7862,7 @@ static void	DCget_function(DC_FUNCTION *dst_function, const ZBX_DC_FUNCTION *src
 	dst_function->functionid = src_function->functionid;
 	dst_function->triggerid = src_function->triggerid;
 	dst_function->itemid = src_function->itemid;
+	dst_function->type = src_function->type;
 
 	sz_function = strlen(src_function->function) + 1;
 	sz_parameter = strlen(src_function->parameter) + 1;

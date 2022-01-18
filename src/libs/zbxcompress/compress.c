@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "log.h"
+
 #include "zbxcompress.h"
 
 #ifdef HAVE_ZLIB

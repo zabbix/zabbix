@@ -21,6 +21,7 @@
 #define ZABBIX_DBSYNC_H
 
 #include "common.h"
+#include "dbconfig.h"
 
 /* no changes */
 #define ZBX_DBSYNC_ROW_NONE	0
