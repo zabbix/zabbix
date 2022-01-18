@@ -1242,6 +1242,12 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 					zbx_clear_cache_snmp(process_type, process_num);
 					snmp_reload = 1;
 				}
+				else if (ZBX_RTC_SHUTDOWN == rtc_cmd)
+				{
+					zbx_tcp_unaccept(&s);
+					goto out;
+				}
+
 			}
 #endif
 			sec = zbx_time();
@@ -1256,7 +1262,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 					zbx_socket_strerror());
 		}
 	}
-
+out:
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
 	while (1)

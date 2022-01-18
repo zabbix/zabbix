@@ -922,6 +922,8 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 			if (ZBX_RTC_SNMP_CACHE_RELOAD == rtc_cmd)
 				zbx_clear_cache_snmp(process_type, process_num);
 #endif
+			if (ZBX_RTC_SHUTDOWN == rtc_cmd)
+				break;
 		}
 
 	}

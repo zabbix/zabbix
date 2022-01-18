@@ -1004,6 +1004,8 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 					zbx_clear_cache_snmp(process_type, process_num);
 			}
 #endif
+			if (ZBX_RTC_SHUTDOWN == rtc_cmd)
+				break;
 		}
 	}
 
