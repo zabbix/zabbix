@@ -430,3 +430,27 @@ void	zbx_rtc_shutdown_subs(zbx_rtc_t *rtc)
 {
 	rtc_notify(rtc, ZBX_PROCESS_TYPE_UNKNOWN, 0, ZBX_RTC_SHUTDOWN, NULL, 0);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: reset the RTC service state by removing subscriptions and hooks   *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_rtc_reset(zbx_rtc_t *rtc)
+{
+	int	i;
+
+	for (i = 0; i < rtc->subs.values_num; i++)
+	{
+		zbx_ipc_client_close(rtc->subs.values[i]->client);
+		zbx_free(rtc->subs.values[i]);
+	}
+	zbx_vector_rtc_sub_clear(&rtc->subs);
+
+	for (i = 0; i < rtc->hooks.values_num;)
+	{
+		zbx_ipc_client_close(rtc->hooks.values[i]->client);
+		zbx_free(rtc->hooks.values[i]);
+	}
+	zbx_vector_rtc_hook_clear(&rtc->hooks);
+}

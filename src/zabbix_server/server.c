@@ -1465,6 +1465,8 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 
 	zbx_unset_child_signal_handler();
 
+	zbx_rtc_reset(rtc);
+
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 	/* Disable locks so main process doesn't hang on logging if a process was              */
 	/* killed during logging. The locks will be re-enabled after logger is reinitialized   */
