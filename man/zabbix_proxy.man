@@ -33,7 +33,7 @@
 .
 .  hy \\n(HY
 ..
-.TH ZABBIX_PROXY 8 "2020\-09\-04" Zabbix
+.TH ZABBIX_PROXY 8 "2022\-01\-06" Zabbix
 .SH NAME
 zabbix_proxy \- Zabbix proxy daemon
 .SH SYNOPSIS
@@ -105,7 +105,7 @@ Log level control targets
 .RS 4
 .TP 4
 .I process\-type
-All processes of specified type (configuration\ syncer, data\ sender, discoverer, heartbeat\ sender, history\ syncer, housekeeper, http\ poller, icmp\ pinger, ipmi\ manager, ipmi\ poller, java\ poller, poller, self\-monitoring, snmp\ trapper, task\ manager, trapper, unreachable\ poller, vmware\ collector, history\ poller, availability\ manager)
+All processes of specified type (configuration\ syncer, data\ sender, discoverer, heartbeat\ sender, history\ syncer, housekeeper, http\ poller, icmp\ pinger, ipmi\ manager, ipmi\ poller, java\ poller, poller, self\-monitoring, snmp\ trapper, task\ manager, trapper, unreachable\ poller, vmware\ collector, history\ poller, availability\ manager, odbc\ poller)
 .RE
 .RS 4
 .TP 4
@@ -115,7 +115,7 @@ Process type and number (e.g., poller,3)
 .RS 4
 .TP 4
 .I pid
-Process identifier, up to 65535. For larger values specify target as "process\-type,N"
+Process identifier
 .RE
 .RE
 .IP "\fB\-h\fR, \fB\-\-help\fR"
@@ -138,5 +138,3 @@ Documentation
 .BR zabbix_js (1),
 .BR zabbix_agent2 (8),
 .BR zabbix_web_service (8)
-.SH AUTHOR
-Alexei Vladishev <alex@zabbix.com>

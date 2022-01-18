@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,8 +43,6 @@
 static char	host_block[HOST_TMP_36_BASE_BUF_LEN];
 
 /******************************************************************************
- *                                                                            *
- * Function: pad                                                              *
  *                                                                            *
  * Purpose: modify string in-place to the specified length as required by     *
  *          CUID algorithm                                                    *
@@ -128,8 +126,6 @@ static void	from_decimal(char *res, size_t base, size_t input_num)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_cuid_init                                                    *
- *                                                                            *
  * Purpose: initializes context for the cuid generation                       *
  *                                                                            *
  ******************************************************************************/
@@ -175,8 +171,6 @@ static size_t	next(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_new_cuid                                                     *
  *                                                                            *
  * Purpose: generates cuid, is based on the go cuid implementation from       *
  *          https://github.com/lucsky/cuid/blob/master/cuid.go                *

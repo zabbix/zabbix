@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -182,7 +182,9 @@ class C44ImportConverter extends CConverter {
 	 */
 	protected function extractSnmpFields(array $host): array {
 		// SNMP types.
-		$types = [CXmlConstantName::SNMPV1, CXmlConstantName::SNMPV2, CXmlConstantName::SNMPV3];
+		$types = [CXmlConstantName::SNMPV1, CXmlConstantName::SNMPV2, CXmlConstantName::SNMPV3,
+			CXmlConstantName::SNMP_TRAP
+		];
 		$interfaces = [];
 
 		if (array_key_exists('items', $host)) {
@@ -254,14 +256,20 @@ class C44ImportConverter extends CConverter {
 	protected function createNewInterface(array $item, int $maxid, array $parent_interface): array {
 		$interface = ['interface_ref' => 'if'.$maxid] + $parent_interface;
 
-		$interface['details']['version'] = $item['type'];
+		if ($item['type'] == CXmlConstantName::SNMP_TRAP) {
+			$interface['details']['version'] = CXmlConstantName::SNMPV2;
+			$interface['details']['community'] = '{$SNMP_COMMUNITY}';
+		}
+		else {
+			$interface['details']['version'] = $item['type'];
+		}
 
 		// Set item port if have.
 		if ($item['port'] !== '') {
 			$interface['port'] = $item['port'];
 		}
 
-		if ($item['type'] === CXmlConstantName::SNMPV1  || $item['type'] === CXmlConstantName::SNMPV2) {
+		if ($item['type'] === CXmlConstantName::SNMPV1 || $item['type'] === CXmlConstantName::SNMPV2) {
 			$interface['details']['community'] = $item['community'];
 		}
 
@@ -366,11 +374,18 @@ class C44ImportConverter extends CConverter {
 								// Set SNMP version from first item.
 								foreach ($new_interfaces[$interfaceid] as &$iface) {
 									if (array_key_exists('new', $iface)) {
-										$iface['details']['version'] = $item['type'];
+										if ($item['type'] === CXmlConstantName::SNMP_TRAP) {
+											// Use default SNMP V2 interface for SNMP traps.
+											$iface['details']['version'] = CXmlConstantName::SNMPV2;
+											$iface['details']['community'] = '{$SNMP_COMMUNITY}';
+										}
+										else {
+											$iface['details']['version'] = $item['type'];
+										}
 
 										// Item port not set here because we will find it in next steps.
 
-										// And set others snmp fields
+										// And set other SNMP fields.
 										if ($item['type'] === CXmlConstantName::SNMPV1
 												|| $item['type'] === CXmlConstantName::SNMPV2) {
 											$iface['details']['community'] = $item['community'];
@@ -394,20 +409,23 @@ class C44ImportConverter extends CConverter {
 
 								// Find interfaces having same SNMP version.
 								$same_ver_interfaces = array_filter($new_interfaces[$interfaceid],
-									function(array $iface) use ($item): bool {
-										return $iface['details']['version'] === $item['type'];
+									function (array $iface) use ($item): bool {
+										// Use default SNMP V2 interface for SNMP traps.
+										if ($item['type'] === CXmlConstantName::SNMP_TRAP) {
+											$item['type'] = CXmlConstantName::SNMPV2;
+										}
+
+										return ($iface['details']['version'] === $item['type']);
 									}
 								);
 
 								if ($same_ver_interfaces) {
 									$same_interfaces = array_filter($same_ver_interfaces,
-										function(array $iface) use ($item, $parent_interface): bool {
+										function (array $iface) use ($item, $parent_interface): bool {
 											// If item port differs from interface ports it is 100% new interface.
 											if ($item['port'] === '') {
 												// Item port not set and interface port not equal parent port.
-												if ($iface['port'] !== $parent_interface['port']) {
-													return false;
-												}
+												return ($iface['port'] === $parent_interface['port']);
 											}
 											else {
 												// If item port not equal interface ports it is 100% new interface.

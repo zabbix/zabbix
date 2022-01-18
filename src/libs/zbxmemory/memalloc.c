@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,9 +28,7 @@
  *                     Some information on memory layout                      *
  *                  ---------------------------------------                   *
  *                                                                            *
- *                                                                            *
  * (*) chunk: a contiguous piece of memory that is either free or used        *
- *                                                                            *
  *                                                                            *
  *                    +-------- size of + --------------+                     *
  *                    |       (8 bytes) |               |                     *
@@ -47,7 +45,6 @@
  *                                                                            *
  *                     8-aligned               8-aligned                      *
  *                                                                            *
- *                                                                            *
  *     when a chunk is used, `size' fields have MEM_FLG_USED bit set          *
  *                                                                            *
  *     when a chunk is free, the first 2 * ZBX_PTR_SIZE bytes of allocatable  *
@@ -61,11 +58,9 @@
  *           (when freeing a chunk, we can quickly see if the previous        *
  *           and next chunks are free, those will not have MEM_FLG_USED)      *
  *                                                                            *
- *                                                                            *
  * (*) free chunks are stored in doubly-linked lists according to their sizes *
  *                                                                            *
  *     a typical situation is thus as follows (1 used chunk, 2 free chunks)   *
- *                                                                            *
  *                                                                            *
  *  +--------------------------- shared memory ----------------------------+  *
  *  |                         (can be misaligned)                          |  *

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -144,9 +144,9 @@ $overviewFormList->addRow(_('Monitoring'),
 		$data['allowed_ui_latest_data']
 			? new CLink(_('Latest data'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'latest.view')
-				->setArgument('filter_hostids[]', $data['host']['hostid'])
-				->setArgument('filter_show_details', '1')
-				->setArgument('filter_set', '1')
+				->setArgument('hostids[]', $data['host']['hostid'])
+				->setArgument('show_details', '1')
+				->setArgument('filter_name', '')
 			)
 			: _('Latest data'),
 		$data['allowed_ui_problems']

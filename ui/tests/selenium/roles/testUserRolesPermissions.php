@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -118,19 +118,16 @@ class testUserRolesPermissions extends CWebTest {
 			[
 				'name' => 'Parent 1',
 				'algorithm' => 1,
-				'showsla' => 0,
 				'sortorder' => 1
 			],
 			[
 				'name' => 'Parent 2',
 				'algorithm' => 2,
-				'showsla' => 0,
 				'sortorder' => 2
 			],
 			[
 				'name' => 'Child of parent 1',
 				'algorithm' => 2,
-				'showsla' => 0,
 				'sortorder' => 1,
 				'tags' => [
 					[
@@ -142,13 +139,11 @@ class testUserRolesPermissions extends CWebTest {
 			[
 				'name' => 'Child of child 1',
 				'algorithm' => 2,
-				'showsla' => 0,
 				'sortorder' => 1
 			],
 			[
 				'name' => 'Child of parent 2',
 				'algorithm' => 2,
-				'showsla' => 0,
 				'sortorder' => 1
 			]
 		]);
@@ -517,6 +512,7 @@ class testUserRolesPermissions extends CWebTest {
 	public function testUserRolesPermissions_Module() {
 		$pages_before = [
 			'Monitoring',
+			'Services',
 			'Inventory',
 			'Reports',
 			'Configuration',
@@ -966,8 +962,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Hosts',
 						'Latest data',
 						'Maps',
-						'Discovery',
-						'Services'
+						'Discovery'
 					],
 					'link' => ['zabbix.php?action=problem.view']
 				]
@@ -981,8 +976,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Problems',
 						'Latest data',
 						'Maps',
-						'Discovery',
-						'Services'
+						'Discovery'
 					],
 					'link' => ['zabbix.php?action=host.view']
 				]
@@ -996,8 +990,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Problems',
 						'Hosts',
 						'Maps',
-						'Discovery',
-						'Services'
+						'Discovery'
 					],
 					'link' => ['zabbix.php?action=latest.view']
 				]
@@ -1011,8 +1004,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Problems',
 						'Hosts',
 						'Latest data',
-						'Discovery',
-						'Services'
+						'Discovery'
 					],
 					'link' => ['sysmaps.php']
 				]
@@ -1026,25 +1018,57 @@ class testUserRolesPermissions extends CWebTest {
 						'Problems',
 						'Hosts',
 						'Latest data',
-						'Maps',
-						'Services'
+						'Maps'
 					],
 					'link' => ['zabbix.php?action=discovery.view']
 				]
 			],
 			[
 				[
-					'section' => 'Monitoring',
+					'section' => 'Services',
 					'page' => 'Services',
 					'displayed_ui' => [
-						'Dashboard',
-						'Problems',
-						'Hosts',
-						'Latest data',
-						'Maps',
-						'Discovery'
+						'Service actions',
+						'SLA',
+						'SLA report'
 					],
 					'link' => ['zabbix.php?action=service.list']
+				]
+			],
+			[
+				[
+					'section' => 'Services',
+					'page' => 'Service actions',
+					'displayed_ui' => [
+						'Services',
+						'SLA',
+						'SLA report'
+					],
+					'link' => ['actionconf.php?eventsource=4']
+				]
+			],
+			[
+				[
+					'section' => 'Services',
+					'page' => 'SLA',
+					'displayed_ui' => [
+						'Services',
+						'Service actions',
+						'SLA report'
+					],
+					'link' => ['zabbix.php?action=sla.list']
+				]
+			],
+			[
+				[
+					'section' => 'Services',
+					'page' => 'SLA report',
+					'displayed_ui' => [
+						'Services',
+						'Service actions',
+						'SLA'
+					],
+					'link' => ['zabbix.php?action=slareport.list']
 				]
 			]
 		];
@@ -1076,7 +1100,14 @@ class testUserRolesPermissions extends CWebTest {
 				$menu->select($data['section']);
 			}
 
-			$this->assertEquals($action_status, $menu->exists($data['page']));
+			if ($data['page'] === $data['section']) {
+				$submenu = $menu->query("xpath:.//a[text()=".CXPathHelper::escapeQuotes($data['section']).
+						"]/../ul[@class='submenu']")->one();
+				$this->assertEquals($action_status, $submenu->query('link', $data['page'])->one(false)->isValid());
+			}
+			else {
+				$this->assertEquals($action_status, $menu->exists($data['page']));
+			}
 
 			if ($action_status) {
 				if (array_key_exists('user_roles', $data)) {
@@ -1118,8 +1149,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Hosts',
 						'Latest data',
 						'Maps',
-						'Discovery',
-						'Services'
+						'Discovery'
 					]
 				]
 			],
@@ -1130,8 +1160,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Hosts',
 						'Latest data',
 						'Maps',
-						'Discovery',
-						'Services'
+						'Discovery'
 					]
 				]
 			]
@@ -1143,8 +1172,7 @@ class testUserRolesPermissions extends CWebTest {
 //						'Overview',
 //						'Latest data',
 //						'Maps',
-//						'Discovery',
-//						'Services'
+//						'Discovery'
 //					]
 //				]
 //			]
@@ -1172,7 +1200,7 @@ class testUserRolesPermissions extends CWebTest {
 			else {
 				$this->checkLinks(['zabbix.php?action=dashboard.view'], $data['button']);
 				$this->changeRoleRule(['Monitoring' => ['Dashboard', 'Problems', 'Hosts', 'Latest data', 'Maps',
-						'Discovery', 'Services']]
+						'Discovery']]
 				);
 			}
 		}

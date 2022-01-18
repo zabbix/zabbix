@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 Official JMX Template for WildFly Domain Controller.
 
 
@@ -15,7 +15,7 @@ This template was tested on:
 
 > See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/jmx) for basic instructions.
 
-Metrics are collected by JMX.  
+Metrics are collected by JMX.
 This template works with Domain Controller.
 
 1. Enable and configure JMX access to WildFly. See documentation for [instructions](https://docs.wildfly.org/23/Admin_Guide.html#JMX).
@@ -50,8 +50,8 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Deployments discovery |<p>Discovery deployments metrics.</p> |JMX |jmx.get[beans,"jboss.as.expr:deployment=*,server-group=*"]<p>**Filter**:</p>AND <p>- A: {#DEPLOYMENT} MATCHES_REGEX `{$WILDFLY.DEPLOYMENT.MATCHES}`</p><p>- B: {#DEPLOYMENT} NOT_MATCHES_REGEX `{$WILDFLY.DEPLOYMENT.NOT_MATCHES}`</p> |
-|Servers discovery |<p>Discovery instances in domain.</p> |JMX |jmx.get[beans,"jboss.as:host=master,server-config=*"]<p>**Filter**:</p>AND <p>- A: {#SERVER} MATCHES_REGEX `{$WILDFLY.SERVER.MATCHES}`</p><p>- B: {#SERVER} NOT_MATCHES_REGEX `{$WILDFLY.SERVER.NOT_MATCHES}`</p> |
+|Deployments discovery |<p>Discovery deployments metrics.</p> |JMX |jmx.get[beans,"jboss.as.expr:deployment=*,server-group=*"]<p>**Filter**:</p>AND <p>- {#DEPLOYMENT} MATCHES_REGEX `{$WILDFLY.DEPLOYMENT.MATCHES}`</p><p>- {#DEPLOYMENT} NOT_MATCHES_REGEX `{$WILDFLY.DEPLOYMENT.NOT_MATCHES}`</p> |
+|Servers discovery |<p>Discovery instances in domain.</p> |JMX |jmx.get[beans,"jboss.as:host=master,server-config=*"]<p>**Filter**:</p>AND <p>- {#SERVER} MATCHES_REGEX `{$WILDFLY.SERVER.MATCHES}`</p><p>- {#SERVER} NOT_MATCHES_REGEX `{$WILDFLY.SERVER.NOT_MATCHES}`</p> |
 
 ## Items collected
 
@@ -62,9 +62,9 @@ There are no template links in this template.
 |WildFly |WildFly: Process type |<p>The type of process represented by this root resource.</p> |JMX |jmx["jboss.as:management-root=server","processType"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |WildFly |WildFly: Version |<p>The version of the WildFly Core based product release</p> |JMX |jmx["jboss.as:management-root=server","productVersion"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |WildFly |WildFly: Uptime |<p>WildFly server uptime.</p> |JMX |jmx["java.lang:type=Runtime","Uptime"]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
-|WildFly |WildFly deployment [{#DEPLOYMENT}]: Enabled |<p>Boolean indicating whether the deployment content is currently deployed in the runtime (or should be deployed in the runtime the next time the server starts.)</p> |JMX |jmx["{#JMXOBJ}",enabled]<p>**Preprocessing**:</p><p>- BOOL_TO_DECIMAL<p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
-|WildFly |WildFly deployment [{#DEPLOYMENT}]: Managed |<p>Indicates if the deployment is managed (aka uses the ContentRepository).</p> |JMX |jmx["{#JMXOBJ}",managed]<p>**Preprocessing**:</p><p>- BOOL_TO_DECIMAL<p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
-|WildFly |WildFly domain: Server {#SERVER}: Autostart |<p>Whether or not this server should be started when the Host Controller starts.</p> |JMX |jmx["{#JMXOBJ}",autoStart]<p>**Preprocessing**:</p><p>- BOOL_TO_DECIMAL<p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|WildFly |WildFly deployment [{#DEPLOYMENT}]: Enabled |<p>Boolean indicating whether the deployment content is currently deployed in the runtime (or should be deployed in the runtime the next time the server starts.)</p> |JMX |jmx["{#JMXOBJ}",enabled]<p>**Preprocessing**:</p><p>- BOOL_TO_DECIMAL</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|WildFly |WildFly deployment [{#DEPLOYMENT}]: Managed |<p>Indicates if the deployment is managed (aka uses the ContentRepository).</p> |JMX |jmx["{#JMXOBJ}",managed]<p>**Preprocessing**:</p><p>- BOOL_TO_DECIMAL</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|WildFly |WildFly domain: Server {#SERVER}: Autostart |<p>Whether or not this server should be started when the Host Controller starts.</p> |JMX |jmx["{#JMXOBJ}",autoStart]<p>**Preprocessing**:</p><p>- BOOL_TO_DECIMAL</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |WildFly |WildFly domain: Server {#SERVER}: Status |<p>The current status of the server.</p> |JMX |jmx["{#JMXOBJ}",status]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |WildFly |WildFly domain: Server {#SERVER}: Server group |<p>The name of a server group from the domain model.</p> |JMX |jmx["{#JMXOBJ}",group]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 
@@ -72,10 +72,10 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|WildFly: Version has changed (new version: {ITEM.VALUE}) |<p>WildFly version has changed. Ack to close.</p> |`{TEMPLATE_NAME:jmx["jboss.as:management-root=server","productVersion"].diff()}=1 and {TEMPLATE_NAME:jmx["jboss.as:management-root=server","productVersion"].strlen()}>0` |INFO |<p>Manual close: YES</p> |
-|WildFly: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:jmx["java.lang:type=Runtime","Uptime"].last()}<10m` |INFO |<p>Manual close: YES</p> |
-|WildFly domain: Server {#SERVER}: Server status has changed (new status: {ITEM.VALUE}) |<p>Server status has changed. Ack to close.</p> |`{TEMPLATE_NAME:jmx["{#JMXOBJ}",status].diff()}=1 and {TEMPLATE_NAME:jmx["{#JMXOBJ}",status].strlen()}>0` |WARNING |<p>Manual close: YES</p> |
-|WildFly domain: Server {#SERVER}: Server group has changed (new group: {ITEM.VALUE}) |<p>Server group has changed. Ack to close.</p> |`{TEMPLATE_NAME:jmx["{#JMXOBJ}",group].diff()}=1 and {TEMPLATE_NAME:jmx["{#JMXOBJ}",group].strlen()}>0` |INFO |<p>Manual close: YES</p> |
+|WildFly: Version has changed (new version: {ITEM.VALUE}) |<p>WildFly version has changed. Ack to close.</p> |`last(/WildFly Domain by JMX/jmx["jboss.as:management-root=server","productVersion"],#1)<>last(/WildFly Domain by JMX/jmx["jboss.as:management-root=server","productVersion"],#2) and length(last(/WildFly Domain by JMX/jmx["jboss.as:management-root=server","productVersion"]))>0` |INFO |<p>Manual close: YES</p> |
+|WildFly: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/WildFly Domain by JMX/jmx["java.lang:type=Runtime","Uptime"])<10m` |INFO |<p>Manual close: YES</p> |
+|WildFly domain: Server {#SERVER}: Server status has changed (new status: {ITEM.VALUE}) |<p>Server status has changed. Ack to close.</p> |`last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",status],#1)<>last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",status],#2) and length(last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",status]))>0` |WARNING |<p>Manual close: YES</p> |
+|WildFly domain: Server {#SERVER}: Server group has changed (new group: {ITEM.VALUE}) |<p>Server group has changed. Ack to close.</p> |`last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",group],#1)<>last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",group],#2) and length(last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",group]))>0` |INFO |<p>Manual close: YES</p> |
 
 ## Feedback
 

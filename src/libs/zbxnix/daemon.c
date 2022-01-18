@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,8 +46,6 @@ static void	(*zbx_sigusr_handler)(int flags);
 
 #ifdef HAVE_SIGQUEUE
 /******************************************************************************
- *                                                                            *
- * Function: common_sigusr_handler                                            *
  *                                                                            *
  * Purpose: common SIGUSR1 handler for Zabbix processes                       *
  *                                                                            *
@@ -145,7 +143,7 @@ void	zbx_signal_process_by_type(int proc_type, int proc_num, int flags, char **o
 	}
 	else
 	{
-		if (0 != failed_num)
+		if (0 != failed_num && NULL != out)
 			*out = zbx_strdup(*out, "failed to redirect remote control signal(s)");
 	}
 }
@@ -184,7 +182,7 @@ void	zbx_signal_process_by_pid(int pid, int flags, char **out)
 	}
 	else
 	{
-		if (0 != failed_num)
+		if (0 != failed_num && NULL != out)
 			*out = zbx_strdup(*out, "failed to redirect remote control signal(s)");
 	}
 }
@@ -197,8 +195,6 @@ void	zbx_set_sigusr_handler(void (*handler)(int flags))
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: user1_signal_handler                                             *
  *                                                                            *
  * Purpose: handle user signal SIGUSR1                                        *
  *                                                                            *
@@ -276,8 +272,6 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 
 /******************************************************************************
  *                                                                            *
- * Function: pipe_signal_handler                                              *
- *                                                                            *
  * Purpose: handle pipe signal SIGPIPE                                        *
  *                                                                            *
  ******************************************************************************/
@@ -291,8 +285,6 @@ static void	pipe_signal_handler(int sig, siginfo_t *siginfo, void *context)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: set_daemon_signal_handlers                                       *
  *                                                                            *
  * Purpose: set the signal handlers used by daemons                           *
  *                                                                            *
@@ -315,16 +307,12 @@ static void	set_daemon_signal_handlers(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: daemon_start                                                     *
- *                                                                            *
  * Purpose: init process as daemon                                            *
  *                                                                            *
  * Parameters: allow_root - allow root permission for application             *
  *             user       - user on the system to which to drop the           *
  *                          privileges                                        *
  *             flags      - daemon startup flags                              *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: it doesn't allow running under 'root' if allow_root is zero      *
  *                                                                            *

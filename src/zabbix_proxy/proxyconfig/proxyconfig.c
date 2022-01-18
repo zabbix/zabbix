@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,11 +55,6 @@ static void	zbx_proxyconfig_sigusr_handler(int flags)
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: process_configuration_sync                                       *
- *                                                                            *
- ******************************************************************************/
 static void	process_configuration_sync(size_t *data_size)
 {
 	zbx_socket_t		sock;
@@ -157,15 +152,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: main_proxyconfig_loop                                            *
- *                                                                            *
  * Purpose: periodically request config data                                  *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: never returns                                                    *
  *                                                                            *

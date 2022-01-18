@@ -1,6 +1,6 @@
 dnl
 dnl Zabbix
-dnl Copyright (C) 2001-2021 Zabbix SIA
+dnl Copyright (C) 2001-2022 Zabbix SIA
 dnl
 dnl This program is free software; you can redistribute it and/or modify
 dnl it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[6.0.0beta2])
+AC_INIT([Zabbix],[6.0.0rc1])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects filename-length-max=99])
 
@@ -1895,6 +1895,7 @@ if test "x$want_libpcre2" = "xyes"; then
 	fi
 
 	AC_DEFINE([HAVE_PCRE2_H], 1, [Define to 1 if you have the 'libpcre2' library (-lpcre2-8)])
+	have_pcre2=1
 else
 	if test "x$found_libpcre" != "xyes"; then
 		AC_MSG_ERROR([Unable to use libpcre (libpcre check failed)])
@@ -1909,8 +1910,12 @@ else
 	fi
 
 	AC_DEFINE([HAVE_PCRE_H], 1, [Define to 1 if you have the 'libpcre' library (-lpcre)])
+	have_pcre=1
 fi
 fi
+
+AM_CONDITIONAL([HAVE_PCRE], [test "x$have_pcre" = "x1"])
+AM_CONDITIONAL([HAVE_PCRE2], [test "x$have_pcre2" = "x1"])
 
 found_iconv="no"
 dnl Check for libiconv [by default - skip]

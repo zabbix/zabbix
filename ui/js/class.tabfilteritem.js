@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -131,10 +131,10 @@ class CTabFilterItem extends CBaseComponent {
 	/**
 	 * Open tab filter configuration popup.
 	 *
-	 * @param {object}      params    Object of params to be passed to ajax call when opening popup.
-	 * @param {HTMLElement} edit_elm  HTML element to broadcast popup update or delete event.
+	 * @param {object} params    Object of params to be passed to ajax call when opening popup.
+	 * @param {Node}   trigger_element  DOM element to broadcast popup update or delete event.
 	 */
-	openPropertiesDialog(params, edit_elm) {
+	openPropertiesDialog(params, trigger_element) {
 		let defaults = {
 			idx: this._idx_namespace,
 			idx2: this._index,
@@ -150,7 +150,10 @@ class CTabFilterItem extends CBaseComponent {
 		}
 
 		this.updateUnsavedState();
-		return PopUp('popup.tabfilter.edit', {...defaults, ...params}, 'tabfilter_dialogue', edit_elm);
+
+		return PopUp('popup.tabfilter.edit', { ...defaults, ...params },
+			{dialogueid: 'tabfilter_dialogue', trigger_element}
+		);
 	}
 
 	/**
@@ -349,7 +352,7 @@ class CTabFilterItem extends CBaseComponent {
 
 			for (const checkbox of form.querySelectorAll('input[type="checkbox"][unchecked-value]')) {
 				if (!checkbox.checked) {
-					params.set(checkbox.getAttribute('name'), checkbox.getAttribute('unchecked-value'))
+					params.set(checkbox.getAttribute('name'), checkbox.getAttribute('unchecked-value'));
 				}
 			}
 
@@ -472,6 +475,61 @@ class CTabFilterItem extends CBaseComponent {
 	initUnsavedState() {
 		if (this._src_url === null) {
 			this.resetUnsavedState();
+		}
+	}
+
+	/**
+	 * Unset selected subfilters.
+	 */
+	emptySubfilter() {
+		[...this.getForm().elements]
+			.filter(el => el.name.substr(0, 10) === 'subfilter_')
+			.forEach(el => el.remove());
+	}
+
+	/**
+	 * Shorthand function to check if subfilter has given value.
+	 *
+	 * @param {string} key   Subfilter parameter name.
+	 * @param {string} value Subfilter parameter value.
+	 *
+	 * @return {bool}
+	 */
+	hasSubfilter(key, value) {
+		return Boolean([...this.getForm().elements].filter(el => (el.name === key && el.value === value)).length);
+	}
+
+	/**
+	 * Set new subfilter field.
+	 *
+	 * @param {string} key    Subfilter parameter name.
+	 * @param {string} value  Subfilter parameter value.
+	 */
+	setSubfilter(key, value) {
+		value = String(value);
+
+		if (!this.hasSubfilter(key, value)) {
+			const el = document.createElement('input');
+			el.type = 'hidden';
+			el.name = key;
+			el.value = value;
+			this.getForm().appendChild(el);
+		}
+	}
+
+	/**
+	 * Remove some of existing subfilter field.
+	 *
+	 * @param {string} key    Subfilter parameter name.
+	 * @param {string} value  Subfilter parameter value.
+	 */
+	unsetSubfilter(key, value) {
+		value = String(value);
+
+		if (this.hasSubfilter(key, value)) {
+			[...this.getForm().elements]
+				.filter(el => (el.name === key && el.value === value))
+				.forEach(el => el.remove());
 		}
 	}
 

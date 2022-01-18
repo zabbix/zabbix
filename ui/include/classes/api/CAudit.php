@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -81,6 +81,7 @@ class CAudit {
 	public const RESOURCE_AUTH_TOKEN = 45;
 	public const RESOURCE_SCHEDULED_REPORT = 46;
 	public const RESOURCE_HA_NODE = 47;
+	public const RESOURCE_SLA = 48;
 
 	/**
 	 * Audit details actions.
@@ -119,6 +120,7 @@ class CAudit {
 		self::RESOURCE_ITEM => 'items',
 		self::RESOURCE_IT_SERVICE => 'services',
 		self::RESOURCE_MACRO => 'globalmacro',
+		self::RESOURCE_MAINTENANCE => 'maintenances',
 		self::RESOURCE_MEDIA_TYPE => 'media_type',
 		self::RESOURCE_MODULE => 'module',
 		self::RESOURCE_PROXY => 'hosts',
@@ -126,6 +128,7 @@ class CAudit {
 		self::RESOURCE_SCHEDULED_REPORT => 'report',
 		self::RESOURCE_SCRIPT => 'scripts',
 		self::RESOURCE_SETTINGS => 'config',
+		self::RESOURCE_SLA => 'sla',
 		self::RESOURCE_TEMPLATE => 'hosts',
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'dashboard',
 		self::RESOURCE_USER => 'users',
@@ -164,6 +167,7 @@ class CAudit {
 		self::RESOURCE_ITEM => 'name',
 		self::RESOURCE_IT_SERVICE => 'name',
 		self::RESOURCE_MACRO => 'macro',
+		self::RESOURCE_MAINTENANCE => 'name',
 		self::RESOURCE_MEDIA_TYPE => 'name',
 		self::RESOURCE_MODULE => 'id',
 		self::RESOURCE_PROXY => 'host',
@@ -171,6 +175,7 @@ class CAudit {
 		self::RESOURCE_SCHEDULED_REPORT => 'name',
 		self::RESOURCE_SCRIPT => 'name',
 		self::RESOURCE_SETTINGS => null,
+		self::RESOURCE_SLA => 'name',
 		self::RESOURCE_TEMPLATE => 'host',
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'name',
 		self::RESOURCE_USER => 'username',
@@ -198,6 +203,7 @@ class CAudit {
 		self::RESOURCE_ITEM => 'item',
 		self::RESOURCE_IT_SERVICE => 'service',
 		self::RESOURCE_MACRO => 'usermacro',
+		self::RESOURCE_MAINTENANCE => 'maintenance',
 		self::RESOURCE_MEDIA_TYPE => 'mediatype',
 		self::RESOURCE_MODULE => 'module',
 		self::RESOURCE_PROXY => 'proxy',
@@ -205,6 +211,7 @@ class CAudit {
 		self::RESOURCE_SCHEDULED_REPORT => 'report',
 		self::RESOURCE_SCRIPT => 'script',
 		self::RESOURCE_SETTINGS => 'settings',
+		self::RESOURCE_SLA => 'sla',
 		self::RESOURCE_TEMPLATE => 'template',
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'templatedashboard',
 		self::RESOURCE_USER => 'user',
@@ -292,6 +299,10 @@ class CAudit {
 		'hostprototype.tags' => 'host_tag',
 		'hostprototype.templates' => 'hosts_templates',
 		'iconmap.mappings' => 'icon_mapping',
+		'maintenance.groups' => 'maintenances_groups',
+		'maintenance.hosts' => 'maintenances_hosts',
+		'maintenance.tags' => 'maintenance_tag',
+		'maintenance.timeperiods' => 'timeperiods',
 		'mediatype.message_templates' => 'media_type_message',
 		'mediatype.parameters' => 'media_type_param',
 		'proxy.hosts' => 'hosts',
@@ -304,7 +315,9 @@ class CAudit {
 		'service.problem_tags' => 'service_problem_tag',
 		'service.status_rules' => 'service_status_rule',
 		'service.tags' => 'service_tag',
-		'service.times' => 'services_times',
+		'sla.service_tags' => 'sla_service_tag',
+		'sla.schedule' => 'sla_schedule',
+		'sla.excluded_downtimes' => 'sla_excluded_downtime',
 		'script.parameters' => 'script_param',
 		'template.groups' => 'hosts_groups',
 		'template.macros' => 'hostmacro',
@@ -363,6 +376,10 @@ class CAudit {
 		'hostprototype.tags' => 'hosttagid',
 		'hostprototype.templates' => 'hosttemplateid',
 		'iconmap.mappings' => 'iconmappingid',
+		'maintenance.groups' => 'maintenance_groupid',
+		'maintenance.hosts' => 'maintenance_hostid',
+		'maintenance.tags' => 'maintenancetagid',
+		'maintenance.timeperiods' => 'timeperiodid',
 		'mediatype.message_templates' => 'mediatype_messageid',
 		'mediatype.parameters' => 'mediatype_paramid',
 		'proxy.hosts' => 'hostid',
@@ -375,7 +392,9 @@ class CAudit {
 		'service.problem_tags' => 'service_problem_tagid',
 		'service.status_rules' => 'service_status_ruleid',
 		'service.tags' => 'servicetagid',
-		'service.times' => 'timeid',
+		'sla.service_tags' => 'sla_service_tagid',
+		'sla.schedule' => 'sla_scheduleid',
+		'sla.excluded_downtimes' => 'sla_excluded_downtimeid',
 		'template.groups' => 'hostgroupid',
 		'template.macros' => 'hostmacroid',
 		'template.tags' => 'hosttagid',

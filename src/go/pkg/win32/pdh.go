@@ -2,7 +2,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,10 @@ import (
 	"errors"
 	"fmt"
 	"syscall"
+	"time"
 	"unsafe"
+
+	"zabbix.com/pkg/log"
 
 	"golang.org/x/sys/windows"
 )
@@ -54,9 +57,10 @@ const (
 	PDH_CSTATUS_NEW_DATA     = 0x00000001
 	PDH_CSTATUS_INVALID_DATA = 0xC0000BBA
 
-	PDH_MORE_DATA    = 0x800007D2
-	PDH_NO_DATA      = 0x800007D5
-	PDH_INVALID_DATA = 0xc0000bc6
+	PDH_MORE_DATA                 = 0x800007D2
+	PDH_NO_DATA                   = 0x800007D5
+	PDH_INVALID_DATA              = 0xc0000bc6
+	PDH_CALC_NEGATIVE_DENOMINATOR = 0x800007D6
 
 	PDH_FMT_DOUBLE   = 0x00000200
 	PDH_FMT_LARGE    = 0x00000400
@@ -135,11 +139,22 @@ func PdhCollectQueryData(query PDH_HQUERY) (err error) {
 }
 
 func PdhGetFormattedCounterValueDouble(counter PDH_HCOUNTER) (value *float64, err error) {
+	return PdhGetFormattedCounterValueDoubleHelper(counter, true)
+}
+
+func PdhGetFormattedCounterValueDoubleHelper(counter PDH_HCOUNTER, retry bool) (value *float64, err error) {
 	var pdhValue PDH_FMT_COUNTERVALUE_DOUBLE
 	ret, _, _ := syscall.Syscall6(pdhGetFormattedCounterValue, 4, uintptr(counter),
 		uintptr(PDH_FMT_DOUBLE|PDH_FMT_NOCAP100), 0, uintptr(unsafe.Pointer(&pdhValue)), 0, 0)
 	if syscall.Errno(ret) != windows.ERROR_SUCCESS {
-		if ret == PDH_INVALID_DATA || ret == PDH_CSTATUS_INVALID_DATA {
+		if ret == PDH_CALC_NEGATIVE_DENOMINATOR {
+			if retry {
+				log.Debugf("Detected performance counter with negative denominator, retrying in 1 second")
+				time.Sleep(time.Second)
+				return PdhGetFormattedCounterValueDoubleHelper(counter, false)
+			}
+			log.Warningf("Detected performance counter with negative denominator the second time after retry, giving up...")
+		} else if ret == PDH_INVALID_DATA || ret == PDH_CSTATUS_INVALID_DATA {
 			return nil, nil
 		}
 		return nil, newPdhError(ret)
@@ -148,11 +163,22 @@ func PdhGetFormattedCounterValueDouble(counter PDH_HCOUNTER) (value *float64, er
 }
 
 func PdhGetFormattedCounterValueInt64(counter PDH_HCOUNTER) (value *int64, err error) {
+	return PdhGetFormattedCounterValueInt64Helper(counter, true)
+}
+
+func PdhGetFormattedCounterValueInt64Helper(counter PDH_HCOUNTER, retry bool) (value *int64, err error) {
 	var pdhValue PDH_FMT_COUNTERVALUE_LARGE
 	ret, _, _ := syscall.Syscall6(pdhGetFormattedCounterValue, 4, uintptr(counter), uintptr(PDH_FMT_LARGE), 0,
 		uintptr(unsafe.Pointer(&pdhValue)), 0, 0)
 	if syscall.Errno(ret) != windows.ERROR_SUCCESS {
-		if ret == PDH_INVALID_DATA || ret == PDH_CSTATUS_INVALID_DATA {
+		if ret == PDH_CALC_NEGATIVE_DENOMINATOR {
+			if retry {
+				log.Debugf("Detected performance counter with negative denominator, retrying in 1 second")
+				time.Sleep(time.Second)
+				return PdhGetFormattedCounterValueInt64Helper(counter, false)
+			}
+			log.Warningf("Detected performance counter with negative denominator the second time after retry, giving up...")
+		} else if ret == PDH_INVALID_DATA || ret == PDH_CSTATUS_INVALID_DATA {
 			return nil, nil
 		}
 		return nil, newPdhError(ret)

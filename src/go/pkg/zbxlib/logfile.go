@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -176,12 +176,14 @@ static void free_log_result(log_result_t *result)
 	zbx_free(result);
 }
 
-int	process_value_cb(zbx_vector_ptr_t *addrs, const char *host, const char *key,
+int	process_value_cb(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *host, const char *key,
 		const char *value, unsigned char state, zbx_uint64_t *lastlogsize, const int *mtime,
 		unsigned long *timestamp, const char *source, unsigned short *severity, unsigned long *logeventid,
 		unsigned char flags)
 {
-	log_result_t *result = (log_result_t *)addrs;
+	ZBX_UNUSED(addrs);
+
+	log_result_t *result = (log_result_t *)agent2_result;
 	if (result->values.values_num == result->slots)
 		return FAIL;
 
@@ -293,7 +295,7 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsa
 
 	var cerrmsg *C.char
 	cprepVec := C.new_prep_vec() // In Agent2 it is always empty vector. Not used but required for linking.
-	ret := C.process_log_check(C.zbx_vector_ptr_lp_t(unsafe.Pointer(result)), C.zbx_vector_ptr_lp_t(cblob),
+	ret := C.process_log_check(nil, C.zbx_vector_ptr_lp_t(unsafe.Pointer(result)), C.zbx_vector_ptr_lp_t(cblob),
 		C.ZBX_ACTIVE_METRIC_LP(data), C.zbx_process_value_func_t(C.process_value_cb), &clastLogsizeSent,
 		&cmtimeSent, &cerrmsg, cprepVec)
 	C.free_prep_vec(cprepVec)

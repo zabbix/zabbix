@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,8 +30,6 @@ extern unsigned char	program_type;
 
 /******************************************************************************
  *                                                                            *
- * Function: get_value_agent                                                  *
- *                                                                            *
  * Purpose: retrieve data from Zabbix agent                                   *
  *                                                                            *
  * Parameters: item - item we are interested in                               *
@@ -42,8 +40,6 @@ extern unsigned char	program_type;
  *               NOTSUPPORTED - item not supported by the agent               *
  *               AGENT_ERROR - uncritical error on agent side occurred        *
  *               FAIL - otherwise                                             *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: error will contain error message                                 *
  *                                                                            *

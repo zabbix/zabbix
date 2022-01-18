@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -290,8 +290,6 @@ close_query:
 
 /******************************************************************************
  *                                                                            *
- * Function: get_builtin_object_index                                         *
- *                                                                            *
  * Purpose: get performance object index by reference value described by      *
  *          zbx_builtin_counter_ref_t enum                                    *
  *                                                                            *
@@ -308,8 +306,6 @@ DWORD	get_builtin_object_index(zbx_builtin_counter_ref_t counter_ref)
 
 /******************************************************************************
  *                                                                            *
- * Function: get_builtin_counter_index                                        *
- *                                                                            *
  * Purpose: get performance counter index by reference value described by     *
  *          zbx_builtin_counter_ref_t enum                                    *
  *                                                                            *
@@ -325,8 +321,6 @@ DWORD	get_builtin_counter_index(zbx_builtin_counter_ref_t counter_ref)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: get_all_counter_names                                            *
  *                                                                            *
  * Purpose: function to read counter names/help from registry                 *
  *                                                                            *
@@ -378,8 +372,6 @@ finish:
 
 /******************************************************************************
  *                                                                            *
- * Function: get_perf_name_by_index                                           *
- *                                                                            *
  * Purpose: fills performance counter name based on its index                 *
  *                                                                            *
  * Parameters: index - [IN]  PDH counter index                                *
@@ -406,8 +398,6 @@ static int	get_perf_name_by_index(DWORD index, wchar_t *name, DWORD size)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: validate_counter_path                                            *
  *                                                                            *
  * Purpose: checks if a specified counter path data is pointing to a valid    *
  *          counter                                                           *
@@ -461,8 +451,6 @@ static int	validate_counter_path(PDH_COUNTER_PATH_ELEMENTS	*cpe)
 
 /******************************************************************************
  *                                                                            *
- * Function: validate_object_counter                                          *
- *                                                                            *
  * Purpose: checks if specified counter is valid successor of the object      *
  *                                                                            *
  * Parameters: object  - [IN] PDH object index                                *
@@ -508,8 +496,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: init_builtin_counter_indexes                                     *
  *                                                                            *
  * Purpose: Scans registry key with all performance counter English names     *
  *          and obtains system-dependent PDH counter indexes for further      *
@@ -618,8 +604,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: get_counter_name                                                 *
  *                                                                            *
  * Purpose: get performance object or counter name by PDH index               *
  *                                                                            *

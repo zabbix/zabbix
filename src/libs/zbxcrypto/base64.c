@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,12 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include <assert.h>
 #include "common.h"
+
 #include "base64.h"
 
 /******************************************************************************
- *                                                                            *
- * Function: is_base64                                                        *
  *                                                                            *
  * Purpose: is the character passed in a base64 character?                    *
  *                                                                            *
@@ -50,12 +50,9 @@ static int	is_base64(char c)
 
 /******************************************************************************
  *                                                                            *
- * Function: char_base64_encode                                               *
+ * Purpose: encode 6 bits into a base64 character                             *
  *                                                                            *
- * Purpose: encode a byte into a base64 character                             *
- *                                                                            *
- * Parameters: uc - character to encode                                       *
- *                                                                            *
+ * Parameters: uc - character to encode. Its value must be 0 ... 63.          *
  * Return value: byte encoded into a base64 character                         *
  *                                                                            *
  ******************************************************************************/
@@ -67,8 +64,6 @@ static char	char_base64_encode(unsigned char uc)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: char_base64_decode                                               *
  *                                                                            *
  * Purpose: decode a base64 character into a byte                             *
  *                                                                            *
@@ -103,8 +98,6 @@ static unsigned char	char_base64_decode(char c)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: str_base64_encode                                                *
  *                                                                            *
  * Purpose: encode a string into a base64 string                              *
  *                                                                            *
@@ -170,8 +163,6 @@ void	str_base64_encode(const char *p_str, char *p_b64str, int in_size)
 
 /******************************************************************************
  *                                                                            *
- * Function: str_base64_encode_dyn                                            *
- *                                                                            *
  * Purpose: encode a string into a base64 string                              *
  *          with dynamic memory allocation                                    *
  *                                                                            *
@@ -216,8 +207,6 @@ void	str_base64_encode_dyn(const char *p_str, char **p_b64str, int in_size)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: str_base64_decode                                                *
  *                                                                            *
  * Purpose: decode a base64 string into a string                              *
  *                                                                            *

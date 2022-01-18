@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-10-28T09:48:10Z'
+  date: '2021-12-17T06:25:03Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -19,7 +19,7 @@ zabbix_export:
         MIBs used:
         CISCO-ENVMON-MIB
         
-        Template tooling version used: 0.39
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Modules
@@ -285,7 +285,7 @@ zabbix_export:
         MIBs used:
         CISCO-MEMORY-POOL-MIB
         
-        Template tooling version used: 0.39
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Modules
@@ -381,7 +381,7 @@ zabbix_export:
         MIBs used:
         CISCO-PROCESS-MIB
         
-        Template tooling version used: 0.39
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Modules
@@ -394,8 +394,8 @@ zabbix_export:
           key: cpu.discovery
           delay: 1h
           description: |
-            If your IOS device has several CPUs, you must use CISCO-PROCESS-MIB and its object cpmCPUTotal5minRev from the table called cpmCPUTotalTable ,
-            indexed with cpmCPUTotalIndex .
+            If your IOS device has several CPUs, you must use CISCO-PROCESS-MIB and its object cpmCPUTotal5minRev from the table called cpmCPUTotalTable,
+            indexed with cpmCPUTotalIndex.
             This table allows CISCO-PROCESS-MIB to keep CPU statistics for different physical entities in the router,
             like different CPU chips, group of CPUs, or CPUs in different modules/cards.
             In case of a single CPU, cpmCPUTotalTable has only one entry.
@@ -416,7 +416,7 @@ zabbix_export:
                 period. This object deprecates the avgBusy5 object from
                 the OLD-CISCO-SYSTEM-MIB. This object is deprecated
                 by cpmCPUTotal5minRev which has the changed range
-                of value (0..100)
+                of value (0..100).
                 Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15215-collect-cpu-util-snmp.html
               tags:
                 -
@@ -457,7 +457,7 @@ zabbix_export:
         MIBs used:
         CISCO-PROCESS-MIB
         
-        Template tooling version used: 0.39
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Modules
@@ -470,8 +470,8 @@ zabbix_export:
           key: cpu.discovery
           delay: 1h
           description: |
-            If your IOS device has several CPUs, you must use CISCO-PROCESS-MIB and its object cpmCPUTotal5minRev from the table called cpmCPUTotalTable ,
-            indexed with cpmCPUTotalIndex .
+            If your IOS device has several CPUs, you must use CISCO-PROCESS-MIB and its object cpmCPUTotal5minRev from the table called cpmCPUTotalTable,
+            indexed with cpmCPUTotalIndex.
             This table allows CISCO-PROCESS-MIB to keep CPU statistics for different physical entities in the router,
             like different CPU chips, group of CPUs, or CPUs in different modules/cards.
             In case of a single CPU, cpmCPUTotalTable has only one entry.
@@ -530,7 +530,7 @@ zabbix_export:
         ENTITY-MIB
         SNMPv2-MIB
         
-        Template tooling version used: 0.39
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Modules
@@ -674,7 +674,7 @@ zabbix_export:
       description: |
         Cisco IOS Software releases prior to 12.0(3)T
         
-        Template tooling version used: 0.39
+        Template tooling version used: 0.40
       templates:
         -
           name: 'Cisco CISCO-ENVMON-MIB SNMP'
@@ -702,7 +702,7 @@ zabbix_export:
           Version: IOS for example: 12.1(22)EA11, 15.4(3)M2
           Device: C2911, C7600
         
-        Template tooling version used: 0.39
+        Template tooling version used: 0.40
       templates:
         -
           name: 'Cisco CISCO-ENVMON-MIB SNMP'
@@ -728,7 +728,7 @@ zabbix_export:
       description: |
         Cisco IOS Software releases later to 12.0(3)T and prior to 12.2(3.5)
         
-        Template tooling version used: 0.39
+        Template tooling version used: 0.40
       templates:
         -
           name: 'Cisco CISCO-ENVMON-MIB SNMP'
@@ -755,7 +755,7 @@ zabbix_export:
         MIBs used:
         OLD-CISCO-CPU-MIB
         
-        Template tooling version used: 0.39
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Modules

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -123,14 +123,14 @@ const char	*help_message[] = {
 	"                                  lld, valuecache, locks) or everything if section is",
 	"                                  not specified",
 	"      " ZBX_SERVICE_CACHE_RELOAD "        Reload service manager cache",
-	"      " ZBX_HA_STATUS "                   Log HA cluster status",
-	"      " ZBX_HA_REMOVE_NODE "=target       Remove the HA node specified by its listed number",
+	"      " ZBX_HA_STATUS "                   Display HA cluster status",
+	"      " ZBX_HA_REMOVE_NODE "=target       Remove the HA node specified by its name or ID",
 	"      " ZBX_HA_SET_FAILOVER_DELAY "=delay Set HA failover delay",
 	"",
 	"      Log level control targets:",
 	"        process-type              All processes of specified type",
 	"                                  (alerter, alert manager, configuration syncer,",
-	"                                  discoverer, escalator, history syncer,",
+	"                                  discoverer, escalator, ha manager, history syncer,",
 	"                                  housekeeper, http poller, icmp pinger,",
 	"                                  ipmi manager, ipmi poller, java poller,",
 	"                                  poller, preprocessing manager,",
@@ -138,10 +138,9 @@ const char	*help_message[] = {
 	"                                  self-monitoring, snmp trapper, task manager,",
 	"                                  timer, trapper, unreachable poller,",
 	"                                  vmware collector, history poller,",
-	"                                  availability manager, service manager)",
+	"                                  availability manager, service manager, odbc poller)",
 	"        process-type,N            Process type and number (e.g., poller,3)",
-	"        pid                       Process identifier, up to 65535. For larger",
-	"                                  values specify target as \"process-type,N\"",
+	"        pid                       Process identifier",
 	"",
 	"  -h --help                       Display this help message",
 	"  -V --version                    Display version number",
@@ -221,6 +220,7 @@ int	CONFIG_REPORTMANAGER_FORKS	= 0;
 int	CONFIG_REPORTWRITER_FORKS	= 0;
 int	CONFIG_SERVICEMAN_FORKS		= 1;
 int	CONFIG_PROBLEMHOUSEKEEPER_FORKS = 1;
+int	CONFIG_ODBCPOLLER_FORKS		= 1;
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
@@ -530,6 +530,11 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 		*local_process_type = ZBX_PROCESS_TYPE_PROBLEMHOUSEKEEPER;
 		*local_process_num = local_server_num - server_count + CONFIG_PROBLEMHOUSEKEEPER_FORKS;
 	}
+	else if (local_server_num <= (server_count += CONFIG_ODBCPOLLER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_ODBCPOLLER;
+		*local_process_num = local_server_num - server_count + CONFIG_ODBCPOLLER_FORKS;
+	}
 	else
 		return FAIL;
 
@@ -538,11 +543,7 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_set_defaults                                                 *
- *                                                                            *
  * Purpose: set configuration defaults                                        *
- *                                                                            *
- * Author: Vladimir Levijev                                                   *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_set_defaults(void)
@@ -611,11 +612,7 @@ static void	zbx_set_defaults(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_validate_config                                              *
- *                                                                            *
  * Purpose: validate configuration parameters                                 *
- *                                                                            *
- * Author: Vladimir Levijev                                                   *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_validate_config(ZBX_TASK_EX *task)
@@ -726,6 +723,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 #if !defined(HAVE_OPENIPMI)
 	err |= (FAIL == check_cfg_feature_int("StartIPMIPollers", CONFIG_IPMIPOLLER_FORKS, "IPMI support"));
 #endif
+
 	err |= (FAIL == zbx_db_validate_config_features());
 
 	if (0 != CONFIG_REPORTWRITER_FORKS && NULL == CONFIG_WEBSERVICE_URL)
@@ -740,15 +738,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_load_config                                                  *
- *                                                                            *
  * Purpose: parse config file and update configuration parameters             *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: will terminate process if parsing fails                          *
  *                                                                            *
@@ -969,6 +959,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"NodeAddress",			&CONFIG_NODE_ADDRESS,		TYPE_STRING,
 			PARM_OPT,	0,			0},
+		{"StartODBCPollers",		&CONFIG_ODBCPOLLER_FORKS,		TYPE_INT,
+			PARM_OPT,	0,			1000},
 		{NULL}
 	};
 
@@ -992,8 +984,6 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_free_config                                                  *
- *                                                                            *
  * Purpose: free configuration memory                                         *
  *                                                                            *
  ******************************************************************************/
@@ -1004,11 +994,7 @@ static void	zbx_free_config(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: main                                                             *
- *                                                                            *
  * Purpose: executes server processes                                         *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
 int	main(int argc, char **argv)
@@ -1196,8 +1182,6 @@ static void	zbx_check_db(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: server_startup                                                   *
- *                                                                            *
  * Purpose: initialize shared resources and start processes                   *
  *                                                                            *
  ******************************************************************************/
@@ -1256,6 +1240,7 @@ static int	server_startup(zbx_socket_t *listen_sock, zbx_rtc_t *rtc)
 			return FAIL;
 		}
 	}
+
 	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_POLLER_FORKS
 			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS
 			+ CONFIG_ALERTER_FORKS + CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS
@@ -1266,7 +1251,8 @@ static int	server_startup(zbx_socket_t *listen_sock, zbx_rtc_t *rtc)
 			+ CONFIG_ALERTMANAGER_FORKS + CONFIG_PREPROCMAN_FORKS + CONFIG_PREPROCESSOR_FORKS
 			+ CONFIG_LLDMANAGER_FORKS + CONFIG_LLDWORKER_FORKS + CONFIG_ALERTDB_FORKS
 			+ CONFIG_HISTORYPOLLER_FORKS + CONFIG_AVAILMAN_FORKS + CONFIG_REPORTMANAGER_FORKS
-			+ CONFIG_REPORTWRITER_FORKS + CONFIG_SERVICEMAN_FORKS + CONFIG_PROBLEMHOUSEKEEPER_FORKS;
+			+ CONFIG_REPORTWRITER_FORKS + CONFIG_SERVICEMAN_FORKS + CONFIG_PROBLEMHOUSEKEEPER_FORKS
+			+ CONFIG_ODBCPOLLER_FORKS;
 	threads = (pid_t *)zbx_calloc(threads, (size_t)threads_num, sizeof(pid_t));
 	threads_flags = (int *)zbx_calloc(threads_flags, (size_t)threads_num, sizeof(int));
 
@@ -1431,6 +1417,11 @@ static int	server_startup(zbx_socket_t *listen_sock, zbx_rtc_t *rtc)
 			case ZBX_PROCESS_TYPE_PROBLEMHOUSEKEEPER:
 				zbx_thread_start(trigger_housekeeper_thread, &thread_args, &threads[i]);
 				break;
+			case ZBX_PROCESS_TYPE_ODBCPOLLER:
+				poller_type = ZBX_POLLER_TYPE_ODBC;
+				thread_args.args = &poller_type;
+				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
+				break;
 		}
 	}
 
@@ -1461,8 +1452,6 @@ static int	server_restart_logger(char **error)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: server_teardown                                                  *
  *                                                                            *
  * Purpose: terminate processes and destroy shared resources                  *
  *                                                                            *

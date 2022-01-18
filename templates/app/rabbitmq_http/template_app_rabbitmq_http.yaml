@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:17Z'
+  version: '6.0'
+  date: '2022-01-10T07:40:06Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -15,7 +15,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387226-discussion-thread-for-official-zabbix-template-rabbitmq
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Applications
@@ -1001,7 +1001,7 @@ zabbix_export:
                 - |
                   var rabbit_version = parseInt(value.split('.')[0]) * 10000 +
                                        parseInt(value.split('.')[1]) * 100 +
-                                       parseInt(value.split('.')[2]) 
+                                       parseInt(value.split('.')[2])
                   return JSON.stringify(rabbit_version >= 30810 ? [{'{#SINGLETON}': ''}] : []);
       macros:
         -
@@ -1136,7 +1136,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387226-discussion-thread-for-official-zabbix-template-rabbitmq
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Applications
@@ -1690,7 +1690,7 @@ zabbix_export:
                 - |
                   var rabbit_version = parseInt(value.split('.')[0]) * 10000 +
                                        parseInt(value.split('.')[1]) * 100 +
-                                       parseInt(value.split('.')[2]) 
+                                       parseInt(value.split('.')[2])
                   return JSON.stringify(rabbit_version < 30810 ? [{'{#SINGLETON}': ''}] : []);
         -
           uuid: ab89d103c015400fbbeecaaf9bf01400
@@ -1792,14 +1792,14 @@ zabbix_export:
                   description: 'http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html'
             -
               uuid: 9867c266760a48d981caa1f34f2c3238
-              name: 'RabbitMQ: Healthcheck: classic mirrored queues without synchronised mirrors online{#SINGLETON}'
+              name: 'RabbitMQ: Healthcheck: classic mirrored queues without synchronized mirrors online{#SINGLETON}'
               type: HTTP_AGENT
               key: 'rabbitmq.healthcheck.mirror_sync[{#SINGLETON}]'
               history: 7d
               authtype: BASIC
               username: '{$RABBITMQ.API.USER}'
               password: '{$RABBITMQ.API.PASSWORD}'
-              description: 'Checks if there are classic mirrored queues without synchronised mirrors online (queues that would potentially lose data if the target node is shut down). Responds a 200 OK if there are no such classic mirrored queues, otherwise responds with a 503 Service Unavailable.'
+              description: 'Checks if there are classic mirrored queues without synchronized mirrors online (queues that would potentially lose data if the target node is shut down). Responds a 200 OK if there are no such classic mirrored queues, otherwise responds with a 503 Service Unavailable.'
               valuemap:
                 name: 'RabbitMQ healthcheck'
               preprocessing:
@@ -1938,7 +1938,7 @@ zabbix_export:
                 - |
                   var rabbit_version = parseInt(value.split('.')[0]) * 10000 +
                                        parseInt(value.split('.')[1]) * 100 +
-                                       parseInt(value.split('.')[2]) 
+                                       parseInt(value.split('.')[2])
                   return JSON.stringify(rabbit_version >= 30810 ? [{'{#SINGLETON}': ''}] : []);
         -
           uuid: cc1d85b6045b44b38f588cd9a4c6c62d

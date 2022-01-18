@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,8 +18,13 @@
 **/
 
 #include "db.h"
+#include "zbxeval.h"
+#include "log.h"
+#include "../../libs/zbxaudit/audit.h"
 #include "../../libs/zbxaudit/audit_trigger.h"
+#include "../../libs/zbxalgo/vectorimpl.h"
 #include "trigger_dep_linking.h"
+
 #include "trigger_linking.h"
 
 typedef struct
@@ -289,8 +294,6 @@ static void	trigger_tag_insert_temp_free(zbx_trigger_tag_insert_temp_t *trigger_
 }
 
 /********************************************************************************
- *                                                                              *
- * Function: DBcopy_template_trigger_tags                                       *
  *                                                                              *
  * Purpose: copies tags from template triggers to created/linked triggers       *
  *                                                                              *
@@ -1363,8 +1366,6 @@ static void	trigger_copies_free(zbx_trigger_copy_t *trigger_copy)
 }
 
 /********************************************************************************
- *                                                                              *
- * Function: DBcopy_template_triggers                                           *
  *                                                                              *
  * Purpose: Copy template triggers to host                                      *
  *                                                                              *

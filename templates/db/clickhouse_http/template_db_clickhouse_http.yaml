@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:39Z'
+  version: '6.0'
+  date: '2022-01-10T07:41:26Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -13,7 +13,7 @@ zabbix_export:
       description: |
         Get node metrics from ClickHouse HTTP interface using HTTP agent.
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Databases
@@ -381,9 +381,9 @@ zabbix_export:
           history: 7d
           units: B
           description: |
-            "Maximum number of bytes in physically resident data pages mapped by the allocator, 
-            comprising all pages dedicated to allocator metadata, pages backing active allocations, 
-            and unused dirty pages."
+            Maximum number of bytes in physically resident data pages mapped by the allocator,
+            comprising all pages dedicated to allocator metadata, pages backing active allocations,
+            and unused dirty pages.
           preprocessing:
             -
               type: JSONPATH
@@ -403,8 +403,8 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: |
-            "Clickhouse MergeTree table engine split each INSERT query to partitions (PARTITION BY expression) and add one or more PARTS per INSERT inside each partition, 
-            after that background merge process run."
+            Clickhouse MergeTree table engine split each INSERT query to partitions (PARTITION BY expression) and add one or more PARTS per INSERT inside each partition,
+            after that background merge process run.
           preprocessing:
             -
               type: JSONPATH
@@ -423,11 +423,11 @@ zabbix_export:
               name: 'ClickHouse: Too many MergeTree parts (over 90% of {$CLICKHOUSE.PARTS.PER.PARTITION.WARN})'
               priority: WARNING
               description: |
-                "Descease INSERT queries frequency.
-                Clickhouse MergeTree table engine split each INSERT query to partitions (PARTITION BY expression) 
-                and add one or more PARTS per INSERT inside each partition, 
-                after that background merge process run, and when you have too much unmerged parts inside partition, 
-                SELECT queries performance can significate degrade, so clickhouse try delay insert, or abort it"
+                Descease INSERT queries frequency.
+                Clickhouse MergeTree table engine split each INSERT query to partitions (PARTITION BY expression)
+                and add one or more PARTS per INSERT inside each partition,
+                after that background merge process run, and when you have too much unmerged parts inside partition,
+                SELECT queries performance can significate degrade, so clickhouse try delay insert, or abort it.
               manual_close: 'YES'
         -
           uuid: a4344162643142c9be3b09439b466a5d
@@ -508,8 +508,8 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: |
-            "Total amount of memory (bytes) allocated for background merges. Included in MemoryTrackingInBackgroundProcessingPool. Note that this value may include a drift when the memory was allocated in a context of background processing pool and freed in other context or vice-versa. 
-            This happens naturally due to caches for tables indexes and doesn't indicate memory leaks."
+            Total amount of memory (bytes) allocated for background merges. Included in MemoryTrackingInBackgroundProcessingPool. Note that this value may include a drift when the memory was allocated in a context of background processing pool and freed in other context or vice-versa.
+            This happens naturally due to caches for tables indexes and doesn't indicate memory leaks.
           preprocessing:
             -
               type: JSONPATH
@@ -668,7 +668,6 @@ zabbix_export:
               parameters:
                 - 10m
           url: '{$CLICKHOUSE.SCHEME}://{HOST.CONN}:{$CLICKHOUSE.PORT}/ping'
-          status_codes: ''
           tags:
             -
               tag: Application
@@ -852,8 +851,8 @@ zabbix_export:
               name: 'ClickHouse: Replication lag is too high (over {$CLICKHOUSE.REPLICA.MAX.WARN} sec for 5min)'
               priority: WARNING
               description: |
-                "When replica have too much lag, it can be skipped from Distributed SELECT Queries without errors 
-                and you will have wrong query results."
+                When replica have too much lag, it can be skipped from Distributed SELECT Queries without errors
+                and you will have wrong query results.
               manual_close: 'YES'
         -
           uuid: dd61675348374d2ea06cdde144fe4e26
@@ -863,9 +862,9 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: |
-            "Number of Replicated tables that are currently in readonly state 
-            due to re-initialization after ZooKeeper session loss 
-            or due to startup without ZooKeeper configured."
+            Number of Replicated tables that are currently in readonly state
+            due to re-initialization after ZooKeeper session loss
+            or due to startup without ZooKeeper configured.
           preprocessing:
             -
               type: JSONPATH
@@ -1227,7 +1226,7 @@ zabbix_export:
           uuid: f8e6a866d8c745d39ed124f19afe8041
           name: 'ClickHouse: ZooKeeper hardware exceptions per second'
           type: DEPENDENT
-          key: clickhouse.zookeper.hw_exeptions.rate
+          key: clickhouse.zookeper.hw_exceptions.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -1294,13 +1293,13 @@ zabbix_export:
               name: 'ClickHouse: Too many ZooKeeper sessions opened'
               priority: WARNING
               description: |
-                "Number of sessions (connections) to ZooKeeper. 
-                Should be no more than one, because using more than one connection to ZooKeeper may lead to bugs due to lack of linearizability (stale reads) that ZooKeeper consistency model allows."
+                Number of sessions (connections) to ZooKeeper.
+                Should be no more than one, because using more than one connection to ZooKeeper may lead to bugs due to lack of linearizability (stale reads) that ZooKeeper consistency model allows.
         -
           uuid: 4931797c1034488fb9a2fc01e22b599c
           name: 'ClickHouse: ZooKeeper user exceptions per second'
           type: DEPENDENT
-          key: clickhouse.zookeper.user_exeptions.rate
+          key: clickhouse.zookeper.user_exceptions.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -1393,7 +1392,7 @@ zabbix_export:
             -
               uuid: 1d4b9842b66b4da9ab3750944b2fa050
               expression: 'last(/ClickHouse by HTTP/net.tcp.service[{$CLICKHOUSE.SCHEME},"{HOST.CONN}","{$CLICKHOUSE.PORT}"])=0'
-              name: 'ClickHouse: Port {$CLICKHOUSE.PORT} is unavaliable'
+              name: 'ClickHouse: Port {$CLICKHOUSE.PORT} is unavailable'
               priority: AVERAGE
               manual_close: 'YES'
       discovery_rules:
@@ -1532,7 +1531,7 @@ zabbix_export:
               key: 'clickhouse.replica.future_parts["{#DB}.{#TABLE}"]'
               delay: '0'
               history: 7d
-              description: 'Number of data parts that will appear as the result of INSERTs or merges that haven’t been done yet.'
+              description: 'Number of data parts that will appear as the result of INSERTs or merges that haven''t been done yet.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1572,7 +1571,7 @@ zabbix_export:
               history: 7d
               description: |
                 Whether the replica is in read-only mode.
-                This mode is turned on if the config doesn’t have sections with ZooKeeper, if an unknown error occurred when reinitializing sessions in ZooKeeper, and during session reinitialization in ZooKeeper.
+                This mode is turned on if the config doesn't have sections with ZooKeeper, if an unknown error occurred when re-initializing sessions in ZooKeeper, and during session re-initialization in ZooKeeper.
               valuemap:
                 name: 'Replicas state'
               preprocessing:
@@ -1592,7 +1591,7 @@ zabbix_export:
                   expression: 'min(/ClickHouse by HTTP/clickhouse.replica.is_readonly["{#DB}.{#TABLE}"],5m)=1'
                   name: 'ClickHouse: {#DB}.{#TABLE} Replica is readonly'
                   priority: WARNING
-                  description: 'This mode is turned on if the config doesn’t have sections with ZooKeeper, if an unknown error occurred when reinitializing sessions in ZooKeeper, and during session reinitialization in ZooKeeper.'
+                  description: 'This mode is turned on if the config doesn''t have sections with ZooKeeper, if an unknown error occurred when re-initializing sessions in ZooKeeper, and during session re-initialization in ZooKeeper.'
             -
               uuid: a889475b8ddf48109af3dd2b7ed58627
               name: 'ClickHouse: {#DB}.{#TABLE}: Replica session expired'
@@ -1620,7 +1619,7 @@ zabbix_export:
                   expression: 'min(/ClickHouse by HTTP/clickhouse.replica.is_session_expired["{#DB}.{#TABLE}"],5m)=1'
                   name: 'ClickHouse: {#DB}.{#TABLE} Replica session is expired'
                   priority: WARNING
-                  description: 'This mode is turned on if the config doesn’t have sections with ZooKeeper, if an unknown error occurred when reinitializing sessions in ZooKeeper, and during session reinitialization in ZooKeeper.'
+                  description: 'This mode is turned on if the config doesn''t have sections with ZooKeeper, if an unknown error occurred when re-initializing sessions in ZooKeeper, and during session re-initialization in ZooKeeper.'
             -
               uuid: 8acd6e2195064708886d9944af264c32
               name: 'ClickHouse: {#DB}.{#TABLE}: Replica lag'
@@ -2031,7 +2030,7 @@ zabbix_export:
       manual_close: 'YES'
       dependencies:
         -
-          name: 'ClickHouse: Port {$CLICKHOUSE.PORT} is unavaliable'
+          name: 'ClickHouse: Port {$CLICKHOUSE.PORT} is unavailable'
           expression: 'last(/ClickHouse by HTTP/net.tcp.service[{$CLICKHOUSE.SCHEME},"{HOST.CONN}","{$CLICKHOUSE.PORT}"])=0'
   graphs:
     -
@@ -2267,13 +2266,13 @@ zabbix_export:
           color: 2774A4
           item:
             host: 'ClickHouse by HTTP'
-            key: clickhouse.zookeper.hw_exeptions.rate
+            key: clickhouse.zookeper.hw_exceptions.rate
         -
           sortorder: '2'
           color: F63100
           item:
             host: 'ClickHouse by HTTP'
-            key: clickhouse.zookeper.user_exeptions.rate
+            key: clickhouse.zookeper.user_exceptions.rate
         -
           sortorder: '3'
           drawtype: BOLD_LINE

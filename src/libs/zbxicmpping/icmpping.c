@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -86,8 +86,6 @@ static void	get_source_ip_option(const char *fping, const char **option, unsigne
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: get_interval_option                                              *
  *                                                                            *
  * Purpose: detect minimal possible fping packet interval                     *
  *                                                                            *
@@ -226,8 +224,6 @@ out:
 
 #ifdef HAVE_IPV6
 /******************************************************************************
- *                                                                            *
- * Function: get_ipv6_support                                                 *
  *                                                                            *
  * Purpose: check fping supports IPv6                                         *
  *                                                                            *
@@ -698,8 +694,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_ping                                                         *
- *                                                                            *
  * Purpose: ping hosts listed in the host files                               *
  *                                                                            *
  *             hosts_count   - [IN]  number of target hosts                   *
@@ -718,8 +712,6 @@ out:
  *                                                                            *
  * Return value: SUCCEED - successfully processed hosts                       *
  *               NOTSUPPORTED - otherwise                                     *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: use external binary 'fping' to avoid superuser privileges        *
  *                                                                            *

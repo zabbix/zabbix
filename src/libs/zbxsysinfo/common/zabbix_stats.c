@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,15 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "comms.h"
 #include "zbxjson.h"
+#include "sysinfo.h"
+#include "common.h"
 
 #include "zabbix_stats.h"
 
 /******************************************************************************
- *                                                                            *
- * Function: check_response                                                   *
  *                                                                            *
  * Purpose: Check whether JSON response is "success" or "failed"              *
  *                                                                            *
@@ -67,8 +66,6 @@ static int	check_response(const char *response, AGENT_RESULT *result)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: get_remote_zabbix_stats                                          *
  *                                                                            *
  * Purpose: send Zabbix stats request and receive the result data             *
  *                                                                            *
@@ -121,8 +118,6 @@ static void	get_remote_zabbix_stats(const struct zbx_json *json, const char *ip,
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_get_remote_zabbix_stats                                      *
- *                                                                            *
  * Purpose: create Zabbix stats request                                       *
  *                                                                            *
  * Parameters: ip     - [IN] external Zabbix instance hostname                *
@@ -148,8 +143,6 @@ int	zbx_get_remote_zabbix_stats(const char *ip, unsigned short port, AGENT_RESUL
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_get_remote_zabbix_stats_queue                                *
  *                                                                            *
  * Purpose: create Zabbix stats queue request                                 *
  *                                                                            *

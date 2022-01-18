@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 /**
  * @var CPartial $this
+ * @var array    $data
  */
 
 $form = (new CForm('GET', 'history.php'))
@@ -43,6 +44,27 @@ $col_name = make_sorting_header(_('Name'), 'name', $data['sort_field'], $data['s
 $simple_interval_parser = new CSimpleIntervalParser();
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 
+if ($data['filter']['show_tags'] == SHOW_TAGS_NONE) {
+	$tags_header = null;
+}
+else {
+	$tags_header = new CColHeader(_('Tags'));
+
+	switch ($data['filter']['show_tags']) {
+		case SHOW_TAGS_1:
+			$tags_header->addClass(ZBX_STYLE_COLUMN_TAGS_1);
+			break;
+
+		case SHOW_TAGS_2:
+			$tags_header->addClass(ZBX_STYLE_COLUMN_TAGS_2);
+			break;
+
+		case SHOW_TAGS_3:
+			$tags_header->addClass(ZBX_STYLE_COLUMN_TAGS_3);
+			break;
+	}
+}
+
 if ($data['filter']['show_details']) {
 	$table->setHeader([
 		$col_check_all->addStyle('width: 15px;'),
@@ -55,7 +77,7 @@ if ($data['filter']['show_details']) {
 		(new CColHeader(_('Last check')))->addStyle('width: 14%'),
 		(new CColHeader(_('Last value')))->addStyle('width: 14%'),
 		(new CColHeader(_x('Change', 'noun')))->addStyle('width: 10%'),
-		(new CColHeader(_('Tags')))->addClass(ZBX_STYLE_COLUMN_TAGS_3),
+		$tags_header,
 		(new CColHeader())->addStyle('width: 6%'),
 		(new CColHeader(_('Info')))->addStyle('width: 35px')
 	]);
@@ -68,7 +90,7 @@ else {
 		(new CColHeader(_('Last check')))->addStyle('width: 14%'),
 		(new CColHeader(_('Last value')))->addStyle('width: 14%'),
 		(new CColHeader(_x('Change', 'noun')))->addStyle('width: 10%'),
-		(new CColHeader(_('Tags')))->addClass(ZBX_STYLE_COLUMN_TAGS_3),
+		$tags_header,
 		(new CColHeader())->addStyle('width: 6%'),
 		(new CColHeader(_('Info')))->addStyle('width: 35px')
 	]);
@@ -176,6 +198,21 @@ foreach ($data['items'] as $itemid => $item) {
 		->addClass($host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_RED : null)
 		->setMenuPopup(CMenuPopupHelper::getHost($item['hostid']));
 
+	$maintenance_icon = '';
+
+	if ($host['status'] == HOST_STATUS_MONITORED && $host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+		if (array_key_exists($host['maintenanceid'], $data['maintenances'])) {
+			$maintenance = $data['maintenances'][$host['maintenanceid']];
+			$maintenance_icon = makeMaintenanceIcon($host['maintenance_type'], $maintenance['name'],
+				$maintenance['description']
+			);
+		}
+		else {
+			$maintenance_icon = makeMaintenanceIcon($host['maintenance_type'],
+				_('Inaccessible maintenance'), ''
+			);
+		}
+	}
 
 	$item_icons = [];
 	if ($item['status'] == ITEM_STATUS_ACTIVE && $item['error'] !== '') {
@@ -211,7 +248,7 @@ foreach ($data['items'] as $itemid => $item) {
 
 		$table_row = new CRow([
 			$checkbox,
-			$host_name,
+			[$host_name, $maintenance_icon],
 			(new CCol([$item_name, $item_key]))->addClass($state_css),
 			(new CCol($item_delay))->addClass($state_css),
 			(new CCol($item_history))->addClass($state_css),
@@ -220,7 +257,7 @@ foreach ($data['items'] as $itemid => $item) {
 			(new CCol($last_check))->addClass($state_css),
 			(new CCol($last_value))->addClass($state_css),
 			(new CCol($change))->addClass($state_css),
-			$data['tags'][$itemid],
+			($data['filter']['show_tags'] != SHOW_TAGS_NONE) ? $data['tags'][$itemid] : null,
 			$actions,
 			makeInformationList($item_icons)
 		]);
@@ -228,12 +265,12 @@ foreach ($data['items'] as $itemid => $item) {
 	else {
 		$table_row = new CRow([
 			$checkbox,
-			$host_name,
+			[$host_name, $maintenance_icon],
 			(new CCol($item_name))->addClass($state_css),
 			(new CCol($last_check))->addClass($state_css),
 			(new CCol($last_value))->addClass($state_css),
 			(new CCol($change))->addClass($state_css),
-			$data['tags'][$itemid],
+			($data['filter']['show_tags'] != SHOW_TAGS_NONE) ? $data['tags'][$itemid] : null,
 			$actions,
 			makeInformationList($item_icons)
 		]);

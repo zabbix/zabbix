@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $form = (new CForm())
@@ -55,24 +56,22 @@ $controls = (new CForm())
 
 $services = (new CTableInfo())
 	->setHeader([
-		(new CColHeader(new CCheckBox('serviceid_all')))->addClass(ZBX_STYLE_CELL_WIDTH),
+		$data['is_multiple'] ? (new CColHeader(new CCheckBox('serviceid_all')))->addClass(ZBX_STYLE_CELL_WIDTH) : null,
 		_('Name'),
-		_('Status calculation rule'),
+		_('Tags'),
 		_('Problem tags')
 	]);
 
 foreach ($data['services'] as $service) {
 	$services->addRow([
-		new CCol([
-			(new CCheckBox('serviceid', $service['serviceid']))->removeId(),
+		$data['is_multiple'] ? (new CCheckBox('serviceid', $service['serviceid']))->removeId() : null,
+		(new CCol([
+			$data['is_multiple'] ? null : (new CVar('serviceid', $service['serviceid']))->removeId(),
 			(new CVar('name', $service['name']))->removeId(),
-			(new CVar('algorithm', $service['algorithm']))->removeId(),
-			(new CVar('problem_tags_html', $data['problem_tags_html'][$service['serviceid']]))->removeId()
-		]),
-		(new CCol(
+			(new CVar('problem_tags_html', $data['problem_tags_html'][$service['serviceid']]))->removeId(),
 			(new CLink($service['name']))->addClass('js-name')
-		))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol(CServiceHelper::getAlgorithmNames()[$service['algorithm']]))->addClass(ZBX_STYLE_NOWRAP),
+		]))->addClass(ZBX_STYLE_WORDBREAK),
+		new CCol($data['tags'][$service['serviceid']]),
 		new CCol($data['problem_tags'][$service['serviceid']])
 	]);
 }
@@ -81,22 +80,28 @@ $form
 	->addItem($services)
 	->addItem(
 		(new CScriptTag('
-			services_popup.init();
+			services_popup.init('.json_encode([
+				'is_multiple' => $data['is_multiple']
+			]).');
 		'))->setOnDocumentReady()
 	);
+
+$buttons = [];
+
+if ($data['is_multiple']) {
+	$buttons[] = [
+		'title' => _('Select'),
+		'keepOpen' => true,
+		'isSubmit' => true,
+		'action' => 'services_popup.submit();'
+	];
+}
 
 $output = [
 	'header' => $data['title'],
 	'controls' => $controls->toString(),
 	'body' => $form->toString(),
-	'buttons' => [
-		[
-			'title' => _('Select'),
-			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'services_popup.submit();'
-		]
-	],
+	'buttons' => $buttons,
 	'script_inline' => $this->readJsFile('popup.services.js.php')
 ];
 

@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-07-22T14:50:06Z'
+  version: '6.0'
+  date: '2021-12-17T06:34:10Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -27,7 +27,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/422668-discussion-thread-for-official-zabbix-templates-for-zyxel
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: 'Templates/Network devices'
@@ -521,7 +521,7 @@ zabbix_export:
               description: |
                 MIB: ADSL-LINE-MIB
                 Measured difference in the total power transmitted by
-                the peer ATU and the total power received by this ATU. 
+                the peer ATU and the total power received by this ATU.
                 The Info Atuc fields show data acquired from the ATUC (ADSL Termination Unit – Central), in this case ZYXEL IES-500x, during negotiation/provisioning message interchanges.
               preprocessing:
                 -
@@ -554,7 +554,7 @@ zabbix_export:
               units: dB
               description: |
                 MIB: ADSL-LINE-MIB
-                Measured total output power transmitted by this ATU. 
+                Measured total output power transmitted by this ATU.
                 The Info Atuc fields show data acquired from the ATUC (ADSL Termination Unit – Central), in this case ZYXEL IES-500x, during negotiation/provisioning message interchanges.
               preprocessing:
                 -
@@ -581,7 +581,7 @@ zabbix_export:
               description: |
                 MIB: ADSL-LINE-MIB
                 Noise Margin as seen by this ATU with respect to its
-                received signal in tenth dB. 
+                received signal in tenth dB.
                 The Info Atuc fields show data acquired from the ATUC (ADSL Termination Unit – Central), in this case ZYXEL IES-500x, during negotiation/provisioning message interchanges.
               preprocessing:
                 -
@@ -615,8 +615,8 @@ zabbix_export:
               description: |
                 MIB: ADSL-LINE-MIB
                 Measured difference in the total power transmitted by
-                the peer ATU and the total power received by this ATU. 
-                The Info Atur fields show data acquired from the ATUR (ADSL Termination Unit – Remote), in this case the subscriber’s ADSL modem or router, during negotiation/provisioning message interchanges.
+                the peer ATU and the total power received by this ATU.
+                The Info Atur fields show data acquired from the ATUR (ADSL Termination Unit – Remote), in this case the subscriber's ADSL modem or router, during negotiation/provisioning message interchanges.
               preprocessing:
                 -
                   type: MULTIPLIER
@@ -648,8 +648,8 @@ zabbix_export:
               units: dB
               description: |
                 MIB: ADSL-LINE-MIB
-                Measured total output power transmitted by this ATU. 
-                The Info Atur fields show data acquired from the ATUR (ADSL Termination Unit – Remote), in this case the subscriber’s ADSL modem or router, during negotiation/provisioning message interchanges.
+                Measured total output power transmitted by this ATU.
+                The Info Atur fields show data acquired from the ATUR (ADSL Termination Unit – Remote), in this case the subscriber's ADSL modem or router, during negotiation/provisioning message interchanges.
               preprocessing:
                 -
                   type: MULTIPLIER
@@ -675,8 +675,8 @@ zabbix_export:
               description: |
                 MIB: ADSL-LINE-MIB
                 Noise Margin as seen by this ATU with respect to its
-                received signal in tenth dB. 
-                The Info Atur fields show data acquired from the ATUR (ADSL Termination Unit – Remote), in this case the subscriber’s ADSL modem or router, during negotiation/provisioning message interchanges.
+                received signal in tenth dB.
+                The Info Atur fields show data acquired from the ATUR (ADSL Termination Unit – Remote), in this case the subscriber's ADSL modem or router, during negotiation/provisioning message interchanges.
               preprocessing:
                 -
                   type: MULTIPLIER
@@ -2059,12 +2059,8 @@ zabbix_export:
           value: '8'
           description: 'Type the minimum signal to noise margin (0-31 dB)'
         -
-          macro: '{$ZYXEL.LLD.FILTER.SLOT.STATUS.NOT_MATCHES}'
-          value: '1'
-          description: 'Filter to exclude discovered slots by status.'
-        -
           macro: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
-          value: 'CHANGE_IF_NEEDED'
+          value: CHANGE_IF_NEEDED
           description: 'Triggers will be created only for interfaces whose description contains the value of this macro'
         -
           macro: '{$ZYXEL.LLD.FILTER.IF.DESC.MATCHES}'
@@ -2086,6 +2082,10 @@ zabbix_export:
           macro: '{$ZYXEL.LLD.FILTER.SLOT.STATUS.MATCHES}'
           value: '.*'
           description: 'Filter by discoverable slot status.'
+        -
+          macro: '{$ZYXEL.LLD.FILTER.SLOT.STATUS.NOT_MATCHES}'
+          value: '1'
+          description: 'Filter to exclude discovered slots by status.'
       valuemaps:
         -
           uuid: 10dd3d9951014a38bc3517df54381a66
