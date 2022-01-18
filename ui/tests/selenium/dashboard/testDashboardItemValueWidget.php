@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  *
  * @onBefore prepareDashboardData
  */
-class testDashboardSingleItemWidget extends CWebTest {
+class testDashboardItemValueWidget extends CWebTest {
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -159,6 +159,7 @@ class testDashboardSingleItemWidget extends CWebTest {
 					'fields' => [
 						'Type' => 'Item value',
 						'Name' => 'Some name',
+						'Refresh interval' => 'No refresh',
 						'Item' => [
 							'values' => 'Available memory in %',
 							'context' => [
@@ -272,6 +273,7 @@ class testDashboardSingleItemWidget extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Type' => 'Item value',
+						'Refresh interval' => '30 seconds',
 						'Item' => [
 							'values' => '',
 							'context' => [
@@ -441,7 +443,7 @@ class testDashboardSingleItemWidget extends CWebTest {
 	 *
 	 * @dataProvider getWidgetData
 	 */
-	public function testDashboardSingleItemWidget_Update($data) {
+	public function testDashboardItemValueWidget_Update($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 
 		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
@@ -493,7 +495,7 @@ class testDashboardSingleItemWidget extends CWebTest {
 	/**
 	 * @dataProvider getWidgetData
 	 */
-	public function testDashboardSingleItemWidget_Create($data) {
+	public function testDashboardItemValueWidget_Create($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$old_widget_count = $dashboard->getWidgets()->count();
@@ -539,7 +541,7 @@ class testDashboardSingleItemWidget extends CWebTest {
 		}
 	}
 
-	public function testDashboardSingleItemWidget_Delete() {
+	public function testDashboardItemValueWidget_Delete() {
 		$name = 'Widget to delete';
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one()->edit();
@@ -553,12 +555,21 @@ class testDashboardSingleItemWidget extends CWebTest {
 
 	}
 
+	/**
+	 * Function for checking dashboard update message.
+	 */
 	private function checkDashboardUpdateMessage() {
 		$message = CMessageElement::find()->waitUntilVisible()->one();
 		$this->assertTrue($message->isGood());
 		$this->assertEquals('Dashboard updated', $message->getTitle());
 	}
 
+	/**
+	 * Function for checking widget refresh interval.
+	 *
+	 * @param array $data	data provider
+	 * @param string $header	name of existing widget
+	 */
 	private function checkRefreshInterval($data, $header) {
 		$dashboard = CDashboardElement::find()->one();
 		$widget = $dashboard->getWidget($header);

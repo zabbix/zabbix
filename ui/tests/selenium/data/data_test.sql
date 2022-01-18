@@ -2677,6 +2677,26 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUE
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90444, 1073, 0, 'show_legend', 0);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_graphid) VALUES (905053, 1073, 7, 'graphid', 0, 600000);
 
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (1074, 130, 'item', 'Test copy item value', 0, 29, 6, 4);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (905056, 1074, 4, 'itemid', 0, 29177);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905057, 1074, 0, 'rf_rate', 60);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905058, 1074, 0, 'adv_conf', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905059, 1074, 0, 'desc_h_pos', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905060, 1074, 0, 'desc_v_pos', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905061, 1074, 0, 'desc_bold', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905062, 1074, 0, 'time_h_pos', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905063, 1074, 0, 'time_v_pos', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905064, 1074, 0, 'time_bold', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905065, 1074, 0, 'time_size', 16);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905066, 1074, 0, 'units_size', 34);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (905067, 1074, 1, 'units', 'some');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (905068, 1074, 1, 'bg_color', 'E1E1E1');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (905069, 1074, 1, 'updown_color', 'FFB300');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (905070, 1074, 1, 'up_color', 'CE93D8');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (905071, 1074, 1, 'down_color', '29B6F6');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905072, 1074, 0, 'value_v_pos', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905073, 1074, 0, 'dynamic', 1);
+
 -- Dashboard for Graph Prototype widget
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (140, 'Dashboard for Graph Prototype widget', 1, 1);
 INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (140, 140);

@@ -179,7 +179,7 @@ require_once dirname(__FILE__).'/dashboard/testDashboardDynamicItemWidgets.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardGraphWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardHostAvailabilityWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardProblemsBySeverityWidget.php';
-require_once dirname(__FILE__).'/dashboard/testDashboardSingleItemWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardItemValueWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardSystemInformationWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardPages.php';
 require_once dirname(__FILE__).'/dashboard/testFormTemplateDashboards.php';
@@ -366,7 +366,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardGraphWidget');
 		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
 		$suite->addTestSuite('testDashboardProblemsBySeverityWidget');
-		$suite->addTestSuite('testDashboardSingleItemWidget');
+		$suite->addTestSuite('testDashboardItemValueWidget');
 		$suite->addTestSuite('testDashboardSystemInformationWidget');
 		$suite->addTestSuite('testDashboardPages');
 		$suite->addTestSuite('testFormTemplateDashboards');

@@ -138,7 +138,7 @@ class testDashboardCopyWidgets extends CWebTest {
 							],
 							[
 								'type' => 'item',
-								'name' => 'Single item widget',
+								'name' => 'Item value widget',
 								'x' => 13,
 								'y' => 4,
 								'width' => 4,
@@ -389,7 +389,7 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
-					'name' => 'Single item widget',
+					'name' => 'Item value widget',
 					'copy to' => 'same page'
 				]
 			],
@@ -425,7 +425,7 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
-					'name' => 'Single item widget',
+					'name' => 'Item value widget',
 					'copy to' => 'another page'
 				]
 			],
@@ -461,7 +461,7 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
-					'name' => 'Single item widget',
+					'name' => 'Item value widget',
 					'copy to' => 'another dashboard'
 				]
 			],
