@@ -68,5 +68,6 @@ func (cp *common) osSkip(path string, d fs.DirEntry) bool {
 	}
 
 	cp.files = append(cp.files, i)
+
 	return false
 }
