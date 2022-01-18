@@ -846,7 +846,7 @@ static int	get_minnextcheck(void)
  ******************************************************************************/
 ZBX_THREAD_ENTRY(discoverer_thread, args)
 {
-	int			nextcheck, sleeptime = -1, rule_count = 0, old_rule_count = 0;
+	int			nextcheck = 0, sleeptime = -1, rule_count = 0, old_rule_count = 0;
 	double			sec, total_sec = 0.0, old_total_sec = 0.0;
 	time_t			last_stat_time;
 	zbx_ipc_async_socket_t	rtc;
@@ -888,10 +888,15 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 					old_total_sec);
 		}
 
-		rule_count += process_discovery();
-		total_sec += zbx_time() - sec;
+		if ((int)sec >= nextcheck)
+		{
+			rule_count += process_discovery();
+			total_sec += zbx_time() - sec;
 
-		nextcheck = get_minnextcheck();
+			if (FAIL == (nextcheck = get_minnextcheck()))
+				nextcheck = time(NULL) + DISCOVERER_DELAY;
+		}
+
 		sleeptime = calculate_sleeptime(nextcheck, DISCOVERER_DELAY);
 
 		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
