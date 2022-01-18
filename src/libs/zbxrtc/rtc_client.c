@@ -19,7 +19,6 @@
 
 #include "zbxserialize.h"
 #include "zbxjson.h"
-#include "zbxrtc.h"
 #include "rtc.h"
 #include "zbxself.h"
 #include "log.h"
