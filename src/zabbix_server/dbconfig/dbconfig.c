@@ -42,7 +42,7 @@ extern ZBX_THREAD_LOCAL int		server_num, process_num;
 ZBX_THREAD_ENTRY(dbconfig_thread, args)
 {
 	double			sec = 0.0;
-	int			nextcheck = 0, sleeptime = CONFIG_CONFSYNCER_FREQUENCY, secrets_reload = 0;
+	int			nextcheck = 0, sleeptime, secrets_reload = 0;
 	zbx_ipc_async_socket_t	rtc;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
@@ -61,7 +61,6 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	sec = zbx_time();
-	nextcheck = (int)sec + CONFIG_CONFSYNCER_FREQUENCY;
 	zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
 	DCsync_configuration(ZBX_DBSYNC_INIT);
 	DCsync_kvs_paths(NULL);
@@ -70,10 +69,14 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 
 	zbx_rtc_notify_config_sync(&rtc);
 
+	nextcheck = (int)time(NULL) + CONFIG_CONFSYNCER_FREQUENCY;
+
 	while (ZBX_IS_RUNNING())
 	{
 		zbx_uint32_t	rtc_cmd;
 		unsigned char	*rtc_data;
+
+		sleeptime = nextcheck - (int)time(NULL);
 
 		while (SUCCEED == zbx_rtc_wait(&rtc, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
 		{
@@ -114,7 +117,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 			DCsync_configuration(ZBX_DBSYNC_UPDATE);
 			DCsync_kvs_paths(NULL);
 			DCupdate_interfaces_availability();
-			nextcheck = (int)sec + CONFIG_CONFSYNCER_FREQUENCY;
+			nextcheck = (int)time(NULL) + CONFIG_CONFSYNCER_FREQUENCY;
 		}
 		else
 		{
@@ -126,9 +129,6 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 
 		zbx_setproctitle("%s [synced configuration in " ZBX_FS_DBL " sec, idle %d sec]",
 				get_process_type_string(process_type), sec, CONFIG_CONFSYNCER_FREQUENCY);
-
-		if (0 > (sleeptime = nextcheck - (int)time(NULL)))
-			sleeptime = 0;
 	}
 stop:
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
