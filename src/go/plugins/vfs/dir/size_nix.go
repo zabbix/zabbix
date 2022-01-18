@@ -24,6 +24,7 @@ package dir
 import (
 	"fmt"
 	"io/fs"
+	"os"
 	"syscall"
 )
 
@@ -54,5 +55,18 @@ func (sp *sizeParams) handleHomeDir(path string, d fs.DirEntry) (int64, error) {
 }
 
 func (cp *common) osSkip(path string, d fs.DirEntry) bool {
+	i, err := d.Info()
+	if err != nil {
+		impl.Logger.Errf("failed to get file info for path %s, %s", path, err.Error())
+		return true
+	}
+
+	for _, f := range cp.files {
+		if os.SameFile(f, i) {
+			return true
+		}
+	}
+
+	cp.files = append(cp.files, i)
 	return false
 }
