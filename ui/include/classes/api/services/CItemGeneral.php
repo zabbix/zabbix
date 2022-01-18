@@ -467,6 +467,7 @@ abstract class CItemGeneral extends CApiService {
 				}
 			}
 
+			$item['flags'] = $db_item['flags'];
 			$item['hostid'] = $db_item['hostid'];
 		}
 		unset($item);
