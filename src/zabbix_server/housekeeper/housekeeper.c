@@ -1139,7 +1139,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		if (!ZBX_IS_RUNNING())
 			break;
 
-		if (0 != CONFIG_HOUSEKEEPING_FREQUENCY)
+		if (0 == CONFIG_HOUSEKEEPING_FREQUENCY)
 			sleeptime = ZBX_IPC_WAIT_FOREVER;
 		else
 			sleeptime = CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR;
