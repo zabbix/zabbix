@@ -240,7 +240,7 @@ void	zbx_rtc_notify_config_sync(zbx_ipc_async_socket_t *rtc)
 		exit(EXIT_FAILURE);
 	}
 
-	if (FAIL ==zbx_ipc_async_socket_flush(rtc, CONFIG_TIMEOUT))
+	if (FAIL == zbx_ipc_async_socket_flush(rtc, CONFIG_TIMEOUT))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot flush configuration syncer notification");
 		exit(EXIT_FAILURE);

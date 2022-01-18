@@ -238,8 +238,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 				get_process_type_string(process_type), (zbx_fs_size_t)data_size, sec,
 				CONFIG_PROXYCONFIG_FREQUENCY);
 
-		if (0 > (sleeptime = CONFIG_PROXYCONFIG_FREQUENCY - (int)sec))
-			sleeptime = 0;
+		sleeptime = CONFIG_PROXYCONFIG_FREQUENCY;
 	}
 stop:
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
