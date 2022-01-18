@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -105,7 +105,7 @@ class testDashboardGraphWidget extends CWebTest {
 		$errors = [];
 
 		$tabs = ['Displaying options', 'Time period', 'Axes', 'Legend', 'Problems', 'Overrides'];
-// TODO: wait for DEV-2058 - return this array and change screenshot.
+// TODO: fix hex field - return this array and change screenshot.
 //		$tabs = ['Data set', 'Displaying options', 'Time period', 'Axes', 'Legend', 'Problems', 'Overrides'];
 		foreach ($tabs as $tab) {
 			$form->selectTab($tab);
@@ -166,22 +166,29 @@ class testDashboardGraphWidget extends CWebTest {
 		}
 
 		sleep(2);
+		if (array_key_exists('color_error', $data)) {
+			$message = $form->getOverlayMessage();
+			$this->assertTrue($message->isBad());
+			$this->assertTrue($message->hasLine($data['color_error']));
+		}
 		$form->submit();
 		COverlayDialogElement::find()->one()->waitUntilReady()->query('xpath:div[@class="overlay-dialogue-footer"]'.
 				'//button[@class="dialogue-widget-save"]')->waitUntilClickable()->one();
 
-		if (!is_array($data['error'])) {
-			$data['error'] = [$data['error']];
-		}
-		// Check error message.
-		$message = $form->getOverlayMessage();
-		$this->assertTrue($message->isBad());
-		$count = count($data['error']);
-		$message->query('xpath:./div[@class="msg-details"]/ul/li['.$count.']')->waitUntilPresent();
-		$this->assertEquals($count, $message->getLines()->count());
+		if (array_key_exists('error', $data)) {
+			if (!is_array($data['error'])) {
+				$data['error'] = [$data['error']];
+			}
+			// Check error message.
+			$message = $form->getOverlayMessage();
+			$this->assertTrue($message->isBad());
+			$count = count($data['error']);
+			$message->query('xpath:./div[@class="msg-details"]/ul/li['.$count.']')->waitUntilPresent();
+			$this->assertEquals($count, $message->getLines()->count());
 
-		foreach ($data['error'] as $error) {
-			$this->assertTrue($message->hasLine($error));
+			foreach ($data['error'] as $error) {
+				$this->assertTrue($message->hasLine($error));
+			}
 		}
 
 		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
@@ -196,38 +203,37 @@ class testDashboardGraphWidget extends CWebTest {
 				]
 			],
 			// Base color field validation.
-// TODO: wait for DEV-2058
-/*			[
-*				[
-*					'Data set' => [
-*						[
-*							'Base color' => ''
-*						]
-*					],
-*					'error' => 'Invalid parameter "Data set/1/color": cannot be empty.'
-*				]
-*			],
-*			[
-*				[
-*					'Data set' => [
-*						[
-*							'Base color' => '00000!'
-*						]
-*					],
-*					'error' => 'Invalid parameter "Data set/1/color": a hexadecimal color code (6 symbols) is expected.'
-*				]
-*			],
-*			[
-*				[
-*					'Data set' => [
-*						[
-*							'Base color' => '00000'
-*						]
-*					],
-*					'error' => 'Invalid parameter "Data set/1/color": a hexadecimal color code (6 symbols) is expected.'
-*				]
-*			],
-*/
+			[
+				[
+					'Data set' => [
+						'color' => [
+							'id:lbl_ds_0_color' => ''
+						]
+					],
+					'color_error' => 'Invalid parameter "Data set/1/color": cannot be empty.'
+				]
+			],
+			[
+				[
+					'Data set' => [
+						'color' => [
+							'id:lbl_ds_0_color' => '00000!'
+						]
+					],
+					'color_error' => 'Invalid parameter "Data set/1/color": a hexadecimal color code (6 symbols) is expected.'
+				]
+			],
+			[
+				[
+					'Data set' => [
+						'color' => [
+							'id:lbl_ds_0_color' => '00000 '
+						]
+					],
+					'color_error' => 'Invalid parameter "Data set/1/color": a hexadecimal color code (6 symbols) is expected.'
+				]
+			],
+
 			// Time shift field validation.
 			[
 				[
@@ -361,20 +367,21 @@ class testDashboardGraphWidget extends CWebTest {
 					'error' => 'Invalid parameter "Data set/2/items": cannot be empty.'
 				]
 			],
-// TODO: wait for DEV-2058
-//			[
-//				[
-//					'Data set' => [
-//						[],
-//						[
-//							'host' => 'Zabbix*',
-//							'item' => 'Agent ping'
-//							'Base color' => '00000'
-//						]
-//					],
-//					'error' => 'Invalid parameter "Data set/2/color": a hexadecimal color code (6 symbols) is expected.'
-//				]
-//			],
+			[
+				[
+					'Data set' => [
+						[],
+						[
+							'host' => 'Zabbix*',
+							'item' => 'Agent ping',
+							'color' => [
+							'id:lbl_ds_1_color' => '00000 '
+							]
+						]
+					],
+					'color_error' => 'Invalid parameter "Data set/2/color": a hexadecimal color code (6 symbols) is expected.'
+				]
+			],
 			[
 				[
 					'Data set' => [
@@ -557,7 +564,7 @@ class testDashboardGraphWidget extends CWebTest {
 						'To' => '2021-07-04 15:53:07'
 					],
 					'error' => [
-						'Invalid parameter "From": a time is expected.',
+						'Invalid parameter "From": a time range is expected.',
 						'Minimum time period to display is 1 minute.'
 					]
 				]
@@ -569,7 +576,7 @@ class testDashboardGraphWidget extends CWebTest {
 						'From' => '2021-07-04 15:53:07',
 						'To' => 'abc'
 					],
-					'error' => 'Invalid parameter "To": a time is expected.'
+					'error' => 'Invalid parameter "To": a time range is expected.'
 				]
 			],
 			[
@@ -580,7 +587,7 @@ class testDashboardGraphWidget extends CWebTest {
 						'To' => '2021-07-04 15:53:07'
 					],
 					'error' => [
-						'Invalid parameter "From": a time is expected.',
+						'Invalid parameter "From": a time range is expected.',
 						'Minimum time period to display is 1 minute.'
 					]
 				]
@@ -593,7 +600,7 @@ class testDashboardGraphWidget extends CWebTest {
 						'To' => '2021-07-04 15:53:07'
 					],
 					'error' => [
-						'Invalid parameter "From": a time is expected.',
+						'Invalid parameter "From": a time range is expected.',
 						'Minimum time period to display is 1 minute.'
 					]
 				]
@@ -605,7 +612,7 @@ class testDashboardGraphWidget extends CWebTest {
 						'From' => '2021-05-02 00:00:00',
 						'To' => '2021-25-09 00:00:00'
 					],
-					'error' => 'Invalid parameter "To": a time is expected.'
+					'error' => 'Invalid parameter "To": a time range is expected.'
 				]
 			],
 			[
@@ -615,7 +622,7 @@ class testDashboardGraphWidget extends CWebTest {
 						'From' => '2021-05-02 00:00:00',
 						'To' => '2021.07.31 15:53:07'
 					],
-					'error' => 'Invalid parameter "To": a time is expected.'
+					'error' => 'Invalid parameter "To": a time range is expected.'
 				]
 			],
 			[
@@ -625,7 +632,7 @@ class testDashboardGraphWidget extends CWebTest {
 						'From' => '2021-07-04 12:53:00',
 						'To' => 'now-s'
 					],
-					'error' => 'Invalid parameter "To": a time is expected.'
+					'error' => 'Invalid parameter "To": a time range is expected.'
 				]
 			],
 			// Time range validation
@@ -931,33 +938,38 @@ class testDashboardGraphWidget extends CWebTest {
 					'error' => 'Invalid parameter "Overrides/1/color": cannot be empty.'
 				]
 			],
-// TODO: wait for DEV-2058
-//			[
-//				[
-//					'Overrides' => [
-//						[
-//							'color' => '00000!',
-//							'options' => [
-//								'Base color'
-//							]
-//						]
-//					],
-//					'error' => 'Invalid parameter "Overrides/1/color": a hexadecimal color code (6 symbols) is expected.'
-//				]
-//			],
-//			[
-//				[
-//					'Overrides' => [
-//						[
-//							'color' => '00000',
-//							'options' => [
-//								'Base color'
-//							]
-//						]
-//					],
-//					'error' => 'Invalid parameter "Overrides/1/color": a hexadecimal color code (6 symbols) is expected.'
-//				]
-//			],
+			[
+				[
+					'Overrides' => [
+						[
+
+							'options' => [
+								'Base color'
+							],
+							'color' => [
+								'id:lbl_or_0__color_' => '00000!'
+							]
+						]
+					],
+					'color_error' => 'Invalid parameter "Overrides/1/color": a hexadecimal color code (6 symbols) is expected.'
+				]
+			],
+			[
+				[
+					'Overrides' => [
+						[
+
+							'options' => [
+								'Base color'
+							],
+							'color' => [
+								'id:lbl_or_0__color_' => '00000 '
+							]
+						]
+					],
+					'color_error' => 'Invalid parameter "Overrides/1/color": a hexadecimal color code (6 symbols) is expected.'
+				]
+			],
 			// Time shift field validation.
 			[
 				[
@@ -1093,26 +1105,25 @@ class testDashboardGraphWidget extends CWebTest {
 					'error' => 'Invalid parameter "Overrides/2": at least one override option must be specified.'
 				]
 			],
-// TODO: wait for DEV-2058
-//			[
-//				[
-//					'Overrides' => [
-//						[
-//							'options' => [
-//								['Width', '5']
-//							]
-//						],
-//						[
-//							'host' => 'Two host',
-//							'item' => 'Two item',
-//							'options' => [
-//								'Base color'
-//							]
-//						]
-//					],
-//					'error' => 'Invalid parameter "Overrides/2/color": cannot be empty.'
-//				]
-//			],
+			[
+				[
+					'Overrides' => [
+						[
+							'options' => [
+								['Width', '5']
+							]
+						],
+						[
+							'host' => 'Two host',
+							'item' => 'Two item',
+							'options' => [
+								'Base color'
+							]
+						]
+					],
+					'error' => 'Invalid parameter "Overrides/2/color": cannot be empty.'
+				]
+			],
 			[
 				[
 					'Overrides' => [
@@ -1450,8 +1461,9 @@ class testDashboardGraphWidget extends CWebTest {
 						[
 							'host' => 'One host',
 							'item' => 'One item',
-// TODO: wait for DEV-2058
-//							'Base color' => '009688',
+							'color' => [
+								'id:lbl_ds_0_color' => '009688'
+							],
 							'Draw' => 'Staircase',
 							'Width' => '10',
 							'Transparency' => '10',
@@ -1465,8 +1477,9 @@ class testDashboardGraphWidget extends CWebTest {
 						[
 							'host' => 'Two host',
 							'item' => 'Two item',
-// TODO: wait for DEV-2058
-//							'Base color' => '000000',
+							'color' => [
+								'id:lbl_ds_0_color' => '000000'
+							],
 							'Y-axis' => 'Right',
 							'Draw' => 'Points',
 							'Point size' => '1',
@@ -1479,8 +1492,8 @@ class testDashboardGraphWidget extends CWebTest {
 					],
 					'Time period' => [
 						'Set custom time period' => true,
-						'From' => '2018-11-15',
-						'To' => '2018-11-15 14:20:00'
+						'From' => '2018-11-15 08',
+						'To' => '2018-11-15 14:20'
 					],
 					'Axes' => [
 						'id:lefty_min' => '5',
@@ -1512,12 +1525,9 @@ class testDashboardGraphWidget extends CWebTest {
 						[
 							'host' => 'One host',
 							'item' => 'One item',
-// TODO: wait for DEV-2058
-//							'color' => '000000',
 							'time_shift' => '-5s',
 							'options' => [
-// TODO: wait for DEV-2058
-//								'Base color',
+								'Base color',
 								['Width', '0'],
 								['Draw', 'Line'],
 								['Transparency', '0'],
@@ -1526,17 +1536,17 @@ class testDashboardGraphWidget extends CWebTest {
 								['Missing data', 'None'],
 								['Y-axis', 'Right'],
 								'Time shift'
+							],
+							'color' => [
+								'id:lbl_or_0__color_' => '000000 '
 							]
 						],
 						[
 							'host' => 'Two host',
 							'item' => 'Two item',
-// TODO: wait for DEV-2058
-//							'color' => 'FFFFFF',
 							'time_shift' => '5s',
 							'options' => [
-// TODO: wait for DEV-2058
-//								'Base color',
+								'Base color',
 								['Width', '1'],
 								['Draw', 'Points'],
 								['Transparency', '2'],
@@ -1545,6 +1555,9 @@ class testDashboardGraphWidget extends CWebTest {
 								['Missing data', 'Connected'],
 								['Y-axis', 'Left'],
 								'Time shift'
+							],
+							'color' => [
+								'id:lbl_or_1__color_' => 'FFFFFF '
 							]
 						]
 					],
@@ -1744,7 +1757,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'host' => 'One host',
 							'item' => 'One item',
 							'Y-axis' => 'Left',
-// TODO: wait for DEV-2058
+// TODO: fix hex field
 //							'Base color' => '009688',
 							'Draw' => 'Staircase',
 							'Width' => '10',
@@ -1756,7 +1769,7 @@ class testDashboardGraphWidget extends CWebTest {
 						[
 							'host' => 'Two host',
 							'item' => 'Two item',
-// TODO: wait for DEV-2058
+// TODO: fix hex field
 //							'Base color' => '000000',
 							'Y-axis' => 'Right',
 							'Draw' => 'Bar',
@@ -1773,7 +1786,7 @@ class testDashboardGraphWidget extends CWebTest {
 					],
 					'Time period' => [
 						'Set custom time period' => true,
-						'From' => '2018-11-15',
+						'From' => '2018-11-15 08',
 						'To' => '2018-11-15 14:20'
 					],
 					'Axes' => [
@@ -1810,11 +1823,11 @@ class testDashboardGraphWidget extends CWebTest {
 						[
 							'host' => 'One host',
 							'item' => 'One item',
-// TODO: wait for DEV-2058
+// TODO: fix hex field
 //							'color' => '000000',
 							'time_shift' => '-5s',
 							'options' => [
-// TODO: wait for DEV-2058
+// TODO: fix hex field
 //								'Base color',
 								['Width', '0'],
 								['Draw', 'Line'],
@@ -1829,11 +1842,11 @@ class testDashboardGraphWidget extends CWebTest {
 						[
 							'host' => 'Two host',
 							'item' => 'Two item',
-// TODO: wait for DEV-2058
+// TODO: fix hex field
 //							'color' => 'FFFFFF',
 							'time_shift' => '5s',
 							'options' => [
-// TODO: wait for DEV-2058
+// TODO: fix hex field
 //								'Base color',
 								['Width', '1'],
 								['Draw', 'Bar'],
@@ -1950,6 +1963,15 @@ class testDashboardGraphWidget extends CWebTest {
 				];
 				// If host or item of data set exist in data provider, add the xpath selector and value from data provider to them.
 				foreach ($mapping as $field => $selector) {
+					if (array_key_exists('color', $data_set)) {
+						foreach ($data_set['color'] as $selector => $color) {
+							$form->query($selector)->one()->click()->waitUntilReady();
+							$this->query('xpath://div[@id="color_picker"]')->asColorPicker()->one()->fill($color);
+						}
+						unset($data_set['color']);
+
+						return array_values($data_set);
+					}
 					if (array_key_exists($field, $data_set)) {
 						$data_set = [$selector => $data_set[$field]] + $data_set;
 						unset($data_set[$field]);
@@ -2008,9 +2030,9 @@ class testDashboardGraphWidget extends CWebTest {
 						'selector' => 'xpath://div[@id="or_'.$i.'_items_"]/..',
 						'class' => CMultiselectElement::class
 					],
-					'color' => 'id:or_'.$i.'__color_',
 					'time_shift' => 'name:or['.$i.'][timeshift]'
 				];
+
 				foreach ($mapping as $field => $item) {
 					if (!array_key_exists($field, $override)) {
 						continue;
@@ -2021,6 +2043,15 @@ class testDashboardGraphWidget extends CWebTest {
 					}
 
 					$form->query($item['selector'])->cast($item['class'])->one()->fill($override[$field]);
+					if (array_key_exists('color', $override)) {
+						foreach ($override['color'] as $selector => $color) {
+							$form->query($selector)->one()->click()->waitUntilReady();
+							$this->query('xpath://div[@id="color_picker"]')->asColorPicker()->one()->fill($color);
+						}
+						unset($override['color']);
+
+						return array_values($override);
+					}
 				}
 
 				// Press "Add new override" button, except for last override set and if in data provider exist only one set.
