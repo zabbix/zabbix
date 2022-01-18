@@ -57,17 +57,14 @@ class CWidgetHelper {
 			->setAttribute('autofocus', 'autofocus')
 			->addOptions(CSelect::createOptionsFromArray($known_widget_types));
 
-		if (!CSettingsHelper::get(CSettingsHelper::HIDE_DEPRECATED_WIDGETS)) {
+		if ($deprecated_types) {
 			$types_select->addOptionGroup(
 				(new CSelectOptionGroup(_('Deprecated')))->addOptions(
 					CSelect::createOptionsFromArray($deprecated_types)
 			));
 		}
-		else if (array_key_exists($type, $deprecated_types)) {
-			$types_select
-				->addOption(new CSelectOption($type, $deprecated_types[$type]))
-				->setReadonly(true)
-				->removeAttribute('autofocus');
+
+		if (array_key_exists($type, $deprecated_types)) {
 			$types_select = [$types_select, ' ', makeWarningIcon(_('Widget is deprecated.'))];
 		}
 

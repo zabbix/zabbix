@@ -63,9 +63,6 @@
 							$('#history_period').val("<?= DB::getDefault('config', 'history_period') ?>");
 							$('#period_default').val("<?= DB::getDefault('config', 'period_default') ?>");
 							$('#max_period').val("<?= DB::getDefault('config', 'max_period') ?>");
-							$('#hide_deprecated_widgets').prop('checked', <?=
-								json_encode((bool) DB::getDefault('config', 'hide_deprecated_widgets'))
-							?>);
 						}
 					}
 				]

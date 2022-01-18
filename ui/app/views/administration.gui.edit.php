@@ -136,12 +136,6 @@ $gui_tab = (new CFormList())
 		(new CTextBox('max_period', $data['max_period'], false, DB::getFieldLength('config', 'max_period')))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired()
-	)
-	->addRow(
-		(new CLabel(_('Hide deprecated widgets'), 'hide_deprecated_widgets')),
-		(new CCheckBox('hide_deprecated_widgets'))
-			->setUncheckedValue('0')
-			->setChecked($data['hide_deprecated_widgets'] == 1)
 	);
 
 $gui_view = (new CTabView())

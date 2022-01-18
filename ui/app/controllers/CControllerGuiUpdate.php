@@ -37,8 +37,7 @@ class CControllerGuiUpdate extends CController {
 			'show_technical_errors' =>		'db config.show_technical_errors|in 0,1',
 			'history_period' =>				'required|db config.history_period|time_unit '.implode(':', [SEC_PER_DAY, 7 * SEC_PER_DAY]),
 			'period_default' =>				'required|db config.period_default|time_unit_year '.implode(':', [SEC_PER_MIN, 10 * SEC_PER_YEAR]),
-			'max_period' =>					'required|db config.max_period|time_unit_year '.implode(':', [SEC_PER_YEAR, 10 * SEC_PER_YEAR]),
-			'hide_deprecated_widgets' =>	'db config.hide_deprecated_widgets|in 0,1'
+			'max_period' =>					'required|db config.max_period|time_unit_year '.implode(':', [SEC_PER_YEAR, 10 * SEC_PER_YEAR])
 		];
 
 		$ret = $this->validateInput($fields);
@@ -80,8 +79,7 @@ class CControllerGuiUpdate extends CController {
 			CSettingsHelper::SHOW_TECHNICAL_ERRORS => $this->getInput('show_technical_errors', 0),
 			CSettingsHelper::HISTORY_PERIOD => $this->getInput('history_period'),
 			CSettingsHelper::PERIOD_DEFAULT => $this->getInput('period_default'),
-			CSettingsHelper::MAX_PERIOD => $this->getInput('max_period'),
-			CSettingsHelper::HIDE_DEPRECATED_WIDGETS => $this->getInput('hide_deprecated_widgets', 0)
+			CSettingsHelper::MAX_PERIOD => $this->getInput('max_period')
 		];
 
 		if ($this->hasInput('default_lang')) {
