@@ -26,7 +26,6 @@
 #include "discovery.h"
 #include "zbxserver.h"
 #include "zbxself.h"
-#include "zbxipcservice.h"
 #include "zbxrtc.h"
 
 #include "daemon.h"

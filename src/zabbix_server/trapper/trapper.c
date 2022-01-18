@@ -33,16 +33,19 @@
 #include "daemon.h"
 #include "zbxcrypto.h"
 #include "../../libs/zbxserver/zabbix_stats.h"
-#include "zbxipcservice.h"
 #include "../poller/checks_snmp.h"
-#include "zbxrtc.h"
 
 #include "trapper_auth.h"
 #include "trapper_preproc.h"
 #include "trapper_expressions_evaluate.h"
 #include "trapper_item_test.h"
-#include "trapper.h"
 #include "trapper_request.h"
+
+#ifdef HAVE_NETSNMP
+#	include "zbxrtc.h"
+#endif
+
+#include "trapper.h"
 
 #define ZBX_MAX_SECTION_ENTRIES		4
 #define ZBX_MAX_ENTRY_ATTRIBUTES	3
@@ -1262,7 +1265,9 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 					zbx_socket_strerror());
 		}
 	}
+#ifdef HAVE_NETSNMP
 out:
+#endif
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
 	while (1)

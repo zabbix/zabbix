@@ -18,9 +18,9 @@
 **/
 
 #include "common.h"
-#include "db.h"
-#include "log.h"
 #include "../zbxalgo/vectorimpl.h"
+
+#include "db.h"
 
 zbx_db_tag_t	*zbx_db_tag_create(const char *tag_tag, const char *tag_value)
 {

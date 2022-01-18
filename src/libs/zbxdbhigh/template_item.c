@@ -22,10 +22,8 @@
 #include "db.h"
 #include "log.h"
 #include "dbcache.h"
-#include "zbxserver.h"
-#include "template.h"
 #include "../zbxalgo/vectorimpl.h"
-
+#include "../../libs/zbxaudit/audit.h"
 #include "../../libs/zbxaudit/audit_item.h"
 
 struct _zbx_template_item_preproc_t

@@ -21,11 +21,8 @@
 #include "db.h"
 #include "log.h"
 #include "zbxserver.h"
-
 #include "operations.h"
-#include "events.h"
 #include "zbxregexp.h"
-
 #include "../../libs/zbxaudit/audit.h"
 
 #include "actions.h"

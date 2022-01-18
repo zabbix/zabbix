@@ -72,7 +72,6 @@
 #include "../libs/zbxdbcache/valuecache.h"
 #include "setproctitle.h"
 #include "zbxcrypto.h"
-#include "zbxipcservice.h"
 #include "zbxhistory.h"
 #include "postinit.h"
 #include "export.h"

@@ -17,13 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxipcservice.h"
-#include "daemon.h"
 #include "log.h"
 #include "zbxdiag.h"
 #include "zbxjson.h"
 #include "zbxha.h"
-#include "zbxrtc.h"
+#include "zbxtypes.h"
+#include "common.h"
+#include "daemon.h"
+
 #include "rtc.h"
 #include "zbxservice.h"
 

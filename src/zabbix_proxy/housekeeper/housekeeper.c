@@ -23,7 +23,6 @@
 #include "daemon.h"
 #include "zbxself.h"
 #include "dbcache.h"
-#include "zbxipcservice.h"
 #include "zbxrtc.h"
 
 #include "housekeeper.h"

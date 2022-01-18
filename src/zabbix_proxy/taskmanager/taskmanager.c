@@ -26,7 +26,6 @@
 #include "dbcache.h"
 #include "zbxcrypto.h"
 #include "zbxdiag.h"
-#include "zbxipcservice.h"
 #include "zbxrtc.h"
 
 #include "../../zabbix_server/scripts/scripts.h"

@@ -25,7 +25,7 @@
 #include "zbxserver.h"
 #include "zbxself.h"
 #include "preproc.h"
-#include "../events.h"
+//#include "../events.h"
 #include "zbxrtc.h"
 
 #include "poller.h"
@@ -46,6 +46,7 @@
 #include "zbxjson.h"
 #include "zbxhttp.h"
 #include "avail_protocol.h"
+#include "log.h"
 #include "zbxavailability.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;

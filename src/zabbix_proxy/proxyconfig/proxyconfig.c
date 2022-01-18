@@ -28,7 +28,6 @@
 #include "zbxcrypto.h"
 #include "zbxcompress.h"
 #include "zbxrtc.h"
-#include "zbxipcservice.h"
 
 #define CONFIG_PROXYCONFIG_RETRY	120	/* seconds */
 

@@ -18,11 +18,11 @@
 **/
 
 #include "common.h"
-#include "log.h"
 #include "zbxalgo.h"
 #include "db.h"
 #include "dbcache.h"
 #include "zbxhistory.h"
+
 #include "history.h"
 
 typedef struct
