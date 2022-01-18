@@ -1049,6 +1049,7 @@ if (getRequest('form') === 'create' || getRequest('form') === 'update'
 		$host = $item['hosts'][0];
 		unset($item['hosts']);
 
+		$i = 0;
 		foreach ($item['preprocessing'] as &$step) {
 			if ($step['type'] == ZBX_PREPROC_SCRIPT) {
 				$step['params'] = [$step['params'], ''];
@@ -1056,6 +1057,7 @@ if (getRequest('form') === 'create' || getRequest('form') === 'update'
 			else {
 				$step['params'] = explode("\n", $step['params']);
 			}
+			$step['sortorder'] = $i++;
 		}
 		unset($step);
 

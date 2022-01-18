@@ -1022,6 +1022,8 @@ function getItemFormData(array $item = [], array $options = []) {
 		}
 	}
 
+	CArrayHelper::sort($data['preprocessing'], ['sortorder']);
+
 	if (!$data['delay_flex']) {
 		$data['delay_flex'][] = ['delay' => '', 'period' => '', 'type' => ITEM_DELAY_FLEXIBLE];
 	}
@@ -1468,7 +1470,7 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 		$preprocessing_list->addItem(
 			(new CListItem([
 				(new CDiv([
-					(new CDiv())
+					(new CDiv(new CVar('preprocessing['.$i.'][sortorder]', $step['sortorder'])))
 						->addClass(ZBX_STYLE_DRAG_ICON)
 						->addClass(!$sortable ? ZBX_STYLE_DISABLED : null),
 					(new CDiv($preproc_types_select))
