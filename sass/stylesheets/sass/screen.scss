@@ -3026,8 +3026,8 @@ $form-icon-btn: (
 			width: 100%;
 			max-height: calc(100vh - 220px);
 			max-width: inherit;
-			margin: 0 -10px 8px;
-			padding: 2px 10px;
+			margin: 0 -10px 10px;
+			padding: 0 10px;
 			position: relative;
 			@extend %webkit-scrollbar;
 
@@ -3187,7 +3187,7 @@ $form-icon-btn: (
 	}
 
 	.dashboard-widget-head {
-		margin: -10px -10px 4px;
+		margin: -10px -10px 6px;
 	}
 
 	.maps-container {
@@ -5746,6 +5746,13 @@ $range-input-width: 31px;
 		margin-right: 0;
 		margin-left: 0;
 	}
+
+	.ui-tabs-nav {
+		position: sticky;
+		top: 0;
+		background: $header-bg-color;
+		z-index: 3;
+	}
 }
 
 // Screen reader.
@@ -6369,6 +6376,7 @@ z-select,
 }
 
 .modal-popup-medium,
+.modal-popup-large,
 .modal-popup-static,
 .modal-popup-preprocessing {
 	.table-forms-container {
