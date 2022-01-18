@@ -397,8 +397,11 @@ function getSelementInfo(array $i, ?int $show_unack = null): array {
 	}
 
 	if ($i['maintenance']) {
-		$info['iconid'] = $i['iconid_maintenance'];
-		$info['icon_type'] = SYSMAP_ELEMENT_ICON_MAINTENANCE;
+		if (!$has_problem) {
+			$info['iconid'] = $i['iconid_maintenance'];
+			$info['icon_type'] = SYSMAP_ELEMENT_ICON_MAINTENANCE;
+		}
+
 		$info['info']['maintenance'] = [
 			'msg' => ($i['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST)
 				? _('In maintenance')
