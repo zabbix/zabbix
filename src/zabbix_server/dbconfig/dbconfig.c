@@ -108,14 +108,14 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 		sec = zbx_time();
 		zbx_update_env(sec);
 
-		if ((int)sec >= nextcheck)
+		if (0 == secrets_reload)
 		{
 			DCsync_configuration(ZBX_DBSYNC_UPDATE);
 			DCsync_kvs_paths(NULL);
 			DCupdate_interfaces_availability();
 			nextcheck = (int)sec + CONFIG_CONFSYNCER_FREQUENCY;
 		}
-		else if (1 == secrets_reload)
+		else
 		{
 			DCsync_kvs_paths(NULL);
 			secrets_reload = 0;
