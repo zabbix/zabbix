@@ -1281,7 +1281,8 @@ static int	server_startup(zbx_socket_t *listen_sock, zbx_rtc_t *rtc)
 				break;
 			case ZBX_PROCESS_TYPE_CONFSYNCER:
 				zbx_thread_start(dbconfig_thread, &thread_args, &threads[i]);
-				zbx_rtc_wait_config_sync(rtc);
+				if (FAIL == (ret = zbx_rtc_wait_config_sync(rtc)))
+					goto out;
 
 				if (SUCCEED != (ret = zbx_ha_get_status(&ha_status, &error)))
 				{

@@ -1318,7 +1318,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		{
 			case ZBX_PROCESS_TYPE_CONFSYNCER:
 				zbx_thread_start(proxyconfig_thread, &thread_args, &threads[i]);
-				zbx_rtc_wait_config_sync(&rtc);
+				if (FAIL == zbx_rtc_wait_config_sync(&rtc))
+					goto out;
 				break;
 			case ZBX_PROCESS_TYPE_TRAPPER:
 				thread_args.args = &listen_sock;
@@ -1436,7 +1437,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			break;
 		}
 	}
-
+out:
 	zbx_rtc_shutdown_subs(&rtc);
 
 	zbx_on_exit(ZBX_EXIT_STATUS());
