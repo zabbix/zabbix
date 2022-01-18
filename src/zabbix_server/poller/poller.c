@@ -25,7 +25,6 @@
 #include "zbxserver.h"
 #include "zbxself.h"
 #include "preproc.h"
-//#include "../events.h"
 #include "zbxrtc.h"
 
 #include "poller.h"
