@@ -129,10 +129,6 @@ class CWidgetField {
 		$this->ex_validation_rules = $ex_validation_rules;
 	}
 
-	public function getDefault() {
-		return $this->default;
-	}
-
 	/**
 	 * Get field value. If no value is set, will return default value.
 	 *
