@@ -3326,7 +3326,11 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 		{
 			int	updated = 0, revision;
 
-			service_cache_reload_requested = 0;
+			if (1 == service_cache_reload_requested)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the service manager cache");
+				service_cache_reload_requested = 0;
+			}
 
 			do
 			{
@@ -3410,7 +3414,13 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 					process_event_severities(message, &service_manager);
 					break;
 				case ZBX_IPC_SERVICE_RELOAD_CACHE:
-					service_cache_reload_requested = 1;
+					if (0 != service_cache_reload_requested)
+					{
+						zabbix_log(LOG_LEVEL_WARNING, "service manager cache reloading is"
+								" already in progress");
+					}
+					else
+						service_cache_reload_requested = 1;
 					break;
 				default:
 					THIS_SHOULD_NEVER_HAPPEN;
