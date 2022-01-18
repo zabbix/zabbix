@@ -31,36 +31,34 @@
 
 extern zbx_uint64_t	CONFIG_VALUE_CACHE_SIZE;
 
-void	zbx_vc_test_check_result(zbx_uint64_t *cache_hits, zbx_uint64_t *cache_misses)
+static void	zbx_vc_test_check_result(zbx_uint64_t cache_hits, zbx_uint64_t cache_misses)
 {
 	zbx_uint64_t	expected_hits, expected_misses;
 
 	if (FAIL == is_uint64(zbx_mock_get_parameter_string("out.cache.hits"), &expected_hits))
 		fail_msg("Invalid out.cache.hits value");
-	zbx_mock_assert_uint64_eq("cache.hits", expected_hits, *cache_hits);
+	zbx_mock_assert_uint64_eq("cache.hits", expected_hits, cache_hits);
 
 	if (FAIL == is_uint64(zbx_mock_get_parameter_string("out.cache.misses"), &expected_misses))
 		fail_msg("Invalid out.cache.misses value");
-	zbx_mock_assert_uint64_eq("cache.misses", expected_misses, *cache_misses);
+	zbx_mock_assert_uint64_eq("cache.misses", expected_misses, cache_misses);
 }
 
 void	zbx_vc_common_test_func(
 		void **state,
 		zbx_vc_test_add_values_setup_cb add_values_cb,
 		zbx_vc_test_get_value_setup_cb get_value_cb,
-		zbx_vc_test_check_result_cb check_result_cb,
-		zbx_vc_test_get_values_setup_cb get_values_cb)
+		zbx_vc_test_get_values_setup_cb get_values_cb,
+		int test_check_result)
 {
-	int				err, seconds, count, item_status, item_active_range, item_db_cached_from,
-					item_values_total, cache_mode, ret_flush;
+	int				err, seconds, count, cache_mode;
 	zbx_vector_history_record_t	expected, returned;
 	const char			*data;
 	char				*error;
-	zbx_mock_handle_t		handle, hitem, hitems, hstatus;
+	zbx_mock_handle_t		handle, hitem, hitems;
 	zbx_mock_error_t		mock_err;
 	zbx_uint64_t			itemid, cache_hits, cache_misses;
 	unsigned char			value_type;
-	zbx_vector_ptr_t		history;
 	zbx_timespec_t			ts;
 
 	ZBX_UNUSED(state);
@@ -96,6 +94,9 @@ void	zbx_vc_common_test_func(
 
 	if (NULL != add_values_cb)
 	{
+		int			ret_flush;
+		zbx_vector_ptr_t	history;
+
 		add_values_cb(&handle, &history, &err, &data, &ret_flush);
 	}
 	else if (NULL != get_value_cb)
@@ -112,6 +113,9 @@ void	zbx_vc_common_test_func(
 
 	while (ZBX_MOCK_END_OF_VECTOR != (mock_err = (zbx_mock_vector_element(hitems, &hitem))))
 	{
+		int			item_status, item_active_range, item_db_cached_from, item_values_total;
+		zbx_mock_handle_t	hstatus;
+
 		if (ZBX_MOCK_NOT_A_VECTOR == mock_err)
 			fail_msg("out.cache.items parameter is not a vector");
 
@@ -120,7 +124,7 @@ void	zbx_vc_common_test_func(
 			fail_msg("Invalid itemid \"%s\"", data);
 
 		err = zbx_vc_get_item_state(itemid, &item_status, &item_active_range, &item_values_total,
-						&item_db_cached_from);
+				&item_db_cached_from);
 
 		mock_err = zbx_mock_object_member(hitem, "status", &hstatus);
 
@@ -168,8 +172,8 @@ void	zbx_vc_common_test_func(
 	zbx_mock_assert_int_eq("cache.mode",
 			zbx_vcmock_str_to_cache_mode(zbx_mock_get_parameter_string("out.cache.mode")), cache_mode);
 
-	if (NULL != check_result_cb)
-		check_result_cb(&cache_hits, &cache_misses);
+	if (1 == test_check_result)
+		zbx_vc_test_check_result(cache_hits, cache_misses);
 
 	/* cleanup */
 

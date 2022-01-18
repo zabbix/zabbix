@@ -17,15 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef VC_COMMON_H
-#define VC_COMMON_H
+#ifndef ZBX_VC_COMMON_H
+#define ZBX_VC_COMMON_H
 
 typedef void	(*zbx_vc_test_add_values_setup_cb)(zbx_mock_handle_t *handle, zbx_vector_ptr_t *history, int *err,
 		const char **data, int *ret_flush);
 typedef void	(*zbx_vc_test_get_value_setup_cb)(zbx_mock_handle_t *handle, zbx_uint64_t *itemid,
 		unsigned char *value_type, zbx_timespec_t *ts, int *err, zbx_vector_history_record_t *expected,
 		zbx_vector_history_record_t *returned);
-typedef void	(*zbx_vc_test_check_result_cb)(zbx_uint64_t *cache_hits, zbx_uint64_t *cache_misses);
 typedef void	(*zbx_vc_test_get_values_setup_cb)(zbx_mock_handle_t *handle, zbx_uint64_t *itemid,
 		unsigned char *value_type, zbx_timespec_t *ts, int *err, zbx_vector_history_record_t *expected,
 		zbx_vector_history_record_t *returned, int *seconds, int *count);
@@ -35,7 +34,6 @@ void	zbx_vc_test_add_values_setup(zbx_mock_handle_t *handle, zbx_vector_ptr_t *h
 void	zbx_vc_test_get_value_setup(zbx_mock_handle_t *handle, zbx_uint64_t *itemid, unsigned char *value_type,
 		zbx_timespec_t *ts, int *err, zbx_vector_history_record_t *expected,
 		zbx_vector_history_record_t *returned);
-void	zbx_vc_test_check_result(zbx_uint64_t *cache_hits, zbx_uint64_t *cache_misses);
 void	zbx_vc_test_get_values_setup(zbx_mock_handle_t *handle, zbx_uint64_t *itemid, unsigned char *value_type,
 		zbx_timespec_t *ts, int *err, zbx_vector_history_record_t *expected,
 				zbx_vector_history_record_t *returned, int *seconds, int *count);
@@ -44,6 +42,6 @@ void	zbx_vc_common_test_func(
 		void **state,
 		zbx_vc_test_add_values_setup_cb add_values_cb,
 		zbx_vc_test_get_value_setup_cb get_value_cb,
-		zbx_vc_test_check_result_cb check_result_cb,
-		zbx_vc_test_get_values_setup_cb get_values_cb);
+		zbx_vc_test_get_values_setup_cb get_values_cb,
+		int test_check_result);
 #endif

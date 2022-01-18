@@ -64,6 +64,5 @@ void	zbx_vc_test_get_value_setup(zbx_mock_handle_t *handle, zbx_uint64_t *itemid
 
 void	zbx_mock_test_entry(void **state)
 {
-	zbx_vc_common_test_func(state, NULL, zbx_vc_test_get_value_setup, zbx_vc_test_check_result, NULL);
+	zbx_vc_common_test_func(state, NULL, zbx_vc_test_get_value_setup, NULL, 1);
 }
-

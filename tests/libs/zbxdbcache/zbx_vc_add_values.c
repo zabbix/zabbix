@@ -54,5 +54,5 @@ void	zbx_vc_test_add_values_setup(zbx_mock_handle_t *handle, zbx_vector_ptr_t *h
 
 void	zbx_mock_test_entry(void **state)
 {
-	zbx_vc_common_test_func(state, zbx_vc_test_add_values_setup, NULL, NULL, NULL);
+	zbx_vc_common_test_func(state, zbx_vc_test_add_values_setup, NULL, NULL, 0);
 }
