@@ -532,9 +532,9 @@ abstract class CItemGeneral extends CApiService {
 											['else' => true, 'type' => API_INT32, 'in' => ZBX_PREPROC_FAIL_DEFAULT, 'default' => ZBX_PREPROC_FAIL_DEFAULT]
 			]],
 			'error_handler_params' =>	['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'error_handler', 'in' => ZBX_PREPROC_FAIL_DEFAULT.','.ZBX_PREPROC_FAIL_DISCARD_VALUE], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => ''],
 											['if' => ['field' => 'error_handler', 'in' => ZBX_PREPROC_FAIL_SET_VALUE], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('item_preproc', 'error_handler_params')],
-											['if' => ['field' => 'error_handler', 'in' => ZBX_PREPROC_FAIL_SET_ERROR], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('item_preproc', 'error_handler_params')],
-											['else' => true, 'type' => API_UNEXPECTED]
+											['if' => ['field' => 'error_handler', 'in' => ZBX_PREPROC_FAIL_SET_ERROR], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('item_preproc', 'error_handler_params')]
 			]]
 		]];
 
@@ -2404,6 +2404,10 @@ abstract class CItemGeneral extends CApiService {
 	 */
 	protected static function normalizeItemPreprocessingSteps(array $preprocessing): array {
 		foreach ($preprocessing as &$step) {
+			if (!array_key_exists('params', $step)) {
+				continue;
+			}
+
 			$step['params'] = str_replace("\r\n", "\n", $step['params']);
 			$params = explode("\n", $step['params']);
 
@@ -2416,26 +2420,6 @@ abstract class CItemGeneral extends CApiService {
 			}
 
 			$step['params'] = implode("\n", $params);
-
-			switch ($step['type']) {
-				case ZBX_PREPROC_BOOL2DEC:
-				case ZBX_PREPROC_OCT2DEC:
-				case ZBX_PREPROC_HEX2DEC:
-				case ZBX_PREPROC_DELTA_VALUE:
-				case ZBX_PREPROC_DELTA_SPEED:
-				case ZBX_PREPROC_THROTTLE_VALUE:
-				case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
-				case ZBX_PREPROC_XML_TO_JSON:
-					unset($step['params']);
-					break;
-			}
-
-			if (!array_key_exists('error_handler', $step)
-					|| !in_array($step['error_handler'], [ZBX_PREPROC_FAIL_SET_VALUE, ZBX_PREPROC_FAIL_SET_ERROR])) {
-				unset($step['error_handler_params']);
-			}
-
-			unset($step['on_fail']);
 		}
 		unset($step);
 

@@ -2118,6 +2118,10 @@ function validateDelay(CUpdateIntervalParser $parser, $field_name, $value, &$err
  */
 function normalizeItemPreprocessingSteps(array $preprocessing): array {
 	foreach ($preprocessing as &$step) {
+		if (!is_array($step['params'])) {
+			$step['params'] = explode("\n", $step['params']);
+		}
+
 		switch ($step['type']) {
 			case ZBX_PREPROC_MULTIPLIER:
 			case ZBX_PREPROC_PROMETHEUS_TO_JSON:
@@ -2179,6 +2183,18 @@ function normalizeItemPreprocessingSteps(array $preprocessing): array {
 				$step['params'] = implode("\n", $step['params']);
 				break;
 
+			// Preprocessing types without params.
+			case ZBX_PREPROC_BOOL2DEC:
+			case ZBX_PREPROC_OCT2DEC:
+			case ZBX_PREPROC_HEX2DEC:
+			case ZBX_PREPROC_DELTA_VALUE:
+			case ZBX_PREPROC_DELTA_SPEED:
+			case ZBX_PREPROC_THROTTLE_VALUE:
+			case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
+			case ZBX_PREPROC_XML_TO_JSON:
+				unset($step['params']);
+				break;
+
 			default:
 				$step['params'] = '';
 		}
@@ -2187,6 +2203,8 @@ function normalizeItemPreprocessingSteps(array $preprocessing): array {
 			'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
 			'error_handler_params' => ''
 		];
+
+		unset($step['on_fail']);
 	}
 	unset($step);
 

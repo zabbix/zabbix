@@ -781,6 +781,8 @@ class CConfigurationImport {
 				}
 				unset($preprocessing_step);
 
+				$item['preprocessing'] = normalizeItemPreprocessingSteps($item['preprocessing']);
+
 				$itemid = array_key_exists('uuid', $item)
 					? $this->referencer->findItemidByUuid($item['uuid'])
 					: $this->referencer->findItemidByKey($hostid, $item['key_']);
