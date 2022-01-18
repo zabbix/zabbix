@@ -1293,6 +1293,8 @@ static int	get_dir_names(const char *filename, char **basename, char **dirname, 
 
 	if (NULL == (*pathname = realpath(filename, resolved_path)))
 		return FAIL;
+
+	*pathname = zbx_strdup(NULL, *pathname);
 #else
 	if (NULL == (*pathname = realpath(filename, NULL)))
 		return FAIL;
