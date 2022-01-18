@@ -360,6 +360,8 @@ func parseType(in string, exclude bool) (out map[fs.FileMode]bool, err error) {
 	types := strings.Split(in, ",")
 
 	for _, t := range types {
+		t = strings.TrimSpace(t)
+
 		switch t {
 		case "all":
 			//If all are set no need to iterate further
