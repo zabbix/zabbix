@@ -1495,7 +1495,6 @@ class CHostPrototype extends CHostBase {
 	 */
 	private static function updateGroupLinks(array &$host_prototypes, array $db_host_prototypes = null): void {
 		$ins_group_links = [];
-		$upd_group_links = [];
 		$del_group_prototypeids = [];
 
 		foreach ($host_prototypes as &$host_prototype) {
@@ -1510,18 +1509,6 @@ class CHostPrototype extends CHostBase {
 			foreach ($host_prototype['groupLinks'] as &$group_link) {
 				if (array_key_exists($group_link['groupid'], $db_group_links)) {
 					$group_link['group_prototypeid'] = $db_group_links[$group_link['groupid']]['group_prototypeid'];
-
-					$upd_group_link = DB::getUpdatedValues('group_prototype', $group_link,
-						$db_group_links[$group_link['groupid']]
-					);
-
-					if ($upd_group_link) {
-						$upd_group_links[] = [
-							'values' => $upd_group_link,
-							'where' => ['group_prototypeid' => $group_link['group_prototypeid']]
-						];
-					}
-
 					unset($db_group_links[$group_link['groupid']]);
 				}
 				else {
@@ -1538,10 +1525,6 @@ class CHostPrototype extends CHostBase {
 
 		if ($ins_group_links) {
 			$group_prototypeids = DB::insert('group_prototype', $ins_group_links);
-		}
-
-		if ($upd_group_links) {
-			DB::update('group_prototype', $upd_group_links);
 		}
 
 		if ($del_group_prototypeids) {
@@ -1569,7 +1552,6 @@ class CHostPrototype extends CHostBase {
 	 */
 	private static function updateGroupPrototypes(array &$host_prototypes, array $db_host_prototypes = null): void {
 		$ins_group_prototypes = [];
-		$upd_group_prototypes = [];
 		$del_group_prototypeids = [];
 
 		foreach ($host_prototypes as &$host_prototype) {
@@ -1583,20 +1565,8 @@ class CHostPrototype extends CHostBase {
 
 			foreach ($host_prototype['groupPrototypes'] as &$group_prototype) {
 				if (array_key_exists($group_prototype['name'], $db_group_prototypes)) {
-					$group_prototype['group_prototypeid']
-						= $db_group_prototypes[$group_prototype['name']]['group_prototypeid'];
-
-					$upd_group_prototype = DB::getUpdatedValues('group_prototype', $group_prototype,
-						$db_group_prototypes[$group_prototype['name']]
-					);
-
-					if ($upd_group_prototype) {
-						$upd_group_prototypes[] = [
-							'values' => $upd_group_prototype,
-							'where' => ['group_prototypeid' => $upd_group_prototype['group_prototypeid']]
-						];
-					}
-
+					$group_prototype['group_prototypeid'] =
+						$db_group_prototypes[$group_prototype['name']]['group_prototypeid'];
 					unset($db_group_prototypes[$group_prototype['name']]);
 				}
 				else {
@@ -1613,10 +1583,6 @@ class CHostPrototype extends CHostBase {
 
 		if ($ins_group_prototypes) {
 			$group_prototypeids = DB::insert('group_prototype', $ins_group_prototypes);
-		}
-
-		if ($upd_group_prototypes) {
-			DB::update('group_prototype', $upd_group_prototypes);
 		}
 
 		if ($del_group_prototypeids) {
