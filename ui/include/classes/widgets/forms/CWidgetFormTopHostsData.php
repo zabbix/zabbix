@@ -24,7 +24,6 @@
  */
 class CWidgetFormTopHostsData extends CWidgetForm {
 
-	const ORDER_NONE = 1;
 	const ORDER_TOPN = 2;
 	const ORDER_BOTTOMN = 3;
 
@@ -130,11 +129,10 @@ class CWidgetFormTopHostsData extends CWidgetForm {
 
 		// Order.
 		$field_order = (new CWidgetFieldRadioButtonList('order', _('Order'), [
-			self::ORDER_NONE => _('None'),
 			self::ORDER_TOPN => _('Top N'),
 			self::ORDER_BOTTOMN => _('Bottom N')
 		]))
-			->setDefault(self::ORDER_NONE)
+			->setDefault(self::ORDER_TOPN)
 			->setModern(true);
 
 		if (array_key_exists('order', $this->data)) {
@@ -144,16 +142,8 @@ class CWidgetFormTopHostsData extends CWidgetForm {
 		$this->fields[$field_order->getName()] = $field_order;
 
 		// Field column.
-		$field_column = (new CWidgetFieldSelect('column', _('Order column'), $field_column_values));
-
-		if ($field_order->getValue() == self::ORDER_NONE) {
-			$field_column
-				->setFlags(CWidgetField::FLAG_DISABLED)
-				->setDefault(0);
-		}
-		else {
-			$field_column->setFlags(CWidgetField::FLAG_LABEL_ASTERISK);
-		}
+		$field_column = (new CWidgetFieldSelect('column', _('Order column'), $field_column_values))
+			->setFlags(CWidgetField::FLAG_LABEL_ASTERISK);
 
 		if (array_key_exists('column', $this->data)) {
 			$field_column->setValue($this->data['column']);
