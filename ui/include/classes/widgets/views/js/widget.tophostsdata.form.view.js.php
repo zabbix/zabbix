@@ -37,7 +37,6 @@ window.widget_tophostsdata_form = {
 		// Modal triggers 'data.ready' event via jQuery.
 		$(form).on('data.ready', (e, data) => {
 			// data - added/updated data object, if data.edit is set data is updated.
-			let thresholds = data.thresholds;
 			let input = document.createElement('input');
 			let tr = e.target.closest('tr');
 			let index;

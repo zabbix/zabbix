@@ -89,12 +89,20 @@ $form_grid->addItem([
 	new CFormField($item_select)
 ]);
 
+// Time shift.
+$form_grid->addItem([
+	new CLabel(_('Time shift'), 'timeshift'),
+	new CFormField((new CTextBox('timeshift', $data['timeshift']))
+		->setAttribute('placeholder', _('none'))
+		->setWidth(ZBX_TEXTAREA_TINY_WIDTH))
+]);
+
 // Aggregation function.
 $form_grid->addItem([
-	new CLabel(_('Aggregation function'), 'function'),
+	new CLabel(_('Aggregation function'), 'aggregate_function'),
 	new CFormField(
-		(new CSelect('function'))
-			->setValue($data['function'])
+		(new CSelect('aggregate_function'))
+			->setValue($data['aggregate_function'])
 			->addOptions(CSelect::createOptionsFromArray([
 				CWidgetFieldColumnsList::FUNC_NONE => _('none'),
 				CWidgetFieldColumnsList::FUNC_MIN => _('min'),
@@ -107,17 +115,14 @@ $form_grid->addItem([
 	)
 ]);
 
-// From.
+// Aggregation interval.
 $form_grid->addItem([
-	(new CLabel(_('From'), 'from'))->setAsteriskMark(),
-	new CFormField(new CDateSelector('from', $data['from']))
-]);
-
-// To.
-$form_grid->addItem([
-	(new CLabel(_('To'), 'to'))->setAsteriskMark(),
-	new CFormField(new CDateSelector('to', $data['to']))
-]);
+	(new CLabel(_('Aggregation interval'), 'aggregate_interval'))->setAsteriskMark(),
+	new CFormField(
+		(new CTextBox('aggregate_interval', $data['aggregate_interval']))
+			->setAttribute('placeholder', _('none'))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+)]);
 
 // Display.
 $form_grid->addItem([
@@ -227,11 +232,10 @@ $output = [
 	'body'			=> $form->toString(),
 	'buttons'		=> [
 		[
-			'title'		=> $data['edit'] ? _('Update') : _('Add'),
-			'class'		=> '',
+			'title'		=> array_key_exists('edit', $data) ? _('Update') : _('Add'),
 			'keepOpen'	=> true,
 			'isSubmit'	=> true,
-			'action'	=> 'return $(document.forms.top_hosts_data_grid).trigger("submit.form", [overlay])'
+			'action'	=> '$(document.forms.top_hosts_data_grid).trigger("submit.form", [overlay])'
 		]
 	]
 ];

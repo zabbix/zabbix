@@ -56,37 +56,42 @@ class CWidgetFieldColumnsList extends CWidgetField {
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 		$this->setValidationRules(['type' => API_OBJECTS, 'fields' => [
-			'name'			=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
-			'data'			=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => self::DATA_ITEM_VALUE.':'.self::DATA_TEXT],
-			'item'			=> ['type' => API_STRING_UTF8, 'default' => '', 'length' => 255],
-			'function'		=> ['type' => API_INT32, 'in' => self::FUNC_NONE.':'.self::FUNC_COUNT],
-			'from'			=> ['type' => API_RANGE_TIME],
-			'to'			=> ['type' => API_RANGE_TIME],
-			'display'		=> ['type' => API_INT32, 'in' => self::DISPLAY_AS_IS.':'.self::DISPLAY_INDICATORS],
-			'history'		=> ['type' => API_INT32, 'in' => self::HISTORY_DATA_AUTO.':'.self::HISTORY_DATA_TRENDS],
-			'base_color'	=> ['type' => API_COLOR],
-			'min'			=> ['type' => API_NUMERIC],
-			'max'			=> ['type' => API_NUMERIC],
-			'thresholds'	=> ['type' =>  API_OBJECTS, 'fields' => [
-				'color'			=> ['type' => API_COLOR],
-				'threshold'		=> ['type' => API_NUMERIC]
+			'name'					=> ['type' => API_STRING_UTF8, 'default' => '', 'length' => 255],
+			'data'					=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [self::DATA_ITEM_VALUE, self::DATA_HOST_NAME, self::DATA_TEXT])],
+			'item'					=> ['type' => API_MULTIPLE, 'rules' => [
+						['if' => ['field' => 'data', 'in' => self::DATA_ITEM_VALUE],
+							'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
+						['else' => true,
+							'type' => API_STRING_UTF8]
 			]],
-			'text'			=> ['type' => API_STRING_UTF8, 'length' => 255]
-		]]);
-		$this->setDefault([[
-			'name' => '',
-			'data' => self::DATA_HOST_NAME,
-			'item' => '',
-			'function'	=> self::FUNC_NONE,
-			'display' => self::DISPLAY_AS_IS,
-			'history' => self::HISTORY_DATA_AUTO,
-			'from' => 'now-1h',
-			'to'	=> 'now',
-			'min'	=> '',
-			'max'	=> '',
-			'base_color' => '',
-			'text' => '',
-			'thresholds' => []
+			'timeshift'				=> ['type' => API_TIME_UNIT, 'in' => implode(':', [ZBX_MIN_TIMESHIFT, ZBX_MAX_TIMESHIFT])],
+			'aggregate_function'	=> ['type' => API_INT32, 'in' => implode(',', [self::FUNC_NONE, self::FUNC_MIN, self::FUNC_MAX, self::FUNC_AVG, self::FUNC_LAST, self::FUNC_FIRST, self::FUNC_COUNT]), 'default' => self::FUNC_NONE],
+			'aggregate_interval'	=> ['type' => API_TIME_UNIT, 'flags' => API_TIME_UNIT_WITH_YEAR, 'in' => implode(':', [1, ZBX_MAX_TIMESHIFT])],
+			'display'				=> ['type' => API_MULTIPLE, 'rules' => [
+						['if' => ['field' => 'data', 'in' => self::DATA_ITEM_VALUE],
+							'type' => API_INT32, 'default' => self::DISPLAY_AS_IS, 'in' => implode(',', [self::DISPLAY_AS_IS, self::DISPLAY_BAR, self::DISPLAY_INDICATORS])],
+						['else' => true,
+							'type' => API_INT32]
+			]],
+			'history'				=> ['type' => API_MULTIPLE, 'rules' => [
+						['if' => ['field' => 'data', 'in' => self::DATA_ITEM_VALUE],
+							'type' => API_INT32, 'default' => self::HISTORY_DATA_AUTO, 'in' => implode(',', [self::HISTORY_DATA_AUTO, self::HISTORY_DATA_HISTORY, self::HISTORY_DATA_TRENDS])],
+						['else' => true,
+							'type' => API_INT32]
+			]],
+			'base_color'			=> ['type' => API_COLOR],
+			'min'					=> ['type' => API_NUMERIC],
+			'max'					=> ['type' => API_NUMERIC],
+			'thresholds'			=> ['type' =>  API_OBJECTS, 'uniq' => [['threshold']], 'fields' => [
+						'color'			=> ['type' => API_COLOR],
+						'threshold'		=> ['type' => API_NUMERIC]
+			]],
+			'text'					=> ['type' => API_MULTIPLE, 'rules' => [
+						['if' => ['field' => 'data', 'in' => self::DATA_TEXT],
+							'type' => API_STRING_UTF8, 'flags' => API_REQUIRED|API_NOT_EMPTY, 'length' => 255],
+						['else' => true,
+							'type' => API_STRING_UTF8]
+			]]
 		]]);
 	}
 
@@ -108,20 +113,20 @@ class CWidgetFieldColumnsList extends CWidgetField {
 			'name' => ZBX_WIDGET_FIELD_TYPE_STR,
 			'data' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'item' => ZBX_WIDGET_FIELD_TYPE_STR,
-			'function' => ZBX_WIDGET_FIELD_TYPE_INT32,
-			'from' => ZBX_WIDGET_FIELD_TYPE_STR,
-			'to' => ZBX_WIDGET_FIELD_TYPE_STR,
+			'timeshift' => ZBX_WIDGET_FIELD_TYPE_STR,
+			'aggregate_function' => ZBX_WIDGET_FIELD_TYPE_INT32,
+			'aggregate_interval' => ZBX_WIDGET_FIELD_TYPE_STR,
 			'display' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'history' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'base_color' => ZBX_WIDGET_FIELD_TYPE_STR,
 			'text' => ZBX_WIDGET_FIELD_TYPE_STR
 		];
 
-		foreach ($this->getValue() as $index => $val) {
+		foreach ($this->getValue() as $column_index => $val) {
 			foreach (array_intersect_key($fields, $val) as $field => $field_type) {
 				$widget_fields[] = [
 					'type' => $field_type,
-					'name' => implode('.', [$this->name, $field, $index]),
+					'name' => implode('.', [$this->name, $field, $column_index]),
 					'value' => $val[$field]
 				];
 			}
@@ -130,15 +135,15 @@ class CWidgetFieldColumnsList extends CWidgetField {
 				continue;
 			}
 
-			foreach ($val['thresholds'] as $i => $threshold) {
+			foreach ($val['thresholds'] as $threshold_index => $threshold) {
 				$widget_fields[] = [
 					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-					'name' => implode('.', [$this->name, 'thresholds', $index, $i, 'color']),
+					'name' => implode('.', ['thresholds.color', $column_index, $threshold_index]),
 					'value' => $threshold['color']
 				];
 				$widget_fields[] = [
 					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-					'name' => implode('.', [$this->name, 'thresholds', $index, $i, 'threshold']),
+					'name' => implode('.', ['thresholds.threshold', $column_index, $threshold_index]),
 					'value' => $threshold['threshold']
 				];
 			}

@@ -27,7 +27,7 @@
 	let $widget_form = $('form[name="<?= $data['form'] ?>"]');
 	let $thresholds_table = $widget_form.find('#thresholds_table');
 
-	$('[name="display"],[name="data"]', $widget_form).change(updateAccessability);
+	$('[name="display"],[name="data"],[name="aggregate_function"]', $widget_form).change(updateAccessability);
 
 	$thresholds_table.dynamicRows({
 		rows: <?= json_encode($data['thresholds']) ?>,
@@ -79,12 +79,13 @@
 		let display_as_is = ($('[name="display"]:checked').val() == <?= CWidgetFieldColumnsList::DISPLAY_AS_IS ?>);
 		let data_item_value = ($('[name="data"]').val() == <?= CWidgetFieldColumnsList::DATA_ITEM_VALUE ?>);
 		let data_text = ($('[name="data"]').val() == <?= CWidgetFieldColumnsList::DATA_TEXT ?>);
+		let no_aggregate_function = $('[name="aggregate_function"]').val() == <?= CWidgetFieldColumnsList::FUNC_NONE ?>;
 
 		$('#item', $widget_form).multiSelect(data_item_value ? 'enable' : 'disable');
-		$('[name="function"],[name="from"],[name="from_calendar"],[name="to"],[name="to_calendar"]', $widget_form)
-			.attr('disabled', !data_item_value);
-		$('[name="display"],[name="history"]').attr('disabled', !data_item_value);
-		$('[name="text"]').attr('disabled', !data_text);
+		$('[name="aggregate_function"],[name="timeshift"]', $widget_form).attr('disabled', !data_item_value);
+		$('[name="aggregate_interval"]', $widget_form).attr('disabled', !data_item_value || no_aggregate_function);
+		$('[name="display"],[name="history"]', $widget_form).attr('disabled', !data_item_value);
+		$('[name="text"]', $widget_form).attr('disabled', !data_text);
 		$('[name="min"],[name="max"]', $widget_form).attr('disabled', display_as_is || !data_item_value);
 		$thresholds_table.toggleClass('disabled', !data_item_value);
 		$('[name$="[color]"],[name$="[threshold]"],button', $thresholds_table).attr('disabled', !data_item_value);

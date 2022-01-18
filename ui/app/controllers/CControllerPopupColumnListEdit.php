@@ -21,7 +21,21 @@
 
 class CControllerPopupColumnListEdit extends CController {
 
-	protected $column_defaults = [];
+	protected $column_defaults = [
+		'name'					=> '',
+		'data'					=> CWidgetFieldColumnsList::DATA_HOST_NAME,
+		'item'					=> '',
+		'timeshift' 			=> '',
+		'aggregate_function'	=> CWidgetFieldColumnsList::FUNC_NONE,
+		'aggregate_interval'	=> '1h',
+		'display'				=> CWidgetFieldColumnsList::DISPLAY_AS_IS,
+		'history'				=> CWidgetFieldColumnsList::HISTORY_DATA_AUTO,
+		'min'					=> '',
+		'max'					=> '',
+		'base_color'			=> '',
+		'text'					=> '',
+		'thresholds'			=> []
+	];
 
 	protected function init() {
 		$this->disableSIDValidation();
@@ -30,19 +44,19 @@ class CControllerPopupColumnListEdit extends CController {
 	protected function checkInput() {
 		// Validation is done by CWidgetFieldColumnsList
 		$fields = [
-			'name'			=> 'string',
-			'data'			=> 'int32',
-			'item'			=> 'string',
-			'function'		=> 'int32',
-			'from'			=> 'string',
-			'to'			=> 'string',
-			'display'		=> 'int32',
-			'history'		=> 'int32',
-			'base_color'	=> 'string',
-			'thresholds'	=> 'array',
-			'text'			=> 'string',
-			'edit'			=> 'in 1',
-			'update'		=> 'in 1'
+			'name'					=> 'string',
+			'data'					=> 'int32',
+			'item'					=> 'string',
+			'timeshift'				=> 'string',
+			'aggregate_function'	=> 'int32',
+			'aggregate_interval'	=> 'string',
+			'display'				=> 'int32',
+			'history'				=> 'int32',
+			'base_color'			=> 'string',
+			'thresholds'			=> 'array',
+			'text'					=> 'string',
+			'edit'					=> 'in 1',
+			'update'				=> 'in 1'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateFields($this->getInputAll());
@@ -64,10 +78,8 @@ class CControllerPopupColumnListEdit extends CController {
 
 	protected function validateFields(array $input): bool {
 		$field = new CWidgetFieldColumnsList('columns', '');
-		$default = $field->getDefault();
-		$this->column_defaults = reset($default);
 
-		if (!$this->hasInput('edit')) {
+		if (!$this->hasInput('edit') && !$this->hasInput('update')) {
 			$input += $this->column_defaults;
 		}
 

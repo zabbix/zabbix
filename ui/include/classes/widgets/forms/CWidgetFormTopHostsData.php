@@ -35,8 +35,25 @@ class CWidgetFormTopHostsData extends CWidgetForm {
 
 		$this->data = self::convertDottedKeys($this->data);
 
+		if (array_key_exists('thresholds', $this->data)) {
+			foreach ($this->data['thresholds'] as $column_index => $fields) {
+				$this->data['columns'][$column_index]['thresholds'] = [];
+
+				foreach ($fields as $field_key => $field_values) {
+					foreach ($field_values as $value_index => $value) {
+						$this->data['columns'][$column_index]['thresholds'][$value_index][$field_key] = $value;
+					}
+				}
+			}
+		}
+
 		// Apply sortable changes to data.
 		if (array_key_exists('sortorder', $this->data)) {
+			if (array_key_exists('column', $this->data) && array_key_exists('columns', $this->data['sortorder'])) {
+				// Fix selected column index when columns were sorted.
+				$this->data['column'] = array_search($this->data['column'], $this->data['sortorder']['columns']);
+			}
+
 			foreach ($this->data['sortorder'] as $key => $sortorder) {
 				if (!array_key_exists($key, $this->data)) {
 					continue;
@@ -96,8 +113,19 @@ class CWidgetFormTopHostsData extends CWidgetForm {
 
 		// Columns definition table.
 		$field_columns = (new CWidgetFieldColumnsList('columns', _('Columns')))
-			->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
-			->setValue(array_key_exists('columns', $this->data) ? $this->data['columns'] : []);
+			->setFlags(CWidgetField::FLAG_LABEL_ASTERISK);
+		$field_column_values = [];
+
+		if (array_key_exists('columns', $this->data)) {
+			$field_columns->setValue($this->data['columns']);
+
+			foreach ($this->data['columns'] as $key => $value) {
+				if ($value['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE) {
+					$field_column_values[$key] = $value['item'];
+				}
+			}
+		}
+
 		$this->fields[$field_columns->getName()] = $field_columns;
 
 		// Order.
@@ -116,31 +144,23 @@ class CWidgetFormTopHostsData extends CWidgetForm {
 		$this->fields[$field_order->getName()] = $field_order;
 
 		// Field column.
-		$values = [];
+		$field_column = (new CWidgetFieldSelect('column', _('Order column'), $field_column_values));
 
-		foreach ($field_columns->getValue() as $key => $value) {
-			if ($value['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE) {
-				$values[$key] = $value['item'];
-			}
-		}
-
-		$field_column = (new CWidgetFieldSelect('column', _('Column'), $values))->setFlags(
-			($field_order->getValue() == self::ORDER_NONE)
-				? CWidgetField::FLAG_DISABLED
-				: CWidgetField::FLAG_LABEL_ASTERISK
-		);
-
-		if (array_key_exists('column', $this->data)) {
-			// Fix selected column index if columns were sorted.
-			if (array_key_exists('sortorder', $this->data) && array_key_exists('columns', $this->data['sortorder'])) {
-				$this->data['column'] = array_search($this->data['column'], $this->data['sortorder']['columns']);
-			}
-
-			$field_column->setValue($this->data['column']);
+		if ($field_order->getValue() == self::ORDER_NONE) {
+			$field_column
+				->setFlags(CWidgetField::FLAG_DISABLED)
+				->setDefault(0);
 		}
 		else {
-			reset($values);
-			$field_column->setValue((int) key($values));
+			$field_column->setFlags(CWidgetField::FLAG_LABEL_ASTERISK);
+		}
+
+		if (array_key_exists('column', $this->data)) {
+			$field_column->setValue($this->data['column']);
+		}
+		else if ($field_column_values) {
+			reset($field_column_values);
+			$field_column->setValue((int) key($field_column_values));
 		}
 
 		$this->fields[$field_column->getName()] = $field_column;

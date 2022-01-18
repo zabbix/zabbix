@@ -565,13 +565,12 @@ class CWidgetHelper {
 			->setId('list_'.$field->getName())
 			->setHeader((new CRowHeader($header))->addClass($columns ? null : ZBX_STYLE_DISPLAY_NONE));
 		$enabled = !($field->getFlags() & CWidgetField::FLAG_DISABLED);
-		$i = 0;
 
-		foreach ($columns as $column) {
-			$column_data = [new CVar('sortorder['.$field->getName().'][]', $i)];
+		foreach ($columns as $column_index => $column) {
+			$column_data = [new CVar('sortorder['.$field->getName().'][]', $column_index)];
 
 			foreach ($column as $key => $value) {
-				$column_data[] = new CVar($field->getName().'['.$i.']['.$key.']', $value);
+				$column_data[] = new CVar($field->getName().'['.$column_index.']['.$key.']', $value);
 			}
 
 			$label = array_key_exists('item', $column) ? $column['item'] : '';
@@ -589,7 +588,6 @@ class CWidgetHelper {
 				$label,
 				(new CList(array_merge($row_actions, [$column_data])))->addClass(ZBX_STYLE_HOR_LIST)
 			]))->addClass('sortable'));
-			$i++;
 		}
 
 		$table->addRow(
