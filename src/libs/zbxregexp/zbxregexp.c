@@ -155,7 +155,7 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 	{
 		err_msg_buff = (char*)zbx_malloc(NULL, ZBX_REGEXP_ERR_MSG_SIZE);
 
-		if (0 > pcre2_get_error_message(error, (PCRE2_UCHAR8 *)err_msg_buff, ZBX_REGEXP_ERR_MSG_SIZE))
+		if (0 > pcre2_get_error_message(error, (PCRE2_UCHAR8*)err_msg_buff, ZBX_REGEXP_ERR_MSG_SIZE))
 			zbx_snprintf(err_msg_buff, ZBX_REGEXP_ERR_MSG_SIZE, "unknown regexp error");
 
 		*err_msg = (const char*)err_msg_buff;
