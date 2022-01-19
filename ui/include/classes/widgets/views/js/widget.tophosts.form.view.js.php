@@ -23,7 +23,7 @@
  */
 
 ?>
-window.widget_tophostsdata_form = {
+window.widget_tophosts_form = {
 
 	init(options) {
 		let form = document.querySelector('#'+options.form_id);
@@ -120,11 +120,11 @@ window.widget_tophostsdata_form = {
 				let index = elm.closest('tr').querySelector('[name="sortorder[columns][]"]').value;
 				let form_fields = getFormFields(elm.closest('form'));
 
-				PopUp('popup.widget.columnlist.edit', {...form_fields.columns[index], edit: 1}, null, elm);
+				PopUp('popup.tophosts.column.edit', {...form_fields.columns[index], edit: 1}, null, elm);
 				break;
 
 			case 'add':
-				PopUp('popup.widget.columnlist.edit', {}, null, elm);
+				PopUp('popup.tophosts.column.edit', {}, null, elm);
 				break;
 
 			case 'remove':

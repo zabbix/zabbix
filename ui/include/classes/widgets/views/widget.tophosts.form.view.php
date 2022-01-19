@@ -32,7 +32,7 @@ $form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dia
 	$data['dialogue']['view_mode'], $data['known_widget_types'], $rf_rate_field
 );
 
-$scripts = [$this->readJsFile('../../../include/classes/widgets/views/js/widget.tophostsdata.form.view.js.php')];
+$scripts = [$this->readJsFile('../../../include/classes/widgets/views/js/widget.tophosts.form.view.js.php')];
 
 // Host groups.
 $field_groupids = CWidgetHelper::getGroup($fields['groupids'], $data['captions']['ms']['groups']['groupids'],
@@ -80,7 +80,7 @@ $form_list->addRow(CWidgetHelper::getLabel($fields['hosts_count']), CWidgetHelpe
 
 $form->addItem($form_list);
 $form->addItem(
-	(new CScriptTag('widget_tophostsdata_form.init('.json_encode([
+	(new CScriptTag('widget_tophosts_form.init('.json_encode([
 			'form_id' => $form->getId()
 		]).');'
 	))->setOnDocumentReady()

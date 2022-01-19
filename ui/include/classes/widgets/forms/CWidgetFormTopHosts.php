@@ -22,7 +22,7 @@
 /**
  * Top hosts data widget form.
  */
-class CWidgetFormTopHostsData extends CWidgetForm {
+class CWidgetFormTopHosts extends CWidgetForm {
 
 	const ORDER_TOPN = 2;
 	const ORDER_BOTTOMN = 3;
@@ -30,7 +30,7 @@ class CWidgetFormTopHostsData extends CWidgetForm {
 	const DEFAULT_HOSTS_COUNT = 10;
 
 	public function __construct($data, $templateid) {
-		parent::__construct($data, $templateid, WIDGET_TOP_HOSTS_DATA);
+		parent::__construct($data, $templateid, WIDGET_TOP_HOSTS);
 
 		$this->data = self::convertDottedKeys($this->data);
 

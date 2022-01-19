@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerPopupColumnListEdit extends CController {
+class CControllerPopupTopHostsColumnEdit extends CController {
 
 	protected $column_defaults = [
 		'name'					=> '',

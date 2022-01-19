@@ -71,7 +71,7 @@ class CWidgetConfig {
 			WIDGET_TRIG_OVER			=> _('Trigger overview'),
 			WIDGET_URL					=> _('URL'),
 			WIDGET_WEB					=> _('Web monitoring'),
-			WIDGET_TOP_HOSTS_DATA		=> _('Top hosts data grid')
+			WIDGET_TOP_HOSTS			=> _('Top hosts data grid')
 		];
 
 		$types = array_filter($types,
@@ -115,7 +115,7 @@ class CWidgetConfig {
 			WIDGET_TRIG_OVER			=> 'CWidgetTrigerOver',
 			WIDGET_URL					=> 'CWidget',
 			WIDGET_WEB					=> 'CWidget',
-			WIDGET_TOP_HOSTS_DATA		=> 'CWidget'
+			WIDGET_TOP_HOSTS			=> 'CWidget'
 		];
 	}
 
@@ -185,7 +185,7 @@ class CWidgetConfig {
 			WIDGET_TRIG_OVER			=> ['width' => 12,	'height' => 5],
 			WIDGET_URL					=> ['width' => 12,	'height' => 5],
 			WIDGET_WEB					=> ['width' => 6,	'height' => 3],
-			WIDGET_TOP_HOSTS_DATA		=> ['width' => 12,	'height' => 5]
+			WIDGET_TOP_HOSTS			=> ['width' => 12,	'height' => 5]
 		];
 	}
 
@@ -263,7 +263,7 @@ class CWidgetConfig {
 		switch ($type) {
 			case WIDGET_ACTION_LOG:
 			case WIDGET_DATA_OVER:
-			case WIDGET_TOP_HOSTS_DATA:
+			case WIDGET_TOP_HOSTS:
 			case WIDGET_DISCOVERY:
 			case WIDGET_GEOMAP:
 			case WIDGET_GRAPH:
@@ -497,8 +497,8 @@ class CWidgetConfig {
 			case WIDGET_ITEM:
 				return new CWidgetFormItem($data, $templateid);
 
-			case WIDGET_TOP_HOSTS_DATA:
-				return new CWidgetFormTopHostsData($data, $templateid);
+			case WIDGET_TOP_HOSTS:
+				return new CWidgetFormTopHosts($data, $templateid);
 
 			default:
 				return new CWidgetForm($data, $templateid, $type);

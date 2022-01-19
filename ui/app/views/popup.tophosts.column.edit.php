@@ -221,7 +221,7 @@ $form_grid->addItem([
 $form->addItem($form_grid);
 // Set thresholds colors.
 $scripts[] = 'colorPalette.setThemeColors('.json_encode($data['thresholds_colors']).');';
-$scripts[] = $this->readJsFile('popup.widget.columnlist.edit.js.php', [
+$scripts[] = $this->readJsFile('popup.tophosts.column.edit.js.php', [
 	'thresholds'	=> $data['thresholds'],
 	'form'			=> $form->getName()
 ]);

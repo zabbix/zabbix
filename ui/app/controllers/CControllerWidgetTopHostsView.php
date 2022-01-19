@@ -19,12 +19,12 @@
 **/
 
 
-class CControllerWidgetTopHostsDataView extends CControllerWidget {
+class CControllerWidgetTopHostsView extends CControllerWidget {
 
 	public function __construct() {
 		parent::__construct();
 
-		$this->setType(WIDGET_TOP_HOSTS_DATA);
+		$this->setType(WIDGET_TOP_HOSTS);
 		$this->setValidationRules([
 			'name' => 'string',
 			'fields' => 'json'
