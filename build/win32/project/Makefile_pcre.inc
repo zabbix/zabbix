@@ -37,10 +37,10 @@ LIBS = $(LIBS) "$(PCRELIBDIR)\pcre.lib"
 !	ENDIF
 
 !	IF "$(PCRE2LIBDIR)" != ""
-!		IF EXISTS("$(PCRE2LIBDIR)\libpcre2-8.a")
-LIBS = $(LIBS) "$(PCRE2LIBDIR)\libpcre2-8.a"
+!		IF EXISTS("$(PCRE2LIBDIR)\pcre2-8-staticd.lib")
+LIBS = $(LIBS) "$(PCRE2LIBDIR)\pcre2-8-staticd.lib"
 !		ELSE
-!			ERROR PCRE2LIBDIR "$(PCRE2LIBDIR)" cannot find "$(PCRE2LIBDIR)\libpcre2-8.a"
+!			ERROR PCRE2LIBDIR "$(PCRE2LIBDIR)" cannot find "$(PCRE2LIBDIR)\pcre2-8-staticd.lib"
 !		ENDIF
 !	ENDIF
 
