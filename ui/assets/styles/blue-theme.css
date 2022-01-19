@@ -4478,8 +4478,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       width: 100%;
       max-height: calc(100vh - 220px);
       max-width: inherit;
-      margin: 0 -10px 8px;
-      padding: 2px 10px;
+      margin: 0 -10px 10px;
+      padding: 0 10px;
       position: relative; }
       .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-td-right {
         padding-right: 8px; }
@@ -4528,24 +4528,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     .overlay-dialogue.modal-popup.modal-popup-preprocessing {
       max-width: 900px;
       width: 100%; }
-      .overlay-dialogue.modal-popup.modal-popup-preprocessing .preprocessing-list .step-name {
-        flex: 0 0 180px; }
-      .overlay-dialogue.modal-popup.modal-popup-preprocessing .preprocessing-list {
-        min-width: unset;
-        max-width: unset; }
     .overlay-dialogue.modal-popup.modal-popup-fullscreen {
       width: calc(100vw - 40px);
       max-width: calc(100vw - 40px); }
-    .overlay-dialogue.modal-popup .table-forms-container, .overlay-dialogue.modal-popup .browser-warning-container {
-      border: none; }
-    .overlay-dialogue.modal-popup .ui-tabs-nav {
-      position: sticky;
-      top: 0;
-      background: #ffffff;
-      z-index: 3; }
-    .overlay-dialogue.modal-popup .textarea-flexible {
-      max-height: 200px;
-      overflow-y: auto; }
   .overlay-dialogue .hintbox-wrap {
     overflow: auto;
     max-height: 240px;
@@ -4576,7 +4561,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     .overlay-dialogue .table-forms-td-right td label {
       display: block; }
   .overlay-dialogue .dashboard-widget-head {
-    margin: -10px -10px 4px; }
+    margin: -10px -10px 6px; }
   .overlay-dialogue .maps-container {
     max-height: 128px;
     overflow-y: auto;
@@ -6372,6 +6357,11 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
     padding-left: calc(15% + 10px);
     margin-right: 0;
     margin-left: 0; }
+  .graph-widget-config-tabs .ui-tabs-nav {
+    position: sticky;
+    top: 0;
+    background: #ffffff;
+    z-index: 3; }
 
 .inline-sr-only {
   font-size: 0; }
@@ -6726,12 +6716,15 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   max-width: unset; }
 
 .modal-popup-medium .table-forms-container, .modal-popup-medium .browser-warning-container,
+.modal-popup-large .table-forms-container,
+.modal-popup-large .browser-warning-container,
 .modal-popup-static .table-forms-container,
 .modal-popup-static .browser-warning-container,
 .modal-popup-preprocessing .table-forms-container,
 .modal-popup-preprocessing .browser-warning-container {
   border: none; }
 .modal-popup-medium .ui-tabs-nav,
+.modal-popup-large .ui-tabs-nav,
 .modal-popup-static .ui-tabs-nav,
 .modal-popup-preprocessing .ui-tabs-nav {
   position: sticky;
@@ -6739,6 +6732,7 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   background: #ffffff;
   z-index: 3; }
 .modal-popup-medium .textarea-flexible,
+.modal-popup-large .textarea-flexible,
 .modal-popup-static .textarea-flexible,
 .modal-popup-preprocessing .textarea-flexible {
   max-height: 200px;

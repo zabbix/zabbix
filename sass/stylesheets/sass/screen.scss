@@ -3017,8 +3017,8 @@ $form-icon-btn: (
 			width: 100%;
 			max-height: calc(100vh - 220px);
 			max-width: inherit;
-			margin: 0 -10px 8px;
-			padding: 2px 10px;
+			margin: 0 -10px 10px;
+			padding: 0 10px;
 			position: relative;
 			@extend %webkit-scrollbar;
 
@@ -3110,36 +3110,11 @@ $form-icon-btn: (
 		&.modal-popup-preprocessing {
 			max-width: 900px;
 			width: 100%;
-
-			.preprocessing-list .step-name {
-				flex: 0 0 180px;
-			}
-
-			.preprocessing-list {
-				min-width: unset;
-				max-width: unset;
-			}
 		}
 
 		&.modal-popup-fullscreen {
 			width: calc(100vw - 40px);
 			max-width: calc(100vw - 40px);
-		}
-
-		.table-forms-container {
-			border: none;
-		}
-
-		.ui-tabs-nav {
-			position: sticky;
-			top: 0;
-			background: $header-bg-color;
-			z-index: 3;
-		}
-
-		.textarea-flexible {
-			max-height: 200px;
-			overflow-y: auto;
 		}
 	}
 
@@ -3203,7 +3178,7 @@ $form-icon-btn: (
 	}
 
 	.dashboard-widget-head {
-		margin: -10px -10px 4px;
+		margin: -10px -10px 6px;
 	}
 
 	.maps-container {
@@ -5697,6 +5672,13 @@ $range-input-width: 31px;
 		margin-right: 0;
 		margin-left: 0;
 	}
+
+	.ui-tabs-nav {
+		position: sticky;
+		top: 0;
+		background: $header-bg-color;
+		z-index: 3;
+	}
 }
 
 // Screen reader.
@@ -6320,6 +6302,7 @@ z-select,
 }
 
 .modal-popup-medium,
+.modal-popup-large,
 .modal-popup-static,
 .modal-popup-preprocessing {
 	.table-forms-container {
