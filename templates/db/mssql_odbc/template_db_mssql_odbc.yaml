@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-09-03T05:58:49Z'
+  date: '2022-01-10T13:23:24Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -13,7 +13,7 @@ zabbix_export:
       description: |
         1. Create an MSSQL user for monitoring.
           View Server State and View Any Definition permissions should be granted to the user.
-          Grant this user read permissions to the sysjobschedules, sysjobhistory, sysjobs tables.  
+          Grant this user read permissions to the sysjobschedules, sysjobhistory, sysjobs tables.
           For more information, see MSSQL documentation.
         2. Set the user name and password in host macros ({$MSSQL.USER} and {$MSSQL.PASSWORD}).
           Do not forget to install Microsoft ODBC driver on Zabbix server or Zabbix proxy.
@@ -25,7 +25,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
-        Template tooling version used: 0.39
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Databases
@@ -181,7 +181,7 @@ zabbix_export:
           units: ms
           params: |
             (last(//mssql.average_latch_wait_time_raw) - last(//mssql.average_latch_wait_time_raw,#2)) /
-            (last(//mssql.average_latch_wait_time_base) - last(//mssql.average_latch_wait_time_base,#2) + 
+            (last(//mssql.average_latch_wait_time_base) - last(//mssql.average_latch_wait_time_base,#2) +
             (last(//mssql.average_latch_wait_time_base) - last(//mssql.average_latch_wait_time_base,#2)=0))
           description: 'Average latch wait time (in milliseconds) for latch requests that had to wait.'
           tags:
@@ -238,7 +238,7 @@ zabbix_export:
           units: ms
           params: |
             (last(//mssql.average_wait_time_raw) - last(//mssql.average_wait_time_raw,#2)) /
-            (last(//mssql.average_wait_time_base) - last(//mssql.average_wait_time_base,#2) + 
+            (last(//mssql.average_wait_time_base) - last(//mssql.average_wait_time_base,#2) +
             (last(//mssql.average_wait_time_base) - last(//mssql.average_wait_time_base,#2)=0))
           description: 'The average wait time, in milliseconds, for each lock request that had to wait.'
           tags:
@@ -908,7 +908,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Total number of logins started per second. This does not include pooled connections. Any value over 2 may indicate insufcient connection pooling.'
+          description: 'Total number of logins started per second. This does not include pooled connections. Any value over 2 may indicate insufficient connection pooling.'
           preprocessing:
             -
               type: JSONPATH
@@ -932,7 +932,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Total number of logout operations started per second. Any value over 2 may indicate insufcient connection pooling.'
+          description: 'Total number of logout operations started per second. Any value over 2 may indicate insufficient connection pooling.'
           preprocessing:
             -
               type: JSONPATH
@@ -1276,7 +1276,7 @@ zabbix_export:
               expression: 'min(/MSSQL by ODBC/mssql.percent_of_adhoc_queries,15m) > {$MSSQL.PERCENT_COMPILATIONS.MAX}'
               name: 'MSSQL: Percent of adhoc queries running is over {$MSSQL.PERCENT_COMPILATIONS.MAX}% for 15m'
               priority: WARNING
-              description: 'The lower this value is the better. High values often indicate excessive adhoc querying and should be as low as possible. If excessive adhoc querying is happening, try rewriting the queries as procedures or invoke the queries using sp_executeSQL. When rewriting isn’t possible, consider using a plan guide or setting the database to parameterization forced mode.'
+              description: 'The lower this value is the better. High values often indicate excessive adhoc querying and should be as low as possible. If excessive adhoc querying is happening, try rewriting the queries as procedures or invoke the queries using sp_executeSQL. When rewriting isn''t possible, consider using a plan guide or setting the database to parameterization forced mode.'
         -
           uuid: ceab0472883f47b0a18b04fc6f7438ab
           name: 'MSSQL: Percent of Recompiled Transact-SQL Objects'
@@ -1300,7 +1300,7 @@ zabbix_export:
               expression: 'min(/MSSQL by ODBC/mssql.percent_recompilations_to_compilations,15m) > {$MSSQL.PERCENT_RECOMPILATIONS.MAX}'
               name: 'MSSQL: Percent of times statement recompiles is over {$MSSQL.PERCENT_RECOMPILATIONS.MAX}% for 15m'
               priority: WARNING
-              description: 'This number should be at or near zero, since recompiles can cause deadlocks and exclusive compile locks. This counter’s value should follow in proportion to “Batch Requests/sec” and “SQL Compilations/sec”.'
+              description: 'This number should be at or near zero, since recompiles can cause deadlocks and exclusive compile locks. This counter''s value should follow in proportion to “Batch Requests/sec” and “SQL Compilations/sec”.'
         -
           uuid: 5c0bee24f9494bb49860171ff875caf7
           name: 'MSSQL: Number of blocked processes'
@@ -1824,7 +1824,7 @@ zabbix_export:
               expression: 'max(/MSSQL by ODBC/mssql.worktables_from_cache_ratio,5m)<{$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}'
               name: 'MSSQL: Percentage of work tables available from the work table cache is low (below {$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}% for 5m)'
               priority: HIGH
-              description: 'A value less than 90% may indicate insufcient memory, since execution plans are being dropped, or on 32-bit systems, may indicate the need for an upgrade to a 64-bit system'
+              description: 'A value less than 90% may indicate insufficient memory, since execution plans are being dropped, or on 32-bit systems, may indicate the need for an upgrade to a 64-bit system'
         -
           uuid: c0302965c2574b43955a1d37a8fce9eb
           name: 'MSSQL: Service''s TCP port state'
@@ -1859,7 +1859,7 @@ zabbix_export:
           key: 'db.odbc.discovery[availability_groups,"{$MSSQL.DSN}"]'
           delay: 1h
           params: |
-            SELECT name as group_name 
+            SELECT name as group_name
             FROM sys.availability_groups
           username: '{$MSSQL.USER}'
           password: '{$MSSQL.PASSWORD}'
@@ -2038,7 +2038,7 @@ zabbix_export:
           key: 'db.odbc.discovery[dbname,"{$MSSQL.DSN}"]'
           delay: 1h
           params: |
-            SELECT name as dbname 
+            SELECT name as dbname
             FROM sys.databases
           username: '{$MSSQL.USER}'
           password: '{$MSSQL.PASSWORD}'
@@ -3232,8 +3232,8 @@ zabbix_export:
           params: |
             SELECT ag.name AS group_name, arcs.replica_server_name AS replica_name,
             db_name(drs.database_id) AS dbname, drs.is_local
-            FROM sys.dm_hadr_database_replica_states drs JOIN sys.dm_hadr_availability_replica_cluster_states arcs 
-            ON arcs.replica_id = drs.replica_id 
+            FROM sys.dm_hadr_database_replica_states drs JOIN sys.dm_hadr_availability_replica_cluster_states arcs
+            ON arcs.replica_id = drs.replica_id
             JOIN sys.availability_groups ag ON ag.group_id = arcs.group_id
             JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replica_id
             WHERE drs.is_local = 0
@@ -3348,9 +3348,9 @@ zabbix_export:
           key: 'db.odbc.discovery[replicas,"{$MSSQL.DSN}"]'
           delay: 1h
           params: |
-            SELECT ag.name as group_name, 
+            SELECT ag.name as group_name,
             arcs.replica_server_name as replica_name
-            FROM sys.dm_hadr_availability_replica_cluster_states as arcs 
+            FROM sys.dm_hadr_availability_replica_cluster_states as arcs
             JOIN sys.availability_groups ag ON ag.group_id = arcs.group_id
             JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replica_id
           username: '{$MSSQL.USER}'
@@ -3638,7 +3638,7 @@ zabbix_export:
               name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': {#REPLICA_NAME} is disconnected'
               priority: WARNING
               description: |
-                The response of an availability replica to the DISCONNECTED state depends on its role: 
+                The response of an availability replica to the DISCONNECTED state depends on its role:
                 On the primary replica, if a secondary replica is disconnected, its secondary databases are marked as NOT SYNCHRONIZED on the primary replica, which waits for the secondary to reconnect; On a secondary replica, upon detecting that it is disconnected, the secondary replica attempts to reconnect to the primary replica.
           preprocessing:
             -
@@ -4028,7 +4028,7 @@ zabbix_export:
     -
       uuid: a1397bd4e9334a24a34dba0687b263e6
       expression: 'last(/MSSQL by ODBC/mssql.forwarded_records_sec.rate) * 100 > 10 * last(/MSSQL by ODBC/mssql.batch_requests_sec.rate)'
-      name: 'MSSQL: Too frequently pointers using'
+      name: 'MSSQL: Too frequently using pointers'
       priority: WARNING
       description: 'Rows with varchar columns can experience expansion when varchar values are updated with a longer string.  In the case where the row cannot fit in the existing page, the row migrates and access to the row will traverse a pointer.  This only happens on heaps (tables without clustered indexes). Evaluate clustered index for heap tables.  In cases where clustered indexes cannot be used, drop non-clustered indexes, build a clustered index to reorg pages and rows, drop the clustered index, then recreate non-clustered indexes.'
     -

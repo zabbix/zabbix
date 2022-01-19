@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -114,10 +114,10 @@ Overlay.prototype.centerDialog = function() {
 	});
 
 	this.$dialogue.css({
-		'left': Math.max(0, parseInt((jQuery(window).width() - this.$dialogue.outerWidth(true)) / 2)) + 'px',
-		'top': this.$dialogue.hasClass('sticked-to-top')
-			? ''
-			: Math.max(0, parseInt((jQuery(window).height() - this.$dialogue.outerHeight(true)) / 2)) + 'px'
+		'left': Math.max(0, Math.floor((jQuery(window).width() - this.$dialogue.outerWidth(true)) / 2)) + 'px',
+		'top': this.$dialogue.hasClass('position-middle')
+			? Math.max(0, Math.floor((jQuery(window).height() - this.$dialogue.outerHeight(true)) / 2)) + 'px'
+			: ''
 	});
 
 	var size = {

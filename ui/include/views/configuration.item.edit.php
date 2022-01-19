@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -103,14 +103,13 @@ if (!$readonly) {
 	$key_controls[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 	$key_controls[] = (new CButton('keyButton', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("popup.generic",jQuery.extend('.
-			json_encode([
+		->onClick(
+			'return PopUp("popup.generic", jQuery.extend('.json_encode([
 				'srctbl' => 'help_items',
 				'srcfld1' => 'key',
 				'dstfrm' => $form->getName(),
 				'dstfld1' => 'key'
-			]).
-				',{itemtype: jQuery("#type").val()}), null, this);'
+			]).', {itemtype: jQuery("#type").val()}), {dialogue_class: "modal-popup-generic"});'
 		);
 }
 

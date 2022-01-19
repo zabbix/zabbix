@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 #define DMI_HEADER_SIZE		4
 
 #define CHASSIS_TYPE_BITS	0x7f	/* bits 0-6 represent the chassis type */
-#define MAX_CHASSIS_TYPE	0x1d
+#define MAX_CHASSIS_TYPE	0x24
 
 #define DMI_GET_TYPE		0x01
 #define DMI_GET_VENDOR		0x02

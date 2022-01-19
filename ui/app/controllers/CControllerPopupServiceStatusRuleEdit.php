@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,11 +26,10 @@ class CControllerPopupServiceStatusRuleEdit extends CController {
 			'form_refresh' => 	'int32',
 			'edit' => 			'in 1',
 			'row_index' =>		'required|int32',
-			'new_status' =>		'int32',
+			'new_status' =>		'in '.implode(',', array_keys(CServiceHelper::getProblemStatusNames())),
 			'type' =>			'in '.implode(',', array_keys(CServiceHelper::getStatusRuleTypeOptions())),
 			'limit_value' =>	'int32',
-			'limit_status' =>	'in '.implode(',', array_keys(CServiceHelper::getStatusNames())),
-			'new_status' =>		'in '.implode(',', array_keys(CServiceHelper::getProblemStatusNames()))
+			'limit_status' =>	'in '.implode(',', array_keys(CServiceHelper::getStatusNames()))
 		];
 
 		$ret = $this->validateInput($fields);
@@ -47,7 +46,7 @@ class CControllerPopupServiceStatusRuleEdit extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES);
+		return $this->checkAccess(CRoleHelper::UI_SERVICES_SERVICES);
 	}
 
 	protected function doAction(): void {

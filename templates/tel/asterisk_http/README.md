@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 The template for monitoring Asterisk over HTTP that works without any external scripts.  
 It collects metrics by polling the Asterisk Manager API remotely using an HTTP agent and JS preprocessing.  
 All metrics are collected at once, thanks to Zabbix's bulk data collection.
@@ -11,7 +11,6 @@ All metrics are collected at once, thanks to Zabbix's bulk data collection.
 
 This template was tested on:
 
-- Zabbix, version 5.4 and later
 - Asterisk, version 13 and later
 
 ## Setup
@@ -63,7 +62,7 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Asterisk |Asterisk: Service status |<p>Asterisk Manager API port avalability.</p> |SIMPLE |net.tcp.service["tcp","{HOST.CONN}","{$AMI.PORT}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|Asterisk |Asterisk: Service status |<p>Asterisk Manager API port availability.</p> |SIMPLE |net.tcp.service["tcp","{HOST.CONN}","{$AMI.PORT}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |Asterisk |Asterisk: Service response time |<p>Asterisk Manager API performance.</p> |SIMPLE |net.tcp.service.perf["tcp","{HOST.CONN}","{$AMI.PORT}"] |
 |Asterisk |Asterisk: Version |<p>Service version</p> |DEPENDENT |asterisk.version<p>**Preprocessing**:</p><p>- JSONPATH: `$.version`</p> |
 |Asterisk |Asterisk: Uptime |<p>System uptime in 'N days, hh:mm:ss' format.</p> |DEPENDENT |asterisk.uptime<p>**Preprocessing**:</p><p>- JSONPATH: `$.uptime`</p> |
@@ -71,7 +70,7 @@ There are no template links in this template.
 |Asterisk |Asterisk: Active channels |<p>The number of active channels at the moment.</p> |DEPENDENT |asterisk.active_channels<p>**Preprocessing**:</p><p>- JSONPATH: `$.active_channels`</p> |
 |Asterisk |Asterisk: Active calls |<p>The number of active calls at the moment.</p> |DEPENDENT |asterisk.active_calls<p>**Preprocessing**:</p><p>- JSONPATH: `$.active_calls`</p> |
 |Asterisk |Asterisk: Calls processed |<p>The number of calls processed after the last service restart.</p> |DEPENDENT |asterisk.calls_processed<p>**Preprocessing**:</p><p>- JSONPATH: `$.calls_processed`</p> |
-|Asterisk |Asterisk: Calls processed per second |<p>The number of calls processed per second.</p> |DEPENDENT |asterisk.calls_processed.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.calls_processed`</p><p>- CHANGE_PER_SECOND |
+|Asterisk |Asterisk: Calls processed per second |<p>The number of calls processed per second.</p> |DEPENDENT |asterisk.calls_processed.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.calls_processed`</p><p>- CHANGE_PER_SECOND</p> |
 |Asterisk |Asterisk: Total queues |<p>The number of configured queues.</p> |DEPENDENT |asterisk.total_queues<p>**Preprocessing**:</p><p>- JSONPATH: `$.queue.total`</p> |
 |Asterisk |Asterisk: SIP monitored online |<p>The number of monitored online SIP peers.</p> |DEPENDENT |asterisk.sip.monitored_online<p>**Preprocessing**:</p><p>- JSONPATH: `$.sip.monitored_online`</p> |
 |Asterisk |Asterisk: SIP monitored offline |<p>The number of monitored offline SIP peers.</p> |DEPENDENT |asterisk.sip.monitored_offline<p>**Preprocessing**:</p><p>- JSONPATH: `$.sip.monitored_offline`</p> |
@@ -103,22 +102,22 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Asterisk: Service is down |<p>-</p> |`{TEMPLATE_NAME:net.tcp.service["tcp","{HOST.CONN}","{$AMI.PORT}"].last()}=0` |AVERAGE |<p>Manual close: YES</p> |
-|Asterisk: Service response time is too high (over {$AMI.RESPONSE_TIME.MAX.WARN} for 5m) |<p>-</p> |`{TEMPLATE_NAME:net.tcp.service.perf["tcp","{HOST.CONN}","{$AMI.PORT}"].min(5m)}>{$AMI.RESPONSE_TIME.MAX.WARN}` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Asterisk: Service is down</p> |
-|Asterisk: Version has changed (new version: {ITEM.VALUE}) |<p>Asterisk version has changed. Ack to close.</p> |`{TEMPLATE_NAME:asterisk.version.diff()}=1 and {TEMPLATE_NAME:asterisk.version.strlen()}>0` |INFO |<p>Manual close: YES</p> |
-|Asterisk: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:asterisk.uptime.last()}<10m` |INFO |<p>Manual close: YES</p> |
-|Asterisk: Failed to fetch AMI page (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes.</p> |`{TEMPLATE_NAME:asterisk.uptime.nodata(30m)}=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Asterisk: Service is down</p> |
-|Asterisk: has been reloaded (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:asterisk.uptime_reload.last()}<10m` |INFO |<p>Manual close: YES</p> |
-|Asterisk: Total number of active channels of SIP trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"SIP"} for 10m) |<p>The SIP trunks may not be able to process new calls.</p> |`{TEMPLATE_NAME:asterisk.sip.active_channels.min(10m)}>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"SIP"}` |WARNING | |
-|Asterisk: Total number of active channels of IAX trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"IAX"} for 10m) |<p>The IAX trunks may not be able to process new calls.</p> |`{TEMPLATE_NAME:asterisk.iax.active_channels.min(10m)}>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"IAX"}` |WARNING | |
-|Asterisk: Total number of active channels of PJSIP trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"PJSIP"} for 10m) |<p>The PJSIP trunks may not be able to process new calls.</p> |`{TEMPLATE_NAME:asterisk.pjsip.active_channels.min(10m)}>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"PJSIP"}` |WARNING | |
-|SIP trunk "{#OBJECTNAME}": SIP trunk {#OBJECTNAME} has a state {ITEM.VALUE} |<p>The SIP trunk is unable to establish a connection with a neighbor due to network issues or incorrect configuration.</p> |`{TEMPLATE_NAME:asterisk.sip.trunk.status[{#OBJECTNAME}].last()}="UNKNOWN" or {TEMPLATE_NAME:asterisk.sip.trunk.status[{#OBJECTNAME}].last()}="UNREACHABLE"` |AVERAGE | |
-|SIP trunk "{#OBJECTNAME}": Number of the SIP trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m) |<p>The SIP trunk may not be able to process new calls.</p> |`{TEMPLATE_NAME:asterisk.sip.trunk.active_channels[{#OBJECTNAME}].min(10m)}>={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}` |WARNING | |
-|IAX trunk "{#OBJECTNAME}": IAX trunk {#OBJECTNAME} has a state {ITEM.VALUE} |<p>The IAX trunk is unable to establish a connection with a neighbor due to network issues or incorrect configuration.</p> |`{TEMPLATE_NAME:asterisk.iax.trunk.status[{#OBJECTNAME}].last()}="UNKNOWN" or {TEMPLATE_NAME:asterisk.iax.trunk.status[{#OBJECTNAME}].last()}="UNREACHABLE"` |AVERAGE | |
-|IAX trunk "{#OBJECTNAME}": Number of the IAX trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m) |<p>The IAX trunk may not be able to process new calls.</p> |`{TEMPLATE_NAME:asterisk.iax.trunk.active_channels[{#OBJECTNAME}].min(10m)}>={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}` |WARNING | |
-|PJSIP trunk "{#OBJECTNAME}": PJSIP trunk {#OBJECTNAME} has a state Unavailable |<p>The PJSIP trunk is unable to establish a connection with a neighbor due to network issues or incorrect configuration.</p> |`{TEMPLATE_NAME:asterisk.pjsip.trunk.devicestate[{#OBJECTNAME}].last()}="Unavailable"` |AVERAGE | |
-|PJSIP trunk "{#OBJECTNAME}": Number of the PJSIP trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m) |<p>The PJSIP trunk may not be able to process new calls.</p> |`{TEMPLATE_NAME:asterisk.pjsip.trunk.active_channels[{#OBJECTNAME}].min(10m)}>={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}` |WARNING | |
-|"{#QUEUE}": Number of callers in the queue "{#QUEUE}" is too high (over {$AMI.QUEUE_CALLERS.MAX.WARN:"{#QUEUE}"} for 10m) |<p>There is a large number of calls in the queue.</p> |`{TEMPLATE_NAME:asterisk.queue.callers[{#QUEUE}].min(10m)}>{$AMI.QUEUE_CALLERS.MAX.WARN:"{#QUEUE}"}` |WARNING | |
+|Asterisk: Service is down |<p>-</p> |`last(/Asterisk by HTTP/net.tcp.service["tcp","{HOST.CONN}","{$AMI.PORT}"])=0` |AVERAGE |<p>Manual close: YES</p> |
+|Asterisk: Service response time is too high (over {$AMI.RESPONSE_TIME.MAX.WARN} for 5m) |<p>-</p> |`min(/Asterisk by HTTP/net.tcp.service.perf["tcp","{HOST.CONN}","{$AMI.PORT}"],5m)>{$AMI.RESPONSE_TIME.MAX.WARN}` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Asterisk: Service is down</p> |
+|Asterisk: Version has changed (new version: {ITEM.VALUE}) |<p>Asterisk version has changed. Ack to close.</p> |`last(/Asterisk by HTTP/asterisk.version,#1)<>last(/Asterisk by HTTP/asterisk.version,#2) and length(last(/Asterisk by HTTP/asterisk.version))>0` |INFO |<p>Manual close: YES</p> |
+|Asterisk: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/Asterisk by HTTP/asterisk.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|Asterisk: Failed to fetch AMI page (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes.</p> |`nodata(/Asterisk by HTTP/asterisk.uptime,30m)=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Asterisk: Service is down</p> |
+|Asterisk: has been reloaded (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/Asterisk by HTTP/asterisk.uptime_reload)<10m` |INFO |<p>Manual close: YES</p> |
+|Asterisk: Total number of active channels of SIP trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"SIP"} for 10m) |<p>The SIP trunks may not be able to process new calls.</p> |`min(/Asterisk by HTTP/asterisk.sip.active_channels,10m)>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"SIP"}` |WARNING | |
+|Asterisk: Total number of active channels of IAX trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"IAX"} for 10m) |<p>The IAX trunks may not be able to process new calls.</p> |`min(/Asterisk by HTTP/asterisk.iax.active_channels,10m)>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"IAX"}` |WARNING | |
+|Asterisk: Total number of active channels of PJSIP trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"PJSIP"} for 10m) |<p>The PJSIP trunks may not be able to process new calls.</p> |`min(/Asterisk by HTTP/asterisk.pjsip.active_channels,10m)>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"PJSIP"}` |WARNING | |
+|SIP trunk "{#OBJECTNAME}": SIP trunk {#OBJECTNAME} has a state {ITEM.VALUE} |<p>The SIP trunk is unable to establish a connection with a neighbor due to network issues or incorrect configuration.</p> |`last(/Asterisk by HTTP/asterisk.sip.trunk.status[{#OBJECTNAME}])="UNKNOWN" or last(/Asterisk by HTTP/asterisk.sip.trunk.status[{#OBJECTNAME}])="UNREACHABLE"` |AVERAGE | |
+|SIP trunk "{#OBJECTNAME}": Number of the SIP trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m) |<p>The SIP trunk may not be able to process new calls.</p> |`min(/Asterisk by HTTP/asterisk.sip.trunk.active_channels[{#OBJECTNAME}],10m)>={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}` |WARNING | |
+|IAX trunk "{#OBJECTNAME}": IAX trunk {#OBJECTNAME} has a state {ITEM.VALUE} |<p>The IAX trunk is unable to establish a connection with a neighbor due to network issues or incorrect configuration.</p> |`last(/Asterisk by HTTP/asterisk.iax.trunk.status[{#OBJECTNAME}])="UNKNOWN" or last(/Asterisk by HTTP/asterisk.iax.trunk.status[{#OBJECTNAME}])="UNREACHABLE"` |AVERAGE | |
+|IAX trunk "{#OBJECTNAME}": Number of the IAX trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m) |<p>The IAX trunk may not be able to process new calls.</p> |`min(/Asterisk by HTTP/asterisk.iax.trunk.active_channels[{#OBJECTNAME}],10m)>={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}` |WARNING | |
+|PJSIP trunk "{#OBJECTNAME}": PJSIP trunk {#OBJECTNAME} has a state Unavailable |<p>The PJSIP trunk is unable to establish a connection with a neighbor due to network issues or incorrect configuration.</p> |`last(/Asterisk by HTTP/asterisk.pjsip.trunk.devicestate[{#OBJECTNAME}])="Unavailable"` |AVERAGE | |
+|PJSIP trunk "{#OBJECTNAME}": Number of the PJSIP trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m) |<p>The PJSIP trunk may not be able to process new calls.</p> |`min(/Asterisk by HTTP/asterisk.pjsip.trunk.active_channels[{#OBJECTNAME}],10m)>={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}` |WARNING | |
+|"{#QUEUE}": Number of callers in the queue "{#QUEUE}" is too high (over {$AMI.QUEUE_CALLERS.MAX.WARN:"{#QUEUE}"} for 10m) |<p>There is a large number of calls in the queue.</p> |`min(/Asterisk by HTTP/asterisk.queue.callers[{#QUEUE}],10m)>{$AMI.QUEUE_CALLERS.MAX.WARN:"{#QUEUE}"}` |WARNING | |
 
 ## Feedback
 

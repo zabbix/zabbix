@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -298,21 +298,26 @@ int	zbx_default_uint64_compare_func(const void *d1, const void *d2)
 
 int	zbx_default_uint64_ptr_compare_func(const void *d1, const void *d2)
 {
-	const zbx_uint64_t	*p1 = *(const zbx_uint64_t **)d1;
-	const zbx_uint64_t	*p2 = *(const zbx_uint64_t **)d2;
+	const zbx_uint64_t	*p1 = *(const zbx_uint64_t * const *)d1;
+	const zbx_uint64_t	*p2 = *(const zbx_uint64_t * const *)d2;
 
 	return zbx_default_uint64_compare_func(p1, p2);
 }
 
 int	zbx_default_str_compare_func(const void *d1, const void *d2)
 {
-	return strcmp(*(const char **)d1, *(const char **)d2);
+	return strcmp(*(const char * const *)d1, *(const char * const *)d2);
+}
+
+int	zbx_natural_str_compare_func(const void *d1, const void *d2)
+{
+	return zbx_strcmp_natural(*(const char * const *)d1, *(const char * const *)d2);
 }
 
 int	zbx_default_ptr_compare_func(const void *d1, const void *d2)
 {
-	const void	*p1 = *(const void **)d1;
-	const void	*p2 = *(const void **)d2;
+	const void	*p1 = *(const void * const *)d1;
+	const void	*p2 = *(const void * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(p1, p2);
 
@@ -387,8 +392,6 @@ int	next_prime(int n)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_isqrt32                                                      *
- *                                                                            *
  * Purpose: calculate integer part of square root of a 32 bit integer value   *
  *                                                                            *
  * Parameters: value     - [IN] the value to calculate square root for        *
@@ -421,8 +424,6 @@ unsigned int	zbx_isqrt32(unsigned int value)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_gen_uuid4                                                    *
  *                                                                            *
  * Purpose: calculate UUID version 4 as string of 32 symbols                  *
  *                                                                            *
@@ -461,4 +462,3 @@ char	*zbx_gen_uuid4(const char *seed)
 
 	return uuid;
 }
-

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,9 +19,9 @@
 
 #include "common.h"
 #include "log.h"
-#include "mutexs.h"
 #include "stats.h"
 #include "ipc.h"
+
 #include "procstat.h"
 
 #ifdef ZBX_PROCSTAT_COLLECTOR
@@ -190,8 +190,6 @@ static int			procstat_snapshot_num;
 
 /******************************************************************************
  *                                                                            *
- * Function: procstat_dshm_has_enough_space                                   *
- *                                                                            *
  * Purpose: check if the procstat shared memory segment has at least          *
  *          the specified amount of free bytes in the segment                 *
  *                                                                            *
@@ -213,8 +211,6 @@ static int	procstat_dshm_has_enough_space(void *base, size_t size)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: procstat_dshm_used_size                                          *
  *                                                                            *
  * Purpose: calculate the actual shared memory size used by procstat          *
  *                                                                            *
@@ -252,8 +248,6 @@ static size_t	procstat_dshm_used_size(void *base)
 
 /******************************************************************************
  *                                                                            *
- * Function: procstat_queries_num                                             *
- *                                                                            *
  * Purpose: calculate the number of active queries                            *
  *                                                                            *
  * Parameters: base - [IN] the procstat shared memory segment                 *
@@ -278,8 +272,6 @@ static int	procstat_queries_num(void *base)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: procstat_alloc                                                   *
  *                                                                            *
  * Purpose: allocates memory in the shared memory segment,                    *
  *          calls exit() if segment is too small                              *
@@ -312,8 +304,6 @@ static int	procstat_alloc(void *base, size_t size)
 
 /******************************************************************************
  *                                                                            *
- * Function: procstat_strdup                                                  *
- *                                                                            *
  * Purpose: allocates required memory in procstat memory segment and copies   *
  *          the specified string (calls exit() if segment is too small)       *
  *                                                                            *
@@ -343,8 +333,6 @@ static size_t	procstat_strdup(void *base, const char *str)
 
 /******************************************************************************
  *                                                                            *
- * Function: procstat_reattach                                                *
- *                                                                            *
  * Purpose: reattaches the procstat_ref to the shared memory segment if it    *
  *          was 'resized' (a new segment created and the old data copied) by  *
  *          other process.                                                    *
@@ -366,8 +354,6 @@ static void	procstat_reattach(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: procstat_copy_data                                               *
  *                                                                            *
  * Purpose: copies procstat data to a new shared memory segment               *
  *                                                                            *
@@ -416,8 +402,6 @@ static void	procstat_copy_data(void *dst, size_t size_dst, const void *src)
 
 /******************************************************************************
  *                                                                            *
- * Function: procstat_running                                                 *
- *                                                                            *
  * Purpose: checks if processor statistics collector is running (at least one *
  *          one process statistics query has been made).                      *
  *                                                                            *
@@ -431,8 +415,6 @@ static int	procstat_running(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: procstat_get_query                                               *
  *                                                                            *
  * Purpose: get process statistics query based on process name, user name     *
  *          and command line                                                  *
@@ -471,8 +453,6 @@ static	zbx_procstat_query_t	*procstat_get_query(void *base, const char *procname
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: procstat_add                                                     *
  *                                                                            *
  * Purpose: adds a new query to process statistics collector                  *
  *                                                                            *
@@ -555,8 +535,6 @@ static void	procstat_add(const char *procname, const char *username, const char 
 
 /******************************************************************************
  *                                                                            *
- * Function: procstat_free_query_data                                         *
- *                                                                            *
  * Purpose: frees the query data structure used to store queries locally      *
  *                                                                            *
  ******************************************************************************/
@@ -567,8 +545,6 @@ static void	procstat_free_query_data(zbx_procstat_query_data_t *data)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: procstat_try_compress                                            *
  *                                                                            *
  * Purpose: try to compress (remove inactive queries) the procstat shared     *
  *          memory segment once per day                                       *
@@ -604,8 +580,6 @@ static void	procstat_try_compress(void *base)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: procstat_build_local_query_vector                                *
  *                                                                            *
  * Purpose: builds a local copy of the process cpu utilization queries and    *
  *          removes expired (not used during last 24 hours) queries           *
@@ -695,8 +669,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: procstat_scan_query_pids                                         *
- *                                                                            *
  * Purpose: for every query gets the pids of processes matching query         *
  *          attributes                                                        *
  *                                                                            *
@@ -724,8 +696,6 @@ static int	procstat_scan_query_pids(zbx_vector_ptr_t *queries, const zbx_vector_
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: procstat_get_monitored_pids                                      *
  *                                                                            *
  * Purpose: creates a list of unique pids that are monitored by current data  *
  *          gathering cycle                                                   *
@@ -761,8 +731,6 @@ static void	procstat_get_monitored_pids(zbx_vector_uint64_t *pids, const zbx_vec
 
 /******************************************************************************
  *                                                                            *
- * Function: procstat_get_cpu_util_snapshot_for_pids                          *
- *                                                                            *
  * Purpose: gets cpu utilization data snapshot for the monitored processes    *
  *                                                                            *
  * Parameters: stats - [OUT] current reading of the per-pid cpu usage         *
@@ -791,8 +759,6 @@ static zbx_timespec_t	procstat_get_cpu_util_snapshot_for_pids(zbx_procstat_util_
 
 /******************************************************************************
  *                                                                            *
- * Function: procstat_util_compare                                            *
- *                                                                            *
  * Purpose: compare process utilization data by their pids                    *
  *                                                                            *
  ******************************************************************************/
@@ -807,8 +773,6 @@ static int	procstat_util_compare(const void *d1, const void *d2)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: procstat_calculate_cpu_util_for_queries                          *
  *                                                                            *
  * Purpose: calculates the cpu utilization for queries since the previous     *
  *          snapshot                                                          *
@@ -867,8 +831,6 @@ static void	procstat_calculate_cpu_util_for_queries(zbx_vector_ptr_t *queries,
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: procstat_update_query_statistics                                 *
  *                                                                            *
  * Purpose: updates cpu utilization and saves the new snapshot for queries in *
  *          shared memory segment                                             *
@@ -950,8 +912,6 @@ static void	procstat_update_query_statistics(zbx_vector_ptr_t *queries, int runi
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_procstat_collector_started                                   *
- *                                                                            *
  * Purpose: checks if processor statistics collector is enabled (the main     *
  *          collector has been initialized)                                   *
  *                                                                            *
@@ -965,8 +925,6 @@ int	zbx_procstat_collector_started(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_procstat_init                                                *
  *                                                                            *
  * Purpose: initializes process statistics collector                          *
  *                                                                            *
@@ -991,8 +949,6 @@ void	zbx_procstat_init(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_procstat_destroy                                             *
- *                                                                            *
  * Purpose: destroys process statistics collector                             *
  *                                                                            *
  ******************************************************************************/
@@ -1011,8 +967,6 @@ void	zbx_procstat_destroy(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_procstat_get_util                                            *
  *                                                                            *
  * Purpose: gets process cpu utilization                                      *
  *                                                                            *
@@ -1102,8 +1056,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_procstat_collect                                             *
  *                                                                            *
  * Purpose: performs process statistics collection                            *
  *                                                                            *

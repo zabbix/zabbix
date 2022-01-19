@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-27T13:57:40Z'
+  version: '6.0'
+  date: '2021-12-15T06:57:50Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: 8cad0f2564694416b60bd8a414948641
-      template: 'Template App Nginx Plus by HTTP'
-      name: 'Template App Nginx Plus by HTTP'
+      template: 'Nginx Plus by HTTP'
+      name: 'Nginx Plus by HTTP'
       description: |
         Get Nginx Plus metrics by HTTP agent.
         Metrics are collected by requests to Nginx Plus API.
@@ -17,7 +17,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Applications
@@ -101,7 +101,7 @@ zabbix_export:
           triggers:
             -
               uuid: 91c9dab8147a4d0086019119e4e55b5e
-              expression: 'min(/Template App Nginx Plus by HTTP/nginx.connections.dropped,5m) > {$NGINX.DROP_RATE.MAX.WARN}'
+              expression: 'min(/Nginx Plus by HTTP/nginx.connections.dropped,5m) > {$NGINX.DROP_RATE.MAX.WARN}'
               name: 'Nginx: High connections drop rate (more than {$NGINX.DROP_RATE.MAX.WARN} for 5m)'
               priority: WARNING
               description: 'The dropping rate connections is greater than {$NGINX.DROP_RATE.MAX.WARN} for the last 5 minutes.'
@@ -238,7 +238,7 @@ zabbix_export:
           triggers:
             -
               uuid: e444c708371748bd831bba6c8d9a92e0
-              expression: 'length(last(/Template App Nginx Plus by HTTP/nginx.info.error))>0'
+              expression: 'length(last(/Nginx Plus by HTTP/nginx.info.error))>0'
               name: 'Nginx: Server response error (text: {ITEM.VALUE})'
               priority: HIGH
         -
@@ -292,14 +292,14 @@ zabbix_export:
           triggers:
             -
               uuid: 396fb4be618e45578566971d5399d611
-              expression: 'nodata(/Template App Nginx Plus by HTTP/nginx.info.uptime,30m)=1'
+              expression: 'nodata(/Nginx Plus by HTTP/nginx.info.uptime,30m)=1'
               name: 'Nginx: Failed to fetch info data (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for metrics for the last 30 minutes'
               manual_close: 'YES'
             -
               uuid: 95622a29bd58444b9f0bd985db99f922
-              expression: 'last(/Template App Nginx Plus by HTTP/nginx.info.uptime)<10m'
+              expression: 'last(/Nginx Plus by HTTP/nginx.info.uptime)<10m'
               name: 'Nginx: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
@@ -332,7 +332,7 @@ zabbix_export:
           triggers:
             -
               uuid: a91ff018fe4f4a1495b08adeb2b0005f
-              expression: 'last(/Template App Nginx Plus by HTTP/nginx.info.version,#1)<>last(/Template App Nginx Plus by HTTP/nginx.info.version,#2) and length(last(/Template App Nginx Plus by HTTP/nginx.info.version))>0'
+              expression: 'last(/Nginx Plus by HTTP/nginx.info.version,#1)<>last(/Nginx Plus by HTTP/nginx.info.version,#2) and length(last(/Nginx Plus by HTTP/nginx.info.version))>0'
               name: 'Nginx: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Nginx version has changed. Ack to close.'
@@ -782,7 +782,7 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Template App Nginx Plus by HTTP'
+                    host: 'Nginx Plus by HTTP'
                     key: 'nginx.http.location_zones.requests.rate[{#NAME}]'
             -
               uuid: 6b05907e4c544986b977a1b496ca92e2
@@ -792,35 +792,35 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Template App Nginx Plus by HTTP'
+                    host: 'Nginx Plus by HTTP'
                     key: 'nginx.http.location_zones.responses.2xx.rate[{#NAME}]'
                 -
                   sortorder: '1'
                   drawtype: GRADIENT_LINE
                   color: 2774A4
                   item:
-                    host: 'Template App Nginx Plus by HTTP'
+                    host: 'Nginx Plus by HTTP'
                     key: 'nginx.http.location_zones.responses.1xx.rate[{#NAME}]'
                 -
                   sortorder: '2'
                   drawtype: GRADIENT_LINE
                   color: F63100
                   item:
-                    host: 'Template App Nginx Plus by HTTP'
+                    host: 'Nginx Plus by HTTP'
                     key: 'nginx.http.location_zones.responses.3xx.rate[{#NAME}]'
                 -
                   sortorder: '3'
                   drawtype: GRADIENT_LINE
                   color: A54F10
                   item:
-                    host: 'Template App Nginx Plus by HTTP'
+                    host: 'Nginx Plus by HTTP'
                     key: 'nginx.http.location_zones.responses.4xx.rate[{#NAME}]'
                 -
                   sortorder: '4'
                   drawtype: GRADIENT_LINE
                   color: FC6EA3
                   item:
-                    host: 'Template App Nginx Plus by HTTP'
+                    host: 'Nginx Plus by HTTP'
                     key: 'nginx.http.location_zones.responses.5xx.rate[{#NAME}]'
           master_item:
             key: nginx.http.location_zones
@@ -836,7 +836,6 @@ zabbix_export:
                   });
                   
                   return JSON.stringify(output);
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1118,7 +1117,7 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Template App Nginx Plus by HTTP'
+                    host: 'Nginx Plus by HTTP'
                     key: 'nginx.http.server_zones.requests.rate[{#NAME}]'
             -
               uuid: 5870e9a861f046b3946c2464c6c5007d
@@ -1128,35 +1127,35 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Template App Nginx Plus by HTTP'
+                    host: 'Nginx Plus by HTTP'
                     key: 'nginx.http.server_zones.responses.2xx.rate[{#NAME}]'
                 -
                   sortorder: '1'
                   drawtype: GRADIENT_LINE
                   color: 2774A4
                   item:
-                    host: 'Template App Nginx Plus by HTTP'
+                    host: 'Nginx Plus by HTTP'
                     key: 'nginx.http.server_zones.responses.1xx.rate[{#NAME}]'
                 -
                   sortorder: '2'
                   drawtype: GRADIENT_LINE
                   color: F63100
                   item:
-                    host: 'Template App Nginx Plus by HTTP'
+                    host: 'Nginx Plus by HTTP'
                     key: 'nginx.http.server_zones.responses.3xx.rate[{#NAME}]'
                 -
                   sortorder: '3'
                   drawtype: GRADIENT_LINE
                   color: A54F10
                   item:
-                    host: 'Template App Nginx Plus by HTTP'
+                    host: 'Nginx Plus by HTTP'
                     key: 'nginx.http.server_zones.responses.4xx.rate[{#NAME}]'
                 -
                   sortorder: '4'
                   drawtype: GRADIENT_LINE
                   color: FC6EA3
                   item:
-                    host: 'Template App Nginx Plus by HTTP'
+                    host: 'Nginx Plus by HTTP'
                     key: 'nginx.http.server_zones.responses.5xx.rate[{#NAME}]'
           master_item:
             key: nginx.http.server_zones
@@ -1172,7 +1171,6 @@ zabbix_export:
                   });
                   
                   return JSON.stringify(output);
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1572,7 +1570,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: fc6586fe2eef457bac1d71ce0313f95d
-                  expression: 'find(/Template App Nginx Plus by HTTP/nginx.http.upstream.peer.state[{#UPSTREAM},{#PEER}],,"like","up")=0 and find(/Template App Nginx Plus by HTTP/nginx.http.upstream.peer.state[{#UPSTREAM},{#PEER}],,"like","down")=0'
+                  expression: 'find(/Nginx Plus by HTTP/nginx.http.upstream.peer.state[{#UPSTREAM},{#PEER}],,"like","up")=0 and find(/Nginx Plus by HTTP/nginx.http.upstream.peer.state[{#UPSTREAM},{#PEER}],,"like","down")=0'
                   name: 'Nginx: HTTP upstream server is not in UP or DOWN state.'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -1598,12 +1596,12 @@ zabbix_export:
           trigger_prototypes:
             -
               uuid: e7b4782a796b4710b50a96f3d24c8208
-              expression: 'sum(/Template App Nginx Plus by HTTP/nginx.http.upstream.peer.responses.4xx.rate[{#UPSTREAM},{#PEER}],5m) > (sum(/Template App Nginx Plus by HTTP/nginx.http.upstream.peer.responses.total.rate[{#UPSTREAM},{#PEER}],5m)*({$NGINX.HTTP.UPSTREAM.4XX.MAX.WARN}/100))'
+              expression: 'sum(/Nginx Plus by HTTP/nginx.http.upstream.peer.responses.4xx.rate[{#UPSTREAM},{#PEER}],5m) > (sum(/Nginx Plus by HTTP/nginx.http.upstream.peer.responses.total.rate[{#UPSTREAM},{#PEER}],5m)*({$NGINX.HTTP.UPSTREAM.4XX.MAX.WARN}/100))'
               name: 'Nginx: Too many HTTP requests with code 4xx (over {$NGINX.HTTP.UPSTREAM.4XX.MAX.WARN}% for 5m)'
               priority: WARNING
             -
               uuid: f542573d149547d3844f635bf2a87120
-              expression: 'sum(/Template App Nginx Plus by HTTP/nginx.http.upstream.peer.responses.5xx.rate[{#UPSTREAM},{#PEER}],5m) > (sum(/Template App Nginx Plus by HTTP/nginx.http.upstream.peer.responses.total.rate[{#UPSTREAM},{#PEER}],5m)*({$NGINX.HTTP.UPSTREAM.5XX.MAX.WARN}/100))'
+              expression: 'sum(/Nginx Plus by HTTP/nginx.http.upstream.peer.responses.5xx.rate[{#UPSTREAM},{#PEER}],5m) > (sum(/Nginx Plus by HTTP/nginx.http.upstream.peer.responses.total.rate[{#UPSTREAM},{#PEER}],5m)*({$NGINX.HTTP.UPSTREAM.5XX.MAX.WARN}/100))'
               name: 'Nginx: Too many HTTP requests with code 5xx (over {$NGINX.HTTP.UPSTREAM.5XX.MAX.WARN}% for 5m)'
               priority: HIGH
           graph_prototypes:
@@ -1615,21 +1613,21 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Template App Nginx Plus by HTTP'
+                    host: 'Nginx Plus by HTTP'
                     key: 'nginx.http.upstream.peer.health_checks.checks[{#UPSTREAM},{#PEER}]'
                 -
                   sortorder: '1'
                   drawtype: GRADIENT_LINE
                   color: 2774A4
                   item:
-                    host: 'Template App Nginx Plus by HTTP'
+                    host: 'Nginx Plus by HTTP'
                     key: 'nginx.http.upstream.peer.health_checks.fails[{#UPSTREAM},{#PEER}]'
                 -
                   sortorder: '2'
                   drawtype: GRADIENT_LINE
                   color: F63100
                   item:
-                    host: 'Template App Nginx Plus by HTTP'
+                    host: 'Nginx Plus by HTTP'
                     key: 'nginx.http.upstream.peer.health_checks.unhealthy[{#UPSTREAM},{#PEER}]'
             -
               uuid: 49cd8f25969d486ab4482b4986b1815a
@@ -1639,35 +1637,35 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Template App Nginx Plus by HTTP'
+                    host: 'Nginx Plus by HTTP'
                     key: 'nginx.http.upstream.peer.responses.2xx.rate[{#UPSTREAM},{#PEER}]'
                 -
                   sortorder: '1'
                   drawtype: GRADIENT_LINE
                   color: 2774A4
                   item:
-                    host: 'Template App Nginx Plus by HTTP'
+                    host: 'Nginx Plus by HTTP'
                     key: 'nginx.http.upstream.peer.responses.1xx.rate[{#UPSTREAM},{#PEER}]'
                 -
                   sortorder: '2'
                   drawtype: GRADIENT_LINE
                   color: F63100
                   item:
-                    host: 'Template App Nginx Plus by HTTP'
+                    host: 'Nginx Plus by HTTP'
                     key: 'nginx.http.upstream.peer.responses.3xx.rate[{#UPSTREAM},{#PEER}]'
                 -
                   sortorder: '3'
                   drawtype: GRADIENT_LINE
                   color: A54F10
                   item:
-                    host: 'Template App Nginx Plus by HTTP'
+                    host: 'Nginx Plus by HTTP'
                     key: 'nginx.http.upstream.peer.responses.4xx.rate[{#UPSTREAM},{#PEER}]'
                 -
                   sortorder: '4'
                   drawtype: GRADIENT_LINE
                   color: FC6EA3
                   item:
-                    host: 'Template App Nginx Plus by HTTP'
+                    host: 'Nginx Plus by HTTP'
                     key: 'nginx.http.upstream.peer.responses.5xx.rate[{#UPSTREAM},{#PEER}]'
           master_item:
             key: nginx.http.upstreams
@@ -1686,8 +1684,6 @@ zabbix_export:
                   });
                   
                   return JSON.stringify(output);
-                  
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1788,7 +1784,6 @@ zabbix_export:
                   });
                   
                   return JSON.stringify(output);
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -2074,21 +2069,21 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Template App Nginx Plus by HTTP'
+                    host: 'Nginx Plus by HTTP'
                     key: 'nginx.resolvers.requests.name.rate[{#NAME}]'
                 -
                   sortorder: '1'
                   drawtype: GRADIENT_LINE
                   color: 2774A4
                   item:
-                    host: 'Template App Nginx Plus by HTTP'
+                    host: 'Nginx Plus by HTTP'
                     key: 'nginx.resolvers.requests.srv.rate[{#NAME}]'
                 -
                   sortorder: '2'
                   drawtype: GRADIENT_LINE
                   color: F63100
                   item:
-                    host: 'Template App Nginx Plus by HTTP'
+                    host: 'Nginx Plus by HTTP'
                     key: 'nginx.resolvers.requests.addr.rate[{#NAME}]'
             -
               uuid: e3535ce974114e6188752937c1bdb2c7
@@ -2098,56 +2093,56 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Template App Nginx Plus by HTTP'
+                    host: 'Nginx Plus by HTTP'
                     key: 'nginx.resolvers.responses.noerror.rate[{#NAME}]'
                 -
                   sortorder: '1'
                   drawtype: GRADIENT_LINE
                   color: 2774A4
                   item:
-                    host: 'Template App Nginx Plus by HTTP'
+                    host: 'Nginx Plus by HTTP'
                     key: 'nginx.resolvers.responses.formerr.rate[{#NAME}]'
                 -
                   sortorder: '2'
                   drawtype: GRADIENT_LINE
                   color: F63100
                   item:
-                    host: 'Template App Nginx Plus by HTTP'
+                    host: 'Nginx Plus by HTTP'
                     key: 'nginx.resolvers.responses.servfail.rate[{#NAME}]'
                 -
                   sortorder: '3'
                   drawtype: GRADIENT_LINE
                   color: A54F10
                   item:
-                    host: 'Template App Nginx Plus by HTTP'
+                    host: 'Nginx Plus by HTTP'
                     key: 'nginx.resolvers.responses.nxdomain.rate[{#NAME}]'
                 -
                   sortorder: '4'
                   drawtype: GRADIENT_LINE
                   color: FC6EA3
                   item:
-                    host: 'Template App Nginx Plus by HTTP'
+                    host: 'Nginx Plus by HTTP'
                     key: 'nginx.resolvers.responses.notimp.rate[{#NAME}]'
                 -
                   sortorder: '5'
                   drawtype: GRADIENT_LINE
                   color: 6C59DC
                   item:
-                    host: 'Template App Nginx Plus by HTTP'
+                    host: 'Nginx Plus by HTTP'
                     key: 'nginx.resolvers.responses.refused.rate[{#NAME}]'
                 -
                   sortorder: '6'
                   drawtype: GRADIENT_LINE
                   color: AC8C14
                   item:
-                    host: 'Template App Nginx Plus by HTTP'
+                    host: 'Nginx Plus by HTTP'
                     key: 'nginx.resolvers.responses.timedout.rate[{#NAME}]'
                 -
                   sortorder: '7'
                   drawtype: GRADIENT_LINE
                   color: 611F27
                   item:
-                    host: 'Template App Nginx Plus by HTTP'
+                    host: 'Nginx Plus by HTTP'
                     key: 'nginx.resolvers.responses.unknown.rate[{#NAME}]'
           master_item:
             key: nginx.resolvers
@@ -2163,7 +2158,6 @@ zabbix_export:
                   });
                   
                   return JSON.stringify(output);
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -2399,21 +2393,21 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Template App Nginx Plus by HTTP'
+                    host: 'Nginx Plus by HTTP'
                     key: 'nginx.stream.server_zones.sessions.2xx.rate[{#NAME}]'
                 -
                   sortorder: '1'
                   drawtype: GRADIENT_LINE
                   color: 2774A4
                   item:
-                    host: 'Template App Nginx Plus by HTTP'
+                    host: 'Nginx Plus by HTTP'
                     key: 'nginx.stream.server_zones.sessions.4xx.rate[{#NAME}]'
                 -
                   sortorder: '2'
                   drawtype: GRADIENT_LINE
                   color: F63100
                   item:
-                    host: 'Template App Nginx Plus by HTTP'
+                    host: 'Nginx Plus by HTTP'
                     key: 'nginx.stream.server_zones.sessions.5xx.rate[{#NAME}]'
           master_item:
             key: nginx.stream.server_zones
@@ -2429,7 +2423,6 @@ zabbix_export:
                   });
                   
                   return JSON.stringify(output);
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -2708,7 +2701,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 20ef9b9e953246ef856dd46033595e52
-                  expression: 'find(/Template App Nginx Plus by HTTP/nginx.stream.upstream.peer.state[{#UPSTREAM},{#PEER}],,"like","up")=0 and find(/Template App Nginx Plus by HTTP/nginx.stream.upstream.peer.state[{#UPSTREAM},{#PEER}],,"like","down")=0'
+                  expression: 'find(/Nginx Plus by HTTP/nginx.stream.upstream.peer.state[{#UPSTREAM},{#PEER}],,"like","up")=0 and find(/Nginx Plus by HTTP/nginx.stream.upstream.peer.state[{#UPSTREAM},{#PEER}],,"like","down")=0'
                   name: 'Nginx: Stream upstream server is not in UP or DOWN state.'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -2740,21 +2733,21 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Template App Nginx Plus by HTTP'
+                    host: 'Nginx Plus by HTTP'
                     key: 'nginx.stream.upstream.peer.health_checks.checks[{#UPSTREAM},{#PEER}]'
                 -
                   sortorder: '1'
                   drawtype: GRADIENT_LINE
                   color: 2774A4
                   item:
-                    host: 'Template App Nginx Plus by HTTP'
+                    host: 'Nginx Plus by HTTP'
                     key: 'nginx.stream.upstream.peer.health_checks.fails[{#UPSTREAM},{#PEER}]'
                 -
                   sortorder: '2'
                   drawtype: GRADIENT_LINE
                   color: F63100
                   item:
-                    host: 'Template App Nginx Plus by HTTP'
+                    host: 'Nginx Plus by HTTP'
                     key: 'nginx.stream.upstream.peer.health_checks.unhealthy[{#UPSTREAM},{#PEER}]'
           master_item:
             key: nginx.stream.upstreams
@@ -2773,8 +2766,6 @@ zabbix_export:
                   });
                   
                   return JSON.stringify(output);
-                  
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -2854,7 +2845,6 @@ zabbix_export:
                   });
                   
                   return JSON.stringify(output);
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -2932,28 +2922,28 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'Template App Nginx Plus by HTTP'
+            host: 'Nginx Plus by HTTP'
             key: nginx.connections.accepted.rate
         -
           sortorder: '1'
           drawtype: GRADIENT_LINE
           color: 2774A4
           item:
-            host: 'Template App Nginx Plus by HTTP'
+            host: 'Nginx Plus by HTTP'
             key: nginx.connections.dropped
         -
           sortorder: '2'
           drawtype: GRADIENT_LINE
           color: F63100
           item:
-            host: 'Template App Nginx Plus by HTTP'
+            host: 'Nginx Plus by HTTP'
             key: nginx.connections.active
         -
           sortorder: '3'
           drawtype: GRADIENT_LINE
           color: A54F10
           item:
-            host: 'Template App Nginx Plus by HTTP'
+            host: 'Nginx Plus by HTTP'
             key: nginx.connections.idle
     -
       uuid: 4be7153e244b4c28a53c527aa9fd5706
@@ -2963,7 +2953,7 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'Template App Nginx Plus by HTTP'
+            host: 'Nginx Plus by HTTP'
             key: nginx.requests.total.rate
     -
       uuid: b1c647610c974bc8aad4fb55e1e3c8d3
@@ -2973,21 +2963,21 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'Template App Nginx Plus by HTTP'
+            host: 'Nginx Plus by HTTP'
             key: nginx.ssl.handshakes.rate
         -
           sortorder: '1'
           drawtype: GRADIENT_LINE
           color: 2774A4
           item:
-            host: 'Template App Nginx Plus by HTTP'
+            host: 'Nginx Plus by HTTP'
             key: nginx.ssl.handshakes_failed.rate
         -
           sortorder: '2'
           drawtype: GRADIENT_LINE
           color: F63100
           item:
-            host: 'Template App Nginx Plus by HTTP'
+            host: 'Nginx Plus by HTTP'
             key: nginx.ssl.session_reuses.rate
     -
       uuid: b2da29d4951745db8a66a076eb99d0aa
@@ -2996,5 +2986,5 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Template App Nginx Plus by HTTP'
+            host: 'Nginx Plus by HTTP'
             key: nginx.info.uptime

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -114,8 +114,6 @@ extern "C" void	zbx_co_uninitialize()
 
 /******************************************************************************
  *                                                                            *
- * Function: parse_first_first                                                *
- *                                                                            *
  * Purpose: extract only one value from the search result                     *
  *                                                                            *
  * Parameters: pEnumerator - [IN] the search result                           *
@@ -194,8 +192,6 @@ out2:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: parse_all                                                        *
  *                                                                            *
  * Purpose: extract all values from the search result                         *
  *                                                                            *
@@ -281,8 +277,6 @@ extern "C" static int	parse_all(IEnumWbemClassObject *pEnumerator, double timeou
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_wmi_get_variant                                              *
  *                                                                            *
  * Purpose: retrieves WMI value and stores it in the provided memory location *
  *                                                                            *
@@ -373,8 +367,6 @@ exit:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_wmi_get                                                      *
- *                                                                            *
  * Purpose: wrapper function for zbx_wmi_get_variant(), stores the retrieved  *
  *          WMI value as UTF-8 encoded string                                 *
  *                                                                            *
@@ -429,8 +421,6 @@ out:
 
 
 /******************************************************************************
- *                                                                            *
- * Function: WMI_GET                                                          *
  *                                                                            *
  * Purpose: wrapper function for wmi.get metric                               *
  *                                                                            *
@@ -549,8 +539,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: proc_arr_element                                                 *
  *                                                                            *
  * Purpose: take one element from array and put value to JSON document        *
  *                                                                            *
@@ -686,8 +674,6 @@ extern "C" int	proc_arr_element(SAFEARRAY *sa, LONG *index, const char *prop_err
 
 /******************************************************************************
  *                                                                            *
- * Function: convert_wmiarray_json                                            *
- *                                                                            *
  * Purpose: transformation of variant array from WMI search result to JSON    *
  *                                                                            *
  * Parameters: vtProp     - [IN] variant WMI property value                   *
@@ -756,8 +742,6 @@ extern "C" int	convert_wmiarray_json(VARIANT *vtProp, const char *prop_name, ULO
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: put_variant_json                                                 *
  *                                                                            *
  * Purpose: copy value of VARIANT type to JSON document                       *
  *                                                                            *
@@ -850,8 +834,6 @@ extern "C" int	put_variant_json(const char *prop_json, const char *prop_err, VAR
 
 /******************************************************************************
  *                                                                            *
- * Function: convert_wmi_json                                                 *
- *                                                                            *
  * Purpose: transformation of WMI search result to JSON                       *
  *                                                                            *
  * Parameters: wmi_values - [IN] WMI search result                            *
@@ -901,8 +883,6 @@ extern "C" int	convert_wmi_json(zbx_vector_wmi_instance_t *wmi_values, char **js
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: WMI_GETALL                                                       *
  *                                                                            *
  * Purpose: wrapper function for wmi.getall metric                            *
  *                                                                            *

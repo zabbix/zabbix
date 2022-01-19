@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,8 +43,6 @@ zbx_history_log_cb_t		*history_log_cbs = NULL;
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_register_module_items                                        *
- *                                                                            *
  * Purpose: add items supported by module                                     *
  *                                                                            *
  * Parameters: metrics       - list of items supported by module              *
@@ -75,8 +73,6 @@ static int	zbx_register_module_items(ZBX_METRIC *metrics, char *error, size_t ma
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_register_module                                              *
- *                                                                            *
  * Purpose: add module to the list of successfully loaded modules             *
  *                                                                            *
  ******************************************************************************/
@@ -93,8 +89,6 @@ static zbx_module_t	*zbx_register_module(void *lib, char *name)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_register_history_write_cbs                                   *
  *                                                                            *
  * Purpose: registers callback functions for history export                   *
  *                                                                            *
@@ -212,8 +206,6 @@ static int	zbx_module_compare_func(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_load_module                                                  *
- *                                                                            *
  * Purpose: load loadable module                                              *
  *                                                                            *
  * Parameters: path    - directory where modules are located                  *
@@ -322,8 +314,6 @@ fail:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_load_modules                                                 *
- *                                                                            *
  * Purpose: load loadable modules (dynamic libraries)                         *
  *                                                                            *
  * Parameters: path - directory where modules are located                     *
@@ -378,8 +368,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_unload_module                                                *
- *                                                                            *
  * Purpose: unload module and free allocated resources                        *
  *                                                                            *
  ******************************************************************************/
@@ -402,8 +390,6 @@ static void	zbx_unload_module(void *data)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_unload_modules                                               *
  *                                                                            *
  * Purpose: Unload already loaded loadable modules (dynamic libraries).       *
  *          It is called on process shutdown.                                 *

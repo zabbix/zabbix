@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -148,6 +148,20 @@ class C20ImportConverter extends CConverter {
 			}
 
 			$item['key'] = $this->itemKeyConverter->convert($item['key']);
+
+			/*
+			 * Prepare the 2.0 format for 3.0 validator. 2.2-2.4 will already have these fields exported.
+			 *
+			 * 2.2 introduced new fields "snmpv3_contextname", "snmpv3_authprotocol", "snmpv3_privprotocol", but this
+			 * converter is for all 2.x. In 2.2+ they are exported, but for 2.0 they have to be added. It is, however,
+			 * expected by 3.0 validator for all items, not just SNMP v3. In 2.2 a field "logtimefmt" was also
+			 * added which is required by 3.0 validator.
+			 */
+			foreach (['snmpv3_contextname', 'snmpv3_authprotocol', 'snmpv3_privprotocol', 'logtimefmt'] as $field) {
+				if (!array_key_exists($field, $item)) {
+					$item[$field] = '';
+				}
+			}
 		}
 		unset($item);
 
@@ -247,7 +261,7 @@ class C20ImportConverter extends CConverter {
 			$screen_item['application'] = '';
 
 			if (!array_key_exists('max_columns', $screen_item)) {
-				$screen_item['max_columns'] = '';
+				$screen_item['max_columns'] = (string) SCREEN_SURROGATE_MAX_COLUMNS_DEFAULT;
 			}
 		}
 		unset($screen_item);
@@ -305,6 +319,19 @@ class C20ImportConverter extends CConverter {
 				$discovery_rule['status'] = (string) ITEM_STATUS_ACTIVE;
 			}
 
+			/*
+			 * Prepare the 2.0 format for 3.0 validator. 2.2-2.4 will already have these fields exported.
+			 *
+			 * 2.2 introduced new fields "snmpv3_contextname", "snmpv3_authprotocol", "snmpv3_privprotocol", but this
+			 * converter is for all 2.x. In 2.2+ they are exported, but for 2.0 they have to be added. It is, however,
+			 * expected by 3.0 validator for all discovery rules, not just SNMP v3.
+			 */
+			foreach (['snmpv3_contextname', 'snmpv3_authprotocol', 'snmpv3_privprotocol'] as $field) {
+				if (!array_key_exists($field, $discovery_rule)) {
+					$discovery_rule[$field] = '';
+				}
+			}
+
 			if (in_array($discovery_rule['type'], [ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3])) {
 				$param = CItemKey::quoteParam($discovery_rule['snmp_oid']);
 				if ($param !== false) {
@@ -338,6 +365,20 @@ class C20ImportConverter extends CConverter {
 		foreach ($item_prototypes as &$item_prototype) {
 			$item_prototype['key'] = $this->itemKeyConverter->convert($item_prototype['key']);
 			$item_prototype['application_prototypes'] = '';
+
+			/*
+			 * Prepare the 2.0 format for 3.0 validator. 2.2-2.4 will already have these fields exported.
+			 *
+			 * 2.2 introduced new fields "snmpv3_contextname", "snmpv3_authprotocol", "snmpv3_privprotocol", but this
+			 * converter is for all 2.x. In 2.2+ they are exported, but for 2.0 they have to be added. It is, however,
+			 * expected by 3.0 validator for all item prototypes, not just SNMP v3. In 2.2 a field "logtimefmt" was also
+			 * added which is required by 3.0 validator.
+			 */
+			foreach (['snmpv3_contextname', 'snmpv3_authprotocol', 'snmpv3_privprotocol', 'logtimefmt'] as $field) {
+				if (!array_key_exists($field, $item_prototype)) {
+					$item_prototype[$field] = '';
+				}
+			}
 		}
 		unset($item_prototype);
 

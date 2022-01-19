@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,18 +18,15 @@
 **/
 
 #include "common.h"
-#include "log.h"
 #include "zbxalgo.h"
-#include "zbxserver.h"
-#include "zbxeval.h"
 #include "eval.h"
+
+#include "zbxeval.h"
 
 /* The tag expression token is virtual token used during item query filter processing. */
 #define ZBX_EVAL_TOKEN_TAG_EXPRESSION		(1000)
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_eval_parse_query                                             *
  *                                                                            *
  * Purpose: parse item query /host/key?[filter] into host, key and filter     *
  *          components                                                        *
@@ -67,8 +64,6 @@ size_t	zbx_eval_parse_query(const char *str, size_t len, zbx_item_query_t *query
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_eval_clear_filter                                            *
- *                                                                            *
  * Purpose: frees resources allocated by item reference                       *
  *                                                                            *
  ******************************************************************************/
@@ -80,8 +75,6 @@ void	zbx_eval_clear_query(zbx_item_query_t *query)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_eval_prepare_filter                                          *
  *                                                                            *
  * Purpose: prepare filter expression by converting property comparisons      *
  *          prop =/<> "value" to prop("value")/not prop("value") function     *
@@ -136,8 +129,6 @@ void	zbx_eval_prepare_filter(zbx_eval_context_t *ctx)
 
 /******************************************************************************
  *                                                                            *
- * Function: eval_filter_apply_op2                                            *
- *                                                                            *
  * Purpose: apply binary operation to stack                                   *
  *                                                                            *
  * Parameters: token - [IN] the operation token                               *
@@ -185,8 +176,6 @@ static void	eval_filter_apply_op2(zbx_eval_token_t *token, zbx_vector_eval_token
 
 /******************************************************************************
  *                                                                            *
- * Function: eval_filter_apply_op1                                            *
- *                                                                            *
  * Purpose: apply unary operation to stack                                    *
  *                                                                            *
  * Parameters: token - [IN] the operation token                               *
@@ -208,8 +197,6 @@ static void	eval_filter_apply_op1(zbx_eval_token_t *token, zbx_vector_eval_token
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: eval_filter_apply_func                                           *
  *                                                                            *
  * Purpose: apply function to stack                                           *
  *                                                                            *
@@ -239,8 +226,6 @@ static void	eval_filter_apply_func(zbx_eval_context_t *ctx, zbx_eval_token_t *to
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: eval_op_str                                                      *
  *                                                                            *
  * Purpose: get operator in text format                                       *
  *                                                                            *
@@ -274,8 +259,6 @@ static const char	*eval_op_str(zbx_token_type_t op)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: eval_unquote_str                                                 *
  *                                                                            *
  * Purpose: unquote string                                                    *
  *                                                                            *
@@ -314,8 +297,6 @@ static char	*eval_unquote_str(char *str)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: eval_generate_filter                                             *
  *                                                                            *
  * Purpose: generate filter expression from the specified stack               *
  *                                                                            *
@@ -417,8 +398,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_eval_get_group_filter                                        *
  *                                                                            *
  * Purpose: generate group SQL filter expression from item filter             *
  *                                                                            *

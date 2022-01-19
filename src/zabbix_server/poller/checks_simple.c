@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,12 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "common.h"
 #include "checks_simple_vmware.h"
-#include "checks_simple.h"
 #include "simple.h"
 #include "log.h"
-
 #include "zbxself.h"
+
+#include "checks_simple.h"
 
 typedef int	(*vmfunc_t)(AGENT_REQUEST *, const char *, const char *, AGENT_RESULT *);
 
@@ -139,8 +140,6 @@ static zbx_vmcheck_t	vmchecks[] =
 };
 
 /******************************************************************************
- *                                                                            *
- * Function: get_vmware_function                                              *
  *                                                                            *
  * Purpose: Retrieves a handler of the item key                               *
  *                                                                            *

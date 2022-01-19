@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,7 +18,10 @@
 **/
 
 #include "db.h"
+#include "../../libs/zbxaudit/audit.h"
 #include "../../libs/zbxaudit/audit_graph.h"
+#include "../../libs/zbxalgo/vectorimpl.h"
+
 #include "graph_linking.h"
 
 typedef struct
@@ -253,7 +256,6 @@ static int	zbx_graphs_names_compare_func(const void *d1, const void *d2)
 
 	return strcmp((graph_names_entry_1)->name, (graph_names_entry_2)->name);
 }
-
 
 static void	graphs_names_clean(zbx_hashset_t *x)
 {
@@ -868,8 +870,6 @@ static void	prepare_graph_for_insert(graphs_items_entry_t *graphs_items_template
 
 /************************************************************************************
  *                                                                                  *
- * Function: process_template_graph                                                 *
- *                                                                                  *
  * Description: 1) gets a template graph and host graph and compares them           *
  *              2) if they are the same (they have same names and all of            *
  *                 their items keys are the same) and checks which fields           *
@@ -946,8 +946,6 @@ static int	process_template_graph(zbx_uint64_t host_graphid, zbx_hashset_t *host
 }
 
 /************************************************************************************
- *                                                                                  *
- * Function: process_graphs                                                         *
  *                                                                                  *
  * Description: 1) gets a list graph from the templates                             *
  *              2) gets a list of graphs_items for that graph                       *
@@ -1464,8 +1462,6 @@ static int	execute_graphs_inserts(zbx_vector_graphs_copies_t *graphs_copies_inse
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: DBcopy_template_graphs                                           *
  *                                                                            *
  * Purpose: copy graphs from template to host                                 *
  *                                                                            *

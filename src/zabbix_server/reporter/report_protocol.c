@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,12 +19,13 @@
 
 #include "common.h"
 #include "zbxreport.h"
-#include "report_protocol.h"
 #include "zbxipcservice.h"
 #include "zbxserialize.h"
 #include "zbxalgo.h"
 #include "db.h"
 #include "zbxalert.h"
+
+#include "report_protocol.h"
 
 static int	json_uint_by_tag(const struct zbx_json_parse *jp, const char *tag, zbx_uint64_t *value, char **error)
 {
@@ -122,8 +123,6 @@ void	report_deserialize_test_report(const unsigned char *data, char **name, zbx_
 		zbx_vector_ptr_pair_append(params, pair);
 	}
 }
-
-#include "log.h"
 
 /******************************************************************************
  *                                                                            *

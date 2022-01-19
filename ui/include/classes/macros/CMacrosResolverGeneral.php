@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -726,7 +726,7 @@ class CMacrosResolverGeneral {
 	 * Resolves macros in the item key parameters.
 	 *
 	 * @param string $key_chain		an item key chain
-	 * @param string $params_raw
+	 * @param array  $params_raw
 	 * @param array  $macros		the list of macros (['{<MACRO>}' => '<value>', ...])
 	 * @param array  $types			the types of macros (see getMacroPositions() for more details)
 	 *
@@ -992,7 +992,6 @@ class CMacrosResolverGeneral {
 		]);
 
 		$db_items = CMacrosResolverHelper::resolveItemKeys($db_items);
-		$db_items = CMacrosResolverHelper::resolveItemNames($db_items);
 		$db_items = CMacrosResolverHelper::resolveItemDescriptions($db_items);
 
 		foreach ($db_items as &$db_item) {
@@ -1001,7 +1000,7 @@ class CMacrosResolverGeneral {
 		unset($db_item);
 
 		$item_macros = ['{ITEM.DESCRIPTION}' => 'description_expanded', '{ITEM.DESCRIPTION.ORIG}' => 'description',
-			'{ITEM.KEY}' => 'key_expanded', '{ITEM.KEY.ORIG}' => 'key_', '{ITEM.NAME}' => 'name_expanded',
+			'{ITEM.KEY}' => 'key_expanded', '{ITEM.KEY.ORIG}' => 'key_', '{ITEM.NAME}' => 'name',
 			'{ITEM.NAME.ORIG}' => 'name', '{ITEM.STATE}' => 'state', '{ITEM.VALUETYPE}' => 'value_type'
 		];
 
@@ -1168,14 +1167,13 @@ class CMacrosResolverGeneral {
 		];
 
 		$functions = DBfetchArray(DBselect(
-			'SELECT f.triggerid,f.functionid,i.itemid,i.hostid,i.name,i.key_,i.value_type,i.units,i.valuemapid'.
+			'SELECT f.triggerid,f.functionid,i.itemid,i.name,i.value_type,i.units,i.valuemapid'.
 			' FROM functions f'.
 				' JOIN items i ON f.itemid=i.itemid'.
 				' JOIN hosts h ON i.hostid=h.hostid'.
 			' WHERE '.dbConditionInt('f.functionid', array_keys($macros))
 		));
 
-		$functions = CMacrosResolverHelper::resolveItemNames($functions);
 		$functions = self::getItemsValueMaps($functions);
 
 		// False passed to DBfetch to get data without null converted to 0, which is done by default.
@@ -1257,7 +1255,7 @@ class CMacrosResolverGeneral {
 						$hint_table = (new CTable())
 							->addClass('list-table')
 							->addRow([
-								new CCol($function['name_expanded']),
+								new CCol($function['name']),
 								new CCol(
 									($clock !== null)
 										? zbx_date2str(DATE_TIME_FORMAT_SECONDS, $clock)
@@ -1303,7 +1301,7 @@ class CMacrosResolverGeneral {
 		}
 
 		$functions = DBfetchArray(DBselect(
-			'SELECT f.triggerid,f.functionid,i.itemid,i.hostid,i.name,i.key_,i.value_type'.
+			'SELECT f.triggerid,f.functionid,i.itemid,i.value_type'.
 			' FROM functions f'.
 				' JOIN items i ON f.itemid=i.itemid'.
 				' JOIN hosts h ON i.hostid=h.hostid'.
@@ -1314,8 +1312,6 @@ class CMacrosResolverGeneral {
 		if (!$functions) {
 			return $macro_values;
 		}
-
-		$functions = CMacrosResolverHelper::resolveItemNames($functions);
 
 		foreach ($functions as $function) {
 			foreach ($macros[$function['functionid']] as $m => $tokens) {

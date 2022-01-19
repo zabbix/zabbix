@@ -2,7 +2,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ package zbxcmd
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -62,7 +63,7 @@ func execute(s string, timeout time.Duration, path string, strict bool) (string,
 	}
 
 	// we need to check error after t.Stop so we can inform the user if timeout was reached and Zabbix agent2 terminated the command
-	if strict && werr != nil {
+	if strict && werr != nil && !errors.Is(werr, syscall.ECHILD) {
 		return "", fmt.Errorf("Command execution failed: %s", werr)
 	}
 

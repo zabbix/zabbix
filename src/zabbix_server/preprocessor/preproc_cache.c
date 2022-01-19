@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,16 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "log.h"
 #include "../../libs/zbxalgo/vectorimpl.h"
 #include "zbxprometheus.h"
+
 #include "item_preproc.h"
 
-ZBX_VECTOR_IMPL(ppcache, zbx_preproc_cache_ref_t);
+ZBX_VECTOR_IMPL(ppcache, zbx_preproc_cache_ref_t)
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_preproc_cache_get                                            *
  *                                                                            *
  * Purpose: get cache by preprocessing step type                              *
  *                                                                            *
@@ -52,8 +50,6 @@ void	*zbx_preproc_cache_get(zbx_preproc_cache_t *cache, unsigned char type)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_preproc_cache_put                                            *
- *                                                                            *
  * Purpose: put preprocessing step cache into preprocessing cache             *
  *                                                                            *
  * Parameters: cache - [IN] the preprocessing cache                           *
@@ -76,8 +72,6 @@ void	zbx_preproc_cache_put(zbx_preproc_cache_t *cache, unsigned char type, void 
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_preproc_cache_init                                           *
- *                                                                            *
  * Purpose: initialize preprocessing cache                                    *
  *                                                                            *
  ******************************************************************************/
@@ -87,8 +81,6 @@ void	zbx_preproc_cache_init(zbx_preproc_cache_t *cache)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_preproc_cache_clear                                          *
  *                                                                            *
  * Purpose: free resources allocated by preprocessing cache                   *
  *                                                                            *
@@ -109,5 +101,3 @@ void	zbx_preproc_cache_clear(zbx_preproc_cache_t *cache)
 
 	zbx_vector_ppcache_destroy(&cache->refs);
 }
-
-

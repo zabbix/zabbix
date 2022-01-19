@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,10 +37,10 @@ else {
 
 		foreach ($data['items'] as $item) {
 			$table_header[] = (new CColHeader(
-				($data['same_host'] ? '' : $item['hosts'][0]['name'].NAME_DELIMITER).$item['name_expanded']
+				($data['same_host'] ? '' : $item['hosts'][0]['name'].NAME_DELIMITER).$item['name']
 			))
 				->addClass('vertical_rotation')
-				->setTitle($item['name_expanded']);
+				->setTitle($item['name']);
 		}
 	}
 	else {
@@ -66,7 +66,7 @@ else {
 				$table_row[] = ($data['same_host']
 					? ''
 					: $data['items'][$history_item['itemid']]['hosts'][0]['name'].NAME_DELIMITER).
-					$data['items'][$history_item['itemid']]['name_expanded'];
+					$data['items'][$history_item['itemid']]['name'];
 			}
 			$table_row[] = $history_item['value'];
 			$table->addRow($table_row);

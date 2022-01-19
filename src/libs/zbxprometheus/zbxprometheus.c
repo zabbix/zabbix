@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -131,8 +131,6 @@ zbx_prometheus_label_index_t;
 
 /******************************************************************************
  *                                                                            *
- * Function: str_loc_dup                                                      *
- *                                                                            *
  * Purpose: allocates and copies substring at the specified location          *
  *                                                                            *
  * Parameters: src - [IN] the source string                                   *
@@ -155,8 +153,6 @@ static char	*str_loc_dup(const char *src, const zbx_strloc_t *loc)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: str_loc_unquote_dyn                                              *
  *                                                                            *
  * Purpose: unquotes substring at the specified location                      *
  *                                                                            *
@@ -201,8 +197,6 @@ static char	*str_loc_unquote_dyn(const char *src, const zbx_strloc_t *loc)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: str_loc_unescape_hint_dyn                                        *
  *                                                                            *
  * Purpose: unescapes HELP hint                                               *
  *                                                                            *
@@ -250,8 +244,6 @@ static char	*str_loc_unescape_hint_dyn(const char *src, const zbx_strloc_t *loc)
 
 /******************************************************************************
  *                                                                            *
- * Function: str_loc_cmp                                                      *
- *                                                                            *
  * Purpose: compares substring at the specified location with the specified   *
  *          text                                                              *
  *                                                                            *
@@ -272,8 +264,6 @@ static int	str_loc_cmp(const char *src, const zbx_strloc_t *loc, const char *tex
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: str_loc_op                                                       *
  *                                                                            *
  * Purpose: parses condition operation at the specified location              *
  *                                                                            *
@@ -305,12 +295,10 @@ static zbx_prometheus_condition_op_t	str_loc_op(const char *data, const zbx_strl
 
 /******************************************************************************
  *                                                                            *
- * Function: skip_spaces                                                      *
- *                                                                            *
  * Purpose: skips spaces                                                      *
  *                                                                            *
- * Parameters: src - [IN] the source string                                   *
- *             pos - [IN] the starting position                               *
+ * Parameters: data - [IN] the source string                                  *
+ *             pos  - [IN] the starting position                              *
  *                                                                            *
  * Return value: The position of the next non space character.                *
  *                                                                            *
@@ -324,8 +312,6 @@ static size_t	skip_spaces(const char *data, size_t pos)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: skip_row                                                         *
  *                                                                            *
  * Purpose: skips until beginning of the next row                             *
  *                                                                            *
@@ -346,8 +332,6 @@ static size_t	skip_row(const char *data, size_t pos)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: parse_metric                                                     *
  *                                                                            *
  * Purpose: parses metric name                                                *
  *                                                                            *
@@ -380,8 +364,6 @@ static int	parse_metric(const char *data, size_t pos, zbx_strloc_t *loc)
 
 /******************************************************************************
  *                                                                            *
- * Function: parse_label                                                      *
- *                                                                            *
  * Purpose: parses label name                                                 *
  *                                                                            *
  * Parameters: data - [IN] the source string                                  *
@@ -412,8 +394,6 @@ static int	parse_label(const char *data, size_t pos, zbx_strloc_t *loc)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: parse_label_op                                                   *
  *                                                                            *
  * Purpose: parses label operation                                            *
  *                                                                            *
@@ -450,8 +430,6 @@ static int	parse_label_op(const char *data, size_t pos, zbx_strloc_t *loc)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: parse_label_value                                                *
  *                                                                            *
  * Purpose: parses label value                                                *
  *                                                                            *
@@ -495,8 +473,6 @@ static int	parse_label_value(const char *data, size_t pos, zbx_strloc_t *loc)
 
 /******************************************************************************
  *                                                                            *
- * Function: parse_metric_op                                                  *
- *                                                                            *
  * Purpose: parses metric operation                                           *
  *                                                                            *
  * Parameters: data - [IN] the source string                                  *
@@ -524,8 +500,6 @@ static int	parse_metric_op(const char *data, size_t pos, zbx_strloc_t *loc)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: str_copy_lowercase                                               *
  *                                                                            *
  * Purpose: copies lowercase converted string to a buffer                     *
  *                                                                            *
@@ -556,8 +530,6 @@ static int	str_copy_lowercase(char *dst, int size, const char *src, int len)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: parse_metric_value                                               *
  *                                                                            *
  * Purpose: parses metric value                                               *
  *                                                                            *
@@ -602,11 +574,6 @@ static int	parse_metric_value(const char *data, size_t pos, zbx_strloc_t *loc)
 	return SUCCEED;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: prometheus_condition_free                                        *
- *                                                                            *
- ******************************************************************************/
 static void	prometheus_condition_free(zbx_prometheus_condition_t *condition)
 {
 	zbx_free(condition->key);
@@ -615,8 +582,6 @@ static void	prometheus_condition_free(zbx_prometheus_condition_t *condition)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: prometheus_condition_create                                      *
  *                                                                            *
  * Purpose: allocates and initializes conditionect                            *
  *                                                                            *
@@ -642,8 +607,6 @@ static zbx_prometheus_condition_t	*prometheus_condition_create(char *key, char *
 
 /******************************************************************************
  *                                                                            *
- * Function: prometheus_filter_clear                                          *
- *                                                                            *
  * Purpose: clears resources allocated by prometheus filter                   *
  *                                                                            *
  * Parameters: filter - [IN] the filter to clear                              *
@@ -662,8 +625,6 @@ static void	prometheus_filter_clear(zbx_prometheus_filter_t *filter)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: parse_condition                                                  *
  *                                                                            *
  * Purpose: parses condition data - key, pattern and operation                *
  *                                                                            *
@@ -697,8 +658,6 @@ static int	parse_condition(const char *data, size_t pos, zbx_strloc_t *loc_key, 
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: prometheus_filter_parse_labels                                   *
  *                                                                            *
  * Purpose: parses label conditions                                           *
  *                                                                            *
@@ -768,8 +727,6 @@ static int	prometheus_filter_parse_labels(zbx_prometheus_filter_t *filter, const
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: prometheus_filter_init                                           *
  *                                                                            *
  * Purpose: initializes prometheus pattern filter from the specified data     *
  *                                                                            *
@@ -860,11 +817,6 @@ out:
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: prometheus_label_free                                            *
- *                                                                            *
- ******************************************************************************/
 static void	prometheus_label_free(zbx_prometheus_label_t *label)
 {
 	zbx_free(label->name);
@@ -872,11 +824,6 @@ static void	prometheus_label_free(zbx_prometheus_label_t *label)
 	zbx_free(label);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: prometheus_row_free                                              *
- *                                                                            *
- ******************************************************************************/
 static void	prometheus_row_free(zbx_prometheus_row_t *row)
 {
 	zbx_free(row->metric);
@@ -888,8 +835,6 @@ static void	prometheus_row_free(zbx_prometheus_row_t *row)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: condition_match_key_value                                        *
  *                                                                            *
  * Purpose: matches key,value against filter condition                        *
  *                                                                            *
@@ -937,8 +882,6 @@ static int	condition_match_key_value(const zbx_prometheus_condition_t *condition
 
 /******************************************************************************
  *                                                                            *
- * Function: condition_match_metric_value                                     *
- *                                                                            *
  * Purpose: matches metric value against filter condition                     *
  *                                                                            *
  * Parameters: pattern   - [IN] the condition                                 *
@@ -976,8 +919,6 @@ static int	condition_match_metric_value(const char *pattern, const char *value)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: prometheus_metric_parse_labels                                   *
  *                                                                            *
  * Purpose: parses metric labels                                              *
  *                                                                            *
@@ -1042,8 +983,6 @@ static int	prometheus_metric_parse_labels(const char *data, size_t pos, zbx_vect
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: prometheus_parse_row                                             *
  *                                                                            *
  * Purpose: parses metric row                                                 *
  *                                                                            *
@@ -1191,8 +1130,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: parse_help                                                       *
- *                                                                            *
  * Purpose: parses HELP comment metric and help text                          *
  *                                                                            *
  * Parameters: data       - [IN] the prometheus data                          *
@@ -1231,8 +1168,6 @@ static int	parse_help(const char *data, size_t pos, zbx_strloc_t *loc_metric, zb
 
 /******************************************************************************
  *                                                                            *
- * Function: parse_type                                                       *
- *                                                                            *
  * Purpose: parses TYPE comment metric and the type                           *
  *                                                                            *
  * Parameters: data       - [IN] the prometheus data                          *
@@ -1267,8 +1202,6 @@ static int	parse_type(const char *data, size_t pos, zbx_strloc_t *loc_metric, zb
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: prometheus_register_hint                                         *
  *                                                                            *
  * Purpose: registers TYPE/HELP comment hint to the specified metric          *
  *                                                                            *
@@ -1327,13 +1260,11 @@ static int	prometheus_register_hint(zbx_hashset_t *hints, const char *data, char
 
 /******************************************************************************
  *                                                                            *
- * Function: prometheus_parse_hint                                            *
- *                                                                            *
  * Purpose: parses TYPE/HELP comment hint and registers it                    *
  *                                                                            *
  * Parameters: filter     - [IN] the prometheus filter                        *
  *             data       - [IN] the prometheus data                          *
- *             pso        - [IN] the position of comments in prometheus data  *
+ *             pos        - [IN] the position of comments in prometheus data  *
  *             hints      - [IN/OUT] the hint registry                        *
  *             error      - [OUT] the error message                           *
  *                                                                            *
@@ -1402,8 +1333,6 @@ static int	prometheus_parse_hint(zbx_prometheus_filter_t *filter, const char *da
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: prometheus_parse_rows                                            *
  *                                                                            *
  * Purpose: parses rows with metrics from prometheus data                     *
  *                                                                            *
@@ -1488,8 +1417,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: prometheus_extract_value                                         *
- *                                                                            *
  * Purpose: extracts value from row                                           *
  *                                                                            *
  * Parameters: rows    - [IN] the source rows                                 *
@@ -1569,8 +1496,6 @@ static int prometheus_extract_value(const zbx_vector_ptr_t *rows, const char *ou
 
 /******************************************************************************
  *                                                                            *
- * Function: prometheus_aggregate_values                                      *
- *                                                                            *
  * Purpose: aggregates row values                                             *
  *                                                                            *
  * Parameters: rows     - [IN] the source rows                                *
@@ -1642,8 +1567,6 @@ static int	prometheus_aggregate_values(const zbx_vector_ptr_t *rows, const char 
 
 /******************************************************************************
  *                                                                            *
- * Function: prometheus_query_rows                                            *
- *                                                                            *
  * Purpose: performs the specified request on rows                            *
  *                                                                            *
  * Parameters: rows    - [IN] the source rows                                 *
@@ -1666,8 +1589,6 @@ static int	prometheus_query_rows(const zbx_vector_ptr_t *rows, const char *reque
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: prometheus_filter_rows                                           *
  *                                                                            *
  * Purpose: get rows matching the filter criteria                             *
  *                                                                            *
@@ -1730,8 +1651,6 @@ static void	prometheus_filter_rows(zbx_vector_ptr_t *rows, zbx_prometheus_filter
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_prometheus_init                                              *
- *                                                                            *
  * Purpose: parse prometheus input and initialize cache                       *
  *                                                                            *
  * Parameters: prom  - [IN] the prometheus cache                              *
@@ -1766,7 +1685,6 @@ out:
 	return ret;
 }
 
-
 static void	prometheus_label_index_free(zbx_prometheus_label_index_t *label_index)
 {
 	zbx_hashset_iter_t	iter;
@@ -1783,8 +1701,6 @@ static void	prometheus_label_index_free(zbx_prometheus_label_index_t *label_inde
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_prometheus_clear                                             *
  *                                                                            *
  * Purpose: free resources allocated by prometheus cache                      *
  *                                                                            *
@@ -1843,8 +1759,6 @@ static int	prometheus_index_compare_func(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Function: prometheus_get_row_label                                         *
- *                                                                            *
  * Purpose: get label from row by the specified name                          *
  *                                                                            *
  * Parameters: row  - [IN] the prometheus row                                 *
@@ -1870,8 +1784,6 @@ static zbx_prometheus_label_t	*prometheus_get_row_label(zbx_prometheus_row_t *ro
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: prometheus_get_indexed_rows_by_label                             *
  *                                                                            *
  * Purpose: get rows matching one filter label                                *
  *                                                                            *
@@ -1950,8 +1862,6 @@ static int	prometheus_get_indexed_rows_by_label(zbx_prometheus_t *prom, zbx_prom
 
 /******************************************************************************
  *                                                                            *
- * Function: prometheus_validate_request                                      *
- *                                                                            *
  * Purpose: validate prometheus pattern request and output                    *
  *                                                                            *
  * Return value: SUCCEED - valid request and output combination               *
@@ -1981,12 +1891,10 @@ static int	prometheus_validate_request(const char *request, const char *output, 
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_prometheus_pattern_ex                                        *
- *                                                                            *
  * Purpose: extract value from prometheus cache by the specified filter       *
  *                                                                            *
  * Parameters: data        - [IN] the prometheus cache                        *
- *             fitler_data - [IN] the filter in text format                   *
+ *             filter_data - [IN] the filter in text format                   *
  *             request     - [IN] the data request - value, label, function   *
  *             output      - [IN] the output template/function name           *
  *             value       - [OUT] the extracted value                        *
@@ -2039,12 +1947,10 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_prometheus_pattern                                           *
- *                                                                            *
  * Purpose: extracts value from prometheus data by the specified filter       *
  *                                                                            *
  * Parameters: data        - [IN] the prometheus data                         *
- *             fitler_data - [IN] the filter in text format                   *
+ *             filter_data - [IN] the filter in text format                   *
  *             request     - [IN] the data request - value, label, function   *
  *             output      - [IN] the output template/function name           *
  *             value       - [OUT] the extracted value                        *
@@ -2099,12 +2005,10 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_prometheus_to_json                                           *
- *                                                                            *
  * Purpose: converts filtered prometheus data to json to be used with LLD     *
  *                                                                            *
  * Parameters: data        - [IN] the prometheus data                         *
- *             fitler_data - [IN] the filter in text format                   *
+ *             filter_data - [IN] the filter in text format                   *
  *             value       - [OUT] the converted data                         *
  *             error       - [OUT] the error message                          *
  *                                                                            *
@@ -2225,7 +2129,6 @@ int	zbx_prometheus_validate_label(const char *label)
 
 	return SUCCEED;
 }
-
 
 #ifdef HAVE_TESTS
 #	include "../../../tests/libs/zbxprometheus/prometheus_test.c"

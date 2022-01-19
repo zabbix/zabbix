@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-06-17T15:25:51Z'
+  version: '6.0'
+  date: '2022-01-10T07:41:30Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -13,13 +13,13 @@ zabbix_export:
       description: |
         The template to monitor GridGain In-Memory Computing Platform by Zabbix that work without any external scripts.
           It works with both standalone and cluster instances.
-          The metrics are discoverable and collected by JMX.  
+          The metrics are discoverable and collected by JMX.
           Current JMX tree hierarchy contains classloader by default. Add the following jvm option `-DIGNITE_MBEAN_APPEND_CLASS_LOADER_ID=false`to will exclude one level with Classloader name.
           You can set {$GRIDGAIN.USER} and {$GRIDGAIN.PASSWORD} macros in the template for using on the host level.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Databases
@@ -114,7 +114,7 @@ zabbix_export:
                   expression: 'min(/GridGain by JMX/jmx["{#JMXOBJ}",EvictionRate],5m)>0'
                   name: 'Data region {#JMXNAME}: Node started to evict pages'
                   priority: INFO
-                  description: 'You store more data then region can accommodate. Data started to move to disk it can make requests work slower. Ack to close.'
+                  description: 'You store more data than region can accommodate. Data started to move to disk it can make requests work slower. Ack to close.'
                   manual_close: 'YES'
             -
               uuid: 9f7d683cf3ca47c681eef43e4dd9a471
@@ -255,18 +255,18 @@ zabbix_export:
             -
               uuid: 92c2772aa8d7425e8bee5d760ba5b607
               expression: 'min(/GridGain by JMX/jmx["{#JMXOBJ}",OffheapUsedSize],5m)/last(/GridGain by JMX/jmx["{#JMXOBJ}",OffHeapSize])*100>{$GRIDGAIN.DATA.REGION.PUSED.MAX.HIGH}'
-              name: 'Data region {#JMXNAME}: Data region utilisation is too high (over {$GRIDGAIN.DATA.REGION.PUSED.MAX.HIGH} in 5m)'
+              name: 'Data region {#JMXNAME}: Data region utilization is too high (over {$GRIDGAIN.DATA.REGION.PUSED.MAX.HIGH} in 5m)'
               priority: HIGH
               description: 'Data region utilization is high. Increase data region size or delete any data.'
             -
               uuid: 3694e6d813b04b51a77c842de617503c
               expression: 'min(/GridGain by JMX/jmx["{#JMXOBJ}",OffheapUsedSize],5m)/last(/GridGain by JMX/jmx["{#JMXOBJ}",OffHeapSize])*100>{$GRIDGAIN.DATA.REGION.PUSED.MAX.WARN}'
-              name: 'Data region {#JMXNAME}: Data region utilisation is too high (over {$GRIDGAIN.DATA.REGION.PUSED.MAX.WARN} in 5m)'
+              name: 'Data region {#JMXNAME}: Data region utilization is too high (over {$GRIDGAIN.DATA.REGION.PUSED.MAX.WARN} in 5m)'
               priority: WARNING
               description: 'Data region utilization is high. Increase data region size or delete any data.'
               dependencies:
                 -
-                  name: 'Data region {#JMXNAME}: Data region utilisation is too high (over {$GRIDGAIN.DATA.REGION.PUSED.MAX.HIGH} in 5m)'
+                  name: 'Data region {#JMXNAME}: Data region utilization is too high (over {$GRIDGAIN.DATA.REGION.PUSED.MAX.HIGH} in 5m)'
                   expression: 'min(/GridGain by JMX/jmx["{#JMXOBJ}",OffheapUsedSize],5m)/last(/GridGain by JMX/jmx["{#JMXOBJ}",OffHeapSize])*100>{$GRIDGAIN.DATA.REGION.PUSED.MAX.HIGH}'
           graph_prototypes:
             -
@@ -287,7 +287,7 @@ zabbix_export:
                     key: 'jmx["{#JMXOBJ}",UsedCheckpointBufferSize]'
             -
               uuid: 6f2ffd3ba45c4803864d049e7bfbbf18
-              name: 'Data region {#JMXNAME}: DataRegion utilisation'
+              name: 'Data region {#JMXNAME}: DataRegion utilization'
               graph_items:
                 -
                   drawtype: BOLD_LINE
@@ -318,7 +318,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(data)
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -593,7 +592,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(data)
-                  
         -
           uuid: 5b7b9e010a274bb5a52784143dd57628
           name: 'Cluster metrics'
@@ -738,7 +736,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(data)
-                  
         -
           uuid: 3b81fbcbef204717be1918d3df919174
           name: 'GridGain kernal metrics'
@@ -855,11 +852,9 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(data)
-                  
-                  
         -
           uuid: 6265d30cd7494809bc94f929968d3c6f
-          name: 'TCP Ccmmunication SPI metrics'
+          name: 'TCP Communication SPI metrics'
           type: JMX
           key: 'jmx.discovery[beans,"org.apache:group=SPIs,name=TcpCommunicationSpi,*"]'
           delay: 30m
@@ -975,9 +970,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(data)
-                  
-                  
-                  
         -
           uuid: 5fb38d8148d746d6ae19d4f8c5a33ce8
           name: 'TCP discovery SPI'
@@ -1167,9 +1159,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(data)
-                  
-                  
-                  
         -
           uuid: b0b570121f1646e5baf0b0ff5cc5de2b
           name: 'Transaction metrics'
@@ -1299,9 +1288,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(data)
-                  
-                  
-                  
         -
           uuid: 7e3825aba1ad47c194162122eb050612
           name: 'Cache groups'
@@ -1529,7 +1515,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(data)
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1661,7 +1646,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(data)
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1950,7 +1934,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(data)
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:

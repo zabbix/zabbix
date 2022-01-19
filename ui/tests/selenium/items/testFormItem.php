@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -630,18 +630,8 @@ class testFormItem extends CLegacyWebTest {
 				'Text'
 			]);
 
-			$this->zbxTestIsEnabled("//*[@id='value_type']//li[text()='Numeric (unsigned)']");
-			$this->zbxTestIsEnabled("//*[@id='value_type']//li[text()='Numeric (float)']");
-
-			if ($type == 'Calculated') {
-				$this->zbxTestAssertAttribute("//*[@id='value_type']//li[text()='Character']", 'disabled');
-				$this->zbxTestAssertAttribute("//*[@id='value_type']//li[text()='Log']", 'disabled');
-				$this->zbxTestAssertAttribute("//*[@id='value_type']//li[text()='Text']", 'disabled');
-			}
-			else {
-				$this->zbxTestIsEnabled("//*[@id='value_type']//li[text()='Character']");
-				$this->zbxTestIsEnabled("//*[@id='value_type']//li[text()='Log']");
-				$this->zbxTestIsEnabled("//*[@id='value_type']//li[text()='Text']");
+			foreach (['Numeric (unsigned)', 'Numeric (float)', 'Character', 'Log', 'Text'] as $info_type) {
+				$this->zbxTestIsEnabled('//*[@id="value_type"]//li[text()='.CXPathHelper::escapeQuotes($info_type).']');
 			}
 		}
 		else {

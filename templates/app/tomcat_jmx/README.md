@@ -1,16 +1,15 @@
 
-# Apache Tomcat JMX
+# Apache Tomcat by JMX
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 Official JMX Template for Apache Tomcat.
 
 
 This template was tested on:
 
 - Apache Tomcat, version 8.5.59
-- Zabbix, version 5.4
 
 ## Setup
 
@@ -47,20 +46,20 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Global request processors discovery |<p>Discovery for GlobalRequesProcessor</p> |JMX |jmx.discovery[beans,"Catalina:type=GlobalRequestProcessor,name=*"]<p>**Filter**:</p>AND <p>- A: {#JMXNAME} MATCHES_REGEX `{$TOMCAT.LLD.FILTER.MATCHES:"GlobalRequesProcessor"}`</p><p>- B: {#JMXNAME} NOT_MATCHES_REGEX `{$TOMCAT.LLD.FILTER.NOT_MATCHES:"GlobalRequesProcessor"}`</p> |
-|Protocol handlers discovery |<p>Discovery for ProtocolHandler</p> |JMX |jmx.discovery[attributes,"Catalina:type=ProtocolHandler,port=*"]<p>**Filter**:</p>AND <p>- A: {#JMXATTR} MATCHES_REGEX `^name$`</p> |
-|Thread pools discovery |<p>Discovery for ThreadPool</p> |JMX |jmx.discovery[beans,"Catalina:type=ThreadPool,name=*"]<p>**Filter**:</p>AND <p>- A: {#JMXNAME} MATCHES_REGEX `{$TOMCAT.LLD.FILTER.MATCHES:"ThreadPool"}`</p><p>- B: {#JMXNAME} NOT_MATCHES_REGEX `{$TOMCAT.LLD.FILTER.NOT_MATCHES:"ThreadPool"}`</p> |
-|Contexts discovery |<p>Discovery for contexts</p> |JMX |jmx.discovery[beans,"Catalina:type=Manager,host=*,context=*"]<p>**Filter**:</p>AND <p>- A: {#JMXHOST} MATCHES_REGEX `{$TOMCAT.LLD.FILTER.MATCHES:"Manager"}`</p><p>- B: {#JMXHOST} NOT_MATCHES_REGEX `{$TOMCAT.LLD.FILTER.NOT_MATCHES:"Manager"}`</p> |
+|Global request processors discovery |<p>Discovery for GlobalRequesProcessor</p> |JMX |jmx.discovery[beans,"Catalina:type=GlobalRequestProcessor,name=*"]<p>**Filter**:</p>AND <p>- {#JMXNAME} MATCHES_REGEX `{$TOMCAT.LLD.FILTER.MATCHES:"GlobalRequesProcessor"}`</p><p>- {#JMXNAME} NOT_MATCHES_REGEX `{$TOMCAT.LLD.FILTER.NOT_MATCHES:"GlobalRequesProcessor"}`</p> |
+|Protocol handlers discovery |<p>Discovery for ProtocolHandler</p> |JMX |jmx.discovery[attributes,"Catalina:type=ProtocolHandler,port=*"]<p>**Filter**:</p>AND <p>- {#JMXATTR} MATCHES_REGEX `^name$`</p> |
+|Thread pools discovery |<p>Discovery for ThreadPool</p> |JMX |jmx.discovery[beans,"Catalina:type=ThreadPool,name=*"]<p>**Filter**:</p>AND <p>- {#JMXNAME} MATCHES_REGEX `{$TOMCAT.LLD.FILTER.MATCHES:"ThreadPool"}`</p><p>- {#JMXNAME} NOT_MATCHES_REGEX `{$TOMCAT.LLD.FILTER.NOT_MATCHES:"ThreadPool"}`</p> |
+|Contexts discovery |<p>Discovery for contexts</p> |JMX |jmx.discovery[beans,"Catalina:type=Manager,host=*,context=*"]<p>**Filter**:</p>AND <p>- {#JMXHOST} MATCHES_REGEX `{$TOMCAT.LLD.FILTER.MATCHES:"Manager"}`</p><p>- {#JMXHOST} NOT_MATCHES_REGEX `{$TOMCAT.LLD.FILTER.NOT_MATCHES:"Manager"}`</p> |
 
 ## Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
 |Tomcat |Tomcat: Version |<p>The version of the Tomcat.</p> |JMX |jmx["Catalina:type=Server",serverInfo]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
-|Tomcat |{#JMXNAME}: Bytes received per second |<p>Bytes received rate by processor {#JMXNAME}</p> |JMX |jmx[{#JMXOBJ},bytesReceived]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|Tomcat |{#JMXNAME}: Bytes sent per second |<p>Bytes sent rate by processor {#JMXNAME}</p> |JMX |jmx[{#JMXOBJ},bytesSent]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|Tomcat |{#JMXNAME}: Errors per second |<p>Error rate of request processor {#JMXNAME}</p> |JMX |jmx[{#JMXOBJ},errorCount]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|Tomcat |{#JMXNAME}: Requests per second |<p>Rate of requests served by request processor {#JMXNAME}</p> |JMX |jmx[{#JMXOBJ},requestCount]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
+|Tomcat |{#JMXNAME}: Bytes received per second |<p>Bytes received rate by processor {#JMXNAME}</p> |JMX |jmx[{#JMXOBJ},bytesReceived]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
+|Tomcat |{#JMXNAME}: Bytes sent per second |<p>Bytes sent rate by processor {#JMXNAME}</p> |JMX |jmx[{#JMXOBJ},bytesSent]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
+|Tomcat |{#JMXNAME}: Errors per second |<p>Error rate of request processor {#JMXNAME}</p> |JMX |jmx[{#JMXOBJ},errorCount]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
+|Tomcat |{#JMXNAME}: Requests per second |<p>Rate of requests served by request processor {#JMXNAME}</p> |JMX |jmx[{#JMXOBJ},requestCount]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
 |Tomcat |{#JMXNAME}: Requests processing time |<p>The total time to process all incoming requests of request processor {#JMXNAME}</p> |JMX |jmx[{#JMXOBJ},processingTime]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
 |Tomcat |{#JMXVALUE}: Gzip compression status |<p>Gzip compression status on {#JMXNAME}. Enabling gzip compression may save server bandwidth.</p> |JMX |jmx[{#JMXOBJ},compression]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Tomcat |{#JMXNAME}: Threads count |<p>Amount of threads the thread pool has right now, both busy and free.</p> |JMX |jmx[{#JMXOBJ},currentThreadCount]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
@@ -68,17 +67,17 @@ There are no template links in this template.
 |Tomcat |{#JMXNAME}: Threads busy |<p>Number of the requests that are being currently handled.</p> |JMX |jmx[{#JMXOBJ},currentThreadsBusy] |
 |Tomcat |{#JMXHOST}{#JMXCONTEXT}: Sessions active |<p>Active sessions of the application.</p> |JMX |jmx[{#JMXOBJ},activeSessions] |
 |Tomcat |{#JMXHOST}{#JMXCONTEXT}: Sessions active maximum so far |<p>Maximum number of active sessions so far.</p> |JMX |jmx[{#JMXOBJ},maxActive] |
-|Tomcat |{#JMXHOST}{#JMXCONTEXT}: Sessions created per second |<p>Rate of sessions created by this application per second.</p> |JMX |jmx[{#JMXOBJ},sessionCounter]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|Tomcat |{#JMXHOST}{#JMXCONTEXT}: Sessions rejected per second |<p>Rate of sessions we rejected due to maxActive being reached.</p> |JMX |jmx[{#JMXOBJ},rejectedSessions]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
+|Tomcat |{#JMXHOST}{#JMXCONTEXT}: Sessions created per second |<p>Rate of sessions created by this application per second.</p> |JMX |jmx[{#JMXOBJ},sessionCounter]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
+|Tomcat |{#JMXHOST}{#JMXCONTEXT}: Sessions rejected per second |<p>Rate of sessions we rejected due to maxActive being reached.</p> |JMX |jmx[{#JMXOBJ},rejectedSessions]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
 |Tomcat |{#JMXHOST}{#JMXCONTEXT}: Sessions allowed maximum |<p>The maximum number of active Sessions allowed, or -1 for no limit.</p> |JMX |jmx[{#JMXOBJ},maxActiveSessions] |
 
 ## Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Tomcat: Version has been changed |<p>Tomcat version has changed. Ack to close.</p> |`{TEMPLATE_NAME:jmx["Catalina:type=Server",serverInfo].diff()}=1 and {TEMPLATE_NAME:jmx["Catalina:type=Server",serverInfo].strlen()}>0` |INFO |<p>Manual close: YES</p> |
-|{#JMXVALUE}: Gzip compression is disabled |<p>gzip compression is disabled for connector {#JMXVALUE}.</p> |`{TEMPLATE_NAME:jmx[{#JMXOBJ},compression].str(off)} = 1` |INFO |<p>Manual close: YES</p> |
-|{#JMXNAME}: Busy worker threads count are more than {$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}% of the limit for {$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"} |<p>When current threads busy counter reaches the limit, no more requests could be handled, and the application chokes.</p> |`{TEMPLATE_NAME:jmx[{#JMXOBJ},currentThreadsBusy].min({$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"})}>{Apache Tomcat JMX:jmx[{#JMXOBJ},maxThreads].last()}*{$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}/100` |HIGH | |
+|Tomcat: Version has been changed |<p>Tomcat version has changed. Ack to close.</p> |`last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo],#1)<>last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo],#2) and length(last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo]))>0` |INFO |<p>Manual close: YES</p> |
+|{#JMXVALUE}: Gzip compression is disabled |<p>gzip compression is disabled for connector {#JMXVALUE}.</p> |`find(/Apache Tomcat by JMX/jmx[{#JMXOBJ},compression],,"like","off") = 1` |INFO |<p>Manual close: YES</p> |
+|{#JMXNAME}: Busy worker threads count are more than {$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}% of the limit for {$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"} |<p>When current threads busy counter reaches the limit, no more requests could be handled, and the application chokes.</p> |`min(/Apache Tomcat by JMX/jmx[{#JMXOBJ},currentThreadsBusy],{$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"})>last(/Apache Tomcat by JMX/jmx[{#JMXOBJ},maxThreads])*{$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}/100` |HIGH | |
 
 ## Feedback
 
