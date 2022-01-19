@@ -119,14 +119,15 @@ static void	get_source_ip_option(const char *fping, const char **option, unsigne
 static int	get_interval_option(const char *fping, ZBX_FPING_HOST *hosts, int hosts_count, int *value, char *error,
 		size_t max_error_len)
 {
-	char		*out = NULL, *dst;
+	char		*out = NULL;
 	unsigned int	intervals[] = {0, 1, 10};
-	size_t		j, out_len;
+	size_t		out_len;
 	int		ret = FAIL, i;
 
-	for(i = 0; i < hosts_count; i++)
+	for (i = 0; i < hosts_count; i++)
 	{
-		dst = hosts[i].addr;
+		size_t		j;
+		const char	*dst = hosts[i].addr;
 
 		for (j = 0; j < ARRSIZE(intervals); j++)
 		{
@@ -199,7 +200,7 @@ static int	get_interval_option(const char *fping, ZBX_FPING_HOST *hosts, int hos
 
 				if (strlen(p) >= strlen(dst) && 0 == strncmp(p, dst, strlen(dst)))
 				{
-					*value = intervals[j];
+					*value = (int)intervals[j];
 					ret = SUCCEED;
 
 					goto out;
