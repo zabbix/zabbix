@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-13T15:23:28Z'
+  date: '2022-01-19T15:46:44Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -18,7 +18,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -977,9 +977,6 @@ zabbix_export:
                 -
                   tag: resource
                   value: '{#RESOURCE}'
-                -
-                  tag: type
-                  value: gauge
           master_item:
             key: kubernetes.api.get_metrics
           preprocessing:
@@ -1269,9 +1266,6 @@ zabbix_export:
                   tag: component
                   value: requests
                 -
-                  tag: type
-                  value: percentile
-                -
                   tag: verb
                   value: '{#VERB}'
             -
@@ -1515,7 +1509,7 @@ zabbix_export:
           value: software
         -
           tag: target
-          value: kubernetes-api-server
+          value: 'kubernetes api server'
       macros:
         -
           macro: '{$KUBE.API.CERT.EXPIRATION}'
