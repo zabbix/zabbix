@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,20 +46,14 @@ class testEscalations extends CIntegrationTest {
 		$response = $this->call('host.create', [
 			'host' => self::HOST_NAME,
 			'interfaces' => [
-				[
-					'type' => 1,
-					'main' => 1,
-					'useip' => 1,
-					'ip' => '127.0.0.1',
-					'dns' => '',
-					'port' => $this->getConfigurationValue(self::COMPONENT_AGENT, 'ListenPort')
-				]
+				'type' => 1,
+				'main' => 1,
+				'useip' => 1,
+				'ip' => '127.0.0.1',
+				'dns' => '',
+				'port' => $this->getConfigurationValue(self::COMPONENT_AGENT, 'ListenPort')
 			],
-			'groups' => [
-				[
-					'groupid' => 4
-				]
-			]
+			'groups' => ['groupid' => 4]
 		]);
 
 		$this->assertArrayHasKey('hostids', $response['result']);

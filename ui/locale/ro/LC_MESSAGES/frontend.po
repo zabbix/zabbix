@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-05 19:52+0200\n"
+"POT-Creation-Date: 2022-01-07 19:54+0200\n"
 "PO-Revision-Date: 2021-03-19 18:02+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -315,7 +315,7 @@ msgstr "(Numai super administratorii pot creea grupuri)"
 msgid "(no proxy)"
 msgstr "(fără proxy)"
 
-#: include/classes/setup/CSetupWizard.php:248
+#: include/classes/setup/CSetupWizard.php:250
 msgid "0 - use default port"
 msgstr ""
 
@@ -978,7 +978,7 @@ msgstr ""
 msgid "Allowed hosts"
 msgstr "Servere permise"
 
-#: include/classes/setup/CSetupWizard.php:473
+#: include/classes/setup/CSetupWizard.php:489
 msgid "Alternatively, you can install it manually:"
 msgstr ""
 
@@ -1337,6 +1337,7 @@ msgid "Authentication protocol"
 msgstr "Protocol de autentificare"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:313
+#: app/controllers/CControllerAuthenticationUpdate.php:322
 msgid "Authentication settings updated"
 msgstr ""
 
@@ -1429,8 +1430,8 @@ msgstr "Mediu"
 msgid "Axes"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:132
-#: include/classes/setup/CSetupWizard.php:421
+#: include/classes/setup/CSetupWizard.php:134
+#: include/classes/setup/CSetupWizard.php:423
 msgid "Back"
 msgstr ""
 
@@ -1654,7 +1655,7 @@ msgstr ""
 #: app/views/js/administration.trigseverity.edit.js.php:37
 #: app/views/monitoring.dashboard.view.php:114
 #: include/classes/html/CButtonCancel.php:25
-#: include/classes/setup/CSetupWizard.php:114
+#: include/classes/setup/CSetupWizard.php:116
 #: include/views/conf.import.php:131 include/views/js/conf.import.js.php:42
 #: include/views/monitoring.slideconf.edit.php:281 jsLoader.php:122
 #: jsLoader.php:139 jsLoader.php:243 jsLoader.php:324 jsLoader.php:336
@@ -1697,7 +1698,7 @@ msgid "Cannot add correlation condition"
 msgstr ""
 
 #: include/classes/api/services/CTrigger.php:970
-#: include/classes/api/services/CTriggerPrototype.php:780
+#: include/classes/api/services/CTriggerPrototype.php:795
 msgid "Cannot add dependency from a host to a template."
 msgstr "Nu se poate adăuga dependința server - șablon."
 
@@ -1908,7 +1909,7 @@ msgstr ""
 msgid "Cannot connect to LDAP server."
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:321
+#: include/classes/setup/CSetupWizard.php:323
 msgid "Cannot connect to the database."
 msgstr ""
 
@@ -1952,7 +1953,7 @@ msgid "Cannot create another database connection."
 msgstr "Nu se poate crea o altă conexiune la baza de date."
 
 #: include/classes/api/services/CTrigger.php:1004
-#: include/classes/api/services/CTriggerPrototype.php:811
+#: include/classes/api/services/CTriggerPrototype.php:826
 msgid "Cannot create circular dependencies."
 msgstr "Nu se pot crea dependințe circulare."
 
@@ -1960,7 +1961,7 @@ msgstr "Nu se pot crea dependințe circulare."
 msgid "Cannot create dependency on trigger itself."
 msgstr "Nu se poate crea dependință cu trigger-ul însuși."
 
-#: include/classes/api/services/CTriggerPrototype.php:750
+#: include/classes/api/services/CTriggerPrototype.php:765
 msgid "Cannot create dependency on trigger prototype itself."
 msgstr ""
 
@@ -1976,7 +1977,7 @@ msgstr "Nu se poate crea icon hartă"
 msgid "Cannot create new application, web scenario is already assigned to application."
 msgstr "Nu se poate crea o aplicație nouă, scenariul web este deja asignat unei aplicații."
 
-#: include/classes/setup/CSetupWizard.php:469
+#: include/classes/setup/CSetupWizard.php:485
 msgid "Cannot create the configuration file."
 msgstr ""
 
@@ -2200,7 +2201,7 @@ msgstr ""
 msgid "Cannot delete templated graph."
 msgstr ""
 
-#: include/classes/api/services/CHostPrototype.php:1159
+#: include/classes/api/services/CHostPrototype.php:1161
 msgid "Cannot delete templated host prototype."
 msgstr "Nu se poate șterge prototipul de server bazat pe un șablon."
 
@@ -3238,7 +3239,7 @@ msgid "Check for error using regular expression"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:46
-#: include/classes/setup/CSetupWizard.php:215
+#: include/classes/setup/CSetupWizard.php:217
 msgid "Check of pre-requisites"
 msgstr ""
 
@@ -3590,7 +3591,7 @@ msgstr "Configurare"
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "Statistici configurare cache. Cache - buffer (moduri: pfree, total, used, free)."
 
-#: include/classes/setup/CSetupWizard.php:488
+#: include/classes/setup/CSetupWizard.php:516
 #, c-format
 msgid "Configuration file \"%1$s\" created."
 msgstr ""
@@ -3763,7 +3764,7 @@ msgid "Configuration updated"
 msgstr "Configuraţie actualizată"
 
 #: include/classes/setup/CSetupWizard.php:50
-#: include/classes/setup/CSetupWizard.php:330
+#: include/classes/setup/CSetupWizard.php:332
 msgid "Configure DB connection"
 msgstr ""
 
@@ -3771,7 +3772,7 @@ msgstr ""
 msgid "Confirmation text"
 msgstr "Text de confirmare"
 
-#: include/classes/setup/CSetupWizard.php:486
+#: include/classes/setup/CSetupWizard.php:514
 msgid "Congratulations! You have successfully installed Zabbix frontend."
 msgstr ""
 
@@ -3823,7 +3824,7 @@ msgid ""
 "2. Firewall is blocking TCP connection.\n"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:273
+#: include/classes/setup/CSetupWizard.php:275
 msgid "Connection will not be encrypted because it uses a socket file (on Unix) or shared memory (Windows)."
 msgstr ""
 
@@ -4259,7 +4260,7 @@ msgstr "Critic"
 msgid "Current host"
 msgstr "Serverul curent"
 
-#: include/classes/setup/CSetupWizard.php:173
+#: include/classes/setup/CSetupWizard.php:175
 msgid "Current value"
 msgstr "Valoare curentă"
 
@@ -4455,16 +4456,16 @@ msgstr ""
 msgid "Data storage period"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:288
-#: include/classes/setup/CSetupWizard.php:389
-#: include/classes/setup/CSetupWizard.php:528
+#: include/classes/setup/CSetupWizard.php:290
+#: include/classes/setup/CSetupWizard.php:391
+#: include/classes/setup/CSetupWizard.php:555
 msgid "Database TLS CA file"
 msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:686
-#: include/classes/setup/CSetupWizard.php:300
-#: include/classes/setup/CSetupWizard.php:395
-#: include/classes/setup/CSetupWizard.php:536
+#: include/classes/setup/CSetupWizard.php:302
+#: include/classes/setup/CSetupWizard.php:397
+#: include/classes/setup/CSetupWizard.php:563
 msgid "Database TLS certificate file"
 msgstr ""
 
@@ -4472,19 +4473,19 @@ msgstr ""
 msgid "Database TLS certificate files must be read-only"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:312
-#: include/classes/setup/CSetupWizard.php:402
+#: include/classes/setup/CSetupWizard.php:314
+#: include/classes/setup/CSetupWizard.php:404
 msgid "Database TLS cipher list"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:270
-#: include/classes/setup/CSetupWizard.php:385
+#: include/classes/setup/CSetupWizard.php:272
+#: include/classes/setup/CSetupWizard.php:387
 msgid "Database TLS encryption"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:294
-#: include/classes/setup/CSetupWizard.php:392
-#: include/classes/setup/CSetupWizard.php:532
+#: include/classes/setup/CSetupWizard.php:296
+#: include/classes/setup/CSetupWizard.php:394
+#: include/classes/setup/CSetupWizard.php:559
 msgid "Database TLS key file"
 msgstr ""
 
@@ -4492,12 +4493,12 @@ msgstr ""
 msgid "Database history tables upgraded"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:238
+#: include/classes/setup/CSetupWizard.php:240
 msgid "Database host"
 msgstr "Server bază de date"
 
-#: include/classes/setup/CSetupWizard.php:306
-#: include/classes/setup/CSetupWizard.php:398
+#: include/classes/setup/CSetupWizard.php:308
+#: include/classes/setup/CSetupWizard.php:400
 msgid "Database host verification"
 msgstr ""
 
@@ -4505,35 +4506,35 @@ msgstr ""
 msgid "Database monitor"
 msgstr "Monitor bază de date"
 
-#: include/classes/setup/CSetupWizard.php:251
-#: include/classes/setup/CSetupWizard.php:379 setup.php:44
+#: include/classes/setup/CSetupWizard.php:253
+#: include/classes/setup/CSetupWizard.php:381 setup.php:44
 msgid "Database name"
 msgstr "Nume bază de date"
 
-#: include/classes/setup/CSetupWizard.php:381
+#: include/classes/setup/CSetupWizard.php:383
 msgid "Database password"
 msgstr "Parolă bază de date"
 
-#: include/classes/setup/CSetupWizard.php:243
-#: include/classes/setup/CSetupWizard.php:378 setup.php:43
+#: include/classes/setup/CSetupWizard.php:245
+#: include/classes/setup/CSetupWizard.php:380 setup.php:43
 msgid "Database port"
 msgstr "Port bază de date"
 
-#: include/classes/setup/CSetupWizard.php:256
-#: include/classes/setup/CSetupWizard.php:383
+#: include/classes/setup/CSetupWizard.php:258
+#: include/classes/setup/CSetupWizard.php:385
 msgid "Database schema"
 msgstr "Schema bazei de date"
 
-#: include/classes/setup/CSetupWizard.php:377
+#: include/classes/setup/CSetupWizard.php:379
 msgid "Database server"
 msgstr "Server baze de date"
 
-#: include/classes/setup/CSetupWizard.php:230
-#: include/classes/setup/CSetupWizard.php:372
+#: include/classes/setup/CSetupWizard.php:232
+#: include/classes/setup/CSetupWizard.php:374
 msgid "Database type"
 msgstr "Tipul bazei de date"
 
-#: include/classes/setup/CSetupWizard.php:380
+#: include/classes/setup/CSetupWizard.php:382
 msgid "Database user"
 msgstr "Utilizator bază de date"
 
@@ -4987,7 +4988,7 @@ msgstr ""
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Ștergere: Server \"%1$s\"."
 
-#: include/classes/api/services/CHostPrototype.php:1027
+#: include/classes/api/services/CHostPrototype.php:1029
 #, c-format
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Creat: Prototip server \"%1$s\" pe \"%2$s\"."
@@ -5522,7 +5523,7 @@ msgstr "Oprit"
 msgid "Download image"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:475
+#: include/classes/setup/CSetupWizard.php:491
 msgid "Download the configuration file"
 msgstr ""
 
@@ -5581,7 +5582,7 @@ msgstr ""
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "Dublează dependențe în trigger \"%1$s\"."
 
-#: include/classes/api/services/CTriggerPrototype.php:981
+#: include/classes/api/services/CTriggerPrototype.php:996
 #, c-format
 msgid "Duplicate dependencies in trigger prototype \"%1$s\"."
 msgstr ""
@@ -5807,7 +5808,7 @@ msgstr ""
 #: include/classes/api/services/CHost.php:855
 #: include/classes/api/services/CHost.php:1427
 #: include/classes/api/services/CHost.php:1963
-#: include/classes/api/services/CHostPrototype.php:955
+#: include/classes/api/services/CHostPrototype.php:957
 #: include/classes/api/services/CImage.php:423
 #: include/classes/api/services/CImage.php:475
 #: include/classes/api/services/CMaintenance.php:535
@@ -6348,7 +6349,7 @@ msgstr "FALS"
 msgid "FTP"
 msgstr "FTP"
 
-#: include/classes/setup/CSetupWizard.php:189
+#: include/classes/setup/CSetupWizard.php:191
 msgid "Fail"
 msgstr "Greșeală"
 
@@ -6579,7 +6580,7 @@ msgstr ""
 msgid "Find string on a web page. Returns the matched string, or as specified by the optional output parameter"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:129
+#: include/classes/setup/CSetupWizard.php:131
 msgid "Finish"
 msgstr "Sfârșit"
 
@@ -7115,7 +7116,7 @@ msgstr "Grup pentru servere detectate \"%1$s\"."
 msgid "Group name"
 msgstr "Nume grup"
 
-#: include/classes/api/services/CHostPrototype.php:1117
+#: include/classes/api/services/CHostPrototype.php:1119
 #, c-format
 msgid "Group prototype cannot be based on a discovered host group \"%1$s\"."
 msgstr "Grupul prototip nu se poate baza pe un grup server detectat \"%1$s\"."
@@ -7383,7 +7384,7 @@ msgstr "Aliniere orizontală"
 #: include/classes/screens/CScreenProblem.php:893
 #: include/classes/screens/CScreenProblem.php:1142
 #: include/classes/screens/CScreenTriggersInfo.php:40
-#: include/classes/setup/CSetupWizard.php:342
+#: include/classes/setup/CSetupWizard.php:344
 #: include/classes/widgets/forms/CWidgetFormProblems.php:206
 #: include/classes/widgets/forms/CWidgetFormProblems.php:207
 #: include/hostgroups.inc.php:249 include/maps.inc.php:24
@@ -7646,12 +7647,12 @@ msgstr "Rețele server"
 msgid "Host prototype"
 msgstr ""
 
-#: include/classes/api/services/CHostPrototype.php:835
+#: include/classes/api/services/CHostPrototype.php:837
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Serverul prototip \"%1$s\" există deja pe \"%2$s\", moștenită de la alt șablon."
 
-#: include/classes/api/services/CHostPrototype.php:823
+#: include/classes/api/services/CHostPrototype.php:825
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "Serverul prototip \"%1$s\" există deja pe \"%2$s\"."
@@ -8558,9 +8559,9 @@ msgstr "Nume sau valoare câmp \"%1$s\" incorecte în care afirmația pentru tab
 msgid "Incorrect fields for sysmap."
 msgstr "Câmpuri incorecte pentru sysmap."
 
-#: include/classes/setup/CSetupWizard.php:528
-#: include/classes/setup/CSetupWizard.php:532
-#: include/classes/setup/CSetupWizard.php:536
+#: include/classes/setup/CSetupWizard.php:555
+#: include/classes/setup/CSetupWizard.php:559
+#: include/classes/setup/CSetupWizard.php:563
 #, c-format
 msgid "Incorrect file path for \"%1$s\": %2$s."
 msgstr ""
@@ -9397,11 +9398,12 @@ msgid "Insert expression"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:62
-#: include/classes/setup/CSetupWizard.php:493
+#: include/classes/setup/CSetupWizard.php:497
+#: include/classes/setup/CSetupWizard.php:520
 msgid "Install"
 msgstr ""
 
-#: setup.php:108
+#: setup.php:92
 msgid "Installation"
 msgstr "Instalare"
 
@@ -9935,7 +9937,7 @@ msgstr "Italiană (it)"
 msgid "Item"
 msgstr "Item"
 
-#: include/classes/api/services/CHostPrototype.php:1061
+#: include/classes/api/services/CHostPrototype.php:1063
 #: include/classes/api/services/CItem.php:62
 #, c-format
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
@@ -11903,9 +11905,9 @@ msgstr ""
 msgid "Next page"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:126
-#: include/classes/setup/CSetupWizard.php:332
-#: include/classes/setup/CSetupWizard.php:421
+#: include/classes/setup/CSetupWizard.php:128
+#: include/classes/setup/CSetupWizard.php:334
+#: include/classes/setup/CSetupWizard.php:423
 msgid "Next step"
 msgstr ""
 
@@ -12335,9 +12337,9 @@ msgstr "Nicio permisiune de acces la sistem."
 #: include/classes/api/services/CHostPrototype.php:418
 #: include/classes/api/services/CHostPrototype.php:464
 #: include/classes/api/services/CHostPrototype.php:485
-#: include/classes/api/services/CHostPrototype.php:1086
-#: include/classes/api/services/CHostPrototype.php:1108
-#: include/classes/api/services/CHostPrototype.php:1142
+#: include/classes/api/services/CHostPrototype.php:1088
+#: include/classes/api/services/CHostPrototype.php:1110
+#: include/classes/api/services/CHostPrototype.php:1144
 #: include/classes/api/services/CHttpTest.php:446
 #: include/classes/api/services/CHttpTest.php:539
 #: include/classes/api/services/CHttpTest.php:626
@@ -12399,8 +12401,9 @@ msgstr "Nicio permisiune de acces la sistem."
 #: include/classes/api/services/CTrigger.php:734
 #: include/classes/api/services/CTrigger.php:827
 #: include/classes/api/services/CTriggerPrototype.php:522
-#: include/classes/api/services/CTriggerPrototype.php:700
-#: include/classes/api/services/CTriggerPrototype.php:718
+#: include/classes/api/services/CTriggerPrototype.php:708
+#: include/classes/api/services/CTriggerPrototype.php:716
+#: include/classes/api/services/CTriggerPrototype.php:731
 #: include/classes/api/services/CUserGroup.php:322
 #: include/classes/api/services/CUserGroup.php:870
 #: include/classes/api/services/CUserMacro.php:377
@@ -12544,7 +12547,7 @@ msgid "Not all results are displayed. Please provide more specific search criter
 msgstr ""
 
 #: include/classes/api/services/CTrigger.php:1049
-#: include/classes/api/services/CTriggerPrototype.php:859
+#: include/classes/api/services/CTriggerPrototype.php:874
 #, c-format
 msgid "Not all templates are linked to \"%1$s\"."
 msgstr ""
@@ -13593,7 +13596,7 @@ msgstr "Pasiv"
 #: app/views/administration.user.edit.php:111
 #: app/views/administration.user.edit.php:126 disc_prototypes.php:232
 #: host_discovery.php:184 httpconf.php:64
-#: include/classes/setup/CSetupWizard.php:266
+#: include/classes/setup/CSetupWizard.php:268
 #: include/views/configuration.host.discovery.edit.php:303
 #: include/views/configuration.host.discovery.edit.php:428
 #: include/views/configuration.host.discovery.edit.php:458
@@ -13736,7 +13739,7 @@ msgstr "Redare"
 msgid "Play sound"
 msgstr "Redare sunet"
 
-#: include/classes/setup/CSetupWizard.php:421
+#: include/classes/setup/CSetupWizard.php:423
 #, c-format
 msgid "Please check configuration parameters. If all is correct, press \"%1$s\" button, or \"%2$s\" button to change configuration parameters."
 msgstr ""
@@ -13745,12 +13748,12 @@ msgstr ""
 msgid "Please confirm that you want to remove all macros."
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:332
+#: include/classes/setup/CSetupWizard.php:334
 #, c-format
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:361
+#: include/classes/setup/CSetupWizard.php:363
 msgid "Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional)."
 msgstr ""
 
@@ -13795,7 +13798,7 @@ msgstr "Populare câmp server inventar"
 #: app/views/administration.proxy.edit.php:47
 #: app/views/monitoring.host.view.php:131
 #: app/views/popup.itemtestedit.view.php:123
-#: include/classes/setup/CSetupWizard.php:347 include/hosts.inc.php:1444
+#: include/classes/setup/CSetupWizard.php:349 include/hosts.inc.php:1444
 #: include/views/configuration.host.list.php:141
 #: include/views/inventory.host.view.php:79 setup.php:57
 msgid "Port"
@@ -13826,7 +13829,7 @@ msgid "Post type"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:58
-#: include/classes/setup/CSetupWizard.php:419
+#: include/classes/setup/CSetupWizard.php:421
 msgid "Pre-installation summary"
 msgstr ""
 
@@ -14657,7 +14660,7 @@ msgstr ""
 msgid "Request type"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:173
+#: include/classes/setup/CSetupWizard.php:175
 #: include/views/configuration.httpconf.edit.php:221
 msgid "Required"
 msgstr "Necesar"
@@ -15208,7 +15211,7 @@ msgstr "Sâmbătă"
 msgid "Save changes"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:476
+#: include/classes/setup/CSetupWizard.php:492
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr ""
@@ -17484,7 +17487,7 @@ msgstr "Prototipul trigger \"%1$s\" trebuie să conțină cel puțin un prototip
 msgid "Trigger prototype added"
 msgstr "Prototip trigger adăugat"
 
-#: include/classes/api/services/CTriggerPrototype.php:916
+#: include/classes/api/services/CTriggerPrototype.php:931
 msgid "Trigger prototype cannot be dependent on a trigger that is inherited from it."
 msgstr ""
 
@@ -18172,7 +18175,7 @@ msgstr ""
 #: app/views/administration.user.edit.php:220
 #: app/views/reports.auditlog.list.php:87 httpconf.php:58
 #: include/actions.inc.php:1725 include/actions.inc.php:1780
-#: include/actions.inc.php:2001 include/classes/setup/CSetupWizard.php:263
+#: include/actions.inc.php:2001 include/classes/setup/CSetupWizard.php:265
 #: include/hosts.inc.php:61 include/views/configuration.httpconf.edit.php:181
 msgid "User"
 msgstr "Utilizator"
@@ -18859,7 +18862,7 @@ msgstr "Vânzător"
 msgid "Verbose"
 msgstr "Detaliat"
 
-#: include/classes/setup/CSetupWizard.php:282
+#: include/classes/setup/CSetupWizard.php:284
 msgid "Verify database certificate"
 msgstr ""
 
@@ -18932,7 +18935,7 @@ msgstr "M"
 msgid "Warning"
 msgstr "Avertisment"
 
-#: include/classes/setup/CSetupWizard.php:185
+#: include/classes/setup/CSetupWizard.php:187
 msgctxt "setup"
 msgid "Warning"
 msgstr "Avertisment"
@@ -19045,7 +19048,7 @@ msgstr "Săptămânal"
 msgid "Welcome"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:165
+#: include/classes/setup/CSetupWizard.php:167
 msgid "Welcome to"
 msgstr ""
 
@@ -19489,7 +19492,7 @@ msgstr ""
 
 #: app/partials/popup.operations.php:235
 #: app/views/administration.script.edit.php:57 include/actions.inc.php:880
-#: include/classes/setup/CSetupWizard.php:410
+#: include/classes/setup/CSetupWizard.php:412
 msgid "Zabbix server"
 msgstr "Server Zabbix"
 
@@ -19507,7 +19510,7 @@ msgid "Zabbix server (proxy)"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:54
-#: include/classes/setup/CSetupWizard.php:359
+#: include/classes/setup/CSetupWizard.php:361
 msgid "Zabbix server details"
 msgstr ""
 
@@ -19524,11 +19527,11 @@ msgstr "Serverul Zabbix rulează"
 msgid "Zabbix server is running check interval \"%1$s\"."
 msgstr "Serverul Zabbix rulează intervalul de verificare \"%1$s\"."
 
-#: include/classes/setup/CSetupWizard.php:414
+#: include/classes/setup/CSetupWizard.php:416
 msgid "Zabbix server name"
 msgstr "Nume server Zabbix"
 
-#: include/classes/setup/CSetupWizard.php:411
+#: include/classes/setup/CSetupWizard.php:413
 msgid "Zabbix server port"
 msgstr "Port server Zabbix "
 
@@ -19996,7 +19999,7 @@ msgid "days"
 msgstr "zile"
 
 #: app/controllers/CControllerMapView.php:124
-#: include/classes/setup/CSetupWizard.php:374
+#: include/classes/setup/CSetupWizard.php:376
 #: include/classes/widgets/CWidgetHelper.php:70
 #: include/views/js/monitoring.slideconf.edit.js.php:40
 #: include/views/monitoring.slideconf.edit.php:136

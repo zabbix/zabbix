@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -126,11 +126,13 @@ class CPage {
 		$this->resetViewport();
 
 		if (self::$cookie !== null) {
-			$session_id = $this->driver->manage()->getCookieNamed('zbx_sessionid');
-
-			if ($session_id === null || !array_key_exists('value', $session_id)
-					|| $session_id['value'] !== self::$cookie['value']) {
-				self::$cookie = null;
+			foreach ($this->driver->manage()->getCookies() as $cookie) {
+				if ($cookie->getName() === 'zbx_sessionid') {
+					if ($cookie->getValue() !== self::$cookie['value']) {
+						self::$cookie = null;
+					}
+					break;
+				}
 			}
 		}
 
@@ -227,9 +229,19 @@ class CPage {
 			// Before logout open page without any scripts, otherwise session might be restored and logout won't work.
 			$this->open('setup.php');
 
-			$session = (self::$cookie === null)
-					? CTestArrayHelper::get($this->driver->manage()->getCookieNamed('zbx_sessionid'), 'value')
-					: self::$cookie['value'];
+			$session = null;
+
+			if (self::$cookie === null) {
+				foreach ($this->driver->manage()->getCookies() as $cookie) {
+					if ($cookie->getName() === 'zbx_sessionid') {
+						$session = $cookie->getValue();
+						break;
+					}
+				}
+			}
+			else {
+				$session = self::$cookie['value'];
+			}
 
 			if ($session !== null) {
 				DBExecute('DELETE FROM sessions WHERE sessionid='.zbx_dbstr($session));

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -220,7 +220,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 		$this->page->logout();
 		$this->page->open('index.php')->waitUntilReady();
 		$link = $this->query('link:Sign in with Single Sign-On (SAML)')->one()->waitUntilClickable();
-		$this->assertContains('index_sso.php', $link->getAttribute('href'));
+		$this->assertStringContainsString('index_sso.php', $link->getAttribute('href'));
 		// Login and disable SAML authentication.
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
 		$form = $this->query('name:form_auth')->asForm()->one();
@@ -379,7 +379,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 		// Make sure that it is possible to log out.
 		$this->query('link:Sign out')->one()->click();
 		$this->page->waitUntilReady();
-		$this->assertContains('index.php', $this->page->getCurrentUrl());
+		$this->assertStringContainsString('index.php', $this->page->getCurrentUrl());
 	}
 
 	/**

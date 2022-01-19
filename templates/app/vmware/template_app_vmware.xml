@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-07-14T07:09:05Z</date>
+   <date>2021-12-13T13:54:15Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -13,7 +13,7 @@
          <name>Template VM VMware</name>
          <description>You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <templates>
             <template>
                <name>Template VM VMware macros</name>
@@ -121,7 +121,6 @@ Template tooling version used: 0.38</description>
                      </valuemap>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Discover VMware datastores</name>
@@ -193,7 +192,6 @@ Template tooling version used: 0.38</description>
                      </applications>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Discover VMware hypervisors</name>
@@ -277,7 +275,7 @@ Template tooling version used: 0.38</description>
       <template>
          <template>Template VM VMware Guest</template>
          <name>Template VM VMware Guest</name>
-         <description>Template tooling version used: 0.38</description>
+         <description>Template tooling version used: 0.39</description>
          <templates>
             <template>
                <name>Template VM VMware macros</name>
@@ -628,7 +626,7 @@ Template tooling version used: 0.38</description>
                      <expression>{last()}&lt;10m</expression>
                      <name>VMware: {HOST.HOST} has been restarted (uptime &lt; 10m)</name>
                      <priority>WARNING</priority>
-                     <description>Uptime is less than 10 minutes</description>
+                     <description>Uptime is less than 10 minutes.</description>
                      <manual_close>YES</manual_close>
                   </trigger>
                </triggers>
@@ -703,7 +701,6 @@ Template tooling version used: 0.38</description>
                      </applications>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Disk device discovery</name>
@@ -773,7 +770,6 @@ Template tooling version used: 0.38</description>
                      </applications>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Mounted filesystem discovery</name>
@@ -853,14 +849,13 @@ Template tooling version used: 0.38</description>
                      </applications>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
       </template>
       <template>
          <template>Template VM VMware Hypervisor</template>
          <name>Template VM VMware Hypervisor</name>
-         <description>Template tooling version used: 0.38</description>
+         <description>Template tooling version used: 0.39</description>
          <templates>
             <template>
                <name>Template VM VMware macros</name>
@@ -877,6 +872,36 @@ Template tooling version used: 0.38</description>
             </application>
          </applications>
          <items>
+            <item>
+               <name>VMware: Hypervisor ping</name>
+               <type>SIMPLE</type>
+               <key>icmpping[]</key>
+               <history>7d</history>
+               <description>Checks if the hypervisor is running and accepting ICMP pings.</description>
+               <applications>
+                  <application>
+                     <name>VMware</name>
+                  </application>
+               </applications>
+               <valuemap>
+                  <name>Service state</name>
+               </valuemap>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>10m</params>
+                  </step>
+               </preprocessing>
+               <triggers>
+                  <trigger>
+                     <expression>{last()}=0</expression>
+                     <name>VMware: Hypervisor is down</name>
+                     <priority>AVERAGE</priority>
+                     <description>The service is unavailable or does not accept ICMP ping.</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
             <item>
                <name>VMware: Cluster name</name>
                <type>SIMPLE</type>
@@ -1131,7 +1156,6 @@ Template tooling version used: 0.38</description>
                <name>VMware: Number of bytes received</name>
                <type>SIMPLE</type>
                <key>vmware.hv.network.in[{$VMWARE.URL},{HOST.HOST},bps]</key>
-               <delay>1m</delay>
                <history>7d</history>
                <units>Bps</units>
                <username>{$VMWARE.USERNAME}</username>
@@ -1147,7 +1171,6 @@ Template tooling version used: 0.38</description>
                <name>VMware: Number of bytes transmitted</name>
                <type>SIMPLE</type>
                <key>vmware.hv.network.out[{$VMWARE.URL},{HOST.HOST},bps]</key>
-               <delay>1m</delay>
                <history>7d</history>
                <units>Bps</units>
                <username>{$VMWARE.USERNAME}</username>
@@ -1264,7 +1287,7 @@ Template tooling version used: 0.38</description>
                <triggers>
                   <trigger>
                      <expression>{last()}&lt;10m</expression>
-                     <name>VMware: {HOST.HOST} has been restarted (uptime &lt; 10m)</name>
+                     <name>VMware: Hypervisor has been restarted (uptime &lt; 10m)</name>
                      <priority>WARNING</priority>
                      <description>Uptime is less than 10 minutes</description>
                      <manual_close>YES</manual_close>
@@ -1317,7 +1340,6 @@ Template tooling version used: 0.38</description>
                      <name>VMware: Average read latency of the datastore {#DATASTORE}</name>
                      <type>SIMPLE</type>
                      <key>vmware.hv.datastore.read[{$VMWARE.URL},{HOST.HOST},{#DATASTORE},latency]</key>
-                     <delay>1m</delay>
                      <history>7d</history>
                      <username>{$VMWARE.USERNAME}</username>
                      <password>{$VMWARE.PASSWORD}</password>
@@ -1365,7 +1387,6 @@ Template tooling version used: 0.38</description>
                      <name>VMware: Average write latency of the datastore {#DATASTORE}</name>
                      <type>SIMPLE</type>
                      <key>vmware.hv.datastore.write[{$VMWARE.URL},{HOST.HOST},{#DATASTORE},latency]</key>
-                     <delay>1m</delay>
                      <history>7d</history>
                      <username>{$VMWARE.USERNAME}</username>
                      <password>{$VMWARE.PASSWORD}</password>
@@ -1377,14 +1398,13 @@ Template tooling version used: 0.38</description>
                      </applications>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
       </template>
       <template>
          <template>Template VM VMware macros</template>
          <name>Template VM VMware macros</name>
-         <description>Template tooling version used: 0.38</description>
+         <description>Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -1407,6 +1427,19 @@ Template tooling version used: 0.38</description>
       </template>
    </templates>
    <value_maps>
+      <value_map>
+         <name>Service state</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Down</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Up</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
       <value_map>
          <name>VMware status</name>
          <mappings>

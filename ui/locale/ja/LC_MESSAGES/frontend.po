@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-05 19:52+0200\n"
+"POT-Creation-Date: 2022-01-07 19:54+0200\n"
 "PO-Revision-Date: 2021-11-08 13:49+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -281,7 +281,7 @@ msgstr "(特権管理者のみがグループを作成できます)"
 msgid "(no proxy)"
 msgstr "(プロキシなし)"
 
-#: include/classes/setup/CSetupWizard.php:248
+#: include/classes/setup/CSetupWizard.php:250
 msgid "0 - use default port"
 msgstr "0 - デフォルトのポート番号を使用"
 
@@ -940,7 +940,7 @@ msgstr "手動クローズを許可"
 msgid "Allowed hosts"
 msgstr "許可されたホスト"
 
-#: include/classes/setup/CSetupWizard.php:473
+#: include/classes/setup/CSetupWizard.php:489
 msgid "Alternatively, you can install it manually:"
 msgstr "代わりに、手動でインストールすることができます:"
 
@@ -1296,6 +1296,7 @@ msgid "Authentication protocol"
 msgstr "認証プロトコル"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:313
+#: app/controllers/CControllerAuthenticationUpdate.php:322
 msgid "Authentication settings updated"
 msgstr "認証の設定を更新しました"
 
@@ -1388,8 +1389,8 @@ msgstr "軽度の障害"
 msgid "Axes"
 msgstr "軸"
 
-#: include/classes/setup/CSetupWizard.php:132
-#: include/classes/setup/CSetupWizard.php:421
+#: include/classes/setup/CSetupWizard.php:134
+#: include/classes/setup/CSetupWizard.php:423
 msgid "Back"
 msgstr "戻る"
 
@@ -1613,7 +1614,7 @@ msgstr "削除できません"
 #: app/views/js/administration.trigseverity.edit.js.php:37
 #: app/views/monitoring.dashboard.view.php:114
 #: include/classes/html/CButtonCancel.php:25
-#: include/classes/setup/CSetupWizard.php:114
+#: include/classes/setup/CSetupWizard.php:116
 #: include/views/conf.import.php:131 include/views/js/conf.import.js.php:42
 #: include/views/monitoring.slideconf.edit.php:281 jsLoader.php:122
 #: jsLoader.php:139 jsLoader.php:243 jsLoader.php:324 jsLoader.php:336
@@ -1656,7 +1657,7 @@ msgid "Cannot add correlation condition"
 msgstr "相関関係の条件を追加できません"
 
 #: include/classes/api/services/CTrigger.php:970
-#: include/classes/api/services/CTriggerPrototype.php:780
+#: include/classes/api/services/CTriggerPrototype.php:795
 msgid "Cannot add dependency from a host to a template."
 msgstr "ホストからテンプレートへの依存関係は作成できません。"
 
@@ -1865,7 +1866,7 @@ msgstr "障害をクローズできません: %1$s。"
 msgid "Cannot connect to LDAP server."
 msgstr "LDAPサーバーに接続できません。"
 
-#: include/classes/setup/CSetupWizard.php:321
+#: include/classes/setup/CSetupWizard.php:323
 msgid "Cannot connect to the database."
 msgstr "データベースに接続できません。"
 
@@ -1903,7 +1904,7 @@ msgid "Cannot create another database connection."
 msgstr "データベースへのコネクションを作成できません。"
 
 #: include/classes/api/services/CTrigger.php:1004
-#: include/classes/api/services/CTriggerPrototype.php:811
+#: include/classes/api/services/CTriggerPrototype.php:826
 msgid "Cannot create circular dependencies."
 msgstr "循環する依存関係は作成できません。"
 
@@ -1911,7 +1912,7 @@ msgstr "循環する依存関係は作成できません。"
 msgid "Cannot create dependency on trigger itself."
 msgstr "自身に対する依存関係は作成できません。"
 
-#: include/classes/api/services/CTriggerPrototype.php:750
+#: include/classes/api/services/CTriggerPrototype.php:765
 msgid "Cannot create dependency on trigger prototype itself."
 msgstr "トリガーのプロトタイプ自身に対する依存関係は作成できません。"
 
@@ -1927,7 +1928,7 @@ msgstr "アイコンのマッピングを作成できません"
 msgid "Cannot create new application, web scenario is already assigned to application."
 msgstr "新規アプリケーションを作成できません。Webシナリオがアプリケーションに割り当てられています。"
 
-#: include/classes/setup/CSetupWizard.php:469
+#: include/classes/setup/CSetupWizard.php:485
 msgid "Cannot create the configuration file."
 msgstr "設定ファイルが作成できません。"
 
@@ -2126,7 +2127,7 @@ msgstr "テンプレートのグラフのプロトタイプを削除できませ
 msgid "Cannot delete templated graph."
 msgstr "テンプレートのグラフを削除できません。"
 
-#: include/classes/api/services/CHostPrototype.php:1159
+#: include/classes/api/services/CHostPrototype.php:1161
 msgid "Cannot delete templated host prototype."
 msgstr "テンプレートのホストのプロトタイプを削除できません。"
 
@@ -3102,7 +3103,7 @@ msgid "Check for error using regular expression"
 msgstr "正規表現使用時のエラーチェック"
 
 #: include/classes/setup/CSetupWizard.php:46
-#: include/classes/setup/CSetupWizard.php:215
+#: include/classes/setup/CSetupWizard.php:217
 msgid "Check of pre-requisites"
 msgstr "前提条件のチェック"
 
@@ -3454,7 +3455,7 @@ msgstr "設定"
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "設定したキャッシュの統計。cache - buffer (mode: pfree, total, used, free)。"
 
-#: include/classes/setup/CSetupWizard.php:488
+#: include/classes/setup/CSetupWizard.php:516
 #, c-format
 msgid "Configuration file \"%1$s\" created."
 msgstr "設定ファイル\"%1$s\"を作成しました。"
@@ -3627,7 +3628,7 @@ msgid "Configuration updated"
 msgstr "設定を更新しました"
 
 #: include/classes/setup/CSetupWizard.php:50
-#: include/classes/setup/CSetupWizard.php:330
+#: include/classes/setup/CSetupWizard.php:332
 msgid "Configure DB connection"
 msgstr "データベース接続設定"
 
@@ -3635,7 +3636,7 @@ msgstr "データベース接続設定"
 msgid "Confirmation text"
 msgstr "確認テキスト"
 
-#: include/classes/setup/CSetupWizard.php:486
+#: include/classes/setup/CSetupWizard.php:514
 msgid "Congratulations! You have successfully installed Zabbix frontend."
 msgstr "おめでとうございます！Webインターフェースのインストールが終了しました。"
 
@@ -3698,7 +3699,7 @@ msgstr ""
 "1. \"zabbix.conf.php\"に設定されたIP/DNSが正しくない。\n"
 "2. FirewallによってTCPでの接続がブロックされている。\n"
 
-#: include/classes/setup/CSetupWizard.php:273
+#: include/classes/setup/CSetupWizard.php:275
 msgid "Connection will not be encrypted because it uses a socket file (on Unix) or shared memory (Windows)."
 msgstr "ソケットファイル(UNIX系OS上)や共有メモリ(Windows上)が使用されるので接続は暗号化されません。"
 
@@ -4130,7 +4131,7 @@ msgstr "クリティカル"
 msgid "Current host"
 msgstr "現在のホスト"
 
-#: include/classes/setup/CSetupWizard.php:173
+#: include/classes/setup/CSetupWizard.php:175
 msgid "Current value"
 msgstr "現在の値"
 
@@ -4324,16 +4325,16 @@ msgstr "データセット"
 msgid "Data storage period"
 msgstr "データ保存期間"
 
-#: include/classes/setup/CSetupWizard.php:288
-#: include/classes/setup/CSetupWizard.php:389
-#: include/classes/setup/CSetupWizard.php:528
+#: include/classes/setup/CSetupWizard.php:290
+#: include/classes/setup/CSetupWizard.php:391
+#: include/classes/setup/CSetupWizard.php:555
 msgid "Database TLS CA file"
 msgstr "データベースのTLS CAファイル"
 
 #: include/classes/setup/CFrontendSetup.php:686
-#: include/classes/setup/CSetupWizard.php:300
-#: include/classes/setup/CSetupWizard.php:395
-#: include/classes/setup/CSetupWizard.php:536
+#: include/classes/setup/CSetupWizard.php:302
+#: include/classes/setup/CSetupWizard.php:397
+#: include/classes/setup/CSetupWizard.php:563
 msgid "Database TLS certificate file"
 msgstr "データベースのTLS証明書ファイル"
 
@@ -4341,19 +4342,19 @@ msgstr "データベースのTLS証明書ファイル"
 msgid "Database TLS certificate files must be read-only"
 msgstr "データベースのTLS証明書ファイルは読み込み専用にしてください"
 
-#: include/classes/setup/CSetupWizard.php:312
-#: include/classes/setup/CSetupWizard.php:402
+#: include/classes/setup/CSetupWizard.php:314
+#: include/classes/setup/CSetupWizard.php:404
 msgid "Database TLS cipher list"
 msgstr "データベースのTLS暗号化方式リスト"
 
-#: include/classes/setup/CSetupWizard.php:270
-#: include/classes/setup/CSetupWizard.php:385
+#: include/classes/setup/CSetupWizard.php:272
+#: include/classes/setup/CSetupWizard.php:387
 msgid "Database TLS encryption"
 msgstr "データベースのTLS暗号化"
 
-#: include/classes/setup/CSetupWizard.php:294
-#: include/classes/setup/CSetupWizard.php:392
-#: include/classes/setup/CSetupWizard.php:532
+#: include/classes/setup/CSetupWizard.php:296
+#: include/classes/setup/CSetupWizard.php:394
+#: include/classes/setup/CSetupWizard.php:559
 msgid "Database TLS key file"
 msgstr "データベースのTLSキーファイル"
 
@@ -4361,12 +4362,12 @@ msgstr "データベースのTLSキーファイル"
 msgid "Database history tables upgraded"
 msgstr "データベースのヒストリテーブルをアップグレードしました"
 
-#: include/classes/setup/CSetupWizard.php:238
+#: include/classes/setup/CSetupWizard.php:240
 msgid "Database host"
 msgstr "データベースホスト"
 
-#: include/classes/setup/CSetupWizard.php:306
-#: include/classes/setup/CSetupWizard.php:398
+#: include/classes/setup/CSetupWizard.php:308
+#: include/classes/setup/CSetupWizard.php:400
 msgid "Database host verification"
 msgstr "データベースのホスト検証"
 
@@ -4374,35 +4375,35 @@ msgstr "データベースのホスト検証"
 msgid "Database monitor"
 msgstr "データベースモニタ"
 
-#: include/classes/setup/CSetupWizard.php:251
-#: include/classes/setup/CSetupWizard.php:379 setup.php:44
+#: include/classes/setup/CSetupWizard.php:253
+#: include/classes/setup/CSetupWizard.php:381 setup.php:44
 msgid "Database name"
 msgstr "データベース名"
 
-#: include/classes/setup/CSetupWizard.php:381
+#: include/classes/setup/CSetupWizard.php:383
 msgid "Database password"
 msgstr "データベースパスワード"
 
-#: include/classes/setup/CSetupWizard.php:243
-#: include/classes/setup/CSetupWizard.php:378 setup.php:43
+#: include/classes/setup/CSetupWizard.php:245
+#: include/classes/setup/CSetupWizard.php:380 setup.php:43
 msgid "Database port"
 msgstr "データベースポート"
 
-#: include/classes/setup/CSetupWizard.php:256
-#: include/classes/setup/CSetupWizard.php:383
+#: include/classes/setup/CSetupWizard.php:258
+#: include/classes/setup/CSetupWizard.php:385
 msgid "Database schema"
 msgstr "データベーススキーマ"
 
-#: include/classes/setup/CSetupWizard.php:377
+#: include/classes/setup/CSetupWizard.php:379
 msgid "Database server"
 msgstr "データベースサーバー"
 
-#: include/classes/setup/CSetupWizard.php:230
-#: include/classes/setup/CSetupWizard.php:372
+#: include/classes/setup/CSetupWizard.php:232
+#: include/classes/setup/CSetupWizard.php:374
 msgid "Database type"
 msgstr "データベースタイプ"
 
-#: include/classes/setup/CSetupWizard.php:380
+#: include/classes/setup/CSetupWizard.php:382
 msgid "Database user"
 msgstr "データベースユーザー"
 
@@ -4854,7 +4855,7 @@ msgstr "Webシナリオを削除しますか？"
 msgid "Deleted: Host \"%1$s\"."
 msgstr "削除: ホスト\"%1$s\"。"
 
-#: include/classes/api/services/CHostPrototype.php:1027
+#: include/classes/api/services/CHostPrototype.php:1029
 #, c-format
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "削除: \"%2$s\"のホストのプロトタイプ\"%1$s\"。"
@@ -5385,7 +5386,7 @@ msgstr "Down"
 msgid "Download image"
 msgstr "イメージのダウンロード"
 
-#: include/classes/setup/CSetupWizard.php:475
+#: include/classes/setup/CSetupWizard.php:491
 msgid "Download the configuration file"
 msgstr "設定ファイルのダウンロード"
 
@@ -5444,7 +5445,7 @@ msgstr "スクリーンのための\"name\"の値\"%1$s\"が重複していま�
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "トリガー\"%1$s\"の依存関係が重複しています。"
 
-#: include/classes/api/services/CTriggerPrototype.php:981
+#: include/classes/api/services/CTriggerPrototype.php:996
 #, c-format
 msgid "Duplicate dependencies in trigger prototype \"%1$s\"."
 msgstr "トリガープロトタイプ\"%1$s\"の依存関係が重複しています。"
@@ -5670,7 +5671,7 @@ msgstr "アクション\"%1$s\"のフィルター条件タイプが空白です�
 #: include/classes/api/services/CHost.php:855
 #: include/classes/api/services/CHost.php:1427
 #: include/classes/api/services/CHost.php:1963
-#: include/classes/api/services/CHostPrototype.php:955
+#: include/classes/api/services/CHostPrototype.php:957
 #: include/classes/api/services/CImage.php:423
 #: include/classes/api/services/CImage.php:475
 #: include/classes/api/services/CMaintenance.php:535
@@ -6208,7 +6209,7 @@ msgstr "偽"
 msgid "FTP"
 msgstr "FTP"
 
-#: include/classes/setup/CSetupWizard.php:189
+#: include/classes/setup/CSetupWizard.php:191
 msgid "Fail"
 msgstr "失敗"
 
@@ -6439,7 +6440,7 @@ msgstr "ファイル内の文字列検索。一致する文字列を含む行か
 msgid "Find string on a web page. Returns the matched string, or as specified by the optional output parameter"
 msgstr "Webページ上の文字列検索。一致する文字列かoutputパラメータで指定したものを返す。"
 
-#: include/classes/setup/CSetupWizard.php:129
+#: include/classes/setup/CSetupWizard.php:131
 msgid "Finish"
 msgstr "終了"
 
@@ -6970,7 +6971,7 @@ msgstr "ディスカバリで発見されたホスト\"%1$s\"のグループ。"
 msgid "Group name"
 msgstr "グループ名"
 
-#: include/classes/api/services/CHostPrototype.php:1117
+#: include/classes/api/services/CHostPrototype.php:1119
 #, c-format
 msgid "Group prototype cannot be based on a discovered host group \"%1$s\"."
 msgstr "グループのプロトタイプにディスカバリされたホスト用のグループ\"%1$s\"を使用することはできません。"
@@ -7238,7 +7239,7 @@ msgstr "横位置"
 #: include/classes/screens/CScreenProblem.php:893
 #: include/classes/screens/CScreenProblem.php:1142
 #: include/classes/screens/CScreenTriggersInfo.php:40
-#: include/classes/setup/CSetupWizard.php:342
+#: include/classes/setup/CSetupWizard.php:344
 #: include/classes/widgets/forms/CWidgetFormProblems.php:206
 #: include/classes/widgets/forms/CWidgetFormProblems.php:207
 #: include/hostgroups.inc.php:249 include/maps.inc.php:24
@@ -7494,12 +7495,12 @@ msgstr "ホストネットワーク"
 msgid "Host prototype"
 msgstr "ホストプロトタイプ"
 
-#: include/classes/api/services/CHostPrototype.php:835
+#: include/classes/api/services/CHostPrototype.php:837
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "ホストのプロトタイプ\"%1$s\"は\"%2$s\"にすでに存在しています(他のテンプレートからの継承)。"
 
-#: include/classes/api/services/CHostPrototype.php:823
+#: include/classes/api/services/CHostPrototype.php:825
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "ホストのプロトタイプ\"%1$s\"は\"%2$s\"にすでに存在しています。"
@@ -8403,9 +8404,9 @@ msgstr "テーブル\"%2$s\"へのwhereステートメントのフィールド\"
 msgid "Incorrect fields for sysmap."
 msgstr "マップの設定が正しくありません。"
 
-#: include/classes/setup/CSetupWizard.php:528
-#: include/classes/setup/CSetupWizard.php:532
-#: include/classes/setup/CSetupWizard.php:536
+#: include/classes/setup/CSetupWizard.php:555
+#: include/classes/setup/CSetupWizard.php:559
+#: include/classes/setup/CSetupWizard.php:563
 #, c-format
 msgid "Incorrect file path for \"%1$s\": %2$s."
 msgstr "\"%1$s\": %2$sのファイルパスが正しくありません。"
@@ -9242,11 +9243,12 @@ msgid "Insert expression"
 msgstr "条件式の挿入"
 
 #: include/classes/setup/CSetupWizard.php:62
-#: include/classes/setup/CSetupWizard.php:493
+#: include/classes/setup/CSetupWizard.php:497
+#: include/classes/setup/CSetupWizard.php:520
 msgid "Install"
 msgstr "インストール"
 
-#: setup.php:108
+#: setup.php:92
 msgid "Installation"
 msgstr "インストール"
 
@@ -9780,7 +9782,7 @@ msgstr "イタリア語 (it_IT)"
 msgid "Item"
 msgstr "アイテム"
 
-#: include/classes/api/services/CHostPrototype.php:1061
+#: include/classes/api/services/CHostPrototype.php:1063
 #: include/classes/api/services/CItem.php:62
 #, c-format
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
@@ -11708,9 +11710,9 @@ msgstr "新規トリガー"
 msgid "Next page"
 msgstr "次のページ"
 
-#: include/classes/setup/CSetupWizard.php:126
-#: include/classes/setup/CSetupWizard.php:332
-#: include/classes/setup/CSetupWizard.php:421
+#: include/classes/setup/CSetupWizard.php:128
+#: include/classes/setup/CSetupWizard.php:334
+#: include/classes/setup/CSetupWizard.php:423
 msgid "Next step"
 msgstr "次のステップ"
 
@@ -12140,9 +12142,9 @@ msgstr "システムへのアクセス権がありません。"
 #: include/classes/api/services/CHostPrototype.php:418
 #: include/classes/api/services/CHostPrototype.php:464
 #: include/classes/api/services/CHostPrototype.php:485
-#: include/classes/api/services/CHostPrototype.php:1086
-#: include/classes/api/services/CHostPrototype.php:1108
-#: include/classes/api/services/CHostPrototype.php:1142
+#: include/classes/api/services/CHostPrototype.php:1088
+#: include/classes/api/services/CHostPrototype.php:1110
+#: include/classes/api/services/CHostPrototype.php:1144
 #: include/classes/api/services/CHttpTest.php:446
 #: include/classes/api/services/CHttpTest.php:539
 #: include/classes/api/services/CHttpTest.php:626
@@ -12204,8 +12206,9 @@ msgstr "システムへのアクセス権がありません。"
 #: include/classes/api/services/CTrigger.php:734
 #: include/classes/api/services/CTrigger.php:827
 #: include/classes/api/services/CTriggerPrototype.php:522
-#: include/classes/api/services/CTriggerPrototype.php:700
-#: include/classes/api/services/CTriggerPrototype.php:718
+#: include/classes/api/services/CTriggerPrototype.php:708
+#: include/classes/api/services/CTriggerPrototype.php:716
+#: include/classes/api/services/CTriggerPrototype.php:731
 #: include/classes/api/services/CUserGroup.php:322
 #: include/classes/api/services/CUserGroup.php:870
 #: include/classes/api/services/CUserMacro.php:377
@@ -12349,7 +12352,7 @@ msgid "Not all results are displayed. Please provide more specific search criter
 msgstr "すべての結果が表示されるわけではありません。 より具体的な検索条件を入力してください。"
 
 #: include/classes/api/services/CTrigger.php:1049
-#: include/classes/api/services/CTriggerPrototype.php:859
+#: include/classes/api/services/CTriggerPrototype.php:874
 #, c-format
 msgid "Not all templates are linked to \"%1$s\"."
 msgstr "すべてのテンプレートは\"%1$s\"にリンクされていません。"
@@ -13396,7 +13399,7 @@ msgstr "パッシブ"
 #: app/views/administration.user.edit.php:111
 #: app/views/administration.user.edit.php:126 disc_prototypes.php:232
 #: host_discovery.php:184 httpconf.php:64
-#: include/classes/setup/CSetupWizard.php:266
+#: include/classes/setup/CSetupWizard.php:268
 #: include/views/configuration.host.discovery.edit.php:303
 #: include/views/configuration.host.discovery.edit.php:428
 #: include/views/configuration.host.discovery.edit.php:458
@@ -13539,7 +13542,7 @@ msgstr "再生"
 msgid "Play sound"
 msgstr "サウンド再生"
 
-#: include/classes/setup/CSetupWizard.php:421
+#: include/classes/setup/CSetupWizard.php:423
 #, c-format
 msgid "Please check configuration parameters. If all is correct, press \"%1$s\" button, or \"%2$s\" button to change configuration parameters."
 msgstr "設定値を確認してください。正しければ\"%1$s\"ボタンを押してください。もしくは、\"%2$s\"ボタンを押して設定値を修正してください。"
@@ -13548,12 +13551,12 @@ msgstr "設定値を確認してください。正しければ\"%1$s\"ボタン�
 msgid "Please confirm that you want to remove all macros."
 msgstr "すべてのマクロを削除してよいか確認してください。"
 
-#: include/classes/setup/CSetupWizard.php:332
+#: include/classes/setup/CSetupWizard.php:334
 #, c-format
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
 msgstr "データベースを手動で作成してください。そしてデータベースに接続するための設定値を設定してください。終了したら\"%1$s\"ボタンを押してください。"
 
-#: include/classes/setup/CSetupWizard.php:361
+#: include/classes/setup/CSetupWizard.php:363
 msgid "Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional)."
 msgstr "Zabbixサーバーのホスト名かホストのIPアドレスとポート番号をを入力してください。必要に応じて名前も入力してください。"
 
@@ -13598,7 +13601,7 @@ msgstr "ホストインベントリフィールドの自動設定"
 #: app/views/administration.proxy.edit.php:47
 #: app/views/monitoring.host.view.php:131
 #: app/views/popup.itemtestedit.view.php:123
-#: include/classes/setup/CSetupWizard.php:347 include/hosts.inc.php:1444
+#: include/classes/setup/CSetupWizard.php:349 include/hosts.inc.php:1444
 #: include/views/configuration.host.list.php:141
 #: include/views/inventory.host.view.php:79 setup.php:57
 msgid "Port"
@@ -13629,7 +13632,7 @@ msgid "Post type"
 msgstr "POSTデータの形式"
 
 #: include/classes/setup/CSetupWizard.php:58
-#: include/classes/setup/CSetupWizard.php:419
+#: include/classes/setup/CSetupWizard.php:421
 msgid "Pre-installation summary"
 msgstr "インストール事前準備概要"
 
@@ -14455,7 +14458,7 @@ msgstr "リクエストを送信しました"
 msgid "Request type"
 msgstr "リクエストメソッド"
 
-#: include/classes/setup/CSetupWizard.php:173
+#: include/classes/setup/CSetupWizard.php:175
 #: include/views/configuration.httpconf.edit.php:221
 msgid "Required"
 msgstr "要求文字列"
@@ -15006,7 +15009,7 @@ msgstr "土曜"
 msgid "Save changes"
 msgstr "変更を保存"
 
-#: include/classes/setup/CSetupWizard.php:476
+#: include/classes/setup/CSetupWizard.php:492
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "\"%1$s\"として保存しました"
@@ -17269,7 +17272,7 @@ msgstr "トリガーのプロトタイプ\"%1$s\"は少なくとも1つ以上の
 msgid "Trigger prototype added"
 msgstr "トリガーのプロトタイプを追加しました"
 
-#: include/classes/api/services/CTriggerPrototype.php:916
+#: include/classes/api/services/CTriggerPrototype.php:931
 msgid "Trigger prototype cannot be dependent on a trigger that is inherited from it."
 msgstr "トリガーのプロトタイプは自身から継承したトリガーに依存することができません。"
 
@@ -17952,7 +17955,7 @@ msgstr "アイテムで使用"
 #: app/views/administration.user.edit.php:220
 #: app/views/reports.auditlog.list.php:87 httpconf.php:58
 #: include/actions.inc.php:1725 include/actions.inc.php:1780
-#: include/actions.inc.php:2001 include/classes/setup/CSetupWizard.php:263
+#: include/actions.inc.php:2001 include/classes/setup/CSetupWizard.php:265
 #: include/hosts.inc.php:61 include/views/configuration.httpconf.edit.php:181
 msgid "User"
 msgstr "ユーザー"
@@ -18628,7 +18631,7 @@ msgstr "ベンダー"
 msgid "Verbose"
 msgstr "Verbose"
 
-#: include/classes/setup/CSetupWizard.php:282
+#: include/classes/setup/CSetupWizard.php:284
 msgid "Verify database certificate"
 msgstr "データベースの証明書確認"
 
@@ -18701,7 +18704,7 @@ msgstr "W"
 msgid "Warning"
 msgstr "警告"
 
-#: include/classes/setup/CSetupWizard.php:185
+#: include/classes/setup/CSetupWizard.php:187
 msgctxt "setup"
 msgid "Warning"
 msgstr "警告"
@@ -18810,7 +18813,7 @@ msgstr "毎週"
 msgid "Welcome"
 msgstr "ようこそ"
 
-#: include/classes/setup/CSetupWizard.php:165
+#: include/classes/setup/CSetupWizard.php:167
 msgid "Welcome to"
 msgstr "ようこそ"
 
@@ -19254,7 +19257,7 @@ msgstr "Zabbixのログイン画面"
 
 #: app/partials/popup.operations.php:235
 #: app/views/administration.script.edit.php:57 include/actions.inc.php:880
-#: include/classes/setup/CSetupWizard.php:410
+#: include/classes/setup/CSetupWizard.php:412
 msgid "Zabbix server"
 msgstr "Zabbixサーバー"
 
@@ -19275,7 +19278,7 @@ msgid "Zabbix server (proxy)"
 msgstr "Zabbixサーバーまたはプロキシ"
 
 #: include/classes/setup/CSetupWizard.php:54
-#: include/classes/setup/CSetupWizard.php:359
+#: include/classes/setup/CSetupWizard.php:361
 msgid "Zabbix server details"
 msgstr "Zabbixサーバーの詳細"
 
@@ -19292,11 +19295,11 @@ msgstr "Zabbixサーバーの起動"
 msgid "Zabbix server is running check interval \"%1$s\"."
 msgstr "Zabbixサーバーの動作チェック間隔\"%1$s\""
 
-#: include/classes/setup/CSetupWizard.php:414
+#: include/classes/setup/CSetupWizard.php:416
 msgid "Zabbix server name"
 msgstr "Zabbixサーバー名"
 
-#: include/classes/setup/CSetupWizard.php:411
+#: include/classes/setup/CSetupWizard.php:413
 msgid "Zabbix server port"
 msgstr "Zabbixサーバーのポート"
 
@@ -19764,7 +19767,7 @@ msgid "days"
 msgstr "日"
 
 #: app/controllers/CControllerMapView.php:124
-#: include/classes/setup/CSetupWizard.php:374
+#: include/classes/setup/CSetupWizard.php:376
 #: include/classes/widgets/CWidgetHelper.php:70
 #: include/views/js/monitoring.slideconf.edit.js.php:40
 #: include/views/monitoring.slideconf.edit.php:136

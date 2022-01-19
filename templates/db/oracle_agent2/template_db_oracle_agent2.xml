@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-02-10T14:36:17Z</date>
+   <date>2022-01-10T14:11:39Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -11,7 +11,7 @@
       <template>
          <template>Template DB Oracle by Zabbix Agent 2</template>
          <name>Template DB Oracle by Zabbix Agent 2</name>
-         <description>Template tooling version used: 0.38</description>
+         <description>Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Databases</name>
@@ -207,7 +207,7 @@
                <history>0</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
-               <description>Get info about CDB and  No-CDB databases on instansce.</description>
+               <description>Get info about CDB and  No-CDB databases on instance.</description>
                <applications>
                   <application>
                      <name>Zabbix raw items</name>
@@ -790,7 +790,7 @@
                <history>0</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
-               <description>Get info about PDB databases on instansce.</description>
+               <description>Get info about PDB databases on instance.</description>
                <applications>
                   <application>
                      <name>Zabbix raw items</name>
@@ -1153,7 +1153,7 @@
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
-               <description>The percentage of concurrency. Concurrency is a DB behaviour when different transactions request to change the same resource - in case of modifying data transactions sequentially block temporarily the right to change data, the rest of the transactions are waiting for access. In the case when access for resource is locked for a long time, then the concurrency grows (like the transaction queue) and this often has an extremely negative impact on performance. A high contention value does not indicate the root cause of the problem, but is a signal to search for it.</description>
+               <description>The percentage of concurrency. Concurrency is a DB behavior when different transactions request to change the same resource - in case of modifying data transactions sequentially block temporarily the right to change data, the rest of the transactions are waiting for access. In the case when access for resource is locked for a long time, then the concurrency grows (like the transaction queue) and this often has an extremely negative impact on performance. A high contention value does not indicate the root cause of the problem, but is a signal to search for it.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -1286,7 +1286,7 @@
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
-               <description>Count of the prolongely locked sessions. (You can change maximum session lock duration in seconds for query by {$ORACLE.SESSION.LOCK.MAX.TIME} macro. Default 600 sec)</description>
+               <description>Count of the prolongedly locked sessions. (You can change maximum session lock duration in seconds for query by {$ORACLE.SESSION.LOCK.MAX.TIME} macro. Default 600 sec)</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -1793,7 +1793,6 @@
          <discovery_rules>
             <discovery_rule>
                <name>Archive log discovery</name>
-               <type>ZABBIX_PASSIVE</type>
                <key>oracle.archive.discovery["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
                <delay>1h</delay>
                <description>Log archive destinations.</description>
@@ -1854,7 +1853,7 @@
                      <key>oracle.archivelog_log_status["{#DEST_NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <description>Identifies the current status of the destination: 1 - 'Valid', 2 - 'Dederred',3 - 'Error', 0 - 'Unknown'</description>
+                     <description>Identifies the current status of the destination: 1 - 'Valid', 2 - 'Deferred',3 - 'Error', 0 - 'Unknown'</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Oracle Archivelog</name>
@@ -1886,11 +1885,9 @@
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Database discovery</name>
-               <type>ZABBIX_PASSIVE</type>
                <key>oracle.db.discovery["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
                <delay>1h</delay>
                <filter>
@@ -1999,12 +1996,6 @@
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{last()}=1</expression>
-                           <name>Oracle Database '{#DBNAME}': Open status in mount mode</name>
-                           <priority>WARNING</priority>
-                           <description>The Oracle DB has a MOUNTED state.</description>
-                        </trigger_prototype>
-                        <trigger_prototype>
                            <expression>{diff()}=1</expression>
                            <name>Oracle Database '{#DBNAME}': Open status has changed (new value received: {ITEM.VALUE})</name>
                            <priority>INFO</priority>
@@ -2016,6 +2007,12 @@
                                  <expression>{Template DB Oracle by Zabbix Agent 2:oracle.db_open_mode["{#DBNAME}"].last()}=1</expression>
                               </dependency>
                            </dependencies>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()}=1</expression>
+                           <name>Oracle Database '{#DBNAME}': Open status in mount mode</name>
+                           <priority>WARNING</priority>
+                           <description>The Oracle DB has a MOUNTED state.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -2058,7 +2055,6 @@
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template DB Oracle by Zabbix Agent 2:oracle.db_force_logging["{#DBNAME}"].last()} = 0 and {Template DB Oracle by Zabbix Agent 2:oracle.db_log_mode["{#DBNAME}"].last()} = 1</expression>
@@ -2070,7 +2066,6 @@
             </discovery_rule>
             <discovery_rule>
                <name>ASM disk groups discovery</name>
-               <type>ZABBIX_PASSIVE</type>
                <key>oracle.diskgroups.discovery["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
                <delay>1h</delay>
                <description>ASM disk groups</description>
@@ -2146,6 +2141,12 @@
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
+                           <expression>{min(5m)}&gt;{$ORACLE.ASM.USED.PCT.MAX.HIGH}</expression>
+                           <name>ASM '{#DG_NAME}': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.HIGH}% for 5m)</name>
+                           <priority>HIGH</priority>
+                           <description>Usage percent of ASM disk group is over {$ORACLE.ASM.USED.PCT.MAX.WARN}</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
                            <expression>{min(5m)}&gt;{$ORACLE.ASM.USED.PCT.MAX.WARN}</expression>
                            <name>ASM '{#DG_NAME}': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.WARN}% for 5m)</name>
                            <priority>WARNING</priority>
@@ -2157,16 +2158,9 @@
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
-                        <trigger_prototype>
-                           <expression>{min(5m)}&gt;{$ORACLE.ASM.USED.PCT.MAX.HIGH}</expression>
-                           <name>ASM '{#DG_NAME}': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.HIGH}% for 5m)</name>
-                           <priority>HIGH</priority>
-                           <description>Usage percent of ASM disk group is over {$ORACLE.ASM.USED.PCT.MAX.WARN}</description>
-                        </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>ASM '{#DG_NAME}': ASM disk group '{#DG_NAME}'</name>
@@ -2192,7 +2186,6 @@
             </discovery_rule>
             <discovery_rule>
                <name>PDB discovery</name>
-               <type>ZABBIX_PASSIVE</type>
                <key>oracle.pdb.discovery["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
                <delay>1h</delay>
                <filter>
@@ -2243,26 +2236,24 @@
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{last()}=1</expression>
-                           <name>Oracle Database '{#DBNAME}': Open status in mount mode</name>
-                           <priority>WARNING</priority>
-                           <description>The Oracle DB has a MOUNTED state.</description>
-                        </trigger_prototype>
-                        <trigger_prototype>
                            <expression>{diff()}=1</expression>
                            <name>Oracle Database '{#DBNAME}': Open status has changed (new value received: {ITEM.VALUE})</name>
                            <priority>INFO</priority>
                            <description>Oracle DB open status has changed. Ack to close.</description>
                            <manual_close>YES</manual_close>
                         </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()}=1</expression>
+                           <name>Oracle Database '{#DBNAME}': Open status in mount mode</name>
+                           <priority>WARNING</priority>
+                           <description>The Oracle DB has a MOUNTED state.</description>
+                        </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Tablespace discovery</name>
-               <type>ZABBIX_PASSIVE</type>
                <key>oracle.ts.discovery["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
                <delay>1h</delay>
                <filter>
@@ -2379,9 +2370,9 @@
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()}=2</expression>
-                           <name>Oracle TBS '{#TABLESPACE}': Tablespase is OFFLINE</name>
+                           <name>Oracle TBS '{#TABLESPACE}': Tablespace is OFFLINE</name>
                            <priority>WARNING</priority>
-                           <description>The tablespase is in the offline state.</description>
+                           <description>The tablespace is in the offline state.</description>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{diff()}=1</expression>
@@ -2391,7 +2382,7 @@
                            <manual_close>YES</manual_close>
                            <dependencies>
                               <dependency>
-                                 <name>Oracle TBS '{#TABLESPACE}': Tablespase is OFFLINE</name>
+                                 <name>Oracle TBS '{#TABLESPACE}': Tablespace is OFFLINE</name>
                                  <expression>{Template DB Oracle by Zabbix Agent 2:oracle.tbs_status["{#TABLESPACE}"].last()}=2</expression>
                               </dependency>
                            </dependencies>
@@ -2446,6 +2437,11 @@
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
+                           <expression>{min(5m)}&gt;{$ORACLE.TBS.USED.PCT.MAX.HIGH}</expression>
+                           <name>Oracle TBS '{#TABLESPACE}': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m).</name>
+                           <priority>HIGH</priority>
+                        </trigger_prototype>
+                        <trigger_prototype>
                            <expression>{min(5m)}&gt;{$ORACLE.TBS.USED.PCT.MAX.WARN}</expression>
                            <name>Oracle TBS '{#TABLESPACE}': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.WARN}% for 5m).</name>
                            <priority>WARNING</priority>
@@ -2455,11 +2451,6 @@
                                  <expression>{Template DB Oracle by Zabbix Agent 2:oracle.tbs_used_file_pct["{#TABLESPACE}"].min(5m)}&gt;{$ORACLE.TBS.USED.PCT.MAX.HIGH}</expression>
                               </dependency>
                            </dependencies>
-                        </trigger_prototype>
-                        <trigger_prototype>
-                           <expression>{min(5m)}&gt;{$ORACLE.TBS.USED.PCT.MAX.HIGH}</expression>
-                           <name>Oracle TBS '{#TABLESPACE}': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m).</name>
-                           <priority>HIGH</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -2506,7 +2497,6 @@
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>Oracle TBS '{#TABLESPACE}': Tablespace '{#TABLESPACE}'</name>
@@ -2607,12 +2597,12 @@
             <macro>
                <macro>{$ORACLE.SESSION.LOCK.MAX.TIME}</macro>
                <value>600</value>
-               <description>Maximum session lock duration in seconds for count the session as a prolongely locked query.</description>
+               <description>Maximum session lock duration in seconds for count the session as a prolongedly locked query.</description>
             </macro>
             <macro>
                <macro>{$ORACLE.SESSION.LONG.LOCK.MAX.WARN}</macro>
                <value>3</value>
-               <description>Maximum number of the prolongely locked sessions alert threshold (for trigger expression).</description>
+               <description>Maximum number of the prolongedly locked sessions alert threshold (for trigger expression).</description>
             </macro>
             <macro>
                <macro>{$ORACLE.SESSIONS.LOCK.MAX.WARN}</macro>
@@ -2902,15 +2892,44 @@
    </graphs>
    <value_maps>
       <value_map>
-         <name>Service state</name>
+         <name>Oracle Archivelog status</name>
          <mappings>
             <mapping>
                <value>0</value>
-               <newvalue>Down</newvalue>
+               <newvalue>Unknown</newvalue>
             </mapping>
             <mapping>
                <value>1</value>
-               <newvalue>Up</newvalue>
+               <newvalue>Error</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Deferred</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Valid</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>Oracle archiver state</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Stopped</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Started</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Failed</newvalue>
             </mapping>
          </mappings>
       </value_map>
@@ -2969,6 +2988,36 @@
          </mappings>
       </value_map>
       <value_map>
+         <name>Oracle force log status</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>No</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Yes</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>Oracle instance role</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Primary</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Secondary</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
          <name>Oracle instance status</name>
          <mappings>
             <mapping>
@@ -2994,40 +3043,19 @@
          </mappings>
       </value_map>
       <value_map>
-         <name>Oracle instance role</name>
+         <name>Oracle log mode</name>
          <mappings>
             <mapping>
                <value>0</value>
-               <newvalue>Unknown</newvalue>
+               <newvalue>NOARCHIVELOG</newvalue>
             </mapping>
             <mapping>
                <value>1</value>
-               <newvalue>Primary</newvalue>
+               <newvalue>ARCHIVELOG</newvalue>
             </mapping>
             <mapping>
                <value>2</value>
-               <newvalue>Secondary</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>Oracle archiver state</name>
-         <mappings>
-            <mapping>
-               <value>0</value>
-               <newvalue>Unknown</newvalue>
-            </mapping>
-            <mapping>
-               <value>1</value>
-               <newvalue>Stopped</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>Started</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>Failed</newvalue>
+               <newvalue>MANUAL</newvalue>
             </mapping>
          </mappings>
       </value_map>
@@ -3053,53 +3081,15 @@
          </mappings>
       </value_map>
       <value_map>
-         <name>Oracle Archivelog status</name>
+         <name>Service state</name>
          <mappings>
             <mapping>
                <value>0</value>
-               <newvalue>Unknown</newvalue>
+               <newvalue>Down</newvalue>
             </mapping>
             <mapping>
                <value>1</value>
-               <newvalue>Error</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>Deferred</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>Valid</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>Oracle force log status</name>
-         <mappings>
-            <mapping>
-               <value>0</value>
-               <newvalue>No</newvalue>
-            </mapping>
-            <mapping>
-               <value>1</value>
-               <newvalue>Yes</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>Oracle log mode</name>
-         <mappings>
-            <mapping>
-               <value>0</value>
-               <newvalue>NOARCHIVELOG</newvalue>
-            </mapping>
-            <mapping>
-               <value>1</value>
-               <newvalue>ARCHIVELOG</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>MANUAL</newvalue>
+               <newvalue>Up</newvalue>
             </mapping>
          </mappings>
       </value_map>

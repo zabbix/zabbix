@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,6 @@ class CIntegrationTest extends CAPITest {
 
 	// Default delays (in seconds):
 	const WAIT_ITERATION_DELAY		= 1; // Wait iteration delay.
-	const COMPONENT_STARTUP_DELAY	= 10; // Component start delay.
 	const CACHE_RELOAD_DELAY		= 5; // Configuration cache reload delay.
 	const DATA_PROCESSING_DELAY		= 5; // Data processing delay.
 
@@ -48,6 +47,7 @@ class CIntegrationTest extends CAPITest {
 	const AGENT_PORT_SUFFIX = '50';
 	const SERVER_PORT_SUFFIX = '51';
 	const PROXY_PORT_SUFFIX = '52';
+	const AGENT2_PORT_SUFFIX = '53';
 
 	/**
 	 * Components required by test suite.
@@ -180,9 +180,8 @@ class CIntegrationTest extends CAPITest {
 				continue;
 			}
 
-			self::$suite_configuration[$component] = array_merge(self::$suite_configuration[$component],
-					$result['configuration'][$component]
-			);
+			self::$suite_configuration[$component]
+				= array_merge(self::$suite_configuration[$component], $result['configuration'][$component]);
 		}
 
 		try {
@@ -195,11 +194,6 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		self::setHostStatus(self::$suite_hosts, HOST_STATUS_MONITORED);
-
-		foreach (self::$suite_components as $component) {
-			self::prepareComponentConfiguration($component, self::$suite_configuration);
-			self::startComponent($component);
-		}
 	}
 
 	/**
@@ -230,22 +224,21 @@ class CIntegrationTest extends CAPITest {
 			}
 
 			self::$case_configuration[$component] = array_merge(self::$case_configuration[$component],
-					$result['configuration'][$component]
+				$result['configuration'][$component]
 			);
 		}
 
 		self::setHostStatus($this->case_hosts, HOST_STATUS_MONITORED);
 
-		foreach (self::$suite_components as $component) {
-			if (self::$case_configuration[$component] === self::$suite_configuration[$component]) {
-				continue;
+		foreach ($this->case_components as $component) {
+			if (in_array($component, self::$suite_components)) {
+				throw new Exception('Component "'.$component.'" already started on suite level.');
 			}
-
-			self::prepareComponentConfiguration($component, self::$case_configuration);
-			self::restartComponent($component);
 		}
 
-		foreach ($this->case_components as $component) {
+		$components = array_merge(self::$suite_components, $this->case_components);
+
+		foreach ($components as $component) {
 			self::prepareComponentConfiguration($component, self::$case_configuration);
 			self::startComponent($component);
 		}
@@ -257,29 +250,22 @@ class CIntegrationTest extends CAPITest {
 	 * @after
 	 */
 	public function onAfterTestCase() {
-		foreach ($this->case_components as $component) {
+		$components = array_merge(self::$suite_components, $this->case_components);
+
+		foreach ($components as $component) {
 			try {
 				self::stopComponent($component);
 			}
 			catch (Exception $e) {
-				self::addWarning($e->getMessage());
+				self::zbxAddWarning($e->getMessage());
 			}
-		}
-
-		foreach (self::$suite_components as $component) {
-			if (array_key_exists($component, self::$case_configuration)
-					&& self::$case_configuration[$component] === self::$suite_configuration[$component]) {
-				continue;
-			}
-
-			self::prepareComponentConfiguration($component, self::$suite_configuration);
-			self::restartComponent($component);
 		}
 
 		self::setHostStatus($this->case_hosts, HOST_STATUS_NOT_MONITORED);
-		self::$case_configuration = [];
 
 		parent::onAfterTestCase();
+
+		self::$case_configuration = [];
 	}
 
 	/**
@@ -293,7 +279,7 @@ class CIntegrationTest extends CAPITest {
 				self::stopComponent($component);
 			}
 			catch (Exception $e) {
-				self::addWarning($e->getMessage());
+				self::zbxAddWarning($e->getMessage());
 			}
 		}
 
@@ -344,8 +330,20 @@ class CIntegrationTest extends CAPITest {
 		for ($r = 0; $r < self::WAIT_ITERATIONS; $r++) {
 			$pid = @file_get_contents(self::getPidPath($component));
 			if ($pid && is_numeric($pid) && posix_kill($pid, 0)) {
-				sleep(self::COMPONENT_STARTUP_DELAY);
+				switch ($component) {
+					case self::COMPONENT_SERVER:
+					case self::COMPONENT_PROXY:
+						self::waitForLogLineToBePresent($component, 'started [trapper #1]', false, 5, 1);
+						break;
 
+					case self::COMPONENT_AGENT:
+						self::waitForLogLineToBePresent($component, 'started [listener #1]', false, 5, 1);
+						break;
+
+					case self::COMPONENT_AGENT2:
+						self::waitForLogLineToBePresent($component, 'using configuration file', false, 5, 1);
+						break;
+				}
 				return;
 			}
 
@@ -379,18 +377,15 @@ class CIntegrationTest extends CAPITest {
 	/**
 	 * Execute command and the execution result.
 	 *
-	 * @param string $command   command to be executed
-	 * @param array  $params    parameters to be passed
-	 * @param string $suffix    command suffix
+	 * @param string $command     command to be executed
+	 * @param array  $params      parameters to be passed
+	 * @param bool   $background  run command in background
 	 *
 	 * @return string
 	 *
 	 * @throws Exception    on execution error
 	 */
-	private static function executeCommand($command, $params = [], $suffix = '') {
-		$return = null;
-		$output = null;
-
+	private static function executeCommand(string $command, array $params, bool $background = false) {
 		if ($params) {
 			foreach ($params as &$param) {
 				$param = escapeshellarg($param);
@@ -400,13 +395,16 @@ class CIntegrationTest extends CAPITest {
 			$params = ' '.implode(' ', $params);
 		}
 		else {
-			$params = null;
+			$params = '';
 		}
 
-		exec($command.$params.$suffix, $output, $return);
+		$command .= $params.($background ? ' > /dev/null 2>&1 &' : ' 2>&1');
+
+		exec($command, $output, $return);
 
 		if ($return !== 0) {
-			throw new Exception('Failed to execute command "'.$command.$params.$suffix.'".');
+			$output = $output ? "\n".'Output:'."\n".implode("\n", $output) : '';
+			throw new Exception('Failed to execute command "'.$command.'".'.$output);
 		}
 
 		return $output;
@@ -460,7 +458,7 @@ class CIntegrationTest extends CAPITest {
 				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent2.log',
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent2.pid',
 				'ControlSocket' => PHPUNIT_COMPONENT_DIR.'zabbix_agent2.sock',
-				'ListenPort' => PHPUNIT_PORT_PREFIX.self::AGENT_PORT_SUFFIX
+				'ListenPort' => PHPUNIT_PORT_PREFIX.self::AGENT2_PORT_SUFFIX
 			]
 		];
 
@@ -487,13 +485,9 @@ class CIntegrationTest extends CAPITest {
 
 		if (array_key_exists($component, $values) && $values[$component] && is_array($values[$component])) {
 			foreach ($values[$component] as $key => $value) {
-				$result = preg_replace('/^'.$key.'\s*=.*$/m', $key.'='.$value, $config);
-				if ($result !== $config) {
-					$config = $result;
-					continue;
-				}
-				else {
-					$config .= "\n".$key.'='.$value;
+				$config = preg_replace('/^(\s*'.$key.'\s*=.*)$/m', '#\1', $config);
+				foreach ((array) $value as $val) {
+					$config .= "\n".$key.'='.$val;
 				}
 			}
 		}
@@ -521,8 +515,8 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		self::clearLog($component);
-		$suffix = ($component === self::COMPONENT_AGENT2) ? ' > /dev/null 2>&1 &' : '';
-		self::executeCommand(PHPUNIT_BINARY_DIR.'zabbix_'.$component, ['-c', $config], $suffix);
+		$background = ($component === self::COMPONENT_AGENT2);
+		self::executeCommand(PHPUNIT_BINARY_DIR.'zabbix_'.$component, ['-c', $config], $background);
 		self::waitForStartup($component);
 	}
 
@@ -541,18 +535,6 @@ class CIntegrationTest extends CAPITest {
 			posix_kill($pid, SIGTERM);
 		}
 		self::waitForShutdown($component);
-	}
-
-	/**
-	 * Restart component.
-	 *
-	 * @param string $component    component name
-	 *
-	 * @throws Exception    on missing configuration or failed restart
-	 */
-	protected static function restartComponent($component) {
-		self::stopComponent($component);
-		self::startComponent($component);
 	}
 
 	/**
@@ -732,8 +714,8 @@ class CIntegrationTest extends CAPITest {
 			$component = $this->getActiveComponent();
 		}
 
-		$params = ['--runtime-control', 'config_cache_reload'];
-		self::executeCommand(PHPUNIT_BINARY_DIR.'zabbix_'.$component, $params, '> /dev/null 2>&1');
+		self::executeCommand(PHPUNIT_BINARY_DIR.'zabbix_'.$component, ['--runtime-control', 'config_cache_reload']);
+
 		sleep(self::CACHE_RELOAD_DELAY);
 	}
 
@@ -860,7 +842,7 @@ class CIntegrationTest extends CAPITest {
 	 *
 	 * @throws Exception    on failed wait operation
 	 */
-	protected function waitForLogLineToBePresent($component, $lines, $incremental = true, $iterations = null, $delay = null) {
+	protected static function waitForLogLineToBePresent($component, $lines, $incremental = true, $iterations = null, $delay = null) {
 		if ($iterations === null) {
 			$iterations = self::WAIT_ITERATIONS;
 		}
@@ -870,7 +852,7 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		for ($r = 0; $r < $iterations; $r++) {
-			if ($this->isLogLinePresent($component, $lines, $incremental)) {
+			if (self::isLogLinePresent($component, $lines, $incremental)) {
 				return;
 			}
 

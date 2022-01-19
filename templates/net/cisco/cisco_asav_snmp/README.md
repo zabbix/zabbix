@@ -1,5 +1,5 @@
 
-# Cisco ASAv SNMP
+# Template Net Cisco ASAv SNMP
 
 ## Overview
 
@@ -34,6 +34,7 @@ No specific Zabbix configuration is required.
 |{$CISCO.LLD.FILTER.IF.NAME.MATCHES} |<p>Filter by discoverable interface names.</p> |`.*` |
 |{$CISCO.LLD.FILTER.IF.NAME.NOT_MATCHES} |<p>Filter to exclude discovered interfaces by name.</p> |`CHANGE_IF_NEEDED` |
 |{$CPU.UTIL.CRIT} |<p>-</p> |`90` |
+|{$IFCONTROL} |<p>-</p> |`1` |
 |{$MEMORY.UTIL.MAX} |<p>-</p> |`90` |
 |{$SNMP.TIMEOUT} |<p>The time interval for SNMP agent availability trigger expression.</p> |`5m` |
 
@@ -46,7 +47,7 @@ There are no template links in this template.
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |Physical entry discovery |<p>Information about a particular physical entity.</p> |SNMP |cisco.asav.physical.entry.discovery |
-|Interface discovery |<p>Network interfaces discovery</p> |SNMP |cisco.asav.net.if.discovery<p>**Filter**:</p>AND <p>- A: {#CISCO.IF.NAME} MATCHES_REGEX `{$CISCO.LLD.FILTER.IF.NAME.MATCHES}`</p><p>- B: {#CISCO.IF.NAME} NOT_MATCHES_REGEX `{$CISCO.LLD.FILTER.IF.NAME.NOT_MATCHES}`</p><p>- C: {#CISCO.IF.STATUS.ADMIN} MATCHES_REGEX `{$CISCO.LLD.FILTER.IF.ADMIN.MATCHES}`</p><p>- D: {#CISCO.IF.STATUS.ADMIN} NOT_MATCHES_REGEX `{$CISCO.LLD.FILTER.IF.ADMIN.NOT_MATCHES}`</p><p>- E: {#CISCO.IF.DESC} MATCHES_REGEX `{$CISCO.LLD.FILTER.IF.DESC.MATCHES}`</p><p>- F: {#CISCO.IF.DESC} NOT_MATCHES_REGEX `{$CISCO.LLD.FILTER.IF.DESC.NOT_MATCHES}`</p> |
+|Interface discovery |<p>Network interfaces discovery</p> |SNMP |cisco.asav.net.if.discovery<p>**Filter**:</p>AND <p>- A: {#CISCO.IF.NAME} MATCHES_REGEX `{$CISCO.LLD.FILTER.IF.NAME.MATCHES}`</p><p>- B: {#CISCO.IF.NAME} NOT_MATCHES_REGEX `{$CISCO.LLD.FILTER.IF.NAME.NOT_MATCHES}`</p><p>- C: {#CISCO.IF.STATUS.ADMIN} MATCHES_REGEX `{$CISCO.LLD.FILTER.IF.ADMIN.MATCHES}`</p><p>- D: {#CISCO.IF.STATUS.ADMIN} NOT_MATCHES_REGEX `{$CISCO.LLD.FILTER.IF.ADMIN.NOT_MATCHES}`</p><p>- E: {#CISCO.IF.DESC} MATCHES_REGEX `{$CISCO.LLD.FILTER.IF.DESC.MATCHES}`</p><p>- F: {#CISCO.IF.DESC} NOT_MATCHES_REGEX `{$CISCO.LLD.FILTER.IF.DESC.NOT_MATCHES}`</p><p>**Overrides:**</p><p>Don't create triggers for matching interface<br> - {#CISCO.IF.NAME} NOT_MATCHES_REGEX `{$CISCO.LLD.FILTER.IF.CONTROL.MATCHES}`<br>  - TRIGGER_PROTOTYPE REGEXP `.*` - NO_DISCOVER</p> |
 |Memory discovery |<p>Discovery of ciscoMemoryPoolTable, a table of memory pool monitoring entries.</p> |SNMP |cisco.asav.memory.discovery |
 |CPU discovery |<p>Discovery of cpmCPUTotalTable, a table of CPU monitoring entries.</p> |SNMP |cisco.asav.cpu.discovery |
 |Session discovery |<p>Remote access session discovery</p> |SNMP |cisco.asav.session.discovery |

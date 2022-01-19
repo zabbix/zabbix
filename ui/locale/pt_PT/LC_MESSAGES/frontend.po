@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-05 19:52+0200\n"
-"PO-Revision-Date: 2021-03-19 18:01+0300\n"
-"Last-Translator: Anonymous Pootle User\n"
+"POT-Creation-Date: 2022-01-07 19:54+0200\n"
+"PO-Revision-Date: 2021-12-16 18:18+0300\n"
+"Last-Translator: hugosantos <hugopedrosantos@gmail.com>\n"
 "Language-Team: none\n"
 "Language: pt_PT\n"
 "MIME-Version: 1.0\n"
@@ -12,14 +12,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1616169710.000000\n"
+"X-POOTLE-MTIME: 1639671507.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:139
 #: include/classes/db/PostgresqlDbBackend.php:96
 #, c-format
 msgid "\"%1$s\" instead \"%2$s\""
-msgstr ""
+msgstr "\"%1$s\" como alternativa a \"%2$s\""
 
 #: include/classes/import/validators/C10XmlValidator.php:346
 #: include/classes/import/validators/C10XmlValidator.php:363
@@ -44,12 +44,12 @@ msgstr "é esperado \"%1$s\""
 #: maintenance.php:133 services.php:182 services.php:191
 #, c-format
 msgid "\"%1$s\" must be between 1970.01.01 and 2038.01.18."
-msgstr ""
+msgstr "\"%1$s\" deverá ser entre 1970.01.01 e 2038.01.18."
 
 #: include/classes/api/services/CItemGeneral.php:1381
 #, c-format
 msgid "\"%1$s\" value must be less than or equal to \"%2$s\" value"
-msgstr ""
+msgstr "valor \"%1$s\" deve ser menor ou igual ao valor \"%2$s\""
 
 #: include/classes/import/validators/C10XmlValidator.php:381
 #: include/classes/import/validators/C10XmlValidator.php:403
@@ -62,7 +62,7 @@ msgstr "é esperado par \"host:key\""
 #: include/views/js/configuration.host.discovery.edit.js.php:91
 #: include/views/js/item.preprocessing.js.php:148
 msgid "$.path.to.node"
-msgstr ""
+msgstr "$.path.to.node"
 
 #: include/classes/api/services/CDRule.php:549
 #, c-format
@@ -80,7 +80,7 @@ msgstr[1] "%1$d dias"
 #, c-format
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
-msgstr ""
+msgstr "%1$d correspondências para %2$s encontrados"
 
 #: app/controllers/CControllerWidgetProblemsView.php:57
 #: include/classes/screens/CScreenHostTriggers.php:211
@@ -103,7 +103,7 @@ msgstr "%1$s (ano %2$s)"
 #: include/classes/core/CModuleManager.php:228
 #, c-format
 msgid "%1$s - thrown by module located at %2$s."
-msgstr ""
+msgstr "%1$s -  com origem no módulo localizado em %2$s."
 
 #: app/partials/monitoring.latest.view.html.php:133
 #, c-format
@@ -123,18 +123,18 @@ msgstr "%1$s [Linha: %2$s | Coluna: %3$s]"
 msgctxt "screen reader"
 msgid "%1$s action"
 msgid_plural "%1$s actions"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s ação"
+msgstr[1] "%1$s ações"
 
 #: jsLoader.php:239
 #, c-format
 msgid "%1$s characters"
-msgstr ""
+msgstr "%1$s caracteres"
 
 #: jsLoader.php:240
 #, c-format
 msgid "%1$s characters remaining"
-msgstr ""
+msgstr "%1$s caracteres em falta"
 
 #: app/views/popup.acknowledge.edit.php:59
 #: app/views/popup.acknowledge.edit.php:64
@@ -148,8 +148,8 @@ msgstr[1] "%1$s eventos"
 #, c-format
 msgid "%1$s host in maintenance"
 msgid_plural "%1$s hosts in maintenance"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s servidor em manutenção"
+msgstr[1] "%1$s servidores em manutenção"
 
 #: app/controllers/CControllerWidgetPlainTextView.php:119
 #: include/views/monitoring.history.php:32
@@ -164,8 +164,8 @@ msgstr[1] "%1$s items"
 msgctxt "screen reader"
 msgid "%1$s message"
 msgid_plural "%1$s messages"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s mensagem"
+msgstr[1] "%1$s mensagens"
 
 #: include/classes/widgets/CWidgetConfig.php:162
 #: include/classes/widgets/CWidgetConfig.php:163
@@ -182,8 +182,8 @@ msgstr[1] "%1$s minutos"
 #, c-format
 msgid "%1$s of %2$s element in problem state"
 msgid_plural "%1$s of %2$s elements in problem state"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s de %2$s elemento no estado problema"
+msgstr[1] "%1$s de %2$s elementos no estado problema"
 
 #: jsLoader.php:259
 #, c-format
@@ -297,7 +297,7 @@ msgstr "(Só super-administradores podem criar grupos)"
 msgid "(no proxy)"
 msgstr "(sem proxy)"
 
-#: include/classes/setup/CSetupWizard.php:248
+#: include/classes/setup/CSetupWizard.php:250
 msgid "0 - use default port"
 msgstr "0 - usar porta padrão"
 
@@ -958,7 +958,7 @@ msgstr "Permitir encerramento manual"
 msgid "Allowed hosts"
 msgstr "Hosts permitidos"
 
-#: include/classes/setup/CSetupWizard.php:473
+#: include/classes/setup/CSetupWizard.php:489
 msgid "Alternatively, you can install it manually:"
 msgstr "Alternativamente, pode instalar manualmente:"
 
@@ -1315,6 +1315,7 @@ msgid "Authentication protocol"
 msgstr "Protocolo de autenticação"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:313
+#: app/controllers/CControllerAuthenticationUpdate.php:322
 msgid "Authentication settings updated"
 msgstr ""
 
@@ -1407,8 +1408,8 @@ msgstr "Média"
 msgid "Axes"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:132
-#: include/classes/setup/CSetupWizard.php:421
+#: include/classes/setup/CSetupWizard.php:134
+#: include/classes/setup/CSetupWizard.php:423
 msgid "Back"
 msgstr "Voltar"
 
@@ -1632,7 +1633,7 @@ msgstr ""
 #: app/views/js/administration.trigseverity.edit.js.php:37
 #: app/views/monitoring.dashboard.view.php:114
 #: include/classes/html/CButtonCancel.php:25
-#: include/classes/setup/CSetupWizard.php:114
+#: include/classes/setup/CSetupWizard.php:116
 #: include/views/conf.import.php:131 include/views/js/conf.import.js.php:42
 #: include/views/monitoring.slideconf.edit.php:281 jsLoader.php:122
 #: jsLoader.php:139 jsLoader.php:243 jsLoader.php:324 jsLoader.php:336
@@ -1675,7 +1676,7 @@ msgid "Cannot add correlation condition"
 msgstr "Não foi possível adicionar a condição de correlação"
 
 #: include/classes/api/services/CTrigger.php:970
-#: include/classes/api/services/CTriggerPrototype.php:780
+#: include/classes/api/services/CTriggerPrototype.php:795
 msgid "Cannot add dependency from a host to a template."
 msgstr "Não foi possível adicionar dependência de um host para um template."
 
@@ -1885,7 +1886,7 @@ msgstr "Não foi possível terminar o problema: %1$s."
 msgid "Cannot connect to LDAP server."
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:321
+#: include/classes/setup/CSetupWizard.php:323
 msgid "Cannot connect to the database."
 msgstr "Não foi possível a ligação à base de dados."
 
@@ -1926,7 +1927,7 @@ msgid "Cannot create another database connection."
 msgstr "Não foi possível criar outra ligação à base de dados."
 
 #: include/classes/api/services/CTrigger.php:1004
-#: include/classes/api/services/CTriggerPrototype.php:811
+#: include/classes/api/services/CTriggerPrototype.php:826
 msgid "Cannot create circular dependencies."
 msgstr "Não é possível criar uma dependência circular."
 
@@ -1934,7 +1935,7 @@ msgstr "Não é possível criar uma dependência circular."
 msgid "Cannot create dependency on trigger itself."
 msgstr "Não é possível criar uma dependência de um trigger com ele mesmo."
 
-#: include/classes/api/services/CTriggerPrototype.php:750
+#: include/classes/api/services/CTriggerPrototype.php:765
 msgid "Cannot create dependency on trigger prototype itself."
 msgstr "Não é possível criar dependência entre um protótipo de trigger e o próprio."
 
@@ -1950,7 +1951,7 @@ msgstr "Não foi possível criar o mapa de ícones"
 msgid "Cannot create new application, web scenario is already assigned to application."
 msgstr "Não foi possível criar a nova aplicação, o cenário web já possui uma aplicação."
 
-#: include/classes/setup/CSetupWizard.php:469
+#: include/classes/setup/CSetupWizard.php:485
 msgid "Cannot create the configuration file."
 msgstr "Não foi possível criar o arquivo de configuração."
 
@@ -2159,7 +2160,7 @@ msgstr ""
 msgid "Cannot delete templated graph."
 msgstr ""
 
-#: include/classes/api/services/CHostPrototype.php:1159
+#: include/classes/api/services/CHostPrototype.php:1161
 msgid "Cannot delete templated host prototype."
 msgstr "Não é possível eliminar protótipos de host baseados em templates."
 
@@ -2210,7 +2211,7 @@ msgstr "Não foi possível eliminar triggers"
 msgid "Cannot delete user"
 msgid_plural "Cannot delete users"
 msgstr[0] "Não foi possível eliminar o utilizador"
-msgstr[1] ""
+msgstr[1] "Não foi possível eliminar os utilizadores"
 
 #: app/controllers/CControllerUsergroupDelete.php:59
 msgid "Cannot delete user group"
@@ -3164,7 +3165,7 @@ msgid "Check for error using regular expression"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:46
-#: include/classes/setup/CSetupWizard.php:215
+#: include/classes/setup/CSetupWizard.php:217
 msgid "Check of pre-requisites"
 msgstr "Verificação de pré-requisitos"
 
@@ -3516,7 +3517,7 @@ msgstr "Configuração"
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "Configuração de estatísticas de cache. Cache - buffer (modes: pfree, total, used, free)."
 
-#: include/classes/setup/CSetupWizard.php:488
+#: include/classes/setup/CSetupWizard.php:516
 #, c-format
 msgid "Configuration file \"%1$s\" created."
 msgstr "O arquivo de configuração \"%1$s\" foi criado."
@@ -3689,7 +3690,7 @@ msgid "Configuration updated"
 msgstr "Configuração actualizada"
 
 #: include/classes/setup/CSetupWizard.php:50
-#: include/classes/setup/CSetupWizard.php:330
+#: include/classes/setup/CSetupWizard.php:332
 msgid "Configure DB connection"
 msgstr "Configura a ligação com o DB"
 
@@ -3697,7 +3698,7 @@ msgstr "Configura a ligação com o DB"
 msgid "Confirmation text"
 msgstr "Texto de confirmação"
 
-#: include/classes/setup/CSetupWizard.php:486
+#: include/classes/setup/CSetupWizard.php:514
 msgid "Congratulations! You have successfully installed Zabbix frontend."
 msgstr "Parabéns! Instalou com sucesso a interface web do Zabbix."
 
@@ -3749,7 +3750,7 @@ msgid ""
 "2. Firewall is blocking TCP connection.\n"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:273
+#: include/classes/setup/CSetupWizard.php:275
 msgid "Connection will not be encrypted because it uses a socket file (on Unix) or shared memory (Windows)."
 msgstr ""
 
@@ -4183,7 +4184,7 @@ msgstr "Crítico"
 msgid "Current host"
 msgstr "Host actual"
 
-#: include/classes/setup/CSetupWizard.php:173
+#: include/classes/setup/CSetupWizard.php:175
 msgid "Current value"
 msgstr "Valor actual"
 
@@ -4378,16 +4379,16 @@ msgstr ""
 msgid "Data storage period"
 msgstr "Périodo de armazenamento de dados"
 
-#: include/classes/setup/CSetupWizard.php:288
-#: include/classes/setup/CSetupWizard.php:389
-#: include/classes/setup/CSetupWizard.php:528
+#: include/classes/setup/CSetupWizard.php:290
+#: include/classes/setup/CSetupWizard.php:391
+#: include/classes/setup/CSetupWizard.php:555
 msgid "Database TLS CA file"
 msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:686
-#: include/classes/setup/CSetupWizard.php:300
-#: include/classes/setup/CSetupWizard.php:395
-#: include/classes/setup/CSetupWizard.php:536
+#: include/classes/setup/CSetupWizard.php:302
+#: include/classes/setup/CSetupWizard.php:397
+#: include/classes/setup/CSetupWizard.php:563
 msgid "Database TLS certificate file"
 msgstr ""
 
@@ -4395,19 +4396,19 @@ msgstr ""
 msgid "Database TLS certificate files must be read-only"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:312
-#: include/classes/setup/CSetupWizard.php:402
+#: include/classes/setup/CSetupWizard.php:314
+#: include/classes/setup/CSetupWizard.php:404
 msgid "Database TLS cipher list"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:270
-#: include/classes/setup/CSetupWizard.php:385
+#: include/classes/setup/CSetupWizard.php:272
+#: include/classes/setup/CSetupWizard.php:387
 msgid "Database TLS encryption"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:294
-#: include/classes/setup/CSetupWizard.php:392
-#: include/classes/setup/CSetupWizard.php:532
+#: include/classes/setup/CSetupWizard.php:296
+#: include/classes/setup/CSetupWizard.php:394
+#: include/classes/setup/CSetupWizard.php:559
 msgid "Database TLS key file"
 msgstr ""
 
@@ -4415,12 +4416,12 @@ msgstr ""
 msgid "Database history tables upgraded"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:238
+#: include/classes/setup/CSetupWizard.php:240
 msgid "Database host"
 msgstr "Servidor de base de dados"
 
-#: include/classes/setup/CSetupWizard.php:306
-#: include/classes/setup/CSetupWizard.php:398
+#: include/classes/setup/CSetupWizard.php:308
+#: include/classes/setup/CSetupWizard.php:400
 msgid "Database host verification"
 msgstr ""
 
@@ -4428,35 +4429,35 @@ msgstr ""
 msgid "Database monitor"
 msgstr "Monitor de base de dados"
 
-#: include/classes/setup/CSetupWizard.php:251
-#: include/classes/setup/CSetupWizard.php:379 setup.php:44
+#: include/classes/setup/CSetupWizard.php:253
+#: include/classes/setup/CSetupWizard.php:381 setup.php:44
 msgid "Database name"
 msgstr "Nome da base de dados"
 
-#: include/classes/setup/CSetupWizard.php:381
+#: include/classes/setup/CSetupWizard.php:383
 msgid "Database password"
 msgstr "Senha da base de dados"
 
-#: include/classes/setup/CSetupWizard.php:243
-#: include/classes/setup/CSetupWizard.php:378 setup.php:43
+#: include/classes/setup/CSetupWizard.php:245
+#: include/classes/setup/CSetupWizard.php:380 setup.php:43
 msgid "Database port"
 msgstr "Porto da base de dados"
 
-#: include/classes/setup/CSetupWizard.php:256
-#: include/classes/setup/CSetupWizard.php:383
+#: include/classes/setup/CSetupWizard.php:258
+#: include/classes/setup/CSetupWizard.php:385
 msgid "Database schema"
 msgstr "Schema da base de dados"
 
-#: include/classes/setup/CSetupWizard.php:377
+#: include/classes/setup/CSetupWizard.php:379
 msgid "Database server"
 msgstr "Servidor de base de dados"
 
-#: include/classes/setup/CSetupWizard.php:230
-#: include/classes/setup/CSetupWizard.php:372
+#: include/classes/setup/CSetupWizard.php:232
+#: include/classes/setup/CSetupWizard.php:374
 msgid "Database type"
 msgstr "Tipo de base de dados"
 
-#: include/classes/setup/CSetupWizard.php:380
+#: include/classes/setup/CSetupWizard.php:382
 msgid "Database user"
 msgstr "Utilizador da base de dados"
 
@@ -4910,7 +4911,7 @@ msgstr "Eliminar cenário web?"
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Eliminado: Host \"%1$s\"."
 
-#: include/classes/api/services/CHostPrototype.php:1027
+#: include/classes/api/services/CHostPrototype.php:1029
 #, c-format
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Eliminado: Protótipo de host \"%1$s\" em \"%2$s\"."
@@ -5443,7 +5444,7 @@ msgstr "Descer"
 msgid "Download image"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:475
+#: include/classes/setup/CSetupWizard.php:491
 msgid "Download the configuration file"
 msgstr "Transferir a configuração"
 
@@ -5502,7 +5503,7 @@ msgstr "O campo \"name\" possui valor duplicado \"%1$s\" no ecrã."
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "Dependências duplicadas no trigger \"%1$s\"."
 
-#: include/classes/api/services/CTriggerPrototype.php:981
+#: include/classes/api/services/CTriggerPrototype.php:996
 #, c-format
 msgid "Duplicate dependencies in trigger prototype \"%1$s\"."
 msgstr "Dependência duplicada no protótipo de trigger \"%1$s\"."
@@ -5728,7 +5729,7 @@ msgstr ""
 #: include/classes/api/services/CHost.php:855
 #: include/classes/api/services/CHost.php:1427
 #: include/classes/api/services/CHost.php:1963
-#: include/classes/api/services/CHostPrototype.php:955
+#: include/classes/api/services/CHostPrototype.php:957
 #: include/classes/api/services/CImage.php:423
 #: include/classes/api/services/CImage.php:475
 #: include/classes/api/services/CMaintenance.php:535
@@ -6028,7 +6029,6 @@ msgid "Event ID"
 msgstr "ID do evento"
 
 #: include/actions.inc.php:61
-#, fuzzy
 msgid "Event acknowledged"
 msgstr "Evento reconhecido"
 
@@ -6268,7 +6268,7 @@ msgstr "FALSO"
 msgid "FTP"
 msgstr "FTP"
 
-#: include/classes/setup/CSetupWizard.php:189
+#: include/classes/setup/CSetupWizard.php:191
 msgid "Fail"
 msgstr "Falha"
 
@@ -6499,7 +6499,7 @@ msgstr "Pesquisar texto num arquivo. Retorna a linha que contêm o texto pesquis
 msgid "Find string on a web page. Returns the matched string, or as specified by the optional output parameter"
 msgstr "Pesquisar texto numa página web. Retorna a linha que contêm o texto pesquisado, ou como for especificado no parâmetro opcional de saída"
 
-#: include/classes/setup/CSetupWizard.php:129
+#: include/classes/setup/CSetupWizard.php:131
 msgid "Finish"
 msgstr "Terminar"
 
@@ -7032,7 +7032,7 @@ msgstr "Grupo para a descoberta de hosts \"%1$s\"."
 msgid "Group name"
 msgstr "Nome do grupo"
 
-#: include/classes/api/services/CHostPrototype.php:1117
+#: include/classes/api/services/CHostPrototype.php:1119
 #, c-format
 msgid "Group prototype cannot be based on a discovered host group \"%1$s\"."
 msgstr "O protótipo de grupo não pode ser baseado em regra de autodescoberta no host \"%1$s\"."
@@ -7300,7 +7300,7 @@ msgstr "Alinhamento horizontal"
 #: include/classes/screens/CScreenProblem.php:893
 #: include/classes/screens/CScreenProblem.php:1142
 #: include/classes/screens/CScreenTriggersInfo.php:40
-#: include/classes/setup/CSetupWizard.php:342
+#: include/classes/setup/CSetupWizard.php:344
 #: include/classes/widgets/forms/CWidgetFormProblems.php:206
 #: include/classes/widgets/forms/CWidgetFormProblems.php:207
 #: include/hostgroups.inc.php:249 include/maps.inc.php:24
@@ -7559,12 +7559,12 @@ msgstr "Redes do host"
 msgid "Host prototype"
 msgstr ""
 
-#: include/classes/api/services/CHostPrototype.php:835
+#: include/classes/api/services/CHostPrototype.php:837
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "O protótipo de host \"%1$s\" já existe em \"%2$s\", herdado de outro template."
 
-#: include/classes/api/services/CHostPrototype.php:823
+#: include/classes/api/services/CHostPrototype.php:825
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "O protótipo de host \"%1$s\" já existe em \"%2$s\"."
@@ -8469,9 +8469,9 @@ msgstr "O nome para o campo \"%1$s\" é inválido ou o valor é incorrecto para 
 msgid "Incorrect fields for sysmap."
 msgstr "Campos inválidos para o mapa do sistema."
 
-#: include/classes/setup/CSetupWizard.php:528
-#: include/classes/setup/CSetupWizard.php:532
-#: include/classes/setup/CSetupWizard.php:536
+#: include/classes/setup/CSetupWizard.php:555
+#: include/classes/setup/CSetupWizard.php:559
+#: include/classes/setup/CSetupWizard.php:563
 #, c-format
 msgid "Incorrect file path for \"%1$s\": %2$s."
 msgstr ""
@@ -9308,11 +9308,12 @@ msgid "Insert expression"
 msgstr "Insira a expressão"
 
 #: include/classes/setup/CSetupWizard.php:62
-#: include/classes/setup/CSetupWizard.php:493
+#: include/classes/setup/CSetupWizard.php:497
+#: include/classes/setup/CSetupWizard.php:520
 msgid "Install"
 msgstr "Instalação"
 
-#: setup.php:108
+#: setup.php:92
 msgid "Installation"
 msgstr "Instalação"
 
@@ -9847,7 +9848,7 @@ msgstr "Italiano (it_IT)"
 msgid "Item"
 msgstr "Item"
 
-#: include/classes/api/services/CHostPrototype.php:1061
+#: include/classes/api/services/CHostPrototype.php:1063
 #: include/classes/api/services/CItem.php:62
 #, c-format
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
@@ -11794,9 +11795,9 @@ msgstr "Novos triggers"
 msgid "Next page"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:126
-#: include/classes/setup/CSetupWizard.php:332
-#: include/classes/setup/CSetupWizard.php:421
+#: include/classes/setup/CSetupWizard.php:128
+#: include/classes/setup/CSetupWizard.php:334
+#: include/classes/setup/CSetupWizard.php:423
 msgid "Next step"
 msgstr "Próximo passo"
 
@@ -12226,9 +12227,9 @@ msgstr "Sem permissões para acesso ao sistema."
 #: include/classes/api/services/CHostPrototype.php:418
 #: include/classes/api/services/CHostPrototype.php:464
 #: include/classes/api/services/CHostPrototype.php:485
-#: include/classes/api/services/CHostPrototype.php:1086
-#: include/classes/api/services/CHostPrototype.php:1108
-#: include/classes/api/services/CHostPrototype.php:1142
+#: include/classes/api/services/CHostPrototype.php:1088
+#: include/classes/api/services/CHostPrototype.php:1110
+#: include/classes/api/services/CHostPrototype.php:1144
 #: include/classes/api/services/CHttpTest.php:446
 #: include/classes/api/services/CHttpTest.php:539
 #: include/classes/api/services/CHttpTest.php:626
@@ -12290,8 +12291,9 @@ msgstr "Sem permissões para acesso ao sistema."
 #: include/classes/api/services/CTrigger.php:734
 #: include/classes/api/services/CTrigger.php:827
 #: include/classes/api/services/CTriggerPrototype.php:522
-#: include/classes/api/services/CTriggerPrototype.php:700
-#: include/classes/api/services/CTriggerPrototype.php:718
+#: include/classes/api/services/CTriggerPrototype.php:708
+#: include/classes/api/services/CTriggerPrototype.php:716
+#: include/classes/api/services/CTriggerPrototype.php:731
 #: include/classes/api/services/CUserGroup.php:322
 #: include/classes/api/services/CUserGroup.php:870
 #: include/classes/api/services/CUserMacro.php:377
@@ -12435,7 +12437,7 @@ msgid "Not all results are displayed. Please provide more specific search criter
 msgstr ""
 
 #: include/classes/api/services/CTrigger.php:1049
-#: include/classes/api/services/CTriggerPrototype.php:859
+#: include/classes/api/services/CTriggerPrototype.php:874
 #, c-format
 msgid "Not all templates are linked to \"%1$s\"."
 msgstr ""
@@ -12517,7 +12519,7 @@ msgstr "Número de itens activados no host."
 
 #: include/blocks.inc.php:623
 msgid "Number of hosts (enabled/disabled)"
-msgstr ""
+msgstr "Número de servidores (ativo/desativado) "
 
 #: include/blocks.inc.php:636
 msgid "Number of items (enabled/disabled/not supported)"
@@ -13483,7 +13485,7 @@ msgstr "Passivo"
 #: app/views/administration.user.edit.php:111
 #: app/views/administration.user.edit.php:126 disc_prototypes.php:232
 #: host_discovery.php:184 httpconf.php:64
-#: include/classes/setup/CSetupWizard.php:266
+#: include/classes/setup/CSetupWizard.php:268
 #: include/views/configuration.host.discovery.edit.php:303
 #: include/views/configuration.host.discovery.edit.php:428
 #: include/views/configuration.host.discovery.edit.php:458
@@ -13626,7 +13628,7 @@ msgstr "Tocar"
 msgid "Play sound"
 msgstr "Tocar som"
 
-#: include/classes/setup/CSetupWizard.php:421
+#: include/classes/setup/CSetupWizard.php:423
 #, c-format
 msgid "Please check configuration parameters. If all is correct, press \"%1$s\" button, or \"%2$s\" button to change configuration parameters."
 msgstr "Por favor verifique os parâmetros de configuração. Se tudo estiver correto pressione o botão \"%1$s\", ou pressione o botão \"%2$s\" para modificar parâmetros de configuração."
@@ -13635,12 +13637,12 @@ msgstr "Por favor verifique os parâmetros de configuração. Se tudo estiver co
 msgid "Please confirm that you want to remove all macros."
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:332
+#: include/classes/setup/CSetupWizard.php:334
 #, c-format
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
 msgstr "Por favor crie a base de dados manualmente e informe os parâmetros de ligação para a base. Pressione o botão \"%1$s\" quando estiver pronto."
 
-#: include/classes/setup/CSetupWizard.php:361
+#: include/classes/setup/CSetupWizard.php:363
 msgid "Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional)."
 msgstr "Por favor informe o nome ou IP e a porta do servidor Zabbix, assim como um nome para esta instalação (opcional)."
 
@@ -13685,7 +13687,7 @@ msgstr "Preenche o campo inventário do host"
 #: app/views/administration.proxy.edit.php:47
 #: app/views/monitoring.host.view.php:131
 #: app/views/popup.itemtestedit.view.php:123
-#: include/classes/setup/CSetupWizard.php:347 include/hosts.inc.php:1444
+#: include/classes/setup/CSetupWizard.php:349 include/hosts.inc.php:1444
 #: include/views/configuration.host.list.php:141
 #: include/views/inventory.host.view.php:79 setup.php:57
 msgid "Port"
@@ -13716,7 +13718,7 @@ msgid "Post type"
 msgstr "Tipo do publicação"
 
 #: include/classes/setup/CSetupWizard.php:58
-#: include/classes/setup/CSetupWizard.php:419
+#: include/classes/setup/CSetupWizard.php:421
 msgid "Pre-installation summary"
 msgstr "Sumário da pré-instalação"
 
@@ -14544,7 +14546,7 @@ msgstr ""
 msgid "Request type"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:173
+#: include/classes/setup/CSetupWizard.php:175
 #: include/views/configuration.httpconf.edit.php:221
 msgid "Required"
 msgstr "Obrigatório"
@@ -15095,7 +15097,7 @@ msgstr "Sábado"
 msgid "Save changes"
 msgstr "Salvar alterações"
 
-#: include/classes/setup/CSetupWizard.php:476
+#: include/classes/setup/CSetupWizard.php:492
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "Salvar como \"%1$s\""
@@ -16442,7 +16444,7 @@ msgstr "Nome do host. Retorna: texto"
 #: include/classes/widgets/CWidgetConfig.php:50 include/menu.inc.php:131
 #: include/screens.inc.php:36
 msgid "System information"
-msgstr ""
+msgstr "Informação do sistema"
 
 #: include/classes/items/CHelpItems.php:249
 #: include/classes/items/CHelpItems.php:599
@@ -17364,7 +17366,7 @@ msgstr "O protótipo de trigger \"%1$s\" precisa conter pelo menos um protótipo
 msgid "Trigger prototype added"
 msgstr "Protótipo de trigger adicionado"
 
-#: include/classes/api/services/CTriggerPrototype.php:916
+#: include/classes/api/services/CTriggerPrototype.php:931
 msgid "Trigger prototype cannot be dependent on a trigger that is inherited from it."
 msgstr "O protótipo de trigger não pode depender de uma trigger da qual ele tenha sido herdado."
 
@@ -18049,7 +18051,7 @@ msgstr "Utilizado em itens"
 #: app/views/administration.user.edit.php:220
 #: app/views/reports.auditlog.list.php:87 httpconf.php:58
 #: include/actions.inc.php:1725 include/actions.inc.php:1780
-#: include/actions.inc.php:2001 include/classes/setup/CSetupWizard.php:263
+#: include/actions.inc.php:2001 include/classes/setup/CSetupWizard.php:265
 #: include/hosts.inc.php:61 include/views/configuration.httpconf.edit.php:181
 msgid "User"
 msgstr "Utilizador"
@@ -18113,7 +18115,7 @@ msgstr "O utilizador não pode mudar seu tipo."
 msgid "User deleted"
 msgid_plural "Users deleted"
 msgstr[0] "Utilizador eliminado"
-msgstr[1] ""
+msgstr[1] "Utilizadores eliminados"
 
 #: app/controllers/CControllerAuditLogList.php:194
 #: app/partials/popup.operations.php:83
@@ -18730,7 +18732,7 @@ msgstr "Vendedor"
 msgid "Verbose"
 msgstr "Detalhado"
 
-#: include/classes/setup/CSetupWizard.php:282
+#: include/classes/setup/CSetupWizard.php:284
 msgid "Verify database certificate"
 msgstr ""
 
@@ -18801,9 +18803,9 @@ msgstr "Q"
 #: app/views/administration.trigseverity.edit.php:52 include/items.inc.php:33
 #: include/views/general.warning.php:26
 msgid "Warning"
-msgstr "Warning"
+msgstr "Aviso"
 
-#: include/classes/setup/CSetupWizard.php:185
+#: include/classes/setup/CSetupWizard.php:187
 msgctxt "setup"
 msgid "Warning"
 msgstr "Aviso"
@@ -18914,7 +18916,7 @@ msgstr "Semanalmente"
 msgid "Welcome"
 msgstr "Bem vindo"
 
-#: include/classes/setup/CSetupWizard.php:165
+#: include/classes/setup/CSetupWizard.php:167
 msgid "Welcome to"
 msgstr "Bem vindo a"
 
@@ -19358,7 +19360,7 @@ msgstr ""
 
 #: app/partials/popup.operations.php:235
 #: app/views/administration.script.edit.php:57 include/actions.inc.php:880
-#: include/classes/setup/CSetupWizard.php:410
+#: include/classes/setup/CSetupWizard.php:412
 msgid "Zabbix server"
 msgstr "Servidor Zabbix"
 
@@ -19376,7 +19378,7 @@ msgid "Zabbix server (proxy)"
 msgstr "Servidor Zabbix (proxy)"
 
 #: include/classes/setup/CSetupWizard.php:54
-#: include/classes/setup/CSetupWizard.php:359
+#: include/classes/setup/CSetupWizard.php:361
 msgid "Zabbix server details"
 msgstr "Detalhes do servidor Zabbix"
 
@@ -19393,11 +19395,11 @@ msgstr "O servidor Zabbix está em execução"
 msgid "Zabbix server is running check interval \"%1$s\"."
 msgstr "O servidor Zabbix está em execução com um intervalo de verificação de \"%1$s\"."
 
-#: include/classes/setup/CSetupWizard.php:414
+#: include/classes/setup/CSetupWizard.php:416
 msgid "Zabbix server name"
 msgstr "Nome do servidor Zabbix"
 
-#: include/classes/setup/CSetupWizard.php:411
+#: include/classes/setup/CSetupWizard.php:413
 msgid "Zabbix server port"
 msgstr "Porto do servidor Zabbix"
 
@@ -19865,7 +19867,7 @@ msgid "days"
 msgstr "dias"
 
 #: app/controllers/CControllerMapView.php:124
-#: include/classes/setup/CSetupWizard.php:374
+#: include/classes/setup/CSetupWizard.php:376
 #: include/classes/widgets/CWidgetHelper.php:70
 #: include/views/js/monitoring.slideconf.edit.js.php:40
 #: include/views/monitoring.slideconf.edit.php:136

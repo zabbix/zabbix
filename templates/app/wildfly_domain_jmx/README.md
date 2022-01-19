@@ -1,5 +1,5 @@
 
-# WildFly Domain by JMX
+# Template APP WildFly Domain by JMX
 
 ## Overview
 

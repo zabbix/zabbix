@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1842,7 +1842,7 @@ out:
  * Purpose: update configuration                                              *
  *                                                                            *
  ******************************************************************************/
-void	process_proxyconfig(struct zbx_json_parse *jp_data)
+int	process_proxyconfig(struct zbx_json_parse *jp_data)
 {
 	typedef struct
 	{
@@ -1935,20 +1935,17 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 	}
 	zbx_vector_ptr_destroy(&tables_proxy);
 
-	if (SUCCEED != DBend(ret))
+	if (SUCCEED != (ret = DBend(ret)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "failed to update local proxy configuration copy: %s",
 				(NULL == error ? "database error" : error));
-	}
-	else
-	{
-		DCsync_configuration(ZBX_DBSYNC_UPDATE);
-		DCupdate_hosts_availability();
 	}
 
 	zbx_free(error);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
+	return ret;
 }
 
 /******************************************************************************

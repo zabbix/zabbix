@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-11-25T11:53:05Z</date>
+   <date>2021-12-24T12:45:10Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -1564,7 +1564,7 @@ Template tooling version used: 0.39</description>
                            <type>JAVASCRIPT</type>
                            <params>var newvalue;
 switch(value) {
-  case "unkonwn":
+  case "unknown":
     newvalue = 0;
     break;
   case "notpresent":
