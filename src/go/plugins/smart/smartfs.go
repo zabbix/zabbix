@@ -118,7 +118,6 @@ type table struct {
 	Attrname string `json:"name"`
 	ID       int    `json:"id"`
 	Thresh   int    `json:"thresh"`
-	Value    int    `json:"value"`
 }
 
 type raidParameters struct {

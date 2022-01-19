@@ -26,12 +26,11 @@ import (
 )
 
 var (
-	table1         = table{"test1", 1, 11, 111}
-	table2         = table{"test2", 2, 22, 222}
-	table3         = table{"test3", 3, 33, 333}
-	table4         = table{"test4", 4, 44, 444}
-	attrTable      = table{"Spin_Up_Time", 5, 55, 555}
-	attrEmptyTable = table{"Spin_Up_Time", 6, 66, 0}
+	table1    = table{"test1", 1, 11}
+	table2    = table{"test2", 2, 22}
+	table3    = table{"test3", 3, 33}
+	table4    = table{"test4", 4, 44}
+	attrTable = table{"Spin_Up_Time", 5, 55}
 )
 
 func Test_setDiskFields(t *testing.T) {
@@ -120,19 +119,15 @@ func Test_getAttributeType(t *testing.T) {
 		want string
 	}{
 		{"ssd_no_tables", args{"SAT", 0, nil}, "ssd"},
-		{"ssd_tables_empty_value", args{"SAT", 0, []table{table1, table2, table4, attrEmptyTable}}, "ssd"},
 		{"ssd_tables_no_spin_up_table", args{"SAT", 0, []table{table1, table2, table4}}, "ssd"},
 		{"hdd_no_tables", args{"SAT", 12, nil}, "hdd"},
 		{"hdd_rate_spin_up_table", args{"SAT", 12, []table{table1, table2, table4, attrTable}}, "hdd"},
 		{"hdd_no_rate_spin_up_table", args{"SAT", 0, []table{table1, table2, table4, attrTable}}, "hdd"},
-		{"hdd_no_empty_value", args{"SAT", 12, []table{table1, table2, table4, attrEmptyTable}}, "hdd"},
 		{"hdd_no_spin_up_table", args{"SAT", 12, []table{table1, table2, table4}}, "hdd"},
 		{"unknown_no_attr_table", args{"unknown", 1000, []table{table1, table2, table4}}, "unknown"},
-		{"unknown_empty_value_table", args{"unknown", 1000, []table{table1, table2, table3, attrEmptyTable}}, "unknown"},
 		{"unknown_value_table", args{"unknown", 1000, []table{table1, table2, table4, attrTable}}, "unknown"},
 		{"unknown_no_rate_no_tables", args{"unknown", 0, nil}, "unknown"},
 		{"unknown_no_rate_no_attr_table", args{"unknown", 0, []table{table1, table2, table4}}, "unknown"},
-		{"unknown_no_rate_empty_value_table", args{"unknown", 0, []table{table1, table2, table3, attrEmptyTable}}, "unknown"},
 		{"unknown_no_rate_value_table", args{"unknown", 0, []table{table1, table2, table4, attrTable}}, "unknown"},
 	}
 
@@ -157,28 +152,22 @@ func Test_getType(t *testing.T) {
 		wantOut string
 	}{
 		{"ssd_no_tables", args{"SAT", 0, nil}, "ssd"},
-		{"ssd_tables_empty_value", args{"SAT", 0, []table{table1, table2, table4, attrEmptyTable}}, "ssd"},
 		{"ssd_tables_no_spin_up_table", args{"SAT", 0, []table{table1, table2, table4}}, "ssd"},
 		{"hdd_no_tables", args{"SAT", 12, nil}, "hdd"},
 		{"hdd_rate_spin_up_table", args{"SAT", 12, []table{table1, table2, table4, attrTable}}, "hdd"},
 		{"hdd_no_rate_spin_up_table", args{"SAT", 0, []table{table1, table2, table4, attrTable}}, "hdd"},
-		{"hdd_no_empty_value", args{"SAT", 12, []table{table1, table2, table4, attrEmptyTable}}, "hdd"},
 		{"hdd_no_spin_up_table", args{"SAT", 12, []table{table1, table2, table4}}, "hdd"},
 		{"nvme_no_tables", args{"nvme", 1000, nil}, "nvme"},
 		{"nvme_no_attr_table", args{"nvme", 1000, []table{table1, table2, table4}}, "nvme"},
-		{"nvme_empty_value_table", args{"nvme", 1000, []table{table1, table2, table4, attrEmptyTable}}, "nvme"},
 		{"nvme_value_table", args{"nvme", 1000, []table{table1, table2, table4, attrTable}}, "nvme"},
 		{"nvme_no_rate_no_tables", args{"nvme", 0, nil}, "nvme"},
 		{"nvme_no_rate_no_attr_table", args{"nvme", 0, []table{table1, table2, table4}}, "nvme"},
-		{"nvme_no_rate_empty_value_table", args{"nvme", 0, []table{table1, table2, table4, attrEmptyTable}}, "nvme"},
 		{"nvme_no_rate_value_table", args{"nvme", 0, []table{table1, table2, table4, attrTable}}, "nvme"},
 		{"unknown_no_tables", args{"unknown", 1000, nil}, "unknown"},
 		{"unknown_no_attr_table", args{"unknown", 1000, []table{table1, table2, table4}}, "unknown"},
-		{"unknown_empty_value_table", args{"unknown", 1000, []table{table1, table2, table3, attrEmptyTable}}, "unknown"},
 		{"unknown_value_table", args{"unknown", 1000, []table{table1, table2, table4, attrTable}}, "unknown"},
 		{"unknown_no_rate_no_tables", args{"unknown", 0, nil}, "unknown"},
 		{"unknown_no_rate_no_attr_table", args{"unknown", 0, []table{table1, table2, table4}}, "unknown"},
-		{"unknown_no_rate_empty_value_table", args{"unknown", 0, []table{table1, table2, table3, attrEmptyTable}}, "unknown"},
 		{"unknown_no_rate_value_table", args{"unknown", 0, []table{table1, table2, table4, attrTable}}, "unknown"},
 	}
 
@@ -204,9 +193,7 @@ func Test_getTypeByRateAndAttr(t *testing.T) {
 		{"zero_rate_zero_spin_up", args{0, []table{table1, table2}}, "ssd"},
 		{"zero_rate_no_tables", args{0, nil}, "ssd"},
 		{"negative_rate_no_tables", args{-1000, nil}, "ssd"},
-		{"zero_rate_empty_attr_value_spin_up_table", args{-1000, []table{table1, table2, table4, attrEmptyTable}}, "ssd"},
 		{"positive_rate_spin_up_table", args{12, []table{table1, table2, table3, attrTable}}, "hdd"},
-		{"positive_rate_empty_attr_value_spin_up_table", args{12, []table{table1, table2, table3, attrEmptyTable}}, "hdd"},
 		{"positive_rate_no_tables", args{12, nil}, "hdd"},
 		{"zero_rate_spin_up_table", args{0, []table{table1, table2, table3, attrTable}}, "hdd"},
 	}

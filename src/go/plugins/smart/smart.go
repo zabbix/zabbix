@@ -244,7 +244,7 @@ func getTypeByRateAndAttr(rate int, tables []table) string {
 	}
 
 	for _, t := range tables {
-		if t.Attrname == spinUpAttrName && t.Value > 0 {
+		if t.Attrname == spinUpAttrName {
 			return hddType
 		}
 	}
