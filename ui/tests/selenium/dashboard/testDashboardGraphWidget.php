@@ -375,7 +375,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'host' => 'Zabbix*',
 							'item' => 'Agent ping',
 							'color' => [
-							'id:lbl_ds_1_color' => '00000 '
+								'id:lbl_ds_1_color' => '00000 '
 							]
 						]
 					],
@@ -564,7 +564,7 @@ class testDashboardGraphWidget extends CWebTest {
 						'To' => '2021-07-04 15:53:07'
 					],
 					'error' => [
-						'Invalid parameter "From": a time range is expected.',
+						'Invalid parameter "From": a time is expected.',
 						'Minimum time period to display is 1 minute.'
 					]
 				]
@@ -576,7 +576,7 @@ class testDashboardGraphWidget extends CWebTest {
 						'From' => '2021-07-04 15:53:07',
 						'To' => 'abc'
 					],
-					'error' => 'Invalid parameter "To": a time range is expected.'
+					'error' => 'Invalid parameter "To": a time is expected.'
 				]
 			],
 			[
@@ -587,7 +587,7 @@ class testDashboardGraphWidget extends CWebTest {
 						'To' => '2021-07-04 15:53:07'
 					],
 					'error' => [
-						'Invalid parameter "From": a time range is expected.',
+						'Invalid parameter "From": a time is expected.',
 						'Minimum time period to display is 1 minute.'
 					]
 				]
@@ -600,7 +600,7 @@ class testDashboardGraphWidget extends CWebTest {
 						'To' => '2021-07-04 15:53:07'
 					],
 					'error' => [
-						'Invalid parameter "From": a time range is expected.',
+						'Invalid parameter "From": a time is expected.',
 						'Minimum time period to display is 1 minute.'
 					]
 				]
@@ -612,7 +612,7 @@ class testDashboardGraphWidget extends CWebTest {
 						'From' => '2021-05-02 00:00:00',
 						'To' => '2021-25-09 00:00:00'
 					],
-					'error' => 'Invalid parameter "To": a time range is expected.'
+					'error' => 'Invalid parameter "To": a time is expected.'
 				]
 			],
 			[
@@ -622,7 +622,7 @@ class testDashboardGraphWidget extends CWebTest {
 						'From' => '2021-05-02 00:00:00',
 						'To' => '2021.07.31 15:53:07'
 					],
-					'error' => 'Invalid parameter "To": a time range is expected.'
+					'error' => 'Invalid parameter "To": a time is expected.'
 				]
 			],
 			[
@@ -632,7 +632,7 @@ class testDashboardGraphWidget extends CWebTest {
 						'From' => '2021-07-04 12:53:00',
 						'To' => 'now-s'
 					],
-					'error' => 'Invalid parameter "To": a time range is expected.'
+					'error' => 'Invalid parameter "To": a time is expected.'
 				]
 			],
 			// Time range validation
@@ -1461,9 +1461,6 @@ class testDashboardGraphWidget extends CWebTest {
 						[
 							'host' => 'One host',
 							'item' => 'One item',
-							'color' => [
-								'id:lbl_ds_0_color' => '009688'
-							],
 							'Draw' => 'Staircase',
 							'Width' => '10',
 							'Transparency' => '10',
@@ -1472,19 +1469,22 @@ class testDashboardGraphWidget extends CWebTest {
 							'Time shift' => '0',
 							'Aggregation function' => 'last',
 							'Aggregation interval' => '1',
-							'Aggregate' => 'Data set'
+							'Aggregate' => 'Data set',
+							'color' => [
+								'id:lbl_ds_0_color' => '009688'
+							]
 						],
 						[
 							'host' => 'Two host',
 							'item' => 'Two item',
-							'color' => [
-								'id:lbl_ds_1_color' => '000000'
-							],
 							'Y-axis' => 'Right',
 							'Draw' => 'Points',
 							'Point size' => '1',
 							'Transparency' => '0',
-							'Time shift' => '-1s'
+							'Time shift' => '-1s',
+							'color' => [
+								'id:lbl_ds_1_color' => '000000'
+							]
 						]
 					],
 					'Displaying options' => [
@@ -1492,7 +1492,7 @@ class testDashboardGraphWidget extends CWebTest {
 					],
 					'Time period' => [
 						'Set custom time period' => true,
-						'From' => '2018-11-15 08',
+						'From' => '2018-11-15',
 						'To' => '2018-11-15 14:20'
 					],
 					'Axes' => [
@@ -1788,7 +1788,7 @@ class testDashboardGraphWidget extends CWebTest {
 					],
 					'Time period' => [
 						'Set custom time period' => true,
-						'From' => '2018-11-15 08',
+						'From' => '2018-11-15',
 						'To' => '2018-11-15 14:20'
 					],
 					'Axes' => [
@@ -1959,25 +1959,27 @@ class testDashboardGraphWidget extends CWebTest {
 			$count_sets = $form->query('xpath://li[contains(@class, "list-accordion-item")]')->all()->count();
 
 			foreach ($data_sets as $i => $data_set) {
+				if (array_key_exists('color', $data_set)) {
+					foreach ($data_set['color'] as $selector => $color) {
+						$form->query($selector)->one()->click()->waitUntilReady();
+						$this->query('xpath://div[@id="color_picker"]')->asColorPicker()->one()->fill($color);
+					}
+
+					unset($data_set['color']);
+				}
+
 				$mapping = [
 					'host' => 'xpath://div[@id="ds_'.$i.'_hosts_"]/..',
 					'item' => 'xpath://div[@id="ds_'.$i.'_items_"]/..'
 				];
 				// If host or item of data set exist in data provider, add the xpath selector and value from data provider to them.
 				foreach ($mapping as $field => $selector) {
-					if (array_key_exists('color', $data_set)) {
-						foreach ($data_set['color'] as $selector => $color) {
-							$form->query($selector)->one()->click()->waitUntilReady();
-							$this->query('xpath://div[@id="color_picker"]')->asColorPicker()->one()->fill($color);
-						}
-						unset($data_set['color']);
 
-						return array_values($data_set);
-					}
 					if (array_key_exists($field, $data_set)) {
 						$data_set = [$selector => $data_set[$field]] + $data_set;
 						unset($data_set[$field]);
 					}
+
 				}
 				$form->fill($data_set);
 
@@ -2018,6 +2020,7 @@ class testDashboardGraphWidget extends CWebTest {
 			$last = count($overrides) - 1;
 
 			foreach ($overrides as $i => $override) {
+
 				// Prepare non-standard fields.
 				$mapping = [
 					'options' => [
@@ -2045,14 +2048,12 @@ class testDashboardGraphWidget extends CWebTest {
 					}
 
 					$form->query($item['selector'])->cast($item['class'])->one()->fill($override[$field]);
-					if (array_key_exists('color', $override)) {
-						foreach ($override['color'] as $selector => $color) {
-							$form->query($selector)->one()->click()->waitUntilReady();
-							$this->query('xpath://div[@id="color_picker"]')->asColorPicker()->one()->fill($color);
-						}
-						unset($override['color']);
+				}
 
-						return array_values($override);
+				if (array_key_exists('color', $override)) {
+					foreach ($override['color'] as $selector => $color) {
+						$form->query($selector)->one()->click()->waitUntilReady();
+						$this->query('xpath://div[@id="color_picker"]')->asColorPicker()->one()->fill($color);
 					}
 				}
 
@@ -2089,6 +2090,10 @@ class testDashboardGraphWidget extends CWebTest {
 			}
 
 			// Check fields value.
+			if (array_key_exists('color', $data_set)) {
+				unset($data_set['color']);
+			}
+
 			$form->checkValue($data_set);
 
 			// Open next data set, if exist.
@@ -2126,6 +2131,11 @@ class testDashboardGraphWidget extends CWebTest {
 			}
 
 			foreach ($data['Overrides'] as $i => $override) {
+
+				if (array_key_exists('color', $override)) {
+					unset($override['color']);
+				}
+
 				// Prepare input fields.
 				$mapping = [
 					'host' => 'xpath://div[@id="or_'.$i.'_hosts_"]/..',
@@ -2140,6 +2150,8 @@ class testDashboardGraphWidget extends CWebTest {
 					}
 					$inputs[$selector] = $override[$field];
 				}
+
+				// Check fields value.
 				$form->checkValue($inputs);
 
 				// Check values of override options in data provider and in widget, except color and time shift fields.
