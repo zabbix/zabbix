@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-17T06:42:55Z'
+  date: '2022-01-18T20:50:16Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -18,19 +18,167 @@ zabbix_export:
         
         MIBs used:
         FOUNDRY-SN-AGENT-MIB
+        SNMPv2-MIB
+        IF-MIB
         
-        Template tooling version used: 0.40
-      templates:
-        -
-          name: 'Brocade_Foundry Performance SNMP'
-        -
-          name: 'Generic SNMP'
-        -
-          name: 'Interfaces SNMP'
+        Template tooling version used: 0.41
       groups:
         -
           name: 'Templates/Network devices'
       items:
+        -
+          uuid: b77f1a0ffd4c4b6d870eda4b573b4d13
+          name: 'ICMP ping'
+          type: SIMPLE
+          key: icmpping
+          history: 1w
+          valuemap:
+            name: 'Service state'
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 3e93707bfbed4541a90548f64b2dfc18
+              expression: 'max(/Brocade_Foundry Nonstackable SNMP/icmpping,#3)=0'
+              name: 'Unavailable by ICMP ping'
+              priority: HIGH
+              description: 'Last three attempts returned timeout.  Please check device connectivity.'
+        -
+          uuid: 6e20f516917f40bca4a53ed015e065d2
+          name: 'ICMP loss'
+          type: SIMPLE
+          key: icmppingloss
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 3f3500c666bb47208115b6ca43fc8458
+              expression: 'min(/Brocade_Foundry Nonstackable SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Brocade_Foundry Nonstackable SNMP/icmppingloss,5m)<100'
+              name: 'High ICMP ping loss'
+              opdata: 'Loss: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'Unavailable by ICMP ping'
+                  expression: 'max(/Brocade_Foundry Nonstackable SNMP/icmpping,#3)=0'
+        -
+          uuid: c2888004f9e84640a088f891f8b0703d
+          name: 'ICMP response time'
+          type: SIMPLE
+          key: icmppingsec
+          history: 1w
+          value_type: FLOAT
+          units: s
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: e1bcb2ad662f4e4fb0ff67f0f1fc39e5
+              expression: 'avg(/Brocade_Foundry Nonstackable SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
+              name: 'High ICMP ping response time'
+              opdata: 'Value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'High ICMP ping loss'
+                  expression: 'min(/Brocade_Foundry Nonstackable SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Brocade_Foundry Nonstackable SNMP/icmppingloss,5m)<100'
+                -
+                  name: 'Unavailable by ICMP ping'
+                  expression: 'max(/Brocade_Foundry Nonstackable SNMP/icmpping,#3)=0'
+        -
+          uuid: 2d0b064b0fd74361ac1c32cdea2c1123
+          name: 'SNMP traps (fallback)'
+          type: SNMP_TRAP
+          key: snmptrap.fallback
+          history: 2w
+          trends: '0'
+          value_type: LOG
+          description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items'
+          logtimefmt: 'hh:mm:sszyyyy/MM/dd'
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: d0561cc5be67434088c1e591a577d7e3
+          name: 'System contact details'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.4.0
+          key: 'system.contact[sysContact.0]'
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.
+          inventory_link: CONTACT
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 2083ecbada4344b4b26dba0145694d7e
+          name: 'CPU utilization'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.1991.1.1.2.1.52.0
+          key: 'system.cpu.util[snAgGblCpuUtil1MinAvg.0]'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: |
+            MIB: FOUNDRY-SN-AGENT-MIB
+            The statistics collection of 1 minute CPU utilization.
+          tags:
+            -
+              tag: Application
+              value: CPU
+          triggers:
+            -
+              uuid: bf59d38703f44bcb9497dcbda684b071
+              expression: 'min(/Brocade_Foundry Nonstackable SNMP/system.cpu.util[snAgGblCpuUtil1MinAvg.0],5m)>{$CPU.UTIL.CRIT}'
+              name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'CPU utilization is too high. The system might be slow to respond.'
+        -
+          uuid: 9f49220f80c04e2e98ecf3ec5fa53c2e
+          name: 'System description'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.1.0
+          key: 'system.descr[sysDescr.0]'
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            A textual description of the entity. This value should
+            include the full name and version identification of the system's hardware type, software operating-system, and
+            networking software.
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
+          tags:
+            -
+              tag: Application
+              value: General
         -
           uuid: 4f58884d810a416ea321dd622c876d06
           name: 'Firmware version'
@@ -91,6 +239,171 @@ zabbix_export:
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
+        -
+          uuid: 3accd01dca984406990051338ce3f269
+          name: 'System location'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.6.0
+          key: 'system.location[sysLocation.0]'
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.
+          inventory_link: LOCATION
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 0d27ffcf928949188fbe1994b6b4dcbb
+          name: 'System name'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.5.0
+          key: system.name
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            An administratively-assigned name for this managed node.By convention, this is the node's fully-qualified domain name.  If the name is unknown, the value is the zero-length string.
+          inventory_link: NAME
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
+          tags:
+            -
+              tag: Application
+              value: General
+          triggers:
+            -
+              uuid: ee0c67c575cb4b01bc3733d719baac4f
+              expression: 'last(/Brocade_Foundry Nonstackable SNMP/system.name,#1)<>last(/Brocade_Foundry Nonstackable SNMP/system.name,#2) and length(last(/Brocade_Foundry Nonstackable SNMP/system.name))>0'
+              name: 'System name has changed (new name: {ITEM.VALUE})'
+              priority: INFO
+              description: 'System name has changed. Ack to close.'
+              manual_close: 'YES'
+        -
+          uuid: 702517f6c1024b3c8860a63c9cd57367
+          name: 'System object ID'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.2.0
+          key: 'system.objectid[sysObjectID.0]'
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            The vendor's authoritative identification of the network management subsystem contained in the entity.  This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 3a534079085747b0916da05afdfafba0
+          name: Uptime
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.3.0
+          key: 'system.uptime[sysUpTime.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: SNMPv2-MIB
+            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 99208318a05445518bebae305dd53d34
+              expression: 'last(/Brocade_Foundry Nonstackable SNMP/system.uptime[sysUpTime.0])<10m'
+              name: '{HOST.NAME} has been restarted (uptime < 10m)'
+              priority: WARNING
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'No SNMP data collection'
+                  expression: 'max(/Brocade_Foundry Nonstackable SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+        -
+          uuid: 1e1b82a4271d4e159315e74547bea34e
+          name: 'Memory utilization'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.1991.1.1.2.1.53.0
+          key: 'vm.memory.util[snAgGblDynMemUtil.0]'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: |
+            MIB: FOUNDRY-SN-AGENT-MIB
+            The system dynamic memory utilization, in unit of percentage.
+            Deprecated: Refer to snAgSystemDRAMUtil.
+            For NI platforms, refer to snAgentBrdMemoryUtil100thPercent.
+          tags:
+            -
+              tag: Application
+              value: Memory
+          triggers:
+            -
+              uuid: 07bba62d70fa4e7b81f82fc44036ce6e
+              expression: 'min(/Brocade_Foundry Nonstackable SNMP/vm.memory.util[snAgGblDynMemUtil.0],5m)>{$MEMORY.UTIL.MAX}'
+              name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+              priority: AVERAGE
+              description: 'The system is running out of free memory.'
+        -
+          uuid: b782df60263e4302b83f66e920ac217f
+          name: 'SNMP agent availability'
+          type: INTERNAL
+          key: 'zabbix[host,snmp,available]'
+          history: 7d
+          description: |
+            Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.
+            Possible value:
+            0 - not available
+            1 - available
+            2 - unknown
+          valuemap:
+            name: zabbix.host.available
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: fb3168f6539c4a55b5aab3efbcad117d
+              expression: 'max(/Brocade_Foundry Nonstackable SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              name: 'No SNMP data collection'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
+              dependencies:
+                -
+                  name: 'Unavailable by ICMP ping'
+                  expression: 'max(/Brocade_Foundry Nonstackable SNMP/icmpping,#3)=0'
       discovery_rules:
         -
           uuid: cb46b61100c8456098a85b1e48644146
@@ -136,6 +449,415 @@ zabbix_export:
                     -
                       name: 'Fan {#FAN_INDEX}: Fan is in critical state'
                       expression: 'count(/Brocade_Foundry Nonstackable SNMP/sensor.fan.status[snChasFanOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
+        -
+          uuid: 1b7d06dba8fb4869812e95417c05ec25
+          name: 'Network interfaces discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#IFOPERSTATUS},1.3.6.1.2.1.2.2.1.8,{#IFADMINSTATUS},1.3.6.1.2.1.2.2.1.7,{#IFALIAS},1.3.6.1.2.1.31.1.1.1.18,{#IFNAME},1.3.6.1.2.1.31.1.1.1.1,{#IFDESCR},1.3.6.1.2.1.2.2.1.2,{#IFTYPE},1.3.6.1.2.1.2.2.1.3]'
+          key: net.if.discovery
+          delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#IFADMINSTATUS}'
+                value: '{$NET.IF.IFADMINSTATUS.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#IFADMINSTATUS}'
+                value: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+              -
+                macro: '{#IFOPERSTATUS}'
+                value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
+                formulaid: I
+              -
+                macro: '{#IFOPERSTATUS}'
+                value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: J
+              -
+                macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.MATCHES}'
+                formulaid: G
+              -
+                macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: H
+              -
+                macro: '{#IFDESCR}'
+                value: '{$NET.IF.IFDESCR.MATCHES}'
+                formulaid: E
+              -
+                macro: '{#IFDESCR}'
+                value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: F
+              -
+                macro: '{#IFALIAS}'
+                value: '{$NET.IF.IFALIAS.MATCHES}'
+                formulaid: C
+              -
+                macro: '{#IFALIAS}'
+                value: '{$NET.IF.IFALIAS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              -
+                macro: '{#IFTYPE}'
+                value: '{$NET.IF.IFTYPE.MATCHES}'
+                formulaid: K
+              -
+                macro: '{#IFTYPE}'
+                value: '{$NET.IF.IFTYPE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: L
+          description: 'Discovering interfaces from IF-MIB.'
+          item_prototypes:
+            -
+              uuid: c01ebcc6ef2a4af3bc1a541a8e7ea348
+              name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets discarded'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.13.{#SNMPINDEX}'
+              key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
+              delay: 3m
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                The number of inbound packets which were chosen to be discarded
+                even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.
+                One possible reason for discarding such a packet could be to free up buffer space.
+                Discontinuities in the value of this counter can occur at re-initialization of the management system,
+                and at other times as indicated by the value of ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+            -
+              uuid: de91b80675624e889349e90fef603e9f
+              name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.14.{#SNMPINDEX}'
+              key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
+              delay: 3m
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+            -
+              uuid: 2b169ba2d5a44d85ae78b32261cd6852
+              name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}'
+              key: 'net.if.in[ifHCInOctets.{#SNMPINDEX}]'
+              delay: 3m
+              history: 7d
+              units: bps
+              description: |
+                MIB: IF-MIB
+                The total number of octets received on the interface, including framing characters. This object is a 64-bit version of ifInOctets. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+            -
+              uuid: eb286f99f6f1495bbff1f888dfdbfad6
+              name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.19.{#SNMPINDEX}'
+              key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
+              delay: 3m
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                The number of outbound packets which were chosen to be discarded
+                even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.
+                One possible reason for discarding such a packet could be to free up buffer space.
+                Discontinuities in the value of this counter can occur at re-initialization of the management system,
+                and at other times as indicated by the value of ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+            -
+              uuid: 1e16a6f28fe3455b9c37c8d842102ace
+              name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.20.{#SNMPINDEX}'
+              key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
+              delay: 3m
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+            -
+              uuid: 24fb27f79bfc4cde8081ffe55cf945c5
+              name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}'
+              key: 'net.if.out[ifHCOutOctets.{#SNMPINDEX}]'
+              delay: 3m
+              history: 7d
+              units: bps
+              description: |
+                MIB: IF-MIB
+                The total number of octets transmitted out of the interface, including framing characters. This object is a 64-bit version of ifOutOctets.Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+            -
+              uuid: 2cff6fcf8aaa486aa0b7d26d71a928f1
+              name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}'
+              key: 'net.if.speed[ifHighSpeed.{#SNMPINDEX}]'
+              delay: 5m
+              history: 7d
+              trends: 0d
+              units: bps
+              description: |
+                MIB: IF-MIB
+                An estimate of the interface's current bandwidth in units of 1,000,000 bits per second. If this object reports a value of `n' then the speed of the interface is somewhere in the range of `n-500,000' to`n+499,999'.  For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made, this object should contain the nominal bandwidth. For a sub-layer which has no concept of bandwidth, this object should be zero.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1000000'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+            -
+              uuid: 23402859e08647d8bdb39ca8f39daf3b
+              name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
+              key: 'net.if.status[ifOperStatus.{#SNMPINDEX}]'
+              history: 7d
+              trends: '0'
+              description: |
+                MIB: IF-MIB
+                The current operational state of the interface.
+                - The testing(3) state indicates that no operational packet scan be passed
+                - If ifAdminStatus is down(2) then ifOperStatus should be down(2)
+                - If ifAdminStatus is changed to up(1) then ifOperStatus should change to up(1) if the interface is ready to transmit and receive network traffic
+                - It should change todormant(5) if the interface is waiting for external actions (such as a serial line waiting for an incoming connection)
+                - It should remain in the down(2) state if and only if there is a fault that prevents it from going to the up(1) state
+                - It should remain in the notPresent(6) state if the interface has missing(typically, hardware) components.
+              valuemap:
+                name: 'IF-MIB::ifOperStatus'
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+              trigger_prototypes:
+                -
+                  uuid: 3455100ce855445ab3806379fbdc0bbf
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Brocade_Foundry Nonstackable SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Brocade_Foundry Nonstackable SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Brocade_Foundry Nonstackable SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'last(/Brocade_Foundry Nonstackable SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: |
+                    This trigger expression works as follows:
+                    1. Can be triggered if operations status is down.
+                    2. {$IFCONTROL:"{#IFNAME}"}=1 - user can redefine Context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
+                    3. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)
+                    
+                    WARNING: if closed manually - won't fire again on next poll, because of .diff.
+                  manual_close: 'YES'
+            -
+              uuid: 9657eee8f64d4bbe934cfb03f047caa7
+              name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.3.{#SNMPINDEX}'
+              key: 'net.if.type[ifType.{#SNMPINDEX}]'
+              delay: 1h
+              history: 7d
+              trends: 0d
+              description: |
+                MIB: IF-MIB
+                The type of interface.
+                Additional values for ifType are assigned by the Internet Assigned NumbersAuthority (IANA),
+                through updating the syntax of the IANAifType textual convention.
+              valuemap:
+                name: 'IF-MIB::ifType'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+          trigger_prototypes:
+            -
+              uuid: e5f54206b19f4f589229c7137365351c
+              expression: |
+                change(/Brocade_Foundry Nonstackable SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/Brocade_Foundry Nonstackable SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+                and (
+                last(/Brocade_Foundry Nonstackable SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
+                last(/Brocade_Foundry Nonstackable SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
+                last(/Brocade_Foundry Nonstackable SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
+                last(/Brocade_Foundry Nonstackable SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
+                last(/Brocade_Foundry Nonstackable SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
+                last(/Brocade_Foundry Nonstackable SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
+                )
+                and
+                (last(/Brocade_Foundry Nonstackable SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: |
+                (change(/Brocade_Foundry Nonstackable SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/Brocade_Foundry Nonstackable SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
+                (last(/Brocade_Foundry Nonstackable SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
+              name: 'Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before'
+              opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
+              priority: INFO
+              description: 'This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Ack to close.'
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Brocade_Foundry Nonstackable SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Brocade_Foundry Nonstackable SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Brocade_Foundry Nonstackable SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Brocade_Foundry Nonstackable SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+            -
+              uuid: 093696611acd4d75b00e83ce5b11df35
+              expression: |
+                (avg(/Brocade_Foundry Nonstackable SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Brocade_Foundry Nonstackable SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
+                avg(/Brocade_Foundry Nonstackable SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Brocade_Foundry Nonstackable SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
+                last(/Brocade_Foundry Nonstackable SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: |
+                avg(/Brocade_Foundry Nonstackable SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Brocade_Foundry Nonstackable SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
+                avg(/Brocade_Foundry Nonstackable SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Brocade_Foundry Nonstackable SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
+              name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
+              opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
+              priority: WARNING
+              description: 'The network interface utilization is close to its estimated maximum bandwidth.'
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Brocade_Foundry Nonstackable SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Brocade_Foundry Nonstackable SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Brocade_Foundry Nonstackable SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Brocade_Foundry Nonstackable SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+            -
+              uuid: 5337b53e473248719eb502428a4bcc38
+              expression: |
+                min(/Brocade_Foundry Nonstackable SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                or min(/Brocade_Foundry Nonstackable SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: |
+                max(/Brocade_Foundry Nonstackable SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                and max(/Brocade_Foundry Nonstackable SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+              name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+              opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
+              priority: WARNING
+              description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Brocade_Foundry Nonstackable SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Brocade_Foundry Nonstackable SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Brocade_Foundry Nonstackable SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Brocade_Foundry Nonstackable SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+          graph_prototypes:
+            -
+              uuid: 96d099e3a5c142ce8c3bc1e88cb65d5e
+              name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Brocade_Foundry Nonstackable SNMP'
+                    key: 'net.if.in[ifHCInOctets.{#SNMPINDEX}]'
+                -
+                  sortorder: '1'
+                  drawtype: BOLD_LINE
+                  color: 2774A4
+                  item:
+                    host: 'Brocade_Foundry Nonstackable SNMP'
+                    key: 'net.if.out[ifHCOutOctets.{#SNMPINDEX}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  yaxisside: RIGHT
+                  item:
+                    host: 'Brocade_Foundry Nonstackable SNMP'
+                    key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  yaxisside: RIGHT
+                  item:
+                    host: 'Brocade_Foundry Nonstackable SNMP'
+                    key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
+                -
+                  sortorder: '4'
+                  color: FC6EA3
+                  yaxisside: RIGHT
+                  item:
+                    host: 'Brocade_Foundry Nonstackable SNMP'
+                    key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
+                -
+                  sortorder: '5'
+                  color: 6C59DC
+                  yaxisside: RIGHT
+                  item:
+                    host: 'Brocade_Foundry Nonstackable SNMP'
+                    key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
         -
           uuid: 9ea01b3ce15248868f1ced0b38bf1245
           name: 'PSU Discovery'
@@ -308,17 +1030,81 @@ zabbix_export:
                   priority: AVERAGE
       macros:
         -
+          macro: '{$CPU.UTIL.CRIT}'
+          value: '90'
+        -
           macro: '{$FAN_CRIT_STATUS}'
           value: '3'
         -
           macro: '{$FAN_OK_STATUS}'
           value: '2'
         -
+          macro: '{$ICMP_LOSS_WARN}'
+          value: '20'
+        -
+          macro: '{$ICMP_RESPONSE_TIME_WARN}'
+          value: '0.15'
+        -
+          macro: '{$IF.ERRORS.WARN}'
+          value: '2'
+        -
+          macro: '{$IF.UTIL.MAX}'
+          value: '90'
+        -
+          macro: '{$IFCONTROL}'
+          value: '1'
+        -
+          macro: '{$MEMORY.UTIL.MAX}'
+          value: '90'
+        -
+          macro: '{$NET.IF.IFADMINSTATUS.MATCHES}'
+          value: '^.*'
+          description: 'Ignore notPresent(6)'
+        -
+          macro: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
+          value: ^2$
+          description: 'Ignore down(2) administrative status'
+        -
+          macro: '{$NET.IF.IFALIAS.MATCHES}'
+          value: '.*'
+        -
+          macro: '{$NET.IF.IFALIAS.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+        -
+          macro: '{$NET.IF.IFDESCR.MATCHES}'
+          value: '.*'
+        -
+          macro: '{$NET.IF.IFDESCR.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+        -
+          macro: '{$NET.IF.IFNAME.MATCHES}'
+          value: '^.*$'
+        -
+          macro: '{$NET.IF.IFNAME.NOT_MATCHES}'
+          value: '(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9a-z]+$|docker[0-9]+|br-[a-z0-9]{12})'
+          description: 'Filter out loopbacks, nulls, docker veth links and docker0 bridge by default'
+        -
+          macro: '{$NET.IF.IFOPERSTATUS.MATCHES}'
+          value: '^.*$'
+        -
+          macro: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
+          value: ^6$
+          description: 'Ignore notPresent(6)'
+        -
+          macro: '{$NET.IF.IFTYPE.MATCHES}'
+          value: '.*'
+        -
+          macro: '{$NET.IF.IFTYPE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+        -
           macro: '{$PSU_CRIT_STATUS}'
           value: '3'
         -
           macro: '{$PSU_OK_STATUS}'
           value: '2'
+        -
+          macro: '{$SNMP.TIMEOUT}'
+          value: 5m
         -
           macro: '{$TEMP_CRIT}'
           value: '75'
@@ -328,6 +1114,36 @@ zabbix_export:
         -
           macro: '{$TEMP_WARN}'
           value: '65'
+      dashboards:
+        -
+          uuid: 881c7f5e3dc444f988b314bdb810cb6c
+          name: 'Network interfaces'
+          pages:
+            -
+              widgets:
+                -
+                  type: GRAPH_PROTOTYPE
+                  width: '24'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '1'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
+                        host: 'Brocade_Foundry Nonstackable SNMP'
       valuemaps:
         -
           uuid: d457efd8cee74f168bd88f4fb2376142
@@ -355,6 +1171,913 @@ zabbix_export:
             -
               value: '3'
               newvalue: failure
+        -
+          uuid: 1b40ba5987784986bb25aa9dfa2d1e81
+          name: 'IF-MIB::ifOperStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: up
+            -
+              value: '2'
+              newvalue: down
+            -
+              value: '4'
+              newvalue: unknown
+            -
+              value: '5'
+              newvalue: dormant
+            -
+              value: '6'
+              newvalue: notPresent
+            -
+              value: '7'
+              newvalue: lowerLayerDown
+        -
+          uuid: 5a55c0fddcc9450eb3e07b76cc73f8ee
+          name: 'IF-MIB::ifType'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: regular1822
+            -
+              value: '3'
+              newvalue: hdh1822
+            -
+              value: '4'
+              newvalue: ddnX25
+            -
+              value: '5'
+              newvalue: rfc877x25
+            -
+              value: '6'
+              newvalue: ethernetCsmacd
+            -
+              value: '7'
+              newvalue: iso88023Csmacd
+            -
+              value: '8'
+              newvalue: iso88024TokenBus
+            -
+              value: '9'
+              newvalue: iso88025TokenRing
+            -
+              value: '10'
+              newvalue: iso88026Man
+            -
+              value: '11'
+              newvalue: starLan
+            -
+              value: '12'
+              newvalue: proteon10Mbit
+            -
+              value: '13'
+              newvalue: proteon80Mbit
+            -
+              value: '14'
+              newvalue: hyperchannel
+            -
+              value: '15'
+              newvalue: fddi
+            -
+              value: '16'
+              newvalue: lapb
+            -
+              value: '17'
+              newvalue: sdlc
+            -
+              value: '18'
+              newvalue: ds1
+            -
+              value: '19'
+              newvalue: e1
+            -
+              value: '20'
+              newvalue: basicISDN
+            -
+              value: '21'
+              newvalue: primaryISDN
+            -
+              value: '22'
+              newvalue: propPointToPointSerial
+            -
+              value: '23'
+              newvalue: ppp
+            -
+              value: '24'
+              newvalue: softwareLoopback
+            -
+              value: '25'
+              newvalue: eon
+            -
+              value: '26'
+              newvalue: ethernet3Mbit
+            -
+              value: '27'
+              newvalue: nsip
+            -
+              value: '28'
+              newvalue: slip
+            -
+              value: '29'
+              newvalue: ultra
+            -
+              value: '30'
+              newvalue: ds3
+            -
+              value: '31'
+              newvalue: sip
+            -
+              value: '32'
+              newvalue: frameRelay
+            -
+              value: '33'
+              newvalue: rs232
+            -
+              value: '34'
+              newvalue: para
+            -
+              value: '35'
+              newvalue: arcnet
+            -
+              value: '36'
+              newvalue: arcnetPlus
+            -
+              value: '37'
+              newvalue: atm
+            -
+              value: '38'
+              newvalue: miox25
+            -
+              value: '39'
+              newvalue: sonet
+            -
+              value: '40'
+              newvalue: x25ple
+            -
+              value: '41'
+              newvalue: iso88022llc
+            -
+              value: '42'
+              newvalue: localTalk
+            -
+              value: '43'
+              newvalue: smdsDxi
+            -
+              value: '44'
+              newvalue: frameRelayService
+            -
+              value: '45'
+              newvalue: v35
+            -
+              value: '46'
+              newvalue: hssi
+            -
+              value: '47'
+              newvalue: hippi
+            -
+              value: '48'
+              newvalue: modem
+            -
+              value: '49'
+              newvalue: aal5
+            -
+              value: '50'
+              newvalue: sonetPath
+            -
+              value: '51'
+              newvalue: sonetVT
+            -
+              value: '52'
+              newvalue: smdsIcip
+            -
+              value: '53'
+              newvalue: propVirtual
+            -
+              value: '54'
+              newvalue: propMultiplexor
+            -
+              value: '55'
+              newvalue: ieee80212
+            -
+              value: '56'
+              newvalue: fibreChannel
+            -
+              value: '57'
+              newvalue: hippiInterface
+            -
+              value: '58'
+              newvalue: frameRelayInterconnect
+            -
+              value: '59'
+              newvalue: aflane8023
+            -
+              value: '60'
+              newvalue: aflane8025
+            -
+              value: '61'
+              newvalue: cctEmul
+            -
+              value: '62'
+              newvalue: fastEther
+            -
+              value: '63'
+              newvalue: isdn
+            -
+              value: '64'
+              newvalue: v11
+            -
+              value: '65'
+              newvalue: v36
+            -
+              value: '66'
+              newvalue: g703at64k
+            -
+              value: '67'
+              newvalue: g703at2mb
+            -
+              value: '68'
+              newvalue: qllc
+            -
+              value: '69'
+              newvalue: fastEtherFX
+            -
+              value: '70'
+              newvalue: channel
+            -
+              value: '71'
+              newvalue: ieee80211
+            -
+              value: '72'
+              newvalue: ibm370parChan
+            -
+              value: '73'
+              newvalue: escon
+            -
+              value: '74'
+              newvalue: dlsw
+            -
+              value: '75'
+              newvalue: isdns
+            -
+              value: '76'
+              newvalue: isdnu
+            -
+              value: '77'
+              newvalue: lapd
+            -
+              value: '78'
+              newvalue: ipSwitch
+            -
+              value: '79'
+              newvalue: rsrb
+            -
+              value: '80'
+              newvalue: atmLogical
+            -
+              value: '81'
+              newvalue: ds0
+            -
+              value: '82'
+              newvalue: ds0Bundle
+            -
+              value: '83'
+              newvalue: bsc
+            -
+              value: '84'
+              newvalue: async
+            -
+              value: '85'
+              newvalue: cnr
+            -
+              value: '86'
+              newvalue: iso88025Dtr
+            -
+              value: '87'
+              newvalue: eplrs
+            -
+              value: '88'
+              newvalue: arap
+            -
+              value: '89'
+              newvalue: propCnls
+            -
+              value: '90'
+              newvalue: hostPad
+            -
+              value: '91'
+              newvalue: termPad
+            -
+              value: '92'
+              newvalue: frameRelayMPI
+            -
+              value: '93'
+              newvalue: x213
+            -
+              value: '94'
+              newvalue: adsl
+            -
+              value: '95'
+              newvalue: radsl
+            -
+              value: '96'
+              newvalue: sdsl
+            -
+              value: '97'
+              newvalue: vdsl
+            -
+              value: '98'
+              newvalue: iso88025CRFPInt
+            -
+              value: '99'
+              newvalue: myrinet
+            -
+              value: '100'
+              newvalue: voiceEM
+            -
+              value: '101'
+              newvalue: voiceFXO
+            -
+              value: '102'
+              newvalue: voiceFXS
+            -
+              value: '103'
+              newvalue: voiceEncap
+            -
+              value: '104'
+              newvalue: voiceOverIp
+            -
+              value: '105'
+              newvalue: atmDxi
+            -
+              value: '106'
+              newvalue: atmFuni
+            -
+              value: '107'
+              newvalue: atmIma
+            -
+              value: '108'
+              newvalue: pppMultilinkBundle
+            -
+              value: '109'
+              newvalue: ipOverCdlc
+            -
+              value: '110'
+              newvalue: ipOverClaw
+            -
+              value: '111'
+              newvalue: stackToStack
+            -
+              value: '112'
+              newvalue: virtualIpAddress
+            -
+              value: '113'
+              newvalue: mpc
+            -
+              value: '114'
+              newvalue: ipOverAtm
+            -
+              value: '115'
+              newvalue: iso88025Fiber
+            -
+              value: '116'
+              newvalue: tdlc
+            -
+              value: '117'
+              newvalue: gigabitEthernet
+            -
+              value: '118'
+              newvalue: hdlc
+            -
+              value: '119'
+              newvalue: lapf
+            -
+              value: '120'
+              newvalue: v37
+            -
+              value: '121'
+              newvalue: x25mlp
+            -
+              value: '122'
+              newvalue: x25huntGroup
+            -
+              value: '123'
+              newvalue: trasnpHdlc
+            -
+              value: '124'
+              newvalue: interleave
+            -
+              value: '125'
+              newvalue: fast
+            -
+              value: '126'
+              newvalue: ip
+            -
+              value: '127'
+              newvalue: docsCableMaclayer
+            -
+              value: '128'
+              newvalue: docsCableDownstream
+            -
+              value: '129'
+              newvalue: docsCableUpstream
+            -
+              value: '130'
+              newvalue: a12MppSwitch
+            -
+              value: '131'
+              newvalue: tunnel
+            -
+              value: '132'
+              newvalue: coffee
+            -
+              value: '133'
+              newvalue: ces
+            -
+              value: '134'
+              newvalue: atmSubInterface
+            -
+              value: '135'
+              newvalue: l2vlan
+            -
+              value: '136'
+              newvalue: l3ipvlan
+            -
+              value: '137'
+              newvalue: l3ipxvlan
+            -
+              value: '138'
+              newvalue: digitalPowerline
+            -
+              value: '139'
+              newvalue: mediaMailOverIp
+            -
+              value: '140'
+              newvalue: dtm
+            -
+              value: '141'
+              newvalue: dcn
+            -
+              value: '142'
+              newvalue: ipForward
+            -
+              value: '143'
+              newvalue: msdsl
+            -
+              value: '144'
+              newvalue: ieee1394
+            -
+              value: '145'
+              newvalue: if-gsn
+            -
+              value: '146'
+              newvalue: dvbRccMacLayer
+            -
+              value: '147'
+              newvalue: dvbRccDownstream
+            -
+              value: '148'
+              newvalue: dvbRccUpstream
+            -
+              value: '149'
+              newvalue: atmVirtual
+            -
+              value: '150'
+              newvalue: mplsTunnel
+            -
+              value: '151'
+              newvalue: srp
+            -
+              value: '152'
+              newvalue: voiceOverAtm
+            -
+              value: '153'
+              newvalue: voiceOverFrameRelay
+            -
+              value: '154'
+              newvalue: idsl
+            -
+              value: '155'
+              newvalue: compositeLink
+            -
+              value: '156'
+              newvalue: ss7SigLink
+            -
+              value: '157'
+              newvalue: propWirelessP2P
+            -
+              value: '158'
+              newvalue: frForward
+            -
+              value: '159'
+              newvalue: rfc1483
+            -
+              value: '160'
+              newvalue: usb
+            -
+              value: '161'
+              newvalue: ieee8023adLag
+            -
+              value: '162'
+              newvalue: bgppolicyaccounting
+            -
+              value: '163'
+              newvalue: frf16MfrBundle
+            -
+              value: '164'
+              newvalue: h323Gatekeeper
+            -
+              value: '165'
+              newvalue: h323Proxy
+            -
+              value: '166'
+              newvalue: mpls
+            -
+              value: '167'
+              newvalue: mfSigLink
+            -
+              value: '168'
+              newvalue: hdsl2
+            -
+              value: '169'
+              newvalue: shdsl
+            -
+              value: '170'
+              newvalue: ds1FDL
+            -
+              value: '171'
+              newvalue: pos
+            -
+              value: '172'
+              newvalue: dvbAsiIn
+            -
+              value: '173'
+              newvalue: dvbAsiOut
+            -
+              value: '174'
+              newvalue: plc
+            -
+              value: '175'
+              newvalue: nfas
+            -
+              value: '176'
+              newvalue: tr008
+            -
+              value: '177'
+              newvalue: gr303RDT
+            -
+              value: '178'
+              newvalue: gr303IDT
+            -
+              value: '179'
+              newvalue: isup
+            -
+              value: '180'
+              newvalue: propDocsWirelessMaclayer
+            -
+              value: '181'
+              newvalue: propDocsWirelessDownstream
+            -
+              value: '182'
+              newvalue: propDocsWirelessUpstream
+            -
+              value: '183'
+              newvalue: hiperlan2
+            -
+              value: '184'
+              newvalue: propBWAp2Mp
+            -
+              value: '185'
+              newvalue: sonetOverheadChannel
+            -
+              value: '186'
+              newvalue: digitalWrapperOverheadChannel
+            -
+              value: '187'
+              newvalue: aal2
+            -
+              value: '188'
+              newvalue: radioMAC
+            -
+              value: '189'
+              newvalue: atmRadio
+            -
+              value: '190'
+              newvalue: imt
+            -
+              value: '191'
+              newvalue: mvl
+            -
+              value: '192'
+              newvalue: reachDSL
+            -
+              value: '193'
+              newvalue: frDlciEndPt
+            -
+              value: '194'
+              newvalue: atmVciEndPt
+            -
+              value: '195'
+              newvalue: opticalChannel
+            -
+              value: '196'
+              newvalue: opticalTransport
+            -
+              value: '197'
+              newvalue: propAtm
+            -
+              value: '198'
+              newvalue: voiceOverCable
+            -
+              value: '199'
+              newvalue: infiniband
+            -
+              value: '200'
+              newvalue: teLink
+            -
+              value: '201'
+              newvalue: q2931
+            -
+              value: '202'
+              newvalue: virtualTg
+            -
+              value: '203'
+              newvalue: sipTg
+            -
+              value: '204'
+              newvalue: sipSig
+            -
+              value: '205'
+              newvalue: docsCableUpstreamChannel
+            -
+              value: '206'
+              newvalue: econet
+            -
+              value: '207'
+              newvalue: pon155
+            -
+              value: '208'
+              newvalue: pon622
+            -
+              value: '209'
+              newvalue: bridge
+            -
+              value: '210'
+              newvalue: linegroup
+            -
+              value: '211'
+              newvalue: voiceEMFGD
+            -
+              value: '212'
+              newvalue: voiceFGDEANA
+            -
+              value: '213'
+              newvalue: voiceDID
+            -
+              value: '214'
+              newvalue: mpegTransport
+            -
+              value: '215'
+              newvalue: sixToFour
+            -
+              value: '216'
+              newvalue: gtp
+            -
+              value: '217'
+              newvalue: pdnEtherLoop1
+            -
+              value: '218'
+              newvalue: pdnEtherLoop2
+            -
+              value: '219'
+              newvalue: opticalChannelGroup
+            -
+              value: '220'
+              newvalue: homepna
+            -
+              value: '221'
+              newvalue: gfp
+            -
+              value: '222'
+              newvalue: ciscoISLvlan
+            -
+              value: '223'
+              newvalue: actelisMetaLOOP
+            -
+              value: '224'
+              newvalue: fcipLink
+            -
+              value: '225'
+              newvalue: rpr
+            -
+              value: '226'
+              newvalue: qam
+            -
+              value: '227'
+              newvalue: lmp
+            -
+              value: '228'
+              newvalue: cblVectaStar
+            -
+              value: '229'
+              newvalue: docsCableMCmtsDownstream
+            -
+              value: '230'
+              newvalue: adsl2
+            -
+              value: '231'
+              newvalue: macSecControlledIF
+            -
+              value: '232'
+              newvalue: macSecUncontrolledIF
+            -
+              value: '233'
+              newvalue: aviciOpticalEther
+            -
+              value: '234'
+              newvalue: atmbond
+            -
+              value: '235'
+              newvalue: voiceFGDOS
+            -
+              value: '236'
+              newvalue: mocaVersion1
+            -
+              value: '237'
+              newvalue: ieee80216WMAN
+            -
+              value: '238'
+              newvalue: adsl2plus
+            -
+              value: '239'
+              newvalue: dvbRcsMacLayer
+            -
+              value: '240'
+              newvalue: dvbTdm
+            -
+              value: '241'
+              newvalue: dvbRcsTdma
+            -
+              value: '242'
+              newvalue: x86Laps
+            -
+              value: '243'
+              newvalue: wwanPP
+            -
+              value: '244'
+              newvalue: wwanPP2
+            -
+              value: '245'
+              newvalue: voiceEBS
+            -
+              value: '246'
+              newvalue: ifPwType
+            -
+              value: '247'
+              newvalue: ilan
+            -
+              value: '248'
+              newvalue: pip
+            -
+              value: '249'
+              newvalue: aluELP
+            -
+              value: '250'
+              newvalue: gpon
+            -
+              value: '251'
+              newvalue: vdsl2
+            -
+              value: '252'
+              newvalue: capwapDot11Profile
+            -
+              value: '253'
+              newvalue: capwapDot11Bss
+            -
+              value: '254'
+              newvalue: capwapWtpVirtualRadio
+            -
+              value: '255'
+              newvalue: bits
+            -
+              value: '256'
+              newvalue: docsCableUpstreamRfPort
+            -
+              value: '257'
+              newvalue: cableDownstreamRfPort
+            -
+              value: '258'
+              newvalue: vmwareVirtualNic
+            -
+              value: '259'
+              newvalue: ieee802154
+            -
+              value: '260'
+              newvalue: otnOdu
+            -
+              value: '261'
+              newvalue: otnOtu
+            -
+              value: '262'
+              newvalue: ifVfiType
+            -
+              value: '263'
+              newvalue: g9981
+            -
+              value: '264'
+              newvalue: g9982
+            -
+              value: '265'
+              newvalue: g9983
+            -
+              value: '266'
+              newvalue: aluEpon
+            -
+              value: '267'
+              newvalue: aluEponOnu
+            -
+              value: '268'
+              newvalue: aluEponPhysicalUni
+            -
+              value: '269'
+              newvalue: aluEponLogicalLink
+            -
+              value: '270'
+              newvalue: aluGponOnu
+            -
+              value: '271'
+              newvalue: aluGponPhysicalUni
+            -
+              value: '272'
+              newvalue: vmwareNicTeam
+            -
+              value: '277'
+              newvalue: docsOfdmDownstream
+            -
+              value: '278'
+              newvalue: docsOfdmaUpstream
+            -
+              value: '279'
+              newvalue: gfast
+            -
+              value: '280'
+              newvalue: sdci
+            -
+              value: '281'
+              newvalue: xboxWireless
+            -
+              value: '282'
+              newvalue: fastdsl
+            -
+              value: '283'
+              newvalue: docsCableScte55d1FwdOob
+            -
+              value: '284'
+              newvalue: docsCableScte55d1RetOob
+            -
+              value: '285'
+              newvalue: docsCableScte55d2DsOob
+            -
+              value: '286'
+              newvalue: docsCableScte55d2UsOob
+            -
+              value: '287'
+              newvalue: docsCableNdf
+            -
+              value: '288'
+              newvalue: docsCableNdr
+            -
+              value: '289'
+              newvalue: ptm
+            -
+              value: '290'
+              newvalue: ghn
+        -
+          uuid: ac73622b29f54d21aa6bcbac5a783599
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up
+        -
+          uuid: f74856688e9444bd93951f0c246ae483
+          name: zabbix.host.available
+          mappings:
+            -
+              value: '0'
+              newvalue: 'not available'
+            -
+              value: '1'
+              newvalue: available
+            -
+              value: '2'
+              newvalue: unknown
     -
       uuid: c55052212c774e3fbab00343050b3db5
       template: 'Brocade_Foundry Performance SNMP'
@@ -365,7 +2088,7 @@ zabbix_export:
         MIBs used:
         FOUNDRY-SN-AGENT-MIB
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Modules
@@ -435,7 +2158,9 @@ zabbix_export:
         
         MIBs used:
         FOUNDRY-SN-AGENT-MIB
+        SNMPv2-MIB
         FOUNDRY-SN-STACKING-MIB
+        IF-MIB
         
         Known Issues:
         
@@ -443,18 +2168,164 @@ zabbix_export:
           Version: Version 08.0.40b and above
           Device: ICX 7750 in stack
         
-        Template tooling version used: 0.40
-      templates:
-        -
-          name: 'Brocade_Foundry Performance SNMP'
-        -
-          name: 'Generic SNMP'
-        -
-          name: 'Interfaces SNMP'
+        Template tooling version used: 0.41
       groups:
         -
           name: 'Templates/Network devices'
       items:
+        -
+          uuid: df3428a8cf5a449e9ffec28d846a3062
+          name: 'ICMP ping'
+          type: SIMPLE
+          key: icmpping
+          history: 1w
+          valuemap:
+            name: 'Service state'
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 06ed32e60b9d4fb387116b5bb9c1700a
+              expression: 'max(/Brocade_Foundry Stackable SNMP/icmpping,#3)=0'
+              name: 'Unavailable by ICMP ping'
+              priority: HIGH
+              description: 'Last three attempts returned timeout.  Please check device connectivity.'
+        -
+          uuid: 3e97bfa40e1547b5be3f72f9675dfc62
+          name: 'ICMP loss'
+          type: SIMPLE
+          key: icmppingloss
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 305f5a75aed34094a1721653ba6cafda
+              expression: 'min(/Brocade_Foundry Stackable SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Brocade_Foundry Stackable SNMP/icmppingloss,5m)<100'
+              name: 'High ICMP ping loss'
+              opdata: 'Loss: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'Unavailable by ICMP ping'
+                  expression: 'max(/Brocade_Foundry Stackable SNMP/icmpping,#3)=0'
+        -
+          uuid: 79ca1e3ac22742d28e08c722dad1e254
+          name: 'ICMP response time'
+          type: SIMPLE
+          key: icmppingsec
+          history: 1w
+          value_type: FLOAT
+          units: s
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 6e7e8f250fbb47778405daeea7a2b852
+              expression: 'avg(/Brocade_Foundry Stackable SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
+              name: 'High ICMP ping response time'
+              opdata: 'Value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'High ICMP ping loss'
+                  expression: 'min(/Brocade_Foundry Stackable SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Brocade_Foundry Stackable SNMP/icmppingloss,5m)<100'
+                -
+                  name: 'Unavailable by ICMP ping'
+                  expression: 'max(/Brocade_Foundry Stackable SNMP/icmpping,#3)=0'
+        -
+          uuid: 584f0625be1c40e69294dce25fc9ead6
+          name: 'SNMP traps (fallback)'
+          type: SNMP_TRAP
+          key: snmptrap.fallback
+          history: 2w
+          trends: '0'
+          value_type: LOG
+          description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items'
+          logtimefmt: 'hh:mm:sszyyyy/MM/dd'
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: b973c42ae6da4707893b21f20d09ecd3
+          name: 'System contact details'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.4.0
+          key: 'system.contact[sysContact.0]'
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.
+          inventory_link: CONTACT
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: bfb60806299f4388bb5bfafd2c0329be
+          name: 'CPU utilization'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.1991.1.1.2.1.52.0
+          key: 'system.cpu.util[snAgGblCpuUtil1MinAvg.0]'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: |
+            MIB: FOUNDRY-SN-AGENT-MIB
+            The statistics collection of 1 minute CPU utilization.
+          tags:
+            -
+              tag: Application
+              value: CPU
+          triggers:
+            -
+              uuid: c390ed19b59a45b29f80cb95ee6e635a
+              expression: 'min(/Brocade_Foundry Stackable SNMP/system.cpu.util[snAgGblCpuUtil1MinAvg.0],5m)>{$CPU.UTIL.CRIT}'
+              name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'CPU utilization is too high. The system might be slow to respond.'
+        -
+          uuid: 11f6230e5f2945aab338c958f38ce9d3
+          name: 'System description'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.1.0
+          key: 'system.descr[sysDescr.0]'
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            A textual description of the entity. This value should
+            include the full name and version identification of the system's hardware type, software operating-system, and
+            networking software.
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
+          tags:
+            -
+              tag: Application
+              value: General
         -
           uuid: 5c17e0d80c354391b339142f2a973886
           name: 'Firmware version'
@@ -486,6 +2357,171 @@ zabbix_export:
               priority: INFO
               description: 'Firmware version has changed. Ack to close'
               manual_close: 'YES'
+        -
+          uuid: 99be144849104b3cad296b2f21355e93
+          name: 'System location'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.6.0
+          key: 'system.location[sysLocation.0]'
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.
+          inventory_link: LOCATION
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 7af427adf5ad451894ae1e6af72c1890
+          name: 'System name'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.5.0
+          key: system.name
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            An administratively-assigned name for this managed node.By convention, this is the node's fully-qualified domain name.  If the name is unknown, the value is the zero-length string.
+          inventory_link: NAME
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
+          tags:
+            -
+              tag: Application
+              value: General
+          triggers:
+            -
+              uuid: 1e455a8b19994e9a9f9147d4c3abfa59
+              expression: 'last(/Brocade_Foundry Stackable SNMP/system.name,#1)<>last(/Brocade_Foundry Stackable SNMP/system.name,#2) and length(last(/Brocade_Foundry Stackable SNMP/system.name))>0'
+              name: 'System name has changed (new name: {ITEM.VALUE})'
+              priority: INFO
+              description: 'System name has changed. Ack to close.'
+              manual_close: 'YES'
+        -
+          uuid: 886dd0ed732c49118f012a402b4a5f45
+          name: 'System object ID'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.2.0
+          key: 'system.objectid[sysObjectID.0]'
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            The vendor's authoritative identification of the network management subsystem contained in the entity.  This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: c32cf75496ce40e5b3d06a049fa3205d
+          name: Uptime
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.3.0
+          key: 'system.uptime[sysUpTime.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: SNMPv2-MIB
+            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 0fd4a268d6d34a2d925a97babe365b65
+              expression: 'last(/Brocade_Foundry Stackable SNMP/system.uptime[sysUpTime.0])<10m'
+              name: '{HOST.NAME} has been restarted (uptime < 10m)'
+              priority: WARNING
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'No SNMP data collection'
+                  expression: 'max(/Brocade_Foundry Stackable SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+        -
+          uuid: 631268898edf40908c9d1dd75ed4eef8
+          name: 'Memory utilization'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.1991.1.1.2.1.53.0
+          key: 'vm.memory.util[snAgGblDynMemUtil.0]'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: |
+            MIB: FOUNDRY-SN-AGENT-MIB
+            The system dynamic memory utilization, in unit of percentage.
+            Deprecated: Refer to snAgSystemDRAMUtil.
+            For NI platforms, refer to snAgentBrdMemoryUtil100thPercent.
+          tags:
+            -
+              tag: Application
+              value: Memory
+          triggers:
+            -
+              uuid: 18623226ce15406488bc99f075cf2590
+              expression: 'min(/Brocade_Foundry Stackable SNMP/vm.memory.util[snAgGblDynMemUtil.0],5m)>{$MEMORY.UTIL.MAX}'
+              name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+              priority: AVERAGE
+              description: 'The system is running out of free memory.'
+        -
+          uuid: a25878004da548e9824321fe0f55955e
+          name: 'SNMP agent availability'
+          type: INTERNAL
+          key: 'zabbix[host,snmp,available]'
+          history: 7d
+          description: |
+            Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.
+            Possible value:
+            0 - not available
+            1 - available
+            2 - unknown
+          valuemap:
+            name: zabbix.host.available
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: a4bb03ba3e4645fdb7ecab56ddde776f
+              expression: 'max(/Brocade_Foundry Stackable SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              name: 'No SNMP data collection'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
+              dependencies:
+                -
+                  name: 'Unavailable by ICMP ping'
+                  expression: 'max(/Brocade_Foundry Stackable SNMP/icmpping,#3)=0'
       discovery_rules:
         -
           uuid: 88f67d02cd484dfb841f5f841c3e0bd6
@@ -570,6 +2606,415 @@ zabbix_export:
                     -
                       name: 'Unit {#FAN_UNIT} Fan {#FAN_INDEX}: Fan is in critical state'
                       expression: 'count(/Brocade_Foundry Stackable SNMP/sensor.fan.status[snChasFan2OperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
+        -
+          uuid: 3a38811553e5456f9d3cc842c5bd3809
+          name: 'Network interfaces discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#IFOPERSTATUS},1.3.6.1.2.1.2.2.1.8,{#IFADMINSTATUS},1.3.6.1.2.1.2.2.1.7,{#IFALIAS},1.3.6.1.2.1.31.1.1.1.18,{#IFNAME},1.3.6.1.2.1.31.1.1.1.1,{#IFDESCR},1.3.6.1.2.1.2.2.1.2,{#IFTYPE},1.3.6.1.2.1.2.2.1.3]'
+          key: net.if.discovery
+          delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#IFADMINSTATUS}'
+                value: '{$NET.IF.IFADMINSTATUS.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#IFADMINSTATUS}'
+                value: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+              -
+                macro: '{#IFOPERSTATUS}'
+                value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
+                formulaid: I
+              -
+                macro: '{#IFOPERSTATUS}'
+                value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: J
+              -
+                macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.MATCHES}'
+                formulaid: G
+              -
+                macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: H
+              -
+                macro: '{#IFDESCR}'
+                value: '{$NET.IF.IFDESCR.MATCHES}'
+                formulaid: E
+              -
+                macro: '{#IFDESCR}'
+                value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: F
+              -
+                macro: '{#IFALIAS}'
+                value: '{$NET.IF.IFALIAS.MATCHES}'
+                formulaid: C
+              -
+                macro: '{#IFALIAS}'
+                value: '{$NET.IF.IFALIAS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              -
+                macro: '{#IFTYPE}'
+                value: '{$NET.IF.IFTYPE.MATCHES}'
+                formulaid: K
+              -
+                macro: '{#IFTYPE}'
+                value: '{$NET.IF.IFTYPE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: L
+          description: 'Discovering interfaces from IF-MIB.'
+          item_prototypes:
+            -
+              uuid: d8691667a3b641b68de53ad50928216e
+              name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets discarded'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.13.{#SNMPINDEX}'
+              key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
+              delay: 3m
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                The number of inbound packets which were chosen to be discarded
+                even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.
+                One possible reason for discarding such a packet could be to free up buffer space.
+                Discontinuities in the value of this counter can occur at re-initialization of the management system,
+                and at other times as indicated by the value of ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+            -
+              uuid: c73aaba921794ec3bd0b8783047dca07
+              name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.14.{#SNMPINDEX}'
+              key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
+              delay: 3m
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+            -
+              uuid: 3cc7e079ba25461c887fc976664311ba
+              name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}'
+              key: 'net.if.in[ifHCInOctets.{#SNMPINDEX}]'
+              delay: 3m
+              history: 7d
+              units: bps
+              description: |
+                MIB: IF-MIB
+                The total number of octets received on the interface, including framing characters. This object is a 64-bit version of ifInOctets. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+            -
+              uuid: d310f098ff6f4704b974028707c0350b
+              name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.19.{#SNMPINDEX}'
+              key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
+              delay: 3m
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                The number of outbound packets which were chosen to be discarded
+                even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.
+                One possible reason for discarding such a packet could be to free up buffer space.
+                Discontinuities in the value of this counter can occur at re-initialization of the management system,
+                and at other times as indicated by the value of ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+            -
+              uuid: 3628163a8ecc43e98b81b91e9f6b51a0
+              name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.20.{#SNMPINDEX}'
+              key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
+              delay: 3m
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+            -
+              uuid: 05eab5a457df403d89e76f7fc20689e4
+              name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}'
+              key: 'net.if.out[ifHCOutOctets.{#SNMPINDEX}]'
+              delay: 3m
+              history: 7d
+              units: bps
+              description: |
+                MIB: IF-MIB
+                The total number of octets transmitted out of the interface, including framing characters. This object is a 64-bit version of ifOutOctets.Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+            -
+              uuid: 65b44b69e0524cec94c36469987e2fec
+              name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}'
+              key: 'net.if.speed[ifHighSpeed.{#SNMPINDEX}]'
+              delay: 5m
+              history: 7d
+              trends: 0d
+              units: bps
+              description: |
+                MIB: IF-MIB
+                An estimate of the interface's current bandwidth in units of 1,000,000 bits per second. If this object reports a value of `n' then the speed of the interface is somewhere in the range of `n-500,000' to`n+499,999'.  For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made, this object should contain the nominal bandwidth. For a sub-layer which has no concept of bandwidth, this object should be zero.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1000000'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+            -
+              uuid: cdba234cfd6f475d8a67528a677b79a0
+              name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
+              key: 'net.if.status[ifOperStatus.{#SNMPINDEX}]'
+              history: 7d
+              trends: '0'
+              description: |
+                MIB: IF-MIB
+                The current operational state of the interface.
+                - The testing(3) state indicates that no operational packet scan be passed
+                - If ifAdminStatus is down(2) then ifOperStatus should be down(2)
+                - If ifAdminStatus is changed to up(1) then ifOperStatus should change to up(1) if the interface is ready to transmit and receive network traffic
+                - It should change todormant(5) if the interface is waiting for external actions (such as a serial line waiting for an incoming connection)
+                - It should remain in the down(2) state if and only if there is a fault that prevents it from going to the up(1) state
+                - It should remain in the notPresent(6) state if the interface has missing(typically, hardware) components.
+              valuemap:
+                name: 'IF-MIB::ifOperStatus'
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+              trigger_prototypes:
+                -
+                  uuid: 4c175f17331942ae8342b0abf43f8fe2
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Brocade_Foundry Stackable SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Brocade_Foundry Stackable SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Brocade_Foundry Stackable SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'last(/Brocade_Foundry Stackable SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: |
+                    This trigger expression works as follows:
+                    1. Can be triggered if operations status is down.
+                    2. {$IFCONTROL:"{#IFNAME}"}=1 - user can redefine Context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
+                    3. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)
+                    
+                    WARNING: if closed manually - won't fire again on next poll, because of .diff.
+                  manual_close: 'YES'
+            -
+              uuid: 4c8df33c9eb748bd90ea7053c5aa11ce
+              name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.3.{#SNMPINDEX}'
+              key: 'net.if.type[ifType.{#SNMPINDEX}]'
+              delay: 1h
+              history: 7d
+              trends: 0d
+              description: |
+                MIB: IF-MIB
+                The type of interface.
+                Additional values for ifType are assigned by the Internet Assigned NumbersAuthority (IANA),
+                through updating the syntax of the IANAifType textual convention.
+              valuemap:
+                name: 'IF-MIB::ifType'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+          trigger_prototypes:
+            -
+              uuid: 8a83aadcd4474f8d99a4712c2f49e737
+              expression: |
+                change(/Brocade_Foundry Stackable SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/Brocade_Foundry Stackable SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+                and (
+                last(/Brocade_Foundry Stackable SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
+                last(/Brocade_Foundry Stackable SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
+                last(/Brocade_Foundry Stackable SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
+                last(/Brocade_Foundry Stackable SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
+                last(/Brocade_Foundry Stackable SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
+                last(/Brocade_Foundry Stackable SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
+                )
+                and
+                (last(/Brocade_Foundry Stackable SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: |
+                (change(/Brocade_Foundry Stackable SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/Brocade_Foundry Stackable SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
+                (last(/Brocade_Foundry Stackable SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
+              name: 'Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before'
+              opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
+              priority: INFO
+              description: 'This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Ack to close.'
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Brocade_Foundry Stackable SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Brocade_Foundry Stackable SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Brocade_Foundry Stackable SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Brocade_Foundry Stackable SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+            -
+              uuid: a1ec6d8bc0644db9be849d79e9f24ea1
+              expression: |
+                (avg(/Brocade_Foundry Stackable SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Brocade_Foundry Stackable SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
+                avg(/Brocade_Foundry Stackable SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Brocade_Foundry Stackable SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
+                last(/Brocade_Foundry Stackable SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: |
+                avg(/Brocade_Foundry Stackable SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Brocade_Foundry Stackable SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
+                avg(/Brocade_Foundry Stackable SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Brocade_Foundry Stackable SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
+              name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
+              opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
+              priority: WARNING
+              description: 'The network interface utilization is close to its estimated maximum bandwidth.'
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Brocade_Foundry Stackable SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Brocade_Foundry Stackable SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Brocade_Foundry Stackable SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Brocade_Foundry Stackable SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+            -
+              uuid: acba5651b6dd4ed29166698a4faed7f8
+              expression: |
+                min(/Brocade_Foundry Stackable SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                or min(/Brocade_Foundry Stackable SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: |
+                max(/Brocade_Foundry Stackable SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                and max(/Brocade_Foundry Stackable SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+              name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+              opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
+              priority: WARNING
+              description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Brocade_Foundry Stackable SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Brocade_Foundry Stackable SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Brocade_Foundry Stackable SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Brocade_Foundry Stackable SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+          graph_prototypes:
+            -
+              uuid: 6367b40612f94d9b9a3b2d4276268190
+              name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Brocade_Foundry Stackable SNMP'
+                    key: 'net.if.in[ifHCInOctets.{#SNMPINDEX}]'
+                -
+                  sortorder: '1'
+                  drawtype: BOLD_LINE
+                  color: 2774A4
+                  item:
+                    host: 'Brocade_Foundry Stackable SNMP'
+                    key: 'net.if.out[ifHCOutOctets.{#SNMPINDEX}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  yaxisside: RIGHT
+                  item:
+                    host: 'Brocade_Foundry Stackable SNMP'
+                    key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  yaxisside: RIGHT
+                  item:
+                    host: 'Brocade_Foundry Stackable SNMP'
+                    key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
+                -
+                  sortorder: '4'
+                  color: FC6EA3
+                  yaxisside: RIGHT
+                  item:
+                    host: 'Brocade_Foundry Stackable SNMP'
+                    key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
+                -
+                  sortorder: '5'
+                  color: 6C59DC
+                  yaxisside: RIGHT
+                  item:
+                    host: 'Brocade_Foundry Stackable SNMP'
+                    key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
         -
           uuid: 36f00d10099946c9bf3a9e617252bec1
           name: 'PSU Discovery'
@@ -709,17 +3154,81 @@ zabbix_export:
                   priority: AVERAGE
       macros:
         -
+          macro: '{$CPU.UTIL.CRIT}'
+          value: '90'
+        -
           macro: '{$FAN_CRIT_STATUS}'
           value: '3'
         -
           macro: '{$FAN_OK_STATUS}'
           value: '2'
         -
+          macro: '{$ICMP_LOSS_WARN}'
+          value: '20'
+        -
+          macro: '{$ICMP_RESPONSE_TIME_WARN}'
+          value: '0.15'
+        -
+          macro: '{$IF.ERRORS.WARN}'
+          value: '2'
+        -
+          macro: '{$IF.UTIL.MAX}'
+          value: '90'
+        -
+          macro: '{$IFCONTROL}'
+          value: '1'
+        -
+          macro: '{$MEMORY.UTIL.MAX}'
+          value: '90'
+        -
+          macro: '{$NET.IF.IFADMINSTATUS.MATCHES}'
+          value: '^.*'
+          description: 'Ignore notPresent(6)'
+        -
+          macro: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
+          value: ^2$
+          description: 'Ignore down(2) administrative status'
+        -
+          macro: '{$NET.IF.IFALIAS.MATCHES}'
+          value: '.*'
+        -
+          macro: '{$NET.IF.IFALIAS.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+        -
+          macro: '{$NET.IF.IFDESCR.MATCHES}'
+          value: '.*'
+        -
+          macro: '{$NET.IF.IFDESCR.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+        -
+          macro: '{$NET.IF.IFNAME.MATCHES}'
+          value: '^.*$'
+        -
+          macro: '{$NET.IF.IFNAME.NOT_MATCHES}'
+          value: '(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9a-z]+$|docker[0-9]+|br-[a-z0-9]{12})'
+          description: 'Filter out loopbacks, nulls, docker veth links and docker0 bridge by default'
+        -
+          macro: '{$NET.IF.IFOPERSTATUS.MATCHES}'
+          value: '^.*$'
+        -
+          macro: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
+          value: ^6$
+          description: 'Ignore notPresent(6)'
+        -
+          macro: '{$NET.IF.IFTYPE.MATCHES}'
+          value: '.*'
+        -
+          macro: '{$NET.IF.IFTYPE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+        -
           macro: '{$PSU_CRIT_STATUS}'
           value: '3'
         -
           macro: '{$PSU_OK_STATUS}'
           value: '2'
+        -
+          macro: '{$SNMP.TIMEOUT}'
+          value: 5m
         -
           macro: '{$TEMP_CRIT}'
           value: '75'
@@ -729,6 +3238,36 @@ zabbix_export:
         -
           macro: '{$TEMP_WARN}'
           value: '65'
+      dashboards:
+        -
+          uuid: ee74d182515b4ca6a8a31792c91da381
+          name: 'Network interfaces'
+          pages:
+            -
+              widgets:
+                -
+                  type: GRAPH_PROTOTYPE
+                  width: '24'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '1'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
+                        host: 'Brocade_Foundry Stackable SNMP'
       valuemaps:
         -
           uuid: 41fadae69fa64af4a21c853fc00f23c0
@@ -756,6 +3295,913 @@ zabbix_export:
             -
               value: '3'
               newvalue: failure
+        -
+          uuid: 82de0c54872847d190ee681690aac69c
+          name: 'IF-MIB::ifOperStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: up
+            -
+              value: '2'
+              newvalue: down
+            -
+              value: '4'
+              newvalue: unknown
+            -
+              value: '5'
+              newvalue: dormant
+            -
+              value: '6'
+              newvalue: notPresent
+            -
+              value: '7'
+              newvalue: lowerLayerDown
+        -
+          uuid: 6ba7778a7b454c649d6eb0126edd6a62
+          name: 'IF-MIB::ifType'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: regular1822
+            -
+              value: '3'
+              newvalue: hdh1822
+            -
+              value: '4'
+              newvalue: ddnX25
+            -
+              value: '5'
+              newvalue: rfc877x25
+            -
+              value: '6'
+              newvalue: ethernetCsmacd
+            -
+              value: '7'
+              newvalue: iso88023Csmacd
+            -
+              value: '8'
+              newvalue: iso88024TokenBus
+            -
+              value: '9'
+              newvalue: iso88025TokenRing
+            -
+              value: '10'
+              newvalue: iso88026Man
+            -
+              value: '11'
+              newvalue: starLan
+            -
+              value: '12'
+              newvalue: proteon10Mbit
+            -
+              value: '13'
+              newvalue: proteon80Mbit
+            -
+              value: '14'
+              newvalue: hyperchannel
+            -
+              value: '15'
+              newvalue: fddi
+            -
+              value: '16'
+              newvalue: lapb
+            -
+              value: '17'
+              newvalue: sdlc
+            -
+              value: '18'
+              newvalue: ds1
+            -
+              value: '19'
+              newvalue: e1
+            -
+              value: '20'
+              newvalue: basicISDN
+            -
+              value: '21'
+              newvalue: primaryISDN
+            -
+              value: '22'
+              newvalue: propPointToPointSerial
+            -
+              value: '23'
+              newvalue: ppp
+            -
+              value: '24'
+              newvalue: softwareLoopback
+            -
+              value: '25'
+              newvalue: eon
+            -
+              value: '26'
+              newvalue: ethernet3Mbit
+            -
+              value: '27'
+              newvalue: nsip
+            -
+              value: '28'
+              newvalue: slip
+            -
+              value: '29'
+              newvalue: ultra
+            -
+              value: '30'
+              newvalue: ds3
+            -
+              value: '31'
+              newvalue: sip
+            -
+              value: '32'
+              newvalue: frameRelay
+            -
+              value: '33'
+              newvalue: rs232
+            -
+              value: '34'
+              newvalue: para
+            -
+              value: '35'
+              newvalue: arcnet
+            -
+              value: '36'
+              newvalue: arcnetPlus
+            -
+              value: '37'
+              newvalue: atm
+            -
+              value: '38'
+              newvalue: miox25
+            -
+              value: '39'
+              newvalue: sonet
+            -
+              value: '40'
+              newvalue: x25ple
+            -
+              value: '41'
+              newvalue: iso88022llc
+            -
+              value: '42'
+              newvalue: localTalk
+            -
+              value: '43'
+              newvalue: smdsDxi
+            -
+              value: '44'
+              newvalue: frameRelayService
+            -
+              value: '45'
+              newvalue: v35
+            -
+              value: '46'
+              newvalue: hssi
+            -
+              value: '47'
+              newvalue: hippi
+            -
+              value: '48'
+              newvalue: modem
+            -
+              value: '49'
+              newvalue: aal5
+            -
+              value: '50'
+              newvalue: sonetPath
+            -
+              value: '51'
+              newvalue: sonetVT
+            -
+              value: '52'
+              newvalue: smdsIcip
+            -
+              value: '53'
+              newvalue: propVirtual
+            -
+              value: '54'
+              newvalue: propMultiplexor
+            -
+              value: '55'
+              newvalue: ieee80212
+            -
+              value: '56'
+              newvalue: fibreChannel
+            -
+              value: '57'
+              newvalue: hippiInterface
+            -
+              value: '58'
+              newvalue: frameRelayInterconnect
+            -
+              value: '59'
+              newvalue: aflane8023
+            -
+              value: '60'
+              newvalue: aflane8025
+            -
+              value: '61'
+              newvalue: cctEmul
+            -
+              value: '62'
+              newvalue: fastEther
+            -
+              value: '63'
+              newvalue: isdn
+            -
+              value: '64'
+              newvalue: v11
+            -
+              value: '65'
+              newvalue: v36
+            -
+              value: '66'
+              newvalue: g703at64k
+            -
+              value: '67'
+              newvalue: g703at2mb
+            -
+              value: '68'
+              newvalue: qllc
+            -
+              value: '69'
+              newvalue: fastEtherFX
+            -
+              value: '70'
+              newvalue: channel
+            -
+              value: '71'
+              newvalue: ieee80211
+            -
+              value: '72'
+              newvalue: ibm370parChan
+            -
+              value: '73'
+              newvalue: escon
+            -
+              value: '74'
+              newvalue: dlsw
+            -
+              value: '75'
+              newvalue: isdns
+            -
+              value: '76'
+              newvalue: isdnu
+            -
+              value: '77'
+              newvalue: lapd
+            -
+              value: '78'
+              newvalue: ipSwitch
+            -
+              value: '79'
+              newvalue: rsrb
+            -
+              value: '80'
+              newvalue: atmLogical
+            -
+              value: '81'
+              newvalue: ds0
+            -
+              value: '82'
+              newvalue: ds0Bundle
+            -
+              value: '83'
+              newvalue: bsc
+            -
+              value: '84'
+              newvalue: async
+            -
+              value: '85'
+              newvalue: cnr
+            -
+              value: '86'
+              newvalue: iso88025Dtr
+            -
+              value: '87'
+              newvalue: eplrs
+            -
+              value: '88'
+              newvalue: arap
+            -
+              value: '89'
+              newvalue: propCnls
+            -
+              value: '90'
+              newvalue: hostPad
+            -
+              value: '91'
+              newvalue: termPad
+            -
+              value: '92'
+              newvalue: frameRelayMPI
+            -
+              value: '93'
+              newvalue: x213
+            -
+              value: '94'
+              newvalue: adsl
+            -
+              value: '95'
+              newvalue: radsl
+            -
+              value: '96'
+              newvalue: sdsl
+            -
+              value: '97'
+              newvalue: vdsl
+            -
+              value: '98'
+              newvalue: iso88025CRFPInt
+            -
+              value: '99'
+              newvalue: myrinet
+            -
+              value: '100'
+              newvalue: voiceEM
+            -
+              value: '101'
+              newvalue: voiceFXO
+            -
+              value: '102'
+              newvalue: voiceFXS
+            -
+              value: '103'
+              newvalue: voiceEncap
+            -
+              value: '104'
+              newvalue: voiceOverIp
+            -
+              value: '105'
+              newvalue: atmDxi
+            -
+              value: '106'
+              newvalue: atmFuni
+            -
+              value: '107'
+              newvalue: atmIma
+            -
+              value: '108'
+              newvalue: pppMultilinkBundle
+            -
+              value: '109'
+              newvalue: ipOverCdlc
+            -
+              value: '110'
+              newvalue: ipOverClaw
+            -
+              value: '111'
+              newvalue: stackToStack
+            -
+              value: '112'
+              newvalue: virtualIpAddress
+            -
+              value: '113'
+              newvalue: mpc
+            -
+              value: '114'
+              newvalue: ipOverAtm
+            -
+              value: '115'
+              newvalue: iso88025Fiber
+            -
+              value: '116'
+              newvalue: tdlc
+            -
+              value: '117'
+              newvalue: gigabitEthernet
+            -
+              value: '118'
+              newvalue: hdlc
+            -
+              value: '119'
+              newvalue: lapf
+            -
+              value: '120'
+              newvalue: v37
+            -
+              value: '121'
+              newvalue: x25mlp
+            -
+              value: '122'
+              newvalue: x25huntGroup
+            -
+              value: '123'
+              newvalue: trasnpHdlc
+            -
+              value: '124'
+              newvalue: interleave
+            -
+              value: '125'
+              newvalue: fast
+            -
+              value: '126'
+              newvalue: ip
+            -
+              value: '127'
+              newvalue: docsCableMaclayer
+            -
+              value: '128'
+              newvalue: docsCableDownstream
+            -
+              value: '129'
+              newvalue: docsCableUpstream
+            -
+              value: '130'
+              newvalue: a12MppSwitch
+            -
+              value: '131'
+              newvalue: tunnel
+            -
+              value: '132'
+              newvalue: coffee
+            -
+              value: '133'
+              newvalue: ces
+            -
+              value: '134'
+              newvalue: atmSubInterface
+            -
+              value: '135'
+              newvalue: l2vlan
+            -
+              value: '136'
+              newvalue: l3ipvlan
+            -
+              value: '137'
+              newvalue: l3ipxvlan
+            -
+              value: '138'
+              newvalue: digitalPowerline
+            -
+              value: '139'
+              newvalue: mediaMailOverIp
+            -
+              value: '140'
+              newvalue: dtm
+            -
+              value: '141'
+              newvalue: dcn
+            -
+              value: '142'
+              newvalue: ipForward
+            -
+              value: '143'
+              newvalue: msdsl
+            -
+              value: '144'
+              newvalue: ieee1394
+            -
+              value: '145'
+              newvalue: if-gsn
+            -
+              value: '146'
+              newvalue: dvbRccMacLayer
+            -
+              value: '147'
+              newvalue: dvbRccDownstream
+            -
+              value: '148'
+              newvalue: dvbRccUpstream
+            -
+              value: '149'
+              newvalue: atmVirtual
+            -
+              value: '150'
+              newvalue: mplsTunnel
+            -
+              value: '151'
+              newvalue: srp
+            -
+              value: '152'
+              newvalue: voiceOverAtm
+            -
+              value: '153'
+              newvalue: voiceOverFrameRelay
+            -
+              value: '154'
+              newvalue: idsl
+            -
+              value: '155'
+              newvalue: compositeLink
+            -
+              value: '156'
+              newvalue: ss7SigLink
+            -
+              value: '157'
+              newvalue: propWirelessP2P
+            -
+              value: '158'
+              newvalue: frForward
+            -
+              value: '159'
+              newvalue: rfc1483
+            -
+              value: '160'
+              newvalue: usb
+            -
+              value: '161'
+              newvalue: ieee8023adLag
+            -
+              value: '162'
+              newvalue: bgppolicyaccounting
+            -
+              value: '163'
+              newvalue: frf16MfrBundle
+            -
+              value: '164'
+              newvalue: h323Gatekeeper
+            -
+              value: '165'
+              newvalue: h323Proxy
+            -
+              value: '166'
+              newvalue: mpls
+            -
+              value: '167'
+              newvalue: mfSigLink
+            -
+              value: '168'
+              newvalue: hdsl2
+            -
+              value: '169'
+              newvalue: shdsl
+            -
+              value: '170'
+              newvalue: ds1FDL
+            -
+              value: '171'
+              newvalue: pos
+            -
+              value: '172'
+              newvalue: dvbAsiIn
+            -
+              value: '173'
+              newvalue: dvbAsiOut
+            -
+              value: '174'
+              newvalue: plc
+            -
+              value: '175'
+              newvalue: nfas
+            -
+              value: '176'
+              newvalue: tr008
+            -
+              value: '177'
+              newvalue: gr303RDT
+            -
+              value: '178'
+              newvalue: gr303IDT
+            -
+              value: '179'
+              newvalue: isup
+            -
+              value: '180'
+              newvalue: propDocsWirelessMaclayer
+            -
+              value: '181'
+              newvalue: propDocsWirelessDownstream
+            -
+              value: '182'
+              newvalue: propDocsWirelessUpstream
+            -
+              value: '183'
+              newvalue: hiperlan2
+            -
+              value: '184'
+              newvalue: propBWAp2Mp
+            -
+              value: '185'
+              newvalue: sonetOverheadChannel
+            -
+              value: '186'
+              newvalue: digitalWrapperOverheadChannel
+            -
+              value: '187'
+              newvalue: aal2
+            -
+              value: '188'
+              newvalue: radioMAC
+            -
+              value: '189'
+              newvalue: atmRadio
+            -
+              value: '190'
+              newvalue: imt
+            -
+              value: '191'
+              newvalue: mvl
+            -
+              value: '192'
+              newvalue: reachDSL
+            -
+              value: '193'
+              newvalue: frDlciEndPt
+            -
+              value: '194'
+              newvalue: atmVciEndPt
+            -
+              value: '195'
+              newvalue: opticalChannel
+            -
+              value: '196'
+              newvalue: opticalTransport
+            -
+              value: '197'
+              newvalue: propAtm
+            -
+              value: '198'
+              newvalue: voiceOverCable
+            -
+              value: '199'
+              newvalue: infiniband
+            -
+              value: '200'
+              newvalue: teLink
+            -
+              value: '201'
+              newvalue: q2931
+            -
+              value: '202'
+              newvalue: virtualTg
+            -
+              value: '203'
+              newvalue: sipTg
+            -
+              value: '204'
+              newvalue: sipSig
+            -
+              value: '205'
+              newvalue: docsCableUpstreamChannel
+            -
+              value: '206'
+              newvalue: econet
+            -
+              value: '207'
+              newvalue: pon155
+            -
+              value: '208'
+              newvalue: pon622
+            -
+              value: '209'
+              newvalue: bridge
+            -
+              value: '210'
+              newvalue: linegroup
+            -
+              value: '211'
+              newvalue: voiceEMFGD
+            -
+              value: '212'
+              newvalue: voiceFGDEANA
+            -
+              value: '213'
+              newvalue: voiceDID
+            -
+              value: '214'
+              newvalue: mpegTransport
+            -
+              value: '215'
+              newvalue: sixToFour
+            -
+              value: '216'
+              newvalue: gtp
+            -
+              value: '217'
+              newvalue: pdnEtherLoop1
+            -
+              value: '218'
+              newvalue: pdnEtherLoop2
+            -
+              value: '219'
+              newvalue: opticalChannelGroup
+            -
+              value: '220'
+              newvalue: homepna
+            -
+              value: '221'
+              newvalue: gfp
+            -
+              value: '222'
+              newvalue: ciscoISLvlan
+            -
+              value: '223'
+              newvalue: actelisMetaLOOP
+            -
+              value: '224'
+              newvalue: fcipLink
+            -
+              value: '225'
+              newvalue: rpr
+            -
+              value: '226'
+              newvalue: qam
+            -
+              value: '227'
+              newvalue: lmp
+            -
+              value: '228'
+              newvalue: cblVectaStar
+            -
+              value: '229'
+              newvalue: docsCableMCmtsDownstream
+            -
+              value: '230'
+              newvalue: adsl2
+            -
+              value: '231'
+              newvalue: macSecControlledIF
+            -
+              value: '232'
+              newvalue: macSecUncontrolledIF
+            -
+              value: '233'
+              newvalue: aviciOpticalEther
+            -
+              value: '234'
+              newvalue: atmbond
+            -
+              value: '235'
+              newvalue: voiceFGDOS
+            -
+              value: '236'
+              newvalue: mocaVersion1
+            -
+              value: '237'
+              newvalue: ieee80216WMAN
+            -
+              value: '238'
+              newvalue: adsl2plus
+            -
+              value: '239'
+              newvalue: dvbRcsMacLayer
+            -
+              value: '240'
+              newvalue: dvbTdm
+            -
+              value: '241'
+              newvalue: dvbRcsTdma
+            -
+              value: '242'
+              newvalue: x86Laps
+            -
+              value: '243'
+              newvalue: wwanPP
+            -
+              value: '244'
+              newvalue: wwanPP2
+            -
+              value: '245'
+              newvalue: voiceEBS
+            -
+              value: '246'
+              newvalue: ifPwType
+            -
+              value: '247'
+              newvalue: ilan
+            -
+              value: '248'
+              newvalue: pip
+            -
+              value: '249'
+              newvalue: aluELP
+            -
+              value: '250'
+              newvalue: gpon
+            -
+              value: '251'
+              newvalue: vdsl2
+            -
+              value: '252'
+              newvalue: capwapDot11Profile
+            -
+              value: '253'
+              newvalue: capwapDot11Bss
+            -
+              value: '254'
+              newvalue: capwapWtpVirtualRadio
+            -
+              value: '255'
+              newvalue: bits
+            -
+              value: '256'
+              newvalue: docsCableUpstreamRfPort
+            -
+              value: '257'
+              newvalue: cableDownstreamRfPort
+            -
+              value: '258'
+              newvalue: vmwareVirtualNic
+            -
+              value: '259'
+              newvalue: ieee802154
+            -
+              value: '260'
+              newvalue: otnOdu
+            -
+              value: '261'
+              newvalue: otnOtu
+            -
+              value: '262'
+              newvalue: ifVfiType
+            -
+              value: '263'
+              newvalue: g9981
+            -
+              value: '264'
+              newvalue: g9982
+            -
+              value: '265'
+              newvalue: g9983
+            -
+              value: '266'
+              newvalue: aluEpon
+            -
+              value: '267'
+              newvalue: aluEponOnu
+            -
+              value: '268'
+              newvalue: aluEponPhysicalUni
+            -
+              value: '269'
+              newvalue: aluEponLogicalLink
+            -
+              value: '270'
+              newvalue: aluGponOnu
+            -
+              value: '271'
+              newvalue: aluGponPhysicalUni
+            -
+              value: '272'
+              newvalue: vmwareNicTeam
+            -
+              value: '277'
+              newvalue: docsOfdmDownstream
+            -
+              value: '278'
+              newvalue: docsOfdmaUpstream
+            -
+              value: '279'
+              newvalue: gfast
+            -
+              value: '280'
+              newvalue: sdci
+            -
+              value: '281'
+              newvalue: xboxWireless
+            -
+              value: '282'
+              newvalue: fastdsl
+            -
+              value: '283'
+              newvalue: docsCableScte55d1FwdOob
+            -
+              value: '284'
+              newvalue: docsCableScte55d1RetOob
+            -
+              value: '285'
+              newvalue: docsCableScte55d2DsOob
+            -
+              value: '286'
+              newvalue: docsCableScte55d2UsOob
+            -
+              value: '287'
+              newvalue: docsCableNdf
+            -
+              value: '288'
+              newvalue: docsCableNdr
+            -
+              value: '289'
+              newvalue: ptm
+            -
+              value: '290'
+              newvalue: ghn
+        -
+          uuid: 534121daa14949a6b5205cb9b7138b04
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up
+        -
+          uuid: e7bbb30eb3b748c6b6087bc2c353c3a8
+          name: zabbix.host.available
+          mappings:
+            -
+              value: '0'
+              newvalue: 'not available'
+            -
+              value: '1'
+              newvalue: available
+            -
+              value: '2'
+              newvalue: unknown
   graphs:
     -
       uuid: ed536efa5baa4d5ca8ee1af4fc813e72
@@ -770,6 +4216,30 @@ zabbix_export:
             host: 'Brocade_Foundry Performance SNMP'
             key: 'system.cpu.util[snAgGblCpuUtil1MinAvg.0]'
     -
+      uuid: 569601f45b394cc68ddf75f37c086ec2
+      name: 'CPU utilization'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'Brocade_Foundry Nonstackable SNMP'
+            key: 'system.cpu.util[snAgGblCpuUtil1MinAvg.0]'
+    -
+      uuid: d999400f4c7c43c7a1f0af7bbc82bd36
+      name: 'CPU utilization'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'Brocade_Foundry Stackable SNMP'
+            key: 'system.cpu.util[snAgGblCpuUtil1MinAvg.0]'
+    -
       uuid: 8e5d8b8e81d2473c99df3d7ad5c147c3
       name: 'Memory utilization'
       ymin_type_1: FIXED
@@ -780,4 +4250,28 @@ zabbix_export:
           color: 1A7C11
           item:
             host: 'Brocade_Foundry Performance SNMP'
+            key: 'vm.memory.util[snAgGblDynMemUtil.0]'
+    -
+      uuid: e9b341d71fde4609b1e38d917042fd3b
+      name: 'Memory utilization'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'Brocade_Foundry Nonstackable SNMP'
+            key: 'vm.memory.util[snAgGblDynMemUtil.0]'
+    -
+      uuid: 06183d560def4fcb8ba81469e4d53c67
+      name: 'Memory utilization'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'Brocade_Foundry Stackable SNMP'
             key: 'vm.memory.util[snAgGblDynMemUtil.0]'

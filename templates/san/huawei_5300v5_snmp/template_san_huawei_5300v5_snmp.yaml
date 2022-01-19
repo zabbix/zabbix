@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-15T14:25:38Z'
+  date: '2022-01-18T20:39:05Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -13,12 +13,12 @@ zabbix_export:
       description: |
         The template to monitor SAN Huawei OceanStor 5300 V5 by Zabbix SNMP agent.
         
+        MIBs used:
+        SNMPv2-MIB
+        
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/418855-discussion-thread-for-official-zabbix-template-huawei-oceanstor
         
-        Template tooling version used: 0.40
-      templates:
-        -
-          name: 'Generic SNMP'
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/SAN
@@ -107,6 +107,275 @@ zabbix_export:
               priority: INFO
               description: 'OceanStor 5300 V5 version has changed. Ack to close.'
               manual_close: 'YES'
+        -
+          uuid: 030530f5193246f4b983ec802030e49b
+          name: 'ICMP ping'
+          type: SIMPLE
+          key: icmpping
+          history: 1w
+          valuemap:
+            name: 'Service state'
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: ef6b5dc40f9a49599aae97c2cf68d3cb
+              expression: 'max(/Huawei OceanStor 5300 V5 SNMP/icmpping,#3)=0'
+              name: 'Unavailable by ICMP ping'
+              priority: HIGH
+              description: 'Last three attempts returned timeout.  Please check device connectivity.'
+        -
+          uuid: c82fa3f20c7443e4849ea8e8aec1e49d
+          name: 'ICMP loss'
+          type: SIMPLE
+          key: icmppingloss
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: c9765f7f271d46c99ad7dd45efa79849
+              expression: 'min(/Huawei OceanStor 5300 V5 SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Huawei OceanStor 5300 V5 SNMP/icmppingloss,5m)<100'
+              name: 'High ICMP ping loss'
+              opdata: 'Loss: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'Unavailable by ICMP ping'
+                  expression: 'max(/Huawei OceanStor 5300 V5 SNMP/icmpping,#3)=0'
+        -
+          uuid: 0a95c43c70e54ad49f073fee69a2452d
+          name: 'ICMP response time'
+          type: SIMPLE
+          key: icmppingsec
+          history: 1w
+          value_type: FLOAT
+          units: s
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: b8815a9e952047e09d1e657cea5d538e
+              expression: 'avg(/Huawei OceanStor 5300 V5 SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
+              name: 'High ICMP ping response time'
+              opdata: 'Value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'High ICMP ping loss'
+                  expression: 'min(/Huawei OceanStor 5300 V5 SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Huawei OceanStor 5300 V5 SNMP/icmppingloss,5m)<100'
+                -
+                  name: 'Unavailable by ICMP ping'
+                  expression: 'max(/Huawei OceanStor 5300 V5 SNMP/icmpping,#3)=0'
+        -
+          uuid: 2ec396a7adf64637ae453d7f26cd5b20
+          name: 'SNMP traps (fallback)'
+          type: SNMP_TRAP
+          key: snmptrap.fallback
+          history: 2w
+          trends: '0'
+          value_type: LOG
+          description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items'
+          logtimefmt: 'hh:mm:sszyyyy/MM/dd'
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: e98719af84414ef5ab3dd788c7d2d72f
+          name: 'System contact details'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.4.0
+          key: 'system.contact[sysContact.0]'
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.
+          inventory_link: CONTACT
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: cf59fb53834d4b14bdb0251e66c5143f
+          name: 'System description'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.1.0
+          key: 'system.descr[sysDescr.0]'
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            A textual description of the entity. This value should
+            include the full name and version identification of the system's hardware type, software operating-system, and
+            networking software.
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: fed7a954ea614cb086b901b2e6957621
+          name: 'System location'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.6.0
+          key: 'system.location[sysLocation.0]'
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.
+          inventory_link: LOCATION
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 354fe7cd2632425b9f937e8714d79798
+          name: 'System name'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.5.0
+          key: system.name
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            An administratively-assigned name for this managed node.By convention, this is the node's fully-qualified domain name.  If the name is unknown, the value is the zero-length string.
+          inventory_link: NAME
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
+          tags:
+            -
+              tag: Application
+              value: General
+          triggers:
+            -
+              uuid: 72a31faa805b40e795a57649c724da1e
+              expression: 'last(/Huawei OceanStor 5300 V5 SNMP/system.name,#1)<>last(/Huawei OceanStor 5300 V5 SNMP/system.name,#2) and length(last(/Huawei OceanStor 5300 V5 SNMP/system.name))>0'
+              name: 'System name has changed (new name: {ITEM.VALUE})'
+              priority: INFO
+              description: 'System name has changed. Ack to close.'
+              manual_close: 'YES'
+        -
+          uuid: bf571c06cc264eca89d68f0b0b7559f7
+          name: 'System object ID'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.2.0
+          key: 'system.objectid[sysObjectID.0]'
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            The vendor's authoritative identification of the network management subsystem contained in the entity.  This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: f14eaa207ac9480995d2a2a10bea1467
+          name: Uptime
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.3.0
+          key: 'system.uptime[sysUpTime.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: SNMPv2-MIB
+            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 0e3713bdf52e40d692cf256ac2a01988
+              expression: 'last(/Huawei OceanStor 5300 V5 SNMP/system.uptime[sysUpTime.0])<10m'
+              name: '{HOST.NAME} has been restarted (uptime < 10m)'
+              priority: WARNING
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'No SNMP data collection'
+                  expression: 'max(/Huawei OceanStor 5300 V5 SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+        -
+          uuid: 197767da1b3c4c4f8f3c59ab3c3fc5b8
+          name: 'SNMP agent availability'
+          type: INTERNAL
+          key: 'zabbix[host,snmp,available]'
+          history: 7d
+          description: |
+            Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.
+            Possible value:
+            0 - not available
+            1 - available
+            2 - unknown
+          valuemap:
+            name: zabbix.host.available
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: b0c4103eac9447ee9f7f31627baf4eea
+              expression: 'max(/Huawei OceanStor 5300 V5 SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              name: 'No SNMP data collection'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
+              dependencies:
+                -
+                  name: 'Unavailable by ICMP ping'
+                  expression: 'max(/Huawei OceanStor 5300 V5 SNMP/icmpping,#3)=0'
       discovery_rules:
         -
           uuid: 6de9606d1f594546b76e79bbb72a8a56
@@ -1243,6 +1512,15 @@ zabbix_export:
           macro: '{$HUAWEI.5300.TEMP.MAX.WARN}'
           value: '35'
           description: 'Maximum temperature of enclosure'
+        -
+          macro: '{$ICMP_LOSS_WARN}'
+          value: '20'
+        -
+          macro: '{$ICMP_RESPONSE_TIME_WARN}'
+          value: '0.15'
+        -
+          macro: '{$SNMP.TIMEOUT}'
+          value: 5m
       valuemaps:
         -
           uuid: b5c6d9d67da54531a918c93a9c98cec8
@@ -1659,6 +1937,29 @@ zabbix_export:
             -
               value: '109'
               newvalue: 'Running(synchronizing data)'
+        -
+          uuid: 0aa29a4ffa224d56a107a1cfbd6c416a
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up
+        -
+          uuid: d107957d44424014a251dff95751a41f
+          name: zabbix.host.available
+          mappings:
+            -
+              value: '0'
+              newvalue: 'not available'
+            -
+              value: '1'
+              newvalue: available
+            -
+              value: '2'
+              newvalue: unknown
   graphs:
     -
       uuid: 9401d60314c441a5a04d7a9709c6970e
