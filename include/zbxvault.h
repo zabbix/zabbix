@@ -24,9 +24,10 @@
 #include "zbxjson.h"
 #include "zbxalgo.h"
 
-typedef	int (*zbx_vault_kvs_get_cb_t)(const char *path, zbx_hashset_t *kvs, char *vault_url, char *token, long timeout,
-		char **error);
-typedef	int (*zbx_vault_init_db_credentials_cb_t)(char *vault_url, char *token, long timeout, const char *db_path,
+typedef	int (*zbx_vault_kvs_get_cb_t)(const char *vault_url, const char *token, const char *ssl_cert_file,
+		const char *ssl_key_file, const char *path, long timeout, zbx_hashset_t *kvs, char **error);
+typedef	int (*zbx_vault_init_db_credentials_cb_t)(char *vault_url, char *token,
+		const char *ssl_cert_file, const char *ssl_key_file, const char *db_path, long timeout,
 		char **dbuser, char **dbpassword, char **error);
 
 void	zbx_vault_init_cb(zbx_vault_kvs_get_cb_t vault_kvs_get_cb,

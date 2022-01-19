@@ -23,6 +23,8 @@
 
 extern char	*CONFIG_VAULTTOKEN;
 extern char	*CONFIG_VAULTURL;
+extern char	*CONFIG_VAULTTLSCERTFILE;
+extern char	*CONFIG_VAULTTLSKEYFILE;
 extern char	*CONFIG_VAULTDBPATH;
 
 extern char	*CONFIG_DBUSER;
@@ -67,7 +69,8 @@ int	zbx_vault_kvs_get(const char *path, zbx_hashset_t *kvs, char **error)
 		return FAIL;
 	}
 
-	return zbx_vault_kvs_get_cb(path, kvs, CONFIG_VAULTURL, CONFIG_VAULTTOKEN, ZBX_VAULT_TIMEOUT, error);
+	return zbx_vault_kvs_get_cb(CONFIG_VAULTURL, CONFIG_VAULTTOKEN, CONFIG_VAULTTLSCERTFILE, CONFIG_VAULTTLSKEYFILE,
+			path, ZBX_VAULT_TIMEOUT, kvs, error);
 }
 
 int	zbx_vault_init_db_credentials(char **error)
@@ -95,6 +98,7 @@ int	zbx_vault_init_db_credentials(char **error)
 		return FAIL;
 	}
 
-	return zbx_vault_init_db_credentials_cb(CONFIG_VAULTURL, CONFIG_VAULTTOKEN, ZBX_VAULT_TIMEOUT,
-			CONFIG_VAULTDBPATH, &CONFIG_DBUSER, &CONFIG_DBPASSWORD, error);
+	return zbx_vault_init_db_credentials_cb(CONFIG_VAULTURL, CONFIG_VAULTTOKEN,
+			CONFIG_VAULTTLSCERTFILE, CONFIG_VAULTTLSKEYFILE, CONFIG_VAULTDBPATH, ZBX_VAULT_TIMEOUT,
+			&CONFIG_DBUSER, &CONFIG_DBPASSWORD, error);
 }

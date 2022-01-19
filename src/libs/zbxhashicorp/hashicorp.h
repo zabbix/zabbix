@@ -23,8 +23,9 @@
 #include "common.h"
 #include "zbxalgo.h"
 
-int	zbx_hashicorp_kvs_get(const char *path, zbx_hashset_t *kvs, char *url, char *token, long timeout, char **error);
-int	zbx_hashicorp_init_db_credentials(char *vault_url, char *token, long timeout, const char *db_path,
-		char **dbuser, char **dbpassword, char **error);
+int	zbx_hashicorp_kvs_get(const char *vault_url, const char *token, const char *ssl_cert_file,
+		const char *ssl_key_file, const char *path, long timeout, zbx_hashset_t *kvs, char **error);
+int	zbx_hashicorp_init_db_credentials(char *vault_url, char *token, const char *ssl_cert_file,
+		const char *ssl_key_file, const char *db_path, long timeout, char **dbuser, char **dbpassword, char **error);
 
 #endif

@@ -23,8 +23,8 @@
 #include "zbxvault.h"
 #include "../zbxkvs/kvs.h"
 
-int	zbx_hashicorp_kvs_get(const char *path, zbx_hashset_t *kvs, char *vault_url, char *token, long timeout,
-		char **error)
+int	zbx_hashicorp_kvs_get(const char *vault_url, const char *token, const char *ssl_cert_file,
+		const char *ssl_key_file, const char *path, long timeout, zbx_hashset_t *kvs, char **error)
 {
 #ifndef HAVE_LIBCURL
 	ZBX_UNUSED(path);
@@ -57,7 +57,7 @@ int	zbx_hashicorp_kvs_get(const char *path, zbx_hashset_t *kvs, char *vault_url,
 
 	zbx_snprintf(header, sizeof(header), "X-Vault-Token: %s", token);
 
-	if (SUCCEED != zbx_http_get(url, header, timeout, &out, &response_code, error))
+	if (SUCCEED != zbx_http_get(url, header, timeout, ssl_cert_file, ssl_key_file, &out, &response_code, error))
 		goto fail;
 
 	if (200 != response_code && 204 != response_code)
@@ -97,8 +97,9 @@ fail:
 #endif
 }
 
-int	zbx_hashicorp_init_db_credentials(char *vault_url, char *token, long timeout, const char *db_path,
-		char **dbuser, char **dbpassword, char **error)
+int	zbx_hashicorp_init_db_credentials(char *vault_url, char *token, const char *ssl_cert_file,
+		const char *ssl_key_file, const char *db_path, long timeout, char **dbuser, char **dbpassword,
+		char **error)
 {
 	int		ret = FAIL;
 	zbx_hashset_t	kvs;
@@ -107,8 +108,11 @@ int	zbx_hashicorp_init_db_credentials(char *vault_url, char *token, long timeout
 	zbx_hashset_create_ext(&kvs, 2, zbx_kv_hash, zbx_kv_compare, zbx_kv_clean,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
-	if (SUCCEED != zbx_hashicorp_kvs_get(db_path, &kvs, vault_url, token, timeout, error))
+	if (SUCCEED != zbx_hashicorp_kvs_get(vault_url, token, ssl_cert_file, ssl_key_file, db_path, timeout, &kvs,
+			error))
+	{
 		goto fail;
+	}
 
 	kv_local.key = ZBX_PROTO_TAG_USERNAME;
 
