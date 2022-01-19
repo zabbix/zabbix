@@ -138,5 +138,6 @@ window.widget_tophosts_form = new class {
 	// Need to remove function after subpopups auto close.
 	removeColorpicker() {
 		document.getElementById('color_picker').remove();
+		removeFromOverlaysStack('color_picker');
 	}
 }();
