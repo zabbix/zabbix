@@ -85,7 +85,9 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxtrends/libzbxtrends_baseline.a \
 	$(top_builddir)/src/libs/zbxtrends/libzbxtrends.a \
 	$(top_builddir)/src/libs/zbxprometheus/libzbxprometheus.a \
+	$(top_builddir)/src/libs/zbxhashicorp/libzbxhashicorp.a \
 	$(top_builddir)/src/libs/zbxvault/libzbxvault.a \
+	$(top_builddir)/src/libs/zbxkvs/libzbxkvs.a \
 	$(top_builddir)/src/libs/zbxavailability/libzbxavailability.a \
 	libzbxproxy.a
 

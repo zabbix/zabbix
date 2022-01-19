@@ -17,22 +17,26 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_ZBXVAULT_H
-#define ZABBIX_ZBXVAULT_H
+#ifndef ZABBIX_KVS_H
+#define ZABBIX_KVS_H
 
 #include "common.h"
-#include "zbxjson.h"
 #include "zbxalgo.h"
+#include "zbxjson.h"
 
-typedef	int (*zbx_vault_kvs_get_cb_t)(const char *path, zbx_hashset_t *kvs, char *vault_url, char *token, long timeout,
+typedef struct
+{
+	char	*key;
+	char	*value;
+}
+zbx_kv_t;
+
+zbx_hash_t	zbx_kv_hash(const void *data);
+int		zbx_kv_compare(const void *d1, const void *d2);
+void		zbx_kv_clean(void *data);
+
+int	zbx_kvs_json_parse_by_path(const char *path, const struct zbx_json_parse *jp_kvs_paths, zbx_hashset_t *kvs,
 		char **error);
-typedef	int (*zbx_vault_init_db_credentials_cb_t)(char *vault_url, char *token, long timeout, const char *db_path,
-		char **dbuser, char **dbpassword, char **error);
-
-void	zbx_vault_init_cb(zbx_vault_kvs_get_cb_t vault_kvs_get_cb,
-		zbx_vault_init_db_credentials_cb_t vault_init_db_credentials);
-int	zbx_vault_init_token_from_env(char **error);
-int	zbx_vault_init_db_credentials(char **error);
-int	zbx_vault_kvs_get(const char *path, zbx_hashset_t *kvs, char **error);
+void	zbx_kvs_json_parse(const struct zbx_json_parse *jp_kvs, zbx_hashset_t *kvs);
 
 #endif

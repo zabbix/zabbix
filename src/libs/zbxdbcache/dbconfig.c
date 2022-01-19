@@ -31,6 +31,7 @@
 #include "zbxtasks.h"
 #include "../zbxcrypto/tls_tcp_active.h"
 #include "../zbxalgo/vectorimpl.h"
+#include "../zbxkvs/kvs.h"
 #include "base64.h"
 #include "zbxeval.h"
 
@@ -2123,7 +2124,7 @@ void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_ptr_pair_create(&diff);
-	zbx_hashset_create_ext(&kvs, 100, zbx_vault_kv_hash, zbx_vault_kv_compare, zbx_vault_kv_clean,
+	zbx_hashset_create_ext(&kvs, 100, zbx_kv_hash, zbx_kv_compare, zbx_kv_clean,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	for (i = 0; i < config->kvs_paths.values_num; i++)
@@ -2134,7 +2135,7 @@ void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 
 		if (NULL != jp_kvs_paths)
 		{
-			if (FAIL == zbx_vault_json_kvs_get(dc_kvs_path->path, jp_kvs_paths, &kvs, &error))
+			if (FAIL == zbx_kvs_json_parse_by_path(dc_kvs_path->path, jp_kvs_paths, &kvs, &error))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s",
 						dc_kvs_path->path, error);

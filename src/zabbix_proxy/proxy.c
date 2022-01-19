@@ -63,6 +63,7 @@
 #include "zbxdiag.h"
 #include "sighandler.h"
 #include "zbxrtc.h"
+#include "../libs/zbxhashicorp/hashicorp.h"
 
 #ifdef HAVE_OPENIPMI
 #include "../zabbix_server/ipmi/ipmi_manager.h"
@@ -1237,6 +1238,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
+
+	zbx_vault_init_cb(zbx_hashicorp_kvs_get, zbx_hashicorp_init_db_credentials);
 
 	if (SUCCEED != zbx_vault_init_db_credentials(&error))
 	{

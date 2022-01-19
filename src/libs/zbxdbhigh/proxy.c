@@ -30,6 +30,7 @@
 #include "zbxalgo.h"
 #include "preproc.h"
 #include "../zbxcrypto/tls_tcp_active.h"
+#include "../zbxkvs/kvs.h"
 #include "zbxlld.h"
 #include "events.h"
 #include "zbxvault.h"
@@ -1040,7 +1041,7 @@ static void	get_macro_secrets(const zbx_vector_ptr_t *keys_paths, struct zbx_jso
 	int		i;
 	zbx_hashset_t	kvs;
 
-	zbx_hashset_create_ext(&kvs, 100, zbx_vault_kv_hash, zbx_vault_kv_compare, zbx_vault_kv_clean,
+	zbx_hashset_create_ext(&kvs, 100, zbx_kv_hash, zbx_kv_compare, zbx_kv_clean,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	zbx_json_addobject(j, "macro.secrets");

@@ -17,22 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_ZBXVAULT_H
-#define ZABBIX_ZBXVAULT_H
+#ifndef ZABBIX_HASHICORP_H
+#define ZABBIX_HASHICORP_H
 
 #include "common.h"
-#include "zbxjson.h"
 #include "zbxalgo.h"
 
-typedef	int (*zbx_vault_kvs_get_cb_t)(const char *path, zbx_hashset_t *kvs, char *vault_url, char *token, long timeout,
-		char **error);
-typedef	int (*zbx_vault_init_db_credentials_cb_t)(char *vault_url, char *token, long timeout, const char *db_path,
+int	zbx_hashicorp_kvs_get(const char *path, zbx_hashset_t *kvs, char *url, char *token, long timeout, char **error);
+int	zbx_hashicorp_init_db_credentials(char *vault_url, char *token, long timeout, const char *db_path,
 		char **dbuser, char **dbpassword, char **error);
-
-void	zbx_vault_init_cb(zbx_vault_kvs_get_cb_t vault_kvs_get_cb,
-		zbx_vault_init_db_credentials_cb_t vault_init_db_credentials);
-int	zbx_vault_init_token_from_env(char **error);
-int	zbx_vault_init_db_credentials(char **error);
-int	zbx_vault_kvs_get(const char *path, zbx_hashset_t *kvs, char **error);
 
 #endif
