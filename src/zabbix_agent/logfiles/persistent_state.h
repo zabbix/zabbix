@@ -25,6 +25,8 @@
 #include "zbxtypes.h"	/* for zbx_uint64_t struct st_logfile; */
 #include "zbxalgo.h"
 
+struct st_logfile;
+
 #define ZBX_PERSIST_INACTIVITY_PERIOD	SEC_PER_DAY	/* the time period after which persistent files used by log */
 							/* items which are not received in active check list can be */
 							/* removed */

@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:04:19Z'
+  version: '6.0'
+  date: '2022-01-18T20:37:13Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -10,19 +10,68 @@ zabbix_export:
       uuid: eaf36c98b91843b7b79bd5184a23d377
       template: Solaris
       name: Solaris
-      templates:
-        -
-          name: 'Zabbix agent'
+      description: |
+        Official Solaris OS template. Requires Zabbix agent 4.0.0 or newer.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
+        
+        Template tooling version used: 0.41
       groups:
         -
           name: 'Templates/Operating systems'
       items:
         -
+          uuid: 0a64ce48b94b4886af4bd97beab5f93d
+          name: 'Host name of Zabbix agent running'
+          key: agent.hostname
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: Application
+              value: 'Monitoring agent'
+        -
+          uuid: d708ce58ad214d19a740824512e8be6a
+          name: 'Zabbix agent ping'
+          key: agent.ping
+          history: 7d
+          description: 'The agent always returns 1 for this item. It could be used in combination with nodata() for availability check'
+          valuemap:
+            name: 'Zabbix agent ping status'
+          tags:
+            -
+              tag: Application
+              value: 'Monitoring agent'
+        -
+          uuid: 633a1d74569f4f61892dabf7e0acf6c1
+          name: 'Version of Zabbix agent running'
+          key: agent.version
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: Application
+              value: 'Monitoring agent'
+        -
           uuid: 2fa6d58a5c7d48da90b1caf521e867cd
           name: 'Maximum number of processes'
           key: kernel.maxproc
           delay: 1h
-          history: 1w
+          history: 7d
           description: 'It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.'
           tags:
             -
@@ -32,13 +81,13 @@ zabbix_export:
             -
               uuid: 2a567bc9d5584dfea986b5b70c89fc65
               expression: last(/Solaris/kernel.maxproc)<256
-              name: 'Configured max number of processes is too low on {HOST.NAME}'
+              name: 'Configured max number of processes is too low'
               priority: INFO
         -
           uuid: 7c8c8421fb514e67bc9f14cefe4018f3
           name: 'Number of running processes'
           key: 'proc.num[,,run]'
-          history: 1w
+          history: 7d
           description: 'Number of processes in running state.'
           tags:
             -
@@ -48,13 +97,13 @@ zabbix_export:
             -
               uuid: 6504ba0f7fa445ea9083af008d52c525
               expression: 'avg(/Solaris/proc.num[,,run],5m)>30'
-              name: 'Too many processes running on {HOST.NAME}'
+              name: 'Too many processes running'
               priority: WARNING
         -
           uuid: 74c805e8bfd947348b206a0d33bfc461
           name: 'Number of processes'
           key: 'proc.num[]'
-          history: 1w
+          history: 7d
           description: 'Total number of processes in any state.'
           tags:
             -
@@ -64,14 +113,14 @@ zabbix_export:
             -
               uuid: cc2731add899436ca2c12fff13c838fb
               expression: 'avg(/Solaris/proc.num[],5m)>300'
-              name: 'Too many processes on {HOST.NAME}'
+              name: 'Too many processes'
               priority: WARNING
         -
           uuid: 1812e26de9ad4a36abb5498154e6ea3c
           name: 'Host boot time'
           key: system.boottime
           delay: 10m
-          history: 1w
+          history: 7d
           units: unixtime
           tags:
             -
@@ -84,7 +133,7 @@ zabbix_export:
           uuid: 8186ed95ed8c4d6eb52ea2e718984170
           name: 'Interrupts per second'
           key: system.cpu.intr
-          history: 1w
+          history: 7d
           units: ips
           preprocessing:
             -
@@ -102,7 +151,7 @@ zabbix_export:
           uuid: 1a7cc53a5497427da28f882b1b185fad
           name: 'Processor load (1 min average per core)'
           key: 'system.cpu.load[percpu,avg1]'
-          history: 1w
+          history: 7d
           value_type: FLOAT
           description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
           tags:
@@ -116,13 +165,13 @@ zabbix_export:
             -
               uuid: e7ef1c2b702440a3a7a20a544446a068
               expression: 'avg(/Solaris/system.cpu.load[percpu,avg1],5m)>5'
-              name: 'Processor load is too high on {HOST.NAME}'
+              name: 'Processor load is too high'
               priority: WARNING
         -
           uuid: 5b053b6c00464f8b8f5fc49fffda1394
           name: 'Processor load (5 min average per core)'
           key: 'system.cpu.load[percpu,avg5]'
-          history: 1w
+          history: 7d
           value_type: FLOAT
           description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
           tags:
@@ -136,7 +185,7 @@ zabbix_export:
           uuid: c13c2ff556594c5d985420dc974659cf
           name: 'Processor load (15 min average per core)'
           key: 'system.cpu.load[percpu,avg15]'
-          history: 1w
+          history: 7d
           value_type: FLOAT
           description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
           tags:
@@ -150,7 +199,7 @@ zabbix_export:
           uuid: 320f8803624f4ad2b9e66f1a08f5a145
           name: 'Context switches per second'
           key: system.cpu.switches
-          history: 1w
+          history: 7d
           units: sps
           preprocessing:
             -
@@ -168,7 +217,7 @@ zabbix_export:
           uuid: a653205d5ce4462089da4ed4d6f97f3a
           name: 'CPU idle time'
           key: 'system.cpu.util[,idle]'
-          history: 1w
+          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The time the CPU has spent doing nothing.'
@@ -183,7 +232,7 @@ zabbix_export:
           uuid: 9bee92be803c48489509e41c19718abc
           name: 'CPU iowait time'
           key: 'system.cpu.util[,iowait]'
-          history: 1w
+          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'Amount of time the CPU has been waiting for I/O to complete.'
@@ -198,14 +247,14 @@ zabbix_export:
             -
               uuid: 280634a65c9d4702a4913c9c2cd5869c
               expression: 'avg(/Solaris/system.cpu.util[,iowait],5m)>20'
-              name: 'Disk I/O is overloaded on {HOST.NAME}'
+              name: 'Disk I/O is overloaded'
               priority: WARNING
               description: 'OS spends significant time waiting for I/O (input/output) operations. It could be indicator of performance issues with storage system.'
         -
           uuid: bb32808bf73f489399ecb3e02bc18194
           name: 'CPU system time'
           key: 'system.cpu.util[,system]'
-          history: 1w
+          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The time the CPU has spent running the kernel and its processes.'
@@ -220,7 +269,7 @@ zabbix_export:
           uuid: d30ad6a457df4e39819b76fc1be7a562
           name: 'CPU user time'
           key: 'system.cpu.util[,user]'
-          history: 1w
+          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The time the CPU has spent running users'' processes that are not niced.'
@@ -236,11 +285,16 @@ zabbix_export:
           name: 'Host name'
           key: system.hostname
           delay: 1h
-          history: 1w
+          history: 7d
           trends: '0'
           value_type: CHAR
           description: 'System host name.'
           inventory_link: NAME
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
           tags:
             -
               tag: Application
@@ -252,13 +306,13 @@ zabbix_export:
             -
               uuid: cc5a9c97827f4091b83af8be33d58560
               expression: 'last(/Solaris/system.hostname,#1)<>last(/Solaris/system.hostname,#2)'
-              name: 'Hostname was changed on {HOST.NAME}'
+              name: 'Hostname was changed'
               priority: INFO
         -
           uuid: 0a0a8ab7047b400aaffe99917349291e
           name: 'Host local time'
           key: system.localtime
-          history: 1w
+          history: 7d
           units: unixtime
           tags:
             -
@@ -271,7 +325,7 @@ zabbix_export:
           uuid: 71597a2dfdeb4c63acf7505ffb7f4f08
           name: 'Free swap space'
           key: 'system.swap.size[,free]'
-          history: 1w
+          history: 7d
           units: B
           tags:
             -
@@ -281,7 +335,7 @@ zabbix_export:
           uuid: b2ee2b52a64841e282915d6de3c7f739
           name: 'Free swap space in %'
           key: 'system.swap.size[,pfree]'
-          history: 1w
+          history: 7d
           value_type: FLOAT
           units: '%'
           tags:
@@ -292,7 +346,7 @@ zabbix_export:
             -
               uuid: 7be6856162ca445388b13e524f01a3c2
               expression: 'last(/Solaris/system.swap.size[,pfree])<50'
-              name: 'Lack of free swap space on {HOST.NAME}'
+              name: 'Lack of free swap space'
               priority: WARNING
               description: 'It probably means that the systems requires more physical memory.'
         -
@@ -300,7 +354,7 @@ zabbix_export:
           name: 'Total swap space'
           key: 'system.swap.size[,total]'
           delay: 1h
-          history: 1w
+          history: 7d
           units: B
           tags:
             -
@@ -311,11 +365,16 @@ zabbix_export:
           name: 'System information'
           key: system.uname
           delay: 1h
-          history: 1w
+          history: 7d
           trends: '0'
           value_type: CHAR
           description: 'The information as normally returned by ''uname -a''.'
           inventory_link: OS
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
           tags:
             -
               tag: Application
@@ -327,14 +386,14 @@ zabbix_export:
             -
               uuid: dc293e688ac54ac0aee61e398d8bc5c5
               expression: 'last(/Solaris/system.uname,#1)<>last(/Solaris/system.uname,#2)'
-              name: 'Host information was changed on {HOST.NAME}'
+              name: 'Host information was changed'
               priority: INFO
         -
           uuid: c15a8b1b6cbd446bad669ead64a172a1
           name: 'System uptime'
           key: system.uptime
           delay: 10m
-          history: 1w
+          history: 7d
           units: uptime
           tags:
             -
@@ -347,13 +406,13 @@ zabbix_export:
             -
               uuid: 56284beb4a464017b3aa2f4c00bc271f
               expression: change(/Solaris/system.uptime)<0
-              name: '{HOST.NAME} has just been restarted'
+              name: 'Server has just been restarted'
               priority: INFO
         -
           uuid: a2c0d69124424e49aa4fc1f2416ffc37
           name: 'Number of logged in users'
           key: system.users.num
-          history: 1w
+          history: 7d
           description: 'Number of users who are currently logged in.'
           tags:
             -
@@ -367,7 +426,7 @@ zabbix_export:
           name: 'Checksum of /etc/passwd'
           key: 'vfs.file.cksum[/etc/passwd,sha256]'
           delay: 1h
-          history: 1w
+          history: 7d
           tags:
             -
               tag: Application
@@ -376,13 +435,13 @@ zabbix_export:
             -
               uuid: 50e5be0acabb41658ec82772d9ec234e
               expression: 'last(/Solaris/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/Solaris/vfs.file.cksum[/etc/passwd,sha256],#2)'
-              name: '/etc/passwd has been changed on {HOST.NAME}'
+              name: '/etc/passwd has been changed'
               priority: WARNING
         -
           uuid: 6888f0dd6b2e418f8c28a0ee59648fa3
           name: 'Available memory'
           key: 'vm.memory.size[available]'
-          history: 1w
+          history: 7d
           units: B
           description: 'Available memory is defined as free+cached+buffers memory.'
           tags:
@@ -393,19 +452,40 @@ zabbix_export:
             -
               uuid: a0769befcb4e4c649557926824d7dbf3
               expression: 'last(/Solaris/vm.memory.size[available])<20M'
-              name: 'Lack of available memory on server {HOST.NAME}'
+              name: 'Lack of available memory on server'
               priority: AVERAGE
         -
           uuid: d96d5ebfa074428e957335b5fa58189b
           name: 'Total memory'
           key: 'vm.memory.size[total]'
           delay: 1h
-          history: 1w
+          history: 7d
           units: B
           tags:
             -
               tag: Application
               value: Memory
+        -
+          uuid: 46dc8d0138314f41962dc357d1e4af20
+          name: 'Zabbix agent availability'
+          type: INTERNAL
+          key: 'zabbix[host,agent,available]'
+          history: 7d
+          description: 'Monitoring agent availability status'
+          valuemap:
+            name: zabbix.host.available
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 4ca39fa4a86c45e19e03eff89edd239b
+              expression: 'max(/Solaris/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0'
+              name: 'Zabbix agent is not available (for {$AGENT.TIMEOUT})'
+              priority: AVERAGE
+              description: 'For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.'
+              manual_close: 'YES'
       discovery_rules:
         -
           uuid: 6a47f796859241c1aa30f0d731cacf52
@@ -422,9 +502,9 @@ zabbix_export:
           item_prototypes:
             -
               uuid: 548f317737ee4facbed4a371f3476352
-              name: 'Incoming network traffic on {#IFNAME}'
+              name: 'Interface {#IFNAME}: Incoming network traffic'
               key: 'net.if.in[{#IFNAME}]'
-              history: 1w
+              history: 7d
               units: bps
               preprocessing:
                 -
@@ -441,9 +521,9 @@ zabbix_export:
                   value: 'Network interfaces'
             -
               uuid: 02dbf0af85294ab0bbf042fca79448cc
-              name: 'Outgoing network traffic on {#IFNAME}'
+              name: 'Interface {#IFNAME}: Outgoing network traffic'
               key: 'net.if.out[{#IFNAME}]'
-              history: 1w
+              history: 7d
               units: bps
               preprocessing:
                 -
@@ -461,7 +541,7 @@ zabbix_export:
           graph_prototypes:
             -
               uuid: 61d0d627f36e4b1b97fec7857ac99ac1
-              name: 'Network traffic on {#IFNAME}'
+              name: 'Interface {#IFNAME}: Network traffic'
               ymin_type_1: FIXED
               graph_items:
                 -
@@ -492,9 +572,9 @@ zabbix_export:
           item_prototypes:
             -
               uuid: aa40b3df2229405193c373b00064e420
-              name: 'Free inodes on {#FSNAME} (percentage)'
+              name: '{#FSNAME}: Free inodes (percentage)'
               key: 'vfs.fs.inode[{#FSNAME},pfree]'
-              history: 1w
+              history: 7d
               value_type: FLOAT
               units: '%'
               tags:
@@ -505,13 +585,13 @@ zabbix_export:
                 -
                   uuid: a56d85c866814b5e9273815beafba98c
                   expression: 'last(/Solaris/vfs.fs.inode[{#FSNAME},pfree])<20'
-                  name: 'Free inodes is less than 20% on volume {#FSNAME}'
+                  name: '{#FSNAME}: Free inodes is less than 20%'
                   priority: WARNING
             -
               uuid: e4c935091c6c49f185ef0e93963388ff
-              name: 'Free disk space on {#FSNAME}'
+              name: '{#FSNAME}: Free disk space'
               key: 'vfs.fs.size[{#FSNAME},free]'
-              history: 1w
+              history: 7d
               units: B
               tags:
                 -
@@ -519,9 +599,9 @@ zabbix_export:
                   value: Filesystems
             -
               uuid: e2805fb218d64ddd8ea58beae73e1343
-              name: 'Free disk space on {#FSNAME} (percentage)'
+              name: '{#FSNAME}: Free disk space (percentage)'
               key: 'vfs.fs.size[{#FSNAME},pfree]'
-              history: 1w
+              history: 7d
               value_type: FLOAT
               units: '%'
               tags:
@@ -532,14 +612,14 @@ zabbix_export:
                 -
                   uuid: e93165ebd8d94064836405c8c377bf62
                   expression: 'last(/Solaris/vfs.fs.size[{#FSNAME},pfree])<20'
-                  name: 'Free disk space is less than 20% on volume {#FSNAME}'
+                  name: '{#FSNAME}: Free disk space is less than 20%'
                   priority: WARNING
             -
               uuid: e15cfb60494944db8e9b2fe929d91fef
-              name: 'Total disk space on {#FSNAME}'
+              name: '{#FSNAME}: Total disk space'
               key: 'vfs.fs.size[{#FSNAME},total]'
               delay: 1h
-              history: 1w
+              history: 7d
               units: B
               tags:
                 -
@@ -547,9 +627,9 @@ zabbix_export:
                   value: Filesystems
             -
               uuid: 0da8a65250ec4027b3093772f5c26532
-              name: 'Used disk space on {#FSNAME}'
+              name: '{#FSNAME}: Used disk space'
               key: 'vfs.fs.size[{#FSNAME},used]'
-              history: 1w
+              history: 7d
               units: B
               tags:
                 -
@@ -558,7 +638,7 @@ zabbix_export:
           graph_prototypes:
             -
               uuid: ba1e86d39b2d4f61892228add27101f2
-              name: 'Disk space usage {#FSNAME}'
+              name: '{#FSNAME}: Disk space usage'
               width: '600'
               height: '340'
               show_work_period: 'NO'
@@ -578,6 +658,11 @@ zabbix_export:
                   item:
                     host: Solaris
                     key: 'vfs.fs.size[{#FSNAME},free]'
+      macros:
+        -
+          macro: '{$AGENT.TIMEOUT}'
+          value: 3m
+          description: 'Timeout after which agent is considered unavailable. Works only for agents reachable from Zabbix server/proxy (passive mode).'
       dashboards:
         -
           uuid: 774e5b14c75c49b4a3a4196ce1ccdaf7
@@ -620,7 +705,7 @@ zabbix_export:
                   type: GRAPH_CLASSIC
                   'y': '5'
                   width: '12'
-                  height: '7'
+                  height: '5'
                   fields:
                     -
                       type: INTEGER
@@ -637,7 +722,7 @@ zabbix_export:
                   x: '12'
                   'y': '5'
                   width: '12'
-                  height: '7'
+                  height: '5'
                   fields:
                     -
                       type: INTEGER
@@ -651,7 +736,7 @@ zabbix_export:
                         host: Solaris
                 -
                   type: GRAPH_CLASSIC
-                  'y': '12'
+                  'y': '10'
                   width: '12'
                   height: '5'
                   fields:
@@ -668,7 +753,7 @@ zabbix_export:
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
-                  'y': '12'
+                  'y': '10'
                   width: '12'
                   height: '5'
                   fields:
@@ -682,6 +767,27 @@ zabbix_export:
                       value:
                         key: 'proc.num[,,run]'
                         host: Solaris
+      valuemaps:
+        -
+          uuid: 2a704279b6e946a99b88bdebd4f99653
+          name: zabbix.host.available
+          mappings:
+            -
+              value: '0'
+              newvalue: 'not available'
+            -
+              value: '1'
+              newvalue: available
+            -
+              value: '2'
+              newvalue: unknown
+        -
+          uuid: 5db838501e354313888d84800658ed6a
+          name: 'Zabbix agent ping status'
+          mappings:
+            -
+              value: '1'
+              newvalue: Up
   graphs:
     -
       uuid: 9a3df2f49bf24b4597c6e488e1016f78

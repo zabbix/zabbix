@@ -22,14 +22,12 @@
 #include "threads.h"
 
 #include "db.h"
-#include "dbcache.h"
 #include "ipc.h"
 #include "mutexs.h"
 #include "zbxserver.h"
 #include "proxy.h"
 #include "events.h"
 #include "memalloc.h"
-#include "zbxalgo.h"
 #include "valuecache.h"
 #include "zbxmodules.h"
 #include "module.h"
@@ -41,6 +39,8 @@
 #include "zbxtrends.h"
 #include "zbxalgo.h"
 #include "../zbxalgo/vectorimpl.h"
+
+#include "dbcache.h"
 
 static zbx_mem_info_t	*hc_index_mem = NULL;
 static zbx_mem_info_t	*hc_mem = NULL;

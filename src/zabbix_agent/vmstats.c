@@ -18,10 +18,11 @@
 **/
 
 #include "common.h"
-#include "vmstats.h"
-#include "log.h"
 
 #ifdef _AIX
+
+#include "vmstats.h"
+#include "log.h"
 
 #ifndef XINTFRAC	/* defined in IBM AIX 7.1 libperfstat.h, not defined in AIX 6.1 */
 #include <sys/systemcfg.h>

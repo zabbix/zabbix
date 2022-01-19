@@ -1377,7 +1377,7 @@ class CWidgetHelper {
 						jQuery("#widget-dialogue-form")[0].scrollHeight - container.height()
 					));'.
 
-					'jQuery(".input-color-picker input").colorpicker({onUpdate: function(color) {'.
+					'jQuery(".'.ZBX_STYLE_COLOR_PICKER.' input").colorpicker({onUpdate: function(color) {'.
 						'var ds = jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'");'.
 						'jQuery(".'.ZBX_STYLE_COLOR_PREVIEW_BOX.'", ds).css("background-color", "#"+color);'.
 					'}, appendTo: ".overlay-dialogue-body"});'.
@@ -1439,7 +1439,7 @@ class CWidgetHelper {
 			'});',
 
 			// Initialize color-picker UI elements.
-			'jQuery(".input-color-picker input").colorpicker({onUpdate: function(color){'.
+			'jQuery(".'.ZBX_STYLE_COLOR_PICKER.' input").colorpicker({onUpdate: function(color){'.
 				'var ds = jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'");'.
 				'jQuery(".'.ZBX_STYLE_COLOR_PREVIEW_BOX.'", ds).css("background-color", "#"+color);'.
 			'}, appendTo: ".overlay-dialogue-body"});',
