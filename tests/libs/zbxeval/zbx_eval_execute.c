@@ -78,7 +78,7 @@ void	zbx_mock_test_entry(void **state)
 	if (SUCCEED == expected_ret)
 	{
 		/* use custom epsilon for floating point values to account for */
-		/* rounding differences with various sytems/libs               */
+		/* rounding differences with various systems/libs              */
 		if (ZBX_VARIANT_DBL == value.type)
 		{
 			double	expected_value;

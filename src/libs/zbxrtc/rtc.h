@@ -20,6 +20,7 @@
 #ifndef ZABBIX_RTC_H
 #define ZABBIX_RTC_H
 
+#include "sysinc.h"
 #include "zbxtypes.h"
 #include "zbxrtc.h"
 

@@ -20,6 +20,7 @@
 #ifndef ZABBIX_ZBXRTC_H
 #define ZABBIX_ZBXRTC_H
 
+#include "zbxalgo.h"
 #include "zbxipcservice.h"
 
 typedef struct
@@ -39,7 +40,7 @@ typedef struct
 }
 zbx_rtc_hook_t;
 
-ZBX_PTR_VECTOR_DECL(rtc_hook, zbx_rtc_hook_t *);
+ZBX_PTR_VECTOR_DECL(rtc_hook, zbx_rtc_hook_t *)
 
 typedef struct
 {

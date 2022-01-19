@@ -26,6 +26,7 @@
 #include "zbxalgo.h"
 #include "zbxserver.h"
 #include "zbxrtc.h"
+#include "zbxipcservice.h"
 
 #include "history_compress.h"
 #include "../../libs/zbxdbcache/valuecache.h"
