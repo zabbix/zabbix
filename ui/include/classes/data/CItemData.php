@@ -777,16 +777,12 @@ final class CItemData {
 				ITEM_VALUE_TYPE_LOG => [
 					'js-item-log-time-format-label',
 					'js-item-log-time-format-field',
-					'js-item-trends-label',
-					'js-item-trends-field',
 					'logtimefmt'
 				],
 				ITEM_VALUE_TYPE_STR => [
 					'js-item-inventory-link-label',
 					'js-item-inventory-link-field',
 					'inventory_link',
-					'js-item-trends-label',
-					'js-item-trends-field',
 					'js-item-value-map-label',
 					'js-item-value-map-field',
 					'valuemap_name',
@@ -795,8 +791,6 @@ final class CItemData {
 				ITEM_VALUE_TYPE_TEXT => [
 					'js-item-inventory-link-label',
 					'js-item-inventory-link-field',
-					'js-item-trends-label',
-					'js-item-trends-field',
 					'inventory_link'
 				],
 				ITEM_VALUE_TYPE_UINT64 => [
