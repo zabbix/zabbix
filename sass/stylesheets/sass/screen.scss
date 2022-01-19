@@ -297,17 +297,26 @@ form {
 	.action-container {
 		display: flex;
 		width: 100%;
+		height: 18px;
+		line-height: 18px;
 
-		.label {
+		.link-action {
+			height: 16px;
+			min-width: 1em;
 			@extend %overflow-ellipsis;
-		}
-
-		.separator {
-			margin-right: 4px;
 		}
 
 		[class*='icon-'] {
 			flex-shrink: 0;
+		}
+
+		.rel-container {
+			display: flex;
+		}
+
+		.separator {
+			flex-shrink: 0;
+			margin-right: 4px;
 		}
 	}
 
@@ -493,25 +502,6 @@ form {
 
 			.icon-description {
 				margin-left: 2px;
-			}
-		}
-
-		.action-container {
-			height: 18px;
-			line-height: 18px;
-
-			.rel-container {
-				display: flex;
-			}
-
-			.link-action {
-				height: 16px;
-				min-width: 1em;
-				@extend %overflow-ellipsis;
-			}
-
-			.separator {
-				flex-shrink: 0;
 			}
 		}
 	}
