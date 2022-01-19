@@ -57,9 +57,7 @@
 					let i = 0;
 
 					table.find('.' + table_row_class).each(function() {
-						const $sortorder = $(this).find('[name*="sortorder"]');
-
-						$($sortorder[0]).val(i++);
+						$(this).find('[name*="sortorder"]').val(i++);
 					});
 				}
 			});
@@ -148,9 +146,7 @@
 					let i = 0;
 
 					$rows.each(function() {
-						const $sortorder = $(this).find('[name*="sortorder"]');
-
-						$($sortorder[0]).val(i++);
+						$(this).find('[name*="sortorder"]').val(i++);
 					});
 				}
 			}

@@ -152,11 +152,19 @@ $query_fields_data = [];
 if (is_array($data['query_fields']) && $data['query_fields']) {
 	$i = 0;
 	foreach ($data['query_fields'] as $pair) {
-		$query_fields_data[] = ['name' => key($pair), 'value' => reset($pair), 'sortorder' => $i++];
+		$query_fields_data[] = [
+			'name' => key($pair),
+			'value' => reset($pair),
+			'sortorder' => $i++
+		];
 	}
 }
 elseif (!$readonly) {
-	$query_fields_data[] = ['name' => '', 'value' => '', 'sortorder' => 0];
+	$query_fields_data[] = [
+		'name' => '',
+		'value' => '',
+		'sortorder' => 0
+	];
 }
 
 $query_fields = (new CTag('script', true))->setAttribute('type', 'text/json');
@@ -229,9 +237,11 @@ $item_tab
 			(new CTag('script', true))
 				->setAttribute('type', 'text/x-jquery-tmpl')
 				->addItem(new CRow([
-					(new CCol((new CDiv(
-						new CVar('query_fields[sortorder][#{index}]', '#{sortorder}')
-					))->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+					(new CCol(
+						(new CDiv(
+							new CVar('query_fields[sortorder][#{index}]', '#{sortorder}')
+						))->addClass(ZBX_STYLE_DRAG_ICON)
+					))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 					(new CTextBox('query_fields[name][#{index}]', '#{name}', $readonly))
 						->setAttribute('placeholder', _('name'))
 						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
@@ -377,9 +387,11 @@ $item_tab
 				(new CTag('script', true))
 					->setAttribute('type', 'text/x-jquery-tmpl')
 					->addItem(new CRow([
-						(new CCol((new CDiv(
-							new CVar('headers[sortorder][#{index}]', '#{sortorder}')
-						))->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+						(new CCol(
+							(new CDiv(
+								new CVar('headers[sortorder][#{index}]', '#{sortorder}')
+							))->addClass(ZBX_STYLE_DRAG_ICON)
+						))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 						(new CTextBox('headers[name][#{index}]', '#{name}', $readonly))
 							->setAttribute('placeholder', _('name'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
