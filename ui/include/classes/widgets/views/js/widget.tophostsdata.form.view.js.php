@@ -46,6 +46,7 @@ window.widget_tophostsdata_form = {
 
 			if (data.edit) {
 				index = tr.querySelector('[name="sortorder[columns][]"]').value;
+				tr.querySelectorAll(`[name^="columns[${index}][`).forEach(node => node.remove());
 				delete data.edit;
 			}
 			else {

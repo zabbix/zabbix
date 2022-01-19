@@ -63,7 +63,7 @@ $form_grid->addItem([
 
 // Static text.
 $form_grid->addItem([
-	new CLabel(_('Text'), 'text'),
+	(new CLabel(_('Text'), 'text'))->setAsteriskMark(),
 	new CFormField(
 		(new CTextBox('text', $data['text']))
 			->setAttribute('placeholder', _('Text, supports {INVENTORY.*}, {HOST.*} macros'))

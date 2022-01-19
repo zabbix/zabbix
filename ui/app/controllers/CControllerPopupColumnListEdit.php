@@ -114,7 +114,7 @@ class CControllerPopupColumnListEdit extends CController {
 
 		$thresholds = [];
 
-		if ($this->hasInput('thresholds')) {
+		if (array_key_exists('thresholds', $input)) {
 			foreach ($input['thresholds'] as $threshold) {
 				if (trim($threshold['threshold']) !== '') {
 					$thresholds[] = $threshold;
