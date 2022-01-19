@@ -2264,6 +2264,15 @@ div.dashboard-grid-widget-item {
     background-color: #2b2b2b;
     padding: 10px 0;
     margin-bottom: 6px; }
+    .filter-container.tabfilter-container .tabfilter-content-container.tabfilter-collapsed .tabfilter-tabs-container,
+    .filter-container.tabfilter-container .tabfilter-content-container.tabfilter-collapsed .form-buttons {
+      display: none; }
+  .filter-container.tabfilter-container .subfilter-option-grid {
+    grid-template-columns: minmax(75px, max-content) auto;
+    display: grid;
+    margin: 5px 0; }
+    .filter-container.tabfilter-container .subfilter-option-grid .subfilter-options {
+      grid-column: 2 / -1; }
   .filter-container.tabfilter-container nav > ul {
     display: flex;
     flex: 1;
@@ -2339,7 +2348,7 @@ div.dashboard-grid-widget-item {
     .filter-container.tabfilter-container .tabfilter-item-label.disabled {
       box-shadow: none;
       pointer-events: none; }
-    .filter-container.tabfilter-container .tabfilter-item-label .icon-home.tabfilter-item-link[data-counter]::after {
+    .filter-container.tabfilter-container .tabfilter-item-label .icon-filter.tabfilter-item-link[data-counter]::after {
       display: none; }
   .filter-container.tabfilter-container .tabfilter-item-link {
     display: inline-block;
@@ -2381,15 +2390,15 @@ div.dashboard-grid-widget-item {
 .menu-popup .menu-popup-item[data-counter] {
   padding-right: 35px; }
 
-.icon-home::before {
+.icon-filter::before {
   display: block;
-  width: 22px;
+  width: 24px;
   height: 24px;
   content: '';
-  background: url("../img/icon-sprite.svg?20211222") no-repeat -433px -510px; }
+  background: url("../img/icon-sprite.svg?20211222") no-repeat -87px -547px; }
 
-.selected.expanded .icon-home::before {
-  background: url("../img/icon-sprite.svg?20211222") no-repeat -121px -510px; }
+.selected.expanded .icon-filter::before {
+  background-position: -246px -547px; }
 
 .toc .toc-row {
   padding: 8px 10px;
@@ -5138,6 +5147,12 @@ a.link-action {
   max-width: 133px;
   vertical-align: middle;
   border-radius: 2px; }
+  .tag a.link-action {
+    color: inherit !important;
+    border-bottom: none; }
+    .tag a.link-action:hover {
+      text-decoration: underline;
+      border-bottom: none; }
   .tag:last-child {
     margin: 0; }
   .tag.green-bg {
@@ -6963,3 +6978,6 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   content: " /"; }
 .breadcrumbs > :last-child::after {
   content: ""; }
+
+.selected.expanded .icon-filter::before {
+  background-position: -87px -547px; }

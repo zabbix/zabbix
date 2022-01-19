@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-11 10:46+0200\n"
+"POT-Creation-Date: 2022-01-14 19:55+0200\n"
 "PO-Revision-Date: 2018-09-24 07:57+0300\n"
 "Last-Translator: Lukáš <iam@lukasmaly.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -558,7 +558,7 @@ msgstr "Potvrzené VYŘEŠENÉ události"
 #: app/views/administration.iconmap.edit.php:58
 #: app/views/administration.mediatype.edit.php:103
 #: app/views/administration.mediatype.edit.php:155
-#: app/views/administration.mediatype.list.php:83
+#: app/views/administration.mediatype.list.php:87
 #: app/views/administration.regex.edit.php:51
 #: app/views/administration.script.edit.php:65
 #: app/views/administration.user.edit.php:294
@@ -683,7 +683,7 @@ msgstr "Akce byla aktualizována"
 #: include/classes/screens/CScreenProblem.php:1158
 #: include/classes/screens/CScreenProblem.php:1219 include/events.inc.php:291
 #: include/forms.inc.php:1220 include/views/configuration.action.edit.php:28
-#: include/views/monitoring.sysmap.list.php:69 jsLoader.php:131
+#: include/views/monitoring.sysmap.list.php:73 jsLoader.php:131
 #: jsLoader.php:162 jsLoader.php:171 jsLoader.php:198 jsLoader.php:212
 #: jsLoader.php:350 tr_events.php:183
 msgid "Actions"
@@ -1031,7 +1031,7 @@ msgstr "Agent"
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
 msgstr "Kontrola dostupnosti agenta. Vrátí nic - nedostupný, 1 - dostupný"
 
-#: app/views/configuration.host.list.php:194
+#: app/views/configuration.host.list.php:196
 msgid "Agent encryption"
 msgstr "Agent šifrování"
 
@@ -1217,7 +1217,7 @@ msgid "Annually"
 msgstr ""
 
 #: app/partials/monitoring.host.filter.php:127
-#: app/views/administration.mediatype.list.php:55
+#: app/views/administration.mediatype.list.php:59
 #: app/views/administration.module.list.php:52
 #: app/views/administration.proxy.list.php:53
 #: app/views/administration.script.list.php:50
@@ -1226,7 +1226,7 @@ msgstr ""
 #: app/views/administration.user.token.list.php:59
 #: app/views/configuration.correlation.list.php:55
 #: app/views/configuration.discovery.list.php:55
-#: app/views/configuration.host.list.php:129
+#: app/views/configuration.host.list.php:131
 #: app/views/reports.scheduledreport.list.php:60
 #: app/views/service.list.edit.php:79 app/views/service.list.edit.php:107
 #: app/views/service.list.php:82 app/views/sla.list.php:51
@@ -1575,7 +1575,7 @@ msgid "Autoregistration data storage period"
 msgstr ""
 
 #: app/partials/monitoring.host.view.html.php:36
-#: app/views/configuration.host.list.php:193
+#: app/views/configuration.host.list.php:195
 msgid "Availability"
 msgstr "Dostupnost"
 
@@ -1765,9 +1765,9 @@ msgstr "Podle šablony spouštěče"
 
 #: app/views/administration.proxy.list.php:141
 #: app/views/administration.proxy.list.php:154
-#: app/views/configuration.host.list.php:381
-#: app/views/configuration.host.list.php:402
-#: app/views/configuration.host.list.php:405
+#: app/views/configuration.host.list.php:383
+#: app/views/configuration.host.list.php:404
+#: app/views/configuration.host.list.php:407
 msgid "CERT"
 msgstr "CERT"
 
@@ -2701,7 +2701,7 @@ msgstr ""
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
 msgstr "Host \"%1$s\" použitý v mapě \"%2$s\" nebyl nalezený."
 
-#: include/classes/import/CConfigurationImport.php:1206
+#: include/classes/import/CConfigurationImport.php:1212
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Nelze najít skupinu \"%1$s\" pro prototyp hosta \"%2$s\" zjišťovacího pravidla \"%3$s\" na\"%4$s\"."
@@ -2724,47 +2724,47 @@ msgstr "Nelze najít ikonu \"%1$s\" použitou v mapě \"%2$s\"."
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr "Mapa ikon \"%1$s\" použitá v mapě \"%2$s\" nebyla nalezena."
 
-#: include/classes/import/CConfigurationImport.php:948
+#: include/classes/import/CConfigurationImport.php:952
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for discovery rule \"%2$s\" on \"%3$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:717
+#: include/classes/import/CConfigurationImport.php:719
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:1100
+#: include/classes/import/CConfigurationImport.php:1106
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:1631
+#: include/classes/import/CConfigurationImport.php:1641
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph \"%3$s\"."
 msgstr "Nejde nalézt položku \"%1$s\" na \"%2$s\" použitou jako maximální hodnota Y ose grafu \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1403
+#: include/classes/import/CConfigurationImport.php:1413
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Nejde nalézt položku \"%1$s\" na \"%2$s\" použitou jako maximální hodnota Y ose prototypu grafu \"%3$s\" objevovacího pravidla \"%4$s\" na \"%5$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1613
+#: include/classes/import/CConfigurationImport.php:1623
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph \"%3$s\"."
 msgstr "Nejde nalézt položku \"%1$s\" na \"%2$s\" použitou jako minimální hodnota Y ose grafu \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1382
+#: include/classes/import/CConfigurationImport.php:1392
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Nejde nalézt položku \"%1$s\" na \"%2$s\" použitou jako minimální hodnota Y ose prototypu grafu \"%3$s\" objevovacího pravidla \"%4$s\" na \"%5$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1651
+#: include/classes/import/CConfigurationImport.php:1661
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
 msgstr "Nemůžu najít položku \"%1$s\" na \"%2$s\" použitou v grafu \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1424
+#: include/classes/import/CConfigurationImport.php:1434
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Nemohu nalézt položku \"%1$s\" na \"%2$s\" použitou v prototypu grafu \"%3$s\" objevovacího pravidla \"%4$s\" na \"%5$s\"."
@@ -2779,12 +2779,12 @@ msgstr ""
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
 msgstr "Mapa \"%1$s\" použitá v mapě \"%2$s\" nebyla nalezena."
 
-#: include/classes/import/CConfigurationImport.php:1229
+#: include/classes/import/CConfigurationImport.php:1235
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Nelze nalézt šablonu \"%1$s\" pro prototyp hosta \"%2$s\" objevovacího pravidla \"%3$s\" na \"%4$s\"."
 
-#: include/classes/import/CConfigurationImport.php:998
+#: include/classes/import/CConfigurationImport.php:1002
 #, c-format
 msgid "Cannot find template \"%1$s\" for override \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr ""
@@ -2795,12 +2795,12 @@ msgstr ""
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "Spouštěč \"%1$s\" použitý v mapě \"%2$s\" nebyl nalezený."
 
-#: include/classes/import/CConfigurationImport.php:730
+#: include/classes/import/CConfigurationImport.php:732
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr "Nelze nalézt mapu hodnot \"%1$s\" použitou pro položku \"%2$s\" na \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1116
+#: include/classes/import/CConfigurationImport.php:1122
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Nelze nalézt mapu hodnot \"%1$s\" použitou pro prototyp položky \"%2$s\" objevovacího pravidla \"%3$s\" na \"%4$s\"."
@@ -4129,8 +4129,8 @@ msgstr "Připojení na hostitele"
 msgid "Connections to proxy"
 msgstr "Připojení k proxy"
 
-#: include/views/monitoring.sysmap.list.php:80
-#: include/views/monitoring.sysmap.list.php:81
+#: include/views/monitoring.sysmap.list.php:84
+#: include/views/monitoring.sysmap.list.php:85
 msgid "Constructor"
 msgstr "Konstruktor"
 
@@ -4155,7 +4155,7 @@ msgstr "Obsahuje"
 
 #: app/views/administration.iconmap.list.php:36
 #: app/views/administration.image.list.php:70
-#: app/views/administration.mediatype.list.php:41
+#: app/views/administration.mediatype.list.php:45
 #: app/views/administration.module.list.php:36
 #: app/views/administration.proxy.list.php:39
 #: app/views/administration.regex.list.php:40
@@ -4169,7 +4169,7 @@ msgstr "Obsahuje"
 #: app/views/configuration.dashboard.edit.php:71
 #: app/views/configuration.dashboard.list.php:81
 #: app/views/configuration.discovery.list.php:41
-#: app/views/configuration.host.list.php:46
+#: app/views/configuration.host.list.php:48
 #: app/views/monitoring.charts.view.php:69
 #: app/views/monitoring.dashboard.list.php:50
 #: app/views/monitoring.dashboard.view.php:133
@@ -4195,11 +4195,11 @@ msgstr "Obsahuje"
 #: include/views/configuration.item.list.php:46
 #: include/views/configuration.item.prototype.list.php:37
 #: include/views/configuration.maintenance.list.php:35
-#: include/views/configuration.template.list.php:102
+#: include/views/configuration.template.list.php:104
 #: include/views/configuration.trigger.prototype.list.php:36
 #: include/views/configuration.triggers.list.php:160
 #: include/views/monitoring.history.php:240
-#: include/views/monitoring.sysmap.list.php:39 report2.php:175
+#: include/views/monitoring.sysmap.list.php:43 report2.php:175
 #: tr_events.php:201
 msgid "Content controls"
 msgstr "Nabídka ovládacích prvků"
@@ -4682,7 +4682,7 @@ msgid "DD.MM.YY"
 msgstr "DD.MM.YY"
 
 #: app/partials/monitoring.host.filter.php:108
-#: app/views/configuration.host.list.php:106 app/views/search.php:35
+#: app/views/configuration.host.list.php:108 app/views/search.php:35
 msgid "DNS"
 msgstr "DNS"
 
@@ -4774,8 +4774,8 @@ msgstr ""
 #: app/views/monitoring.dashboard.list.php:35
 #: app/views/monitoring.host.dashboard.view.php:32 app/views/search.php:102
 #: app/views/search.php:107 app/views/search.php:329 app/views/search.php:336
-#: include/html.inc.php:371 include/views/configuration.template.list.php:121
-#: include/views/configuration.template.list.php:234
+#: include/html.inc.php:371 include/views/configuration.template.list.php:123
+#: include/views/configuration.template.list.php:236
 #: include/views/inventory.host.view.php:170
 #: include/views/inventory.host.view.php:174 jsLoader.php:358
 msgid "Dashboards"
@@ -5064,7 +5064,7 @@ msgstr "Zpožděno o"
 #: app/views/administration.iconmap.edit.php:139
 #: app/views/administration.image.edit.php:79
 #: app/views/administration.mediatype.edit.php:364
-#: app/views/administration.mediatype.list.php:186
+#: app/views/administration.mediatype.list.php:190
 #: app/views/administration.proxy.edit.php:162
 #: app/views/administration.proxy.list.php:189
 #: app/views/administration.regex.edit.php:148
@@ -5087,7 +5087,7 @@ msgstr "Zpožděno o"
 #: app/views/configuration.discovery.edit.php:155
 #: app/views/configuration.discovery.list.php:122
 #: app/views/configuration.host.edit.php:49
-#: app/views/configuration.host.list.php:524
+#: app/views/configuration.host.list.php:526
 #: app/views/monitoring.dashboard.list.php:123
 #: app/views/popup.host.edit.php:82 app/views/popup.service.edit.php:381
 #: app/views/popup.sla.edit.php:264 app/views/popup.tabfilter.edit.php:71
@@ -5104,10 +5104,10 @@ msgstr "Zpožděno o"
 #: include/views/configuration.item.list.php:318
 #: include/views/configuration.item.prototype.list.php:205
 #: include/views/configuration.maintenance.list.php:124
-#: include/views/configuration.template.list.php:288
+#: include/views/configuration.template.list.php:290
 #: include/views/configuration.trigger.prototype.list.php:211
 #: include/views/configuration.triggers.list.php:354
-#: include/views/monitoring.sysmap.list.php:110 jsLoader.php:135
+#: include/views/monitoring.sysmap.list.php:114 jsLoader.php:135
 #: jsLoader.php:164 jsLoader.php:359
 msgid "Delete"
 msgstr "Smazat"
@@ -5117,11 +5117,11 @@ msgid "Delete all elements that are not present in the import file?"
 msgstr ""
 
 #: include/views/configuration.template.edit.php:224
-#: include/views/configuration.template.list.php:289
+#: include/views/configuration.template.list.php:291
 msgid "Delete and clear"
 msgstr "Smazat a pročistit"
 
-#: include/views/configuration.template.list.php:290
+#: include/views/configuration.template.list.php:292
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr "Smazat a vyčistit zvolené šablony? (Upozornění: tímto smažete vybrané šablony a pročistíte všechny připojené hostitele!)"
 
@@ -5282,7 +5282,7 @@ msgstr "Smazat označené prototypy hosta?"
 msgid "Delete selected host?"
 msgstr "Smazat vybraného hostitele?"
 
-#: app/views/configuration.host.list.php:525
+#: app/views/configuration.host.list.php:527
 msgid "Delete selected hosts?"
 msgstr "Smazat vybrané hostitele?"
 
@@ -5306,11 +5306,11 @@ msgstr "Smazat vybraná servisní okna?"
 msgid "Delete selected map?"
 msgstr "Smazat vybrané mapy?"
 
-#: include/views/monitoring.sysmap.list.php:110
+#: include/views/monitoring.sysmap.list.php:114
 msgid "Delete selected maps?"
 msgstr "Smazat vybrané mapy?"
 
-#: app/views/administration.mediatype.list.php:186
+#: app/views/administration.mediatype.list.php:190
 msgid "Delete selected media types?"
 msgstr "Smazat vybrané typy médií?"
 
@@ -5354,7 +5354,7 @@ msgstr ""
 msgid "Delete selected shapes?"
 msgstr "Smazat vybrané tvary?"
 
-#: include/views/configuration.template.list.php:288
+#: include/views/configuration.template.list.php:290
 msgid "Delete selected templates?"
 msgstr "Smazat vybrané šablony?"
 
@@ -5489,7 +5489,7 @@ msgid "Description"
 msgstr "Popis"
 
 #: app/partials/administration.system.info.php:30
-#: app/views/administration.mediatype.list.php:82
+#: app/views/administration.mediatype.list.php:86
 #: app/views/js/reports.auditlog.list.js.php:153
 #: app/views/reports.auditlog.list.php:96
 #: app/views/reports.auditlog.list.php:129 include/func.inc.php:1668
@@ -5537,14 +5537,14 @@ msgstr ""
 msgid "Directory size (in bytes). Returns integer"
 msgstr "Velikost adresáře (v bajtech). Vrací celé číslo"
 
-#: app/views/administration.mediatype.list.php:177
+#: app/views/administration.mediatype.list.php:181
 #: app/views/administration.module.list.php:124
 #: app/views/administration.token.list.php:200
 #: app/views/administration.usergroup.list.php:219
 #: app/views/administration.user.token.list.php:152
 #: app/views/configuration.correlation.list.php:148
 #: app/views/configuration.discovery.list.php:121
-#: app/views/configuration.host.list.php:503
+#: app/views/configuration.host.list.php:505
 #: app/views/reports.scheduledreport.list.php:89 app/views/sla.list.php:169
 #: include/views/configuration.action.list.php:168
 #: include/views/configuration.host.discovery.list.php:325
@@ -5566,7 +5566,7 @@ msgstr "Zakázat ladící mód pro vybrané skupiny?"
 msgid "Disable host"
 msgstr "Zakázat hostitele"
 
-#: app/views/configuration.host.list.php:275
+#: app/views/configuration.host.list.php:277
 msgid "Disable host?"
 msgstr "Zakázat host?"
 
@@ -5613,7 +5613,7 @@ msgstr "Zakázat vybraná  pravidla nálezu?"
 msgid "Disable selected groups?"
 msgstr "Zakázat vybrané skupiny?"
 
-#: app/views/configuration.host.list.php:504
+#: app/views/configuration.host.list.php:506
 msgid "Disable selected hosts?"
 msgstr "Zakázat vybrané hostitele?"
 
@@ -5621,7 +5621,7 @@ msgstr "Zakázat vybrané hostitele?"
 msgid "Disable selected items?"
 msgstr "Zakázat vybrané položky?"
 
-#: app/views/administration.mediatype.list.php:177
+#: app/views/administration.mediatype.list.php:181
 msgid "Disable selected media types?"
 msgstr "Zakázat označené media typy?"
 
@@ -5647,8 +5647,8 @@ msgstr "Zakázat označené scénáře?"
 #: app/partials/monitoring.host.filter.php:129
 #: app/partials/monitoring.host.view.html.php:117
 #: app/partials/scheduledreport.table.html.php:80
-#: app/views/administration.mediatype.list.php:57
-#: app/views/administration.mediatype.list.php:141
+#: app/views/administration.mediatype.list.php:61
+#: app/views/administration.mediatype.list.php:145
 #: app/views/administration.miscconfig.edit.php:59
 #: app/views/administration.module.list.php:54
 #: app/views/administration.module.list.php:101
@@ -5668,7 +5668,7 @@ msgstr "Zakázat označené scénáře?"
 #: app/views/configuration.correlation.list.php:57
 #: app/views/configuration.correlation.list.php:108
 #: app/views/configuration.discovery.list.php:57
-#: app/views/configuration.host.list.php:280 app/views/popup.generic.php:646
+#: app/views/configuration.host.list.php:282 app/views/popup.generic.php:646
 #: app/views/popup.lldoperation.php:280
 #: app/views/popup.massupdate.host.php:140
 #: app/views/popup.massupdate.host.php:182
@@ -5733,8 +5733,8 @@ msgstr "Objevené"
 msgid "Discovered device"
 msgstr "Nalezené zařízení"
 
-#: app/views/configuration.host.list.php:187
-#: app/views/configuration.host.list.php:452
+#: app/views/configuration.host.list.php:189
+#: app/views/configuration.host.list.php:454
 #: app/views/popup.mediatype.message.php:67 app/views/search.php:149
 #: app/views/search.php:154 app/views/search.php:339 app/views/search.php:344
 #: include/classes/helpers/CMediatypeHelper.php:163
@@ -5742,8 +5742,8 @@ msgstr "Nalezené zařízení"
 #: include/classes/helpers/CMenuHelper.php:227
 #: include/classes/helpers/CRoleHelper.php:344
 #: include/classes/helpers/CRoleHelper.php:413 include/forms.inc.php:543
-#: include/views/configuration.template.list.php:122
-#: include/views/configuration.template.list.php:243
+#: include/views/configuration.template.list.php:124
+#: include/views/configuration.template.list.php:245
 #: include/views/inventory.host.view.php:200
 #: include/views/inventory.host.view.php:218
 msgid "Discovery"
@@ -6251,14 +6251,14 @@ msgstr "Prázdná vstupní parametr."
 msgid "Empty map ID."
 msgstr "Prázdné ID mapy."
 
-#: app/views/administration.mediatype.list.php:176
+#: app/views/administration.mediatype.list.php:180
 #: app/views/administration.module.list.php:123
 #: app/views/administration.token.list.php:199
 #: app/views/administration.usergroup.list.php:213
 #: app/views/administration.user.token.list.php:151
 #: app/views/configuration.correlation.list.php:147
 #: app/views/configuration.discovery.list.php:120
-#: app/views/configuration.host.list.php:496
+#: app/views/configuration.host.list.php:498
 #: app/views/reports.scheduledreport.list.php:84 app/views/sla.list.php:163
 #: include/views/configuration.action.list.php:167
 #: include/views/configuration.host.discovery.list.php:324
@@ -6304,7 +6304,7 @@ msgstr "Povolit ladící mód pro vybrané skupiny?"
 msgid "Enable host"
 msgstr "Povolit hostitele"
 
-#: app/views/configuration.host.list.php:283
+#: app/views/configuration.host.list.php:285
 msgid "Enable host?"
 msgstr "Povolit hosta?"
 
@@ -6356,7 +6356,7 @@ msgstr "Zapnout vybraná pravidla nálezu?"
 msgid "Enable selected groups?"
 msgstr "Povolit vybrané skupiny?"
 
-#: app/views/configuration.host.list.php:497
+#: app/views/configuration.host.list.php:499
 #: include/views/configuration.hostgroups.list.php:200
 msgid "Enable selected hosts?"
 msgstr "Povolit označené hosty?"
@@ -6365,7 +6365,7 @@ msgstr "Povolit označené hosty?"
 msgid "Enable selected items?"
 msgstr "Povolit vybrané položky?"
 
-#: app/views/administration.mediatype.list.php:176
+#: app/views/administration.mediatype.list.php:180
 msgid "Enable selected media types?"
 msgstr "Povolit označené typy médií?"
 
@@ -6400,8 +6400,8 @@ msgstr "Zapnout pasti"
 #: app/partials/scheduledreport.formgrid.html.php:201
 #: app/partials/scheduledreport.table.html.php:84
 #: app/views/administration.mediatype.edit.php:267
-#: app/views/administration.mediatype.list.php:56
-#: app/views/administration.mediatype.list.php:137
+#: app/views/administration.mediatype.list.php:60
+#: app/views/administration.mediatype.list.php:141
 #: app/views/administration.module.edit.php:45
 #: app/views/administration.module.list.php:53
 #: app/views/administration.module.list.php:95
@@ -6431,7 +6431,7 @@ msgstr "Zapnout pasti"
 #: app/views/configuration.correlation.list.php:119
 #: app/views/configuration.discovery.edit.php:130
 #: app/views/configuration.discovery.list.php:56
-#: app/views/configuration.host.list.php:272 app/views/popup.generic.php:645
+#: app/views/configuration.host.list.php:274 app/views/popup.generic.php:645
 #: app/views/popup.massupdate.host.php:139 app/views/popup.media.php:89
 #: app/views/popup.sla.edit.php:175 app/views/popup.triggerwizard.php:137
 #: app/views/reports.scheduledreport.list.php:61 app/views/sla.list.php:52
@@ -7038,7 +7038,7 @@ msgid "Filled region"
 msgstr "Oblast"
 
 #: app/partials/configuration.filter.items.php:230
-#: app/views/administration.mediatype.list.php:47
+#: app/views/administration.mediatype.list.php:51
 #: app/views/administration.module.list.php:44
 #: app/views/administration.proxy.list.php:45
 #: app/views/administration.script.list.php:42
@@ -7049,7 +7049,7 @@ msgstr "Oblast"
 #: app/views/administration.user.token.list.php:37
 #: app/views/configuration.correlation.list.php:47
 #: app/views/configuration.discovery.list.php:47
-#: app/views/configuration.host.list.php:56
+#: app/views/configuration.host.list.php:58
 #: app/views/monitoring.charts.view.php:83
 #: app/views/monitoring.dashboard.list.php:59
 #: app/views/monitoring.discovery.view.php:46
@@ -7072,7 +7072,7 @@ msgstr "Oblast"
 #: include/views/configuration.triggers.list.php:143
 #: include/views/inventory.host.list.php:43
 #: include/views/monitoring.history.php:269
-#: include/views/monitoring.sysmap.list.php:46
+#: include/views/monitoring.sysmap.list.php:50
 #: include/views/reports.toptriggers.php:83 report2.php:501
 msgid "Filter"
 msgstr "Filtr"
@@ -7244,7 +7244,7 @@ msgid "Function"
 msgstr "Funkce"
 
 #: app/views/administration.mediatype.edit.php:127
-#: app/views/administration.mediatype.list.php:100
+#: app/views/administration.mediatype.list.php:104
 msgid "GSM modem"
 msgstr "GSM modem"
 
@@ -7523,8 +7523,8 @@ msgstr "Graf se jménem \"%1$s\" již existuje v grafech, nebo prototypech graf�
 #: app/partials/monitoring.host.view.html.php:41
 #: app/partials/monitoring.host.view.html.php:131
 #: app/partials/monitoring.host.view.html.php:139
-#: app/views/configuration.host.list.php:186
-#: app/views/configuration.host.list.php:443
+#: app/views/configuration.host.list.php:188
+#: app/views/configuration.host.list.php:445
 #: app/views/monitoring.charts.view.php:38
 #: app/views/monitoring.charts.view.php:110
 #: app/views/monitoring.charts.view.php:138 app/views/popup.import.php:38
@@ -7534,8 +7534,8 @@ msgstr "Graf se jménem \"%1$s\" již existuje v grafech, nebo prototypech graf�
 #: include/views/configuration.graph.edit.php:30
 #: include/views/configuration.graph.list.php:44
 #: include/views/configuration.host.discovery.list.php:196
-#: include/views/configuration.template.list.php:120
-#: include/views/configuration.template.list.php:225
+#: include/views/configuration.template.list.php:122
+#: include/views/configuration.template.list.php:227
 #: include/views/inventory.host.view.php:160
 #: include/views/inventory.host.view.php:168
 #: include/views/inventory.host.view.php:194
@@ -7729,7 +7729,7 @@ msgstr "Hebrejština (he_IL)"
 #: include/views/js/monitoring.sysmaps.js.php:123
 #: include/views/js/monitoring.sysmaps.js.php:468
 #: include/views/monitoring.sysmap.edit.php:105
-#: include/views/monitoring.sysmap.list.php:68 sysmaps.php:40
+#: include/views/monitoring.sysmap.list.php:72 sysmaps.php:40
 msgid "Height"
 msgstr "Výška"
 
@@ -8040,7 +8040,7 @@ msgstr "Skupina hostů s ID \"%1$s\" není dostupná."
 #: app/partials/monitoring.host.filter.php:83
 #: app/partials/monitoring.problem.filter.php:35
 #: app/partials/popup.operations.php:199
-#: app/views/configuration.host.list.php:60
+#: app/views/configuration.host.list.php:62
 #: app/views/monitoring.latest.view.php:50
 #: app/views/monitoring.web.view.php:50
 #: app/views/popup.condition.common.php:101
@@ -8253,9 +8253,9 @@ msgstr "Host se stejným viditelným jménem \"%1$s\" již existuje."
 #: include/views/configuration.hostgroups.list.php:178
 #: include/views/configuration.httpconf.list.php:50
 #: include/views/configuration.maintenance.edit.php:225
-#: include/views/configuration.template.list.php:117
-#: include/views/configuration.template.list.php:197
-#: include/views/configuration.template.list.php:203
+#: include/views/configuration.template.list.php:119
+#: include/views/configuration.template.list.php:199
+#: include/views/configuration.template.list.php:205
 #: include/views/configuration.triggers.list.php:48
 #: include/views/reports.toptriggers.php:57 report2.php:465
 msgid "Hosts"
@@ -8316,7 +8316,7 @@ msgid "IMAP"
 msgstr "IMAP"
 
 #: app/partials/monitoring.host.filter.php:103
-#: app/views/configuration.host.list.php:112
+#: app/views/configuration.host.list.php:114
 #: app/views/reports.auditlog.list.php:91 app/views/search.php:34
 msgid "IP"
 msgstr "IP"
@@ -8640,7 +8640,7 @@ msgid "Inaccessible dashboard"
 msgstr ""
 
 #: app/partials/configuration.host.edit.html.php:60
-#: app/views/configuration.host.list.php:234
+#: app/views/configuration.host.list.php:236
 msgid "Inaccessible discovery rule"
 msgstr ""
 
@@ -8671,7 +8671,7 @@ msgstr ""
 
 #: app/partials/monitoring.host.view.html.php:105
 #: app/partials/monitoring.latest.view.html.php:190
-#: app/views/configuration.host.list.php:267
+#: app/views/configuration.host.list.php:269
 #: include/classes/screens/CScreenProblem.php:386
 #: include/hostgroups.inc.php:293 include/triggers.inc.php:2027
 #: include/views/inventory.host.view.php:42
@@ -9470,18 +9470,18 @@ msgstr "Nesprávná hodnota pro pole \"%1$s\"."
 #: include/classes/graphdraw/CPieGraphDraw.php:175
 #: include/classes/helpers/CSvgGraphHelper.php:368
 #: include/classes/helpers/CSvgGraphHelper.php:380
-#: include/classes/import/CConfigurationImport.php:743
-#: include/classes/import/CConfigurationImport.php:838
-#: include/classes/import/CConfigurationImport.php:875
-#: include/classes/import/CConfigurationImport.php:976
-#: include/classes/import/CConfigurationImport.php:1130
-#: include/classes/import/CConfigurationImport.php:2686
-#: include/classes/import/CConfigurationImport.php:2790
+#: include/classes/import/CConfigurationImport.php:745
+#: include/classes/import/CConfigurationImport.php:842
+#: include/classes/import/CConfigurationImport.php:879
+#: include/classes/import/CConfigurationImport.php:980
+#: include/classes/import/CConfigurationImport.php:1136
+#: include/classes/import/CConfigurationImport.php:2696
 #: include/classes/import/CConfigurationImport.php:2800
-#: include/classes/import/CConfigurationImport.php:2827
-#: include/classes/import/CConfigurationImport.php:2842
-#: include/classes/import/CConfigurationImport.php:2851
-#: include/classes/import/CConfigurationImport.php:2857
+#: include/classes/import/CConfigurationImport.php:2810
+#: include/classes/import/CConfigurationImport.php:2837
+#: include/classes/import/CConfigurationImport.php:2852
+#: include/classes/import/CConfigurationImport.php:2861
+#: include/classes/import/CConfigurationImport.php:2867
 #: include/classes/validators/CActionCondValidator.php:66
 #: include/classes/validators/CActionCondValidator.php:72
 #: include/classes/validators/CActionCondValidator.php:83
@@ -9542,7 +9542,7 @@ msgstr ""
 #: app/partials/monitoring.latest.view.html.php:60
 #: app/partials/monitoring.latest.view.html.php:73
 #: app/partials/scheduledreport.table.html.php:45
-#: app/views/configuration.host.list.php:195
+#: app/views/configuration.host.list.php:197
 #: app/views/monitoring.widget.actionlog.view.php:39
 #: app/views/monitoring.widget.problems.view.php:57
 #: app/views/service.list.edit.php:57 app/views/service.list.php:60
@@ -9650,7 +9650,7 @@ msgstr ""
 
 #: app/partials/monitoring.host.view.html.php:35
 #: app/views/administration.proxy.edit.php:76
-#: app/views/configuration.host.list.php:189 disc_prototypes.php:40
+#: app/views/configuration.host.list.php:191 disc_prototypes.php:40
 #: host_discovery.php:47 include/classes/html/CHostAvailability.php:76
 #: items.php:38
 msgid "Interface"
@@ -10403,8 +10403,8 @@ msgstr "Položka s klíčem \"%1$s\" již existuje na \"%2$s\"."
 #: app/controllers/CControllerPopupImportCompare.php:168
 #: app/partials/dataoverview.table.top.php:29
 #: app/views/administration.queue.overview.php:45
-#: app/views/configuration.host.list.php:184
-#: app/views/configuration.host.list.php:425 app/views/popup.import.php:35
+#: app/views/configuration.host.list.php:186
+#: app/views/configuration.host.list.php:427 app/views/popup.import.php:35
 #: app/views/search.php:120 app/views/search.php:125 app/views/search.php:302
 #: app/views/search.php:307
 #: include/classes/widgets/forms/CWidgetFormPlainText.php:31
@@ -10412,8 +10412,8 @@ msgstr "Položka s klíčem \"%1$s\" již existuje na \"%2$s\"."
 #: include/views/configuration.host.discovery.list.php:194
 #: include/views/configuration.item.edit.php:27
 #: include/views/configuration.item.list.php:29
-#: include/views/configuration.template.list.php:118
-#: include/views/configuration.template.list.php:207
+#: include/views/configuration.template.list.php:120
+#: include/views/configuration.template.list.php:209
 #: include/views/inventory.host.view.php:182
 #: include/views/inventory.host.view.php:215 items.php:1157
 msgid "Items"
@@ -10885,11 +10885,11 @@ msgid "Linked map"
 msgstr "Mapa odkazů"
 
 #: include/views/configuration.template.list.php:64
-#: include/views/configuration.template.list.php:124
+#: include/views/configuration.template.list.php:126
 msgid "Linked templates"
 msgstr "Připojené šablony"
 
-#: include/views/configuration.template.list.php:125
+#: include/views/configuration.template.list.php:127
 msgid "Linked to templates"
 msgstr ""
 
@@ -11365,11 +11365,11 @@ msgstr "Maska"
 #: app/controllers/CControllerPopupMassupdateTemplate.php:378
 #: app/controllers/CControllerPopupMassupdateTrigger.php:235
 #: app/partials/service.list.edit.php:140
-#: app/views/configuration.host.list.php:516
+#: app/views/configuration.host.list.php:518
 #: include/classes/screens/CScreenProblem.php:1130
 #: include/views/configuration.item.list.php:309
 #: include/views/configuration.item.prototype.list.php:196
-#: include/views/configuration.template.list.php:279
+#: include/views/configuration.template.list.php:281
 #: include/views/configuration.trigger.prototype.list.php:202
 #: include/views/configuration.triggers.list.php:345
 msgid "Mass update"
@@ -11824,7 +11824,7 @@ msgstr "Po"
 msgid "Monday"
 msgstr "Pondělí"
 
-#: app/views/configuration.host.list.php:126
+#: app/views/configuration.host.list.php:128
 msgid "Monitored by"
 msgstr "Monitorováno"
 
@@ -11987,8 +11987,8 @@ msgstr "NTLM"
 #: app/views/administration.image.edit.php:45
 #: app/views/administration.mediatype.edit.php:49
 #: app/views/administration.mediatype.edit.php:153
-#: app/views/administration.mediatype.list.php:48
-#: app/views/administration.mediatype.list.php:78
+#: app/views/administration.mediatype.list.php:52
+#: app/views/administration.mediatype.list.php:82
 #: app/views/administration.module.edit.php:38
 #: app/views/administration.module.list.php:45
 #: app/views/administration.module.list.php:70
@@ -12023,8 +12023,8 @@ msgstr "NTLM"
 #: app/views/configuration.discovery.edit.php:43
 #: app/views/configuration.discovery.list.php:48
 #: app/views/configuration.discovery.list.php:73
-#: app/views/configuration.host.list.php:100
-#: app/views/configuration.host.list.php:173
+#: app/views/configuration.host.list.php:102
+#: app/views/configuration.host.list.php:175
 #: app/views/dashboard.page.properties.edit.php:36
 #: app/views/dashboard.properties.edit.php:63
 #: app/views/monitoring.dashboard.list.php:60
@@ -12097,7 +12097,7 @@ msgstr "NTLM"
 #: include/views/configuration.maintenance.list.php:85
 #: include/views/configuration.template.edit.php:69
 #: include/views/configuration.template.list.php:80
-#: include/views/configuration.template.list.php:114
+#: include/views/configuration.template.list.php:116
 #: include/views/configuration.trigger.prototype.edit.php:70
 #: include/views/configuration.trigger.prototype.edit.php:576
 #: include/views/configuration.trigger.prototype.list.php:58
@@ -12111,8 +12111,8 @@ msgstr "NTLM"
 #: include/views/js/monitoring.sysmaps.js.php:636
 #: include/views/monitoring.sysmap.edit.php:93
 #: include/views/monitoring.sysmap.edit.php:278
-#: include/views/monitoring.sysmap.list.php:47
-#: include/views/monitoring.sysmap.list.php:66 items.php:46 maintenance.php:40
+#: include/views/monitoring.sysmap.list.php:51
+#: include/views/monitoring.sysmap.list.php:70 items.php:46 maintenance.php:40
 #: report2.php:507 sysmaps.php:38 trigger_prototypes.php:37 triggers.php:45
 msgid "Name"
 msgstr "Jméno"
@@ -12800,10 +12800,10 @@ msgstr "Non-boolean flags jsou zastaralé."
 #: app/views/administration.usergroup.edit.php:134
 #: app/views/administration.userrole.edit.php:142
 #: app/views/administration.userrole.edit.php:183
-#: app/views/configuration.host.list.php:369
-#: app/views/configuration.host.list.php:375
-#: app/views/configuration.host.list.php:388
-#: app/views/configuration.host.list.php:391
+#: app/views/configuration.host.list.php:371
+#: app/views/configuration.host.list.php:377
+#: app/views/configuration.host.list.php:390
+#: app/views/configuration.host.list.php:393
 #: include/classes/widgets/CWidgetHelper.php:852
 #: include/classes/widgets/CWidgetHelper.php:927
 #: include/classes/widgets/CWidgetHelper.php:1186
@@ -13735,9 +13735,9 @@ msgstr "PROBLEM režim generování událostí"
 #: app/views/administration.proxy.edit.php:125
 #: app/views/administration.proxy.list.php:138
 #: app/views/administration.proxy.list.php:151
-#: app/views/configuration.host.list.php:378
-#: app/views/configuration.host.list.php:395
-#: app/views/configuration.host.list.php:398
+#: app/views/configuration.host.list.php:380
+#: app/views/configuration.host.list.php:397
+#: app/views/configuration.host.list.php:400
 #: app/views/popup.massupdate.host.php:232
 #: app/views/popup.massupdate.host.php:245
 #: app/views/popup.massupdate.host.php:260
@@ -14107,7 +14107,7 @@ msgstr "Vyplň pole host inventáře"
 #: app/views/administration.authentication.edit.php:169
 #: app/views/administration.proxy.edit.php:49
 #: app/views/administration.script.edit.php:162
-#: app/views/configuration.host.list.php:118
+#: app/views/configuration.host.list.php:120
 #: app/views/popup.itemtestedit.view.php:112 include/hosts.inc.php:1228
 #: include/views/inventory.host.view.php:81
 msgid "Port"
@@ -14396,8 +14396,8 @@ msgstr "Model Prometheus"
 msgid "Prometheus to JSON"
 msgstr "Prometheus na JSON"
 
-#: include/views/monitoring.sysmap.list.php:77
-#: include/views/monitoring.sysmap.list.php:78 jsLoader.php:143
+#: include/views/monitoring.sysmap.list.php:81
+#: include/views/monitoring.sysmap.list.php:82 jsLoader.php:143
 msgid "Properties"
 msgstr "Vlastnosti"
 
@@ -14424,9 +14424,9 @@ msgstr "Proxy"
 #: app/views/administration.queue.details.php:49
 #: app/views/administration.queue.overview.proxy.php:45
 #: app/views/configuration.discovery.list.php:78
-#: app/views/configuration.host.list.php:131
-#: app/views/configuration.host.list.php:136
-#: app/views/configuration.host.list.php:190
+#: app/views/configuration.host.list.php:133
+#: app/views/configuration.host.list.php:138
+#: app/views/configuration.host.list.php:192
 #: app/views/popup.condition.common.php:520
 #: app/views/popup.itemtestedit.view.php:237 include/actions.inc.php:62
 msgid "Proxy"
@@ -15489,17 +15489,17 @@ msgid "SMTP"
 msgstr "SMTP"
 
 #: app/views/administration.mediatype.edit.php:74
-#: app/views/administration.mediatype.list.php:92
+#: app/views/administration.mediatype.list.php:96
 msgid "SMTP email"
 msgstr "SMTP e-mail"
 
 #: app/views/administration.mediatype.edit.php:69
-#: app/views/administration.mediatype.list.php:91
+#: app/views/administration.mediatype.list.php:95
 msgid "SMTP helo"
 msgstr "SMTP helo"
 
 #: app/views/administration.mediatype.edit.php:61
-#: app/views/administration.mediatype.list.php:90
+#: app/views/administration.mediatype.list.php:94
 msgid "SMTP server"
 msgstr "SMTP server"
 
@@ -15835,7 +15835,7 @@ msgid "Script execution successful."
 msgstr ""
 
 #: app/views/administration.mediatype.edit.php:95
-#: app/views/administration.mediatype.list.php:96
+#: app/views/administration.mediatype.list.php:100
 msgid "Script name"
 msgstr "Název skriptu"
 
@@ -16072,7 +16072,7 @@ msgstr "Serif"
 #: app/controllers/CControllerQueueOverviewProxy.php:61
 #: app/controllers/CControllerWidgetClockView.php:115
 #: app/views/administration.script.list.php:167
-#: app/views/configuration.host.list.php:130
+#: app/views/configuration.host.list.php:132
 msgid "Server"
 msgstr "Server"
 
@@ -16779,8 +16779,8 @@ msgstr ""
 #: app/partials/scheduledreport.table.html.php:44
 #: app/partials/service.info.php:115 app/partials/service.list.edit.php:55
 #: app/partials/service.list.php:52
-#: app/views/administration.mediatype.list.php:53
-#: app/views/administration.mediatype.list.php:80
+#: app/views/administration.mediatype.list.php:57
+#: app/views/administration.mediatype.list.php:84
 #: app/views/administration.module.list.php:50
 #: app/views/administration.module.list.php:78
 #: app/views/administration.token.list.php:91
@@ -16795,7 +16795,7 @@ msgstr ""
 #: app/views/configuration.correlation.list.php:78
 #: app/views/configuration.discovery.list.php:53
 #: app/views/configuration.discovery.list.php:81
-#: app/views/configuration.host.list.php:176
+#: app/views/configuration.host.list.php:178
 #: app/views/hintbox.eventlist.php:74
 #: app/views/monitoring.widget.actionlog.view.php:38
 #: app/views/monitoring.widget.problems.view.php:56
@@ -17198,8 +17198,8 @@ msgstr "Hodnota značky"
 #: app/partials/monitoring.latest.view.html.php:71
 #: app/partials/monitoring.problem.filter.php:231
 #: app/partials/service.info.php:126 app/partials/service.list.edit.php:58
-#: app/partials/service.list.php:55 app/views/configuration.host.list.php:156
-#: app/views/configuration.host.list.php:196
+#: app/partials/service.list.php:55 app/views/configuration.host.list.php:158
+#: app/views/configuration.host.list.php:198
 #: app/views/hintbox.eventlist.php:77 app/views/monitoring.latest.view.php:90
 #: app/views/monitoring.web.view.php:87
 #: app/views/monitoring.widget.problems.view.php:68
@@ -17241,7 +17241,7 @@ msgstr "Hodnota značky"
 #: include/views/configuration.maintenance.edit.php:247
 #: include/views/configuration.template.edit.php:179
 #: include/views/configuration.template.list.php:83
-#: include/views/configuration.template.list.php:126
+#: include/views/configuration.template.list.php:128
 #: include/views/configuration.trigger.prototype.edit.php:560
 #: include/views/configuration.trigger.prototype.list.php:63
 #: include/views/configuration.triggers.edit.php:585
@@ -17373,8 +17373,8 @@ msgstr "Šablona se stejným viditelným jménem \"%1$s\" již existuje."
 #: app/partials/configuration.filter.items.php:72
 #: app/partials/configuration.host.edit.html.php:210
 #: app/partials/popup.operations.php:212
-#: app/views/configuration.host.list.php:81
-#: app/views/configuration.host.list.php:191
+#: app/views/configuration.host.list.php:83
+#: app/views/configuration.host.list.php:193
 #: app/views/popup.condition.common.php:357 app/views/popup.import.php:31
 #: app/views/search.php:223 app/views/search.php:227 app/views/search.php:369
 #: include/classes/helpers/CMenuHelper.php:173
@@ -17408,7 +17408,7 @@ msgstr "Šablony aktualizovány"
 #: app/controllers/CControllerPopupTestTriggerExpr.php:212
 #: app/partials/scheduledreport.formgrid.html.php:211
 #: app/views/administration.authentication.edit.php:339
-#: app/views/administration.mediatype.list.php:146
+#: app/views/administration.mediatype.list.php:150
 #: app/views/administration.regex.edit.php:140
 #: app/views/js/popup.itemtestedit.view.js.php:571
 #: app/views/popup.itemtestedit.view.php:432
@@ -17937,7 +17937,7 @@ msgstr "Spouštěč \"%1$s\" již existuje na \"%2$s\"."
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
 msgstr "Spouštěč \"%1$s\" patří do šablony s různými vazbami."
 
-#: include/classes/import/CConfigurationImport.php:1830
+#: include/classes/import/CConfigurationImport.php:1840
 #, c-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Spouštěč \"%1$s\" závisí na jiném spouštěči \"%2$s\", který neexistuje."
@@ -18047,7 +18047,7 @@ msgstr "Prototype spouštěče \"%1$s\" patří do šablony s různými vazbami.
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
 msgstr "Prototyp spouštěče \"%1$s\" obsahuje prototypy položek z různých pravidel objevování."
 
-#: include/classes/import/CConfigurationImport.php:1511
+#: include/classes/import/CConfigurationImport.php:1521
 #, c-format
 msgid "Trigger prototype \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Trigger prototyp \"%1$s\" závisí na spouštěči \"%2$s\", který neexistuje."
@@ -18119,16 +18119,16 @@ msgstr "Spouštěč byl aktualizován"
 #: app/partials/configuration.filter.items.php:191
 #: app/partials/monitoring.problem.filter.php:74
 #: app/partials/trigoverview.table.top.php:29
-#: app/views/configuration.host.list.php:185
-#: app/views/configuration.host.list.php:434
+#: app/views/configuration.host.list.php:187
+#: app/views/configuration.host.list.php:436
 #: app/views/popup.condition.common.php:208 app/views/popup.import.php:37
 #: app/views/search.php:131 app/views/search.php:136 app/views/search.php:312
 #: app/views/search.php:317 include/html.inc.php:341
 #: include/views/configuration.host.discovery.list.php:195
 #: include/views/configuration.item.list.php:86
 #: include/views/configuration.item.list.php:222
-#: include/views/configuration.template.list.php:119
-#: include/views/configuration.template.list.php:216
+#: include/views/configuration.template.list.php:121
+#: include/views/configuration.template.list.php:218
 #: include/views/configuration.triggers.edit.php:28
 #: include/views/configuration.triggers.list.php:146
 #: include/views/inventory.host.view.php:188
@@ -18181,7 +18181,7 @@ msgstr ""
 #: app/partials/monitoring.latest.view.html.php:54
 #: app/views/administration.image.list.php:38
 #: app/views/administration.mediatype.edit.php:55
-#: app/views/administration.mediatype.list.php:79
+#: app/views/administration.mediatype.list.php:83
 #: app/views/administration.script.edit.php:112
 #: app/views/administration.script.list.php:77
 #: app/views/administration.user.edit.php:294
@@ -18735,7 +18735,7 @@ msgstr "Použít pro závažnost"
 msgid "Use iframe sandboxing"
 msgstr ""
 
-#: app/views/administration.mediatype.list.php:81
+#: app/views/administration.mediatype.list.php:85
 #: app/views/administration.script.list.php:76
 msgid "Used in actions"
 msgstr "Používané v akcích"
@@ -19646,12 +19646,12 @@ msgstr "Je nám líto, maximální počet elementů na zapamatování byl již d
 #: app/partials/monitoring.host.view.html.php:43
 #: app/partials/monitoring.host.view.html.php:152
 #: app/partials/monitoring.host.view.html.php:160
-#: app/views/configuration.host.list.php:188
-#: app/views/configuration.host.list.php:461 app/views/search.php:110
+#: app/views/configuration.host.list.php:190
+#: app/views/configuration.host.list.php:463 app/views/search.php:110
 #: app/views/search.php:116 app/views/search.php:158 app/views/search.php:163
 #: app/views/search.php:255 app/views/search.php:261 app/views/search.php:347
-#: app/views/search.php:352 include/views/configuration.template.list.php:123
-#: include/views/configuration.template.list.php:252
+#: app/views/search.php:352 include/views/configuration.template.list.php:125
+#: include/views/configuration.template.list.php:254
 #: include/views/inventory.host.view.php:138
 #: include/views/inventory.host.view.php:143
 #: include/views/inventory.host.view.php:206
@@ -19787,7 +19787,7 @@ msgstr ""
 #: include/views/js/monitoring.sysmaps.js.php:417
 #: include/views/js/monitoring.sysmaps.js.php:459
 #: include/views/monitoring.sysmap.edit.php:100
-#: include/views/monitoring.sysmap.list.php:67 sysmaps.php:39
+#: include/views/monitoring.sysmap.list.php:71 sysmaps.php:39
 msgid "Width"
 msgstr "Šířka"
 
@@ -20655,10 +20655,10 @@ msgstr "nemůže být změněno"
 #: include/classes/api/services/CUserGroup.php:462
 #: include/classes/api/services/CUser.php:759
 #: include/classes/api/services/CUser.php:919
-#: include/classes/import/CConfigurationImport.php:744
-#: include/classes/import/CConfigurationImport.php:977
-#: include/classes/import/CConfigurationImport.php:1131
-#: include/classes/import/CConfigurationImport.php:2828
+#: include/classes/import/CConfigurationImport.php:746
+#: include/classes/import/CConfigurationImport.php:981
+#: include/classes/import/CConfigurationImport.php:1137
+#: include/classes/import/CConfigurationImport.php:2838
 #: include/classes/validators/CActionCondValidator.php:66
 #: include/classes/validators/CActionCondValidator.php:72
 #: include/classes/validators/CActionCondValidator.php:83
@@ -20749,7 +20749,7 @@ msgid "circular dependency is not allowed"
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:2316
-#: include/classes/import/CConfigurationImport.php:2843
+#: include/classes/import/CConfigurationImport.php:2853
 msgid "circular item dependency is not allowed"
 msgstr "zacyklená provázanost položek není povolena"
 
@@ -21393,8 +21393,8 @@ msgid "maximum dependent items count reached"
 msgstr "maximální počet závislých položek dosažen"
 
 #: include/classes/api/services/CItemGeneral.php:2396
-#: include/classes/import/CConfigurationImport.php:2791
-#: include/classes/import/CConfigurationImport.php:2858
+#: include/classes/import/CConfigurationImport.php:2801
+#: include/classes/import/CConfigurationImport.php:2868
 msgid "maximum number of dependency levels reached"
 msgstr "maximální počet úrovní závislostí dosažen"
 
@@ -22229,11 +22229,11 @@ msgstr "hodnota"
 msgid "value \"%1$s\" already exists"
 msgstr "hodnota \"%1$s\" již existuje"
 
-#: include/classes/import/CConfigurationImport.php:839
-#: include/classes/import/CConfigurationImport.php:876
-#: include/classes/import/CConfigurationImport.php:2687
-#: include/classes/import/CConfigurationImport.php:2801
-#: include/classes/import/CConfigurationImport.php:2852
+#: include/classes/import/CConfigurationImport.php:843
+#: include/classes/import/CConfigurationImport.php:880
+#: include/classes/import/CConfigurationImport.php:2697
+#: include/classes/import/CConfigurationImport.php:2811
+#: include/classes/import/CConfigurationImport.php:2862
 #, c-format
 msgid "value \"%1$s\" not found"
 msgstr "hodnota \"%1$s\" nebyla nalezena"
