@@ -123,7 +123,7 @@ foreach ($data['items'] as $itemid => $item) {
 		$last_value = (new CSpan(formatHistoryValue($last_history['value'], $item, false)))
 			->addClass(ZBX_STYLE_CURSOR_POINTER)
 			->setHint(
-				(new CDiv(mb_substr($last_history['value'], 0, 8000)))->addClass(ZBX_STYLE_HINTBOX_WRAP),
+				(new CDiv(mb_substr($last_history['value'], 0, ZBX_HINTBOX_CONTENT_LIMIT)))->addClass(ZBX_STYLE_HINTBOX_WRAP),
 				'', true, '', 0
 			);
 
