@@ -1875,6 +1875,18 @@ static int	DBpatch_5050141(void)
 
 	return FAIL;
 }
+
+static int	DBpatch_5050142(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx like 'web.latest.filter.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(5050)
@@ -2010,5 +2022,6 @@ DBPATCH_ADD(5050138, 0, 1)
 DBPATCH_ADD(5050139, 0, 1)
 DBPATCH_ADD(5050140, 0, 1)
 DBPATCH_ADD(5050141, 0, 1)
+DBPATCH_ADD(5050142, 0, 1)
 
 DBPATCH_END()

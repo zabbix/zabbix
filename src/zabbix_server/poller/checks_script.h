@@ -20,7 +20,7 @@
 #ifndef ZABBIX_CHECKS_SCRIPT_H
 #define ZABBIX_CHECKS_SCRIPT_H
 
-#include "common.h"
+#include "module.h"
 #include "dbcache.h"
 
 void	scriptitem_es_engine_init(void);

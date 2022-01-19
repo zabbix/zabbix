@@ -21,6 +21,7 @@
 
 /**
  * @var CPartial $this
+ * @var array    $data
  */
 
 $form = (new CForm('GET', 'history.php'))
@@ -43,6 +44,27 @@ $col_name = make_sorting_header(_('Name'), 'name', $data['sort_field'], $data['s
 $simple_interval_parser = new CSimpleIntervalParser();
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 
+if ($data['filter']['show_tags'] == SHOW_TAGS_NONE) {
+	$tags_header = null;
+}
+else {
+	$tags_header = new CColHeader(_('Tags'));
+
+	switch ($data['filter']['show_tags']) {
+		case SHOW_TAGS_1:
+			$tags_header->addClass(ZBX_STYLE_COLUMN_TAGS_1);
+			break;
+
+		case SHOW_TAGS_2:
+			$tags_header->addClass(ZBX_STYLE_COLUMN_TAGS_2);
+			break;
+
+		case SHOW_TAGS_3:
+			$tags_header->addClass(ZBX_STYLE_COLUMN_TAGS_3);
+			break;
+	}
+}
+
 if ($data['filter']['show_details']) {
 	$table->setHeader([
 		$col_check_all->addStyle('width: 15px;'),
@@ -55,7 +77,7 @@ if ($data['filter']['show_details']) {
 		(new CColHeader(_('Last check')))->addStyle('width: 14%'),
 		(new CColHeader(_('Last value')))->addStyle('width: 14%'),
 		(new CColHeader(_x('Change', 'noun')))->addStyle('width: 10%'),
-		(new CColHeader(_('Tags')))->addClass(ZBX_STYLE_COLUMN_TAGS_3),
+		$tags_header,
 		(new CColHeader())->addStyle('width: 6%'),
 		(new CColHeader(_('Info')))->addStyle('width: 35px')
 	]);
@@ -68,7 +90,7 @@ else {
 		(new CColHeader(_('Last check')))->addStyle('width: 14%'),
 		(new CColHeader(_('Last value')))->addStyle('width: 14%'),
 		(new CColHeader(_x('Change', 'noun')))->addStyle('width: 10%'),
-		(new CColHeader(_('Tags')))->addClass(ZBX_STYLE_COLUMN_TAGS_3),
+		$tags_header,
 		(new CColHeader())->addStyle('width: 6%'),
 		(new CColHeader(_('Info')))->addStyle('width: 35px')
 	]);
@@ -81,7 +103,8 @@ foreach ($data['items'] as $itemid => $item) {
 	$state_css = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? ZBX_STYLE_GREY : null;
 
 	$item_name = (new CDiv([
-		(new CSpan($item['name']))->addClass('label'),
+		(new CLinkAction($item['name']))
+			->setMenuPopup(CMenuPopupHelper::getItem(['itemid' => $itemid])),
 		($item['description_expanded'] !== '') ? makeDescriptionIcon($item['description_expanded']) : null
 	]))->addClass('action-container');
 
@@ -100,7 +123,7 @@ foreach ($data['items'] as $itemid => $item) {
 		$last_value = (new CSpan(formatHistoryValue($last_history['value'], $item, false)))
 			->addClass(ZBX_STYLE_CURSOR_POINTER)
 			->setHint(
-				(new CDiv(mb_substr($last_history['value'], 0, 8000)))->addClass(ZBX_STYLE_HINTBOX_WRAP),
+				(new CDiv(mb_substr($last_history['value'], 0, ZBX_HINTBOX_CONTENT_LIMIT)))->addClass(ZBX_STYLE_HINTBOX_WRAP),
 				'', true, '', 0
 			);
 
@@ -198,16 +221,7 @@ foreach ($data['items'] as $itemid => $item) {
 	}
 
 	if ($data['filter']['show_details']) {
-		$item_config_url = (new CUrl('items.php'))
-			->setArgument('form', 'update')
-			->setArgument('itemid', $itemid)
-			->setArgument('context', 'host');
-
-		$item_key = ($item['type'] == ITEM_TYPE_HTTPTEST)
-			? (new CSpan($item['key_expanded']))->addClass(ZBX_STYLE_GREEN)
-			: (new CLink($item['key_expanded'], $item_config_url))
-				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(ZBX_STYLE_GREEN);
+		$item_key = (new CSpan($item['key_expanded']))->addClass(ZBX_STYLE_GREEN);
 
 		if (in_array($item['type'], [ITEM_TYPE_SNMPTRAP, ITEM_TYPE_TRAPPER, ITEM_TYPE_DEPENDENT])
 				|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_expanded'], 'mqtt.get', 8) === 0)) {
@@ -235,7 +249,7 @@ foreach ($data['items'] as $itemid => $item) {
 			(new CCol($last_check))->addClass($state_css),
 			(new CCol($last_value))->addClass($state_css),
 			(new CCol($change))->addClass($state_css),
-			$data['tags'][$itemid],
+			($data['filter']['show_tags'] != SHOW_TAGS_NONE) ? $data['tags'][$itemid] : null,
 			$actions,
 			makeInformationList($item_icons)
 		]);
@@ -248,7 +262,7 @@ foreach ($data['items'] as $itemid => $item) {
 			(new CCol($last_check))->addClass($state_css),
 			(new CCol($last_value))->addClass($state_css),
 			(new CCol($change))->addClass($state_css),
-			$data['tags'][$itemid],
+			($data['filter']['show_tags'] != SHOW_TAGS_NONE) ? $data['tags'][$itemid] : null,
 			$actions,
 			makeInformationList($item_icons)
 		]);

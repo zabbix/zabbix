@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-16T20:03:53Z'
+  date: '2022-01-18T20:40:28Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -14,18 +14,84 @@ zabbix_export:
         Template Server HP iLO
         
         MIBs used:
-        CPQSINFO-MIB
         CPQHLTH-MIB
+        SNMPv2-MIB
+        CPQSINFO-MIB
         CPQIDA-MIB
         
-        Template tooling version used: 0.40
-      templates:
-        -
-          name: 'Generic SNMP'
+        Template tooling version used: 0.41
       groups:
         -
           name: 'Templates/Server hardware'
       items:
+        -
+          uuid: 5abff4175d1640b9b633c4d9184bd243
+          name: 'ICMP ping'
+          type: SIMPLE
+          key: icmpping
+          history: 1w
+          valuemap:
+            name: 'Service state'
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 755a4c5e809d418cbb1162102b0d1c26
+              expression: 'max(/HP iLO SNMP/icmpping,#3)=0'
+              name: 'Unavailable by ICMP ping'
+              priority: HIGH
+              description: 'Last three attempts returned timeout.  Please check device connectivity.'
+        -
+          uuid: 1db2fcdd357e4d15a989c0511bbed8bd
+          name: 'ICMP loss'
+          type: SIMPLE
+          key: icmppingloss
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 0492380bc6374f24b92b4661b27d8f2c
+              expression: 'min(/HP iLO SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/HP iLO SNMP/icmppingloss,5m)<100'
+              name: 'High ICMP ping loss'
+              opdata: 'Loss: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'Unavailable by ICMP ping'
+                  expression: 'max(/HP iLO SNMP/icmpping,#3)=0'
+        -
+          uuid: 8be612f43d1d40ce9efd3c36d18e6a20
+          name: 'ICMP response time'
+          type: SIMPLE
+          key: icmppingsec
+          history: 1w
+          value_type: FLOAT
+          units: s
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: a869db9f341c479c80dca50bac0ff309
+              expression: 'avg(/HP iLO SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
+              name: 'High ICMP ping response time'
+              opdata: 'Value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'High ICMP ping loss'
+                  expression: 'min(/HP iLO SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/HP iLO SNMP/icmppingloss,5m)<100'
+                -
+                  name: 'Unavailable by ICMP ping'
+                  expression: 'max(/HP iLO SNMP/icmpping,#3)=0'
         -
           uuid: 399110973c134983bd5020b9e5b509f4
           name: 'System: Temperature status'
@@ -53,6 +119,67 @@ zabbix_export:
             -
               tag: Application
               value: Temperature
+        -
+          uuid: 0107bcd0d6b840c4a64061ee83e69f11
+          name: 'SNMP traps (fallback)'
+          type: SNMP_TRAP
+          key: snmptrap.fallback
+          history: 2w
+          trends: '0'
+          value_type: LOG
+          description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items'
+          logtimefmt: 'hh:mm:sszyyyy/MM/dd'
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 2203e586148a418f9e2f06b38c340b53
+          name: 'System contact details'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.4.0
+          key: 'system.contact[sysContact.0]'
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.
+          inventory_link: CONTACT
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 03ff0b6d9c7a483eaae565d90473d291
+          name: 'System description'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.1.0
+          key: 'system.descr[sysDescr.0]'
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            A textual description of the entity. This value should
+            include the full name and version identification of the system's hardware type, software operating-system, and
+            networking software.
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
+          tags:
+            -
+              tag: Application
+              value: General
         -
           uuid: 2708e6cb2ba240a791685ebdcab3407f
           name: 'Hardware model name'
@@ -106,6 +233,82 @@ zabbix_export:
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
         -
+          uuid: 84ed489ba1be43738be79f8a71b60381
+          name: 'System location'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.6.0
+          key: 'system.location[sysLocation.0]'
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.
+          inventory_link: LOCATION
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 88baf9f1da184fc78a49b064f0b4de85
+          name: 'System name'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.5.0
+          key: system.name
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            An administratively-assigned name for this managed node.By convention, this is the node's fully-qualified domain name.  If the name is unknown, the value is the zero-length string.
+          inventory_link: NAME
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
+          tags:
+            -
+              tag: Application
+              value: General
+          triggers:
+            -
+              uuid: df3c9e64b0f844ddac8f40f6df956595
+              expression: 'last(/HP iLO SNMP/system.name,#1)<>last(/HP iLO SNMP/system.name,#2) and length(last(/HP iLO SNMP/system.name))>0'
+              name: 'System name has changed (new name: {ITEM.VALUE})'
+              priority: INFO
+              description: 'System name has changed. Ack to close.'
+              manual_close: 'YES'
+        -
+          uuid: d02b8e2d5c7a4afabc2fbadc8674288c
+          name: 'System object ID'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.2.0
+          key: 'system.objectid[sysObjectID.0]'
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            The vendor's authoritative identification of the network management subsystem contained in the entity.  This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
+          tags:
+            -
+              tag: Application
+              value: General
+        -
           uuid: 5f30715570c449ecb4e07858256a3e05
           name: 'Overall system health status'
           type: SNMP_AGENT
@@ -146,6 +349,70 @@ zabbix_export:
                 -
                   name: 'System status is in critical state'
                   expression: 'count(/HP iLO SNMP/system.status[cpqHeMibCondition.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1'
+        -
+          uuid: 05166eb015534cae9798f9266d3d0a6b
+          name: Uptime
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.3.0
+          key: 'system.uptime[sysUpTime.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: SNMPv2-MIB
+            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 261749b9936c4a26b48d660f01435fb7
+              expression: 'last(/HP iLO SNMP/system.uptime[sysUpTime.0])<10m'
+              name: '{HOST.NAME} has been restarted (uptime < 10m)'
+              priority: WARNING
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'No SNMP data collection'
+                  expression: 'max(/HP iLO SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+        -
+          uuid: e5ebd75f34f24502b3cdc2a707fb24c5
+          name: 'SNMP agent availability'
+          type: INTERNAL
+          key: 'zabbix[host,snmp,available]'
+          history: 7d
+          description: |
+            Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.
+            Possible value:
+            0 - not available
+            1 - available
+            2 - unknown
+          valuemap:
+            name: zabbix.host.available
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 8870beab300f41ea8d54619fd2bf0371
+              expression: 'max(/HP iLO SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              name: 'No SNMP data collection'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
+              dependencies:
+                -
+                  name: 'Unavailable by ICMP ping'
+                  expression: 'max(/HP iLO SNMP/icmpping,#3)=0'
       discovery_rules:
         -
           uuid: 7589f2f30c7e4cf88bb7cd1d57f543a4
@@ -1552,11 +1819,20 @@ zabbix_export:
           macro: '{$HEALTH_WARN_STATUS}'
           value: '3'
         -
+          macro: '{$ICMP_LOSS_WARN}'
+          value: '20'
+        -
+          macro: '{$ICMP_RESPONSE_TIME_WARN}'
+          value: '0.15'
+        -
           macro: '{$PSU_CRIT_STATUS}'
           value: '4'
         -
           macro: '{$PSU_WARN_STATUS}'
           value: '3'
+        -
+          macro: '{$SNMP.TIMEOUT}'
+          value: 5m
         -
           macro: '{$VDISK_CRIT_STATUS}'
           value: '3'
@@ -2112,3 +2388,26 @@ zabbix_export:
             -
               value: '4'
               newvalue: failed
+        -
+          uuid: 98d8b8c35272455281f6ae0775691117
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up
+        -
+          uuid: 1d84ec840bfb4ca0a8e98d11008e8423
+          name: zabbix.host.available
+          mappings:
+            -
+              value: '0'
+              newvalue: 'not available'
+            -
+              value: '1'
+              newvalue: available
+            -
+              value: '2'
+              newvalue: unknown

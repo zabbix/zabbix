@@ -16,12 +16,10 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
 #include "common.h"
 #include "module.h"
 #include "sysinfo.h"
 #include "log.h"
-#include "cfg.h"
 #include "alias.h"
 #include "threads.h"
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
@@ -30,12 +28,14 @@
 #include "zbxalgo.h"
 #include "zbxregexp.h"
 
+extern int	CONFIG_TIMEOUT;
+
 #ifdef WITH_AGENT_METRICS
 #	include "agent/agent.h"
 #endif
 
 #ifdef WITH_COMMON_METRICS
-#	include "common/common.h"
+	#include "common/zbxsysinfo_common.h"
 #endif
 
 #ifdef WITH_HTTP_METRICS

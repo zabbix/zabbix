@@ -18,14 +18,13 @@
 **/
 
 #include "common.h"
-#include "sysinfo.h"
 #include "zbxregexp.h"
 #include "zbxhttp.h"
-
 #include "comms.h"
-#include "cfg.h"
 
 #include "http.h"
+
+extern int	CONFIG_TIMEOUT;
 
 #define HTTP_SCHEME_STR		"http://"
 

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-16T08:28:15Z'
+  date: '2022-01-18T20:38:37Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -16,14 +16,79 @@ zabbix_export:
         MIBs used:
         SNMPv2-MIB
         
-        Template tooling version used: 0.40
-      templates:
-        -
-          name: 'ICMP Ping'
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Modules
       items:
+        -
+          uuid: 0db3c804c6174c018071e15cbc8c56ae
+          name: 'ICMP ping'
+          type: SIMPLE
+          key: icmpping
+          history: 1w
+          valuemap:
+            name: 'Service state'
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 085d6f785f1e46faa447d6921036d01d
+              expression: 'max(/Generic SNMP/icmpping,#3)=0'
+              name: 'Unavailable by ICMP ping'
+              priority: HIGH
+              description: 'Last three attempts returned timeout.  Please check device connectivity.'
+        -
+          uuid: 5d306c51188e496ba19b75b99e28cc7b
+          name: 'ICMP loss'
+          type: SIMPLE
+          key: icmppingloss
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: d1bd868814ba4ace9b5034ac4e303259
+              expression: 'min(/Generic SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Generic SNMP/icmppingloss,5m)<100'
+              name: 'High ICMP ping loss'
+              opdata: 'Loss: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'Unavailable by ICMP ping'
+                  expression: 'max(/Generic SNMP/icmpping,#3)=0'
+        -
+          uuid: 9ad39c8c6ede46e6953aa6f9466eaf69
+          name: 'ICMP response time'
+          type: SIMPLE
+          key: icmppingsec
+          history: 1w
+          value_type: FLOAT
+          units: s
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: ecd74ec29b484a499414293bf671160b
+              expression: 'avg(/Generic SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
+              name: 'High ICMP ping response time'
+              opdata: 'Value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'High ICMP ping loss'
+                  expression: 'min(/Generic SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Generic SNMP/icmppingloss,5m)<100'
+                -
+                  name: 'Unavailable by ICMP ping'
+                  expression: 'max(/Generic SNMP/icmpping,#3)=0'
         -
           uuid: 2cda26906f254e13985cecdbb7901d1a
           name: 'SNMP traps (fallback)'
@@ -227,9 +292,25 @@ zabbix_export:
                   expression: 'max(/Generic SNMP/icmpping,#3)=0'
       macros:
         -
+          macro: '{$ICMP_LOSS_WARN}'
+          value: '20'
+        -
+          macro: '{$ICMP_RESPONSE_TIME_WARN}'
+          value: '0.15'
+        -
           macro: '{$SNMP.TIMEOUT}'
           value: 5m
       valuemaps:
+        -
+          uuid: 1817725a41454fd3b9ad22feaf889fc5
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up
         -
           uuid: ced60845a741400390ba002e69e26b0f
           name: zabbix.host.available
