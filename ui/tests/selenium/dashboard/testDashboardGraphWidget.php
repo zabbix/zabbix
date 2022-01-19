@@ -1478,7 +1478,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'host' => 'Two host',
 							'item' => 'Two item',
 							'color' => [
-								'id:lbl_ds_0_color' => '000000'
+								'id:lbl_ds_1_color' => '000000'
 							],
 							'Y-axis' => 'Right',
 							'Draw' => 'Points',
@@ -1757,20 +1757,19 @@ class testDashboardGraphWidget extends CWebTest {
 							'host' => 'One host',
 							'item' => 'One item',
 							'Y-axis' => 'Left',
-// TODO: fix hex field
-//							'Base color' => '009688',
 							'Draw' => 'Staircase',
 							'Width' => '10',
 							'Transparency' => '10',
 							'Fill' => '10',
 							'Missing data' => 'Connected',
-							'Time shift' => '0'
+							'Time shift' => '0',
+							'color' => [
+								'id:lbl_ds_0_color' => '009688'
+							]
 						],
 						[
 							'host' => 'Two host',
 							'item' => 'Two item',
-// TODO: fix hex field
-//							'Base color' => '000000',
 							'Y-axis' => 'Right',
 							'Draw' => 'Bar',
 							'Transparency' => '10',
@@ -1778,7 +1777,10 @@ class testDashboardGraphWidget extends CWebTest {
 							'Time shift' => '-1s',
 							'Aggregation function' => 'avg',
 							'Aggregation interval' => '5h',
-							'Aggregate' => 'Data set'
+							'Aggregate' => 'Data set',
+							'color' => [
+								'id:lbl_ds_1_color' => '000000'
+							]
 						]
 					],
 					'Displaying options' => [
@@ -1823,12 +1825,9 @@ class testDashboardGraphWidget extends CWebTest {
 						[
 							'host' => 'One host',
 							'item' => 'One item',
-// TODO: fix hex field
-//							'color' => '000000',
 							'time_shift' => '-5s',
 							'options' => [
-// TODO: fix hex field
-//								'Base color',
+								'Base color',
 								['Width', '0'],
 								['Draw', 'Line'],
 								['Transparency', '0'],
@@ -1837,17 +1836,17 @@ class testDashboardGraphWidget extends CWebTest {
 								['Missing data', 'None'],
 								['Y-axis', 'Right'],
 								'Time shift'
+							],
+							'color' => [
+								'id:lbl_or_0__color_' => '000000 '
 							]
 						],
 						[
 							'host' => 'Two host',
 							'item' => 'Two item',
-// TODO: fix hex field
-//							'color' => 'FFFFFF',
 							'time_shift' => '5s',
 							'options' => [
-// TODO: fix hex field
-//								'Base color',
+								'Base color',
 								['Width', '1'],
 								['Draw', 'Bar'],
 								['Transparency', '2'],
@@ -1856,6 +1855,9 @@ class testDashboardGraphWidget extends CWebTest {
 								['Missing data', 'Connected'],
 								['Y-axis', 'Left'],
 								'Time shift'
+							],
+							'color' => [
+								'id:lbl_or_0__color_' => 'FFFFFF '
 							]
 						]
 					],
