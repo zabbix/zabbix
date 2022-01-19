@@ -93,7 +93,7 @@
 
 	function handleFormSubmit(e, overlay) {
 		let url = new Curl(e.target.getAttribute('action'));
-		let body_selector = `.overlay-dialogue[data-dialogueid='${overlay.dialogueid}'] .overlay-dialogue-body`;
+		//let body_selector = `.overlay-dialogue[data-dialogueid='${overlay.dialogueid}'] .overlay-dialogue-body`;
 
 		fetch(url.getUrl(), {
 				method: 'POST',
@@ -101,25 +101,32 @@
 			})
 			.then(response => response.json())
 			.then(response => {
-				overlay.$dialogue.find('.msg-bad, .msg-good').remove();
-
-				if (response.errors) {
-					document
-						.querySelector(body_selector)
-						.prepend($(response.errors).get(0));
-					overlay.unsetLoading();
-
-					return;
+				if ('errors' in response) {
+					throw {html_string: response.errors};
 				}
 
 				overlayDialogueDestroy(overlay.dialogueid);
 
 				overlay.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 			})
-			.catch((e) => {
-				document
-					.querySelector(body_selector)
-					.prepend(makeMessageBox('bad', e, null)[0]);
+			.catch((error) => {
+				overlay.$dialogue.find('.msg-bad, .msg-good').remove();
+
+				let message_box;
+
+				if (typeof error === 'object' && 'html_string' in error) {
+					message_box = new DOMParser().parseFromString(error.html_string, 'text/html').body.
+						firstElementChild;
+				}
+				else {
+					const error = <?= json_encode(_('Unexpected server error.')) ?>;
+
+					message_box = makeMessageBox('bad', [], error, true, false)[0];
+				}
+
+				this.parentNode.insertBefore(message_box, this);
+			})
+			.finally(() => {
 				overlay.unsetLoading();
 			});
 	}
