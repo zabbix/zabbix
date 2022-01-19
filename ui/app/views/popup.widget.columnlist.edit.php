@@ -61,6 +61,16 @@ $form_grid->addItem([
 	)
 ]);
 
+// Static text.
+$form_grid->addItem([
+	new CLabel(_('Text'), 'text'),
+	new CFormField(
+		(new CTextBox('text', $data['text']))
+			->setAttribute('placeholder', _('Text, supports {INVENTORY.*}, {HOST.*} macros'))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+]);
+
 // Item.
 $item_select = (new CPatternSelect([
 		'name' => 'item',
@@ -151,16 +161,6 @@ $form_grid->addItem([
 $form_grid->addItem([
 	new CLabel(_('Base color'), 'base_color'),
 	new CFormField(new CColor('base_color', $data['base_color']))
-]);
-
-// Static text.
-$form_grid->addItem([
-	new CLabel(_('Text'), 'text'),
-	new CFormField(
-		(new CTextBox('text', $data['text']))
-			->setAttribute('placeholder', _('Text, supports {INVENTORY.*}, {HOST.*} macros'))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	)
 ]);
 
 // Min value.
