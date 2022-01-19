@@ -310,9 +310,7 @@
 				let i = 0;
 
 				$(this).find('li.sortable').each(function() {
-					const $sortorder = $(this).find('[name*="sortorder"]');
-
-					$($sortorder[0]).val(i++);
+					$(this).find('[name*="sortorder"]').val(i++);
 				});
 			}
 		});
@@ -322,12 +320,12 @@
 		$preprocessing
 			.on('click', '.element-table-add', function() {
 				let sortable_count = $preprocessing.find('li.sortable').length;
-				const preproc_row_tmpl = new Template($('#preprocessing-steps-tmpl').html()),
-					$row = $(preproc_row_tmpl.evaluate({
-						rowNum: step_index,
-						sortorder: sortable_count++
-					}));
-					type = $('z-select[name*="type"]', $row).val();
+				const preproc_row_tmpl = new Template($('#preprocessing-steps-tmpl').html());
+				const $row = $(preproc_row_tmpl.evaluate({
+					rowNum: step_index,
+					sortorder: sortable_count++
+				}));
+				const type = $('z-select[name*="type"]', $row).val();
 
 				$('.step-parameters', $row).html(makeParameterInput(step_index, type));
 				$(this).closest('.preprocessing-list-foot').before($row);
@@ -387,9 +385,7 @@
 					let i = 0;
 
 					$preprocessing.find('li.sortable').each(function() {
-						const $sortorder = $(this).find('[name*="sortorder"]');
-
-						$($sortorder[0]).val(i++);
+						$(this).find('[name*="sortorder"]').val(i++);
 					});
 				}
 
