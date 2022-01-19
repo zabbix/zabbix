@@ -1643,7 +1643,7 @@ static int	eval_execute_function_concat(const zbx_eval_context_t *ctx, const zbx
 		zbx_vector_var_t *output, char **error)
 {
 	int		i, ret;
-	zbx_variant_t	*arg, value;
+	zbx_variant_t	value;
 	char		*result = NULL;
 
 	if (2 > token->opt)
@@ -1656,8 +1656,10 @@ static int	eval_execute_function_concat(const zbx_eval_context_t *ctx, const zbx
 	if (UNKNOWN != (ret = eval_validate_function_args(ctx, token, output, error)))
 		return ret;
 
-	for (i = output->values_num - token->opt; i < output->values_num; i++)
+	for (i = output->values_num - (int)token->opt; i < output->values_num; i++)
 	{
+		zbx_variant_t	*arg;
+
 		arg = &output->values[i];
 
 		if (SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_STR, arg, error))
