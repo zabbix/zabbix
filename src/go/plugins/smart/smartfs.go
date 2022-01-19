@@ -33,9 +33,20 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
-const supportedSmartctl = 7.1
+const (
+	supportedSmartctl = 7.1
 
-const satType = "sat"
+	satType     = "sat"
+	nvmeType    = "nvme"
+	unknownType = "unknown"
+	ssdType     = "ssd"
+	hddType     = "hdd"
+
+	spinUpAttrName = "Spin_Up_Time"
+
+	ataSmartAttrFieldName      = "ata_smart_attributes"
+	ataSmartAttrTableFieldName = "table"
+)
 
 var (
 	cpuCount     int
@@ -107,6 +118,7 @@ type table struct {
 	Attrname string `json:"name"`
 	ID       int    `json:"id"`
 	Thresh   int    `json:"thresh"`
+	Value    int    `json:"value"`
 }
 
 type raidParameters struct {

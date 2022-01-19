@@ -21,7 +21,17 @@ package smart
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
+)
+
+var (
+	table1         = table{"test1", 1, 11, 111}
+	table2         = table{"test2", 2, 22, 222}
+	table3         = table{"test3", 3, 33, 333}
+	table4         = table{"test4", 4, 44, 444}
+	attrTable      = table{"Spin_Up_Time", 5, 55, 555}
+	attrEmptyTable = table{"Spin_Up_Time", 6, 66, 0}
 )
 
 func Test_setDiskFields(t *testing.T) {
@@ -63,24 +73,72 @@ func Test_setDiskFields(t *testing.T) {
 	}
 }
 
+func Test_getAttributeTables(t *testing.T) {
+	map1 := map[string][]table{"table": {table1, table2, attrTable}}
+	map2 := map[string][]table{"table": {table1, table2, table4}}
+
+	attrTable1 := map[string]interface{}{"ata_smart_attributes": map1}
+	attrTable2 := map[string]interface{}{"ata_smart_attributes": map2}
+	attrTable3 := map[string]interface{}{"ata_smart_attributes": nil}
+	attrTable4 := map[string]interface{}{"ata_smart_attributes": []table{}}
+	attrTable5 := map[string]interface{}{"ata_smart_attributes": map[string][]table{}}
+
+	type args struct {
+		in map[string]interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want []table
+	}{
+		{"attr_table", args{attrTable1}, []table{table1, table2, attrTable}},
+		{"no_attr_table", args{attrTable2}, []table{table1, table2, table4}},
+		{"no_table", args{attrTable3}, nil},
+		{"incorrect_table_value", args{attrTable4}, nil},
+		{"empty_map", args{attrTable5}, nil},
+		{"no_ata_attributes", args{nil}, nil},
+		{"empty_ata_attributes", args{map[string]interface{}{}}, nil},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := getAttributeTables(tt.args.in); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("getAttributeTables() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func Test_getAttributeType(t *testing.T) {
 	type args struct {
 		devType string
 		rate    int
+		tables  []table
 	}
 	tests := []struct {
 		name string
 		args args
 		want string
 	}{
-		{"ssd", args{"SAT", 0}, "SSD"},
-		{"hdd", args{"SAT", 12}, "HDD"},
-		{"unknown", args{"unknown", 1000}, "UNKNOWN"},
-		{"unknown_no_rate", args{"unknown", 0}, "UNKNOWN"},
-		{"negative_rate", args{"SAT", -1}, "UNKNOWN"}}
+		{"ssd_no_tables", args{"SAT", 0, nil}, "ssd"},
+		{"ssd_tables_empty_value", args{"SAT", 0, []table{table1, table2, table4, attrEmptyTable}}, "ssd"},
+		{"ssd_tables_no_spin_up_table", args{"SAT", 0, []table{table1, table2, table4}}, "ssd"},
+		{"hdd_no_tables", args{"SAT", 12, nil}, "hdd"},
+		{"hdd_rate_spin_up_table", args{"SAT", 12, []table{table1, table2, table4, attrTable}}, "hdd"},
+		{"hdd_no_rate_spin_up_table", args{"SAT", 0, []table{table1, table2, table4, attrTable}}, "hdd"},
+		{"hdd_no_empty_value", args{"SAT", 12, []table{table1, table2, table4, attrEmptyTable}}, "hdd"},
+		{"hdd_no_spin_up_table", args{"SAT", 12, []table{table1, table2, table4}}, "hdd"},
+		{"unknown_no_attr_table", args{"unknown", 1000, []table{table1, table2, table4}}, "unknown"},
+		{"unknown_empty_value_table", args{"unknown", 1000, []table{table1, table2, table3, attrEmptyTable}}, "unknown"},
+		{"unknown_value_table", args{"unknown", 1000, []table{table1, table2, table4, attrTable}}, "unknown"},
+		{"unknown_no_rate_no_tables", args{"unknown", 0, nil}, "unknown"},
+		{"unknown_no_rate_no_attr_table", args{"unknown", 0, []table{table1, table2, table4}}, "unknown"},
+		{"unknown_no_rate_empty_value_table", args{"unknown", 0, []table{table1, table2, table3, attrEmptyTable}}, "unknown"},
+		{"unknown_no_rate_value_table", args{"unknown", 0, []table{table1, table2, table4, attrTable}}, "unknown"},
+	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := getAttributeType(tt.args.devType, tt.args.rate); got != tt.want {
+			if got := getAttributeType(tt.args.devType, tt.args.rate, tt.args.tables); got != tt.want {
 				t.Errorf("getAttributeType() = %v, want %v", got, tt.want)
 			}
 		})
@@ -91,46 +149,70 @@ func Test_getType(t *testing.T) {
 	type args struct {
 		devType string
 		rate    int
+		tables  []table
 	}
 	tests := []struct {
 		name    string
 		args    args
 		wantOut string
 	}{
-		{"ssd", args{"SAT", 0}, "ssd"},
-		{"hdd", args{"SAT", 12}, "hdd"},
-		{"nvme", args{"nvme", 1000}, "nvme"},
-		{"nvme_no_rate", args{"nvme", 0}, "nvme"},
-		{"unknown", args{"unknown", 1000}, "unknown"},
-		{"unknown_no_rate", args{"unknown", 0}, "unknown"},
-		{"negative_rate", args{"SAT", -1}, "unknown"},
+		{"ssd_no_tables", args{"SAT", 0, nil}, "ssd"},
+		{"ssd_tables_empty_value", args{"SAT", 0, []table{table1, table2, table4, attrEmptyTable}}, "ssd"},
+		{"ssd_tables_no_spin_up_table", args{"SAT", 0, []table{table1, table2, table4}}, "ssd"},
+		{"hdd_no_tables", args{"SAT", 12, nil}, "hdd"},
+		{"hdd_rate_spin_up_table", args{"SAT", 12, []table{table1, table2, table4, attrTable}}, "hdd"},
+		{"hdd_no_rate_spin_up_table", args{"SAT", 0, []table{table1, table2, table4, attrTable}}, "hdd"},
+		{"hdd_no_empty_value", args{"SAT", 12, []table{table1, table2, table4, attrEmptyTable}}, "hdd"},
+		{"hdd_no_spin_up_table", args{"SAT", 12, []table{table1, table2, table4}}, "hdd"},
+		{"nvme_no_tables", args{"nvme", 1000, nil}, "nvme"},
+		{"nvme_no_attr_table", args{"nvme", 1000, []table{table1, table2, table4}}, "nvme"},
+		{"nvme_empty_value_table", args{"nvme", 1000, []table{table1, table2, table4, attrEmptyTable}}, "nvme"},
+		{"nvme_value_table", args{"nvme", 1000, []table{table1, table2, table4, attrTable}}, "nvme"},
+		{"nvme_no_rate_no_tables", args{"nvme", 0, nil}, "nvme"},
+		{"nvme_no_rate_no_attr_table", args{"nvme", 0, []table{table1, table2, table4}}, "nvme"},
+		{"nvme_no_rate_empty_value_table", args{"nvme", 0, []table{table1, table2, table4, attrEmptyTable}}, "nvme"},
+		{"nvme_no_rate_value_table", args{"nvme", 0, []table{table1, table2, table4, attrTable}}, "nvme"},
+		{"unknown_no_tables", args{"unknown", 1000, nil}, "unknown"},
+		{"unknown_no_attr_table", args{"unknown", 1000, []table{table1, table2, table4}}, "unknown"},
+		{"unknown_empty_value_table", args{"unknown", 1000, []table{table1, table2, table3, attrEmptyTable}}, "unknown"},
+		{"unknown_value_table", args{"unknown", 1000, []table{table1, table2, table4, attrTable}}, "unknown"},
+		{"unknown_no_rate_no_tables", args{"unknown", 0, nil}, "unknown"},
+		{"unknown_no_rate_no_attr_table", args{"unknown", 0, []table{table1, table2, table4}}, "unknown"},
+		{"unknown_no_rate_empty_value_table", args{"unknown", 0, []table{table1, table2, table3, attrEmptyTable}}, "unknown"},
+		{"unknown_no_rate_value_table", args{"unknown", 0, []table{table1, table2, table4, attrTable}}, "unknown"},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if gotOut := getType(tt.args.devType, tt.args.rate); gotOut != tt.wantOut {
+			if gotOut := getType(tt.args.devType, tt.args.rate, tt.args.tables); gotOut != tt.wantOut {
 				t.Errorf("getType() = %v, want %v", gotOut, tt.wantOut)
 			}
 		})
 	}
 }
 
-func Test_getTypeByRate(t *testing.T) {
+func Test_getTypeByRateAndAttr(t *testing.T) {
 	type args struct {
-		rate int
+		rate   int
+		tables []table
 	}
 	tests := []struct {
 		name string
 		args args
 		want string
 	}{
-		{"zero_rate", args{0}, "ssd"},
-		{"positive_rate", args{12}, "hdd"},
-		{"negative_rate", args{-1000}, "unknown"},
+		{"zero_rate_zero_spin_up", args{0, []table{table1, table2}}, "ssd"},
+		{"zero_rate_no_tables", args{0, nil}, "ssd"},
+		{"negative_rate_no_tables", args{-1000, nil}, "ssd"},
+		{"zero_rate_empty_attr_value_spin_up_table", args{-1000, []table{table1, table2, table4, attrEmptyTable}}, "ssd"},
+		{"positive_rate_spin_up_table", args{12, []table{table1, table2, table3, attrTable}}, "hdd"},
+		{"positive_rate_empty_attr_value_spin_up_table", args{12, []table{table1, table2, table3, attrEmptyTable}}, "hdd"},
+		{"positive_rate_no_tables", args{12, nil}, "hdd"},
+		{"zero_rate_spin_up_table", args{0, []table{table1, table2, table3, attrTable}}, "hdd"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := getTypeByRate(tt.args.rate); got != tt.want {
+			if got := getTypeByRateAndAttr(tt.args.rate, tt.args.tables); got != tt.want {
 				t.Errorf("getTypeByRate() = %v, want %v", got, tt.want)
 			}
 		})

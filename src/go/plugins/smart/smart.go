@@ -21,18 +21,10 @@ package smart
 
 import (
 	"encoding/json"
-	"strings"
 
 	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/zbxerr"
-)
-
-const (
-	nvmeType    = "nvme"
-	unknownType = "unknown"
-	ssdType     = "ssd"
-	hddType     = "hdd"
 )
 
 // Options -
@@ -90,7 +82,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		for _, dev := range r.devices {
 			out = append(out, device{
 				Name:       cutPrefix(dev.Info.Name),
-				DeviceType: strings.ToUpper(getType(dev.Info.DevType, dev.RotationRate)),
+				DeviceType: getType(dev.Info.DevType, dev.RotationRate, dev.SmartAttributes.Table),
 				Model:      dev.ModelName, SerialNumber: dev.SerialNumber,
 			})
 		}
@@ -134,11 +126,12 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		}
 
 		for _, dev := range r.devices {
+			t := getAttributeType(dev.Info.DevType, dev.RotationRate, dev.SmartAttributes.Table)
 			for _, attr := range dev.SmartAttributes.Table {
 				out = append(
 					out, attribute{
 						Name:       cutPrefix(dev.Info.Name),
-						DeviceType: getAttributeType(dev.Info.DevType, dev.RotationRate),
+						DeviceType: t,
 						ID:         attr.ID,
 						Attrname:   attr.Attrname,
 						Thresh:     attr.Thresh,
@@ -195,41 +188,68 @@ func setDiskFields(deviceJsons map[string]jsonDevice) (out []interface{}, err er
 			}
 		}
 
-		b["disk_type"] = getType(devType, rateInt)
+		b["disk_type"] = getType(devType, rateInt, getAttributeTables(b))
 		out = append(out, b)
 	}
 
 	return
 }
 
-func getAttributeType(devType string, rate int) string {
-	if devType == unknownType {
-		return strings.ToUpper(unknownType)
+func getAttributeTables(in map[string]interface{}) []table {
+	attr, ok := in[ataSmartAttrFieldName]
+	if !ok {
+		return nil
 	}
 
-	return strings.ToUpper(getTypeByRate(rate))
+	var attrMap map[string][]table
+
+	switch a := attr.(type) {
+	case map[string][]table:
+		attrMap = a
+	default:
+		return nil
+	}
+
+	tables, ok := attrMap[ataSmartAttrTableFieldName]
+	if !ok {
+		return nil
+	}
+
+	return tables
+
 }
 
-func getType(devType string, rate int) string {
+func getAttributeType(devType string, rate int, tables []table) string {
+	if devType == unknownType {
+		return unknownType
+	}
+
+	return getTypeByRateAndAttr(rate, tables)
+}
+
+func getType(devType string, rate int, tables []table) string {
 	switch devType {
 	case nvmeType:
 		return nvmeType
 	case unknownType:
 		return unknownType
 	default:
-		return getTypeByRate(rate)
+		return getTypeByRateAndAttr(rate, tables)
 	}
 }
 
-func getTypeByRate(rate int) string {
-	if rate == 0 {
-		return ssdType
-	}
+func getTypeByRateAndAttr(rate int, tables []table) string {
 	if rate > 0 {
 		return hddType
 	}
 
-	return unknownType
+	for _, t := range tables {
+		if t.Attrname == spinUpAttrName && t.Value > 0 {
+			return hddType
+		}
+	}
+
+	return ssdType
 }
 
 func init() {
