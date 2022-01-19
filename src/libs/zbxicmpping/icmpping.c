@@ -143,7 +143,7 @@ static int	get_interval_option(const char *fping, ZBX_FPING_HOST *hosts, int hos
 
 			/* call fping, ignore its exit code but mind execution failures */
 			if (TIMEOUT_ERROR == (ret_exec = zbx_execute(tmp, &out, err, sizeof(err), 1,
-					ZBX_EXIT_CODE_CHECKS_DISABLED)))
+					ZBX_EXIT_CODE_CHECKS_DISABLED, NULL)))
 			{
 				zbx_snprintf(error, max_error_len, "Timeout while executing \"%s\"", tmp);
 				goto out;
