@@ -45,7 +45,8 @@ $triggersForm = (new CForm('post', $url))
 	->addVar('toggle_expression_constructor', '')
 	->addVar('toggle_recovery_expression_constructor', '')
 	->addVar('remove_expression', '')
-	->addVar('remove_recovery_expression', '');
+	->addVar('remove_recovery_expression', '')
+	->addVar('backurl', $data['backurl']);
 
 if ($data['triggerid'] !== null) {
 	$triggersForm->addVar('triggerid', $data['triggerid']);
@@ -649,10 +650,14 @@ $dependenciesFormList->addRow(_('Dependencies'),
 );
 $triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList, TAB_INDICATOR_DEPENDENCY);
 
+$cancelButton = $data['backurl']
+	? new CButtonCancel(null, "redirect('".$data['backurl']."');")
+	: new CButtonCancel(url_params(['parent_discoveryid', 'context']));
+
 // append buttons to form
 if (!empty($data['triggerid'])) {
 	$deleteButton = new CButtonDelete(_('Delete trigger prototype?'),
-		url_params(['form', 'triggerid', 'parent_discoveryid', 'context']), 'context'
+		url_params(['form', 'triggerid', 'parent_discoveryid', 'context', 'backurl']), 'context'
 	);
 
 	if ($data['limited']) {
@@ -663,15 +668,14 @@ if (!empty($data['triggerid'])) {
 		new CSubmit('update', _('Update')), [
 			new CSubmit('clone', _('Clone')),
 			$deleteButton,
-			new CButtonCancel(url_params(['parent_discoveryid', 'context']))
+			$cancelButton
 		]
 	));
 }
 else {
 	$triggersTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel(url_params(['parent_discoveryid', 'context']))]
-	));
+		[$cancelButton]));
 }
 
 // append tabs to form

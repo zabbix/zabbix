@@ -38,7 +38,7 @@
 			$(".js-event-color-picker").each(function() {
 				var $field = $(this);
 				$field.toggleClass('<?= ZBX_STYLE_DISABLED ?>', !checked);
-				$("input", $field).prop('disabled', !checked);
+				$("input, input+button", $field).prop('disabled', !checked);
 			});
 		});
 
