@@ -17,67 +17,18 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
-/**
- * @var CView $this
- */
-
 ?>
-window.widget_tophosts_form = {
+
+
+window.widget_tophosts_form = new class {
 
 	init(options) {
-		let form = document.querySelector('#'+options.form_id);
+		this._form = document.getElementById(options.form_id);
+		this._list_columns = document.getElementById('list_columns');
+		this.initSortable(this._list_columns);
 
-		this.initSortable(form.querySelector('#list_columns'));
-		form.querySelectorAll('[name="order"]').forEach(checkbox => {
-			checkbox.addEventListener('change', () => ZABBIX.Dashboard.reloadWidgetProperties());
-		});
-		form.addEventListener('click', this.processColumnsAction);
-
-		// Modal triggers 'data.ready' event via jQuery.
-		$(form).on('data.ready', (e, data) => {
-			// data - added/updated data object, if data.edit is set data is updated.
-			let input = document.createElement('input');
-			let tr = e.target.closest('tr');
-			let index;
-
-			input.setAttribute('type', 'hidden');
-			form.querySelectorAll(`[name^="columns[${index}]["]`).forEach(element => element.remove());
-
-			if (data.edit) {
-				index = tr.querySelector('[name="sortorder[columns][]"]').value;
-				tr.querySelectorAll(`[name^="columns[${index}][`).forEach(node => node.remove());
-				delete data.edit;
-			}
-			else {
-				index = tr.closest('table').querySelectorAll('tr').length;
-				input.setAttribute('name', `sortorder[columns][]`);
-				input.setAttribute('value', index);
-				form.appendChild(input.cloneNode());
-			}
-
-			if (data.thresholds) {
-				for (let [key, value] of Object.entries(data.thresholds)) {
-					input.setAttribute('name', `columns[${index}][thresholds][${key}][color]`);
-					input.setAttribute('value', value.color);
-					form.appendChild(input.cloneNode());
-					input.setAttribute('name', `columns[${index}][thresholds][${key}][threshold]`);
-					input.setAttribute('value', value.threshold);
-					form.appendChild(input.cloneNode());
-				}
-
-				delete data.thresholds;
-			}
-
-			for (let [key, value] of Object.entries(data)) {
-				input.setAttribute('name', `columns[${index}][${key}]`);
-				input.setAttribute('value', value);
-				form.appendChild(input.cloneNode());
-			}
-
-			ZABBIX.Dashboard.reloadWidgetProperties();
-		});
-	},
+		this._list_columns.addEventListener('click', (e) => this.processColumnsAction(e));
+	}
 
 	initSortable(element) {
 		$(element).sortable({
@@ -110,27 +61,82 @@ window.widget_tophosts_form = {
 				$(ui.placeholder).height($(ui.helper).height());
 			}
 		});
-	},
+	}
 
 	processColumnsAction(e) {
-		let elm = e.srcElement;
+		const target = e.target;
 
-		switch (elm.getAttribute('name')) {
-			case 'edit':
-				let index = elm.closest('tr').querySelector('[name="sortorder[columns][]"]').value;
-				let form_fields = getFormFields(elm.closest('form'));
+		let column_popup;
 
-				PopUp('popup.tophosts.column.edit', {...form_fields.columns[index], edit: 1}, null, elm);
+		switch (target.getAttribute('name')) {
+			case 'add':
+				this._column_index = this._list_columns.querySelectorAll('tr').length;
+
+				column_popup = PopUp('popup.tophosts.column.edit', {}, null, target).$dialogue[0];
+				column_popup.addEventListener('dialogue.submit', (e) => this.updateColumns(e));
+				column_popup.addEventListener('overlay.close', this.removeColorpicker);
 				break;
 
-			case 'add':
-				PopUp('popup.tophosts.column.edit', {}, null, elm);
+			case 'edit':
+				const form_fields = getFormFields(this._form);
+
+				this._column_index = target.closest('tr').querySelector('[name="sortorder[columns][]"]').value;
+
+				column_popup = PopUp('popup.tophosts.column.edit',
+					{...form_fields.columns[this._column_index], edit: 1}, null, target).$dialogue[0];
+				column_popup.addEventListener('dialogue.submit', (e) => this.updateColumns(e));
+				column_popup.addEventListener('overlay.close', this.removeColorpicker);
 				break;
 
 			case 'remove':
-				e.srcElement.closest('tr').remove();
+				target.closest('tr').remove();
 				ZABBIX.Dashboard.reloadWidgetProperties();
 				break;
 		}
 	}
-};
+
+	updateColumns(e) {
+		const data = e.detail;
+		const input = document.createElement('input');
+
+		input.setAttribute('type', 'hidden');
+
+		if (data.edit) {
+			this._list_columns.querySelectorAll(`[name^="columns[${this._column_index}][`)
+				.forEach((node) => node.remove());
+
+			delete data.edit;
+		}
+		else {
+			input.setAttribute('name', `sortorder[columns][]`);
+			input.setAttribute('value', this._column_index);
+			this._form.appendChild(input.cloneNode());
+		}
+
+		if (data.thresholds) {
+			for (const [key, value] of Object.entries(data.thresholds)) {
+				input.setAttribute('name', `columns[${this._column_index}][thresholds][${key}][color]`);
+				input.setAttribute('value', value.color);
+				this._form.appendChild(input.cloneNode());
+				input.setAttribute('name', `columns[${this._column_index}][thresholds][${key}][threshold]`);
+				input.setAttribute('value', value.threshold);
+				this._form.appendChild(input.cloneNode());
+			}
+
+			delete data.thresholds;
+		}
+
+		for (const [key, value] of Object.entries(data)) {
+			input.setAttribute('name', `columns[${this._column_index}][${key}]`);
+			input.setAttribute('value', value);
+			this._form.appendChild(input.cloneNode());
+		}
+
+		ZABBIX.Dashboard.reloadWidgetProperties();
+	}
+
+	// Need to remove function after subpopups auto close.
+	removeColorpicker() {
+		document.getElementById('color_picker').remove();
+	}
+}();

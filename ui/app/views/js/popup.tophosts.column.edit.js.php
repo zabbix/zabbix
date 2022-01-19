@@ -112,8 +112,9 @@
 					return;
 				}
 
-				$(overlay.element).trigger('data.ready', [response]);
 				overlayDialogueDestroy(overlay.dialogueid);
+
+				overlay.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 			})
 			.catch((e) => {
 				document

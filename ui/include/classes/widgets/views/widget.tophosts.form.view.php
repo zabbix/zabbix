@@ -20,6 +20,11 @@
 
 
 /**
+ * @var CView $this
+ * @var array $data
+ */
+
+/**
  * Data overview widget form view.
  */
 $fields = $data['dialogue']['fields'];
@@ -80,10 +85,11 @@ $form_list->addRow(CWidgetHelper::getLabel($fields['hosts_count']), CWidgetHelpe
 
 $form->addItem($form_list);
 $form->addItem(
-	(new CScriptTag('widget_tophosts_form.init('.json_encode([
+	(new CScriptTag('
+		widget_tophosts_form.init('.json_encode([
 			'form_id' => $form->getId()
-		]).');'
-	))->setOnDocumentReady()
+		]).');
+	'))->setOnDocumentReady()
 );
 
 return [
