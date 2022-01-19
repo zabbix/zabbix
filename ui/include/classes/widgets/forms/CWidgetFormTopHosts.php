@@ -120,7 +120,7 @@ class CWidgetFormTopHosts extends CWidgetForm {
 
 			foreach ($this->data['columns'] as $key => $value) {
 				if ($value['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE) {
-					$field_column_values[$key] = $value['item'];
+					$field_column_values[$key] = ($value['name'] === '') ? $value['item'] : $value['name'];
 				}
 			}
 		}
