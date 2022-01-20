@@ -23,7 +23,7 @@ class CControllerPopupTopHostsColumnEdit extends CController {
 
 	protected $column_defaults = [
 		'name'					=> '',
-		'data'					=> CWidgetFieldColumnsList::DATA_HOST_NAME,
+		'data'					=> CWidgetFieldColumnsList::DATA_ITEM_VALUE,
 		'item'					=> '',
 		'timeshift' 			=> '',
 		'aggregate_function'	=> CWidgetFieldColumnsList::FUNC_NONE,
