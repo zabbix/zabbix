@@ -841,7 +841,7 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 //		Support of user macros in item names has been dropped.
 		$this->assertTrue($this->query('xpath://span[text()='.CXPATHHelper::escapeQuotes('trap['.$macro['value'].']').']')->exists());
 
-				// Change macro type.
+		// Change macro type.
 		$this->page->open('zabbix.php?action=macros.edit')->waitUntilReady();
 		$value_field = $this->getValueField($macro['macro']);
 		$value_field->changeInputType(CInputGroupElement::TYPE_SECRET);
