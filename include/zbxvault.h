@@ -26,6 +26,6 @@ int	zbx_vault_init(const char *vault, char **error);
 int	zbx_vault_kvs_get(const char *path, zbx_hashset_t *kvs, char **error);
 int	zbx_vault_db_credentials_get(char **dbuser, char **dbpassword, char **error);
 
-int	zbx_vault_token_from_env_get(char **error);
+int	zbx_vault_token_from_env_get(char **token, char **error);
 
 #endif

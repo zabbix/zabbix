@@ -157,7 +157,7 @@ fail:
 	return ret;
 }
 
-int	zbx_vault_token_from_env_get(char **error)
+int	zbx_vault_token_from_env_get(char **token, char **error)
 {
 #if defined(HAVE_GETENV) && defined(HAVE_UNSETENV)
 	char	*ptr;
@@ -165,15 +165,18 @@ int	zbx_vault_token_from_env_get(char **error)
 	if (NULL == (ptr = getenv("VAULT_TOKEN")))
 		return SUCCEED;
 
-	if (NULL != CONFIG_VAULTTOKEN)
+	if (NULL != *token)
 	{
 		*error = zbx_dsprintf(*error, "both \"VaultToken\" configuration parameter"
 				" and \"VAULT_TOKEN\" environment variable are defined");
 		return FAIL;
 	}
 
-	CONFIG_VAULTTOKEN = zbx_strdup(NULL, ptr);
+	*token = zbx_strdup(NULL, ptr);
 	unsetenv("VAULT_TOKEN");
+#else
+	ZBX_UNUSED(token)
+	ZBX_UNUSED(error);
 #endif
 	return SUCCEED;
 }

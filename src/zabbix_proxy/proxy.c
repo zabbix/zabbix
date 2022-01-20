@@ -1241,7 +1241,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_vault_token_from_env_get(&error))
+	if (SUCCEED != zbx_vault_token_from_env_get(&CONFIG_VAULTTOKEN, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault token: %s", error);
 		zbx_free(error);
