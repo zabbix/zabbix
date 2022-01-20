@@ -143,7 +143,7 @@ window.tophosts_column_edit_form = new class {
 					message_box = makeMessageBox('bad', [], error, true, false)[0];
 				}
 
-				this.parentNode.insertBefore(message_box, this);
+				this._$widget_form.before(message_box, this);
 			})
 			.finally(() => {
 				overlay.unsetLoading();
