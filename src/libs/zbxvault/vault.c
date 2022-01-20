@@ -88,8 +88,8 @@ int	zbx_vault_init(const char *vault, char **error)
 		}
 
 		zbx_vault_init_cb(zbx_cyberark_kvs_get);
-		zbx_vault_key_dbuser = ZBX_CYBERARK_DBUSERNAME;
-		zbx_vault_key_dbpassword = ZBX_CYBERARK_DBPASSWORD;
+		zbx_vault_key_dbuser = ZBX_CYBERARK_DBUSERNAME_KEY;
+		zbx_vault_key_dbpassword = ZBX_CYBERARK_DBPASSWORD_KEY;
 	}
 	else
 	{
