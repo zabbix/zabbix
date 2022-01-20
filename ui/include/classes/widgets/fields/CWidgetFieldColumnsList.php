@@ -121,6 +121,8 @@ class CWidgetFieldColumnsList extends CWidgetField {
 			'timeshift' => ZBX_WIDGET_FIELD_TYPE_STR,
 			'aggregate_function' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'aggregate_interval' => ZBX_WIDGET_FIELD_TYPE_STR,
+			'min' => ZBX_WIDGET_FIELD_TYPE_STR,
+			'max' => ZBX_WIDGET_FIELD_TYPE_STR,
 			'display' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'history' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'base_color' => ZBX_WIDGET_FIELD_TYPE_STR,

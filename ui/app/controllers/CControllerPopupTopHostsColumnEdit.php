@@ -52,6 +52,8 @@ class CControllerPopupTopHostsColumnEdit extends CController {
 			'aggregate_interval'	=> 'string',
 			'display'				=> 'int32',
 			'history'				=> 'int32',
+			'min'					=> 'string',
+			'max'					=> 'string',
 			'base_color'			=> 'string',
 			'thresholds'			=> 'array',
 			'text'					=> 'string',
