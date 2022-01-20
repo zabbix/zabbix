@@ -37,7 +37,6 @@ abstract class CControllerLatest extends CController {
 		'show_tags' => SHOW_TAGS_3,
 		'tag_name_format' => TAG_NAME_FULL,
 		'tag_priority' => '',
-		'show_without_data' => 1,
 		'show_details' => 1,
 		'page' => null,
 		'sort' => 'name',
@@ -60,7 +59,6 @@ abstract class CControllerLatest extends CController {
 	 * @param string $filter['tags'][]['tag']
 	 * @param string $filter['tags'][]['value']
 	 * @param int    $filter['tags'][]['operator']
-	 * @param int    $filter['show_without_data']  Include items with empty history.
 	 * @param string $sort_field                   Sorting field.
 	 * @param string $sort_order                   Sorting order.
 	 *
@@ -90,7 +88,7 @@ abstract class CControllerLatest extends CController {
 				continue;
 			}
 
-			$host_items = API::Item()->get([
+			$select_items += API::Item()->get([
 				'output' => ['itemid', 'hostid', 'value_type'],
 				'hostids' => [$hostid],
 				'webitems' => true,
@@ -104,10 +102,6 @@ abstract class CControllerLatest extends CController {
 				],
 				'preservekeys' => true
 			]);
-
-			$select_items += $filter['show_without_data']
-				? $host_items
-				: Manager::History()->getItemsHavingValues($host_items, $history_period);
 
 			$select_items_cnt = count($select_items);
 		}
@@ -261,7 +255,6 @@ abstract class CControllerLatest extends CController {
 	 * @param array  $filter['hostids']             Filter items by host groups.
 	 * @param string $filter['evaltype']            Filter items by tags.
 	 * @param string $filter['tags']                Filter items by tag names and values.
-	 * @param int    $filter['show_without_data']   Filter items with/without data.
 	 * @param array  $filter['subfilter_hostids']	Host subfilter.
 	 * @param array  $filter['subfilter_tagnames']	Tagname subfilter.
 	 * @param array  $filter['subfilter_tags']      Tags subfilter.
@@ -310,12 +303,9 @@ abstract class CControllerLatest extends CController {
 			}
 		}
 
-		$subfilter_data = -1;
-		if ($filter['show_without_data']
-				&& array_key_exists('subfilter_data', $filter)
-				&& $filter['subfilter_data'] && count($filter['subfilter_data']) != 2) {
-			$subfilter_data = reset($filter['subfilter_data']);
-		}
+		$subfilter_data = (array_key_exists('subfilter_data', $filter) && count($filter['subfilter_data']) == 1)
+			? reset($filter['subfilter_data'])
+			: -1;
 
 		$search_limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 		$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
@@ -419,12 +409,10 @@ abstract class CControllerLatest extends CController {
 	 * @param array  $prepared_data['items'][]['matching_subfilters']  [OUT] Flag for each of subfilter group showing
 	 *                                                                 either item fits its subfilter requirements.
 	 * @param bool   $prepared_data['items'][]['has_data']             [OUT] Flag either item has data.
-	 * @param array  $filter                                           Filter parameters.
-	 * @param int    $filter['show_without_data']                      "Show items without data" filter checkbox value.
 	 *
 	 * @return array
 	 */
-	protected static function getSubfilters(array $subfilters, array &$prepared_data, array $filter): array {
+	protected static function getSubfilters(array $subfilters, array &$prepared_data): array {
 		$subfilter_options = self::getSubfilterOptions($prepared_data, $subfilters);
 		$prepared_data['items'] = self::getItemMatchings($prepared_data['items'], $subfilters);
 
@@ -476,11 +464,9 @@ abstract class CControllerLatest extends CController {
 				}
 			}
 
-			// Data subfilter. Enabled only when 'Show without data' checkbox is on.
-			if ($filter['show_without_data']) {
-				$data_key = (int) $item['has_data'];
-				$subfilter_options['data'][$data_key]['count']++;
-			}
+			// Data subfilter.
+			$data_key = (int) $item['has_data'];
+			$subfilter_options['data'][$data_key]['count']++;
 		}
 
 		// No need to show data subfilter if all selected items fits into same group.
