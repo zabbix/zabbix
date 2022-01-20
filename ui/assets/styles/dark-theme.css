@@ -11,7 +11,7 @@
   .timeline-axis::before {
     background-color: #454f55 !important; }
 
-.sidebar .server-name, .dashboard-navigation-tabs .sortable-item > div span, .dashboard-grid-widget-head h4, .dashboard-grid-iterator-head h4, .list-table .action-container .label, .list-table.compact-view .action-container .link-action, .menu-popup .menu-popup-item, .menu-popup h3, .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a {
+.sidebar .server-name, .dashboard-navigation-tabs .sortable-item > div span, .dashboard-grid-widget-head h4, .dashboard-grid-iterator-head h4, form.dashboard-grid-widget-tophosts #list_columns .text, .list-table .action-container .label, .list-table.compact-view .action-container .link-action, .menu-popup .menu-popup-item, .menu-popup h3, .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; }
@@ -1539,6 +1539,21 @@ div.dashboard-grid-widget-item {
   fill: #FC5A5A; }
 .dashboard-grid-widget-item .svg-arrow-up-down {
   fill: #3DC51D; }
+
+form.dashboard-grid-widget-tophosts #list_columns .text {
+  max-width: 150px; }
+form.dashboard-grid-widget-tophosts #column {
+  max-width: 150px; }
+
+div.dashboard-grid-widget-tophosts td {
+  line-height: 20px; }
+div.dashboard-grid-widget-tophosts .link-action {
+  white-space: nowrap; }
+div.dashboard-grid-widget-tophosts .item-value {
+  text-align: center; }
+div.dashboard-grid-widget-tophosts z-bar-gauge {
+  min-width: 64px;
+  height: 20px; }
 
 .diff {
   padding: 4px;
