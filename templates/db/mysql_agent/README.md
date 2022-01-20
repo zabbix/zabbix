@@ -1,5 +1,5 @@
 
-# MySQL by Zabbix agent
+# Template DB MySQL by Zabbix agent
 
 ## Overview
 

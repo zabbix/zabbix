@@ -1,5 +1,5 @@
 
-# Zookeeper by HTTP
+# Template App Zookeeper by HTTP
 
 ## Overview
 
@@ -19,7 +19,7 @@ This template was tested on:
 
 This template works with standalone and cluster instances. Metrics are collected from each Zookeper node by requests to [AdminServer](https://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_adminserver).  
 By default AdminServer is enabled and listens on port 8080.  
-You can enable or configure AdminServer parameters according [official documentations](https://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_adminserver_config).  
+You can еnable or configure AdminServer parameters according [official documentations](https://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_adminserver_config).  
 Don't forget to change macros {$ZOOKEEPER.COMMAND_URL}, {$ZOOKEEPER.PORT}, {$ZOOKEEPER.SCHEME}.
 
 
@@ -47,7 +47,7 @@ There are no template links in this template.
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |Leader metrics discovery |<p>Additional metrics for leader node</p> |DEPENDENT |zookeeper.metrics.leader<p>**Preprocessing**:</p><p>- JSONPATH: `$.server_state`</p><p>- JAVASCRIPT: `return JSON.stringify(value == 'leader' ? [{'{#SINGLETON}': ''}] : []);`</p> |
-|Clients discovery |<p>Get list of client connections.</p><p>Note, depending on the number of client connections this operation may be expensive (i.e. impact server performance).</p> |HTTP_AGENT |zookeeper.clients<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
+|Clients discovery |<p>Get list of client connections.</p><p>Note, depending on the number of client connections this operation may be expensive (i.e. impact server performance).</p> |HTTP_AGENT |zookeeper.clients<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 
 ## Items collected
 
@@ -82,11 +82,11 @@ There are no template links in this template.
 |Zookeeper |Zookeeper: Packets sent per sec |<p>The number of zookeeper packets sent from a server per second.</p> |DEPENDENT |zookeeper.packets_sent<p>**Preprocessing**:</p><p>- JSONPATH: `$.packets_sent`</p><p>- CHANGE_PER_SECOND |
 |Zookeeper |Zookeeper: Packets received per sec |<p>The number of zookeeper packets received by a server per second.</p> |DEPENDENT |zookeeper.packets_received.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.packets_received`</p><p>- CHANGE_PER_SECOND |
 |Zookeeper |Zookeeper: Bytes received per sec |<p>Number of bytes received per second.</p> |DEPENDENT |zookeeper.bytes_received_count.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.bytes_received_count`</p><p>- CHANGE_PER_SECOND |
-|Zookeeper |Zookeeper: Election time, avg |<p>Time between entering and leaving election.</p> |DEPENDENT |zookeeper.avg_election_time<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
-|Zookeeper |Zookeeper: Elections |<p>Number of elections happened.</p> |DEPENDENT |zookeeper.cnt_election_time<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
-|Zookeeper |Zookeeper: Fsync time, avg |<p>Time to fsync transaction log.</p> |DEPENDENT |zookeeper.avg_fsynctime<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
+|Zookeeper |Zookeeper: Election time, avg |<p>Time between entering and leaving election.</p> |DEPENDENT |zookeeper.avg_election_time<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
+|Zookeeper |Zookeeper: Elections |<p>Number of elections happened.</p> |DEPENDENT |zookeeper.cnt_election_time<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
+|Zookeeper |Zookeeper: Fsync time, avg |<p>Time to fsync transaction log.</p> |DEPENDENT |zookeeper.avg_fsynctime<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |Zookeeper |Zookeeper: Fsync |<p>Count of performed fsyncs.</p> |DEPENDENT |zookeeper.cnt_fsynctime<p>**Preprocessing**:</p><p>- JAVASCRIPT: `var metrics = JSON.parse(value) return metrics.cnt_fsynctime || metrics.fsynctime_count`</p> |
-|Zookeeper |Zookeeper: Snapshot write time, avg |<p>Average time to write a snapshot.</p> |DEPENDENT |zookeeper.avg_snapshottime<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
+|Zookeeper |Zookeeper: Snapshot write time, avg |<p>Average time to write a snapshot.</p> |DEPENDENT |zookeeper.avg_snapshottime<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |Zookeeper |Zookeeper: Snapshot writes |<p>Count of performed snapshot writes.</p> |DEPENDENT |zookeeper.cnt_snapshottime<p>**Preprocessing**:</p><p>- JAVASCRIPT: `var metrics = JSON.parse(value) return metrics.snapshottime_count || metrics.cnt_snapshottime`</p> |
 |Zookeeper |Zookeeper: Pending syncs{#SINGLETON} |<p>Number of pending syncs to carry out to ZooKeeper ensemble followers.</p> |DEPENDENT |zookeeper.pending_syncs[{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pending_syncs`</p> |
 |Zookeeper |Zookeeper: Quorum size{#SINGLETON} | |DEPENDENT |zookeeper.quorum_size[{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.quorum_size`</p> |
@@ -109,10 +109,10 @@ There are no template links in this template.
 |Zookeeper: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:zookeeper.uptime.last()}<10m` |INFO |<p>Manual close: YES</p> |
 |Zookeeper: Failed to fetch info data (or no data for 10m) |<p>Zabbix has not received data for items for the last 10 minutes</p> |`{TEMPLATE_NAME:zookeeper.uptime.nodata(10m)}=1` |WARNING |<p>Manual close: YES</p> |
 |Zookeeper: Version has changed (new version: {ITEM.VALUE}) |<p>Zookeeper version has changed. Ack to close.</p> |`{TEMPLATE_NAME:zookeeper.version.diff()}=1 and {TEMPLATE_NAME:zookeeper.version.strlen()}>0` |INFO |<p>Manual close: YES</p> |
-|Zookeeper: Too many file descriptors used (over {$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}% for 5 min) |<p>Number of file descriptors used more than {$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}% of the available number of file descriptors.</p> |`{TEMPLATE_NAME:zookeeper.open_file_descriptor_count.min(5m)} * 100 / {Zookeeper by HTTP:zookeeper.max_file_descriptor_count.last()} > {$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}` |WARNING | |
+|Zookeeper: Too many file descriptors used (over {$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}% for 5 min) |<p>Number of file descriptors used more than {$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}% of the available number of file descriptors.</p> |`{TEMPLATE_NAME:zookeeper.open_file_descriptor_count.min(5m)} * 100 / {TEMPLATE_NAME:zookeeper.max_file_descriptor_count.last()} > {$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}` |WARNING | |
 |Zookeeper: Too many queued requests (over {$ZOOKEEPER.OUTSTANDING_REQ.MAX.WARN}% for 5 min) |<p>Number of queued requests in the server. This goes up when the server receives more requests than it can process.</p> |`{TEMPLATE_NAME:zookeeper.outstanding_requests.min(5m)}>{$ZOOKEEPER.OUTSTANDING_REQ.MAX.WARN}` |AVERAGE |<p>Manual close: YES</p> |
 |Zookeeper: Too many pending syncs (over {$ZOOKEEPER.PENDING_SYNCS.MAX.WARN}% for 5 min) |<p>-</p> |`{TEMPLATE_NAME:zookeeper.pending_syncs[{#SINGLETON}].min(5m)}>{$ZOOKEEPER.PENDING_SYNCS.MAX.WARN}` |AVERAGE |<p>Manual close: YES</p> |
-|Zookeeper: Too few active followers |<p>The number of followers should equal the total size of your ZooKeeper ensemble, minus 1 (the leader is not included in the follower count). If the ensemble fails to maintain quorum, all automatic failover features are suspended. </p> |`{TEMPLATE_NAME:zookeeper.synced_followers[{#SINGLETON}].last()} < {Zookeeper by HTTP:zookeeper.quorum_size[{#SINGLETON}].last()}-1` |AVERAGE | |
+|Zookeeper: Too few active followers |<p>The number of followers should equal the total size of your ZooKeeper ensemble, minus 1 (the leader is not included in the follower count). If the ensemble fails to maintain quorum, all automatic failover features are suspended. </p> |`{TEMPLATE_NAME:zookeeper.synced_followers[{#SINGLETON}].last()} < {TEMPLATE_NAME:zookeeper.quorum_size[{#SINGLETON}].last()}-1` |AVERAGE | |
 
 ## Feedback
 

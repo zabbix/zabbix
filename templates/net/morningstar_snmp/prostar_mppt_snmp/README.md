@@ -1,5 +1,5 @@
 
-# Morningstar ProStar MPPT SNMP
+# Template Net Morningstar ProStar MPPT SNMP
 
 ## Overview
 
@@ -43,7 +43,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Battery voltage discovery |<p>Discovery for battery voltage triggers</p> |DEPENDENT |battery.voltage.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
+|Battery voltage discovery |<p>Discovery for battery voltage triggers</p> |DEPENDENT |battery.voltage.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 
 ## Items collected
 
@@ -64,9 +64,9 @@ There are no template links in this template.
 |Load |Load: Voltage |<p>MIB: PROSTAR-MPPT</p><p>Load Voltage</p><p> Description:Load Voltage</p><p> Scaling Factor:1.0</p><p> Units:V</p><p> Range:[0, 80]</p><p> Modbus address:0x0014</p> |SNMP |load.voltage[loadVoltage.0] |
 |Load |Load: Current |<p>MIB: PROSTAR-MPPT</p><p>Load Current</p><p> Description:Load Current</p><p> Scaling Factor:1.0</p><p> Units:A</p><p> Range:[0, 60]</p><p> Modbus address:0x0016</p> |SNMP |load.current[loadCurrent.0] |
 |Status |Status: Uptime |<p>Device uptime in seconds</p> |SNMP |status.uptime<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.01`</p> |
-|Status |Status: Array Faults |<p>MIB: PROSTAR-MPPT</p><p>Description:Array Faults</p><p>Modbus address:0x0022</p> |SNMP |status.array_faults[arrayFaults.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
-|Status |Status: Load Faults |<p>MIB: PROSTAR-MPPT</p><p>Description:Array Faults</p><p>Modbus address:0x0022</p> |SNMP |status.load_faults[loadFaults.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
-|Status |Status: Alarms |<p>MIB: PROSTAR-MPPT</p><p>Description:Alarms</p><p>Modbus addresses:H=0x0038 L=0x0039</p> |SNMP |status.alarms[alarms.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
+|Status |Status: Array Faults |<p>MIB: PROSTAR-MPPT</p><p>Description:Array Faults</p><p>Modbus address:0x0022</p> |SNMP |status.array_faults[arrayFaults.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
+|Status |Status: Load Faults |<p>MIB: PROSTAR-MPPT</p><p>Description:Array Faults</p><p>Modbus address:0x0022</p> |SNMP |status.load_faults[loadFaults.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
+|Status |Status: Alarms |<p>MIB: PROSTAR-MPPT</p><p>Description:Alarms</p><p>Modbus addresses:H=0x0038 L=0x0039</p> |SNMP |status.alarms[alarms.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |Temperature |Temperature: Ambient |<p>MIB: PROSTAR-MPPT</p><p>Ambient Temperature</p><p> Description:Ambient Temperature</p><p> Scaling Factor:1.0</p><p> Units:deg C</p><p> Range:[-128, 127]</p><p> Modbus address:0x001C</p> |SNMP |temp.ambient[ambientTemperature.0] |
 |Temperature |Temperature: Battery |<p>MIB: PROSTAR-MPPT</p><p>Battery Temperature</p><p>  Description:Battery Temperature</p><p>  Scaling Factor:1.0</p><p>  Units:deg C</p><p>  Range:[-128, 127]</p><p>  Modbus address:0x001B</p> |SNMP |temp.battery[batteryTemperature.0] |
 |Temperature |Temperature: Heatsink |<p>MIB: PROSTAR-MPPT</p><p>Heatsink Temperature</p><p> Description:Heatsink Temperature</p><p> Scaling Factor:1.0</p><p> Units:deg C</p><p> Range:[-128, 127]</p><p> Modbus address:0x001A</p> |SNMP |temp.heatsink[heatsinkTemperature.0] |

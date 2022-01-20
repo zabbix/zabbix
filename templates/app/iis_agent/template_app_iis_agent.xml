@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-05-28T08:09:15Z</date>
+   <date>2021-12-21T18:00:06Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -11,12 +11,12 @@
       <template>
          <template>Template App IIS by Zabbix agent</template>
          <name>Template App IIS by Zabbix agent</name>
-         <description>Get metrics from IIS using Zabbix agent running on Windows&#13;
+         <description>Get metrics from IIS using Zabbix agent running on Windows.&#13;
 &#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/401862-discussion-thread-for-official-zabbix-template-internet-information-services&#13;
 &#13;
-Template tooling version used: 0.35</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -711,7 +711,6 @@ Template tooling version used: 0.35</description>
          <discovery_rules>
             <discovery_rule>
                <name>Application pools discovery</name>
-               <type>ZABBIX_PASSIVE</type>
                <key>wmi.getall[root\webAdministration, select Name from ApplicationPool]</key>
                <delay>1h</delay>
                <filter>
@@ -997,6 +996,39 @@ Template tooling version used: 0.35</description>
    </graphs>
    <value_maps>
       <value_map>
+         <name>Application pool state</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>Uninitialized</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Initialized</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Running</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>Disabling</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>Disabled</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>Shutdown Pending</newvalue>
+            </mapping>
+            <mapping>
+               <value>7</value>
+               <newvalue>Delete Pending</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
          <name>Service state</name>
          <mappings>
             <mapping>
@@ -1047,39 +1079,6 @@ Template tooling version used: 0.35</description>
             <mapping>
                <value>255</value>
                <newvalue>No such service</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>Application pool state</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>Uninitialized</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>Initialized</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>Running</newvalue>
-            </mapping>
-            <mapping>
-               <value>4</value>
-               <newvalue>Disabling</newvalue>
-            </mapping>
-            <mapping>
-               <value>5</value>
-               <newvalue>Disabled</newvalue>
-            </mapping>
-            <mapping>
-               <value>6</value>
-               <newvalue>Shutdown Pending</newvalue>
-            </mapping>
-            <mapping>
-               <value>7</value>
-               <newvalue>Delete Pending</newvalue>
             </mapping>
          </mappings>
       </value_map>

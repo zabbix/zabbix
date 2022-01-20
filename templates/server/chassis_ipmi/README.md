@@ -1,5 +1,5 @@
 
-# Chassis by IPMI
+# Template Server Chassis by IPMI
 
 ## Overview
 
@@ -42,7 +42,7 @@ There are no template links in this template.
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |Discrete sensors discovery |<p>Discovery of the discrete IPMI sensors.</p> |DEPENDENT |ipmi.discrete.discovery<p>**Filter**:</p>AND <p>- A: {#SENSOR_READING_TYPE} NOT_MATCHES_REGEX `threshold`</p><p>- B: {#SENSOR_TYPE} MATCHES_REGEX `{$IPMI.SENSOR_TYPE.MATCHES}`</p><p>- C: {#SENSOR_TYPE} NOT_MATCHES_REGEX `{$IPMI.SENSOR_TYPE.NOT_MATCHES}`</p> |
-|Threshold sensors discovery |<p>Discovery of the threshold IPMI sensors.</p> |DEPENDENT |ipmi.sensors.discovery<p>**Filter**:</p>AND <p>- A: {#SENSOR_READING_TYPE} MATCHES_REGEX `threshold`</p><p>- B: {#SENSOR_TYPE} MATCHES_REGEX `{$IPMI.SENSOR_TYPE.MATCHES}`</p><p>- C: {#SENSOR_TYPE} NOT_MATCHES_REGEX `{$IPMI.SENSOR_TYPE.NOT_MATCHES}`</p> |
+|Threshold sensors discovery |<p>Discovery of the threshold IPMI sensors.</p> |DEPENDENT |ipmi.sensors.discovery<p>**Filter**:</p>AND <p>- A: {#SENSOR_READING_TYPE} MATCHES_REGEX `threshold`</p><p>- B: {#SENSOR_TYPE} MATCHES_REGEX `{$IPMI.SENSOR_TYPE.MATCHES}`</p><p>- C: {#SENSOR_TYPE} NOT_MATCHES_REGEX `{$IPMI.SENSOR_TYPE.NOT_MATCHES}`</p><p>**Overrides:**</p><p>trigger SENSOR_LO_WARN<br><br>  - TRIGGER_PROTOTYPE LIKE `{#SENSOR_LO_WARN}` - NO_DISCOVER</p><p>trigger SENSOR_LO_CRIT<br><br>  - TRIGGER_PROTOTYPE LIKE `{#SENSOR_LO_CRIT}` - NO_DISCOVER</p><p>trigger SENSOR_LO_DISAST<br><br>  - TRIGGER_PROTOTYPE LIKE `{#SENSOR_LO_DISAST}` - NO_DISCOVER</p><p>trigger SENSOR_HI_WARN<br><br>  - TRIGGER_PROTOTYPE LIKE `{#SENSOR_HI_WARN}` - NO_DISCOVER</p><p>trigger SENSOR_HI_CRIT<br><br>  - TRIGGER_PROTOTYPE LIKE `{#SENSOR_HI_CRIT}` - NO_DISCOVER</p><p>trigger SENSOR_HI_DISAST<br><br>  - TRIGGER_PROTOTYPE LIKE `{#SENSOR_HI_DISAST}` - NO_DISCOVER</p> |
 
 ## Items collected
 

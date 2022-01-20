@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-07-14T06:56:18Z</date>
+   <date>2021-12-21T18:00:06Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -11,7 +11,7 @@
       <template>
          <template>Template App Generic Java JMX</template>
          <name>Template App Generic Java JMX</name>
-         <description>Template tooling version used: 0.38</description>
+         <description>Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -897,7 +897,7 @@
                <type>JMX</type>
                <key>jmx["java.lang:type=OperatingSystem","OpenFileDescriptorCount"]</key>
                <history>7d</history>
-               <description>This is the number of opened file descriptors at the moment, if this reaches the MaxFileDescriptorCount, the application will throw an IOException: Too many open files. This could mean you’re are opening file descriptors and never closing them.</description>
+               <description>This is the number of opened file descriptors at the moment, if this reaches the MaxFileDescriptorCount, the application will throw an IOException: Too many open files. This could mean you're are opening file descriptors and never closing them.</description>
                <applications>
                   <application>
                      <name>JMX</name>

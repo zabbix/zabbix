@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -103,8 +103,6 @@ class CSetupWizard extends CForm {
 	}
 
 	protected function bodyToString(bool $destroy = true): string {
-		$step = $this->getStep();
-
 		$setup_left = (new CDiv())
 			->addClass(ZBX_STYLE_SETUP_LEFT)
 			->addItem((new CDiv(makeLogo(LOGO_TYPE_NORMAL)))->addClass('setup-logo'))
@@ -124,18 +122,18 @@ class CSetupWizard extends CForm {
 			$cancel_button = null;
 		}
 
-		if (array_key_exists($step + 1, $this->stage)) {
-			$next_button = new CSubmit('next['.$step.']', _('Next step'));
+		if (array_key_exists($this->getStep() + 1, $this->stage)) {
+			$next_button = new CSubmit('next['.$this->getStep().']', _('Next step'));
 		}
 		else {
 			$next_button = new CSubmit($this->SHOW_RETRY_BUTTON ? 'retry' : 'finish', _('Finish'));
 		}
 
-		$back_button = (new CSubmit('back['.$step.']', _('Back')))
+		$back_button = (new CSubmit('back['.$this->getStep().']', _('Back')))
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->addClass(ZBX_STYLE_FLOAT_LEFT);
 
-		if ($step == 0 || $this->DISABLE_BACK_BUTTON) {
+		if ($this->getStep() == 0 || $this->DISABLE_BACK_BUTTON) {
 			$back_button->setEnabled(false);
 		}
 
@@ -427,20 +425,6 @@ class CSetupWizard extends CForm {
 	}
 
 	private function stage5(): array {
-		/*
-		 * Having non-super-admin authenticated at this step means:
-		 *   - Either the config file has been manually created by the user.
-		 *   - Or dealing with a spoofed session cookie.
-		 *
-		 * Since it is not possible to distinguish between the two, it's also impossible to validate the config file
-		 * and display any discrepancies with the configuration stored within the session.
-		 */
-		if (CWebUser::$data && CWebUser::getType() < USER_TYPE_SUPER_ADMIN) {
-			CSession::clear();
-
-			return $this->stageInstalled();
-		}
-
 		$this->setConfig('ZBX_CONFIG_FILE_CORRECT', true);
 
 		$config_file_name = APP::getInstance()->getRootDir().CConfigFile::CONFIG_FILE_PATH;
@@ -492,29 +476,18 @@ class CSetupWizard extends CForm {
 					new CTag('li', true, _s('Save it as "%1$s"', $config_file_name))
 				])
 			];
+		}
+		else {
+			$this->DISABLE_CANCEL_BUTTON = true;
+			$this->DISABLE_BACK_BUTTON = true;
 
-			return [
-				new CTag('h1', true, _('Install')),
-				(new CDiv([$message_box, $message]))->addClass(ZBX_STYLE_SETUP_RIGHT_BODY)
+			$message_box = null;
+			$message = [
+				(new CTag('h1', true, _('Congratulations! You have successfully installed Zabbix frontend.')))
+					->addClass(ZBX_STYLE_GREEN),
+				new CTag('p', true, _s('Configuration file "%1$s" created.', ltrim(CConfigFile::CONFIG_FILE_PATH, '/')))
 			];
 		}
-
-		// Clear session after success install.
-		CSession::clear();
-
-		return $this->stageInstalled();
-	}
-
-	private function stageInstalled() {
-		$this->DISABLE_CANCEL_BUTTON = true;
-		$this->DISABLE_BACK_BUTTON = true;
-
-		$message_box = null;
-		$message = [
-			(new CTag('h1', true, _('Congratulations! You have successfully installed Zabbix frontend.')))
-				->addClass(ZBX_STYLE_GREEN),
-			new CTag('p', true, _s('Configuration file "%1$s" created.', ltrim(CConfigFile::CONFIG_FILE_PATH, '/')))
-		];
 
 		return [
 			new CTag('h1', true, _('Install')),
@@ -609,18 +582,6 @@ class CSetupWizard extends CForm {
 	}
 
 	private function eventHandler(): void {
-		/*
-		 * Having non-super-admin authenticated at this step means:
-		 *   - Either the config file has been manually created by the user.
-		 *   - Or dealing with a spoofed session cookie.
-		 *
-		 * Since it is not possible to distinguish between the two, skip data validation and prevent stage switching.
-		 * Any of either cases is only possible with 5th stage.
-		 */
-		if (CWebUser::$data && CWebUser::getType() < USER_TYPE_SUPER_ADMIN) {
-			return;
-		}
-
 		if (hasRequest('back') && array_key_exists($this->getStep(), getRequest('back'))) {
 			$this->doBack();
 		}

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -146,19 +146,10 @@ static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 {
 	zbx_es_httprequest_t	*request;
 	CURLcode		err;
-	zbx_es_env_t		*env;
 	int			err_index = -1;
 
 	if (!duk_is_constructor_call(ctx))
 		return DUK_RET_TYPE_ERROR;
-
-	duk_push_global_stash(ctx);
-
-	if (1 != duk_get_prop_string(ctx, -1, "\xff""\xff""zbx_env"))
-		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
-
-	env = (zbx_es_env_t *)duk_to_pointer(ctx, -1);
-	duk_pop(ctx);
 
 	duk_push_this(ctx);
 
@@ -177,7 +168,6 @@ static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_WRITEDATA, request, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_PRIVATE, request, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_SSL_VERIFYPEER, 0L, err);
-	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_TIMEOUT, (long)env->timeout, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_SSL_VERIFYHOST, 0L, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HEADERFUNCTION, curl_header_cb, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HEADERDATA, request, err);
@@ -273,6 +263,20 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 	char			*url = NULL, *contents = NULL;
 	CURLcode		err;
 	int			err_index = -1;
+	zbx_es_env_t		*env;
+	zbx_uint64_t		timeout_ms, elapsed_ms;
+
+	if (NULL == (env = zbx_es_get_env(ctx)))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
+
+	elapsed_ms = zbx_get_duration_ms(&env->start_time);
+	timeout_ms = (zbx_uint64_t)env->timeout * 1000;
+
+	if (elapsed_ms >= timeout_ms)
+	{
+		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "script execution timeout occurred");
+		goto out;
+	}
 
 	if (SUCCEED != zbx_cesu8_to_utf8(duk_to_string(ctx, 0), &url))
 	{
@@ -319,6 +323,7 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HTTPHEADER, request->headers, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_CUSTOMREQUEST, http_request, err);
+	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_TIMEOUT_MS, timeout_ms - elapsed_ms, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_POSTFIELDS, ZBX_NULL2EMPTY_STR(contents), err);
 	ZBX_CURL_SETOPT(ctx, request->handle, ZBX_CURLOPT_ACCEPT_ENCODING, "", err);
 

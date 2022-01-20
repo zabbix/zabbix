@@ -1,5 +1,5 @@
 
-# DELL PowerEdge R720 SNMP
+# Template Server DELL PowerEdge R720 SNMP
 
 ## Overview
 

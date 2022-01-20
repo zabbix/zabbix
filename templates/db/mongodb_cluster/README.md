@@ -25,7 +25,7 @@ This template was tested on:
 
 **Note**, depending on the number of DBs and collections discovery operation may be expensive. Use filters with macros {$MONGODB.LLD.FILTER.DB.MATCHES}, {$MONGODB.LLD.FILTER.DB.NOT_MATCHES}, {$MONGODB.LLD.FILTER.COLLECTION.MATCHES}, {$MONGODB.LLD.FILTER.COLLECTION.NOT_MATCHES}.
 
-All sharded Mongodb nodes (mongod) will be discovered with attached template "Template DB MongoDB node by Zabbix Agent 2".
+All sharded Mongodb nodes (mongod) will be discovered with attached template "MongoDB node by Zabbix Agent 2".
 
 
 Test availability: `zabbix_get -s mongos.node -k 'mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]"`
@@ -78,7 +78,7 @@ There are no template links in this template.
 |MongoDB sharded cluster |MongoDB cluster: Operations: insert, rate |<p>"The number of insert operations received the mongos instance per second."</p> |DEPENDENT |mongodb.opcounters.insert.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.opcounters.insert`</p><p>- CHANGE_PER_SECOND |
 |MongoDB sharded cluster |MongoDB cluster: Operations: getmore, rate |<p>"The number of “getmore” operations the mongos per second. This counter can be high even if the query count is low.</p><p>Secondary nodes send getMore operations as part of the replication process."</p> |DEPENDENT |mongodb.opcounters.getmore.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.opcounters.getmore`</p><p>- CHANGE_PER_SECOND |
 |MongoDB sharded cluster |MongoDB cluster: Last seen configserver |<p>The latest optime of the CSRS primary that the mongos has seen.</p> |DEPENDENT |mongodb.last_seen_config_server<p>**Preprocessing**:</p><p>- JAVASCRIPT: `data = JSON.parse(value) return data.sharding.lastSeenConfigServerOpTime.ts/Math.pow(2,32) `</p> |
-|MongoDB sharded cluster |MongoDB cluster: Configserver heartbeat |<p>Difference between the latest optime of the CSRS primary that the mongos has seen and cluster time.</p> |DEPENDENT |mongodb.config_server_heartbeat<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
+|MongoDB sharded cluster |MongoDB cluster: Configserver heartbeat |<p>Difference between the latest optime of the CSRS primary that the mongos has seen and cluster time.</p> |DEPENDENT |mongodb.config_server_heartbeat<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |MongoDB sharded cluster |MongoDB cluster: Bytes in, rate |<p>The total number of bytes that the server has received over network connections initiated by clients or other mongod/mongos instances per second.</p> |DEPENDENT |mongodb.network.bytes_in.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.network.bytesIn`</p><p>- CHANGE_PER_SECOND |
 |MongoDB sharded cluster |MongoDB cluster: Bytes out, rate |<p>The total number of bytes that the server has sent over network connections initiated by clients or other mongod/mongos instances per second.</p> |DEPENDENT |mongodb.network.bytes_out.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.network.bytesOut`</p><p>- CHANGE_PER_SECOND |
 |MongoDB sharded cluster |MongoDB cluster: Requests, rate |<p>Number of distinct requests that the server has received per second</p> |DEPENDENT |mongodb.network.numRequests.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.network.numRequests`</p><p>- CHANGE_PER_SECOND |
@@ -116,7 +116,7 @@ There are no template links in this template.
 |MongoDB sharded cluster |MongoDB {#DBNAME}.{#COLLECTION}: Capped |<p>Whether or not the collection is capped.</p> |DEPENDENT |mongodb.collection.capped["{#DBNAME}","{#COLLECTION}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.capped`</p><p>- BOOL_TO_DECIMAL<p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |Zabbix_raw_items |MongoDB cluster: Get server status |<p>The mongos statistic</p> |ZABBIX_PASSIVE |mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"] |
 |Zabbix_raw_items |MongoDB cluster: Get mongodb.connpool.stats |<p>Returns current info about connpool.stats.</p> |ZABBIX_PASSIVE |mongodb.connpool.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"] |
-|Zabbix_raw_items |MongoDB {#DBNAME}: Get db stats {#DBNAME} |<p>Returns statistics reflecting the database system’s state.</p> |ZABBIX_PASSIVE |mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"] |
+|Zabbix_raw_items |MongoDB {#DBNAME}: Get db stats {#DBNAME} |<p>Returns statistics reflecting the database system's state.</p> |ZABBIX_PASSIVE |mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"] |
 |Zabbix_raw_items |MongoDB {#DBNAME}.{#COLLECTION}: Get collection stats {#DBNAME}.{#COLLECTION} |<p>Returns a variety of storage statistics for a given collection.</p> |ZABBIX_PASSIVE |mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"] |
 
 ## Triggers

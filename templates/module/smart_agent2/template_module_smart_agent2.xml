@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-09-29T05:40:12Z</date>
+   <date>2021-12-24T10:21:04Z</date>
    <groups>
       <group>
          <name>Templates/Modules</name>
@@ -118,13 +118,11 @@ Template tooling version used: 0.39</description>
                               <macro>{#ID}</macro>
                               <value>{$SMART.ATTRIBUTE.ID.MATCHES}</value>
                               <formulaid>A</formulaid>
-                              <operator>MATCHES_REGEX</operator>
                            </condition>
                            <condition>
                               <macro>{#NAME}</macro>
                               <value>{$SMART.DISK.NAME.MATCHES}</value>
                               <formulaid>B</formulaid>
-                              <operator>MATCHES_REGEX</operator>
                            </condition>
                         </conditions>
                      </filter>
@@ -257,7 +255,7 @@ Template tooling version used: 0.39</description>
                      <delay>0</delay>
                      <history>7d</history>
                      <units>%</units>
-                     <description>Contains a vendor specific estimate of the percentage of NVM subsystem life used based on the actual usage and the manufacturer’s prediction of NVM life. A value of 100 indicates that the estimated endurance of the NVM in the NVM subsystem has been consumed, but may not indicate an NVM subsystem failure. The value is allowed to exceed 100. Percentages greater than 254 shall be represented as 255. This value shall be updated once per power-on hour (when the controller is not in a sleep state).</description>
+                     <description>Contains a vendor specific estimate of the percentage of NVM subsystem life used based on the actual usage and the manufacturer's prediction of NVM life. A value of 100 indicates that the estimated endurance of the NVM in the NVM subsystem has been consumed, but may not indicate an NVM subsystem failure. The value is allowed to exceed 100. Percentages greater than 254 shall be represented as 255. This value shall be updated once per power-on hour (when the controller is not in a sleep state).</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>{#DISKTYPE} {#NAME}</name>
@@ -411,7 +409,6 @@ Template tooling version used: 0.39</description>
                               <macro>{#DISKTYPE}</macro>
                               <value>nvme</value>
                               <formulaid>A</formulaid>
-                              <operator>MATCHES_REGEX</operator>
                            </condition>
                         </conditions>
                      </filter>

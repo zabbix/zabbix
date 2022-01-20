@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-10-20T07:20:38Z</date>
+   <date>2021-12-23T14:12:44Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -18,7 +18,7 @@ JUNIPER-ALARM-MIB&#13;
 JUNIPER-MIB&#13;
 SNMPv2-MIB&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <templates>
             <template>
                <name>Template Module EtherLike-MIB SNMP</name>
@@ -262,7 +262,6 @@ Reference: http://kb.juniper.net/library/CUSTOMERSERVICE/GLOBAL_JTAC/BK26199/SRX
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>{#SNMPVALUE}: CPU utilization</name>
@@ -332,7 +331,6 @@ Reference: http://kb.juniper.net/library/CUSTOMERSERVICE/GLOBAL_JTAC/BK26199/SRX
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>PSU Discovery</name>
@@ -372,7 +370,6 @@ This is fixed in Junos 13.3R7 https://forums.juniper.net/t5/Routing/PEM-0-not-OK
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature discovery</name>
@@ -410,6 +407,15 @@ The temperature in Celsius (degrees C) of {#SENSOR_INFO}</description>
                      </applications>
                      <trigger_prototypes>
                         <trigger_prototype>
+                           <expression>{avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                           <name>{#SENSOR_INFO}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
                            <expression>{avg(5m)}&gt;{$TEMP_WARN:""}</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
@@ -426,15 +432,6 @@ The temperature in Celsius (degrees C) of {#SENSOR_INFO}</description>
                            </dependencies>
                         </trigger_prototype>
                         <trigger_prototype>
-                           <expression>{avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                           <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
-                           <name>{#SENSOR_INFO}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                           <priority>HIGH</priority>
-                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
-                        </trigger_prototype>
-                        <trigger_prototype>
                            <expression>{avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
@@ -445,7 +442,6 @@ The temperature in Celsius (degrees C) of {#SENSOR_INFO}</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
          <macros>
@@ -494,23 +490,6 @@ The temperature in Celsius (degrees C) of {#SENSOR_INFO}</description>
    </templates>
    <value_maps>
       <value_map>
-         <name>JUNIPER-ALARM-MIB::jnxRedAlarmState</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>other</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>off</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>on - RedAlarm</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
          <name>JUNIPER-ALARM-MIB::jnxOperatingState</name>
          <mappings>
             <mapping>
@@ -540,6 +519,23 @@ The temperature in Celsius (degrees C) of {#SENSOR_INFO}</description>
             <mapping>
                <value>7</value>
                <newvalue>standby</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>JUNIPER-ALARM-MIB::jnxRedAlarmState</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>other</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>off</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>on - RedAlarm</newvalue>
             </mapping>
          </mappings>
       </value_map>
