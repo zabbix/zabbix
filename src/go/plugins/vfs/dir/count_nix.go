@@ -1,6 +1,9 @@
+//go:build !windows
+// +build !windows
+
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,11 +20,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package zabbixsync
+package dir
 
-func getMetrics() []string {
-	return []string{
-		"net.dns", "Checks if DNS service is up.",
-		"net.dns.record", "Performs DNS query.",
+import "io/fs"
+
+func (cp *countParams) skipType(path string, d fs.DirEntry) bool {
+	if len(cp.typesInclude) > 0 && !isTypeMatch(cp.typesInclude, d.Type()) {
+		return true
 	}
+
+	if len(cp.typesExclude) > 0 && isTypeMatch(cp.typesExclude, d.Type()) {
+		return true
+	}
+
+	return false
 }

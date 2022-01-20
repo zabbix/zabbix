@@ -50,8 +50,6 @@ int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_SWAP_OUT(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_USERS_NUM(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	VFS_DIR_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	VFS_DIR_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -96,10 +94,6 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 		cfunc = unsafe.Pointer(C.SYSTEM_SWAP_IN)
 	case "system.swap.out":
 		cfunc = unsafe.Pointer(C.SYSTEM_SWAP_OUT)
-	case "vfs.dir.count":
-		cfunc = unsafe.Pointer(C.VFS_DIR_COUNT)
-	case "vfs.dir.size":
-		cfunc = unsafe.Pointer(C.VFS_DIR_SIZE)
 	}
 	return
 }
