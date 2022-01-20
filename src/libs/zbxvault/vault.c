@@ -112,7 +112,7 @@ int	zbx_vault_kvs_get(const char *path, zbx_hashset_t *kvs, char **error)
 			path, ZBX_VAULT_TIMEOUT, kvs, error);
 }
 
-int	zbx_vault_init_db_credentials(char **error)
+int	zbx_vault_init_db_credentials(char **dbuser, char **dbpassword, char **error)
 {
 	int		ret = FAIL;
 	zbx_hashset_t	kvs;
@@ -127,14 +127,14 @@ int	zbx_vault_init_db_credentials(char **error)
 	if (NULL == CONFIG_VAULTDBPATH)
 		return SUCCEED;
 
-	if (NULL != CONFIG_DBUSER)
+	if (NULL != *dbuser)
 	{
 		*error = zbx_dsprintf(*error, "\"DBUser\" configuration parameter cannot be used when \"VaultDBPath\""
 				" is defined");
 		return FAIL;
 	}
 
-	if (NULL != CONFIG_DBPASSWORD)
+	if (NULL != *dbpassword)
 	{
 		*error = zbx_dsprintf(*error, "\"DBPassword\" configuration parameter cannot be used when"
 				" \"VaultDBPath\" is defined");
@@ -167,8 +167,8 @@ int	zbx_vault_init_db_credentials(char **error)
 		goto fail;
 	}
 
-	CONFIG_DBUSER = zbx_strdup(NULL, kv_username->value);
-	CONFIG_DBPASSWORD = zbx_strdup(NULL, kv_password->value);
+	*dbuser = zbx_strdup(NULL, kv_username->value);
+	*dbpassword = zbx_strdup(NULL, kv_password->value);
 
 	ret = SUCCEED;
 fail:

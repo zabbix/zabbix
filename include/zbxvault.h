@@ -29,7 +29,7 @@ typedef	int (*zbx_vault_kvs_get_cb_t)(const char *vault_url, const char *token, 
 
 int	zbx_vault_init(const char *vault, char **error);
 int	zbx_vault_init_token_from_env(char **error);
-int	zbx_vault_init_db_credentials(char **error);
+int	zbx_vault_init_db_credentials(char **dbuser, char **dbpassword, char **error);
 int	zbx_vault_kvs_get(const char *path, zbx_hashset_t *kvs, char **error);
 
 #endif
