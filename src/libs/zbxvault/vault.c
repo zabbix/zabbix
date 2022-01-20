@@ -30,9 +30,6 @@ extern char	*CONFIG_VAULTTLSCERTFILE;
 extern char	*CONFIG_VAULTTLSKEYFILE;
 extern char	*CONFIG_VAULTDBPATH;
 
-extern char	*CONFIG_DBUSER;
-extern char	*CONFIG_DBPASSWORD;
-
 static zbx_vault_kvs_get_cb_t	zbx_vault_kvs_get_cb;
 static char			*zbx_vault_key_dbuser, *zbx_vault_key_dbpassword;
 
