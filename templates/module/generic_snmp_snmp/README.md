@@ -17,13 +17,13 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$ICMP_LOSS_WARN} |<p>-</p> |`20` |
+|{$ICMP_RESPONSE_TIME_WARN} |<p>-</p> |`0.15` |
 |{$SNMP.TIMEOUT} |<p>-</p> |`5m` |
 
 ## Template links
 
-|Name|
-|----|
-|ICMP Ping |
+There are no template links in this template.
 
 ## Discovery rules
 
@@ -40,6 +40,9 @@ No specific Zabbix configuration is required.
 |General |System description |<p>MIB: SNMPv2-MIB</p><p>A textual description of the entity. This value should</p><p>include the full name and version identification of the system's hardware type, software operating-system, and</p><p>networking software.</p> |SNMP |system.descr[sysDescr.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
 |Status |Uptime |<p>MIB: SNMPv2-MIB</p><p>The time (in hundredths of a second) since the network management portion of the system was last re-initialized.</p> |SNMP |system.uptime[sysUpTime.0]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.01`</p> |
 |Status |SNMP agent availability |<p>Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.</p><p>Possible value:</p><p>0 - not available</p><p>1 - available</p><p>2 - unknown</p> |INTERNAL |zabbix[host,snmp,available] |
+|Status |ICMP ping |<p>-</p> |SIMPLE |icmpping |
+|Status |ICMP loss |<p>-</p> |SIMPLE |icmppingloss |
+|Status |ICMP response time |<p>-</p> |SIMPLE |icmppingsec |
 
 ## Triggers
 
@@ -48,6 +51,9 @@ No specific Zabbix configuration is required.
 |System name has changed (new name: {ITEM.VALUE}) |<p>System name has changed. Ack to close.</p> |`last(/Generic SNMP/system.name,#1)<>last(/Generic SNMP/system.name,#2) and length(last(/Generic SNMP/system.name))>0` |INFO |<p>Manual close: YES</p> |
 |{HOST.NAME} has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/Generic SNMP/system.uptime[sysUpTime.0])<10m` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- No SNMP data collection</p> |
 |No SNMP data collection |<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p> |`max(/Generic SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0` |WARNING |<p>**Depends on**:</p><p>- Unavailable by ICMP ping</p> |
+|Unavailable by ICMP ping |<p>Last three attempts returned timeout.  Please check device connectivity.</p> |`max(/Generic SNMP/icmpping,#3)=0` |HIGH | |
+|High ICMP ping loss |<p>-</p> |`min(/Generic SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Generic SNMP/icmppingloss,5m)<100` |WARNING |<p>**Depends on**:</p><p>- Unavailable by ICMP ping</p> |
+|High ICMP ping response time |<p>-</p> |`avg(/Generic SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}` |WARNING |<p>**Depends on**:</p><p>- High ICMP ping loss</p><p>- Unavailable by ICMP ping</p> |
 
 ## Feedback
 

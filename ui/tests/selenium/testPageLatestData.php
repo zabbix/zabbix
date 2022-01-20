@@ -25,19 +25,26 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
  */
 class testPageLatestData extends CWebTest {
 
+	private function getTable() {
+		$table_path = '//table['.CXPathHelper::fromClass('overflow-ellipsis').']';
+
+		return $this->query('xpath', $table_path)->asTable()->one();
+	}
+
 	public function testPageLatestData_CheckLayout() {
 		$this->page->login()->open('zabbix.php?action=latest.view');
 		$this->page->assertTitle('Latest data');
 		$this->page->assertHeader('Latest data');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
-		$this->assertEquals(['Host groups', 'Hosts', 'Name', 'Tags', 'Show details'],
-				$form->getLabels()->asText());
+		$this->assertEquals(['Host groups', 'Hosts', 'Name', 'Tags', 'Show tags', 'Tag display priority', 'Show details'],
+				$form->getLabels()->asText()
+		);
 		$this->assertTrue($form->query('xpath:.//label[text()="Show items without data"]')->one()->isValid());
 
 		// Show item without data is checked/disabled without Hosts in filter and checked/enabled with Hosts in filter.
 		foreach ([false, true] as $status) {
-			$form->query('id:filter_show_without_data')->one()->isEnabled($status);
-			$form->query('id:filter_show_without_data')->one()->isAttributePresent('checked');
+			$form->query('name:show_without_data')->one()->isEnabled($status);
+			$form->query('name:show_without_data')->one()->isAttributePresent('checked');
 			if (!$status) {
 				$form->fill(['Hosts' => 'Host 1 from first group']);
 			}
@@ -45,23 +52,24 @@ class testPageLatestData extends CWebTest {
 
 		// Check filter buttons.
 		foreach (['Apply', 'Reset'] as $button) {
-			$this->assertTrue($form->query('button', $button)->one()->isClickable());
+			$this->assertTrue($this->query('button', $button)->one()->isClickable());
 		}
 
 		// Check table headers.
-		$table = $this->query('class:list-table')->asTable()->one();
-		$this->assertEquals(['', 'Host', 'Name', 'Last check', 'Last value', 'Change', 'Tags', '', 'Info'],
-				$table->getHeadersText());
+		$this->assertEquals(['', 'Host', 'Name', 'Interval', 'History', 'Trends', 'Type', 'Last check', 'Last value',
+				'Change', 'Tags', '', 'Info'], $this->getTable()->getHeadersText()
+		);
 
 		// Check that sortable headers are clickable.
 		foreach (['Host', 'Name'] as $header) {
-			$this->assertTrue($table->query('xpath:.//th/a[text()="'.$header.'"]')->one()->isClickable());
+			$this->assertTrue($this->getTable()->query('xpath:.//th/a[text()="'.$header.'"]')->one()->isClickable());
 		}
 
 		// Check filter collapse/expand.
-		$filter_tab = $this->query('xpath://a[contains(@class, "filter-trigger")]')->one();
-		foreach ([true, false] as $status) {
-			$this->assertEquals($status, $this->query('xpath://div[contains(@class, "filter-container")]')->one()->isDisplayed());
+		$filter_tab = $this->query('xpath://a[contains(@class, "tabfilter-item-link")]')->one();
+		foreach ([false, true] as $status) {
+			$this->assertEquals($status, $this->query('xpath://div[contains(@class, "tabfilter-collapsed")]')
+					->one(false)->isValid());
 			$filter_tab->click();
 		}
 	}
@@ -75,9 +83,8 @@ class testPageLatestData extends CWebTest {
 				' AND name <> host'
 		);
 		$this->page->login()->open('zabbix.php?action=latest.view');
-		$table = $this->query('class:list-table')->asTable()->one();
 		foreach ($result as $hostname) {
-			$this->assertFalse($table->query('xpath://td/a[text()='.CXPathHelper::escapeQuotes($hostname['host']).']')
+			$this->assertFalse($this->getTable()->query('xpath://td/a[text()='.CXPathHelper::escapeQuotes($hostname['host']).']')
 					->one(false)->isDisplayed());
 		}
 	}
@@ -180,11 +187,9 @@ class testPageLatestData extends CWebTest {
 	public function testPageLatestData_checkItemDescription($data) {
 		// Open Latest data for host 'testPageHistory_CheckLayout'
 		$this->page->login()->open('zabbix.php?&action=latest.view&show_details=0&hostids%5B%5D='.$data['hostid']);
-		$table_path = '//table['.CXPathHelper::fromClass('overflow-ellipsis').']';
-		$table = $this->query('xpath', $table_path)->asTable()->one();
 
 		// Find rows from the data provider and click on the description icon if such should persist.
-		$row = $table->findRow('Name', $data['Item name'], true);
+		$row = $this->getTable()->findRow('Name', $data['Item name'], true);
 
 		if (CTestArrayHelper::get($data,'description', false)) {
 			$row->query('class:icon-description')->one()->click()->waitUntilReady();
@@ -240,15 +245,14 @@ class testPageLatestData extends CWebTest {
 		$true_time = date("Y-m-d H:i:s", $time);
 		$this->page->login()->open('zabbix.php?action=latest.view');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
-		$form->query('button:Reset')->one()->click();
+		$this->query('button:Reset')->one()->click();
 		$form->fill(['Name' => '4_item'])->submit();
-		$table = $this->query('class:list-table')->asTable()->one();
 
 		foreach (['Last check', 'Last value'] as $column) {
 			if ($column === 'Last value') {
-				$this->assertEquals('15 UNIT', $table->getRow(0)->getColumn($column)->getText());
+				$this->assertEquals('15 UNIT', $this->getTable()->getRow(0)->getColumn($column)->getText());
 			}
-			$table->getRow(0)->getColumn($column)->query('class:cursor-pointer')->one()->click();
+			$this->getTable()->getRow(0)->getColumn($column)->query('class:cursor-pointer')->one()->click();
 			$hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last()->getText();
 			$compare_hint = ($column === 'Last check') ? $true_time : $value;
 			$this->assertEquals($compare_hint, $hint);

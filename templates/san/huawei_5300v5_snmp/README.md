@@ -6,9 +6,6 @@
 For Zabbix version: 6.0 and higher  
 The template to monitor SAN Huawei OceanStor 5300 V5 by Zabbix SNMP agent.
 
-
-
-
 This template was tested on:
 
 - Huawei OceanStor 5300 V5
@@ -22,9 +19,6 @@ This template was tested on:
 2\. Link the template to the host.
 
 3\. Customize macro values if needed.
-
-
-
 
 ## Zabbix configuration
 
@@ -46,24 +40,25 @@ No specific Zabbix configuration is required.
 |{$HUAWEI.5300.POOL.CAPACITY.THRESH.TIME} |<p>The time during which free capacity may exceed the {#THRESHOLD} from hwInfoStoragePoolFullThreshold.</p> |`5m` |
 |{$HUAWEI.5300.TEMP.MAX.TIME} |<p>The time during which temperature of enclosure may exceed the threshold.</p> |`3m` |
 |{$HUAWEI.5300.TEMP.MAX.WARN} |<p>Maximum temperature of enclosure</p> |`35` |
+|{$ICMP_LOSS_WARN} |<p>-</p> |`20` |
+|{$ICMP_RESPONSE_TIME_WARN} |<p>-</p> |`0.15` |
+|{$SNMP.TIMEOUT} |<p>-</p> |`5m` |
 
 ## Template links
 
-|Name|
-|----|
-|Generic SNMP |
+There are no template links in this template.
 
 ## Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
+|BBU discovery |<p>Discovery of BBU</p> |SNMP |huawei.5300.bbu.discovery |
 |Controllers discovery |<p>Discovery of controllers</p> |SNMP |huawei.5300.controllers.discovery |
+|Disks discovery |<p>Discovery of disks</p> |SNMP |huawei.5300.disks.discovery |
 |Enclosure discovery |<p>Discovery of enclosures</p> |SNMP |huawei.5300.enclosure.discovery |
 |FANs discovery |<p>Discovery of FANs</p> |SNMP |huawei.5300.fan.discovery |
-|BBU discovery |<p>Discovery of BBU</p> |SNMP |huawei.5300.bbu.discovery |
-|Disks discovery |<p>Discovery of disks</p> |SNMP |huawei.5300.disks.discovery |
-|Nodes performance discovery |<p>Discovery of nodes performance counters</p> |SNMP |huawei.5300.nodes.discovery |
 |LUNs discovery |<p>Discovery of LUNs</p> |SNMP |huawei.5300.lun.discovery |
+|Nodes performance discovery |<p>Discovery of nodes performance counters</p> |SNMP |huawei.5300.nodes.discovery |
 |Storage pools discovery |<p>Discovery of storage pools</p> |SNMP |huawei.5300.pool.discovery |
 
 ## Items collected
@@ -72,6 +67,12 @@ No specific Zabbix configuration is required.
 |-----|----|-----------|----|---------------------|
 |CPU |Controller {#ID}: CPU utilization |<p>CPU usage of a controller {#ID}.</p> |SNMP |huawei.5300.v5[hwInfoControllerCPUUsage, "{#ID}"] |
 |CPU |Node {#NODE}: CPU utilization |<p>CPU usage of the node {#NODE}.</p> |SNMP |huawei.5300.v5[hwPerfNodeCPUUsage, "{#NODE}"] |
+|General |SNMP traps (fallback) |<p>The item is used to collect all SNMP traps unmatched by other snmptrap items</p> |SNMP_TRAP |snmptrap.fallback |
+|General |System location |<p>MIB: SNMPv2-MIB</p><p>The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.</p> |SNMP |system.location[sysLocation.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
+|General |System contact details |<p>MIB: SNMPv2-MIB</p><p>The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.</p> |SNMP |system.contact[sysContact.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
+|General |System object ID |<p>MIB: SNMPv2-MIB</p><p>The vendor's authoritative identification of the network management subsystem contained in the entity.  This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.</p> |SNMP |system.objectid[sysObjectID.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
+|General |System name |<p>MIB: SNMPv2-MIB</p><p>An administratively-assigned name for this managed node.By convention, this is the node's fully-qualified domain name.  If the name is unknown, the value is the zero-length string.</p> |SNMP |system.name<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
+|General |System description |<p>MIB: SNMPv2-MIB</p><p>A textual description of the entity. This value should</p><p>include the full name and version identification of the system's hardware type, software operating-system, and</p><p>networking software.</p> |SNMP |system.descr[sysDescr.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
 |Huawei |OceanStor 5300 V5: Status |<p>System running status.</p> |SNMP |huawei.5300.v5[status]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Huawei |OceanStor 5300 V5: Version |<p>The device version.</p> |SNMP |huawei.5300.v5[version]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Huawei |OceanStor 5300 V5: Capacity total |<p>Total capacity of a device.</p> |SNMP |huawei.5300.v5[totalCapacity]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1048576`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
@@ -115,6 +116,11 @@ No specific Zabbix configuration is required.
 |Huawei |Pool {#NAME}: Capacity free |<p>Available capacity of a storage pool.</p> |SNMP |huawei.5300.v5[hwInfoStoragePoolFreeCapacity, "{#NAME}"]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1048576`</p> |
 |Huawei |Pool {#NAME}: Capacity used |<p>Used capacity of a storage pool.</p> |SNMP |huawei.5300.v5[hwInfoStoragePoolSubscribedCapacity, "{#NAME}"]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1048576`</p> |
 |Huawei |Pool {#NAME}: Capacity used percentage |<p>Used capacity of a storage pool in percents.</p> |CALCULATED |huawei.5300.v5[hwInfoStoragePoolFreeCapacityPct, "{#NAME}"]<p>**Expression**:</p>`last(//huawei.5300.v5[hwInfoStoragePoolSubscribedCapacity, "{#NAME}"])/last(//huawei.5300.v5[hwInfoStoragePoolTotalCapacity, "{#NAME}"])*100` |
+|Status |Uptime |<p>MIB: SNMPv2-MIB</p><p>The time (in hundredths of a second) since the network management portion of the system was last re-initialized.</p> |SNMP |system.uptime[sysUpTime.0]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.01`</p> |
+|Status |SNMP agent availability |<p>Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.</p><p>Possible value:</p><p>0 - not available</p><p>1 - available</p><p>2 - unknown</p> |INTERNAL |zabbix[host,snmp,available] |
+|Status |ICMP ping |<p>-</p> |SIMPLE |icmpping |
+|Status |ICMP loss |<p>-</p> |SIMPLE |icmppingloss |
+|Status |ICMP response time |<p>-</p> |SIMPLE |icmppingsec |
 
 ## Triggers
 
@@ -122,6 +128,7 @@ No specific Zabbix configuration is required.
 |----|-----------|----|----|----|
 |Controller {#ID}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m) |<p>CPU utilization is too high. The system might be slow to respond.</p> |`min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerCPUUsage, "{#ID}"],5m)>{$CPU.UTIL.CRIT}` |WARNING | |
 |Node {#NODE}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m) |<p>CPU utilization is too high. The system might be slow to respond.</p> |`min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwPerfNodeCPUUsage, "{#NODE}"],5m)>{$CPU.UTIL.CRIT}` |WARNING | |
+|System name has changed (new name: {ITEM.VALUE}) |<p>System name has changed. Ack to close.</p> |`last(/Huawei OceanStor 5300 V5 SNMP/system.name,#1)<>last(/Huawei OceanStor 5300 V5 SNMP/system.name,#2) and length(last(/Huawei OceanStor 5300 V5 SNMP/system.name))>0` |INFO |<p>Manual close: YES</p> |
 |OceanStor 5300 V5: Storage version has been changed |<p>OceanStor 5300 V5 version has changed. Ack to close.</p> |`last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[version],#1)<>last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[version],#2) and length(last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[version]))>0` |INFO |<p>Manual close: YES</p> |
 |Controller {#ID}: Memory usage is too high (over {$HUAWEI.5300.MEM.MAX.WARN} for {$HUAWEI.5300.MEM.MAX.TIME}) |<p>-</p> |`min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerMemoryUsage, "{#ID}"],{$HUAWEI.5300.MEM.MAX.TIME})>{$HUAWEI.5300.MEM.MAX.WARN}` |AVERAGE | |
 |Controller {#ID}: Health status is not Normal |<p>-</p> |`last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerHealthStatus, "{#ID}"])<>1` |HIGH | |
@@ -143,10 +150,15 @@ No specific Zabbix configuration is required.
 |Pool {#NAME}: Health status is not Normal |<p>-</p> |`last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoStoragePoolHealthStatus, "{#NAME}"])<>1` |HIGH | |
 |Pool {#NAME}: Running status is not Online |<p>-</p> |`last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoStoragePoolRunningStatus, "{#NAME}"])<>27` |AVERAGE | |
 |Pool {#NAME}: Used capacity is too high (over {#THRESHOLD}%) |<p>-</p> |`min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoStoragePoolFreeCapacityPct, "{#NAME}"],{$HUAWEI.5300.POOL.CAPACITY.THRESH.TIME})>{#THRESHOLD}` |AVERAGE | |
+|{HOST.NAME} has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/Huawei OceanStor 5300 V5 SNMP/system.uptime[sysUpTime.0])<10m` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- No SNMP data collection</p> |
+|No SNMP data collection |<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p> |`max(/Huawei OceanStor 5300 V5 SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0` |WARNING |<p>**Depends on**:</p><p>- Unavailable by ICMP ping</p> |
+|Unavailable by ICMP ping |<p>Last three attempts returned timeout.  Please check device connectivity.</p> |`max(/Huawei OceanStor 5300 V5 SNMP/icmpping,#3)=0` |HIGH | |
+|High ICMP ping loss |<p>-</p> |`min(/Huawei OceanStor 5300 V5 SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Huawei OceanStor 5300 V5 SNMP/icmppingloss,5m)<100` |WARNING |<p>**Depends on**:</p><p>- Unavailable by ICMP ping</p> |
+|High ICMP ping response time |<p>-</p> |`avg(/Huawei OceanStor 5300 V5 SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}` |WARNING |<p>**Depends on**:</p><p>- High ICMP ping loss</p><p>- Unavailable by ICMP ping</p> |
 
 ## Feedback
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/418855-discussion-thread-for-official-zabbix-template-huawei-oceanstor).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/418855-discussion-thread-for-official-zabbix-template-huawei-oceanstor).
 

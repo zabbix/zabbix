@@ -643,7 +643,7 @@ class CElement extends CBaseElement implements IWaitable {
 			return $this->asCompositeInput($options);
 		}
 
-		if (in_array('input-color-picker', $class)) {
+		if (in_array('color-picker', $class)) {
 			return $this->asColorPicker($options);
 		}
 

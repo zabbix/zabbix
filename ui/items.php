@@ -555,12 +555,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 				if ($simple_interval_parser->parse($interval['delay']) != CParser::PARSE_SUCCESS) {
 					$result = false;
-					info(_s('Invalid interval "%1$s".', $interval['delay']));
+					error(_s('Invalid interval "%1$s".', $interval['delay']));
 					break;
 				}
 				elseif ($time_period_parser->parse($interval['period']) != CParser::PARSE_SUCCESS) {
 					$result = false;
-					info(_s('Invalid interval "%1$s".', $interval['period']));
+					error(_s('Invalid interval "%1$s".', $interval['period']));
 					break;
 				}
 
@@ -573,7 +573,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 				if ($scheduling_interval_parser->parse($interval['schedule']) != CParser::PARSE_SUCCESS) {
 					$result = false;
-					info(_s('Invalid interval "%1$s".', $interval['schedule']));
+					error(_s('Invalid interval "%1$s".', $interval['schedule']));
 					break;
 				}
 

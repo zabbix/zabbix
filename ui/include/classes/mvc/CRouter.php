@@ -195,7 +195,6 @@ class CRouter {
 		'popup.tabfilter.update'					=> ['CControllerPopupTabFilterUpdate',					'layout.json',			null],
 		'popup.testtriggerexpr'						=> ['CControllerPopupTestTriggerExpr',					'layout.json',			'popup.testtriggerexpr'],
 		'popup.triggerexpr'							=> ['CControllerPopupTriggerExpr',						'layout.json',			'popup.triggerexpr'],
-		'popup.triggerwizard'						=> ['CControllerPopupTriggerWizard',					'layout.json',			'popup.triggerwizard'],
 		'popup.massupdate.host'						=> ['CControllerPopupMassupdateHost',					'layout.json',			'popup.massupdate.host'],
 		'popup.massupdate.item'						=> ['CControllerPopupMassupdateItem',					'layout.json',			'popup.massupdate.item'],
 		'popup.massupdate.itemprototype'			=> ['CControllerPopupMassupdateItem',					'layout.json',			'popup.massupdate.item'],

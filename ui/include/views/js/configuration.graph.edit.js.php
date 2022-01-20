@@ -482,7 +482,7 @@
 			}
 
 			$('#itemButtonsRow').before($row);
-			$row.find('.input-color-picker input').colorpicker();
+			$row.find('.<?= ZBX_STYLE_COLOR_PICKER ?> input').colorpicker();
 
 			colorPalette.incrementNextColor();
 
@@ -516,9 +516,9 @@
 				};
 				const $row = $(itemTpl.evaluate(item));
 
-				$row.find('#items_' + number + '_calc_fnc').val('<?= CALC_FNC_AVG ?>');
 				$('#itemButtonsRow').before($row);
-				$row.find('.input-color-picker input').colorpicker();
+				$row.find('#items_' + number + '_calc_fnc').val('<?= CALC_FNC_AVG ?>');
+				$(`#items_${number}_color`).colorpicker();
 			}
 
 			if (!this.graphs.readonly) {

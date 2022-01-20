@@ -42,21 +42,7 @@ include __DIR__.'/itemtest.js.php';
 			const $value_type = $('#value_type');
 
 			$('#type')
-				.change(function() {
-					view.typeChangeHandler();
-
-					const type = $(this).val();
-					const old_value = $value_type.val();
-
-					if (type == <?= ITEM_TYPE_CALCULATED ?>) {
-						if (!(old_value == <?= ITEM_VALUE_TYPE_UINT64 ?>
-								|| old_value == <?= ITEM_VALUE_TYPE_FLOAT ?>)) {
-							$value_type.val(<?= ITEM_VALUE_TYPE_UINT64 ?>);
-						}
-
-						$value_type.trigger('change');
-					}
-				})
+				.change(typeChangeHandler)
 				.trigger('change');
 
 			// Whenever non-numeric type is changed back to numeric type, set the default value in "trends" field.
