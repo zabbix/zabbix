@@ -82,8 +82,6 @@
 #include "sighandler.h"
 #include "zbxrtc.h"
 #include "zbxha.h"
-#include "../libs/zbxhashicorp/hashicorp.h"
-#include "../libs/zbxcyberark/cyberark.h"
 
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"

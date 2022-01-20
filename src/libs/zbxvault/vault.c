@@ -20,6 +20,7 @@
 #include "zbxvault.h"
 #include "../zbxhashicorp/hashicorp.h"
 #include "../zbxcyberark/cyberark.h"
+#include "../zbxkvs/kvs.h"
 
 #define ZBX_VAULT_TIMEOUT	SEC_PER_MIN
 
@@ -32,8 +33,8 @@ extern char	*CONFIG_VAULTDBPATH;
 extern char	*CONFIG_DBUSER;
 extern char	*CONFIG_DBPASSWORD;
 
-static zbx_vault_kvs_get_cb_t			zbx_vault_kvs_get_cb;
-static zbx_vault_init_db_credentials_cb_t	zbx_vault_init_db_credentials_cb;
+static zbx_vault_kvs_get_cb_t	zbx_vault_kvs_get_cb;
+static char			*zbx_vault_key_dbuser, *zbx_vault_key_dbpassword;
 
 int	zbx_vault_init_token_from_env(char **error)
 {
@@ -56,32 +57,43 @@ int	zbx_vault_init_token_from_env(char **error)
 	return SUCCEED;
 }
 
-static void	zbx_vault_init_cb(zbx_vault_kvs_get_cb_t vault_kvs_get_cb,
-		zbx_vault_init_db_credentials_cb_t vault_init_db_credentials)
+static void	zbx_vault_init_cb(zbx_vault_kvs_get_cb_t vault_kvs_get_cb)
 {
 	zbx_vault_kvs_get_cb = vault_kvs_get_cb;
-	zbx_vault_init_db_credentials_cb = vault_init_db_credentials;
 }
 
 int	zbx_vault_init(const char *vault, char **error)
 {
-	if (NULL == vault || '\0' == *vault)
+	if (NULL == vault || '\0' == *vault || 0 == strcmp(vault, ZBX_VAULT_HASHICORP))
 	{
-		zbx_vault_init_cb(zbx_hashicorp_kvs_get, zbx_hashicorp_init_db_credentials);
-	}
-	else if (0 == strcmp(vault, ZBX_VAULT_HASHICORP))
-	{
-		zbx_vault_init_cb(zbx_hashicorp_kvs_get, zbx_hashicorp_init_db_credentials);
-		if (NULL == CONFIG_VAULTTOKEN)
+		if (NULL == CONFIG_VAULTTOKEN && 0 == zbx_strcmp_null(vault, ZBX_VAULT_HASHICORP))
 		{
 			*error = zbx_dsprintf(*error, "\"Vault\" value \"%s\" requires \"VaultToken\" configuration"
 					" parameter or \"VAULT_TOKEN\" environment variable", vault);
 			return FAIL;
 		}
+
+		zbx_vault_init_cb(zbx_hashicorp_kvs_get);
+		zbx_vault_key_dbuser = ZBX_KEY_HASHICORP_USERNAME;
+		zbx_vault_key_dbpassword = ZBX_KEY_HASHICORP_PASSWORD;
 	}
 	else if (0 == strcmp(vault, ZBX_VAULT_CYBERARKCPP))
 	{
-		zbx_vault_init_cb(zbx_cyberark_kvs_get, zbx_cyberark_init_db_credentials);
+		if (NULL != CONFIG_VAULTTOKEN)
+		{
+			*error = zbx_dsprintf(*error, "\"Vault\" value \"%s\" requires \"VaultToken\" configuration"
+					" parameter and \"VAULT_TOKEN\" environment variable not to be defined", vault);
+			return FAIL;
+		}
+
+		zbx_vault_init_cb(zbx_cyberark_kvs_get);
+		zbx_vault_key_dbuser = ZBX_KEY_CYBERARK_USERNAME;
+		zbx_vault_key_dbpassword = ZBX_KEY_CYBERARK_PASSWORD;
+	}
+	else
+	{
+		*error = zbx_dsprintf(*error, "invalid \"Vault\" configuration parameter: '%s'", vault);
+		return FAIL;
 	}
 
 	return SUCCEED;
@@ -92,6 +104,7 @@ int	zbx_vault_kvs_get(const char *path, zbx_hashset_t *kvs, char **error)
 	if (NULL == zbx_vault_kvs_get_cb)
 	{
 		*error = zbx_dsprintf(*error, "missing vault library");
+		THIS_SHOULD_NEVER_HAPPEN;
 		return FAIL;
 	}
 
@@ -101,7 +114,11 @@ int	zbx_vault_kvs_get(const char *path, zbx_hashset_t *kvs, char **error)
 
 int	zbx_vault_init_db_credentials(char **error)
 {
-	if (NULL == zbx_vault_init_db_credentials_cb)
+	int		ret = FAIL;
+	zbx_hashset_t	kvs;
+	zbx_kv_t	*kv_username, *kv_password, kv_local;
+
+	if (NULL == zbx_vault_kvs_get_cb)
 	{
 		*error = zbx_dsprintf(*error, "missing vault library");
 		return FAIL;
@@ -124,7 +141,38 @@ int	zbx_vault_init_db_credentials(char **error)
 		return FAIL;
 	}
 
-	return zbx_vault_init_db_credentials_cb(CONFIG_VAULTURL, CONFIG_VAULTTOKEN,
-			CONFIG_VAULTTLSCERTFILE, CONFIG_VAULTTLSKEYFILE, CONFIG_VAULTDBPATH, ZBX_VAULT_TIMEOUT,
-			&CONFIG_DBUSER, &CONFIG_DBPASSWORD, error);
+	zbx_hashset_create_ext(&kvs, 2, zbx_kv_hash, zbx_kv_compare, zbx_kv_clean,
+			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+
+	if (SUCCEED != zbx_vault_kvs_get_cb(CONFIG_VAULTURL, CONFIG_VAULTTOKEN, CONFIG_VAULTTLSCERTFILE,
+			CONFIG_VAULTTLSKEYFILE, CONFIG_VAULTDBPATH, ZBX_VAULT_TIMEOUT, &kvs,
+			error))
+	{
+		goto fail;
+	}
+
+	kv_local.key = zbx_vault_key_dbuser;
+
+	if (NULL == (kv_username = (zbx_kv_t *)zbx_hashset_search(&kvs, &kv_local)))
+	{
+		*error = zbx_dsprintf(*error, "cannot retrieve value of key \"%s\"", ZBX_PROTO_TAG_USERNAME);
+		goto fail;
+	}
+
+	kv_local.key = zbx_vault_key_dbpassword;
+
+	if (NULL == (kv_password = (zbx_kv_t *)zbx_hashset_search(&kvs, &kv_local)))
+	{
+		*error = zbx_dsprintf(*error, "cannot retrieve value of key \"%s\"", ZBX_PROTO_TAG_PASSWORD);
+		goto fail;
+	}
+
+	CONFIG_DBUSER = zbx_strdup(NULL, kv_username->value);
+	CONFIG_DBPASSWORD = zbx_strdup(NULL, kv_password->value);
+
+	ret = SUCCEED;
+fail:
+	zbx_hashset_destroy(&kvs);
+
+	return ret;
 }
