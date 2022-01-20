@@ -20,7 +20,6 @@
 #ifndef ZABBIX_HASHICORP_H
 #define ZABBIX_HASHICORP_H
 
-#include "common.h"
 #include "zbxalgo.h"
 
 #define ZBX_VAULT_HASHICORP		"HashiCorp"
