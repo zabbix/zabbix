@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -17,48 +17,63 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
-
-/**
- * @var CView $this
- */
 ?>
-(function () {
-	let $widget_form = $('form[name="<?= $data['form'] ?>"]');
-	let $thresholds_table = $widget_form.find('#thresholds_table');
 
-	$('[name="display"],[name="data"],[name="aggregate_function"]', $widget_form).change(updateAccessability);
 
-	$thresholds_table.dynamicRows({
-		rows: <?= json_encode($data['thresholds']) ?>,
-		template: '#thresholds-row-tmpl',
-		dataCallback: row_data => row_data.color = colorPalette.getNextColor()
-	});
-	$('tr.form_row input[name$="[color]"]', $thresholds_table).each((i, colorpicker) => {
-		$(colorpicker).colorpicker({appendTo: $(colorpicker).closest('.input-color-picker')});
-	});
-	$thresholds_table.on('afteradd.dynamicRows', e => {
-		let $colorpicker = $('tr.form_row:last input[name$="[color]"]', e.target);
+window.tophosts_column_edit_form = new class {
 
-		$colorpicker.colorpicker({appendTo: $colorpicker.closest('.input-color-picker')});
-	});
-	$thresholds_table.on('blur afterremove.dynamicRows', 'input[name$="[threshold]"]', sortThresholdsTable);
-	$widget_form.on('process.form', handleFormSubmit);
+	init({form_name, thresholds, thresholds_colors}) {
+		this._$widget_form = $(`form[name="${form_name}"]`);
+		this._$thresholds_table = this._$widget_form.find('#thresholds_table');
 
-	function sortThresholdsTable() {
+		$('[name="display"],[name="data"],[name="aggregate_function"]', this._$widget_form).on('change', () => {
+			this.updateAccessibility();
+		});
+
+		colorPalette.setThemeColors(thresholds_colors);
+
+		this._$thresholds_table.dynamicRows({
+			rows: thresholds,
+			template: '#thresholds-row-tmpl',
+			dataCallback: row_data => row_data.color = colorPalette.getNextColor()
+		});
+
+		$('tr.form_row input[name$="[color]"]', this._$thresholds_table).each((i, colorpicker) => {
+			$(colorpicker).colorpicker({appendTo: $(colorpicker).closest('.input-color-picker')});
+		});
+
+		this._$thresholds_table.on('afteradd.dynamicRows', e => {
+			const $colorpicker = $('tr.form_row:last input[name$="[color]"]', e.target);
+
+			$colorpicker.colorpicker({appendTo: $colorpicker.closest('.input-color-picker')});
+		});
+
+		this._$thresholds_table.on('blur afterremove.dynamicRows', 'input[name$="[threshold]"]', () => {
+			this.sortThresholdsTable();
+		});
+
+		this._$widget_form.on('process.form', (e, overlay) => {
+			this.handleFormSubmit(e, overlay);
+		});
+
+		// Initialize form elements accessibility.
+		this.updateAccessibility();
+	}
+
+	sortThresholdsTable() {
 		let rows = [];
 
-		$thresholds_table.find('tr.form_row').each((i, row) => {
-			let color = $('input[name$="[color]"]', row).val();
-			let threshold = $('input[name$="[threshold]"]', row).val();
+		this._$thresholds_table.find('tr.form_row').each((i, row) => {
+			const color = $('input[name$="[color]"]', row).val();
+			const threshold = $('input[name$="[threshold]"]', row).val();
 
-			if (isNaN(+threshold) || $.trim(threshold) === '') {
+			if (isNaN(threshold) || $.trim(threshold) === '') {
 				rows = [];
 
-				return false;
+				return;
 			}
 
-			rows[rows.length] = {color: color, threshold: threshold};
+			rows[rows.length] = {color, threshold};
 		});
 
 		if (!rows.length) {
@@ -67,31 +82,29 @@
 
 		rows = rows.sort((a, b) => a.threshold - b.threshold);
 
-		$thresholds_table.find('tr.form_row').each((i, row) => {
-			let $colorinput = $('input[name$="[color]"]', row);
-
-			$.colorpicker('set_color_by_id', $colorinput.attr('id'), rows[i].color);
+		this._$thresholds_table.find('tr.form_row').each((i, row) => {
+			$.colorpicker('set_color_by_id', $('input[name$="[color]"]', row).attr('id'), rows[i].color);
 			$('input[name$="[threshold]"]', row).val(rows[i].threshold);
 		});
 	}
 
-	function updateAccessability() {
-		let display_as_is = ($('[name="display"]:checked').val() == <?= CWidgetFieldColumnsList::DISPLAY_AS_IS ?>);
-		let data_item_value = ($('[name="data"]').val() == <?= CWidgetFieldColumnsList::DATA_ITEM_VALUE ?>);
-		let data_text = ($('[name="data"]').val() == <?= CWidgetFieldColumnsList::DATA_TEXT ?>);
-		let no_aggregate_function = $('[name="aggregate_function"]').val() == <?= CWidgetFieldColumnsList::FUNC_NONE ?>;
+	updateAccessibility() {
+		const display_as_is = ($('[name="display"]:checked').val() == <?= CWidgetFieldColumnsList::DISPLAY_AS_IS ?>);
+		const data_item_value = ($('[name="data"]').val() == <?= CWidgetFieldColumnsList::DATA_ITEM_VALUE ?>);
+		const data_text = ($('[name="data"]').val() == <?= CWidgetFieldColumnsList::DATA_TEXT ?>);
+		const no_aggregate_function = $('[name="aggregate_function"]').val() == <?= CWidgetFieldColumnsList::FUNC_NONE ?>;
 
-		$('#item', $widget_form).multiSelect(data_item_value ? 'enable' : 'disable');
-		$('[name="aggregate_function"],[name="timeshift"]', $widget_form).attr('disabled', !data_item_value);
-		$('[name="aggregate_interval"]', $widget_form).attr('disabled', !data_item_value || no_aggregate_function);
-		$('[name="display"],[name="history"]', $widget_form).attr('disabled', !data_item_value);
-		$('[name="text"]', $widget_form).attr('disabled', !data_text);
-		$('[name="min"],[name="max"]', $widget_form).attr('disabled', display_as_is || !data_item_value);
-		$thresholds_table.toggleClass('disabled', !data_item_value);
-		$('[name$="[color]"],[name$="[threshold]"],button', $thresholds_table).attr('disabled', !data_item_value);
+		$('#item', this._$widget_form).multiSelect(data_item_value ? 'enable' : 'disable');
+		$('[name="aggregate_function"],[name="timeshift"]', this._$widget_form).attr('disabled', !data_item_value);
+		$('[name="aggregate_interval"]', this._$widget_form).attr('disabled', !data_item_value || no_aggregate_function);
+		$('[name="display"],[name="history"]', this._$widget_form).attr('disabled', !data_item_value);
+		$('[name="text"]', this._$widget_form).attr('disabled', !data_text);
+		$('[name="min"],[name="max"]', this._$widget_form).attr('disabled', display_as_is || !data_item_value);
+		this._$thresholds_table.toggleClass('disabled', !data_item_value);
+		$('[name$="[color]"],[name$="[threshold]"],button', this._$thresholds_table).attr('disabled', !data_item_value);
 
 		// Toggle visibility of disabled form elements.
-		$('.form-grid > label', $widget_form).each((i, elm) => {
+		$('.form-grid > label', this._$widget_form).each((i, elm) => {
 			const form_field = $(elm).next();
 			const is_visible = (form_field.find(':disabled,.disabled').length == 0);
 
@@ -100,13 +113,11 @@
 		});
 	}
 
-	function handleFormSubmit(e, overlay) {
-		let url = new Curl(e.target.getAttribute('action'));
-
-		fetch(url.getUrl(), {
-				method: 'POST',
-				body: new URLSearchParams(new FormData(e.target))
-			})
+	handleFormSubmit(e, overlay) {
+		fetch(new Curl(e.target.getAttribute('action')).getUrl(), {
+			method: 'POST',
+			body: new URLSearchParams(new FormData(e.target))
+		})
 			.then(response => response.json())
 			.then(response => {
 				if ('errors' in response) {
@@ -138,7 +149,4 @@
 				overlay.unsetLoading();
 			});
 	}
-
-	// Initialize form elements accessibility.
-	updateAccessability();
-})();
+}();

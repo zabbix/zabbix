@@ -23,7 +23,7 @@
  * @var CView $this
  */
 $form = (new CForm())
-	->setName('top_hosts_data_grid')
+	->setName('tophosts_column')
 	->addVar('action', $data['action'])
 	->addVar('update', 1)
 	->addItem((new CInput('submit', 'submit'))
@@ -31,6 +31,8 @@ $form = (new CForm())
 		->removeId()
 	);
 $form_grid = new CFormGrid();
+
+$scripts = [];
 
 if (array_key_exists('edit', $data)) {
 	$form->addVar('edit', 1);
@@ -76,7 +78,6 @@ $item_select = (new CPatternSelect([
 		'name' => 'item',
 		'object_name' => 'items',
 		'data' => $data['item'] === '' ? '' : [$data['item']],
-		'placeholder' => _('item pattern'),
 		'multiple' => false,
 		'popup' => [
 			'parameters' => [
@@ -184,7 +185,11 @@ $form_grid->addItem([
 ]);
 
 // Thresholds table.
-$header_row = ['', _('Threshold'), _('Action')];
+$header_row = [
+	'',
+	(new CColHeader(_('Threshold')))->setWidth('100%'),
+	_('Action')
+];
 $thresholds = (new CDiv([
 	(new CTable())
 		->setId('thresholds_table')
@@ -197,7 +202,9 @@ $thresholds = (new CDiv([
 					->addClass('element-table-add')
 			))->setColSpan(count($header_row))
 		))
-]))->addClass('table-forms-separator');
+]))
+	->addClass('table-forms-separator')
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 $thresholds->addItem(
 	(new CTag('script', true))
 		->setAttribute('type', 'text/x-jquery-tmpl')
@@ -218,23 +225,28 @@ $form_grid->addItem([
 	new CFormField($thresholds)
 ]);
 
-$form->addItem($form_grid);
-// Set thresholds colors.
-$scripts[] = 'colorPalette.setThemeColors('.json_encode($data['thresholds_colors']).');';
-$scripts[] = $this->readJsFile('popup.tophosts.column.edit.js.php', [
-	'thresholds'	=> $data['thresholds'],
-	'form'			=> $form->getName()
-]);
+$form
+	->addItem($form_grid)
+	->addItem(
+		(new CScriptTag('
+			tophosts_column_edit_form.init('.json_encode([
+				'form_name'			=> $form->getName(),
+				'thresholds'		=> $data['thresholds'],
+				'thresholds_colors'	=> $data['thresholds_colors']
+			]).');
+		'))->setOnDocumentReady()
+	);
+
 $output = [
 	'header'		=> array_key_exists('edit', $data) ? _('Update column') : _('New column'),
-	'script_inline'	=> implode('', $scripts),
+	'script_inline'	=> implode('', $scripts).$this->readJsFile('popup.tophosts.column.edit.js.php'),
 	'body'			=> $form->toString(),
 	'buttons'		=> [
 		[
 			'title'		=> array_key_exists('edit', $data) ? _('Update') : _('Add'),
 			'keepOpen'	=> true,
 			'isSubmit'	=> true,
-			'action'	=> '$(document.forms.top_hosts_data_grid).trigger("process.form", [overlay])'
+			'action'	=> '$(document.forms.tophosts_column).trigger("process.form", [overlay])'
 		]
 	]
 ];
