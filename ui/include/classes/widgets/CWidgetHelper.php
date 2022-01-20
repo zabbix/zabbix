@@ -581,8 +581,8 @@ class CWidgetHelper {
 
 			$table->addRow((new CRow([
 				(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-				$column['name'],
-				$label,
+				(new CDiv($column['name']))->addClass('text'),
+				(new CDiv($label))->addClass('text'),
 				(new CList(array_merge($row_actions, [$column_data])))->addClass(ZBX_STYLE_HOR_LIST)
 			]))->addClass('sortable'));
 		}
