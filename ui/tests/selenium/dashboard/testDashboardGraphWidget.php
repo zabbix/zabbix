@@ -206,8 +206,10 @@ class testDashboardGraphWidget extends CWebTest {
 			[
 				[
 					'Data set' => [
-						'color' => [
-							'id:lbl_ds_0_color' => ''
+						[
+							'color' => [
+								'id:lbl_ds_0_color' => ''
+							]
 						]
 					],
 					'color_error' => 'Invalid parameter "Data set/1/color": cannot be empty.'
@@ -216,8 +218,10 @@ class testDashboardGraphWidget extends CWebTest {
 			[
 				[
 					'Data set' => [
-						'color' => [
-							'id:lbl_ds_0_color' => '00000!'
+						[
+							'color' => [
+								'id:lbl_ds_0_color' => '00000!'
+							]
 						]
 					],
 					'color_error' => 'Invalid parameter "Data set/1/color": a hexadecimal color code (6 symbols) is expected.'
@@ -226,8 +230,10 @@ class testDashboardGraphWidget extends CWebTest {
 			[
 				[
 					'Data set' => [
-						'color' => [
-							'id:lbl_ds_0_color' => '00000 '
+						[
+							'color' => [
+								'id:lbl_ds_0_color' => '00000 '
+							]
 						]
 					],
 					'color_error' => 'Invalid parameter "Data set/1/color": a hexadecimal color code (6 symbols) is expected.'
@@ -510,7 +516,6 @@ class testDashboardGraphWidget extends CWebTest {
 	 * Check validation of "Data set" tab.
 	 *
 	 * @dataProvider getDatasetValidationCreateData
-	 * @dataProvider getDatasetValidationUpdateData
 	 */
 	public function testDashboardGraphWidget_DatasetValidation($data) {
 		$this->validate($data, 'Data set');
@@ -1538,7 +1543,7 @@ class testDashboardGraphWidget extends CWebTest {
 								'Time shift'
 							],
 							'color' => [
-								'id:lbl_or_0__color_' => '000000 '
+								'id:lbl_or_0__color_' => '000000'
 							]
 						],
 						[
@@ -1557,7 +1562,7 @@ class testDashboardGraphWidget extends CWebTest {
 								'Time shift'
 							],
 							'color' => [
-								'id:lbl_or_1__color_' => 'FFFFFF '
+								'id:lbl_or_1__color_' => 'FFFFFF'
 							]
 						]
 					],
@@ -1838,7 +1843,7 @@ class testDashboardGraphWidget extends CWebTest {
 								'Time shift'
 							],
 							'color' => [
-								'id:lbl_or_0__color_' => '000000 '
+								'id:lbl_or_0__color_' => '000000'
 							]
 						],
 						[
@@ -1857,7 +1862,7 @@ class testDashboardGraphWidget extends CWebTest {
 								'Time shift'
 							],
 							'color' => [
-								'id:lbl_or_0__color_' => 'FFFFFF '
+								'id:lbl_or_1__color_' => 'FFFFFF'
 							]
 						]
 					],
@@ -1974,13 +1979,13 @@ class testDashboardGraphWidget extends CWebTest {
 				];
 				// If host or item of data set exist in data provider, add the xpath selector and value from data provider to them.
 				foreach ($mapping as $field => $selector) {
-
 					if (array_key_exists($field, $data_set)) {
 						$data_set = [$selector => $data_set[$field]] + $data_set;
 						unset($data_set[$field]);
 					}
 
 				}
+
 				$form->fill($data_set);
 
 				// Open next dataset, if it exist on frontend.
@@ -2089,11 +2094,16 @@ class testDashboardGraphWidget extends CWebTest {
 				unset($data_set[$field]);
 			}
 
-			// Check fields value.
+			// Check color value.
 			if (array_key_exists('color', $data_set)) {
+				foreach($data_set['color'] as $selector => $value) {
+					$this->assertEquals('#'.$value, $this->query($selector)->one()->getAttribute('title'));
+				}
+
 				unset($data_set['color']);
 			}
 
+			// Check fields value.
 			$form->checkValue($data_set);
 
 			// Open next data set, if exist.
@@ -2131,8 +2141,12 @@ class testDashboardGraphWidget extends CWebTest {
 			}
 
 			foreach ($data['Overrides'] as $i => $override) {
-
+				// Check color value.
 				if (array_key_exists('color', $override)) {
+					foreach($override['color'] as $selector => $value) {
+						$this->assertEquals('#'.$value, $this->query($selector)->one()->getAttribute('title'));
+					}
+
 					unset($override['color']);
 				}
 
@@ -2140,7 +2154,6 @@ class testDashboardGraphWidget extends CWebTest {
 				$mapping = [
 					'host' => 'xpath://div[@id="or_'.$i.'_hosts_"]/..',
 					'item' => 'xpath://div[@id="or_'.$i.'_items_"]/..',
-					'color' => 'id:or_'.$i.'__color_',
 					'time_shift' => 'name:or['.$i.'][timeshift]'
 				];
 				$inputs = [];
