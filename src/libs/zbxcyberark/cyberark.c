@@ -18,16 +18,22 @@
 **/
 
 #include "cyberark.h"
+#include "../zbxkvs/kvs.h"
 #include "zbxjson.h"
 #include "zbxhttp.h"
-#include "../zbxkvs/kvs.h"
 
 int	zbx_cyberark_kvs_get(const char *vault_url, const char *token, const char *ssl_cert_file,
 		const char *ssl_key_file, const char *path, long timeout, zbx_hashset_t *kvs, char **error)
 {
 #ifndef HAVE_LIBCURL
+	ZBX_UNUSED(vault_url);
+	ZBX_UNUSED(token);
+	ZBX_UNUSED(ssl_cert_file);
+	ZBX_UNUSED(ssl_key_file);
 	ZBX_UNUSED(path);
+	ZBX_UNUSED(timeout);
 	ZBX_UNUSED(kvs);
+
 	*error = zbx_dsprintf(*error, "missing cURL library");
 	return FAIL;
 #else

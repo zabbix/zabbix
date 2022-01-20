@@ -65,9 +65,9 @@ static void	zbx_vault_init_cb(zbx_vault_kvs_get_cb_t vault_kvs_get_cb)
 
 int	zbx_vault_init(const char *vault, char **error)
 {
-	if (NULL == vault || '\0' == *vault || 0 == strcmp(vault, ZBX_VAULT_HASHICORP))
+	if (NULL == vault || '\0' == *vault || 0 == strcmp(vault, ZBX_HASHICORP_NAME))
 	{
-		if (NULL == CONFIG_VAULTTOKEN && 0 == zbx_strcmp_null(vault, ZBX_VAULT_HASHICORP))
+		if (NULL == CONFIG_VAULTTOKEN && 0 == zbx_strcmp_null(vault, ZBX_HASHICORP_NAME))
 		{
 			*error = zbx_dsprintf(*error, "\"Vault\" value \"%s\" requires \"VaultToken\" configuration"
 					" parameter or \"VAULT_TOKEN\" environment variable", vault);
@@ -75,10 +75,10 @@ int	zbx_vault_init(const char *vault, char **error)
 		}
 
 		zbx_vault_init_cb(zbx_hashicorp_kvs_get);
-		zbx_vault_key_dbuser = ZBX_KEY_HASHICORP_USERNAME;
-		zbx_vault_key_dbpassword = ZBX_KEY_HASHICORP_PASSWORD;
+		zbx_vault_key_dbuser = ZBX_HASHICORP_DBUSERNAME_KEY;
+		zbx_vault_key_dbpassword = ZBX_HASHICORP_DBPASSWORD_KEY;
 	}
-	else if (0 == strcmp(vault, ZBX_VAULT_CYBERARKCPP))
+	else if (0 == strcmp(vault, ZBX_CYBERARKCPP_NAME))
 	{
 		if (NULL != CONFIG_VAULTTOKEN)
 		{
@@ -88,8 +88,8 @@ int	zbx_vault_init(const char *vault, char **error)
 		}
 
 		zbx_vault_init_cb(zbx_cyberark_kvs_get);
-		zbx_vault_key_dbuser = ZBX_KEY_CYBERARK_USERNAME;
-		zbx_vault_key_dbpassword = ZBX_KEY_CYBERARK_PASSWORD;
+		zbx_vault_key_dbuser = ZBX_CYBERARK_DBUSERNAME;
+		zbx_vault_key_dbpassword = ZBX_CYBERARK_DBPASSWORD;
 	}
 	else
 	{

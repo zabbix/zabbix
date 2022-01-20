@@ -22,9 +22,9 @@
 
 #include "zbxalgo.h"
 
-#define ZBX_VAULT_HASHICORP		"HashiCorp"
-#define ZBX_KEY_HASHICORP_USERNAME	"username"
-#define ZBX_KEY_HASHICORP_PASSWORD	"password"
+#define ZBX_HASHICORP_NAME		"HashiCorp"
+#define ZBX_HASHICORP_DBUSERNAME_KEY	"username"
+#define ZBX_HASHICORP_DBPASSWORD_KEY	"password"
 
 int	zbx_hashicorp_kvs_get(const char *vault_url, const char *token, const char *ssl_cert_file,
 		const char *ssl_key_file, const char *path, long timeout, zbx_hashset_t *kvs, char **error);
