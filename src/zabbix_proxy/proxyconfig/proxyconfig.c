@@ -171,7 +171,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 
 	zbx_rtc_notify_config_sync(&rtc);
 
-	sleeptime = (ZBX_PROGRAM_TYPE_PROXY_PASSIVE == program_type ? ZBX_IPC_WAIT_FOREVER : CONFIG_PROXYCONFIG_FREQUENCY);
+	sleeptime = (ZBX_PROGRAM_TYPE_PROXY_PASSIVE == program_type ? ZBX_IPC_WAIT_FOREVER : 0);
 
 	while (ZBX_IS_RUNNING())
 	{
