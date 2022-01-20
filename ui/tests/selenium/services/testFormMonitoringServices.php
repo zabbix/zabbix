@@ -33,8 +33,6 @@ class testFormMonitoringServices extends CWebTest {
 
 	const UPDATE = true;
 
-	const CHILDREN_COUNT = 13;
-
 	private static $service_sql = 'SELECT * FROM services ORDER BY serviceid';
 	private static $update_service = 'Update service';
 
@@ -273,7 +271,7 @@ class testFormMonitoringServices extends CWebTest {
 		$this->assertEquals($hintbox, $hint->one()->getText());
 
 		// Close the hint-box.
-		$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
+		$hint->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
 		$hint->waitUntilNotPresent();
 
 		// Check advanced configuration default value.
@@ -329,7 +327,7 @@ class testFormMonitoringServices extends CWebTest {
 		// Enter and submit filtering data.
 		$children_dialog->query('id:services-filter-name')->one()->fill('Parent1');
 		$this->assertTrue($children_dialog->query('button:Cancel')->one()->isCLickable());
-		$children_dialog->query('button:Filter')->one()->waitUntilClickable()->click();
+		$children_dialog->query('button:Filter')->waitUntilClickable()->one()->click();
 		$children_dialog->waitUntilReady();
 		$children_dialog->invalidate();
 
@@ -346,9 +344,8 @@ class testFormMonitoringServices extends CWebTest {
 		$children_dialog->query('button:Reset')->one()->waitUntilClickable()->click();
 		$children_dialog->invalidate();
 
-		$this->assertEquals(self::CHILDREN_COUNT, count($children_dialog->query('class:list-table')->asTable()
-				->waitUntilReady()->one()->getRows()->asArray())
-		);
+		// Check possible children count in table.
+		$this->assertEquals(13, $children_dialog->query('class:list-table')->asTable()->one()->getRows()->count());
 
 		foreach (['Add', 'Cancel'] as $button) {
 			$this->assertTrue($dialog->query("xpath:.//div[@class='overlay-dialogue-footer']//button[text()=".

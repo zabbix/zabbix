@@ -450,13 +450,7 @@ class testPageMonitoringServices extends CWebTest {
 		}
 
 		$edit_button = $info_card->query('xpath://button['.CXPathHelper::fromClass('btn-edit').']');
-		if ($edit) {
-			$this->assertTrue($edit_button->one()->isClickable());
-		}
-		else {
-			$this->assertFalse($edit_button->exists());
-		}
-
+		$this->assertEquals($edit, $edit_button->one(false)->isClickable());
 		$table->invalidate();
 		$this->assertTableStats(1);
 	}
@@ -949,7 +943,7 @@ class testPageMonitoringServices extends CWebTest {
 
 		// Check parent-child linking in DB.
 		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services_links WHERE serviceupid='.
-				$parentid.' AND servicedownid ='.$childid));
+				$parentid.' AND servicedownid ='.zbx_dbstr($childid)));
 	}
 
 	public function testPageMonitoringServices_CancelDeleteFromRow() {
@@ -1014,8 +1008,7 @@ class testPageMonitoringServices extends CWebTest {
 		$this->assertFalse($table->query("xpath:.//td/a[text()=".CXPathHelper::escapeQuotes($name)."]")->exists());
 
 		// Check database.
-		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($name))
-		);
+		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($name)));
 	}
 
 	public function testPageMonitoringServices_DeleteChildFromRow() {
@@ -1040,8 +1033,7 @@ class testPageMonitoringServices extends CWebTest {
 
 		// Check service disappeared from frontend.
 		$this->assertTableData();
-		$this->assertFalse($table->query("xpath:.//td/a[text()=".CXPathHelper::escapeQuotes($name)."]")->exists()
-		);
+		$this->assertFalse($table->query("xpath:.//td/a[text()=".CXPathHelper::escapeQuotes($name)."]")->exists());
 
 		// Check database.
 		foreach ([$name => 0, $parent => 1] as $service => $count) {

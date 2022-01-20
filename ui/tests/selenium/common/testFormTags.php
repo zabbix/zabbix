@@ -506,12 +506,12 @@ class testFormTags extends CWebTest {
 		$this->page->login()->open($this->link);
 
 		if ($object === 'service') {
-			$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
+			$table = $this->query('class:list-table')->asTable()->one()->waitUntilPresent();
 			$table->findRow('Name', $data['name'], true)->query('xpath:.//button[@title="Edit"]')
 					->waitUntilClickable()->one()->click();
 		}
 		else {
-			$this->query('link', $this->update_name)->waitUntilPresent()->one()->click();
+			$this->query('link', $this->update_name)->waitUntilClickable()->one()->click();
 		}
 
 		$form = ($object === 'host' || $object === 'service')
