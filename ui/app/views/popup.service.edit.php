@@ -376,7 +376,7 @@ if ($data['serviceid'] !== null) {
 						'class' => 'js-add',
 						'keepOpen' => true,
 						'isSubmit' => true,
-						'action' => 'service_edit_popup.submit();',
+						'action' => 'service_edit_popup.submit();'
 					],
 					[
 						'title' => _('Cancel'),

@@ -259,7 +259,7 @@ if ($data['slaid'] !== null) {
 						'class' => 'js-add',
 						'keepOpen' => true,
 						'isSubmit' => true,
-						'action' => 'sla_edit_popup.submit();',
+						'action' => 'sla_edit_popup.submit();'
 					],
 					[
 						'title' => _('Cancel'),
