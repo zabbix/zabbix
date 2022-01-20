@@ -1278,6 +1278,13 @@ static int	get_dir_names(const char *filename, char **basename, char **dirname, 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 	if (NULL == (*pathname = _fullpath(NULL, filename, 0)))
 		return FAIL;
+#elif defined(__hpux)
+	char resolved_path[PATH_MAX + 1];
+
+	if (NULL == (*pathname = realpath(filename, resolved_path)))
+		return FAIL;
+
+	*pathname = zbx_strdup(NULL, *pathname);
 #else
 	if (NULL == (*pathname = realpath(filename, NULL)))
 		return FAIL;

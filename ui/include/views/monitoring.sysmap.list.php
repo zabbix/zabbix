@@ -32,7 +32,11 @@ $widget = (new CWidget())
 				->addItem((new CSubmit('form', _('Create map')))->setEnabled($data['allowed_edit']))
 				->addItem(
 					(new CButton('form', _('Import')))
-						->onClick('return PopUp("popup.import", {rules_preset: "map"}, null, this);')
+						->onClick(
+							'return PopUp("popup.import", {rules_preset: "map"},
+								{dialogue_class: "modal-popup-generic"}
+							);'
+						)
 						->setEnabled($data['allowed_edit'])
 						->removeId()
 				)

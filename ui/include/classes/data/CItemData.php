@@ -727,21 +727,6 @@ final class CItemData {
 					'publickey'
 				]
 			],
-			// Dropdown entries of parent with {id} to disable for specific type.
-			'disable_for_type' => [
-				ITEM_TYPE_CALCULATED => [
-					'value_type' => [
-						ITEM_VALUE_TYPE_STR,
-						ITEM_VALUE_TYPE_LOG,
-						ITEM_VALUE_TYPE_TEXT
-					],
-					'value_type_steps' => [
-						ITEM_VALUE_TYPE_STR,
-						ITEM_VALUE_TYPE_LOG,
-						ITEM_VALUE_TYPE_TEXT
-					]
-				]
-			],
 			'for_http_auth_type' => [
 				HTTPTEST_AUTH_BASIC => [
 					'js-item-http-username-label',

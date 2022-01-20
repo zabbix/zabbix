@@ -18,11 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'6.0.0beta2');
+define('ZABBIX_VERSION',		'6.0.0rc1');
 define('ZABBIX_API_VERSION',	'6.0.0');
 define('ZABBIX_EXPORT_VERSION',	'6.0');
 
-define('ZABBIX_DB_VERSION',		5050141);
+define('ZABBIX_DB_VERSION',		5050142);
 
 define('DB_VERSION_SUPPORTED',				0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',		1);
@@ -1873,7 +1873,6 @@ define('ZBX_STYLE_INLINE_FILTER', 'inline-filter');
 define('ZBX_STYLE_INLINE_FILTER_LABEL', 'inline-filter-label');
 define('ZBX_STYLE_INLINE_FILTER_FOOTER', 'inline-filter-footer');
 define('ZBX_STYLE_INLINE_FILTER_STATS', 'inline-filter-stats');
-define('ZBX_STYLE_INPUT_COLOR_PICKER', 'input-color-picker');
 define('ZBX_STYLE_LAYOUT_KIOSKMODE', 'layout-kioskmode');
 define('ZBX_STYLE_CONTAINER', 'container');
 define('ZBX_STYLE_LAYOUT_WRAPPER', 'wrapper');
@@ -1972,7 +1971,6 @@ define('ZBX_STYLE_STATUS_NA_BG', 'status-na-bg');
 define('ZBX_STYLE_STATUS_RED', 'status-red');
 define('ZBX_STYLE_STATUS_WARNING_BG', 'status-warning-bg');
 define('ZBX_STYLE_STATUS_YELLOW', 'status-yellow');
-define('ZBX_STYLE_STICKED_TO_TOP', 'sticked-to-top');
 define('ZBX_STYLE_SVG_GRAPH', 'svg-graph');
 define('ZBX_STYLE_SVG_GRAPH_PREVIEW', 'svg-graph-preview');
 define('ZBX_STYLE_SUBFILTER', 'subfilter');
@@ -2102,15 +2100,15 @@ define('ZBX_PROPERTY_OWN',			0x02);
 define('ZBX_PROPERTY_BOTH',			0x03);	// ZBX_PROPERTY_INHERITED | ZBX_PROPERTY_OWN
 
 // Number of tags to display in Problems widget and Monitoring > Problems.
-define('PROBLEMS_SHOW_TAGS_NONE', 0);
-define('PROBLEMS_SHOW_TAGS_1', 1);
-define('PROBLEMS_SHOW_TAGS_2', 2);
-define('PROBLEMS_SHOW_TAGS_3', 3);
+define('SHOW_TAGS_NONE', 0);
+define('SHOW_TAGS_1', 1);
+define('SHOW_TAGS_2', 2);
+define('SHOW_TAGS_3', 3);
 
 // Tag name format to display in Problems widget and Monitoring > Problems.
-define('PROBLEMS_TAG_NAME_FULL',      0);
-define('PROBLEMS_TAG_NAME_SHORTENED', 1);
-define('PROBLEMS_TAG_NAME_NONE',      2);
+define('TAG_NAME_FULL',      0);
+define('TAG_NAME_SHORTENED', 1);
+define('TAG_NAME_NONE',      2);
 
 define('OPERATIONAL_DATA_SHOW_NONE',         0);
 define('OPERATIONAL_DATA_SHOW_SEPARATELY',   1);

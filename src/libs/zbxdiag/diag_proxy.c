@@ -24,8 +24,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: diag_add_section_info                                            *
- *                                                                            *
  * Purpose: add requested section diagnostic information                      *
  *                                                                            *
  * Parameters: section - [IN] the section name                                *

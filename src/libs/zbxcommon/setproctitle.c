@@ -50,8 +50,6 @@ static size_t	ps_buf_size = PS_BUF_SIZE, ps_buf_size_msg = PS_BUF_SIZE;
 
 /******************************************************************************
  *                                                                            *
- * Function: setproctitle_save_env                                            *
- *                                                                            *
  * Purpose: prepare for changing process commandline to display status        *
  *          messages with "ps" command on platforms which do not support      *
  *          setproctitle(). Depending on platform:                            *
@@ -180,8 +178,6 @@ char	**setproctitle_save_env(int argc, char **argv)
 
 /******************************************************************************
  *                                                                            *
- * Function: setproctitle_set_status                                          *
- *                                                                            *
  * Purpose: set a process command line displayed by "ps" command.             *
  *                                                                            *
  * Comments: call this function when a process starts some interesting task.  *
@@ -243,8 +239,6 @@ void	setproctitle_set_status(const char *status)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: setproctitle_free_env                                            *
  *                                                                            *
  * Purpose: release memory allocated in setproctitle_save_env().              *
  *                                                                            *

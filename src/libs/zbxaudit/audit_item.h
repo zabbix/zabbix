@@ -21,7 +21,6 @@
 #define ZABBIX_AUDIT_ITEM_H
 
 #include "common.h"
-#include "audit.h"
 
 #include "../zbxdbhigh/template.h"
 #include "../../zabbix_server/lld/lld.h"

@@ -45,8 +45,6 @@ static char	*export_dir;
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_validate_export_type                                         *
- *                                                                            *
  * Purpose: validate export type                                              *
  *                                                                            *
  * Parameters:  export_type - [in] list of export types                       *
@@ -113,8 +111,6 @@ int	zbx_validate_export_type(char *export_type, uint32_t *export_mask)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_is_export_enabled                                            *
  *                                                                            *
  * Purpose: checks if export is enabled for given type(s)                     *
  *                                                                            *

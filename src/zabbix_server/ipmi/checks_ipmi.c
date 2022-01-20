@@ -189,8 +189,6 @@ static char	*zbx_sensor_id_to_str(char *str, size_t str_sz, const char *id, enum
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_get_ipmi_host                                                *
- *                                                                            *
  * Purpose: Find element in the global list 'hosts' using parameters as       *
  *          search criteria                                                   *
  *                                                                            *
@@ -224,8 +222,6 @@ static zbx_ipmi_host_t	*zbx_get_ipmi_host(const char *ip, const int port, int au
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_allocate_ipmi_host                                           *
  *                                                                            *
  * Purpose: create a new element in the global list 'hosts'                   *
  *                                                                            *
@@ -330,8 +326,6 @@ static zbx_ipmi_sensor_t	*zbx_get_ipmi_sensor_by_full_name(const zbx_ipmi_host_t
 
 /******************************************************************************
  *                                                                            *
- * Function: get_domain_offset                                                *
- *                                                                            *
  * Purpose: Check if an item name starts from domain name and find the domain *
  *          name length                                                       *
  *                                                                            *
@@ -355,8 +349,6 @@ static size_t	get_domain_offset(const zbx_ipmi_host_t *h, const char *full_name)
 	return offset;
 }
 /******************************************************************************
- *                                                                            *
- * Function: zbx_get_sensor_id                                                *
  *                                                                            *
  * Purpose:  Converts sensor id to printable string and return id_type        *
  *                                                                            *
@@ -848,8 +840,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_perform_openipmi_ops                                         *
- *                                                                            *
  * Purpose: Pass control to OpenIPMI library to process events                *
  *                                                                            *
  * Return value: SUCCEED - no errors                                          *
@@ -884,8 +874,6 @@ static int	zbx_perform_openipmi_ops(zbx_ipmi_host_t *h, const char *func_name)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_perform_all_openipmi_ops                                     *
  *                                                                            *
  * Purpose: Pass control to OpenIPMI library to process all internal events   *
  *                                                                            *
@@ -1682,8 +1670,6 @@ void	zbx_delete_inactive_ipmi_hosts(time_t last_check)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: has_name_prefix                                                  *
  *                                                                            *
  * Purpose: Check if a string starts with one of predefined prefixes and      *
  *          set prefix length                                                 *

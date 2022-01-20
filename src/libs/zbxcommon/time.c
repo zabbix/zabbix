@@ -50,8 +50,6 @@ zbx_time_unit_t	zbx_tm_str_to_unit(const char *text)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_tm_parse_period                                              *
- *                                                                            *
  * Purpose: parse time period in format <multiplier><time unit>               *
  *                                                                            *
  * Parameters: period     - [IN] the time period                              *
@@ -71,7 +69,7 @@ int	zbx_tm_parse_period(const char *period, size_t *len, int *multiplier, zbx_ti
 	for (ptr = period; 0 != isdigit(*ptr); ptr++)
 		;
 
-	if (FAIL == is_uint_n_range(period, ptr - period, multiplier, sizeof(*multiplier), 1, UINT32_MAX))
+	if (FAIL == is_uint_n_range(period, ptr - period, multiplier, sizeof(*multiplier), 0, UINT32_MAX))
 	{
 		*error = zbx_strdup(*error, "invalid period multiplier");
 		return FAIL;
@@ -89,8 +87,6 @@ int	zbx_tm_parse_period(const char *period, size_t *len, int *multiplier, zbx_ti
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: tm_add_seconds                                                   *
  *                                                                            *
  * Purpose: add seconds to the time and adjust result by dst                  *
  *                                                                            *
@@ -124,8 +120,6 @@ static void	tm_add_seconds(struct tm *tm, int seconds)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: tm_add                                                           *
  *                                                                            *
  * Purpose: add time duration without adjusting DST clocks                    *
  *                                                                            *
@@ -181,8 +175,6 @@ static void	tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_tm_add                                                       *
- *                                                                            *
  * Purpose: add time duration                                                 *
  *                                                                            *
  * Parameter: tm         - [IN/OUT] the time structure                        *
@@ -210,8 +202,6 @@ void	zbx_tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base)
 
 /******************************************************************************
  *                                                                            *
- * Function: neg_to_pos_wrap                                                  *
- *                                                                            *
  * Purpose: convert negative number to positive by wrapping around the base   *
  *                                                                            *
  * Parameter: value - [IN/OUT] the value to convert                           *
@@ -226,8 +216,6 @@ static void	neg_to_pos_wrap(int *value, int base)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: tm_sub                                                           *
  *                                                                            *
  * Purpose: subtracts time duration without adjusting DST clocks              *
  *                                                                            *
@@ -294,8 +282,6 @@ static void	tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_tm_sub                                                       *
- *                                                                            *
  * Purpose: subtracts time duration                                           *
  *                                                                            *
  * Parameter: tm         - [IN/OUT] the time structure                        *
@@ -336,8 +322,6 @@ void	zbx_tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_tm_round_up                                                  *
  *                                                                            *
  * Purpose: rounds time by the specified unit upwards                         *
  *                                                                            *
@@ -403,8 +387,6 @@ void	zbx_tm_round_up(struct tm *tm, zbx_time_unit_t base)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_tm_round_down                                                *
  *                                                                            *
  * Purpose: rounds time by the specified unit downwards                       *
  *                                                                            *
@@ -475,8 +457,6 @@ static	int	get_week_days(int yday, int wday)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_get_week_number                                              *
  *                                                                            *
  * Purpose: get ISO 8061 week number (1-53)                                   *
  *                                                                            *

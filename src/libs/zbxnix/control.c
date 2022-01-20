@@ -17,8 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "common.h"
+
 #include "control.h"
-#include "zbxdiag.h"
 
 static int	parse_log_level_options(const char *opt, size_t len, unsigned int *scope, unsigned int *data)
 {
@@ -108,8 +109,6 @@ static int	parse_log_level_options(const char *opt, size_t len, unsigned int *sc
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: parse_rtc_options                                                *
  *                                                                            *
  * Purpose: parse runtime control options and create a runtime control        *
  *          message                                                           *

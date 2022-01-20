@@ -18,11 +18,10 @@
 **/
 
 #include "common.h"
-
 #include "db.h"
 #include "log.h"
-#include "sysinfo.h"
 #include "zbxdbupgrade.h"
+
 #include "dbupgrade.h"
 
 typedef struct
@@ -135,8 +134,6 @@ typedef enum
 zbx_oracle_column_type_t;
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_oracle_column_type                                           *
  *                                                                            *
  * Purpose: determine whether column type is character or numeric             *
  *                                                                            *

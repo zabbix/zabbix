@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-26T13:57:31Z'
+  version: '6.0'
+  date: '2021-12-14T17:44:29Z'
   groups:
     -
       uuid: 1d12408342854fd5a4436dd6d5d1bd4a
@@ -25,7 +25,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/410060-discussion-thread-for-official-zabbix-template-asterisk
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Telephony
@@ -434,7 +434,6 @@ zabbix_export:
                   catch (e) {}
                   
                   return JSON.stringify(asterisk);
-                  
           url: '{$AMI.URL}'
           query_fields:
             -
@@ -904,7 +903,7 @@ zabbix_export:
           type: SIMPLE
           key: 'net.tcp.service["tcp","{HOST.CONN}","{$AMI.PORT}"]'
           history: 7d
-          description: 'Asterisk Manager API port avalability.'
+          description: 'Asterisk Manager API port availability.'
           valuemap:
             name: 'Service state'
           preprocessing:

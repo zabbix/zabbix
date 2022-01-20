@@ -261,7 +261,10 @@
 
 			switch ($btn.data('action')) {
 				case 'add':
-					PopUp('popup.discovery.check', {}, null, $btn);
+					PopUp('popup.discovery.check', {}, {
+						dialogue_class: 'modal-popup-medium',
+						trigger_element: this
+					});
 					break;
 
 				case 'edit':
@@ -280,7 +283,10 @@
 						}
 					});
 
-					PopUp('popup.discovery.check', params, null, $btn);
+					PopUp('popup.discovery.check', params, {
+						dialogue_class: 'modal-popup-medium',
+						trigger_element: this
+					});
 					break;
 			}
 		});

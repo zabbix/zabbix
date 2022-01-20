@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-06-18T06:57:07Z'
+  version: '6.0'
+  date: '2022-01-10T07:40:16Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -15,7 +15,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/409339-discussion-thread-for-official-zabbix-template-squid
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Modules
@@ -1051,7 +1051,7 @@ zabbix_export:
             key: 'squid[cacheDnsReplies]'
     -
       uuid: e301cc76e0ff4e22bc66a46b19230c33
-      name: 'Squid: Domain name (FQDN) cache ctatistics'
+      name: 'Squid: Domain name (FQDN) cache statistics'
       graph_items:
         -
           color: 1A7C11

@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T14:37:54Z'
+  version: '6.0'
+  date: '2021-12-16T07:08:28Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: d38b271797bd41f2ad8c79d83b9d8d9c
-      template: 'MongoDB cluster by Zabbix Agent 2'
-      name: 'MongoDB cluster by Zabbix Agent 2'
+      template: 'MongoDB cluster by Zabbix agent 2'
+      name: 'MongoDB cluster by Zabbix agent 2'
       description: |
         Get MongoDB metrics from plugin for the zabbix-agent2.
           1. Setup and configure zabbix-agent2 compiled with the MongoDB monitoring plugin.
@@ -20,7 +20,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/420659-discussion-thread-for-official-zabbix-template-db-mongodb
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Databases
@@ -41,7 +41,6 @@ zabbix_export:
                 - |
                   data = JSON.parse(value)
                   return (data["$clusterTime"].clusterTime-data.sharding.lastSeenConfigServerOpTime.ts)/Math.pow(2,32);
-                  
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
@@ -56,7 +55,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: |
-            "The number of active client connections to the server. 
+            "The number of active client connections to the server.
             Active client connections refers to client connections that currently have operations in progress.
             Available starting in  4.0.7, 0 for older versions."
           preprocessing:
@@ -94,7 +93,7 @@ zabbix_export:
           triggers:
             -
               uuid: eae86b6f98db49099259a466b78d1c59
-              expression: 'max(/MongoDB cluster by Zabbix Agent 2/mongodb.connections.available,5m)<{$MONGODB.CONNS.AVAILABLE.MIN.WARN}'
+              expression: 'max(/MongoDB cluster by Zabbix agent 2/mongodb.connections.available,5m)<{$MONGODB.CONNS.AVAILABLE.MIN.WARN}'
               name: 'MongoDB cluster: Available connections less then {$MONGODB.CONNS.AVAILABLE.MIN.WARN}'
               priority: WARNING
               description: |
@@ -108,7 +107,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: |
-            "The number of incoming connections from clients to the database server. 
+            "The number of incoming connections from clients to the database server.
             This number includes the current shell session"
           preprocessing:
             -
@@ -317,7 +316,7 @@ zabbix_export:
           triggers:
             -
               uuid: 67db1f543818476ca0b07e2cc1709452
-              expression: 'min(/MongoDB cluster by Zabbix Agent 2/mongodb.cursor.open.total,5m)>{$MONGODB.CURSOR.OPEN.MAX.WARN}'
+              expression: 'min(/MongoDB cluster by Zabbix agent 2/mongodb.cursor.open.total,5m)>{$MONGODB.CURSOR.OPEN.MAX.WARN}'
               name: 'MongoDB cluster: Too many cursors opened by MongoDB for clients (over {$MONGODB.CURSOR.OPEN.MAX.WARN} in 5m)'
               priority: WARNING
         -
@@ -347,7 +346,7 @@ zabbix_export:
           triggers:
             -
               uuid: 5ea8cf9c955940a6a580cd6f4bb2cc78
-              expression: 'min(/MongoDB cluster by Zabbix Agent 2/mongodb.cursor.timed_out.rate,5m)>{$MONGODB.CURSOR.TIMEOUT.MAX.WARN}'
+              expression: 'min(/MongoDB cluster by Zabbix agent 2/mongodb.cursor.timed_out.rate,5m)>{$MONGODB.CURSOR.TIMEOUT.MAX.WARN}'
               name: 'MongoDB cluster: Too many cursors are timing out (over {$MONGODB.CURSOR.TIMEOUT.MAX.WARN} per second in 5m)'
               priority: WARNING
         -
@@ -376,7 +375,6 @@ zabbix_export:
                 - |
                   data = JSON.parse(value)
                   return data.sharding.lastSeenConfigServerOpTime.ts/Math.pow(2,32)
-                  
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
@@ -717,7 +715,7 @@ zabbix_export:
           triggers:
             -
               uuid: cd74289970204ca281c5bc7d5c695e95
-              expression: 'last(/MongoDB cluster by Zabbix Agent 2/mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"])=0'
+              expression: 'last(/MongoDB cluster by Zabbix agent 2/mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"])=0'
               name: 'MongoDB cluster: Connection to mongos proxy is unavailable'
               priority: HIGH
               description: 'Connection to mongos proxy instance is currently unavailable.'
@@ -756,7 +754,7 @@ zabbix_export:
           triggers:
             -
               uuid: ee70d6da232a4068b574c9c147c622c9
-              expression: 'nodata(/MongoDB cluster by Zabbix Agent 2/mongodb.uptime,10m)=1'
+              expression: 'nodata(/MongoDB cluster by Zabbix agent 2/mongodb.uptime,10m)=1'
               name: 'MongoDB cluster: Failed to fetch info data (or no data for 10m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 10 minutes'
@@ -764,10 +762,10 @@ zabbix_export:
               dependencies:
                 -
                   name: 'MongoDB cluster: Connection to mongos proxy is unavailable'
-                  expression: 'last(/MongoDB cluster by Zabbix Agent 2/mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"])=0'
+                  expression: 'last(/MongoDB cluster by Zabbix agent 2/mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"])=0'
             -
               uuid: 99ff438a7e3e4b0a8190b2ab9f41f076
-              expression: 'last(/MongoDB cluster by Zabbix Agent 2/mongodb.uptime)<10m'
+              expression: 'last(/MongoDB cluster by Zabbix agent 2/mongodb.uptime)<10m'
               name: 'MongoDB cluster: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
@@ -800,7 +798,7 @@ zabbix_export:
           triggers:
             -
               uuid: 921ee489887943838d69558f103ad646
-              expression: 'last(/MongoDB cluster by Zabbix Agent 2/mongodb.version,#1)<>last(/MongoDB cluster by Zabbix Agent 2/mongodb.version,#2) and length(last(/MongoDB cluster by Zabbix Agent 2/mongodb.version))>0'
+              expression: 'last(/MongoDB cluster by Zabbix agent 2/mongodb.version,#1)<>last(/MongoDB cluster by Zabbix agent 2/mongodb.version,#2) and length(last(/MongoDB cluster by Zabbix agent 2/mongodb.version))>0'
               name: 'MongoDB cluster: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'MongoDB cluster version has changed. Ack to close.'
@@ -826,7 +824,7 @@ zabbix_export:
                   name: 'MongoDB sharded cluster/{#REPLICASET}'
               templates:
                 -
-                  name: 'MongoDB node by Zabbix Agent 2'
+                  name: 'MongoDB node by Zabbix agent 2'
               macros:
                 -
                   macro: '{$MONGODB.CONNSTRING}'
@@ -1196,7 +1194,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Returns statistics reflecting the database system’s state.'
+              description: 'Returns statistics reflecting the database system''s state.'
               tags:
                 -
                   tag: Application
@@ -1229,25 +1227,25 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'MongoDB cluster by Zabbix Agent 2'
+                    host: 'MongoDB cluster by Zabbix agent 2'
                     key: 'mongodb.db.index_size["{#DBNAME}"]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'MongoDB cluster by Zabbix Agent 2'
+                    host: 'MongoDB cluster by Zabbix agent 2'
                     key: 'mongodb.db.storage_size["{#DBNAME}"]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
-                    host: 'MongoDB cluster by Zabbix Agent 2'
+                    host: 'MongoDB cluster by Zabbix agent 2'
                     key: 'mongodb.db.file_size["{#DBNAME}"]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
-                    host: 'MongoDB cluster by Zabbix Agent 2'
+                    host: 'MongoDB cluster by Zabbix agent 2'
                     key: 'mongodb.db.data_size["{#DBNAME}"]'
         -
           uuid: a8bcea1509974c0f9d0051591e92cd5a
@@ -1269,7 +1267,7 @@ zabbix_export:
                   name: 'MongoDB sharded cluster/{#ID}'
               templates:
                 -
-                  name: 'MongoDB node by Zabbix Agent 2'
+                  name: 'MongoDB node by Zabbix agent 2'
               macros:
                 -
                   macro: '{$MONGODB.CONNSTRING}'
@@ -1343,31 +1341,31 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.connection_pool.available
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.connection_pool.refreshing
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.connection_pool.in_use
         -
           sortorder: '3'
           color: A54F10
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.connection_pool.scoped
         -
           sortorder: '4'
           color: FC6EA3
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.connection_pool.client
     -
       uuid: 71a5a2d563d64bceacd564fe25b4d49e
@@ -1376,19 +1374,19 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.connections.available
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.connections.active
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.connections.current
         -
           sortorder: '3'
@@ -1396,7 +1394,7 @@ zabbix_export:
           color: A54F10
           yaxisside: RIGHT
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.connections.rate
     -
       uuid: b4277ddaf3c5486cacba0f9b7208c5b2
@@ -1405,19 +1403,19 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.cursor.open.total
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.cursor.open.pinned
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.metrics.cursor.open.no_timeout
     -
       uuid: d612246739784b9b9403dee6024493ce
@@ -1426,13 +1424,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.network.bytes_out.rate
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.network.bytes_in.rate
     -
       uuid: 4228deefccae4cd2959b183ba3e36295
@@ -1442,40 +1440,40 @@ zabbix_export:
           drawtype: BOLD_LINE
           color: 1A7C11
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.opcounters.query.rate
         -
           sortorder: '1'
           drawtype: BOLD_LINE
           color: 2774A4
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.opcounters.insert.rate
         -
           sortorder: '2'
           drawtype: BOLD_LINE
           color: F63100
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.opcounters.getmore.rate
         -
           sortorder: '3'
           drawtype: BOLD_LINE
           color: A54F10
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.opcounters.update.rate
         -
           sortorder: '4'
           drawtype: BOLD_LINE
           color: FC6EA3
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.opcounters.delete.rate
         -
           sortorder: '5'
           drawtype: BOLD_LINE
           color: 6C59DC
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.opcounters.command.rate

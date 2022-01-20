@@ -93,8 +93,6 @@ int	zbx_send_proxy_data_response(const DC_PROXY *proxy, zbx_socket_t *sock, cons
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_recv_proxy_data                                              *
- *                                                                            *
  * Purpose: receive 'proxy data' request from proxy                           *
  *                                                                            *
  * Parameters: sock - [IN] the connection socket                              *
@@ -184,8 +182,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: send_data_to_server                                              *
- *                                                                            *
  * Purpose: sends data from proxy to server                                   *
  *                                                                            *
  * Parameters: sock  - [IN] the connection socket                             *
@@ -212,8 +208,6 @@ static int	send_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_send_proxy_data                                              *
  *                                                                            *
  * Purpose: sends 'proxy data' request to server                              *
  *                                                                            *
@@ -325,8 +319,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_send_task_data                                               *
  *                                                                            *
  * Purpose: sends 'proxy data' request to server                              *
  *                                                                            *

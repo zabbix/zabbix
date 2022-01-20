@@ -75,15 +75,15 @@ if ($data['item_required']) {
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CButton('select', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
-			->onClick('return PopUp("popup.generic",'.json_encode($popup_options).', null, this);')
+			->onClick('return PopUp("popup.generic", '.json_encode($popup_options).');')
 	];
 
 	if ($data['parent_discoveryid'] !== '') {
 		$item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 		$item[] = (new CButton('select', _('Select prototype')))
 			->addClass(ZBX_STYLE_BTN_GREY)
-			->onClick('return PopUp("popup.generic",'.
-				json_encode([
+			->onClick(
+				'return PopUp("popup.generic", '.json_encode([
 					'srctbl' => 'item_prototypes',
 					'srcfld1' => 'itemid',
 					'srcfld2' => 'name',
@@ -91,7 +91,7 @@ if ($data['item_required']) {
 					'dstfld1' => 'itemid',
 					'dstfld2' => 'item_description',
 					'parent_discoveryid' => $data['parent_discoveryid']
-				]).', null, this);'
+				]).', {dialogue_class: "modal-popup-generic"});'
 			)
 			->removeId();
 	}
