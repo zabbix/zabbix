@@ -20,7 +20,6 @@
 #ifndef ZABBIX_KVS_H
 #define ZABBIX_KVS_H
 
-#include "common.h"
 #include "zbxalgo.h"
 #include "zbxjson.h"
 
