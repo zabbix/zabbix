@@ -390,7 +390,7 @@ runner:
 			device, err := r.plugin.executeSmartctl(fmt.Sprintf("-a %s -j ", name), false)
 			if err != nil {
 				r.plugin.Tracef(
-					"stopped looking for RAID devices of %s type, err:",
+					"stopped looking for RAID devices of %s type, err: %s",
 					raid.rType, fmt.Errorf("failed to get RAID disk data from smartctl: %s", err.Error()),
 				)
 
@@ -400,8 +400,8 @@ runner:
 			var dp deviceParser
 			if err = json.Unmarshal(device, &dp); err != nil {
 				r.plugin.Tracef(
-					"stopped looking for RAID devices of %s type, err:",
-					raid.rType, fmt.Errorf("failed to get RAID disk data from smartctl: %s", err.Error()),
+					"stopped looking for RAID devices of %s type, err: %s",
+					raid.rType, fmt.Errorf("failed to parse RAID disk data from smartctl: %s", err.Error()),
 				)
 
 				continue runner
@@ -410,7 +410,7 @@ runner:
 			err = dp.checkErr()
 			if err != nil {
 				r.plugin.Tracef(
-					"stopped looking for RAID devices of %s type, err:",
+					"stopped looking for RAID devices of %s type, err: %s",
 					raid.rType, fmt.Errorf("failed to get disk data from smartctl: %s", err.Error()),
 				)
 
