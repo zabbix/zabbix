@@ -46,6 +46,11 @@ const (
 
 	ataSmartAttrFieldName      = "ata_smart_attributes"
 	ataSmartAttrTableFieldName = "table"
+
+	rotationRateFieldName = "rotation_rate"
+
+	deviceFieldName = "device"
+	typeFieldName   = "type"
 )
 
 var (

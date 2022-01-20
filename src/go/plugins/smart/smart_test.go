@@ -72,9 +72,65 @@ func Test_setDiskFields(t *testing.T) {
 	}
 }
 
-func Test_getAttributeTables(t *testing.T) {
-	map1 := map[string][]table{"table": {table1, table2, attrTable}}
-	map2 := map[string][]table{"table": {table1, table2, table4}}
+func Test_getRateFromJson(t *testing.T) {
+	type args struct {
+		in map[string]interface{}
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantOut int
+	}{
+		{"rate", args{map[string]interface{}{"rotation_rate": 10}}, 10},
+		{"multiple_fields", args{map[string]interface{}{"foobar": "abc", "rotation_rate": 10}}, 10},
+		{"no_rate", args{map[string]interface{}{"foobar": "abc"}}, 0},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotOut := getRateFromJson(tt.args.in); gotOut != tt.wantOut {
+				t.Errorf("getRateFromJson() = %v, want %v", gotOut, tt.wantOut)
+			}
+		})
+	}
+}
+
+func Test_getTypeFromJson(t *testing.T) {
+	map1 := make(map[string]interface{})
+	map1["device"] = map[string]interface{}{"type": "sat"}
+
+	map2 := make(map[string]interface{})
+	map2["device"] = map[string]interface{}{"type": "sat", "foobar": "abc"}
+
+	map3 := make(map[string]interface{})
+	map3["device"] = map[string]interface{}{"foobar": "abc"}
+
+	type args struct {
+		in map[string]interface{}
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantOut string
+	}{
+		{"type", args{map1}, "sat"},
+		{"multiple_fields", args{map2}, "sat"},
+		{"no_type", args{map3}, ""},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotOut := getTypeFromJson(tt.args.in); gotOut != tt.wantOut {
+				t.Errorf("getTypeFromJson() = %v, want %v", gotOut, tt.wantOut)
+			}
+		})
+	}
+}
+
+func Test_getTablesFromJson(t *testing.T) {
+	map1 := make(map[string]interface{})
+	map1["table"] = []interface{}{table1, table2, attrTable}
+
+	map2 := make(map[string]interface{})
+	map2["table"] = []interface{}{table1, table2, table4}
 
 	attrTable1 := map[string]interface{}{"ata_smart_attributes": map1}
 	attrTable2 := map[string]interface{}{"ata_smart_attributes": map2}
@@ -100,8 +156,8 @@ func Test_getAttributeTables(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := getAttributeTables(tt.args.in); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("getAttributeTables() = %v, want %v", got, tt.want)
+			if got := getTablesFromJson(tt.args.in); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("getTablesFromJson() = %v, want %v", got, tt.want)
 			}
 		})
 	}

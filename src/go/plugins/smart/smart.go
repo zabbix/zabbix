@@ -162,61 +162,75 @@ func setDiskFields(deviceJsons map[string]jsonDevice) (out []interface{}, err er
 		}
 
 		b["disk_name"] = cutPrefix(k)
+		b["disk_type"] = getType(getTypeFromJson(b), getRateFromJson(b), getTablesFromJson(b))
 
-		var devType string
-
-		if dev, ok := b["device"]; ok {
-			s, ok := dev.(string)
-			if ok {
-				info := make(map[string]string)
-				if err = json.Unmarshal([]byte(s), &info); err != nil {
-					return out, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
-				}
-
-				devType = info["type"]
-			}
-		}
-
-		rateInt := -1
-
-		if rate, ok := b["rotation_rate"]; ok {
-			switch r := rate.(type) {
-			case int:
-				rateInt = r
-			case float64:
-				rateInt = int(r)
-			}
-		}
-
-		b["disk_type"] = getType(devType, rateInt, getAttributeTables(b))
 		out = append(out, b)
 	}
 
 	return
 }
 
-func getAttributeTables(in map[string]interface{}) []table {
+func getRateFromJson(in map[string]interface{}) (out int) {
+	if r, ok := in[rotationRateFieldName]; ok {
+		switch rate := r.(type) {
+		case int:
+			out = rate
+		case float64:
+			out = int(rate)
+		}
+	}
+
+	return
+}
+
+func getTypeFromJson(in map[string]interface{}) (out string) {
+	if dev, ok := in[deviceFieldName]; ok {
+		m, ok := dev.(map[string]interface{})
+		if ok {
+			if t, ok := m[typeFieldName]; ok {
+				s, ok := t.(string)
+				if ok {
+					out = s
+				}
+			}
+		}
+	}
+
+	return
+}
+
+func getTablesFromJson(in map[string]interface{}) (out []table) {
 	attr, ok := in[ataSmartAttrFieldName]
 	if !ok {
-		return nil
+		return
 	}
 
-	var attrMap map[string][]table
-
-	switch a := attr.(type) {
-	case map[string][]table:
-		attrMap = a
-	default:
-		return nil
-	}
-
-	tables, ok := attrMap[ataSmartAttrTableFieldName]
+	a, ok := attr.(map[string]interface{})
 	if !ok {
-		return nil
+		return
 	}
 
-	return tables
+	tables, ok := a[ataSmartAttrTableFieldName]
+	if !ok {
+		return
+	}
 
+	tmp, ok := tables.([]interface{})
+	if !ok {
+		return
+	}
+
+	b, err := json.Marshal(tmp)
+	if err != nil {
+		return
+	}
+
+	err = json.Unmarshal(b, &out)
+	if err != nil {
+		return
+	}
+
+	return
 }
 
 func getAttributeType(devType string, rate int, tables []table) string {
