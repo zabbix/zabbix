@@ -22,11 +22,10 @@
 #include "../zbxcyberark/cyberark.h"
 #include "../zbxkvs/kvs.h"
 
+#define ZBX_VAULT_TIMEOUT	SEC_PER_MIN
 
 typedef	int (*zbx_vault_kvs_get_cb_t)(const char *vault_url, const char *token, const char *ssl_cert_file,
 		const char *ssl_key_file, const char *path, long timeout, zbx_hashset_t *kvs, char **error);
-
-#define ZBX_VAULT_TIMEOUT	SEC_PER_MIN
 
 extern char	*CONFIG_VAULT;
 extern char	*CONFIG_VAULTTOKEN;
