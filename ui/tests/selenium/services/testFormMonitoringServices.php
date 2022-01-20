@@ -654,9 +654,7 @@ class testFormMonitoringServices extends CWebTest {
 		$form->selectTab('Service');
 		$name = 'New cloned name'.microtime();
 		$form->fill(['Name' => $name]);
-
-		// TODO: after ZBX-20288 is fixed change this to $form->submit();
-		$dialog->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
+		$form->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Service created');
 

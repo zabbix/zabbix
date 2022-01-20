@@ -241,11 +241,6 @@ class testFormTags extends CWebTest {
 	 * @param string   $expression   trigger or trigger prototype expression
 	 */
 	public function checkTagsCreate($data, $object, $expression = null) {
-		// TODO: remove this if when trailing spaces are fixed in services tags, ZBX-20365.
-		if ($object === 'service' && $data['name'] === 'With trailing spaces') {
-			return;
-		}
-
 		$sql = null;
 		$old_hash = null;
 
@@ -464,11 +459,6 @@ class testFormTags extends CWebTest {
 	 * @param string   $object   host, template, trigger or prototype
 	 */
 	public function checkTagsUpdate($data, $object) {
-		// TODO: remove this if when trailing spaces are fixed in services tags, ZBX-20365.
-		if ($object === 'service' && $data['tags'][0]['tag'] === 'new tag       ') {
-			return;
-		}
-
 		$sql = null;
 		$old_hash = null;
 
