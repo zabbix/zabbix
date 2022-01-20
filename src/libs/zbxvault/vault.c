@@ -37,11 +37,6 @@ extern char	*CONFIG_VAULTDBPATH;
 static zbx_vault_kvs_get_cb_t	zbx_vault_kvs_get_cb;
 static char			*zbx_vault_dbuser_key, *zbx_vault_dbpassword_key;
 
-static void	zbx_vault_init_cb(zbx_vault_kvs_get_cb_t vault_kvs_get_cb)
-{
-	zbx_vault_kvs_get_cb = vault_kvs_get_cb;
-}
-
 int	zbx_vault_init(char **error)
 {
 	if (NULL == CONFIG_VAULT || '\0' == *CONFIG_VAULT || 0 == strcmp(CONFIG_VAULT, ZBX_HASHICORP_NAME))
@@ -53,7 +48,7 @@ int	zbx_vault_init(char **error)
 			return FAIL;
 		}
 
-		zbx_vault_init_cb(zbx_hashicorp_kvs_get);
+		zbx_vault_kvs_get_cb = zbx_hashicorp_kvs_get;
 		zbx_vault_dbuser_key = ZBX_HASHICORP_DBUSER_KEY;
 		zbx_vault_dbpassword_key = ZBX_HASHICORP_DBPASSWORD_KEY;
 	}
@@ -67,7 +62,7 @@ int	zbx_vault_init(char **error)
 			return FAIL;
 		}
 
-		zbx_vault_init_cb(zbx_cyberark_kvs_get);
+		zbx_vault_kvs_get_cb = zbx_cyberark_kvs_get;
 		zbx_vault_dbuser_key = ZBX_CYBERARK_DBUSER_KEY;
 		zbx_vault_dbpassword_key = ZBX_CYBERARK_DBPASSWORD_KEY;
 	}
