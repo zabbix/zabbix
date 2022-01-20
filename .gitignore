@@ -73,6 +73,7 @@ etc/zabbix_agent2.d/plugins.d/oracle.conf
 etc/zabbix_agent2.d/plugins.d/postgres.conf
 etc/zabbix_agent2.d/plugins.d/redis.conf
 etc/zabbix_agent2.d/plugins.d/smart.conf
+m4/conf_tests.m4
 frontend.mo
 include/config.h
 include/config.h.in
@@ -102,16 +103,7 @@ sass/wide-table.html
 sbin/zabbix_agent2
 sbin/zabbix_agentd
 sbin/zabbix_web_service
-sbin/zabbix_java/bin/zabbix-java-gateway-4.4.0alpha1.jar
-sbin/zabbix_java/lib/android-json-4.3_r3.1.jar
-sbin/zabbix_java/lib/logback-classic-1.2.3.jar
-sbin/zabbix_java/lib/logback-console.xml
-sbin/zabbix_java/lib/logback-core-1.2.3.jar
-sbin/zabbix_java/lib/logback.xml
-sbin/zabbix_java/lib/slf4j-api-1.7.30.jar
-sbin/zabbix_java/settings.sh
-sbin/zabbix_java/shutdown.sh
-sbin/zabbix_java/startup.sh
+sbin/zabbix_java
 sbin/zabbix_proxy
 sbin/zabbix_server
 share/man/man1/zabbix_get.1

@@ -83,6 +83,7 @@
 #include "zbxrtc.h"
 #include "zbxha.h"
 #include "../libs/zbxhashicorp/hashicorp.h"
+#include "../libs/zbxcyberark/cyberark.h"
 
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"
@@ -266,6 +267,7 @@ char	*CONFIG_DBNAME			= NULL;
 char	*CONFIG_DBSCHEMA		= NULL;
 char	*CONFIG_DBUSER			= NULL;
 char	*CONFIG_DBPASSWORD		= NULL;
+char	*CONFIG_VAULT			= NULL;
 char	*CONFIG_VAULTURL		= NULL;
 char	*CONFIG_VAULTTOKEN		= NULL;
 char	*CONFIG_VAULTTLSCERTFILE	= NULL;
@@ -690,6 +692,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	err |= (FAIL == check_cfg_feature_str("HistoryStorageTypes", CONFIG_HISTORY_STORAGE_OPTS, "cURL library"));
 	err |= (FAIL == check_cfg_feature_int("HistoryStorageDateIndex", CONFIG_HISTORY_STORAGE_PIPELINES,
 			"cURL library"));
+	err |= (FAIL == check_cfg_feature_str("Vault", CONFIG_VAULT, "cURL library"));
 	err |= (FAIL == check_cfg_feature_str("VaultToken", CONFIG_VAULTTOKEN, "cURL library"));
 	err |= (FAIL == check_cfg_feature_str("VaultDBPath", CONFIG_VAULTDBPATH, "cURL library"));
 
@@ -847,6 +850,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{"DBPassword",			&CONFIG_DBPASSWORD,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"VaultToken",			&CONFIG_VAULTTOKEN,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"Vault",			&CONFIG_VAULT,				TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"VaultTLSCertFile",		&CONFIG_VAULTTLSCERTFILE,		TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -1665,7 +1670,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	zbx_vault_init_cb(zbx_hashicorp_kvs_get, zbx_hashicorp_init_db_credentials);
+	if (SUCCEED != zbx_vault_init(CONFIG_VAULT, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
 
 	if (SUCCEED != zbx_vault_init_db_credentials(&error))
 	{

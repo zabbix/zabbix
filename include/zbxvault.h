@@ -30,8 +30,7 @@ typedef	int (*zbx_vault_init_db_credentials_cb_t)(char *vault_url, char *token,
 		const char *ssl_cert_file, const char *ssl_key_file, const char *db_path, long timeout,
 		char **dbuser, char **dbpassword, char **error);
 
-void	zbx_vault_init_cb(zbx_vault_kvs_get_cb_t vault_kvs_get_cb,
-		zbx_vault_init_db_credentials_cb_t vault_init_db_credentials);
+int	zbx_vault_init(const char *vault, char **error);
 int	zbx_vault_init_token_from_env(char **error);
 int	zbx_vault_init_db_credentials(char **error);
 int	zbx_vault_kvs_get(const char *path, zbx_hashset_t *kvs, char **error);

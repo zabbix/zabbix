@@ -18,6 +18,8 @@
 **/
 
 #include "zbxvault.h"
+#include "../zbxhashicorp/hashicorp.h"
+#include "../zbxcyberark/cyberark.h"
 
 #define ZBX_VAULT_TIMEOUT	SEC_PER_MIN
 
@@ -30,8 +32,8 @@ extern char	*CONFIG_VAULTDBPATH;
 extern char	*CONFIG_DBUSER;
 extern char	*CONFIG_DBPASSWORD;
 
-zbx_vault_kvs_get_cb_t			zbx_vault_kvs_get_cb;
-zbx_vault_init_db_credentials_cb_t	zbx_vault_init_db_credentials_cb;
+static zbx_vault_kvs_get_cb_t			zbx_vault_kvs_get_cb;
+static zbx_vault_init_db_credentials_cb_t	zbx_vault_init_db_credentials_cb;
 
 int	zbx_vault_init_token_from_env(char **error)
 {
@@ -54,11 +56,35 @@ int	zbx_vault_init_token_from_env(char **error)
 	return SUCCEED;
 }
 
-void	zbx_vault_init_cb(zbx_vault_kvs_get_cb_t vault_kvs_get_cb,
+static void	zbx_vault_init_cb(zbx_vault_kvs_get_cb_t vault_kvs_get_cb,
 		zbx_vault_init_db_credentials_cb_t vault_init_db_credentials)
 {
 	zbx_vault_kvs_get_cb = vault_kvs_get_cb;
 	zbx_vault_init_db_credentials_cb = vault_init_db_credentials;
+}
+
+int	zbx_vault_init(const char *vault, char **error)
+{
+	if (NULL == vault || '\0' == *vault)
+	{
+		zbx_vault_init_cb(zbx_hashicorp_kvs_get, zbx_hashicorp_init_db_credentials);
+	}
+	else if (0 == strcmp(vault, ZBX_VAULT_HASHICORP))
+	{
+		zbx_vault_init_cb(zbx_hashicorp_kvs_get, zbx_hashicorp_init_db_credentials);
+		if (NULL == CONFIG_VAULTTOKEN)
+		{
+			*error = zbx_dsprintf(*error, "\"Vault\" value \"%s\" requires \"VaultToken\" configuration"
+					" parameter or \"VAULT_TOKEN\" environment variable", vault);
+			return FAIL;
+		}
+	}
+	else if (0 == strcmp(vault, ZBX_VAULT_CYBERARKCPP))
+	{
+		zbx_vault_init_cb(zbx_cyberark_kvs_get, zbx_cyberark_init_db_credentials);
+	}
+
+	return SUCCEED;
 }
 
 int	zbx_vault_kvs_get(const char *path, zbx_hashset_t *kvs, char **error)

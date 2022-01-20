@@ -20,7 +20,6 @@
 #include "hashicorp.h"
 #include "zbxjson.h"
 #include "zbxhttp.h"
-#include "zbxvault.h"
 #include "../zbxkvs/kvs.h"
 
 int	zbx_hashicorp_kvs_get(const char *vault_url, const char *token, const char *ssl_cert_file,

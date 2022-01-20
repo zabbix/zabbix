@@ -105,6 +105,7 @@ static void	dc_maintenance_precache_nested_groups(void);
 static unsigned char	macro_env = ZBX_MACRO_ENV_NONSECURE;
 extern char		*CONFIG_VAULTDBPATH;
 extern char		*CONFIG_VAULTTOKEN;
+extern char		*CONFIG_VAULT;
 /******************************************************************************
  *                                                                            *
  * Purpose: copies string into configuration cache shared memory              *
@@ -1414,7 +1415,7 @@ done:
 		if ((HOST_STATUS_PROXY_PASSIVE == status && 0 != (ZBX_TCP_SEC_UNENCRYPTED & host->tls_connect)) ||
 				(HOST_STATUS_PROXY_ACTIVE == status && 0 != (ZBX_TCP_SEC_UNENCRYPTED & host->tls_accept)))
 		{
-			if (NULL != CONFIG_VAULTTOKEN)
+			if (NULL != CONFIG_VAULTTOKEN || NULL != CONFIG_VAULT)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "connection with Zabbix proxy \"%s\" should not be"
 						" unencrypted when using Vault", host->host);

@@ -31,8 +31,9 @@ DIST_SUBDIRS = \
 	zbxcompress \
 	zbxembed \
 	zbxprometheus \
-	zbxhashicorp \
 	zbxvault \
+	zbxcyberark \
+	zbxhashicorp \
 	zbxkvs \
 	zbxdiag \
 	zbxtrends \
@@ -62,8 +63,9 @@ SERVER_SUBDIRS = \
 	zbxxml \
 	zbxembed \
 	zbxprometheus \
-	zbxhashicorp \
 	zbxvault \
+	zbxcyberark \
+	zbxhashicorp \
 	zbxkvs \
 	zbxdiag \
 	zbxtrends \
@@ -91,8 +93,9 @@ PROXY_SUBDIRS = \
 	zbxxml \
 	zbxembed \
 	zbxprometheus \
-	zbxhashicorp \
 	zbxvault \
+	zbxcyberark \
+	zbxhashicorp \
 	zbxkvs \
 	zbxdiag \
 	zbxtrends \
