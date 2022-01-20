@@ -92,7 +92,7 @@ int	zbx_vault_kvs_get(const char *path, zbx_hashset_t *kvs, char **error)
 			path, ZBX_VAULT_TIMEOUT, kvs, error);
 }
 
-int	zbx_vault_init_db_credentials(char **dbuser, char **dbpassword, char **error)
+int	zbx_vault_get_db_credentials(char **dbuser, char **dbpassword, char **error)
 {
 	int		ret = FAIL;
 	zbx_hashset_t	kvs;
