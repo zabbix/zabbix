@@ -30,6 +30,7 @@ class ZBarGauge extends HTMLElement {
 
 		this._refresh_frame = null;
 
+		this._fill = BAR_GAUGE_BAR_DEFAULT_COLOR;
 		this._solid = false;
 		this._min = 0;
 		this._max = 100;
@@ -60,7 +61,11 @@ class ZBarGauge extends HTMLElement {
 	attributeChangedCallback(name, old_value, new_value) {
 		switch (name) {
 			case 'fill':
-				this._thresholds[0] = /^#([0-9A-F]{6})$/i.test(new_value) ? new_value : BAR_GAUGE_BAR_DEFAULT_COLOR;
+				this._fill = (new_value !== null && /^#([0-9A-F]{6})$/i.test(new_value))
+					? new_value
+					: BAR_GAUGE_BAR_DEFAULT_COLOR;
+
+				this._events.update();
 				break;
 
 			case 'max':
@@ -241,7 +246,7 @@ class ZBarGauge extends HTMLElement {
 			},
 
 			update: () => {
-				this._thresholds = {0: BAR_GAUGE_BAR_DEFAULT_COLOR};
+				this._thresholds = {0: this._fill};
 
 				for (const threshold of this.querySelectorAll('threshold')) {
 					if (threshold.hasAttribute('fill') && threshold.hasAttribute('value')) {
