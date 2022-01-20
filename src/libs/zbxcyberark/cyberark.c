@@ -40,7 +40,7 @@ int	zbx_cyberark_kvs_get(const char *vault_url, const char *token, const char *s
 
 	url = zbx_dsprintf(NULL, "%s/AIMWebService/api/Accounts?%s", vault_url, path);
 
-	if (SUCCEED != zbx_http_get(url, "Content type: application/json", timeout, ssl_cert_file, ssl_key_file, &out,
+	if (SUCCEED != zbx_http_get(url, "Content-Type: application/json", timeout, ssl_cert_file, ssl_key_file, &out,
 			&response_code, error))
 	{
 		goto fail;
