@@ -56,8 +56,8 @@ int	zbx_vault_init(char **error)
 	{
 		if (NULL != CONFIG_VAULTTOKEN)
 		{
-			*error = zbx_dsprintf(*error, "cannot use \"Vault\" value \"%s\" with \"VaultToken\""
-					" configuration parameter or with \"VAULT_TOKEN\" environment variable",
+			*error = zbx_dsprintf(*error, "\"Vault\" value \"%s\" cannot be used when \"VaultToken\""
+					" configuration parameter or \"VAULT_TOKEN\" environment variable is defined",
 					CONFIG_VAULT);
 			return FAIL;
 		}
