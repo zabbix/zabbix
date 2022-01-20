@@ -40,7 +40,7 @@ void	zbx_kv_clean(void *data)
 	zbx_free(kv->value);
 }
 
-void	zbx_kvs_json_parse(const struct zbx_json_parse *jp_kvs, zbx_hashset_t *kvs)
+void	zbx_kvs_from_json_get(const struct zbx_json_parse *jp_kvs, zbx_hashset_t *kvs)
 {
 	char		key[MAX_STRING_LEN], *value = NULL;
 	const char	*pnext = NULL;
@@ -73,7 +73,7 @@ void	zbx_kvs_json_parse(const struct zbx_json_parse *jp_kvs, zbx_hashset_t *kvs)
 	zbx_free(value);
 }
 
-int	zbx_kvs_json_parse_by_path(const char *path, const struct zbx_json_parse *jp_kvs_paths, zbx_hashset_t *kvs,
+int	zbx_kvs_from_json_by_path_get(const char *path, const struct zbx_json_parse *jp_kvs_paths, zbx_hashset_t *kvs,
 		char **error)
 {
 	const char		*p;
@@ -87,7 +87,7 @@ int	zbx_kvs_json_parse_by_path(const char *path, const struct zbx_json_parse *jp
 			return FAIL;
 		}
 
-		zbx_kvs_json_parse(&jp_kvs, kvs);
+		zbx_kvs_from_json_get(&jp_kvs, kvs);
 		return SUCCEED;
 	}
 	else

@@ -90,7 +90,7 @@ int	zbx_hashicorp_kvs_get(const char *vault_url, const char *token, const char *
 		goto fail;
 	}
 
-	zbx_kvs_json_parse(&jp_data_data, kvs);
+	zbx_kvs_from_json_get(&jp_data_data, kvs);
 
 	ret = SUCCEED;
 fail:

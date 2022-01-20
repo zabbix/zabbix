@@ -2136,7 +2136,7 @@ void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 
 		if (NULL != jp_kvs_paths)
 		{
-			if (FAIL == zbx_kvs_json_parse_by_path(dc_kvs_path->path, jp_kvs_paths, &kvs, &error))
+			if (FAIL == zbx_kvs_from_json_by_path_get(dc_kvs_path->path, jp_kvs_paths, &kvs, &error))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s",
 						dc_kvs_path->path, error);

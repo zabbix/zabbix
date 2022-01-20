@@ -34,8 +34,8 @@ zbx_hash_t	zbx_kv_hash(const void *data);
 int		zbx_kv_compare(const void *d1, const void *d2);
 void		zbx_kv_clean(void *data);
 
-int	zbx_kvs_json_parse_by_path(const char *path, const struct zbx_json_parse *jp_kvs_paths, zbx_hashset_t *kvs,
+int	zbx_kvs_from_json_by_path_get(const char *path, const struct zbx_json_parse *jp_kvs_paths, zbx_hashset_t *kvs,
 		char **error);
-void	zbx_kvs_json_parse(const struct zbx_json_parse *jp_kvs, zbx_hashset_t *kvs);
+void	zbx_kvs_from_json_get(const struct zbx_json_parse *jp_kvs, zbx_hashset_t *kvs);
 
 #endif

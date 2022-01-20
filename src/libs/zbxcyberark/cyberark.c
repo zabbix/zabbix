@@ -70,7 +70,7 @@ int	zbx_cyberark_kvs_get(const char *vault_url, const char *token, const char *s
 		goto fail;
 	}
 
-	zbx_kvs_json_parse(&jp_data, kvs);
+	zbx_kvs_from_json_get(&jp_data, kvs);
 
 	ret = SUCCEED;
 fail:
