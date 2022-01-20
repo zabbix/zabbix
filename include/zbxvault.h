@@ -20,7 +20,6 @@
 #ifndef ZABBIX_ZBXVAULT_H
 #define ZABBIX_ZBXVAULT_H
 
-#include "common.h"
 #include "zbxalgo.h"
 
 typedef	int (*zbx_vault_kvs_get_cb_t)(const char *vault_url, const char *token, const char *ssl_cert_file,
