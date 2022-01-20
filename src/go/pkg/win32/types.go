@@ -228,3 +228,10 @@ type IO_COUNTERS struct {
 	WriteTransferCount  uint64
 	OtherTransferCount  uint64
 }
+
+type CLUSTER struct {
+	LpSectorsPerCluster     uint32
+	LpBytesPerSector        uint32
+	LpNumberOfFreeClusters  uint32
+	LpTotalNumberOfClusters uint32
+}

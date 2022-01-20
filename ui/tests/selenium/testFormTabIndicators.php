@@ -936,6 +936,8 @@ class testFormTabIndicators extends CWebTest {
 
 			case 'data_set':
 				if ($action === USER_ACTION_REMOVE) {
+					// In graph widget form the 1st row is covered by header with tabs if scroll is not in top position.
+					COverlayDialogElement::find()->one()->scrollToTop();
 					$form->query('class:btn-remove')->all()->click();
 				}
 				else {

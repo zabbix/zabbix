@@ -41,6 +41,7 @@ import (
 	_ "zabbix.com/plugins/system/uptime"
 	_ "zabbix.com/plugins/system/users"
 	_ "zabbix.com/plugins/systemrun"
+	_ "zabbix.com/plugins/vfs/dir"
 	_ "zabbix.com/plugins/vfs/file"
 	_ "zabbix.com/plugins/vfs/fs"
 	_ "zabbix.com/plugins/vm/memory"
