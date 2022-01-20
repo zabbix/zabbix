@@ -516,6 +516,7 @@ class testDashboardGraphWidget extends CWebTest {
 	 * Check validation of "Data set" tab.
 	 *
 	 * @dataProvider getDatasetValidationCreateData
+	 * @dataProvider getDatasetValidationUpdateData
 	 */
 	public function testDashboardGraphWidget_DatasetValidation($data) {
 		$this->validate($data, 'Data set');
