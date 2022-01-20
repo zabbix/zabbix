@@ -70,7 +70,7 @@ window.tophosts_column_edit_form = new class {
 			if (isNaN(threshold) || $.trim(threshold) === '') {
 				rows = [];
 
-				return;
+				return false;
 			}
 
 			rows[rows.length] = {color, threshold};
