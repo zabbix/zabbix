@@ -1668,7 +1668,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_vault_init(CONFIG_VAULT, &error))
+	if (SUCCEED != zbx_vault_init(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault: %s", error);
 		zbx_free(error);

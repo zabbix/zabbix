@@ -28,6 +28,7 @@ typedef	int (*zbx_vault_kvs_get_cb_t)(const char *vault_url, const char *token, 
 
 #define ZBX_VAULT_TIMEOUT	SEC_PER_MIN
 
+extern char	*CONFIG_VAULT;
 extern char	*CONFIG_VAULTTOKEN;
 extern char	*CONFIG_VAULTURL;
 extern char	*CONFIG_VAULTTLSCERTFILE;
@@ -42,14 +43,14 @@ static void	zbx_vault_init_cb(zbx_vault_kvs_get_cb_t vault_kvs_get_cb)
 	zbx_vault_kvs_get_cb = vault_kvs_get_cb;
 }
 
-int	zbx_vault_init(const char *vault, char **error)
+int	zbx_vault_init(char **error)
 {
-	if (NULL == vault || '\0' == *vault || 0 == strcmp(vault, ZBX_HASHICORP_NAME))
+	if (NULL == CONFIG_VAULT || '\0' == *CONFIG_VAULT || 0 == strcmp(CONFIG_VAULT, ZBX_HASHICORP_NAME))
 	{
-		if (NULL == CONFIG_VAULTTOKEN && 0 == zbx_strcmp_null(vault, ZBX_HASHICORP_NAME))
+		if (NULL == CONFIG_VAULTTOKEN && 0 == zbx_strcmp_null(CONFIG_VAULT, ZBX_HASHICORP_NAME))
 		{
 			*error = zbx_dsprintf(*error, "\"Vault\" value \"%s\" requires \"VaultToken\" configuration"
-					" parameter or \"VAULT_TOKEN\" environment variable", vault);
+					" parameter or \"VAULT_TOKEN\" environment variable", CONFIG_VAULT);
 			return FAIL;
 		}
 
@@ -57,12 +58,12 @@ int	zbx_vault_init(const char *vault, char **error)
 		zbx_vault_key_dbuser = ZBX_HASHICORP_DBUSERNAME_KEY;
 		zbx_vault_key_dbpassword = ZBX_HASHICORP_DBPASSWORD_KEY;
 	}
-	else if (0 == strcmp(vault, ZBX_CYBERARKCPP_NAME))
+	else if (0 == strcmp(CONFIG_VAULT, ZBX_CYBERARKCPP_NAME))
 	{
 		if (NULL != CONFIG_VAULTTOKEN)
 		{
 			*error = zbx_dsprintf(*error, "\"Vault\" value \"%s\" requires \"VaultToken\" configuration"
-					" parameter and \"VAULT_TOKEN\" environment variable not to be defined", vault);
+					" parameter and \"VAULT_TOKEN\" environment variable not to be defined", CONFIG_VAULT);
 			return FAIL;
 		}
 
@@ -72,7 +73,7 @@ int	zbx_vault_init(const char *vault, char **error)
 	}
 	else
 	{
-		*error = zbx_dsprintf(*error, "invalid \"Vault\" configuration parameter: '%s'", vault);
+		*error = zbx_dsprintf(*error, "invalid \"Vault\" configuration parameter: '%s'", CONFIG_VAULT);
 		return FAIL;
 	}
 
