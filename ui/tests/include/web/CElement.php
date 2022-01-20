@@ -732,4 +732,11 @@ class CElement extends CBaseElement implements IWaitable {
 
 		return $this;
 	}
+
+	/**
+	 * Scroll the element to the top position.
+	 */
+	public function scrollToTop() {
+		CElementQuery::getDriver()->executeScript('arguments[0].scrollTo(0, 0)', [$this]);
+	}
 }
