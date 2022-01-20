@@ -36,7 +36,7 @@ extern char	*CONFIG_VAULTTLSKEYFILE;
 extern char	*CONFIG_VAULTDBPATH;
 
 static zbx_vault_kvs_get_cb_t	zbx_vault_kvs_get_cb;
-static char			*zbx_vault_key_dbuser, *zbx_vault_key_dbpassword;
+static char			*zbx_vault_dbuser_key, *zbx_vault_dbpassword_key;
 
 static void	zbx_vault_init_cb(zbx_vault_kvs_get_cb_t vault_kvs_get_cb)
 {
@@ -55,21 +55,22 @@ int	zbx_vault_init(char **error)
 		}
 
 		zbx_vault_init_cb(zbx_hashicorp_kvs_get);
-		zbx_vault_key_dbuser = ZBX_HASHICORP_DBUSERNAME_KEY;
-		zbx_vault_key_dbpassword = ZBX_HASHICORP_DBPASSWORD_KEY;
+		zbx_vault_dbuser_key = ZBX_HASHICORP_DBUSER_KEY;
+		zbx_vault_dbpassword_key = ZBX_HASHICORP_DBPASSWORD_KEY;
 	}
 	else if (0 == strcmp(CONFIG_VAULT, ZBX_CYBERARKCPP_NAME))
 	{
 		if (NULL != CONFIG_VAULTTOKEN)
 		{
 			*error = zbx_dsprintf(*error, "\"Vault\" value \"%s\" requires \"VaultToken\" configuration"
-					" parameter and \"VAULT_TOKEN\" environment variable not to be defined", CONFIG_VAULT);
+					" parameter and \"VAULT_TOKEN\" environment variable not to be defined",
+					CONFIG_VAULT);
 			return FAIL;
 		}
 
 		zbx_vault_init_cb(zbx_cyberark_kvs_get);
-		zbx_vault_key_dbuser = ZBX_CYBERARK_DBUSERNAME_KEY;
-		zbx_vault_key_dbpassword = ZBX_CYBERARK_DBPASSWORD_KEY;
+		zbx_vault_dbuser_key = ZBX_CYBERARK_DBUSER_KEY;
+		zbx_vault_dbpassword_key = ZBX_CYBERARK_DBPASSWORD_KEY;
 	}
 	else
 	{
@@ -82,13 +83,6 @@ int	zbx_vault_init(char **error)
 
 int	zbx_vault_kvs_get(const char *path, zbx_hashset_t *kvs, char **error)
 {
-	if (NULL == zbx_vault_kvs_get_cb)
-	{
-		*error = zbx_dsprintf(*error, "missing vault library");
-		THIS_SHOULD_NEVER_HAPPEN;
-		return FAIL;
-	}
-
 	return zbx_vault_kvs_get_cb(CONFIG_VAULTURL, CONFIG_VAULTTOKEN, CONFIG_VAULTTLSCERTFILE, CONFIG_VAULTTLSKEYFILE,
 			path, ZBX_VAULT_TIMEOUT, kvs, error);
 }
@@ -98,12 +92,6 @@ int	zbx_vault_db_credentials_get(char **dbuser, char **dbpassword, char **error)
 	int		ret = FAIL;
 	zbx_hashset_t	kvs;
 	zbx_kv_t	*kv_username, *kv_password, kv_local;
-
-	if (NULL == zbx_vault_kvs_get_cb)
-	{
-		*error = zbx_dsprintf(*error, "missing vault library");
-		return FAIL;
-	}
 
 	if (NULL == CONFIG_VAULTDBPATH)
 		return SUCCEED;
@@ -132,7 +120,7 @@ int	zbx_vault_db_credentials_get(char **dbuser, char **dbpassword, char **error)
 		goto fail;
 	}
 
-	kv_local.key = zbx_vault_key_dbuser;
+	kv_local.key = zbx_vault_dbuser_key;
 
 	if (NULL == (kv_username = (zbx_kv_t *)zbx_hashset_search(&kvs, &kv_local)))
 	{
@@ -140,7 +128,7 @@ int	zbx_vault_db_credentials_get(char **dbuser, char **dbpassword, char **error)
 		goto fail;
 	}
 
-	kv_local.key = zbx_vault_key_dbpassword;
+	kv_local.key = zbx_vault_dbpassword_key;
 
 	if (NULL == (kv_password = (zbx_kv_t *)zbx_hashset_search(&kvs, &kv_local)))
 	{

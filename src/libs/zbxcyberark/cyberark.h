@@ -23,7 +23,7 @@
 #include "zbxalgo.h"
 
 #define ZBX_CYBERARKCPP_NAME		"CyberArkCPP"
-#define ZBX_CYBERARK_DBUSERNAME_KEY	"UserName"
+#define ZBX_CYBERARK_DBUSER_KEY	"UserName"
 #define ZBX_CYBERARK_DBPASSWORD_KEY	"Content"
 
 int	zbx_cyberark_kvs_get(const char *vault_url, const char *token, const char *ssl_cert_file,
