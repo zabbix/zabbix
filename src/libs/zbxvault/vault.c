@@ -37,27 +37,6 @@ extern char	*CONFIG_VAULTDBPATH;
 static zbx_vault_kvs_get_cb_t	zbx_vault_kvs_get_cb;
 static char			*zbx_vault_key_dbuser, *zbx_vault_key_dbpassword;
 
-int	zbx_vault_init_token_from_env(char **error)
-{
-#if defined(HAVE_GETENV) && defined(HAVE_UNSETENV)
-	char	*ptr;
-
-	if (NULL == (ptr = getenv("VAULT_TOKEN")))
-		return SUCCEED;
-
-	if (NULL != CONFIG_VAULTTOKEN)
-	{
-		*error = zbx_dsprintf(*error, "both \"VaultToken\" configuration parameter"
-				" and \"VAULT_TOKEN\" environment variable are defined");
-		return FAIL;
-	}
-
-	CONFIG_VAULTTOKEN = zbx_strdup(NULL, ptr);
-	unsetenv("VAULT_TOKEN");
-#endif
-	return SUCCEED;
-}
-
 static void	zbx_vault_init_cb(zbx_vault_kvs_get_cb_t vault_kvs_get_cb)
 {
 	zbx_vault_kvs_get_cb = vault_kvs_get_cb;
@@ -176,4 +155,25 @@ fail:
 	zbx_hashset_destroy(&kvs);
 
 	return ret;
+}
+
+int	zbx_vault_init_token_from_env(char **error)
+{
+#if defined(HAVE_GETENV) && defined(HAVE_UNSETENV)
+	char	*ptr;
+
+	if (NULL == (ptr = getenv("VAULT_TOKEN")))
+		return SUCCEED;
+
+	if (NULL != CONFIG_VAULTTOKEN)
+	{
+		*error = zbx_dsprintf(*error, "both \"VaultToken\" configuration parameter"
+				" and \"VAULT_TOKEN\" environment variable are defined");
+		return FAIL;
+	}
+
+	CONFIG_VAULTTOKEN = zbx_strdup(NULL, ptr);
+	unsetenv("VAULT_TOKEN");
+#endif
+	return SUCCEED;
 }
