@@ -89,11 +89,19 @@
 		$('[name="min"],[name="max"]', $widget_form).attr('disabled', display_as_is || !data_item_value);
 		$thresholds_table.toggleClass('disabled', !data_item_value);
 		$('[name$="[color]"],[name$="[threshold]"],button', $thresholds_table).attr('disabled', !data_item_value);
+
+		// Toggle visibility of disabled form elements.
+		$('.form-grid > label', $widget_form).each((i, elm) => {
+			const form_field = $(elm).next();
+			const is_visible = (form_field.find(':disabled,.disabled').length == 0);
+
+			$(elm).toggle(is_visible);
+			form_field.toggle(is_visible);
+		});
 	}
 
 	function handleFormSubmit(e, overlay) {
 		let url = new Curl(e.target.getAttribute('action'));
-		//let body_selector = `.overlay-dialogue[data-dialogueid='${overlay.dialogueid}'] .overlay-dialogue-body`;
 
 		fetch(url.getUrl(), {
 				method: 'POST',
