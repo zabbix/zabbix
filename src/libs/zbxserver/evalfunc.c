@@ -1770,7 +1770,7 @@ static int	evaluate_LAST(zbx_variant_t *value, DC_ITEM *item, const char *parame
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_MIN_or_MAX(zbx_variant_t *value, DC_ITEM *item, const char *parameters,
+static int	evaluate_MIN_or_MAX(zbx_variant_t *value, const DC_ITEM *item, const char *parameters,
 		const zbx_timespec_t *ts, char **error, int min_or_max)
 {
 	int				arg1, i, ret = FAIL, seconds = 0, nvalues = 0, time_shift;
