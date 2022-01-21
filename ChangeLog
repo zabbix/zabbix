@@ -1,11 +1,29 @@
 Changes for 6.0.0rc1
 
 New features:
+.........T [ZBXNEXT-4635] added templates for Kubernetes Controlplane and Kubestate metrics (afayantsev, ychukina)
+..F....... [ZBXNEXT-7107] added Item popup menu in Latest data; added new links in Configuration Items popup menu and Item prototypes popup menu (epulke)
+...G...... [ZBXNEXT-7409] added native support for the vfs.dir.size and vfs.dir.count keys in Zabbix agent 2 (esneiders)
+A.F.....S. [ZBXNEXT-1911,ZBXNEXT-7399] allowed textual types of information for Calculated items (dgoloscapov, jfreibergs)
+.........T [ZBXNEXT-7389] changed templates to use no linked templates, moved OS templates from the classic folder to the os folder (mchudinov)
+..F.I..... [ZBXNEXT-6687] implemented subfilter and named filters for latest data section (miks)
 ........S. [ZBXNEXT-7101] implemented sleep function into JS engine (asestakovs)
 .........T [ZBXNEXT-6861] updated Zabbix proxy templates according to the latest guidelines (abakaldin)
 .........T [ZBXNEXT-7078] added pfsense template (vkhaliev)
 
 Bug fixes:
+..F....... [ZBX-20300] fixed displaying extra decimal digits in vertical scales of graphs for item units prefixed with "!" (averza)
+...GI..... [ZBX-20444] fixed Agent and Agent 2 compilation with libpcre2 on Windows (ssimonenko)
+..F....... [ZBX-20460] fixed color-picker not updating selected color in its input element (ashubin)
+........S. [ZBX-20446] fixed housekeeper failure when deleting auditlog entries; thanks to Yuuki Enomoto for the patch (arimdjonoks)
+........S. [ZBX-20420] increased storage size of the 'parameters' field of the 'alerts' table for Oracle backend (arimdjonoks)
+...G...... [ZBX-20416] fixed vfs.file.owner to display unknown user:group numerically instead of error (asestakovs)
+..F....... [ZBX-20288] fixed cloning services twice hitting enter key in configuration form (averza)
+.......PS. [ZBX-20293] fixed icmpping items group becomes not supported due to error in interval detection (akozlovs)
+..F....... [ZBX-20428] fixed table headers above the graph area in Graph widget configuration form (ashubin)
+..F....... [ZBX-20342] fixed keyboard navigation for colorpicker (acikuns, ashubin)
+...G...... [ZBX-20417] fixed vfs.file.get error for HP-UX; thanks to Yuuki Enomoto for the patch (arimdjonoks)
+........S. [ZBX-20175] changed functions with disabled history/trends to return error (wiper)
 ...G...... [ZBX-20436] fixed hardcoded -lpcre in Agent 2 embedded C code (ssimonenko)
 ..F....... [ZBX-20431] fixed template import button shown out of bounds (jfreibergs)
 A......... [ZBX-19991] fixed template import of dependent items and item prototypes having newly created master item (miks)
