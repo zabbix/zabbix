@@ -1143,11 +1143,20 @@ out:
 	return ret;
 }
 
+/* flags for evaluate_MIN_or_MAX() */
+#define EVALUATE_MIN	0
+#define EVALUATE_MAX	1
+
+#define LOOP_FIND_MIN_OR_MAX(type, mode_op)							\
+	for (i = 1; i < values.values_num; i++)							\
+	{											\
+		if (values.values[i].value.type mode_op values.values[index].value.type)	\
+			index = i;								\
+	}
+
 /******************************************************************************
  *                                                                            *
- * Function: evaluate_MIN                                                     *
- *                                                                            *
- * Purpose: evaluate function 'min' for the item                              *
+ * Purpose: evaluate function 'min' or 'max' for the item                     *
  *                                                                            *
  * Parameters: item - item (performance metric)                               *
  *             parameters - number of seconds/values and time shift (optional)*
@@ -1156,7 +1165,8 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_MIN(char **value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts, char **error)
+static int	evaluate_MIN_or_MAX(char **value, const DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
+		char **error, int min_or_max)
 {
 	int				nparams, arg1, i, ret = FAIL, seconds = 0, nvalues = 0;
 	zbx_value_type_t		arg1_type;
@@ -1224,130 +1234,24 @@ static int	evaluate_MIN(char **value, DC_ITEM *item, const char *parameters, con
 
 		if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
 		{
-			for (i = 1; i < values.values_num; i++)
+			if (EVALUATE_MIN == min_or_max)
 			{
-				if (values.values[i].value.ui64 < values.values[index].value.ui64)
-					index = i;
+				LOOP_FIND_MIN_OR_MAX(ui64, <);
+			}
+			else
+			{
+				LOOP_FIND_MIN_OR_MAX(ui64, >);
 			}
 		}
 		else
 		{
-			for (i = 1; i < values.values_num; i++)
+			if (EVALUATE_MIN == min_or_max)
 			{
-				if (values.values[i].value.dbl < values.values[index].value.dbl)
-					index = i;
+				LOOP_FIND_MIN_OR_MAX(dbl, <);
 			}
-		}
-
-		*value = zbx_history_value2str_dyn(&values.values[index].value, item->value_type);
-		ret = SUCCEED;
-	}
-	else
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "result for MIN is empty");
-		*error = zbx_strdup(*error, "not enough data");
-	}
-out:
-	zbx_history_record_vector_destroy(&values, item->value_type);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: evaluate_MAX                                                     *
- *                                                                            *
- * Purpose: evaluate function 'max' for the item                              *
- *                                                                            *
- * Parameters: item - item (performance metric)                               *
- *             parameters - number of seconds/values and time shift (optional)*
- *                                                                            *
- * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
- *               FAIL - failed to evaluate function                           *
- *                                                                            *
- ******************************************************************************/
-static int	evaluate_MAX(char **value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts, char **error)
-{
-	int				nparams, arg1, ret = FAIL, i, seconds = 0, nvalues = 0;
-	zbx_value_type_t		arg1_type;
-	zbx_vector_history_record_t	values;
-	zbx_timespec_t			ts_end = *ts;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	zbx_history_record_vector_create(&values);
-
-	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
-	{
-		*error = zbx_strdup(*error, "invalid value type");
-		goto out;
-	}
-
-	if (2 < (nparams = num_param(parameters)))
-	{
-		*error = zbx_strdup(*error, "invalid number of parameters");
-		goto out;
-	}
-
-	if (SUCCEED != get_function_parameter_int(parameters, 1, ZBX_PARAM_MANDATORY, &arg1, &arg1_type) || 0 >= arg1)
-	{
-		*error = zbx_strdup(*error, "invalid first parameter");
-		goto out;
-	}
-
-	if (2 == nparams)
-	{
-		int			time_shift = 0;
-		zbx_value_type_t	time_shift_type = ZBX_VALUE_SECONDS;
-
-		if (SUCCEED != get_function_parameter_int(parameters, 2, ZBX_PARAM_OPTIONAL, &time_shift,
-				&time_shift_type) || ZBX_VALUE_SECONDS != time_shift_type || 0 > time_shift)
-		{
-			*error = zbx_strdup(*error, "invalid second parameter");
-			goto out;
-		}
-
-		ts_end.sec -= time_shift;
-	}
-
-	switch (arg1_type)
-	{
-		case ZBX_VALUE_SECONDS:
-			seconds = arg1;
-			break;
-		case ZBX_VALUE_NVALUES:
-			nvalues = arg1;
-			break;
-		default:
-			THIS_SHOULD_NEVER_HAPPEN;
-	}
-
-	if (FAIL == zbx_vc_get_values(item->itemid, item->value_type, &values, seconds, nvalues, &ts_end))
-	{
-		*error = zbx_strdup(*error, "cannot get values from value cache");
-		goto out;
-	}
-
-	if (0 < values.values_num)
-	{
-		int	index = 0;
-
-		if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
-		{
-			for (i = 1; i < values.values_num; i++)
+			else
 			{
-				if (values.values[i].value.ui64 > values.values[index].value.ui64)
-					index = i;
-			}
-		}
-		else
-		{
-			for (i = 1; i < values.values_num; i++)
-			{
-				if (values.values[i].value.dbl > values.values[index].value.dbl)
-					index = i;
+				LOOP_FIND_MIN_OR_MAX(dbl, >);
 			}
 		}
 
@@ -1357,7 +1261,7 @@ static int	evaluate_MAX(char **value, DC_ITEM *item, const char *parameters, con
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "result for MAX is empty");
+		zabbix_log(LOG_LEVEL_DEBUG, "result for MIN or MAX is empty");
 		*error = zbx_strdup(*error, "not enough data");
 	}
 out:
@@ -2727,11 +2631,11 @@ int	evaluate_function(char **value, DC_ITEM *item, const char *function, const c
 	}
 	else if (0 == strcmp(function, "min"))
 	{
-		ret = evaluate_MIN(value, item, parameter, ts, error);
+		ret = evaluate_MIN_or_MAX(value, item, parameter, ts, error, EVALUATE_MIN);
 	}
 	else if (0 == strcmp(function, "max"))
 	{
-		ret = evaluate_MAX(value, item, parameter, ts, error);
+		ret = evaluate_MIN_or_MAX(value, item, parameter, ts, error, EVALUATE_MAX);
 	}
 	else if (0 == strcmp(function, "avg"))
 	{
