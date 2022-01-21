@@ -327,7 +327,7 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 	}
 
 	$.fn.colorpicker = function(options) {
-		options = $.extend(defaults, options || {});
+		options = $.extend({}, defaults, options || {});
 
 		/**
 		 * Initialize colorpicker overlay if it is not initialized.
