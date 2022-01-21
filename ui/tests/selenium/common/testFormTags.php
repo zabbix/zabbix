@@ -768,18 +768,21 @@ class testFormTags extends CWebTest {
 
 		// Navigate to host or template for full cloning.
 		$this->query('link', ($parent === 'Host') ? $this->host : $this->template)->waitUntilClickable()->one()->click();
-
-		$host_form = $this->query('id', ($parent === 'Host') ? 'host-form' : 'templates-form')->asForm()
-				->waitUntilPresent()->one();
+		$host_form = ($object !== 'host prototype')
+			? COverlayDialogElement::find()->asForm()->one()->waitUntilReady()
+			: $this->query('id', ($parent === 'Host') ? 'host-form' : 'templates-form')->asForm()->waitUntilPresent()->one();
 
 		$host_form->fill([$parent.' name' => $new_name]);
-		$host_form->query('button:Full clone')->one()->click();
-		$host_form->invalidate();
-		$host_form->submit();
+		$this->query('button:Full clone')->one()->click();
+		$this->query('xpath://div[@class="overlay-dialogue-footer" or contains(@class, "tfoot-buttons")]//button[text()="Add"]')
+				->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, $parent.' added');
 
 		if ($parent === 'Host') {
+			if ($object !== 'host prototype') {
+				$this->query('link:All hosts')->one()->click();
+			}
 			$this->page->waitUntilReady();
 			$this->query('button:Reset')->one()->click();
 			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
