@@ -874,6 +874,8 @@ static void	DCdump_triggers(void)
 
 	for (i = 0; i < index.values_num; i++)
 	{
+		zbx_uint64_t	*itemid;
+
 		trigger = (ZBX_DC_TRIGGER *)index.values[i];
 
 		zabbix_log(LOG_LEVEL_TRACE, "triggerid:" ZBX_FS_UI64 " description:'%s' event_name:'%s' type:%u"
@@ -888,6 +890,14 @@ static void	DCdump_triggers(void)
 		zabbix_log(LOG_LEVEL_TRACE, "  topoindex:%u functional:%u locked:%u", trigger->topoindex,
 				trigger->functional, trigger->locked);
 		zabbix_log(LOG_LEVEL_TRACE, "  opdata:'%s'", trigger->opdata);
+
+		if (NULL != trigger->itemids)
+		{
+			zabbix_log(LOG_LEVEL_TRACE, "  itemids:");
+
+			for (itemid = trigger->itemids; 0 != *itemid; itemid++)
+				zabbix_log(LOG_LEVEL_TRACE, "    " ZBX_FS_UI64, *itemid);
+		}
 
 		if (0 != trigger->tags.values_num)
 			DCdump_trigger_tags(trigger);

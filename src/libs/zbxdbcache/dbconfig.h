@@ -51,6 +51,8 @@ typedef struct
 	unsigned char		correlation_mode;	/* see ZBX_TRIGGER_CORRELATION_* defines */
 	unsigned char		timer;
 
+	zbx_uint64_t		*itemids;
+
 	zbx_vector_ptr_t	tags;
 }
 ZBX_DC_TRIGGER;
