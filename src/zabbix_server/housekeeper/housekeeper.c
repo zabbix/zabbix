@@ -656,10 +656,10 @@ static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s' field_name:'%s' filter:'%s' min_clock:%d now:%d",
 			__func__, rule->table, rule->field_name, rule->filter, rule->min_clock, now);
 
-	/* now only audit field has string id, if in the future this list of exceptions is increased */
+	/* NOTE: Do not forget to add here tables whose id column is string-type.                    */
+	/* Now only audit field has string id, if in the future this list of exceptions is increased */
 	/* DBget_table() and DBget_field() functions with cache could be used to determine if string */
-	/* or int version is required                                                                */
-
+	/* or int version is required.                                                               */
 	id_field_str_type = (0 == strcmp("auditid", rule->field_name)) ? 1 : 0;
 
 	/* initialize min_clock with the oldest record timestamp from database */
@@ -751,13 +751,17 @@ static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 						(const char**)ids_str.values, ids_str.values_num);
 			}
 
-			if (ZBX_DB_OK <= (ret = DBexecute("%s", sql)))
-				deleted += ret;
+			ret = DBexecute("%s", sql);
 
 			if (0 == id_field_str_type)
 				zbx_vector_uint64_clear(&ids_uint64);
 			else
 				zbx_vector_str_clear_ext(&ids_str, zbx_str_free);
+
+			if (ZBX_DB_OK > ret)
+				break;
+
+			deleted += ret;
 		}
 
 		zbx_free(sql);
