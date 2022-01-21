@@ -863,7 +863,7 @@ zabbix_export:
                       result = [];
                   
                   JSON.parse(value).forEach(function (item) {
-                      if (item.name === 'kubelet_runtime_operations_total'){
+                      if (item.name === 'kubelet_runtime_operations_total') {
                           var op_type = item.labels.operation_type;
                   
                           if (lookup[op_type]) {
@@ -876,8 +876,8 @@ zabbix_export:
                           });
                       }
 
-                      else if (item.name === 'kubelet_runtime_operations_duration_seconds_bucket'){
-                        var labels = item.labels.operation_type + item.labels.le;
+                      else if (item.name === 'kubelet_runtime_operations_duration_seconds_bucket') {
+                          var labels = item.labels.operation_type + item.labels.le;
                   
                           if (lookup_histogram[labels]) {
                               return;
