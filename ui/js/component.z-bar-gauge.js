@@ -163,10 +163,11 @@ class ZBarGauge extends HTMLElement {
 			const value = Math.max(this._min, Math.min(this._max, Number(this.value)));
 
 			if (this._solid) {
+				const bar_size = value == this._min ? 0 : Math.max(width / (this._max - this._min) * value - 2, 2);
+
 				this._canvas.width = width;
 
-				this._drawCell(ctx, 1, width / (this._max - this._min) * value - 2,
-					this._getThresholdColorByValue(value), 1);
+				this._drawCell(ctx, 1, bar_size, this._getThresholdColorByValue(value), 1);
 			}
 			else {
 				const cell_count = Math.floor((width - 1) / BAR_GAUGE_BAR_ITEM_WIDTH);
@@ -176,7 +177,7 @@ class ZBarGauge extends HTMLElement {
 
 				for (let i = 0; i < cell_count; i++) {
 					this._drawCell(ctx, i * BAR_GAUGE_BAR_ITEM_WIDTH + 1, BAR_GAUGE_BAR_ITEM_WIDTH - 1,
-						this._getThresholdColorByValue(i * cell_interval), value / cell_interval < i ? .25 : 1);
+						this._getThresholdColorByValue(i * cell_interval), value / cell_interval > i ? 1 : .25);
 				}
 			}
 		});
@@ -200,6 +201,8 @@ class ZBarGauge extends HTMLElement {
 	}
 
 	_roundRect(ctx, x, y, width, height, radius) {
+		radius = Math.min(width / 2, radius);
+
 		ctx.beginPath();
 		ctx.moveTo(x + radius, y);
 		ctx.arcTo(x + width, y, x + width, y + height, radius);
