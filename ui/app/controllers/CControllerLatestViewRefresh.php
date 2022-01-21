@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -22,100 +22,72 @@
 /**
  * Controller for the "Latest data" asynchronous refresh page.
  */
-class CControllerLatestViewRefresh extends CControllerLatest {
+class CControllerLatestViewRefresh extends CControllerLatestView {
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
+	protected function doAction(): void {
 
-	protected function checkInput() {
-		$fields = [
-			'page' =>						'ge 1',
+		if ($this->getInput('filter_counters', 0)) {
+			$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))->read();
+			$filters = $this->hasInput('counter_index')
+				? [$profile->getTabFilter($this->getInput('counter_index'))]
+				: $profile->getTabsWithDefaults();
 
-			// filter inputs
-			'filter_groupids' =>			'array_id',
-			'filter_hostids' =>				'array_id',
-			'filter_select' =>				'string',
-			'filter_show_without_data' =>	'in 1',
-			'filter_show_details' =>		'in 1',
-			'filter_evaltype' =>			'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
-			'filter_tags' =>				'array',
-
-			// table sorting inputs
-			'sort' =>						'in host,name,lastclock',
-			'sortorder' =>					'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP
-		];
-
-		$ret = $this->validateInput($fields);
-
-		if ($ret) {
-			// Hosts must have been selected as well if filtering items with data only.
-			if (!$this->getInput('filter_hostids', []) && !$this->getInput('filter_show_without_data', 0)) {
-				$ret = false;
+			$filter_counters = [];
+			foreach ($filters as $index => $tabfilter) {
+				$filter_counters[$index] = $tabfilter['filter_show_counter'] ? $this->getCount($tabfilter) : 0;
 			}
+
+			$this->setResponse(
+				(new CControllerResponseData([
+					'main_block' => json_encode(['filter_counters' => $filter_counters])
+				]))->disableView()
+			);
 		}
+		else {
+			$filter = static::FILTER_FIELDS_DEFAULT;
+			$this->getInputs($filter, array_keys($filter));
+			$filter = $this->cleanInput($filter);
 
-		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
-		}
+			// make data
+			$prepared_data = $this->prepareData($filter, $filter['sort'], $filter['sortorder']);
 
-		return $ret;
-	}
+			// Prepare subfilter data.
+			$subfilters_fields = self::getSubfilterFields($filter);
+			$subfilters = self::getSubfilters($subfilters_fields, $prepared_data, $filter);
+			$prepared_data['items'] = self::applySubfilters($prepared_data['items']);
 
-	protected function checkPermissions() {
-		return $this->checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA);
-	}
+			$page = $this->getInput('page', 1);
+			$view_url = (new CUrl('zabbix.php'))->setArgument('action', 'latest.view');
+			$paging_arguments = array_filter(array_intersect_key($filter, self::FILTER_FIELDS_DEFAULT));
+			array_map([$view_url, 'setArgument'], array_keys($paging_arguments), $paging_arguments);
+			$paging = CPagerHelper::paginate($page, $prepared_data['items'], ZBX_SORT_UP, $view_url);
 
-	protected function doAction() {
-		// filter
-		$filter = [
-			'groupids' => $this->hasInput('filter_groupids') ? $this->getInput('filter_groupids') : null,
-			'hostids' => $this->hasInput('filter_hostids') ? $this->getInput('filter_hostids') : null,
-			'select' => $this->getInput('filter_select', ''),
-			'show_without_data' => $this->getInput('filter_show_without_data', 0),
-			'show_details' => $this->getInput('filter_show_details', 0),
-			'evaltype' => CProfile::get('web.latest.filter.evaltype', TAG_EVAL_TYPE_AND_OR),
-			'tags' => []
-		];
+			$this->extendData($prepared_data);
 
-		// Tags filters.
-		foreach (CProfile::getArray('web.latest.filter.tags.tag', []) as $i => $tag) {
-			$filter['tags'][] = [
-				'tag' => $tag,
-				'value' => CProfile::get('web.latest.filter.tags.value', null, $i),
-				'operator' => CProfile::get('web.latest.filter.tags.operator', null, $i)
+			// make response
+			$data = [
+				'results' => [
+					'filter' => $filter,
+					'view_curl' => $view_url,
+					'sort_field' => $filter['sort'],
+					'sort_order' => $filter['sortorder'],
+					'paging' => $paging,
+					'config' => [
+						'hk_trends' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS),
+						'hk_trends_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL),
+						'hk_history' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY),
+						'hk_history_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)
+					],
+					'tags' => makeTags($prepared_data['items'], true, 'itemid', (int) $filter['show_tags'],
+						$filter['tags'], array_key_exists('tags', $subfilters_fields) ? $subfilters_fields['tags'] : [],
+						(int) $filter['tag_name_format'], $filter['tag_priority']
+					)
+				] + $prepared_data,
+				'subfilters' => $subfilters
 			];
+
+			$response = new CControllerResponseData($data);
+			$this->setResponse($response);
 		}
-
-		$sort_field = $this->getInput('sort', 'name');
-		$sort_order = $this->getInput('sortorder', ZBX_SORT_UP);
-
-		$view_curl = (new CUrl('zabbix.php'))->setArgument('action', 'latest.view');
-
-		// data sort and pager
-		$prepared_data = $this->prepareData($filter, $sort_field, $sort_order);
-
-		$paging = CPagerHelper::paginate($this->getInput('page', 1), $prepared_data['items'], ZBX_SORT_UP, $view_curl);
-
-		$this->extendData($prepared_data);
-
-		// display
-		$data = [
-			'filter' => $filter,
-			'sort_field' => $sort_field,
-			'sort_order' => $sort_order,
-			'view_curl' => $view_curl,
-			'paging' => $paging,
-			'config' => [
-				'hk_trends' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS),
-				'hk_trends_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL),
-				'hk_history' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY),
-				'hk_history_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)
-			],
-			'tags' => makeTags($prepared_data['items'], true, 'itemid', ZBX_TAG_COUNT_DEFAULT, $filter['tags'])
-		] + $prepared_data;
-
-		$response = new CControllerResponseData($data);
-		$this->setResponse($response);
 	}
 }

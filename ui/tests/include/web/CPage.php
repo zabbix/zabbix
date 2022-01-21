@@ -643,4 +643,11 @@ class CPage {
 			throw new \Exception('Header of the page "'.$text.'" is not equal to "'.$header.'".');
 		}
 	}
+
+	/**
+	 * Scroll page to the top position.
+	 */
+	public function scrollToTop() {
+		$this->getDriver()->executeScript('document.getElementsByClassName(\'wrapper\')[0].scrollTo(0, 0)');
+	}
 }

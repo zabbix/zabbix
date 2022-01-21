@@ -847,6 +847,7 @@ class testFormUserRoles extends CWebTest {
 		// New role check with screenshots.
 		$this->page->open('zabbix.php?action=userrole.edit')->waitUntilReady();
 		$this->page->removeFocus();
+
 		$screenshot_area = $this->query('id:user_role_tab')->one();
 		foreach ($roles as $role) {
 			$this->query('id:user-type')->one()->asZDropdown()->select($role);

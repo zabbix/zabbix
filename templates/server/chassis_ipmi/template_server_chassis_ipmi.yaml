@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:37Z'
+  version: '6.0'
+  date: '2021-12-17T06:14:13Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -11,8 +11,8 @@ zabbix_export:
       template: 'Chassis by IPMI'
       name: 'Chassis by IPMI'
       description: |
-        Template for monitoring servers with BMC over IPMI that work without any external scripts. 
-        All metrics are collected at once, thanks to Zabbix's bulk data collection. The template is available starting from Zabbix version 5.0. 
+        Template for monitoring servers with BMC over IPMI that work without any external scripts.
+        All metrics are collected at once, thanks to Zabbix's bulk data collection. The template is available starting from Zabbix version 5.0.
         It collects metrics by polling BMC remotely using an IPMI agent.
         
         
@@ -22,7 +22,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/398023-discussion-thread-for-official-zabbix-template-ipmi
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: 'Templates/Server hardware'

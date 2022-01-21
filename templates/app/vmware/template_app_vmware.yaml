@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-10T13:47:38Z'
+  date: '2022-01-18T20:38:26Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -13,10 +13,7 @@ zabbix_export:
       description: |
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
-        Template tooling version used: 0.40
-      templates:
-        -
-          name: 'VMware macros'
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -242,6 +239,16 @@ zabbix_export:
               interfaces:
                 -
                   ip: '{#VM.IP}'
+      macros:
+        -
+          macro: '{$VMWARE.PASSWORD}'
+          description: 'VMware service {$USERNAME} user password'
+        -
+          macro: '{$VMWARE.URL}'
+          description: 'VMware service (vCenter or ESX hypervisor) SDK URL (https://servername/sdk)'
+        -
+          macro: '{$VMWARE.USERNAME}'
+          description: 'VMware service user name'
       valuemaps:
         -
           uuid: 3c59c22905054d42ac4ee8b72fe5f270
@@ -263,10 +270,7 @@ zabbix_export:
       uuid: 7942fb93ae3b47cf9ca0ea4beb0675ce
       template: 'VMware Guest'
       name: 'VMware Guest'
-      description: 'Template tooling version used: 0.40'
-      templates:
-        -
-          name: 'VMware macros'
+      description: 'Template tooling version used: 0.41'
       groups:
         -
           name: Templates/Applications
@@ -974,6 +978,16 @@ zabbix_export:
                 -
                   tag: Application
                   value: VMware
+      macros:
+        -
+          macro: '{$VMWARE.PASSWORD}'
+          description: 'VMware service {$USERNAME} user password'
+        -
+          macro: '{$VMWARE.URL}'
+          description: 'VMware service (vCenter or ESX hypervisor) SDK URL (https://servername/sdk)'
+        -
+          macro: '{$VMWARE.USERNAME}'
+          description: 'VMware service user name'
       valuemaps:
         -
           uuid: 78f08f5c5c0047b999a2e8daa96cf8b7
@@ -992,10 +1006,7 @@ zabbix_export:
       uuid: 5899b2f0aced4085b5ac25d0461b3425
       template: 'VMware Hypervisor'
       name: 'VMware Hypervisor'
-      description: 'Template tooling version used: 0.40'
-      templates:
-        -
-          name: 'VMware macros'
+      description: 'Template tooling version used: 0.41'
       groups:
         -
           name: Templates/Applications
@@ -1564,6 +1575,16 @@ zabbix_export:
                 -
                   tag: Application
                   value: VMware
+      macros:
+        -
+          macro: '{$VMWARE.PASSWORD}'
+          description: 'VMware service {$USERNAME} user password'
+        -
+          macro: '{$VMWARE.URL}'
+          description: 'VMware service (vCenter or ESX hypervisor) SDK URL (https://servername/sdk)'
+        -
+          macro: '{$VMWARE.USERNAME}'
+          description: 'VMware service user name'
       valuemaps:
         -
           uuid: 25d04e2838af4fcca9ddd21df6781497
@@ -1591,21 +1612,3 @@ zabbix_export:
             -
               value: '3'
               newvalue: red
-    -
-      uuid: 214366d2deb14a0ca6d19d8a54a3b88e
-      template: 'VMware macros'
-      name: 'VMware macros'
-      description: 'Template tooling version used: 0.40'
-      groups:
-        -
-          name: Templates/Applications
-      macros:
-        -
-          macro: '{$VMWARE.PASSWORD}'
-          description: 'VMware service {$USERNAME} user password'
-        -
-          macro: '{$VMWARE.URL}'
-          description: 'VMware service (vCenter or ESX hypervisor) SDK URL (https://servername/sdk)'
-        -
-          macro: '{$VMWARE.USERNAME}'
-          description: 'VMware service user name'

@@ -266,7 +266,10 @@
 			this._removePopupMessage();
 			const original_url = location.href;
 
-			const overlay = PopUp('popup.host.edit', host_data, 'host_edit', document.activeElement);
+			const overlay = PopUp('popup.host.edit', host_data, {
+				dialogueid: 'host_edit',
+				dialogue_class: 'modal-popup-large'
+			});
 
 			this.unscheduleRefresh();
 

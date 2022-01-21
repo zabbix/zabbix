@@ -46,20 +46,14 @@ class testEscalations extends CIntegrationTest {
 		$response = $this->call('host.create', [
 			'host' => self::HOST_NAME,
 			'interfaces' => [
-				[
-					'type' => 1,
-					'main' => 1,
-					'useip' => 1,
-					'ip' => '127.0.0.1',
-					'dns' => '',
-					'port' => $this->getConfigurationValue(self::COMPONENT_AGENT, 'ListenPort')
-				]
+				'type' => 1,
+				'main' => 1,
+				'useip' => 1,
+				'ip' => '127.0.0.1',
+				'dns' => '',
+				'port' => $this->getConfigurationValue(self::COMPONENT_AGENT, 'ListenPort')
 			],
-			'groups' => [
-				[
-					'groupid' => 4
-				]
-			]
+			'groups' => ['groupid' => 4]
 		]);
 
 		$this->assertArrayHasKey('hostids', $response['result']);
@@ -232,8 +226,7 @@ class testEscalations extends CIntegrationTest {
 
 		$response = $this->call('maintenance.create', [
 			'name' => 'Test maintenance',
-			'groupids' => [],
-			'hostids' => [self::$hostid],
+			'hosts' => ['hostid' => self::$hostid],
 			'active_since' => self::$maint_start_tm,
 			'active_till' => $maint_end_tm,
 			'tags_evaltype' => MAINTENANCE_TAG_EVAL_TYPE_AND_OR,
@@ -291,8 +284,7 @@ class testEscalations extends CIntegrationTest {
 
 		$response = $this->call('maintenance.create', [
 			'name' => 'Test maintenance',
-			'groupids' => [],
-			'hostids' => [self::$hostid],
+			'hosts' => ['hostid' => self::$hostid],
 			'active_since' => self::$maint_start_tm,
 			'active_till' => $maint_end_tm,
 			'tags_evaltype' => MAINTENANCE_TAG_EVAL_TYPE_AND_OR,
@@ -354,8 +346,7 @@ class testEscalations extends CIntegrationTest {
 
 		$response = $this->call('maintenance.create', [
 			'name' => 'Test maintenance',
-			'groupids' => [],
-			'hostids' => [self::$hostid],
+			'hosts' => ['hostid' => self::$hostid],
 			'active_since' => self::$maint_start_tm,
 			'active_till' => $maint_end_tm,
 			'tags_evaltype' => MAINTENANCE_TAG_EVAL_TYPE_AND_OR,

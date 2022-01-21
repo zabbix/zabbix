@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:22Z'
+  version: '6.0'
+  date: '2021-12-15T06:57:23Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -11,12 +11,12 @@ zabbix_export:
       template: 'IIS by Zabbix agent active'
       name: 'IIS by Zabbix agent active'
       description: |
-        Get metrics from IIS using Zabbix agent running on Windows
+        Get metrics from IIS using Zabbix agent running on Windows.
         
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/401862-discussion-thread-for-official-zabbix-template-internet-information-services
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Applications
@@ -702,6 +702,10 @@ zabbix_export:
                   expression: 'last(/IIS by Zabbix agent active/perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool State"])<>3 and {$IIS.APPPOOL.MONITORED:"{#APPPOOL}"}=1'
                   name: 'IIS: Application pool {#APPPOOL} is not in Running state'
                   priority: HIGH
+                  dependencies:
+                    -
+                      name: 'IIS: The World Wide Web Publishing Service (W3SVC) is not running'
+                      expression: 'last(/IIS by Zabbix agent active/service_state[W3SVC])<>0'
             -
               uuid: f0a6fe8a4cc44582a3048f1a00442736
               name: 'IIS: {#APPPOOL} Uptime'
@@ -851,6 +855,9 @@ zabbix_export:
               value: '1'
               newvalue: Paused
             -
+              value: '2'
+              newvalue: 'Start pending'
+            -
               value: '3'
               newvalue: 'Pause pending'
             -
@@ -868,9 +875,6 @@ zabbix_export:
             -
               value: '255'
               newvalue: 'No such service'
-            -
-              value: '2'
-              newvalue: 'Start pending'
   graphs:
     -
       uuid: e3b3f8f973204070a37b9eb861e2a079

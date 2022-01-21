@@ -18,10 +18,11 @@
 **/
 
 #include "common.h"
-#include "vmstats.h"
-#include "log.h"
 
 #ifdef _AIX
+
+#include "vmstats.h"
+#include "log.h"
 
 #ifndef XINTFRAC	/* defined in IBM AIX 7.1 libperfstat.h, not defined in AIX 6.1 */
 #include <sys/systemcfg.h>
@@ -75,8 +76,6 @@ static zbx_uint64_t	last_wblks = 0;			/* 512 bytes blocks written to all disks *
 static zbx_uint64_t	last_rblks = 0;			/* 512 bytes blocks read from all disks */
 
 /******************************************************************************
- *                                                                            *
- * Function: update_vmstat                                                    *
  *                                                                            *
  * Purpose: update vmstat values at most once per second                      *
  *                                                                            *

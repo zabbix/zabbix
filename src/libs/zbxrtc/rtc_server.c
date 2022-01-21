@@ -17,13 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxipcservice.h"
-#include "daemon.h"
 #include "log.h"
 #include "zbxdiag.h"
 #include "zbxjson.h"
 #include "zbxha.h"
-#include "zbxrtc.h"
+#include "zbxtypes.h"
+#include "common.h"
+#include "daemon.h"
+
 #include "rtc.h"
 
 int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data, char **error)
@@ -129,8 +130,6 @@ int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data, char 
 
 /******************************************************************************
  *                                                                            *
- * Function: rtc_process_loglevel                                             *
- *                                                                            *
  * Purpose: process loglevel runtime control option                           *
  *                                                                            *
  * Parameters: direction - [IN] the loglevel change direction:                *
@@ -191,8 +190,6 @@ static int	rtc_process_loglevel(int direction, const char *data, char **result)
 
 /******************************************************************************
  *                                                                            *
- * Function: rtc_process_diaginfo                                             *
- *                                                                            *
  * Purpose: process diaginfo runtime control option                           *
  *                                                                            *
  * Parameters: data   - [IN] the runtime control parameter (optional)         *
@@ -237,8 +234,6 @@ static void	rtc_process_diaginfo(const char *data, char **result)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: rtc_ha_status                                                    *
  *                                                                            *
  * Purpose: process ha_status runtime command                                 *
  *                                                                            *
@@ -342,8 +337,6 @@ static void	rtc_ha_status(char **out)
 
 /******************************************************************************
  *                                                                            *
- * Function: rtc_ha_remove_node                                               *
- *                                                                            *
  * Purpose: process ha_remove_node runtime command                            *
  *                                                                            *
  ******************************************************************************/
@@ -375,8 +368,6 @@ static void	rtc_ha_remove_node(const char *data, char **out)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: rtc_ha_failover_delay                                            *
  *                                                                            *
  * Purpose: process ha_failover_delay runtime command                         *
  *                                                                            *
@@ -418,8 +409,6 @@ static void	rtc_ha_failover_delay(const char *data, char **out)
 
 }
 /******************************************************************************
- *                                                                            *
- * Function: rtc_process_request_ex                                           *
  *                                                                            *
  * Purpose: process runtime control option                                    *
  *                                                                            *

@@ -113,13 +113,9 @@ int	comms_parse_response(char *xml, char *host, size_t host_len, char *key, size
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_htole_uint64                                                 *
- *                                                                            *
  * Purpose: convert unsigned integer 64 bit                                   *
  *          from host byte order                                              *
  *          to little-endian byte order format                                *
- *                                                                            *
- * Parameters:                                                                *
  *                                                                            *
  * Return value: unsigned integer 64 bit in little-endian byte order format   *
  *                                                                            *
@@ -144,13 +140,9 @@ zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_letoh_uint64                                                 *
- *                                                                            *
  * Purpose: convert unsigned integer 64 bit                                   *
  *          from little-endian byte order format                              *
  *          to host byte order                                                *
- *                                                                            *
- * Parameters:                                                                *
  *                                                                            *
  * Return value: unsigned integer 64 bit in host byte order                   *
  *                                                                            *
@@ -175,13 +167,9 @@ zbx_uint64_t	zbx_letoh_uint64(zbx_uint64_t data)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_htole_uint32                                                 *
- *                                                                            *
  * Purpose: convert unsigned integer 32 bit                                   *
  *          from host byte order                                              *
  *          to little-endian byte order format                                *
- *                                                                            *
- * Parameters:                                                                *
  *                                                                            *
  * Return value: unsigned integer 32 bit in little-endian byte order format   *
  *                                                                            *
@@ -202,13 +190,9 @@ zbx_uint32_t	zbx_htole_uint32(zbx_uint32_t data)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_letoh_uint32                                                 *
- *                                                                            *
  * Purpose: convert unsigned integer 32 bit                                   *
  *          from little-endian byte order format                              *
  *          to host byte order                                                *
- *                                                                            *
- * Parameters:                                                                *
  *                                                                            *
  * Return value: unsigned integer 32 bit in host byte order                   *
  *                                                                            *

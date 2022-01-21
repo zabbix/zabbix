@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-11-15T17:54:17Z'
+  date: '2022-01-12T12:00:46Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -8,12 +8,12 @@ zabbix_export:
   templates:
     -
       uuid: 399bd1ee587245ecac6f39beaa99886f
-      template: 'PostgreSQL by user parameters'
-      name: 'PostgreSQL by user parameters'
+      template: 'PostgreSQL by Zabbix agent'
+      name: 'PostgreSQL by Zabbix agent'
       description: |
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384190-%C2%A0discussion-thread-for-official-zabbix-template-db-postgresql
         
-        Template tooling version used: 0.39
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Databases
@@ -38,7 +38,7 @@ zabbix_export:
               parameters:
                 - ''
           master_item:
-            key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+            key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
               tag: Application
@@ -63,7 +63,7 @@ zabbix_export:
               parameters:
                 - ''
           master_item:
-            key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+            key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
               tag: Application
@@ -87,7 +87,7 @@ zabbix_export:
               parameters:
                 - ''
           master_item:
-            key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+            key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
               tag: Application
@@ -112,7 +112,7 @@ zabbix_export:
               parameters:
                 - ''
           master_item:
-            key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+            key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
               tag: Application
@@ -137,7 +137,7 @@ zabbix_export:
               parameters:
                 - ''
           master_item:
-            key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+            key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
               tag: Application
@@ -161,7 +161,7 @@ zabbix_export:
               parameters:
                 - ''
           master_item:
-            key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+            key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
               tag: Application
@@ -169,7 +169,7 @@ zabbix_export:
           triggers:
             -
               uuid: 65e7954489854ad3ad1698dead7c4c02
-              expression: 'last(/PostgreSQL by user parameters/pgsql.bgwriter.checkpoints_req.rate) > {$PG.CHECKPOINTS_REQ.MAX.WARN}'
+              expression: 'last(/PostgreSQL by Zabbix agent/pgsql.bgwriter.checkpoints_req.rate) > {$PG.CHECKPOINTS_REQ.MAX.WARN}'
               name: 'PostgreSQL: Required checkpoints occurs too frequently (over {$PG.CHECKPOINTS_REQ.MAX.WARN})'
               priority: AVERAGE
               description: |
@@ -194,7 +194,7 @@ zabbix_export:
               parameters:
                 - ''
           master_item:
-            key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+            key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
               tag: Application
@@ -223,7 +223,7 @@ zabbix_export:
               parameters:
                 - ''
           master_item:
-            key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+            key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
               tag: Application
@@ -252,7 +252,7 @@ zabbix_export:
               parameters:
                 - ''
           master_item:
-            key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+            key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
               tag: Application
@@ -276,7 +276,7 @@ zabbix_export:
               parameters:
                 - ''
           master_item:
-            key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+            key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
               tag: Application
@@ -284,7 +284,7 @@ zabbix_export:
         -
           uuid: 1fc5ba48a0974bd7bf965b5f130deded
           name: 'PostgreSQL: Get bgwriter'
-          key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           history: 1h
           trends: '0'
           value_type: TEXT
@@ -296,18 +296,18 @@ zabbix_export:
           triggers:
             -
               uuid: 768d28b9360b46cda3065f5082ba97ac
-              expression: 'nodata(/PostgreSQL by user parameters/pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],30m) = 1'
+              expression: 'nodata(/PostgreSQL by Zabbix agent/pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"],30m) = 1'
               name: 'PostgreSQL: Failed to get items (no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 30 minutes'
               dependencies:
                 -
                   name: 'PostgreSQL: Service is down'
-                  expression: 'last(/PostgreSQL by user parameters/pgsql.ping["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]) = 0'
+                  expression: 'last(/PostgreSQL by Zabbix agent/pgsql.ping["{$PG.HOST}","{$PG.PORT}"]) = 0'
         -
           uuid: 70a7581fabd14e05bda762b79811187c
           name: 'Status: Cache hit ratio %'
-          key: 'pgsql.cache.hit["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          key: 'pgsql.cache.hit["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           history: 7d
           value_type: FLOAT
           units: '%'
@@ -319,13 +319,13 @@ zabbix_export:
           triggers:
             -
               uuid: 4d87cc71b40f4b59ad27f30f33b15a69
-              expression: 'max(/PostgreSQL by user parameters/pgsql.cache.hit["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],5m) < {$PG.CACHE_HITRATIO.MIN.WARN}'
+              expression: 'max(/PostgreSQL by Zabbix agent/pgsql.cache.hit["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"],5m) < {$PG.CACHE_HITRATIO.MIN.WARN}'
               name: 'PostgreSQL: Cache hit ratio too low (under {$PG.CACHE_HITRATIO.MIN.WARN} in 5m)'
               priority: WARNING
         -
           uuid: 248cbe5067324b9ca435f2aced5e2a5f
           name: 'Status: Config hash'
-          key: 'pgsql.config.hash["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          key: 'pgsql.config.hash["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           delay: 15m
           history: 7d
           trends: '0'
@@ -343,7 +343,7 @@ zabbix_export:
           triggers:
             -
               uuid: b727cfa6d3de4063b6a2dcb6cc84e27b
-              expression: 'last(/PostgreSQL by user parameters/pgsql.config.hash["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],#1)<>last(/PostgreSQL by user parameters/pgsql.config.hash["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],#2) and length(last(/PostgreSQL by user parameters/pgsql.config.hash["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]))>0'
+              expression: 'last(/PostgreSQL by Zabbix agent/pgsql.config.hash["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"],#1)<>last(/PostgreSQL by Zabbix agent/pgsql.config.hash["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"],#2) and length(last(/PostgreSQL by Zabbix agent/pgsql.config.hash["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]))>0'
               name: 'PostgreSQL: Configuration has changed'
               priority: INFO
         -
@@ -360,7 +360,7 @@ zabbix_export:
               parameters:
                 - $.active
           master_item:
-            key: 'pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+            key: 'pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
               tag: Application
@@ -379,7 +379,7 @@ zabbix_export:
               parameters:
                 - $.idle
           master_item:
-            key: 'pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+            key: 'pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
               tag: Application
@@ -398,7 +398,7 @@ zabbix_export:
               parameters:
                 - $.idle_in_transaction
           master_item:
-            key: 'pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+            key: 'pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
               tag: Application
@@ -419,7 +419,7 @@ zabbix_export:
               parameters:
                 - $.prepared
           master_item:
-            key: 'pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+            key: 'pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
               tag: Application
@@ -438,7 +438,7 @@ zabbix_export:
               parameters:
                 - $.total
           master_item:
-            key: 'pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+            key: 'pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
               tag: Application
@@ -458,7 +458,7 @@ zabbix_export:
               parameters:
                 - $.total_pct
           master_item:
-            key: 'pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+            key: 'pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
               tag: Application
@@ -466,7 +466,7 @@ zabbix_export:
           triggers:
             -
               uuid: 54ef12b8ff1e4383a3097c71478ceefa
-              expression: 'min(/PostgreSQL by user parameters/pgsql.connections.sum.total_pct,5m) > {$PG.CONN_TOTAL_PCT.MAX.WARN}'
+              expression: 'min(/PostgreSQL by Zabbix agent/pgsql.connections.sum.total_pct,5m) > {$PG.CONN_TOTAL_PCT.MAX.WARN}'
               name: 'PostgreSQL: Total number of connections is too high (over {$PG.CONN_TOTAL_PCT.MAX.WARN} in 5m)'
               priority: AVERAGE
         -
@@ -485,7 +485,7 @@ zabbix_export:
               parameters:
                 - $.waiting
           master_item:
-            key: 'pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+            key: 'pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
               tag: Application
@@ -493,7 +493,7 @@ zabbix_export:
         -
           uuid: b0da0c4856a645ca8ef03405d2d8d4a5
           name: 'PostgreSQL: Get connections sum'
-          key: 'pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          key: 'pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           history: 1h
           trends: '0'
           value_type: TEXT
@@ -507,7 +507,7 @@ zabbix_export:
         -
           uuid: b44f263fb33e461e8c3d700fb7688c7b
           name: 'PostgreSQL: Get dbstat'
-          key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           history: 1h
           trends: '0'
           value_type: TEXT
@@ -521,7 +521,7 @@ zabbix_export:
         -
           uuid: 7cee21f6225340ef80e9cdef7ce20b10
           name: 'PostgreSQL: Get locks'
-          key: 'pgsql.locks["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          key: 'pgsql.locks["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           history: 1h
           trends: '0'
           value_type: TEXT
@@ -535,7 +535,7 @@ zabbix_export:
         -
           uuid: f42bd73b3af6451b8a3a6113dcc1b675
           name: 'Status: Ping time'
-          key: 'pgsql.ping.time["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          key: 'pgsql.ping.time["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           history: 7d
           value_type: FLOAT
           units: s
@@ -556,17 +556,17 @@ zabbix_export:
           triggers:
             -
               uuid: e19b5630737b4c63886b5df77a3c748c
-              expression: 'min(/PostgreSQL by user parameters/pgsql.ping.time["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],5m) > {$PG.PING_TIME.MAX.WARN}'
+              expression: 'min(/PostgreSQL by Zabbix agent/pgsql.ping.time["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"],5m) > {$PG.PING_TIME.MAX.WARN}'
               name: 'PostgreSQL: Response too long (over {$PG.PING_TIME.MAX.WARN})'
               priority: AVERAGE
               dependencies:
                 -
                   name: 'PostgreSQL: Service is down'
-                  expression: 'last(/PostgreSQL by user parameters/pgsql.ping["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]) = 0'
+                  expression: 'last(/PostgreSQL by Zabbix agent/pgsql.ping["{$PG.HOST}","{$PG.PORT}"]) = 0'
         -
           uuid: f5bd615243b344cb88dac1e83436cc85
           name: 'Status: Ping'
-          key: 'pgsql.ping["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          key: 'pgsql.ping["{$PG.HOST}","{$PG.PORT}"]'
           history: 7d
           valuemap:
             name: 'Service state'
@@ -586,13 +586,13 @@ zabbix_export:
           triggers:
             -
               uuid: 6d9c2b5353ce4f6baeeb0f254fb7d1e2
-              expression: 'last(/PostgreSQL by user parameters/pgsql.ping["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]) = 0'
+              expression: 'last(/PostgreSQL by Zabbix agent/pgsql.ping["{$PG.HOST}","{$PG.PORT}"]) = 0'
               name: 'PostgreSQL: Service is down'
               priority: HIGH
         -
           uuid: 47bf580e1e4e48cf9c0e94fcf90288ac
           name: 'PostgreSQL: Get queries'
-          key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+          key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
           history: 1h
           trends: '0'
           value_type: TEXT
@@ -604,7 +604,7 @@ zabbix_export:
         -
           uuid: d8a509bd011a4ecda5d439295e257e9d
           name: 'Replication: standby count'
-          key: 'pgsql.replication.count["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          key: 'pgsql.replication.count["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           history: 7d
           description: 'Number of standby servers'
           tags:
@@ -614,7 +614,7 @@ zabbix_export:
         -
           uuid: 21f8bea1141249c7a4dfafad5bc3ef41
           name: 'Replication: lag in seconds'
-          key: 'pgsql.replication.lag.sec["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          key: 'pgsql.replication.lag.sec["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           history: 7d
           units: s
           description: 'Replication lag with Master in seconds'
@@ -625,13 +625,13 @@ zabbix_export:
           triggers:
             -
               uuid: 11831c52e86445498eed42de6a629b65
-              expression: 'min(/PostgreSQL by user parameters/pgsql.replication.lag.sec["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],5m) > {$PG.REPL_LAG.MAX.WARN}'
+              expression: 'min(/PostgreSQL by Zabbix agent/pgsql.replication.lag.sec["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"],5m) > {$PG.REPL_LAG.MAX.WARN}'
               name: 'PostgreSQL: Streaming lag with {#MASTER} is too high (over {$PG.REPL_LAG.MAX.WARN} in 5m)'
               priority: AVERAGE
         -
           uuid: 09f696124fca4c5b844bf66c9c912b87
           name: 'Replication: recovery role'
-          key: 'pgsql.replication.recovery_role["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          key: 'pgsql.replication.recovery_role["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           history: 7d
           description: 'Replication role: 1 — recovery is still in progress (standby mode), 0 — master mode.'
           valuemap:
@@ -643,7 +643,7 @@ zabbix_export:
         -
           uuid: d449017462704508a4aad51a6b45fb30
           name: 'Replication: status'
-          key: 'pgsql.replication.status["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          key: 'pgsql.replication.status["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           history: 7d
           description: 'Replication status: 0 — streaming is down, 1 — streaming is up, 2 — master mode'
           valuemap:
@@ -655,7 +655,7 @@ zabbix_export:
           triggers:
             -
               uuid: aef1e1d2bab540f8ab738b4a3fad863c
-              expression: 'max(/PostgreSQL by user parameters/pgsql.replication.status["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],5m)=0'
+              expression: 'max(/PostgreSQL by Zabbix agent/pgsql.replication.status["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"],5m)=0'
               name: 'PostgreSQL: Replication is down'
               priority: AVERAGE
         -
@@ -674,7 +674,7 @@ zabbix_export:
               parameters:
                 - $.active
           master_item:
-            key: 'pgsql.transactions["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+            key: 'pgsql.transactions["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
               tag: Application
@@ -695,7 +695,7 @@ zabbix_export:
               parameters:
                 - $.idle
           master_item:
-            key: 'pgsql.transactions["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+            key: 'pgsql.transactions["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
               tag: Application
@@ -716,7 +716,7 @@ zabbix_export:
               parameters:
                 - $.prepared
           master_item:
-            key: 'pgsql.transactions["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+            key: 'pgsql.transactions["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
               tag: Application
@@ -737,7 +737,7 @@ zabbix_export:
               parameters:
                 - $.waiting
           master_item:
-            key: 'pgsql.transactions["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+            key: 'pgsql.transactions["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
               tag: Application
@@ -745,7 +745,7 @@ zabbix_export:
         -
           uuid: ff26a1c256bd40978f49a7a025538aa1
           name: 'PostgreSQL: Get transactions'
-          key: 'pgsql.transactions["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          key: 'pgsql.transactions["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           history: 1h
           trends: '0'
           value_type: TEXT
@@ -757,7 +757,7 @@ zabbix_export:
         -
           uuid: 6418a2f286e64ecabf2295fca063f8af
           name: 'Status: Uptime'
-          key: 'pgsql.uptime["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          key: 'pgsql.uptime["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           history: 7d
           units: uptime
           tags:
@@ -767,14 +767,14 @@ zabbix_export:
           triggers:
             -
               uuid: 85565aba402740868a16c0e4639a98fc
-              expression: 'last(/PostgreSQL by user parameters/pgsql.uptime["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]) < 10m'
+              expression: 'last(/PostgreSQL by Zabbix agent/pgsql.uptime["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]) < 10m'
               name: 'PostgreSQL: Service has been restarted (uptime < 10m)'
               priority: INFO
               description: 'PostgreSQL uptime is less than 10 minutes'
         -
           uuid: 321525ebcea44396922e96deec2e8ad1
           name: 'Status: Version'
-          key: 'pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          key: 'pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           delay: 15m
           history: 7d
           trends: '0'
@@ -792,7 +792,7 @@ zabbix_export:
           triggers:
             -
               uuid: 8111eb42b0e74fffb43da474677ebc2f
-              expression: 'last(/PostgreSQL by user parameters/pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],#1)<>last(/PostgreSQL by user parameters/pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"],#2) and length(last(/PostgreSQL by user parameters/pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]))>0'
+              expression: 'last(/PostgreSQL by Zabbix agent/pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"],#1)<>last(/PostgreSQL by Zabbix agent/pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"],#2) and length(last(/PostgreSQL by Zabbix agent/pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]))>0'
               name: 'PostgreSQL: Version has changed (new version value received: {ITEM.VALUE})'
               priority: INFO
         -
@@ -809,7 +809,7 @@ zabbix_export:
               parameters:
                 - $.count
           master_item:
-            key: 'pgsql.wal.stat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+            key: 'pgsql.wal.stat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
               tag: Application
@@ -817,7 +817,7 @@ zabbix_export:
         -
           uuid: 7cd6c524ecab41f9a22489866d503361
           name: 'PostgreSQL: Get WAL'
-          key: 'pgsql.wal.stat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          key: 'pgsql.wal.stat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           delay: 5m
           history: 1h
           trends: '0'
@@ -846,7 +846,7 @@ zabbix_export:
               parameters:
                 - ''
           master_item:
-            key: 'pgsql.wal.stat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+            key: 'pgsql.wal.stat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           tags:
             -
               tag: Application
@@ -855,7 +855,7 @@ zabbix_export:
         -
           uuid: 5c4c658507394f5bb362e601f7c59d63
           name: 'Database discovery'
-          key: 'pgsql.discovery.db["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+          key: 'pgsql.discovery.db["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           delay: 1h
           filter:
             conditions:
@@ -867,7 +867,7 @@ zabbix_export:
             -
               uuid: 69575e9785184ef5be2502e3cc282220
               name: 'DB {#DBNAME}: Database size'
-              key: 'pgsql.db.size["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{#DBNAME}"]'
+              key: 'pgsql.db.size["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{#DBNAME}"]'
               delay: 15m
               history: 7d
               units: B
@@ -895,7 +895,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
               tags:
                 -
                   tag: Application
@@ -919,7 +919,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
               tags:
                 -
                   tag: Application
@@ -943,7 +943,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
               tags:
                 -
                   tag: Application
@@ -951,7 +951,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 3b51f02258bd4e02829f04ca016dd01d
-                  expression: 'min(/PostgreSQL by user parameters/pgsql.dbstat.conflicts.rate["{#DBNAME}"],5m) > {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"}'
+                  expression: 'min(/PostgreSQL by Zabbix agent/pgsql.dbstat.conflicts.rate["{#DBNAME}"],5m) > {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"}'
                   name: 'DB {#DBNAME}: Too many recovery conflicts (over {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: AVERAGE
                   description: |
@@ -976,7 +976,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
               tags:
                 -
                   tag: Application
@@ -984,7 +984,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 3bee63fa04d94586937e22aafab9bdd8
-                  expression: 'min(/PostgreSQL by user parameters/pgsql.dbstat.deadlocks.rate["{#DBNAME}"],5m) > {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"}'
+                  expression: 'min(/PostgreSQL by Zabbix agent/pgsql.dbstat.deadlocks.rate["{#DBNAME}"],5m) > {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"}'
                   name: 'DB {#DBNAME}: Deadlock occurred (over {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: HIGH
             -
@@ -1006,7 +1006,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
               tags:
                 -
                   tag: Application
@@ -1029,7 +1029,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
               tags:
                 -
                   tag: Application
@@ -1053,7 +1053,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
               tags:
                 -
                   tag: Application
@@ -1077,7 +1077,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
               tags:
                 -
                   tag: Application
@@ -1101,7 +1101,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
               tags:
                 -
                   tag: Application
@@ -1125,7 +1125,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
               tags:
                 -
                   tag: Application
@@ -1149,7 +1149,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
               tags:
                 -
                   tag: Application
@@ -1173,7 +1173,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
               tags:
                 -
                   tag: Application
@@ -1197,7 +1197,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
               tags:
                 -
                   tag: Application
@@ -1220,7 +1220,7 @@ zabbix_export:
                   parameters:
                     - $.prc_before_av
               master_item:
-                key: 'pgsql.frozenxid["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{#DBNAME}"]'
+                key: 'pgsql.frozenxid["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]'
               tags:
                 -
                   tag: Application
@@ -1243,7 +1243,7 @@ zabbix_export:
                   parameters:
                     - $.prc_before_stop
               master_item:
-                key: 'pgsql.frozenxid["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{#DBNAME}"]'
+                key: 'pgsql.frozenxid["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]'
               tags:
                 -
                   tag: Application
@@ -1251,8 +1251,8 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 709df9c1e29a4ff68a3de9423ff7ae58
-                  expression: 'last(/PostgreSQL by user parameters/pgsql.frozenxid.prc_before_stop["{#DBNAME}"])<{$PG.FROZENXID_PCT_STOP.MIN.HIGH:"{#DBNAME}"}'
-                  name: 'DB {#DBNAME}: VACUUM FREEZE is required to prevent wraparound (frozen XID less then {$PG.FROZENXID_PCT_STOP.MIN.HIGH:"{#DBNAME}"} %)'
+                  expression: 'last(/PostgreSQL by Zabbix agent/pgsql.frozenxid.prc_before_stop["{#DBNAME}"])<{$PG.FROZENXID_PCT_STOP.MIN.HIGH:"{#DBNAME}"}'
+                  name: 'DB {#DBNAME}: VACUUM FREEZE is required to prevent wraparound (frozen XID less than {$PG.FROZENXID_PCT_STOP.MIN.HIGH:"{#DBNAME}"} %)'
                   priority: AVERAGE
                   description: |
                     Preventing Transaction ID Wraparound Failures
@@ -1260,7 +1260,7 @@ zabbix_export:
             -
               uuid: ddf6d0b7b5fe4cbbb540687051b8e5f5
               name: 'DB {#DBNAME}: Get frozen XID'
-              key: 'pgsql.frozenxid["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{#DBNAME}"]'
+              key: 'pgsql.frozenxid["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]'
               history: 1h
               trends: '0'
               value_type: TEXT
@@ -1282,7 +1282,7 @@ zabbix_export:
                   parameters:
                     - '$[''{#DBNAME}''].total'
               master_item:
-                key: 'pgsql.locks["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+                key: 'pgsql.locks["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
               tags:
                 -
                   tag: Application
@@ -1290,7 +1290,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: ef7d3c9866df44aa9b378e7f125a34de
-                  expression: 'min(/PostgreSQL by user parameters/pgsql.locks.total["{#DBNAME}"],5m)>{$PG.LOCKS.MAX.WARN:"{#DBNAME}"}'
+                  expression: 'min(/PostgreSQL by Zabbix agent/pgsql.locks.total["{#DBNAME}"],5m)>{$PG.LOCKS.MAX.WARN:"{#DBNAME}"}'
                   name: 'DB {#DBNAME}: Number of locks is too high (over {$PG.LOCKS.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: WARNING
             -
@@ -1307,7 +1307,7 @@ zabbix_export:
                   parameters:
                     - '$[''{#DBNAME}''].mro_slow_count'
               master_item:
-                key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+                key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
               tags:
                 -
                   tag: Application
@@ -1327,7 +1327,7 @@ zabbix_export:
                   parameters:
                     - '$[''{#DBNAME}''].mro_time_max'
               master_item:
-                key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+                key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
               tags:
                 -
                   tag: Application
@@ -1347,7 +1347,7 @@ zabbix_export:
                   parameters:
                     - '$[''{#DBNAME}''].mro_time_sum'
               master_item:
-                key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+                key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
               tags:
                 -
                   tag: Application
@@ -1366,7 +1366,7 @@ zabbix_export:
                   parameters:
                     - '$[''{#DBNAME}''].query_slow_count'
               master_item:
-                key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+                key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
               tags:
                 -
                   tag: Application
@@ -1374,7 +1374,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: facc8f6976664da4ad5567d270f0f311
-                  expression: 'min(/PostgreSQL by user parameters/pgsql.queries.query.slow_count["{#DBNAME}"],5m)>{$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"}'
+                  expression: 'min(/PostgreSQL by Zabbix agent/pgsql.queries.query.slow_count["{#DBNAME}"],5m)>{$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"}'
                   name: 'DB {#DBNAME}: Too many slow queries (over {$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: WARNING
             -
@@ -1392,7 +1392,7 @@ zabbix_export:
                   parameters:
                     - '$[''{#DBNAME}''].query_time_max'
               master_item:
-                key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+                key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
               tags:
                 -
                   tag: Application
@@ -1412,7 +1412,7 @@ zabbix_export:
                   parameters:
                     - '$[''{#DBNAME}''].query_time_sum'
               master_item:
-                key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+                key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
               tags:
                 -
                   tag: Application
@@ -1431,7 +1431,7 @@ zabbix_export:
                   parameters:
                     - '$[''{#DBNAME}''].tx_slow_count'
               master_item:
-                key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+                key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
               tags:
                 -
                   tag: Application
@@ -1451,7 +1451,7 @@ zabbix_export:
                   parameters:
                     - '$[''{#DBNAME}''].tx_time_max'
               master_item:
-                key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+                key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
               tags:
                 -
                   tag: Application
@@ -1471,7 +1471,7 @@ zabbix_export:
                   parameters:
                     - '$[''{#DBNAME}''].tx_time_sum'
               master_item:
-                key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+                key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
               tags:
                 -
                   tag: Application
@@ -1494,7 +1494,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: 'pgsql.scans["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{#DBNAME}"]'
+                key: 'pgsql.scans["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]'
               tags:
                 -
                   tag: Application
@@ -1518,7 +1518,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: 'pgsql.scans["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{#DBNAME}"]'
+                key: 'pgsql.scans["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]'
               tags:
                 -
                   tag: Application
@@ -1526,7 +1526,7 @@ zabbix_export:
             -
               uuid: 4bf92e4b0fed4d32b808b299d9e1fb0c
               name: 'DB {#DBNAME}: Get scans'
-              key: 'pgsql.scans["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{#DBNAME}"]'
+              key: 'pgsql.scans["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]'
               history: 1h
               trends: '0'
               value_type: TEXT
@@ -1544,13 +1544,13 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'PostgreSQL by user parameters'
+                    host: 'PostgreSQL by Zabbix agent'
                     key: 'pgsql.dbstat.blks_hit.rate["{#DBNAME}"]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'PostgreSQL by user parameters'
+                    host: 'PostgreSQL by Zabbix agent'
                     key: 'pgsql.dbstat.blks_read.rate["{#DBNAME}"]'
             -
               uuid: 6bd0a0d65b8d43ad946b145cf8a8b533
@@ -1560,8 +1560,8 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'PostgreSQL by user parameters'
-                    key: 'pgsql.db.size["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{#DBNAME}"]'
+                    host: 'PostgreSQL by Zabbix agent'
+                    key: 'pgsql.db.size["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{#DBNAME}"]'
             -
               uuid: 41e765d906324595a396d8985b204ff5
               name: 'DB {#DBNAME}: Events'
@@ -1571,25 +1571,25 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'PostgreSQL by user parameters'
+                    host: 'PostgreSQL by Zabbix agent'
                     key: 'pgsql.dbstat.xact_commit.rate["{#DBNAME}"]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'PostgreSQL by user parameters'
+                    host: 'PostgreSQL by Zabbix agent'
                     key: 'pgsql.dbstat.conflicts.rate["{#DBNAME}"]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
-                    host: 'PostgreSQL by user parameters'
+                    host: 'PostgreSQL by Zabbix agent'
                     key: 'pgsql.dbstat.deadlocks.rate["{#DBNAME}"]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
-                    host: 'PostgreSQL by user parameters'
+                    host: 'PostgreSQL by Zabbix agent'
                     key: 'pgsql.dbstat.xact_rollback.rate["{#DBNAME}"]'
             -
               uuid: 2b260fdf7623476095429434b5c79041
@@ -1599,7 +1599,7 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'PostgreSQL by user parameters'
+                    host: 'PostgreSQL by Zabbix agent'
                     key: 'pgsql.locks.total["{#DBNAME}"]'
             -
               uuid: 8a60a92b41b146f49145b86bab559b2e
@@ -1610,42 +1610,42 @@ zabbix_export:
                   color: 1A7C11
                   yaxisside: RIGHT
                   item:
-                    host: 'PostgreSQL by user parameters'
+                    host: 'PostgreSQL by Zabbix agent'
                     key: 'pgsql.queries.mro.time_max["{#DBNAME}"]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   yaxisside: RIGHT
                   item:
-                    host: 'PostgreSQL by user parameters'
+                    host: 'PostgreSQL by Zabbix agent'
                     key: 'pgsql.queries.query.time_max["{#DBNAME}"]'
                 -
                   sortorder: '2'
                   color: F63100
                   yaxisside: RIGHT
                   item:
-                    host: 'PostgreSQL by user parameters'
+                    host: 'PostgreSQL by Zabbix agent'
                     key: 'pgsql.queries.tx.time_max["{#DBNAME}"]'
                 -
                   sortorder: '3'
                   drawtype: GRADIENT_LINE
                   color: A54F10
                   item:
-                    host: 'PostgreSQL by user parameters'
+                    host: 'PostgreSQL by Zabbix agent'
                     key: 'pgsql.queries.mro.time_sum["{#DBNAME}"]'
                 -
                   sortorder: '4'
                   drawtype: GRADIENT_LINE
                   color: FC6EA3
                   item:
-                    host: 'PostgreSQL by user parameters'
+                    host: 'PostgreSQL by Zabbix agent'
                     key: 'pgsql.queries.query.time_sum["{#DBNAME}"]'
                 -
                   sortorder: '5'
                   drawtype: GRADIENT_LINE
                   color: 6C59DC
                   item:
-                    host: 'PostgreSQL by user parameters'
+                    host: 'PostgreSQL by Zabbix agent'
                     key: 'pgsql.queries.tx.time_sum["{#DBNAME}"]'
             -
               uuid: 93518b06f71e46ada3dabefa1726b867
@@ -1655,19 +1655,19 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'PostgreSQL by user parameters'
+                    host: 'PostgreSQL by Zabbix agent'
                     key: 'pgsql.queries.mro.slow_count["{#DBNAME}"]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'PostgreSQL by user parameters'
+                    host: 'PostgreSQL by Zabbix agent'
                     key: 'pgsql.queries.query.slow_count["{#DBNAME}"]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
-                    host: 'PostgreSQL by user parameters'
+                    host: 'PostgreSQL by Zabbix agent'
                     key: 'pgsql.queries.tx.slow_count["{#DBNAME}"]'
             -
               uuid: 779b872280ad46c7a6cdf95c2df7c646
@@ -1677,14 +1677,14 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'PostgreSQL by user parameters'
+                    host: 'PostgreSQL by Zabbix agent'
                     key: 'pgsql.dbstat.temp_bytes.rate["{#DBNAME}"]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   yaxisside: RIGHT
                   item:
-                    host: 'PostgreSQL by user parameters'
+                    host: 'PostgreSQL by Zabbix agent'
                     key: 'pgsql.dbstat.temp_files.rate["{#DBNAME}"]'
             -
               uuid: f10be22e3bac4d66936c34ec99446c64
@@ -1694,31 +1694,31 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'PostgreSQL by user parameters'
+                    host: 'PostgreSQL by Zabbix agent'
                     key: 'pgsql.dbstat.tup_deleted.rate["{#DBNAME}"]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'PostgreSQL by user parameters'
+                    host: 'PostgreSQL by Zabbix agent'
                     key: 'pgsql.dbstat.tup_fetched.rate["{#DBNAME}"]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
-                    host: 'PostgreSQL by user parameters'
+                    host: 'PostgreSQL by Zabbix agent'
                     key: 'pgsql.dbstat.tup_inserted.rate["{#DBNAME}"]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
-                    host: 'PostgreSQL by user parameters'
+                    host: 'PostgreSQL by Zabbix agent'
                     key: 'pgsql.dbstat.tup_returned.rate["{#DBNAME}"]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   item:
-                    host: 'PostgreSQL by user parameters'
+                    host: 'PostgreSQL by Zabbix agent'
                     key: 'pgsql.dbstat.tup_updated.rate["{#DBNAME}"]'
       macros:
         -
@@ -1757,6 +1757,9 @@ zabbix_export:
         -
           macro: '{$PG.LOCKS.MAX.WARN}'
           value: '100'
+        -
+          macro: '{$PG.PASSWORD}'
+          description: 'Please set user''s password in this macro.'
         -
           macro: '{$PG.PING_TIME.MAX.WARN}'
           value: 1s
@@ -1813,7 +1816,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'DB {#DBNAME}: Tuples'
-                        host: 'PostgreSQL by user parameters'
+                        host: 'PostgreSQL by Zabbix agent'
                 -
                   type: GRAPH_PROTOTYPE
                   x: '12'
@@ -1837,7 +1840,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'DB {#DBNAME}: Events'
-                        host: 'PostgreSQL by user parameters'
+                        host: 'PostgreSQL by Zabbix agent'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '5'
@@ -1861,7 +1864,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'DB {#DBNAME}: Block hit/read'
-                        host: 'PostgreSQL by user parameters'
+                        host: 'PostgreSQL by Zabbix agent'
                 -
                   type: GRAPH_PROTOTYPE
                   x: '12'
@@ -1886,7 +1889,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'DB {#DBNAME}: Temp files'
-                        host: 'PostgreSQL by user parameters'
+                        host: 'PostgreSQL by Zabbix agent'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '10'
@@ -1910,7 +1913,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'DB {#DBNAME}: Locks'
-                        host: 'PostgreSQL by user parameters'
+                        host: 'PostgreSQL by Zabbix agent'
                 -
                   type: GRAPH_PROTOTYPE
                   x: '12'
@@ -1935,7 +1938,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'DB {#DBNAME}: Database size'
-                        host: 'PostgreSQL by user parameters'
+                        host: 'PostgreSQL by Zabbix agent'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '15'
@@ -1959,7 +1962,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'DB {#DBNAME}: Queries'
-                        host: 'PostgreSQL by user parameters'
+                        host: 'PostgreSQL by Zabbix agent'
                 -
                   type: GRAPH_PROTOTYPE
                   x: '12'
@@ -1984,7 +1987,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'DB {#DBNAME}: Slow queries'
-                        host: 'PostgreSQL by user parameters'
+                        host: 'PostgreSQL by Zabbix agent'
         -
           uuid: f2ceabf59fd64ca9828ea55e9b9668bd
           name: 'PostgreSQL stat'
@@ -2005,7 +2008,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'PostgreSQL connections'
-                        host: 'PostgreSQL by user parameters'
+                        host: 'PostgreSQL by Zabbix agent'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -2021,7 +2024,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'PostgreSQL transactions'
-                        host: 'PostgreSQL by user parameters'
+                        host: 'PostgreSQL by Zabbix agent'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -2037,7 +2040,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'PostgreSQL ping'
-                        host: 'PostgreSQL by user parameters'
+                        host: 'PostgreSQL by Zabbix agent'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -2054,7 +2057,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'PostgreSQL uptime'
-                        host: 'PostgreSQL by user parameters'
+                        host: 'PostgreSQL by Zabbix agent'
                 -
                   type: GRAPH_CLASSIC
                   'y': '10'
@@ -2070,7 +2073,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'PostgreSQL replication lag'
-                        host: 'PostgreSQL by user parameters'
+                        host: 'PostgreSQL by Zabbix agent'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -2087,7 +2090,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'PostgreSQL WAL'
-                        host: 'PostgreSQL by user parameters'
+                        host: 'PostgreSQL by Zabbix agent'
                 -
                   type: GRAPH_CLASSIC
                   'y': '15'
@@ -2103,7 +2106,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'PostgreSQL bgwriter'
-                        host: 'PostgreSQL by user parameters'
+                        host: 'PostgreSQL by Zabbix agent'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -2120,7 +2123,7 @@ zabbix_export:
                       name: graphid
                       value:
                         name: 'PostgreSQL checkpoints'
-                        host: 'PostgreSQL by user parameters'
+                        host: 'PostgreSQL by Zabbix agent'
       valuemaps:
         -
           uuid: 2e376ee568d04e7bbe98cbae4181f313
@@ -2165,40 +2168,40 @@ zabbix_export:
           color: 1A7C11
           yaxisside: RIGHT
           item:
-            host: 'PostgreSQL by user parameters'
+            host: 'PostgreSQL by Zabbix agent'
             key: pgsql.bgwriter.buffers_alloc.rate
         -
           sortorder: '1'
           color: 2774A4
           yaxisside: RIGHT
           item:
-            host: 'PostgreSQL by user parameters'
+            host: 'PostgreSQL by Zabbix agent'
             key: pgsql.bgwriter.buffers_clean.rate
         -
           sortorder: '2'
           color: F63100
           yaxisside: RIGHT
           item:
-            host: 'PostgreSQL by user parameters'
+            host: 'PostgreSQL by Zabbix agent'
             key: pgsql.bgwriter.buffers_backend.rate
         -
           sortorder: '3'
           color: A54F10
           yaxisside: RIGHT
           item:
-            host: 'PostgreSQL by user parameters'
+            host: 'PostgreSQL by Zabbix agent'
             key: pgsql.bgwriter.buffers_checkpoint.rate
         -
           sortorder: '4'
           color: FC6EA3
           item:
-            host: 'PostgreSQL by user parameters'
+            host: 'PostgreSQL by Zabbix agent'
             key: pgsql.bgwriter.maxwritten_clean.rate
         -
           sortorder: '5'
           color: 6C59DC
           item:
-            host: 'PostgreSQL by user parameters'
+            host: 'PostgreSQL by Zabbix agent'
             key: pgsql.bgwriter.buffers_backend_fsync.rate
     -
       uuid: 4a105d193df64be7898ac19a2f07faa4
@@ -2208,27 +2211,27 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'PostgreSQL by user parameters'
+            host: 'PostgreSQL by Zabbix agent'
             key: pgsql.bgwriter.checkpoints_timed.rate
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'PostgreSQL by user parameters'
+            host: 'PostgreSQL by Zabbix agent'
             key: pgsql.bgwriter.checkpoints_req.rate
         -
           sortorder: '2'
           color: F63100
           yaxisside: RIGHT
           item:
-            host: 'PostgreSQL by user parameters'
+            host: 'PostgreSQL by Zabbix agent'
             key: pgsql.bgwriter.checkpoint_sync_time
         -
           sortorder: '3'
           color: A54F10
           yaxisside: RIGHT
           item:
-            host: 'PostgreSQL by user parameters'
+            host: 'PostgreSQL by Zabbix agent'
             key: pgsql.bgwriter.checkpoint_write_time
     -
       uuid: 8d41d719832049a5a1fcd6f4da67fb6a
@@ -2240,48 +2243,48 @@ zabbix_export:
           color: 1A7C11
           yaxisside: RIGHT
           item:
-            host: 'PostgreSQL by user parameters'
+            host: 'PostgreSQL by Zabbix agent'
             key: pgsql.connections.sum.total
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'PostgreSQL by user parameters'
+            host: 'PostgreSQL by Zabbix agent'
             key: pgsql.connections.sum.total_pct
         -
           sortorder: '2'
           color: F63100
           yaxisside: RIGHT
           item:
-            host: 'PostgreSQL by user parameters'
+            host: 'PostgreSQL by Zabbix agent'
             key: pgsql.connections.sum.active
         -
           sortorder: '3'
           color: A54F10
           yaxisside: RIGHT
           item:
-            host: 'PostgreSQL by user parameters'
+            host: 'PostgreSQL by Zabbix agent'
             key: pgsql.connections.sum.idle
         -
           sortorder: '4'
           color: FC6EA3
           yaxisside: RIGHT
           item:
-            host: 'PostgreSQL by user parameters'
+            host: 'PostgreSQL by Zabbix agent'
             key: pgsql.connections.sum.idle_in_transaction
         -
           sortorder: '5'
           color: 6C59DC
           yaxisside: RIGHT
           item:
-            host: 'PostgreSQL by user parameters'
+            host: 'PostgreSQL by Zabbix agent'
             key: pgsql.connections.sum.prepared
         -
           sortorder: '6'
           color: AC8C14
           yaxisside: RIGHT
           item:
-            host: 'PostgreSQL by user parameters'
+            host: 'PostgreSQL by Zabbix agent'
             key: pgsql.connections.sum.waiting
     -
       uuid: 1e9a55ee61824779a9f46f42ec21abef
@@ -2292,15 +2295,15 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'PostgreSQL by user parameters'
-            key: 'pgsql.ping["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+            host: 'PostgreSQL by Zabbix agent'
+            key: 'pgsql.ping["{$PG.HOST}","{$PG.PORT}"]'
         -
           sortorder: '1'
           color: 2774A4
           yaxisside: RIGHT
           item:
-            host: 'PostgreSQL by user parameters'
-            key: 'pgsql.ping.time["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+            host: 'PostgreSQL by Zabbix agent'
+            key: 'pgsql.ping.time["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
     -
       uuid: d8cf31fc39584a63b9384d9c3ebf40ee
       name: 'PostgreSQL replication lag'
@@ -2309,8 +2312,8 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'PostgreSQL by user parameters'
-            key: 'pgsql.replication.lag.sec["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+            host: 'PostgreSQL by Zabbix agent'
+            key: 'pgsql.replication.lag.sec["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
     -
       uuid: 10d1de74e9d848399ca038055e5cc8ce
       name: 'PostgreSQL transactions'
@@ -2320,28 +2323,28 @@ zabbix_export:
           color: 1A7C11
           yaxisside: RIGHT
           item:
-            host: 'PostgreSQL by user parameters'
+            host: 'PostgreSQL by Zabbix agent'
             key: pgsql.transactions.active
         -
           sortorder: '1'
           color: 2774A4
           yaxisside: RIGHT
           item:
-            host: 'PostgreSQL by user parameters'
+            host: 'PostgreSQL by Zabbix agent'
             key: pgsql.transactions.idle
         -
           sortorder: '2'
           color: F63100
           yaxisside: RIGHT
           item:
-            host: 'PostgreSQL by user parameters'
+            host: 'PostgreSQL by Zabbix agent'
             key: pgsql.transactions.prepared
         -
           sortorder: '3'
           color: A54F10
           yaxisside: RIGHT
           item:
-            host: 'PostgreSQL by user parameters'
+            host: 'PostgreSQL by Zabbix agent'
             key: pgsql.transactions.waiting
     -
       uuid: 45fe7967596741129b4f2462922636bf
@@ -2352,15 +2355,15 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'PostgreSQL by user parameters'
-            key: 'pgsql.uptime["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+            host: 'PostgreSQL by Zabbix agent'
+            key: 'pgsql.uptime["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
         -
           sortorder: '1'
           color: 2774A4
           yaxisside: RIGHT
           item:
-            host: 'PostgreSQL by user parameters'
-            key: 'pgsql.cache.hit["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
+            host: 'PostgreSQL by Zabbix agent'
+            key: 'pgsql.cache.hit["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
     -
       uuid: 93ca2dc7a3ff4a458c45e2a56390ce72
       name: 'PostgreSQL WAL'
@@ -2369,12 +2372,12 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'PostgreSQL by user parameters'
+            host: 'PostgreSQL by Zabbix agent'
             key: pgsql.wal.write
         -
           sortorder: '1'
           color: 2774A4
           yaxisside: RIGHT
           item:
-            host: 'PostgreSQL by user parameters'
+            host: 'PostgreSQL by Zabbix agent'
             key: pgsql.wal.count

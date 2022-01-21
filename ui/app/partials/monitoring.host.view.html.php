@@ -120,8 +120,8 @@ foreach ($data['hosts'] as $hostid => $host) {
 				? new CLink(_('Latest data'),
 					(new CUrl('zabbix.php'))
 						->setArgument('action', 'latest.view')
-						->setArgument('filter_set', '1')
-						->setArgument('filter_hostids', [$host['hostid']])
+						->setArgument('hostids', [$host['hostid']])
+						->setArgument('filter_name', '')
 				)
 				: _('Latest data')
 		],

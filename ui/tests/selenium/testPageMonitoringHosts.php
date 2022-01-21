@@ -888,7 +888,9 @@ class testPageMonitoringHosts extends CWebTest {
 			case 'Available host':
 				$field = ($data['name'] == 'Dynamic widgets H1') ? 'Host' : 'Hosts';
 				$this->selectLink($data['name'], $data['link_name'], $data['page_header']);
-				$form->checkValue([$field => $data['name']]);
+				$this->page->waitUntilReady();
+				$filter_form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+				$filter_form->checkValue([$field => $data['name']]);
 				$this->query('button:Reset')->one()->click();
 				break;
 			case 'ЗАББИКС Сервер':
@@ -1011,6 +1013,53 @@ class testPageMonitoringHosts extends CWebTest {
 		foreach ($data['disabled'] as $disabled) {
 			$this->assertTrue($popup->query('xpath://a[@aria-label="Host, '.
 					$disabled.'" and @class="menu-popup-item disabled"]')->one()->isPresent());
+		}
+	}
+
+	/**
+	 * Check number of problems displayed on Hosts and Problems page.
+	 */
+	public function testPageMonitoringHosts_CountProblems() {
+		$this->page->login();
+		$hosts_names = ['1_Host_to_check_Monitoring_Overview', 'ЗАББИКС Сервер', 'Host for tag permissions', 'Empty host'];
+		foreach ($hosts_names as $host) {
+			$this->page->open('zabbix.php?action=host.view&name='.$host)->waitUntilReady();
+			$table = $this->query('class:list-table')->asTable()->one();
+
+			// Get number of problems displayed on icon and it severity level.
+			if ($host !== 'Empty host') {
+				$icons = $table->query('xpath:.//*[contains(@class, "problem-icon-list-item")]')->all();
+				$results = [];
+
+				foreach ($icons as $icon) {
+					$amount = $icon->getText();
+					$severity = $icon->getAttribute('title');
+					$results[$severity] = $amount;
+				}
+			}
+			else {
+				$this->assertEquals('Problems', $table->getRow(0)->getColumn('Problems')->getText());
+			}
+
+			// Navigate to Problems page from Hosts.
+			$table->getRow(0)->getColumn('Problems')->query('xpath:.//a')->one()->click();
+			$this->page->waitUntilReady();
+			$this->page->assertTitle('Problems');
+			$this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one()->checkValue(['Hosts' => $host]);
+
+			// Count problems of each severity and compare it with problems count from Hosts page.
+			if ($host !== 'Empty host') {
+				foreach ($results as $severity => $count) {
+					$problem_count = $table->query('xpath:.//td[contains(@class, "-bg") and text()="'.$severity.'"]')
+							->all()->count();
+					$this->assertEquals(strval($problem_count), $count);
+				}
+			}
+
+			// Check that table is empty and No data found displayed.
+			else {
+				$this->assertTableData();
+			}
 		}
 	}
 

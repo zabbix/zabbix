@@ -18,12 +18,8 @@
 **/
 
 #include "common.h"
-#include "db.h"
 #include "log.h"
-#include "zbxserver.h"
-#include "zbxregexp.h"
-#include "valuecache.h"
-#include "zbxtrends.h"
+#include "zbxeval.h"
 #include "../zbxalgo/vectorimpl.h"
 
 #include "anomalystl.h"
@@ -32,8 +28,6 @@ ZBX_PTR_VECTOR_DECL(VV, zbx_vector_history_record_t *)
 ZBX_PTR_VECTOR_IMPL(VV, zbx_vector_history_record_t *)
 
 /*******************************************************************************
- *                                                                             *
- * Function: zbx_get_percentage_of_deviations_in_remainder                     *
  *                                                                             *
  * Purpose: finds how many values in stl remainder are outliers                *
  *                                                                             *

@@ -49,7 +49,7 @@ final class CMathFunctionData {
 		'cbrt' =>				[['count' => 1]],
 		'ceil' =>				[['count' => 1]],
 		'char' =>				[['count' => 1]],
-		'concat' =>				[['count' => 2]],
+		'concat' =>				[['min' => 2]],
 		'cos' =>				[['count' => 1]],
 		'cosh' =>				[['count' => 1]],
 		'cot' =>				[['count' => 1]],

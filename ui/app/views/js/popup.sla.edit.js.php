@@ -153,9 +153,9 @@ window.sla_edit_popup = {
 			popup_params = {row_index};
 		}
 
-		const overlay = PopUp('popup.sla.excludeddowntime.edit', popup_params, 'sla_excluded_downtime_edit',
-			document.activeElement
-		);
+		const overlay = PopUp('popup.sla.excludeddowntime.edit', popup_params, {
+			dialogueid: 'sla_excluded_downtime_edit'
+		});
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 			if (row !== null) {
@@ -178,19 +178,11 @@ window.sla_edit_popup = {
 		row.remove();
 	},
 
-	clone(dialog_title) {
+	clone({title, buttons}) {
 		this.slaid = null;
 
-		this.overlay.setProperties({title: dialog_title});
 		this.overlay.unsetLoading();
-
-		for (const element of this.footer.querySelectorAll('.js-update, .js-clone, .js-delete')) {
-			element.classList.add('<?= ZBX_STYLE_DISPLAY_NONE ?>');
-		}
-
-		for (const element of this.footer.querySelectorAll('.js-add')) {
-			element.classList.remove('<?= ZBX_STYLE_DISPLAY_NONE ?>');
-		}
+		this.overlay.setProperties({title, buttons});
 	},
 
 	delete() {

@@ -21,7 +21,6 @@
 #define ZABBIX_STATS_H
 
 #include "threads.h"
-#include "mutexs.h"
 
 #ifndef _WINDOWS
 #	include "diskdevices.h"
