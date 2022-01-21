@@ -1207,12 +1207,15 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.20rc1
 
 New features:
+...G...... [ZBXNEXT-7409] added native support for the vfs.dir.size and vfs.dir.count keys in Zabbix agent 2 (esneiders)
 ........S. [ZBXNEXT-7101] implemented sleep function into JS engine (asestakovs)
 .........T [ZBXNEXT-6861] updated Zabbix proxy templates according to the latest guidelines (abakaldin)
 .........T [ZBXNEXT-7078] added template for pfsense (vkhaliev)
 ...G...... [ZBXNEXT-6875] added native support for the system.hw.chassis and system.hw.devices keys in Zabbix agent 2 (esneiders)
 
 Bug fixes:
+.......PS. [ZBX-20293] fixed icmpping items group becomes not supported due to error in interval detection (akozlovs)
+..F.I..... [ZBX-20387] fixed default language of the setup routine for logged in superadmin users (averza)
 .........T [ZBX-20316] added macro for password and changed conf file in postgresql by user parameters template (vkhaliev)
 .........T [ZBX-20303] fixed trigger name in MSSQL template (vkhaliev)
 ...G...... [ZBX-19565] fixed agent2 to return the same 255 code as agent1 when key service.info does not find service (arimdjonoks)
