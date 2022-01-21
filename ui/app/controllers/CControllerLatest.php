@@ -27,6 +27,12 @@ abstract class CControllerLatest extends CController {
 	// Filter idx prefix.
 	const FILTER_IDX = 'web.monitoring.latest';
 
+	// Number of subfilter values per row.
+	const SUBFILTERS_VALUES_PER_ROW = 100;
+
+	// Number of tag value rows allowed to be included in subfilter.
+	const SUBFILTERS_TAG_VALUE_ROWS = 20;
+
 	// Filter fields default values.
 	const FILTER_FIELDS_DEFAULT = [
 		'groupids' => [],
@@ -643,5 +649,66 @@ abstract class CControllerLatest extends CController {
 		return array_filter($items, function ($item) {
 			return array_sum($item['matching_subfilters']) == count($item['matching_subfilters']);
 		});
+	}
+
+	/**
+	 * Make subset of most severe subfilters to reduce the space used by subfilter.
+	 *
+	 * @param array  $subfilters
+	 * @param string $subfilters[<subfilter option>]['name']      Option name.
+	 * @param bool   $subfilters[<subfilter option>]['selected']  Flag indicating if option is selected.
+	 *
+	 * @return array
+	 */
+	public static function getMostSevereSubfilters(array $subfilters): array {
+		if (self::SUBFILTERS_VALUES_PER_ROW >= count($subfilters)) {
+			return $subfilters;
+		}
+
+		// All selected subfilters always must be included.
+		$most_severe = array_filter($subfilters, function ($elmnt) {
+			return $elmnt['selected'];
+		});
+
+		// Add first non-selected subfilter values in case if limit is not exceeded.
+		$remaining = self::SUBFILTERS_VALUES_PER_ROW - count($most_severe);
+		if ($remaining > 0) {
+			$subfilters = array_diff_key($subfilters, $most_severe);
+			$most_severe += array_slice($subfilters, 0, $remaining);
+		}
+
+		CArrayHelper::sort($most_severe, ['name']);
+
+		return $most_severe;
+	}
+
+	/**
+	 * Make subset of most severe tag value subfilters to reduce the space used by subfilter.
+	 *
+	 * @param array $tags
+	 * @param bool  $tags[<tagname>][<tagvalue>]['selected']  Flag indicating if tag value is selected.
+	 *
+	 * @return array
+	 */
+	public static function getMostSevereTagValueSubfilters(array $tags): array {
+		if (CControllerLatest::SUBFILTERS_TAG_VALUE_ROWS >= count($tags)) {
+			return $tags;
+		}
+
+		// All selected subfilters always must be included.
+		$most_severe = array_filter($tags, function ($tag) {
+			return (bool) array_sum(array_column($tag, 'selected'));
+		});
+
+		// Add first non-selected subfilter values in case if limit is not exceeded.
+		$remaining = self::SUBFILTERS_TAG_VALUE_ROWS - count($most_severe);
+		if ($remaining > 0) {
+			$tags = array_diff_key($tags, $most_severe);
+			$most_severe += array_slice($tags, 0, $remaining);
+		}
+
+		uksort($most_severe, 'strnatcmp');
+
+		return $most_severe;
 	}
 }

@@ -35,6 +35,7 @@ foreach (['hostids', 'tagnames', 'data'] as $key) {
 		$subfilter_options[$key] = [];
 	}
 
+	// Remove non-selected filter options with 0 occurrences.
 	$data[$key] = array_filter($data[$key], function ($elmnt) {
 		return ($elmnt['selected'] || $elmnt['count'] != 0);
 	});
@@ -42,6 +43,9 @@ foreach (['hostids', 'tagnames', 'data'] as $key) {
 	$subfilter_used = (bool) array_filter($data[$key], function ($elmnt) {
 		return $elmnt['selected'];
 	});
+
+	$subfilter_options_count = count($data[$key]);
+	$data[$key] = CControllerLatest::getMostSevereSubfilters($data[$key]);
 
 	foreach ($data[$key] as $value => $element) {
 		if ($element['selected']) {
@@ -77,6 +81,10 @@ foreach (['hostids', 'tagnames', 'data'] as $key) {
 			}
 		}
 	}
+
+	if ($subfilter_options_count > count($subfilter_options[$key])) {
+		$subfilter_options[$key][] = new CSpan('...');
+	}
 }
 
 if (count($data['tags']) > 0) {
@@ -86,11 +94,18 @@ if (count($data['tags']) > 0) {
 		return (bool) array_sum(array_column($elmnt, 'selected'));
 	});
 
+	$tags_count = count($data['tags']);
+	$data['tags'] = CControllerLatest::getMostSevereTagValueSubfilters($data['tags']);
+
 	foreach ($data['tags'] as $tag => $tag_values) {
 
+		// Remove non-selected filter options with 0 occurrences.
 		$tag_values = array_filter($tag_values, function ($elmnt) {
 			return ($elmnt['selected'] || $elmnt['count'] != 0);
 		});
+
+		$tag_values_count = count($tag_values);
+		$tag_values = CControllerLatest::getMostSevereSubfilters($tag_values);
 
 		$tag_values = array_map(function ($element) use ($tag, $subfilter_used) {
 			if ($element['name'] === '') {
@@ -143,11 +158,19 @@ if (count($data['tags']) > 0) {
 		}, $tag_values);
 
 		if ($tag_values) {
+			$tag_values_row = ($tag_values_count > count($tag_values))
+				? [$tag_values, new CSpan('...')]
+				: $tag_values;
+
 			$subfilter_options['tags'][$tag] = (new CDiv([
 				new CTag('label', true, $tag.': '),
-				(new CDiv($tag_values))->addClass('subfilter-options')
+				(new CDiv($tag_values_row))->addClass('subfilter-options')
 			]))->addClass('subfilter-option-grid');
 		}
+	}
+
+	if ($tags_count > count($data['tags'])) {
+		$subfilter_options['tags'][] = new CSpan('...');
 	}
 }
 else {
