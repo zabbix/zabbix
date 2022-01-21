@@ -1,1 +1,1 @@
-..F....... [ZBX-20460] fixed color-picker when doesn't display the color in the input element (ashubin)
+..F....... [ZBX-20460] fixed color-picker not updating selected color in its input element (ashubin)
