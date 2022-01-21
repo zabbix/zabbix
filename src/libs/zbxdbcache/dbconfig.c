@@ -3746,6 +3746,9 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 			if (NULL != trigger->recovery_expression_bin)
 				__config_mem_free_func((void *)trigger->recovery_expression_bin);
 
+			if (NULL != trigger->itemids)
+				__config_mem_free_func((void *)trigger->itemids);
+
 			zbx_hashset_remove_direct(&config->triggers, trigger);
 		}
 	}
