@@ -1747,7 +1747,7 @@ static int	evaluate_LAST(zbx_variant_t *value, DC_ITEM *item, const char *parame
 #define EVALUATE_MIN	0
 #define EVALUATE_MAX	1
 
-#define CHECK_LOOP_MIN_OR_MAX(type, mode_op)							\
+#define LOOP_FIND_MIN_OR_MAX(type, mode_op)							\
 	for (i = 1; i < values.values_num; i++)							\
 	{											\
 		if (values.values[i].value.type mode_op values.values[index].value.type)	\
@@ -1756,7 +1756,7 @@ static int	evaluate_LAST(zbx_variant_t *value, DC_ITEM *item, const char *parame
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate function 'min' for the item                              *
+ * Purpose: evaluate function 'min' or 'max' for the item                     *
  *                                                                            *
  * Parameters: value      - [OUT] result                                      *
  *             item       - [IN] item (performance metric)                    *
@@ -1829,22 +1829,22 @@ static int	evaluate_MIN_or_MAX(zbx_variant_t *value, DC_ITEM *item, const char *
 		{
 			if (EVALUATE_MIN == min_or_max)
 			{
-				CHECK_LOOP_MIN_OR_MAX(ui64, <);
+				LOOP_FIND_MIN_OR_MAX(ui64, <);
 			}
 			else
 			{
-				CHECK_LOOP_MIN_OR_MAX(ui64, >);
+				LOOP_FIND_MIN_OR_MAX(ui64, >);
 			}
 		}
 		else
 		{
 			if (EVALUATE_MIN == min_or_max)
 			{
-				CHECK_LOOP_MIN_OR_MAX(dbl, <);
+				LOOP_FIND_MIN_OR_MAX(dbl, <);
 			}
 			else
 			{
-				CHECK_LOOP_MIN_OR_MAX(dbl, >);
+				LOOP_FIND_MIN_OR_MAX(dbl, >);
 			}
 		}
 
