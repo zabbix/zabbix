@@ -102,10 +102,10 @@ class CWidgetFormTopHosts extends CWidgetForm {
 		$this->fields[$field_evaltype->getName()] = $field_evaltype;
 
 		// Tags array: tag, operator and value. No label, because it belongs to previous group.
-		$field_tags = new CWidgetFieldTags('host_tags', '');
+		$field_tags = new CWidgetFieldTags('hosttags', '');
 
-		if (array_key_exists('host_tags', $this->data)) {
-			$field_tags->setValue($this->data['host_tags']);
+		if (array_key_exists('hosttags', $this->data)) {
+			$field_tags->setValue($this->data['hosttags']);
 		}
 
 		$this->fields[$field_tags->getName()] = $field_tags;
