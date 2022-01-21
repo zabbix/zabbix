@@ -28,8 +28,7 @@ zbx_hash_t	zbx_kv_hash(const void *data)
 }
 
 int	zbx_kv_compare(const void *d1, const void *d2)
-{	zabbix_log(LOG_LEVEL_INFORMATION, "((const zbx_kv_t *)d1)->key '%s'", ((const zbx_kv_t *)d1)->key);
-	zabbix_log(LOG_LEVEL_INFORMATION, "((const zbx_kv_t *)d1)->key '%s'", ((const zbx_kv_t *)d2)->key);
+{
 	return strcmp(((const zbx_kv_t *)d1)->key, ((const zbx_kv_t *)d2)->key);
 }
 
