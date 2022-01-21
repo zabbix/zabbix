@@ -5744,17 +5744,20 @@ static void	dc_trigger_merge_itemids(ZBX_DC_TRIGGER *trigger, zbx_vector_uint64_
 
 	if (NULL != trigger->itemids)
 	{
+		int	itemids_num = 0;
+
 		for (itemid = trigger->itemids; 0 != *itemid; itemid++)
 		{
 			if (FAIL != (i = zbx_vector_uint64_search(itemids, *itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 				zbx_vector_uint64_remove_noorder(itemids, i);
+			itemids_num++;
 		}
 
 		if (0 == itemids->values_num)
 			return;
 
 		trigger->itemids = (zbx_uint64_t *)__config_mem_realloc_func(trigger->itemids,
-				sizeof(zbx_uint64_t) * (size_t)(itemids->values_num + 1));
+				sizeof(zbx_uint64_t) * (size_t)(itemids->values_num + itemids_num + 1));
 	}
 	else
 	{
