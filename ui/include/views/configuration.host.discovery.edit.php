@@ -566,7 +566,7 @@ $item_tab
 		))->setId('js-item-jmx-endpoint-field')
 	])
 	->addItem([
-		(new CLabel(_('User name')))->setId('js-item-username-label'),
+		(new CLabel(_('User name'), 'username'))->setId('js-item-username-label'),
 		(new CFormField((new CTextBox('username', $data['username'], false, 64))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->disableAutocomplete()

@@ -277,7 +277,7 @@ foreach ($data['items'] as $item) {
 		new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']),
 		$wizard,
 		($data['hostid'] == 0) ? $item['host'] : null,
-		$description,
+		(new CCol($description))->addClass(ZBX_STYLE_WORDBREAK),
 		$triggerInfo,
 		(new CDiv(CHtml::encode($item['key_'])))->addClass(ZBX_STYLE_WORDWRAP),
 		$item['delay'],
