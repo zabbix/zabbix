@@ -144,9 +144,11 @@ foreach ($data['columns'] as $columns) {
 				&& array_key_exists('display', $column_config)
 				&& $column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS) {
 			foreach ($column_config['thresholds'] as $threshold) {
-				if ($value >= $threshold['threshold']) {
-					$color = $threshold['color'];
+				if ($value < $threshold['threshold']) {
+					break;
 				}
+
+				$color = $threshold['color'];
 			}
 		}
 
