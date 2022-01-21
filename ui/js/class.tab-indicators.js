@@ -310,17 +310,18 @@ class MacrosTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return [...document.querySelectorAll('#tbl_macros .form_row')].filter((row) => {
-			const macro = row.querySelector('textarea[name$="[macro]"]');
-			const inherited_type = row.querySelector('input[name$="[inherited_type]"]');
+		return [...document.querySelectorAll('#tbl_macros .form_row')]
+			.filter((row) => {
+				const macro = row.querySelector('textarea[name$="[macro]"]');
+				const inherited_type = row.querySelector('input[name$="[inherited_type]"]');
 
-			if (inherited_type !== null
-					&& parseInt(inherited_type.value, 10) == MacrosTabIndicatorItem.ZBX_PROPERTY_INHERITED) {
-				return false;
-			}
+				if (inherited_type !== null
+						&& parseInt(inherited_type.value, 10) == MacrosTabIndicatorItem.ZBX_PROPERTY_INHERITED) {
+					return false;
+				}
 
-			return (macro !== null && macro.value !== '');
-		})
+				return (macro !== null && macro.value !== '');
+			})
 			.length;
 	}
 
