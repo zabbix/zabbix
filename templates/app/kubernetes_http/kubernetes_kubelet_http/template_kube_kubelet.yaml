@@ -518,7 +518,7 @@ zabbix_export:
                   
                   JSON.parse(value).forEach(function (item) {
                       var container_labels = item.labels.container + item.labels.namespace + item.labels.pod;
-                      if (!(item.labels.container === "") && !(lookup[container_labels])) {
+                      if (item.labels.container !== '' && !lookup[container_labels]) {
                           lookup[container_labels] = 1;
                           result.push({
                               '{#CONTAINER}': item.labels.container,
@@ -863,7 +863,7 @@ zabbix_export:
                       result = [];
                   
                   JSON.parse(value).forEach(function (item) {
-                      if (item.name == "kubelet_runtime_operations_total"){
+                      if (item.name === 'kubelet_runtime_operations_total'){
                           var op_type = item.labels.operation_type;
                   
                           if (lookup[op_type]) {
@@ -874,10 +874,10 @@ zabbix_export:
                               '{#TYPE}': 'totals',
                               '{#OP_TYPE}': op_type
                           });
-                  
-                          };
-                      if  (item.name == "kubelet_runtime_operations_duration_seconds_bucket"){
-                       var labels = item.labels.operation_type + item.labels.le;
+                      }
+
+                      else if (item.name === 'kubelet_runtime_operations_duration_seconds_bucket'){
+                        var labels = item.labels.operation_type + item.labels.le;
                   
                           if (lookup_histogram[labels]) {
                               return;
@@ -888,7 +888,7 @@ zabbix_export:
                               '{#OP_TYPE}': item.labels.operation_type,
                               '{#LE}': item.labels.le
                           });
-                      };
+                      }
                   });
                   
                   return JSON.stringify(result);

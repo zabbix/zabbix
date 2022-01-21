@@ -816,25 +816,24 @@ zabbix_export:
                       result = [];
                   
                   JSON.parse(value).forEach(function (item) {
-                      if (item.name === "workqueue_adds_total"){
-                          var label_name = item.labels.name;
-                  
-                          if (lookup[label_name]) {
-                              return;
-                          }
-                          lookup[label_name] = 1;
-                          result.push({
-                              '{#TYPE}': 'totals',
-                              '{#NAME}': label_name
-                          });
-                  
+                      if (item.name === 'workqueue_adds_total') {
+                        var label_name = item.labels.name;
+                
+                        if (lookup[label_name]) {
+                            return;
                         }
-                      else if  (item.name === "workqueue_work_duration_seconds_bucket"){
-                          result.push({
-                              '{#TYPE}': 'buckets',
-                              '{#NAME}': item.labels.name,
-                              '{#LE}': item.labels.le
-                          });
+                        lookup[label_name] = 1;
+                        result.push({
+                            '{#TYPE}': 'totals',
+                            '{#NAME}': label_name
+                        });
+                      }
+                      else if  (item.name === 'workqueue_work_duration_seconds_bucket') {
+                        result.push({
+                            '{#TYPE}': 'buckets',
+                            '{#NAME}': item.labels.name,
+                            '{#LE}': item.labels.le
+                        });
                       }
                   });
                   

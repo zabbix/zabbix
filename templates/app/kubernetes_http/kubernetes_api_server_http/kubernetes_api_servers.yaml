@@ -1348,7 +1348,7 @@ zabbix_export:
                       result = [];
                   
                   JSON.parse(value).forEach(function (item) {
-                      if (item.name === "apiserver_request_duration_seconds_count"){
+                      if (item.name === 'apiserver_request_duration_seconds_count') {
                           var label_verb = item.labels.verb;
                           if (lookup[label_verb]) {
                               return;
@@ -1360,18 +1360,19 @@ zabbix_export:
                           });
                   
                         }
-                      else if  (item.name === "apiserver_request_duration_seconds_bucket"){
-                       var labels = item.labels.verb + item.labels.le;
+                      else if  (item.name === 'apiserver_request_duration_seconds_bucket') {
+                        var labels = item.labels.verb + item.labels.le;
                   
-                          if (lookup_histogram[labels]) {
-                              return;
-                          }
-                          lookup_histogram[labels] = 1;
-                          result.push({
-                              '{#TYPE}': 'buckets',
-                              '{#VERB}': item.labels.verb,
-                              '{#LE}': item.labels.le
-                          });
+                        if (lookup_histogram[labels]) {
+                            return;
+                        }
+
+                        lookup_histogram[labels] = 1;
+                        result.push({
+                            '{#TYPE}': 'buckets',
+                            '{#VERB}': item.labels.verb,
+                            '{#LE}': item.labels.le
+                        });
                       }
                   });
                   
