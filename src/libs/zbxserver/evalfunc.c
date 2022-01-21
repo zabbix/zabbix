@@ -1853,7 +1853,7 @@ static int	evaluate_MIN_or_MAX(zbx_variant_t *value, DC_ITEM *item, const char *
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "result for MIN is empty");
+		zabbix_log(LOG_LEVEL_DEBUG, "result for MIN or MAX is empty");
 		*error = zbx_strdup(*error, "not enough data");
 	}
 out:
