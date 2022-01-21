@@ -76,7 +76,7 @@ $itemTable = (new CTableInfo())
 		(new CColHeader(
 			(new CCheckBox('all_items'))->onClick("checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		_(''),
+		'',
 		($data['hostid'] == 0)
 			? ($data['context'] === 'host')
 				? _('Host')
