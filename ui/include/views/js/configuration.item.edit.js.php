@@ -42,7 +42,7 @@ include __DIR__.'/itemtest.js.php';
 			const $value_type = $('#value_type');
 
 			$('#type')
-				.change(view.typeChangeHandler)
+				.change(this.typeChangeHandler)
 				.trigger('change');
 
 			// Whenever non-numeric type is changed back to numeric type, set the default value in "trends" field.
