@@ -378,7 +378,7 @@ zabbix_export:
                           output = [];
                   
                       if (typeof input !== 'object' || typeof input.items === 'undefined') {
-                          Zabbix.log(4, '[ Kubernetes ] Recieved incorrect JSON: ' + input);
+                          Zabbix.log(4, '[ Kubernetes ] Received incorrect JSON: ' + input);
                           throw 'Incorrect JSON. Check debug log for more information.';
                       }
                   
@@ -1795,7 +1795,7 @@ zabbix_export:
                           output = [];
                   
                       if (typeof input !== 'object' || typeof input.items === 'undefined') {
-                          Zabbix.log(4, '[ Kubernetes ] Recieved incorrect JSON: ' + {0});
+                          Zabbix.log(4, '[ Kubernetes ] Received incorrect JSON: ' + {0});
                           throw 'Incorrect JSON. Check debug log for more information.';
                       }
                   
