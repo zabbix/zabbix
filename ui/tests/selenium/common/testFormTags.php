@@ -769,19 +769,17 @@ class testFormTags extends CWebTest {
 		// Navigate to host or template for full cloning.
 		$this->query('link', ($parent === 'Host') ? $this->host : $this->template)->waitUntilClickable()->one()->click();
 
-		$host_form = ($parent === 'Host')
-			? COverlayDialogElement::find()->asForm()->one()->waitUntilReady()
-			: $this->query('id:templates-form')->asForm()->waitUntilPresent()->one();
+		$host_form = $this->query('id', ($parent === 'Host') ? 'host-form' : 'templates-form')->asForm()
+				->waitUntilPresent()->one();
 
 		$host_form->fill([$parent.' name' => $new_name]);
-		$this->query('button:Full clone')->one()->click();
-		$host_form->waitUntilReady();
+		$host_form->query('button:Full clone')->one()->click();
+		$host_form->invalidate();
 		$host_form->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, $parent.' added');
 
 		if ($parent === 'Host') {
-			$this->query('link:All hosts')->one()->click();
 			$this->page->waitUntilReady();
 			$this->query('button:Reset')->one()->click();
 			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
