@@ -31,6 +31,13 @@ foreach (['hostids', 'tagnames', 'data'] as $key) {
 		$subfilter_options[$key] = null;
 		continue;
 	}
+	else {
+		$subfilter_options[$key] = [];
+	}
+
+	$data[$key] = array_filter($data[$key], function ($elmnt) {
+		return ($elmnt['selected'] || $elmnt['count'] != 0);
+	});
 
 	$subfilter_used = (bool) array_filter($data[$key], function ($elmnt) {
 		return $elmnt['selected'];
@@ -80,6 +87,11 @@ if (count($data['tags']) > 0) {
 	});
 
 	foreach ($data['tags'] as $tag => $tag_values) {
+
+		$tag_values = array_filter($tag_values, function ($elmnt) {
+			return ($elmnt['selected'] || $elmnt['count'] != 0);
+		});
+
 		$tag_values = array_map(function ($element) use ($tag, $subfilter_used) {
 			if ($element['name'] === '') {
 				$element_name = _('None');
@@ -130,10 +142,12 @@ if (count($data['tags']) > 0) {
 			}
 		}, $tag_values);
 
-		$subfilter_options['tags'][$tag] = (new CDiv([
-			new CTag('label', true, $tag.': '),
-			(new CDiv($tag_values))->addClass('subfilter-options')
-		]))->addClass('subfilter-option-grid');
+		if ($tag_values) {
+			$subfilter_options['tags'][$tag] = (new CDiv([
+				new CTag('label', true, $tag.': '),
+				(new CDiv($tag_values))->addClass('subfilter-options')
+			]))->addClass('subfilter-option-grid');
+		}
 	}
 }
 else {
