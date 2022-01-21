@@ -22,11 +22,11 @@ Templates are of two types:
 
 1. Cluster node monitoring
 
-[Kubernetes nodes by HTTP](kubernetes_nodes_http) template discovers cluster nodes, creates hosts in Zabbix based on prototypes and assigns the "Linux by Zabbix agent" template to them. The template collects basic node metrics via the Kubernetes API.
+    [Kubernetes nodes by HTTP](kubernetes_nodes_http) template discovers cluster nodes, creates hosts in Zabbix based on prototypes and assigns the "Linux by Zabbix agent" template to them. The template collects basic node metrics via the Kubernetes API.
 
-1. Main cluster components monitoring
+2. Main cluster components monitoring
 
-[Kubernetes cluster state by HTTP](kubernetes_state_http) discovers cluster components and control plane nodes, creates Zabbix hosts and assigns the required templates to them.
+    [Kubernetes cluster state by HTTP](kubernetes_state_http) discovers cluster components and control plane nodes, creates Zabbix hosts and assigns the required templates to them.
 
 ## Zabbix set up
 
