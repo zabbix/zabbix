@@ -35,7 +35,7 @@ extern char	*CONFIG_VAULTTLSKEYFILE;
 extern char	*CONFIG_VAULTDBPATH;
 
 static zbx_vault_kvs_get_cb_t	zbx_vault_kvs_get_cb;
-static char			*zbx_vault_dbuser_key, *zbx_vault_dbpassword_key;
+static const char		*zbx_vault_dbuser_key, *zbx_vault_dbpassword_key;
 
 int	zbx_vault_init(char **error)
 {
@@ -85,7 +85,7 @@ int	zbx_vault_db_credentials_get(char **dbuser, char **dbpassword, char **error)
 {
 	int		ret = FAIL;
 	zbx_hashset_t	kvs;
-	zbx_kv_t	*kv_username, *kv_password, kv_local;
+	const zbx_kv_t	*kv_username, *kv_password;
 
 	if (NULL == CONFIG_VAULTDBPATH)
 		return SUCCEED;
@@ -114,17 +114,13 @@ int	zbx_vault_db_credentials_get(char **dbuser, char **dbpassword, char **error)
 		goto fail;
 	}
 
-	kv_local.key = zbx_vault_dbuser_key;
-
-	if (NULL == (kv_username = (zbx_kv_t *)zbx_hashset_search(&kvs, &kv_local)))
+	if (NULL == (kv_username = (zbx_kv_t *)zbx_hashset_search(&kvs, &zbx_vault_dbuser_key)))
 	{
 		*error = zbx_dsprintf(*error, "cannot retrieve value of key \"%s\"", ZBX_PROTO_TAG_USERNAME);
 		goto fail;
 	}
 
-	kv_local.key = zbx_vault_dbpassword_key;
-
-	if (NULL == (kv_password = (zbx_kv_t *)zbx_hashset_search(&kvs, &kv_local)))
+	if (NULL == (kv_password = (zbx_kv_t *)zbx_hashset_search(&kvs, &zbx_vault_dbpassword_key)))
 	{
 		*error = zbx_dsprintf(*error, "cannot retrieve value of key \"%s\"", ZBX_PROTO_TAG_PASSWORD);
 		goto fail;

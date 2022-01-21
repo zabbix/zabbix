@@ -22,14 +22,15 @@
 
 zbx_hash_t	zbx_kv_hash(const void *data)
 {
-	zbx_kv_t	*kv = (zbx_kv_t *)data;
+	const zbx_kv_t	*kv = (const zbx_kv_t *)data;
 
 	return ZBX_DEFAULT_STRING_HASH_ALGO(kv->key, strlen(kv->key), ZBX_DEFAULT_HASH_SEED);
 }
 
 int	zbx_kv_compare(const void *d1, const void *d2)
-{
-	return strcmp(((zbx_kv_t *)d1)->key, ((zbx_kv_t *)d2)->key);
+{	zabbix_log(LOG_LEVEL_INFORMATION, "((const zbx_kv_t *)d1)->key '%s'", ((const zbx_kv_t *)d1)->key);
+	zabbix_log(LOG_LEVEL_INFORMATION, "((const zbx_kv_t *)d1)->key '%s'", ((const zbx_kv_t *)d2)->key);
+	return strcmp(((const zbx_kv_t *)d1)->key, ((const zbx_kv_t *)d2)->key);
 }
 
 void	zbx_kv_clean(void *data)
