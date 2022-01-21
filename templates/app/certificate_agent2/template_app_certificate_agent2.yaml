@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-08-09T16:55:44Z'
+  version: '6.0'
+  date: '2021-12-15T07:19:56Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -16,7 +16,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/428309-discussion-thread-for-official-zabbix-template-tls-ssl-certificates-monitoring
         
-        Template tooling version used: 0.39
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Applications

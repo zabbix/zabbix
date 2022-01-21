@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -402,8 +402,8 @@ switch ($data['type']) {
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					(new CButton('btn1', _('Select')))
 						->addClass(ZBX_STYLE_BTN_GREY)
-						->onClick('return PopUp("popup.generic",'.
-							json_encode([
+						->onClick(
+							'return PopUp("popup.generic", '. json_encode([
 								'srctbl' => 'dchecks',
 								'srcfld1' => 'dcheckid',
 								'srcfld2' => 'name',
@@ -411,7 +411,7 @@ switch ($data['type']) {
 								'dstfld1' => 'dcheck_new_condition_value',
 								'dstfld2' => 'dcheck',
 								'writeonly' => '1'
-							]).', null, this);'
+							]).', {dialogue_class: "modal-popup-generic"});'
 						)
 				];
 

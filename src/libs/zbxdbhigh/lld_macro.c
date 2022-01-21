@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,8 +24,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_macro_paths_compare                                          *
- *                                                                            *
  * Purpose: sorting function to sort LLD macros by unique name                *
  *                                                                            *
  ******************************************************************************/
@@ -38,8 +36,6 @@ int	zbx_lld_macro_paths_compare(const void *d1, const void *d2)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_macro_paths_get                                              *
  *                                                                            *
  * Purpose: retrieve list of LLD macros                                       *
  *                                                                            *
@@ -93,8 +89,6 @@ int	zbx_lld_macro_paths_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_macro
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_macro_path_free                                              *
- *                                                                            *
  * Purpose: release resources allocated by lld macro path                     *
  *                                                                            *
  * Parameters: lld_macro_path - [IN] json path to extract from lld_row        *
@@ -108,8 +102,6 @@ void	zbx_lld_macro_path_free(zbx_lld_macro_path_t *lld_macro_path)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_lld_macro_value_by_name                                      *
  *                                                                            *
  * Purpose: get value of LLD macro using json path if available or by         *
  *          searching for such key in key value pairs of array entry          *
@@ -147,4 +139,3 @@ int	zbx_lld_macro_value_by_name(const struct zbx_json_parse *jp_row, const zbx_v
 
 	return FAIL;
 }
-

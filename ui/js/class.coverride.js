@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2021 Zabbix SIA
+ ** Copyright (C) 2001-2022 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ jQuery(function ($) {
 			const input = $('<input>', {'name': field_name, 'type': 'hidden', 'id': id}).val(value);
 
 			return $('<div>')
-				.addClass('input-color-picker')
+				.addClass('color-picker')
 				.append(input)
 				.append(close);
 		}

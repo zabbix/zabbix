@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1044,8 +1044,7 @@ class testPasswordComplexity extends CWebTest {
 		$auth_form->fill($data['auth_fields']);
 		$auth_form->submit();
 		$this->page->waitUntilReady();
-		// TODO: Uncomment this when ZBX-19669 is fixed.
-//		$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
+		$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
 		$this->assertEquals($data['db_passwd_check_rules'],
 				CDBHelper::getValue('SELECT passwd_check_rules FROM config')
 		);

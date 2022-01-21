@@ -1,10 +1,10 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:10Z'
+  version: '6.0'
+  date: '2021-12-17T07:22:56Z'
   groups:
     -
-      uuid: 57b7ae836ca64446ba2c296389c009b7
-      name: Templates/Modules
+      uuid: 36bff6c29af64692839d077febfc7079
+      name: 'Templates/Network devices'
   templates:
     -
       uuid: 4583f0c3bc894251a6c5e7129cb5b9aa
@@ -12,20 +12,22 @@ zabbix_export:
       name: 'Cisco Catalyst 3750V2-24PS SNMP'
       description: |
         Template Cisco Catalyst 3750V2-24PS
+          
+          MIBs used:
+          CISCO-MEMORY-POOL-MIB
+          IF-MIB
+          EtherLike-MIB
+          SNMPv2-MIB
+          CISCO-PROCESS-MIB
+          CISCO-ENVMON-MIB
+          ENTITY-MIB
         
-        MIBs used:
-        CISCO-MEMORY-POOL-MIB
-        IF-MIB
-        EtherLike-MIB
-        SNMPv2-MIB
-        CISCO-PROCESS-MIB
-        CISCO-ENVMON-MIB
-        ENTITY-MIB
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/418396-discussion-thread-for-official-zabbix-templates-for-cisco
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
-          name: Templates/Modules
+          name: 'Templates/Network devices'
       items:
         -
           uuid: 84ef605d7c914f62b4497ed6fdaccd8a

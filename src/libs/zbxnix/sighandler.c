@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,8 +50,6 @@ static void	exit_with_failure(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: fatal_signal_handler                                             *
- *                                                                            *
  * Purpose: handle fatal signals: SIGILL, SIGFPE, SIGSEGV, SIGBUS             *
  *                                                                            *
  ******************************************************************************/
@@ -64,8 +62,6 @@ static void	fatal_signal_handler(int sig, siginfo_t *siginfo, void *context)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: metric_thread_signal_handler                                     *
  *                                                                            *
  * Purpose: same as fatal_signal_handler() but customized for metric thread - *
  *          does not log memory map                                           *
@@ -81,8 +77,6 @@ static void	metric_thread_signal_handler(int sig, siginfo_t *siginfo, void *cont
 
 /******************************************************************************
  *                                                                            *
- * Function: alarm_signal_handler                                             *
- *                                                                            *
  * Purpose: handle alarm signal SIGALRM                                       *
  *                                                                            *
  ******************************************************************************/
@@ -94,8 +88,6 @@ static void	alarm_signal_handler(int sig, siginfo_t *siginfo, void *context)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: terminate_signal_handler                                         *
  *                                                                            *
  * Purpose: handle terminate signals: SIGHUP, SIGINT, SIGTERM, SIGUSR2        *
  *                                                                            *
@@ -144,8 +136,6 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 
 /******************************************************************************
  *                                                                            *
- * Function: child_signal_handler                                             *
- *                                                                            *
  * Purpose: handle child signal SIGCHLD                                       *
  *                                                                            *
  ******************************************************************************/
@@ -169,8 +159,6 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_set_common_signal_handlers                                   *
  *                                                                            *
  * Purpose: set the commonly used signal handlers                             *
  *                                                                            *
@@ -203,8 +191,6 @@ void	zbx_set_common_signal_handlers(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_set_exit_on_terminate                                        *
- *                                                                            *
  * Purpose: make main process to exit on terminate signals                    *
  *                                                                            *
  ******************************************************************************/
@@ -214,8 +200,6 @@ void	zbx_set_exit_on_terminate(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_unset_exit_on_terminate                                      *
  *                                                                            *
  * Purpose: make main process to set exit flag and continue to work on        *
  *          terminate signals                                                 *
@@ -227,8 +211,6 @@ void	zbx_unset_exit_on_terminate(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_set_child_signal_handler                                     *
  *                                                                            *
  * Purpose: set the handlers for child process signals                        *
  *                                                                            *
@@ -253,8 +235,6 @@ void	zbx_unset_child_signal_handler(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_set_metric_thread_signal_handler                             *
- *                                                                            *
  * Purpose: set the handlers for child process signals                        *
  *                                                                            *
  ******************************************************************************/
@@ -276,8 +256,6 @@ void 	zbx_set_metric_thread_signal_handler(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_block_signals                                                *
- *                                                                            *
  * Purpose: block signals to avoid interruption                               *
  *                                                                            *
  ******************************************************************************/
@@ -297,8 +275,6 @@ void	zbx_block_signals(sigset_t *orig_mask)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_unblock_signals                                              *
  *                                                                            *
  * Purpose: unblock signals after blocking                                    *
  *                                                                            *

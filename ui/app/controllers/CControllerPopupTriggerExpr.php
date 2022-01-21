@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1322,7 +1322,7 @@ class CControllerPopupTriggerExpr extends CController {
 						$key = $hist_function_token['data']['parameters'][0]['data']['item'];
 
 						$items = API::Item()->get([
-							'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
+							'output' => ['itemid', 'name', 'key_', 'value_type'],
 							'selectHosts' => ['name'],
 							'webitems' => true,
 							'filter' => [
@@ -1333,7 +1333,7 @@ class CControllerPopupTriggerExpr extends CController {
 
 						if (!$items) {
 							$items = API::ItemPrototype()->get([
-								'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
+								'output' => ['itemid', 'name', 'key_', 'value_type'],
 								'selectHosts' => ['name'],
 								'filter' => [
 									'host' => $host,
@@ -1387,7 +1387,7 @@ class CControllerPopupTriggerExpr extends CController {
 		// Opening an empty form or switching a function.
 		else {
 			$item = API::Item()->get([
-				'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
+				'output' => ['itemid', 'name', 'key_', 'value_type'],
 				'selectHosts' => ['host', 'name'],
 				'itemids' => $itemid,
 				'webitems' => true,
@@ -1398,14 +1398,11 @@ class CControllerPopupTriggerExpr extends CController {
 		}
 
 		if ($item) {
-			$items = CMacrosResolverHelper::resolveItemNames([$item]);
-			$item = $items[0];
-
 			$itemid = $item['itemid'];
 			$item_value_type = $item['value_type'];
 			$item_key = $item['key_'];
 			$item_host_data = reset($item['hosts']);
-			$description = $item_host_data['name'].NAME_DELIMITER.$item['name_expanded'];
+			$description = $item_host_data['name'].NAME_DELIMITER.$item['name'];
 		}
 		else {
 			$item_key = '';

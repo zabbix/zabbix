@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-06-18T08:45:38Z'
+  version: '6.0'
+  date: '2021-12-16T20:03:21Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -15,7 +15,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/426752-discussion-thread-for-official-zabbix-dell-templates
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: 'Templates/Server hardware'
@@ -124,8 +124,6 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'This attribute defines the overall rollup status of all components in the system being monitored by the remote access card. Includes system, storage, IO devices, iDRAC, CPU, memory, etc.'
-          valuemap:
-            name: 'IDRAC-MIB-SMIv2::ObjectStatusEnum'
           preprocessing:
             -
               type: JSONPATH
@@ -269,7 +267,6 @@ zabbix_export:
                   result.firmware = getField(response.body, 'FirmwareVersion', '');
                   
                   return JSON.stringify(result);
-                  
           url: '{$API.URL}/redfish/v1/Systems/System.Embedded.1'
           tags:
             -
@@ -323,8 +320,6 @@ zabbix_export:
               username: '{$API.USER}'
               password: '{$API.PASSWORD}'
               description: 'The status of the job. Possible values: OK, Warning, Critical.'
-              valuemap:
-                name: 'IDRAC-MIB-SMIv2::batteryState'
               preprocessing:
                 -
                   type: JSONPATH
@@ -459,7 +454,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(result);
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -487,8 +481,6 @@ zabbix_export:
               username: '{$API.USER}'
               password: '{$API.PASSWORD}'
               description: 'The status of the job. Possible values: OK, Warning, Critical.'
-              valuemap:
-                name: 'IDRAC-MIB-SMIv2::ObjectStatusEnum'
               preprocessing:
                 -
                   type: JSONPATH
@@ -624,7 +616,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(result);
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -687,8 +678,6 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'The status of the job. Possible values: OK, Warning, Critical.'
-              valuemap:
-                name: 'IDRAC-MIB-SMIv2::StatusProbeEnum'
               preprocessing:
                 -
                   type: JSONPATH
@@ -806,7 +795,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(result);
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -970,7 +958,7 @@ zabbix_export:
                     This trigger expression works as follows:
                     1. Can be triggered if operations status is down.
                     2. {$IFCONTROL:"{#IFNAME}"}=1 - user can redefine Context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
-                    3. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)
+                    3. Condition of difference between last and previous value - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
@@ -1077,7 +1065,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(result);
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1120,8 +1107,6 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'The type of media contained in this drive. Possible values: HDD, SSD, SMR, null.'
-              valuemap:
-                name: 'IDRAC-MIB-SMIv2::physicalDiskMediaType'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1230,8 +1215,6 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'The status of the job. Possible values: OK, Warning, Critical.'
-              valuemap:
-                name: 'IDRAC-MIB-SMIv2::physicalDiskComponentStatus'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1369,7 +1352,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(result);
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1412,8 +1394,6 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'The status of the job. Possible values: OK, Warning, Critical.'
-              valuemap:
-                name: 'IDRAC-MIB-SMIv2::ObjectStatusEnum'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1545,7 +1525,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(result);
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1588,8 +1567,6 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'The status of the job. Possible values: OK, Warning, Critical.'
-              valuemap:
-                name: 'IDRAC-MIB-SMIv2::StatusProbeEnum'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1742,7 +1719,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(result);
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1810,8 +1786,6 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'Indicates the read cache policy setting for the Volume. Possible values: ReadAhead, AdaptiveReadAhead, Off.'
-              valuemap:
-                name: 'IDRAC-MIB-SMIv2::virtualDiskReadPolicy'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1862,8 +1836,6 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'The known state of the Resource, for example, enabled. Possible values: Enabled, Disabled, StandbyOffline, StandbySpare, InTest, Starting, Absent, UnavailableOffline, Deferring, Quiesced, Updating, Qualified.'
-              valuemap:
-                name: 'IDRAC-MIB-SMIv2::virtualDiskOperationalState'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1889,8 +1861,6 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'The status of the job. Possible values: OK, Warning, Critical.'
-              valuemap:
-                name: 'IDRAC-MIB-SMIv2::virtualDiskState'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1935,8 +1905,6 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'Indicates the write cache policy setting for the Volume. Possible values: WriteThrough, ProtectedWriteBack, UnprotectedWriteBack.'
-              valuemap:
-                name: 'IDRAC-MIB-SMIv2::virtualDiskWritePolicy'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2055,7 +2023,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(result);
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -2078,183 +2045,6 @@ zabbix_export:
           value: '1'
           description: 'Link status trigger will be fired only for interfaces that have the context macro equaled 1.'
       valuemaps:
-        -
-          uuid: ce3baf68b6e54ad3a67f77d5e8d5567a
-          name: 'IDRAC-MIB-SMIv2::batteryState'
-          mappings:
-            -
-              value: '1'
-              newvalue: Unknown
-            -
-              value: '2'
-              newvalue: Ready
-            -
-              value: '3'
-              newvalue: Failed
-            -
-              value: '4'
-              newvalue: Degraded
-            -
-              value: '5'
-              newvalue: Missing
-            -
-              value: '6'
-              newvalue: Charging
-            -
-              value: '7'
-              newvalue: 'Below threshold'
-        -
-          uuid: 1ce66d22fc074d6ab113fb5449cb778a
-          name: 'IDRAC-MIB-SMIv2::ObjectStatusEnum'
-          mappings:
-            -
-              value: '1'
-              newvalue: other
-            -
-              value: '2'
-              newvalue: unknown
-            -
-              value: '3'
-              newvalue: ok
-            -
-              value: '4'
-              newvalue: nonCritical
-            -
-              value: '5'
-              newvalue: critical
-            -
-              value: '6'
-              newvalue: nonRecoverable
-        -
-          uuid: c137d9094e9c434e975bac41ebdff156
-          name: 'IDRAC-MIB-SMIv2::physicalDiskComponentStatus'
-          mappings:
-            -
-              value: '1'
-              newvalue: other
-            -
-              value: '2'
-              newvalue: unknown
-            -
-              value: '3'
-              newvalue: ok
-            -
-              value: '4'
-              newvalue: nonCritical
-            -
-              value: '5'
-              newvalue: critical
-            -
-              value: '6'
-              newvalue: nonRecoverable
-        -
-          uuid: f1ee4057a7394260b877b3a2b1ad0943
-          name: 'IDRAC-MIB-SMIv2::physicalDiskMediaType'
-          mappings:
-            -
-              value: '1'
-              newvalue: Unknown
-            -
-              value: '2'
-              newvalue: HDD
-            -
-              value: '3'
-              newvalue: SSD
-        -
-          uuid: 660f91b00d694691953b39ac2800bdbe
-          name: 'IDRAC-MIB-SMIv2::StatusProbeEnum'
-          mappings:
-            -
-              value: '1'
-              newvalue: other
-            -
-              value: '2'
-              newvalue: unknown
-            -
-              value: '3'
-              newvalue: ok
-            -
-              value: '4'
-              newvalue: nonCriticalUpper
-            -
-              value: '5'
-              newvalue: criticalUpper
-            -
-              value: '6'
-              newvalue: nonRecoverableUpper
-            -
-              value: '7'
-              newvalue: nonCriticalLower
-            -
-              value: '8'
-              newvalue: criticalLower
-            -
-              value: '9'
-              newvalue: nonRecoverableLower
-            -
-              value: '10'
-              newvalue: failed
-        -
-          uuid: d8f93c2c425d4d8c9c2d5a5a489ba614
-          name: 'IDRAC-MIB-SMIv2::virtualDiskOperationalState'
-          mappings:
-            -
-              value: '1'
-              newvalue: 'Not applicable'
-            -
-              value: '2'
-              newvalue: Reconstructing
-            -
-              value: '3'
-              newvalue: Resynching
-            -
-              value: '4'
-              newvalue: Initializing
-            -
-              value: '5'
-              newvalue: 'Background init'
-        -
-          uuid: 335c6dd916ba49cda3f537a6f3371540
-          name: 'IDRAC-MIB-SMIv2::virtualDiskReadPolicy'
-          mappings:
-            -
-              value: '1'
-              newvalue: 'No Read Ahead'
-            -
-              value: '2'
-              newvalue: 'Read Ahead'
-            -
-              value: '3'
-              newvalue: 'Adaptive Read Ahead'
-        -
-          uuid: be6fadfed0574457b289dd5beda43e73
-          name: 'IDRAC-MIB-SMIv2::virtualDiskState'
-          mappings:
-            -
-              value: '1'
-              newvalue: Unknown
-            -
-              value: '2'
-              newvalue: Online
-            -
-              value: '3'
-              newvalue: Failed
-            -
-              value: '4'
-              newvalue: Degraded
-        -
-          uuid: 2c0f81605b694b7cba7232b102bde235
-          name: 'IDRAC-MIB-SMIv2::virtualDiskWritePolicy'
-          mappings:
-            -
-              value: '1'
-              newvalue: 'Write Through'
-            -
-              value: '2'
-              newvalue: 'Write Back'
-            -
-              value: '3'
-              newvalue: 'Force Write Back'
         -
           uuid: 42059b2450fd4856a4c38019df326920
           name: zabbix.host.available

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -180,14 +180,14 @@ typedef enum	_EVT_VARIANT_TYPE
 }
 EVT_VARIANT_TYPE;
 
-
-
-int			process_eventslog(zbx_vector_ptr_t *addrs, const char *eventlog_name, zbx_vector_ptr_t *regexps,
-			const char *pattern, const char *key_severity, const char *key_source, const char *key_logeventid,
+int			process_eventslog(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
+			const char *eventlog_name, zbx_vector_ptr_t *regexps, const char *pattern,
+			const char *key_severity, const char *key_source, const char *key_logeventid,
 			int rate, zbx_process_value_func_t process_value_cb, ZBX_ACTIVE_METRIC *metric,
 			zbx_uint64_t *lastlogsize_sent, char **error);
-int			process_eventslog6(zbx_vector_ptr_t *addrs, const char *eventlog_name, EVT_HANDLE *render_context,
-			EVT_HANDLE *query, zbx_uint64_t lastlogsize, zbx_uint64_t FirstID, zbx_uint64_t LastID,
+int			process_eventslog6(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
+			const char *eventlog_name, EVT_HANDLE *render_context, EVT_HANDLE *query,
+			zbx_uint64_t lastlogsize, zbx_uint64_t FirstID, zbx_uint64_t LastID,
 			zbx_vector_ptr_t *regexps, const char *pattern, const char *key_severity, const char *key_source,
 			const char *key_logeventid, int rate, zbx_process_value_func_t process_value_cb,
 			ZBX_ACTIVE_METRIC *metric, zbx_uint64_t *lastlogsize_sent, char **error);
@@ -212,4 +212,3 @@ BOOL WINAPI		EvtFormatMessage(EVT_HANDLE PublisherMetadata, EVT_HANDLE Event, DW
 			PDWORD BufferUsed);
 
 #endif	/* ZABBIX_EVENTLOG_H */
-

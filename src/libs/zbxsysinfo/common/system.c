@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,8 @@
 **/
 
 #include "common.h"
+#include "zbxsysinfo_common.h"
+
 #include "system.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
@@ -26,8 +28,6 @@
 #endif
 
 /******************************************************************************
- *                                                                            *
- * Function: SYSTEM_LOCALTIME                                                 *
  *                                                                            *
  * Comments: Thread-safe                                                      *
  *                                                                            *

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -62,20 +62,8 @@ include __DIR__.'/itemtest.js.php';
 		var old_value,
 			value_type = $('#value_type');
 
-		$('#type').change(function() {
-				typeChangeHandler();
-
-				var type = $(this).val();
-				old_value = value_type.val();
-
-				if (type == <?= ITEM_TYPE_CALCULATED ?>) {
-					if (!(old_value == <?= ITEM_VALUE_TYPE_UINT64 ?> || old_value == <?= ITEM_VALUE_TYPE_FLOAT ?>)) {
-						value_type.val(<?= ITEM_VALUE_TYPE_UINT64 ?>);
-					}
-
-					value_type.trigger('change');
-				}
-			})
+		$('#type')
+			.change(typeChangeHandler)
 			.trigger('change');
 
 		// Whenever non-numeric type is changed back to numeric type, set the default value in "trends" field.

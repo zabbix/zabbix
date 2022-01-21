@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -193,9 +193,11 @@ require_once dirname(__FILE__).'/reports/testPageScheduledReport.php';
 require_once dirname(__FILE__).'/reports/testScheduledReportPermissions.php';
 require_once dirname(__FILE__).'/testSID.php';
 
+use PHPUnit\Framework\TestSuite;
+
 class SeleniumTests {
 	public static function suite() {
-		$suite = new PHPUnit_Framework_TestSuite('selenium');
+		$suite = new TestSuite('selenium');
 
 		$suite->addTestSuite('testGeneric');
 		$suite->addTestSuite('testGraphAxis');

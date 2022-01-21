@@ -20,12 +20,8 @@ Released into the Public Domain by Ulrich Drepper <drepper@redhat.com>.  */
 #endif
 
 #if !(defined(_WINDOWS) || defined(__MINGW32__))
-	#include <errno.h>
-	#include <limits.h>
 	#include <stdio.h>
 	#include <string.h>
-	#include <sys/param.h>
-	#include <sys/types.h>
 #endif
 
 #if __BYTE_ORDER == __LITTLE_ENDIAN
@@ -35,11 +31,9 @@ Released into the Public Domain by Ulrich Drepper <drepper@redhat.com>.  */
 # define SWAP(n) (n)
 #endif
 
-
 /* This array contains the bytes used to pad the buffer to the next
 64-byte boundary.  (FIPS 180-2:5.1.1)  */
 static const unsigned char fillbuf[64] = { 0x80, 0 /* , 0, 0, ...  */ };
-
 
 /* Constants for SHA256 from FIPS 180-2:4.2.2.  */
 static const uint32_t K[64] =
@@ -61,7 +55,6 @@ static const uint32_t K[64] =
 	0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208,
 	0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
 };
-
 
 /* Process LEN bytes of BUFFER, accumulating context into CTX.
 It is assumed that LEN % 64 == 0.  */
@@ -165,7 +158,6 @@ cyclic rotation.  Hope the C compiler is smart enough.  */
 	ctx->H[7] = h;
 }
 
-
 /* Initialize structure containing state of computation.
 (FIPS 180-2:5.3.2)  */
 static void
@@ -183,7 +175,6 @@ sha256_init_ctx (sha256_ctx *ctx)
 	ctx->total[0] = ctx->total[1] = 0;
 	ctx->buflen = 0;
 }
-
 
 /* Process the remaining bytes in the internal buffer and the usual
 prolog according to the standard and write the result to RESBUF.
@@ -220,7 +211,6 @@ sha256_finish_ctx (sha256_ctx *ctx, void *resbuf)
 
 	return resbuf;
 }
-
 
 static void
 sha256_process_bytes (const void *buffer, size_t len, sha256_ctx *ctx)
@@ -315,3 +305,24 @@ void	zbx_sha256_hash(const char *in, char *out)
 	sha256_finish_ctx (&ctx, out);
 }
 
+/* helper functions for sha256 hmac*/
+
+typedef struct
+{
+	uint8_t bytes[ZBX_SHA256_DIGEST_SIZE];
+} SHA256_HASH;
+
+void*	zbx_sha256_hash_for_hmac(const void* data, const size_t datalen, void* out, const size_t outlen)
+{
+	size_t		sz;
+	sha256_ctx	ctx;
+	SHA256_HASH	hash;
+
+	sha256_init_ctx(&ctx);
+	sha256_process_bytes(data, datalen, &ctx);
+	sha256_finish_ctx(&ctx, &hash);
+
+	sz = (outlen > ZBX_SHA256_DIGEST_SIZE) ? ZBX_SHA256_DIGEST_SIZE : outlen;
+
+	return memcpy(out, hash.bytes, sz);
+}

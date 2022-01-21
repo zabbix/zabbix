@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@
 #include "common.h"
 #include "db.h"
 #include "dbupgrade.h"
-#include "log.h"
 
 extern unsigned char	program_type;
 
@@ -145,7 +144,6 @@ static int	DBpatch_4010013(void)
 
 	return SUCCEED;
 }
-
 
 static int	DBpatch_4010014(void)
 {

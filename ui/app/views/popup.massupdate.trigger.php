@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@
 
 // Visibility box javascript is already added. It should not be added in popup response.
 define('CVISIBILITYBOX_JAVASCRIPT_INSERTED', 1);
-define('IS_TEXTAREA_MAXLENGTH_JS_INSERTED', 1);
 
 // Create form.
 $form = (new CForm())
@@ -100,8 +99,8 @@ $dependencies_table = (new CTable())
 $bttn_prototype = '';
 if ($data['prototype']) {
 	$bttn_prototype = (new CButton('add_dep_trigger_prototype', _('Add prototype')))
-	->onClick('return PopUp("popup.generic",'.
-		json_encode([
+	->onClick(
+		'return PopUp("popup.generic", '.json_encode([
 			'srctbl' => 'trigger_prototypes',
 			'srcfld1' => 'triggerid',
 			'dstfrm' => 'massupdate',
@@ -111,7 +110,7 @@ if ($data['prototype']) {
 			'multiselect' => '1',
 			'objname' => 'triggers',
 			'parent_discoveryid' => $data['parent_discoveryid']
-		]).', null, this);'
+		]).', {dialogue_class: "modal-popup-generic"});'
 	)
 	->addClass(ZBX_STYLE_BTN_LINK);
 }
@@ -123,8 +122,8 @@ $dependencies_form_list->addRow(
 		$dependencies_table,
 		new CHorList([
 			(new CButton('btn1', _('Add')))
-				->onClick('return PopUp("popup.generic",'.
-					json_encode([
+				->onClick(
+					'return PopUp("popup.generic", '.json_encode([
 						'srctbl' => 'triggers',
 						'srcfld1' => 'triggerid',
 						'dstfrm' => 'massupdate',
@@ -136,7 +135,7 @@ $dependencies_form_list->addRow(
 						'with_triggers' => '1',
 						'normal_only' => '1',
 						'noempty' => '1'
-					]).', null, this);'
+					]).', {dialogue_class: "modal-popup-generic"});'
 				)
 				->addClass(ZBX_STYLE_BTN_LINK),
 			$bttn_prototype

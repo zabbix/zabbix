@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,8 +18,8 @@
 **/
 
 #include "zbxalgo.h"
-#include "zbxjson.h"
 #include "audit.h"
+
 #include "audit_ha.h"
 
 void	zbx_audit_ha_create_entry(int audit_action, const char *nodeid, const char *name)
@@ -75,4 +75,3 @@ void	zbx_audit_ha_update_field_int(const char *nodeid, const char *key, int old_
 	entry = zbx_audit_get_entry(0, nodeid, AUDIT_HA_NODE_ID);
 	zbx_audit_entry_append_int(entry, AUDIT_ACTION_UPDATE, key, old_value, new_value);
 }
-

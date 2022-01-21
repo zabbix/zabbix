@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,13 +19,11 @@
 
 #include "common.h"
 #include "sysinfo.h"
-
 #include "comms.h"
 #include "log.h"
-#include "cfg.h"
+#include "zbxalgo.h"
 
 #include "dns.h"
-#include "zbxalgo.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #	include <windns.h>
@@ -612,11 +610,11 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 
 	if (1 == short_answer)
 	{
-		SET_UI64_RESULT(result, NOERROR != hp->rcode || 0 == ntohs(hp->ancount) || -1 == res ? 0 : 1);
+		SET_UI64_RESULT(result, -1 == res || NOERROR != hp->rcode || 0 == ntohs(hp->ancount) ? 0 : 1);
 		return SYSINFO_RET_OK;
 	}
 
-	if (NOERROR != hp->rcode || 0 == ntohs(hp->ancount) || -1 == res)
+	if (-1 == res || NOERROR != hp->rcode || 0 == ntohs(hp->ancount))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot perform DNS query."));
 		return SYSINFO_RET_FAIL;
@@ -728,7 +726,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 
 				GETLONG(value, msg_ptr);	/* serial number */
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %u", (zbx_uint32_t)value);
 
 				GETLONG(value, msg_ptr);	/* refresh time */
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
@@ -902,12 +900,40 @@ clean_dns:
 #endif	/* defined(HAVE_RES_QUERY) || defined(_WINDOWS) || defined(__MINGW32__)*/
 }
 
-int	NET_DNS(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	dns_query_short(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return dns_query(request, result, 1);
 }
 
-int	NET_DNS_RECORD(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	dns_query_long(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return dns_query(request, result, 0);
+}
+
+static int	dns_query_is_tcp(AGENT_REQUEST *request)
+{
+	char	*param;
+
+	if (NULL != (param = get_rparam(request, 5)) && 0 == strcmp(param, "tcp"))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+int	NET_DNS(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+	if (SUCCEED == dns_query_is_tcp(request))
+		return zbx_execute_threaded_metric(dns_query_short, request, result);
+#endif
+	return dns_query_short(request, result);
+}
+
+int	NET_DNS_RECORD(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+	if (SUCCEED == dns_query_is_tcp(request))
+		return zbx_execute_threaded_metric(dns_query_long, request, result);
+#endif
+	return dns_query_long(request, result);
 }

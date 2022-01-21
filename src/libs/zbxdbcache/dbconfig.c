@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,9 +21,7 @@
 
 #include "common.h"
 #include "log.h"
-#include "threads.h"
 #include "dbcache.h"
-#include "ipc.h"
 #include "mutexs.h"
 #include "memalloc.h"
 #include "zbxserver.h"
@@ -37,13 +35,14 @@
 #include "zbxeval.h"
 
 #define ZBX_DBCONFIG_IMPL
-#include "dbconfig.h"
 #include "dbsync.h"
 #include "proxy.h"
 #include "actions.h"
 #include "zbxtrends.h"
 #include "zbxvault.h"
 #include "zbxserialize.h"
+
+#include "dbconfig.h"
 
 int	sync_in_progress = 0;
 
@@ -78,8 +77,6 @@ int	sync_in_progress = 0;
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_value_validator_func_t                                       *
- *                                                                            *
  * Purpose: validate macro value when expanding user macros                   *
  *                                                                            *
  * Parameters: macro   - [IN] the user macro                                  *
@@ -109,8 +106,6 @@ extern char		*CONFIG_VAULTDBPATH;
 extern char		*CONFIG_VAULTTOKEN;
 /******************************************************************************
  *                                                                            *
- * Function: dc_strdup                                                        *
- *                                                                            *
  * Purpose: copies string into configuration cache shared memory              *
  *                                                                            *
  ******************************************************************************/
@@ -126,8 +121,6 @@ static char	*dc_strdup(const char *source)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: is_item_processed_by_server                                      *
  *                                                                            *
  * Parameters: type - [IN] item type [ITEM_TYPE_* flag]                       *
  *             key  - [IN] item key                                           *
@@ -218,7 +211,6 @@ static unsigned char	poller_by_item(unsigned char type, const char *key)
 		case ITEM_TYPE_ZABBIX:
 		case ITEM_TYPE_SNMP:
 		case ITEM_TYPE_EXTERNAL:
-		case ITEM_TYPE_DB_MONITOR:
 		case ITEM_TYPE_SSH:
 		case ITEM_TYPE_TELNET:
 		case ITEM_TYPE_HTTPAGENT:
@@ -227,6 +219,11 @@ static unsigned char	poller_by_item(unsigned char type, const char *key)
 				break;
 
 			return ZBX_POLLER_TYPE_NORMAL;
+		case ITEM_TYPE_DB_MONITOR:
+			if (0 == CONFIG_ODBCPOLLER_FORKS)
+				break;
+
+			return ZBX_POLLER_TYPE_ODBC;
 		case ITEM_TYPE_CALCULATED:
 		case ITEM_TYPE_INTERNAL:
 			if (0 == CONFIG_HISTORYPOLLER_FORKS)
@@ -249,8 +246,6 @@ static unsigned char	poller_by_item(unsigned char type, const char *key)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_is_counted_in_item_queue                                     *
  *                                                                            *
  * Purpose: determine whether the given item type is counted in item queue    *
  *                                                                            *
@@ -281,8 +276,6 @@ int	zbx_is_counted_in_item_queue(unsigned char type, const char *key)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: get_item_nextcheck_seed                                          *
  *                                                                            *
  * Purpose: get the seed value to be used for item nextcheck calculations     *
  *                                                                            *
@@ -438,8 +431,6 @@ static void	DCincrease_disable_until(ZBX_DC_INTERFACE *interface, int now)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCfind_id                                                        *
- *                                                                            *
  * Purpose: Find an element in a hashset by its 'id' or create the element if *
  *          it does not exist                                                 *
  *                                                                            *
@@ -499,8 +490,6 @@ static ZBX_DC_HOST	*DCfind_host(const char *host)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: DCfind_proxy                                                     *
  *                                                                            *
  * Purpose: Find a record with proxy details in configuration cache using the *
  *          proxy name                                                        *
@@ -648,8 +637,6 @@ static void	DCupdate_proxy_queue(ZBX_DC_PROXY *proxy)
 
 /******************************************************************************
  *                                                                            *
- * Function: config_gmacro_add_index                                          *
- *                                                                            *
  * Purpose: adds global macro index                                           *
  *                                                                            *
  * Parameters: gmacro_index - [IN/OUT] a global macro index hashset           *
@@ -679,8 +666,6 @@ static ZBX_DC_GMACRO_M	*config_gmacro_add_index(zbx_hashset_t *gmacro_index, ZBX
 
 /******************************************************************************
  *                                                                            *
- * Function: config_gmacro_remove_index                                       *
- *                                                                            *
  * Purpose: removes global macro index                                        *
  *                                                                            *
  * Parameters: gmacro_index - [IN/OUT] a global macro index hashset           *
@@ -703,8 +688,6 @@ static ZBX_DC_GMACRO_M	*config_gmacro_remove_index(zbx_hashset_t *gmacro_index, 
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: config_gmacro_context_compare                                    *
  *                                                                            *
  * Purpose: comparison function to sort global macro vector by context        *
  *          operator, value and macro name                                    *
@@ -729,8 +712,6 @@ static int	config_gmacro_context_compare(const void *d1, const void *d2)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: config_hmacro_add_index                                          *
  *                                                                            *
  * Purpose: adds host macro index                                             *
  *                                                                            *
@@ -760,8 +741,6 @@ static ZBX_DC_HMACRO_HM	*config_hmacro_add_index(zbx_hashset_t *hmacro_index, ZB
 
 /******************************************************************************
  *                                                                            *
- * Function: config_hmacro_remove_index                                       *
- *                                                                            *
  * Purpose: removes host macro index                                          *
  *                                                                            *
  * Parameters: hmacro_index - [IN/OUT] a host macro index hashset             *
@@ -785,8 +764,6 @@ static ZBX_DC_HMACRO_HM	*config_hmacro_remove_index(zbx_hashset_t *hmacro_index,
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: config_hmacro_context_compare                                    *
  *                                                                            *
  * Purpose: comparison function to sort host macro vector by context          *
  *          operator, value and macro name                                    *
@@ -905,8 +882,6 @@ clean:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: set_hk_opt                                                       *
  *                                                                            *
  * Purpose: sets and validates global housekeeping option                     *
  *                                                                            *
@@ -2136,13 +2111,13 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static int	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
+void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 {
 	zbx_dc_kvs_path_t	*dc_kvs_path;
 	zbx_dc_kv_t		*dc_kv;
 	zbx_hashset_t		kvs;
 	zbx_hashset_iter_t	iter;
-	int			i, j, ret;
+	int			i, j;
 	zbx_vector_ptr_pair_t	diff;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -2157,14 +2132,8 @@ static int	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 
 		dc_kvs_path = (zbx_dc_kvs_path_t *)config->kvs_paths.values[i];
 
-		if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		if (NULL != jp_kvs_paths)
 		{
-			if (NULL == jp_kvs_paths)
-			{
-				ret = FAIL;
-				goto fail;
-			}
-
 			if (FAIL == zbx_vault_json_kvs_get(dc_kvs_path->path, jp_kvs_paths, &kvs, &error))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s",
@@ -2228,18 +2197,13 @@ static int	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 		zbx_vector_ptr_pair_clear(&diff);
 		zbx_hashset_clear(&kvs);
 	}
-	ret = SUCCEED;
-fail:
+
 	zbx_vector_ptr_pair_destroy(&diff);
 	zbx_hashset_destroy(&kvs);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-
-	return ret;
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: substitute_host_interface_macros                                 *
  *                                                                            *
  * Purpose: trying to resolve the macros in host interface                    *
  *                                                                            *
@@ -2281,11 +2245,9 @@ static void	substitute_host_interface_macros(ZBX_DC_INTERFACE *interface)
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_interface_snmpaddrs_remove                                    *
- *                                                                            *
  * Purpose: remove interface from SNMP address -> interfaceid index           *
  *                                                                            *
- * Parameters: interface - [IN] the interface                                 *
+ * Parameters: interface - [IN]                                               *
  *                                                                            *
  ******************************************************************************/
 static void	dc_interface_snmpaddrs_remove(ZBX_DC_INTERFACE *interface)
@@ -2319,13 +2281,11 @@ static void	dc_interface_snmpaddrs_remove(ZBX_DC_INTERFACE *interface)
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_interface_snmp_set                                            *
- *                                                                            *
  * Purpose: setup SNMP attributes for interface with interfaceid index        *
  *                                                                            *
- * Parameters: interface - [IN] the interface                                 *
- *             row       - [IN] the row data from DB                          *
- *
+ * Parameters: interfaceid  - [IN]                                            *
+ *             row          - [IN] the row data from DB                       *
+ *             bulk_changed - [IN]                                            *
  *                                                                            *
  ******************************************************************************/
 static ZBX_DC_SNMPINTERFACE	*dc_interface_snmp_set(zbx_uint64_t interfaceid, const char **row,
@@ -2365,11 +2325,9 @@ static ZBX_DC_SNMPINTERFACE	*dc_interface_snmp_set(zbx_uint64_t interfaceid, con
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_interface_snmp_remove                                    *
- *                                                                            *
  * Purpose: remove interface from SNMP address -> interfaceid index           *
  *                                                                            *
- * Parameters: interface - [IN] the interface                                 *
+ * Parameters: interfaceid - [IN]                                             *
  *                                                                            *
  ******************************************************************************/
 static void	dc_interface_snmp_remove(zbx_uint64_t interfaceid)
@@ -2637,8 +2595,6 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_interface_snmpitems_remove                                    *
- *                                                                            *
  * Purpose: remove item from interfaceid -> itemid index                      *
  *                                                                            *
  * Parameters: interface - [IN] the item                                      *
@@ -2669,8 +2625,6 @@ static void	dc_interface_snmpitems_remove(ZBX_DC_ITEM *item)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: dc_masteritem_remove_depitem                                     *
  *                                                                            *
  * Purpose: remove itemid from master item dependent itemid vector            *
  *                                                                            *
@@ -2704,8 +2658,6 @@ static void	dc_masteritem_remove_depitem(zbx_uint64_t master_itemid, zbx_uint64_
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: dc_interface_update_agent_stats                                  *
  *                                                                            *
  * Purpose: update number of items per agent statistics                       *
  *                                                                            *
@@ -3796,8 +3748,6 @@ static void	DCconfig_sort_triggers_topologically(void);
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_trigger_deplist_release                                       *
- *                                                                            *
  * Purpose: releases trigger dependency list, removing it if necessary        *
  *                                                                            *
  ******************************************************************************/
@@ -3815,8 +3765,6 @@ static int	dc_trigger_deplist_release(ZBX_DC_TRIGGER_DEPLIST *trigdep)
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_trigger_deplist_init                                          *
- *                                                                            *
  * Purpose: initializes trigger dependency list                               *
  *                                                                            *
  ******************************************************************************/
@@ -3829,8 +3777,6 @@ static void	dc_trigger_deplist_init(ZBX_DC_TRIGGER_DEPLIST *trigdep, ZBX_DC_TRIG
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: dc_trigger_deplist_reset                                         *
  *                                                                            *
  * Purpose: resets trigger dependency list to release memory allocated by     *
  *          dependencies vector                                               *
@@ -4026,8 +3972,6 @@ static int	dc_function_calculate_nextcheck(const zbx_trigger_timer_t *timer, tim
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_trigger_function_timer_create                                 *
- *                                                                            *
  * Purpose: create trigger timer based on the trend function                  *
  *                                                                            *
  * Return value:  Created timer or NULL in the case of error.                 *
@@ -4079,8 +4023,6 @@ static zbx_trigger_timer_t	*dc_trigger_function_timer_create(ZBX_DC_FUNCTION *fu
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_trigger_timer_create                                          *
- *                                                                            *
  * Purpose: create trigger timer based on the specified trigger               *
  *                                                                            *
  * Return value:  Created timer or NULL in the case of error.                 *
@@ -4106,8 +4048,6 @@ static zbx_trigger_timer_t	*dc_trigger_timer_create(ZBX_DC_TRIGGER *trigger)
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_trigger_timer_free                                            *
- *                                                                            *
  * Purpose: free trigger timer                                                *
  *                                                                            *
  ******************************************************************************/
@@ -4120,8 +4060,6 @@ static void	dc_trigger_timer_free(zbx_trigger_timer_t *timer)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: dc_schedule_trigger_timer                                        *
  *                                                                            *
  * Purpose: schedule trigger timer to be executed at the specified time       *
  *                                                                            *
@@ -4149,8 +4087,6 @@ static void	dc_schedule_trigger_timer(zbx_trigger_timer_t *timer, const zbx_time
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: dc_schedule_new_trigger_timers                                   *
  *                                                                            *
  * Purpose: set timer schedule and evaluation times based on functions and    *
  *          old trend function queue                                          *
@@ -4329,8 +4265,6 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_regexp_remove_expression                                      *
- *                                                                            *
  * Purpose: removes expression from regexp                                    *
  *                                                                            *
  ******************************************************************************/
@@ -4356,8 +4290,6 @@ static ZBX_DC_REGEXP	*dc_regexp_remove_expression(const char *regexp_name, zbx_u
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: DCsync_expressions                                               *
  *                                                                            *
  * Purpose: Updates expressions configuration cache                           *
  *                                                                            *
@@ -4450,8 +4382,6 @@ static void	DCsync_expressions(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCsync_actions                                                   *
- *                                                                            *
  * Purpose: Updates actions configuration cache                               *
  *                                                                            *
  * Parameters: sync - [IN] the db synchronization data                        *
@@ -4522,8 +4452,6 @@ static void	DCsync_actions(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCsync_action_ops                                                *
- *                                                                            *
  * Purpose: Updates action operation class flags in configuration cache       *
  *                                                                            *
  * Parameters: sync - [IN] the db synchronization data                        *
@@ -4558,8 +4486,6 @@ static void	DCsync_action_ops(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_compare_action_conditions_by_type                             *
- *                                                                            *
  * Purpose: compare two action conditions by their type                       *
  *                                                                            *
  * Comments: This function is used to sort action conditions by type.         *
@@ -4576,8 +4502,6 @@ static int	dc_compare_action_conditions_by_type(const void *d1, const void *d2)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: DCsync_action_conditions                                         *
  *                                                                            *
  * Purpose: Updates action conditions configuration cache                     *
  *                                                                            *
@@ -4682,8 +4606,6 @@ static void	DCsync_action_conditions(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCsync_correlations                                              *
- *                                                                            *
  * Purpose: Updates correlations configuration cache                          *
  *                                                                            *
  * Parameters: sync - [IN] the db synchronization data                        *
@@ -4752,14 +4674,10 @@ static void	DCsync_correlations(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_corr_condition_get_size                                       *
- *                                                                            *
  * Purpose: get the actual size of correlation condition data depending on    *
  *          its type                                                          *
  *                                                                            *
  * Parameters: type - [IN] the condition type                                 *
- *                                                                            *
- * Return value: the size                                                     *
  *                                                                            *
  ******************************************************************************/
 static size_t	dc_corr_condition_get_size(unsigned char type)
@@ -4785,8 +4703,6 @@ static size_t	dc_corr_condition_get_size(unsigned char type)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: dc_corr_condition_init_data                                      *
  *                                                                            *
  * Purpose: initializes correlation condition data from database row          *
  *                                                                            *
@@ -4835,8 +4751,6 @@ static void	dc_corr_condition_init_data(zbx_dc_corr_condition_t *condition, int 
 
 /******************************************************************************
  *                                                                            *
- * Function: corr_condition_free_data                                         *
- *                                                                            *
  * Purpose: frees correlation condition data                                  *
  *                                                                            *
  * Parameters: condition - [IN] the condition                                 *
@@ -4866,8 +4780,6 @@ static void	corr_condition_free_data(zbx_dc_corr_condition_t *condition)
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_compare_corr_conditions_by_type                               *
- *                                                                            *
  * Purpose: compare two correlation conditions by their type                  *
  *                                                                            *
  * Comments: This function is used to sort correlation conditions by type.    *
@@ -4884,8 +4796,6 @@ static int	dc_compare_corr_conditions_by_type(const void *d1, const void *d2)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: DCsync_corr_conditions                                           *
  *                                                                            *
  * Purpose: Updates correlation conditions configuration cache                *
  *                                                                            *
@@ -4994,8 +4904,6 @@ static void	DCsync_corr_conditions(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCsync_corr_operations                                           *
- *                                                                            *
  * Purpose: Updates correlation operations configuration cache                *
  *                                                                            *
  * Parameters: result - [IN] the result of correlation operations database    *
@@ -5078,8 +4986,6 @@ static int	dc_compare_hgroups(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCsync_hostgroups                                                *
- *                                                                            *
  * Purpose: Updates host groups configuration cache                           *
  *                                                                            *
  * Parameters: sync - [IN] the db synchronization data                        *
@@ -5145,8 +5051,6 @@ static void	DCsync_hostgroups(zbx_dbsync_t *sync)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: DCsync_trigger_tags                                              *
  *                                                                            *
  * Purpose: Updates trigger tags in configuration cache                       *
  *                                                                            *
@@ -5231,8 +5135,6 @@ static void	DCsync_trigger_tags(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCsync_item_tags                                                 *
- *                                                                            *
  * Purpose: Updates item tags in configuration cache                          *
  *                                                                            *
  * Parameters: sync - [IN] the db synchronization data                        *
@@ -5315,8 +5217,6 @@ static void	DCsync_item_tags(zbx_dbsync_t *sync)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: DCsync_host_tags                                                 *
  *                                                                            *
  * Purpose: Updates host tags in configuration cache                          *
  *                                                                            *
@@ -5414,8 +5314,6 @@ static void	DCsync_host_tags(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_compare_itemscript_param                                      *
- *                                                                            *
  * Purpose: compare two item script parameters                                *
  *                                                                            *
  ******************************************************************************/
@@ -5431,8 +5329,6 @@ static int	dc_compare_itemscript_param(const void *d1, const void *d2)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: dc_compare_item_preproc_by_step                                  *
  *                                                                            *
  * Purpose: compare two item preprocessing operations by step                 *
  *                                                                            *
@@ -5456,8 +5352,6 @@ static int	dc_compare_preprocops_by_step(const void *d1, const void *d2)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: DCsync_item_preproc                                              *
  *                                                                            *
  * Purpose: Updates item preprocessing steps in configuration cache           *
  *                                                                            *
@@ -5577,8 +5471,6 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, int timestamp)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCsync_itemscript_param                                          *
- *                                                                            *
  * Purpose: Updates item script parameters in configuration cache             *
  *                                                                            *
  * Parameters: sync - [IN] the db synchronization data                        *
@@ -5687,8 +5579,6 @@ static void	DCsync_itemscript_param(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCsync_hostgroup_hosts                                           *
- *                                                                            *
  * Purpose: Updates group hosts in configuration cache                        *
  *                                                                            *
  * Parameters: sync - [IN] the db synchronization data                        *
@@ -5751,8 +5641,6 @@ static void	DCsync_hostgroup_hosts(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_trigger_update_topology                                       *
- *                                                                            *
  * Purpose: updates trigger topology after trigger dependency changes         *
  *                                                                            *
  ******************************************************************************/
@@ -5780,8 +5668,6 @@ static int	zbx_default_ptr_pair_ptr_compare_func(const void *d1, const void *d2)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: dc_trigger_update_cache                                          *
  *                                                                            *
  * Purpose: updates trigger related cache data;                               *
  *              1) time triggers assigned to timer processes                  *
@@ -5867,8 +5753,6 @@ static void	dc_trigger_update_cache(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_hostgroups_update_cache                                       *
- *                                                                            *
  * Purpose: updates hostgroup name index and resets nested group lists        *
  *                                                                            *
  ******************************************************************************/
@@ -5891,8 +5775,6 @@ static void	dc_hostgroups_update_cache(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: dc_load_trigger_queue                                            *
  *                                                                            *
  * Purpose: load trigger queue from database                                  *
  *                                                                            *
@@ -5934,14 +5816,10 @@ static void	dc_load_trigger_queue(zbx_hashset_t *trend_functions)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCsync_configuration                                             *
- *                                                                            *
  * Purpose: Synchronize configuration data from database                      *
  *                                                                            *
- * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
- *                                                                            *
  ******************************************************************************/
-void	DCsync_configuration(unsigned char mode, const struct zbx_json_parse *jp_kvs_paths)
+void	DCsync_configuration(unsigned char mode)
 {
 	int		i, flags;
 	double		sec, csec, hsec, hisec, htsec, gmsec, hmsec, ifsec, isec, tsec, dsec, fsec, expr_sec, csec2,
@@ -5969,12 +5847,6 @@ void	DCsync_configuration(unsigned char mode, const struct zbx_json_parse *jp_kv
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	config->sync_start_ts = time(NULL);
-
-	if (ZBX_SYNC_SECRETS == mode)
-	{
-		DCsync_kvs_paths(NULL);
-		goto skip;
-	}
 
 	zbx_dbsync_init_env(config);
 
@@ -6084,13 +5956,15 @@ void	DCsync_configuration(unsigned char mode, const struct zbx_json_parse *jp_kv
 	sec = zbx_time();
 	DCsync_host_tags(&host_tag_sync);
 	host_tag_sec2 = zbx_time() - sec;
-	FINISH_SYNC;
 
-	if (FAIL == DCsync_kvs_paths(jp_kvs_paths))
+	/* postpone configuration sync until macro secrets are received from Zabbix server */
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER) && 0 != config->kvs_paths.values_num &&
+			ZBX_DBSYNC_INIT == mode)
 	{
-		START_SYNC;
 		goto out;
 	}
+
+	FINISH_SYNC;
 
 	/* sync host data to support host lookups when resolving macros during configuration sync */
 
@@ -6682,7 +6556,7 @@ out:
 		zbx_hashset_destroy(&trend_queue);
 
 	zbx_dbsync_free_env();
-skip:
+
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		DCdump_configuration();
 
@@ -7003,11 +6877,7 @@ static int	__config_data_session_compare(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Function: init_configuration_cache                                         *
- *                                                                            *
  * Purpose: Allocate shared memory for configuration cache                    *
- *                                                                            *
- * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  ******************************************************************************/
 int	init_configuration_cache(char **error)
@@ -7200,11 +7070,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: free_configuration_cache                                         *
- *                                                                            *
  * Purpose: Free memory allocated for configuration cache                     *
- *                                                                            *
- * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
  *                                                                            *
  ******************************************************************************/
 void	free_configuration_cache(void)
@@ -7225,8 +7091,6 @@ void	free_configuration_cache(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: in_maintenance_without_data_collection                           *
  *                                                                            *
  * Parameters: maintenance_status - [IN] maintenance status                   *
  *                                       HOST_MAINTENANCE_STATUS_* flag       *
@@ -7321,16 +7185,12 @@ static void	DCget_host(DC_HOST *dst_host, const ZBX_DC_HOST *src_host, unsigned 
 
 /******************************************************************************
  *                                                                            *
- * Function: DCget_host_by_hostid                                             *
- *                                                                            *
  * Purpose: Locate host in configuration cache                                *
  *                                                                            *
  * Parameters: host - [OUT] pointer to DC_HOST structure                      *
  *             hostid - [IN] host ID from database                            *
  *                                                                            *
  * Return value: SUCCEED if record located and FAIL otherwise                 *
- *                                                                            *
- * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  ******************************************************************************/
 int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid)
@@ -7352,8 +7212,6 @@ int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: DCcheck_proxy_permissions                                        *
  *                                                                            *
  * Purpose:                                                                   *
  *     Check access rights for an active proxy and get the proxy ID           *
@@ -7482,8 +7340,6 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
- * Function: DCget_psk_by_identity                                            *
- *                                                                            *
  * Purpose:                                                                   *
  *     Find PSK with the specified identity in configuration cache            *
  *                                                                            *
@@ -7559,8 +7415,6 @@ size_t	DCget_psk_by_identity(const unsigned char *psk_identity, unsigned char *p
 #endif
 
 /******************************************************************************
- *                                                                            *
- * Function: DCget_autoregistration_psk                                       *
  *                                                                            *
  * Purpose:                                                                   *
  *     Copy autoregistration PSK identity and value from configuration cache  *
@@ -8008,6 +7862,7 @@ static void	DCget_function(DC_FUNCTION *dst_function, const ZBX_DC_FUNCTION *src
 	dst_function->functionid = src_function->functionid;
 	dst_function->triggerid = src_function->triggerid;
 	dst_function->itemid = src_function->itemid;
+	dst_function->type = src_function->type;
 
 	sz_function = strlen(src_function->function) + 1;
 	sz_parameter = strlen(src_function->parameter) + 1;
@@ -8110,16 +7965,12 @@ static void	DCclean_trigger(DC_TRIGGER *trigger)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_get_items_by_keys                                       *
- *                                                                            *
  * Purpose: locate item in configuration cache by host and key                *
  *                                                                            *
  * Parameters: items    - [OUT] pointer to array of DC_ITEM structures        *
  *             keys     - [IN] list of item keys with host names              *
  *             errcodes - [OUT] SUCCEED if record located and FAIL otherwise  *
  *             num      - [IN] number of elements in items, keys, errcodes    *
- *                                                                            *
- * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  ******************************************************************************/
 void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_host_key_t *keys, int *errcodes, size_t num)
@@ -8169,16 +8020,12 @@ int	DCconfig_get_hostid_by_name(const char *host, zbx_uint64_t *hostid)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_get_items_by_itemids                                    *
- *                                                                            *
  * Purpose: Get item with specified ID                                        *
  *                                                                            *
  * Parameters: items    - [OUT] pointer to DC_ITEM structures                 *
  *             itemids  - [IN] array of item IDs                              *
  *             errcodes - [OUT] SUCCEED if item found, otherwise FAIL         *
  *             num      - [IN] number of elements                             *
- *                                                                            *
- * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  ******************************************************************************/
 void	DCconfig_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, size_t num)
@@ -8262,8 +8109,6 @@ void	DCconfig_get_items_by_itemids_partial(DC_ITEM *items, const zbx_uint64_t *i
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_preproc_item_init                                             *
- *                                                                            *
  * Purpose: initialize new preprocessor item from configuration cache         *
  *                                                                            *
  * Parameters: item   - [OUT] the item to initialize                          *
@@ -8306,8 +8151,6 @@ static int	dc_preproc_item_init(zbx_preproc_item_t *item, zbx_uint64_t itemid)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: DCconfig_get_preprocessable_items                                *
  *                                                                            *
  * Purpose: get preprocessable items:                                         *
  *              * items with preprocessing steps                              *
@@ -8473,16 +8316,12 @@ void	DCconfig_get_triggers_by_triggerids(DC_TRIGGER *triggers, const zbx_uint64_
 
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_get_functions_by_functionids                            *
- *                                                                            *
  * Purpose: Get functions by IDs                                              *
  *                                                                            *
  * Parameters: functions   - [OUT] pointer to DC_FUNCTION structures          *
  *             functionids - [IN] array of function IDs                       *
  *             errcodes    - [OUT] SUCCEED if item found, otherwise FAIL      *
  *             num         - [IN] number of elements                          *
- *                                                                            *
- * Author: Aleksandrs Saveljevs, Alexander Vladishev                          *
  *                                                                            *
  ******************************************************************************/
 void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions, zbx_uint64_t *functionids, int *errcodes,
@@ -8508,13 +8347,6 @@ void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions, zbx_uint64_t 
 	UNLOCK_CACHE;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: DCconfig_clean_functions                                         *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
 void	DCconfig_clean_functions(DC_FUNCTION *functions, int *errcodes, size_t num)
 {
 	size_t	i;
@@ -8543,8 +8375,6 @@ void	DCconfig_clean_triggers(DC_TRIGGER *triggers, int *errcodes, size_t num)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_lock_triggers_by_history_items                          *
- *                                                                            *
  * Purpose: Lock triggers for specified items so that multiple processes do   *
  *          not process one trigger simultaneously. Otherwise, this leads to  *
  *          problems like multiple successive OK events or escalations being  *
@@ -8559,8 +8389,6 @@ void	DCconfig_clean_triggers(DC_TRIGGER *triggers, int *errcodes, size_t num)
  *             triggerids  - [OUT] list of trigger IDs that this function has *
  *                                 locked for processing; unlock those using  *
  *                                 DCconfig_unlock_triggers() function        *
- *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
  * Comments: This does not solve the problem fully (e.g., ZBX-7484). There is *
  *           a significant time period between the place where we lock the    *
@@ -8630,8 +8458,6 @@ next:;
 
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_lock_triggers_by_triggerids                             *
- *                                                                            *
  * Purpose: Lock triggers so that multiple processes do not process one       *
  *          trigger simultaneously.                                           *
  *                                                                            *
@@ -8664,13 +8490,6 @@ void	DCconfig_lock_triggers_by_triggerids(zbx_vector_uint64_t *triggerids_in, zb
 	UNLOCK_CACHE;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: DCconfig_unlock_triggers                                         *
- *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
- *                                                                            *
- ******************************************************************************/
 void	DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids)
 {
 	int		i;
@@ -8691,8 +8510,6 @@ void	DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: DCconfig_unlock_all_triggers                                     *
  *                                                                            *
  * Purpose: Unlocks all locked triggers before doing full history sync at     *
  *          program exit                                                      *
@@ -8715,11 +8532,7 @@ void	DCconfig_unlock_all_triggers(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_get_triggers_by_itemids                                 *
- *                                                                            *
  * Purpose: get enabled triggers for specified items                          *
- *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
  ******************************************************************************/
 void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
@@ -8774,8 +8587,6 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_find_active_time_function                               *
- *                                                                            *
  * Purpose: check if the expression contains time based functions             *
  *                                                                            *
  * Parameters: expression    - [IN] the original expression                   *
@@ -8825,8 +8636,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_dc_get_triggers_by_timers                                    *
  *                                                                            *
  * Purpose: gets timer triggers from cache                                    *
  *                                                                            *
@@ -8895,8 +8704,6 @@ void	zbx_dc_get_triggers_by_timers(zbx_hashset_t *trigger_info, zbx_vector_ptr_t
 
 /******************************************************************************
  *                                                                            *
- * Function: trigger_timer_validate                                           *
- *                                                                            *
  * Purpose: validate trigger timer                                            *
  *                                                                            *
  * Parameters: timer      - [IN] trigger timer                                *
@@ -8946,8 +8753,6 @@ static int	trigger_timer_validate(zbx_trigger_timer_t *timer, ZBX_DC_TRIGGER **d
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_dc_get_trigger_timers                                        *
  *                                                                            *
  * Purpose: gets timers from trigger queue                                    *
  *                                                                            *
@@ -9050,8 +8855,6 @@ void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_reschedule_trigger_timers                                     *
- *                                                                            *
  * Purpose: reschedule trigger timers                                         *
  *                                                                            *
  * Comments: Triggers are unlocked by DCconfig_unlock_triggers()              *
@@ -9099,8 +8902,6 @@ static void	dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_reschedule_trigger_timers                                 *
- *                                                                            *
  * Purpose: reschedule trigger timers while locking configuration cache       *
  *                                                                            *
  * Comments: Triggers are unlocked by DCconfig_unlock_triggers()              *
@@ -9129,8 +8930,6 @@ void	zbx_dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_dc_get_timer_queue                                           *
  *                                                                            *
  * Purpose: clears timer trigger queue                                        *
  *                                                                            *
@@ -9164,11 +8963,6 @@ void	zbx_dc_clear_timer_queue(zbx_vector_ptr_t *timers)
 	UNLOCK_CACHE;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: zbx_dc_free_timers                                               *
- *                                                                            *
- ******************************************************************************/
 void	zbx_dc_free_timers(zbx_vector_ptr_t *timers)
 {
 	int	i;
@@ -9279,8 +9073,6 @@ static int	dc_get_interface_by_type(DC_INTERFACE *interface, zbx_uint64_t hostid
 
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_get_interface_by_type                                   *
- *                                                                            *
  * Purpose: Locate main interface of specified type in configuration cache    *
  *                                                                            *
  * Parameters: interface - [OUT] pointer to DC_INTERFACE structure            *
@@ -9304,8 +9096,6 @@ int	DCconfig_get_interface_by_type(DC_INTERFACE *interface, zbx_uint64_t hostid,
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: DCconfig_get_interface                                           *
  *                                                                            *
  * Purpose: Locate interface in configuration cache                           *
  *                                                                            *
@@ -9362,11 +9152,9 @@ unlock:
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_config_get_queue_nextcheck                                    *
- *                                                                            *
  * Purpose: Get nextcheck for selected queue                                  *
  *                                                                            *
- * Parameters: queue - [IN] the queue                                         *
+ * Parameters: queue - [IN]                                                   *
  *                                                                            *
  * Return value: nextcheck or FAIL if no items for the specified queue        *
  *                                                                            *
@@ -9392,15 +9180,11 @@ static int	dc_config_get_queue_nextcheck(zbx_binary_heap_t *queue)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_get_poller_nextcheck                                    *
- *                                                                            *
  * Purpose: Get nextcheck for selected poller                                 *
  *                                                                            *
  * Parameters: poller_type - [IN] poller type (ZBX_POLLER_TYPE_...)           *
  *                                                                            *
  * Return value: nextcheck or FAIL if no items for selected poller            *
- *                                                                            *
- * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  ******************************************************************************/
 int	DCconfig_get_poller_nextcheck(unsigned char poller_type)
@@ -9440,8 +9224,6 @@ static void	dc_requeue_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, co
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_requeue_item_at                                               *
- *                                                                            *
  * Purpose: requeues items at the specified time                              *
  *                                                                            *
  * Parameters: dc_item   - [IN] the item to reque                             *
@@ -9467,16 +9249,12 @@ static void	dc_requeue_item_at(ZBX_DC_ITEM *dc_item, ZBX_DC_HOST *dc_host, int n
 
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_get_poller_items                                        *
- *                                                                            *
  * Purpose: Get array of items for selected poller                            *
  *                                                                            *
  * Parameters: poller_type - [IN] poller type (ZBX_POLLER_TYPE_...)           *
  *             items       - [OUT] array of items                             *
  *                                                                            *
  * Return value: number of items in items array                               *
- *                                                                            *
- * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  * Comments: Items leave the queue only through this function. Pollers must   *
  *           always return the items they have taken using DCrequeue_items()  *
@@ -9627,8 +9405,6 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM **items)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_get_ipmi_poller_items                                   *
- *                                                                            *
  * Purpose: Get array of items for IPMI poller                                *
  *                                                                            *
  * Parameters: now       - [IN] current timestamp                             *
@@ -9720,16 +9496,11 @@ int	DCconfig_get_ipmi_poller_items(int now, DC_ITEM *items, int items_num, int *
 	return num;
 }
 
-
 /******************************************************************************
- *                                                                            *
- * Function: DCconfig_get_snmp_interfaceids_by_addr                           *
  *                                                                            *
  * Purpose: get array of interface IDs for the specified address              *
  *                                                                            *
  * Return value: number of interface IDs returned                             *
- *                                                                            *
- * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
  ******************************************************************************/
 int	DCconfig_get_snmp_interfaceids_by_addr(const char *addr, zbx_uint64_t **interfaceids)
@@ -9763,13 +9534,9 @@ unlock:
 
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_get_snmp_items_by_interfaceid                           *
- *                                                                            *
  * Purpose: get array of snmp trap items for the specified interfaceid        *
  *                                                                            *
  * Return value: number of items returned                                     *
- *                                                                            *
- * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
  ******************************************************************************/
 size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM **items)
@@ -9905,8 +9672,6 @@ void	DCpoller_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks,
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_requeue_unreachable_items                                 *
- *                                                                            *
  * Purpose: requeue unreachable items                                         *
  *                                                                            *
  * Parameters: itemids     - [IN] the item id array                           *
@@ -9956,8 +9721,6 @@ void	zbx_dc_requeue_unreachable_items(zbx_uint64_t *itemids, size_t itemids_num)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCinterface_get_agent_availability                               *
- *                                                                            *
  * Purpose: get interface availability data for the specified agent           *
  *                                                                            *
  * Parameters: dc_interface - [IN] the interface                              *
@@ -9987,7 +9750,7 @@ static void	DCagent_set_availability(zbx_agent_availability_t *av,  unsigned cha
 		if (dst != src)					\
 			dst = src;				\
 		else						\
-			flags &= (~(mask));			\
+			flags &= (unsigned char)(~(mask));	\
 	}
 
 #define AGENT_AVAILABILITY_ASSIGN_STR(flags, mask, dst, src)	\
@@ -9996,7 +9759,7 @@ static void	DCagent_set_availability(zbx_agent_availability_t *av,  unsigned cha
 		if (0 != strcmp(dst, src))			\
 			DCstrpool_replace(1, &dst, src);	\
 		else						\
-			flags &= (~(mask));			\
+			flags &= (unsigned char)(~(mask));	\
 	}
 
 	AGENT_AVAILABILITY_ASSIGN(av->flags, ZBX_FLAGS_AGENT_STATUS_AVAILABLE, *available, av->available);
@@ -10009,8 +9772,6 @@ static void	DCagent_set_availability(zbx_agent_availability_t *av,  unsigned cha
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: DCinterface_set_agent_availability                               *
  *                                                                            *
  * Purpose: set interface availability data in configuration cache            *
  *                                                                            *
@@ -10043,8 +9804,6 @@ static int	DCinterface_set_agent_availability(ZBX_DC_INTERFACE *dc_interface, in
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: DCinterface_set_availability                                     *
  *                                                                            *
  * Purpose: set interface availability data in configuration cache            *
  *                                                                            *
@@ -10080,12 +9839,10 @@ static int	DCinterface_set_availability(ZBX_DC_INTERFACE *dc_interface, int now,
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_interface_availability_init                                  *
- *                                                                            *
  * Purpose: initializes interface availability data                           *
  *                                                                            *
  * Parameters: availability - [IN/OUT] interface availability data            *
- *             interfaceid  - [IN] interface id                               *
+ *             interfaceid  - [IN]                                            *
  *                                                                            *
  ******************************************************************************/
 void	zbx_interface_availability_init(zbx_interface_availability_t *availability, zbx_uint64_t interfaceid)
@@ -10095,8 +9852,6 @@ void	zbx_interface_availability_init(zbx_interface_availability_t *availability,
 }
 
 /********************************************************************************
- *                                                                              *
- * Function: zbx_interface_availability_clean                                   *
  *                                                                              *
  * Purpose: releases resources allocated to store interface availability data   *
  *                                                                              *
@@ -10109,8 +9864,6 @@ void	zbx_interface_availability_clean(zbx_interface_availability_t *ia)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_interface_availability_free                                  *
  *                                                                            *
  * Purpose: frees interface availability data                                 *
  *                                                                            *
@@ -10125,8 +9878,6 @@ void	zbx_interface_availability_free(zbx_interface_availability_t *availability)
 
 ZBX_PTR_VECTOR_IMPL(availability_ptr, zbx_interface_availability_t *)
 /******************************************************************************
- *                                                                            *
- * Function: zbx_agent_availability_init                                      *
  *                                                                            *
  * Purpose: initializes agent availability with the specified data            *
  *                                                                            *
@@ -10148,8 +9899,6 @@ static void	zbx_agent_availability_init(zbx_agent_availability_t *agent, unsigne
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_interface_availability_is_set                                *
  *                                                                            *
  * Purpose: checks interface availability if agent availability field is set  *
  *                                                                            *
@@ -10207,8 +9956,6 @@ int	zbx_interface_availability_is_set(const zbx_interface_availability_t *ia)
  **************************************************************************************/
 
 /*******************************************************************************
- *                                                                             *
- * Function: DCinterface_activate                                              *
  *                                                                             *
  * Purpose: set interface as available based on the agent availability data    *
  *                                                                             *
@@ -10270,8 +10017,6 @@ out:
 }
 
 /************************************************************************************
- *                                                                                  *
- * Function: DCinterface_deactivate                                                 *
  *                                                                                  *
  * Purpose: attempt to set interface as unavailable based on agent availability     *
  *                                                                                  *
@@ -10372,8 +10117,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: DCset_interfaces_availability                                    *
  *                                                                            *
  * Purpose: update availability of interfaces in configuration cache and      *
  *          return the updated field flags                                    *
@@ -10494,14 +10237,10 @@ static int	DCconfig_check_trigger_dependencies_rec(const ZBX_DC_TRIGGER_DEPLIST 
 
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_check_trigger_dependencies                              *
- *                                                                            *
  * Purpose: check whether any of trigger dependencies have value PROBLEM      *
  *                                                                            *
  * Return value: SUCCEED - trigger can change its value                       *
  *               FAIL - otherwise                                             *
- *                                                                            *
- * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
  *                                                                            *
  ******************************************************************************/
 int	DCconfig_check_trigger_dependencies(zbx_uint64_t triggerid)
@@ -10569,11 +10308,7 @@ exit:
 
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_sort_triggers_topologically                             *
- *                                                                            *
  * Purpose: assign each trigger an index based on trigger dependency topology *
- *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
  ******************************************************************************/
 static void	DCconfig_sort_triggers_topologically(void)
@@ -10596,8 +10331,6 @@ static void	DCconfig_sort_triggers_topologically(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: DCconfig_triggers_apply_changes                                  *
  *                                                                            *
  * Purpose: apply trigger value,state,lastchange or error changes to          *
  *          configuration cache after committed to database                   *
@@ -10639,11 +10372,7 @@ void	DCconfig_triggers_apply_changes(zbx_vector_ptr_t *trigger_diff)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_get_stats                                               *
- *                                                                            *
  * Purpose: get statistics of the database cache                              *
- *                                                                            *
- * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  ******************************************************************************/
 void	*DCconfig_get_stats(int request)
@@ -10751,17 +10480,7 @@ int	DCconfig_get_last_sync_time(void)
 	return config->sync_ts;
 }
 
-void	DCconfig_wait_sync(void)
-{
-	struct timespec	ts = {0, 1e8};
-
-	while (0 == config->sync_ts)
-		nanosleep(&ts, NULL);
-}
-
 /******************************************************************************
- *                                                                            *
- * Function: DCconfig_get_proxypoller_hosts                                   *
  *                                                                            *
  * Purpose: Get array of proxies for proxy poller                             *
  *                                                                            *
@@ -10769,8 +10488,6 @@ void	DCconfig_wait_sync(void)
  *             max_hosts - [IN] elements in hosts array                       *
  *                                                                            *
  * Return value: number of proxies in hosts array                             *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: Proxies leave the queue only through this function. Pollers must *
  *           always return the proxies they have taken using DCrequeue_proxy. *
@@ -10816,13 +10533,9 @@ int	DCconfig_get_proxypoller_hosts(DC_PROXY *proxies, int max_hosts)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_get_proxypoller_nextcheck                               *
- *                                                                            *
  * Purpose: Get nextcheck for passive proxies                                 *
  *                                                                            *
  * Return value: nextcheck or FAIL if no passive proxies in queue             *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 int	DCconfig_get_proxypoller_nextcheck(void)
@@ -11108,8 +10821,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_expand_user_macros                                            *
- *                                                                            *
  * Purpose: expand user macros in the specified text value                    *
  *                                                                            *
  * Parameters: text         - [IN] the text value to expand                   *
@@ -11192,8 +10903,6 @@ int	dc_expand_user_macros_len(const char *text, size_t text_len, zbx_uint64_t *h
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_expand_user_macros_len                                    *
- *                                                                            *
  * Purpose: expand user macros in the specified text                          *
  *                                                                            *
  * Parameters: text         - [IN] the text value to expand                   *
@@ -11227,8 +10936,6 @@ int	zbx_dc_expand_user_macros_len(const char *text, size_t text_len, zbx_uint64_
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: dc_expand_user_macros                                            *
  *                                                                            *
  * Purpose: expand user macros in the specified text value                    *
  * WARNING - DO NOT USE FOR TRIGGERS, for triggers use the dedicated function *
@@ -11291,8 +10998,6 @@ char	*dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_expand_user_macros                                        *
- *                                                                            *
  * Purpose: expand user macros in the specified text value                    *
  *                                                                            *
  * Parameters: text           - [IN] the text value to expand                 *
@@ -11317,8 +11022,6 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t hostid)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCfree_item_queue                                                *
- *                                                                            *
  * Purpose: frees the item queue data vector created by DCget_item_queue()    *
  *                                                                            *
  * Parameters: queue - [IN] the item queue data vector to free                *
@@ -11333,8 +11036,6 @@ void	DCfree_item_queue(zbx_vector_ptr_t *queue)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: DCget_item_queue                                                 *
  *                                                                            *
  * Purpose: retrieves vector of delayed items                                 *
  *                                                                            *
@@ -11428,8 +11129,6 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_trigger_items_hosts_enabled                                   *
- *                                                                            *
  * Purpose: check that functionids in trigger (recovery) expression           *
  *                                                                            *
  * Parameters: expression - [IN] trigger (recovery) expression                *
@@ -11480,8 +11179,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: dc_status_update                                                 *
  *                                                                            *
  * Purpose: check when status information stored in configuration cache was   *
  *          updated last time and update it if necessary                      *
@@ -11690,8 +11387,6 @@ static void	dc_status_update(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCget_item_count                                                 *
- *                                                                            *
  * Purpose: return the number of active items                                 *
  *                                                                            *
  * Parameters: hostid - [IN] the host id, pass 0 to specify all hosts         *
@@ -11721,8 +11416,6 @@ zbx_uint64_t	DCget_item_count(zbx_uint64_t hostid)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: DCget_item_unsupported_count                                     *
  *                                                                            *
  * Purpose: return the number of active unsupported items                     *
  *                                                                            *
@@ -11754,8 +11447,6 @@ zbx_uint64_t	DCget_item_unsupported_count(zbx_uint64_t hostid)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCget_trigger_count                                              *
- *                                                                            *
  * Purpose: count active triggers                                             *
  *                                                                            *
  ******************************************************************************/
@@ -11775,8 +11466,6 @@ zbx_uint64_t	DCget_trigger_count(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: DCget_host_count                                                 *
  *                                                                            *
  * Purpose: count monitored and not monitored hosts                           *
  *                                                                            *
@@ -11798,8 +11487,6 @@ zbx_uint64_t	DCget_host_count(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCget_required_performance                                       *
- *                                                                            *
  * Return value: the required nvps number                                     *
  *                                                                            *
  ******************************************************************************/
@@ -11819,8 +11506,6 @@ double	DCget_required_performance(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: DCget_count_stats_all                                            *
  *                                                                            *
  * Purpose: retrieves all internal metrics of the configuration cache         *
  *                                                                            *
@@ -11909,8 +11594,6 @@ void	DCget_status(zbx_vector_ptr_t *hosts_monitored, zbx_vector_ptr_t *hosts_not
 
 /******************************************************************************
  *                                                                            *
- * Function: DCget_expressions_by_names                                       *
- *                                                                            *
  * Purpose: retrieves global expression data from cache                       *
  *                                                                            *
  * Parameters: expressions  - [OUT] a vector of expression data pointers      *
@@ -11961,8 +11644,6 @@ void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * cons
 
 /******************************************************************************
  *                                                                            *
- * Function: DCget_expression                                                 *
- *                                                                            *
  * Purpose: retrieves regular expression data from cache                      *
  *                                                                            *
  * Parameters: expressions  - [OUT] a vector of expression data pointers      *
@@ -11979,13 +11660,11 @@ void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCget_data_expected_from                                         *
- *                                                                            *
  * Purpose: Returns time since which data is expected for the given item. We  *
  *          would not mind not having data for the item before that time, but *
  *          since that time we expect data to be coming.                      *
  *                                                                            *
- * Parameters: itemid  - [IN] the item id                                     *
+ * Parameters: itemid  - [IN]                                                 *
  *             seconds - [OUT] the time data is expected as a Unix timestamp  *
  *                                                                            *
  ******************************************************************************/
@@ -12020,13 +11699,11 @@ unlock:
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_get_hostids_by_functionids                                    *
- *                                                                            *
  * Purpose: get host identifiers for the specified list of functions          *
  *                                                                            *
- * Parameters: functionids     - [IN] the function ids                        *
- *             functionids_num - [IN] the number of function ids              *
- *             hostids         - [OUT] the host ids                           *
+ * Parameters: functionids     - [IN]                                         *
+ *             functionids_num - [IN]                                         *
+ *             hostids         - [OUT]                                        *
  *                                                                            *
  * Comments: this function must be used only by configuration syncer          *
  *                                                                            *
@@ -12053,12 +11730,10 @@ void	dc_get_hostids_by_functionids(const zbx_uint64_t *functionids, int function
 
 /******************************************************************************
  *                                                                            *
- * Function: DCget_hostids_by_functionids                                     *
- *                                                                            *
  * Purpose: get function host ids grouped by an object (trigger) id           *
  *                                                                            *
- * Parameters: functionids - [IN] the function ids                            *
- *             hostids     - [OUT] the host ids                               *
+ * Parameters: functionids - [IN]                                             *
+ *             hostids     - [OUT]                                            *
  *                                                                            *
  ******************************************************************************/
 void	DCget_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_uint64_t *hostids)
@@ -12076,13 +11751,11 @@ void	DCget_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_u
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_get_hosts_by_functionids                                      *
- *                                                                            *
  * Purpose: get hosts for the specified list of functions                     *
  *                                                                            *
- * Parameters: functionids     - [IN] the function ids                        *
- *             functionids_num - [IN] the number of function ids              *
- *             hosts           - [OUT] hosts                                  *
+ * Parameters: functionids     - [IN]                                         *
+ *             functionids_num - [IN]                                         *
+ *             hosts           - [OUT]                                        *
  *                                                                            *
  ******************************************************************************/
 static void	dc_get_hosts_by_functionids(const zbx_uint64_t *functionids, int functionids_num, zbx_hashset_t *hosts)
@@ -12111,12 +11784,10 @@ static void	dc_get_hosts_by_functionids(const zbx_uint64_t *functionids, int fun
 
 /******************************************************************************
  *                                                                            *
- * Function: DCget_hosts_by_functionids                                       *
- *                                                                            *
  * Purpose: get hosts for the specified list of functions                     *
  *                                                                            *
- * Parameters: functionids - [IN] the function ids                            *
- *             hosts       - [OUT] hosts                                      *
+ * Parameters: functionids - [IN]                                             *
+ *             hosts       - [OUT]                                            *
  *                                                                            *
  ******************************************************************************/
 void	DCget_hosts_by_functionids(const zbx_vector_uint64_t *functionids, zbx_hashset_t *hosts)
@@ -12133,8 +11804,6 @@ void	DCget_hosts_by_functionids(const zbx_vector_uint64_t *functionids, zbx_hash
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: DCget_internal_action_count                                      *
  *                                                                            *
  * Purpose: get number of enabled internal actions                            *
  *                                                                            *
@@ -12155,8 +11824,6 @@ unsigned int	DCget_internal_action_count(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_config_get                                                   *
  *                                                                            *
  * Purpose: get global configuration data                                     *
  *                                                                            *
@@ -12218,8 +11885,6 @@ void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_config_get_hk_mode                                           *
- *                                                                            *
  * Purpose: get housekeeping mode for history and trends tables               *
  *                                                                            *
  * Parameters: history_mode - [OUT] history housekeeping mode, can be either  *
@@ -12237,8 +11902,6 @@ void	zbx_config_get_hk_mode(unsigned char *history_mode, unsigned char *trends_m
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_config_clean                                                 *
  *                                                                            *
  * Purpose: cleans global configuration data structure filled                 *
  *          by zbx_config_get() function                                      *
@@ -12266,8 +11929,6 @@ void	zbx_config_clean(zbx_config_t *cfg)
 }
 
 /*********************************************************************************
- *                                                                               *
- * Function: DCreset_interfaces_availability                                     *
  *                                                                               *
  * Purpose: resets interfaces availability for disabled hosts and hosts          *
  *          without enabled items for the corresponding interface                *
@@ -12364,8 +12025,6 @@ int	DCreset_interfaces_availability(zbx_vector_availability_ptr_t *interfaces)
 
 /*******************************************************************************
  *                                                                             *
- * Function: DCget_interfaces_availability                                     *
- *                                                                             *
  * Purpose: gets availability data for interfaces with availability data       *
  *          changed in period from last availability update to the specified   *
  *          timestamp                                                          *
@@ -12416,8 +12075,6 @@ int	DCget_interfaces_availability(zbx_vector_ptr_t *interfaces, int *ts)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCtouch_interfaces_availability                                  *
- *                                                                            *
  * Purpose: sets availability timestamp to current time for the specified     *
  *          interfaces                                                        *
  *                                                                            *
@@ -12447,8 +12104,6 @@ void	DCtouch_interfaces_availability(const zbx_vector_uint64_t *interfaceids)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: dc_action_copy_conditions                                        *
  *                                                                            *
  * Purpose: copies configuration cache action conditions to the specified     *
  *          vector                                                            *
@@ -12485,8 +12140,6 @@ static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vect
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_action_eval_create                                            *
- *                                                                            *
  * Purpose: creates action evaluation data from configuration cache action    *
  *                                                                            *
  * Parameters: dc_action - [IN] the source action                             *
@@ -12516,8 +12169,6 @@ static zbx_action_eval_t	*dc_action_eval_create(const zbx_dc_action_t *dc_action
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_dc_get_actions_eval                                          *
  *                                                                            *
  * Purpose: gets action evaluation data                                       *
  *                                                                            *
@@ -12556,8 +12207,6 @@ void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions, unsigned char opflags)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_set_availability_update_ts                                   *
- *                                                                            *
  * Purpose: sets timestamp of the last availability update                    *
  *                                                                            *
  * Parameter: ts - [IN] the last availability update timestamp                *
@@ -12573,8 +12222,6 @@ void	zbx_set_availability_diff_ts(int ts)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: corr_condition_clean                                             *
  *                                                                            *
  * Purpose: frees correlation condition                                       *
  *                                                                            *
@@ -12605,8 +12252,6 @@ static void	corr_condition_clean(zbx_corr_condition_t *condition)
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_correlation_free                                              *
- *                                                                            *
  * Purpose: frees global correlation rule                                     *
  *                                                                            *
  * Parameter: condition - [IN] the condition to free                          *
@@ -12625,8 +12270,6 @@ static void	dc_correlation_free(zbx_correlation_t *correlation)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: dc_corr_condition_copy                                           *
  *                                                                            *
  * Purpose: copies cached correlation condition to memory                     *
  *                                                                            *
@@ -12667,8 +12310,6 @@ static void	dc_corr_condition_copy(const zbx_dc_corr_condition_t *dc_condition, 
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_corr_operation_dup                                        *
- *                                                                            *
  * Purpose: clones cached correlation operation to memory                     *
  *                                                                            *
  * Parameter: operation - [IN] the operation to clone                         *
@@ -12687,8 +12328,6 @@ static zbx_corr_operation_t	*zbx_dc_corr_operation_dup(const zbx_dc_corr_operati
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: dc_correlation_formula_dup                                       *
  *                                                                            *
  * Purpose: clones cached correlation formula, generating it if necessary     *
  *                                                                            *
@@ -12810,8 +12449,6 @@ void	zbx_dc_correlation_rules_free(zbx_correlation_rules_t *rules)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_correlation_get_rules                                     *
- *                                                                            *
  * Purpose: gets correlation rules from configuration cache                   *
  *                                                                            *
  * Parameter: rules   - [IN/OUT] the correlation rules                        *
@@ -12877,8 +12514,6 @@ void	zbx_dc_correlation_rules_get(zbx_correlation_rules_t *rules)
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_hostgroup_cache_nested_groupids                               *
- *                                                                            *
  * Purpose: cache nested group identifiers                                    *
  *                                                                            *
  ******************************************************************************/
@@ -12912,8 +12547,6 @@ void	dc_hostgroup_cache_nested_groupids(zbx_dc_hostgroup_t *parent_group)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: dc_maintenance_precache_nested_groups                            *
  *                                                                            *
  * Purpose: pre-caches nested groups for groups used in running maintenances  *
  *                                                                            *
@@ -12957,8 +12590,6 @@ static void	dc_maintenance_precache_nested_groups(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_get_nested_hostgroupids                                       *
- *                                                                            *
  * Purpose: gets nested group ids for the specified host group                *
  *          (including the target group id)                                   *
  *                                                                            *
@@ -12991,8 +12622,6 @@ void	dc_get_nested_hostgroupids(zbx_uint64_t groupid, zbx_vector_uint64_t *neste
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_get_nested_hostgroupids                                   *
- *                                                                            *
  * Purpose: gets nested group ids for the specified host groups               *
  *                                                                            *
  * Parameter: groupids        - [IN] the parent group identifiers             *
@@ -13016,8 +12645,6 @@ void	zbx_dc_get_nested_hostgroupids(zbx_uint64_t *groupids, int groupids_num, zb
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_dc_get_hostids_by_group_name                                 *
  *                                                                            *
  * Purpose: gets hostids belonging to the group and its nested groups         *
  *                                                                            *
@@ -13077,8 +12704,6 @@ void	zbx_dc_get_hostids_by_group_name(const char *name, zbx_vector_uint64_t *hos
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_get_active_proxy_by_name                                  *
- *                                                                            *
  * Purpose: gets active proxy data by its name from configuration cache       *
  *                                                                            *
  * Parameters:                                                                *
@@ -13126,8 +12751,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_dc_items_update_nextcheck                                    *
  *                                                                            *
  * Purpose: updates item nextcheck values in configuration cache              *
  *                                                                            *
@@ -13183,8 +12806,6 @@ void	zbx_dc_items_update_nextcheck(DC_ITEM *items, zbx_agent_value_t *values, in
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_dc_get_host_interfaces                                       *
  *                                                                            *
  * Purpose: get data of all network interfaces for a host in configuration    *
  *          cache                                                             *
@@ -13263,8 +12884,6 @@ unlock:
 
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_items_apply_changes                                     *
- *                                                                            *
  * Purpose: apply item state, error, mtime, lastlogsize changes to            *
  *          configuration cache                                               *
  *                                                                            *
@@ -13305,8 +12924,6 @@ void	DCconfig_items_apply_changes(const zbx_vector_ptr_t *item_diff)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_update_inventory_values                                 *
- *                                                                            *
  * Purpose: update automatic inventory in configuration cache                 *
  *                                                                            *
  ******************************************************************************/
@@ -13340,8 +12957,6 @@ void	DCconfig_update_inventory_values(const zbx_vector_ptr_t *inventory_values)
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_get_host_inventory_value_by_hostid                            *
- *                                                                            *
  * Purpose: find inventory value in automatically populated cache, if not     *
  *          found then look in main inventory cache                           *
  *                                                                            *
@@ -13372,8 +12987,6 @@ static int	dc_get_host_inventory_value_by_hostid(zbx_uint64_t hostid, char **rep
 
 /******************************************************************************
  *                                                                            *
- * Function: DCget_host_inventory_value_by_itemid                             *
- *                                                                            *
  * Purpose: find inventory value in automatically populated cache, if not     *
  *          found then look in main inventory cache                           *
  *                                                                            *
@@ -13395,8 +13008,6 @@ int	DCget_host_inventory_value_by_itemid(zbx_uint64_t itemid, char **replace_to,
 
 /******************************************************************************
  *                                                                            *
- * Function: DCget_host_inventory_value_by_hostid                             *
- *                                                                            *
  * Purpose: find inventory value in automatically populated cache, if not     *
  *          found then look in main inventory cache                           *
  *                                                                            *
@@ -13415,8 +13026,6 @@ int	DCget_host_inventory_value_by_hostid(zbx_uint64_t hostid, char **replace_to,
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_dc_get_trigger_dependencies                                  *
  *                                                                            *
  * Purpose: checks/returns trigger dependencies for a set of triggers         *
  *                                                                            *
@@ -13481,8 +13090,6 @@ void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_reschedule_items                                          *
- *                                                                            *
  * Purpose: reschedules items that are processed by the target daemon         *
  *                                                                            *
  * Parameter: itemids       - [IN] the item identifiers                       *
@@ -13537,8 +13144,6 @@ void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int nextcheck, 
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_proxy_update_nodata                                       *
- *                                                                            *
  * Purpose: stop suppress mode of the nodata() trigger                        *
  *                                                                            *
  * Parameter: subscriptions - [IN] the array of trigger id and time of values *
@@ -13585,8 +13190,6 @@ void	zbx_dc_proxy_update_nodata(zbx_vector_uint64_pair_t *subscriptions)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_dc_update_proxy                                              *
  *                                                                            *
  * Purpose: updates changed proxy data in configuration cache and updates     *
  *          diff flags to reflect the updated data                            *
@@ -13677,8 +13280,6 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_get_proxy_lastaccess                                      *
- *                                                                            *
  * Purpose: returns proxy lastaccess changes since last lastaccess request    *
  *                                                                            *
  * Parameter: lastaccess - [OUT] last access updates for proxies that need    *
@@ -13719,8 +13320,6 @@ void	zbx_dc_get_proxy_lastaccess(zbx_vector_uint64_pair_t *lastaccess)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_get_session_token                                         *
- *                                                                            *
  * Purpose: returns session token                                             *
  *                                                                            *
  * Return value: pointer to session token (NULL for server).                  *
@@ -13736,8 +13335,6 @@ const char	*zbx_dc_get_session_token(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_dc_get_or_create_data_session                                *
  *                                                                            *
  * Purpose: returns data session, creates a new session if none found         *
  *                                                                            *
@@ -13782,8 +13379,6 @@ zbx_data_session_t	*zbx_dc_get_or_create_data_session(zbx_uint64_t hostid, const
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_dc_cleanup_data_sessions                                     *
  *                                                                            *
  * Purpose: removes data sessions not accessed for 24 hours                   *
  *                                                                            *
@@ -13932,8 +13527,6 @@ void	zbx_dc_get_item_tags_by_functionids(const zbx_uint64_t *functionids, size_t
 
 /******************************************************************************
  *                                                                            *
- * Function: DCget_proxy_nodata_win                                           *
- *                                                                            *
  * Purpose: retrieves proxy suppress window data from the cache               *
  *                                                                            *
  * Parameters: hostid     - [IN] proxy host id                                *
@@ -13972,8 +13565,6 @@ int	DCget_proxy_nodata_win(zbx_uint64_t hostid, zbx_proxy_suppress_t *nodata_win
 
 /******************************************************************************
  *                                                                            *
- * Function: DCget_proxy_delay                                                *
- *                                                                            *
  * Purpose: retrieves proxy delay from the cache                              *
  *                                                                            *
  * Parameters: hostid - [IN] proxy host id                                    *
@@ -14006,13 +13597,11 @@ int	DCget_proxy_delay(zbx_uint64_t hostid, int *delay)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCget_proxy_delay_by_name                                        *
- *                                                                            *
  * Purpose: retrieves proxy delay from the cache                              *
  *                                                                            *
  * Parameters: name  - [IN] proxy host name                                   *
  *             delay - [OUT] proxy delay                                      *
- *             error - [OUT] error                                            *
+ *             error - [OUT]                                                  *
  *                                                                            *
  * Return value: SUCCEED - proxy delay is retrieved                           *
  *               FAIL    - proxy delay cannot be retrieved                    *
@@ -14043,8 +13632,6 @@ int	DCget_proxy_delay_by_name(const char *name, int *delay, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_set_macro_env                                             *
- *                                                                            *
  * Purpose: sets user macro environment security level                        *
  *                                                                            *
  * Parameter: env - [IN] the security level (see ZBX_MACRO_ENV_* defines)     *
@@ -14062,8 +13649,6 @@ unsigned char	zbx_dc_set_macro_env(unsigned char env)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_get_instanceid                                            *
- *                                                                            *
  * Purpose: returns server/proxy instance id                                  *
  *                                                                            *
  * Return value: the instance id                                              *
@@ -14077,10 +13662,6 @@ const char	*zbx_dc_get_instanceid(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: dc_expand_user_macros_in_func_params                             *
- *                                                                            *
- * Purpose: expand user macros in trigger function parameters                 *
  *                                                                            *
  * Parameters: params - [IN] the function parameters                          *
  *             hostid - [IN] host of the item used in function                *
@@ -14129,11 +13710,7 @@ char	*dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t host
 
 /*********************************************************************************
  *                                                                               *
- * Function: zbx_get_host_interfaces_availability                                *
- *                                                                               *
- * Purpose: get host interfaces availability                                     *
- *                                                                               *
- * Parameters: hostid               - [IN] the host id                           *
+ * Parameters: hostid               - [IN]                                       *
  *             agents               - [OUT] Zabbix agent availability            *
  *                                                                               *
  ********************************************************************************/
@@ -14178,8 +13755,6 @@ void	zbx_get_host_interfaces_availability(zbx_uint64_t hostid, zbx_agent_availab
 }
 
 /*********************************************************************************
- *                                                                               *
- * Function: zbx_dc_eval_expand_user_macros                                      *
  *                                                                               *
  * Purpose: resolve user macros in parsed expression                             *
  *                                                                               *

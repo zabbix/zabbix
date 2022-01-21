@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,12 +22,13 @@
 #include "zbxself.h"
 #include "log.h"
 #include "zbxipcservice.h"
-#include "zbxserialize.h"
 #include "zbxjson.h"
 #include "zbxalert.h"
 #include "db.h"
-#include "report_writer.h"
 #include "report_protocol.h"
+
+#include "report_writer.h"
+
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
@@ -80,8 +81,6 @@ static char	*rw_curl_error(CURLcode err)
 #endif
 
 /******************************************************************************
- *                                                                            *
- * Function: rw_get_report                                                    *
  *                                                                            *
  * Purpose: get report from web service                                       *
  *                                                                            *
@@ -175,7 +174,6 @@ static int	rw_get_report(const char *url, const char *cookie, int width, int hei
 		}
 	}
 
-
 	if (CURLE_OK != (err = curl_easy_perform(curl)))
 	{
 		*error = zbx_dsprintf(*error, "Cannot connect to web service: %s", (curl_error = rw_curl_error(err)));
@@ -244,8 +242,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: rw_begin_report                                                  *
- *                                                                            *
  * Purpose: begin report dispatch                                             *
  *                                                                            *
  * Parameters: msg      - [IN] the begin report request message               *
@@ -307,8 +303,6 @@ static int	rw_begin_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispa
 
 /******************************************************************************
  *                                                                            *
- * Function: rw_send_report                                                   *
- *                                                                            *
  * Purpose: send report to the recipients using specified media type          *
  *                                                                            *
  * Parameters: msg      - [IN] the send report request message                *
@@ -349,8 +343,6 @@ static int	rw_send_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispat
 
 /******************************************************************************
  *                                                                            *
- * Function: rw_end_report                                                    *
- *                                                                            *
  * Purpose: finish report dispatch                                            *
  *                                                                            *
  * Parameters: dispatch - [IN] the alerter dispatch                           *
@@ -375,8 +367,6 @@ static int	rw_end_report(zbx_alerter_dispatch_t *dispatch, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Function: rw_send_result                                                   *
- *                                                                            *
  * Purpose: send report result back to manager                                *
  *                                                                            *
  * Parameters: socket - [IN] the report manager IPC socket                    *
@@ -398,11 +388,6 @@ static void	rw_send_result(zbx_ipc_socket_t *socket, zbx_alerter_dispatch_t *dis
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: report_writer_thread                                             *
- *                                                                            *
- ******************************************************************************/
 ZBX_THREAD_ENTRY(report_writer_thread, args)
 {
 #define	ZBX_STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */

@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-08-09T08:38:36Z'
+  version: '6.0'
+  date: '2021-12-15T08:55:27Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -22,7 +22,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/393527-discussion-thread-for-official-zabbix-template-haproxy
         
-        Template tooling version used: 0.39
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Applications
@@ -866,6 +866,8 @@ zabbix_export:
                 MAINT - The server has been disabled or put into maintenance mode.
                 DRAIN - The server has been put into drain mode.
                 no check - Health checks are not enabled for this server.
+              valuemap:
+                name: 'Service state'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2566,6 +2568,8 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
+              valuemap:
+                name: 'Service state'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2911,7 +2915,7 @@ zabbix_export:
                 -
                   type: GRAPH_PROTOTYPE
                   width: '24'
-                  height: '12'
+                  height: '5'
                   fields:
                     -
                       type: INTEGER
@@ -2924,7 +2928,7 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '3'
+                      value: '1'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -2933,9 +2937,9 @@ zabbix_export:
                         host: 'HAProxy by Zabbix agent'
                 -
                   type: GRAPH_PROTOTYPE
-                  'y': '12'
+                  'y': '5'
                   width: '24'
-                  height: '12'
+                  height: '5'
                   fields:
                     -
                       type: INTEGER
@@ -2948,7 +2952,7 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '3'
+                      value: '1'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -2957,9 +2961,9 @@ zabbix_export:
                         host: 'HAProxy by Zabbix agent'
                 -
                   type: GRAPH_PROTOTYPE
-                  'y': '24'
+                  'y': '10'
                   width: '24'
-                  height: '12'
+                  height: '5'
                   fields:
                     -
                       type: INTEGER
@@ -2972,7 +2976,7 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '3'
+                      value: '1'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -2988,7 +2992,7 @@ zabbix_export:
                 -
                   type: GRAPH_PROTOTYPE
                   width: '24'
-                  height: '12'
+                  height: '5'
                   fields:
                     -
                       type: INTEGER
@@ -3001,7 +3005,7 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '3'
+                      value: '1'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -3010,9 +3014,9 @@ zabbix_export:
                         host: 'HAProxy by Zabbix agent'
                 -
                   type: GRAPH_PROTOTYPE
-                  'y': '12'
+                  'y': '5'
                   width: '24'
-                  height: '12'
+                  height: '5'
                   fields:
                     -
                       type: INTEGER
@@ -3025,7 +3029,7 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '3'
+                      value: '1'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -3034,9 +3038,9 @@ zabbix_export:
                         host: 'HAProxy by Zabbix agent'
                 -
                   type: GRAPH_PROTOTYPE
-                  'y': '24'
+                  'y': '10'
                   width: '24'
-                  height: '12'
+                  height: '5'
                   fields:
                     -
                       type: INTEGER
@@ -3049,7 +3053,7 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '3'
+                      value: '1'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -3058,9 +3062,9 @@ zabbix_export:
                         host: 'HAProxy by Zabbix agent'
                 -
                   type: GRAPH_PROTOTYPE
-                  'y': '36'
+                  'y': '15'
                   width: '24'
-                  height: '12'
+                  height: '5'
                   fields:
                     -
                       type: INTEGER
@@ -3073,7 +3077,7 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '3'
+                      value: '1'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -3089,7 +3093,7 @@ zabbix_export:
                 -
                   type: GRAPH_PROTOTYPE
                   width: '24'
-                  height: '12'
+                  height: '5'
                   fields:
                     -
                       type: INTEGER
@@ -3102,7 +3106,7 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '3'
+                      value: '1'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -3111,9 +3115,9 @@ zabbix_export:
                         host: 'HAProxy by Zabbix agent'
                 -
                   type: GRAPH_PROTOTYPE
-                  'y': '12'
+                  'y': '5'
                   width: '24'
-                  height: '12'
+                  height: '5'
                   fields:
                     -
                       type: INTEGER
@@ -3126,7 +3130,7 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '3'
+                      value: '1'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -3135,9 +3139,9 @@ zabbix_export:
                         host: 'HAProxy by Zabbix agent'
                 -
                   type: GRAPH_PROTOTYPE
-                  'y': '24'
+                  'y': '10'
                   width: '24'
-                  height: '12'
+                  height: '5'
                   fields:
                     -
                       type: INTEGER
@@ -3150,7 +3154,7 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '3'
+                      value: '1'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid

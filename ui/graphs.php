@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -617,7 +617,7 @@ elseif (isset($_REQUEST['form'])) {
 	// items
 	if ($data['items']) {
 		$items = API::Item()->get([
-			'output' => ['itemid', 'hostid', 'name', 'key_', 'flags'],
+			'output' => ['itemid', 'hostid', 'name', 'flags'],
 			'selectHosts' => ['hostid', 'name'],
 			'itemids' => zbx_objectValues($data['items'], 'itemid'),
 			'filter' => [
@@ -633,12 +633,36 @@ elseif (isset($_REQUEST['form'])) {
 			$item['host'] = $host['name'];
 			$item['hostid'] = $items[$item['itemid']]['hostid'];
 			$item['name'] = $items[$item['itemid']]['name'];
-			$item['key_'] = $items[$item['itemid']]['key_'];
 			$item['flags'] = $items[$item['itemid']]['flags'];
 		}
 		unset($item);
+	}
 
-		$data['items'] = CMacrosResolverHelper::resolveItemNames($data['items']);
+	// Set ymin_item_name.
+	$data['ymin_item_name'] = '';
+	$data['ymax_item_name'] = '';
+
+	if ($data['ymin_itemid'] != 0 || $data['ymax_itemid'] != 0) {
+		$items = API::Item()->get([
+			'output' => ['itemid', 'name'],
+			'selectHosts' => ['name'],
+			'itemids' => array_filter([$data['ymin_itemid'], $data['ymax_itemid']]),
+			'filter' => [
+				'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED]
+			],
+			'webitems' => true,
+			'preservekeys' => true
+		]);
+
+		if ($data['ymin_itemid'] != 0 && array_key_exists($data['ymin_itemid'], $items)) {
+			$item = $items[$data['ymin_itemid']];
+			$data['ymin_item_name'] = $item['hosts'][0]['name'].NAME_DELIMITER.$item['name'];
+		}
+
+		if ($data['ymax_itemid'] != 0 && array_key_exists($data['ymax_itemid'], $items)) {
+			$item = $items[$data['ymax_itemid']];
+			$data['ymax_item_name'] = $item['hosts'][0]['name'].NAME_DELIMITER.$item['name'];
+		}
 	}
 
 	$data['items'] = array_values($data['items']);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -86,7 +86,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 		'Acknowledged PROBLEM events' => false,
 		'Unacknowledged RESOLVED events' => false,
 		'Acknowledged RESOLVED events' => false
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 /*		'id:problem_unack_color' => 'CC0000',
 *		'id:problem_ack_color'=> 'CC0000',
 *		'id:ok_unack_color'=> '009900',
@@ -105,7 +105,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 *		'High' => 'Custom High',
 *		'High' => 'Custom Disaster'
 */
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //		'id:severity_color_0' => 'E8EAF6',
 //		'id:severity_color_1' => 'D1C4E9',
 //		'id:severity_color_2' => 'B39DDB' ,
@@ -124,7 +124,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 		$form = $this->query($this->form_selector)->waitUntilReady()->asForm()->one();
 
 		$limits = [
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //			'problem_unack_color' => 6,
 //			'problem_ack_color' => 6,
 //			'ok_unack_color' => 6,
@@ -137,7 +137,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			'severity_name_3' => 32,
 			'severity_name_4' => 32,
 			'severity_name_5' => 32
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //			'severity_color_0' => 6,
 //			'severity_color_1' => 6,
 //			'severity_color_2' => 6,
@@ -174,7 +174,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			'lbl_severity_color_4',
 			'lbl_severity_color_5'
 		];
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 /*		$form->fill(['Use custom event status colors' => true]);
 *		foreach ($colorpickers as $colorpicker) {
 *			$this->query('id', $colorpicker)->one()->click();
@@ -236,7 +236,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'Acknowledged PROBLEM events' => true,
 						'Unacknowledged RESOLVED events' => true,
 						'Acknowledged RESOLVED events' => true,
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //						'id:problem_unack_color' => 'D81B60',
 //						'id:problem_ack_color' => 'F8BBD0',
 //						'id:ok_unack_color' => '1A237E',
@@ -249,7 +249,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'Average' => 'Test Average',
 						'High' => 'Test High',
 						'Disaster' => 'Test Disaster'
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //						'id:severity_color_0' => 'E8EAF6',
 //						'id:severity_color_1' => 'D1C4E9',
 //						'id:severity_color_2' => 'B39DDB' ,
@@ -263,7 +263,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'problem_ack_style'=> 1,
 						'ok_unack_style'=> 1,
 						'ok_ack_style'=> 1,
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //						'problem_unack_color' => 'D81B60',
 //						'problem_ack_color' => 'F8BBD0',
 //						'ok_unack_color' => '1A237E',
@@ -276,7 +276,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'severity_name_3' => 'Test Average',
 						'severity_name_4' => 'Test High',
 						'severity_name_5' => 'Test Disaster'
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //						'severity_color_0' => 'E8EAF6',
 //						'severity_color_1' => 'D1C4E9',
 //						'severity_color_2' => 'B39DDB' ,
@@ -312,7 +312,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					'expected' => TEST_GOOD,
 					'fields' =>  [
 						'Use custom event status colors' => true
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //						'id:problem_unack_color' => '000000',
 //						'id:problem_ack_color' => '000000',
 //						'id:ok_unack_color' => '000000',
@@ -326,7 +326,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					],
 					'db' => [
 						'custom_color' => 1
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //						'problem_unack_color' => '000000',
 //						'problem_ack_color' => '000000',
 //						'ok_unack_color' => '000000',
@@ -346,7 +346,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					'expected' => TEST_GOOD,
 					'fields' =>  [
 						'Use custom event status colors' => true
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //						'id:problem_unack_color' => 'AAAAAA',
 //						'id:problem_ack_color' => 'BBBBBB',
 //						'id:ok_unack_color' => 'CCCCCC',
@@ -360,7 +360,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					],
 					'db' => [
 						'custom_color' => 1
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //						'problem_unack_color' => 'AAAAAA',
 //						'problem_ack_color' => 'BBBBBB',
 //						'ok_unack_color' => 'CCCCCC',
@@ -380,7 +380,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					'expected' => TEST_GOOD,
 					'fields' =>  [
 						'Use custom event status colors' => true,
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //						'id:problem_unack_color' => '999999',
 //						'id:problem_ack_color' => '999999',
 //						'id:ok_unack_color' => '999999',
@@ -391,7 +391,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'Average' => 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
 						'High' => 'HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH',
 						'Disaster' => 'DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD'
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //						'id:severity_color_0' => '999999',
 //						'id:severity_color_1' => '999999',
 //						'id:severity_color_2' => '999999' ,
@@ -401,7 +401,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					],
 					'db' => [
 						'custom_color' => 1,
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //						'problem_unack_color' => '999999',
 //						'problem_ack_color' => '999999',
 //						'ok_unack_color' => '999999',
@@ -412,7 +412,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'severity_name_3' => 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
 						'severity_name_4' => 'HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH',
 						'severity_name_5' => 'DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD'
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //						'severity_color_0' => '999999',
 //						'severity_color_1' => '999999',
 //						'severity_color_2' => '999999' ,
@@ -694,14 +694,14 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					'expected' => TEST_BAD,
 					'fields' =>  [
 						'Use custom event status colors' => true,
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //						'id:problem_unack_color' => 'test',
 //						'id:problem_ack_color' => 'test',
 //						'id:ok_unack_color' => 'test',
 //						'id:ok_ack_color' => 'test',
 						'Display OK triggers for' => 'test',
 						'On status change triggers blink for' => 'test'
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //						'id:severity_color_0' => 'test',
 //						'id:severity_color_1' => 'test',
 //						'id:severity_color_2' => 'test' ,
@@ -710,14 +710,14 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 //						'id:severity_color_5' => 'test'
 					],
 					'details' => [
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //						'Incorrect value for field "problem_unack_color": a hexadecimal color code (6 symbols) is expected.',
 //						'Incorrect value for field "problem_ack_color": a hexadecimal color code (6 symbols) is expected.',
 //						'Incorrect value for field "ok_unack_color": a hexadecimal color code (6 symbols) is expected.',
 //						'Incorrect value for field "ok_ack_color": a hexadecimal color code (6 symbols) is expected.',
 						'Incorrect value for field "ok_period": a time unit is expected.',
 						'Incorrect value for field "blink_period": a time unit is expected.'
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //						'Incorrect value for field "severity_color_0": a hexadecimal color code (6 symbols) is expected.',
 //						'Incorrect value for field "severity_color_1": a hexadecimal color code (6 symbols) is expected.',
 //						'Incorrect value for field "severity_color_2": a hexadecimal color code (6 symbols) is expected.',
@@ -733,14 +733,14 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					'expected' => TEST_BAD,
 					'fields' =>  [
 						'Use custom event status colors' => true,
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //						'id:problem_unack_color' => '!@#$%^&*()_+',
 //						'id:problem_ack_color' => '!@#$%^&*()_+',
 //						'id:ok_unack_color' => '!@#$%^&*()_+',
 //						'id:ok_ack_color' => '!@#$%^&*()_+',
 						'Display OK triggers for' => '!@#$%^&*()_+',
 						'On status change triggers blink for' => '!@#$%^&*()_+'
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //						'id:severity_color_0' => '!@#$%^&*()_+',
 //						'id:severity_color_1' => '!@#$%^&*()_+',
 //						'id:severity_color_2' => '!@#$%^&*()_+' ,
@@ -749,14 +749,14 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 //						'id:severity_color_5' => '!@#$%^&*()_+'
 					],
 					'details' => [
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //						'Incorrect value for field "problem_unack_color": a hexadecimal color code (6 symbols) is expected.',
 //						'Incorrect value for field "problem_ack_color": a hexadecimal color code (6 symbols) is expected.',
 //						'Incorrect value for field "ok_unack_color": a hexadecimal color code (6 symbols) is expected.',
 //						'Incorrect value for field "ok_ack_color": a hexadecimal color code (6 symbols) is expected.',
 						'Incorrect value for field "ok_period": a time unit is expected.',
 						'Incorrect value for field "blink_period": a time unit is expected.'
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //						'Incorrect value for field "severity_color_0": a hexadecimal color code (6 symbols) is expected.',
 //						'Incorrect value for field "severity_color_1": a hexadecimal color code (6 symbols) is expected.',
 //						'Incorrect value for field "severity_color_2": a hexadecimal color code (6 symbols) is expected.',
@@ -772,7 +772,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					'expected' => TEST_BAD,
 					'fields' =>  [
 						'Use custom event status colors' => true,
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //						'id:problem_unack_color' => '',
 //						'id:problem_ack_color'=> '',
 //						'id:ok_unack_color'=> '',
@@ -785,7 +785,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'Average' => '',
 						'High' => '',
 						'Disaster' => ''
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //						'id:severity_color_0' => '',
 //						'id:severity_color_1' => '',
 //						'id:severity_color_2' => '' ,
@@ -794,7 +794,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 //						'id:severity_color_5' => ''
 					],
 					'details' => [
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //						'Incorrect value for field "problem_unack_color": a hexadecimal color code (6 symbols) is expected.',
 //						'Incorrect value for field "problem_ack_color": a hexadecimal color code (6 symbols) is expected.',
 //						'Incorrect value for field "ok_unack_color": a hexadecimal color code (6 symbols) is expected.',
@@ -802,22 +802,22 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'Incorrect value for field "ok_period": cannot be empty.',
 						'Incorrect value for field "blink_period": cannot be empty.',
 						'Incorrect value for field "severity_name_0": cannot be empty.',
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //						'Incorrect value for field "severity_color_0": a hexadecimal color code (6 symbols) is expected.',
 						'Incorrect value for field "severity_name_1": cannot be empty.',
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //						'Incorrect value for field "severity_color_1": a hexadecimal color code (6 symbols) is expected.',
 						'Incorrect value for field "severity_name_2": cannot be empty.',
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //						'Incorrect value for field "severity_color_2": a hexadecimal color code (6 symbols) is expected.',
 						'Incorrect value for field "severity_name_3": cannot be empty.',
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //						'Incorrect value for field "severity_color_3": a hexadecimal color code (6 symbols) is expected.',
 						'Incorrect value for field "severity_name_4": cannot be empty.',
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //						'Incorrect value for field "severity_color_4": a hexadecimal color code (6 symbols) is expected.',
 						'Incorrect value for field "severity_name_5": cannot be empty.'
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //						'Incorrect value for field "severity_color_5": a hexadecimal color code (6 symbols) is expected.'
 					]
 				]
@@ -828,14 +828,14 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					'expected' => TEST_BAD,
 					'fields' =>  [
 						'Use custom event status colors' => true,
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //						'id:problem_unack_color' => '-1',
 //						'id:problem_ack_color'=> '-1',
 //						'id:ok_unack_color'=> '-1',
 //						'id:ok_ack_color'=> '-1',
 						'Display OK triggers for' => '-1',
 						'On status change triggers blink for' => '-1'
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //						'id:severity_color_0' => '-1',
 //						'id:severity_color_1' => '-1',
 //						'id:severity_color_2' => '-1' ,
@@ -844,14 +844,14 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 //						'id:severity_color_5' => '-1'
 					],
 					'details' => [
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //						'Incorrect value for field "problem_unack_color": a hexadecimal color code (6 symbols) is expected.',
 //						'Incorrect value for field "problem_ack_color": a hexadecimal color code (6 symbols) is expected.',
 //						'Incorrect value for field "ok_unack_color": a hexadecimal color code (6 symbols) is expected.',
 //						'Incorrect value for field "ok_ack_color": a hexadecimal color code (6 symbols) is expected.',
 						'Incorrect value for field "ok_period": a time unit is expected.',
 						'Incorrect value for field "blink_period": a time unit is expected.'
-// TODO: fix hex field
+// TODO: wait for DEV-2058
 //						'Incorrect value for field "severity_color_0": a hexadecimal color code (6 symbols) is expected.',
 //						'Incorrect value for field "severity_color_1": a hexadecimal color code (6 symbols) is expected.',
 //						'Incorrect value for field "severity_color_2": a hexadecimal color code (6 symbols) is expected.',

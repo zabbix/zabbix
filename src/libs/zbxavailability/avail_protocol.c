@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,8 +20,8 @@
 #include "common.h"
 #include "zbxserialize.h"
 #include "db.h"
+
 #include "avail_protocol.h"
-#include "dbcache.h"
 
 void	zbx_availability_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset,
 		const zbx_interface_availability_t *interface_availability)
@@ -67,7 +67,6 @@ void	zbx_availability_deserialize(const unsigned char *data, zbx_uint32_t size,
 		zbx_interface_availability_t	*interface_availability;
 		zbx_uint32_t			deserialize_error_len;
 
-
 		interface_availability = (zbx_interface_availability_t *)zbx_malloc(NULL,
 				sizeof(zbx_interface_availability_t));
 
@@ -83,4 +82,3 @@ void	zbx_availability_deserialize(const unsigned char *data, zbx_uint32_t size,
 		data += zbx_deserialize_str(data, &interface_availability->agent.error, deserialize_error_len);
 	}
 }
-

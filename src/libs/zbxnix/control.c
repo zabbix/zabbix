@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,8 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "common.h"
+
 #include "control.h"
-#include "zbxdiag.h"
 
 static int	parse_log_level_options(const char *opt, size_t len, unsigned int *scope, unsigned int *data)
 {
@@ -109,13 +110,10 @@ static int	parse_log_level_options(const char *opt, size_t len, unsigned int *sc
 
 /******************************************************************************
  *                                                                            *
- * Function: parse_rtc_options                                                *
- *                                                                            *
  * Purpose: parse runtime control options and create a runtime control        *
  *          message                                                           *
  *                                                                            *
  * Parameters: opt          - [IN] the command line argument                  *
- *             program_type - [IN] the program type                           *
  *             message      - [OUT] the message containing options for log    *
  *                                  level change or cache reload              *
  *                                                                            *
@@ -123,7 +121,7 @@ static int	parse_log_level_options(const char *opt, size_t len, unsigned int *sc
  *               FAIL    - an error occurred                                  *
  *                                                                            *
  ******************************************************************************/
-int	parse_rtc_options(const char *opt, unsigned char program_type, int *message)
+int	parse_rtc_options(const char *opt, int *message)
 {
 	unsigned int	scope, data, command;
 
@@ -141,144 +139,11 @@ int	parse_rtc_options(const char *opt, unsigned char program_type, int *message)
 		if (SUCCEED != parse_log_level_options(opt, ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_DECREASE), &scope, &data))
 			return FAIL;
 	}
-	else if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY)) &&
-			0 == strcmp(opt, ZBX_CONFIG_CACHE_RELOAD))
-	{
-		command = ZBX_RTC_CONFIG_CACHE_RELOAD;
-		scope = 0;
-		data = 0;
-	}
-	else if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY)) &&
-			0 == strcmp(opt, ZBX_HOUSEKEEPER_EXECUTE))
-	{
-		command = ZBX_RTC_HOUSEKEEPER_EXECUTE;
-		scope = 0;
-		data = 0;
-	}
-	else if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY)) &&
-			0 == strcmp(opt, ZBX_SNMP_CACHE_RELOAD))
-	{
-#ifdef HAVE_NETSNMP
-		command = ZBX_RTC_SNMP_CACHE_RELOAD;
-		/* Scope is ignored for SNMP. R/U pollers, trapper, discoverer and taskmanager always get targeted. */
-		scope = 0;
-		data = 0;
-#else
-		zbx_error("invalid runtime control option: no SNMP support enabled");
-		return FAIL;
-#endif
-	}
-	else if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY)) &&
-			0 == strncmp(opt, ZBX_DIAGINFO, ZBX_CONST_STRLEN(ZBX_DIAGINFO)))
-	{
-		command = ZBX_RTC_DIAGINFO;
-		data = 0;
-		scope = ZBX_DIAGINFO_ALL;
-
-		if ('=' == opt[ZBX_CONST_STRLEN(ZBX_DIAGINFO)])
-		{
-			const char	*section = opt + ZBX_CONST_STRLEN(ZBX_DIAGINFO) + 1;
-
-			if (0 == strcmp(section, ZBX_DIAG_HISTORYCACHE))
-			{
-				scope = ZBX_DIAGINFO_HISTORYCACHE;
-			}
-			else if (0 == strcmp(section, ZBX_DIAG_PREPROCESSING))
-			{
-				scope = ZBX_DIAGINFO_PREPROCESSING;
-			}
-			else if (0 == strcmp(section, ZBX_DIAG_LOCKS))
-			{
-				scope = ZBX_DIAGINFO_LOCKS;
-			}
-			else if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER)))
-			{
-				if (0 == strcmp(section, ZBX_DIAG_VALUECACHE))
-					scope = ZBX_DIAGINFO_VALUECACHE;
-				else if (0 == strcmp(section, ZBX_DIAG_LLD))
-					scope = ZBX_DIAGINFO_LLD;
-				else if (0 == strcmp(section, ZBX_DIAG_ALERTING))
-					scope = ZBX_DIAGINFO_ALERTING;
-			}
-
-			if (0 == scope)
-			{
-				zbx_error("invalid diaginfo section: %s", section);
-				return FAIL;
-			}
-		}
-		else if ('\0' != opt[ZBX_CONST_STRLEN(ZBX_DIAGINFO)])
-		{
-			zbx_error("invalid runtime control option: %s", opt);
-			return FAIL;
-		}
-	}
-	else if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) && 0 == strcmp(opt, ZBX_SECRETS_RELOAD))
-	{
-		command = ZBX_RTC_SECRETS_RELOAD;
-		scope = 0;
-		data = 0;
-	}
-	else if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) && 0 == strcmp(opt, ZBX_SERVICE_CACHE_RELOAD))
-	{
-		command = ZBX_RTC_SERVICE_CACHE_RELOAD;
-		scope = 0;
-		data = 0;
-	}
-	else if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER)) && 0 == strcmp(opt, ZBX_TRIGGER_HOUSEKEEPER_EXECUTE))
-	{
-		command = ZBX_RTC_TRIGGER_HOUSEKEEPER_EXECUTE;
-		scope = 0;
-		data = 0;
-	}
-	else if (0 != (program_type & (ZBX_PROGRAM_TYPE_AGENTD)) && 0 == strcmp(opt, ZBX_USER_PARAMETERS_RELOAD))
+	else if (0 == strcmp(opt, ZBX_USER_PARAMETERS_RELOAD))
 	{
 		command = ZBX_RTC_USER_PARAMETERS_RELOAD;
 		scope = 0;
 		data = 0;
-	}
-	else if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER)) && 0 == strcmp(opt, ZBX_HA_STATUS))
-	{
-		command = ZBX_RTC_HA_STATUS;
-		scope = 0;
-		data = 0;
-	}
-	else if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER)) &&
-			0 == strncmp(opt, ZBX_HA_REMOVE_NODE, ZBX_CONST_STRLEN(ZBX_HA_REMOVE_NODE)))
-	{
-		command = ZBX_RTC_HA_REMOVE_NODE;
-		scope = 0;
-		if ('=' != opt[ZBX_CONST_STRLEN(ZBX_HA_REMOVE_NODE)] ||
-				SUCCEED != is_uint32(opt + ZBX_CONST_STRLEN(ZBX_HA_REMOVE_NODE) + 1, &data))
-		{
-			zbx_error("invalid HA node number: %s\n", opt);
-			return FAIL;
-		}
-	}
-	else if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER)) &&
-			0 == strncmp(opt, ZBX_HA_SET_FAILOVER_DELAY, ZBX_CONST_STRLEN(ZBX_HA_SET_FAILOVER_DELAY)))
-	{
-		int	delay;
-
-		if ('=' == opt[ZBX_CONST_STRLEN(ZBX_HA_SET_FAILOVER_DELAY)] &&
-				SUCCEED == is_time_suffix(opt + ZBX_CONST_STRLEN(ZBX_HA_SET_FAILOVER_DELAY) + 1, &delay,
-				ZBX_LENGTH_UNLIMITED))
-		{
-			if (delay < 10 || delay > 15 * SEC_PER_MIN)
-			{
-				zbx_error("failover delay must be in range from 10s to 15m");
-				return FAIL;
-			}
-
-			command = ZBX_RTC_HA_SET_FAILOVER_DELAY;
-			scope = 0;
-			data = (unsigned int)delay;
-		}
-		else
-		{
-			zbx_error("invalid HA failover delay value: %s\n", opt);
-			return FAIL;
-		}
 	}
 	else
 	{

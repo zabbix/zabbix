@@ -1,8 +1,9 @@
+//go:build !windows
 // +build !windows
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -61,6 +62,9 @@ type AgentOptions struct {
 	TLSKeyFile             string   `conf:"optional"`
 	TLSServerCertIssuer    string   `conf:"optional"`
 	TLSServerCertSubject   string   `conf:"optional"`
+	ExternalPlugins        []string `conf:"optional,name=PluginPath"`
+	ExternalPluginTimeout  int      `conf:"optional,name=PluginTimeout,range=1:30"`
+	ExternalPluginsSocket  string   `conf:"optional,name=PluginSocket,default=/tmp/agent.plugin.sock"`
 
 	AllowKey interface{} `conf:"optional"`
 	DenyKey  interface{} `conf:"optional"`

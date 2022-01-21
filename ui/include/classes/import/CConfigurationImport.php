@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -696,6 +696,7 @@ class CConfigurationImport {
 
 		$items_to_create = [];
 		$items_to_update = [];
+		$levels = [];
 
 		foreach ($this->getFormattedItems() as $host => $items) {
 			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
@@ -709,6 +710,7 @@ class CConfigurationImport {
 			foreach ($order_tree[$host] as $item_key => $level) {
 				$item = $items[$item_key];
 				$item['hostid'] = $hostid;
+				$levels[$level] = true;
 
 				if (array_key_exists('interface_ref', $item) && $item['interface_ref']) {
 					$interfaceid = $this->referencer->findInterfaceidByRef($hostid, $item['interface_ref']);
@@ -803,12 +805,14 @@ class CConfigurationImport {
 			}
 		}
 
-		if ($this->options['items']['updateExisting'] && $items_to_update) {
-			$this->updateItemsWithDependency($items_to_update, $master_item_key, API::Item());
-		}
-
-		if ($this->options['items']['createMissing'] && $items_to_create) {
-			$this->createItemsWithDependency($items_to_create, $master_item_key, API::Item());
+		ksort($levels);
+		foreach (array_keys($levels) as $level) {
+			if ($this->options['items']['updateExisting'] && array_key_exists($level, $items_to_update)) {
+				$this->updateItemsWithDependency([$items_to_update[$level]], $master_item_key, API::Item());
+			}
+			if ($this->options['items']['createMissing'] && array_key_exists($level, $items_to_create)) {
+				$this->createItemsWithDependency([$items_to_create[$level]], $master_item_key, API::Item());
+			}
 		}
 
 		// Refresh items because templated ones can be inherited to host and used in triggers, graphs, etc.
@@ -1068,6 +1072,7 @@ class CConfigurationImport {
 		$host_prototypes_to_update = [];
 		$host_prototypes_to_create = [];
 		$ex_group_prototypes_where = [];
+		$levels = [];
 
 		foreach ($discovery_rules_by_hosts as $host => $discovery_rules) {
 			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
@@ -1086,6 +1091,7 @@ class CConfigurationImport {
 				foreach ($item_prototypes as $index => $level) {
 					$item_prototype = $discovery_rule['item_prototypes'][$index];
 					$item_prototype['hostid'] = $hostid;
+					$levels[$level] = true;
 
 					if (array_key_exists('interface_ref', $item_prototype) && $item_prototype['interface_ref']) {
 						$interfaceid = $this->referencer->findInterfaceidByRef($hostid,
@@ -1310,14 +1316,18 @@ class CConfigurationImport {
 			}
 		}
 
-		if ($item_prototypes_to_update) {
-			ksort($item_prototypes_to_update);
-			$this->updateItemsWithDependency($item_prototypes_to_update, $master_item_key, API::ItemPrototype());
-		}
-
-		if ($item_prototypes_to_create) {
-			ksort($item_prototypes_to_create);
-			$this->createItemsWithDependency($item_prototypes_to_create, $master_item_key, API::ItemPrototype());
+		ksort($levels);
+		foreach (array_keys($levels) as $level) {
+			if (array_key_exists($level, $item_prototypes_to_update) && $item_prototypes_to_update[$level]) {
+				$this->updateItemsWithDependency([$item_prototypes_to_update[$level]], $master_item_key,
+					API::ItemPrototype()
+				);
+			}
+			if (array_key_exists($level, $item_prototypes_to_create) && $item_prototypes_to_create[$level]) {
+				$this->createItemsWithDependency([$item_prototypes_to_create[$level]], $master_item_key,
+					API::ItemPrototype()
+				);
+			}
 		}
 
 		if ($host_prototypes_to_update) {

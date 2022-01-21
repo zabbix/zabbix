@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@
 #include "zbxhttp.h"
 #include "zbxjson.h"
 #include "log.h"
+#include "dbcache.h"
+
 #ifdef HAVE_LIBCURL
 
 #define HTTP_REQUEST_GET	0

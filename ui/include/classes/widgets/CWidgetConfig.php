@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -66,6 +66,7 @@ class CWidgetConfig {
 			WIDGET_PROBLEM_HOSTS		=> _('Problem hosts'),
 			WIDGET_PROBLEMS				=> _('Problems'),
 			WIDGET_PROBLEMS_BY_SV		=> _('Problems by severity'),
+			WIDGET_SLA_REPORT			=> _('SLA report'),
 			WIDGET_SVG_GRAPH			=> _('Graph'),
 			WIDGET_SYSTEM_INFO			=> _('System information'),
 			WIDGET_TRIG_OVER			=> _('Trigger overview'),
@@ -110,6 +111,7 @@ class CWidgetConfig {
 			WIDGET_PROBLEM_HOSTS		=> 'CWidget',
 			WIDGET_PROBLEMS				=> 'CWidgetProblems',
 			WIDGET_PROBLEMS_BY_SV		=> 'CWidgetProblemsBySv',
+			WIDGET_SLA_REPORT			=> 'CWidget',
 			WIDGET_SVG_GRAPH			=> 'CWidgetSvgGraph',
 			WIDGET_SYSTEM_INFO			=> 'CWidget',
 			WIDGET_TRIG_OVER			=> 'CWidgetTrigerOver',
@@ -180,6 +182,7 @@ class CWidgetConfig {
 			WIDGET_PROBLEM_HOSTS		=> ['width' => 12,	'height' => 5],
 			WIDGET_PROBLEMS				=> ['width' => 12,	'height' => 5],
 			WIDGET_PROBLEMS_BY_SV		=> ['width' => 12,	'height' => 5],
+			WIDGET_SLA_REPORT			=> ['width' => 12,	'height' => 5],
 			WIDGET_SVG_GRAPH			=> ['width' => 12,	'height' => 5],
 			WIDGET_SYSTEM_INFO			=> ['width' => 12,	'height' => 5],
 			WIDGET_TRIG_OVER			=> ['width' => 12,	'height' => 5],
@@ -211,8 +214,7 @@ class CWidgetConfig {
 				'js_class' => $js_clases[$type],
 				'iterator' => self::isIterator($type),
 				'reference_field' => self::getReferenceField($type),
-				'foreign_reference_fields' => self::getForeignReferenceFields($type),
-				'dialogue_stick_to_top' => self::getDialogueStickToTop($type)
+				'foreign_reference_fields' => self::getForeignReferenceFields($type)
 			];
 		}
 
@@ -287,6 +289,7 @@ class CWidgetConfig {
 			case WIDGET_SYSTEM_INFO:
 				return 15 * SEC_PER_MIN;
 
+			case WIDGET_SLA_REPORT:
 			case WIDGET_URL:
 				return 0;
 		}
@@ -345,23 +348,6 @@ class CWidgetConfig {
 	public static function isIterator(string $type): bool {
 		switch ($type) {
 			case WIDGET_GRAPH_PROTOTYPE:
-				return true;
-
-			default:
-				return false;
-		}
-	}
-
-	/**
-	 * Check if widget dialogue should be sticked to top instead of being centered vertically.
-	 *
-	 * @param string $type  Widget type - 'WIDGET_*' constant.
-	 *
-	 * @return bool
-	 */
-	public static function getDialogueStickToTop(string $type): bool {
-		switch ($type) {
-			case WIDGET_SVG_GRAPH:
 				return true;
 
 			default:
@@ -478,6 +464,9 @@ class CWidgetConfig {
 
 			case WIDGET_PROBLEMS_BY_SV:
 				return new CWidgetFormProblemsBySv($data, $templateid);
+
+			case WIDGET_SLA_REPORT:
+				return new CWidgetFormSlaReport($data, $templateid);
 
 			case WIDGET_SVG_GRAPH:
 				return new CWidgetFormSvgGraph($data, $templateid);

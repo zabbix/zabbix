@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:23Z'
+  version: '6.0'
+  date: '2021-12-15T07:20:29Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -14,9 +14,12 @@ zabbix_export:
         Overview:
         Template receives data via HTTP Agent.
         Setup:
-        Create a new host. 
+        Create a new host.
         Define macros according to your Sharepoint web portal.
         It is recommended to fill in the values of the filter macros to avoid getting redundant data.
+        
+        
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Applications
@@ -138,9 +141,6 @@ zabbix_export:
               error_handler_params: '{"status":520,"data":{},"time":0}'
           parameters:
             -
-              name: root
-              value: '{$SHAREPOINT.ROOT}'
-            -
               name: password
               value: '{$SHAREPOINT.PASSWORD}'
             -
@@ -149,6 +149,9 @@ zabbix_export:
             -
               name: user
               value: '{$SHAREPOINT.USER}'
+            -
+              name: root
+              value: '{$SHAREPOINT.ROOT}'
           tags:
             -
               tag: Application
@@ -482,34 +485,36 @@ zabbix_export:
         -
           macro: '{$SHAREPOINT.LLD.FILTER.FULL_PATH.MATCHES}'
           value: ^/
-          description: 'Filter of discoverable dictionaries by full path'
+          description: 'Filter of discoverable dictionaries by full path.'
         -
           macro: '{$SHAREPOINT.LLD.FILTER.FULL_PATH.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered dictionaries by full path'
+          description: 'Filter to exclude discovered dictionaries by full path.'
         -
           macro: '{$SHAREPOINT.LLD.FILTER.NAME.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable dictionaries by name'
+          description: 'Filter of discoverable dictionaries by name.'
         -
           macro: '{$SHAREPOINT.LLD.FILTER.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered dictionaries by name'
+          description: 'Filter to exclude discovered dictionaries by name.'
         -
           macro: '{$SHAREPOINT.LLD.FILTER.TYPE.MATCHES}'
           value: FOLDER
-          description: 'Filter of discoverable types'
+          description: 'Filter of discoverable types.'
         -
           macro: '{$SHAREPOINT.LLD.FILTER.TYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered types'
+          description: 'Filter to exclude discovered types.'
         -
           macro: '{$SHAREPOINT.LLD_INTERVAL}'
           value: 3h
         -
           macro: '{$SHAREPOINT.MAX_HEALT_SCORE}'
           value: '5'
-          description: 'Must be in the range from 0 to 10 in details: https://docs.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-wsshp/c60ddeb6-4113-4a73-9e97-26b5c3907d33'
+          description: |
+            Must be in the range from 0 to 10
+            in details: https://docs.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-wsshp/c60ddeb6-4113-4a73-9e97-26b5c3907d33
         -
           macro: '{$SHAREPOINT.PASSWORD}'
           type: SECRET_TEXT

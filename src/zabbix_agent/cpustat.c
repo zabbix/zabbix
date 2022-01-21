@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1307,8 +1307,6 @@ static int	get_cpu_status(int pc_status)
 #endif	/* _WINDOWS */
 
 /******************************************************************************
- *                                                                            *
- * Function: get_cpus                                                         *
  *                                                                            *
  * Purpose: Retrieve list of available CPUs in the collector                  *
  *                                                                            *

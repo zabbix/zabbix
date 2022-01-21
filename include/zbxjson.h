@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -180,6 +180,12 @@
 #define ZBX_PROTO_TAG_LASTACCESS		"lastaccess"
 #define ZBX_PROTO_TAG_LASTACCESS_AGE		"lastaccess_age"
 #define ZBX_PROTO_TAG_DB_TIMESTAMP		"db_timestamp"
+#define ZBX_PROTO_TAG_NODE			"node"
+#define ZBX_PROTO_TAG_FAILOVER_DELAY		"failover_delay"
+#define ZBX_PROTO_TAG_SECTION			"section"
+#define ZBX_PROTO_TAG_PID			"pid"
+#define ZBX_PROTO_TAG_PROCESS_NAME		"process_name"
+#define ZBX_PROTO_TAG_PROCESS_NUM		"process_num"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"

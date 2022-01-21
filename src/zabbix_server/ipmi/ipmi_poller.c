@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,15 +21,13 @@
 
 #ifdef HAVE_OPENIPMI
 
-#include "dbcache.h"
 #include "daemon.h"
 #include "zbxself.h"
 #include "log.h"
 #include "zbxipcservice.h"
-
-#include "ipmi_manager.h"
 #include "ipmi_protocol.h"
 #include "checks_ipmi.h"
+
 #include "ipmi_poller.h"
 
 #define ZBX_IPMI_MANAGER_CLEANUP_DELAY		SEC_PER_DAY
@@ -39,8 +37,6 @@ extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 /******************************************************************************
- *                                                                            *
- * Function: ipmi_poller_register                                             *
  *                                                                            *
  * Purpose: registers IPMI poller with IPMI manager                           *
  *                                                                            *
@@ -57,8 +53,6 @@ static void	ipmi_poller_register(zbx_ipc_async_socket_t *socket)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ipmi_poller_send_result                                          *
  *                                                                            *
  * Purpose: sends IPMI poll result to manager                                 *
  *                                                                            *
@@ -83,8 +77,6 @@ static void	ipmi_poller_send_result(zbx_ipc_async_socket_t *socket, zbx_uint32_t
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ipmi_poller_process_value_request                                *
  *                                                                            *
  * Purpose: gets IPMI sensor value from the specified host                    *
  *                                                                            *
@@ -134,8 +126,6 @@ static void	ipmi_poller_process_value_request(zbx_ipc_async_socket_t *socket, zb
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ipmi_poller_process_command_request                              *
  *                                                                            *
  * Purpose:sets IPMI sensor value                                             *
  *                                                                            *
