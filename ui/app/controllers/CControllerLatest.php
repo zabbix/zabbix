@@ -374,10 +374,7 @@ abstract class CControllerLatest extends CController {
 	protected static function getSubfilterFields(array $filter, bool $show_data_subfilter): array {
 		$subfilters = [];
 
-		$subfilter_keys = ['subfilter_hostids', 'subfilter_tagnames', 'subfilter_tags'];
-		if ($show_data_subfilter) {
-			$subfilter_keys[] = 'subfilter_data';
-		}
+		$subfilter_keys = ['subfilter_hostids', 'subfilter_tagnames', 'subfilter_tags', 'subfilter_data'];
 
 		foreach ($subfilter_keys as $key) {
 			if (!array_key_exists($key, $filter)) {
@@ -395,6 +392,10 @@ abstract class CControllerLatest extends CController {
 			else {
 				$subfilters[$key] = array_flip($filter[$key]);
 			}
+		}
+
+		if (!$show_data_subfilter || !$subfilters['subfilter_data']) {
+			unset($subfilters['subfilter_data']);
 		}
 
 		return CArrayHelper::renameKeys($subfilters, [
