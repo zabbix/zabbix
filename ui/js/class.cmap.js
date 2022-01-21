@@ -625,6 +625,16 @@ ZABBIX.apps.map = (function($) {
 					event.preventDefault();
 					event.stopPropagation();
 
+					const overlay = overlays_stack.end();
+
+					if (typeof overlay !== 'undefined' && 'element' in overlay && overlay.element !== event.target) {
+						$('.menu-popup-top').menuPopup('close', null, false);
+					}
+
+					if (!(can_copy || can_paste || can_remove || can_reorder)) {
+						return false;
+					}
+
 					var items = [
 						{
 							'items': [
@@ -732,12 +742,6 @@ ZABBIX.apps.map = (function($) {
 							]
 						}
 					];
-
-					const overlay = overlays_stack.end();
-
-					if (typeof overlay !== 'undefined' && 'element' in overlay && overlay.element !== event.target) {
-						$('.menu-popup-top').menuPopup('close', null, false);
-					}
 
 					$(event.target).menuPopup(items, event);
 				});
