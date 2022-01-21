@@ -374,7 +374,10 @@ abstract class CControllerLatest extends CController {
 	protected static function getSubfilterFields(array $filter, bool $show_data_subfilter): array {
 		$subfilters = [];
 
-		$subfilter_keys = ['subfilter_hostids', 'subfilter_tagnames', 'subfilter_tags', 'subfilter_data'];
+		$subfilter_keys = ['subfilter_hostids', 'subfilter_tagnames', 'subfilter_tags'];
+		if ($show_data_subfilter) {
+			$subfilter_keys[] = 'subfilter_data';
+		}
 
 		foreach ($subfilter_keys as $key) {
 			if (!array_key_exists($key, $filter)) {
@@ -392,10 +395,6 @@ abstract class CControllerLatest extends CController {
 			else {
 				$subfilters[$key] = array_flip($filter[$key]);
 			}
-		}
-
-		if (!$show_data_subfilter || !$subfilters['subfilter_data']) {
-			unset($subfilters['subfilter_data']);
 		}
 
 		return CArrayHelper::renameKeys($subfilters, [
@@ -628,9 +627,12 @@ abstract class CControllerLatest extends CController {
 
 			if (array_key_exists('data', $subfilter)) {
 				$item['has_data'] = array_key_exists($item['itemid'], $with_data);
-				$item['matching_subfilters']['data'] = (array_key_exists(0, $subfilter['data']) && !$item['has_data']
-					|| array_key_exists(1, $subfilter['data']) && $item['has_data']
-				);
+
+				if ($subfilter['data']) {
+					$item['matching_subfilters']['data'] = (array_key_exists(0, $subfilter['data']) && !$item['has_data']
+						|| array_key_exists(1, $subfilter['data']) && $item['has_data']
+					);
+				}
 			}
 		}
 		unset($item);
