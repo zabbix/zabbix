@@ -43,7 +43,7 @@ abstract class CControllerLatest extends CController {
 		'show_tags' => SHOW_TAGS_3,
 		'tag_name_format' => TAG_NAME_FULL,
 		'tag_priority' => '',
-		'show_details' => 1,
+		'show_details' => 0,
 		'page' => null,
 		'sort' => 'name',
 		'sortorder' => ZBX_SORT_UP,
