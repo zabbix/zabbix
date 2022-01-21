@@ -144,7 +144,7 @@ class CControllerLatestView extends CControllerLatest {
 		$prepared_data = $this->prepareData($filter, $sort_field, $sort_order);
 
 		// Prepare subfilter data.
-		$subfilters_fields = self::getSubfilterFields($filter);
+		$subfilters_fields = self::getSubfilterFields($filter, (count($filter['hostids']) == 1));
 		$subfilters = self::getSubfilters($subfilters_fields, $prepared_data);
 		$prepared_data['items'] = self::applySubfilters($prepared_data['items']);
 

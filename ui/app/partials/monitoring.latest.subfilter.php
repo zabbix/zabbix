@@ -27,7 +27,7 @@
 $subfilter_options = [];
 
 foreach (['hostids', 'tagnames', 'data'] as $key) {
-	if (count($data[$key]) <= 1) {
+	if (!array_key_exists($key, $data) || count($data[$key]) <= 1) {
 		$subfilter_options[$key] = null;
 		continue;
 	}
