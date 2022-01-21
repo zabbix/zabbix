@@ -86,7 +86,7 @@ typedef struct
 }
 zbx_hk_cleanup_table_t;
 
-static unsigned char poption_mode_regular 	= ZBX_HK_MODE_REGULAR;
+static unsigned char poption_mode_regular	= ZBX_HK_MODE_REGULAR;
 static unsigned char poption_global_disabled	= ZBX_HK_OPTION_DISABLED;
 
 /* Housekeeper table mapping to housekeeping configuration values.    */
@@ -651,10 +651,16 @@ static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		keep_from, deleted = 0;
+	int		keep_from, id_field_str_type, deleted = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s' field_name:'%s' filter:'%s' min_clock:%d now:%d",
 			__func__, rule->table, rule->field_name, rule->filter, rule->min_clock, now);
+
+	/* NOTE: Do not forget to add here tables whose id column is string-type.                    */
+	/* Now only audit field has string id, if in the future this list of exceptions is increased */
+	/* DBget_table() and DBget_field() functions with cache could be used to determine if string */
+	/* or int version is required.                                                               */
+	id_field_str_type = (0 == strcmp("auditid", rule->field_name)) ? 1 : 0;
 
 	/* initialize min_clock with the oldest record timestamp from database */
 	if (0 == rule->min_clock)
@@ -677,10 +683,14 @@ static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 		char			buffer[MAX_STRING_LEN];
 		char			*sql = NULL;
 		size_t			sql_alloc = 0, sql_offset;
-		zbx_vector_uint64_t	ids;
+		zbx_vector_uint64_t	ids_uint64;
+		zbx_vector_str_t	ids_str;
 		int			ret;
 
-		zbx_vector_uint64_create(&ids);
+		if (0 == id_field_str_type)
+			zbx_vector_uint64_create(&ids_uint64);
+		else
+			zbx_vector_str_create(&ids_str);
 
 		rule->min_clock = MIN(keep_from, rule->min_clock + HK_MAX_DELETE_PERIODS * hk_period);
 
@@ -703,30 +713,63 @@ static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 
 			while (NULL != (row = DBfetch(result)))
 			{
-				zbx_uint64_t	id;
+				if (0 == id_field_str_type)
+				{
+					zbx_uint64_t	id;
 
-				ZBX_STR2UINT64(id, row[0]);
-				zbx_vector_uint64_append(&ids, id);
+					ZBX_STR2UINT64(id, row[0]);
+					zbx_vector_uint64_append(&ids_uint64, id);
+				}
+				else
+					zbx_vector_str_append(&ids_str, zbx_strdup(NULL, row[0]));
 			}
+
 			DBfree_result(result);
 
-			if (0 == ids.values_num)
-				break;
+			if (0 == id_field_str_type)
+			{
+				if (0 == ids_uint64.values_num)
+					break;
+			}
+			else
+			{
+				if (0 == ids_str.values_num)
+					break;
+			}
 
 			sql_offset = 0;
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from %s where", rule->table);
-			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, rule->field_name, ids.values,
-					ids.values_num);
 
-			if (ZBX_DB_OK > (ret = DBexecute("%s", sql)))
+			if (0 == id_field_str_type)
+			{
+				DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, rule->field_name,
+						ids_uint64.values, ids_uint64.values_num);
+			}
+			else
+			{
+				DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, rule->field_name,
+						(const char**)ids_str.values, ids_str.values_num);
+			}
+
+			ret = DBexecute("%s", sql);
+
+			if (0 == id_field_str_type)
+				zbx_vector_uint64_clear(&ids_uint64);
+			else
+				zbx_vector_str_clear_ext(&ids_str, zbx_str_free);
+
+			if (ZBX_DB_OK > ret)
 				break;
 
 			deleted += ret;
-			zbx_vector_uint64_clear(&ids);
 		}
 
 		zbx_free(sql);
-		zbx_vector_uint64_destroy(&ids);
+
+		if (0 == id_field_str_type)
+			zbx_vector_uint64_destroy(&ids_uint64);
+		else
+			zbx_vector_str_destroy(&ids_str);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, deleted);
