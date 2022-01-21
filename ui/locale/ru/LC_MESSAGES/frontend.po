@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-07 19:54+0200\n"
+"POT-Creation-Date: 2022-01-21 19:52+0200\n"
 "PO-Revision-Date: 2021-11-13 21:53+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -315,7 +315,7 @@ msgstr "(Только супер администраторы могут соз�
 msgid "(no proxy)"
 msgstr "(без прокси)"
 
-#: include/classes/setup/CSetupWizard.php:250
+#: include/classes/setup/CSetupWizard.php:248
 msgid "0 - use default port"
 msgstr "0 - использовать порт по умолчанию"
 
@@ -978,7 +978,7 @@ msgstr "Разрешить закрывать вручную"
 msgid "Allowed hosts"
 msgstr "Разрешенные хосты"
 
-#: include/classes/setup/CSetupWizard.php:489
+#: include/classes/setup/CSetupWizard.php:473
 msgid "Alternatively, you can install it manually:"
 msgstr "В качестве альтернативы, вы можете установить его вручную:"
 
@@ -1433,8 +1433,8 @@ msgstr "Средняя"
 msgid "Axes"
 msgstr "Оси"
 
-#: include/classes/setup/CSetupWizard.php:134
-#: include/classes/setup/CSetupWizard.php:423
+#: include/classes/setup/CSetupWizard.php:132
+#: include/classes/setup/CSetupWizard.php:421
 msgid "Back"
 msgstr "Назад"
 
@@ -1658,7 +1658,7 @@ msgstr "Нельзя удалить"
 #: app/views/js/administration.trigseverity.edit.js.php:37
 #: app/views/monitoring.dashboard.view.php:114
 #: include/classes/html/CButtonCancel.php:25
-#: include/classes/setup/CSetupWizard.php:116
+#: include/classes/setup/CSetupWizard.php:114
 #: include/views/conf.import.php:131 include/views/js/conf.import.js.php:42
 #: include/views/monitoring.slideconf.edit.php:281 jsLoader.php:122
 #: jsLoader.php:139 jsLoader.php:243 jsLoader.php:324 jsLoader.php:336
@@ -1912,7 +1912,7 @@ msgstr "Не удалось закрыть проблему: %1$s."
 msgid "Cannot connect to LDAP server."
 msgstr "Не удалось подключиться к LDAP серверу."
 
-#: include/classes/setup/CSetupWizard.php:323
+#: include/classes/setup/CSetupWizard.php:321
 msgid "Cannot connect to the database."
 msgstr "Не возможно подключиться к базе данных."
 
@@ -1980,7 +1980,7 @@ msgstr "Не удалось создать соответствие иконок
 msgid "Cannot create new application, web scenario is already assigned to application."
 msgstr "Не удалось создать новую группу элементов данных, веб-сценарий уже присоединен к группе элементов данных."
 
-#: include/classes/setup/CSetupWizard.php:485
+#: include/classes/setup/CSetupWizard.php:469
 msgid "Cannot create the configuration file."
 msgstr "Не возможно создать конфигурационный файл."
 
@@ -3233,7 +3233,7 @@ msgid "Check for error using regular expression"
 msgstr "Проверьте на ошибку при использовании регулярного выражения"
 
 #: include/classes/setup/CSetupWizard.php:46
-#: include/classes/setup/CSetupWizard.php:217
+#: include/classes/setup/CSetupWizard.php:215
 msgid "Check of pre-requisites"
 msgstr "Проверка предварительных условий"
 
@@ -3585,7 +3585,7 @@ msgstr "Настройка"
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "Статистика конфигурационного кэша. Кэш - буфер (режимы: pfree, total, used, free)."
 
-#: include/classes/setup/CSetupWizard.php:516
+#: include/classes/setup/CSetupWizard.php:488
 #, c-format
 msgid "Configuration file \"%1$s\" created."
 msgstr "Файл конфигурации \"%1$s\" создан."
@@ -3758,7 +3758,7 @@ msgid "Configuration updated"
 msgstr "Настройки обновлены"
 
 #: include/classes/setup/CSetupWizard.php:50
-#: include/classes/setup/CSetupWizard.php:332
+#: include/classes/setup/CSetupWizard.php:330
 msgid "Configure DB connection"
 msgstr "Настройка подключения к БД"
 
@@ -3766,7 +3766,7 @@ msgstr "Настройка подключения к БД"
 msgid "Confirmation text"
 msgstr "Текст подтверждения"
 
-#: include/classes/setup/CSetupWizard.php:514
+#: include/classes/setup/CSetupWizard.php:486
 msgid "Congratulations! You have successfully installed Zabbix frontend."
 msgstr "Поздравляем! Вы успешно установили Zabbix веб-интерфейс."
 
@@ -3829,7 +3829,7 @@ msgstr ""
 "1. Некорректный IP/DNS сервера в \"zabbix.conf.php\";\n"
 "2. Брандмауэр блокирует TCP соединение.\n"
 
-#: include/classes/setup/CSetupWizard.php:275
+#: include/classes/setup/CSetupWizard.php:273
 msgid "Connection will not be encrypted because it uses a socket file (on Unix) or shared memory (Windows)."
 msgstr "Подключение не будет шифрованным, так как используется файл сокета (на Unix) или разделяемая память (Windows)."
 
@@ -4265,7 +4265,7 @@ msgstr "Критичная"
 msgid "Current host"
 msgstr "Текущий узел сети"
 
-#: include/classes/setup/CSetupWizard.php:175
+#: include/classes/setup/CSetupWizard.php:173
 msgid "Current value"
 msgstr "Текущее значение"
 
@@ -4461,16 +4461,16 @@ msgstr "Набор данных"
 msgid "Data storage period"
 msgstr "Период хранения данных"
 
-#: include/classes/setup/CSetupWizard.php:290
-#: include/classes/setup/CSetupWizard.php:391
-#: include/classes/setup/CSetupWizard.php:555
+#: include/classes/setup/CSetupWizard.php:288
+#: include/classes/setup/CSetupWizard.php:389
+#: include/classes/setup/CSetupWizard.php:528
 msgid "Database TLS CA file"
 msgstr "Файл TLS CA базы данных"
 
 #: include/classes/setup/CFrontendSetup.php:686
-#: include/classes/setup/CSetupWizard.php:302
-#: include/classes/setup/CSetupWizard.php:397
-#: include/classes/setup/CSetupWizard.php:563
+#: include/classes/setup/CSetupWizard.php:300
+#: include/classes/setup/CSetupWizard.php:395
+#: include/classes/setup/CSetupWizard.php:536
 msgid "Database TLS certificate file"
 msgstr "Файл TLS сертификата базы данных"
 
@@ -4478,19 +4478,19 @@ msgstr "Файл TLS сертификата базы данных"
 msgid "Database TLS certificate files must be read-only"
 msgstr "Файлы TLS сертификатов базы данных должны быть только на чтение"
 
-#: include/classes/setup/CSetupWizard.php:314
-#: include/classes/setup/CSetupWizard.php:404
+#: include/classes/setup/CSetupWizard.php:312
+#: include/classes/setup/CSetupWizard.php:402
 msgid "Database TLS cipher list"
 msgstr "Список TLS шифров базы данных"
 
-#: include/classes/setup/CSetupWizard.php:272
-#: include/classes/setup/CSetupWizard.php:387
+#: include/classes/setup/CSetupWizard.php:270
+#: include/classes/setup/CSetupWizard.php:385
 msgid "Database TLS encryption"
 msgstr "TLS шифрование базы данных"
 
-#: include/classes/setup/CSetupWizard.php:296
-#: include/classes/setup/CSetupWizard.php:394
-#: include/classes/setup/CSetupWizard.php:559
+#: include/classes/setup/CSetupWizard.php:294
+#: include/classes/setup/CSetupWizard.php:392
+#: include/classes/setup/CSetupWizard.php:532
 msgid "Database TLS key file"
 msgstr "Файл TLS ключа базы данных"
 
@@ -4498,12 +4498,12 @@ msgstr "Файл TLS ключа базы данных"
 msgid "Database history tables upgraded"
 msgstr "Таблицы истории в базе данных обновлены"
 
-#: include/classes/setup/CSetupWizard.php:240
+#: include/classes/setup/CSetupWizard.php:238
 msgid "Database host"
 msgstr "Хост базы данных"
 
-#: include/classes/setup/CSetupWizard.php:308
-#: include/classes/setup/CSetupWizard.php:400
+#: include/classes/setup/CSetupWizard.php:306
+#: include/classes/setup/CSetupWizard.php:398
 msgid "Database host verification"
 msgstr "Сверка хоста базы данных"
 
@@ -4511,35 +4511,35 @@ msgstr "Сверка хоста базы данных"
 msgid "Database monitor"
 msgstr "Монитор баз данных"
 
-#: include/classes/setup/CSetupWizard.php:253
-#: include/classes/setup/CSetupWizard.php:381 setup.php:44
+#: include/classes/setup/CSetupWizard.php:251
+#: include/classes/setup/CSetupWizard.php:379 setup.php:44
 msgid "Database name"
 msgstr "Имя базы данных"
 
-#: include/classes/setup/CSetupWizard.php:383
+#: include/classes/setup/CSetupWizard.php:381
 msgid "Database password"
 msgstr "Пароль от базы данных"
 
-#: include/classes/setup/CSetupWizard.php:245
-#: include/classes/setup/CSetupWizard.php:380 setup.php:43
+#: include/classes/setup/CSetupWizard.php:243
+#: include/classes/setup/CSetupWizard.php:378 setup.php:43
 msgid "Database port"
 msgstr "Порт базы данных"
 
-#: include/classes/setup/CSetupWizard.php:258
-#: include/classes/setup/CSetupWizard.php:385
+#: include/classes/setup/CSetupWizard.php:256
+#: include/classes/setup/CSetupWizard.php:383
 msgid "Database schema"
 msgstr "Схема базы данных"
 
-#: include/classes/setup/CSetupWizard.php:379
+#: include/classes/setup/CSetupWizard.php:377
 msgid "Database server"
 msgstr "Сервер базы данных"
 
-#: include/classes/setup/CSetupWizard.php:232
-#: include/classes/setup/CSetupWizard.php:374
+#: include/classes/setup/CSetupWizard.php:230
+#: include/classes/setup/CSetupWizard.php:372
 msgid "Database type"
 msgstr "Тип базы данных"
 
-#: include/classes/setup/CSetupWizard.php:382
+#: include/classes/setup/CSetupWizard.php:380
 msgid "Database user"
 msgstr "Имя пользователя от базы данных"
 
@@ -5528,7 +5528,7 @@ msgstr "Недоступен"
 msgid "Download image"
 msgstr "Загрузить изображение"
 
-#: include/classes/setup/CSetupWizard.php:491
+#: include/classes/setup/CSetupWizard.php:475
 msgid "Download the configuration file"
 msgstr "Загрузить конфигурационный файл"
 
@@ -6353,7 +6353,7 @@ msgstr "ЛОЖЬ"
 msgid "FTP"
 msgstr "FTP"
 
-#: include/classes/setup/CSetupWizard.php:191
+#: include/classes/setup/CSetupWizard.php:189
 msgid "Fail"
 msgstr "Ошибка"
 
@@ -6584,7 +6584,7 @@ msgstr "Поиск строки в файле. Возвращается стро
 msgid "Find string on a web page. Returns the matched string, or as specified by the optional output parameter"
 msgstr "Поиск строки на веб странице. Возвращает подходящую строку, или как определено в дополнительном параметре output"
 
-#: include/classes/setup/CSetupWizard.php:131
+#: include/classes/setup/CSetupWizard.php:129
 msgid "Finish"
 msgstr "Финиш"
 
@@ -7387,7 +7387,7 @@ msgstr "Выравнивание по горизонтали"
 #: include/classes/screens/CScreenProblem.php:893
 #: include/classes/screens/CScreenProblem.php:1142
 #: include/classes/screens/CScreenTriggersInfo.php:40
-#: include/classes/setup/CSetupWizard.php:344
+#: include/classes/setup/CSetupWizard.php:342
 #: include/classes/widgets/forms/CWidgetFormProblems.php:206
 #: include/classes/widgets/forms/CWidgetFormProblems.php:207
 #: include/hostgroups.inc.php:249 include/maps.inc.php:24
@@ -8560,9 +8560,9 @@ msgstr "Некорректное имя поля \"%1$s\" или значени�
 msgid "Incorrect fields for sysmap."
 msgstr "Некорректные поля для карты сети."
 
-#: include/classes/setup/CSetupWizard.php:555
-#: include/classes/setup/CSetupWizard.php:559
-#: include/classes/setup/CSetupWizard.php:563
+#: include/classes/setup/CSetupWizard.php:528
+#: include/classes/setup/CSetupWizard.php:532
+#: include/classes/setup/CSetupWizard.php:536
 #, c-format
 msgid "Incorrect file path for \"%1$s\": %2$s."
 msgstr "Некорректный путь к файлу для \"%1$s\": %2$s."
@@ -9399,12 +9399,11 @@ msgid "Insert expression"
 msgstr "Вставить выражение"
 
 #: include/classes/setup/CSetupWizard.php:62
-#: include/classes/setup/CSetupWizard.php:497
-#: include/classes/setup/CSetupWizard.php:520
+#: include/classes/setup/CSetupWizard.php:493
 msgid "Install"
 msgstr "Установка"
 
-#: setup.php:92
+#: setup.php:108
 msgid "Installation"
 msgstr "Инсталляция"
 
@@ -11904,9 +11903,9 @@ msgstr "Новые триггера"
 msgid "Next page"
 msgstr "Следующая страница"
 
-#: include/classes/setup/CSetupWizard.php:128
-#: include/classes/setup/CSetupWizard.php:334
-#: include/classes/setup/CSetupWizard.php:423
+#: include/classes/setup/CSetupWizard.php:126
+#: include/classes/setup/CSetupWizard.php:332
+#: include/classes/setup/CSetupWizard.php:421
 msgid "Next step"
 msgstr "Далее"
 
@@ -13595,7 +13594,7 @@ msgstr "Пассивный"
 #: app/views/administration.user.edit.php:111
 #: app/views/administration.user.edit.php:126 disc_prototypes.php:232
 #: host_discovery.php:184 httpconf.php:64
-#: include/classes/setup/CSetupWizard.php:268
+#: include/classes/setup/CSetupWizard.php:266
 #: include/views/configuration.host.discovery.edit.php:303
 #: include/views/configuration.host.discovery.edit.php:428
 #: include/views/configuration.host.discovery.edit.php:458
@@ -13738,7 +13737,7 @@ msgstr "Воспроизвести"
 msgid "Play sound"
 msgstr "Воспроизведение звукового сигнала"
 
-#: include/classes/setup/CSetupWizard.php:423
+#: include/classes/setup/CSetupWizard.php:421
 #, c-format
 msgid "Please check configuration parameters. If all is correct, press \"%1$s\" button, or \"%2$s\" button to change configuration parameters."
 msgstr "Пожалуйста, проверьте параметры конфигурации. Если все верно, нажмите кнопку \"%1$s\" или кнопку \"%2$s\" для изменения параметров конфигурации."
@@ -13747,12 +13746,12 @@ msgstr "Пожалуйста, проверьте параметры конфиг
 msgid "Please confirm that you want to remove all macros."
 msgstr "Пожалуйста, подтвердите, что вы хотите удалить все макросы."
 
-#: include/classes/setup/CSetupWizard.php:334
+#: include/classes/setup/CSetupWizard.php:332
 #, c-format
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
 msgstr "Пожалуйста, создайте базу данных вручную и укажите параметры конфигурации для соединения с этой базой. Нажмите кнопку \"%1$s\" при завершении."
 
-#: include/classes/setup/CSetupWizard.php:363
+#: include/classes/setup/CSetupWizard.php:361
 msgid "Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional)."
 msgstr "Пожалуйста, укажите имя хоста или IP адрес хоста и номер порта Zabbix сервера, а так же имя инсталляции (опционально)."
 
@@ -13797,7 +13796,7 @@ msgstr "Заполнение поля инвентаря узла сети"
 #: app/views/administration.proxy.edit.php:47
 #: app/views/monitoring.host.view.php:131
 #: app/views/popup.itemtestedit.view.php:123
-#: include/classes/setup/CSetupWizard.php:349 include/hosts.inc.php:1444
+#: include/classes/setup/CSetupWizard.php:347 include/hosts.inc.php:1444
 #: include/views/configuration.host.list.php:141
 #: include/views/inventory.host.view.php:79 setup.php:57
 msgid "Port"
@@ -13828,7 +13827,7 @@ msgid "Post type"
 msgstr "Тип Post"
 
 #: include/classes/setup/CSetupWizard.php:58
-#: include/classes/setup/CSetupWizard.php:421
+#: include/classes/setup/CSetupWizard.php:419
 msgid "Pre-installation summary"
 msgstr "Предварительный обзор инсталляции"
 
@@ -14658,7 +14657,7 @@ msgstr "Запрос успешно отправлен"
 msgid "Request type"
 msgstr "Тип запроса"
 
-#: include/classes/setup/CSetupWizard.php:175
+#: include/classes/setup/CSetupWizard.php:173
 #: include/views/configuration.httpconf.edit.php:221
 msgid "Required"
 msgstr "Требуется"
@@ -15209,7 +15208,7 @@ msgstr "Суббота"
 msgid "Save changes"
 msgstr "Сохранить изменения"
 
-#: include/classes/setup/CSetupWizard.php:492
+#: include/classes/setup/CSetupWizard.php:476
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "Сохранить как \"%1$s\""
@@ -18171,7 +18170,7 @@ msgstr "Используется в элементах данных"
 #: app/views/administration.user.edit.php:220
 #: app/views/reports.auditlog.list.php:87 httpconf.php:58
 #: include/actions.inc.php:1725 include/actions.inc.php:1780
-#: include/actions.inc.php:2001 include/classes/setup/CSetupWizard.php:265
+#: include/actions.inc.php:2001 include/classes/setup/CSetupWizard.php:263
 #: include/hosts.inc.php:61 include/views/configuration.httpconf.edit.php:181
 msgid "User"
 msgstr "Пользователь"
@@ -18857,7 +18856,7 @@ msgstr "Поставщик"
 msgid "Verbose"
 msgstr "Подробно"
 
-#: include/classes/setup/CSetupWizard.php:284
+#: include/classes/setup/CSetupWizard.php:282
 msgid "Verify database certificate"
 msgstr "Удостоверять сертификат базы данных"
 
@@ -18930,7 +18929,7 @@ msgstr "Ср"
 msgid "Warning"
 msgstr "Предупреждение"
 
-#: include/classes/setup/CSetupWizard.php:187
+#: include/classes/setup/CSetupWizard.php:185
 msgctxt "setup"
 msgid "Warning"
 msgstr "Предупреждение"
@@ -19043,7 +19042,7 @@ msgstr "Еженедельно"
 msgid "Welcome"
 msgstr "Добро пожаловать"
 
-#: include/classes/setup/CSetupWizard.php:167
+#: include/classes/setup/CSetupWizard.php:165
 msgid "Welcome to"
 msgstr "Добро пожаловать в"
 
@@ -19487,7 +19486,7 @@ msgstr "Диалог входа в систему Zabbix"
 
 #: app/partials/popup.operations.php:235
 #: app/views/administration.script.edit.php:57 include/actions.inc.php:880
-#: include/classes/setup/CSetupWizard.php:412
+#: include/classes/setup/CSetupWizard.php:410
 msgid "Zabbix server"
 msgstr "Zabbix сервер"
 
@@ -19508,7 +19507,7 @@ msgid "Zabbix server (proxy)"
 msgstr "Zabbix сервер (прокси)"
 
 #: include/classes/setup/CSetupWizard.php:54
-#: include/classes/setup/CSetupWizard.php:361
+#: include/classes/setup/CSetupWizard.php:359
 msgid "Zabbix server details"
 msgstr "Детали Zabbix сервера"
 
@@ -19525,11 +19524,11 @@ msgstr "Zabbix сервер запущен"
 msgid "Zabbix server is running check interval \"%1$s\"."
 msgstr "Интервал проверки работы Zabbix сервера составляет \"%1$s\"."
 
-#: include/classes/setup/CSetupWizard.php:416
+#: include/classes/setup/CSetupWizard.php:414
 msgid "Zabbix server name"
 msgstr "Имя сервера Zabbix"
 
-#: include/classes/setup/CSetupWizard.php:413
+#: include/classes/setup/CSetupWizard.php:411
 msgid "Zabbix server port"
 msgstr "Порт Zabbix сервера"
 
@@ -19997,7 +19996,7 @@ msgid "days"
 msgstr "дней"
 
 #: app/controllers/CControllerMapView.php:124
-#: include/classes/setup/CSetupWizard.php:376
+#: include/classes/setup/CSetupWizard.php:374
 #: include/classes/widgets/CWidgetHelper.php:70
 #: include/views/js/monitoring.slideconf.edit.js.php:40
 #: include/views/monitoring.slideconf.edit.php:136
