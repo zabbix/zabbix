@@ -202,14 +202,14 @@ class testFormMonitoringServices extends CWebTest {
 	 */
 	public function testFormMonitoringServices_Layout() {
 		$this->page->login()->open('zabbix.php?action=service.list');
-		$this->query('id:list_mode')->one()->asSegmentedRadio()->waitUntilClickable()->select('Edit');
+		$this->query('id:list_mode')->one()->asSegmentedRadio()->waitUntilVisible()->select('Edit');
 		$this->query('button:Create service')->waitUntilClickable()->one()->click();
 
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $dialog->query('id:service-form')->asForm()->one();
 
 		// Check tabs available in the form.
-		$form->checkTabs(['Service', 'Tags', 'Child services']);
+		$this->assertEquals(json_encode(['Service', 'Tags', 'Child services']), json_encode($form->getTabs()));
 
 		$service_tabs_labels = [
 			'Name',
@@ -223,8 +223,8 @@ class testFormMonitoringServices extends CWebTest {
 
 		// Check layout at Service tab.
 		foreach ($service_tabs_labels as $label) {
-			$this->assertTrue($form->query('id:service-tab')->one()->query("xpath:.//label[text()=".
-					CXPathHelper::escapeQuotes($label).']')->one(false)->isValid());
+			$this->assertTrue($form->query("xpath://div[@id='service-tab']//label[text()=".
+					CXPathHelper::escapeQuotes($label)."]")->one(false)->isValid());
 		}
 
 		// Check Problem tags table data.
@@ -342,7 +342,7 @@ class testFormMonitoringServices extends CWebTest {
 
 		// Check filtering reset.
 		$children_dialog->query('button:Reset')->one()->waitUntilClickable()->click();
-		$children_dialog->invalidate();
+		$children_dialog->waitUntilReady();
 
 		// Check possible children count in table.
 		$this->assertEquals(13, $children_dialog->query('class:list-table')->asTable()->one()->getRows()->count());

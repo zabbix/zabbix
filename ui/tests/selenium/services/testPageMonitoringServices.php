@@ -1036,9 +1036,9 @@ class testPageMonitoringServices extends CWebTest {
 		$this->assertFalse($table->query("xpath:.//td/a[text()=".CXPathHelper::escapeQuotes($name)."]")->exists());
 
 		// Check database.
-		foreach ([$name => 0, $parent => 1] as $service => $count) {
-			$this->assertEquals($count, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($service)));
-		}
+		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($name)));
+		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($parent)));
+
 	}
 
 	public function testPageMonitoringServices_DeleteParentFromRow() {
@@ -1075,9 +1075,8 @@ class testPageMonitoringServices extends CWebTest {
 		$this->assertTrue($table->query("xpath:.//td/a[text()=".CXPathHelper::escapeQuotes($child)."]")->exists());
 
 		// Check database.
-		foreach ([$name => 0, $child => 1] as $service => $count) {
-			$this->assertEquals($count, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($service)));
-		}
+		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($name)));
+		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($child)));
 	}
 
 	public function testPageMonitoringServices_SimpleServicesMassDelete() {

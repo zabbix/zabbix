@@ -285,19 +285,12 @@ class CFormElement extends CElement {
 	}
 
 	/**
-	 * Check form tabs presence.
+	 * Get tabs from form.
 	 *
-	 * @param array $expected    expected tabs
+	 * @return CElementCollection
 	 */
-	public function checkTabs($expected) {
-		$tabs = [];
-		foreach ($this->query("xpath:.//li[@role='tab']")->all() as $tab) {
-			$tabs[] = $tab->getText();
-		}
-
-		if ($tabs != $expected) {
-			throw new Exception('Tabs in form '.json_encode($tabs).' don\'t match expected '.json_encode($expected).'.');
-		}
+	public function getTabs() {
+		return $this->query("xpath:.//li[@role='tab']")->all()->asText();
 	}
 
 	/**
