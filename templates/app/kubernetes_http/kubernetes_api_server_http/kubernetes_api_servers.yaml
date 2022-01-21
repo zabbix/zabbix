@@ -1054,7 +1054,7 @@ zabbix_export:
                 - |
                   var lookup = {},
                       result = [];
-                  
+
                   JSON.parse(value).forEach(function (item) {
                       var grpc_code = item.labels.grpc_code;
                       if (!(lookup[grpc_code])) {
@@ -1114,7 +1114,7 @@ zabbix_export:
                 - |
                   var lookup = {},
                       result = [];
-                  
+
                   JSON.parse(value).forEach(function (item) {
                       var request_kind = item.labels.request_kind;
                       if (!(lookup[request_kind])) {
@@ -1181,7 +1181,7 @@ zabbix_export:
                 - |
                   var lookup = {},
                       result = [];
-                  
+
                   JSON.parse(value).forEach(function (item) {
                       var request_kind = item.labels.resource + item.labels.scope + item.labels.verb;
                       if (!(lookup[request_kind])) {
@@ -1361,18 +1361,18 @@ zabbix_export:
                   
                         }
                       else if  (item.name === 'apiserver_request_duration_seconds_bucket') {
-                        var labels = item.labels.verb + item.labels.le;
-                  
-                        if (lookup_histogram[labels]) {
-                            return;
-                        }
+                          var labels = item.labels.verb + item.labels.le;
+                    
+                          if (lookup_histogram[labels]) {
+                              return;
+                          }
 
-                        lookup_histogram[labels] = 1;
-                        result.push({
-                            '{#TYPE}': 'buckets',
-                            '{#VERB}': item.labels.verb,
-                            '{#LE}': item.labels.le
-                        });
+                          lookup_histogram[labels] = 1;
+                          result.push({
+                              '{#TYPE}': 'buckets',
+                              '{#VERB}': item.labels.verb,
+                              '{#LE}': item.labels.le
+                          });
                       }
                   });
                   
