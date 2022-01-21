@@ -785,8 +785,7 @@ footer {
   position: relative;
   background: url("../img/icon-sprite.svg?20211222") no-repeat -323px -411px;
   border: 1px solid #666666;
-  color: #ffffff;
-  vertical-align: inherit; }
+  color: #ffffff; }
 .color-picker .use-default,
 .color-picker-dialogue .use-default {
   background: none; }
@@ -797,18 +796,17 @@ footer {
     top: 0;
     right: 0;
     left: 0;
-    text-align: center; }
+    text-align: center;
+    line-height: 22px; }
 
 .color-picker {
   display: inline-block;
-  line-height: 1.2;
-  vertical-align: sub; }
+  line-height: 24px; }
   .color-picker .color-picker-preview {
     padding: 0;
     background-position: -321px -409px;
-    width: 24px; }
-    .color-picker .color-picker-preview:after {
-      line-height: 22px; }
+    width: 24px;
+    vertical-align: top; }
   .color-picker input:disabled + button {
     pointer-events: none;
     background: #7d7d7d !important;
