@@ -79,7 +79,7 @@ zabbix_export:
             
                     response = request.get(url);
             
-                    Zabbix.Log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus() + ': ' + response);
+                    Zabbix.log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus() + ': ' + response);
             
                     if (request.getStatus() < 200 || request.getStatus() >= 300) {
                         throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
@@ -148,7 +148,7 @@ zabbix_export:
             }
             catch (error) {
                 error += (String(error).endsWith('.')) ? '' : '.';
-                Zabbix.Log(3, '[ Kubernetes ] ERROR: ' + error);
+                Zabbix.log(3, '[ Kubernetes ] ERROR: ' + error);
                 return JSON.stringify({ error: error });
             }
           description: 'Generation of data for Control plane discovery rules.'
@@ -267,9 +267,6 @@ zabbix_export:
             -
               tag: component
               value: namespace
-            -
-              tag: type
-              value: gauge
         -
           uuid: 968e1dcaf76645aebd4979b9ad4eca9e
           name: 'Kubernetes: Node count'
@@ -389,7 +386,7 @@ zabbix_export:
             
                     response = request.get(url);
             
-                    Zabbix.Log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus() + ': ' + response);
+                    Zabbix.log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus() + ': ' + response);
             
                     if (request.getStatus() < 200 || request.getStatus() >= 300) {
                         throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
@@ -455,7 +452,7 @@ zabbix_export:
             
                     response = request.get(url);
             
-                    Zabbix.Log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus() + ': ' + response);
+                    Zabbix.log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus() + ': ' + response);
             
                     if (request.getStatus() < 200 || request.getStatus() >= 300) {
                         throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
@@ -480,7 +477,7 @@ zabbix_export:
             }
             catch (error) {
                 error += (String(error).endsWith('.')) ? '' : '.';
-                Zabbix.Log(3, '[ Kubernetes ] ERROR: ' + error);
+                Zabbix.log(3, '[ Kubernetes ] ERROR: ' + error);
                 return JSON.stringify({ error: error });
             }
           description: 'Collecting Kubernetes metrics from kube-state-metrics.'
@@ -560,7 +557,7 @@ zabbix_export:
             
                     response = request.get(url);
             
-                    Zabbix.Log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus() + ': ' + response);
+                    Zabbix.log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus() + ': ' + response);
             
                     if (request.getStatus() < 200 || request.getStatus() >= 300) {
                         throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
@@ -621,7 +618,7 @@ zabbix_export:
             }
             catch (error) {
                 error += (String(error).endsWith('.')) ? '' : '.';
-                Zabbix.Log(3, '[ Kubernetes ] ERROR: ' + error);
+                Zabbix.log(3, '[ Kubernetes ] ERROR: ' + error);
                 return JSON.stringify({ error: error });
             }
           description: 'Generation of data for Control plane discovery rules.'

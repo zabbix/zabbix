@@ -64,7 +64,7 @@ zabbix_export:
             
                       response = request.get(url);
             
-                      Zabbix.Log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus() + ': ' + response);
+                      Zabbix.log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus() + ': ' + response);
             
                       if (request.getStatus() < 200 || request.getStatus() >= 300) {
                           throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
@@ -272,7 +272,7 @@ zabbix_export:
               }
               catch (error) {
                   error += (String(error).endsWith('.')) ? '' : '.';
-                  Zabbix.Log(3, '[ Kubernetes ] ERROR: ' + error);
+                  Zabbix.log(3, '[ Kubernetes ] ERROR: ' + error);
                   return JSON.stringify({ error: error });
               }
           description: 'Collecting and processing cluster nodes data via Kubernetes API.'
@@ -361,7 +361,7 @@ zabbix_export:
                               if (filter in data || (exclude && exclude[1] in data)) {
                                   if ((exclude && new RegExp(filters[filter]).test(data[exclude[1]]))
                                       || (!exclude && !(new RegExp(filters[filter]).test(data[filter])))) {
-                                      Zabbix.Log(4, '[ Kubernetes discovery ] Discarded "' + name + '" by filter "' + filter + ': ' + filters[filter] + '"');
+                                      Zabbix.log(4, '[ Kubernetes discovery ] Discarded "' + name + '" by filter "' + filter + ': ' + filters[filter] + '"');
                   
                                       filtered = false;
                                       return true;
@@ -378,7 +378,7 @@ zabbix_export:
                           output = [];
                   
                       if (typeof input !== 'object' || typeof input.items === 'undefined') {
-                          Zabbix.Log(4, '[ Kubernetes ] Recieved incorrect JSON: ' + input);
+                          Zabbix.log(4, '[ Kubernetes ] Recieved incorrect JSON: ' + input);
                           throw 'Incorrect JSON. Check debug log for more information.';
                       }
                   
@@ -388,7 +388,7 @@ zabbix_export:
                       input.items.forEach(function (node) {
                           if (filter(node.metadata.name, node.metadata.labels, filterLabels)
                               && filter(node.metadata.name, node.metadata.annotations, filterAnnotations)) {
-                              Zabbix.Log(4, '[ Kubernetes discovery ] Filtered node "' + node.metadata.name + '"');
+                              Zabbix.log(4, '[ Kubernetes discovery ] Filtered node "' + node.metadata.name + '"');
                   
                               var internalIPs = node.status.addresses.filter(function (addr) {
                                   return addr.type === 'InternalIP';
@@ -406,7 +406,7 @@ zabbix_export:
                                   });
                               }
                               else {
-                                  Zabbix.Log(4, '[ Kubernetes discovery ] Node "' + node.metadata.name + '" is not included in the list of endpoint IPs');
+                                  Zabbix.log(4, '[ Kubernetes discovery ] Node "' + node.metadata.name + '" is not included in the list of endpoint IPs');
                               }
                           }
                       });
@@ -415,7 +415,7 @@ zabbix_export:
                   }
                   catch (error) {
                       error += (String(error).endsWith('.')) ? '' : '.';
-                      Zabbix.Log(3, '[ Kubernetes discovery ] ERROR: ' + error);
+                      Zabbix.log(3, '[ Kubernetes discovery ] ERROR: ' + error);
                       throw 'Discovery error: ' + error;
                   }
             -
@@ -1778,7 +1778,7 @@ zabbix_export:
                               if (filter in data || (exclude && exclude[1] in data)) {
                                   if ((exclude && new RegExp(filters[filter]).test(data[exclude[1]]))
                                       || (!exclude && !(new RegExp(filters[filter]).test(data[filter])))) {
-                                      Zabbix.Log(4, '[ Kubernetes discovery ] Discarded "' + name + '" by filter "' + filter + ': ' + filters[filter] + '"');
+                                      Zabbix.log(4, '[ Kubernetes discovery ] Discarded "' + name + '" by filter "' + filter + ': ' + filters[filter] + '"');
                   
                                       filtered = false;
                                       return true;
@@ -1795,7 +1795,7 @@ zabbix_export:
                           output = [];
                   
                       if (typeof input !== 'object' || typeof input.items === 'undefined') {
-                          Zabbix.Log(4, '[ Kubernetes ] Recieved incorrect JSON: ' + {0});
+                          Zabbix.log(4, '[ Kubernetes ] Recieved incorrect JSON: ' + {0});
                           throw 'Incorrect JSON. Check debug log for more information.';
                       }
                   
@@ -1810,7 +1810,7 @@ zabbix_export:
                               node.pods.forEach(function (pod) {
                                   if (filter(pod.name, pod.labels, filterPodLabels)
                                       && filter(pod.name, pod.annotations, filterPodAnnotations)) {
-                                      Zabbix.Log(4, '[ Kubernetes discovery ] Filtered pod "' + pod.name + '"');
+                                      Zabbix.log(4, '[ Kubernetes discovery ] Filtered pod "' + pod.name + '"');
                   
                                       output.push({
                                           '{#POD}': pod.name,
@@ -1826,7 +1826,7 @@ zabbix_export:
                   }
                   catch (error) {
                       error += (String(error).endsWith('.')) ? '' : '.';
-                      Zabbix.Log(3, '[ Kubernetes discovery ] ERROR: ' + error);
+                      Zabbix.log(3, '[ Kubernetes discovery ] ERROR: ' + error);
                       throw 'Discovery error: ' + error;
                   }
             -
