@@ -362,9 +362,9 @@ class CItemPrototype extends CItemGeneral {
 	protected function validateCreate(array &$items, array $specific_rules = []): void {
 		parent::validateCreate($items, [
 			'ruleid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
-			'history' =>		['type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'history')],
+			'history' =>		['type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'history')],
 			'trends' =>			['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'trends')],
+									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'trends')],
 									['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'value_type' =>		['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
@@ -385,7 +385,7 @@ class CItemPrototype extends CItemGeneral {
 			]],
 			'params' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'type', 'in' => implode(',', [ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SCRIPT])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'params')],
-									['if' => ['field' => 'type', 'in' => ITEM_TYPE_CALCULATED], 'type' => API_CALC_FORMULA, 'flags' => API_REQUIRED | API_NOT_EMPTY | $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0, 'length' => DB::getFieldLength('items', 'params')],
+									['if' => ['field' => 'type', 'in' => ITEM_TYPE_CALCULATED], 'type' => API_CALC_FORMULA, 'flags' => API_REQUIRED | API_ALLOW_LLD_MACRO, 'length' => DB::getFieldLength('items', 'params')],
 									['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'interfaceid' =>	['type' => API_MULTIPLE, 'rules' => [
@@ -487,7 +487,7 @@ class CItemPrototype extends CItemGeneral {
 				}
 
 				if (array_key_exists('allow_traps', $item) && $item['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_OFF
-					&& $item['allow_traps'] != $db_items[$item['itemid']]['allow_traps']) {
+						&& $item['allow_traps'] != $db_items[$item['itemid']]['allow_traps']) {
 					$item['trapper_hosts'] = '';
 				}
 
@@ -546,9 +546,9 @@ class CItemPrototype extends CItemGeneral {
 	protected function validateUpdate(array &$items, ?array &$db_items, array $specific_rules = []): void {
 		parent::validateUpdate($items, $db_items, [
 			'ruleid' =>			['type' => API_ID],
-			'history' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO | $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'history')],
+			'history' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'history')],
 			'trends' =>			['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO | $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'trends')],
+									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'trends')],
 									['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'value_type' =>		['type' => API_MULTIPLE, 'rules' => [
@@ -569,7 +569,7 @@ class CItemPrototype extends CItemGeneral {
 			]],
 			'params' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'type', 'in' => implode(',', [ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SCRIPT])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'params')],
-									['if' => ['field' => 'type', 'in' => ITEM_TYPE_CALCULATED], 'type' => API_CALC_FORMULA, 'flags' => API_NOT_EMPTY | $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0, 'length' => DB::getFieldLength('items', 'params')],
+									['if' => ['field' => 'type', 'in' => ITEM_TYPE_CALCULATED], 'type' => API_CALC_FORMULA, 'flags' => API_ALLOW_LLD_MACRO, 'length' => DB::getFieldLength('items', 'params')],
 									['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'interfaceid' =>	['type' => API_MULTIPLE, 'rules' => [
@@ -586,8 +586,6 @@ class CItemPrototype extends CItemGeneral {
 	/**
 	 * @param array $items
 	 * @param array $db_items
-	 *
-	 * @throws APIException
 	 */
 	protected function updateForce(array $items, array $db_items): void {
 		CArrayHelper::sort($items, ['itemid']);
@@ -873,5 +871,14 @@ class CItemPrototype extends CItemGeneral {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * @param array $items
+	 * @param array $db_items
+	 */
+	protected static function addAffectedObjects(array $items, array &$db_items): void {
+		parent::addAffectedObjects($items, $db_items);
+		self::addAffectedTags($items, $db_items);
 	}
 }

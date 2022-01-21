@@ -1468,10 +1468,10 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Method validates preprocessing steps independently from other item properties.
+	 * Method validates preprocessing steps independently of other item properties.
 	 *
-	 * @param array  $preprocessing_steps    An array of item pre-processing step details.
-	 *                                       See self::validateItemPreprocessing for details.
+	 * @param array  $preprocessing_steps  An array of item preprocessing step details.
+	 *                                     See self::validatePreprocessing for details.
 	 *
 	 * @return bool|string
 	 */
@@ -1493,8 +1493,6 @@ abstract class CItemGeneral extends CApiService {
 	 * @param array|null $db_items
 	 */
 	protected static function updateParameters(array &$items, array $db_items = null): void {
-		$is_update = ($db_items !== null);
-
 		$ins_item_parameters = [];
 		$upd_item_parameters = [];
 		$del_item_parameterids = [];
@@ -1504,7 +1502,7 @@ abstract class CItemGeneral extends CApiService {
 				continue;
 			}
 
-			$db_item_parameters = $is_update
+			$db_item_parameters = ($db_items !== null)
 				? array_column($db_items[$item['itemid']]['parameters'], null, 'name')
 				: [];
 
@@ -1755,7 +1753,7 @@ abstract class CItemGeneral extends CApiService {
 
 		$item_types_with_interfaces = [
 			ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
-			ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP,ITEM_TYPE_SNMP
+			ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_SNMP
 		];
 
 		foreach ($items as $i => $item) {
@@ -2295,6 +2293,39 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
+	 * Normalize preprocessing step parameters.
+	 *
+	 * @param array  $preprocessing                   Preprocessing steps.
+	 * @param string $preprocessing[<num>]['params']  Preprocessing step parameters.
+	 * @param int    $preprocessing[<num>]['type']    Preprocessing step type.
+	 *
+	 * @return array
+	 */
+	protected static function normalizeItemPreprocessingSteps(array $preprocessing): array {
+		foreach ($preprocessing as &$step) {
+			if (!array_key_exists('params', $step)) {
+				continue;
+			}
+
+			$step['params'] = str_replace("\r\n", "\n", $step['params']);
+			$params = explode("\n", $step['params']);
+
+			switch ($step['type']) {
+				case ZBX_PREPROC_PROMETHEUS_PATTERN:
+					if (!array_key_exists(2, $params)) {
+						$params[2] = '';
+					}
+					break;
+			}
+
+			$step['params'] = implode("\n", $params);
+		}
+		unset($step);
+
+		return $preprocessing;
+	}
+
+	/**
 	 * @param array $items
 	 * @param bool  $check_permissions
 	 *
@@ -2332,98 +2363,99 @@ abstract class CItemGeneral extends CApiService {
 	 * @param array $db_items
 	 */
 	protected static function addAffectedObjects(array $items, array &$db_items): void {
-		$itemids = ['parameters' => [], 'preprocessing' => [], 'tags' => []];
+		self::addAffectedParameters($items, $db_items);
+		self::addAffectedPreprocessing($items, $db_items);
+	}
+
+	/**
+	 * @param array $items
+	 * @param array $db_items
+	 */
+	protected static function addAffectedParameters(array $items, array &$db_items): void {
+		$itemids = [];
 
 		foreach ($items as $item) {
 			if (array_key_exists('parameters', $item)) {
-				$itemids['parameters'][] = $item['itemid'];
+				$itemids[] = $item['itemid'];
 				$db_items[$item['itemid']]['parameters'] = [];
 			}
-
-			if (array_key_exists('preprocessing', $item)) {
-				$itemids['preprocessing'][] = $item['itemid'];
-				$db_items[$item['itemid']]['preprocessing'] = [];
-			}
-
-			// Tags are only supported for items and item prototypes.
-			if (array_key_exists('tags', $item)) {
-				$itemids['tags'][] = $item['itemid'];
-				$db_items[$item['itemid']]['tags'] = [];
-			}
 		}
 
-		if ($itemids['parameters']) {
-			$options = [
-				'output' => ['item_parameterid', 'itemid', 'name', 'value'],
-				'filter' => ['itemid' => $itemids['parameters']]
-			];
-			$db_item_parameters = DBselect(DB::makeSql('item_parameter', $options));
-
-			while ($db_item_parameter = DBfetch($db_item_parameters)) {
-				$db_items[$db_item_parameter['itemid']]['parameters'][$db_item_parameter['item_parameterid']] =
-					array_diff_key($db_item_parameter, array_flip(['itemid']));
-			}
+		if (!$itemids) {
+			return;
 		}
 
-		if ($itemids['preprocessing']) {
-			$options = [
-				'output' => [
-					'item_preprocid', 'itemid', 'step', 'type', 'params', 'error_handler', 'error_handler_params'
-				],
-				'filter' => ['itemid' => $itemids['preprocessing']]
-			];
-			$db_item_preprocs = DBselect(DB::makeSql('item_preproc', $options));
+		$options = [
+			'output' => ['item_parameterid', 'itemid', 'name', 'value'],
+			'filter' => ['itemid' => $itemids]
+		];
+		$db_item_parameters = DBselect(DB::makeSql('item_parameter', $options));
 
-			while ($db_item_preproc = DBfetch($db_item_preprocs)) {
-				$db_items[$db_item_preproc['itemid']]['preprocessing'][$db_item_preproc['item_preprocid']] =
-					array_diff_key($db_item_preproc, array_flip(['itemid']));
-			}
-		}
-
-		if ($itemids['tags']) {
-			$options = [
-				'output' => ['itemtagid', 'itemid', 'tag', 'value'],
-				'filter' => ['itemid' => $itemids['tags']]
-			];
-			$db_item_tags = DBselect(DB::makeSql('item_tag', $options));
-
-			while ($db_item_tag = DBfetch($db_item_tags)) {
-				$db_items[$db_item_tag['itemid']]['tags'][$db_item_tag['itemtagid']] =
-					array_diff_key($db_item_tag, array_flip(['itemid']));
-			}
+		while ($db_item_parameter = DBfetch($db_item_parameters)) {
+			$db_items[$db_item_parameter['itemid']]['parameters'][$db_item_parameter['item_parameterid']] =
+				array_diff_key($db_item_parameter, array_flip(['itemid']));
 		}
 	}
 
 	/**
-	 * Normalize preprocessing step parameters.
-	 *
-	 * @param array  $preprocessing                   Preprocessing steps.
-	 * @param string $preprocessing[<num>]['params']  Preprocessing step parameters.
-	 * @param int    $preprocessing[<num>]['type']    Preprocessing step type.
-	 *
-	 * @return array
+	 * @param array $items
+	 * @param array $db_items
 	 */
-	protected static function normalizeItemPreprocessingSteps(array $preprocessing): array {
-		foreach ($preprocessing as &$step) {
-			if (!array_key_exists('params', $step)) {
-				continue;
+	protected static function addAffectedPreprocessing(array $items, array &$db_items): void {
+		$itemids = [];
+
+		foreach ($items as $item) {
+			if (array_key_exists('preprocessing', $item)) {
+				$itemids[] = $item['itemid'];
+				$db_items[$item['itemid']]['preprocessing'] = [];
 			}
-
-			$step['params'] = str_replace("\r\n", "\n", $step['params']);
-			$params = explode("\n", $step['params']);
-
-			switch ($step['type']) {
-				case ZBX_PREPROC_PROMETHEUS_PATTERN:
-					if (!array_key_exists(2, $params)) {
-						$params[2] = '';
-					}
-					break;
-			}
-
-			$step['params'] = implode("\n", $params);
 		}
-		unset($step);
 
-		return $preprocessing;
+		if (!$itemids) {
+			return;
+		}
+
+		$options = [
+			'output' => [
+				'item_preprocid', 'itemid', 'step', 'type', 'params', 'error_handler', 'error_handler_params'
+			],
+			'filter' => ['itemid' => $itemids]
+		];
+		$db_item_preprocs = DBselect(DB::makeSql('item_preproc', $options));
+
+		while ($db_item_preproc = DBfetch($db_item_preprocs)) {
+			$db_items[$db_item_preproc['itemid']]['preprocessing'][$db_item_preproc['item_preprocid']] =
+				array_diff_key($db_item_preproc, array_flip(['itemid']));
+		}
+	}
+
+	/**
+	 * @param array $items
+	 * @param array $db_items
+	 */
+	protected static function addAffectedTags(array $items, array &$db_items): void {
+		$itemids = [];
+
+		foreach ($items as $item) {
+			if (array_key_exists('tags', $item)) {
+				$itemids[] = $item['itemid'];
+				$db_items[$item['itemid']]['tags'] = [];
+			}
+		}
+
+		if (!$itemids) {
+			return;
+		}
+
+		$options = [
+			'output' => ['itemtagid', 'itemid', 'tag', 'value'],
+			'filter' => ['itemid' => $itemids]
+		];
+		$db_item_tags = DBselect(DB::makeSql('item_tag', $options));
+
+		while ($db_item_tag = DBfetch($db_item_tags)) {
+			$db_items[$db_item_tag['itemid']]['tags'][$db_item_tag['itemtagid']] =
+				array_diff_key($db_item_tag, array_flip(['itemid']));
+		}
 	}
 }

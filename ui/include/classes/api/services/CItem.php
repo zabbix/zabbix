@@ -500,9 +500,9 @@ class CItem extends CItemGeneral {
 	 */
 	protected function validateCreate(array &$items, array $specific_rules = []): void {
 		parent::validateCreate($items, [
-			'history' =>		['type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'history')],
+			'history' =>		['type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'history')],
 			'trends' =>			['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'trends')],
+									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'trends')],
 									['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'value_type' =>		['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
@@ -523,7 +523,7 @@ class CItem extends CItemGeneral {
 			]],
 			'params' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'type', 'in' => implode(',', [ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SCRIPT])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'params')],
-									['if' => ['field' => 'type', 'in' => ITEM_TYPE_CALCULATED], 'type' => API_CALC_FORMULA, 'flags' => API_REQUIRED | API_NOT_EMPTY | $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0, 'length' => DB::getFieldLength('items', 'params')],
+									['if' => ['field' => 'type', 'in' => ITEM_TYPE_CALCULATED], 'type' => API_CALC_FORMULA, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'params')],
 									['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'interfaceid' =>	['type' => API_MULTIPLE, 'rules' => [
@@ -703,9 +703,9 @@ class CItem extends CItemGeneral {
 	 */
 	protected function validateUpdate(array &$items, ?array &$db_items, array $specific_rules = []): void {
 		parent::validateUpdate($items, $db_items, [
-			'history' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO | $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'history')],
+			'history' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'history')],
 			'trends' =>			['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO | $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'trends')],
+									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'trends')],
 									['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'value_type' =>		['type' => API_MULTIPLE, 'rules' => [
@@ -726,7 +726,7 @@ class CItem extends CItemGeneral {
 			]],
 			'params' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'type', 'in' => implode(',', [ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SCRIPT])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'params')],
-									['if' => ['field' => 'type', 'in' => ITEM_TYPE_CALCULATED], 'type' => API_CALC_FORMULA, 'flags' => API_NOT_EMPTY | $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0, 'length' => DB::getFieldLength('items', 'params')],
+									['if' => ['field' => 'type', 'in' => ITEM_TYPE_CALCULATED], 'type' => API_CALC_FORMULA, 'length' => DB::getFieldLength('items', 'params')],
 									['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'interfaceid' =>	['type' => API_MULTIPLE, 'rules' => [
@@ -776,7 +776,7 @@ class CItem extends CItemGeneral {
 		self::updatePreprocessing($items, $db_items);
 		self::updateTags($items, $db_items);
 
-		// Fix for auditlog because field type in object is different then field type in db object.
+		// Fix for audit log, because field type in object is different from field type in db object.
 		foreach ($db_items as &$item) {
 			if (array_key_exists('query_fields', $item)) {
 				$item['query_fields'] = json_encode($item['query_fields']);
@@ -1061,7 +1061,7 @@ class CItem extends CItemGeneral {
 		return true;
 	}
 
-	public function addRelatedObjects(array $options, array $result) {
+	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
 		$itemids = array_keys($result);
@@ -1323,5 +1323,14 @@ class CItem extends CItemGeneral {
 		}
 
 		return $sqlParts;
+	}
+
+	/**
+	 * @param array $items
+	 * @param array $db_items
+	 */
+	protected static function addAffectedObjects(array $items, array &$db_items): void {
+		parent::addAffectedObjects($items, $db_items);
+		self::addAffectedTags($items, $db_items);
 	}
 }
