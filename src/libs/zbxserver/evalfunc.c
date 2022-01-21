@@ -1743,7 +1743,7 @@ static int	evaluate_LAST(zbx_variant_t *value, DC_ITEM *item, const char *parame
 	return ret;
 }
 
-/* flags for evaluate_MIN() and evaluate_MAX() */
+/* flags for evaluate_MIN_or_MAX() */
 #define EVALUATE_MIN	0
 #define EVALUATE_MAX	1
 
