@@ -1,12 +1,14 @@
 Changes for 5.4.10rc1
 
 New features:
+...G...... [ZBXNEXT-7409] added native support for the vfs.dir.size and vfs.dir.count keys in Zabbix agent 2 (esneiders)
 ........S. [ZBXNEXT-7101] implemented sleep function into JS engine (asestakovs)
 .........T [ZBXNEXT-6861] updated Zabbix proxy templates according to the latest guidelines (abakaldin)
 .........T [ZBXNEXT-7078] added template for pfsense (vkhaliev)
 ...G...... [ZBXNEXT-6875] added native support for the system.hw.chassis and system.hw.devices keys in Zabbix agent 2 (esneiders)
 
 Bug fixes:
+.......PS. [ZBX-20293] fixed icmpping items group becomes not supported due to error in interval detection (akozlovs)
 A......... [ZBX-19991] fixed template import of dependent items and item prototypes having newly created master item (miks)
 .........T [ZBX-20316] added macro for password and changed conf file in postgresql by user parameters template (vkhaliev)
 .........T [ZBX-20303] fixed trigger name in MSSQL template (vkhaliev)
