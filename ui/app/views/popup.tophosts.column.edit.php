@@ -161,7 +161,7 @@ $form_grid->addItem([
 // Base color.
 $form_grid->addItem([
 	new CLabel(_('Base color'), 'base_color'),
-	new CFormField((new CColor('base_color', $data['base_color']))->setOverlayWrapper('body'))
+	new CFormField(new CColor('base_color', $data['base_color']))
 ]);
 
 // Min value.

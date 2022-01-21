@@ -72,7 +72,7 @@ window.widget_tophosts_form = new class {
 			case 'add':
 				this._column_index = this._list_columns.querySelectorAll('tr').length;
 
-				column_popup = PopUp('popup.tophosts.column.edit', {}, null, target).$dialogue[0];
+				column_popup = PopUp('popup.tophosts.column.edit', {}).$dialogue[0];
 				column_popup.addEventListener('dialogue.submit', (e) => this.updateColumns(e));
 				column_popup.addEventListener('overlay.close', this.removeColorpicker);
 				break;
@@ -83,7 +83,7 @@ window.widget_tophosts_form = new class {
 				this._column_index = target.closest('tr').querySelector('[name="sortorder[columns][]"]').value;
 
 				column_popup = PopUp('popup.tophosts.column.edit',
-					{...form_fields.columns[this._column_index], edit: 1}, null, target).$dialogue[0];
+					{...form_fields.columns[this._column_index], edit: 1}).$dialogue[0];
 				column_popup.addEventListener('dialogue.submit', (e) => this.updateColumns(e));
 				column_popup.addEventListener('overlay.close', this.removeColorpicker);
 				break;
@@ -137,7 +137,6 @@ window.widget_tophosts_form = new class {
 
 	// Need to remove function after subpopups auto close.
 	removeColorpicker() {
-		document.getElementById('color_picker').remove();
-		removeFromOverlaysStack('color_picker');
+		$('#color_picker').hide();
 	}
 }();
