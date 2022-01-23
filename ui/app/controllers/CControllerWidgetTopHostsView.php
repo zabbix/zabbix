@@ -97,6 +97,16 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 			}
 		}
 
+		$text_columns = [];
+
+		foreach ($fields['columns'] as $column_index => $column) {
+			if ($column['data'] == CWidgetFieldColumnsList::DATA_TEXT) {
+				$text_columns[$column_index] = $column['text'];
+			}
+		}
+
+		$text_columns = CMacrosResolverHelper::resolveWidgetTopHostsTextColumns($text_columns, $guide_hostids);
+
 		$rows = [];
 
 		foreach ($guide_hostids as $hostid) {
@@ -119,13 +129,15 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 							'value' => $hosts[$hostid]['name'],
 							'hostid' => $hostid
 						];
+
 						break;
 
 					case CWidgetFieldColumnsList::DATA_TEXT:
 						$row[] = [
-							'value' => $column['text'],
+							'value' => $text_columns[$hostid][$column_index],
 							'hostid' => $hostid
 						];
+
 						break;
 
 					case CWidgetFieldColumnsList::DATA_ITEM_VALUE:

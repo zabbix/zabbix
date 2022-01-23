@@ -1652,6 +1652,70 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	}
 
 	/**
+	 * Resolve text-type column macros for top-hosts widget.
+	 *
+	 * @param array $columns
+	 * @param array $hostids
+	 *
+	 * @return array
+	 */
+	public function resolveWidgetTopHostsTextColumns(array $columns, array $hostids): array {
+		$types = [
+			'macros' => [
+				'host' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}', '{HOST.DESCRIPTION}'],
+				'inventory' => array_keys(self::getSupportedHostInventoryMacrosMap())
+			],
+			'usermacros' => true
+		];
+
+		$macro_values = [];
+		$macros = ['host' => [], 'inventory' => []];
+		$usermacros = [];
+
+		$matched_macros = self::extractMacros($columns, $types);
+
+		foreach ($hostids as $hostid) {
+			foreach ($matched_macros['macros']['host'] as $token) {
+				if ($token === '{HOST.ID}') {
+					$macro_values[$hostid][$token] = $hostid;
+				}
+				else {
+					$macro_values[$hostid][$token] = UNRESOLVED_MACRO_STRING;
+					$macros['host'][$hostid][$hostid] = true;
+				}
+			}
+
+			foreach ($matched_macros['macros']['inventory'] as $token) {
+				$macro_values[$hostid][$token] = UNRESOLVED_MACRO_STRING;
+				$macros['inventory'][$hostid][$hostid] = true;
+			}
+
+			if ($matched_macros['usermacros']) {
+				$usermacros[$hostid] = ['hostids' => [$hostid], 'macros' => $matched_macros['usermacros']];
+			}
+		}
+
+		$macro_values = self::getHostMacrosByHostId($macros['host'], $macro_values);
+		$macro_values = self::getInventoryMacrosByHostId($macros['inventory'], $macro_values);
+
+		foreach ($this->getUserMacros($usermacros) as $hostid => $usermacros_data) {
+			$macro_values[$hostid] = array_key_exists($hostid, $macro_values)
+				? array_merge($macro_values[$hostid], $usermacros_data['macros'])
+				: $usermacros_data['macros'];
+		}
+
+		$data = [];
+
+		foreach ($hostids as $hostid) {
+			foreach ($columns as $column => $value) {
+				$data[$hostid][$column] = strtr($value, $macro_values[$hostid]);
+			}
+		}
+
+		return $data;
+	}
+
+	/**
 	 * Resolve item delay macros, item history and item trend macros.
 	 *
 	 * @param array  $data
