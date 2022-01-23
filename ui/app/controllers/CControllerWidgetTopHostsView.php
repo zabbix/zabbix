@@ -134,7 +134,7 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 
 					case CWidgetFieldColumnsList::DATA_TEXT:
 						$row[] = [
-							'value' => $text_columns[$hostid][$column_index],
+							'value' => $text_columns[$column_index][$hostid],
 							'hostid' => $hostid
 						];
 

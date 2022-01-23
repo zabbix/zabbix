@@ -1706,9 +1706,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		$data = [];
 
-		foreach ($hostids as $hostid) {
-			foreach ($columns as $column => $value) {
-				$data[$hostid][$column] = strtr($value, $macro_values[$hostid]);
+		foreach ($columns as $column => $value) {
+			$data[$column] = [];
+
+			foreach ($hostids as $hostid) {
+				$data[$column][$hostid] = strtr($value, $macro_values[$hostid]);
 			}
 		}
 
