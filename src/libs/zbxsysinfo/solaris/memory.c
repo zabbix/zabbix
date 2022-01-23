@@ -18,118 +18,220 @@
 **/
 
 #include "common.h"
+#include "log.h"
 #include "sysinfo.h"
+
+#define CHECKED_SYSCONF_SYSCALL(sysconf_name)									\
+	if (-1 == (sysconf_name##_res = sysconf(sysconf_name)))							\
+	{													\
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot get sysconf(" #sysconf_name ", errno: %s",	\
+				zbx_strerror(errno)));								\
+		ret = SYSINFO_RET_FAIL;										\
+		goto out;											\
+	}													\
+
 #ifdef HAVE_VMINFO_T_UPDATES
 #include "stats.h"
 #endif
 
 static int	VM_MEMORY_TOTAL(AGENT_RESULT *result)
 {
-	SET_UI64_RESULT(result, (zbx_uint64_t)sysconf(_SC_PHYS_PAGES) * sysconf(_SC_PAGESIZE));
+	int	ret;
+	long	 _SC_PHYS_PAGES_res, _SC_PAGESIZE_res;
 
-	return SYSINFO_RET_OK;
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s", __func__);
+
+	CHECKED_SYSCONF_SYSCALL(_SC_PHYS_PAGES);
+	CHECKED_SYSCONF_SYSCALL(_SC_PAGESIZE);
+
+	SET_UI64_RESULT(result, (zbx_uint64_t)_SC_PHYS_PAGES_res * _SC_PAGESIZE_res);
+	ret = SYSINFO_RET_OK;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+	return ret;
 }
 
 #ifndef HAVE_VMINFO_T_UPDATES
 static int	VM_MEMORY_USED(AGENT_RESULT *result)
 {
+	int		ret;
 	zbx_uint64_t	used;
+	long		_SC_PHYS_PAGES_res, _SC_AVPHYS_PAGES_res, _SC_PAGESIZE_res;
 
-	used = sysconf(_SC_PHYS_PAGES) - sysconf(_SC_AVPHYS_PAGES);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s, (no HAVE_VMINFO_T_UPDATES)", __func__);
 
-	SET_UI64_RESULT(result, used * sysconf(_SC_PAGESIZE));
+	CHECKED_SYSCONF_SYSCALL(_SC_PHYS_PAGES);
+	CHECKED_SYSCONF_SYSCALL(_SC_AVPHYS_PAGES);
+	CHECKED_SYSCONF_SYSCALL(_SC_PAGESIZE);
 
-	return SYSINFO_RET_OK;
+	used = _SC_PHYS_PAGES_res - _SC_AVPHYS_PAGES_res;
+
+	SET_UI64_RESULT(result, used * _SC_PAGESIZE_res);
+	ret = SYSINFO_RET_OK;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
 }
 
 static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
 {
+	int		ret;
 	zbx_uint64_t	used, total;
+	long		_SC_PHYS_PAGES_res, _SC_AVPHYS_PAGES_res;
 
-	if (0 == (total = sysconf(_SC_PHYS_PAGES)))
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s, (no HAVE_VMINFO_T_UPDATES)", __func__);
+
+	CHECKED_SYSCONF_SYSCALL(_SC_PHYS_PAGES);
+	CHECKED_SYSCONF_SYSCALL(_SC_AVPHYS_PAGES);
+
+	if (0 == (total = _SC_PHYS_PAGES_res))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot calculate percentage because total is zero."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out;
 	}
 
-	used = total - sysconf(_SC_AVPHYS_PAGES);
+	used = total - _SC_AVPHYS_PAGES_res;
 
 	SET_DBL_RESULT(result, used / (double)total * 100);
+	ret = SYSINFO_RET_OK;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
-	return SYSINFO_RET_OK;
+	return ret;
 }
 
 static int	VM_MEMORY_AVAILABLE(AGENT_RESULT *result)
 {
-	SET_UI64_RESULT(result, (zbx_uint64_t)sysconf(_SC_AVPHYS_PAGES) * sysconf(_SC_PAGESIZE));
+	int		ret;
+	long		_SC_AVPHYS_PAGES_res, _SC_PAGESIZE_res;
 
-	return SYSINFO_RET_OK;
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s, (no HAVE_VMINFO_T_UPDATES)", __func__);
+
+	CHECKED_SYSCONF_SYSCALL(_SC_AVPHYS_PAGES);
+	CHECKED_SYSCONF_SYSCALL(_SC_PAGESIZE);
+
+	SET_UI64_RESULT(result, (zbx_uint64_t)_SC_AVPHYS_PAGES_res * _SC_PAGESIZE_res);
+	ret = SYSINFO_RET_OK;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
 }
 
 static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 {
+	int		ret;
 	zbx_uint64_t	total;
+	long		_SC_PHYS_PAGES_res, _SC_AVPHYS_PAGES_res;
 
-	if (0 == (total = sysconf(_SC_PHYS_PAGES)))
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s, (no HAVE_VMINFO_T_UPDATES)", __func__);
+
+	CHECKED_SYSCONF_SYSCALL(_SC_PHYS_PAGES);
+
+	if (0 == (total = _SC_PHYS_PAGES_res))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot calculate percentage because total is zero."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out;
 	}
 
-	SET_DBL_RESULT(result, sysconf(_SC_AVPHYS_PAGES) / (double)total * 100);
+	CHECKED_SYSCONF_SYSCALL(_SC_AVPHYS_PAGES);
 
-	return SYSINFO_RET_OK;
+	SET_DBL_RESULT(result, _SC_AVPHYS_PAGES_res / (double)total * 100);
+	ret = SYSINFO_RET_OK;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
 }
 
 #else /*HAVE_VMINFO_T_UPDATES*/
 
 static int	VM_MEMORY_USED(AGENT_RESULT *result)
 {
+	int		ret;
 	zbx_uint64_t	freemem;
 	char		*error = NULL;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s (with HAVE_VMINFO_T_UPDATES)", __func__);
+
 	if (SUCCEED == zbx_kstat_get_freemem(&freemem, &error))
 	{
-		SET_UI64_RESULT(result, sysconf(_SC_PHYS_PAGES) * sysconf(_SC_PAGESIZE) - freemem);
+		long	_SC_PHYS_PAGES_res, _SC_PAGESIZE_res;
+
+		CHECKED_SYSCONF_SYSCALL(_SC_PHYS_PAGES);
+		CHECKED_SYSCONF_SYSCALL(_SC_PAGESIZE);
+
+		SET_UI64_RESULT(result, _SC_PHYS_PAGES_res * _SC_PAGESIZE_res - freemem);
 	}
 	else if (NULL != error)
 	{
 		SET_MSG_RESULT(result, error);
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out;
 	}
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "zbx_kstat_get_freemem() failed, but error is NULL");
 
-	return SYSINFO_RET_OK;
+	ret = SYSINFO_RET_OK;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
 }
 
 static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
 {
+	int		ret;
 	zbx_uint64_t	freemem, total;
 	char		*error = NULL;
+	long		_SC_PHYS_PAGES_res;
 
-	if (0 == (total = sysconf(_SC_PHYS_PAGES)))
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s (with HAVE_VMINFO_T_UPDATES)", __func__);
+
+	CHECKED_SYSCONF_SYSCALL(_SC_PHYS_PAGES);
+
+	if (0 == (total = _SC_PHYS_PAGES_res))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot calculate percentage because total is zero."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out;
 	}
 
 	if (SUCCEED == zbx_kstat_get_freemem(&freemem, &error))
 	{
-		total *= sysconf(_SC_PAGESIZE);
+		long	_SC_PAGESIZE_res;
+
+		CHECKED_SYSCONF_SYSCALL(_SC_PAGESIZE);
+
+		total *= _SC_PHYS_PAGES_res;
 		SET_DBL_RESULT(result, (total - freemem) / (double)total * 100);
 	}
 	else if (NULL != error)
 	{
 		SET_MSG_RESULT(result, error);
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out;
 	}
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "zbx_kstat_get_freemem() failed, but error is NULL");
 
-	return SYSINFO_RET_OK;
+	ret = SYSINFO_RET_OK;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
 }
 
 static int	VM_MEMORY_AVAILABLE(AGENT_RESULT *result)
 {
+	int		ret;
 	zbx_uint64_t	freemem;
 	char		*error = NULL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s, (with HAVE_VMINFO_T_UPDATES)", __func__);
 
 	if (SUCCEED == zbx_kstat_get_freemem(&freemem, &error))
 	{
@@ -138,47 +240,75 @@ static int	VM_MEMORY_AVAILABLE(AGENT_RESULT *result)
 	else if (NULL != error)
 	{
 		SET_MSG_RESULT(result, error);
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out;
 	}
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "zbx_kstat_get_freemem() failed, but error is NULL");
 
-	return SYSINFO_RET_OK;
+	ret = SYSINFO_RET_OK;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
 }
 
 static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 {
+	int		ret;
 	zbx_uint64_t	total, freemem;
 	char		*error = NULL;
+	long		_SC_PHYS_PAGES_res;
 
-	if (0 == (total = sysconf(_SC_PHYS_PAGES)))
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s, (with HAVE_VMINFO_T_UPDATES)", __func__);
+
+	CHECKED_SYSCONF_SYSCALL(_SC_PHYS_PAGES);
+
+	if (0 == (total = _SC_PHYS_PAGES_res))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot calculate percentage because total is zero."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out;
 	}
 
 	if (SUCCEED == zbx_kstat_get_freemem(&freemem, &error))
 	{
-		total *= sysconf(_SC_PAGESIZE);
+		long	_SC_PAGESIZE_res;
+
+		CHECKED_SYSCONF_SYSCALL(_SC_PAGESIZE);
+
+		total *= _SC_PAGESIZE_res;
 		SET_DBL_RESULT(result, freemem / (double)total * 100);
 	}
 	else if (NULL != error)
 	{
 		SET_MSG_RESULT(result, error);
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out;
 	}
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "zbx_kstate_get_freemem() failed, but error is NULL");
 
-	return SYSINFO_RET_OK;
+	ret = SYSINFO_RET_OK;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
 }
 #endif /*HAVE_VMINFO_T_UPDATES*/
 
-int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*mode;
 	int	ret;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s", __func__);
+
 	if (1 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out;
 	}
 
 	mode = get_rparam(request, 0);
@@ -196,8 +326,11 @@ int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out;
 	}
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
