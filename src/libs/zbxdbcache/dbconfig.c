@@ -5735,12 +5735,18 @@ static int	zbx_default_ptr_pair_ptr_second_compare_func(const void *d1, const vo
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_trigger_merge_itemids                                         *
+ * Function: dc_trigger_add_itemids                                           *
  *                                                                            *
- * Purpose: merges new itemids into trigger itemids array                     *
+ * Purpose: add new itemids into trigger itemids array                        *
+ *                                                                            *
+ * Comments: If trigger is already linked to an item and a new function       *
+ *           linking the trigger to that item is being added, then the item   *
+ *           triggers will be reset causing itemid to be removed from trigger.*                                                                           *
+ *           Because of that itemids always can be simply appended to the     *
+ *           existing list without checking for duplicates.                   *
  *                                                                            *
  ******************************************************************************/
-static void	dc_trigger_merge_itemids(ZBX_DC_TRIGGER *trigger, zbx_vector_uint64_t *itemids)
+static void	dc_trigger_add_itemids(ZBX_DC_TRIGGER *trigger, const zbx_vector_uint64_t *itemids)
 {
 	zbx_uint64_t	*itemid;
 	int		i;
@@ -5750,14 +5756,7 @@ static void	dc_trigger_merge_itemids(ZBX_DC_TRIGGER *trigger, zbx_vector_uint64_
 		int	itemids_num = 0;
 
 		for (itemid = trigger->itemids; 0 != *itemid; itemid++)
-		{
-			if (FAIL != (i = zbx_vector_uint64_search(itemids, *itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-				zbx_vector_uint64_remove_noorder(itemids, i);
 			itemids_num++;
-		}
-
-		if (0 == itemids->values_num)
-			return;
 
 		trigger->itemids = (zbx_uint64_t *)__config_mem_realloc_func(trigger->itemids,
 				sizeof(zbx_uint64_t) * (size_t)(itemids->values_num + itemids_num + 1));
@@ -5920,7 +5919,7 @@ static void	dc_trigger_update_cache(void)
 		{
 			if (trigger != itemtrigs.values[i].second)
 			{
-				dc_trigger_merge_itemids(trigger, &itemids);
+				dc_trigger_add_itemids(trigger, &itemids);
 				trigger = (ZBX_DC_TRIGGER *)itemtrigs.values[i].second;
 				zbx_vector_uint64_clear(&itemids);
 			}
@@ -5930,7 +5929,7 @@ static void	dc_trigger_update_cache(void)
 		}
 
 		if (0 != itemids.values_num)
-			dc_trigger_merge_itemids(trigger, &itemids);
+			dc_trigger_add_itemids(trigger, &itemids);
 
 		zbx_vector_uint64_destroy(&itemids);
 	}
