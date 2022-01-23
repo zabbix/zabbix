@@ -219,7 +219,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'proxy_hostid' => 0,
+					'proxy_hostid' => 0
 				],
 				[
 					'name' => 'host2',
