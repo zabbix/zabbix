@@ -1655,54 +1655,59 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * Resolve text-type column macros for top-hosts widget.
 	 *
 	 * @param array $columns
-	 * @param array $hostids
+	 * @param array $items
 	 *
 	 * @return array
 	 */
-	public function resolveWidgetTopHostsTextColumns(array $columns, array $hostids): array {
+	public function resolveWidgetTopHostsTextColumns(array $columns, array $items): array {
 		$types = [
 			'macros' => [
 				'host' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}', '{HOST.DESCRIPTION}'],
+				'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 				'inventory' => array_keys(self::getSupportedHostInventoryMacrosMap())
 			],
 			'usermacros' => true
 		];
 
 		$macro_values = [];
-		$macros = ['host' => [], 'inventory' => []];
+		$macros = ['host' => [], 'interface' => [], 'inventory' => []];
 		$usermacros = [];
 
 		$matched_macros = self::extractMacros($columns, $types);
 
-		foreach ($hostids as $hostid) {
-			$macro_values[$hostid] = [];
-
+		foreach ($items as $key => $item) {
 			foreach ($matched_macros['macros']['host'] as $token) {
 				if ($token === '{HOST.ID}') {
-					$macro_values[$hostid][$token] = $hostid;
+					$macro_values[$key][$token] = $item['hostid'];
 				}
 				else {
-					$macro_values[$hostid][$token] = UNRESOLVED_MACRO_STRING;
-					$macros['host'][$hostid][$hostid] = true;
+					$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
+					$macros['host'][$item['hostid']][$key] = true;
 				}
+			}
+
+			foreach ($matched_macros['macros']['interface'] as $token) {
+				$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
+				$macros['interface'][$item['itemid']][$key] = true;
 			}
 
 			foreach ($matched_macros['macros']['inventory'] as $token) {
-				$macro_values[$hostid][$token] = UNRESOLVED_MACRO_STRING;
-				$macros['inventory'][$hostid][$hostid] = true;
+				$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
+				$macros['inventory'][$item['hostid']][$key] = true;
 			}
 
 			if ($matched_macros['usermacros']) {
-				$usermacros[$hostid] = ['hostids' => [$hostid], 'macros' => $matched_macros['usermacros']];
+				$usermacros[$key] = ['hostids' => [$item['hostid']], 'macros' => $matched_macros['usermacros']];
 			}
 		}
 
 		$macro_values = self::getHostMacrosByHostId($macros['host'], $macro_values);
+		$macro_values = self::getInterfaceMacrosByItemId($macros['interface'], $macro_values);
 		$macro_values = self::getInventoryMacrosByHostId($macros['inventory'], $macro_values);
 
-		foreach ($this->getUserMacros($usermacros) as $hostid => $usermacros_data) {
-			$macro_values[$hostid] = array_key_exists($hostid, $macro_values)
-				? array_merge($macro_values[$hostid], $usermacros_data['macros'])
+		foreach ($this->getUserMacros($usermacros) as $key => $usermacros_data) {
+			$macro_values[$key] = array_key_exists($key, $macro_values)
+				? array_merge($macro_values[$key], $usermacros_data['macros'])
 				: $usermacros_data['macros'];
 		}
 
@@ -1711,8 +1716,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		foreach ($columns as $column => $value) {
 			$data[$column] = [];
 
-			foreach ($hostids as $hostid) {
-				$data[$column][$hostid] = strtr($value, $macro_values[$hostid]);
+			foreach ($items as $key => $item) {
+				$data[$column][$key] = strtr($value, $macro_values[$key]);
 			}
 		}
 
