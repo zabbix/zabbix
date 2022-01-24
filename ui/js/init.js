@@ -372,10 +372,10 @@ jQuery(function($) {
 	// redirect buttons
 	$('button[data-url]').click(function() {
 		var button = $(this);
-		var confirmation = button.data('confirmation');
+		var confirmation = button.attr('data-confirmation');
 
 		if (typeof confirmation === 'undefined' || (typeof confirmation !== 'undefined' && confirm(confirmation))) {
-			window.location = button.data('url');
+			window.location = button.attr('data-url');
 		}
 	});
 
