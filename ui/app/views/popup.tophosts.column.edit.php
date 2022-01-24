@@ -21,15 +21,19 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
+
 $form = (new CForm())
 	->setName('tophosts_column')
 	->addVar('action', $data['action'])
 	->addVar('update', 1)
-	->addItem((new CInput('submit', 'submit'))
-		->addStyle('display: none;')
-		->removeId()
+	->addItem(
+		(new CInput('submit', 'submit'))
+			->addStyle('display: none;')
+			->removeId()
 	);
+
 $form_grid = new CFormGrid();
 
 $scripts = [];
@@ -75,26 +79,27 @@ $form_grid->addItem([
 
 // Item.
 $item_select = (new CPatternSelect([
-		'name' => 'item',
-		'object_name' => 'items',
-		'data' => $data['item'] === '' ? '' : [$data['item']],
-		'multiple' => false,
-		'popup' => [
-			'parameters' => [
-				'srctbl' => 'items',
-				'srcfld1' => 'itemid',
-				'real_hosts' => 1,
-				'numeric' => 1,
-				'webitems' => 1,
-				'orig_names' => 1,
-				'dstfrm' => $form->getName(),
-				'dstfld1' => 'item'
-			]
-		],
-		'add_post_js' => false
-	]))
-	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+	'name' => 'item',
+	'object_name' => 'items',
+	'data' => $data['item'] === '' ? '' : [$data['item']],
+	'multiple' => false,
+	'popup' => [
+		'parameters' => [
+			'srctbl' => 'items',
+			'srcfld1' => 'itemid',
+			'real_hosts' => 1,
+			'numeric' => 1,
+			'webitems' => 1,
+			'orig_names' => 1,
+			'dstfrm' => $form->getName(),
+			'dstfld1' => 'item'
+		]
+	],
+	'add_post_js' => false
+]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+
 $scripts[] = $item_select->getPostJS();
+
 $form_grid->addItem([
 	(new CLabel(_('Item'), 'item'))->setAsteriskMark(),
 	new CFormField($item_select)
@@ -103,9 +108,11 @@ $form_grid->addItem([
 // Time shift.
 $form_grid->addItem([
 	new CLabel(_('Time shift'), 'timeshift'),
-	new CFormField((new CTextBox('timeshift', $data['timeshift']))
-		->setAttribute('placeholder', _('none'))
-		->setWidth(ZBX_TEXTAREA_TINY_WIDTH))
+	new CFormField(
+		(new CTextBox('timeshift', $data['timeshift']))
+			->setAttribute('placeholder', _('none'))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+	)
 ]);
 
 // Aggregation function.
@@ -131,9 +138,9 @@ $form_grid->addItem([
 $form_grid->addItem([
 	(new CLabel(_('Aggregation interval'), 'aggregate_interval'))->setAsteriskMark(),
 	new CFormField(
-		(new CTextBox('aggregate_interval', $data['aggregate_interval']))
-			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-)]);
+		(new CTextBox('aggregate_interval', $data['aggregate_interval']))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+	)
+]);
 
 // Display.
 $form_grid->addItem([
@@ -191,7 +198,8 @@ $header_row = [
 	(new CColHeader(_('Threshold')))->setWidth('100%'),
 	_('Action')
 ];
-$thresholds = (new CDiv([
+
+$thresholds = (new CDiv(
 	(new CTable())
 		->setId('thresholds_table')
 		->addClass(ZBX_STYLE_TABLE_FORMS)
@@ -203,13 +211,12 @@ $thresholds = (new CDiv([
 					->addClass('element-table-add')
 			))->setColSpan(count($header_row))
 		))
-]))
+))
 	->addClass('table-forms-separator')
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+
 $thresholds->addItem(
-	(new CTag('script', true))
-		->setAttribute('type', 'text/x-jquery-tmpl')
-		->setId('thresholds-row-tmpl')
+	(new CScriptTemplate('thresholds-row-tmpl'))
 		->addItem((new CRow([
 			(new CColor('thresholds[#{rowNum}][color]', '#{color}'))->appendColorPickerJs(false),
 			(new CTextBox('thresholds[#{rowNum}][threshold]', '#{threshold}', false))
