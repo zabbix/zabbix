@@ -37,13 +37,13 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 		$groupids = $fields['groupids'] ? getSubGroups($fields['groupids']) : null;
 		$hostids = $fields['hostids'] ?: null;
 
-		if (array_key_exists('host_tags', $fields)) {
+		if (array_key_exists('tags', $fields)) {
 			$hosts = API::Host()->get([
 				'output' => ['name'],
 				'groupids' => $groupids,
 				'hostids' => $hostids,
 				'evaltype' => $fields['evaltype'],
-				'tags' => $fields['host_tags'],
+				'tags' => $fields['tags'],
 				'monitored_hosts' => true,
 				'preservekeys' => true
 			]);

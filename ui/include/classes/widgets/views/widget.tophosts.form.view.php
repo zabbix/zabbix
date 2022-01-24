@@ -58,9 +58,9 @@ $scripts[] = $field_hostids->getPostJS();
 $form_list->addRow(CWidgetHelper::getLabel($fields['evaltype']), CWidgetHelper::getRadioButtonList($fields['evaltype']));
 
 // Tags filter list.
-$form_list->addRow(CWidgetHelper::getLabel($fields['hosttags']), CWidgetHelper::getTags($fields['hosttags']));
-$scripts[] = $fields['hosttags']->getJavascript();
-$jq_templates['tag-row-tmpl'] = CWidgetHelper::getTagsTemplate($fields['hosttags']);
+$form_list->addRow(CWidgetHelper::getLabel($fields['tags']), CWidgetHelper::getTags($fields['tags']));
+$scripts[] = $fields['tags']->getJavascript();
+$jq_templates['tag-row-tmpl'] = CWidgetHelper::getTagsTemplate($fields['tags']);
 
 // Columns definition table.
 $form_list->addRow(CWidgetHelper::getLabel($fields['columns']), CWidgetHelper::getWidgetColumns($fields['columns']));
