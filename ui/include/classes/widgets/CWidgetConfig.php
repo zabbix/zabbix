@@ -72,7 +72,7 @@ class CWidgetConfig {
 			WIDGET_TRIG_OVER			=> _('Trigger overview'),
 			WIDGET_URL					=> _('URL'),
 			WIDGET_WEB					=> _('Web monitoring'),
-			WIDGET_TOP_HOSTS			=> _('Top hosts data grid')
+			WIDGET_TOP_HOSTS			=> _('Top hosts')
 		];
 
 		$types = array_filter($types,
