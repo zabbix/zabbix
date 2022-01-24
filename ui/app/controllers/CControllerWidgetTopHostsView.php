@@ -137,7 +137,7 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 
 				$column_item_values = self::getItemValues($column_items, $column, $time_now);
 
-				if ($calc_extremes) {
+				if ($calc_extremes && $column_item_values) {
 					if ($column['min'] === '') {
 						$column['min'] = min($column_item_values);
 					}

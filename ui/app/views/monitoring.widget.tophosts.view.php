@@ -42,25 +42,30 @@ foreach ($data['rows'] as $columns) {
 	$row = [];
 
 	foreach ($columns as $i => $column) {
-		$value = $column['value'];
+		if ($column === null) {
+			$row[] = '';
+
+			continue;
+		}
+
 		$column_config = $data['configuration'][$i];
 
 		switch ($column_config['data']) {
 			case CWidgetFieldColumnsList::DATA_HOST_NAME:
-				$cell = (new CLinkAction($value))->setMenuPopup(CMenuPopupHelper::getHost($column['hostid']));
+				$cell = (new CLinkAction($column['value']))->setMenuPopup(CMenuPopupHelper::getHost($column['hostid']));
 				break;
 
 			case CWidgetFieldColumnsList::DATA_TEXT:
-				$cell = new CDiv($value);
+				$cell = new CDiv($column['value']);
 				break;
 
 			case CWidgetFieldColumnsList::DATA_ITEM_VALUE:
 				if ($column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS) {
-					$cell = (new CDiv(formatHistoryValue($value, $column['item'])))
+					$cell = (new CDiv(formatHistoryValue($column['value'], $column['item'])))
 						->addClass('item-value')
 						->addClass(ZBX_STYLE_CURSOR_POINTER)
 						->setHint(
-							(new CDiv(mb_substr($value, 0, ZBX_HINTBOX_CONTENT_LIMIT)))
+							(new CDiv(mb_substr($column['value'], 0, ZBX_HINTBOX_CONTENT_LIMIT)))
 								->addClass(ZBX_STYLE_HINTBOX_WRAP)
 						);
 
@@ -68,7 +73,7 @@ foreach ($data['rows'] as $columns) {
 				}
 
 				$cell = (new CBarGauge())
-					->setValue($value)
+					->setValue($column['value'])
 					->addClass('item-value');
 
 				if (array_key_exists('thresholds', $column_config)) {
@@ -101,7 +106,7 @@ foreach ($data['rows'] as $columns) {
 				&& array_key_exists('display', $column_config)
 				&& $column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS) {
 			foreach ($column_config['thresholds'] as $threshold) {
-				if ($value < $threshold['threshold']) {
+				if ($column['value'] < $threshold['threshold']) {
 					break;
 				}
 
