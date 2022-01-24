@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@
 #include "zbxalgo.h"
 #include "zbxdb.h"
 #include "dbschema.h"
-#include "zbxeval.h"
 
 extern char	*CONFIG_DBHOST;
 extern char	*CONFIG_DBNAME;
@@ -64,8 +63,6 @@ typedef enum
 	GRAPH_ITEM_AGGREGATED = 1
 }
 zbx_graph_item_type;
-
-struct	_DC_TRIGGER;
 
 #define ZBX_DB_CONNECT_NORMAL	0
 #define ZBX_DB_CONNECT_EXIT	1
@@ -342,6 +339,7 @@ typedef struct
 {
 	zbx_uint64_t		serviceid;
 	char			*name;
+	char			*description;
 	zbx_vector_uint64_t	eventids;
 	zbx_vector_ptr_t	events;
 	zbx_vector_tags_t	service_tags;

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,7 +54,9 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_dir.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/eventlog.o
 #cgo openssl LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/tls_version.o
-#cgo LDFLAGS: -lpcre -lDbghelp -lpsapi -lws2_32 -lWevtapi -ldnsapi
+#cgo LDFLAGS: -lDbghelp -lpsapi -lws2_32 -lWevtapi -ldnsapi
+#cgo pcre  LDFLAGS: -lpcre
+#cgo pcre2 LDFLAGS: -lpcre2-8
 #cgo openssl LDFLAGS: -lssl -lcrypto
 #cgo LDFLAGS: -Wl,--end-group
 

@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:45Z'
+  version: '6.0'
+  date: '2022-01-10T07:41:32Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -13,13 +13,13 @@ zabbix_export:
       description: |
         The template to monitor Apache Ignite by Zabbix that work without any external scripts.
           It works with both standalone and cluster instances.
-          The metrics are discoverable and collected by JMX.  
+          The metrics are discoverable and collected by JMX.
           Current JMX tree hierarchy contains classloader by default. Add the following jvm option `-DIGNITE_MBEAN_APPEND_CLASS_LOADER_ID=false`to will exclude one level with Classloader name.
           You can set {$IGNITE.USER} and {$IGNITE.PASSWORD} macros in the template for using on the host level.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Databases
@@ -114,7 +114,7 @@ zabbix_export:
                   expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",EvictionRate],5m)>0'
                   name: 'Data region {#JMXNAME}: Node started to evict pages'
                   priority: INFO
-                  description: 'You store more data then region can accommodate. Data started to move to disk it can make requests work slower. Ack to close.'
+                  description: 'You store more data than region can accommodate. Data started to move to disk it can make requests work slower. Ack to close.'
                   manual_close: 'YES'
             -
               uuid: 7fa689749cd64474af294976e4bc7762
@@ -255,18 +255,18 @@ zabbix_export:
             -
               uuid: 736fbc965aa448309d022de34354decf
               expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",OffheapUsedSize],5m)/last(/Ignite by JMX/jmx["{#JMXOBJ}",OffHeapSize])*100>{$IGNITE.DATA.REGION.PUSED.MAX.HIGH}'
-              name: 'Data region {#JMXNAME}: Data region utilisation is too high (over {$IGNITE.DATA.REGION.PUSED.MAX.HIGH} in 5m)'
+              name: 'Data region {#JMXNAME}: Data region utilization is too high (over {$IGNITE.DATA.REGION.PUSED.MAX.HIGH} in 5m)'
               priority: HIGH
               description: 'Data region utilization is high. Increase data region size or delete any data.'
             -
               uuid: 6ded19e7616b45f08e37e716d8256c5e
               expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",OffheapUsedSize],5m)/last(/Ignite by JMX/jmx["{#JMXOBJ}",OffHeapSize])*100>{$IGNITE.DATA.REGION.PUSED.MAX.WARN}'
-              name: 'Data region {#JMXNAME}: Data region utilisation is too high (over {$IGNITE.DATA.REGION.PUSED.MAX.WARN} in 5m)'
+              name: 'Data region {#JMXNAME}: Data region utilization is too high (over {$IGNITE.DATA.REGION.PUSED.MAX.WARN} in 5m)'
               priority: WARNING
               description: 'Data region utilization is high. Increase data region size or delete any data.'
               dependencies:
                 -
-                  name: 'Data region {#JMXNAME}: Data region utilisation is too high (over {$IGNITE.DATA.REGION.PUSED.MAX.HIGH} in 5m)'
+                  name: 'Data region {#JMXNAME}: Data region utilization is too high (over {$IGNITE.DATA.REGION.PUSED.MAX.HIGH} in 5m)'
                   expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",OffheapUsedSize],5m)/last(/Ignite by JMX/jmx["{#JMXOBJ}",OffHeapSize])*100>{$IGNITE.DATA.REGION.PUSED.MAX.HIGH}'
           graph_prototypes:
             -
@@ -287,7 +287,7 @@ zabbix_export:
                     key: 'jmx["{#JMXOBJ}",UsedCheckpointBufferSize]'
             -
               uuid: 330be15755ca4b5dbee88e21b2e58df2
-              name: 'Data region {#JMXNAME}: DataRegion utilisation'
+              name: 'Data region {#JMXNAME}: DataRegion utilization'
               graph_items:
                 -
                   drawtype: BOLD_LINE
@@ -309,11 +309,11 @@ zabbix_export:
                 - |
                   var data = JSON.parse(value);
                   for (var item, i = 0; item = data.data[i++];) {
-                  if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
-                  Object.assign(item, {
-                  '{#JMXIGNITEINSTANCENAME}': 'null'
-                  });
-                  }
+                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                          Object.assign(item, {
+                              '{#JMXIGNITEINSTANCENAME}': 'null'
+                          });
+                      }
                   
                   }
                   
@@ -583,11 +583,11 @@ zabbix_export:
                 - |
                   var data = JSON.parse(value);
                   for (var item, i = 0; item = data.data[i++];) {
-                  if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
-                  Object.assign(item, {
-                  '{#JMXIGNITEINSTANCENAME}': 'null'
-                  });
-                  }
+                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                          Object.assign(item, {
+                              '{#JMXIGNITEINSTANCENAME}': 'null'
+                          });
+                      }
                   
                   }
                   
@@ -727,11 +727,11 @@ zabbix_export:
                 - |
                   var data = JSON.parse(value);
                   for (var item, i = 0; item = data.data[i++];) {
-                  if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
-                  Object.assign(item, {
-                  '{#JMXIGNITEINSTANCENAME}': 'null'
-                  });
-                  }
+                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                          Object.assign(item, {
+                              '{#JMXIGNITEINSTANCENAME}': 'null'
+                          });
+                      }
                   
                   }
                   
@@ -843,18 +843,18 @@ zabbix_export:
                 - |
                   var data = JSON.parse(value);
                   for (var item, i = 0; item = data.data[i++];) {
-                  if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
-                  Object.assign(item, {
-                  '{#JMXIGNITEINSTANCENAME}': 'null'
-                  });
-                  }
+                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                          Object.assign(item, {
+                              '{#JMXIGNITEINSTANCENAME}': 'null'
+                          });
+                      }
                   
                   }
                   
                   return JSON.stringify(data)
         -
           uuid: afd0c3182f8d4a299a180848eb096b95
-          name: 'TCP Ccmmunication SPI metrics'
+          name: 'TCP Communication SPI metrics'
           type: JMX
           key: 'jmx.discovery[beans,"org.apache:group=SPIs,name=TcpCommunicationSpi,*"]'
           delay: 30m
@@ -941,11 +941,11 @@ zabbix_export:
                 - |
                   var data = JSON.parse(value);
                   for (var item, i = 0; item = data.data[i++];) {
-                  if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
-                  Object.assign(item, {
-                  '{#JMXIGNITEINSTANCENAME}': 'null'
-                  });
-                  }
+                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                          Object.assign(item, {
+                              '{#JMXIGNITEINSTANCENAME}': 'null'
+                          });
+                      }
                   
                   }
                   
@@ -1130,11 +1130,11 @@ zabbix_export:
                 - |
                   var data = JSON.parse(value);
                   for (var item, i = 0; item = data.data[i++];) {
-                  if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
-                  Object.assign(item, {
-                  '{#JMXIGNITEINSTANCENAME}': 'null'
-                  });
-                  }
+                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                          Object.assign(item, {
+                              '{#JMXIGNITEINSTANCENAME}': 'null'
+                          });
+                      }
                   
                   }
                   
@@ -1259,11 +1259,11 @@ zabbix_export:
                 - |
                   var data = JSON.parse(value);
                   for (var item, i = 0; item = data.data[i++];) {
-                  if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
-                  Object.assign(item, {
-                  '{#JMXIGNITEINSTANCENAME}': 'null'
-                  });
-                  }
+                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                          Object.assign(item, {
+                              '{#JMXIGNITEINSTANCENAME}': 'null'
+                          });
+                      }
                   
                   }
                   
@@ -1486,11 +1486,11 @@ zabbix_export:
                 - |
                   var data = JSON.parse(value);
                   for (var item, i = 0; item = data.data[i++];) {
-                  if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
-                  Object.assign(item, {
-                  '{#JMXIGNITEINSTANCENAME}': 'null'
-                  });
-                  }
+                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                          Object.assign(item, {
+                              '{#JMXIGNITEINSTANCENAME}': 'null'
+                          });
+                      }
                   
                   }
                   
@@ -1617,11 +1617,11 @@ zabbix_export:
                 - |
                   var data = JSON.parse(value);
                   for (var item, i = 0; item = data.data[i++];) {
-                  if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
-                  Object.assign(item, {
-                  '{#JMXIGNITEINSTANCENAME}': 'null'
-                  });
-                  }
+                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                          Object.assign(item, {
+                              '{#JMXIGNITEINSTANCENAME}': 'null'
+                          });
+                      }
                   
                   }
                   
@@ -1905,11 +1905,11 @@ zabbix_export:
                 - |
                   var data = JSON.parse(value);
                   for (var item, i = 0; item = data.data[i++];) {
-                  if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
-                  Object.assign(item, {
-                  '{#JMXIGNITEINSTANCENAME}': 'null'
-                  });
-                  }
+                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                          Object.assign(item, {
+                              '{#JMXIGNITEINSTANCENAME}': 'null'
+                          });
+                      }
                   
                   }
                   

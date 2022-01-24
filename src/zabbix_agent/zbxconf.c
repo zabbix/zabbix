@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,20 +18,18 @@
 **/
 
 #include "common.h"
-#include "zbxconf.h"
-
 #include "cfg.h"
 #include "log.h"
 #include "alias.h"
 #include "sysinfo.h"
+
+#include "zbxconf.h"
+
 #ifdef _WINDOWS
 #	include "perfstat.h"
 #endif
-#include "comms.h"
 
 /******************************************************************************
- *                                                                            *
- * Function: load_aliases                                                     *
  *                                                                            *
  * Purpose: load aliases from configuration                                   *
  *                                                                            *
@@ -75,8 +73,6 @@ void	load_aliases(char **lines)
 
 /******************************************************************************
  *                                                                            *
- * Function: load_user_parameters                                             *
- *                                                                            *
  * Purpose: load user parameters from configuration                           *
  *                                                                            *
  * Parameters: lines - user parameter entries from configuration file         *
@@ -115,8 +111,6 @@ int	load_user_parameters(char **lines, char **err)
 
 /******************************************************************************
  *                                                                            *
- * Function: load_key_access_rule                                             *
- *                                                                            *
  * Purpose: Adds key access rule from configuration                           *
  *                                                                            *
  * Parameters: value - [IN] key access rule parameter value                   *
@@ -142,8 +136,6 @@ int	load_key_access_rule(const char *value, const struct cfg_line *cfg)
 
 #ifdef _WINDOWS
 /******************************************************************************
- *                                                                            *
- * Function: load_perf_counters                                               *
  *                                                                            *
  * Purpose: load performance counters from configuration                      *
  *                                                                            *
@@ -229,8 +221,6 @@ void	load_perf_counters(const char **def_lines, const char **eng_lines)
 #else
 /******************************************************************************
  *                                                                            *
- * Function: load_config_user_params                                          *
- *                                                                            *
  * Purpose: load user parameters from configuration file                      *
  *                                                                            *
  ******************************************************************************/
@@ -249,8 +239,6 @@ static int	load_config_user_params(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: reload_user_parameters                                           *
  *                                                                            *
  * Purpose: reload user parameters                                            *
  *                                                                            *

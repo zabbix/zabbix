@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -325,58 +325,36 @@ function getPosition(obj) {
 /**
  * Opens popup content in overlay dialogue.
  *
- * @param {string} action          Popup controller related action.
- * @param {array|object}  options  (optional) Array with key/value pairs that will be used as query for popup request.
- * @param {string} dialogueid      (optional) id of overlay dialogue.
- * @param {object} trigger_elmnt   (optional) UI element which was clicked to open overlay dialogue.
+ * @param {string}           action           Popup controller related action.
+ * @param {array|object}     parameters       Array with key/value pairs that will be used as query for popup request.
+ *
+ * @param {string}           dialogue_class   CSS class, usually based on .modal-popup and .modal-popup-{size}.
+ * @param {string|null}      dialogueid       ID of overlay dialogue.
+ * @param {HTMLElement|null} trigger_element  UI element which was clicked to open overlay dialogue.
  *
  * @returns {Overlay}
  */
-function PopUp(action, options, dialogueid, trigger_elmnt) {
+function PopUp(action, parameters, {
+	dialogueid = null,
+	dialogue_class = '',
+	trigger_element = document.activeElement
+} = {}) {
 	var overlay = overlays_stack.getById(dialogueid);
+
 	if (!overlay) {
-		var wide_popup_actions = ['popup.generic', 'popup.dashboard.share.edit', 'dashboard.page.properties.edit',
-				'dashboard.properties.edit', 'dashboard.widget.edit', 'popup.media', 'popup.lldoperation',
-				'popup.lldoverride', 'popup.preproctest.edit', 'popup.triggerexpr', 'popup.httpstep',
-				'popup.testtriggerexpr', 'popup.triggerwizard'
-			],
-			medium_popup_actions = ['popup.maintenance.period', 'popup.condition.actions', 'popup.condition.operations',
-				'popup.condition.event.corr', 'popup.discovery.check', 'popup.mediatypetest.edit',
-				'popup.mediatype.message', 'popup.host.edit', 'popup.scriptexec', 'popup.scheduledreport.test',
-				'popup.service.edit'
-			],
-			static_popup_actions = ['popup.massupdate.template', 'popup.massupdate.host', 'popup.massupdate.trigger',
-				'popup.massupdate.triggerprototype', 'popup.massupdate.service'
-			],
-			preprocessing_popup_actions = ['popup.massupdate.item', 'popup.massupdate.itemprototype'],
-			dialogue_class = '';
-
-		if (wide_popup_actions.indexOf(action) !== -1) {
-			dialogue_class = ' modal-popup-generic';
-		}
-		else if (medium_popup_actions.indexOf(action) !== -1) {
-			dialogue_class = ' modal-popup-medium';
-		}
-		else if (static_popup_actions.indexOf(action) !== -1) {
-			dialogue_class = ' modal-popup-static';
-		}
-		else if (preprocessing_popup_actions.indexOf(action) !== -1) {
-			dialogue_class = ' modal-popup-preprocessing';
-		}
-
 		overlay = overlayDialogue({
-			'dialogueid': dialogueid,
-			'title': '',
-			'content': jQuery('<div>', {'height': '68px', class: 'is-loading'}),
-			'class': 'modal-popup' + dialogue_class,
-			'buttons': [],
-			'element': trigger_elmnt,
-			'type': 'popup'
+			dialogueid,
+			title: '',
+			content: jQuery('<div>', {'height': '68px', class: 'is-loading'}),
+			class: 'modal-popup ' + dialogue_class,
+			buttons: [],
+			element: trigger_element,
+			type: 'popup'
 		});
 	}
 
 	overlay
-		.load(action, options)
+		.load(action, parameters)
 		.then(function(resp) {
 			if (typeof resp.errors !== 'undefined') {
 				overlay.setProperties({
@@ -429,23 +407,23 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 /**
  * Open "Update problem" dialog and manage URL change.
  *
- * @param {Object}  options
- * @param {array}  options['eventids']  Eventids to update.
- * @param {object} trigger_elmnt        (optional) UI element which was clicked to open overlay dialogue.
+ * @param {Object} parameters
+ * @param {array}  parameters['eventids']  Eventids to update.
+ * @param {object} trigger_element        (optional) UI element which was clicked to open overlay dialogue.
  *
  * @returns {Overlay}
  */
-function acknowledgePopUp(options, trigger_elmnt) {
-	var overlay = PopUp('popup.acknowledge.edit', options, null, trigger_elmnt),
+function acknowledgePopUp(parameters, trigger_element) {
+	var overlay = PopUp('popup.acknowledge.edit', parameters, {trigger_element}),
 		backurl = location.href;
 
-	overlay.trigger_parents = $(trigger_elmnt).parents();
+	overlay.trigger_parents = $(trigger_element).parents();
 
 	overlay.xhr.then(function() {
 		var url = new Curl('zabbix.php', false);
 		url.setArgument('action', 'popup');
 		url.setArgument('popup_action', 'acknowledge.edit');
-		url.setArgument('eventids', options.eventids);
+		url.setArgument('eventids', parameters.eventids);
 
 		history.replaceState({}, '', url.getUrl());
 	});
@@ -567,15 +545,16 @@ function removeFromOverlaysStack(dialogueid, return_focus) {
  * @param {string} action	(optional) action value that is used in CRouter. Default value is 'popup.generic'.
  */
 function reloadPopup(form, action) {
-	var dialogueid = jQuery(form).closest('[data-dialogueid]').attr('data-dialogueid'),
+	var dialogueid = form.closest('[data-dialogueid]').dataset.dialogueid,
+		dialogue_class = jQuery(form).closest('[data-dialogueid]').prop('class'),
 		action = action || 'popup.generic',
-		options = {};
+		parameters = {};
 
-	jQuery(form.elements).each(function() {
-		options[this.name] = this.value;
-	});
+	for (const input of form.elements) {
+		parameters[input.name] = input.value;
+	};
 
-	PopUp(action, options, dialogueid);
+	PopUp(action, parameters, {dialogueid, dialogue_class});
 }
 
 /**
@@ -1023,30 +1002,33 @@ Function.prototype.bindAsEventListener = function (context) {
 	};
 };
 
-function openMassupdatePopup(elem, popup_name, data = {}) {
-	const form = elem.closest('form');
+function openMassupdatePopup(action, parameters = {}, {
+	dialogue_class = '',
+	trigger_element = document.activeElement
+}) {
+	const form = trigger_element.closest('form');
 
-	data.ids = chkbxRange.getSelectedIds();
+	parameters.ids = chkbxRange.getSelectedIds();
 
-	switch (popup_name) {
+	switch (action) {
 		case 'popup.massupdate.item':
-			data['context'] = form.querySelector('#context').value;
-			data['prototype'] = 0;
+			parameters.context = form.querySelector('#context').value;
+			parameters.prototype = 0;
 			break;
 
 		case 'popup.massupdate.trigger':
-			data['context'] = form.querySelector('#context').value;
+			parameters.context = form.querySelector('#context').value;
 			break;
 
 		case 'popup.massupdate.itemprototype':
 		case 'popup.massupdate.triggerprototype':
-			data['parent_discoveryid'] = form.querySelector('#parent_discoveryid').value;
-			data['context'] = form.querySelector('#context').value;
-			data['prototype'] = 1;
+			parameters.parent_discoveryid = form.querySelector('#parent_discoveryid').value;
+			parameters.context = form.querySelector('#context').value;
+			parameters.prototype = 1;
 			break;
 	}
 
-	return PopUp(popup_name, data, null, elem);
+	return PopUp(action, parameters, {dialogue_class, trigger_element});
 }
 
 /**
@@ -1064,7 +1046,7 @@ function uncheckTableRows(page, keepids = []) {
 		// If keepids will not have same key as value, it will create mess, when new checkbox will be checked.
 		let keepids_formatted = {};
 		for (const id of Object.values(keepids)) {
-			keepids_formatted[id] = id;
+			keepids_formatted[id.toString()] = id.toString();
 		}
 
 		sessionStorage.setItem(key, JSON.stringify(keepids_formatted));

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,8 +24,6 @@
 #include "log.h"
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_ha_get_nodes                                                 *
  *                                                                            *
  * Purpose: get HA nodes in json format                                       *
  *                                                                            *
@@ -62,8 +60,6 @@ int	zbx_ha_get_nodes(char **nodes, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_ha_remove_node                                               *
- *                                                                            *
  * Purpose: remove HA node                                                    *
  *                                                                            *
  * Comments: A new socket is opened to avoid interfering with notification    *
@@ -91,8 +87,6 @@ int	zbx_ha_remove_node(const char *node, char **result, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_ha_set_failover_delay                                        *
- *                                                                            *
  * Purpose: set HA failover delay                                             *
  *                                                                            *
  * Comments: A new socket is opened to avoid interfering with notification    *
@@ -118,8 +112,6 @@ int	zbx_ha_set_failover_delay(int delay, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_ha_get_failover_delay                                        *
- *                                                                            *
  * Purpose: get HA failover delay                                             *
  *                                                                            *
  * Comments: A new socket is opened to avoid interfering with notification    *
@@ -144,8 +136,6 @@ int	zbx_ha_get_failover_delay(int *delay, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_ha_change_loglevel                                           *
- *                                                                            *
  * Purpose: change HA manager log level                                       *
  *                                                                            *
  ******************************************************************************/
@@ -168,8 +158,6 @@ int	zbx_ha_change_loglevel(int direction, char **error)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_ha_status_str                                                *
  *                                                                            *
  * Purpose: get HA status in text format                                      *
  *                                                                            *

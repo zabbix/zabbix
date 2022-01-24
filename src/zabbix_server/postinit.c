@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,15 +23,12 @@
 #include "log.h"
 #include "zbxserver.h"
 #include "postinit.h"
-#include "valuecache.h"
 
 #define ZBX_HIST_MACRO_NONE		(-1)
 #define ZBX_HIST_MACRO_ITEM_VALUE	0
 #define ZBX_HIST_MACRO_ITEM_LASTVALUE	1
 
 /******************************************************************************
- *                                                                            *
- * Function: get_trigger_count                                                *
  *                                                                            *
  * Purpose: gets the total number of triggers on system                       *
  *                                                                            *
@@ -58,8 +55,6 @@ static int	get_trigger_count(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: is_historical_macro                                              *
- *                                                                            *
  * Purpose: checks if this is historical macro that cannot be expanded for    *
  *          bulk event name update                                            *
  *                                                                            *
@@ -81,8 +76,6 @@ static int	is_historical_macro(const char *macro)
 
 /******************************************************************************
  *                                                                            *
- * Function: convert_historical_macro                                         *
- *                                                                            *
  * Purpose: translates historical macro to lld macro format                   *
  *                                                                            *
  * Parameters: macro - [IN] the macro type (see ZBX_HIST_MACRO_* defines)     *
@@ -103,8 +96,6 @@ static const char	*convert_historical_macro(int macro)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: preprocess_trigger_name                                          *
  *                                                                            *
  * Purpose: pre-process trigger name(description) by expanding non historical *
  *          macros                                                            *
@@ -216,8 +207,6 @@ static void	preprocess_trigger_name(DB_TRIGGER *trigger, int *historical)
 
 /******************************************************************************
  *                                                                            *
- * Function: process_event_bulk_update                                        *
- *                                                                            *
  * Purpose: update event/problem names for a trigger with bulk request        *
  *                                                                            *
  * Parameters: trigger    - [IN] the trigger                                  *
@@ -266,8 +255,6 @@ static int	process_event_bulk_update(const DB_TRIGGER *trigger, char **sql, size
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: process_event_update                                             *
  *                                                                            *
  * Purpose: update event/problem names for a trigger with separate requests   *
  *          for each event                                                    *
@@ -352,8 +339,6 @@ static int	process_event_update(const DB_TRIGGER *trigger, char **sql, size_t *s
 
 /******************************************************************************
  *                                                                            *
- * Function: update_event_names                                               *
- *                                                                            *
  * Purpose: update event names in events and problem tables                   *
  *                                                                            *
  * Return value: SUCCEED - the update was successful                          *
@@ -436,8 +421,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_check_postinit_tasks                                         *
  *                                                                            *
  * Purpose: process post initialization tasks                                 *
  *                                                                            *

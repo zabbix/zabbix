@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2902,61 +2902,6 @@ class CApiInputValidatorTest extends TestCase {
 				'{$MACRO: '."\xd1".'ontext}',
 				'/1/macro',
 				'Invalid parameter "/1/macro": invalid byte sequence in UTF-8.'
-			],
-			[
-				['type' => API_RANGE_TIME, 'length' => 6],
-				'now-1d',
-				'/1/time',
-				'now-1d'
-			],
-			[
-				['type' => API_RANGE_TIME, 'length' => 8],
-				'now-1d-1h',
-				'/1/time',
-				'Invalid parameter "/1/time": value is too long.'
-			],
-			[
-				['type' => API_RANGE_TIME],
-				'{$MACRO}',
-				'/1/time',
-				'Invalid parameter "/1/time": a time range is expected.'
-			],
-			[
-				['type' => API_RANGE_TIME],
-				'',
-				'/1/time',
-				'Invalid parameter "/1/time": cannot be empty.'
-			],
-			[
-				['type' => API_RANGE_TIME],
-				[],
-				'/1/time',
-				'Invalid parameter "/1/time": a character string is expected.'
-			],
-			[
-				['type' => API_RANGE_TIME],
-				true,
-				'/1/time',
-				'Invalid parameter "/1/time": a character string is expected.'
-			],
-			[
-				['type' => API_RANGE_TIME],
-				null,
-				'/1/time',
-				'Invalid parameter "/1/time": a character string is expected.'
-			],
-			[
-				['type' => API_RANGE_TIME],
-				'now-5x',
-				'/1/time',
-				'Invalid parameter "/1/time": a time range is expected.'
-			],
-			[
-				['type' => API_RANGE_TIME],
-				// broken UTF-8 byte sequence
-				'now-'."\xd1".'d',
-				'/1/time',
-				'Invalid parameter "/1/time": invalid byte sequence in UTF-8.'
 			],
 			[
 				['type' => API_TIME_PERIOD, 'length' => 16],

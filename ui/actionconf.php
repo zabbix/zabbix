@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -108,15 +108,31 @@ $new_update_operation = getRequest('new_update_operation', []);
 $update_operations = getRequest('update_operations', []);
 $eventsource = getRequest('eventsource', EVENT_SOURCE_TRIGGERS);
 
+$check_actionids = [];
+
 if (hasRequest('actionid')) {
-	$actionPermissions = API::Action()->get([
-		'output' => ['actionid'],
-		'actionids' => $_REQUEST['actionid'],
+	$check_actionids[getRequest('actionid')] = true;
+}
+
+if (hasRequest('g_actionid')) {
+	$check_actionids += array_fill_keys((array) getRequest('g_actionid'), true);
+}
+
+if ($check_actionids) {
+	$actions = API::Action()->get([
+		'output' => [],
+		'actionids' => array_keys($check_actionids),
+		'filter' => [
+			'eventsource' => $eventsource
+		],
 		'editable' => true
 	]);
-	if (empty($actionPermissions)) {
+
+	if (count($actions) != count($check_actionids)) {
 		access_deny();
 	}
+
+	unset($check_actionids, $actions);
 }
 
 /*
@@ -512,6 +528,7 @@ if (hasRequest('form')) {
 	$data = [
 		'form' => getRequest('form'),
 		'actionid' => getRequest('actionid', '0'),
+		'eventsource' => $eventsource,
 		'new_condition' => getRequest('new_condition', []),
 		'new_operation' => getRequest('new_operation'),
 		'new_recovery_operation' => getRequest('new_recovery_operation'),
@@ -538,10 +555,8 @@ if (hasRequest('form')) {
 			'editable' => true
 		]);
 		$data['action'] = reset($data['action']);
-		$data['eventsource'] = $data['action']['eventsource'];
 	}
 	else {
-		$data['eventsource'] = $eventsource;
 		$data['esc_period'] = getRequest('esc_period');
 	}
 
@@ -648,34 +663,64 @@ if (hasRequest('form')) {
 	echo (new CView('configuration.action.edit', $data))->getOutput();
 }
 else {
-	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
-	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+	$eventsource = getRequest('eventsource', EVENT_SOURCE_TRIGGERS);
 
-	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
-	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+	if ($eventsource == EVENT_SOURCE_SERVICE) {
+		$sortField = getRequest('sort', CProfile::get('web.service_actions.sort', 'name'));
+		$sortOrder = getRequest('sortorder', CProfile::get('web.service_actions.sortorder', ZBX_SORT_UP));
 
-	// filter
-	if (hasRequest('filter_set')) {
-		CProfile::update('web.actionconf.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
-		CProfile::update('web.actionconf.filter_status', getRequest('filter_status', -1), PROFILE_TYPE_INT);
+		CProfile::update('web.service_actions.sort', $sortField, PROFILE_TYPE_STR);
+		CProfile::update('web.service_actions.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
+		if (hasRequest('filter_set')) {
+			CProfile::update('web.service_actions.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.service_actions.filter_status', getRequest('filter_status', -1), PROFILE_TYPE_INT);
+		}
+		elseif (hasRequest('filter_rst')) {
+			CProfile::delete('web.service_actions.filter_name');
+			CProfile::delete('web.service_actions.filter_status');
+		}
+
+		$filter = [
+			'name' => CProfile::get('web.service_actions.filter_name', ''),
+			'status' => CProfile::get('web.service_actions.filter_status', -1)
+		];
+
+		$profile = 'web.service_actions.filter';
+		$active_tab = 'web.service_actions.filter.active';
 	}
-	elseif (hasRequest('filter_rst')) {
-		CProfile::delete('web.actionconf.filter_name');
-		CProfile::delete('web.actionconf.filter_status');
-	}
+	else {
+		$sortField = getRequest('sort', CProfile::get('web.actionconf.php.sort', 'name'));
+		$sortOrder = getRequest('sortorder', CProfile::get('web.actionconf.php.sortorder', ZBX_SORT_UP));
 
-	$filter = [
-		'name' => CProfile::get('web.actionconf.filter_name', ''),
-		'status' => CProfile::get('web.actionconf.filter_status', -1)
-	];
+		CProfile::update('web.actionconf.php.sort', $sortField, PROFILE_TYPE_STR);
+		CProfile::update('web.actionconf.php.sortorder', $sortOrder, PROFILE_TYPE_STR);
+
+		if (hasRequest('filter_set')) {
+			CProfile::update('web.actionconf.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.actionconf.filter_status', getRequest('filter_status', -1), PROFILE_TYPE_INT);
+		}
+		elseif (hasRequest('filter_rst')) {
+			CProfile::delete('web.actionconf.filter_name');
+			CProfile::delete('web.actionconf.filter_status');
+		}
+
+		$filter = [
+			'name' => CProfile::get('web.actionconf.filter_name', ''),
+			'status' => CProfile::get('web.actionconf.filter_status', -1)
+		];
+
+		$profile = 'web.actionconf.filter';
+		$active_tab = 'web.actionconf.filter.active';
+	}
 
 	$data = [
-		'eventsource' => getRequest('eventsource', EVENT_SOURCE_TRIGGERS),
+		'eventsource' => $eventsource,
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
 		'filter' => $filter,
-		'profileIdx' => 'web.actionconf.filter',
-		'active_tab' => CProfile::get('web.actionconf.filter.active', 1)
+		'profileIdx' => $profile,
+		'active_tab' => CProfile::get($active_tab, 1)
 	];
 
 	$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;

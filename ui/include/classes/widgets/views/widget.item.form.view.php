@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -230,7 +230,7 @@ $scripts[] =
 		'}'.
 	'};'.
 
-	'$(".input-color-picker input", $(".overlay-dialogue-body"))'.
+	'$(".'.ZBX_STYLE_COLOR_PICKER.' input", $(".overlay-dialogue-body"))'.
 		'.colorpicker({appendTo: ".overlay-dialogue-body", use_default: true, onUpdate: window.setIndicatorColor});'.
 
 	'var $show = $(\'input[id^="show_"]\', "#widget-dialogue-form").not("#show_header");'.

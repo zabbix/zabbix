@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-10-22T20:07:03Z'
+  date: '2022-01-07T12:54:03Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -10,7 +10,7 @@ zabbix_export:
       uuid: e2d2b4e4ac28483996cc11fe42823d57
       template: 'Zabbix server health'
       name: 'Zabbix server health'
-      description: 'Template tooling version used: 0.38'
+      description: 'Template tooling version used: 0.40'
       groups:
         -
           name: Templates/Applications
@@ -408,6 +408,27 @@ zabbix_export:
               name: 'Zabbix server: Utilization of lld worker processes over 75%'
               priority: AVERAGE
         -
+          uuid: f8d593ff5690419f8679a5b8303f3a66
+          name: 'Zabbix server: Utilization of ODBC poller data collector processes, in %'
+          type: INTERNAL
+          key: 'zabbix[process,odbc poller,avg,busy]'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          description: 'Average percentage of time ODBC poller processes have been busy in the last minute'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
+          triggers:
+            -
+              uuid: f536b921e9444c6eb0ac805ab9302af9
+              expression: 'avg(/Zabbix server health/zabbix[process,odbc poller,avg,busy],10m)>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,odbc poller,avg,busy],10m)<65'
+              name: 'Zabbix server: Utilization of ODBC poller processes over 75%'
+              priority: AVERAGE
+        -
           uuid: cbec202e15be49de93dc0c5f58824ae3
           name: 'Zabbix server: Utilization of poller data collector processes, in %'
           type: INTERNAL
@@ -728,7 +749,7 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[queue,10m]'
           history: 1w
-          description: 'Number of monitored items in the queue which are delayed at least by 10 minutes'
+          description: 'Number of monitored items in the queue which are delayed at least by 10 minutes.'
           tags:
             -
               tag: Application
@@ -739,14 +760,14 @@ zabbix_export:
               expression: 'min(/Zabbix server health/zabbix[queue,10m],10m)>100'
               name: 'Zabbix server: More than 100 items having missing data for more than 10 minutes'
               priority: WARNING
-              description: 'zabbix[stats,{$IP},{$PORT},queue,10m] item is collecting data about how many items are missing data for more than 10 minutes'
+              description: 'zabbix[stats,{$IP},{$PORT},queue,10m] item is collecting data about how many items are missing data for more than 10 minutes.'
         -
           uuid: aaf58555c0774e848f51a351b6ae8462
           name: 'Zabbix server: Queue'
           type: INTERNAL
           key: 'zabbix[queue]'
           history: 1w
-          description: 'Number of monitored items in the queue which are delayed at least by 6 seconds'
+          description: 'Number of monitored items in the queue which are delayed at least by 6 seconds.'
           tags:
             -
               tag: Application
@@ -759,7 +780,7 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Availability statistics of Zabbix configuration cache. Percentage of used buffer'
+          description: 'Availability statistics of Zabbix configuration cache. Percentage of used buffer.'
           tags:
             -
               tag: Application
@@ -770,7 +791,7 @@ zabbix_export:
               expression: 'max(/Zabbix server health/zabbix[rcache,buffer,pused],10m)>75'
               name: 'Zabbix server: More than 75% used in the configuration cache'
               priority: AVERAGE
-              description: 'Consider increasing CacheSize in the zabbix_server.conf configuration file'
+              description: 'Consider increasing CacheSize in the zabbix_server.conf configuration file.'
         -
           uuid: b14a5ba6c93f4d6c9dfd820640d34e9b
           name: 'Zabbix server: Trend function cache, % unique requests'
@@ -792,7 +813,7 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: "Effectiveness statistics of the Zabbix trend function cache.\tPercentage of cache misses"
+          description: 'Effectiveness statistics of the Zabbix trend function cache. Percentage of cache misses.'
           tags:
             -
               tag: Application
@@ -805,7 +826,7 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: "Availability statistics of Zabbix value cache.\tPercentage of used buffer"
+          description: 'Availability statistics of Zabbix value cache. Percentage of used buffer.'
           tags:
             -
               tag: Application
@@ -816,7 +837,7 @@ zabbix_export:
               expression: 'max(/Zabbix server health/zabbix[vcache,buffer,pused],10m)>95'
               name: 'Zabbix server: More than 95% used in the value cache'
               priority: AVERAGE
-              description: 'Consider increasing ValueCacheSize in the zabbix_server.conf configuration file'
+              description: 'Consider increasing ValueCacheSize in the zabbix_server.conf configuration file.'
         -
           uuid: 69b14487a9744dbb866f2e6ee131d0e5
           name: 'Zabbix server: Value cache hits'
@@ -825,7 +846,7 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: vps
-          description: 'Effectiveness statistics of Zabbix value cache. Number of cache hits (history values taken from the cache)'
+          description: 'Effectiveness statistics of Zabbix value cache. Number of cache hits (history values taken from the cache).'
           preprocessing:
             -
               type: CHANGE_PER_SECOND
@@ -843,7 +864,7 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: vps
-          description: 'Effectiveness statistics of Zabbix value cache. Number of cache misses (history values taken from the database)'
+          description: 'Effectiveness statistics of Zabbix value cache. Number of cache misses (history values taken from the database).'
           preprocessing:
             -
               type: CHANGE_PER_SECOND
@@ -859,7 +880,7 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[vcache,cache,mode]'
           history: 1w
-          description: 'Value cache operating mode'
+          description: 'Value cache operating mode.'
           valuemap:
             name: 'Value cache operating mode'
           tags:
@@ -907,7 +928,7 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Availability statistics of Zabbix vmware cache. Percentage of used buffer'
+          description: 'Availability statistics of Zabbix vmware cache. Percentage of used buffer.'
           tags:
             -
               tag: Application
@@ -918,7 +939,7 @@ zabbix_export:
               expression: 'max(/Zabbix server health/zabbix[vmware,buffer,pused],10m)>75'
               name: 'Zabbix server: More than 75% used in the vmware cache'
               priority: AVERAGE
-              description: 'Consider increasing VMwareCacheSize in the zabbix_server.conf configuration file'
+              description: 'Consider increasing VMwareCacheSize in the zabbix_server.conf configuration file.'
         -
           uuid: 1ae8253bb4da434da3ea6bcb0352115d
           name: 'Zabbix server: History write cache, % used'
@@ -940,7 +961,7 @@ zabbix_export:
               expression: 'max(/Zabbix server health/zabbix[wcache,history,pused],10m)>75'
               name: 'Zabbix server: More than 75% used in the history cache'
               priority: AVERAGE
-              description: 'Consider increasing HistoryCacheSize in the zabbix_server.conf configuration file'
+              description: 'Consider increasing HistoryCacheSize in the zabbix_server.conf configuration file.'
         -
           uuid: 9fc7faf5455e4e78bdb1406f947bfa08
           name: 'Zabbix server: History index cache, % used'
@@ -962,7 +983,7 @@ zabbix_export:
               expression: 'max(/Zabbix server health/zabbix[wcache,index,pused],10m)>75'
               name: 'Zabbix server: More than 75% used in the history index cache'
               priority: AVERAGE
-              description: 'Consider increasing HistoryIndexCacheSize in the zabbix_server.conf configuration file'
+              description: 'Consider increasing HistoryIndexCacheSize in the zabbix_server.conf configuration file.'
         -
           uuid: 5cca0fc9878d4e068467d5a3b8558ed5
           name: 'Zabbix server: Trend write cache, % used'
@@ -984,7 +1005,7 @@ zabbix_export:
               expression: 'max(/Zabbix server health/zabbix[wcache,trend,pused],10m)>75'
               name: 'Zabbix server: More than 75% used in the trends cache'
               priority: AVERAGE
-              description: 'Consider increasing TrendCacheSize in the zabbix_server.conf configuration file'
+              description: 'Consider increasing TrendCacheSize in the zabbix_server.conf configuration file.'
         -
           uuid: de63f78f36e74361b6c9993d12d8b7c8
           name: 'Zabbix server: Number of processed numeric (float) values per second'
@@ -1125,7 +1146,7 @@ zabbix_export:
           type: DEPENDENT
           key: zabbix.nodes.discovery
           delay: '0'
-          description: 'LLD rule with item and trigger prototypes for node discovery'
+          description: 'LLD rule with item and trigger prototypes for node discovery.'
           item_prototypes:
             -
               uuid: c5cb7ffbd314494cb1801ae804e9c76e
@@ -1136,7 +1157,7 @@ zabbix_export:
               history: 1w
               trends: '0'
               value_type: CHAR
-              description: 'Node IPv4 address'
+              description: 'Node IPv4 address.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1160,7 +1181,7 @@ zabbix_export:
               delay: '0'
               history: 1w
               units: uptime
-              description: 'Time between database unix_timestamp() and last access time'
+              description: 'Time between database unix_timestamp() and last access time.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1180,7 +1201,7 @@ zabbix_export:
               delay: '0'
               history: 1w
               units: unixtime
-              description: 'Last access time'
+              description: 'Last access time.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1199,7 +1220,7 @@ zabbix_export:
               key: 'zabbix.nodes.status[{#NODE.ID}]'
               delay: '0'
               history: 1w
-              description: 'Cluster node status'
+              description: 'Cluster node status.'
               valuemap:
                 name: 'Cluster node status'
               preprocessing:
@@ -1507,6 +1528,12 @@ zabbix_export:
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,history poller,avg,busy]'
+        -
+          sortorder: '11'
+          color: 9FA8DA
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,odbc poller,avg,busy]'
     -
       uuid: ee66abf6d914407c8133b00acad77f17
       name: 'Zabbix server: Data handling processes'
@@ -1784,6 +1811,12 @@ zabbix_export:
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,history poller,avg,busy]'
+        -
+          sortorder: '12'
+          color: 9FA8DA
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,odbc poller,avg,busy]'
     -
       uuid: 630f638ad0054d3380f941e72805ea1d
       name: 'Zabbix server: Zabbix internal process busy %'
@@ -1791,121 +1824,120 @@ zabbix_export:
       ymax_type_1: FIXED
       graph_items:
         -
-          sortorder: '1'
           color: 00EE00
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,timer,avg,busy]'
         -
-          sortorder: '2'
+          sortorder: '1'
           color: 0000EE
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,escalator,avg,busy]'
         -
-          sortorder: '3'
+          sortorder: '2'
           color: FFAA00
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,housekeeper,avg,busy]'
         -
-          sortorder: '4'
+          sortorder: '3'
           color: 00EEEE
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,alerter,avg,busy]'
         -
-          sortorder: '5'
+          sortorder: '4'
           color: '990099'
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,configuration syncer,avg,busy]'
         -
-          sortorder: '6'
+          sortorder: '5'
           color: EE0000
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,history syncer,avg,busy]'
         -
-          sortorder: '7'
+          sortorder: '6'
           color: FF66FF
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,self-monitoring,avg,busy]'
         -
-          sortorder: '8'
+          sortorder: '7'
           color: '009999'
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,task manager,avg,busy]'
         -
-          sortorder: '9'
+          sortorder: '8'
           color: BBBB00
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,ipmi manager,avg,busy]'
         -
-          sortorder: '10'
+          sortorder: '9'
           color: AA0000
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,alert manager,avg,busy]'
         -
-          sortorder: '11'
+          sortorder: '10'
           color: '990000'
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,preprocessing manager,avg,busy]'
         -
-          sortorder: '12'
+          sortorder: '11'
           color: '008800'
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,preprocessing worker,avg,busy]'
         -
-          sortorder: '13'
+          sortorder: '12'
           color: 80B0E0
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,lld manager,avg,busy]'
         -
-          sortorder: '14'
+          sortorder: '13'
           color: 4080B0
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,lld worker,avg,busy]'
         -
-          sortorder: '15'
+          sortorder: '14'
           color: 8000FF
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,alert syncer,avg,busy]'
         -
-          sortorder: '16'
+          sortorder: '15'
           color: 2B5429
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,availability manager,avg,busy]'
         -
-          sortorder: '17'
+          sortorder: '16'
           color: 8048B4
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,report manager,avg,busy]'
         -
-          sortorder: '18'
+          sortorder: '17'
           color: FD5434
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,report writer,avg,busy]'
         -
-          sortorder: '19'
+          sortorder: '18'
           color: 790E1F
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,service manager,avg,busy]'
         -
-          sortorder: '20'
+          sortorder: '19'
           color: 87AC4D
           item:
             host: 'Zabbix server health'

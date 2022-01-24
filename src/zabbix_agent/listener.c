@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,14 +18,13 @@
 **/
 
 #include "common.h"
-#include "listener.h"
-
 #include "comms.h"
 #include "cfg.h"
 #include "zbxconf.h"
-#include "stats.h"
 #include "sysinfo.h"
 #include "log.h"
+
+#include "listener.h"
 
 extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;

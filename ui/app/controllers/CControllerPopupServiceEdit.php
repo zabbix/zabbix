@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,12 +23,15 @@ require_once __DIR__ .'/../../include/forms.inc.php';
 
 class CControllerPopupServiceEdit extends CController {
 
+	/**
+	 * @var array
+	 */
 	private $service;
 
 	protected function checkInput(): bool {
 		$fields = [
-			'serviceid' =>			'db services.serviceid',
-			'parent_serviceids' =>	'array_db services.serviceid'
+			'serviceid' =>			'id',
+			'parent_serviceids' =>	'array_id'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -48,20 +51,19 @@ class CControllerPopupServiceEdit extends CController {
 	 * @throws APIException
 	 */
 	protected function checkPermissions(): bool {
-		if (!$this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES)) {
+		if (!$this->checkAccess(CRoleHelper::UI_SERVICES_SERVICES)) {
 			return false;
 		}
 
 		if ($this->hasInput('serviceid')) {
 			$this->service = API::Service()->get([
-				'output' => ['serviceid', 'name', 'algorithm', 'showsla', 'goodsla', 'sortorder', 'weight',
-					'propagation_rule', 'propagation_value'
+				'output' => ['serviceid', 'name', 'algorithm', 'sortorder', 'weight', 'propagation_rule',
+					'propagation_value', 'description', 'created_at'
 				],
 				'selectParents' => ['serviceid', 'name'],
 				'selectChildren' => ['serviceid', 'name', 'algorithm'],
 				'selectTags' => ['tag', 'value'],
 				'selectProblemTags' => ['tag', 'operator', 'value'],
-				'selectTimes' => ['type', 'ts_from', 'ts_to', 'note'],
 				'selectStatusRules' => ['type', 'limit_value', 'limit_status', 'new_status'],
 				'serviceids' => $this->getInput('serviceid')
 			]);
@@ -92,9 +94,6 @@ class CControllerPopupServiceEdit extends CController {
 
 			CArrayHelper::sort($this->service['problem_tags'], ['tag', 'value', 'operator']);
 			$this->service['problem_tags'] = array_values($this->service['problem_tags']);
-
-			CArrayHelper::sort($this->service['times'], ['type', 'ts_from', 'ts_to']);
-			$this->service['times'] = array_values($this->service['times']);
 
 			CArrayHelper::sort($this->service['status_rules'], ['new_status', 'type', 'limit_value', 'limit_status']);
 			$this->service['status_rules'] = array_values($this->service['status_rules']);
@@ -153,28 +152,6 @@ class CControllerPopupServiceEdit extends CController {
 			}
 			unset($status_rule);
 
-			foreach ($this->service['times'] as $index => &$service_time) {
-				switch ($service_time['type']) {
-					case SERVICE_TIME_TYPE_UPTIME:
-					case SERVICE_TIME_TYPE_DOWNTIME:
-						$from = dowHrMinToStr($service_time['ts_from']);
-						$till = dowHrMinToStr($service_time['ts_to'], true);
-						break;
-
-					case SERVICE_TIME_TYPE_ONETIME_DOWNTIME:
-						$from = zbx_date2str(DATE_TIME_FORMAT, $service_time['ts_from']);
-						$till = zbx_date2str(DATE_TIME_FORMAT, $service_time['ts_to']);
-						break;
-				}
-
-				$service_time += [
-					'row_index' => $index,
-					'from' => $from,
-					'till' => $till
-				];
-			}
-			unset($service_time);
-
 			$data = [
 				'serviceid' => $this->service['serviceid'],
 				'form' => [
@@ -182,14 +159,13 @@ class CControllerPopupServiceEdit extends CController {
 					'parents' => $parents,
 					'children' => $this->service['children'],
 					'children_problem_tags_html' => $children_problem_tags_html,
-					'algorithm' => $this->service['algorithm'],
 					'sortorder' => $this->service['sortorder'],
-					'showsla' => $this->service['showsla'],
-					'goodsla' => $this->service['goodsla'],
-					'times' => $this->service['times'],
+					'algorithm' => $this->service['algorithm'],
+					'description' => $this->service['description'],
+					'created_at' => $this->service['created_at'],
 					'tags' => $this->service['tags'] ?: [['tag' => '', 'value' => '']],
 					'problem_tags' => $this->service['problem_tags']
-						?: [['tag' => '', 'operator' => SERVICE_TAG_OPERATOR_EQUAL, 'value' => '']],
+						?: [['tag' => '', 'operator' => ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL, 'value' => '']],
 					'advanced_configuration' => $this->service['status_rules']
 						|| $this->service['propagation_rule'] != $defaults['propagation_rule']
 						|| $this->service['propagation_value'] != $defaults['propagation_value']
@@ -217,13 +193,13 @@ class CControllerPopupServiceEdit extends CController {
 					'parents' => $parents,
 					'children' => [],
 					'children_problem_tags_html' => $children_problem_tags_html,
-					'algorithm' => ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE,
 					'sortorder' => $defaults['sortorder'],
-					'showsla' => $defaults['showsla'],
-					'goodsla' => $defaults['goodsla'],
-					'times' => [],
+					'algorithm' => ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE,
+					'description' => $defaults['description'],
 					'tags' => [['tag' => '', 'value' => '']],
-					'problem_tags' => [['tag' => '', 'operator' => SERVICE_TAG_OPERATOR_EQUAL, 'value' => '']],
+					'problem_tags' => [
+						['tag' => '', 'operator' => ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL, 'value' => '']
+					],
 					'advanced_configuration' => false,
 					'status_rules' => [],
 					'propagation_rule' => $defaults['propagation_rule'],

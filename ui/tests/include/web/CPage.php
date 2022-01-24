@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -642,5 +642,12 @@ class CPage {
 		if ($text !== $header) {
 			throw new \Exception('Header of the page "'.$text.'" is not equal to "'.$header.'".');
 		}
+	}
+
+	/**
+	 * Scroll page to the top position.
+	 */
+	public function scrollToTop() {
+		$this->getDriver()->executeScript('document.getElementsByClassName(\'wrapper\')[0].scrollTo(0, 0)');
 	}
 }

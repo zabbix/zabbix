@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-08-13T03:59:05Z'
+  date: '2021-12-17T06:24:09Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -25,7 +25,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/418396-discussion-thread-for-official-zabbix-templates-for-cisco
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: 'Templates/Network devices'
@@ -1317,7 +1317,11 @@ zabbix_export:
         -
           macro: '{$CISCO.LLD.FILTER.IF.ADMIN.MATCHES}'
           value: '1'
-          description: 'Filter of discoverable interfaces by admin status. 1 - Up 2 - Down 3 - Testing'
+          description: |
+            Filter of discoverable interfaces by admin status.
+            1 - Up
+            2 - Down
+            3 - Testing
         -
           macro: '{$CISCO.LLD.FILTER.IF.ADMIN.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
@@ -1325,7 +1329,9 @@ zabbix_export:
         -
           macro: '{$CISCO.LLD.FILTER.IF.CONTROL.MATCHES}'
           value: '.*'
-          description: 'Filter triggers by discoverable interface names. Used in overrides. Triggers will only be created for interfaces whose names contain the value of the macro.'
+          description: |
+            Filter triggers by discoverable interface names.
+            Used in overrides. Triggers will only be created for interfaces whose names contain the value of the macro.
         -
           macro: '{$CISCO.LLD.FILTER.IF.DESC.MATCHES}'
           value: '.*'

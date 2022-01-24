@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,8 @@
 #include "md5.h"	/* for MD5_DIGEST_SIZE, md5_byte_t */
 #include "zbxtypes.h"	/* for zbx_uint64_t struct st_logfile; */
 #include "zbxalgo.h"
+
+struct st_logfile;
 
 #define ZBX_PERSIST_INACTIVITY_PERIOD	SEC_PER_DAY	/* the time period after which persistent files used by log */
 							/* items which are not received in active check list can be */

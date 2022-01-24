@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,8 +29,6 @@
 #include "proxyconfig.h"
 
 /******************************************************************************
- *                                                                            *
- * Function: send_proxyconfig                                                 *
  *                                                                            *
  * Purpose: send configuration tables to the proxy from server                *
  *          (for active proxies)                                              *
@@ -122,8 +120,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: recv_proxyconfig                                                 *
  *                                                                            *
  * Purpose: receive configuration tables from server (passive proxies)        *
  *                                                                            *

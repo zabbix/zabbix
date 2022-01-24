@@ -2,7 +2,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -227,4 +227,11 @@ type IO_COUNTERS struct {
 	ReadTransferCount   uint64
 	WriteTransferCount  uint64
 	OtherTransferCount  uint64
+}
+
+type CLUSTER struct {
+	LpSectorsPerCluster     uint32
+	LpBytesPerSector        uint32
+	LpNumberOfFreeClusters  uint32
+	LpTotalNumberOfClusters uint32
 }

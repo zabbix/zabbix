@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,9 +25,9 @@
 #include "log.h"
 #include "zbxdiag.h"
 
+#if defined(HAVE_SIGQUEUE)
+
 /******************************************************************************
- *                                                                            *
- * Function: rtc_change_service_loglevel                                      *
  *                                                                            *
  * Purpose: change log level of service process                               *
  *                                                                            *
@@ -63,8 +63,6 @@ static void	rtc_change_service_loglevel(int code)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: rtc_process_loglevel                                             *
  *                                                                            *
  * Purpose: process loglevel runtime control option                           *
  *                                                                            *
@@ -131,10 +129,9 @@ static void	rtc_process_loglevel(int code, const char *data, char **result)
 
 	zbx_signal_process_by_type(process_type, process_num, ZBX_RTC_MAKE_MESSAGE(code, 0, 0), result);
 }
+#endif
 
 /******************************************************************************
- *                                                                            *
- * Function: rtc_process_diaginfo                                             *
  *                                                                            *
  * Purpose: process diaginfo runtime control option                           *
  *                                                                            *
@@ -183,8 +180,6 @@ static void	rtc_process_diaginfo(const char *data, char **result)
 
 /******************************************************************************
  *                                                                            *
- * Function: rtc_process_request                                              *
- *                                                                            *
  * Purpose: process runtime control option                                    *
  *                                                                            *
  * Parameters: code   - [IN] the request code                                 *
@@ -194,13 +189,16 @@ static void	rtc_process_diaginfo(const char *data, char **result)
  ******************************************************************************/
 static void	rtc_process_request(int code, const unsigned char *data, char **result)
 {
+#if defined(HAVE_SIGQUEUE)
 #ifdef HAVE_NETSNMP
 	int	cmd;
 	char	*tmp = NULL;
 #endif
+#endif
 
 	switch (code)
 	{
+#if defined(HAVE_SIGQUEUE)
 		case ZBX_RTC_LOG_LEVEL_INCREASE:
 		case ZBX_RTC_LOG_LEVEL_DECREASE:
 			rtc_process_loglevel(code, (const char *)data, result);
@@ -234,6 +232,7 @@ static void	rtc_process_request(int code, const unsigned char *data, char **resu
 			*result = zbx_strdup(NULL, "Invalid runtime control option: no SNMP support enabled\n");
 #endif
 			return;
+#endif
 		case ZBX_RTC_DIAGINFO:
 			rtc_process_diaginfo((const char *)data, result);
 			return;
@@ -244,8 +243,6 @@ static void	rtc_process_request(int code, const unsigned char *data, char **resu
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_rtc_init                                                     *
- *                                                                            *
  * Purpose: initialize runtime control service                                *
  *                                                                            *
  ******************************************************************************/
@@ -255,8 +252,6 @@ int	zbx_rtc_init(zbx_rtc_t *rtc ,char **error)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_rtc_dispatch                                                 *
  *                                                                            *
  * Purpose: accept and process runtime control request                        *
  *                                                                            *
@@ -291,8 +286,6 @@ void	zbx_rtc_dispatch(zbx_ipc_client_t *client, zbx_ipc_message_t *message)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_rtc_wait_config_sync                                         *
  *                                                                            *
  * Purpose: wait for configuration sync notification while optionally         *
  *          dispatching runtime control commands                              *

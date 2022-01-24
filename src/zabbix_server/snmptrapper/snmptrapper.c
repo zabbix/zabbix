@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -69,8 +69,6 @@ static void	DBupdate_lastsize(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: process_trap_for_interface                                       *
  *                                                                            *
  * Purpose: add trap to all matching items for the specified interface        *
  *                                                                            *
@@ -228,8 +226,6 @@ next:
 
 /******************************************************************************
  *                                                                            *
- * Function: process_trap                                                     *
- *                                                                            *
  * Purpose: process a single trap                                             *
  *                                                                            *
  * Parameters: addr - [IN] address of the target interface(s)                 *
@@ -272,8 +268,6 @@ static void	process_trap(const char *addr, char *begin, char *end)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: parse_traps                                                      *
  *                                                                            *
  * Purpose: split traps and process them with process_trap()                  *
  *                                                                            *
@@ -381,8 +375,6 @@ static void	parse_traps(int flag)
 
 /******************************************************************************
  *                                                                            *
- * Function: delay_trap_logs                                                  *
- *                                                                            *
  * Purpose: delay SNMP trapper file related issue log entries for 60 seconds  *
  *          unless this is the first time this issue has occurred             *
  *                                                                            *
@@ -409,8 +401,6 @@ static void	delay_trap_logs(char *error, int log_level)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: read_traps                                                       *
  *                                                                            *
  * Purpose: read the traps and then parse them with parse_traps()             *
  *                                                                            *
@@ -455,8 +445,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: close_trap_file                                                  *
- *                                                                            *
  * Purpose: close trap file and reset lastsize                                *
  *                                                                            *
  * Comments: !!! do not reset lastsize elsewhere !!!                          *
@@ -473,8 +461,6 @@ static void	close_trap_file(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: open_trap_file                                                   *
  *                                                                            *
  * Purpose: open the trap file and get it's node number                       *
  *                                                                            *
@@ -515,8 +501,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: get_latest_data                                                  *
  *                                                                            *
  * Purpose: Open the latest trap file. If the current file has been rotated,  *
  *          process that and then open the latest file.                       *
@@ -592,8 +576,6 @@ static int	get_latest_data(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: main_snmptrapper_loop                                            *
  *                                                                            *
  * Purpose: SNMP trap reader's entry point                                    *
  *                                                                            *

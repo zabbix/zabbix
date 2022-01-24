@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2021 Zabbix SIA
+ ** Copyright (C) 2001-2022 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -151,11 +151,15 @@ jQuery(function($) {
 				break;
 
 			case 'item':
-				sections = getMenuPopupItem(data, $obj);
+				sections = getMenuPopupItem(data);
 				break;
 
-			case 'item_prototype':
-				sections = getMenuPopupItemPrototype(data);
+			case 'item_configuration':
+				sections = getMenuPopupItemConfiguration(data);
+				break;
+
+			case 'item_prototype_configuration':
+				sections = getMenuPopupItemPrototypeConfiguration(data);
 				break;
 
 			case 'dropdown':
@@ -164,10 +168,6 @@ jQuery(function($) {
 
 			case 'submenu':
 				sections = getMenuPopupSubmenu(data);
-				break;
-
-			case 'widget_actions':
-				sections = getMenuPopupWidgetActions(data);
 				break;
 
 			default:

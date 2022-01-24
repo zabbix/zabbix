@@ -100,6 +100,7 @@ $menu-main-icons: (
 	dashboard: -600px -664px,
 	problems: -600px -688px,
 	monitoring: -600px -712px,
+	services: -600px -832px,
 	inventory: -600px -736px,
 	reports: -600px -760px,
 	configuration: -600px -784px,
@@ -172,6 +173,7 @@ $msg-warning-border-color: #ffb319;
 $btn-font-color: #333333;
 $btn-bg-color: #e0e0e0;
 $btn-border-color: #333333;
+$btn-border-focus-color: #ffffff;
 
 $btn-alt-font-color: #ffffff;
 $btn-alt-bg-color: transparent;
@@ -1205,6 +1207,12 @@ td.inactive-bg {
 
 // Time selection.
 .ui-tabs-nav {
+	.btn-info {
+		&::after {
+			background-position: -279px -621px;
+		}
+	}
+
 	.btn-time {
 		&::after {
 			background-position: -246px -583px;
@@ -1246,6 +1254,12 @@ td.inactive-bg {
 	}
 
 	.ui-tabs-active {
+		.btn-info {
+			&::after {
+				background-position: -431px -621px;
+			}
+		}
+
 		.btn-time {
 			&::after {
 				background-position: -87px -583px;
@@ -1507,14 +1521,14 @@ td.inactive-bg {
 
 .filter-container.tabfilter-container {
 
-	.selected.expanded .icon-home::before {
+	.selected.expanded .icon-filter::before {
 		// white icon
-		background: url($sprite-path) no-repeat -433px -510px;
+		background: url($sprite-path) no-repeat -87px -547px;
 	}
 
-	.icon-home::before {
+	.icon-filter::before {
 		// black icon
-		background: url($sprite-path) no-repeat -281px -510px;
+		background: url($sprite-path) no-repeat -246px -547px;
 	}
 
 	.tabfilter-item-label {

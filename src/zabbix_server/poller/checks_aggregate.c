@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,8 +33,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: evaluate_history_func_min                                        *
- *                                                                            *
  * Purpose: calculate minimum value from the history value vector             *
  *                                                                            *
  * Parameters: values      - [IN] a vector containing history values          *
@@ -64,8 +62,6 @@ static void	evaluate_history_func_min(zbx_vector_history_record_t *values, int v
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: evaluate_history_func_max                                        *
  *                                                                            *
  * Purpose: calculate maximum value from the history value vector             *
  *                                                                            *
@@ -97,8 +93,6 @@ static void	evaluate_history_func_max(zbx_vector_history_record_t *values, int v
 
 /******************************************************************************
  *                                                                            *
- * Function: evaluate_history_func_sum                                        *
- *                                                                            *
  * Purpose: calculate sum of values from the history value vector             *
  *                                                                            *
  * Parameters: values      - [IN] a vector containing history values          *
@@ -127,8 +121,6 @@ static void	evaluate_history_func_sum(zbx_vector_history_record_t *values, int v
 
 /******************************************************************************
  *                                                                            *
- * Function: evaluate_history_func_avg                                        *
- *                                                                            *
  * Purpose: calculate average value of values from the history value vector   *
  *                                                                            *
  * Parameters: values      - [IN] a vector containing history values          *
@@ -149,8 +141,6 @@ static void	evaluate_history_func_avg(zbx_vector_history_record_t *values, int v
 
 /******************************************************************************
  *                                                                            *
- * Function: evaluate_history_func_count                                      *
- *                                                                            *
  * Purpose: calculate number of values in value vector                        *
  *                                                                            *
  * Parameters: values      - [IN] a vector containing history values          *
@@ -170,8 +160,6 @@ static void	evaluate_history_func_count(zbx_vector_history_record_t *values, int
 
 /******************************************************************************
  *                                                                            *
- * Function: evaluate_history_func_last                                       *
- *                                                                            *
  * Purpose: calculate the last (newest) value in value vector                 *
  *                                                                            *
  * Parameters: values      - [IN] a vector containing history values          *
@@ -184,8 +172,6 @@ static void	evaluate_history_func_last(zbx_vector_history_record_t *values, hist
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: evaluate_history_func                                            *
  *                                                                            *
  * Purpose: calculate function with values from value vector                  *
  *                                                                            *
@@ -228,8 +214,6 @@ static void	evaluate_history_func(zbx_vector_history_record_t *values, int value
 
 /******************************************************************************
  *                                                                            *
- * Function: quote_string                                                     *
- *                                                                            *
  * Purpose: quotes string by enclosing it in double quotes and escaping       *
  *          double quotes inside string with '\'.                             *
  *                                                                            *
@@ -264,8 +248,6 @@ static void	quote_string(char **str, size_t sz_src)
 
 /******************************************************************************
  *                                                                            *
- * Function: aggregate_quote_groups                                           *
- *                                                                            *
  * Purpose: quotes the individual groups in the list if necessary             *
  *                                                                            *
  ******************************************************************************/
@@ -287,8 +269,6 @@ static void	aggregate_quote_groups(char **str, size_t *str_alloc, size_t *str_of
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: aggregate_get_items                                              *
  *                                                                            *
  * Purpose: get array of items specified by key for selected groups           *
  *          (including nested groups)                                         *
@@ -377,8 +357,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: evaluate_aggregate                                               *
  *                                                                            *
  * Parameters: item      - [IN] aggregated item                               *
  *             grp_func  - [IN] one of ZBX_GRP_FUNC_*                         *

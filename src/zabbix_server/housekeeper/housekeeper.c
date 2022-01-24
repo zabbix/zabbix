@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,11 +25,10 @@
 #include "zbxself.h"
 #include "zbxalgo.h"
 #include "zbxserver.h"
-
-#include "zbxhistory.h"
 #include "history_compress.h"
-#include "housekeeper.h"
 #include "../../libs/zbxdbcache/valuecache.h"
+
+#include "housekeeper.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
@@ -87,7 +86,7 @@ typedef struct
 }
 zbx_hk_cleanup_table_t;
 
-static unsigned char poption_mode_regular 	= ZBX_HK_MODE_REGULAR;
+static unsigned char poption_mode_regular	= ZBX_HK_MODE_REGULAR;
 static unsigned char poption_global_disabled	= ZBX_HK_OPTION_DISABLED;
 
 /* Housekeeper table mapping to housekeeping configuration values.    */
@@ -202,8 +201,6 @@ static void	zbx_housekeeper_sigusr_handler(int flags)
 
 /******************************************************************************
  *                                                                            *
- * Function: hk_item_update_cache_compare                                     *
- *                                                                            *
  * Purpose: compare two delete queue items by their itemid                    *
  *                                                                            *
  * Parameters: d1 - [IN] the first delete queue item to compare               *
@@ -227,8 +224,6 @@ static int	hk_item_update_cache_compare(const void *d1, const void *d2)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: hk_history_delete_queue_append                                   *
  *                                                                            *
  * Purpose: add item to the delete queue if necessary                         *
  *                                                                            *
@@ -268,8 +263,6 @@ static void	hk_history_delete_queue_append(zbx_hk_history_rule_t *rule, int now,
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: hk_history_prepare                                               *
  *                                                                            *
  * Purpose: prepares history housekeeping rule                                *
  *                                                                            *
@@ -313,8 +306,6 @@ static void	hk_history_prepare(zbx_hk_history_rule_t *rule)
 
 /******************************************************************************
  *                                                                            *
- * Function: hk_history_release                                               *
- *                                                                            *
  * Purpose: releases history housekeeping rule                                *
  *                                                                            *
  * Parameters: rule  - [IN/OUT] the history housekeeping rule                 *
@@ -334,8 +325,6 @@ static void	hk_history_release(zbx_hk_history_rule_t *rule)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: hk_history_item_update                                           *
  *                                                                            *
  * Purpose: updates history housekeeping rule with item history setting and   *
  *          adds item to the delete queue if necessary                        *
@@ -379,8 +368,6 @@ static void	hk_history_item_update(zbx_hk_history_rule_t *rules, zbx_hk_history_
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: hk_history_update                                                *
  *                                                                            *
  * Purpose: updates history housekeeping rule with the latest item history    *
  *          settings and prepares delete queue                                *
@@ -478,8 +465,6 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 
 /******************************************************************************
  *                                                                            *
- * Function: hk_history_delete_queue_prepare_all                              *
- *                                                                            *
  * Purpose: prepares history housekeeping delete queues for all defined       *
  *          history rules.                                                    *
  *                                                                            *
@@ -522,8 +507,6 @@ static void	hk_history_delete_queue_prepare_all(zbx_hk_history_rule_t *rules, in
 
 /******************************************************************************
  *                                                                            *
- * Function: hk_history_delete_queue_clear                                    *
- *                                                                            *
  * Purpose: clears the history housekeeping delete queue                      *
  *                                                                            *
  * Parameters: rule   - [IN/OUT] the history housekeeping rule                *
@@ -536,8 +519,6 @@ static void	hk_history_delete_queue_clear(zbx_hk_history_rule_t *rule)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: hk_drop_partition_for_rule                                       *
  *                                                                            *
  * Purpose: drop appropriate partitions from the history and trends tables    *
  *                                                                            *
@@ -600,8 +581,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: housekeeping_history_and_trends                                  *
- *                                                                            *
  * Purpose: performs housekeeping for history and trends tables               *
  *                                                                            *
  * Parameters: now    - [IN] the current timestamp                            *
@@ -659,8 +638,6 @@ static int	housekeeping_history_and_trends(int now)
 
 /******************************************************************************
  *                                                                            *
- * Function: housekeeping_process_rule                                        *
- *                                                                            *
  * Purpose: removes old records from a table according to the specified rule  *
  *                                                                            *
  * Parameters: now  - [IN] the current time in seconds                        *
@@ -674,10 +651,16 @@ static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		keep_from, deleted = 0;
+	int		keep_from, id_field_str_type, deleted = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s' field_name:'%s' filter:'%s' min_clock:%d now:%d",
 			__func__, rule->table, rule->field_name, rule->filter, rule->min_clock, now);
+
+	/* NOTE: Do not forget to add here tables whose id column is string-type.                    */
+	/* Now only audit field has string id, if in the future this list of exceptions is increased */
+	/* DBget_table() and DBget_field() functions with cache could be used to determine if string */
+	/* or int version is required.                                                               */
+	id_field_str_type = (0 == strcmp("auditid", rule->field_name)) ? 1 : 0;
 
 	/* initialize min_clock with the oldest record timestamp from database */
 	if (0 == rule->min_clock)
@@ -700,10 +683,14 @@ static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 		char			buffer[MAX_STRING_LEN];
 		char			*sql = NULL;
 		size_t			sql_alloc = 0, sql_offset;
-		zbx_vector_uint64_t	ids;
+		zbx_vector_uint64_t	ids_uint64;
+		zbx_vector_str_t	ids_str;
 		int			ret;
 
-		zbx_vector_uint64_create(&ids);
+		if (0 == id_field_str_type)
+			zbx_vector_uint64_create(&ids_uint64);
+		else
+			zbx_vector_str_create(&ids_str);
 
 		rule->min_clock = MIN(keep_from, rule->min_clock + HK_MAX_DELETE_PERIODS * hk_period);
 
@@ -726,30 +713,63 @@ static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 
 			while (NULL != (row = DBfetch(result)))
 			{
-				zbx_uint64_t	id;
+				if (0 == id_field_str_type)
+				{
+					zbx_uint64_t	id;
 
-				ZBX_STR2UINT64(id, row[0]);
-				zbx_vector_uint64_append(&ids, id);
+					ZBX_STR2UINT64(id, row[0]);
+					zbx_vector_uint64_append(&ids_uint64, id);
+				}
+				else
+					zbx_vector_str_append(&ids_str, zbx_strdup(NULL, row[0]));
 			}
+
 			DBfree_result(result);
 
-			if (0 == ids.values_num)
-				break;
+			if (0 == id_field_str_type)
+			{
+				if (0 == ids_uint64.values_num)
+					break;
+			}
+			else
+			{
+				if (0 == ids_str.values_num)
+					break;
+			}
 
 			sql_offset = 0;
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from %s where", rule->table);
-			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, rule->field_name, ids.values,
-					ids.values_num);
 
-			if (ZBX_DB_OK > (ret = DBexecute("%s", sql)))
+			if (0 == id_field_str_type)
+			{
+				DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, rule->field_name,
+						ids_uint64.values, ids_uint64.values_num);
+			}
+			else
+			{
+				DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, rule->field_name,
+						(const char**)ids_str.values, ids_str.values_num);
+			}
+
+			ret = DBexecute("%s", sql);
+
+			if (0 == id_field_str_type)
+				zbx_vector_uint64_clear(&ids_uint64);
+			else
+				zbx_vector_str_clear_ext(&ids_str, zbx_str_free);
+
+			if (ZBX_DB_OK > ret)
 				break;
 
 			deleted += ret;
-			zbx_vector_uint64_clear(&ids);
 		}
 
 		zbx_free(sql);
-		zbx_vector_uint64_destroy(&ids);
+
+		if (0 == id_field_str_type)
+			zbx_vector_uint64_destroy(&ids_uint64);
+		else
+			zbx_vector_str_destroy(&ids_str);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, deleted);
@@ -758,8 +778,6 @@ static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: DBdelete_from_table                                              *
  *                                                                            *
  * Purpose: delete limited count of rows from table                           *
  *                                                                            *
@@ -817,8 +835,6 @@ static int	DBdelete_from_table(const char *tablename, const char *filter, int li
 
 /******************************************************************************
  *                                                                            *
- * Function: hk_problem_cleanup                                               *
- *                                                                            *
  * Purpose: perform problem table cleanup                                     *
  *                                                                            *
  * Parameters: table    - [IN] the problem table name                         *
@@ -849,8 +865,6 @@ static int	hk_problem_cleanup(const char *table, int source, int object, zbx_uin
 
 /******************************************************************************
  *                                                                            *
- * Function: hk_table_cleanup                                                 *
- *                                                                            *
  * Purpose: perform generic table cleanup                                     *
  *                                                                            *
  * Parameters: table    - [IN] the table name                                 *
@@ -878,8 +892,6 @@ static int	hk_table_cleanup(const char *table, const char *field, zbx_uint64_t i
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: housekeeping_cleanup                                             *
  *                                                                            *
  * Purpose: remove deleted items/triggers data                                *
  *                                                                            *

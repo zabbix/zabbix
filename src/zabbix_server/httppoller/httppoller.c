@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,8 +33,6 @@ extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 /******************************************************************************
- *                                                                            *
- * Function: get_minnextcheck                                                 *
  *                                                                            *
  * Purpose: calculate when we have to process earliest httptest               *
  *                                                                            *
@@ -75,8 +73,6 @@ static int	get_minnextcheck(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: main_httppoller_loop                                             *
  *                                                                            *
  * Purpose: main loop of processing of httptests                              *
  *                                                                            *
