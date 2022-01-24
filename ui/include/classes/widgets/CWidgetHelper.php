@@ -1294,14 +1294,14 @@ class CWidgetHelper {
 									->setFocusableElementId('label-'.$field_name.'_'.$row_num.'_aggregate_function')
 									->setValue((int) $value['aggregate_function'])
 									->addOptions(CSelect::createOptionsFromArray([
-										GRAPH_AGGREGATE_NONE => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_NONE),
-										GRAPH_AGGREGATE_MIN => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_MIN),
-										GRAPH_AGGREGATE_MAX => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_MAX),
-										GRAPH_AGGREGATE_AVG => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_AVG),
-										GRAPH_AGGREGATE_COUNT => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_COUNT),
-										GRAPH_AGGREGATE_SUM => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_SUM),
-										GRAPH_AGGREGATE_FIRST => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_FIRST),
-										GRAPH_AGGREGATE_LAST => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_LAST)
+										AGGREGATE_NONE => graph_item_aggr_fnc2str(AGGREGATE_NONE),
+										AGGREGATE_MIN => graph_item_aggr_fnc2str(AGGREGATE_MIN),
+										AGGREGATE_MAX => graph_item_aggr_fnc2str(AGGREGATE_MAX),
+										AGGREGATE_AVG => graph_item_aggr_fnc2str(AGGREGATE_AVG),
+										AGGREGATE_COUNT => graph_item_aggr_fnc2str(AGGREGATE_COUNT),
+										AGGREGATE_SUM => graph_item_aggr_fnc2str(AGGREGATE_SUM),
+										AGGREGATE_FIRST => graph_item_aggr_fnc2str(AGGREGATE_FIRST),
+										AGGREGATE_LAST => graph_item_aggr_fnc2str(AGGREGATE_LAST)
 									]))
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							)
@@ -1310,7 +1310,7 @@ class CWidgetHelper {
 									$field_name.'['.$row_num.'][aggregate_interval]',
 									$value['aggregate_interval']
 								))
-									->setEnabled($value['aggregate_function'] != GRAPH_AGGREGATE_NONE)
+									->setEnabled($value['aggregate_function'] != AGGREGATE_NONE)
 									->setAttribute('placeholder', GRAPH_AGGREGATE_DEFAULT_INTERVAL)
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							)
@@ -1321,7 +1321,7 @@ class CWidgetHelper {
 								)
 									->addValue(_('Each item'), GRAPH_AGGREGATE_BY_ITEM)
 									->addValue(_('Data set'), GRAPH_AGGREGATE_BY_DATASET)
-									->setEnabled($value['aggregate_function'] != GRAPH_AGGREGATE_NONE)
+									->setEnabled($value['aggregate_function'] != AGGREGATE_NONE)
 									->setModern(true)
 							)
 					))
@@ -1427,7 +1427,7 @@ class CWidgetHelper {
 
 			'function changeDataSetAggregateFunction(obj) {'.
 				'var row_num = obj.id.replace("ds_", "").replace("_aggregate_function", "");'.
-				'var no_aggregation = (jQuery(obj).val() == '.GRAPH_AGGREGATE_NONE.');'.
+				'var no_aggregation = (jQuery(obj).val() == '.AGGREGATE_NONE.');'.
 				'jQuery("#ds_" + row_num + "_aggregate_interval").prop("disabled", no_aggregation);'.
 				'jQuery("#ds_" + row_num + "_aggregate_grouping_0").prop("disabled", no_aggregation);'.
 				'jQuery("#ds_" + row_num + "_aggregate_grouping_1").prop("disabled", no_aggregation);'.

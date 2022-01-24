@@ -26,7 +26,7 @@ class CControllerPopupTopHostsColumnEdit extends CController {
 		'data'					=> CWidgetFieldColumnsList::DATA_ITEM_VALUE,
 		'item'					=> '',
 		'timeshift' 			=> '',
-		'aggregate_function'	=> GRAPH_AGGREGATE_NONE,
+		'aggregate_function'	=> AGGREGATE_NONE,
 		'aggregate_interval'	=> '1h',
 		'display'				=> CWidgetFieldColumnsList::DISPLAY_AS_IS,
 		'history'				=> CWidgetFieldColumnsList::HISTORY_DATA_AUTO,

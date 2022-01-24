@@ -215,7 +215,7 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 	private static function getItemValues(array $items, array $column_fields, int $time_now): array {
 		$timeshift = $column_fields['timeshift'] !== '' ? timeUnitToSeconds($column_fields['timeshift']) : 0;
 
-		if ($timeshift == 0 && $column_fields['aggregate_function'] == GRAPH_AGGREGATE_NONE) {
+		if ($timeshift == 0 && $column_fields['aggregate_function'] == AGGREGATE_NONE) {
 			$data = Manager::History()->getLastValues($items);
 
 			return array_column(array_column($data, 0), 'value', 'itemid');
@@ -223,19 +223,19 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 
 		$time_to = $time_now + $timeshift;
 
-		$time_from = $column_fields['aggregate_function'] != GRAPH_AGGREGATE_NONE
+		$time_from = $column_fields['aggregate_function'] != AGGREGATE_NONE
 			? $time_to - timeUnitToSeconds($column_fields['aggregate_interval'])
 			: $time_to - timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
 
 		self::addDataSource($items, $time_from, $time_now, $column_fields['data']);
 
-		$function = $column_fields['aggregate_function'] != GRAPH_AGGREGATE_NONE
+		$function = $column_fields['aggregate_function'] != AGGREGATE_NONE
 			? $column_fields['aggregate_function']
-			: GRAPH_AGGREGATE_LAST;
+			: AGGREGATE_LAST;
 
 		$interval = $time_to;
 
-		$data = Manager::History()->getGraphAggregationByInterval($items, $time_from, $time_to, $function, $interval);
+		$data = Manager::History()->getAggregationByInterval($items, $time_from, $time_to, $function, $interval);
 
 		return array_column(array_column(array_column($data, 'data'), 0), 'value', 'itemid');
 	}

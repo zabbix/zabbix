@@ -56,9 +56,9 @@ class CWidgetFieldColumnsList extends CWidgetField {
 							'type' => API_STRING_UTF8]
 			]],
 			'timeshift'				=> ['type' => API_TIME_UNIT, 'in' => implode(':', [ZBX_MIN_TIMESHIFT, ZBX_MAX_TIMESHIFT])],
-			'aggregate_function'	=> ['type' => API_INT32, 'in' => implode(',', [GRAPH_AGGREGATE_NONE, GRAPH_AGGREGATE_MIN, GRAPH_AGGREGATE_MAX, GRAPH_AGGREGATE_AVG, GRAPH_AGGREGATE_LAST, GRAPH_AGGREGATE_FIRST, GRAPH_AGGREGATE_COUNT]), 'default' => GRAPH_AGGREGATE_NONE],
+			'aggregate_function'	=> ['type' => API_INT32, 'in' => implode(',', [AGGREGATE_NONE, AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_LAST, AGGREGATE_FIRST, AGGREGATE_COUNT]), 'default' => AGGREGATE_NONE],
 			'aggregate_interval'	=> ['type' => API_MULTIPLE, 'rules' => [
-						['if' => ['field' => 'aggregate_function', 'in' => implode(',', [GRAPH_AGGREGATE_MIN, GRAPH_AGGREGATE_MAX, GRAPH_AGGREGATE_AVG, GRAPH_AGGREGATE_LAST, GRAPH_AGGREGATE_FIRST, GRAPH_AGGREGATE_COUNT])],
+						['if' => ['field' => 'aggregate_function', 'in' => implode(',', [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_LAST, AGGREGATE_FIRST, AGGREGATE_COUNT])],
 							'type' => API_TIME_UNIT, 'flags' => API_REQUIRED|API_NOT_EMPTY|API_TIME_UNIT_WITH_YEAR, 'in' => implode(':', [1, ZBX_MAX_TIMESHIFT])],
 						['else' => true,
 							'type' => API_STRING_UTF8]
