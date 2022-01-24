@@ -677,7 +677,7 @@ abstract class CControllerLatest extends CController {
 		$remaining = self::SUBFILTERS_VALUES_PER_ROW - count($most_severe);
 		if ($remaining > 0) {
 			$subfilters = array_diff_key($subfilters, $most_severe);
-			$most_severe += array_slice($subfilters, 0, $remaining);
+			$most_severe += array_slice($subfilters, 0, $remaining, true);
 		}
 
 		CArrayHelper::sort($most_severe, ['name']);
@@ -707,7 +707,7 @@ abstract class CControllerLatest extends CController {
 		$remaining = self::SUBFILTERS_TAG_VALUE_ROWS - count($most_severe);
 		if ($remaining > 0) {
 			$tags = array_diff_key($tags, $most_severe);
-			$most_severe += array_slice($tags, 0, $remaining);
+			$most_severe += array_slice($tags, 0, $remaining, true);
 		}
 
 		uksort($most_severe, 'strnatcmp');
