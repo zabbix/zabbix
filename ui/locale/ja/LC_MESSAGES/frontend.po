@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-21 19:55+0200\n"
-"PO-Revision-Date: 2022-01-11 12:22+0300\n"
+"PO-Revision-Date: 2022-01-24 02:28+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1641896524.000000\n"
+"X-POOTLE-MTIME: 1642984112.000000\n"
 
 #: app/controllers/CControllerSlaReportList.php:181
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:104
@@ -4628,7 +4628,7 @@ msgstr "破線"
 
 #: app/partials/monitoring.latest.subfilter.php:176
 msgid "Data"
-msgstr ""
+msgstr "取得データ"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:2214
 #: include/classes/graphdraw/CPieGraphDraw.php:770
@@ -6913,7 +6913,7 @@ msgstr "フィルター"
 
 #: app/views/js/popup.tabfilter.edit.js.php:57
 msgid "Filter deleted"
-msgstr ""
+msgstr "フィルターを削除しました"
 
 #: app/controllers/CControllerPopupTabFilterEdit.php:117
 msgid "Filter properties"
@@ -16944,7 +16944,7 @@ msgstr "タグの値"
 
 #: app/partials/monitoring.latest.subfilter.php:168
 msgid "Tag values"
-msgstr ""
+msgstr "タグの値"
 
 #: app/controllers/CControllerPopupLldOperation.php:138
 #: app/partials/administration.usergroup.tagfilters.html.php:29
@@ -19521,7 +19521,7 @@ msgstr "幅"
 
 #: app/controllers/CControllerLatest.php:552
 msgid "With data"
-msgstr ""
+msgstr "データあり"
 
 #: include/views/configuration.maintenance.edit.php:104
 #: include/views/configuration.maintenance.list.php:111
@@ -19552,7 +19552,7 @@ msgstr "トリガーあり"
 
 #: app/controllers/CControllerLatest.php:557
 msgid "Without data"
-msgstr ""
+msgstr "データなし"
 
 #: app/views/monitoring.widget.problemhosts.view.php:32
 msgid "Without problems"
