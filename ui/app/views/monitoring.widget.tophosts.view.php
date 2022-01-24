@@ -24,7 +24,19 @@
  * @var array $data
  */
 
-$table = (new CTableInfo())->setHeader(array_column($data['configuration'], 'name'));
+$headers = [];
+
+foreach ($data['configuration'] as $column_config) {
+	if ($column_config['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE
+			&& $column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS) {
+		$headers[] = (new CColHeader($column_config['name']))->addClass(ZBX_STYLE_CENTER);
+	}
+	else {
+		$headers[] = $column_config['name'];
+	}
+}
+
+$table = (new CTableInfo())->setHeader($headers);
 
 foreach ($data['rows'] as $columns) {
 	$row = [];
@@ -61,7 +73,7 @@ foreach ($data['rows'] as $columns) {
 
 				if (array_key_exists('thresholds', $column_config)) {
 					foreach ($column_config['thresholds'] as $threshold) {
-						$cell->addThreshold($threshold['threshold'], $threshold['color']);
+						$cell->addThreshold($threshold['threshold'], '#'.$threshold['color']);
 					}
 				}
 

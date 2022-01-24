@@ -18,6 +18,10 @@ form.dashboard-grid-widget-tophosts {
 div.dashboard-grid-widget-tophosts {
 	$bar-gauge-height: 20px;
 
+	.list-table th.center {
+		text-align: center;
+	}
+
 	td {
 		line-height: $bar-gauge-height;
 	}
