@@ -35,10 +35,9 @@ class CControllerChartsView extends CControllerCharts {
 			'view_as'               => 'in '.HISTORY_GRAPH.','.HISTORY_VALUES,
 			'filter_set'            => 'in 1',
 			'filter_rst'            => 'in 1',
-			'filter_search_type'    => 'in '.ZBX_SEARCH_TYPE_STRICT.','.ZBX_SEARCH_TYPE_PATTERN,
 			'filter_hostids'        => 'array_id',
-			'filter_graphids'       => 'array_id',
-			'filter_graph_patterns' => 'array',
+			'filter_name'           => 'string',
+			'filter_show'           => 'in '.GRAPH_FILTER_ALL.','.GRAPH_FILTER_HOST.','.GRAPH_FILTER_SIMPLE,
 			'page'                  => 'ge 1'
 		];
 
@@ -56,35 +55,24 @@ class CControllerChartsView extends CControllerCharts {
 	}
 
 	protected function doAction() {
+		// TODO VM: dbpatch to remove profiles: web.charts.filter.search_type, web.charts.filter.graphids, web.charts.filter.graph_patterns
+
 		if ($this->hasInput('filter_rst')) {
-			CProfile::deleteIdx('web.charts.filter.search_type');
-			CProfile::deleteIdx('web.charts.filter.graphids');
-			CProfile::deleteIdx('web.charts.filter.graph_patterns');
+			CProfile::deleteIdx('web.charts.filter.hostids');
+			CProfile::deleteIdx('web.charts.filter.name');
+			CProfile::deleteIdx('web.charts.filter.show');
 		}
 		elseif ($this->hasInput('filter_set')) {
-			CProfile::update('web.charts.filter.search_type',
-				$this->getInput('filter_search_type', ZBX_SEARCH_TYPE_STRICT), PROFILE_TYPE_INT
-			);
-			CProfile::updateArray('web.charts.filter.graphids', $this->getInput('filter_graphids', []),
-				PROFILE_TYPE_ID
-			);
-			CProfile::updateArray('web.charts.filter.graph_patterns', $this->getInput('filter_graph_patterns', []),
-				PROFILE_TYPE_STR
-			);
 			CProfile::updateArray('web.charts.filter.hostids', $this->getInput('filter_hostids', []), PROFILE_TYPE_ID);
+			CProfile::update('web.charts.filter.name', $this->getInput('filter_name', ''), PROFILE_TYPE_INT);
+			CProfile::update('web.charts.filter.show',
+				$this->getInput('filter_show', GRAPH_FILTER_ALL), PROFILE_TYPE_INT
+			);
 		}
 
-		$filter_search_type = (int) $this->getInput('filter_search_type',
-			CProfile::get('web.charts.filter.search_type', ZBX_SEARCH_TYPE_STRICT)
-		);
-
-		$filter_graphids = $this->getInput('filter_graphids', CProfile::getArray('web.charts.filter.graphids', []));
-
-		$filter_graph_patterns = $this->getInput('filter_graph_patterns',
-			CProfile::getArray('web.charts.filter.graph_patterns', [])
-		);
-
 		$filter_hostids = $this->getInput('filter_hostids', CProfile::getArray('web.charts.filter.hostids', []));
+		$filter_name = $this->getInput('filter_name', CProfile::get('web.charts.filter.name', ''));
+		$filter_show = (int) $this->getInput('filter_show', CProfile::get('web.charts.filter.show', GRAPH_FILTER_ALL));
 
 		$timeselector_options = [
 			'profileIdx' => 'web.charts.filter',
@@ -96,50 +84,15 @@ class CControllerChartsView extends CControllerCharts {
 
 		$data = [
 			'view_as' => $this->getInput('view_as', HISTORY_GRAPH),
-			'graphids' => [],
-			'charts' => [],
 			'ms_hosts' => [],
-			'ms_graphs' => [],
-			'ms_graph_patterns' => [],
 			'timeline' => getTimeSelectorPeriod($timeselector_options),
 			'active_tab' => CProfile::get('web.charts.filter.active', 1),
-			'filter_search_type' => $filter_search_type,
 			'filter_hostids' => $filter_hostids,
-			'filter_graphids' => $filter_graphids,
-			'filter_graph_patterns' => $filter_graph_patterns,
-			'must_specify_host' => true,
+			'filter_name' => $filter_name,
+			'filter_show' => $filter_show,
 			'error' => '',
 			'page' => $this->getInput('page', 1)
 		];
-
-		if ($filter_search_type == ZBX_SEARCH_TYPE_PATTERN) {
-			foreach ($filter_graph_patterns as $pattern) {
-				$data['ms_graph_patterns'][] = ['name' => $pattern, 'id' => $pattern];
-			}
-		}
-
-		if ($filter_graphids && $filter_search_type == ZBX_SEARCH_TYPE_STRICT) {
-			$data['ms_graphs'] = CArrayHelper::renameObjectsKeys(API::Graph()->get([
-				'output' => ['name', 'graphid'],
-				'selectHosts' => ['name'],
-				'graphids' => $filter_graphids
-			]), ['graphid' => 'id']);
-
-			// Cuntinue with readable graphs only.
-			if (count($filter_graphids) != count($data['ms_graphs'])) {
-				$filter_graphids = array_column($data['ms_graphs'], 'id');
-				if ($this->hasInput('filter_set')) {
-					$data['error'] = _('No permissions to referred object or it does not exist!');
-				}
-			}
-
-			// Prefix graphs by hostnames.
-			foreach ($data['ms_graphs'] as &$graph) {
-				$graph['prefix'] = $graph['hosts'][0]['name'].NAME_DELIMITER;
-				unset($graph['hosts']);
-			}
-			unset($graph);
-		}
 
 		if ($filter_hostids) {
 			$data['ms_hosts'] = CArrayHelper::renameObjectsKeys(API::Host()->get([
@@ -147,7 +100,7 @@ class CControllerChartsView extends CControllerCharts {
 				'hostids' => $filter_hostids
 			]), ['hostid' => 'id']);
 
-			// Cuntinue with readable hosts only.
+			// Continue with readable hosts only.
 			if (count($filter_hostids) != count($data['ms_hosts'])) {
 				$filter_hostids = array_column($data['ms_hosts'], 'id');
 				if ($this->hasInput('filter_set')) {
@@ -156,35 +109,28 @@ class CControllerChartsView extends CControllerCharts {
 			}
 		}
 
-		// Host must be specified if pattern select is used or if strict select is used without any selected graphs.
-		if ($filter_search_type == ZBX_SEARCH_TYPE_STRICT && $filter_graphids) {
-			$data['must_specify_host'] = false;
-		}
-		elseif ($filter_hostids) {
-			$data['must_specify_host'] = false;
-		}
+		$host_graphs = [];
+		$simple_graphs = [];
 
-		if (!$data['must_specify_host']) {
-			if ($filter_search_type == ZBX_SEARCH_TYPE_STRICT) {
-				$data['graphids'] = $this->getGraphidsByHostids($filter_hostids, $filter_graphids);
+		if ($filter_hostids) {
+			if (in_array($filter_show, [GRAPH_FILTER_ALL, GRAPH_FILTER_HOST])) {
+				[$host_graphs, $host_items] = $this->getHostGraphs($filter_hostids, $filter_name);
 			}
-			else {
-				$data['graphids'] = $this->getGraphidsByPatterns($filter_graph_patterns, $filter_hostids);
+
+			if (in_array($filter_show, [GRAPH_FILTER_ALL, GRAPH_FILTER_SIMPLE])) {
+				$simple_graphs = $this->getSimpleGraphs($filter_hostids, $filter_name);
 			}
 		}
 
-		if ($data['graphids']) {
-			if ($data['view_as'] === HISTORY_VALUES) {
-				$data['itemids'] = array_keys(API::Item()->get([
-					'output' => [],
-					'graphids' => $data['graphids'],
-					'preservekeys' => true
-				]));
-			}
-			else {
-				$data['charts'] = $this->getChartsById($data['graphids']);
-			}
-		}
+		$graphs = array_merge($host_graphs, $simple_graphs);
+		CArrayHelper::sort($graphs, ['name', 'graphid', 'itemid']);
+
+		$view_url = (new CUrl('zabbix.php'))->setArgument('action', 'charts.view');
+//		$paging_arguments = array_filter(array_intersect_key($filter, self::FILTER_FIELDS_DEFAULT)); // TODO VM: implement
+//		array_map([$view_url, 'setArgument'], array_keys($paging_arguments), $paging_arguments);
+		$data['paging'] = CPagerHelper::paginate($this->getInput('page', 1), $graphs, ZBX_SORT_UP, $view_url);
+
+		$data['charts'] = $this->getCharts($graphs);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Custom graphs'));

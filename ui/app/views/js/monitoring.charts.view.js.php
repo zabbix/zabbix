@@ -71,7 +71,13 @@
 			this.dimensions = chart.dimensions;
 
 			this.curl = new Curl(chart.src, false);
-			this.curl.setArgument('graphid', chart.chartid);
+
+			if ('graphid' in chart) {
+				this.curl.setArgument('graphid', chart.graphid);
+			}
+			else {
+				this.curl.setArgument('itemids', [chart.itemid]);
+			}
 
 			this.use_sbox = !!chart.sbox;
 			this.wrapper = wrapper;
@@ -254,7 +260,8 @@
 
 			// Filter.
 			this.curl.setArgument('filter_hostids', this.config.filter_hostids);
-			this.curl.setArgument('filter_graph_patterns', this.config.filter_graph_patterns);
+			this.curl.setArgument('filter_name', this.config.filter_name);
+			this.curl.setArgument('filter_show', this.config.filter_show);
 
 			return fetch(this.curl.getUrl())
 				.then(resp => resp.json())
@@ -271,42 +278,29 @@
 		 * @param {number} delay_loading  (optional) Add "loading indicator" only when request exceeds delay.
 		 */
 		ChartList.prototype.refresh = function(delay_loading) {
-			const {refresh_interval, refresh_list} = this.config;
+			const {refresh_interval} = this.config;
 
 			if (this._timeoutid) {
 				clearTimeout(this._timeoutid);
 			}
 
-			if (refresh_list) {
-				for (const chart of this.charts) {
-					chart.scheduleRefresh(0);
-				}
+			for (const chart of this.charts) {
+				chart.scheduleRefresh(0);
+			}
 
-				this.updateListAndCharts(delay_loading)
-					.finally(_ => {
-						if (refresh_interval) {
-							this._timeoutid = setTimeout(_ => this.refresh(Chart.DELAY_LOADING),
-								refresh_interval * 1000
-							);
-						}
-					})
-					.catch(_ => {
-						for (const chart of this.charts) {
-							chart.setLoading();
-						}
-					});
-			}
-			else {
-				for (const chart of this.charts) {
+			this.updateListAndCharts(delay_loading)
+				.finally(_ => {
 					if (refresh_interval) {
-						chart.scheduleRefresh(refresh_interval, delay_loading);
+						this._timeoutid = setTimeout(_ => this.refresh(Chart.DELAY_LOADING),
+							refresh_interval * 1000
+						);
 					}
-					else {
-						chart.scheduleRefresh(0);
-						chart.refresh(delay_loading);
+				})
+				.catch(_ => {
+					for (const chart of this.charts) {
+						chart.setLoading();
 					}
-				}
-			}
+				});
 		};
 
 		/**
@@ -367,23 +361,6 @@
 		$.subscribe('timeselector.rangeupdate', function(e, data) {
 			app.timeline = data;
 			app.updateCharts();
-		});
-
-		$('#filter_search_type').change(e => {
-			if (e.target.value === '<?= ZBX_SEARCH_TYPE_STRICT ?>') {
-				$('#ms_graph_patterns').addClass('<?= ZBX_STYLE_DISPLAY_NONE ?>');
-				$('#ms_graphids').removeClass('<?= ZBX_STYLE_DISPLAY_NONE ?>');
-				$('#filter_graphids_, #filter_graph_patterns_').multiSelect('clean');
-			}
-			else {
-				$('#ms_graph_patterns').removeClass('<?= ZBX_STYLE_DISPLAY_NONE ?>');
-				$('#ms_graphids').addClass('<?= ZBX_STYLE_DISPLAY_NONE ?>');
-				$('#filter_graphids_, #filter_graph_patterns_').multiSelect('clean');
-			}
-		});
-
-		$('#view-as').change(() => {
-			document.forms['main_filter'].submit();
 		});
 	});
 </script>

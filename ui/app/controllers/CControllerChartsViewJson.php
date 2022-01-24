@@ -33,7 +33,8 @@ class CControllerChartsViewJson extends CControllerCharts {
 			'from'                  => 'range_time',
 			'to'                    => 'range_time',
 			'filter_hostids'        => 'required | array_id',
-			'filter_graph_patterns' => 'array'
+			'filter_name'           => 'string',
+			'filter_show'           => 'in '.GRAPH_FILTER_ALL.','.GRAPH_FILTER_HOST.','.GRAPH_FILTER_SIMPLE
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod();
@@ -58,13 +59,34 @@ class CControllerChartsViewJson extends CControllerCharts {
 		];
 		updateTimeSelectorPeriod($timeselector_options);
 
-		$graphids = $this->getGraphidsByPatterns($this->getInput('filter_graph_patterns', []),
-			$this->getInput('filter_hostids')
-		);
+		$filter_hostids = $this->getInput('filter_hostids', []);
+		$filter_name = $this->getInput('filter_name', '');
+		$filter_show = $this->getInput('filter_show', GRAPH_FILTER_ALL);
+		$host_graphs = [];
+		$simple_graphs = [];
+
+		if ($filter_hostids) {
+			if (in_array($filter_show, [GRAPH_FILTER_ALL, GRAPH_FILTER_HOST])) {
+				[$host_graphs, $host_items] = $this->getHostGraphs($filter_hostids, $filter_name);
+			}
+
+			if (in_array($filter_show, [GRAPH_FILTER_ALL, GRAPH_FILTER_SIMPLE])) {
+				$simple_graphs = $this->getSimpleGraphs($filter_hostids, $filter_name);
+			}
+		}
+
+		$graphs = array_merge($host_graphs, $simple_graphs);
+		CArrayHelper::sort($graphs, ['name', 'graphid', 'itemid']);
+
+		$view_url = (new CUrl('zabbix.php'))->setArgument('action', 'charts.view');
+//		$paging_arguments = array_filter(array_intersect_key($filter, self::FILTER_FIELDS_DEFAULT)); // TODO VM: implement
+//		array_map([$view_url, 'setArgument'], array_keys($paging_arguments), $paging_arguments);
+		$paging = CPagerHelper::paginate($this->getInput('page', 1), $graphs, ZBX_SORT_UP, $view_url);
 
 		$data = [
-			'charts' => $this->getChartsById($graphids),
-			'timeline' => getTimeSelectorPeriod($timeselector_options)
+			'charts' => $this->getCharts($graphs),
+			'timeline' => getTimeSelectorPeriod($timeselector_options),
+			'paging' => $paging
 		];
 
 		$this->setResponse(new CControllerResponseData($data));
