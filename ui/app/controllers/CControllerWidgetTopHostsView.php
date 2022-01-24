@@ -254,7 +254,7 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 			$single_key = reset($items)['key_'];
 
 			$items = array_filter($items,
-				static function ($item) use ($single_key): bool  {
+				static function ($item) use ($single_key): bool {
 					return $item['key_'] === $single_key;
 				}
 			);
