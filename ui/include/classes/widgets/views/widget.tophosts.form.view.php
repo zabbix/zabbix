@@ -81,7 +81,7 @@ if (!$fields['column']->getValues()) {
 $form_list->addRow(CWidgetHelper::getLabel($fields['column']), $column);
 
 // Hosts count.
-$form_list->addRow(CWidgetHelper::getLabel($fields['hosts_count']), CWidgetHelper::getIntegerBox($fields['hosts_count']));
+$form_list->addRow(CWidgetHelper::getLabel($fields['count']), CWidgetHelper::getIntegerBox($fields['count']));
 
 $form->addItem($form_list);
 $form->addItem(

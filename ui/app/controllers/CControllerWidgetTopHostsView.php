@@ -66,7 +66,7 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 			asort($guide_item_values, SORT_NUMERIC);
 		}
 
-		$guide_item_values = array_slice($guide_item_values, 0, $fields['hosts_count'], true);
+		$guide_item_values = array_slice($guide_item_values, 0, $fields['count'], true);
 		$guide_items = array_intersect_key($guide_items, $guide_item_values);
 
 		$guide_hostids = [];

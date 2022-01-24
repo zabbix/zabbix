@@ -155,17 +155,17 @@ class CWidgetFormTopHosts extends CWidgetForm {
 
 		$this->fields[$field_column->getName()] = $field_column;
 
-		// Hosts count.
-		$field_hosts_count = (new CWidgetFieldIntegerBox('hosts_count', _('Hosts count'), ZBX_MIN_WIDGET_LINES,
+		// Host count.
+		$field_count = (new CWidgetFieldIntegerBox('count', _('Host count'), ZBX_MIN_WIDGET_LINES,
 			ZBX_MAX_WIDGET_LINES
 		))
 			->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 			->setDefault(self::DEFAULT_HOSTS_COUNT);
 
-		if (array_key_exists('hosts_count', $this->data)) {
-			$field_hosts_count->setValue((int) $this->data['hosts_count']);
+		if (array_key_exists('count', $this->data)) {
+			$field_count->setValue((int) $this->data['count']);
 		}
 
-		$this->fields[$field_hosts_count->getName()] = $field_hosts_count;
+		$this->fields[$field_count->getName()] = $field_count;
 	}
 }
