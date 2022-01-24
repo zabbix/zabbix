@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -298,21 +298,26 @@ int	zbx_default_uint64_compare_func(const void *d1, const void *d2)
 
 int	zbx_default_uint64_ptr_compare_func(const void *d1, const void *d2)
 {
-	const zbx_uint64_t	*p1 = *(const zbx_uint64_t **)d1;
-	const zbx_uint64_t	*p2 = *(const zbx_uint64_t **)d2;
+	const zbx_uint64_t	*p1 = *(const zbx_uint64_t * const *)d1;
+	const zbx_uint64_t	*p2 = *(const zbx_uint64_t * const *)d2;
 
 	return zbx_default_uint64_compare_func(p1, p2);
 }
 
 int	zbx_default_str_compare_func(const void *d1, const void *d2)
 {
-	return strcmp(*(const char **)d1, *(const char **)d2);
+	return strcmp(*(const char * const *)d1, *(const char * const *)d2);
+}
+
+int	zbx_natural_str_compare_func(const void *d1, const void *d2)
+{
+	return zbx_strcmp_natural(*(const char * const *)d1, *(const char * const *)d2);
 }
 
 int	zbx_default_ptr_compare_func(const void *d1, const void *d2)
 {
-	const void	*p1 = *(const void **)d1;
-	const void	*p2 = *(const void **)d2;
+	const void	*p1 = *(const void * const *)d1;
+	const void	*p2 = *(const void * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(p1, p2);
 

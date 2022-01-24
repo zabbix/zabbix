@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1543,6 +1543,7 @@ void	zbx_tcp_unaccept(zbx_socket_t *s)
 
 	shutdown(s->socket, 2);
 
+	zbx_socket_free(s);
 	zbx_socket_close(s->socket);
 
 	s->socket = s->socket_orig;	/* restore main socket */

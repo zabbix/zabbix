@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,8 +33,6 @@
 #else
 #	define ZBX_NO_RETURN
 #endif
-
-ZBX_NO_RETURN void	_fail(const char * const file, const int line);
 
 void	zbx_mock_test_entry(void **state);
 

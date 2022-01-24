@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -179,9 +179,8 @@
 			};
 
 			this.allow_empty_message = true;
-			this.$noInterfacesMsg = jQuery('<div class="<?= ZBX_STYLE_GREY ?>"></div>')
+			this.$noInterfacesMsg = jQuery('<div>', {class: '<?= ZBX_STYLE_GREY ?>'})
 				.text('<?= _('No interfaces are defined.') ?>')
-				.addClass('<?= ZBX_STYLE_GREY ?>')
 				.css('padding', '5px 0px')
 				.insertAfter(jQuery('.<?= ZBX_STYLE_HOST_INTERFACE_CONTAINER_HEADER ?>'));
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,6 @@
 #include <delayimp.h>
 #include <sddl.h>
 
-#define	DEFAULT_EVENT_CONTENT_SIZE	256
 #define MAX_NAME			256
 
 static const wchar_t	*RENDER_ITEMS[] = {
@@ -338,19 +337,13 @@ static void	zbx_translate_message_params(char **message, HINSTANCE hLib)
 static int get_eventlog6_id(EVT_HANDLE *event_query, EVT_HANDLE *render_context, zbx_uint64_t *id, char **error)
 {
 	int		ret = FAIL;
-	DWORD		size_required = 0;
-	DWORD		size = DEFAULT_EVENT_CONTENT_SIZE;
-	DWORD		status = 0;
-	DWORD		bookmarkedCount = 0;
+	DWORD		size_required_next = 0, size_required = 0, size = 0, status = 0, bookmarkedCount = 0;
 	EVT_VARIANT*	renderedContent = NULL;
 	EVT_HANDLE	event_bookmark = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	/* get the entries and allocate the required space */
-	renderedContent = zbx_malloc(renderedContent, size);
-
-	if (TRUE != EvtNext(*event_query, 1, &event_bookmark, INFINITE, 0, &size_required))
+	if (TRUE != EvtNext(*event_query, 1, &event_bookmark, INFINITE, 0, &size_required_next))
 	{
 		/* no data in eventlog */
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() EvtNext failed:%s", __func__, strerror_from_system(GetLastError()));
@@ -370,8 +363,8 @@ static int get_eventlog6_id(EVT_HANDLE *event_query, EVT_HANDLE *render_context,
 			goto out;
 		}
 
-		renderedContent = (EVT_VARIANT*)zbx_realloc((void *)renderedContent, size_required);
 		size = size_required;
+		renderedContent = (EVT_VARIANT*)zbx_malloc(NULL, size);
 
 		if (TRUE != EvtRender(*render_context, event_bookmark, EvtRenderEventValues, size, renderedContent,
 				&size_required, &bookmarkedCount))
@@ -736,7 +729,7 @@ static int	zbx_parse_eventlog_message6(const wchar_t *wsource, EVT_HANDLE *rende
 	EVT_VARIANT*		renderedContent = NULL;
 	const wchar_t		*pprovider = NULL;
 	char			*tmp_str = NULL;
-	DWORD			size = DEFAULT_EVENT_CONTENT_SIZE, bookmarkedCount = 0, require = 0, error_code;
+	DWORD			size = 0, bookmarkedCount = 0, require = 0, error_code;
 	const zbx_uint64_t	sec_1970 = 116444736000000000;
 	const zbx_uint64_t	success_audit = 0x20000000000000;
 	const zbx_uint64_t	failure_audit = 0x10000000000000;
@@ -745,9 +738,6 @@ static int	zbx_parse_eventlog_message6(const wchar_t *wsource, EVT_HANDLE *rende
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() EventRecordID:" ZBX_FS_UI64, __func__, *which);
 
 	/* obtain the information from the selected events */
-
-	renderedContent = (EVT_VARIANT *)zbx_malloc((void *)renderedContent, size);
-
 	if (TRUE != EvtRender(*render_context, *event_bookmark, EvtRenderEventValues, size, renderedContent,
 			&require, &bookmarkedCount))
 	{
@@ -758,8 +748,8 @@ static int	zbx_parse_eventlog_message6(const wchar_t *wsource, EVT_HANDLE *rende
 			goto out;
 		}
 
-		renderedContent = (EVT_VARIANT *)zbx_realloc((void *)renderedContent, require);
 		size = require;
+		renderedContent = (EVT_VARIANT *)zbx_malloc(NULL, size);
 
 		if (TRUE != EvtRender(*render_context, *event_bookmark, EvtRenderEventValues, size, renderedContent,
 				&require, &bookmarkedCount))

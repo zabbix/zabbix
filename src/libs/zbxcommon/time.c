@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ int	zbx_tm_parse_period(const char *period, size_t *len, int *multiplier, zbx_ti
 	for (ptr = period; 0 != isdigit(*ptr); ptr++)
 		;
 
-	if (FAIL == is_uint_n_range(period, ptr - period, multiplier, sizeof(*multiplier), 1, UINT32_MAX))
+	if (FAIL == is_uint_n_range(period, ptr - period, multiplier, sizeof(*multiplier), 0, UINT32_MAX))
 	{
 		*error = zbx_strdup(*error, "invalid period multiplier");
 		return FAIL;
@@ -429,7 +429,7 @@ const char	*zbx_timespec_str(const zbx_timespec_t *ts)
 	struct tm	tm;
 
 	localtime_r(&ts_time, &tm);
-	zbx_snprintf(str, sizeof(str), "%04d.%02d.%02d %02d:%02d:%02d %09d", tm.tm_year + 1900, tm.tm_mon + 1,
+	zbx_snprintf(str, sizeof(str), "%04d.%02d.%02d %02d:%02d:%02d.%09d", tm.tm_year + 1900, tm.tm_mon + 1,
 			tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, ts->ns);
 
 	return str;

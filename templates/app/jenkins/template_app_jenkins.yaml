@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-11T08:05:25Z'
+  date: '2021-12-19T15:19:42Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -17,7 +17,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Applications
@@ -204,7 +204,6 @@ zabbix_export:
               parameters:
                 - ''
           url: '{$JENKINS.URL}/metrics/{$JENKINS.API.KEY}/metrics'
-          status_codes: ''
           tags:
             -
               tag: Application
@@ -223,7 +222,6 @@ zabbix_export:
               parameters:
                 - ''
           url: '{$JENKINS.URL}/metrics/{$JENKINS.API.KEY}/healthcheck'
-          status_codes: ''
           tags:
             -
               tag: Application
@@ -1253,7 +1251,6 @@ zabbix_export:
               parameters:
                 - 30m
           url: '{$JENKINS.URL}/metrics/{$JENKINS.API.KEY}/ping'
-          status_codes: ''
           tags:
             -
               tag: Application
@@ -1538,7 +1535,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The system load on the Jenkins master as reported by the JVM’s Operating System JMX bean. The calculation of system load is operating system dependent. Typically this is the sum of the number of processes that are currently running plus the number that are waiting to run. This is typically comparable against the number of CPU cores.'
+          description: 'The system load on the Jenkins master as reported by the JVM''s Operating System JMX bean. The calculation of system load is operating system dependent. Typically this is the sum of the number of processes that are currently running plus the number that are waiting to run. This is typically comparable against the number of CPU cores.'
           preprocessing:
             -
               type: JSONPATH
@@ -2530,7 +2527,7 @@ zabbix_export:
       name: 'Jenkins: One or more Jenkins plugins failed to start'
       priority: INFO
       description: |
-        A failure is typically indicative of a potential issue within the Jenkins installation that will either be solved by explicitly disabling the failing plugin(s) or by resolving the corresponding plugin dependency issues. 
+        A failure is typically indicative of a potential issue within the Jenkins installation that will either be solved by explicitly disabling the failing plugin(s) or by resolving the corresponding plugin dependency issues.
         Health check message: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}
       manual_close: 'YES'
     -

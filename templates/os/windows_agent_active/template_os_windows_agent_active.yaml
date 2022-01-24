@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-10-21T07:42:33Z'
+  date: '2021-12-20T10:17:19Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -19,7 +19,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387224-discussion-thread-for-official-zabbix-template-for-windows
         
-        Template tooling version used: 0.39
+        Template tooling version used: 0.40
       templates:
         -
           name: 'Windows CPU by Zabbix agent active'
@@ -211,7 +211,7 @@ zabbix_export:
       uuid: 296cb27ad93b4063b77aaf1a8339d40c
       template: 'Windows CPU by Zabbix agent active'
       name: 'Windows CPU by Zabbix agent active'
-      description: 'Template tooling version used: 0.39'
+      description: 'Template tooling version used: 0.40'
       groups:
         -
           name: Templates/Modules
@@ -225,10 +225,10 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: |
-            Processor DPC time is the time that a single processor spent receiving and servicing deferred procedure 
-            calls (DPCs). DPCs are interrupts that run at a lower priority than standard interrupts. % DPC Time is a 
-            component of % Privileged Time because DPCs are executed in privileged mode. If a high % DPC Time is 
-            sustained, there may be a processor bottleneck or an application or hardware related issue that can 
+            Processor DPC time is the time that a single processor spent receiving and servicing deferred procedure
+            calls (DPCs). DPCs are interrupts that run at a lower priority than standard interrupts. % DPC Time is a
+            component of % Privileged Time because DPCs are executed in privileged mode. If a high % DPC Time is
+            sustained, there may be a processor bottleneck or an application or hardware related issue that can
             significantly diminish overall system performance.
           tags:
             -
@@ -243,10 +243,10 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: |
-            The Processor Information\% Interrupt Time is the time the processor spends receiving and servicing 
-            hardware interrupts during sample intervals. This value is an indirect indicator of the activity of 
-            devices that generate interrupts, such as the system clock, the mouse, disk drivers, data communication 
-            lines, network interface cards and other peripheral devices. This is an easy way to identify a potential 
+            The Processor Information\% Interrupt Time is the time the processor spends receiving and servicing
+            hardware interrupts during sample intervals. This value is an indirect indicator of the activity of
+            devices that generate interrupts, such as the system clock, the mouse, disk drivers, data communication
+            lines, network interface cards and other peripheral devices. This is an easy way to identify a potential
             hardware failure. This should never be higher than 20%.
           tags:
             -
@@ -260,10 +260,10 @@ zabbix_export:
               priority: WARNING
               description: |
                 "The CPU Interrupt Time in the last 5 minutes exceeds {$CPU.INTERRUPT.CRIT.MAX}%."
-                The Processor Information\% Interrupt Time is the time the processor spends receiving and servicing 
-                hardware interrupts during sample intervals. This value is an indirect indicator of the activity of 
-                devices that generate interrupts, such as the system clock, the mouse, disk drivers, data communication 
-                lines, network interface cards and other peripheral devices. This is an easy way to identify a potential 
+                The Processor Information\% Interrupt Time is the time the processor spends receiving and servicing
+                hardware interrupts during sample intervals. This value is an indirect indicator of the activity of
+                devices that generate interrupts, such as the system clock, the mouse, disk drivers, data communication
+                lines, network interface cards and other peripheral devices. This is an easy way to identify a potential
                 hardware failure. This should never be higher than 20%.
               dependencies:
                 -
@@ -278,9 +278,9 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: |
-            The Processor Information\% Privileged Time counter shows the percent of time that the processor is spent 
-            executing in Kernel (or Privileged) mode. Privileged mode includes services interrupts inside Interrupt 
-            Service Routines (ISRs), executing Deferred Procedure Calls (DPCs), Device Driver calls and other kernel-mode 
+            The Processor Information\% Privileged Time counter shows the percent of time that the processor is spent
+            executing in Kernel (or Privileged) mode. Privileged mode includes services interrupts inside Interrupt
+            Service Routines (ISRs), executing Deferred Procedure Calls (DPCs), Device Driver calls and other kernel-mode
             functions of the Windows® Operating System.
           tags:
             -
@@ -309,7 +309,7 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: |
-            The Processor Information\% User Time counter shows the percent of time that the processor(s) is spent executing 
+            The Processor Information\% User Time counter shows the percent of time that the processor(s) is spent executing
             in User mode.
           tags:
             -
@@ -339,7 +339,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: |
-            The Processor Queue Length shows the number of threads that are observed as delayed in the processor Ready Queue 
+            The Processor Queue Length shows the number of threads that are observed as delayed in the processor Ready Queue
             and are waiting to be executed.
           tags:
             -
@@ -398,7 +398,7 @@ zabbix_export:
       uuid: 1b04ac025fcf474cb97e6c8c95855eeb
       template: 'Windows filesystems by Zabbix agent active'
       name: 'Windows filesystems by Zabbix agent active'
-      description: 'Template tooling version used: 0.39'
+      description: 'Template tooling version used: 0.40'
       groups:
         -
           name: Templates/Modules
@@ -551,7 +551,7 @@ zabbix_export:
           description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'
         -
           macro: '{$VFS.FS.FSNAME.NOT_MATCHES}'
-          value: ^(/dev|/sys|/run|/proc|.+/shm$)
+          value: '^(?:/dev|/sys|/run|/proc|.+/shm$)'
           description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'
         -
           macro: '{$VFS.FS.FSTYPE.MATCHES}'
@@ -573,7 +573,7 @@ zabbix_export:
       uuid: 6dd37a415f4c40aa960d7ba91b6b5143
       template: 'Windows generic by Zabbix agent active'
       name: 'Windows generic by Zabbix agent active'
-      description: 'Template tooling version used: 0.39'
+      description: 'Template tooling version used: 0.40'
       groups:
         -
           name: Templates/Modules
@@ -631,6 +631,7 @@ zabbix_export:
         -
           uuid: 78f2089b58f54042ac70fd9ac3b2aa7e
           name: 'System local time'
+          type: ZABBIX_ACTIVE
           key: system.localtime
           history: 7d
           status: DISABLED
@@ -672,7 +673,7 @@ zabbix_export:
           name: 'System description'
           type: ZABBIX_ACTIVE
           key: system.uname
-          delay: 1h
+          delay: 15m
           history: 2w
           trends: '0'
           value_type: CHAR
@@ -717,7 +718,7 @@ zabbix_export:
       uuid: e6535f54a0554463889fb8c65db11250
       template: 'Windows memory by Zabbix agent active'
       name: 'Windows memory by Zabbix agent active'
-      description: 'Template tooling version used: 0.39'
+      description: 'Template tooling version used: 0.40'
       groups:
         -
           name: Templates/Modules
@@ -730,8 +731,8 @@ zabbix_export:
           history: 7d
           units: B
           description: |
-            Cache Bytes is the sum of the Memory\\System Cache Resident Bytes, Memory\\System Driver Resident Bytes, 
-            Memory\\System Code Resident Bytes, and Memory\\Pool Paged Resident Bytes counters. This counter displays 
+            Cache Bytes is the sum of the Memory\\System Cache Resident Bytes, Memory\\System Driver Resident Bytes,
+            Memory\\System Code Resident Bytes, and Memory\\Pool Paged Resident Bytes counters. This counter displays
             the last observed value only; it is not an average.
           tags:
             -
@@ -744,7 +745,7 @@ zabbix_export:
           key: 'perf_counter_en["\Memory\Free System Page Table Entries"]'
           history: 7d
           description: |
-            This indicates the number of page table entries not currently in use by the system. If the number is less 
+            This indicates the number of page table entries not currently in use by the system. If the number is less
             than 5,000, there may well be a memory leak or you running out of memory.
           tags:
             -
@@ -769,11 +770,11 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: |
-            Page Faults/sec is the average number of pages faulted per second. It is measured in number of pages 
-            faulted per second because only one page is faulted in each fault operation, hence this is also equal 
-            to the number of page fault operations. This counter includes both hard faults (those that require 
-            disk access) and soft faults (where the faulted page is found elsewhere in physical memory.) Most 
-            processors can handle large numbers of soft faults without significant consequence. However, hard faults, 
+            Page Faults/sec is the average number of pages faulted per second. It is measured in number of pages
+            faulted per second because only one page is faulted in each fault operation, hence this is also equal
+            to the number of page fault operations. This counter includes both hard faults (those that require
+            disk access) and soft faults (where the faulted page is found elsewhere in physical memory.) Most
+            processors can handle large numbers of soft faults without significant consequence. However, hard faults,
             which require disk access, can cause significant delays.
           tags:
             -
@@ -787,7 +788,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: |
-            This measures the rate at which pages are read from or written to disk to resolve hard page faults. 
+            This measures the rate at which pages are read from or written to disk to resolve hard page faults.
             If the value is greater than 1,000, as a result of excessive paging, there may be a memory leak.
           tags:
             -
@@ -812,9 +813,9 @@ zabbix_export:
           history: 7d
           units: B
           description: |
-            This measures the size, in bytes, of the non-paged pool. This is an area of system memory for objects 
-            that cannot be written to disk but instead must remain in physical memory as long as they are allocated. 
-            There is a possible memory leak if the value is greater than 175MB (or 100MB with the /3GB switch). 
+            This measures the size, in bytes, of the non-paged pool. This is an area of system memory for objects
+            that cannot be written to disk but instead must remain in physical memory as long as they are allocated.
+            There is a possible memory leak if the value is greater than 175MB (or 100MB with the /3GB switch).
             A typical Event ID 2019 is recorded in the system event log.
           tags:
             -
@@ -945,7 +946,7 @@ zabbix_export:
       uuid: 792cb76a1a6340d8acb36d8802d22c00
       template: 'Windows network by Zabbix agent active'
       name: 'Windows network by Zabbix agent active'
-      description: 'Template tooling version used: 0.39'
+      description: 'Template tooling version used: 0.40'
       groups:
         -
           name: Templates/Modules
@@ -1499,7 +1500,7 @@ zabbix_export:
       uuid: 222cf73cb40941f6be62db0540524e5e
       template: 'Windows physical disks by Zabbix agent active'
       name: 'Windows physical disks by Zabbix agent active'
-      description: 'Template tooling version used: 0.39'
+      description: 'Template tooling version used: 0.40'
       groups:
         -
           name: Templates/Modules
@@ -1526,13 +1527,18 @@ zabbix_export:
           item_prototypes:
             -
               uuid: 7d6ab9b1b76041869d7818652b5c5b0e
-              name: '{#DEVNAME}: Disk utilization'
+              name: '{#DEVNAME}: Disk utilization by idle time'
               type: ZABBIX_ACTIVE
-              key: 'perf_counter_en["\PhysicalDisk({#DEVNAME})\% Disk Time",60]'
+              key: 'perf_counter_en["\PhysicalDisk({#DEVNAME})\% Idle Time",60]'
               history: 7d
               value_type: FLOAT
               units: '%'
-              description: 'This item is the percentage of elapsed time that the selected disk drive was busy servicing read or writes requests.'
+              description: 'This item is the percentage of elapsed time that the selected disk drive was busy servicing read or writes requests based on idle time.'
+              preprocessing:
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return 100 - value'
               tags:
                 -
                   tag: Application
@@ -1540,7 +1546,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 6baacd2fab15466ab3b12dcfb7e2980a
-                  expression: 'min(/Windows physical disks by Zabbix agent active/perf_counter_en["\PhysicalDisk({#DEVNAME})\% Disk Time",60],15m)>{$VFS.DEV.UTIL.MAX.WARN}'
+                  expression: 'min(/Windows physical disks by Zabbix agent active/perf_counter_en["\PhysicalDisk({#DEVNAME})\% Idle Time",60],15m)>{$VFS.DEV.UTIL.MAX.WARN}'
                   name: '{#DEVNAME}: Disk is overloaded (util > {$VFS.DEV.UTIL.MAX.WARN}% for 15m)'
                   priority: WARNING
                   description: 'The disk appears to be under heavy load'
@@ -1720,7 +1726,7 @@ zabbix_export:
                   color: 2774A4
                   item:
                     host: 'Windows physical disks by Zabbix agent active'
-                    key: 'perf_counter_en["\PhysicalDisk({#DEVNAME})\% Disk Time",60]'
+                    key: 'perf_counter_en["\PhysicalDisk({#DEVNAME})\% Idle Time",60]'
           preprocessing:
             -
               type: STR_REPLACE
@@ -1755,7 +1761,7 @@ zabbix_export:
       description: |
         Template Services OS Windows
         
-        Template tooling version used: 0.39
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Modules
@@ -1815,15 +1821,15 @@ zabbix_export:
           description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
         -
           macro: '{$SERVICE.NAME.NOT_MATCHES}'
-          value: '^RemoteRegistry|MMCSS|gupdate|SysmonLog|clr_optimization_v.+|clr_optimization_v.+|sppsvc|gpsvc|Pml Driver HPZ12|Net Driver HPZ12|MapsBroker|IntelAudioService|Intel\(R\) TPM Provisioning Service|dbupdate|DoSvc$'
+          value: '^(?:RemoteRegistry|MMCSS|gupdate|SysmonLog|clr_optimization_v.+|clr_optimization_v.+|sppsvc|gpsvc|Pml Driver HPZ12|Net Driver HPZ12|MapsBroker|IntelAudioService|Intel\(R\) TPM Provisioning Service|dbupdate|DoSvc)$'
           description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
         -
           macro: '{$SERVICE.STARTUPNAME.MATCHES}'
-          value: '^automatic|automatic delayed$'
+          value: '^(?:automatic|automatic delayed)$'
           description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
         -
           macro: '{$SERVICE.STARTUPNAME.NOT_MATCHES}'
-          value: ^manual|disabled$
+          value: '^(?:manual|disabled)$'
           description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
       valuemaps:
         -

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -268,12 +268,6 @@ static int	get_function_parameter_hist_range(int from, const char *parameters, i
 		if (-1 == (end = mktime(&tm)))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() invalid timeshift value:%s", __func__, zbx_strerror(errno));
-			goto out;
-		}
-
-		if (end >= from)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() timeshift produced time in future", __func__);
 			goto out;
 		}
 

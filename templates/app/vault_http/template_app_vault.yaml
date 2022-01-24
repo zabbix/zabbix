@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-11T08:05:20Z'
+  date: '2021-12-19T15:19:55Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -17,7 +17,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Applications
@@ -1065,7 +1065,7 @@ zabbix_export:
               expression: '(max(/HashiCorp Vault by HTTP/vault.metrics.core.leadership.setup_failed,1h)-min(/HashiCorp Vault by HTTP/vault.metrics.core.leadership.setup_failed,1h))>{$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN}'
               name: 'Vault: High frequency of leadership setup failures (over {$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN} for 1h)'
               priority: AVERAGE
-              description: 'There have been more than {$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN} Vault leadership setup failures in the past 1h'
+              description: 'There have been more than {$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN} Vault leadership setup failures in the past 1h.'
         -
           uuid: f0ca68774b5842d7803d2c2619958184
           name: 'Vault: Leadership setup lost, counter'
@@ -1097,7 +1097,7 @@ zabbix_export:
               expression: '(max(/HashiCorp Vault by HTTP/vault.metrics.core.leadership_lost,1h)-min(/HashiCorp Vault by HTTP/vault.metrics.core.leadership_lost,1h))>{$VAULT.LEADERSHIP.LOSSES.MAX.WARN}'
               name: 'Vault: High frequency of leadership losses (over {$VAULT.LEADERSHIP.LOSSES.MAX.WARN} for 1h)'
               priority: AVERAGE
-              description: 'There have been more than {$VAULT.LEADERSHIP.LOSSES.MAX.WARN} Vault leadership losses in the past 1h'
+              description: 'There have been more than {$VAULT.LEADERSHIP.LOSSES.MAX.WARN} Vault leadership losses in the past 1h.'
         -
           uuid: 2bdb273b513d4a06914cd6ea11ac2368
           name: 'Vault: Post-unseal ops, counter'
@@ -1105,7 +1105,7 @@ zabbix_export:
           key: vault.metrics.core.post_unseal
           delay: '0'
           history: 7d
-          description: 'Duration of time taken by post-unseal operations handled by Vault core'
+          description: 'Duration of time taken by post-unseal operations handled by Vault core.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -1126,7 +1126,7 @@ zabbix_export:
           key: vault.metrics.core.pre_seal
           delay: '0'
           history: 7d
-          description: 'Duration of time taken by pre-seal operations'
+          description: 'Duration of time taken by pre-seal operations.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -1235,7 +1235,7 @@ zabbix_export:
               expression: '(max(/HashiCorp Vault by HTTP/vault.metrics.core.step_down,1h)-min(/HashiCorp Vault by HTTP/vault.metrics.core.step_down,1h))>{$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN}'
               name: 'Vault: High frequency of leadership step downs (over {$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN} for 1h)'
               priority: AVERAGE
-              description: 'There have been more than {$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN} Vault leadership step downs in the past 1h'
+              description: 'There have been more than {$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN} Vault leadership step downs in the past 1h.'
         -
           uuid: 075c83114d1746b6b773579404e0268d
           name: 'Vault: Unseal ops, counter'
@@ -1940,7 +1940,7 @@ zabbix_export:
           key: vault.metrics.secret.kv.count
           delay: '0'
           history: 7d
-          description: 'Number of entries in each key-value secret engine'
+          description: 'Number of entries in each key-value secret engine.'
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -2070,7 +2070,7 @@ zabbix_export:
           key: vault.metrics.token.by_ttl
           delay: '0'
           history: 7d
-          description: 'Number of service tokens, grouped by the TTL range they were assigned at creation'
+          description: 'Number of service tokens, grouped by the TTL range they were assigned at creation.'
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -2385,7 +2385,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Number of incidences where the starting Merkle Tree index used to begin streaming WAL entries is matched/found'
+              description: 'Number of incidences where the starting Merkle Tree index used to begin streaming WAL entries is matched/found.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -2407,7 +2407,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Number of incidences where the starting Merkle Tree index used to begin streaming WAL entries is not matched/found'
+              description: 'Number of incidences where the starting Merkle Tree index used to begin streaming WAL entries is not matched/found.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -2556,7 +2556,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Number of a {#OPERATION} operation against the {#STORAGE} storage backend'
+              description: 'Number of a {#OPERATION} operation against the {#STORAGE} storage backend.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -2586,7 +2586,7 @@ zabbix_export:
           item_prototypes:
             -
               uuid: 9a9359e74c3a48b1bbada84d772e665a
-              name: 'Token [{#TOKEN_NAME}] error'
+              name: 'Vault: Token [{#TOKEN_NAME}] error'
               type: DEPENDENT
               key: 'vault.token_via_accessor.error["{#ACCESSOR}"]'
               delay: '0'
@@ -2623,7 +2623,7 @@ zabbix_export:
                       expression: 'last(/HashiCorp Vault by HTTP/vault.health.sealed)=1'
             -
               uuid: caa3f9ca96b14b929dd75238602fead9
-              name: 'Token [{#TOKEN_NAME}] has TTL'
+              name: 'Vault: Token [{#TOKEN_NAME}] has TTL'
               type: DEPENDENT
               key: 'vault.token_via_accessor.has_ttl["{#ACCESSOR}"]'
               delay: '0'
@@ -2652,7 +2652,7 @@ zabbix_export:
                   value: 'Vault: Token {#TOKEN_NAME}'
             -
               uuid: 0f872d9d811c44f6a9a9f8f5089ca0a1
-              name: 'Token [{#TOKEN_NAME}] TTL'
+              name: 'Vault: Token [{#TOKEN_NAME}] TTL'
               type: DEPENDENT
               key: 'vault.token_via_accessor.ttl["{#ACCESSOR}"]'
               delay: '0'
@@ -2710,7 +2710,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Time taken to delete a Write Ahead Log (WAL)'
+              description: 'Time taken to delete a Write Ahead Log (WAL).'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -2732,7 +2732,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Time taken to flush a ready Write Ahead Log (WAL) to storage'
+              description: 'Time taken to flush a ready Write Ahead Log (WAL) to storage.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -2754,7 +2754,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Number of Write Ahead Logs (WAL) deleted during each garbage collection run'
+              description: 'Number of Write Ahead Logs (WAL) deleted during each garbage collection run.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -2776,7 +2776,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Total Number of Write Ahead Logs (WAL) on disk'
+              description: 'Total Number of Write Ahead Logs (WAL) on disk.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -2798,7 +2798,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Time taken to load a Write Ahead Log (WAL)'
+              description: 'Time taken to load a Write Ahead Log (WAL).'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -2820,7 +2820,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Time taken to persist a Write Ahead Log (WAL)'
+              description: 'Time taken to persist a Write Ahead Log (WAL).'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -2848,7 +2848,7 @@ zabbix_export:
         -
           macro: '{$VAULT.HOST}'
           value: '<PUT YOUR VAULT HOST>'
-          description: 'Vault host name'
+          description: 'Vault host name.'
         -
           macro: '{$VAULT.LEADERSHIP.LOSSES.MAX.WARN}'
           value: '5'
@@ -2856,7 +2856,7 @@ zabbix_export:
         -
           macro: '{$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN}'
           value: '5'
-          description: 'Maximum number of Vault leadership setyp failed.'
+          description: 'Maximum number of Vault leadership setup failed.'
         -
           macro: '{$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN}'
           value: '5'
@@ -2868,7 +2868,7 @@ zabbix_export:
         -
           macro: '{$VAULT.OPEN.FDS.MAX.WARN}'
           value: '90'
-          description: 'Maximum percentage of used file descriptors for trigger expression'
+          description: 'Maximum percentage of used file descriptors for trigger expression.'
         -
           macro: '{$VAULT.TOKEN}'
           value: '<PUT YOUR AUTH TOKEN>'

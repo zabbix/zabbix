@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ func connectionsHandler(ctx context.Context, conn PostgresClient,
 			count(*)*100/(SELECT current_setting('max_connections')::int) AS total_pct,
 			sum(CASE WHEN wait_event IS NOT NULL THEN 1 ELSE 0 END) AS waiting,
 			(SELECT count(*) FROM pg_prepared_xacts) AS prepared
-		FROM pg_stat_activity WHERE datid is not NULL) T;`
+		FROM pg_stat_activity WHERE datid IS NOT NULL AND state IS NOT NULL) T;`
 
 	row, err := conn.QueryRow(ctx, query)
 	if err != nil {

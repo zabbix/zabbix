@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,6 +34,14 @@ static int	DBpatch_5040000(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_5040001(void)
+{
+	if (FAIL != DBindex_exists("alerts", "alerts_8"))
+		return SUCCEED;
+
+	return DBcreate_index("alerts", "alerts_8", "acknowledgeid", 0);
+}
+
 #endif
 
 DBPATCH_START(5040)
@@ -41,5 +49,6 @@ DBPATCH_START(5040)
 /* version, duplicates flag, mandatory flag */
 
 DBPATCH_ADD(5040000, 0, 1)
+DBPATCH_ADD(5040001, 0, 0)
 
 DBPATCH_END()

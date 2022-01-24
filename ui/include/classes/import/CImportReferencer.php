@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1404,7 +1404,7 @@ class CImportReferencer {
 
 		$this->db_proxies = API::Proxy()->get([
 			'output' => ['host'],
-			'search' => ['host' => array_keys($this->proxies)],
+			'filter' => ['host' => array_keys($this->proxies)],
 			'preservekeys' => true
 		]);
 

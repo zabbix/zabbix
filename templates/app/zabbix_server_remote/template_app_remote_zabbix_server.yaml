@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-11T10:33:50Z'
+  date: '2021-12-19T15:20:01Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -10,7 +10,7 @@ zabbix_export:
       uuid: 79b16cbbe593444eae3de66de0cb566b
       template: 'Remote Zabbix server health'
       name: 'Remote Zabbix server health'
-      description: 'Template tooling version used: 0.38'
+      description: 'Template tooling version used: 0.40'
       groups:
         -
           name: Templates/Applications
@@ -798,6 +798,37 @@ zabbix_export:
               name: 'Remote Zabbix server: Utilization of self-monitoring processes over 75%'
               priority: AVERAGE
         -
+          uuid: 99da1d8bd47447d282542d40c1edea00
+          name: 'Remote Zabbix server: Utilization of service manager internal processes, in %'
+          type: DEPENDENT
+          key: process.service_manager.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          description: 'Average percentage of time service manager processes have been busy in the last minute'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.data.process[''service manager''].busy.avg'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Processes service manager not started'
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
+          triggers:
+            -
+              uuid: 001c9e2027ca4e7c8f5dc5b78681c573
+              expression: 'avg(/Remote Zabbix server health/process.service_manager.avg.busy,10m)>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/Remote Zabbix server health/process.service_manager.avg.busy,10m)<65'
+              name: 'Remote Zabbix server: Utilization of service manager processes over 75%'
+              priority: AVERAGE
+        -
           uuid: 643036d74a10414f94dc357efbbd42b2
           name: 'Remote Zabbix server: Utilization of snmp trapper data collector processes, in %'
           type: DEPENDENT
@@ -922,6 +953,37 @@ zabbix_export:
               name: 'Remote Zabbix server: Utilization of trapper processes over 75%'
               priority: AVERAGE
         -
+          uuid: 56dca0db33264d4b9c8fd769fbdff7b5
+          name: 'Remote Zabbix server: Utilization of trigger housekeeper internal processes, in %'
+          type: DEPENDENT
+          key: process.trigger_housekeeper.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          description: 'Average percentage of time trigger housekeeper processes have been busy in the last minute'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.data.process[''trigger housekeeper''].busy.avg'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Processes trigger housekeeper not started'
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: Application
+              value: 'Zabbix server'
+          triggers:
+            -
+              uuid: 9c0daf6e85884122aa8c5b8432709c92
+              expression: 'avg(/Remote Zabbix server health/process.trigger_housekeeper.avg.busy,10m)>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/Remote Zabbix server health/process.trigger_housekeeper.avg.busy,10m)<65'
+              name: 'Remote Zabbix server: Utilization of trigger housekeeper processes over 75%'
+              priority: AVERAGE
+        -
           uuid: 8d43954f6b9843009353c560a4f84157
           name: 'Remote Zabbix server: Utilization of unreachable poller data collector processes, in %'
           type: DEPENDENT
@@ -992,7 +1054,7 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Availability statistics of Zabbix configuration cache. Percentage of used buffer'
+          description: 'Availability statistics of Zabbix configuration cache. Percentage of used buffer.'
           preprocessing:
             -
               type: JSONPATH
@@ -1010,7 +1072,7 @@ zabbix_export:
               expression: 'max(/Remote Zabbix server health/rcache.buffer.pused,10m)>75'
               name: 'Remote Zabbix server: More than 75% used in the configuration cache'
               priority: AVERAGE
-              description: 'Consider increasing CacheSize in the zabbix_server.conf configuration file'
+              description: 'Consider increasing CacheSize in the zabbix_server.conf configuration file.'
         -
           uuid: 1625b3470fbf4bd7aa5b7051e328b37c
           name: 'Remote Zabbix server: Trend function cache, % unique requests'
@@ -1020,7 +1082,10 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Effectiveness statistics of the Zabbix trend function cache. Percentage of cached items from cached items + requests. Low percentage most likely means that the cache size can be reduced.'
+          description: |
+            Effectiveness statistics of the Zabbix trend function cache. Percentage
+            of cached items from cached items + requests. Low percentage most likely means
+            that the cache size can be reduced.
           preprocessing:
             -
               type: JSONPATH
@@ -1043,7 +1108,7 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: "Effectiveness statistics of the Zabbix trend function cache.\tPercentage of cache misses"
+          description: 'Effectiveness statistics of the Zabbix trend function cache. Percentage of cache misses.'
           preprocessing:
             -
               type: JSONPATH
@@ -1066,7 +1131,7 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: "Availability statistics of Zabbix value cache.\tPercentage of used buffer"
+          description: 'Availability statistics of Zabbix value cache. Percentage of used buffer.'
           preprocessing:
             -
               type: JSONPATH
@@ -1084,7 +1149,7 @@ zabbix_export:
               expression: 'max(/Remote Zabbix server health/vcache.buffer.pused,10m)>95'
               name: 'Remote Zabbix server: More than 95% used in the value cache'
               priority: AVERAGE
-              description: 'Consider increasing ValueCacheSize in the zabbix_server.conf configuration file'
+              description: 'Consider increasing ValueCacheSize in the zabbix_server.conf configuration file.'
         -
           uuid: 9bd0079126974bf2a61f552de2cdf880
           name: 'Remote Zabbix server: Value cache hits'
@@ -1094,7 +1159,9 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: vps
-          description: 'Effectiveness statistics of Zabbix value cache. Number of cache hits (history values taken from the cache)'
+          description: |
+            Effectiveness statistics of Zabbix value cache. Number of cache hits
+            (history values taken from the cache).
           preprocessing:
             -
               type: JSONPATH
@@ -1119,7 +1186,9 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: vps
-          description: 'Effectiveness statistics of Zabbix value cache. Number of cache misses (history values taken from the database)'
+          description: |
+            Effectiveness statistics of Zabbix value cache. Number of cache misses
+            (history values taken from the database).
           preprocessing:
             -
               type: JSONPATH
@@ -1142,7 +1211,7 @@ zabbix_export:
           key: vcache.cache.mode
           delay: '0'
           history: 1w
-          description: 'Value cache operating mode'
+          description: 'Value cache operating mode.'
           valuemap:
             name: 'Value cache operating mode'
           preprocessing:
@@ -1205,7 +1274,7 @@ zabbix_export:
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Availability statistics of Zabbix vmware cache. Percentage of used buffer'
+          description: 'Availability statistics of Zabbix vmware cache. Percentage of used buffer.'
           preprocessing:
             -
               type: JSONPATH
@@ -1225,7 +1294,7 @@ zabbix_export:
               expression: 'max(/Remote Zabbix server health/vmware.buffer.pused,10m)>75'
               name: 'Remote Zabbix server: More than 75% used in the vmware cache'
               priority: AVERAGE
-              description: 'Consider increasing VMwareCacheSize in the zabbix_server.conf configuration file'
+              description: 'Consider increasing VMwareCacheSize in the zabbix_server.conf configuration file.'
         -
           uuid: 98f47a07e2ba4294a9eb2aa1df2ba9f3
           name: 'Remote Zabbix server: History write cache, % used'
@@ -1255,7 +1324,7 @@ zabbix_export:
               expression: 'max(/Remote Zabbix server health/wcache.history.pused,10m)>75'
               name: 'Remote Zabbix server: More than 75% used in the history cache'
               priority: AVERAGE
-              description: 'Consider increasing HistoryCacheSize in the zabbix_server.conf configuration file'
+              description: 'Consider increasing HistoryCacheSize in the zabbix_server.conf configuration file.'
         -
           uuid: b1add70210a44b668f06cc3e062173ad
           name: 'Remote Zabbix server: History index cache, % used'
@@ -1285,7 +1354,7 @@ zabbix_export:
               expression: 'max(/Remote Zabbix server health/wcache.index.pused,10m)>75'
               name: 'Remote Zabbix server: More than 75% used in the history index cache'
               priority: AVERAGE
-              description: 'Consider increasing HistoryIndexCacheSize in the zabbix_server.conf configuration file'
+              description: 'Consider increasing HistoryIndexCacheSize in the zabbix_server.conf configuration file.'
         -
           uuid: 1f79208bb2ec4e4eb26e6e1b95c3635e
           name: 'Remote Zabbix server: Trend write cache, % used'
@@ -1315,7 +1384,7 @@ zabbix_export:
               expression: 'max(/Remote Zabbix server health/wcache.trend.pused,10m)>75'
               name: 'Remote Zabbix server: More than 75% used in the trends cache'
               priority: AVERAGE
-              description: 'Consider increasing TrendCacheSize in the zabbix_server.conf configuration file'
+              description: 'Consider increasing TrendCacheSize in the zabbix_server.conf configuration file.'
         -
           uuid: 34fe014843974248a98a45596ce43e1a
           name: 'Remote Zabbix server: Number of processed values per second'
@@ -1504,7 +1573,7 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[stats,{$ADDRESS},{$PORT},queue,10m]'
           history: 1w
-          description: 'Number of monitored items in the queue which are delayed at least by 10 minutes'
+          description: 'Number of monitored items in the queue which are delayed at least by 10 minutes.'
           preprocessing:
             -
               type: JSONPATH
@@ -1520,14 +1589,16 @@ zabbix_export:
               expression: 'min(/Remote Zabbix server health/zabbix[stats,{$ADDRESS},{$PORT},queue,10m],10m)>100'
               name: 'Remote Zabbix server: More than 100 items having missing data for more than 10 minutes'
               priority: WARNING
-              description: 'zabbix[stats,{$IP},{$PORT},queue,10m] item is collecting data about how many items are missing data for more than 10 minutes'
+              description: |
+                zabbix[stats,{$IP},{$PORT},queue,10m] item is collecting data about
+                how many items are missing data for more than 10 minutes.
         -
           uuid: c140ebe6c0404ee6b17b5ada2de09f28
           name: 'Remote Zabbix server: Zabbix stats queue'
           type: INTERNAL
           key: 'zabbix[stats,{$ADDRESS},{$PORT},queue]'
           history: 1w
-          description: 'Number of monitored items in the queue which are delayed at least by 6 seconds'
+          description: 'Number of monitored items in the queue which are delayed at least by 6 seconds.'
           preprocessing:
             -
               type: JSONPATH
@@ -1550,6 +1621,128 @@ zabbix_export:
             -
               tag: Application
               value: 'Zabbix raw items'
+      discovery_rules:
+        -
+          uuid: 0557f879881a4d558410444737ae3738
+          name: 'High availability cluster node discovery'
+          type: DEPENDENT
+          key: zabbix.nodes.discovery
+          delay: '0'
+          description: 'LLD rule with item and trigger prototypes for node discovery.'
+          item_prototypes:
+            -
+              uuid: caca3ccdcec141a3a9c3233ba72b8d0d
+              name: 'Cluster node [{#NODE.NAME}]: Address'
+              type: DEPENDENT
+              key: 'zabbix.nodes.address[{#NODE.ID}]'
+              delay: '0'
+              history: 1w
+              trends: '0'
+              value_type: CHAR
+              description: 'Node IPv4 address.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.data.ha[?(@.id=="{#NODE.ID}")].address.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Cluster node [{#NODE.NAME}]'
+            -
+              uuid: a9ded61c4dba4abb9213aec9af00a604
+              name: 'Cluster node [{#NODE.NAME}]: Last access age'
+              type: DEPENDENT
+              key: 'zabbix.nodes.lastaccess.age[{#NODE.ID}]'
+              delay: '0'
+              history: 1w
+              units: uptime
+              description: 'Time between database unix_timestamp() and last access time.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.data.ha[?(@.id=="{#NODE.ID}")].lastaccess_age.first()'
+              master_item:
+                key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Cluster node [{#NODE.NAME}]'
+            -
+              uuid: 0968e4fe51eb4c2b98a508090014aba0
+              name: 'Cluster node [{#NODE.NAME}]: Last access time'
+              type: DEPENDENT
+              key: 'zabbix.nodes.lastaccess.time[{#NODE.ID}]'
+              delay: '0'
+              history: 1w
+              units: unixtime
+              description: 'Last access time.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.data.ha[?(@.id=="{#NODE.ID}")].lastaccess.first()'
+              master_item:
+                key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Cluster node [{#NODE.NAME}]'
+            -
+              uuid: 2b629362886546cab34396352b93835a
+              name: 'Cluster node [{#NODE.NAME}]: Status'
+              type: DEPENDENT
+              key: 'zabbix.nodes.status[{#NODE.ID}]'
+              delay: '0'
+              history: 1w
+              description: 'Node status.'
+              valuemap:
+                name: 'Cluster node status'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.data.ha[?(@.id=="{#NODE.ID}")].status.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+              tags:
+                -
+                  tag: Application
+                  value: 'Cluster node [{#NODE.NAME}]'
+              trigger_prototypes:
+                -
+                  uuid: 5d68b55175924cb4adde600a019496c4
+                  expression: 'last(/Remote Zabbix server health/zabbix.nodes.status[{#NODE.ID}],#1)<>last(/Remote Zabbix server health/zabbix.nodes.status[{#NODE.ID}],#2)'
+                  name: 'Cluster node [{#NODE.NAME}]: Status changed'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: INFO
+                  description: 'The state of the node has changed. Confirm to close.'
+                  manual_close: 'YES'
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          lld_macro_paths:
+            -
+              lld_macro: '{#NODE.ID}'
+              path: $.id
+            -
+              lld_macro: '{#NODE.NAME}'
+              path: $.name
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.data.ha
       macros:
         -
           macro: '{$ADDRESS}'
@@ -1730,6 +1923,22 @@ zabbix_export:
                         name: 'Remote Zabbix server: Data gathering processes'
                         host: 'Remote Zabbix server health'
       valuemaps:
+        -
+          uuid: 25ab0f5c570b4a7e9d15bd41db79fe25
+          name: 'Cluster node status'
+          mappings:
+            -
+              value: '0'
+              newvalue: Standby
+            -
+              value: '1'
+              newvalue: Stopped
+            -
+              value: '2'
+              newvalue: Unavailable
+            -
+              value: '3'
+              newvalue: Active
         -
           uuid: 5dff563dde3c45d8b6d92525111384c6
           name: 'Value cache operating mode'
@@ -2201,6 +2410,18 @@ zabbix_export:
           item:
             host: 'Remote Zabbix server health'
             key: process.report_writer.avg.busy
+        -
+          sortorder: '18'
+          color: 790E1F
+          item:
+            host: 'Remote Zabbix server health'
+            key: process.service_manager.avg.busy
+        -
+          sortorder: '19'
+          color: 87AC4D
+          item:
+            host: 'Remote Zabbix server health'
+            key: process.trigger_housekeeper.avg.busy
     -
       uuid: 63004d5061324a90b247209977de9cbd
       name: 'Remote Zabbix server: Zabbix internal queues'

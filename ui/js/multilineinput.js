@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -121,7 +121,7 @@
 
 		if ('maxlength' in obj.options) {
 			$textarea.attr('maxlength', obj.options.maxlength);
-			$footer.html(sprintf(t('S_N_CHARS_REMAINING'), '<span>0</span>'));
+			$footer.html(sprintf(t('S_N_CHAR_COUNT_REMAINING'), '<span>0</span>'));
 		}
 		else {
 			$footer.html(sprintf(t('S_N_CHAR_COUNT'), '<span>0</span>'));

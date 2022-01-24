@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,6 +48,16 @@ class CMessageElement extends CElement {
 	public function isBad() {
 		return in_array('msg-bad', explode(' ', $this->getAttribute('class')));
 	}
+
+	/**
+	 * Check if message is warning.
+	 *
+	 * @return boolean
+	 */
+	public function isWarning() {
+		return in_array('msg-warning', explode(' ', $this->getAttribute('class')));
+	}
+
 
 	/**
 	 * Get message title.

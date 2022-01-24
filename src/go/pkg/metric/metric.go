@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@ const (
 	kindSession paramKind = iota
 	kindConn
 	kindGeneral
+	kindSessionOnly
 )
 
 const (
@@ -51,7 +52,6 @@ type Param struct {
 	required     bool
 	validator    Validator
 	defaultValue *string
-	sessionOnly  bool
 }
 
 func ucFirst(str string) string {
@@ -99,6 +99,12 @@ func NewConnParam(name, description string) *Param {
 	return newParam(name, description, kindConn, optional, nil)
 }
 
+// NewSessionParam creates a new connection parameter with given name and validator.
+// Returns a pointer.
+func NewSessionOnlyParam(name, description string) *Param {
+	return newParam(name, description, kindSessionOnly, optional, nil)
+}
+
 // WithSession transforms a connection typed parameter to a dual purpose parameter which can be either
 // a connection parameter or session name.
 // Returns a pointer.
@@ -120,12 +126,6 @@ func (p *Param) WithDefault(value string) *Param {
 	}
 
 	p.defaultValue = &value
-
-	return p
-}
-
-func (p *Param) SessionOnly() *Param {
-	p.sessionOnly = true
 
 	return p
 }
@@ -369,7 +369,7 @@ func (m *Metric) EvalParams(rawParams []string, sessions interface{}) (params ma
 				val = p.defaultValue
 			}
 		} else {
-			if p.sessionOnly {
+			if p.kind == kindSessionOnly {
 				return nil, zbxerr.ErrorInvalidParams.Wrap(
 					fmt.Errorf("%q cannot be passed as a key parameter", p.name))
 			}

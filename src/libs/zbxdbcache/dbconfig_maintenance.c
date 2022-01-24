@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1545,6 +1545,8 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vec
 
 		for (j = 0; j < query->functionids.values_num; j++)
 		{
+			ZBX_DC_HOST	*dc_host;
+
 			if (NULL == (function = (ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions,
 					&query->functionids.values[j])))
 			{
@@ -1553,6 +1555,12 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vec
 
 			if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &function->itemid)))
 				continue;
+
+			if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &item->hostid)))
+				continue;
+
+			if (HOST_MAINTENANCE_STATUS_OFF == dc_host->maintenance_status)
+				goto skip;
 
 			zbx_vector_uint64_append(&hostids, item->hostid);
 		}
@@ -1596,7 +1604,7 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vec
 				ret = SUCCEED;
 			}
 		}
-
+skip:
 		zbx_vector_uint64_clear(&hostids);
 	}
 unlock:

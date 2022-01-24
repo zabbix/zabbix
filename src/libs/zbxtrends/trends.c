@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -267,6 +267,12 @@ int	zbx_trends_parse_range(time_t from, const char *param, int *start, int *end,
 	if ('\0' != param[len] && ':' != param[len])
 	{
 		*error = zbx_dsprintf(*error, "unexpected character[s] in period \"%s\"", param + len);
+		return FAIL;
+	}
+
+	if (0 == period_num)
+	{
+		*error = zbx_strdup(*error, "period cannot be zero");
 		return FAIL;
 	}
 

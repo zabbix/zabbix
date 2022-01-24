@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,8 +20,11 @@
 #ifndef ZABBIX_SHA256CRYPT_H
 #define ZABBIX_SHA256CRYPT_H
 
+#include "common.h"
+
 #define ZBX_SHA256_DIGEST_SIZE	32
 
 void	zbx_sha256_hash(const char *in, char *out);
+void*	zbx_sha256_hash_for_hmac(const void* data, const size_t datalen, void* out, const size_t outlen);
 
 #endif /* ZABBIX_SHA256CRYPT_H */

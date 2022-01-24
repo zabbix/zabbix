@@ -1,6 +1,6 @@
 /* /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ func processNameDiscoveryHandler(ctx context.Context, conn PostgresClient,
 	var appNameJSON string
 
 	query := `SELECT 
-	json_build_object('data',json_agg(json_build_object('{#APPLICATION_NAME}',CONCAT(application_name, ' ', pid))))		
+	json_build_object('data',COALESCE(json_agg(json_build_object('{#APPLICATION_NAME}',application_name)), '[]'))		
 	FROM pg_stat_replication`
 
 	row, err := conn.QueryRow(ctx, query)

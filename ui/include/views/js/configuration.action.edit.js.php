@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -624,7 +624,7 @@
 	OperationViewType.prototype.setConfig = function(conf) {
 		const {options, selected} = conf;
 		if (options.length == 1) {
-			const $hidden_input = $('<input />', {type: 'hidden', name: this.$select.attr('name'), value: selected});
+			const $hidden_input = $('<input>', {type: 'hidden', name: this.$select.attr('name'), value: selected});
 			this.$select.replaceWith([options[0].name, $hidden_input]);
 		}
 		else {

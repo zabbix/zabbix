@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,12 +27,10 @@ class CEncryptHelper {
 	/**
 	 * Signature algorithm.
 	 */
-	public const SIGN_ALGO = 'aes-256-ecb';
+	public const SIGN_ALGO = 'sha256';
 
 	/**
 	 * Session secret key.
-	 *
-	 * @static
 	 *
 	 * @var string
 	 */
@@ -40,8 +38,6 @@ class CEncryptHelper {
 
 	/**
 	 * Return session key.
-	 *
-	 * @static
 	 *
 	 * @return string|null
 	 */
@@ -67,8 +63,6 @@ class CEncryptHelper {
 	/**
 	 * Timing attack safe string comparison.
 	 *
-	 * @static
-	 *
 	 * @param string $known_string
 	 * @param string $user_string
 	 *
@@ -81,8 +75,6 @@ class CEncryptHelper {
 	/**
 	 * Encrypt string with session key.
 	 *
-	 * @static
-	 *
 	 * @param string $data
 	 *
 	 * @return string
@@ -90,13 +82,11 @@ class CEncryptHelper {
 	public static function sign(string $data): string {
 		$key = self::getKey();
 
-		return openssl_encrypt($data, self::SIGN_ALGO, $key);
+		return hash_hmac(self::SIGN_ALGO, $data, $key, false);
 	}
 
 	/**
 	 * Generate random 16 bytes key.
-	 *
-	 * @static
 	 *
 	 * @return string
 	 */
@@ -106,8 +96,6 @@ class CEncryptHelper {
 
 	/**
 	 * Update secret session key.
-	 *
-	 * @static
 	 *
 	 * @param string $key
 	 *

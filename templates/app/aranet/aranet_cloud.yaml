@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-11T08:05:19Z'
+  date: '2021-12-19T15:19:29Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -10,7 +10,7 @@ zabbix_export:
       uuid: af21edc47557400583e537904ea632aa
       template: 'Aranet Cloud'
       name: 'Aranet Cloud'
-      description: 'Template tooling version used: 0.38'
+      description: 'Template tooling version used: 0.40'
       groups:
         -
           name: Templates/Applications
@@ -1729,57 +1729,68 @@ zabbix_export:
         -
           macro: '{$ARANET.API.ENDPOINT}'
           value: 'https://aranet.cloud/api'
+          description: 'Aranet Cloud API endpoint.'
         -
           macro: '{$ARANET.API.PASSWORD}'
           value: '<PUT YOUR PASSWORD>'
+          description: 'Aranet Cloud password.'
         -
           macro: '{$ARANET.API.SPACE_NAME}'
           value: '<PUT YOUR SPACE NAME>'
+          description: 'Aranet Cloud organization name.'
         -
           macro: '{$ARANET.API.USERNAME}'
           value: '<PUT YOUR USERNAME>'
+          description: 'Aranet Cloud username.'
         -
           macro: '{$ARANET.BATT.VOLTAGE.MIN.CRIT}'
           value: '2'
+          description: 'Battery voltage critical threshold.'
         -
           macro: '{$ARANET.BATT.VOLTAGE.MIN.WARN}'
           value: '1'
+          description: 'Battery voltage warning threshold.'
         -
           macro: '{$ARANET.CO2.MAX.CRIT}'
           value: '1000'
+          description: 'CO2 critical threshold.'
         -
           macro: '{$ARANET.CO2.MAX.WARN}'
           value: '600'
+          description: 'CO2 warning threshold.'
         -
           macro: '{$ARANET.HUMIDITY.MAX.WARN}'
           value: '70'
+          description: 'Maximum humidity threshold.'
         -
           macro: '{$ARANET.HUMIDITY.MIN.WARN}'
           value: '20'
+          description: 'Minimum humidity threshold.'
         -
           macro: '{$ARANET.LAST_UPDATE.MAX.WARN}'
           value: 1h
+          description: 'Data update delay threshold.'
         -
           macro: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
           value: .+
-          description: 'Filter of discoverable sensors by gateway id'
+          description: 'Filter of discoverable sensors by gateway id.'
         -
           macro: '{$ARANET.LLD.FILTER.GATEWAY_NAME.MATCHES}'
           value: .+
-          description: 'Filter of discoverable sensors by gateway name'
+          description: 'Filter of discoverable sensors by gateway name.'
         -
           macro: '{$ARANET.LLD.FILTER.GATEWAY_NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discoverable sensors by gateway name'
+          description: 'Filter to exclude discoverable sensors by gateway name.'
         -
           macro: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
           value: .+
-          description: 'Filter of discoverable sensors by id'
+          description: 'Filter of discoverable sensors by id.'
         -
           macro: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
           value: .+
-          description: 'Filter of discoverable sensors by name'
+          description: 'Filter of discoverable sensors by name.'
         -
           macro: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discoverable sensors by name'
+          description: 'Filter to exclude discoverable sensors by name.'

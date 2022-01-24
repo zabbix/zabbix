@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,8 @@ require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 /**
  * @backup sessions
+ *
+ * @backupConfig
  */
 class testFormSetup extends CWebTest {
 
@@ -327,7 +329,7 @@ class testFormSetup extends CWebTest {
 			$xpath = 'xpath://span[text()='.CXPathHelper::escapeQuotes($field_name).']/../../div[@class="table-forms-td-right"]';
 			// Assert contains is used as Password length can differ.
 			if ($field_name === 'Database password') {
-				$this->assertContains($value, $this->query($xpath)->one()->getText());
+				$this->assertStringContainsString($value, $this->query($xpath)->one()->getText());
 			}
 			else {
 				$this->assertEquals($value, $this->query($xpath)->one()->getText());
@@ -346,7 +348,7 @@ class testFormSetup extends CWebTest {
 
 	public function testFormSetup_installSection() {
 		$this->openSpecifiedSection('Install');
-		$this->checkPageTextElements('Install', '/conf/zabbix.conf.php" created.');
+		$this->checkPageTextElements('Install', 'Configuration file "conf/zabbix.conf.php" created.');
 		$this->assertEquals('Congratulations! You have successfully installed Zabbix frontend.',
 				$this->query('class:green')->one()->getText());
 		$this->checkButtons('last section');
@@ -355,7 +357,7 @@ class testFormSetup extends CWebTest {
 		// Check that Dashboard view is opened after completing the form.
 		$this->query('button:Finish')->one()->click();
 		$this->page->waitUntilReady();
-		$this->assertContains('index.php', $this->page->getCurrentURL());
+		$this->assertStringContainsString('index.php', $this->page->getCurrentURL());
 	}
 
 	public function getDbConnectionDetails() {
@@ -845,7 +847,7 @@ class testFormSetup extends CWebTest {
 		$this->page->userLogin('Admin', 'zabbix');
 		$this->assertEquals($server_parameters['Name'].': Dashboard', $this->page->getTitle());
 		$system_info = CDashboardElement::find()->one()->getWidget('System information')->getContent();
-		$this->assertContains($server_parameters['Host'].':'.$server_parameters['Port'], $system_info->getText());
+		$this->assertStringContainsString($server_parameters['Host'].':'.$server_parameters['Port'], $system_info->getText());
 	}
 
 	public function testFormSetup_backButtons() {
@@ -868,21 +870,7 @@ class testFormSetup extends CWebTest {
 
 		// Cancel setup form update.
 		$this->query('button:Cancel')->one()->click();
-		$this->assertContains('zabbix.php?action=dashboard.view', $this->page->getCurrentURL());
-	}
-
-	public function testFormSetup_restoreServerConfig() {
-		// Open the last section of the setup form.
-		$this->openSpecifiedSection('Zabbix server details');
-		// Restore Zabbix server name field value.
-		$form = $this->query('xpath://form')->asForm()->one();
-		$form->getField('Name')->fill('TEST_SERVER_NAME');
-		$this->query('button:Next step')->one()->click();
-		$this->query('button:Next step')->one()->click();
-		$this->query('button:Next step')->one()->click();
-		// Need to wait for 3s for php cache to reload and for zabbix server parameter the changes to take place.
-		sleep(3);
-		$this->query('button:Finish')->one()->click();
+		$this->assertStringContainsString('zabbix.php?action=dashboard.view', $this->page->getCurrentURL());
 	}
 
 	/**
@@ -895,7 +883,7 @@ class testFormSetup extends CWebTest {
 		$this->assertTrue($this->query('xpath://h1[text()='.CXPathHelper::escapeQuotes($title).']')->one()->isValid());
 		$this->checkSections($title);
 		if ($text) {
-			$this->assertContains($text, $this->query('xpath:.//p')->one()->getText());
+			$this->assertStringContainsString($text, $this->query('xpath:.//p')->one()->getText());
 		}
 	}
 

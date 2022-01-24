@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -137,7 +137,7 @@
 					.forEach((element) => { element.remove(); });
 
 				const update_btn = document.querySelector('#update');
-				update_btn.innerHTML = <?= json_encode(_('Add')) ?>;
+				update_btn.textContent = <?= json_encode(_('Add')) ?>;
 				update_btn.setAttribute('value', 'userrole.create');
 				update_btn.setAttribute('id', 'add');
 

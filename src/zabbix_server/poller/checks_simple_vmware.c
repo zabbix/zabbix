@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -315,6 +315,7 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 		case ZBX_VMWARE_UNIT_NUMBER:
 		case ZBX_VMWARE_UNIT_SECOND:
 		case ZBX_VMWARE_UNIT_WATT:
+		case ZBX_VMWARE_UNIT_CELSIUS:
 			SET_UI64_RESULT(result, perfvalue->value);
 			break;
 		default:
@@ -1141,6 +1142,8 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, con
 				NULL != cluster ? cluster->name : "", ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "{#PARENT.NAME}", hv->parent_name, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "{#PARENT.TYPE}", hv->parent_type, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "{#HV.NETNAME}",
+				ZBX_NULL2EMPTY_STR(hv->props[ZBX_VMWARE_HVPROP_NET_NAME]), ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&json_data);
 	}
 

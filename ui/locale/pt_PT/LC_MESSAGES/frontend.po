@@ -1,10 +1,10 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Zabbix 4.2\n"
+"Project-Id-Version: Zabbix 5.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-22 19:54+0300\n"
-"PO-Revision-Date: 2013-10-10 08:35+0300\n"
-"Last-Translator: richlv <richlv@nakts.net>\n"
+"POT-Creation-Date: 2022-01-14 19:53+0200\n"
+"PO-Revision-Date: 2021-12-31 13:31+0300\n"
+"Last-Translator: hugosantos <hugopedrosantos@gmail.com>\n"
 "Language-Team: none\n"
 "Language: pt_PT\n"
 "MIME-Version: 1.0\n"
@@ -12,18 +12,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1381386929.000000\n"
+"X-POOTLE-MTIME: 1640950291.000000\n"
 
-#: include/classes/items/CHelpItems.php:1081
+#: include/classes/items/CHelpItems.php:1089
+#, fuzzy
 msgid "\tThe average time a read from the virtual disk takes , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
-msgstr ""
+msgstr "\tO tempo médio a ler do disco virtual é de, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
 #: include/classes/db/PostgresqlDbBackend.php:96
 #, c-format
 msgid "\"%1$s\" instead \"%2$s\""
-msgstr ""
+msgstr "\"%1$s\" em alternativa a \"%2$s\""
 
 #: include/classes/import/validators/C10XmlValidator.php:321
 #: include/classes/import/validators/C10XmlValidator.php:338
@@ -41,11 +42,12 @@ msgstr ""
 msgid "\"%1$s\" is expected"
 msgstr "é esperado \"%1$s\""
 
+# Yurii This string was corrected translated, what was the reason to reset?
 #: include/classes/api/services/CReport.php:237
 #: include/classes/api/services/CReport.php:651
 #, c-format
 msgid "\"%1$s\" must be an empty string or greater than \"%2$s\"."
-msgstr ""
+msgstr "\"%1$s\" deve ser uma string vazia ou maior que \"%2$s\"."
 
 #: include/classes/api/services/CMaintenance.php:359
 #: include/classes/api/services/CMaintenance.php:366
@@ -56,12 +58,12 @@ msgstr ""
 #: maintenance.php:143 services.php:182 services.php:191
 #, c-format
 msgid "\"%1$s\" must be between 1970.01.01 and 2038.01.18."
-msgstr ""
+msgstr "\"%1$s\" deve ser entre 1970.01.01 e 2038.01.18."
 
 #: include/classes/api/services/CItemGeneral.php:1399
 #, c-format
 msgid "\"%1$s\" value must be less than or equal to \"%2$s\" value"
-msgstr ""
+msgstr "\"%1$s\" o valor deve ser menor ou igual ao valor \"%2$s\""
 
 #: include/classes/import/validators/C10XmlValidator.php:356
 #: include/classes/import/validators/C10XmlValidator.php:378
@@ -74,7 +76,7 @@ msgstr "é esperado par \"host:key\""
 #: include/views/js/configuration.host.discovery.edit.js.php:98
 #: include/views/js/item.preprocessing.js.php:148
 msgid "$.path.to.node"
-msgstr ""
+msgstr "$.path.to.node"
 
 #: include/classes/api/services/CDRule.php:556
 #, c-format
@@ -88,23 +90,23 @@ msgid_plural "%1$d days"
 msgstr[0] "%1$d dia"
 msgstr[1] "%1$d dias"
 
-#: jsLoader.php:306
+#: jsLoader.php:307
 #, c-format
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
-msgstr ""
+msgstr "%1$d correspondências para %2$s encontradas"
 
 #: app/controllers/CControllerWidgetProblemsView.php:55
 #, c-format
 msgid "%1$d of %3$d%2$s problem is shown"
 msgid_plural "%1$d of %3$d%2$s problems are shown"
-msgstr[0] "é mostrado %1$d de %3$d%2$s problema"
-msgstr[1] "são mostrados %1$d de %3$d%2$s problemas"
+msgstr[0] "%1$d de %3$d%2$s problema visível"
+msgstr[1] "%1$d de %3$d%2$s problemas visíveis"
 
 #: app/controllers/CControllerPopupAcknowledgeEdit.php:117
 #, c-format
 msgid "%1$d problems selected."
-msgstr ""
+msgstr "%1$d problemas selecionados."
 
 #: chart4.php:94 chart5.php:89
 #, c-format
@@ -112,9 +114,9 @@ msgid "%1$s (year %2$s)"
 msgstr "%1$s (ano %2$s)"
 
 #: include/classes/core/CModuleManager.php:228
-#, c-format
+#, fuzzy, c-format
 msgid "%1$s - thrown by module located at %2$s."
-msgstr ""
+msgstr "%1$s - executado pelo módulo localizado em %2$s."
 
 #: include/classes/api/services/CItemGeneral.php:2608
 #: include/classes/import/readers/CXmlImportReader.php:46
@@ -127,8 +129,18 @@ msgstr "%1$s [Linha: %2$s | Coluna: %3$s]"
 msgctxt "screen reader"
 msgid "%1$s action"
 msgid_plural "%1$s actions"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s ação"
+msgstr[1] "%1$s ações"
+
+#: jsLoader.php:288
+#, c-format
+msgid "%1$s characters"
+msgstr "%1$s caracteres"
+
+#: jsLoader.php:289
+#, c-format
+msgid "%1$s characters remaining"
+msgstr "%1$s caracteres restantes"
 
 #: app/views/popup.acknowledge.edit.php:60
 #: app/views/popup.acknowledge.edit.php:65
@@ -142,15 +154,15 @@ msgstr[1] "%1$s eventos"
 #, c-format
 msgid "%1$s host in maintenance"
 msgid_plural "%1$s hosts in maintenance"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s servidor em manutenção "
+msgstr[1] "%1$s servidores em manutenção "
 
 #: include/func.inc.php:2625
 #, c-format
 msgid "%1$s hour"
 msgid_plural "%1$s hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s hora"
+msgstr[1] "%1$s horas"
 
 #: app/controllers/CControllerWidgetPlainTextView.php:134
 #: app/controllers/CControllerWidgetPlainTextView.php:135
@@ -166,8 +178,8 @@ msgstr[1] "%1$s items"
 msgctxt "screen reader"
 msgid "%1$s message"
 msgid_plural "%1$s messages"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s mensagem"
+msgstr[1] "%1$s mensagens"
 
 #: include/classes/widgets/CWidgetConfig.php:285
 #: include/classes/widgets/CWidgetConfig.php:286
@@ -184,29 +196,29 @@ msgstr[1] "%1$s minutos"
 #, c-format
 msgid "%1$s of %2$s element in problem state"
 msgid_plural "%1$s of %2$s elements in problem state"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s de %2$s elemento no estado do problema"
+msgstr[1] "%1$s de %2$s elementos no estado do problema"
 
-#: jsLoader.php:307
+#: jsLoader.php:308
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s preselected, use down,up arrow keys and enter to select"
-msgstr ""
+msgstr "%1$s pré-selecionado, use as teclas de seta para cima e para baixo e enter para selecionar "
 
 #: include/maps.inc.php:340 include/maps.inc.php:344 include/maps.inc.php:351
 #: include/maps.inc.php:400
 #, c-format
 msgid "%1$s problem"
 msgid_plural "%1$s problems"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s problema"
+msgstr[1] "%1$s problemas"
 
 #: include/classes/helpers/CMapHelper.php:319
 #, c-format
 msgid "%1$s problem in total"
 msgid_plural "%1$s problems in total"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s problema no total"
+msgstr[1] "%1$s problemas no total"
 
 #: app/views/monitoring.widget.actionlog.view.php:45
 #: include/actions.inc.php:2117
@@ -227,37 +239,32 @@ msgid_plural "%1$s seconds"
 msgstr[0] "%1$s segundo"
 msgstr[1] "%1$s segundos"
 
-#: jsLoader.php:288
-#, c-format
-msgid "%1$s symbols remaining"
-msgstr ""
-
 #: include/maps.inc.php:368 include/maps.inc.php:371 include/maps.inc.php:378
 #: include/maps.inc.php:383
 #, c-format
 msgid "%1$s unacknowledged problem"
 msgid_plural "%1$s unacknowledged problems"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s problema não reconhecido "
+msgstr[1] "%1$s problemas não reconhecidos "
 
 #: app/views/monitoring.widget.problemhosts.view.php:108
 #: app/views/monitoring.widget.problems.view.php:207
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, Severity, %2$s"
-msgstr ""
+msgstr "%1$s, Gravidade , %2$s"
 
-#: jsLoader.php:301
+#: jsLoader.php:302
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, read only"
-msgstr ""
+msgstr "%1$s, somente para leitura"
 
-#: jsLoader.php:344
+#: jsLoader.php:345
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, selected"
-msgstr ""
+msgstr "%1$s, selecionado"
 
 #: include/func.inc.php:1880
 #, c-format
@@ -346,7 +353,7 @@ msgstr "últimos 500 valores"
 #: app/views/js/popup.itemtestedit.view.js.php:37
 #: app/views/js/popup.itemtestedit.view.js.php:44
 msgid "<empty string>"
-msgstr ""
+msgstr "<empty string>"
 
 #: include/forms.inc.php:1341 include/views/js/item.preprocessing.js.php:197
 msgid "<label name>"
@@ -487,7 +494,7 @@ msgstr ""
 msgid "Ack"
 msgstr "Reconhecido"
 
-#: app/views/popup.acknowledge.edit.php:83 jsLoader.php:311
+#: app/views/popup.acknowledge.edit.php:83 jsLoader.php:312
 msgid "Acknowledge"
 msgstr "Reconhecer"
 
@@ -650,7 +657,7 @@ msgstr "Acção actualizada"
 #: include/classes/screens/CScreenProblem.php:1223 include/events.inc.php:288
 #: include/forms.inc.php:1222 include/views/configuration.action.edit.php:28
 #: include/views/monitoring.sysmap.list.php:68 jsLoader.php:127
-#: jsLoader.php:155 jsLoader.php:170 jsLoader.php:184 jsLoader.php:310
+#: jsLoader.php:155 jsLoader.php:170 jsLoader.php:184 jsLoader.php:311
 #: tr_events.php:182
 msgid "Actions"
 msgstr "Acções"
@@ -922,7 +929,7 @@ msgstr "Adicionar widget"
 msgid "Added"
 msgstr ""
 
-#: jsLoader.php:299
+#: jsLoader.php:300
 #, c-format
 msgctxt "screen reader"
 msgid "Added, %1$s"
@@ -962,7 +969,7 @@ msgid "Agent"
 msgstr "Agente"
 
 #: include/classes/items/CHelpItems.php:69
-#: include/classes/items/CHelpItems.php:399
+#: include/classes/items/CHelpItems.php:403
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
 msgstr "Verificação de disponibilidade do agente. Se retornar nulo - indisponível; 1 - Disponível"
 
@@ -971,13 +978,18 @@ msgid "Agent encryption"
 msgstr "Encriptação do agente"
 
 #: include/classes/items/CHelpItems.php:65
-#: include/classes/items/CHelpItems.php:395
+#: include/classes/items/CHelpItems.php:399
 msgid "Agent host name. Returns string"
 msgstr "Nome do host do agente. Retorna string"
 
 #: include/views/inventory.host.view.php:62
 msgid "Agent interfaces"
 msgstr "Interfaces do agente"
+
+#: include/classes/items/CHelpItems.php:73
+#: include/classes/items/CHelpItems.php:407
+msgid "Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2"
+msgstr ""
 
 #: include/classes/widgets/CWidgetHelper.php:1148
 msgid "Aggregate"
@@ -1018,7 +1030,7 @@ msgstr ""
 #: app/views/reports.scheduledreport.list.php:55
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:122
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:178
-#: include/views/monitoring.sysmap.edit.php:261 jsLoader.php:367
+#: include/views/monitoring.sysmap.edit.php:261 jsLoader.php:368
 msgid "All"
 msgstr "Tudo"
 
@@ -1083,15 +1095,15 @@ msgstr "Hosts permitidos"
 msgid "Allowed methods"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:682
+#: include/classes/setup/CSetupWizard.php:696
 msgid "Alternatively, you can install it manually:"
 msgstr "Alternativamente, pode instalar manualmente:"
 
-#: include/classes/items/CHelpItems.php:997
+#: include/classes/items/CHelpItems.php:1005
 msgid "Amount of guest physical memory that is swapped out to the swap space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1021
+#: include/classes/items/CHelpItems.php:1029
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
@@ -1168,7 +1180,7 @@ msgstr "Erro na aplicação."
 #: include/views/js/monitoring.sysmaps.js.php:604
 #: include/views/js/monitoring.sysmaps.js.php:709
 #: include/views/js/monitoring.sysmaps.js.php:815 jsLoader.php:177
-#: jsLoader.php:290
+#: jsLoader.php:291
 msgid "Apply"
 msgstr "Aplicar"
 
@@ -1390,6 +1402,7 @@ msgid "Authentication protocol"
 msgstr "Protocolo de autenticação"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:359
+#: app/controllers/CControllerAuthenticationUpdate.php:367
 msgid "Authentication settings updated"
 msgstr ""
 
@@ -1479,11 +1492,11 @@ msgstr "Disponível"
 msgid "Average"
 msgstr "Média"
 
-#: include/classes/items/CHelpItems.php:1077
+#: include/classes/items/CHelpItems.php:1085
 msgid "Average number of outstanding read requests to the virtual disk during the collection interval , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1097
+#: include/classes/items/CHelpItems.php:1105
 msgid "Average number of outstanding write requests to the virtual disk during the collection interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
 msgstr ""
 
@@ -1640,34 +1653,34 @@ msgstr "CERTIFICADO"
 msgid "CLOSING"
 msgstr "TERMINANDO"
 
-#: include/classes/items/CHelpItems.php:229
-#: include/classes/items/CHelpItems.php:583
+#: include/classes/items/CHelpItems.php:233
+#: include/classes/items/CHelpItems.php:591
 msgid "CPU information. Returns string or integer"
 msgstr "Informação da CPU. Retorna texto ou número inteiro"
 
-#: include/classes/items/CHelpItems.php:205
-#: include/classes/items/CHelpItems.php:559
+#: include/classes/items/CHelpItems.php:209
+#: include/classes/items/CHelpItems.php:567
 msgid "CPU load. Returns float"
 msgstr "Carga da CPU. Retorna um ponto flutuante (número)"
 
-#: include/classes/items/CHelpItems.php:977
+#: include/classes/items/CHelpItems.php:985
 msgid "CPU time spent waiting for swap-in, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:829
+#: include/classes/items/CHelpItems.php:837
 msgid "CPU usage as a percentage during the interval depends on power management or HT, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:825
+#: include/classes/items/CHelpItems.php:833
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:985
+#: include/classes/items/CHelpItems.php:993
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:217
-#: include/classes/items/CHelpItems.php:571
+#: include/classes/items/CHelpItems.php:221
+#: include/classes/items/CHelpItems.php:579
 msgid "CPU utilisation percentage. Returns float"
 msgstr "Uso percentagem de CPU. Retorna número com ponto flutuante"
 
@@ -1696,7 +1709,7 @@ msgstr ""
 msgid "Callback"
 msgstr "Callback"
 
-#: jsLoader.php:302
+#: jsLoader.php:303
 msgctxt "screen reader"
 msgid "Can not be removed"
 msgstr ""
@@ -1731,7 +1744,7 @@ msgstr ""
 #: app/views/popup.import.compare.php:162
 #: include/classes/html/CButtonCancel.php:25
 #: include/classes/setup/CSetupWizard.php:130 jsLoader.php:178
-#: jsLoader.php:188 jsLoader.php:291 jsLoader.php:363
+#: jsLoader.php:188 jsLoader.php:292 jsLoader.php:364
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -1767,7 +1780,7 @@ msgid "Cannot add dashboard page: maximum number of %1$d dashboard pages has bee
 msgstr ""
 
 #: include/classes/api/services/CTrigger.php:966
-#: include/classes/api/services/CTriggerPrototype.php:773
+#: include/classes/api/services/CTriggerPrototype.php:788
 msgid "Cannot add dependency from a host to a template."
 msgstr "Não foi possível adicionar dependência de um host para um template."
 
@@ -1998,7 +2011,7 @@ msgid "Cannot create another database connection."
 msgstr "Não foi possível criar outra ligação à base de dados."
 
 #: include/classes/api/services/CTrigger.php:1000
-#: include/classes/api/services/CTriggerPrototype.php:804
+#: include/classes/api/services/CTriggerPrototype.php:819
 msgid "Cannot create circular dependencies."
 msgstr "Não é possível criar uma dependência circular."
 
@@ -2006,7 +2019,7 @@ msgstr "Não é possível criar uma dependência circular."
 msgid "Cannot create dependency on trigger itself."
 msgstr "Não é possível criar uma dependência de um trigger com ele mesmo."
 
-#: include/classes/api/services/CTriggerPrototype.php:743
+#: include/classes/api/services/CTriggerPrototype.php:758
 msgid "Cannot create dependency on trigger prototype itself."
 msgstr "Não é possível criar dependência entre um protótipo de trigger e o próprio."
 
@@ -2023,7 +2036,7 @@ msgstr "Não foi possível criar o mapa de ícones"
 msgid "Cannot create scheduled report"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:678
+#: include/classes/setup/CSetupWizard.php:692
 msgid "Cannot create the configuration file."
 msgstr "Não foi possível criar o arquivo de configuração."
 
@@ -2048,11 +2061,10 @@ msgid "Cannot delete action"
 msgstr "Não foi possível eliminar acção"
 
 #: app/controllers/CControllerCorrelationDelete.php:68
-#, fuzzy
 msgid "Cannot delete correlation"
 msgid_plural "Cannot delete correlations"
 msgstr[0] "Não foi possível eliminar a correlação"
-msgstr[1] "Não foi possível eliminar a correlação"
+msgstr[1] "Não foi possível eliminar as correlações"
 
 #: app/controllers/CControllerDashboardDelete.php:63
 #: app/controllers/CControllerTemplateDashboardDelete.php:61
@@ -2067,11 +2079,10 @@ msgid "Cannot delete dependency"
 msgstr "Não foi possível eliminar dependência"
 
 #: app/controllers/CControllerDiscoveryDelete.php:69 host_discovery.php:412
-#, fuzzy
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
-msgstr[0] "Não foi possível eliminar regra de descoberta"
-msgstr[1] "Não foi possível eliminar regra de descoberta"
+msgstr[0] "Não foi possível eliminar a regra de descoberta"
+msgstr[1] "Não foi possível eliminar as regras de descoberta"
 
 #: host_discovery.php:760
 msgid "Cannot delete discovery rules"
@@ -2229,7 +2240,7 @@ msgstr ""
 msgid "Cannot delete templated graph."
 msgstr ""
 
-#: include/classes/api/services/CHostPrototype.php:1311
+#: include/classes/api/services/CHostPrototype.php:1313
 msgid "Cannot delete templated host prototype."
 msgstr "Não é possível eliminar protótipos de host baseados em templates."
 
@@ -2280,7 +2291,7 @@ msgstr "Não foi possível eliminar triggers"
 msgid "Cannot delete user"
 msgid_plural "Cannot delete users"
 msgstr[0] "Não foi possível eliminar o utilizador"
-msgstr[1] ""
+msgstr[1] "Não foi possível eliminar os utilizadores"
 
 #: app/controllers/CControllerUsergroupDelete.php:59
 msgid "Cannot delete user group"
@@ -2481,7 +2492,7 @@ msgstr ""
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
 msgstr "Não foi possível encontrar host \"%1$s\" utilizado no mapa \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1206
+#: include/classes/import/CConfigurationImport.php:1212
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Não foi possível localizar o grupo de host \"%1$s\" para o protótipo de host \"%2$s\" da autodescoberta \"%3$s\" em \"%4$s\"."
@@ -2504,47 +2515,47 @@ msgstr "Não foi possível encontrar ícone \"%1$s\" utilizado no mapa \"%2$s\".
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr "Não foi possível encontrar o mapeamento de ícones \"%1$s\" utilizado no mapa \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:948
+#: include/classes/import/CConfigurationImport.php:952
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for discovery rule \"%2$s\" on \"%3$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:717
+#: include/classes/import/CConfigurationImport.php:719
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:1100
+#: include/classes/import/CConfigurationImport.php:1106
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:1631
+#: include/classes/import/CConfigurationImport.php:1641
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph \"%3$s\"."
 msgstr "Não foi possível localizar o item \"%1$s\" em \"%2$s\" utilizado como limite MÁXIMO para o eixo Y no gráfico \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1403
+#: include/classes/import/CConfigurationImport.php:1413
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Não foi possível encontrar o item \"%1$s\" em \"%2$s\" utilizado como MÁXIMO para o eixo Y no protótipo de gráfico \"%3$s\" da autodescoberta \"%4$s\" em \"%5$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1613
+#: include/classes/import/CConfigurationImport.php:1623
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph \"%3$s\"."
 msgstr "Não foi possível encontrar o item \"%1$s\" em \"%2$s\" utilizado como MÁXIMO para o eixo Y do gráfico \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1382
+#: include/classes/import/CConfigurationImport.php:1392
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Não foi possível encontrar o item \"%1$s\" em \"%2$s\" utilizado como MÍNIMO para o eixo Y no protótipo de gráfico \"%3$s\" da autodescoberta \"%4$s\" em \"%5$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1651
+#: include/classes/import/CConfigurationImport.php:1661
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
 msgstr "Não foi possível encontrar o item \"%1$s\" em \"%2$s\". Ele é utilizado pelo gráfico \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1424
+#: include/classes/import/CConfigurationImport.php:1434
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Não foi possível encontrar o item \"%1$s\" em \"%2$s\". Ele é utilizado pelo protótipo de gráfico \"%3$s\" da autodescoberta \"%4$s\" em \"%5$s\"."
@@ -2559,12 +2570,12 @@ msgstr ""
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
 msgstr "Não foi possível encontrar mapa \"%1$s\" utilizado no mapa \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1229
+#: include/classes/import/CConfigurationImport.php:1235
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Não foi possível localizar o template \"%1$s\" para o protótipo de host \"%2$s\" da autodescoberta \"%3$s\" em \"%4$s\"."
 
-#: include/classes/import/CConfigurationImport.php:998
+#: include/classes/import/CConfigurationImport.php:1002
 #, c-format
 msgid "Cannot find template \"%1$s\" for override \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr ""
@@ -2575,12 +2586,12 @@ msgstr ""
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "Não foi possível encontrar trigger \"%1$s\" utilizado no mapa \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:730
+#: include/classes/import/CConfigurationImport.php:732
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr "Não foi possível localizar o mapeamento de valores \"%1$s\" utilizado para o item \"%2$s\" em \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1116
+#: include/classes/import/CConfigurationImport.php:1122
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Não foi possível localizar o mapeamento de valores \"%1$s\" utilizado para o protótipo de item \"%2$s\" da autodescoberta \"%3$s\" em \"%4$s\"."
@@ -3111,11 +3122,11 @@ msgstr ""
 msgid "Catalan (ca_ES)"
 msgstr "Catalão (ca_ES)"
 
-#: include/classes/items/CHelpItems.php:1131
+#: include/classes/items/CHelpItems.php:1139
 msgid "Catches all SNMP traps that match regex. If regexp is unspecified, catches any trap."
 msgstr "Captura todas as traps SNMP que combinem com a expressão regular. Se a expressão não for definida irá capturar todas as traps."
 
-#: include/classes/items/CHelpItems.php:1127
+#: include/classes/items/CHelpItems.php:1135
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr "Captura todas as traps SNMP que não tiverem sido recebidas por nenhum item de snmptrap[]."
 
@@ -3203,8 +3214,8 @@ msgstr ""
 msgid "Chassis"
 msgstr "Chassis"
 
-#: include/classes/items/CHelpItems.php:225
-#: include/classes/items/CHelpItems.php:579
+#: include/classes/items/CHelpItems.php:229
+#: include/classes/items/CHelpItems.php:587
 msgid "Chassis information. Returns string"
 msgstr "Informação do chassis. Retorna um texto"
 
@@ -3253,56 +3264,56 @@ msgstr "Tipo de verificação"
 msgid "Checks"
 msgstr "Verificações"
 
-#: include/classes/items/CHelpItems.php:89
-#: include/classes/items/CHelpItems.php:443
+#: include/classes/items/CHelpItems.php:93
+#: include/classes/items/CHelpItems.php:451
 msgid "Checks if DNS service is up. Returns 0 - DNS is down (server did not respond or DNS resolution failed); 1 - DNS is up"
 msgstr "Verifica se o serviço do DNS está em execução. Retorna 0 - DNS fora (servidor não respondeu ou a resolução de nome falhou); 1 - DNS em execução"
 
-#: include/classes/items/CHelpItems.php:317
-#: include/classes/items/CHelpItems.php:671
+#: include/classes/items/CHelpItems.php:321
+#: include/classes/items/CHelpItems.php:679
 msgid "Checks if file exists. Returns 0 - not found; 1 - file of the specified type exists"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:745
+#: include/classes/items/CHelpItems.php:753
 msgid "Checks if host is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:125
-#: include/classes/items/CHelpItems.php:479
+#: include/classes/items/CHelpItems.php:129
+#: include/classes/items/CHelpItems.php:487
 msgid "Checks if it is possible to make TCP connection to specified port. Returns 0 - cannot connect; 1 - can connect"
 msgstr "Verifica se é possível estabelecer uma ligação TCP com a porta especificada. Retorna 0 - não foi possível ligar; 1 - Foi possível a ligação"
 
-#: include/classes/items/CHelpItems.php:129
-#: include/classes/items/CHelpItems.php:483
-#: include/classes/items/CHelpItems.php:757
+#: include/classes/items/CHelpItems.php:133
+#: include/classes/items/CHelpItems.php:491
+#: include/classes/items/CHelpItems.php:765
 msgid "Checks if service is running and accepting TCP connections. Returns 0 - service is down; 1 - service is running"
 msgstr "Verifica se o serviço está em execução e aceita ligações TCP. Retorna: 0 - serviço não está em execução; 1 - serviço em execução"
 
-#: include/classes/items/CHelpItems.php:141
-#: include/classes/items/CHelpItems.php:495
-#: include/classes/items/CHelpItems.php:765
+#: include/classes/items/CHelpItems.php:145
+#: include/classes/items/CHelpItems.php:503
+#: include/classes/items/CHelpItems.php:773
 msgid "Checks if service is running and responding to UDP requests. Returns 0 - service is down; 1 - service is running"
 msgstr "Verifica se o serviço está em execução e a responder a requisições UDP. Retorna: 0 - serviço não está em execução; 1 - serviço em execução"
 
-#: include/classes/items/CHelpItems.php:121
-#: include/classes/items/CHelpItems.php:475
+#: include/classes/items/CHelpItems.php:125
+#: include/classes/items/CHelpItems.php:483
 msgid "Checks if this TCP port is in LISTEN state. Returns 0 - it is not in LISTEN state; 1 - it is in LISTEN state"
 msgstr "Verifica se determinada porta TCP está em modo de ESCUTA. Retorna: 0 - não está em modo de escuta; 1 - está em modo de escuta"
 
-#: include/classes/items/CHelpItems.php:137
-#: include/classes/items/CHelpItems.php:491
+#: include/classes/items/CHelpItems.php:141
+#: include/classes/items/CHelpItems.php:499
 msgid "Checks if this UDP port is in LISTEN state. Returns 0 - it is not in LISTEN state; 1 - it is in LISTEN state"
 msgstr "Verifica se determinada porta UDP está em modo de ESCUTA. Retorna: 0 - não está em modo de escuta; 1 - está em modo de escuta"
 
-#: include/classes/items/CHelpItems.php:133
-#: include/classes/items/CHelpItems.php:487
-#: include/classes/items/CHelpItems.php:761
+#: include/classes/items/CHelpItems.php:137
+#: include/classes/items/CHelpItems.php:495
+#: include/classes/items/CHelpItems.php:769
 msgid "Checks performance of TCP service. Returns 0 - service is down; seconds - the number of seconds spent while connecting to the service"
 msgstr "Verifica a performance de um serviço TCP. Retornos possíveis: 0 - serviço indisponível; segundos - tempo utilizado, em segundos, para se ligar ao serviço"
 
-#: include/classes/items/CHelpItems.php:145
-#: include/classes/items/CHelpItems.php:499
-#: include/classes/items/CHelpItems.php:769
+#: include/classes/items/CHelpItems.php:149
+#: include/classes/items/CHelpItems.php:507
+#: include/classes/items/CHelpItems.php:777
 msgid "Checks performance of UDP service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service"
 msgstr "Verifica a performance de um serviço UDP. Retornos possíveis: 0 - serviço indisponível; segundos - tempo utilizado, em segundos, para se conectar ao serviço"
 
@@ -3352,7 +3363,7 @@ msgstr "Limpar ao desvincular"
 msgid "Click and drag to desired size."
 msgstr ""
 
-#: jsLoader.php:289
+#: jsLoader.php:290
 msgid "Click to view or edit"
 msgstr ""
 
@@ -3382,7 +3393,7 @@ msgstr "Relógio"
 #: include/views/configuration.template.edit.php:237
 #: include/views/configuration.trigger.prototype.edit.php:654
 #: include/views/configuration.triggers.edit.php:647
-#: include/views/monitoring.sysmap.edit.php:421 jsLoader.php:313
+#: include/views/monitoring.sysmap.edit.php:421 jsLoader.php:314
 msgid "Clone"
 msgstr "Clonar"
 
@@ -3394,7 +3405,7 @@ msgstr "Clonar"
 #: include/views/js/monitoring.sysmaps.js.php:611
 #: include/views/js/monitoring.sysmaps.js.php:716
 #: include/views/js/monitoring.sysmaps.js.php:819 jsLoader.php:189
-#: jsLoader.php:268 jsLoader.php:285 jsLoader.php:356
+#: jsLoader.php:268 jsLoader.php:285 jsLoader.php:357
 msgid "Close"
 msgstr "Fechar"
 
@@ -3569,15 +3580,15 @@ msgstr "Condições duplicadas para o correlacionamento \"%1$s\"."
 #: app/views/search.php:37 app/views/search.php:195 app/views/search.php:275
 #: include/classes/helpers/CMenuHelper.php:219
 #: include/classes/helpers/CRoleHelper.php:355
-#: include/views/inventory.host.view.php:222 jsLoader.php:312
+#: include/views/inventory.host.view.php:222 jsLoader.php:313
 msgid "Configuration"
 msgstr "Configuração"
 
-#: include/classes/items/CHelpItems.php:1221
+#: include/classes/items/CHelpItems.php:1229
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "Configuração de estatísticas de cache. Cache - buffer (modes: pfree, total, used, free)."
 
-#: include/classes/setup/CSetupWizard.php:700
+#: include/classes/setup/CSetupWizard.php:723
 #, c-format
 msgid "Configuration file \"%1$s\" created."
 msgstr "O arquivo de configuração \"%1$s\" foi criado."
@@ -3738,7 +3749,7 @@ msgstr "Configura a ligação com o DB"
 msgid "Confirmation text"
 msgstr "Texto de confirmação"
 
-#: include/classes/setup/CSetupWizard.php:698
+#: include/classes/setup/CSetupWizard.php:721
 msgid "Congratulations! You have successfully installed Zabbix frontend."
 msgstr "Parabéns! Instalou com sucesso a interface web do Zabbix."
 
@@ -3956,11 +3967,10 @@ msgid "Correlation added"
 msgstr "Correlacionamento adicionado"
 
 #: app/controllers/CControllerCorrelationDelete.php:65
-#, fuzzy
 msgid "Correlation deleted"
 msgid_plural "Correlations deleted"
 msgstr[0] "Correlacionamento eliminado"
-msgstr[1] "Correlacionamento eliminado"
+msgstr[1] "Correlacionamentos eliminados"
 
 #: app/controllers/CControllerCorrelationDisable.php:72
 msgid "Correlation disabled"
@@ -4003,29 +4013,29 @@ msgstr "Não foi possível guardar a imagem!"
 msgid "Count"
 msgstr "Contador"
 
-#: include/classes/items/CHelpItems.php:213
-#: include/classes/items/CHelpItems.php:567
+#: include/classes/items/CHelpItems.php:217
+#: include/classes/items/CHelpItems.php:575
 msgid "Count of context switches. Returns integer"
 msgstr "Número de trocas de contexto. Retorna: número inteiro"
 
-#: include/classes/items/CHelpItems.php:301
-#: include/classes/items/CHelpItems.php:655
+#: include/classes/items/CHelpItems.php:305
+#: include/classes/items/CHelpItems.php:663
 msgid "Count of directory entries, recursively. Returns integer"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:431
+#: include/classes/items/CHelpItems.php:439
 msgid "Count of matched lines in log file monitoring with log rotation support. Returns integer"
 msgstr "Quantidade de linhas compatíveis no arquivo de log monitorado com suporte a rotação. Retorna Inteiro"
 
-#: include/classes/items/CHelpItems.php:423
+#: include/classes/items/CHelpItems.php:431
 msgid "Count of matched lines in log file monitoring. Returns integer"
 msgstr "Quantidade de linhas compatíveis no arquivo de log monitorado. Retorna inteiro"
 
-#: include/classes/items/CHelpItems.php:1197
+#: include/classes/items/CHelpItems.php:1205
 msgid "Count of values enqueued in the low-level discovery processing queue."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1201
+#: include/classes/items/CHelpItems.php:1209
 msgid "Count of values enqueued in the preprocessing queue."
 msgstr ""
 
@@ -4063,11 +4073,11 @@ msgstr "Criar correlacionamento"
 msgid "Create dashboard"
 msgstr "Criar dashboard"
 
-#: jsLoader.php:317
+#: jsLoader.php:318
 msgid "Create dependent discovery rule"
 msgstr ""
 
-#: jsLoader.php:316
+#: jsLoader.php:317
 msgid "Create dependent item"
 msgstr "Criar item dependente"
 
@@ -4184,7 +4194,7 @@ msgstr "Criar mapa"
 msgid "Create media type"
 msgstr "Criar tipo de média"
 
-#: app/views/popup.import.php:130 jsLoader.php:314
+#: app/views/popup.import.php:130 jsLoader.php:315
 msgid "Create new"
 msgstr "Criar novo"
 
@@ -4204,7 +4214,7 @@ msgstr "Criar script"
 msgid "Create template"
 msgstr "Criar template"
 
-#: include/views/configuration.triggers.list.php:148 jsLoader.php:315
+#: include/views/configuration.triggers.list.php:148 jsLoader.php:316
 msgid "Create trigger"
 msgstr "Criar trigger"
 
@@ -4454,7 +4464,7 @@ msgstr ""
 #: include/html.inc.php:371 include/views/configuration.template.list.php:121
 #: include/views/configuration.template.list.php:233
 #: include/views/inventory.host.view.php:168
-#: include/views/inventory.host.view.php:172 jsLoader.php:318
+#: include/views/inventory.host.view.php:172 jsLoader.php:319
 msgid "Dashboards"
 msgstr "Dashboards"
 
@@ -4496,14 +4506,14 @@ msgstr "Périodo de armazenamento de dados"
 
 #: include/classes/setup/CSetupWizard.php:388
 #: include/classes/setup/CSetupWizard.php:534
-#: include/classes/setup/CSetupWizard.php:740
+#: include/classes/setup/CSetupWizard.php:762
 msgid "Database TLS CA file"
 msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:668
 #: include/classes/setup/CSetupWizard.php:400
 #: include/classes/setup/CSetupWizard.php:540
-#: include/classes/setup/CSetupWizard.php:748
+#: include/classes/setup/CSetupWizard.php:770
 msgid "Database TLS certificate file"
 msgstr ""
 
@@ -4523,7 +4533,7 @@ msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:394
 #: include/classes/setup/CSetupWizard.php:537
-#: include/classes/setup/CSetupWizard.php:744
+#: include/classes/setup/CSetupWizard.php:766
 msgid "Database TLS key file"
 msgstr ""
 
@@ -4624,7 +4634,7 @@ msgstr "Dia da semana"
 msgid "Days"
 msgstr "Dias"
 
-#: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:347
+#: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:348
 msgid "Debug"
 msgstr "Debug"
 
@@ -4769,7 +4779,7 @@ msgstr "Atrasado em"
 #: include/views/configuration.trigger.prototype.list.php:207
 #: include/views/configuration.triggers.list.php:349
 #: include/views/monitoring.sysmap.list.php:109 jsLoader.php:131
-#: jsLoader.php:157 jsLoader.php:319
+#: jsLoader.php:157 jsLoader.php:320
 msgid "Delete"
 msgstr "Eliminar"
 
@@ -4798,7 +4808,7 @@ msgstr "Eliminar acção actual?"
 msgid "Delete current correlation?"
 msgstr "Eliminar o correlacionamento atual?"
 
-#: jsLoader.php:320
+#: jsLoader.php:321
 msgid "Delete dashboard?"
 msgstr "Eliminar o dashboard?"
 
@@ -5050,7 +5060,7 @@ msgstr "Eliminar cenário web?"
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Eliminado: Host \"%1$s\"."
 
-#: include/classes/api/services/CHostPrototype.php:1179
+#: include/classes/api/services/CHostPrototype.php:1181
 #, c-format
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Eliminado: Protótipo de host \"%1$s\" em \"%2$s\"."
@@ -5156,8 +5166,8 @@ msgstr "Detalhes do cenário web"
 msgid "Device"
 msgstr "Dispositivo"
 
-#: include/classes/items/CHelpItems.php:201
-#: include/classes/items/CHelpItems.php:555
+#: include/classes/items/CHelpItems.php:205
+#: include/classes/items/CHelpItems.php:563
 msgid "Device interrupts. Returns integer"
 msgstr "Interrupções do dispositivo. Retorna: número inteiro"
 
@@ -5173,8 +5183,8 @@ msgstr ""
 msgid "Directory"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:305
-#: include/classes/items/CHelpItems.php:659
+#: include/classes/items/CHelpItems.php:309
+#: include/classes/items/CHelpItems.php:667
 msgid "Directory size (in bytes). Returns integer"
 msgstr "Tamanho do diretório (em bytes). Retorna inteiro"
 
@@ -5406,31 +5416,31 @@ msgstr "Lista de descobertas"
 msgid "Discovery object"
 msgstr "Objecto de descoberta"
 
-#: include/classes/items/CHelpItems.php:773
+#: include/classes/items/CHelpItems.php:781
 msgid "Discovery of VMware clusters, <url> - VMware service URL. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:785
+#: include/classes/items/CHelpItems.php:793
 msgid "Discovery of VMware datastores, <url> - VMware service URL. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:837
+#: include/classes/items/CHelpItems.php:845
 msgid "Discovery of VMware hypervisor datastores, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:861
+#: include/classes/items/CHelpItems.php:869
 msgid "Discovery of VMware hypervisors, <url> - VMware service URL. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1105
+#: include/classes/items/CHelpItems.php:1113
 msgid "Discovery of VMware virtual machine disk devices, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1117
+#: include/classes/items/CHelpItems.php:1125
 msgid "Discovery of VMware virtual machine file systems, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:993
+#: include/classes/items/CHelpItems.php:1001
 msgid "Discovery of VMware virtual machines, <url> - VMware service URL. Returns JSON"
 msgstr ""
 
@@ -5476,11 +5486,10 @@ msgid "Discovery rule created"
 msgstr "Regra de descoberta criada"
 
 #: app/controllers/CControllerDiscoveryDelete.php:66 host_discovery.php:412
-#, fuzzy
 msgid "Discovery rule deleted"
 msgid_plural "Discovery rules deleted"
 msgstr[0] "Regra de descoberta eliminada"
-msgstr[1] "Regra de descoberta eliminada"
+msgstr[1] "Regras de descoberta eliminadas"
 
 #: app/controllers/CControllerDiscoveryDisable.php:71 host_discovery.php:747
 msgid "Discovery rule disabled"
@@ -5518,18 +5527,18 @@ msgstr "Regras de descoberta eliminadas"
 msgid "Discovery status"
 msgstr "Estado da descoberta"
 
-#: include/classes/items/CHelpItems.php:293
-#: include/classes/items/CHelpItems.php:647
+#: include/classes/items/CHelpItems.php:297
+#: include/classes/items/CHelpItems.php:655
 msgid "Disk read statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps"
 msgstr "Estatísticas de leitura de disco. Retorna: inteiro - se o tipo for setores, operações ou bytes; ponto flutuante - se o tipo for sps, ops, bps"
 
-#: include/classes/items/CHelpItems.php:353
-#: include/classes/items/CHelpItems.php:707
+#: include/classes/items/CHelpItems.php:357
+#: include/classes/items/CHelpItems.php:715
 msgid "Disk space in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Espaço em disco em bytes ou em percentagem do total. Retorna: inteiro para bytes; ponto flutuante para percentagem"
 
-#: include/classes/items/CHelpItems.php:297
-#: include/classes/items/CHelpItems.php:651
+#: include/classes/items/CHelpItems.php:301
+#: include/classes/items/CHelpItems.php:659
 msgid "Disk write statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps"
 msgstr "Estatísticas de gravação de disco. Retorna: inteiro - se o tipo for setores, operações ou bytes; ponto flutuante - se o tipo for sps, ops, bps"
 
@@ -5553,7 +5562,7 @@ msgstr "Mostrar gráfico empilhado"
 #: app/views/administration.queue.details.php:85 app/views/search.php:184
 #: app/views/search.php:268 app/views/search.php:367
 #: include/actions.inc.php:1669 include/actions.inc.php:1741
-#: include/classes/helpers/CPagerHelper.php:147 jsLoader.php:359
+#: include/classes/helpers/CPagerHelper.php:147 jsLoader.php:360
 #, c-format
 msgid "Displaying %1$s of %2$s found"
 msgstr "A mostrar %1$s de %2$s encontrados"
@@ -5589,7 +5598,7 @@ msgstr ""
 msgid "Do not keep trends"
 msgstr ""
 
-#: jsLoader.php:197 jsLoader.php:321
+#: jsLoader.php:197 jsLoader.php:322
 msgid "Do you wish to replace the conditional expression?"
 msgstr "Deseja substituir a expressão condicional?"
 
@@ -5649,7 +5658,7 @@ msgstr "Descer"
 msgid "Download image"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:684
+#: include/classes/setup/CSetupWizard.php:698
 msgid "Download the configuration file"
 msgstr "Transferir a configuração"
 
@@ -5697,7 +5706,7 @@ msgstr "O valor fornecido para o \"nome\" do mapa \"%1$s\" está duplicado."
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "Dependências duplicadas no trigger \"%1$s\"."
 
-#: include/classes/api/services/CTriggerPrototype.php:974
+#: include/classes/api/services/CTriggerPrototype.php:989
 #, c-format
 msgid "Duplicate dependencies in trigger prototype \"%1$s\"."
 msgstr "Dependência duplicada no protótipo de trigger \"%1$s\"."
@@ -5792,7 +5801,7 @@ msgstr ""
 msgid "Edit tree element"
 msgstr "Editar árvore de elementos"
 
-#: jsLoader.php:322
+#: jsLoader.php:323
 msgid "Edit trigger"
 msgstr "Editar trigger"
 
@@ -5892,7 +5901,7 @@ msgstr ""
 #: include/classes/api/services/CHost.php:1319
 #: include/classes/api/services/CHost.php:1850
 #: include/classes/api/services/CHost.php:2075
-#: include/classes/api/services/CHostPrototype.php:1107
+#: include/classes/api/services/CHostPrototype.php:1109
 #: include/classes/api/services/CImage.php:430
 #: include/classes/api/services/CImage.php:482
 #: include/classes/api/services/CMaintenance.php:542
@@ -6204,7 +6213,6 @@ msgid "Event ID"
 msgstr "ID do evento"
 
 #: include/actions.inc.php:61
-#, fuzzy
 msgid "Event acknowledged"
 msgstr "Evento reconhecido"
 
@@ -6241,7 +6249,7 @@ msgstr ""
 msgid "Event list [previous 20]"
 msgstr "Lista de eventos [20 anteriores]"
 
-#: include/classes/items/CHelpItems.php:407
+#: include/classes/items/CHelpItems.php:415
 msgid "Event log monitoring. Returns log"
 msgstr "Monitoração do log de eventos. Retorna: log"
 
@@ -6309,12 +6317,12 @@ msgstr "Executar"
 msgid "Execute SQL error [%1$s] in [%2$s]."
 msgstr "Erro de execução SQL [%1$s] em [%2$s]."
 
-#: include/classes/items/CHelpItems.php:381
+#: include/classes/items/CHelpItems.php:385
 msgid "Execute WMI query and return the JSON document with all selected objects"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:377
-#: include/classes/items/CHelpItems.php:731
+#: include/classes/items/CHelpItems.php:381
+#: include/classes/items/CHelpItems.php:739
 msgid "Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)"
 msgstr "Executa requisição WMI retornando o primeiro objeto seleccionado. Retorna: inteiro, ponto flutuante, caracter ou texto (dependendo da requisição)"
 
@@ -6649,8 +6657,8 @@ msgstr "O campo \"%1$s\" não é deve estar faltando."
 msgid "Field \"host\" is mandatory."
 msgstr "O campo \"host\" é obrigatório."
 
-#: include/classes/items/CHelpItems.php:309
-#: include/classes/items/CHelpItems.php:663
+#: include/classes/items/CHelpItems.php:313
+#: include/classes/items/CHelpItems.php:671
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer"
 msgstr "Verificação \"checksum\", calculada pelo algoritmo UNIX cksum. Retorna: número inteiro"
 
@@ -6667,13 +6675,13 @@ msgstr ""
 msgid "File is too big, max upload size is %1$s bytes."
 msgstr "O ficheiro é demasiado grande, o tamanho máximo para upload é de %1$s bytes."
 
-#: include/classes/items/CHelpItems.php:333
-#: include/classes/items/CHelpItems.php:687
+#: include/classes/items/CHelpItems.php:337
+#: include/classes/items/CHelpItems.php:695
 msgid "File size (in bytes). Returns integer"
 msgstr "Tamanho do arquivo (em bytes). Retorna: número inteiro"
 
-#: include/classes/items/CHelpItems.php:337
-#: include/classes/items/CHelpItems.php:691
+#: include/classes/items/CHelpItems.php:341
+#: include/classes/items/CHelpItems.php:699
 msgid "File time information. Returns integer (Unix timestamp)"
 msgstr "Horário do arquivo. Retorna: timestamp UNIX (número inteiro)"
 
@@ -6746,18 +6754,18 @@ msgstr ""
 msgid "Filters"
 msgstr "Filtros"
 
-#: include/classes/items/CHelpItems.php:329
-#: include/classes/items/CHelpItems.php:683
+#: include/classes/items/CHelpItems.php:333
+#: include/classes/items/CHelpItems.php:691
 msgid "Find string in a file. Returns 0 - match not found; 1 - found"
 msgstr "Busca um texto em um arquivo. Retorna: 0 - não localizou; 1 - Localizou"
 
-#: include/classes/items/CHelpItems.php:325
-#: include/classes/items/CHelpItems.php:679
+#: include/classes/items/CHelpItems.php:329
+#: include/classes/items/CHelpItems.php:687
 msgid "Find string in a file. Returns the line containing the matched string, or as specified by the optional output parameter"
 msgstr "Pesquisar texto num arquivo. Retorna a linha que contêm o texto pesquisado, ou como for especificado no parâmetro opcional"
 
-#: include/classes/items/CHelpItems.php:373
-#: include/classes/items/CHelpItems.php:727
+#: include/classes/items/CHelpItems.php:377
+#: include/classes/items/CHelpItems.php:735
 msgid "Find string on a web page. Returns the matched string, or as specified by the optional output parameter"
 msgstr "Pesquisar texto numa página web. Retorna a linha que contêm o texto pesquisado, ou como for especificado no parâmetro opcional de saída"
 
@@ -6911,7 +6919,7 @@ msgstr "Modem GSM"
 msgid "GUI"
 msgstr "GUI"
 
-#: include/classes/user/CWebUser.php:63 index_sso.php:245
+#: include/classes/user/CWebUser.php:63 index_sso.php:260
 msgid "GUI access disabled."
 msgstr "Acesso ao GUI desactivado."
 
@@ -6943,8 +6951,8 @@ msgstr "Gregoriano (ka_GE)"
 msgid "German (de_DE)"
 msgstr "Alemão (de_DE)"
 
-#: include/classes/items/CHelpItems.php:365
-#: include/classes/items/CHelpItems.php:719
+#: include/classes/items/CHelpItems.php:369
+#: include/classes/items/CHelpItems.php:727
 msgid "Get content of web page. Returns web page source as text"
 msgstr "Recupera o conteúdo de uma página web. Retorna: o texto com código fonte da página"
 
@@ -6952,7 +6960,7 @@ msgstr "Recupera o conteúdo de uma página web. Retorna: o texto com código fo
 msgid "Get value"
 msgstr ""
 
-#: app/views/js/popup.itemtestedit.view.js.php:505
+#: app/views/js/popup.itemtestedit.view.js.php:503
 #: app/views/popup.itemtestedit.view.php:431
 msgid "Get value and test"
 msgstr ""
@@ -6980,7 +6988,7 @@ msgstr "Valor global"
 msgid "Go back to %1$s"
 msgstr "Voltar para %1$s"
 
-#: jsLoader.php:327
+#: jsLoader.php:328
 msgid "Go to"
 msgstr "Ir para"
 
@@ -7194,7 +7202,7 @@ msgstr "Já existe um gráfico com o nome \"%1$s\" em gráficos ou protótipos d
 #: include/views/inventory.host.view.php:158
 #: include/views/inventory.host.view.php:166
 #: include/views/inventory.host.view.php:194
-#: include/views/inventory.host.view.php:217 jsLoader.php:328
+#: include/views/inventory.host.view.php:217 jsLoader.php:329
 msgid "Graphs"
 msgstr "Gráficos"
 
@@ -7254,7 +7262,7 @@ msgstr "Grupo para hosts descobertos"
 msgid "Group name"
 msgstr "Nome do grupo"
 
-#: include/classes/api/services/CHostPrototype.php:1269
+#: include/classes/api/services/CHostPrototype.php:1271
 #, c-format
 msgid "Group prototype cannot be based on a discovered host group \"%1$s\"."
 msgstr "O protótipo de grupo não pode ser baseado em regra de autodescoberta no host \"%1$s\"."
@@ -7345,8 +7353,8 @@ msgstr "Hardware"
 msgid "Hardware (Full details)"
 msgstr "Hardware (Mais detalhes)"
 
-#: include/classes/items/CHelpItems.php:181
-#: include/classes/items/CHelpItems.php:535
+#: include/classes/items/CHelpItems.php:185
+#: include/classes/items/CHelpItems.php:543
 msgid "Hardware sensor reading. Returns float"
 msgstr "Sensor de leitura de hardware. Retorna: número em ponto flutuante"
 
@@ -7398,7 +7406,7 @@ msgstr "Hexadecimal para decimal"
 msgid "Hidden"
 msgstr "Oculto"
 
-#: jsLoader.php:348
+#: jsLoader.php:349
 msgid "Hide debug"
 msgstr "Ocultar depuração"
 
@@ -7450,7 +7458,7 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:49
 #: include/forms.inc.php:550 include/views/configuration.item.list.php:89
 #: include/views/configuration.item.prototype.list.php:62 items.php:261
-#: jsLoader.php:329
+#: jsLoader.php:330
 msgid "History"
 msgstr "Histórico"
 
@@ -7538,7 +7546,7 @@ msgstr "Alinhamento horizontal"
 #: include/views/js/monitoring.sysmaps.js.php:92
 #: include/views/js/monitoring.sysmaps.js.php:161
 #: include/views/reports.toptriggers.php:83 items.php:982 items.php:1101
-#: jsLoader.php:236 jsLoader.php:330 report2.php:506
+#: jsLoader.php:236 jsLoader.php:331 report2.php:506
 msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "Host"
@@ -7753,12 +7761,12 @@ msgstr "Redes do host"
 msgid "Host prototype"
 msgstr ""
 
-#: include/classes/api/services/CHostPrototype.php:976
+#: include/classes/api/services/CHostPrototype.php:978
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "O protótipo de host \"%1$s\" já existe em \"%2$s\", herdado de outro template."
 
-#: include/classes/api/services/CHostPrototype.php:964
+#: include/classes/api/services/CHostPrototype.php:966
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "O protótipo de host \"%1$s\" já existe em \"%2$s\"."
@@ -7767,7 +7775,7 @@ msgstr "O protótipo de host \"%1$s\" já existe em \"%2$s\"."
 msgid "Host prototype added"
 msgstr "Protótipo de host adicionado"
 
-#: include/classes/api/services/CHostPrototype.php:1757
+#: include/classes/api/services/CHostPrototype.php:1759
 msgid "Host prototype cannot have more than one default interface of the same type."
 msgstr ""
 
@@ -7995,7 +8003,7 @@ msgstr "Interfaces IPMI"
 msgid "IPMI sensor"
 msgstr "Sensor IPMI"
 
-#: include/classes/items/CHelpItems.php:1307
+#: include/classes/items/CHelpItems.php:1315
 msgid "IPMI sensor IDs and other sensor-related parameters. Returns JSON."
 msgstr ""
 
@@ -8087,8 +8095,8 @@ msgstr ""
 msgid "Identical namespace (%1$s) is used by modules located at %2$s."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:277
-#: include/classes/items/CHelpItems.php:631
+#: include/classes/items/CHelpItems.php:281
+#: include/classes/items/CHelpItems.php:639
 msgid "Identification of the system. Returns string"
 msgstr "Identificação do sistema. Retorna texto"
 
@@ -8299,8 +8307,8 @@ msgstr ""
 msgid "Include subgroups"
 msgstr "Incluir subgrupos"
 
-#: include/classes/items/CHelpItems.php:105
-#: include/classes/items/CHelpItems.php:459
+#: include/classes/items/CHelpItems.php:109
+#: include/classes/items/CHelpItems.php:467
 msgid "Incoming traffic statistics on network interface. Returns integer"
 msgstr "Retorna estatísticas de tráfego de uma interface. Retorna: número inteiro"
 
@@ -8663,9 +8671,9 @@ msgstr "O nome para o campo \"%1$s\" é inválido ou o valor é incorrecto para 
 msgid "Incorrect fields for sysmap."
 msgstr "Campos inválidos para o mapa do sistema."
 
-#: include/classes/setup/CSetupWizard.php:740
-#: include/classes/setup/CSetupWizard.php:744
-#: include/classes/setup/CSetupWizard.php:748
+#: include/classes/setup/CSetupWizard.php:762
+#: include/classes/setup/CSetupWizard.php:766
+#: include/classes/setup/CSetupWizard.php:770
 #, c-format
 msgid "Incorrect file path for \"%1$s\": %2$s."
 msgstr ""
@@ -8790,7 +8798,7 @@ msgstr "Lista de itens incorrecta."
 
 #: app/controllers/CControllerPopupMaintenancePeriod.php:89
 msgid "Incorrect maintenance - date must be between 1970.01.01 and 2038.01.18"
-msgstr "Período de manutenção inválido - a data deve estar entre 01/01/1970 e 18/01/2038"
+msgstr "Período de manutenção inválido - a data deve estar entre 1970.01.01 e 2038.01.18"
 
 #: app/controllers/CControllerPopupMaintenancePeriod.php:125
 msgid "Incorrect maintenance period (minimum 5 minutes)"
@@ -9287,18 +9295,18 @@ msgstr ""
 #: include/classes/graphdraw/CPieGraphDraw.php:177
 #: include/classes/helpers/CSvgGraphHelper.php:372
 #: include/classes/helpers/CSvgGraphHelper.php:384
-#: include/classes/import/CConfigurationImport.php:743
-#: include/classes/import/CConfigurationImport.php:838
-#: include/classes/import/CConfigurationImport.php:875
-#: include/classes/import/CConfigurationImport.php:976
-#: include/classes/import/CConfigurationImport.php:1130
-#: include/classes/import/CConfigurationImport.php:2686
-#: include/classes/import/CConfigurationImport.php:2790
+#: include/classes/import/CConfigurationImport.php:745
+#: include/classes/import/CConfigurationImport.php:842
+#: include/classes/import/CConfigurationImport.php:879
+#: include/classes/import/CConfigurationImport.php:980
+#: include/classes/import/CConfigurationImport.php:1136
+#: include/classes/import/CConfigurationImport.php:2696
 #: include/classes/import/CConfigurationImport.php:2800
-#: include/classes/import/CConfigurationImport.php:2827
-#: include/classes/import/CConfigurationImport.php:2842
-#: include/classes/import/CConfigurationImport.php:2851
-#: include/classes/import/CConfigurationImport.php:2857
+#: include/classes/import/CConfigurationImport.php:2810
+#: include/classes/import/CConfigurationImport.php:2837
+#: include/classes/import/CConfigurationImport.php:2852
+#: include/classes/import/CConfigurationImport.php:2861
+#: include/classes/import/CConfigurationImport.php:2867
 #: include/classes/validators/CActionCondValidator.php:65
 #: include/classes/validators/CActionCondValidator.php:71
 #: include/classes/validators/CActionCondValidator.php:82
@@ -9385,8 +9393,8 @@ msgstr "Informação"
 msgid "Information"
 msgstr "Informação"
 
-#: include/classes/items/CHelpItems.php:185
-#: include/classes/items/CHelpItems.php:539
+#: include/classes/items/CHelpItems.php:189
+#: include/classes/items/CHelpItems.php:547
 msgid "Information about a service. Returns integer with param as state, startup; string - with param as displayname, path, user; text - with param as description; Specifically for state: 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service; Specifically for startup: 0 - automatic, 1 - automatic delayed, 2 - manual, 3 - disabled, 4 - unknown"
 msgstr "Informação sobre um serviço. Retorna inteiro - (state, startup); Caractere - (displayname, path, user); Texto - (description); Especificamente para estado: 0 - em execução, 1 - pausado, 2 - iniciação pendente, 3 - pausa pendente, 4 - retorno pendente, 5 - finalização pendente, 6 - finalizado, 7 - desconhecido, 255 - serviço desconhecido; Especificamente para inicialização: 0 - automático, 1 - Automático com atraso, 2 - Manual, 3 - Desabilitado, 4 - desconhecido"
 
@@ -9432,16 +9440,17 @@ msgid "Insert"
 msgstr "Inserir"
 
 #: include/views/configuration.trigger.prototype.edit.php:136
-#: include/views/configuration.triggers.edit.php:162 jsLoader.php:323
+#: include/views/configuration.triggers.edit.php:162 jsLoader.php:324
 msgid "Insert expression"
 msgstr "Insira a expressão"
 
 #: include/classes/setup/CSetupWizard.php:69
-#: include/classes/setup/CSetupWizard.php:705
+#: include/classes/setup/CSetupWizard.php:704
+#: include/classes/setup/CSetupWizard.php:727
 msgid "Install"
 msgstr "Instalação"
 
-#: setup.php:174
+#: setup.php:162
 msgid "Installation"
 msgstr "Instalação"
 
@@ -9666,15 +9675,15 @@ msgstr "Parâmetros inválidos para o método."
 #: include/classes/api/services/CGraphGeneral.php:743
 #: include/classes/api/services/CHostBase.php:522
 #: include/classes/api/services/CHostPrototype.php:325
-#: include/classes/api/services/CHostPrototype.php:1657
-#: include/classes/api/services/CHostPrototype.php:1662
-#: include/classes/api/services/CHostPrototype.php:1669
-#: include/classes/api/services/CHostPrototype.php:1674
-#: include/classes/api/services/CHostPrototype.php:1685
-#: include/classes/api/services/CHostPrototype.php:1690
-#: include/classes/api/services/CHostPrototype.php:1697
-#: include/classes/api/services/CHostPrototype.php:1703
-#: include/classes/api/services/CHostPrototype.php:1713
+#: include/classes/api/services/CHostPrototype.php:1659
+#: include/classes/api/services/CHostPrototype.php:1664
+#: include/classes/api/services/CHostPrototype.php:1671
+#: include/classes/api/services/CHostPrototype.php:1676
+#: include/classes/api/services/CHostPrototype.php:1687
+#: include/classes/api/services/CHostPrototype.php:1692
+#: include/classes/api/services/CHostPrototype.php:1699
+#: include/classes/api/services/CHostPrototype.php:1705
+#: include/classes/api/services/CHostPrototype.php:1715
 #: include/classes/api/services/CHttpTest.php:372
 #: include/classes/api/services/CItemGeneral.php:603
 #: include/classes/api/services/CItemGeneral.php:616
@@ -9886,7 +9895,7 @@ msgstr "Período de tempo inválido."
 #: include/classes/helpers/CMenuHelper.php:103
 #: include/classes/helpers/CRoleHelper.php:350
 #: include/views/configuration.host.edit.php:446
-#: include/views/configuration.host.prototype.edit.php:363 jsLoader.php:331
+#: include/views/configuration.host.prototype.edit.php:363 jsLoader.php:332
 msgid "Inventory"
 msgstr "Inventário"
 
@@ -9938,7 +9947,7 @@ msgstr "Italiano (it_IT)"
 msgid "Item"
 msgstr "Item"
 
-#: include/classes/api/services/CHostPrototype.php:1213
+#: include/classes/api/services/CHostPrototype.php:1215
 #: include/classes/api/services/CItem.php:61
 #, c-format
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
@@ -10076,7 +10085,7 @@ msgstr ""
 msgid "Item tags"
 msgstr ""
 
-#: jsLoader.php:353
+#: jsLoader.php:354
 msgid "Item type does not use interface"
 msgstr ""
 
@@ -10450,11 +10459,11 @@ msgstr ""
 msgid "Last check"
 msgstr "Última verificação"
 
-#: jsLoader.php:334
+#: jsLoader.php:335
 msgid "Last hour graph"
 msgstr "Gráfico da última hora"
 
-#: jsLoader.php:335
+#: jsLoader.php:336
 msgid "Last month graph"
 msgstr "Gráfico do último mês"
 
@@ -10484,7 +10493,7 @@ msgstr ""
 msgid "Last value"
 msgstr "Último valor"
 
-#: jsLoader.php:336
+#: jsLoader.php:337
 msgid "Last week graph"
 msgstr "Gráfico da última semana"
 
@@ -10497,11 +10506,11 @@ msgstr "Gráfico da última semana"
 #: include/classes/helpers/CMenuHelper.php:61
 #: include/classes/helpers/CRoleHelper.php:383
 #: include/views/inventory.host.view.php:143
-#: include/views/inventory.host.view.php:149 jsLoader.php:332
+#: include/views/inventory.host.view.php:149 jsLoader.php:333
 msgid "Latest data"
 msgstr "Dados recentes"
 
-#: jsLoader.php:333
+#: jsLoader.php:334
 msgid "Latest values"
 msgstr "Últimos valores"
 
@@ -10551,7 +10560,7 @@ msgstr ""
 msgid "Length"
 msgstr ""
 
-#: setup.php:197
+#: setup.php:185
 msgid "Licensed under"
 msgstr ""
 
@@ -10655,38 +10664,38 @@ msgstr "Links"
 msgid "List is empty"
 msgstr "A lista está vazia"
 
-#: include/classes/items/CHelpItems.php:289
-#: include/classes/items/CHelpItems.php:643
+#: include/classes/items/CHelpItems.php:293
+#: include/classes/items/CHelpItems.php:651
 msgid "List of block devices and their type. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:197
-#: include/classes/items/CHelpItems.php:551
+#: include/classes/items/CHelpItems.php:201
+#: include/classes/items/CHelpItems.php:559
 msgid "List of detected CPUs/CPU cores. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:341
-#: include/classes/items/CHelpItems.php:695
+#: include/classes/items/CHelpItems.php:345
+#: include/classes/items/CHelpItems.php:703
 msgid "List of mounted filesystems and their types. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:345
-#: include/classes/items/CHelpItems.php:699
+#: include/classes/items/CHelpItems.php:349
+#: include/classes/items/CHelpItems.php:707
 msgid "List of mounted filesystems, their types, disk space and inode statistics. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:101
-#: include/classes/items/CHelpItems.php:455
+#: include/classes/items/CHelpItems.php:105
+#: include/classes/items/CHelpItems.php:463
 msgid "List of network interfaces. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:153
-#: include/classes/items/CHelpItems.php:507
+#: include/classes/items/CHelpItems.php:157
+#: include/classes/items/CHelpItems.php:515
 msgid "List of object instances of Windows performance counters, discovered using object names in English. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:149
-#: include/classes/items/CHelpItems.php:503
+#: include/classes/items/CHelpItems.php:153
+#: include/classes/items/CHelpItems.php:511
 msgid "List of object instances of Windows performance counters. Returns JSON"
 msgstr ""
 
@@ -10700,23 +10709,23 @@ msgstr "Lista de partilha com grupos de utilizadores"
 msgid "List of user shares"
 msgstr "Lista de partilha com utilizadores"
 
-#: include/classes/items/CHelpItems.php:237
-#: include/classes/items/CHelpItems.php:591
+#: include/classes/items/CHelpItems.php:241
+#: include/classes/items/CHelpItems.php:599
 msgid "Listing of MAC addresses. Returns string"
 msgstr "Lista dos endereços MAC. Retorna: texto"
 
-#: include/classes/items/CHelpItems.php:233
-#: include/classes/items/CHelpItems.php:587
+#: include/classes/items/CHelpItems.php:237
+#: include/classes/items/CHelpItems.php:595
 msgid "Listing of PCI or USB devices. Returns text"
 msgstr "Lista de dispositivos USB ou PCI. Retorna: texto"
 
-#: include/classes/items/CHelpItems.php:261
-#: include/classes/items/CHelpItems.php:615
+#: include/classes/items/CHelpItems.php:265
+#: include/classes/items/CHelpItems.php:623
 msgid "Listing of installed packages. Returns text"
 msgstr "Lista de pacotes instalados. Retorna: texto"
 
-#: include/classes/items/CHelpItems.php:189
-#: include/classes/items/CHelpItems.php:543
+#: include/classes/items/CHelpItems.php:193
+#: include/classes/items/CHelpItems.php:551
 msgid "Listing of services. Returns 0 - if empty; text - list of services separated by a newline"
 msgstr "Lista de serviços. Retorna: 0 - se vazia; texto - lista de serviços separados por quebra de linha"
 
@@ -10724,8 +10733,8 @@ msgstr "Lista de serviços. Retorna: 0 - se vazia; texto - lista de serviços se
 msgid "Lithuanian (lt_LT)"
 msgstr "Lituano (lt_LT)"
 
-#: include/classes/items/CHelpItems.php:369
-#: include/classes/items/CHelpItems.php:723
+#: include/classes/items/CHelpItems.php:373
+#: include/classes/items/CHelpItems.php:731
 msgid "Loading time of full web page (in seconds). Returns float"
 msgstr "Tempo para carga completa de uma página web (em segundos). Retorna: ponto flutuante"
 
@@ -10762,11 +10771,11 @@ msgstr "Longitude da localização"
 msgid "Log"
 msgstr "Log"
 
-#: include/classes/items/CHelpItems.php:427
+#: include/classes/items/CHelpItems.php:435
 msgid "Log file monitoring with log rotation support. Returns log"
 msgstr "Monitoração de arquivo de log com suporte a rotação. Retorna: log"
 
-#: include/classes/items/CHelpItems.php:419
+#: include/classes/items/CHelpItems.php:427
 msgid "Log file monitoring. Returns log"
 msgstr "Monitoração de log. Retorna: log"
 
@@ -10783,7 +10792,7 @@ msgstr "Registar traps SNMP sem correspondência"
 #: app/controllers/CControllerAuditLogList.php:166
 #: app/views/administration.authentication.edit.php:132
 #: app/views/administration.user.list.php:112 include/func.inc.php:1523
-#: include/func.inc.php:1539 index_http.php:90 index_sso.php:265
+#: include/func.inc.php:1539 index_http.php:90 index_sso.php:280
 msgid "Login"
 msgstr "Iniciar sessão"
 
@@ -10844,8 +10853,8 @@ msgstr "Endereço MAC B"
 msgid "MD2"
 msgstr "MD2"
 
-#: include/classes/items/CHelpItems.php:321
-#: include/classes/items/CHelpItems.php:675
+#: include/classes/items/CHelpItems.php:325
+#: include/classes/items/CHelpItems.php:683
 msgid "MD5 checksum of file. Returns character string (MD5 hash of the file)"
 msgstr "Verificação checksum MD5. Retorna: texto (hash MD5 do arquivo)"
 
@@ -11199,13 +11208,13 @@ msgstr ""
 msgid "Max period for time selector"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:77
-#: include/classes/items/CHelpItems.php:411
+#: include/classes/items/CHelpItems.php:81
+#: include/classes/items/CHelpItems.php:419
 msgid "Maximum number of opened files supported by OS. Returns integer"
 msgstr "Número máximo de arquivos abertos suportado pelo S.O. Retorna: inteiro"
 
-#: include/classes/items/CHelpItems.php:81
-#: include/classes/items/CHelpItems.php:415
+#: include/classes/items/CHelpItems.php:85
+#: include/classes/items/CHelpItems.php:423
 msgid "Maximum number of processes supported by OS. Returns integer"
 msgstr "Quantidade máxima de processos suportada pelo S.O. Retorna: número inteiro"
 
@@ -11328,13 +11337,13 @@ msgstr "Membros"
 msgid "Memory limit: %1$s"
 msgstr "Limite de memória: %1$s"
 
-#: include/classes/items/CHelpItems.php:357
-#: include/classes/items/CHelpItems.php:711
+#: include/classes/items/CHelpItems.php:361
+#: include/classes/items/CHelpItems.php:719
 msgid "Memory size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Tamanho da memória em bytes ou em percentagem relativo ao total. Retorna: inteiro para bytes; número fracionário para percentagem"
 
-#: include/classes/items/CHelpItems.php:169
-#: include/classes/items/CHelpItems.php:523
+#: include/classes/items/CHelpItems.php:173
+#: include/classes/items/CHelpItems.php:531
 msgid "Memory used by process in bytes. Returns integer"
 msgstr "Memória utilizada pelo processo em bytes. Retorna: número inteiro"
 
@@ -11623,11 +11632,11 @@ msgstr "Mês"
 msgid "Monthly"
 msgstr "Mensal"
 
-#: include/classes/html/CMultiSelect.php:83 jsLoader.php:295
+#: include/classes/html/CMultiSelect.php:83 jsLoader.php:296
 msgid "More matches found..."
 msgstr "Mais correspondentes encontrados..."
 
-#: jsLoader.php:305
+#: jsLoader.php:306
 #, c-format
 msgctxt "screen reader"
 msgid "More than %1$d matches for %2$s found"
@@ -11864,8 +11873,8 @@ msgstr ""
 msgid "Network discovery data storage period"
 msgstr "Período inválido para armazenamento dos dados de descoberta de rede"
 
-#: include/classes/items/CHelpItems.php:109
-#: include/classes/items/CHelpItems.php:463
+#: include/classes/items/CHelpItems.php:113
+#: include/classes/items/CHelpItems.php:471
 msgid "Network interface list (includes interface type, status, IPv4 address, description). Returns text"
 msgstr "Lista das interfaces de rede (incluindo o tipo da interface, status, endereço IPv4 e descrição). Retorna: texto"
 
@@ -11907,7 +11916,7 @@ msgstr ""
 msgid "Network timeout for script execution"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1061
+#: include/classes/items/CHelpItems.php:1069
 msgid "Network utilization (combined transmit-rates and receive-rates) during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance"
 msgstr ""
 
@@ -12113,7 +12122,7 @@ msgid "No data."
 msgstr "Sem dados."
 
 #: include/classes/api/services/CHostInterface.php:1023
-#: include/classes/api/services/CHostPrototype.php:1750
+#: include/classes/api/services/CHostPrototype.php:1752
 #, c-format
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
 msgstr "Não existe interface padrão para o tipo \"%1$s\" em \"%2$s\"."
@@ -12189,7 +12198,7 @@ msgstr "Sem imagem"
 #: app/views/popup.massupdate.item.php:67
 #: include/views/configuration.host.discovery.edit.php:493
 #: include/views/configuration.item.edit.php:546
-#: include/views/configuration.item.prototype.edit.php:533 jsLoader.php:352
+#: include/views/configuration.item.prototype.edit.php:533 jsLoader.php:353
 msgid "No interface found"
 msgstr "Interface não encontrado"
 
@@ -12229,7 +12238,7 @@ msgstr "Nenhuma macro encontrada."
 msgid "No maps added."
 msgstr "Nenhum mapa adicionado."
 
-#: include/classes/html/CMultiSelect.php:82 jsLoader.php:294
+#: include/classes/html/CMultiSelect.php:82 jsLoader.php:295
 msgid "No matches found"
 msgstr "Nenhuma correspondência encontrada"
 
@@ -12334,9 +12343,9 @@ msgstr ""
 #: include/classes/api/services/CHostPrototype.php:543
 #: include/classes/api/services/CHostPrototype.php:602
 #: include/classes/api/services/CHostPrototype.php:623
-#: include/classes/api/services/CHostPrototype.php:1238
-#: include/classes/api/services/CHostPrototype.php:1260
-#: include/classes/api/services/CHostPrototype.php:1294
+#: include/classes/api/services/CHostPrototype.php:1240
+#: include/classes/api/services/CHostPrototype.php:1262
+#: include/classes/api/services/CHostPrototype.php:1296
 #: include/classes/api/services/CHousekeeping.php:169
 #: include/classes/api/services/CHttpTest.php:505
 #: include/classes/api/services/CHttpTest.php:602
@@ -12401,8 +12410,9 @@ msgstr ""
 #: include/classes/api/services/CTrigger.php:730
 #: include/classes/api/services/CTrigger.php:823
 #: include/classes/api/services/CTriggerPrototype.php:515
-#: include/classes/api/services/CTriggerPrototype.php:693
-#: include/classes/api/services/CTriggerPrototype.php:711
+#: include/classes/api/services/CTriggerPrototype.php:701
+#: include/classes/api/services/CTriggerPrototype.php:709
+#: include/classes/api/services/CTriggerPrototype.php:724
 #: include/classes/api/services/CUserGroup.php:329
 #: include/classes/api/services/CUserGroup.php:877
 #: include/classes/api/services/CUserMacro.php:353
@@ -12528,7 +12538,7 @@ msgid "Not all results are displayed. Please provide more specific search criter
 msgstr ""
 
 #: include/classes/api/services/CTrigger.php:1045
-#: include/classes/api/services/CTriggerPrototype.php:852
+#: include/classes/api/services/CTriggerPrototype.php:867
 #, c-format
 msgid "Not all templates are linked to \"%1$s\"."
 msgstr ""
@@ -12609,51 +12619,51 @@ msgstr "Nov"
 msgid "November"
 msgstr "Novembro"
 
-#: include/classes/items/CHelpItems.php:209
-#: include/classes/items/CHelpItems.php:563
+#: include/classes/items/CHelpItems.php:213
+#: include/classes/items/CHelpItems.php:571
 msgid "Number of CPUs. Returns integer"
 msgstr "Número de CPUs. Retorna: número inteiro"
 
-#: include/classes/items/CHelpItems.php:845
+#: include/classes/items/CHelpItems.php:853
 msgid "Number of available DS paths, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - Datastore name, <partitionid> - internal id of physical device from vmware.hv.datastore.discovery"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1161
+#: include/classes/items/CHelpItems.php:1169
 msgid "Number of enabled items on the host."
 msgstr "Número de itens activados no host."
 
 #: include/blocks.inc.php:536
 msgid "Number of hosts (enabled/disabled)"
-msgstr ""
+msgstr "Número de servidores (ativo/desativado) "
 
 #: include/blocks.inc.php:549
 msgid "Number of items (enabled/disabled/not supported)"
 msgstr "Quantidade de itens (activados/desabilitados/não suportados)"
 
-#: include/classes/items/CHelpItems.php:1185
+#: include/classes/items/CHelpItems.php:1193
 msgid "Number of items in Zabbix database."
 msgstr "Número de itens na base de dados do Zabbix."
 
-#: include/classes/items/CHelpItems.php:1213
+#: include/classes/items/CHelpItems.php:1221
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "Número de items no histórico do proxy que ainda não foram enviados para o servidor"
 
-#: include/classes/items/CHelpItems.php:1217
+#: include/classes/items/CHelpItems.php:1225
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr "Número de itens na fila que estão atrasados em segundos."
 
-#: include/classes/items/CHelpItems.php:389
-#: include/classes/items/CHelpItems.php:739
-#: include/classes/items/CHelpItems.php:1233
+#: include/classes/items/CHelpItems.php:393
+#: include/classes/items/CHelpItems.php:747
+#: include/classes/items/CHelpItems.php:1241
 msgid "Number of items in the queue which are delayed in Zabbix server or proxy by \"from\" till \"to\" seconds, inclusive."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1181
+#: include/classes/items/CHelpItems.php:1189
 msgid "Number of monitored hosts"
-msgstr "Quantidade de hosts monitorados"
+msgstr "Quantidade de servidores monitorizados"
 
-#: include/classes/items/CHelpItems.php:97
-#: include/classes/items/CHelpItems.php:451
+#: include/classes/items/CHelpItems.php:101
+#: include/classes/items/CHelpItems.php:459
 msgid "Number of out-of-window collisions. Returns integer"
 msgstr "Número de colisões fora da janela. Retorna: número inteiro"
 
@@ -12665,15 +12675,15 @@ msgstr "Quantidade de problemas"
 msgid "Number of problems and expand most critical one"
 msgstr "Quantidade de problemas e expansão do mais crítico"
 
-#: include/classes/items/CHelpItems.php:877
+#: include/classes/items/CHelpItems.php:885
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Número de cores de processamento em um hypervisor VMware, <url> - URL de serviço do VMware, <uuid> - Nome do host hypervisor do VMware"
 
-#: include/classes/items/CHelpItems.php:881
+#: include/classes/items/CHelpItems.php:889
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Número de threads do processador hypervisor VMware, <url> - URL de serviço VMware, <uuid> - nome do host hypervisor VMware"
 
-#: include/classes/items/CHelpItems.php:965
+#: include/classes/items/CHelpItems.php:973
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Número de processadores na máquina virtual VMware, <url> - URL de serviço VMware, <uuid> - nome do host virtual no VMware"
 
@@ -12698,15 +12708,15 @@ msgstr ""
 msgid "Number of triggers (enabled/disabled [problem/ok])"
 msgstr "Quantidade de triggers (activados/desactivados [incidente/ok])"
 
-#: include/classes/items/CHelpItems.php:1249
+#: include/classes/items/CHelpItems.php:1257
 msgid "Number of triggers in Zabbix database."
 msgstr "Número de triggers na base de dados Zabbix."
 
-#: include/classes/items/CHelpItems.php:1189
+#: include/classes/items/CHelpItems.php:1197
 msgid "Number of unsupported items in Zabbix database."
 msgstr "Número de itens não suportados na base de dados Zabbix."
 
-#: include/classes/items/CHelpItems.php:1165
+#: include/classes/items/CHelpItems.php:1173
 msgid "Number of unsupported items on the host."
 msgstr "Número de itens não suportados no host."
 
@@ -12714,45 +12724,45 @@ msgstr "Número de itens não suportados no host."
 msgid "Number of users (online)"
 msgstr "Número de utilizadores (online)"
 
-#: include/classes/items/CHelpItems.php:285
-#: include/classes/items/CHelpItems.php:639
+#: include/classes/items/CHelpItems.php:289
+#: include/classes/items/CHelpItems.php:647
 msgid "Number of users logged in. Returns integer"
 msgstr "Número de utilizadores conectados. Retorna: número inteiro"
 
-#: include/classes/items/CHelpItems.php:1141
+#: include/classes/items/CHelpItems.php:1149
 msgid "Number of values stored in table HISTORY."
 msgstr "Número de valores armazenados na tabela HISTORY."
 
-#: include/classes/items/CHelpItems.php:1145
+#: include/classes/items/CHelpItems.php:1153
 msgid "Number of values stored in table HISTORY_LOG."
 msgstr "Número de valores armazenados na tabela HISTORY_LOG."
 
-#: include/classes/items/CHelpItems.php:1149
+#: include/classes/items/CHelpItems.php:1157
 msgid "Number of values stored in table HISTORY_STR."
 msgstr "Número de valores armazenados na tabela HISTORY_STR."
 
-#: include/classes/items/CHelpItems.php:1153
+#: include/classes/items/CHelpItems.php:1161
 msgid "Number of values stored in table HISTORY_TEXT."
 msgstr "Número de valores armazenados na tabela HISTORY_TEXT."
 
-#: include/classes/items/CHelpItems.php:1157
+#: include/classes/items/CHelpItems.php:1165
 msgid "Number of values stored in table HISTORY_UINT."
 msgstr "Número de valores armazenados na tabela HISTORY_UINT."
 
-#: include/classes/items/CHelpItems.php:1241
+#: include/classes/items/CHelpItems.php:1249
 msgid "Number of values stored in table TRENDS."
 msgstr "Número de valores armazenados na tabela TRENDS."
 
-#: include/classes/items/CHelpItems.php:1245
+#: include/classes/items/CHelpItems.php:1253
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr "Número de valores armazenados na tabela TRENDS_UINT."
 
-#: include/classes/items/CHelpItems.php:949
+#: include/classes/items/CHelpItems.php:957
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Número de máquinas virtuais no hypervisor VMware, <url> - URL de serviço do VMware, <uuid> - Nome do host hypervisor do VMware"
 
-#: include/classes/items/CHelpItems.php:349
-#: include/classes/items/CHelpItems.php:703
+#: include/classes/items/CHelpItems.php:353
+#: include/classes/items/CHelpItems.php:711
 msgid "Number or percentage of inodes. Returns integer for number; float for percentage"
 msgstr "Quantidade ou percentagem de inodes. Retorna: inteiro para quantidade; número fracionário para percentagem"
 
@@ -12863,7 +12873,7 @@ msgstr "Inactivo"
 #: app/views/report.services.php:82 app/views/report.services.php:83
 #: include/views/configuration.triggers.list.php:94
 #: include/views/js/common.item.edit.js.php:334
-#: include/views/js/configuration.httpconf.edit.js.php:103 jsLoader.php:364
+#: include/views/js/configuration.httpconf.edit.js.php:103 jsLoader.php:365
 #: report2.php:506
 msgid "Ok"
 msgstr "Ok"
@@ -13008,8 +13018,8 @@ msgstr "Apenas são contabilizados triggers associados a hosts activos e que dep
 msgid "Opera"
 msgstr "Opera"
 
-#: include/classes/items/CHelpItems.php:257
-#: include/classes/items/CHelpItems.php:611
+#: include/classes/items/CHelpItems.php:261
+#: include/classes/items/CHelpItems.php:619
 msgid "Operating system information. Returns string"
 msgstr "Informação sobre o sistema operativo. Retorna: texto"
 
@@ -13195,8 +13205,8 @@ msgstr "Outros parâmetros"
 msgid "Others"
 msgstr "Outros"
 
-#: include/classes/items/CHelpItems.php:113
-#: include/classes/items/CHelpItems.php:467
+#: include/classes/items/CHelpItems.php:117
+#: include/classes/items/CHelpItems.php:475
 msgid "Outgoing traffic statistics on network interface. Returns integer"
 msgstr "Estatísticas de saída de tráfego na interface de rede. Retorna: número inteiro"
 
@@ -13637,7 +13647,7 @@ msgstr ""
 msgid "Peak memory usage: %1$s"
 msgstr "Pico de utilização de memória: %1$s"
 
-#: include/classes/items/CHelpItems.php:961
+#: include/classes/items/CHelpItems.php:969
 msgid "Percent of time the virtual machine is unable to run because it is contending for access to the physical CPU(s), <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
@@ -13645,11 +13655,11 @@ msgstr ""
 msgid "Percentage"
 msgstr "Percentual"
 
-#: include/classes/items/CHelpItems.php:1045
+#: include/classes/items/CHelpItems.php:1053
 msgid "Percentage of host physical memory that has been consumed, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:969
+#: include/classes/items/CHelpItems.php:977
 msgid "Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
 msgstr ""
 
@@ -13661,8 +13671,8 @@ msgstr "Linha percentagem (esquerda)"
 msgid "Percentile line (right)"
 msgstr "Linha percentagem (direita)"
 
-#: include/classes/items/CHelpItems.php:93
-#: include/classes/items/CHelpItems.php:447
+#: include/classes/items/CHelpItems.php:97
+#: include/classes/items/CHelpItems.php:455
 msgid "Performs a DNS query. Returns character string with the required type of information"
 msgstr "Executa uma consulta DNS. Retorna: texto com o tipo de informação requisitado"
 
@@ -13755,7 +13765,7 @@ msgstr ""
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
 msgstr "Por favor crie a base de dados manualmente e informe os parâmetros de ligação para a base. Pressione o botão \"%1$s\" quando estiver pronto."
 
-#: include/classes/setup/CSetupWizard.php:888
+#: include/classes/setup/CSetupWizard.php:922
 msgid "Please enable \"allow_url_fopen\" directive."
 msgstr ""
 
@@ -13833,7 +13843,7 @@ msgstr "Campos de publicação"
 msgid "Post type"
 msgstr "Tipo do publicação"
 
-#: include/classes/items/CHelpItems.php:925
+#: include/classes/items/CHelpItems.php:933
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
 msgstr ""
 
@@ -14068,7 +14078,7 @@ msgstr "Problema, se pelo menos um dos filhos tiver um problema"
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:35
 #: include/classes/widgets/views/widget.svggraph.form.view.php:295
 #: include/views/inventory.host.view.php:151
-#: include/views/inventory.host.view.php:156 jsLoader.php:337 report2.php:506
+#: include/views/inventory.host.view.php:156 jsLoader.php:338 report2.php:506
 msgid "Problems"
 msgstr "Problemas"
 
@@ -14076,8 +14086,8 @@ msgstr "Problemas"
 msgid "Problems by severity"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:165
-#: include/classes/items/CHelpItems.php:519
+#: include/classes/items/CHelpItems.php:169
+#: include/classes/items/CHelpItems.php:527
 msgid "Process CPU utilisation percentage. Returns float"
 msgstr "Utilização percentagem, pelo processo, de CPU. Retorna número fracionário"
 
@@ -14302,8 +14312,8 @@ msgstr "Leitura"
 msgid "Read-write"
 msgstr "Leitura e escrita"
 
-#: include/classes/items/CHelpItems.php:85
-#: include/classes/items/CHelpItems.php:435
+#: include/classes/items/CHelpItems.php:89
+#: include/classes/items/CHelpItems.php:443
 msgid "Reads modbus data. Returns various types"
 msgstr ""
 
@@ -14631,7 +14641,7 @@ msgstr ""
 msgid "Removed"
 msgstr ""
 
-#: jsLoader.php:300
+#: jsLoader.php:301
 #, c-format
 msgctxt "screen reader"
 msgid "Removed, %1$s"
@@ -14755,7 +14765,7 @@ msgstr "Permissões de host necessárias"
 msgid "Required performance (vps)"
 msgstr "Performance (vps)"
 
-#: include/classes/items/CHelpItems.php:1225
+#: include/classes/items/CHelpItems.php:1233
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr "Performance requerida do servidor Zabbix, em novos valores por segundo."
 
@@ -14904,8 +14914,8 @@ msgstr ""
 msgid "Retrieve mode"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:313
-#: include/classes/items/CHelpItems.php:667
+#: include/classes/items/CHelpItems.php:317
+#: include/classes/items/CHelpItems.php:675
 msgid "Retrieving contents of a file. Returns text"
 msgstr "Recupera o conteúdo de um arquivo. Retorna: texto"
 
@@ -14913,49 +14923,49 @@ msgstr "Recupera o conteúdo de um arquivo. Retorna: texto"
 msgid "Retry"
 msgstr "Tentar novamente"
 
-#: include/classes/items/CHelpItems.php:1297
+#: include/classes/items/CHelpItems.php:1305
 msgid "Return a JSON array with LLD macros describing the MBean objects or their attributes. Can be used for LLD."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1301
+#: include/classes/items/CHelpItems.php:1309
 msgid "Return a JSON array with MBean objects or their attributes. Compared to jmx.discovery it does not define LLD macros. Can be used for LLD."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1279
+#: include/classes/items/CHelpItems.php:1287
 msgid "Return first column of the first row of the SQL query result."
 msgstr "Retorna a primeira coluna da primeira linha de uma consulta SQL."
 
-#: include/classes/items/CHelpItems.php:1293
+#: include/classes/items/CHelpItems.php:1301
 msgid "Return value of an attribute of MBean object."
 msgstr "Retorna o valor de um atributo de um objeto MBean."
 
-#: include/classes/items/CHelpItems.php:753
+#: include/classes/items/CHelpItems.php:761
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
-msgstr "Tempo de resposta do ICMP ping. Exemplo: 0,02"
+msgstr "Tempo de resposta do ICMP ping. Exemplo: 0.02"
 
-#: include/classes/items/CHelpItems.php:1173
+#: include/classes/items/CHelpItems.php:1181
 msgid "Returns a JSON array describing the host network interfaces configured in Zabbix. Can be used for LLD."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:385
-#: include/classes/items/CHelpItems.php:735
-#: include/classes/items/CHelpItems.php:1229
+#: include/classes/items/CHelpItems.php:389
+#: include/classes/items/CHelpItems.php:743
+#: include/classes/items/CHelpItems.php:1237
 msgid "Returns a JSON object containing Zabbix server or proxy internal metrics."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1177
+#: include/classes/items/CHelpItems.php:1185
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
 msgstr "Retorna a disponibilidade de um tipo particular de verificações no host. O valor deste item corresponde a disponibilidade de ícones na lista do host. Os valores válidos são: agente, snmp, ipmi, jmx."
 
-#: include/classes/items/CHelpItems.php:1169
+#: include/classes/items/CHelpItems.php:1177
 msgid "Returns current maintenance status of the host."
 msgstr "Retorna o status actual de manutenção do host."
 
-#: include/classes/items/CHelpItems.php:1193
+#: include/classes/items/CHelpItems.php:1201
 msgid "Returns information associated with Zabbix Java gateway. Valid params are: ping, version."
 msgstr "Retorna a informação associada ao gateway java do Zabbix. Os parâmetros válidos são: ping, version."
 
-#: include/classes/items/CHelpItems.php:749
+#: include/classes/items/CHelpItems.php:757
 msgid "Returns percentage of lost ICMP ping packets."
 msgstr "Retorna o percentagem de perda de pacotes ICMP."
 
@@ -15026,8 +15036,8 @@ msgstr ""
 msgid "Run script \"%1$s\" on hosts"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:245
-#: include/classes/items/CHelpItems.php:599
+#: include/classes/items/CHelpItems.php:249
+#: include/classes/items/CHelpItems.php:607
 msgid "Run specified command on the host. Returns text result of the command; 1 - with mode as nowait (regardless of command result)"
 msgstr "Executa o comando em no host. Retorna o texto retornado pelo comando; 1 - para modo sem espera (não espera o resultado do comando)"
 
@@ -15281,7 +15291,7 @@ msgstr ""
 msgid "Save changes"
 msgstr "Salvar alterações"
 
-#: include/classes/setup/CSetupWizard.php:685
+#: include/classes/setup/CSetupWizard.php:699
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "Salvar como \"%1$s\""
@@ -15437,7 +15447,7 @@ msgstr "Script actualizado"
 #: app/views/administration.script.edit.php:31
 #: app/views/administration.script.list.php:31
 #: include/classes/helpers/CMenuHelper.php:291
-#: include/classes/helpers/CRoleHelper.php:463 jsLoader.php:338
+#: include/classes/helpers/CRoleHelper.php:463 jsLoader.php:339
 msgid "Scripts"
 msgstr "Scripts"
 
@@ -15517,7 +15527,7 @@ msgstr "Nome de segurança"
 #: include/views/configuration.item.prototype.edit.php:83
 #: include/views/configuration.item.prototype.edit.php:479
 #: include/views/configuration.services.edit.php:99
-#: include/views/js/monitoring.sysmaps.js.php:216 jsLoader.php:298
+#: include/views/js/monitoring.sysmaps.js.php:216 jsLoader.php:299
 msgid "Select"
 msgstr "Seleccionar"
 
@@ -15553,13 +15563,13 @@ msgstr "Elementos seleccionados"
 msgid "Selected items only"
 msgstr ""
 
-#: jsLoader.php:303
+#: jsLoader.php:304
 #, c-format
 msgctxt "screen reader"
 msgid "Selected, %1$s in position %2$d of %3$d"
 msgstr ""
 
-#: jsLoader.php:304
+#: jsLoader.php:305
 #, c-format
 msgctxt "screen reader"
 msgid "Selected, %1$s, read only, in position %2$d of %3$d"
@@ -15743,6 +15753,7 @@ msgid "Services form a circular dependency."
 msgstr "Os serviços formam uma dependência circular."
 
 #: include/classes/core/ZBase.php:242 include/classes/core/ZBase.php:470
+#: index_sso.php:242 index_sso.php:249
 msgid "Session initialization error."
 msgstr ""
 
@@ -15772,7 +15783,7 @@ msgstr ""
 msgid "Set host inventory mode"
 msgstr "Defina o modo de inventário de host"
 
-#: include/classes/html/CInputSecret.php:80 jsLoader.php:370
+#: include/classes/html/CInputSecret.php:80 jsLoader.php:371
 msgid "Set new value"
 msgstr ""
 
@@ -15862,7 +15873,7 @@ msgstr ""
 msgid "Shared"
 msgstr ""
 
-#: include/views/monitoring.sysmap.edit.php:414 jsLoader.php:324
+#: include/views/monitoring.sysmap.edit.php:414 jsLoader.php:325
 msgid "Sharing"
 msgstr "Partilha"
 
@@ -16149,8 +16160,8 @@ msgstr "Aplicação de software D"
 msgid "Software application E"
 msgstr "Aplicação de software E"
 
-#: include/classes/items/CHelpItems.php:253
-#: include/classes/items/CHelpItems.php:607
+#: include/classes/items/CHelpItems.php:257
+#: include/classes/items/CHelpItems.php:615
 msgid "Software architecture information. Returns string"
 msgstr "Informação sobre a arquitetura de software. Retorna: texto"
 
@@ -16253,7 +16264,7 @@ msgstr ""
 msgid "Starting TLS failed."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1137
+#: include/classes/items/CHelpItems.php:1145
 msgid "Startup time of Zabbix server, Unix timestamp."
 msgstr "Horário de início do servidor Zabbix, padrão de hora do UNIX."
 
@@ -16271,7 +16282,7 @@ msgctxt "history source selection method"
 msgid "Static"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1273
+#: include/classes/items/CHelpItems.php:1281
 msgid "Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused)."
 msgstr ""
 
@@ -16476,7 +16487,7 @@ msgctxt "encryption certificate"
 msgid "Subject"
 msgstr "Segurado"
 
-#: jsLoader.php:339
+#: jsLoader.php:340
 msgid "Submap"
 msgstr "Submapa"
 
@@ -16496,8 +16507,8 @@ msgstr "Auditoria de sucesso"
 msgid "Success message"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:117
-#: include/classes/items/CHelpItems.php:471
+#: include/classes/items/CHelpItems.php:121
+#: include/classes/items/CHelpItems.php:479
 msgid "Sum of incoming and outgoing traffic statistics on network interface. Returns integer"
 msgstr "Sumarização das estatísticas de entrada e saída da interface de rede. Retorna: número inteiro"
 
@@ -16530,18 +16541,18 @@ msgstr ""
 msgid "Surname"
 msgstr "Apelido"
 
-#: include/classes/items/CHelpItems.php:265
-#: include/classes/items/CHelpItems.php:619
+#: include/classes/items/CHelpItems.php:269
+#: include/classes/items/CHelpItems.php:627
 msgid "Swap in (from device into memory) statistics. Returns integer"
 msgstr "Estatísticas de envio de dados do swap para a memória. Retorna: número inteiro"
 
-#: include/classes/items/CHelpItems.php:269
-#: include/classes/items/CHelpItems.php:623
+#: include/classes/items/CHelpItems.php:273
+#: include/classes/items/CHelpItems.php:631
 msgid "Swap out (from memory onto device) statistics. Returns integer"
 msgstr "Estatísticas de envio de dados da memória para o swap. Retorna: número inteiro"
 
-#: include/classes/items/CHelpItems.php:273
-#: include/classes/items/CHelpItems.php:627
+#: include/classes/items/CHelpItems.php:277
+#: include/classes/items/CHelpItems.php:635
 msgid "Swap space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Tamanho do espaço do swap em bytes ou percentagem relativo ao total. Retorna: inteiro para bytes; número fracionário para percentagem"
 
@@ -16557,8 +16568,8 @@ msgstr "Ao alterar o método de autenticação irá terminar todas as sessões c
 msgid "System"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:193
-#: include/classes/items/CHelpItems.php:547
+#: include/classes/items/CHelpItems.php:197
+#: include/classes/items/CHelpItems.php:555
 msgid "System boot time. Returns integer (Unix timestamp)"
 msgstr "Tempo desde a carga do sistema. Retorna: timestamp UNIX (número inteiro)"
 
@@ -16577,8 +16588,8 @@ msgstr "Ocorreu um erro de sistema. Contacte um administrador Zabbix."
 msgid "System error."
 msgstr "Erro de sistema."
 
-#: include/classes/items/CHelpItems.php:221
-#: include/classes/items/CHelpItems.php:575
+#: include/classes/items/CHelpItems.php:225
+#: include/classes/items/CHelpItems.php:583
 msgid "System host name. Returns string"
 msgstr "Nome do host. Retorna: texto"
 
@@ -16587,20 +16598,20 @@ msgstr "Nome do host. Retorna: texto"
 #: include/classes/helpers/CRoleHelper.php:403
 #: include/classes/widgets/CWidgetConfig.php:61
 msgid "System information"
-msgstr ""
+msgstr "Informação do sistema"
 
-#: include/classes/items/CHelpItems.php:249
-#: include/classes/items/CHelpItems.php:603
+#: include/classes/items/CHelpItems.php:253
+#: include/classes/items/CHelpItems.php:611
 msgid "System statistics. Returns integer or float"
 msgstr "Estatísticas do sistema. Retorna: número inteiro ou número fracionário"
 
-#: include/classes/items/CHelpItems.php:241
-#: include/classes/items/CHelpItems.php:595
+#: include/classes/items/CHelpItems.php:245
+#: include/classes/items/CHelpItems.php:603
 msgid "System time. Returns integer with type as utc; string - with type as local"
 msgstr "Horário do sistema. Retorna: número inteiro - se o tipo for UTC; Texto - se o tipo for local"
 
-#: include/classes/items/CHelpItems.php:281
-#: include/classes/items/CHelpItems.php:635
+#: include/classes/items/CHelpItems.php:285
+#: include/classes/items/CHelpItems.php:643
 msgid "System uptime in seconds. Returns integer"
 msgstr "Tempo desde a carga do sistema. Retorna: número inteiro"
 
@@ -16897,7 +16908,7 @@ msgstr ""
 #: app/views/administration.authentication.edit.php:271
 #: app/views/administration.mediatype.list.php:139
 #: app/views/administration.regex.edit.php:140
-#: app/views/js/popup.itemtestedit.view.js.php:573
+#: app/views/js/popup.itemtestedit.view.js.php:571
 #: app/views/popup.itemtestedit.view.php:431
 #: app/views/popup.mediatypetest.edit.php:99
 #: app/views/popup.testtriggerexpr.php:124 include/forms.inc.php:1457
@@ -16985,7 +16996,7 @@ msgstr "O método /\"%1$s.%2$s/\" precisa ser invocado sem o parâmetro auth."
 msgid "The Zabbix database version does not match current requirements. Your database version: %1$s. Required version: %2$s. Please contact your system administrator."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1085
+#: include/classes/items/CHelpItems.php:1093
 msgid "The average time a write to the virtual disk takes, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
 msgstr ""
 
@@ -17051,8 +17062,8 @@ msgstr "O item não foi descoberto mais nenhuma vez e será eliminado em %1$s (e
 msgid "The item is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "O item não será novamente descoberto e será eliminado na próxima vez que a autodescoberta for processada."
 
-#: include/classes/items/CHelpItems.php:173
-#: include/classes/items/CHelpItems.php:527
+#: include/classes/items/CHelpItems.php:177
+#: include/classes/items/CHelpItems.php:535
 msgid "The number of processes. Returns integer"
 msgstr "Número de processos. Retorna: número inteiro"
 
@@ -17176,7 +17187,7 @@ msgstr "Até"
 msgid "Time"
 msgstr "Data e hora"
 
-#: include/classes/items/CHelpItems.php:1205
+#: include/classes/items/CHelpItems.php:1213
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
 msgstr ""
 
@@ -17189,7 +17200,7 @@ msgstr ""
 msgid "Time filter default period"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1209
+#: include/classes/items/CHelpItems.php:1217
 msgid "Time of proxy last access. Name - proxy name. Valid params are: lastaccess - Unix timestamp, delay - seconds."
 msgstr ""
 
@@ -17245,7 +17256,7 @@ msgstr "Timestamp"
 msgid "To"
 msgstr "Para"
 
-#: jsLoader.php:351
+#: jsLoader.php:352
 msgid "To set a host interface select a single item type for all items"
 msgstr "Para definir uma interface do host seleccionar um tipo de item único para todos os itens"
 
@@ -17288,7 +17299,7 @@ msgstr "Total de tempo no Elasticsearch: %1$s"
 msgid "Total SQL time: %1$s"
 msgstr "Tempo total do SQL: %1$s"
 
-#: include/classes/items/CHelpItems.php:1001
+#: include/classes/items/CHelpItems.php:1009
 msgid "Total time elapsed, in seconds, since last operating system boot-up, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
@@ -17309,11 +17320,11 @@ msgstr ""
 msgid "Transaction has not been closed. Aborting..."
 msgstr "A transacção não foi fechada. A abortar..."
 
-#: include/classes/items/CHelpItems.php:1283
+#: include/classes/items/CHelpItems.php:1291
 msgid "Transform SQL query result into a JSON array for low-level discovery."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1287
+#: include/classes/items/CHelpItems.php:1295
 msgid "Transform SQL query result into a JSON array."
 msgstr ""
 
@@ -17344,7 +17355,7 @@ msgctxt "missing data function"
 msgid "Treat as 0"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1237
+#: include/classes/items/CHelpItems.php:1245
 msgid "Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems and requests."
 msgstr ""
 
@@ -17377,7 +17388,7 @@ msgstr "Tendências"
 #: include/views/configuration.triggers.edit.php:571
 #: include/views/js/monitoring.sysmaps.js.php:94
 #: include/views/js/monitoring.sysmaps.js.php:792
-#: include/views/reports.toptriggers.php:83 jsLoader.php:238 jsLoader.php:340
+#: include/views/reports.toptriggers.php:83 jsLoader.php:238 jsLoader.php:341
 #: services.php:355
 msgid "Trigger"
 msgstr "Trigger"
@@ -17392,7 +17403,7 @@ msgstr "Trigger \"%1$s\" já existe em \"%2$s\"."
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
 msgstr "A trigger \"%1$s\" pertence a templates com associações distintas."
 
-#: include/classes/import/CConfigurationImport.php:1830
+#: include/classes/import/CConfigurationImport.php:1840
 #, c-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "O trigger \"%1$s\" depende do trigger \"%2$s\", que não existe."
@@ -17502,7 +17513,7 @@ msgstr "O protótipo de trigger \"%1$s\" pertence a templates com diferentes ass
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
 msgstr "O protótipo de trigger \"%1$s\" contêm protótipos de item de múltiplas regras de descoberta."
 
-#: include/classes/import/CConfigurationImport.php:1511
+#: include/classes/import/CConfigurationImport.php:1521
 #, c-format
 msgid "Trigger prototype \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "O protótipo de trigger \"%1$s\" depende da trigger \"%2$s\", que não existe."
@@ -17516,7 +17527,7 @@ msgstr "O protótipo de trigger \"%1$s\" precisa conter pelo menos um protótipo
 msgid "Trigger prototype added"
 msgstr "Protótipo de trigger adicionado"
 
-#: include/classes/api/services/CTriggerPrototype.php:909
+#: include/classes/api/services/CTriggerPrototype.php:924
 msgid "Trigger prototype cannot be dependent on a trigger that is inherited from it."
 msgstr "O protótipo de trigger não pode depender de uma trigger da qual ele tenha sido herdado."
 
@@ -17552,11 +17563,11 @@ msgstr "Protótipos de trigger actualizados"
 msgid "Trigger severity"
 msgstr "Severidade do trigger"
 
-#: jsLoader.php:325
+#: jsLoader.php:326
 msgid "Trigger status \"OK\""
 msgstr "Status do trigger \"OK\""
 
-#: jsLoader.php:326
+#: jsLoader.php:327
 msgid "Trigger status \"Problem\""
 msgstr "Status do trigger \"Problema\""
 
@@ -17722,7 +17733,7 @@ msgstr "DESCONHECIDO"
 #: include/views/configuration.trigger.prototype.edit.php:530
 #: include/views/configuration.triggers.edit.php:557
 #: include/views/js/monitoring.sysmaps.js.php:314
-#: include/views/monitoring.sysmap.edit.php:278 items.php:158 jsLoader.php:341
+#: include/views/monitoring.sysmap.edit.php:278 items.php:158 jsLoader.php:342
 msgid "URL"
 msgstr "URL"
 
@@ -17768,7 +17779,7 @@ msgid "URL should have both \"name\" and \"url\" fields for map \"%1$s\"."
 msgstr "A URL deverá possuir os campos \"name\" e \"url\" no mapa \"%1$s\"."
 
 #: include/views/js/monitoring.sysmaps.js.php:311
-#: include/views/monitoring.sysmap.edit.php:311 jsLoader.php:342
+#: include/views/monitoring.sysmap.edit.php:311 jsLoader.php:343
 msgid "URLs"
 msgstr "URLs"
 
@@ -18132,7 +18143,7 @@ msgstr "Mapas de nível superior"
 msgid "Uptime"
 msgstr "Uptime"
 
-#: include/classes/items/CHelpItems.php:1253
+#: include/classes/items/CHelpItems.php:1261
 msgid "Uptime of Zabbix server process in seconds."
 msgstr "Tempo em execução em segudos do processo do Zabbix."
 
@@ -18242,7 +18253,7 @@ msgstr ""
 msgid "User deleted"
 msgid_plural "Users deleted"
 msgstr[0] "Utilizador eliminado"
-msgstr[1] ""
+msgstr[1] "Utilizadores eliminados"
 
 #: app/controllers/CControllerAuditLogList.php:193
 #: app/partials/js/scheduledreport.subscription.js.php:83
@@ -18459,8 +18470,8 @@ msgstr "Nome de utilizador"
 msgid "Username and password"
 msgstr "Utilizador e senha"
 
-#: include/classes/setup/CSetupWizard.php:600
-#: include/classes/setup/CSetupWizard.php:906
+#: include/classes/setup/CSetupWizard.php:614
+#: include/classes/setup/CSetupWizard.php:940
 msgid "Username and password must be stored in Vault secret keys \"username\" and \"password\"."
 msgstr ""
 
@@ -18486,240 +18497,240 @@ msgstr ""
 msgid "Users"
 msgstr "Utilizadores"
 
-#: include/classes/items/CHelpItems.php:1269
+#: include/classes/items/CHelpItems.php:1277
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "Estatísticas de cache do VMware. Modos válidos: total, free, pfree, used and pused."
 
-#: include/classes/items/CHelpItems.php:781
+#: include/classes/items/CHelpItems.php:789
 msgid "VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:777
+#: include/classes/items/CHelpItems.php:785
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "Status do cluster VMware, <url> URL de serviço do VMware, <name> nome do cluster VMware"
 
-#: include/classes/items/CHelpItems.php:805
+#: include/classes/items/CHelpItems.php:813
 msgid "VMware datacenters and their IDs. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:797
-#: include/classes/items/CHelpItems.php:853
+#: include/classes/items/CHelpItems.php:805
+#: include/classes/items/CHelpItems.php:861
 msgid "VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Estatísticas de capacidade do datastore em bytes ou em percentagem do total. Retorna inteiro para bytes, ponto flutuante para percentagem"
 
-#: include/classes/items/CHelpItems.php:789
+#: include/classes/items/CHelpItems.php:797
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:793
+#: include/classes/items/CHelpItems.php:801
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:801
+#: include/classes/items/CHelpItems.php:809
 msgid "VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:809
+#: include/classes/items/CHelpItems.php:817
 msgid "VMware event log, <url> - VMware service URL, <mode> - all (default), skip - skip processing of older data"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:893
+#: include/classes/items/CHelpItems.php:901
 msgid "VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "UUID da BIOS do hypervisor VMware, <url> - url de serviço do VMware, <uuid> - hostname do hypervisor"
 
-#: include/classes/items/CHelpItems.php:929
+#: include/classes/items/CHelpItems.php:937
 msgid "VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:905
+#: include/classes/items/CHelpItems.php:913
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Hypervisor VMware que aumentou o uso de memória, <url> - URL de serviço VMware, <uuid> - hostname do hypervisor VMware"
 
-#: include/classes/items/CHelpItems.php:817
+#: include/classes/items/CHelpItems.php:825
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Nome do cluster do hypervisor VMware, <url> - url de serviço do VMware, <uuid> - hostname do hypervisor"
 
-#: include/classes/items/CHelpItems.php:833
+#: include/classes/items/CHelpItems.php:841
 msgid "VMware hypervisor datacenter name, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns string"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:849
+#: include/classes/items/CHelpItems.php:857
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "Estatísticas de leitura do datastore do hypervisor VMware, <url> - url de serviço do VMware, <uuid> - hostname do hypervisor, <datastore> - nome do datastore, <mode> - latência"
 
-#: include/classes/items/CHelpItems.php:857
+#: include/classes/items/CHelpItems.php:865
 msgid "VMware hypervisor datastore write statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "Estatísticas de gravação do armazenamento de dados do hypervisor VMware, <url> URL de serviço do VMware, <uuid> - hostname do hypervisor VMware, <datastore> - nome do datastore, <mode> - latência"
 
-#: include/classes/items/CHelpItems.php:841
+#: include/classes/items/CHelpItems.php:849
 msgid "VMware hypervisor datastores list, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:933
+#: include/classes/items/CHelpItems.php:941
 msgid "VMware hypervisor health state rollup sensor, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:901
+#: include/classes/items/CHelpItems.php:909
 msgid "VMware hypervisor maintenance status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:889
+#: include/classes/items/CHelpItems.php:897
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Modelo do hypervisor VMware, <url> URL de serviço do VMware, <uuid> - hostname do hypervisor VMware"
 
-#: include/classes/items/CHelpItems.php:865
+#: include/classes/items/CHelpItems.php:873
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Nome do hypervisor VMware, <url> - url de serviço do VMware, <uuid> - hostname do hypervisor"
 
-#: include/classes/items/CHelpItems.php:913
+#: include/classes/items/CHelpItems.php:921
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "Estatísticas de entrada de rede do hypervisor VMware, <url> - url de serviço do VMware, <uuid> - hostname do hypervisor, <mode> - bps"
 
-#: include/classes/items/CHelpItems.php:917
+#: include/classes/items/CHelpItems.php:925
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "Estatísticas de saída de rede do hypervisor VMware, <url> - url de serviço do VMware, <uuid> - hostname do hypervisor, <mode> - bps"
 
-#: include/classes/items/CHelpItems.php:921
+#: include/classes/items/CHelpItems.php:929
 msgid "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "Contador de desempenho do hypervisor VMWare, <url> - URL de serviço do VMWare, <uuid> - Hostname do hypervisor VMWare, <path> - Caminho do contador de performance, <instance> - Contador de performance da instância"
 
-#: include/classes/items/CHelpItems.php:869
+#: include/classes/items/CHelpItems.php:877
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Frequência do processador do hypervisor VMware, <url> - url de serviço do VMware, <uuid> - hostname do hypervisor"
 
-#: include/classes/items/CHelpItems.php:873
+#: include/classes/items/CHelpItems.php:881
 msgid "VMware hypervisor processor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Modelo do processador do hypervisor VMware, <url> - url de serviço do VMware, <uuid> - hostname do hypervisor"
 
-#: include/classes/items/CHelpItems.php:821
+#: include/classes/items/CHelpItems.php:829
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Utilização do processador do hypervisor VMware em Hz, <url> - url de serviço do VMware, <uuid> - hostname do hypervisor"
 
-#: include/classes/items/CHelpItems.php:937
+#: include/classes/items/CHelpItems.php:945
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Status do hypervisor VMware, <url> - url de serviço do VMware, <uuid> - hostname do hypervisor"
 
-#: include/classes/items/CHelpItems.php:885
+#: include/classes/items/CHelpItems.php:893
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Total de memória do hypervisor VMware, <url> - url de serviço do VMware, <uuid> - hostname do hypervisor"
 
-#: include/classes/items/CHelpItems.php:941
+#: include/classes/items/CHelpItems.php:949
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Tempo desde o ultimo boot do hypervisor VMware, <url> - url de serviço do VMware, <uuid> - hostname do hypervisor"
 
-#: include/classes/items/CHelpItems.php:909
+#: include/classes/items/CHelpItems.php:917
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Total de memória utilizada no hypervisor VMware, <url> - url de serviço do VMware, <uuid> - hostname do hypervisor"
 
-#: include/classes/items/CHelpItems.php:897
+#: include/classes/items/CHelpItems.php:905
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Fornecedor do hypervisor VMware, <url> - url de serviço do VMware, <uuid> - hostname do hypervisor"
 
-#: include/classes/items/CHelpItems.php:945
+#: include/classes/items/CHelpItems.php:953
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Versão do hypervisor VMware, <url> - url de serviço do VMware, <uuid> - hostname do hypervisor"
 
-#: include/classes/items/CHelpItems.php:813
+#: include/classes/items/CHelpItems.php:821
 msgid "VMware service full name, <url> - VMware service URL"
 msgstr "Nome completo do serviço do hypervisor VMware, <url> - url de serviço do VMware"
 
-#: include/classes/items/CHelpItems.php:953
+#: include/classes/items/CHelpItems.php:961
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "Versão do serviço do VMware, <url> - url de serviço do VMware"
 
-#: include/classes/items/CHelpItems.php:1013
+#: include/classes/items/CHelpItems.php:1021
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Máquina virtual VMware que aumentou o uso de memória, <url> - URL de serviço VMware, <uuid> - hostname do máquina virtual"
 
-#: include/classes/items/CHelpItems.php:1073
+#: include/classes/items/CHelpItems.php:1081
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Espaço de armazenamento comprometido com a máquina virtual VMware, <url> - URL de serviço VMware, <uuid> - hostname da máquina virtual"
 
-#: include/classes/items/CHelpItems.php:1017
+#: include/classes/items/CHelpItems.php:1025
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Tamanho comprimido da memória comprometida com a máquina virtual VMware, <url> - URL de serviço VMware, <uuid> - hostname da máquina virtual"
 
-#: include/classes/items/CHelpItems.php:989
+#: include/classes/items/CHelpItems.php:997
 msgid "VMware virtual machine datacenter name, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns string"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1109
+#: include/classes/items/CHelpItems.php:1117
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "Estatísticas de leitura de disco da máquina virtual VMware, <url> - URL de serviço VMware, <uuid> - hostname da máquina virtual, <instance> - Instância de disco, <mode> - bps/ops - bytes/operations per second"
 
-#: include/classes/items/CHelpItems.php:1113
+#: include/classes/items/CHelpItems.php:1121
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "Estatísticas de gravação de disco da máquina virtual VMware, <url> - URL de serviço VMware, <uuid> - hostname da máquina virtual, <instance> - Instância de disco, <mode> - bps/ops - bytes/operations per second"
 
-#: include/classes/items/CHelpItems.php:1121
+#: include/classes/items/CHelpItems.php:1129
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
 msgstr "Estatísticas do sistema de arquivos da máquina virtual VMware, <url> - URL de serviço VMware, <uuid> - hostname da máquina virtual, <fsname> - Nome do sistema de arquivos, <mode> - total/free/used/pfree/pused"
 
-#: include/classes/items/CHelpItems.php:1037
+#: include/classes/items/CHelpItems.php:1045
 msgid "VMware virtual machine guest memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Memória utilizada pelo agente de monitoração VMware na máquina virtual, <url> - URL de serviço VMware, <uuid> - hostname da máquina virtual"
 
-#: include/classes/items/CHelpItems.php:1041
+#: include/classes/items/CHelpItems.php:1049
 msgid "VMware virtual machine host memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Utilização de memória pela máquina virtual VMware, <url> - URL de serviço VMware, <uuid> - hostname da máquina virtual"
 
-#: include/classes/items/CHelpItems.php:1005
+#: include/classes/items/CHelpItems.php:1013
 msgid "VMware virtual machine hypervisor name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Nome do hypervisor da máquina virtual VMware, <url> - URL de serviço VMware, <uuid> - hostname da máquina virtual"
 
-#: include/classes/items/CHelpItems.php:957
+#: include/classes/items/CHelpItems.php:965
 msgid "VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Nome da máquina virtual VMware, <url> - URL de serviço VMware, <uuid> - hostname da máquina virtual"
 
-#: include/classes/items/CHelpItems.php:1053
+#: include/classes/items/CHelpItems.php:1061
 msgid "VMware virtual machine network interface input statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "Estatísticas de entrada de rede da interface na máquina virtual VMware, <url> - URL de serviço VMware, <uuid> - hostname da máquina virtual, <instance> - interface de rede, <mode> - bps/pps - bytes/pacotes por segundo"
 
-#: include/classes/items/CHelpItems.php:1057
+#: include/classes/items/CHelpItems.php:1065
 msgid "VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "Estatísticas de saída de rede da interface na máquina virtual VMware, <url> - URL de serviço VMware, <uuid> - hostname da máquina virtual, <instance> - interface de rede, <mode> - bps/pps - bytes/pacotes por segundo"
 
-#: include/classes/items/CHelpItems.php:1065
+#: include/classes/items/CHelpItems.php:1073
 msgid "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "Contador de desempenho de máquina virtual VMWare, <url> - URL de serviço do VMWare, <uuid> - Hostname da máquina virtual, <path> - Caminho do contador de performance, <instance> - Contador de performance da instância"
 
-#: include/classes/items/CHelpItems.php:1069
+#: include/classes/items/CHelpItems.php:1077
 msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Estado de carga da máquina virtual VMware, <url> - URL de serviço VMware, <uuid> - hostname da máquina virtual"
 
-#: include/classes/items/CHelpItems.php:1025
+#: include/classes/items/CHelpItems.php:1033
 msgid "VMware virtual machine private memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Tamanho da memória privada da máquina virtual VMware, <url> - URL de serviço VMware, <uuid> - hostname da máquina virtual"
 
-#: include/classes/items/CHelpItems.php:973
+#: include/classes/items/CHelpItems.php:981
 msgid "VMware virtual machine processor ready time ms, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Tempo em prontidão do processador da máquina virtual em milisegundos, <url> - URL do serviço VMWare, <uuid> - Nome da máquina virtual no VMWare"
 
-#: include/classes/items/CHelpItems.php:981
+#: include/classes/items/CHelpItems.php:989
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Utilização de processador pela máquina virtual VMware em Hz, <url> - URL de serviço VMware, <uuid> - hostname da máquina virtual"
 
-#: include/classes/items/CHelpItems.php:1029
+#: include/classes/items/CHelpItems.php:1037
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Tamanho da memória compartilhada da máquina virtual VMware, <url> - URL de serviço VMware, <uuid> - hostname da máquina virtual"
 
-#: include/classes/items/CHelpItems.php:1033
+#: include/classes/items/CHelpItems.php:1041
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Tamanho da memória da máquina virtual VMware que está em swap, <url> - URL de serviço VMware, <uuid> - hostname da máquina virtual"
 
-#: include/classes/items/CHelpItems.php:1009
+#: include/classes/items/CHelpItems.php:1017
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Tamanho total da memória da máquina virtual VMware, <url> - URL de serviço VMware, <uuid> - hostname da máquina virtual"
 
-#: include/classes/items/CHelpItems.php:1089
+#: include/classes/items/CHelpItems.php:1097
 msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Espaço de armazenamento alocado mas não utilizado pela máquina virtual VMware, <url> - URL de serviço VMware, <uuid> - hostname da máquina virtual"
 
-#: include/classes/items/CHelpItems.php:1093
+#: include/classes/items/CHelpItems.php:1101
 msgid "VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Espaço de armazenamento não compartilhado pela máquina virtual VMware, <url> - URL de serviço VMware, <uuid> - hostname da máquina virtual"
 
-#: include/classes/items/CHelpItems.php:1101
+#: include/classes/items/CHelpItems.php:1109
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Tempo de carga da máquina virtual VMware, <url> - URL de serviço VMware, <uuid> - hostname do VMware"
 
@@ -18814,11 +18825,11 @@ msgstr "O valor \"%1$s\" é inválido para o parâmetro \"grid_show\". As opçõ
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
 msgstr "O valor \"%1$s\" é demasiado longo para o parâmetro \"%2$s\" - %3$d caracteres. O tamanho máximo permitido é de %4$d caracteres."
 
-#: include/classes/items/CHelpItems.php:1261
+#: include/classes/items/CHelpItems.php:1269
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
 msgstr "Efetividade do cache de valores. Parâmetros válidos: requests, hits e misses."
 
-#: include/classes/items/CHelpItems.php:1257
+#: include/classes/items/CHelpItems.php:1265
 msgid "Value cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "Estatísticas do cache de valores. Modos válidos: total, free, pfree, used e pused."
 
@@ -18855,17 +18866,17 @@ msgstr "Mapeamento de valores"
 msgid "Value mappings"
 msgstr "Mapeamentos de valor"
 
-#: include/classes/items/CHelpItems.php:439
+#: include/classes/items/CHelpItems.php:447
 msgid "Value of MQTT topic. Format of returned data depends on the topic content. If wildcards are used, returns topic values in JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:161
-#: include/classes/items/CHelpItems.php:515
+#: include/classes/items/CHelpItems.php:165
+#: include/classes/items/CHelpItems.php:523
 msgid "Value of any Windows performance counter in English. Returns integer, float, string or text (depending on the request)"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:157
-#: include/classes/items/CHelpItems.php:511
+#: include/classes/items/CHelpItems.php:161
+#: include/classes/items/CHelpItems.php:519
 msgid "Value of any Windows performance counter. Returns integer, float, string or text (depending on the request)"
 msgstr "Valor de um contador de performance do Windows. Retorna: inteiro, número fracionário ou texto (dependendo da requisição)"
 
@@ -18905,8 +18916,8 @@ msgstr "Valores sem nomes não são permitidos nos campos do formulário."
 msgid "Variables"
 msgstr "Variáveis"
 
-#: include/classes/items/CHelpItems.php:177
-#: include/classes/items/CHelpItems.php:531
+#: include/classes/items/CHelpItems.php:181
+#: include/classes/items/CHelpItems.php:539
 msgid "Various information about specific process(es). Returns float"
 msgstr "Várias informações sobre processo(s) específico(s). Retorna número"
 
@@ -18921,7 +18932,7 @@ msgid "Vault authentication token"
 msgstr ""
 
 #: include/classes/core/ZBase.php:229
-#: include/classes/setup/CSetupWizard.php:902 include/config.inc.php:53
+#: include/classes/setup/CSetupWizard.php:936 include/config.inc.php:53
 msgid "Vault connection failed."
 msgstr ""
 
@@ -18951,12 +18962,12 @@ msgstr ""
 msgid "Version"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:73
-#: include/classes/items/CHelpItems.php:403
+#: include/classes/items/CHelpItems.php:77
+#: include/classes/items/CHelpItems.php:411
 msgid "Version of Zabbix agent. Returns string"
 msgstr "Versão do agente Zabbix. Retorna: texto"
 
-#: include/classes/items/CHelpItems.php:1265
+#: include/classes/items/CHelpItems.php:1273
 msgid "Version of Zabbix server or proxy"
 msgstr ""
 
@@ -18983,8 +18994,8 @@ msgstr ""
 msgid "View as"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:361
-#: include/classes/items/CHelpItems.php:715
+#: include/classes/items/CHelpItems.php:365
+#: include/classes/items/CHelpItems.php:723
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Espaço virtual em bytes ou percentagem do total. Retorna inteiro para bytes; Ponto flutuante para percentagem"
 
@@ -19037,7 +19048,7 @@ msgstr "Pedimos desculpa, foi atingido o número máximo possível de elementos.
 #: include/views/inventory.host.view.php:136
 #: include/views/inventory.host.view.php:141
 #: include/views/inventory.host.view.php:206
-#: include/views/inventory.host.view.php:219 jsLoader.php:343
+#: include/views/inventory.host.view.php:219 jsLoader.php:344
 msgid "Web"
 msgstr "Web"
 
@@ -19455,7 +19466,7 @@ msgstr "Está autenticado como \"%1$s\"."
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Não é possível seleccionar algumas das línguas, porque os locales para estas não estão instaladas no servidor web."
 
-#: include/func.inc.php:1533 index_http.php:87 index_sso.php:262
+#: include/func.inc.php:1533 index_http.php:87 index_sso.php:277
 msgid "You are not logged in"
 msgstr "Não está autenticado em"
 
@@ -19987,9 +19998,9 @@ msgstr "não pode ser modificado"
 #: include/classes/api/services/CEvent.php:819
 #: include/classes/api/services/CHost.php:1786
 #: include/classes/api/services/CHost.php:1792
-#: include/classes/api/services/CHostPrototype.php:1663
-#: include/classes/api/services/CHostPrototype.php:1675
-#: include/classes/api/services/CHostPrototype.php:1691
+#: include/classes/api/services/CHostPrototype.php:1665
+#: include/classes/api/services/CHostPrototype.php:1677
+#: include/classes/api/services/CHostPrototype.php:1693
 #: include/classes/api/services/CItemGeneral.php:481
 #: include/classes/api/services/CItemGeneral.php:508
 #: include/classes/api/services/CItemGeneral.php:514
@@ -20022,10 +20033,10 @@ msgstr "não pode ser modificado"
 #: include/classes/api/services/CUserGroup.php:463
 #: include/classes/api/services/CUser.php:697
 #: include/classes/api/services/CUser.php:857
-#: include/classes/import/CConfigurationImport.php:744
-#: include/classes/import/CConfigurationImport.php:977
-#: include/classes/import/CConfigurationImport.php:1131
-#: include/classes/import/CConfigurationImport.php:2828
+#: include/classes/import/CConfigurationImport.php:746
+#: include/classes/import/CConfigurationImport.php:981
+#: include/classes/import/CConfigurationImport.php:1137
+#: include/classes/import/CConfigurationImport.php:2838
 #: include/classes/validators/CActionCondValidator.php:65
 #: include/classes/validators/CActionCondValidator.php:71
 #: include/classes/validators/CActionCondValidator.php:82
@@ -20097,7 +20108,7 @@ msgid "circular dependency is not allowed"
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:2270
-#: include/classes/import/CConfigurationImport.php:2843
+#: include/classes/import/CConfigurationImport.php:2853
 msgid "circular item dependency is not allowed"
 msgstr "dependência circular entre itens não é permitida"
 
@@ -20631,7 +20642,7 @@ msgstr "regra de autodescoberta (LLD)"
 msgid "ltrim() - Remove specified characters from the beginning of a string"
 msgstr ""
 
-#: include/func.inc.php:581 jsLoader.php:121 jsLoader.php:196 jsLoader.php:360
+#: include/func.inc.php:581 jsLoader.php:121 jsLoader.php:196 jsLoader.php:361
 msgctxt "minute short"
 msgid "m"
 msgstr "m"
@@ -20708,8 +20719,8 @@ msgid "maximum dependent items count reached"
 msgstr "o máximo de itens dependentes foi alcançado"
 
 #: include/classes/api/services/CItemGeneral.php:2350
-#: include/classes/import/CConfigurationImport.php:2791
-#: include/classes/import/CConfigurationImport.php:2858
+#: include/classes/import/CConfigurationImport.php:2801
+#: include/classes/import/CConfigurationImport.php:2868
 msgid "maximum number of dependency levels reached"
 msgstr "o nível máximo de dependência foi alcançado"
 
@@ -20799,7 +20810,7 @@ msgstr ""
 msgid "name"
 msgstr "nome"
 
-#: include/classes/html/CMultiSelect.php:85 jsLoader.php:297
+#: include/classes/html/CMultiSelect.php:85 jsLoader.php:298
 msgid "new"
 msgstr "novo"
 
@@ -20934,7 +20945,7 @@ msgstr "saída"
 msgid "path/to/secret"
 msgstr ""
 
-#: include/classes/html/CMacroValue.php:139 jsLoader.php:371
+#: include/classes/html/CMacroValue.php:139 jsLoader.php:372
 msgid "path/to/secret:key"
 msgstr ""
 
@@ -21077,7 +21088,7 @@ msgstr "descrição sumária"
 #: include/classes/api/services/CHost.php:1817
 #: include/classes/api/services/CHost.php:1826
 #: include/classes/api/services/CHost.php:1832
-#: include/classes/api/services/CHostPrototype.php:1714
+#: include/classes/api/services/CHostPrototype.php:1716
 #: include/classes/api/services/CHttpTest.php:983
 #: include/classes/api/services/CHttpTest.php:1079
 #: include/classes/api/services/CItemGeneral.php:495
@@ -21193,10 +21204,10 @@ msgstr "o ID de template \"%1$s\" é passado %2$s vezes"
 #: include/classes/api/services/CHostBase.php:523
 #: include/classes/api/services/CHost.php:1907
 #: include/classes/api/services/CHost.php:2140
-#: include/classes/api/services/CHostPrototype.php:1658
-#: include/classes/api/services/CHostPrototype.php:1670
-#: include/classes/api/services/CHostPrototype.php:1686
-#: include/classes/api/services/CHostPrototype.php:1698
+#: include/classes/api/services/CHostPrototype.php:1660
+#: include/classes/api/services/CHostPrototype.php:1672
+#: include/classes/api/services/CHostPrototype.php:1688
+#: include/classes/api/services/CHostPrototype.php:1700
 #: include/classes/api/services/CHttpTest.php:744
 #: include/classes/api/services/CReport.php:203
 #: include/classes/api/services/CReport.php:592
@@ -21306,7 +21317,7 @@ msgid "truncate() - Truncates a value to decimal places"
 msgstr ""
 
 #: app/partials/layout.htmlpage.aside.php:74
-#: include/classes/html/CMultiSelect.php:84 jsLoader.php:296
+#: include/classes/html/CMultiSelect.php:84 jsLoader.php:297
 msgid "type here to search"
 msgstr "digite aqui para pesquisar"
 
@@ -21351,7 +21362,7 @@ msgstr "fim inesperado da macro"
 #: include/classes/api/services/CGraphGeneral.php:621
 #: include/classes/api/services/CGraphGeneral.php:743
 #: include/classes/api/services/CHostPrototype.php:325
-#: include/classes/api/services/CHostPrototype.php:1704
+#: include/classes/api/services/CHostPrototype.php:1706
 #: include/classes/api/services/CHttpTest.php:372
 #: include/classes/api/services/CHttpTest.php:515
 #: include/classes/api/services/CHttpTest.php:539
@@ -21420,7 +21431,7 @@ msgstr "número de versão não suportado"
 #: app/partials/monitoring.problem.filter.php:369
 #: app/views/administration.usergroup.edit.php:187
 #: app/views/js/popup.itemtestedit.view.js.php:446
-#: app/views/js/popup.itemtestedit.view.js.php:457
+#: app/views/js/popup.itemtestedit.view.js.php:456
 #: app/views/js/popup.valuemap.edit.js.php:29
 #: app/views/js/popup.valuemap.edit.js.php:30
 #: app/views/js/popup.valuemap.edit.js.php:31
@@ -21445,7 +21456,7 @@ msgstr "número de versão não suportado"
 #: include/views/js/configuration.httpconf.edit.js.php:73
 #: include/views/js/configuration.maintenance.edit.js.php:37
 #: include/views/js/configuration.maintenance.edit.js.php:61
-#: include/views/js/item.preprocessing.js.php:416 jsLoader.php:372
+#: include/views/js/item.preprocessing.js.php:416 jsLoader.php:373
 msgid "value"
 msgstr "valor"
 
@@ -21454,11 +21465,11 @@ msgstr "valor"
 msgid "value \"%1$s\" already exists"
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:839
-#: include/classes/import/CConfigurationImport.php:876
-#: include/classes/import/CConfigurationImport.php:2687
-#: include/classes/import/CConfigurationImport.php:2801
-#: include/classes/import/CConfigurationImport.php:2852
+#: include/classes/import/CConfigurationImport.php:843
+#: include/classes/import/CConfigurationImport.php:880
+#: include/classes/import/CConfigurationImport.php:2697
+#: include/classes/import/CConfigurationImport.php:2811
+#: include/classes/import/CConfigurationImport.php:2862
 #, c-format
 msgid "value \"%1$s\" not found"
 msgstr "o valor \"%1$s\" não foi encontrado"

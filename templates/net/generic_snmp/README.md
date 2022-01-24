@@ -17,11 +17,11 @@ No specific Zabbix configuration is required.
 
 ## Template links
 
-| Name                   |
-|------------------------|
-| EtherLike-MIB SNMP     |
-| Generic SNMP           |
-| Interfaces Simple SNMP |
+|Name|
+|----|
+|EtherLike-MIB SNMP |
+|Generic SNMP |
+|Interfaces Simple SNMP |
 
 ## Discovery rules
 

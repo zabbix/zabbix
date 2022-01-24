@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -3883,7 +3883,7 @@ void	zbx_update_env(double time_now)
  *                                                                            *
  * Function: zbx_dc_get_agent_item_nextcheck                                  *
  *                                                                            *
- * Purpose: calculate item nextcheck for zabix agent type items               *
+ * Purpose: calculate item nextcheck for Zabbix agent type items              *
  *                                                                            *
  ******************************************************************************/
 int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now,
@@ -3975,4 +3975,83 @@ int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekday
 	while (-1 != nextcheck && nextcheck <= now);
 
 	return nextcheck;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_md5buf2str                                                   *
+ *                                                                            *
+ * Purpose: get a textual representation of md5 sum                           *
+ *                                                                            *
+ * Parameters:                                                                *
+ *          md5 - [IN] buffer with md5 sum                                    *
+ *          str - [OUT] preallocated string with a text representation of MD5 *
+ *                     sum. String size must be at least                      *
+ *                     ZBX_MD5_PRINT_BUF_LEN bytes.                           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_md5buf2str(const md5_byte_t *md5, char *str)
+{
+	const char	*hex = "0123456789abcdef";
+	char		*p = str;
+	int		i;
+
+	for (i = 0; i < MD5_DIGEST_SIZE; i++)
+	{
+		*p++ = hex[md5[i] >> 4];
+		*p++ = hex[md5[i] & 15];
+	}
+
+	*p = '\0';
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_hex2bin                                                      *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     convert ASCII hex digit string to a binary representation (byte        *
+ *     string)                                                                *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     p_hex   - [IN] null-terminated input string                            *
+ *     buf     - [OUT] output buffer                                          *
+ *     buf_len - [IN] output buffer size                                      *
+ *                                                                            *
+ * Return value:                                                              *
+ *     Number of bytes written into 'buf' on successful conversion.           *
+ *     -1 - an error occurred.                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *     In case of error incomplete useless data may be written into 'buf'.    *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_hex2bin(const unsigned char *p_hex, unsigned char *buf, int buf_len)
+{
+	unsigned char	*q = buf;
+	int		len = 0;
+
+	while ('\0' != *p_hex)
+	{
+		if (0 != isxdigit(*p_hex) && 0 != isxdigit(*(p_hex + 1)) && buf_len > len)
+		{
+			unsigned char	hi = *p_hex & 0x0f;
+			unsigned char	lo;
+
+			if ('9' < *p_hex++)
+				hi = (unsigned char)(hi + 9u);
+
+			lo = *p_hex & 0x0f;
+
+			if ('9' < *p_hex++)
+				lo = (unsigned char)(lo + 9u);
+
+			*q++ = (unsigned char)(hi << 4 | lo);
+			len++;
+		}
+		else
+			return -1;
+	}
+
+	return len;
 }

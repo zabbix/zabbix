@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,23 +36,6 @@ void	lld_field_str_rollback(char **field, char **field_orig, zbx_uint64_t *flags
 	zbx_free(*field);
 	*field = *field_orig;
 	*field_orig = NULL;
-	*flags &= ~flag;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: lld_field_uint64_rollback                                        *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
-void	lld_field_uint64_rollback(zbx_uint64_t *field, zbx_uint64_t *field_orig, zbx_uint64_t *flags, zbx_uint64_t flag)
-{
-	if (0 == (*flags & flag))
-		return;
-
-	*field = *field_orig;
-	*field_orig = 0;
 	*flags &= ~flag;
 }
 

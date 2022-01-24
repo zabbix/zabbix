@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 #include "httprequest.h"
 #include "embed.h"
 #include "duktape.h"
+#include "zbxalgo.h"
 
 #ifdef HAVE_LIBCURL
 
@@ -146,19 +147,10 @@ static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 {
 	zbx_es_httprequest_t	*request;
 	CURLcode		err;
-	zbx_es_env_t		*env;
 	int			err_index = -1;
 
 	if (!duk_is_constructor_call(ctx))
 		return DUK_RET_TYPE_ERROR;
-
-	duk_push_global_stash(ctx);
-
-	if (1 != duk_get_prop_string(ctx, -1, "\xff""\xff""zbx_env"))
-		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
-
-	env = (zbx_es_env_t *)duk_to_pointer(ctx, -1);
-	duk_pop(ctx);
 
 	duk_push_this(ctx);
 
@@ -177,7 +169,6 @@ static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_WRITEDATA, request, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_PRIVATE, request, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_SSL_VERIFYPEER, 0L, err);
-	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_TIMEOUT, (long)env->timeout, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_SSL_VERIFYHOST, 0L, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HEADERFUNCTION, curl_header_cb, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HEADERDATA, request, err);
@@ -273,6 +264,20 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 	char			*url = NULL, *contents = NULL;
 	CURLcode		err;
 	int			err_index = -1;
+	zbx_es_env_t		*env;
+	zbx_uint64_t		timeout_ms, elapsed_ms;
+
+	if (NULL == (env = zbx_es_get_env(ctx)))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
+
+	elapsed_ms = zbx_get_duration_ms(&env->start_time);
+	timeout_ms = (zbx_uint64_t)env->timeout * 1000;
+
+	if (elapsed_ms >= timeout_ms)
+	{
+		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "script execution timeout occurred");
+		goto out;
+	}
 
 	if (SUCCEED != zbx_cesu8_to_utf8(duk_to_string(ctx, 0), &url))
 	{
@@ -319,6 +324,7 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HTTPHEADER, request->headers, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_CUSTOMREQUEST, http_request, err);
+	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_TIMEOUT_MS, timeout_ms - elapsed_ms, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_POSTFIELDS, ZBX_NULL2EMPTY_STR(contents), err);
 
 	request->data_offset = 0;
@@ -440,6 +446,32 @@ static duk_ret_t	es_httprequest_status(duk_context *ctx)
 
 /******************************************************************************
  *                                                                            *
+ * Function: parse_header                                                     *
+ *                                                                            *
+ * Purpose: retrieves value of a header                                       *
+ *                                                                            *
+ * Parameters: header    - [IN] the http header to extract value from         *
+ *             value_out - [OUT] the value                                    *
+ *                                                                            *
+ ******************************************************************************/
+static int	parse_header(char *header, char **value_out)
+{
+	char *value;
+
+	if (NULL == (value = strchr(header, ':')))
+		return FAIL;
+
+	*value++ = '\0';
+	while (' ' == *value || '\t' == *value)
+		value++;
+
+	*value_out = value;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: es_obj_put_http_header                                           *
  *                                                                            *
  * Purpose: puts http header <field>: <value> as object property/value        *
@@ -453,12 +485,8 @@ static void	es_put_header(duk_context *ctx, int idx, char *header)
 {
 	char	*value;
 
-	if (NULL == (value = strchr(header, ':')))
+	if (FAIL == parse_header(header, &value))
 		return;
-
-	*value++ = '\0';
-	while (' ' == *value || '\t' == *value)
-		value++;
 
 	duk_push_string(ctx, value);
 
@@ -468,19 +496,18 @@ static void	es_put_header(duk_context *ctx, int idx, char *header)
 
 /******************************************************************************
  *                                                                            *
- * Function: es_httprequest_get_headers                                       *
+ * Function: get_headers_as_strings                                           *
  *                                                                            *
- * Purpose: CurlHttpRequest.GetHeaders method                                 *
+ * Purpose: retrieve headers from request in form of strings                  *
+ *                                                                            *
+ * Parameters: ctx     - [IN] the duktape context                             *
+ *             request - [IN] the request to retrieve headers from            *
  *                                                                            *
  ******************************************************************************/
-static duk_ret_t	es_httprequest_get_headers(duk_context *ctx)
+static duk_ret_t	get_headers_as_strings(duk_context *ctx, zbx_es_httprequest_t *request)
 {
-	zbx_es_httprequest_t	*request;
-	duk_idx_t		idx;
 	char			*ptr, *header;
-
-	if (NULL == (request = es_httprequest(ctx)))
-		return duk_error(ctx, DUK_RET_EVAL_ERROR, "internal scripting error: null object");
+	duk_idx_t		idx;
 
 	idx = duk_push_object(ctx);
 
@@ -494,6 +521,131 @@ static duk_ret_t	es_httprequest_get_headers(duk_context *ctx)
 	}
 
 	return 1;
+}
+
+typedef struct
+{
+	char			*name;
+	zbx_vector_str_t	values;
+}
+zbx_cached_header_t;
+
+static void	cached_headers_free(zbx_cached_header_t *header)
+{
+	zbx_vector_str_clear_ext(&header->values, zbx_str_free);
+	zbx_vector_str_destroy(&header->values);
+	zbx_free(header->name);
+	zbx_free(header);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_headers_as_arrays                                            *
+ *                                                                            *
+ * Purpose: retrieve headers from request in form of arrays                   *
+ *                                                                            *
+ * Parameters: ctx     - [IN] the duktape context                             *
+ *             request - [IN] the request to retrieve headers from            *
+ *                                                                            *
+ ******************************************************************************/
+static duk_ret_t	get_headers_as_arrays(duk_context *ctx, zbx_es_httprequest_t *request)
+{
+	char			*ptr, *header;
+	zbx_vector_ptr_t	headers;
+	duk_idx_t		idx;
+	int			i, j;
+
+	zbx_vector_ptr_create(&headers);
+
+	idx = duk_push_object(ctx);
+
+	if (0 == request->headers_in_offset)
+		goto out;
+
+	for (ptr = request->headers_in; NULL != (header = zbx_http_parse_header(&ptr)); )
+	{
+		char			*value;
+		zbx_cached_header_t	*existing_header = NULL;
+
+		if (FAIL == parse_header(header, &value))
+		{
+			zbx_free(header);
+			continue;
+		}
+
+		for (j = 0; j < headers.values_num; j++)
+		{
+			zbx_cached_header_t *h = (zbx_cached_header_t*)headers.values[j];
+
+			if (0 == strcmp(header, h->name))
+			{
+				existing_header = h;
+				zbx_vector_str_append(&existing_header->values, zbx_strdup(NULL, value));
+				zbx_free(header);
+
+				break;
+			}
+		}
+
+		if (NULL == existing_header)
+		{
+			zbx_cached_header_t	*cached_header;
+
+			cached_header = zbx_malloc(NULL, sizeof(zbx_cached_header_t));
+
+			cached_header->name = header;
+			zbx_vector_str_create(&cached_header->values);
+			zbx_vector_str_append(&cached_header->values, zbx_strdup(NULL, value));
+			zbx_vector_ptr_append(&headers, cached_header);
+		}
+	}
+
+	for (i = 0; i < headers.values_num; i++) {
+		zbx_cached_header_t	*h = (zbx_cached_header_t*)headers.values[i];
+		duk_idx_t		arr_idx;
+
+		arr_idx = duk_push_array(ctx);
+
+		for (j = 0; j < h->values.values_num; j++)
+		{
+			duk_push_string(ctx, h->values.values[j]);
+			duk_put_prop_index(ctx, arr_idx, (duk_uarridx_t)j);
+		}
+
+		(void)duk_put_prop_string(ctx, idx, h->name);
+	}
+
+out:
+	zbx_vector_ptr_clear_ext(&headers, (zbx_mem_free_func_t)cached_headers_free);
+	zbx_vector_ptr_destroy(&headers);
+	return 1;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: es_httprequest_get_headers                                       *
+ *                                                                            *
+ * Purpose: CurlHttpRequest.GetHeaders method                                 *
+ *                                                                            *
+ ******************************************************************************/
+static duk_ret_t	es_httprequest_get_headers(duk_context *ctx)
+{
+	zbx_es_httprequest_t	*request;
+
+	if (NULL == (request = es_httprequest(ctx)))
+		return duk_error(ctx, DUK_RET_EVAL_ERROR, "internal scripting error: null object");
+
+	if (0 == duk_is_null_or_undefined(ctx, 0))
+	{
+		duk_bool_t	as_array;
+
+		as_array = duk_to_boolean(ctx, 0);
+
+		if (0 != as_array)
+			return get_headers_as_arrays(ctx, request);
+	}
+
+	return get_headers_as_strings(ctx, request);
 }
 
 /******************************************************************************
@@ -563,7 +715,7 @@ static const duk_function_list_entry	curlhttprequest_methods[] = {
 	{"Delete", es_httprequest_delete, 2},
 	{"Status", es_httprequest_status, 0},
 	{"SetProxy", es_httprequest_set_proxy, 1},
-	{"GetHeaders", es_httprequest_get_headers, 0},
+	{"GetHeaders", es_httprequest_get_headers, 1},
 	{"SetHttpAuth", es_httprequest_set_httpauth, 3},
 	{NULL, NULL, 0}
 };
@@ -577,7 +729,7 @@ static const duk_function_list_entry	httprequest_methods[] = {
 	{"delete", es_httprequest_delete, 2},
 	{"getStatus", es_httprequest_status, 0},
 	{"setProxy", es_httprequest_set_proxy, 1},
-	{"getHeaders", es_httprequest_get_headers, 0},
+	{"getHeaders", es_httprequest_get_headers, 1},
 	{"setHttpAuth", es_httprequest_set_httpauth, 3},
 	{NULL, NULL, 0}
 };
