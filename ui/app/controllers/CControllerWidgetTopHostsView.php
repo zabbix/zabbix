@@ -33,6 +33,7 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 
 	protected function doAction() {
 		$fields = $this->getForm()->getFieldsData();
+		$configuration = $fields['columns'];
 
 		$groupids = $fields['groupids'] ? getSubGroups($fields['groupids']) : null;
 		$hostids = $fields['hostids'] ?: null;
@@ -56,8 +57,8 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 
 		$time_now = time();
 
-		$master_items = self::getItems($fields['columns'][$fields['column']]['item'], $groupids, $hostids);
-		$master_item_values = self::getItemValues($master_items, $fields['columns'][$fields['column']], $time_now);
+		$master_items = self::getItems($configuration[$fields['column']]['item'], $groupids, $hostids);
+		$master_item_values = self::getItemValues($master_items, $configuration[$fields['column']], $time_now);
 
 		if ($fields['order'] == CWidgetFormTopHosts::ORDER_TOPN) {
 			arsort($master_item_values, SORT_NUMERIC);
@@ -72,12 +73,12 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 		$master_hostids = [];
 
 		foreach (array_keys($master_item_values) as $itemid) {
-			$master_hostids[] = $master_items[$itemid]['hostid'];
+			$master_hostids[$master_items[$itemid]['hostid']] = true;
 		}
 
 		$item_values = [];
 
-		foreach ($fields['columns'] as $column_index => $column) {
+		foreach ($configuration as $column_index => &$column) {
 			if ($column['data'] != CWidgetFieldColumnsList::DATA_ITEM_VALUE) {
 				continue;
 			}
@@ -87,43 +88,59 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 				$column_item_values = $master_item_values;
 			}
 			else {
-				$column_items = self::getItems($column['item'], $groupids, $master_hostids);
+				$column_items = $column['min'] !== '' && $column['max'] !== ''
+					? self::getItems($column['item'], $groupids, array_keys($master_hostids))
+					: self::getItems($column['item'], $groupids, $hostids);
+
 				$column_item_values = self::getItemValues($column_items, $column, $time_now);
+			}
+
+			if ($column['min'] === '') {
+				$column['min'] = min($column_item_values);
+			}
+
+			if ($column['max'] === '') {
+				$column['max'] = max($column_item_values);
 			}
 
 			$item_values[$column_index] = [];
 
 			foreach ($column_item_values as $itemid => $column_item_value) {
-				$item_values[$column_index][$column_items[$itemid]['hostid']] = [
-					'value' => $column_item_value,
-					'item' => $column_items[$itemid]
-				];
+				if (array_key_exists($column_items[$itemid]['hostid'], $master_hostids)) {
+					$item_values[$column_index][$column_items[$itemid]['hostid']] = [
+						'value' => $column_item_value,
+						'item' => $column_items[$itemid]
+					];
+				}
 			}
 		}
+		unset($column);
 
 		$text_columns = [];
 
-		foreach ($fields['columns'] as $column_index => $column) {
+		foreach ($configuration as $column_index => $column) {
 			if ($column['data'] == CWidgetFieldColumnsList::DATA_TEXT) {
 				$text_columns[$column_index] = $column['text'];
 			}
 		}
 
-		$text_columns = CMacrosResolverHelper::resolveWidgetTopHostsTextColumns($text_columns, $master_hostids);
+		$text_columns = CMacrosResolverHelper::resolveWidgetTopHostsTextColumns($text_columns,
+			array_keys($master_hostids)
+		);
 
 		$rows = [];
 
-		foreach ($master_hostids as $hostid) {
+		foreach (array_keys($master_hostids) as $hostid) {
 			$row = [];
 
-			foreach ($fields['columns'] as $column_index => $column) {
+			foreach ($configuration as $column_index => $column) {
 				switch ($column['data']) {
 					case CWidgetFieldColumnsList::DATA_HOST_NAME:
 						if ($hosts === null) {
 							$hosts = API::Host()->get([
 								'output' => ['name'],
 								'groupids' => $groupids,
-								'hostids' => $master_hostids,
+								'hostids' => array_keys($master_hostids),
 								'monitored_hosts' => true,
 								'preservekeys' => true
 							]);
@@ -161,7 +178,7 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultName()),
-			'configuration' => $fields['columns'],
+			'configuration' => $configuration,
 			'rows' => $rows,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
