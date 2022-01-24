@@ -84,8 +84,8 @@ Ignored if housekeeper is being currently executed.
 .RS 4
 .TP 4
 .B trigger_housekeeper_execute
-Execute the problem housekeeper.
-Ignored if problem housekeeper is being currently executed.
+Execute the trigger housekeeper.
+Ignored if trigger housekeeper is being currently executed.
 .RE
 .RS 4
 .TP 4

@@ -192,7 +192,6 @@
 		});
 
 		$groups_ms.on('change', (e) => {
-			console.log('e')
 			$groups_ms.multiSelect('setDisabledEntries',
 				[... document.querySelectorAll('[name^="groups["], [name^="group_links["]')]
 					.map((input) => input.value)

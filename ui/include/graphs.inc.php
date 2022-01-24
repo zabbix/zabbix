@@ -756,6 +756,7 @@ function yieldGraphScaleInterval(float $min, float $max, bool $is_binary, int $p
 * @param float $data_min   Minimum extreme of the graph.
 * @param float $data_max   Maximum extreme of the graph.
 * @param bool  $is_binary  Is the scale binary (use 1024 base for units)?
+* @param bool  $calc_power Should scale power be calculated?
 * @param bool  $calc_min   Should scale minimum be calculated?
 * @param bool  $calc_max   Should scale maximum be calculated?
 * @param int   $rows_min   Minimum number of scale rows.
@@ -763,15 +764,15 @@ function yieldGraphScaleInterval(float $min, float $max, bool $is_binary, int $p
 *
 * @return array|null
 */
-function calculateGraphScaleExtremes(float $data_min, float $data_max, bool $is_binary, bool $calc_min, bool $calc_max,
-		int $rows_min, int $rows_max): ?array {
+function calculateGraphScaleExtremes(float $data_min, float $data_max, bool $is_binary, bool $calc_power,
+		bool $calc_min, bool $calc_max, int $rows_min, int $rows_max): ?array {
 	$scale_min = truncateFloat($data_min);
 	$scale_max = truncateFloat($data_max);
 
 	if ($scale_min >= $scale_max) {
 		if ($scale_max > 0) {
 			if ($calc_min) {
-				$scale_min = $scale_max > 0 ? 0 : ($scale_max == 0 ? -1 : $scale_max * 1.25);
+				$scale_min = 0;
 			}
 			elseif ($calc_max) {
 				$scale_max = $scale_min < 0 ? 0 : ($scale_min == 0 ? 1 : $scale_min * 1.25);
@@ -785,7 +786,7 @@ function calculateGraphScaleExtremes(float $data_min, float $data_max, bool $is_
 				$scale_max = $scale_min < 0 ? 0 : ($scale_min == 0 ? 1 : $scale_min * 1.25);
 			}
 			elseif ($calc_min) {
-				$scale_min = $scale_max > 0 ? 0 : ($scale_max == 0 ? -1 : $scale_max * 1.25);
+				$scale_min = $scale_max == 0 ? -1 : $scale_max * 1.25;
 			}
 			else {
 				return null;
@@ -793,7 +794,9 @@ function calculateGraphScaleExtremes(float $data_min, float $data_max, bool $is_
 		}
 	}
 
-	$power = (int) min(8, max(0, floor(log(max(abs($scale_min), abs($scale_max)), $is_binary ? ZBX_KIBIBYTE : 1000))));
+	$power = $calc_power
+		? (int) min(8, max(0, floor(log(max(abs($scale_min), abs($scale_max)), $is_binary ? ZBX_KIBIBYTE : 1000))))
+		: 0;
 
 	$best_result_value = null;
 	$best_result = [
@@ -889,7 +892,10 @@ function calculateGraphScaleValues(float $min, float $max, bool $min_calculated,
 		string $units, bool $is_binary, int $power, int $precision_max): array {
 	$unit_base = $is_binary ? ZBX_KIBIBYTE : 1000;
 
-	$units_length = ($units === '' && $power == 0) ? 0 : (1 + mb_strlen($units) + ($power > 0 ? 1 : 0));
+	$units_length = ($units !== '' && $units !== '!')
+		? ($power > 0 ? 1 : 0) + mb_strlen($units) + ($units[0] !== '!' ? 1 : 0)
+		: ($power > 0 ? 1 : 0);
+
 	$precision = max(3, $units_length == 0 ? $precision_max : ($precision_max - $units_length - ($min < 0 ? 1 : 0)));
 
 	$decimals = min(ZBX_UNITS_ROUNDOFF_SUFFIXED, $precision - 1);
