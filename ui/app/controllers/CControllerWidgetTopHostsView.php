@@ -60,16 +60,20 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 		$guide_item_values = self::getItemValues($guide_items, $fields['columns'][$fields['column']], $time_now);
 
 		if ($fields['order'] == CWidgetFormTopHosts::ORDER_TOPN) {
-			asort($guide_item_values, SORT_NUMERIC);
+			arsort($guide_item_values, SORT_NUMERIC);
 		}
 		else {
-			arsort($guide_item_values, SORT_NUMERIC);
+			asort($guide_item_values, SORT_NUMERIC);
 		}
 
 		$guide_item_values = array_slice($guide_item_values, 0, $fields['hosts_count'], true);
 		$guide_items = array_intersect_key($guide_items, $guide_item_values);
 
-		$guide_hostids = array_column($guide_items, 'hostid');
+		$guide_hostids = [];
+
+		foreach (array_keys($guide_item_values) as $itemid) {
+			$guide_hostids[] = $guide_items[$itemid]['hostid'];
+		}
 
 		$item_values = [];
 
