@@ -115,13 +115,13 @@ $form_grid->addItem([
 		(new CSelect('aggregate_function'))
 			->setValue($data['aggregate_function'])
 			->addOptions(CSelect::createOptionsFromArray([
-				CWidgetFieldColumnsList::FUNC_NONE => _('none'),
-				CWidgetFieldColumnsList::FUNC_MIN => _('min'),
-				CWidgetFieldColumnsList::FUNC_MAX => _('max'),
-				CWidgetFieldColumnsList::FUNC_AVG => _('avg'),
-				CWidgetFieldColumnsList::FUNC_LAST => _('last'),
-				CWidgetFieldColumnsList::FUNC_FIRST => _('first'),
-				CWidgetFieldColumnsList::FUNC_COUNT => _('count')
+				GRAPH_AGGREGATE_NONE => _('none'),
+				GRAPH_AGGREGATE_MIN => _('min'),
+				GRAPH_AGGREGATE_MAX => _('max'),
+				GRAPH_AGGREGATE_AVG => _('avg'),
+				GRAPH_AGGREGATE_LAST => _('last'),
+				GRAPH_AGGREGATE_FIRST => _('first'),
+				GRAPH_AGGREGATE_COUNT => _('count')
 			]))
 	)
 ]);

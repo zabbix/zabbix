@@ -56,23 +56,23 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 
 		$time_now = time();
 
-		$guide_items = self::getItems($fields['columns'][$fields['column']]['item'], $groupids, $hostids);
-		$guide_item_values = self::getItemValues($guide_items, $fields['columns'][$fields['column']], $time_now);
+		$master_items = self::getItems($fields['columns'][$fields['column']]['item'], $groupids, $hostids);
+		$master_item_values = self::getItemValues($master_items, $fields['columns'][$fields['column']], $time_now);
 
 		if ($fields['order'] == CWidgetFormTopHosts::ORDER_TOPN) {
-			arsort($guide_item_values, SORT_NUMERIC);
+			arsort($master_item_values, SORT_NUMERIC);
 		}
 		else {
-			asort($guide_item_values, SORT_NUMERIC);
+			asort($master_item_values, SORT_NUMERIC);
 		}
 
-		$guide_item_values = array_slice($guide_item_values, 0, $fields['count'], true);
-		$guide_items = array_intersect_key($guide_items, $guide_item_values);
+		$master_item_values = array_slice($master_item_values, 0, $fields['count'], true);
+		$master_items = array_intersect_key($master_items, $master_item_values);
 
-		$guide_hostids = [];
+		$master_hostids = [];
 
-		foreach (array_keys($guide_item_values) as $itemid) {
-			$guide_hostids[] = $guide_items[$itemid]['hostid'];
+		foreach (array_keys($master_item_values) as $itemid) {
+			$master_hostids[] = $master_items[$itemid]['hostid'];
 		}
 
 		$item_values = [];
@@ -83,11 +83,11 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 			}
 
 			if ($column_index == $fields['column']) {
-				$column_items = $guide_items;
-				$column_item_values = $guide_item_values;
+				$column_items = $master_items;
+				$column_item_values = $master_item_values;
 			}
 			else {
-				$column_items = self::getItems($column['item'], $groupids, $guide_hostids);
+				$column_items = self::getItems($column['item'], $groupids, $master_hostids);
 				$column_item_values = self::getItemValues($column_items, $column, $time_now);
 			}
 
@@ -109,11 +109,11 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 			}
 		}
 
-		$text_columns = CMacrosResolverHelper::resolveWidgetTopHostsTextColumns($text_columns, $guide_hostids);
+		$text_columns = CMacrosResolverHelper::resolveWidgetTopHostsTextColumns($text_columns, $master_hostids);
 
 		$rows = [];
 
-		foreach ($guide_hostids as $hostid) {
+		foreach ($master_hostids as $hostid) {
 			$row = [];
 
 			foreach ($fields['columns'] as $column_index => $column) {
@@ -123,7 +123,7 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 							$hosts = API::Host()->get([
 								'output' => ['name'],
 								'groupids' => $groupids,
-								'hostids' => $guide_hostids,
+								'hostids' => $master_hostids,
 								'monitored_hosts' => true,
 								'preservekeys' => true
 							]);

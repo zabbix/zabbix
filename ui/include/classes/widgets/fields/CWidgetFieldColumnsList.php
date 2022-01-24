@@ -26,15 +26,6 @@ class CWidgetFieldColumnsList extends CWidgetField {
 	const DATA_HOST_NAME = 2;
 	const DATA_TEXT = 3;
 
-	// Value aggregation functions when source of value is set to DATA_ITEM_VALUE.
-	const FUNC_NONE = 0;
-	const FUNC_MIN = 1;
-	const FUNC_MAX = 2;
-	const FUNC_AVG = 3;
-	const FUNC_COUNT = 4;
-	const FUNC_FIRST = 6;
-	const FUNC_LAST = 7;
-
 	// Column value display type.
 	const DISPLAY_AS_IS = 1;
 	const DISPLAY_BAR = 2;
@@ -65,9 +56,9 @@ class CWidgetFieldColumnsList extends CWidgetField {
 							'type' => API_STRING_UTF8]
 			]],
 			'timeshift'				=> ['type' => API_TIME_UNIT, 'in' => implode(':', [ZBX_MIN_TIMESHIFT, ZBX_MAX_TIMESHIFT])],
-			'aggregate_function'	=> ['type' => API_INT32, 'in' => implode(',', [self::FUNC_NONE, self::FUNC_MIN, self::FUNC_MAX, self::FUNC_AVG, self::FUNC_LAST, self::FUNC_FIRST, self::FUNC_COUNT]), 'default' => self::FUNC_NONE],
+			'aggregate_function'	=> ['type' => API_INT32, 'in' => implode(',', [GRAPH_AGGREGATE_NONE, GRAPH_AGGREGATE_MIN, GRAPH_AGGREGATE_MAX, GRAPH_AGGREGATE_AVG, GRAPH_AGGREGATE_LAST, GRAPH_AGGREGATE_FIRST, GRAPH_AGGREGATE_COUNT]), 'default' => GRAPH_AGGREGATE_NONE],
 			'aggregate_interval'	=> ['type' => API_MULTIPLE, 'rules' => [
-						['if' => ['field' => 'aggregate_function', 'in' => implode(',', [self::FUNC_MIN, self::FUNC_MAX, self::FUNC_AVG, self::FUNC_LAST, self::FUNC_FIRST, self::FUNC_COUNT])],
+						['if' => ['field' => 'aggregate_function', 'in' => implode(',', [GRAPH_AGGREGATE_MIN, GRAPH_AGGREGATE_MAX, GRAPH_AGGREGATE_AVG, GRAPH_AGGREGATE_LAST, GRAPH_AGGREGATE_FIRST, GRAPH_AGGREGATE_COUNT])],
 							'type' => API_TIME_UNIT, 'flags' => API_REQUIRED|API_NOT_EMPTY|API_TIME_UNIT_WITH_YEAR, 'in' => implode(':', [1, ZBX_MAX_TIMESHIFT])],
 						['else' => true,
 							'type' => API_STRING_UTF8]

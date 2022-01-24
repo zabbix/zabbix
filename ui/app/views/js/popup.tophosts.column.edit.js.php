@@ -64,7 +64,7 @@ window.tophosts_column_edit_form = new class {
 		const display_as_is = ($('[name="display"]:checked').val() == <?= CWidgetFieldColumnsList::DISPLAY_AS_IS ?>);
 		const data_item_value = ($('[name="data"]').val() == <?= CWidgetFieldColumnsList::DATA_ITEM_VALUE ?>);
 		const data_text = ($('[name="data"]').val() == <?= CWidgetFieldColumnsList::DATA_TEXT ?>);
-		const no_aggregate_function = $('[name="aggregate_function"]').val() == <?= CWidgetFieldColumnsList::FUNC_NONE ?>;
+		const no_aggregate_function = $('[name="aggregate_function"]').val() == <?= GRAPH_AGGREGATE_NONE ?>;
 
 		$('#item', this._$widget_form).multiSelect(data_item_value ? 'enable' : 'disable');
 		$('[name="aggregate_function"],[name="timeshift"]', this._$widget_form).attr('disabled', !data_item_value);
