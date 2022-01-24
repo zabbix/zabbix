@@ -18,8 +18,10 @@
 **/
 
 #include "common.h"
-#include "dbcache.h"
 #include "log.h"
+#include "zbxalgo.h"
+#include "zbxdb.h"
+
 #include "db.h"
 
 void	zbx_lld_override_operation_free(zbx_lld_override_operation_t *override_operation)

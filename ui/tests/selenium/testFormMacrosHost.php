@@ -322,7 +322,7 @@ class testFormMacrosHost extends testFormMacros {
 				$hostid)->waitUntilReady();
 //		Caused by https://support.zabbix.com/browse/ZBXNEXT-7115
 //		Support of user macros in item names has been dropped.
-		$this->assertTrue($this->query('link', 'trap['.$macro['value'].']')->exists());
+		$this->assertTrue($this->query('xpath://span[text()='.CXPATHHelper::escapeQuotes('trap['.$macro['value'].']').']')->exists());
 
 		// Open host form in popup and change macro type.
 		$form = $this->openMacrosTab('zabbix.php?action=host.view', 'hosts', false, $hostname);
@@ -337,7 +337,7 @@ class testFormMacrosHost extends testFormMacros {
 				$hostid)->waitUntilReady();
 //		Caused by https://support.zabbix.com/browse/ZBXNEXT-7115
 //		Support of user macros in item names has been dropped.
-		$this->assertTrue($this->query('link', 'trap[******]')->exists());
+		$this->assertTrue($this->query('xpath://span[text()="trap[******]"]')->exists());
 	}
 
 	public function getCreateVaultMacrosData() {

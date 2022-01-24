@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-16T20:03:01Z'
+  date: '2022-01-18T20:39:29Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -15,15 +15,142 @@ zabbix_export:
         
         MIBs used:
         IDRAC-MIB-SMIv2
+        SNMPv2-MIB
         
-        Template tooling version used: 0.40
-      templates:
-        -
-          name: 'Generic SNMP'
+        Template tooling version used: 0.41
       groups:
         -
           name: 'Templates/Server hardware'
       items:
+        -
+          uuid: e06043e05d5a4c1da6b851bd43d66bda
+          name: 'ICMP ping'
+          type: SIMPLE
+          key: icmpping
+          history: 1w
+          valuemap:
+            name: 'Service state'
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: a6e3c67a99104c6f8672e3826cba009f
+              expression: 'max(/Dell iDRAC SNMP/icmpping,#3)=0'
+              name: 'Unavailable by ICMP ping'
+              priority: HIGH
+              description: 'Last three attempts returned timeout.  Please check device connectivity.'
+        -
+          uuid: 98ab999f96db4eceb4f347baf2df80a9
+          name: 'ICMP loss'
+          type: SIMPLE
+          key: icmppingloss
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 145ea57d03d3460cb86272493e99356a
+              expression: 'min(/Dell iDRAC SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Dell iDRAC SNMP/icmppingloss,5m)<100'
+              name: 'High ICMP ping loss'
+              opdata: 'Loss: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'Unavailable by ICMP ping'
+                  expression: 'max(/Dell iDRAC SNMP/icmpping,#3)=0'
+        -
+          uuid: 52b385efc0a54f5590f55716e4a179bf
+          name: 'ICMP response time'
+          type: SIMPLE
+          key: icmppingsec
+          history: 1w
+          value_type: FLOAT
+          units: s
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: cd49c04001c74051b585f519503861d0
+              expression: 'avg(/Dell iDRAC SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
+              name: 'High ICMP ping response time'
+              opdata: 'Value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'High ICMP ping loss'
+                  expression: 'min(/Dell iDRAC SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Dell iDRAC SNMP/icmppingloss,5m)<100'
+                -
+                  name: 'Unavailable by ICMP ping'
+                  expression: 'max(/Dell iDRAC SNMP/icmpping,#3)=0'
+        -
+          uuid: 2f3d32242b0740e7830a4dff872308ac
+          name: 'SNMP traps (fallback)'
+          type: SNMP_TRAP
+          key: snmptrap.fallback
+          history: 2w
+          trends: '0'
+          value_type: LOG
+          description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items'
+          logtimefmt: 'hh:mm:sszyyyy/MM/dd'
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: ca82831e78f74372bb9be8f2c97ee9ac
+          name: 'System contact details'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.4.0
+          key: 'system.contact[sysContact.0]'
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.
+          inventory_link: CONTACT
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 13bd109b9a814ba4837eb98b8daf98a5
+          name: 'System description'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.1.0
+          key: 'system.descr[sysDescr.0]'
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            A textual description of the entity. This value should
+            include the full name and version identification of the system's hardware type, software operating-system, and
+            networking software.
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
+          tags:
+            -
+              tag: Application
+              value: General
         -
           uuid: e49f14d4a51f4018b17bd200d4819975
           name: 'Firmware version'
@@ -110,6 +237,82 @@ zabbix_export:
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
         -
+          uuid: 59a77e7fe66f4412bb117f8283216ce3
+          name: 'System location'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.6.0
+          key: 'system.location[sysLocation.0]'
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.
+          inventory_link: LOCATION
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 2f76314dc3204e898df338f238f7d407
+          name: 'System name'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.5.0
+          key: system.name
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            An administratively-assigned name for this managed node.By convention, this is the node's fully-qualified domain name.  If the name is unknown, the value is the zero-length string.
+          inventory_link: NAME
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
+          tags:
+            -
+              tag: Application
+              value: General
+          triggers:
+            -
+              uuid: ce1b064b2a07450d9b51b6b12bd752a9
+              expression: 'last(/Dell iDRAC SNMP/system.name,#1)<>last(/Dell iDRAC SNMP/system.name,#2) and length(last(/Dell iDRAC SNMP/system.name))>0'
+              name: 'System name has changed (new name: {ITEM.VALUE})'
+              priority: INFO
+              description: 'System name has changed. Ack to close.'
+              manual_close: 'YES'
+        -
+          uuid: 737d790ef008450b81a69559ed1ee963
+          name: 'System object ID'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.2.0
+          key: 'system.objectid[sysObjectID.0]'
+          delay: 15m
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            The vendor's authoritative identification of the network management subsystem contained in the entity.  This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
+          tags:
+            -
+              tag: Application
+              value: General
+        -
           uuid: 9750f3ffa5d648ce9e99adea1d92b54c
           name: 'Overall system health status'
           type: SNMP_AGENT
@@ -191,6 +394,74 @@ zabbix_export:
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
               manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'System name has changed (new name: {ITEM.VALUE})'
+                  expression: 'last(/Dell iDRAC SNMP/system.name,#1)<>last(/Dell iDRAC SNMP/system.name,#2) and length(last(/Dell iDRAC SNMP/system.name))>0'
+        -
+          uuid: 522c04c2c624478b8de4287f863ea67a
+          name: Uptime
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.3.0
+          key: 'system.uptime[sysUpTime.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: SNMPv2-MIB
+            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: c0efbe61effc494a970e0e02b9ce8f55
+              expression: 'last(/Dell iDRAC SNMP/system.uptime[sysUpTime.0])<10m'
+              name: '{HOST.NAME} has been restarted (uptime < 10m)'
+              priority: WARNING
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'No SNMP data collection'
+                  expression: 'max(/Dell iDRAC SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+        -
+          uuid: 6bcba0816ea942f6a87078070c82e7c3
+          name: 'SNMP agent availability'
+          type: INTERNAL
+          key: 'zabbix[host,snmp,available]'
+          history: 7d
+          description: |
+            Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.
+            Possible value:
+            0 - not available
+            1 - available
+            2 - unknown
+          valuemap:
+            name: zabbix.host.available
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 22ae441fffdd48919be0041e1507a479
+              expression: 'max(/Dell iDRAC SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              name: 'No SNMP data collection'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
+              dependencies:
+                -
+                  name: 'Unavailable by ICMP ping'
+                  expression: 'max(/Dell iDRAC SNMP/icmpping,#3)=0'
       discovery_rules:
         -
           uuid: 2bb1759d46264c92b7cb70e7a1d18236
@@ -1070,6 +1341,12 @@ zabbix_export:
           macro: '{$HEALTH_WARN_STATUS}'
           value: '4'
         -
+          macro: '{$ICMP_LOSS_WARN}'
+          value: '20'
+        -
+          macro: '{$ICMP_RESPONSE_TIME_WARN}'
+          value: '0.15'
+        -
           macro: '{$PSU_CRIT_STATUS:"critical"}'
           value: '5'
         -
@@ -1078,6 +1355,9 @@ zabbix_export:
         -
           macro: '{$PSU_WARN_STATUS:"nonCritical"}'
           value: '4'
+        -
+          macro: '{$SNMP.TIMEOUT}'
+          value: 5m
         -
           macro: '{$TEMP_CRIT}'
           value: '60'
@@ -1323,3 +1603,26 @@ zabbix_export:
             -
               value: '3'
               newvalue: 'Force Write Back'
+        -
+          uuid: 485c599de2394bd3bc7cfd2272d72ca0
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up
+        -
+          uuid: 1548d19085874e6a86abb4783f5ba920
+          name: zabbix.host.available
+          mappings:
+            -
+              value: '0'
+              newvalue: 'not available'
+            -
+              value: '1'
+              newvalue: available
+            -
+              value: '2'
+              newvalue: unknown

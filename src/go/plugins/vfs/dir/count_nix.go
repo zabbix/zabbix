@@ -1,6 +1,9 @@
+//go:build !windows
+// +build !windows
+
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,17 +20,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_SYSINFO_COMMON_H
-#define ZABBIX_SYSINFO_COMMON_H
+package dir
 
-#include "sysinfo.h"
+import "io/fs"
 
-extern ZBX_METRIC	parameters_common[];
-extern ZBX_METRIC	parameters_common_local[];
+func (cp *countParams) skipType(path string, d fs.DirEntry) bool {
+	if len(cp.typesInclude) > 0 && !isTypeMatch(cp.typesInclude, d.Type()) {
+		return true
+	}
 
-int	EXECUTE_USER_PARAMETER(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	EXECUTE_STR(const char *command, AGENT_RESULT *result);
-int	EXECUTE_DBL(const char *command, AGENT_RESULT *result);
-int	EXECUTE_INT(const char *command, AGENT_RESULT *result);
+	if len(cp.typesExclude) > 0 && isTypeMatch(cp.typesExclude, d.Type()) {
+		return true
+	}
 
-#endif
+	return false
+}

@@ -20,13 +20,11 @@
 #include "common.h"
 #include "log.h"
 #include "memalloc.h"
-#include "ipc.h"
 #include "dbcache.h"
 #include "zbxhistory.h"
+#include "vectorimpl.h"
 
 #include "valuecache.h"
-
-#include "vectorimpl.h"
 
 /*
  * The cache (zbx_vc_cache_t) is organized as a hashset of item records (zbx_vc_item_t).

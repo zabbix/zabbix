@@ -341,7 +341,7 @@
 		}
 
 		jQuery('#itemButtonsRow').before($row);
-		$row.find('.input-color-picker input').colorpicker();
+		$row.find('.<?= ZBX_STYLE_COLOR_PICKER ?> input').colorpicker();
 
 		colorPalette.incrementNextColor();
 
@@ -372,9 +372,9 @@
 				};
 			$row = jQuery(itemTpl.evaluate(item));
 
-			$row.find('[name="calc_fnc"]').val(graphs.CALC_FNC_AVG);
 			jQuery('#itemButtonsRow').before($row);
-			$row.find('.input-color-picker input').colorpicker();
+			$row.find('[name="calc_fnc"]').val(graphs.CALC_FNC_AVG);
+			jQuery(`#color_${number}`).colorpicker();
 		}
 
 		if (!graphs.readonly) {

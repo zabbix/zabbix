@@ -23,13 +23,8 @@
 #include "daemon.h"
 #include "zbxserver.h"
 #include "zbxself.h"
-#include "zbxtasks.h"
 #include "../../libs/zbxalgo/vectorimpl.h"
-
-#include "escalator.h"
-#include "../operations.h"
 #include "../actions.h"
-#include "../events.h"
 #include "../scripts/scripts.h"
 #include "zbxcrypto.h"
 #include "comms.h"
@@ -38,6 +33,8 @@
 #include "zbxservice.h"
 #include "service_protocol.h"
 #include "dbcache.h"
+
+#include "escalator.h"
 
 extern int	CONFIG_ESCALATOR_FORKS;
 

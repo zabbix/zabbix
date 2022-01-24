@@ -838,8 +838,11 @@ out:
  *                                                                            *
  * Purpose:  batch processing of Event Log file                               *
  *                                                                            *
- * Parameters: server           - [IN] IP or Hostname of Zabbix server        *
- *             port             - [IN] port of Zabbix server                  *
+ * Parameters: addrs            - [IN] vector for passing server and port     *
+ *                                     where to send data                     *
+ *             agent2_result    - [IN] address of buffer where to store       *
+ *                                     matching log records (used only in     *
+ *                                     Agent2)                                *
  *             eventlog_name    - [IN] the name of the event log              *
  *             render_context   - [IN] the handle to the rendering context    *
  *             query            - [IN] the handle to the query results        *
@@ -847,7 +850,9 @@ out:
  *             FirstID          - [IN] first record in the EventLog file      *
  *             LastID           - [IN] last record in the EventLog file       *
  *             regexps          - [IN] set of regexp rules for Event Log test *
- *             pattern          - [IN] buffer for read of data of EventLog    *
+ *             pattern          - [IN] the regular expression or global       *
+ *                                     regular expression name (@<global      *
+ *                                     regexp name>).                         *
  *             key_severity     - [IN] severity of logged data sources        *
  *             key_source       - [IN] name of logged data source             *
  *             key_logeventid   - [IN] the application-specific identifier    *
@@ -864,11 +869,12 @@ out:
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
  ******************************************************************************/
-int	process_eventslog6(zbx_vector_ptr_t *addrs, const char *eventlog_name, EVT_HANDLE *render_context,
-		EVT_HANDLE *query, zbx_uint64_t lastlogsize, zbx_uint64_t FirstID, zbx_uint64_t LastID,
-		zbx_vector_ptr_t *regexps, const char *pattern, const char *key_severity, const char *key_source,
-		const char *key_logeventid, int rate, zbx_process_value_func_t process_value_cb,
-		ZBX_ACTIVE_METRIC *metric, zbx_uint64_t *lastlogsize_sent, char **error)
+int	process_eventslog6(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *eventlog_name,
+		EVT_HANDLE *render_context, EVT_HANDLE *query, zbx_uint64_t lastlogsize, zbx_uint64_t FirstID,
+		zbx_uint64_t LastID, zbx_vector_ptr_t *regexps, const char *pattern, const char *key_severity,
+		const char *key_source, const char *key_logeventid, int rate,
+		zbx_process_value_func_t process_value_cb, ZBX_ACTIVE_METRIC *metric, zbx_uint64_t *lastlogsize_sent,
+		char **error)
 {
 #	define EVT_ARRAY_SIZE	100
 
@@ -1040,7 +1046,7 @@ int	process_eventslog6(zbx_vector_ptr_t *addrs, const char *eventlog_name, EVT_H
 
 			if (1 == match)
 			{
-				send_err = process_value_cb(addrs, CONFIG_HOSTNAME, metric->key_orig,
+				send_err = process_value_cb(addrs, agent2_result, CONFIG_HOSTNAME, metric->key_orig,
 						evt_message, ITEM_STATE_NORMAL, &lastlogsize, NULL, &evt_timestamp,
 						evt_provider, &evt_severity, &evt_eventid,
 						metric->flags | ZBX_METRIC_FLAG_PERSISTENT);
@@ -1363,11 +1369,16 @@ static void	zbx_parse_eventlog_message(const wchar_t *wsource, const EVENTLOGREC
  *                                                                            *
  * Purpose:  batch processing of Event Log file                               *
  *                                                                            *
- * Parameters: server           - [IN] IP or Hostname of Zabbix server        *
- *             port             - [IN] port of Zabbix server                  *
+ * Parameters: addrs            - [IN] vector for passing server and port     *
+ *                                     where to send data                     *
+ *             agent2_result    - [IN] address of buffer where to store       *
+ *                                     matching log records (used only in     *
+ *                                     Agent2)                                *
  *             eventlog_name    - [IN] the name of the event log              *
  *             regexps          - [IN] set of regexp rules for Event Log test *
- *             pattern          - [IN] buffer for read of data of EventLog    *
+ *             pattern          - [IN] the regular expression or global       *
+ *                                     regular expression name (@<global      *
+ *                                     regexp name>).                         *
  *             key_severity     - [IN] severity of logged data sources        *
  *             key_source       - [IN] name of logged data source             *
  *             key_logeventid   - [IN] the application-specific identifier    *
@@ -1384,10 +1395,10 @@ static void	zbx_parse_eventlog_message(const wchar_t *wsource, const EVENTLOGREC
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
  ******************************************************************************/
-int	process_eventslog(zbx_vector_ptr_t *addrs, const char *eventlog_name, zbx_vector_ptr_t *regexps,
-		const char *pattern, const char *key_severity, const char *key_source, const char *key_logeventid,
-		int rate, zbx_process_value_func_t process_value_cb, ZBX_ACTIVE_METRIC *metric,
-		zbx_uint64_t *lastlogsize_sent, char **error)
+int	process_eventslog(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *eventlog_name,
+		zbx_vector_ptr_t *regexps, const char *pattern, const char *key_severity, const char *key_source,
+		const char *key_logeventid, int rate, zbx_process_value_func_t process_value_cb,
+		ZBX_ACTIVE_METRIC *metric, zbx_uint64_t *lastlogsize_sent, char **error)
 {
 	int		ret = FAIL;
 	HANDLE		eventlog_handle = NULL;
@@ -1623,9 +1634,9 @@ int	process_eventslog(zbx_vector_ptr_t *addrs, const char *eventlog_name, zbx_ve
 
 				if (1 == match)
 				{
-					send_err = process_value_cb(addrs, CONFIG_HOSTNAME, metric->key_orig,
-							value, ITEM_STATE_NORMAL, &lastlogsize, NULL, &timestamp,
-							source, &severity, &logeventid,
+					send_err = process_value_cb(addrs, agent2_result, CONFIG_HOSTNAME,
+							metric->key_orig, value, ITEM_STATE_NORMAL, &lastlogsize,
+							NULL, &timestamp, source, &severity, &logeventid,
 							metric->flags | ZBX_METRIC_FLAG_PERSISTENT);
 
 					if (SUCCEED == send_err)
@@ -1677,8 +1688,9 @@ out:
 	return ret;
 }
 
-int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *regexps, ZBX_ACTIVE_METRIC *metric,
-		zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent, char **error)
+int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_vector_ptr_t *regexps,
+		ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
+		char **error)
 {
 	int 		ret = FAIL;
 	AGENT_REQUEST	request;
@@ -1793,10 +1805,10 @@ int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *regexps, Z
 				goto out;
 			}
 
-			ret = process_eventslog6(addrs, filename, &eventlog6_render_context, &eventlog6_query,
-					lastlogsize, eventlog6_firstid, eventlog6_lastid, regexps, pattern,
-					key_severity, key_source, key_logeventid, rate, process_value_cb, metric,
-					lastlogsize_sent, error);
+			ret = process_eventslog6(addrs, agent2_result, filename, &eventlog6_render_context,
+					&eventlog6_query, lastlogsize, eventlog6_firstid, eventlog6_lastid, regexps,
+					pattern, key_severity, key_source, key_logeventid, rate, process_value_cb,
+					metric, lastlogsize_sent, error);
 
 			finalize_eventlog6(&eventlog6_render_context, &eventlog6_query);
 		}
@@ -1807,7 +1819,7 @@ int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *regexps, Z
 	}
 	else if (versionInfo.dwMajorVersion < 6)    /* Windows versions before Vista */
 	{
-		ret = process_eventslog(addrs, filename, regexps, pattern, key_severity, key_source,
+		ret = process_eventslog(addrs, agent2_result, filename, regexps, pattern, key_severity, key_source,
 				key_logeventid, rate, process_value_cb, metric, lastlogsize_sent, error);
 	}
 out:

@@ -17,7 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "lld.h"
 #include "db.h"
 #include "log.h"
 #include "zbxalgo.h"
@@ -26,6 +25,7 @@
 #include "zbxprometheus.h"
 #include "zbxvariant.h"
 
+#include "../../libs/zbxaudit/audit.h"
 #include "../../libs/zbxaudit/audit_item.h"
 
 typedef zbx_lld_item_full_t	zbx_lld_item_t;

@@ -18,7 +18,10 @@
 **/
 
 #include "db.h"
+#include "log.h"
 #include "../../libs/zbxaudit/audit_trigger.h"
+#include "../../libs/zbxalgo/vectorimpl.h"
+
 #include "trigger_dep_linking.h"
 
 typedef struct
