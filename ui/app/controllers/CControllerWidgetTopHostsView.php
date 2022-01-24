@@ -32,7 +32,24 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 	}
 
 	protected function doAction() {
-		$fields = $this->getForm()->getFieldsData();
+		$data = [
+			'name' => $this->getInput('name', $this->getDefaultName()),
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
+		];
+
+		$data += self::getData($this->getForm()->getFieldsData());
+
+		$this->setResponse(new CControllerResponseData($data));
+	}
+
+	/**
+	 * @param array $fields
+	 *
+	 * @return array
+	 */
+	private static function getData(array $fields): array {
 		$configuration = $fields['columns'];
 
 		$groupids = $fields['groupids'] ? getSubGroups($fields['groupids']) : null;
@@ -60,11 +77,24 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 		$master_items = self::getItems($configuration[$fields['column']]['item'], $groupids, $hostids);
 		$master_item_values = self::getItemValues($master_items, $configuration[$fields['column']], $time_now);
 
+		if (!$master_item_values) {
+			return [
+				'configuration' => $configuration,
+				'rows' => []
+			];
+		}
+
 		if ($fields['order'] == CWidgetFormTopHosts::ORDER_TOPN) {
 			arsort($master_item_values, SORT_NUMERIC);
+
+			$master_items_min = end($master_item_values);
+			$master_items_max = reset($master_item_values);
 		}
 		else {
 			asort($master_item_values, SORT_NUMERIC);
+
+			$master_items_min = reset($master_item_values);
+			$master_items_max = end($master_item_values);
 		}
 
 		$master_item_values = array_slice($master_item_values, 0, $fields['count'], true);
@@ -83,24 +113,39 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 				continue;
 			}
 
+			$calc_extremes = $column['display'] == CWidgetFieldColumnsList::DISPLAY_BAR
+				|| $column['display'] == CWidgetFieldColumnsList::DISPLAY_INDICATORS;
+
 			if ($column_index == $fields['column']) {
 				$column_items = $master_items;
 				$column_item_values = $master_item_values;
+
+				if ($calc_extremes) {
+					if ($column['min'] === '') {
+						$column['min'] = $master_items_min;
+					}
+
+					if ($column['max'] === '') {
+						$column['max'] = $master_items_max;
+					}
+				}
 			}
 			else {
-				$column_items = $column['min'] !== '' && $column['max'] !== ''
+				$column_items = !$calc_extremes || $column['min'] !== '' && $column['max'] !== ''
 					? self::getItems($column['item'], $groupids, array_keys($master_hostids))
 					: self::getItems($column['item'], $groupids, $hostids);
 
 				$column_item_values = self::getItemValues($column_items, $column, $time_now);
-			}
 
-			if ($column['min'] === '') {
-				$column['min'] = min($column_item_values);
-			}
+				if ($calc_extremes) {
+					if ($column['min'] === '') {
+						$column['min'] = min($column_item_values);
+					}
 
-			if ($column['max'] === '') {
-				$column['max'] = max($column_item_values);
+					if ($column['max'] === '') {
+						$column['max'] = max($column_item_values);
+					}
+				}
 			}
 
 			$item_values[$column_index] = [];
@@ -176,14 +221,10 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 			$rows[] = $row;
 		}
 
-		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', $this->getDefaultName()),
+		return [
 			'configuration' => $configuration,
-			'rows' => $rows,
-			'user' => [
-				'debug_mode' => $this->getDebugMode()
-			]
-		]));
+			'rows' => $rows
+		];
 	}
 
 	/**
