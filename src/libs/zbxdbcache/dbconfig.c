@@ -3694,6 +3694,7 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 			zbx_vector_ptr_create_ext(&trigger->tags, __config_mem_malloc_func, __config_mem_realloc_func,
 					__config_mem_free_func);
 			trigger->topoindex = 1;
+			trigger->itemids = NULL;
 		}
 		else
 		{
@@ -3707,7 +3708,6 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 		trigger->recovery_expression_bin = config_decode_serialized_expression(row[17]);
 		trigger->timer = atoi(row[18]);
 		trigger->revision = config->sync_start_ts;
-		trigger->itemids = NULL;
 	}
 
 	/* remove deleted triggers from buffer */
