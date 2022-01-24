@@ -52,6 +52,13 @@
 				start: function(e, ui) {
 					// Fix placeholder not to change height while object is being dragged.
 					$(ui.placeholder).height($(ui.helper).height());
+				},
+				update: function() {
+					let i = 0;
+
+					table.find('.' + table_row_class).each(function() {
+						$(this).find('[name*="sortorder"]').val(i++);
+					});
 				}
 			});
 
@@ -79,7 +86,8 @@
 			 * sort rows using drag and drop.
 			 */
 			function setSortableState() {
-				var allow_sort = table.find('.' + table_row_class).length < 2;
+				const allow_sort = (table.find('.' + table_row_class).length < 2);
+
 				table.sortable('option', 'disabled', allow_sort);
 			}
 
@@ -92,6 +100,13 @@
 			 */
 			function addRow(values) {
 				row_index += 1;
+
+				if (typeof values.sortorder === 'undefined') {
+					let row_count = table.find('.' + table_row_class).length;
+
+					values.sortorder = row_count++;
+				}
+
 				values.index = row_index;
 
 				var new_row = $(row_template.evaluate(values))
@@ -124,6 +139,16 @@
 			function removeRow(row_node) {
 				row_node.remove();
 				setSortableState();
+
+				const $rows = table.find('.' + table_row_class);
+
+				if ($rows.length > 0) {
+					let i = 0;
+
+					$rows.each(function() {
+						$(this).find('[name*="sortorder"]').val(i++);
+					});
+				}
 			}
 
 			return {

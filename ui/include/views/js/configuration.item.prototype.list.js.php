@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,33 +23,8 @@
  * @var CView $this
  */
 ?>
-
-<script type="text/x-jquery-tmpl" id="filter-tag-row-tmpl">
-	<?= CTagFilterFieldHelper::getTemplate(); ?>
-</script>
-
 <script>
 	const view = {
-		init() {
-			$('#filter-tags')
-				.dynamicRows({template: '#filter-tag-row-tmpl'})
-				.on('afteradd.dynamicRows', function() {
-					const rows = this.querySelectorAll('.form_row');
-					new CTagFilterItem(rows[rows.length - 1]);
-				});
-
-			// Init existing fields once loaded.
-			document.querySelectorAll('#filter-tags .form_row').forEach(row => {
-				new CTagFilterItem(row);
-			});
-
-			$('#filter_state')
-				.on('change', function() {
-					$('input[name=filter_status]').prop('disabled', $('input[name=filter_state]:checked').val() != -1);
-				})
-				.trigger('change');
-		},
-
 		editHost(e, hostid) {
 			e.preventDefault();
 			const host_data = {hostid};
