@@ -51,7 +51,9 @@ $filter = (new CFilter())
 		$web_layout_mode != ZBX_LAYOUT_KIOSKMODE
 	)
 	->addFormItem((new CVar('view_as', $data['view_as']))->removeId())
-	->addFormItem((new CVar('action', 'charts.view'))->removeId());
+	->addFormItem((new CVar('action', 'charts.view'))->removeId())
+	->addVar('subfilter_tags', $data['filter_data']['subfilter_tagnames']) // TODO VM
+	->addVar('subfilter_tags', $data['filter_data']['subfilter_tags']);
 
 if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	$filter->addFilterTab(_('Filter'), [
@@ -83,7 +85,8 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 					->addValue(_('Simple graphs'), GRAPH_FILTER_SIMPLE) // TODO VM: new translation
 					->setModern(true)
 			)
-	]);
+	],
+	new CPartial('monitoring.charts.subfilter', $data['subfilters']));
 }
 
 $widget->addItem($filter);

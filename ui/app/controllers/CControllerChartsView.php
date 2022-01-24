@@ -114,7 +114,7 @@ class CControllerChartsView extends CControllerCharts {
 
 		if ($filter_hostids) {
 			if (in_array($filter_show, [GRAPH_FILTER_ALL, GRAPH_FILTER_HOST])) {
-				[$host_graphs, $host_items] = $this->getHostGraphs($filter_hostids, $filter_name);
+				$host_graphs = $this->getHostGraphs($filter_hostids, $filter_name);
 			}
 
 			if (in_array($filter_show, [GRAPH_FILTER_ALL, GRAPH_FILTER_SIMPLE])) {
@@ -123,6 +123,17 @@ class CControllerChartsView extends CControllerCharts {
 		}
 
 		$graphs = array_merge($host_graphs, $simple_graphs);
+
+		// Prepare subfilter data.
+
+		$filter = [ // TODO VM: replace by get from REQUEST
+			'subfilter_tagnames' => [],
+			'subfilter_tags' => []
+		];
+		$subfilters_fields = self::getSubfilterFields($filter);
+		$data['subfilters'] = self::getSubfilters($graphs, $subfilters_fields);
+		$graphs = self::applySubfilters($graphs);
+
 		CArrayHelper::sort($graphs, ['name', 'graphid', 'itemid']);
 
 		$view_url = (new CUrl('zabbix.php'))->setArgument('action', 'charts.view');

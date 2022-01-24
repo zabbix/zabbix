@@ -67,7 +67,7 @@ class CControllerChartsViewJson extends CControllerCharts {
 
 		if ($filter_hostids) {
 			if (in_array($filter_show, [GRAPH_FILTER_ALL, GRAPH_FILTER_HOST])) {
-				[$host_graphs, $host_items] = $this->getHostGraphs($filter_hostids, $filter_name);
+				$host_graphs = $this->getHostGraphs($filter_hostids, $filter_name);
 			}
 
 			if (in_array($filter_show, [GRAPH_FILTER_ALL, GRAPH_FILTER_SIMPLE])) {
