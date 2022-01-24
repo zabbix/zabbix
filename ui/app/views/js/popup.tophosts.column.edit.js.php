@@ -52,44 +52,12 @@ window.tophosts_column_edit_form = new class {
 			$colorpicker.colorpicker({appendTo: $colorpicker.closest('.input-color-picker')});
 		});
 
-		this._$thresholds_table.on('blur afterremove.dynamicRows', 'input[name$="[threshold]"]', () => {
-			this.sortThresholdsTable();
-		});
-
 		this._$widget_form.on('process.form', (e, overlay) => {
 			this.handleFormSubmit(e, overlay);
 		});
 
 		// Initialize form elements accessibility.
 		this.updateAccessibility();
-	}
-
-	sortThresholdsTable() {
-		let rows = [];
-
-		this._$thresholds_table.find('tr.form_row').each((i, row) => {
-			const color = $('input[name$="[color]"]', row).val();
-			const threshold = $('input[name$="[threshold]"]', row).val();
-
-			if (isNaN(threshold) || $.trim(threshold) === '') {
-				rows = [];
-
-				return false;
-			}
-
-			rows[rows.length] = {color, threshold};
-		});
-
-		if (!rows.length) {
-			return;
-		}
-
-		rows = rows.sort((a, b) => a.threshold - b.threshold);
-
-		this._$thresholds_table.find('tr.form_row').each((i, row) => {
-			$.colorpicker('set_color_by_id', $('input[name$="[color]"]', row).attr('id'), rows[i].color);
-			$('input[name$="[threshold]"]', row).val(rows[i].threshold);
-		});
 	}
 
 	updateAccessibility() {
