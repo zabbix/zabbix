@@ -1675,6 +1675,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$matched_macros = self::extractMacros($columns, $types);
 
 		foreach ($hostids as $hostid) {
+			$macro_values[$hostid] = [];
+
 			foreach ($matched_macros['macros']['host'] as $token) {
 				if ($token === '{HOST.ID}') {
 					$macro_values[$hostid][$token] = $hostid;
