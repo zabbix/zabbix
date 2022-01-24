@@ -68,7 +68,7 @@ $form_list->addRow(CWidgetHelper::getLabel($fields['columns']), CWidgetHelper::g
 // Order.
 $form_list->addRow(CWidgetHelper::getLabel($fields['order']), CWidgetHelper::getRadioButtonList($fields['order']));
 
-// Aggregation column.
+// Order column.
 $column = CWidgetHelper::getSelect($fields['column']);
 
 if (!$fields['column']->getValues()) {

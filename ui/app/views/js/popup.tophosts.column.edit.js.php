@@ -35,7 +35,11 @@ window.tophosts_column_edit_form = new class {
 		this._$thresholds_table.dynamicRows({
 			rows: thresholds,
 			template: '#thresholds-row-tmpl',
-			dataCallback: row_data => row_data.color = colorPalette.getNextColor()
+			dataCallback: (row_data) => {
+				if (!('color' in row_data)) {
+					row_data.color = colorPalette.getNextColor();
+				}
+			}
 		});
 
 		$('tr.form_row input[name$="[color]"]', this._$thresholds_table).each((i, colorpicker) => {
