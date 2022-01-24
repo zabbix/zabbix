@@ -311,18 +311,18 @@ class testFormMacrosHost extends testFormMacros {
 	public function testFormMacrosHost_ResolveSecretMacro() {
 		$hostid = 99135;
 		$hostname = 'Available host in maintenance';
+		$item_url = 'zabbix.php?action=latest.view&hostids%5B%5D=';
 
 		$macro = [
 			'macro' => '{$X_SECRET_HOST_MACRO_2_RESOLVE}',
 			'value' => 'Value 2 B resolved'
 		];
 
-		// Open Hosts items page and check macro resolved text.
-		$this->page->login()->open('zabbix.php?show_details=1&show_without_data=1&action=latest.view&hostids%5B%5D='.
-				$hostid)->waitUntilReady();
-//		Caused by https://support.zabbix.com/browse/ZBXNEXT-7115
-//		Support of user macros in item names has been dropped.
+		// Open Hosts items and Latest data pages and check macro resolved text.
+		$this->page->login()->open($item_url.$hostid)->waitUntilReady();
 		$this->assertTrue($this->query('xpath://span[text()='.CXPATHHelper::escapeQuotes('trap['.$macro['value'].']').']')->exists());
+		$this->page->open('items.php?filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host')->waitUntilReady();
+		$this->assertTrue($this->query('link', 'Macro value: '.$macro['macro'])->exists());
 
 		// Open host form in popup and change macro type.
 		$form = $this->openMacrosTab('zabbix.php?action=host.view', 'hosts', false, $hostname);
@@ -333,11 +333,10 @@ class testFormMacrosHost extends testFormMacros {
 		$this->assertMessage(TEST_GOOD, 'Host updated');
 
 		// Open items page and check secret macro appearance.
-		$this->page->open('zabbix.php?show_details=1&show_without_data=1&action=latest.view&hostids%5B%5D='.
-				$hostid)->waitUntilReady();
-//		Caused by https://support.zabbix.com/browse/ZBXNEXT-7115
-//		Support of user macros in item names has been dropped.
+		$this->page->open($item_url.$hostid)->waitUntilReady();
 		$this->assertTrue($this->query('xpath://span[text()="trap[******]"]')->exists());
+		$this->page->open('items.php?filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host')->waitUntilReady();
+		$this->assertTrue($this->query('link', 'Macro value: '.$macro['macro'])->exists());
 	}
 
 	public function getCreateVaultMacrosData() {
