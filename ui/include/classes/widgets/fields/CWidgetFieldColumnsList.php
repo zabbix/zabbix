@@ -50,43 +50,43 @@ class CWidgetFieldColumnsList extends CWidgetField {
 			'name'					=> ['type' => API_STRING_UTF8, 'default' => '', 'length' => 255],
 			'data'					=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [self::DATA_ITEM_VALUE, self::DATA_HOST_NAME, self::DATA_TEXT])],
 			'item'					=> ['type' => API_MULTIPLE, 'rules' => [
-						['if' => ['field' => 'data', 'in' => self::DATA_ITEM_VALUE],
-							'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
-						['else' => true,
-							'type' => API_STRING_UTF8]
+											['if' => ['field' => 'data', 'in' => self::DATA_ITEM_VALUE],
+												'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
+											['else' => true,
+												'type' => API_STRING_UTF8]
 			]],
 			'timeshift'				=> ['type' => API_TIME_UNIT, 'in' => implode(':', [ZBX_MIN_TIMESHIFT, ZBX_MAX_TIMESHIFT])],
-			'aggregate_function'	=> ['type' => API_INT32, 'in' => implode(',', [AGGREGATE_NONE, AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_LAST, AGGREGATE_FIRST, AGGREGATE_COUNT]), 'default' => AGGREGATE_NONE],
+			'aggregate_function'	=> ['type' => API_INT32, 'in' => implode(',', [AGGREGATE_NONE, AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_FIRST, AGGREGATE_LAST]), 'default' => AGGREGATE_NONE],
 			'aggregate_interval'	=> ['type' => API_MULTIPLE, 'rules' => [
-						['if' => ['field' => 'aggregate_function', 'in' => implode(',', [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_LAST, AGGREGATE_FIRST, AGGREGATE_COUNT])],
-							'type' => API_TIME_UNIT, 'flags' => API_REQUIRED|API_NOT_EMPTY|API_TIME_UNIT_WITH_YEAR, 'in' => implode(':', [1, ZBX_MAX_TIMESHIFT])],
-						['else' => true,
-							'type' => API_STRING_UTF8]
+											['if' => ['field' => 'aggregate_function', 'in' => implode(',', [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_FIRST, AGGREGATE_LAST])],
+												'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_TIME_UNIT_WITH_YEAR, 'in' => implode(':', [1, ZBX_MAX_TIMESHIFT])],
+											['else' => true,
+												'type' => API_STRING_UTF8]
 			]],
 			'display'				=> ['type' => API_MULTIPLE, 'rules' => [
-						['if' => ['field' => 'data', 'in' => self::DATA_ITEM_VALUE],
-							'type' => API_INT32, 'default' => self::DISPLAY_AS_IS, 'in' => implode(',', [self::DISPLAY_AS_IS, self::DISPLAY_BAR, self::DISPLAY_INDICATORS])],
-						['else' => true,
-							'type' => API_INT32]
+											['if' => ['field' => 'data', 'in' => self::DATA_ITEM_VALUE],
+												'type' => API_INT32, 'default' => self::DISPLAY_AS_IS, 'in' => implode(',', [self::DISPLAY_AS_IS, self::DISPLAY_BAR, self::DISPLAY_INDICATORS])],
+											['else' => true,
+												'type' => API_INT32]
 			]],
 			'history'				=> ['type' => API_MULTIPLE, 'rules' => [
-						['if' => ['field' => 'data', 'in' => self::DATA_ITEM_VALUE],
-							'type' => API_INT32, 'default' => self::HISTORY_DATA_AUTO, 'in' => implode(',', [self::HISTORY_DATA_AUTO, self::HISTORY_DATA_HISTORY, self::HISTORY_DATA_TRENDS])],
-						['else' => true,
-							'type' => API_INT32]
+											['if' => ['field' => 'data', 'in' => self::DATA_ITEM_VALUE],
+												'type' => API_INT32, 'default' => self::HISTORY_DATA_AUTO, 'in' => implode(',', [self::HISTORY_DATA_AUTO, self::HISTORY_DATA_HISTORY, self::HISTORY_DATA_TRENDS])],
+											['else' => true,
+												'type' => API_INT32]
 			]],
 			'base_color'			=> ['type' => API_COLOR],
 			'min'					=> ['type' => API_NUMERIC],
 			'max'					=> ['type' => API_NUMERIC],
 			'thresholds'			=> ['type' =>  API_OBJECTS, 'uniq' => [['threshold']], 'fields' => [
-						'color'			=> ['type' => API_COLOR],
-						'threshold'		=> ['type' => API_NUMERIC]
+				'color'					=> ['type' => API_COLOR],
+				'threshold'				=> ['type' => API_NUMERIC]
 			]],
 			'text'					=> ['type' => API_MULTIPLE, 'rules' => [
-						['if' => ['field' => 'data', 'in' => self::DATA_TEXT],
-							'type' => API_STRING_UTF8, 'flags' => API_REQUIRED|API_NOT_EMPTY, 'length' => 255],
-						['else' => true,
-							'type' => API_STRING_UTF8]
+											['if' => ['field' => 'data', 'in' => self::DATA_TEXT],
+												'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255],
+											['else' => true,
+												'type' => API_STRING_UTF8]
 			]]
 		]]);
 	}
