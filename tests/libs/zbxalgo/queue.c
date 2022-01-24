@@ -21,7 +21,7 @@
 #include "zbxmockdata.h"
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
-#include <malloc.h>
+#include <stdlib.h>
 
 #include "zbxalgo.h"
 

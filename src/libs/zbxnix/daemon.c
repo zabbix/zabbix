@@ -447,6 +447,7 @@ int	zbx_sigusr_send(int flags)
 		}
 	}
 #else
+	ZBX_UNUSED(flags);
 	zbx_snprintf(error, sizeof(error), "operation is not supported on the given operating system");
 #endif
 	if (SUCCEED != ret)
