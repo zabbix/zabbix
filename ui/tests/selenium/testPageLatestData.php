@@ -32,6 +32,10 @@ class testPageLatestData extends CWebTest {
 	}
 
 	public function testPageLatestData_CheckLayout() {
+		// Add data to item to see With data/Without data subfilter.
+		$time = time() - 100;
+		DBexecute("INSERT INTO history_uint (itemid, clock, value, ns) VALUES (23287, ".zbx_dbstr($time).", 1, 0)");
+
 		$this->page->login()->open('zabbix.php?action=latest.view');
 		$this->page->assertTitle('Latest data');
 		$this->page->assertHeader('Latest data');
@@ -40,7 +44,7 @@ class testPageLatestData extends CWebTest {
 				$form->getLabels()->asText()
 		);
 
-		// Show item without data is checked/disabled without Hosts in filter and checked/enabled with Hosts in filter.
+		// With data/Without data subfilter shows only when some host is filtered.
 		foreach ([false, true] as $status) {
 			$this->assertEquals($status, $this->query('link:With data')->one(false)->isValid());
 			$this->assertEquals($status, $this->query('link:Without data')->one(false)->isValid());
