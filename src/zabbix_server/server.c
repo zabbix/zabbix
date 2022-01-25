@@ -76,7 +76,7 @@
 #include "zbxhistory.h"
 #include "postinit.h"
 #include "export.h"
-#include "zbxvault.h"
+#include "../libs/zbxvault/vault.h"
 #include "zbxtrends.h"
 #include "ha/ha.h"
 #include "sighandler.h"

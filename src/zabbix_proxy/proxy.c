@@ -59,7 +59,7 @@
 #include "../zabbix_server/preprocessor/preproc_manager.h"
 #include "../zabbix_server/preprocessor/preproc_worker.h"
 #include "../zabbix_server/availability/avail_manager.h"
-#include "zbxvault.h"
+#include "../libs/zbxvault/vault.h"
 #include "zbxdiag.h"
 #include "sighandler.h"
 #include "zbxrtc.h"

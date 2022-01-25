@@ -20,10 +20,10 @@
 #ifndef ZABBIX_ZBXVAULT_H
 #define ZABBIX_ZBXVAULT_H
 
-#include "zbxalgo.h"
+#include "../zbxkvs/kvs.h"
 
 int	zbx_vault_init(char **error);
-int	zbx_vault_kvs_get(const char *path, zbx_hashset_t *kvs, char **error);
+int	zbx_vault_kvs_get(const char *path, zbx_kvs_t *kvs, char **error);
 int	zbx_vault_db_credentials_get(char **dbuser, char **dbpassword, char **error);
 
 int	zbx_vault_token_from_env_get(char **token, char **error);

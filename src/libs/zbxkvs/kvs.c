@@ -20,19 +20,19 @@
 #include "kvs.h"
 #include "log.h"
 
-zbx_hash_t	zbx_kv_hash(const void *data)
+static zbx_hash_t	zbx_kv_hash(const void *data)
 {
 	const zbx_kv_t	*kv = (const zbx_kv_t *)data;
 
 	return ZBX_DEFAULT_STRING_HASH_ALGO(kv->key, strlen(kv->key), ZBX_DEFAULT_HASH_SEED);
 }
 
-int	zbx_kv_compare(const void *d1, const void *d2)
+static int	zbx_kv_compare(const void *d1, const void *d2)
 {
 	return strcmp(((const zbx_kv_t *)d1)->key, ((const zbx_kv_t *)d2)->key);
 }
 
-void	zbx_kv_clean(void *data)
+static void	zbx_kv_clean(void *data)
 {
 	zbx_kv_t	*kv = (zbx_kv_t *)data;
 
@@ -40,7 +40,28 @@ void	zbx_kv_clean(void *data)
 	zbx_free(kv->value);
 }
 
-void	zbx_kvs_from_json_get(const struct zbx_json_parse *jp_kvs, zbx_hashset_t *kvs)
+void	zbx_kvs_create(zbx_kvs_t *kvs, size_t init_size)
+{
+	zbx_hashset_create_ext(kvs, init_size, zbx_kv_hash, zbx_kv_compare, zbx_kv_clean,
+			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+}
+
+void	zbx_kvs_clear(zbx_kvs_t *kvs)
+{
+	zbx_hashset_clear(kvs);
+}
+
+void	zbx_kvs_destroy(zbx_kvs_t *kvs)
+{
+	zbx_hashset_destroy(kvs);
+}
+
+zbx_kv_t	*zbx_kvs_search(zbx_kvs_t *kvs, const zbx_kv_t *data)
+{
+	return zbx_hashset_search(kvs, data);
+}
+
+void	zbx_kvs_from_json_get(const struct zbx_json_parse *jp_kvs, zbx_kvs_t *kvs)
 {
 	char		key[MAX_STRING_LEN], *value = NULL;
 	const char	*pnext = NULL;
@@ -73,7 +94,7 @@ void	zbx_kvs_from_json_get(const struct zbx_json_parse *jp_kvs, zbx_hashset_t *k
 	zbx_free(value);
 }
 
-int	zbx_kvs_from_json_by_path_get(const char *path, const struct zbx_json_parse *jp_kvs_paths, zbx_hashset_t *kvs,
+int	zbx_kvs_from_json_by_path_get(const char *path, const struct zbx_json_parse *jp_kvs_paths, zbx_kvs_t *kvs,
 		char **error)
 {
 	const char		*p;

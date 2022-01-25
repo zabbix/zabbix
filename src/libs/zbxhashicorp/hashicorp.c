@@ -23,7 +23,7 @@
 #include "../zbxkvs/kvs.h"
 
 int	zbx_hashicorp_kvs_get(const char *vault_url, const char *token, const char *ssl_cert_file,
-		const char *ssl_key_file, const char *path, long timeout, zbx_hashset_t *kvs, char **error)
+		const char *ssl_key_file, const char *path, long timeout, zbx_kvs_t *kvs, char **error)
 {
 #ifndef HAVE_LIBCURL
 	ZBX_UNUSED(vault_url);

@@ -30,12 +30,15 @@ typedef struct
 }
 zbx_kv_t;
 
-zbx_hash_t	zbx_kv_hash(const void *data);
-int		zbx_kv_compare(const void *d1, const void *d2);
-void		zbx_kv_clean(void *data);
+typedef zbx_hashset_t zbx_kvs_t;
 
-int	zbx_kvs_from_json_by_path_get(const char *path, const struct zbx_json_parse *jp_kvs_paths, zbx_hashset_t *kvs,
+void		zbx_kvs_create(zbx_kvs_t *kvs, size_t init_size);
+void		zbx_kvs_clear(zbx_kvs_t *kvs);
+void		zbx_kvs_destroy(zbx_kvs_t *kvs);
+zbx_kv_t	*zbx_kvs_search(zbx_kvs_t *kvs, const zbx_kv_t *data);
+
+int	zbx_kvs_from_json_by_path_get(const char *path, const struct zbx_json_parse *jp_kvs_paths, zbx_kvs_t *kvs,
 		char **error);
-void	zbx_kvs_from_json_get(const struct zbx_json_parse *jp_kvs, zbx_hashset_t *kvs);
+void	zbx_kvs_from_json_get(const struct zbx_json_parse *jp_kvs, zbx_kvs_t *kvs);
 
 #endif

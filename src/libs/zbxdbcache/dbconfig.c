@@ -32,6 +32,7 @@
 #include "../zbxcrypto/tls_tcp_active.h"
 #include "../zbxalgo/vectorimpl.h"
 #include "../zbxkvs/kvs.h"
+#include "../zbxvault/vault.h"
 #include "base64.h"
 #include "zbxeval.h"
 
@@ -40,7 +41,6 @@
 #include "proxy.h"
 #include "actions.h"
 #include "zbxtrends.h"
-#include "zbxvault.h"
 #include "zbxserialize.h"
 
 #include "dbconfig.h"
@@ -2117,7 +2117,7 @@ void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 {
 	zbx_dc_kvs_path_t	*dc_kvs_path;
 	zbx_dc_kv_t		*dc_kv;
-	zbx_hashset_t		kvs;
+	zbx_kvs_t		kvs;
 	zbx_hashset_iter_t	iter;
 	int			i, j;
 	zbx_vector_ptr_pair_t	diff;
@@ -2125,8 +2125,7 @@ void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_ptr_pair_create(&diff);
-	zbx_hashset_create_ext(&kvs, 100, zbx_kv_hash, zbx_kv_compare, zbx_kv_clean,
-			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+	zbx_kvs_create(&kvs, 100);
 
 	for (i = 0; i < config->kvs_paths.values_num; i++)
 	{
@@ -2159,7 +2158,7 @@ void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 			zbx_ptr_pair_t	pair;
 
 			kv_local.key = (char *)dc_kv->key;
-			if (NULL != (kv = zbx_hashset_search(&kvs, &kv_local)))
+			if (NULL != (kv = zbx_kvs_search(&kvs, &kv_local)))
 			{
 				if (0 == zbx_strcmp_null(dc_kv->value, kv->value))
 					continue;
@@ -2197,11 +2196,11 @@ void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 		}
 
 		zbx_vector_ptr_pair_clear(&diff);
-		zbx_hashset_clear(&kvs);
+		zbx_kvs_clear(&kvs);
 	}
 
 	zbx_vector_ptr_pair_destroy(&diff);
-	zbx_hashset_destroy(&kvs);
+	zbx_kvs_destroy(&kvs);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 

@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxvault.h"
+#include "vault.h"
 #include "../zbxhashicorp/hashicorp.h"
 #include "../zbxcyberark/cyberark.h"
 #include "../zbxkvs/kvs.h"
@@ -25,7 +25,7 @@
 #define ZBX_VAULT_TIMEOUT	SEC_PER_MIN
 
 typedef	int (*zbx_vault_kvs_get_cb_t)(const char *vault_url, const char *token, const char *ssl_cert_file,
-		const char *ssl_key_file, const char *path, long timeout, zbx_hashset_t *kvs, char **error);
+		const char *ssl_key_file, const char *path, long timeout, zbx_kvs_t *kvs, char **error);
 
 extern char	*CONFIG_VAULT;
 extern char	*CONFIG_VAULTTOKEN;
@@ -75,7 +75,7 @@ int	zbx_vault_init(char **error)
 	return SUCCEED;
 }
 
-int	zbx_vault_kvs_get(const char *path, zbx_hashset_t *kvs, char **error)
+int	zbx_vault_kvs_get(const char *path, zbx_kvs_t *kvs, char **error)
 {
 	return zbx_vault_kvs_get_cb(CONFIG_VAULTURL, CONFIG_VAULTTOKEN, CONFIG_VAULTTLSCERTFILE, CONFIG_VAULTTLSKEYFILE,
 			path, ZBX_VAULT_TIMEOUT, kvs, error);
@@ -84,8 +84,9 @@ int	zbx_vault_kvs_get(const char *path, zbx_hashset_t *kvs, char **error)
 int	zbx_vault_db_credentials_get(char **dbuser, char **dbpassword, char **error)
 {
 	int		ret = FAIL;
-	zbx_hashset_t	kvs;
+	zbx_kvs_t	kvs;
 	const zbx_kv_t	*kv_username, *kv_password;
+	zbx_kv_t	kv_local;
 
 	if (NULL == CONFIG_VAULTDBPATH)
 		return SUCCEED;
@@ -104,8 +105,7 @@ int	zbx_vault_db_credentials_get(char **dbuser, char **dbpassword, char **error)
 		return FAIL;
 	}
 
-	zbx_hashset_create_ext(&kvs, 2, zbx_kv_hash, zbx_kv_compare, zbx_kv_clean,
-			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+	zbx_kvs_create(&kvs, 2);
 
 	if (SUCCEED != zbx_vault_kvs_get_cb(CONFIG_VAULTURL, CONFIG_VAULTTOKEN, CONFIG_VAULTTLSCERTFILE,
 			CONFIG_VAULTTLSKEYFILE, CONFIG_VAULTDBPATH, ZBX_VAULT_TIMEOUT, &kvs,
@@ -114,13 +114,15 @@ int	zbx_vault_db_credentials_get(char **dbuser, char **dbpassword, char **error)
 		goto fail;
 	}
 
-	if (NULL == (kv_username = (zbx_kv_t *)zbx_hashset_search(&kvs, &zbx_vault_dbuser_key)))
+	kv_local.key = (char *)zbx_vault_dbuser_key;
+	if (NULL == (kv_username = zbx_kvs_search(&kvs, &kv_local)))
 	{
 		*error = zbx_dsprintf(*error, "cannot retrieve value of key \"%s\"", ZBX_PROTO_TAG_USERNAME);
 		goto fail;
 	}
 
-	if (NULL == (kv_password = (zbx_kv_t *)zbx_hashset_search(&kvs, &zbx_vault_dbpassword_key)))
+	kv_local.key = (char *)zbx_vault_dbpassword_key;
+	if (NULL == (kv_password = zbx_kvs_search(&kvs, &kv_local)))
 	{
 		*error = zbx_dsprintf(*error, "cannot retrieve value of key \"%s\"", ZBX_PROTO_TAG_PASSWORD);
 		goto fail;
@@ -131,7 +133,7 @@ int	zbx_vault_db_credentials_get(char **dbuser, char **dbpassword, char **error)
 
 	ret = SUCCEED;
 fail:
-	zbx_hashset_destroy(&kvs);
+	zbx_kvs_destroy(&kvs);
 
 	return ret;
 }
