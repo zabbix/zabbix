@@ -694,7 +694,7 @@ abstract class CControllerLatest extends CController {
 	 * @return array
 	 */
 	public static function getMostSevereTagValueSubfilters(array $tags): array {
-		if (CControllerLatest::SUBFILTERS_TAG_VALUE_ROWS >= count($tags)) {
+		if (self::SUBFILTERS_TAG_VALUE_ROWS >= count($tags)) {
 			return $tags;
 		}
 
@@ -704,10 +704,23 @@ abstract class CControllerLatest extends CController {
 		});
 
 		// Add first non-selected subfilter values in case if limit is not exceeded.
-		$remaining = self::SUBFILTERS_TAG_VALUE_ROWS - count($most_severe);
-		if ($remaining > 0) {
+		if (self::SUBFILTERS_TAG_VALUE_ROWS > count($most_severe)) {
 			$tags = array_diff_key($tags, $most_severe);
-			$most_severe += array_slice($tags, 0, $remaining, true);
+			$tags_names = array_keys($tags);
+
+			do {
+				if (($tag_name = array_shift($tags_names)) === null) {
+					break;
+				}
+
+				$tag_values = array_filter($tags[$tag_name], function ($elmnt) {
+					return ($elmnt['count'] != 0);
+				});
+
+				if ($tag_values) {
+					$most_severe[$tag_name] = self::getMostSevereSubfilters($tag_values);
+				}
+			} while (self::SUBFILTERS_TAG_VALUE_ROWS > count($most_severe));
 		}
 
 		uksort($most_severe, 'strnatcmp');

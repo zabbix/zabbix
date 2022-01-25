@@ -94,19 +94,7 @@ if (count($data['tags']) > 0) {
 		return (bool) array_sum(array_column($elmnt, 'selected'));
 	});
 
-	$tags_count = count($data['tags']);
-	$data['tags'] = CControllerLatest::getMostSevereTagValueSubfilters($data['tags']);
-
-	foreach ($data['tags'] as $tag => $tag_values) {
-
-		// Remove non-selected filter options with 0 occurrences.
-		$tag_values = array_filter($tag_values, function ($elmnt) {
-			return ($elmnt['selected'] || $elmnt['count'] != 0);
-		});
-
-		$tag_values_count = count($tag_values);
-		$tag_values = CControllerLatest::getMostSevereSubfilters($tag_values);
-
+	foreach (CControllerLatest::getMostSevereTagValueSubfilters($data['tags']) as $tag => $tag_values) {
 		$tag_values = array_map(function ($element) use ($tag, $subfilter_used) {
 			if ($element['name'] === '') {
 				$element_name = _('None');
@@ -157,19 +145,17 @@ if (count($data['tags']) > 0) {
 			}
 		}, $tag_values);
 
-		if ($tag_values) {
-			$tag_values_row = ($tag_values_count > count($tag_values))
-				? [$tag_values, new CSpan('...')]
-				: $tag_values;
+		$tag_values_row = (count($data['tags'][$tag]) > CControllerLatest::SUBFILTERS_VALUES_PER_ROW)
+			? [$tag_values, new CSpan('...')]
+			: $tag_values;
 
-			$subfilter_options['tags'][$tag] = (new CDiv([
-				new CTag('label', true, $tag.': '),
-				(new CDiv($tag_values_row))->addClass('subfilter-options')
-			]))->addClass('subfilter-option-grid');
-		}
+		$subfilter_options['tags'][$tag] = (new CDiv([
+			new CTag('label', true, $tag.': '),
+			(new CDiv($tag_values_row))->addClass('subfilter-options')
+		]))->addClass('subfilter-option-grid');
 	}
 
-	if ($tags_count > count($data['tags'])) {
+	if (count($data['tags']) > CControllerLatest::SUBFILTERS_TAG_VALUE_ROWS) {
 		$subfilter_options['tags'][] = new CSpan('...');
 	}
 }
