@@ -43,11 +43,12 @@ static zbx_mutex_t	kstat_lock = ZBX_MUTEX_NULL;
  * Parameters: error - [OUT] the error message                                *
  *                                                                            *
  * Return value: SUCCEED - the kstat environment was refreshed successfully   *
- *               FAIL - otherwose                                             *
+ *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
 static int	zbx_kstat_refresh(char **error)
 {
+	int	ret;
 	kid_t	kid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -55,7 +56,8 @@ static int	zbx_kstat_refresh(char **error)
 	if (-1 == (kid = kstat_chain_update(kc)))
 	{
 		*error = zbx_dsprintf(*error, "failed to update kstat chain: %s", zbx_strerror(errno));
-		return FAIL;
+		ret = FAIL;
+		goto out;
 	}
 
 	if (0 != kid)
@@ -64,12 +66,14 @@ static int	zbx_kstat_refresh(char **error)
 	if (NULL == (kc_vminfo = kstat_lookup(kc, "unix", -1, "vminfo")))
 	{
 		*error = zbx_dsprintf(*error, "failed to find vminfo data: %s", zbx_strerror(errno));
-		return FAIL;
+		ret = FAIL;
+		goto out;
 	}
-
+	ret = SUCCEED;
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
-	return SUCCEED;
+	return ret;
 }
 
 /******************************************************************************
@@ -82,7 +86,7 @@ static int	zbx_kstat_refresh(char **error)
  *             error - [OUT] the error message                                *
  *                                                                            *
  * Return value: SUCCEED - the kstat environment was initialized successfully *
- *               FAIL - otherwose                                             *
+ *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
 int	zbx_kstat_init(zbx_kstat_t *kstat, char **error)
@@ -176,9 +180,11 @@ void	zbx_kstat_collect(zbx_kstat_t *kstat)
 	kstat->vminfo[kstat->vminfo_index].freemem = vminfo.freemem;
 	kstat->vminfo[kstat->vminfo_index].updates = vminfo.updates;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "vm_index: %d, freemem: %lu, updates: %lu", kstat->vminfo_index,
-			kstat->vminfo[kstat->vminfo_index].freemem, kstat->vminfo[kstat->vminfo_index].updates);
 	zbx_mutex_unlock(kstat_lock);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "vm_index: %d, freemem: %lu, updates: %lu", (int)kstat->vminfo_index,
+			(long unsigned)kstat->vminfo[kstat->vminfo_index].freemem,
+			(long unsigned)kstat->vminfo[kstat->vminfo_index].updates);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -203,7 +209,7 @@ int	zbx_kstat_get_freemem(zbx_uint64_t *value, char **error)
 	int			sysconf_pagesize, last, prev, ret = FAIL;
 	zbx_kstat_vminfo_t	*vminfo;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): collector:%p", __func__, collector);
 
 	zbx_mutex_lock(kstat_lock);
 
@@ -218,10 +224,8 @@ int	zbx_kstat_get_freemem(zbx_uint64_t *value, char **error)
 	prev = last ^ 1;
 	vminfo = collector->kstat.vminfo;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "last: %d", last);
-	zabbix_log(LOG_LEVEL_DEBUG, "prev: %d", prev);
-	zabbix_log(LOG_LEVEL_DEBUG, "vminfo[prev].updates: %lu", vminfo[prev].updates);
-	zabbix_log(LOG_LEVEL_DEBUG, "vminfo[last].updates: %lu", vminfo[last].updates);
+	zabbix_log(LOG_LEVEL_DEBUG, "last: %d, prev: %d, vminfo[prev].updates: %lu, vminfo[last].updates: %lu", last,
+			prev, vminfo[prev].updates, vminfo[last].updates);
 
 	if (0 != vminfo[prev].updates && vminfo[prev].updates < vminfo[last].updates)
 	{
