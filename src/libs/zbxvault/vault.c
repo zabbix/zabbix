@@ -52,7 +52,7 @@ int	zbx_vault_init(char **error)
 		zbx_vault_dbuser_key = ZBX_HASHICORP_DBUSER_KEY;
 		zbx_vault_dbpassword_key = ZBX_HASHICORP_DBPASSWORD_KEY;
 	}
-	else if (0 == strcmp(CONFIG_VAULT, ZBX_CYBERARKCPP_NAME))
+	else if (0 == strcmp(CONFIG_VAULT, ZBX_CYBERARKCCP_NAME))
 	{
 		if (NULL != CONFIG_VAULTTOKEN)
 		{

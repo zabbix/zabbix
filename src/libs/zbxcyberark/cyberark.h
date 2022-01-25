@@ -22,7 +22,7 @@
 
 #include "zbxalgo.h"
 
-#define ZBX_CYBERARKCPP_NAME		"CyberArkCPP"
+#define ZBX_CYBERARKCCP_NAME		"CyberArkCCP"
 #define ZBX_CYBERARK_DBUSER_KEY		"UserName"
 #define ZBX_CYBERARK_DBPASSWORD_KEY	"Content"
 
