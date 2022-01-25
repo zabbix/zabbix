@@ -744,17 +744,27 @@ abstract class CHostGeneral extends CHostBase {
 		}
 
 		API::Item()->syncTemplates($link_request);
-		API::DiscoveryRule()->syncTemplates($link_request);
-		API::ItemPrototype()->syncTemplates($link_request);
-		API::HostPrototype()->syncTemplates($link_request);
+		$ruleids = API::DiscoveryRule()->syncTemplates($templateids, $hostids);
+
+		if ($ruleids) {
+			API::ItemPrototype()->syncTemplates($link_request);
+			API::HostPrototype()->syncTemplates($ruleids, $hostids);
+		}
 
 		API::Trigger()->syncTemplates($link_request);
-		API::TriggerPrototype()->syncTemplates($link_request);
-		API::GraphPrototype()->syncTemplates($link_request);
+
+		if ($ruleids) {
+			API::TriggerPrototype()->syncTemplates($link_request);
+			API::GraphPrototype()->syncTemplates($link_request);
+		}
+
 		API::Graph()->syncTemplates($link_request);
 
 		API::Trigger()->syncTemplateDependencies($link_request);
-		API::TriggerPrototype()->syncTemplateDependencies($link_request);
+
+		if ($ruleids) {
+			API::TriggerPrototype()->syncTemplateDependencies($link_request);
+		}
 	}
 
 	/**
@@ -971,9 +981,12 @@ abstract class CHostGeneral extends CHostBase {
 
 		foreach ($link_requests as $link_request) {
 			API::Item()->syncTemplates($link_request);
-			API::DiscoveryRule()->syncTemplates($link_request);
-			API::ItemPrototype()->syncTemplates($link_request);
-			API::HostPrototype()->syncTemplates($link_request);
+			$ruleids = API::DiscoveryRule()->syncTemplates($link_request['templateids'], $link_request['hostids']);
+
+			if ($ruleids) {
+				API::ItemPrototype()->syncTemplates($link_request);
+				API::HostPrototype()->syncTemplates($ruleids, $link_request['hostids']);
+			}
 		}
 
 		// we do linkage in two separate loops because for triggers you need all items already created on host

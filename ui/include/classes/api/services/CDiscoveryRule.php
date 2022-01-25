@@ -661,10 +661,13 @@ class CDiscoveryRule extends CItemGeneral {
 		return true;
 	}
 
-	public function syncTemplates($data) {
-		$data['templateids'] = zbx_toArray($data['templateids']);
-		$data['hostids'] = zbx_toArray($data['hostids']);
-
+	/**
+	 * @param array $templateids
+	 * @param array $hostids
+	 *
+	 * @return array Array of discovery rule IDs.
+	 */
+	public function syncTemplates(array $templateids, array $hostids): array {
 		$output = [];
 		foreach ($this->fieldRules as $field_name => $rules) {
 			if (!array_key_exists('system', $rules) && !array_key_exists('host', $rules)) {
@@ -674,11 +677,11 @@ class CDiscoveryRule extends CItemGeneral {
 
 		$tpl_items = $this->get([
 			'output' => $output,
-			'hostids' => $data['templateids'],
 			'selectFilter' => ['formula', 'evaltype', 'conditions'],
 			'selectLLDMacroPaths' => ['lld_macro', 'path'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'selectOverrides' => ['name', 'step', 'stop', 'filter', 'operations'],
+			'hostids' => $templateids,
 			'preservekeys' => true,
 			'nopermissions' => true
 		]);
@@ -703,9 +706,9 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 		unset($item);
 
-		$this->inherit($tpl_items, $data['hostids']);
+		$this->inherit($tpl_items, $hostids);
 
-		return true;
+		return array_keys($tpl_items);
 	}
 
 	/**
