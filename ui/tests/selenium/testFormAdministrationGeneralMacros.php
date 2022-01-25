@@ -41,6 +41,8 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 
 	use MacrosTrait;
 
+	const RESOLVE_MACRO = '{$Z_GLOBAL_MACRO_2_RESOLVE}';
+
 	private $macroMaxLength = 255;
 	private $macroPlaceholder = '{$MACRO}';
 	private $macroClass = 'textarea-flexible macro';
@@ -828,31 +830,66 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 		$this->assertEquals($old_values, CDBHelper::getRow($sql));
 	}
 
-	public function testFormAdministrationGeneralMacros_ResolveSecretMacro() {
-		$item_url = 'zabbix.php?action=latest.view&hostids%5B%5D=99134';
-		$item_url_host = 'items.php?filter_set=1&context=host&filter_hostids%5B0%5D=99134';
-		$macro = [
-			'macro' => '{$Z_GLOBAL_MACRO_2_RESOLVE}',
-			'value' => 'Value 2 B resolved'
+	public function getResolveSecretMacroData() {
+		return [
+			// Latest data page. Macro is resolved only in key.
+			[
+				[
+					'url' => 'zabbix.php?action=latest.view&hostids%5B%5D=99134&show_details=1',
+					'name' => 'Macro value: '.self::RESOLVE_MACRO,
+					'key' => 'trap[Value 2 B resolved]',
+					'key_secret' => 'trap[******]'
+				]
+			],
+			// Hosts items page. Macro is not resolved in any field.
+			[
+				[
+					'url' => 'items.php?filter_set=1&filter_hostids%5B0%5D=99134&context=host',
+					'name' => 'Macro value: '.self::RESOLVE_MACRO,
+					'key' => 'trap['.self::RESOLVE_MACRO.']',
+					'key_secret' => 'trap['.self::RESOLVE_MACRO.']'
+				]
+			]
 		];
+	}
 
-		// Open the list of "Available host" and "Latest data" for host items and check macro resolution in item fields.
-		$this->page->login()->open($item_url)->waitUntilReady();
-		$this->assertTrue($this->query('xpath://span[text()='.CXPATHHelper::escapeQuotes('trap['.$macro['value'].']').']')->exists());
-		$this->page->open($item_url_host)->waitUntilReady();
-		$this->assertTrue($this->query('link', 'Macro value: '.$macro['macro'])->exists());
+	/**
+	 * 	Test opens the list of items of "Available host" and "Latest data" and checks macro resolution in item fields.
+	 *
+	 * @dataProvider getResolveSecretMacroData
+	 */
+	public function testFormAdministrationGeneralMacros_ResolveSecretMacro($data) {
+		$this->checkItemFieds($data['url'], $data['name'], $data['key']);
 
 		// Change macro type.
 		$this->page->open('zabbix.php?action=macros.edit')->waitUntilReady();
-		$value_field = $this->getValueField($macro['macro']);
+		$value_field = $this->getValueField(self::RESOLVE_MACRO);
 		$value_field->changeInputType(CInputGroupElement::TYPE_SECRET);
 		$this->query('button:Update')->one()->click();
 
-		// Open list of items and check that macro value is hidden.
-		$this->page->open($item_url)->waitUntilReady();
-		$this->assertTrue($this->query('xpath://span[text()="trap[******]"]')->exists());
-		$this->page->open($item_url_host)->waitUntilReady();
-		$this->assertTrue($this->query('link', 'Macro value: '.$macro['macro'])->exists());
+		$this->checkItemFieds($data['url'], $data['name'], $data['key_secret']);
+	}
+
+	/**
+	 * 	Function for checking item field on Latest data or Items page.
+	 *
+	 * @param string $url    Latest data or Items page URL
+	 * @param string $name   item name
+	 * @param string $key    item key
+	 */
+	private function checkItemFieds($url, $name, $key) {
+		$this->page->login()->open($url)->waitUntilReady();
+		$table = $this->query('xpath://form[@name="items"]/table[@class="list-table"] |'.
+				' //table[contains(@class, "overflow-ellipsis")]')->asTable()->waitUntilPresent()->one();
+
+		$name_column = $table->findRow('Name', $name, true)->getColumn('Name');
+		$this->assertEquals($name, $name_column->query('tag:a')->one()->getText());
+
+		$this->assertEquals($key, (strpos($url, 'latest')
+				? $name_column->query('xpath://span[@class="green"]')->one()->getText()
+				: $table->findRow('Name', $name)->getColumn('Key')->getText()
+			)
+		);
 	}
 
 	public function getCreateVaultMacrosData() {

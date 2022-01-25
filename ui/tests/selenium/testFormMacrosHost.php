@@ -27,6 +27,8 @@ class testFormMacrosHost extends testFormMacros {
 
 	use MacrosTrait;
 
+	const RESOLVE_MACRO = '{$X_SECRET_HOST_MACRO_2_RESOLVE}';
+
 	/**
 	 * The name of the host for updating macros, id=20006.
 	 *
@@ -305,38 +307,70 @@ class testFormMacrosHost extends testFormMacros {
 		$this->updateSecretMacros($data, 'zabbix.php?action=host.view', 'hosts', 'Available host in maintenance');
 	}
 
-	/**
-	 * Check how secret macro is resolved in item name for host, host prototype and template entities.
-	 */
-	public function testFormMacrosHost_ResolveSecretMacro() {
-		$hostid = 99135;
-		$hostname = 'Available host in maintenance';
-		$item_url = 'zabbix.php?action=latest.view&hostids%5B%5D=';
-
-		$macro = [
-			'macro' => '{$X_SECRET_HOST_MACRO_2_RESOLVE}',
-			'value' => 'Value 2 B resolved'
+	public function getResolveSecretMacroData() {
+		return [
+			// Latest data page. Macro is resolved only in key.
+			[
+				[
+					'url' => 'zabbix.php?action=latest.view&hostids%5B%5D=99135&show_details=1',
+					'name' => 'Macro value: '.self::RESOLVE_MACRO,
+					'key' => 'trap[Value 2 B resolved]',
+					'key_secret' => 'trap[******]'
+				]
+			],
+			// Hosts items page. Macro is not resolved in any field.
+			[
+				[
+					'url' => 'items.php?filter_set=1&filter_hostids%5B0%5D=99135&context=host',
+					'name' => 'Macro value: '.self::RESOLVE_MACRO,
+					'key' => 'trap['.self::RESOLVE_MACRO.']',
+					'key_secret' => 'trap['.self::RESOLVE_MACRO.']'
+				]
+			]
 		];
+	}
 
-		// Open Hosts items and Latest data pages and check macro resolved text.
-		$this->page->login()->open($item_url.$hostid)->waitUntilReady();
-		$this->assertTrue($this->query('xpath://span[text()='.CXPATHHelper::escapeQuotes('trap['.$macro['value'].']').']')->exists());
-		$this->page->open('items.php?filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host')->waitUntilReady();
-		$this->assertTrue($this->query('link', 'Macro value: '.$macro['macro'])->exists());
+	/**
+	 * Test opens the list of items of "Available host in maintenance" and "Latest data"
+	 * and checks macro resolution in item fields.
+	 *
+	 * @dataProvider getResolveSecretMacroData
+	 */
+	public function testFormMacrosHost_ResolveSecretMacro($data) {
+		$this->checkItemFieds($data['url'], $data['name'], $data['key']);
 
+		// Change macro type.
 		// Open host form in popup and change macro type.
-		$form = $this->openMacrosTab('zabbix.php?action=host.view', 'hosts', false, $hostname);
-		$this->getValueField($macro['macro'])->changeInputType(CInputGroupElement::TYPE_SECRET);
+		$form = $this->openMacrosTab('zabbix.php?action=host.view', 'hosts', false, 'Available host in maintenance');
+		$this->getValueField(self::RESOLVE_MACRO)->changeInputType(CInputGroupElement::TYPE_SECRET);
 
 		$form->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Host updated');
 
-		// Open items page and check secret macro appearance.
-		$this->page->open($item_url.$hostid)->waitUntilReady();
-		$this->assertTrue($this->query('xpath://span[text()="trap[******]"]')->exists());
-		$this->page->open('items.php?filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host')->waitUntilReady();
-		$this->assertTrue($this->query('link', 'Macro value: '.$macro['macro'])->exists());
+		$this->checkItemFieds($data['url'], $data['name'], $data['key_secret']);
+	}
+
+	/**
+	 * 	Function for checking item field on Latest data or Items page.
+	 *
+	 * @param string $url    Latest data or Items page URL
+	 * @param string $name   item name
+	 * @param string $key    item key
+	 */
+	private function checkItemFieds($url, $name, $key) {
+		$this->page->login()->open($url)->waitUntilReady();
+		$table = $this->query('xpath://form[@name="items"]/table[@class="list-table"] |'.
+				' //table[contains(@class, "overflow-ellipsis")]')->asTable()->waitUntilPresent()->one();
+
+		$name_column = $table->findRow('Name', $name, true)->getColumn('Name');
+		$this->assertEquals($name, $name_column->query('tag:a')->one()->getText());
+
+		$this->assertEquals($key, (strpos($url, 'latest')
+				? $name_column->query('xpath://span[@class="green"]')->one()->getText()
+				: $table->findRow('Name', $name)->getColumn('Key')->getText()
+			)
+		);
 	}
 
 	public function getCreateVaultMacrosData() {
