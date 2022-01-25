@@ -42,7 +42,6 @@ class testDashboardItemValueWidget extends CWebTest {
 
 	protected static $dashboardid;
 	protected static $old_name = 'New widget';
-	protected static $first = true;
 
 	public static function prepareDashboardData() {
 		$response = CDataHelper::call('dashboard.create', [
@@ -154,24 +153,189 @@ class testDashboardItemValueWidget extends CWebTest {
 	public static function getWidgetData() {
 		return [
 			[
-				[ // Min fields. 0
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => 'Item value',
+						'Refresh interval' => '30 seconds',
+						'Item' => [
+							'values' => '',
+							'context' => [
+								'values' => '',
+								'context' => ''
+							]
+						]
+					],
+					'error' => ['Invalid parameter "Item": cannot be empty.']
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => 'Item value',
+						'Item' => [
+							'values' => 'Available memory in %',
+//							]
+						],
+						'Advanced configuration' => true,
+						'id:desc_size' => '0',
+						'id:decimal_size' => '0',
+						'id:value_size' => '0',
+						'id:units_size' => '0',
+						'id:time_size' => '0',
+					],
+						'error' => [
+							'Invalid parameter "Size": value must be one of 1-100.',
+							'Invalid parameter "Size": value must be one of 1-100.',
+							'Invalid parameter "Size": value must be one of 1-100.',
+							'Invalid parameter "Size": value must be one of 1-100.',
+							'Invalid parameter "Size": value must be one of 1-100.'
+						]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => 'Item value',
+						'Item' => [
+							'values' => 'Available memory in %',
+//							]
+						],
+						'Advanced configuration' => true,
+						'id:desc_size' => '101',
+						'id:decimal_size' => '102',
+						'id:value_size' => '103',
+						'id:units_size' => '104',
+						'id:time_size' => '105',
+					],
+						'error' => [
+							'Invalid parameter "Size": value must be one of 1-100.',
+							'Invalid parameter "Size": value must be one of 1-100.',
+							'Invalid parameter "Size": value must be one of 1-100.',
+							'Invalid parameter "Size": value must be one of 1-100.',
+							'Invalid parameter "Size": value must be one of 1-100.'
+						]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => 'Item value',
+						'Item' => [
+							'values' => 'Available memory in %',
+//							]
+						],
+						'Advanced configuration' => true,
+						'id:desc_size' => '-1',
+						'id:decimal_size' => '-2',
+						'id:value_size' => '-3',
+						'id:units_size' => '-4',
+						'id:time_size' => '-5',
+					],
+						'error' => [
+							'Invalid parameter "Size": value must be one of 1-100.',
+							'Invalid parameter "Size": value must be one of 1-100.',
+							'Invalid parameter "Size": value must be one of 1-100.',
+							'Invalid parameter "Size": value must be one of 1-100.',
+							'Invalid parameter "Size": value must be one of 1-100.'
+						]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => 'Item value',
+						'Item' => [
+							'values' => 'Available memory in %',
+//							]
+						],
+						'Advanced configuration' => true,
+						'id:desc_size' => 'aqua',
+						'id:decimal_size' => 'один',
+						'id:value_size' => 'some',
+						'id:units_size' => '@6$',
+						'id:time_size' => '_+(*',
+					],
+						'error' => [
+							'Invalid parameter "Size": value must be one of 1-100.',
+							'Invalid parameter "Size": value must be one of 1-100.',
+							'Invalid parameter "Size": value must be one of 1-100.',
+							'Invalid parameter "Size": value must be one of 1-100.',
+							'Invalid parameter "Size": value must be one of 1-100.'
+						]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => 'Item value',
+						'Item' => [
+							'values' => 'Available memory in %',
+//							]
+						],
+						'Advanced configuration' => true,
+						'id:decimal_places' => '-1',
+					],
+						'error' => [
+							'Invalid parameter "Decimal places": value must be one of 0-10.'
+						]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => 'Item value',
+						'Item' => [
+							'values' => 'Available memory in %',
+//							]
+						],
+						'Advanced configuration' => true,
+						'id:decimal_places' => '99',
+					],
+						'error' => [
+							'Invalid parameter "Decimal places": value must be one of 0-10.'
+						]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => 'Item value',
+						'Item' => [
+							'values' => 'Available memory in %',
+//							]
+						],
+						'Advanced configuration' => true,
+						'id:description' => '',
+					],
+						'error' => [
+							'Invalid parameter "Description": cannot be empty.'
+						]
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Type' => 'Item value',
-						'Name' => 'Some name',
+						'Name' => 'Any name',
 						'Refresh interval' => 'No refresh',
 						'Item' => [
 							'values' => 'Available memory in %',
-							'context' => [
-								'values' => 'ЗАББИКС Сервер',
-								'context' => 'Zabbix servers'
-							]
+//							]
 						]
 					]
 				]
 			],
 			[
-				[ // 1
+				[
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Type' => 'Item value',
@@ -200,19 +364,16 @@ class testDashboardItemValueWidget extends CWebTest {
 				]
 			],
 			[
-				[ // 2
+				[
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Type' => 'Item value',
 						'id:show_header' => false,
-						'Name' => '#$%^&*()!@{}[]<>,.?/\|',
+						'Name' => '#$%^&*()!@{}[]<>,.|',
 						'Refresh interval' => '10 minutes',
 						'Item' => [
 							'values' => 'Response code for step "testFormWeb1" of scenario "testFormWeb1".',
-							'context' => [
-								'values' => 'Simple form test host',
-								'context' => 'Zabbix servers'
-							]
+//							]
 						],
 						'id:show_1' => false,
 						'id:show_2' => true,
@@ -227,7 +388,7 @@ class testDashboardItemValueWidget extends CWebTest {
 				]
 			],
 			[
-				[ // 3 All fields, default colors.
+				[
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Type' => 'Item value',
@@ -235,10 +396,6 @@ class testDashboardItemValueWidget extends CWebTest {
 						'Refresh interval' => '2 minutes',
 						'Item' => [
 							'values' => 'Http agent item form',
-							'context' => [
-								'values' => 'Host for different items types',
-								'context' => 'Zabbix servers'
-							]
 						],
 						'id:show_1' => true,
 						'id:show_2' => true,
@@ -269,120 +426,7 @@ class testDashboardItemValueWidget extends CWebTest {
 				]
 			],
 			[
-				[ // 4
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Type' => 'Item value',
-						'Refresh interval' => '30 seconds',
-						'Item' => [
-							'values' => '',
-							'context' => [
-								'values' => '',
-								'context' => ''
-							]
-						],
-					],
-					'error' => ['Invalid parameter "Item": cannot be empty.']
-				]
-			],
-			[
-				[ // 5
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Type' => 'Item value',
-						'Item' => [
-							'values' => 'Available memory in %',
-							'context' => [
-								'values' => 'ЗАББИКС Сервер',
-								'context' => 'Zabbix servers'
-							]
-						],
-						'Advanced configuration' => true,
-						'id:desc_size' => '0',
-						'id:decimal_size' => '0',
-						'id:value_size' => '0',
-						'id:units_size' => '0',
-						'id:time_size' => '0',
-					],
-						'error' => [
-							'Invalid parameter "Size": value must be one of 1-100.',
-							'Invalid parameter "Size": value must be one of 1-100.',
-							'Invalid parameter "Size": value must be one of 1-100.',
-							'Invalid parameter "Size": value must be one of 1-100.',
-							'Invalid parameter "Size": value must be one of 1-100.'
-						]
-				]
-			],
-			[
-				[ // 6
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Type' => 'Item value',
-						'Item' => [
-							'values' => 'Available memory in %',
-							'context' => [
-								'values' => 'ЗАББИКС Сервер',
-								'context' => 'Zabbix servers'
-							]
-						],
-						'Advanced configuration' => true,
-						'id:desc_size' => '101',
-						'id:decimal_size' => '102',
-						'id:value_size' => '103',
-						'id:units_size' => '104',
-						'id:time_size' => '105',
-					],
-						'error' => [
-							'Invalid parameter "Size": value must be one of 1-100.',
-							'Invalid parameter "Size": value must be one of 1-100.',
-							'Invalid parameter "Size": value must be one of 1-100.',
-							'Invalid parameter "Size": value must be one of 1-100.',
-							'Invalid parameter "Size": value must be one of 1-100.'
-						]
-				]
-			],
-			[
-				[ // 7
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Type' => 'Item value',
-						'Item' => [
-							'values' => 'Available memory in %',
-							'context' => [
-								'values' => 'ЗАББИКС Сервер',
-								'context' => 'Zabbix servers'
-							]
-						],
-						'Advanced configuration' => true,
-						'id:decimal_places' => '-1',
-					],
-						'error' => [
-							'Invalid parameter "Decimal places": value must be one of 0-10.'
-						]
-				]
-			],
-			[
-				[ // 8
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Type' => 'Item value',
-						'Item' => [
-							'values' => 'Available memory in %',
-							'context' => [
-								'values' => 'ЗАББИКС Сервер',
-								'context' => 'Zabbix servers'
-							]
-						],
-						'Advanced configuration' => true,
-						'id:decimal_places' => '99',
-					],
-						'error' => [
-							'Invalid parameter "Decimal places": value must be one of 0-10.'
-						]
-				]
-			],
-			[
-				[ // 9
+				[
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Type' => 'Item value',
@@ -391,10 +435,6 @@ class testDashboardItemValueWidget extends CWebTest {
 						'Refresh interval' => '10 minutes',
 						'Item' => [
 							'values' => 'Response code for step "testFormWeb1" of scenario "testFormWeb1".',
-							'context' => [
-								'values' => 'Simple form test host',
-								'context' => 'Zabbix servers'
-							]
 						],
 						'id:show_1' => true,
 						'id:show_2' => true,
@@ -426,16 +466,71 @@ class testDashboardItemValueWidget extends CWebTest {
 						'Name' => 'Widget to cancel',
 						'Item' => [
 							'values' => 'Available memory in %',
-							'context' => [
-								'values' => 'ЗАББИКС Сервер',
-								'context' => 'Zabbix servers'
-							]
 						]
 					],
 					's_update-cancel' => ''
 				]
 			]
 		];
+	}
+
+	/**
+	 * @dataProvider getWidgetData
+	 */
+	public function testDashboardItemValueWidget_Create($data) {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
+		$dashboard = CDashboardElement::find()->one();
+		$old_widget_count = $dashboard->getWidgets()->count();
+		$old_hash = CDBHelper::getHash('SELECT * FROM widget ORDER BY widgetid');
+
+		// Add a widget.
+		$dialogue = $dashboard->edit()->addWidget();
+		$form = $dialogue->asForm();
+		$form->fill($data['fields']);
+
+		if (array_key_exists('colors', $data)) {
+			foreach ($data['colors'] as $fieldid => $color) {
+				$form->query($fieldid)->one()->click()->waitUntilReady();
+				$this->query('xpath://div[@class="overlay-dialogue"]')->asColorPicker()->one()->fill($color);
+			}
+		}
+
+		COverlayDialogElement::find()->waitUntilReady()->one();
+
+		if (array_key_exists('s_update-cancel', $data)) {
+			$dialogue->query('button', 'Cancel')->one()->click();
+			$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
+		}
+		else {
+			$form->submit();
+		}
+
+		$this->page->waitUntilReady();
+
+		switch ($data['expected']) {
+			case TEST_GOOD:
+				// Make sure that the widget is present before saving the dashboard.
+				$header = CTestArrayHelper::get($data['fields'], 'Name', 'Item');
+				$dashboard->getWidget($header);
+				$dashboard->save();
+
+				// Check that Dashboard has been saved and that widget has been added.
+				$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+				$this->assertEquals($old_widget_count + 1, $dashboard->getWidgets()->count());
+
+				// Check that widget created in DB.
+				$this->assertEquals(1, CDBHelper::getCount('SELECT null from widget WHERE name = '."'".$data['fields']['Name']."'"));
+
+				// Check that widget has been added.
+				$this->checkRefreshInterval($data, $header);
+				break;
+			case TEST_BAD:
+				$this->assertMessage($data['expected'], null, $data['error']);
+				$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM widget ORDER BY widgetid'));
+				break;
+			default:
+				break;
+		}
 	}
 
 	/**
@@ -448,10 +543,12 @@ class testDashboardItemValueWidget extends CWebTest {
 
 		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
 		$old_widget_count = $dashboard->getWidgets()->count();
+		$old_hash = CDBHelper::getHash('SELECT * FROM widget ORDER BY widgetid');
 		$header = self::$old_name;
 		$widget = $dashboard->getWidget($header);
 		$form = $widget->edit()->asForm();
 		$original_values = $form->getFields()->asValues();
+
 		if (!array_key_exists('s_update-cancel', $data)) {
 			$form->fill($data['fields']);
 		}
@@ -462,6 +559,7 @@ class testDashboardItemValueWidget extends CWebTest {
 				$this->query('xpath://div[@class="overlay-dialogue"]')->asColorPicker()->one()->fill($color);
 			}
 		}
+
 		COverlayDialogElement::find()->waitUntilReady()->one();
 		$form->submit();
 
@@ -469,6 +567,7 @@ class testDashboardItemValueWidget extends CWebTest {
 			$new_values = $widget->edit()->getFields()->asValues();
 			$this->assertEquals($original_values, $new_values);
 		}
+
 		$this->page->waitUntilReady();
 
 		switch ($data['expected']) {
@@ -476,69 +575,127 @@ class testDashboardItemValueWidget extends CWebTest {
 				// Make sure that the widget is present before saving the dashboard.
 				$new_header = CTestArrayHelper::get($data['fields'], 'Name', 'Item');
 				$dashboard->getWidget($new_header);
+//				var_dump($data['fields']['Name']);
 				$dashboard->save();
 
 				// Check that Dashboard has been saved and that widget is in place.
-				$this->checkDashboardUpdateMessage();
+				$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 				$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
+
+				// Check that widget updated in DB.
+				$this->assertEquals(2, CDBHelper::getCount('SELECT null from widget WHERE name = '."'".$data['fields']['Name']."'"));
 
 				// Check that widget is.
 				$this->checkRefreshInterval($data, $new_header);
 				self::$old_name = $new_header;
 				break;
-		case TEST_BAD:
+			case TEST_BAD:
 				$this->assertMessage($data['expected'], null, $data['error']);
+				$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM widget ORDER BY widgetid'));
 				break;
 		}
 	}
 
 	/**
-	 * @dataProvider getWidgetData
+	 * Check authentication form fields layout.
 	 */
-	public function testDashboardItemValueWidget_Create($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
-		$dashboard = CDashboardElement::find()->one();
-		$old_widget_count = $dashboard->getWidgets()->count();
+	public function testDashboardItemValueWidget_FormLayout() {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 
-		// Add a widget.
-		$dialogue = $dashboard->edit()->addWidget();
-		$form = $dialogue->asForm();
-		$form->fill($data['fields']);
-		if (array_key_exists('colors', $data)) {
-			foreach ($data['colors'] as $fieldid => $color) {
-				$form->query($fieldid)->one()->click()->waitUntilReady();
-				$this->query('xpath://div[@class="overlay-dialogue"]')->asColorPicker()->one()->fill($color);
-			}
-		}
-		COverlayDialogElement::find()->waitUntilReady()->one();
-		if (array_key_exists('s_update-cancel', $data)) {
-			$dialogue->query('button', 'Cancel')->one()->click();
-			$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
-		} else {
-			$form->submit();
-		}
-		$this->page->waitUntilReady();
+		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
+		$header = self::$old_name;
+		$widget = $dashboard->getWidget($header);
+		$form = $widget->edit()->asForm();
 
-		switch ($data['expected']) {
-			case TEST_GOOD:
-				// Make sure that the widget is present before saving the dashboard.
-				$header = CTestArrayHelper::get($data['fields'], 'Name', 'Item');
-				$dashboard->getWidget($header);
-				$dashboard->save();
+		$form->query('id:adv_conf')->asCheckbox()->one()->check();
 
-				// Check that Dashboard has been saved and that widget has been added.
-				$this->checkDashboardUpdateMessage();
-				$this->assertEquals($old_widget_count + 1, $dashboard->getWidgets()->count());
-				// Check that widget has been added.
-				$this->checkRefreshInterval($data, $header);
-				break;
-			case TEST_BAD:
-				$this->assertMessage($data['expected'], null, $data['error']);
-				break;
-			default:
-				break;
+		// Summon the hint-box.
+		$form->query('xpath://label[@for="description"]//span')->one()->click();
+		$hint = $form->query('xpath://div[@class="wrapper"]/div[@class="overlay-dialogue"]')->waitUntilPresent();
 
-		}
+		// Assert text.
+		$this->assertEquals("Supported macros:".
+			"\n{HOST.*}".
+			"\n{ITEM.*}".
+			"\n{INVENTORY.*}".
+			"\nUser macros", $hint->one()->getText());
+
+		// Close the hint-box.
+		$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
+		$hint->waitUntilNotPresent();
+
+		// Check checkboxes dependencies.
+		$form->query('id:show_1')->asCheckbox()->one()->uncheck();
+		$this->assertFalse($form->query('xpath://textarea[@id="description"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="desc_h_pos_0"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="desc_h_pos_1"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="desc_h_pos_2"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="desc_v_pos_0"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="desc_v_pos_1"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="desc_v_pos_2"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="desc_size"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="desc_bold"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="desc_color"]')->one()->isEnabled());
+		$form->query('id:show_1')->asCheckbox()->one()->check();
+
+		$form->query('id:show_2')->asCheckbox()->one()->uncheck();
+		$this->assertFalse($form->query('xpath://input[@id="decimal_places"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="value_h_pos_0"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="value_h_pos_1"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="value_h_pos_2"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="value_v_pos_0"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="value_v_pos_1"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="value_v_pos_2"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="decimal_size"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="value_size"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="value_bold"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="value_color"]')->one()->isEnabled());
+		$form->query('id:show_2')->asCheckbox()->one()->check();
+
+		$this->assertTrue($form->query('xpath://input[@id="units"]')->one()->isEnabled());
+		$this->assertTrue($form->query('xpath://button[@id="label-units_pos"]')->one()->isEnabled());
+		$this->assertTrue($form->query('xpath://input[@id="units_size"]')->one()->isEnabled());
+		$this->assertTrue($form->query('xpath://input[@id="units_bold"]')->one()->isEnabled());
+		$this->assertTrue($form->query('xpath://input[@id="units_color"]')->one()->isEnabled());
+		$form->query('id:units_show')->asCheckbox()->one()->uncheck();
+		$this->assertFalse($form->query('xpath://input[@id="units"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://button[@id="label-units_pos"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="units_size"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="units_bold"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="units_color"]')->one()->isEnabled());
+		$form->query('id:units_show')->asCheckbox()->one()->check();
+
+		$form->query('id:show_3')->asCheckbox()->one()->uncheck();
+		$this->assertFalse($form->query('xpath://input[@id="time_h_pos_0"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="time_h_pos_1"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="time_h_pos_2"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="time_v_pos_0"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="time_v_pos_1"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="time_v_pos_2"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="time_size"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="time_bold"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="time_color"]')->one()->isEnabled());
+		$form->query('id:show_3')->asCheckbox()->one()->check();
+
+		$form->query('id:show_4')->asCheckbox()->one()->uncheck();
+		$this->assertFalse($form->query('xpath://input[@id="up_color"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="down_color"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="updown_color"]')->one()->isEnabled());
+		$form->query('id:show_4')->asCheckbox()->one()->check();
+
+		$form->query('id:show_4')->asCheckbox()->one()->uncheck();
+		$this->assertFalse($form->query('xpath://input[@id="up_color"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="down_color"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="updown_color"]')->one()->isEnabled());
+		$form->query('id:show_4')->asCheckbox()->one()->check();
+
+		$form->query('id:adv_conf')->asCheckbox()->one()->uncheck();
+		$this->assertFalse($form->query('xpath://input[@id="bg_color"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://textarea[@id="description"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="decimal_places"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="units"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="time_size"]')->one()->isEnabled());
+		$this->assertFalse($form->query('xpath://input[@id="updown_color"]')->one()->isEnabled());
 	}
 
 	public function testDashboardItemValueWidget_Delete() {
@@ -550,18 +707,9 @@ class testDashboardItemValueWidget extends CWebTest {
 		$this->assertEquals(true, $widget->isEditable());
 		$dashboard->deleteWidget($name);
 		$dashboard->save();
-		$this->checkDashboardUpdateMessage();
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 		$this->assertEquals($old_widget_count - 1, $dashboard->getWidgets()->count());
-
-	}
-
-	/**
-	 * Function for checking dashboard update message.
-	 */
-	private function checkDashboardUpdateMessage() {
-		$message = CMessageElement::find()->waitUntilVisible()->one();
-		$this->assertTrue($message->isGood());
-		$this->assertEquals('Dashboard updated', $message->getTitle());
+		$this->assertEquals('', CDBHelper::getRow("SELECT * from widget WHERE name = 'Widget to delete'"));
 	}
 
 	/**
