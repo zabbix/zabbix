@@ -1,6 +1,8 @@
 Changes for 6.0.0rc1
 
 New features:
+..F....... [ZBXNEXT-7125] added new widget "Top hosts"; deprecated widget "Data overview" (ashubin, averza, gcalenko)
+.......PS. [ZBXNEXT-7411] replaced signals with IPC messages for most of internal runtime control option processing (wiper)
 .........T [ZBXNEXT-4635] added templates for Kubernetes Controlplane and Kubestate metrics (afayantsev, ychukina)
 ..F....... [ZBXNEXT-7107] added Item popup menu in Latest data; added new links in Configuration Items popup menu and Item prototypes popup menu (epulke)
 ...G...... [ZBXNEXT-7409] added native support for the vfs.dir.size and vfs.dir.count keys in Zabbix agent 2 (esneiders)
@@ -12,6 +14,10 @@ A.F.....S. [ZBXNEXT-1911,ZBXNEXT-7399] allowed textual types of information for 
 .........T [ZBXNEXT-7078] added pfsense template (vkhaliev)
 
 Bug fixes:
+..F....... [ZBX-20225] fixed host modal window not opening on many pages (Ivo, miks, vmurzins)
+...G...... [ZBX-20453] fixed Agent 2 compilation issues on macOS (ssimonenko)
+..F....... [ZBX-20359] fixed export on Monitoring Problems page getting out of sync with filter (jfreibergs)
+........S. [ZBX-19961] fixed possible crash due to trigger functions being updated during LLD (vso)
 ..F....... [ZBX-20300] fixed displaying extra decimal digits in vertical scales of graphs for item units prefixed with "!" (averza)
 ...GI..... [ZBX-20444] fixed Agent and Agent 2 compilation with libpcre2 on Windows (ssimonenko)
 ..F....... [ZBX-20460] fixed color-picker not updating selected color in its input element (ashubin)
