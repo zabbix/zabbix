@@ -367,7 +367,7 @@ abstract class CControllerLatest extends CController {
 	 * @param array  $filter['subfilter_tagnames']  Selected tagname subfilter parameters.
 	 * @param array  $filter['subfilter_tags']      Selected tags subfilter parameters.
 	 * @param array  $filter['subfilter_data']      Selected data subfilter parameters.
-	 * @oaram bool   $show_data_subfilter           Either the data subfilter should be included.
+	 * @param bool   $show_data_subfilter           Whether the data subfilter should be included.
 	 *
 	 * @return array
 	 */
@@ -562,14 +562,6 @@ abstract class CControllerLatest extends CController {
 			];
 		}
 
-		// Sort subfilters by values.
-		CArrayHelper::sort($subfilter_options['hostids'], ['name']);
-		CArrayHelper::sort($subfilter_options['tagnames'], ['name']);
-		uksort($subfilter_options['tags'], 'strnatcmp');
-		array_walk($subfilter_options['tags'], function (&$tag_values) {
-			CArrayHelper::sort($tag_values, ['name']);
-		});
-
 		return $subfilter_options;
 	}
 
@@ -663,26 +655,30 @@ abstract class CControllerLatest extends CController {
 	 *
 	 * @return array
 	 */
-	public static function getMostSevereSubfilters(array $subfilters): array {
-		if (self::SUBFILTERS_VALUES_PER_ROW >= count($subfilters)) {
-			return $subfilters;
+	public static function getTopPrioritySubfilters(array $subfilters): array {
+		$top_priority_fields = [];
+
+		if (self::SUBFILTERS_VALUES_PER_ROW < count($subfilters)) {
+			// All selected subfilters must always be included.
+			$top_priority_fields = array_filter($subfilters, function ($field) {
+				return $field['selected'];
+			});
+
+			// Add first non-selected subfilter values in case limit is not exceeded.
+			$remaining = self::SUBFILTERS_VALUES_PER_ROW - count($top_priority_fields);
+			if ($remaining > 0) {
+				$subfilters = array_diff_key($subfilters, $top_priority_fields);
+				CArrayHelper::sort($subfilters, ['name']);
+				$top_priority_fields += array_slice($subfilters, 0, $remaining, true);
+			}
+		}
+		else {
+			$top_priority_fields = $subfilters;
 		}
 
-		// All selected subfilters always must be included.
-		$most_severe = array_filter($subfilters, function ($elmnt) {
-			return $elmnt['selected'];
-		});
+		CArrayHelper::sort($top_priority_fields, ['name']);
 
-		// Add first non-selected subfilter values in case if limit is not exceeded.
-		$remaining = self::SUBFILTERS_VALUES_PER_ROW - count($most_severe);
-		if ($remaining > 0) {
-			$subfilters = array_diff_key($subfilters, $most_severe);
-			$most_severe += array_slice($subfilters, 0, $remaining, true);
-		}
-
-		CArrayHelper::sort($most_severe, ['name']);
-
-		return $most_severe;
+		return $top_priority_fields;
 	}
 
 	/**
@@ -693,40 +689,45 @@ abstract class CControllerLatest extends CController {
 	 *
 	 * @return array
 	 */
-	public static function getMostSevereTagValueSubfilters(array $tags): array {
-		if (self::SUBFILTERS_TAG_VALUE_ROWS >= count($tags)) {
-			return $tags;
+	public static function getTopPriorityTagValueSubfilters(array $tags): array {
+		$top_priority_fields = [];
+
+		// All selected subfilters must always be included.
+		foreach ($tags as $tag => $values) {
+			if ((bool) array_sum(array_column($values, 'selected'))) {
+				$top_priority_fields[] = [
+					'name' => $tag,
+					'values' => $values
+				];
+				unset($tags[$tag]);
+			}
 		}
 
-		// All selected subfilters always must be included.
-		$most_severe = array_filter($tags, function ($tag) {
-			return (bool) array_sum(array_column($tag, 'selected'));
-		});
-
-		// Add first non-selected subfilter values in case if limit is not exceeded.
-		if (self::SUBFILTERS_TAG_VALUE_ROWS > count($most_severe)) {
-			$tags = array_diff_key($tags, $most_severe);
+		// Add first non-selected subfilter values in case limit is not exceeded.
+		if (self::SUBFILTERS_TAG_VALUE_ROWS > count($top_priority_fields)) {
 			$tags_names = array_keys($tags);
+			uasort($tags_names, 'strnatcasecmp');
 
 			do {
 				if (($tag_name = array_shift($tags_names)) === null) {
 					break;
 				}
 
-				$tag_values = array_filter($tags[$tag_name], function ($elmnt) {
-					return ($elmnt['count'] != 0);
+				$tag_values = array_filter($tags[$tag_name], function ($field) {
+					return ($field['count'] != 0);
 				});
 
 				if ($tag_values) {
-					$most_severe[$tag_name] = self::getMostSevereSubfilters($tag_values);
+					$top_priority_fields[] = [
+						'name' => $tag_name,
+						'values' => self::getTopPrioritySubfilters($tag_values)
+					];
 				}
-			} while (self::SUBFILTERS_TAG_VALUE_ROWS > count($most_severe));
+			} while (self::SUBFILTERS_TAG_VALUE_ROWS > count($top_priority_fields));
 		}
 
-		uksort($most_severe, function ($a, $b) {
-			return strcmp((string) $a, (string) $b);
-		});
+		CArrayHelper::sort($top_priority_fields, ['name']);
 
-		return $most_severe;
+		return $top_priority_fields;
 	}
 }
