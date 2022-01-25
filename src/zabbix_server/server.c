@@ -63,7 +63,7 @@
 #include "preprocessor/preproc_worker.h"
 #include "availability/avail_manager.h"
 #include "service/service_manager.h"
-#include "housekeeper/problem_housekeeper.h"
+#include "housekeeper/trigger_housekeeper.h"
 #include "lld/lld_manager.h"
 #include "lld/lld_worker.h"
 #include "reporter/report_manager.h"
@@ -72,7 +72,6 @@
 #include "../libs/zbxdbcache/valuecache.h"
 #include "setproctitle.h"
 #include "zbxcrypto.h"
-#include "zbxipcservice.h"
 #include "zbxhistory.h"
 #include "postinit.h"
 #include "export.h"
@@ -111,7 +110,7 @@ const char	*help_message[] = {
 	"    Runtime control options:",
 	"      " ZBX_CONFIG_CACHE_RELOAD "         Reload configuration cache",
 	"      " ZBX_HOUSEKEEPER_EXECUTE "         Execute the housekeeper",
-	"      " ZBX_TRIGGER_HOUSEKEEPER_EXECUTE " Execute the problem housekeeper",
+	"      " ZBX_TRIGGER_HOUSEKEEPER_EXECUTE " Execute the trigger housekeeper",
 	"      " ZBX_LOG_LEVEL_INCREASE "=target   Increase log level, affects all processes if",
 	"                                  target is not specified",
 	"      " ZBX_LOG_LEVEL_DECREASE "=target   Decrease log level, affects all processes if",
@@ -219,7 +218,7 @@ int	CONFIG_AVAILMAN_FORKS		= 1;
 int	CONFIG_REPORTMANAGER_FORKS	= 0;
 int	CONFIG_REPORTWRITER_FORKS	= 0;
 int	CONFIG_SERVICEMAN_FORKS		= 1;
-int	CONFIG_PROBLEMHOUSEKEEPER_FORKS = 1;
+int	CONFIG_TRIGGERHOUSEKEEPER_FORKS = 1;
 int	CONFIG_ODBCPOLLER_FORKS		= 1;
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
@@ -524,11 +523,11 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 		*local_process_type = ZBX_PROCESS_TYPE_REPORTWRITER;
 		*local_process_num = local_server_num - server_count + CONFIG_REPORTWRITER_FORKS;
 	}
-	else if (local_server_num <= (server_count += CONFIG_PROBLEMHOUSEKEEPER_FORKS))
+	else if (local_server_num <= (server_count += CONFIG_TRIGGERHOUSEKEEPER_FORKS))
 	{
 		/* start service manager process and load configuration cache in parallel */
-		*local_process_type = ZBX_PROCESS_TYPE_PROBLEMHOUSEKEEPER;
-		*local_process_num = local_server_num - server_count + CONFIG_PROBLEMHOUSEKEEPER_FORKS;
+		*local_process_type = ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER;
+		*local_process_num = local_server_num - server_count + CONFIG_TRIGGERHOUSEKEEPER_FORKS;
 	}
 	else if (local_server_num <= (server_count += CONFIG_ODBCPOLLER_FORKS))
 	{
@@ -1251,7 +1250,7 @@ static int	server_startup(zbx_socket_t *listen_sock, zbx_rtc_t *rtc)
 			+ CONFIG_ALERTMANAGER_FORKS + CONFIG_PREPROCMAN_FORKS + CONFIG_PREPROCESSOR_FORKS
 			+ CONFIG_LLDMANAGER_FORKS + CONFIG_LLDWORKER_FORKS + CONFIG_ALERTDB_FORKS
 			+ CONFIG_HISTORYPOLLER_FORKS + CONFIG_AVAILMAN_FORKS + CONFIG_REPORTMANAGER_FORKS
-			+ CONFIG_REPORTWRITER_FORKS + CONFIG_SERVICEMAN_FORKS + CONFIG_PROBLEMHOUSEKEEPER_FORKS
+			+ CONFIG_REPORTWRITER_FORKS + CONFIG_SERVICEMAN_FORKS + CONFIG_TRIGGERHOUSEKEEPER_FORKS
 			+ CONFIG_ODBCPOLLER_FORKS;
 	threads = (pid_t *)zbx_calloc(threads, (size_t)threads_num, sizeof(pid_t));
 	threads_flags = (int *)zbx_calloc(threads_flags, (size_t)threads_num, sizeof(int));
@@ -1282,7 +1281,8 @@ static int	server_startup(zbx_socket_t *listen_sock, zbx_rtc_t *rtc)
 				break;
 			case ZBX_PROCESS_TYPE_CONFSYNCER:
 				zbx_thread_start(dbconfig_thread, &thread_args, &threads[i]);
-				zbx_rtc_wait_config_sync(rtc);
+				if (FAIL == (ret = zbx_rtc_wait_config_sync(rtc)))
+					goto out;
 
 				if (SUCCEED != (ret = zbx_ha_get_status(&ha_status, &error)))
 				{
@@ -1414,7 +1414,7 @@ static int	server_startup(zbx_socket_t *listen_sock, zbx_rtc_t *rtc)
 			case ZBX_PROCESS_TYPE_REPORTWRITER:
 				zbx_thread_start(report_writer_thread, &thread_args, &threads[i]);
 				break;
-			case ZBX_PROCESS_TYPE_PROBLEMHOUSEKEEPER:
+			case ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER:
 				zbx_thread_start(trigger_housekeeper_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_ODBCPOLLER:
@@ -1464,6 +1464,8 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 	/* hard kill all zabbix processes, no logging or other  */
 
 	zbx_unset_child_signal_handler();
+
+	zbx_rtc_reset(rtc);
 
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 	/* Disable locks so main process doesn't hang on logging if a process was              */
@@ -1794,7 +1796,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			if (ZBX_NODE_STATUS_ACTIVE == ha_status || ZBX_RTC_LOG_LEVEL_DECREASE == message->code ||
 					ZBX_RTC_LOG_LEVEL_INCREASE == message->code)
 			{
-				zbx_rtc_dispatch(client, message);
+				zbx_rtc_dispatch(&rtc, client, message);
 			}
 			else
 			{
@@ -1866,6 +1868,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			break;
 		}
 	}
+
+	zbx_rtc_shutdown_subs(&rtc);
 
 	if (SUCCEED != zbx_ha_pause(&error))
 	{
