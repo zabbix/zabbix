@@ -358,6 +358,8 @@ New features:
 ...G...... [ZBXNEXT-6875] added native support for the system.hw.chassis and system.hw.devices keys in Zabbix agent 2 (esneiders)
 
 Bug fixes:
+..F....... [ZBX-20359] fixed export on Monitoring Problems page getting out of sync with filter (jfreibergs)
+........S. [ZBX-19961] fixed possible crash due to trigger functions being updated during LLD (vso)
 .......PS. [ZBX-20293] fixed icmpping items group becomes not supported due to error in interval detection (akozlovs)
 A......... [ZBX-19991] fixed template import of dependent items and item prototypes having newly created master item (miks)
 .........T [ZBX-20316] added macro for password and changed conf file in postgresql by user parameters template (vkhaliev)
