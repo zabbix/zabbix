@@ -1039,7 +1039,7 @@ static void	get_proxy_monitored_httptests(zbx_uint64_t proxy_hostid, zbx_vector_
 static void	get_macro_secrets(const zbx_vector_ptr_t *keys_paths, struct zbx_json *j)
 {
 	int		i;
-	zbx_hashset_t	kvs;
+	zbx_kvs_t	kvs;
 
 	zbx_kvs_create(&kvs, 100);
 
