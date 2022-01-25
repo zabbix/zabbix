@@ -723,7 +723,9 @@ abstract class CControllerLatest extends CController {
 			} while (self::SUBFILTERS_TAG_VALUE_ROWS > count($most_severe));
 		}
 
-		uksort($most_severe, 'strnatcmp');
+		uksort($most_severe, function ($a, $b) {
+			return strcmp((string) $a, (string) $b);
+		});
 
 		return $most_severe;
 	}
