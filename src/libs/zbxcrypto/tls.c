@@ -3168,7 +3168,7 @@ void	zbx_tls_free(void)
  ******************************************************************************/
 #if defined(HAVE_GNUTLS)
 int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
-		char **error)
+		const char *server_name, char **error)
 {
 	int	ret = FAIL, res;
 #if defined(_WINDOWS)
@@ -3300,6 +3300,15 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 						gnutls_strerror(res));
 				goto out;
 			}
+		}
+	}
+
+	if (NULL != server_name && ZBX_TCP_SEC_UNENCRYPTED != tls_connect)
+	{
+		if (GNUTLS_E_SUCCESS != gnutls_server_name_set(s->tls_ctx->ctx, GNUTLS_NAME_DNS, server_name,
+				strlen(server_name)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot set %s tls host name", server_name);
 		}
 	}
 
@@ -3437,7 +3446,7 @@ out1:
 }
 #elif defined(HAVE_OPENSSL)
 int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
-		char **error)
+		const char *server_name, char **error)
 {
 	int	ret = FAIL, res;
 	size_t	error_alloc = 0, error_offset = 0;
@@ -3534,6 +3543,14 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 		*error = zbx_strdup(*error, "invalid connection parameters");
 		THIS_SHOULD_NEVER_HAPPEN;
 		goto out1;
+	}
+
+	if (NULL != server_name && ZBX_TCP_SEC_UNENCRYPTED != tls_connect)
+	{
+		if (1 != SSL_set_tlsext_host_name(s->tls_ctx->ctx, server_name))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot set %s tls host name", server_name);
+		}
 	}
 
 	/* set our connected TCP socket to TLS context */
