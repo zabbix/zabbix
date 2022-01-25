@@ -861,7 +861,7 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 	public function testFormAdministrationGeneralMacros_ResolveSecretMacro($data) {
 		$this->checkItemFieds($data['url'], $data['name'], $data['key']);
 
-		// Change macro type.
+		// Change macro type to secret.
 		$this->page->open('zabbix.php?action=macros.edit')->waitUntilReady();
 		$value_field = $this->getValueField(self::RESOLVE_MACRO);
 		$value_field->changeInputType(CInputGroupElement::TYPE_SECRET);

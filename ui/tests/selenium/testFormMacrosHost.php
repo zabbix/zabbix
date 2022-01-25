@@ -339,8 +339,7 @@ class testFormMacrosHost extends testFormMacros {
 	public function testFormMacrosHost_ResolveSecretMacro($data) {
 		$this->checkItemFieds($data['url'], $data['name'], $data['key']);
 
-		// Change macro type.
-		// Open host form in popup and change macro type.
+		// Open host form in popup and change macro type to secret.
 		$form = $this->openMacrosTab('zabbix.php?action=host.view', 'hosts', false, 'Available host in maintenance');
 		$this->getValueField(self::RESOLVE_MACRO)->changeInputType(CInputGroupElement::TYPE_SECRET);
 
