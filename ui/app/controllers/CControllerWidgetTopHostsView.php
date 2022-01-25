@@ -294,8 +294,9 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 		$interval = $time_to;
 
 		$data = Manager::History()->getAggregationByInterval($items, $time_from, $time_to, $function, $interval);
+		$data = array_column(array_column($data, 'data'), 0);
 
-		return array_column(array_column(array_column($data, 'data'), 0), 'value', 'itemid');
+		return array_column($data, $function == AGGREGATE_COUNT ? 'count' : 'value', 'itemid');
 	}
 
 	/**
