@@ -19,10 +19,6 @@
 
 #include "zbx_common_trim_utf8.h"
 #include "zbxmocktest.h"
-#include "zbxmockdata.h"
-#include "zbxmockutil.h"
-#include "zbxmockassert.h"
-
 #include "common.h"
 
 void	zbx_mock_test_entry(void **state)

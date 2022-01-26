@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_MOCK_COMMON_TRIM_UTF8_H
-#define ZABBIX_MOCK_COMMON_TRIM_UTF8_H
+#ifndef ZABBIX_COMMON_TRIM_UTF8_H
+#define ZABBIX_COMMON_TRIM_UTF8_H
 
 #define ZABBIX_MOCK_LTRIM_UTF8	0
 #define ZABBIX_MOCK_RTRIM_UTF8	1

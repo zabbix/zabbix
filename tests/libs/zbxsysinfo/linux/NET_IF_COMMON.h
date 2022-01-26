@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_MOCK_NET_IF_COMMON_HELPER_H
-#define ZABBIX_MOCK_NET_IF_COMMON_HELPER_H
+#ifndef NET_IF_COMMON_H
+#define NET_IF_COMMON_H
 
 #define ZABBIX_MOCK_NET_IF_IN		0
 #define ZABBIX_MOCK_NET_IF_OUT		1

@@ -21,9 +21,6 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
-#include "common.h"
-#include "sysinfo.h"
-
 void	zbx_mock_test_entry(void **state)
 {
 	zbx_mock_test_entry_KERNEL_COMMON(state, ZABBIX_MOCK_KERNEL_MAXPROC);

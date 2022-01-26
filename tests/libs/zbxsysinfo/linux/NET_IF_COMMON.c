@@ -77,14 +77,15 @@ void	zbx_mock_test_entry_NET_IF_COMMON(void **state, int net_if_func)
 
 	init_request(&request);
 	init_result(&param_result);
+
 	if (SUCCEED != parse_item_key(init_param, &request))
 		fail_msg("Cannot parse item key: %s", init_param);
 
-	if (net_if_func == ZABBIX_MOCK_NET_IF_IN)
+	if (ZABBIX_MOCK_NET_IF_IN == net_if_func)
 		actual_result = NET_IF_IN(&request, &param_result);
-	else if (net_if_func == ZABBIX_MOCK_NET_IF_OUT)
+	else if (ZABBIX_MOCK_NET_IF_OUT == net_if_func)
 		actual_result = NET_IF_OUT(&request, &param_result);
-	else if (net_if_func == ZABBIX_MOCK_NET_IF_TOTAL)
+	else if (ZABBIX_MOCK_NET_IF_TOTAL == net_if_func)
 		actual_result = NET_IF_TOTAL(&request, &param_result);
 	else
 		fail_msg("invalid net_if_func");

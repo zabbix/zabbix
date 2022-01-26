@@ -67,5 +67,4 @@ void	zbx_mock_test_entry_common_trim_utf8(void **state, int trim_utf8_func)
 
 	zbx_mock_assert_str_eq("trimmed value", expected, in);
 	zbx_free(in);
-
 }

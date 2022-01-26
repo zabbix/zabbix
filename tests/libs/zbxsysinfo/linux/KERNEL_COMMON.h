@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_MOCK_KERNEL_COMMON_HELPER_H
-#define ZABBIX_MOCK_KERNEL_COMMON_HELPER_H
+#ifndef KERNEL_COMMON_H
+#define KERNEL_COMMON_H
 
 #define ZABBIX_MOCK_KERNEL_MAXPROC	0
 #define ZABBIX_MOCK_KERNEL_MAXFILES	1
