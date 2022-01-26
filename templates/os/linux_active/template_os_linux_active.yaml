@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T14:30:18Z'
+  date: '2022-01-26T19:22:42Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -272,8 +272,8 @@ zabbix_export:
                     - 'return JSON.stringify(value.trim().split(/ +/));'
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: raw
           trigger_prototypes:
             -
               uuid: af9c4b7070f94999a2a1569de0948822
@@ -1750,8 +1750,8 @@ zabbix_export:
                     - 'return JSON.stringify(value.trim().split(/ +/));'
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: raw
           trigger_prototypes:
             -
               uuid: fd5732c3cf5249f9a05e3b6cedc2d2fd
@@ -4633,35 +4633,6 @@ zabbix_export:
             host: 'Linux by Zabbix agent active'
             key: 'system.swap.size[,total]'
     -
-      uuid: aa2447f0256d4985af78af8e1cf7e7bd
-      name: 'System load'
-      ymin_type_1: FIXED
-      graph_items:
-        -
-          color: 1A7C11
-          item:
-            host: 'Linux CPU by Zabbix agent active'
-            key: 'system.cpu.load[all,avg1]'
-        -
-          sortorder: '1'
-          color: 2774A4
-          item:
-            host: 'Linux CPU by Zabbix agent active'
-            key: 'system.cpu.load[all,avg5]'
-        -
-          sortorder: '2'
-          color: F63100
-          item:
-            host: 'Linux CPU by Zabbix agent active'
-            key: 'system.cpu.load[all,avg15]'
-        -
-          sortorder: '3'
-          color: A54F10
-          yaxisside: RIGHT
-          item:
-            host: 'Linux CPU by Zabbix agent active'
-            key: system.cpu.num
-    -
       uuid: d47109e977ec4362a3f3bb5e7708b48a
       name: 'System load'
       ymin_type_1: FIXED
@@ -4689,4 +4660,33 @@ zabbix_export:
           yaxisside: RIGHT
           item:
             host: 'Linux by Zabbix agent active'
+            key: system.cpu.num
+    -
+      uuid: aa2447f0256d4985af78af8e1cf7e7bd
+      name: 'System load'
+      ymin_type_1: FIXED
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Linux CPU by Zabbix agent active'
+            key: 'system.cpu.load[all,avg1]'
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Linux CPU by Zabbix agent active'
+            key: 'system.cpu.load[all,avg5]'
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Linux CPU by Zabbix agent active'
+            key: 'system.cpu.load[all,avg15]'
+        -
+          sortorder: '3'
+          color: A54F10
+          yaxisside: RIGHT
+          item:
+            host: 'Linux CPU by Zabbix agent active'
             key: system.cpu.num
