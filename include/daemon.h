@@ -20,6 +20,8 @@
 #ifndef ZABBIX_DAEMON_H
 #define ZABBIX_DAEMON_H
 
+#include "sysinc.h"
+
 #if defined(_WINDOWS)
 #	error "This module allowed only for Unix OS"
 #endif

@@ -17,6 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "expression.h"
+
 #include "zbxserver.h"
 #include "evalfunc.h"
 #include "log.h"
@@ -53,8 +55,6 @@ zbx_rootcause_t;
 
 ZBX_VECTOR_DECL(rootcause, zbx_rootcause_t)
 ZBX_VECTOR_IMPL(rootcause, zbx_rootcause_t)
-
-#include "expression.h"
 
 /* The following definitions are used to identify the request field */
 /* for various value getters grouped by their scope:                */

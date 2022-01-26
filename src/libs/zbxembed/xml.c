@@ -17,11 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "xml.h"
+
 #include "zbxvariant.h"
 #include "zbxembed.h"
 
 #include "embed.h"
-#include "xml.h"
 
 /******************************************************************************
  *                                                                            *

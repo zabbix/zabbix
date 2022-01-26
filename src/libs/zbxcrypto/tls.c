@@ -21,11 +21,11 @@
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 
+#include "tls.h"
 #include "comms.h"
 #include "threads.h"
 #include "log.h"
 #include "zbxcrypto.h"
-#include "tls.h"
 #include "tls_tcp.h"
 #include "tls_tcp_active.h"
 

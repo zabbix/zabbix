@@ -17,13 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zabbix.h"
+
 #include "common.h"
 #include "log.h"
 #include "zbxjson.h"
 #include "zbxembed.h"
 #include "embed.h"
 #include "duktape.h"
-#include "zabbix.h"
 
 /******************************************************************************
  *                                                                            *

@@ -17,6 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "jsonpath.h"
+
 #include "common.h"
 #include "zbxalgo.h"
 #include "zbxregexp.h"
@@ -25,8 +27,6 @@
 #include "json_parser.h"
 #include "zbxvariant.h"
 #include "../zbxalgo/vectorimpl.h"
-
-#include "jsonpath.h"
 
 typedef struct
 {

@@ -17,9 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "telnet.h"
+
 #include "common.h"
 #include "comms.h"
-#include "telnet.h"
 #include "log.h"
 
 static char	prompt_char = '\0';

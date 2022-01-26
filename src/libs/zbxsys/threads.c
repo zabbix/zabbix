@@ -17,9 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "threads.h"
+
 #include "common.h"
 #include "log.h"
-#include "threads.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 int	zbx_win_exception_filter(unsigned int code, struct _EXCEPTION_POINTERS *ep);

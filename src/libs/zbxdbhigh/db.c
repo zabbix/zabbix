@@ -17,6 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "db.h"
+
 #include "log.h"
 #include "common.h"
 #include "events.h"
@@ -24,8 +26,6 @@
 #include "dbcache.h"
 #include "zbxalgo.h"
 #include "cfg.h"
-
-#include "db.h"
 
 #if defined(HAVE_POSTGRESQL)
 #	define ZBX_SUPPORTED_DB_CHARACTER_SET	"utf8"

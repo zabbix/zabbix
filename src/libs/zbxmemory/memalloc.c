@@ -17,11 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "memalloc.h"
+
 #include "common.h"
 #include "mutexs.h"
 #include "log.h"
-
-#include "memalloc.h"
 
 /******************************************************************************
  *                                                                            *

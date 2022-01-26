@@ -20,6 +20,8 @@
 #ifndef ZABBIX_ZABBIX_H
 #define ZABBIX_ZABBIX_H
 
+#include "zbxembed.h"
+
 int	zbx_es_init_zabbix(zbx_es_t *es, char **error);
 
 #endif

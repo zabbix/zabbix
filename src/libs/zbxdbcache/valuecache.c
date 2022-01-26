@@ -17,14 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "valuecache.h"
+
 #include "common.h"
 #include "log.h"
 #include "memalloc.h"
 #include "dbcache.h"
 #include "zbxhistory.h"
 #include "vectorimpl.h"
-
-#include "valuecache.h"
 
 /*
  * The cache (zbx_vc_cache_t) is organized as a hashset of item records (zbx_vc_item_t).

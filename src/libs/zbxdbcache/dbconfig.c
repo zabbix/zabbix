@@ -35,14 +35,14 @@
 #include "zbxeval.h"
 
 #define ZBX_DBCONFIG_IMPL
+#include "dbconfig.h"
+
 #include "dbsync.h"
 #include "proxy.h"
 #include "actions.h"
 #include "zbxtrends.h"
 #include "zbxvault.h"
 #include "zbxserialize.h"
-
-#include "dbconfig.h"
 
 int	sync_in_progress = 0;
 
