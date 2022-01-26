@@ -26,6 +26,9 @@
 
 $subfilter_options = [];
 
+$selected_tagnames = [];
+$selected_tags = [];
+
 foreach (['tagnames'] as $key) { // TODO VM: remove loop
 	if (!array_key_exists($key, $data) || count($data[$key]) <= 1) {
 		$subfilter_options[$key] = null;
@@ -47,18 +50,20 @@ foreach (['tagnames'] as $key) { // TODO VM: remove loop
 	$subfilter_options_count = count($data[$key]);
 	$data[$key] = CControllerCharts::getMostSevereSubfilters($data[$key]);
 
-	foreach ($data[$key] as $value => $element) {
+	foreach ($data[$key] as $tag_name => $element) {
 		if ($element['selected']) {
 			$subfilter_options[$key][] = (new CSpan([
-				(new CLinkAction($element['name']))->onClick(CHtml::encode(
-					'view.unsetSubfilter('.json_encode(['subfilter_'.$key.'[]', $value]).')'
-				)),
+				(new CLinkAction($element['name']))
+					->addClass('js-subfilter-unset')
+					->setAttribute('data-tag', $tag_name),
 				' ',
 				new CSup($element['count'])
 			]))
 				->addClass(ZBX_STYLE_NOWRAP)
 				->addClass(ZBX_STYLE_SUBFILTER)
 				->addClass(ZBX_STYLE_SUBFILTER_ENABLED);
+
+			$selected_tagnames[] = $tag_name;
 		}
 		else {
 			if ($element['count'] == 0) {
@@ -70,9 +75,9 @@ foreach (['tagnames'] as $key) { // TODO VM: remove loop
 			}
 			else {
 				$subfilter_options[$key][] = (new CSpan([
-					(new CLinkAction($element['name']))->onClick(CHtml::encode(
-						'view.setSubfilter('.json_encode(['subfilter_'.$key.'[]', $value]).')'
-					)),
+					(new CLinkAction($element['name']))
+						->addClass('js-subfilter-set')
+						->setAttribute('data-tag', $tag_name),
 					' ',
 					new CSup(($subfilter_used ? '+' : '').$element['count'])
 				]))
@@ -97,7 +102,7 @@ if (count($data['tags']) > 0) {
 	$tags_count = count($data['tags']);
 	$data['tags'] = CControllerCharts::getMostSevereTagValueSubfilters($data['tags']);
 
-	foreach ($data['tags'] as $tag => $tag_values) {
+	foreach ($data['tags'] as $tag_name => $tag_values) {
 
 		// Remove non-selected filter options with 0 occurrences.
 		$tag_values = array_filter($tag_values, function ($elmnt) {
@@ -106,8 +111,9 @@ if (count($data['tags']) > 0) {
 
 		$tag_values_count = count($tag_values);
 		$tag_values = CControllerCharts::getMostSevereSubfilters($tag_values);
+		$tag_values_spans = [];
 
-		$tag_values = array_map(function ($element) use ($tag, $subfilter_used) {
+		foreach ($tag_values as $element) {
 			if ($element['name'] === '') {
 				$element_name = _('None');
 				$element_style = 'font-style: italic;';
@@ -118,22 +124,24 @@ if (count($data['tags']) > 0) {
 			}
 
 			if ($element['selected']) {
-				return (new CSpan([
+				$tag_values_spans[] = (new CSpan([
 					(new CLinkAction($element_name))
+						->addClass('js-subfilter-unset')
 						->addStyle($element_style)
-						->onClick(CHtml::encode(
-							'view.unsetSubfilter('.json_encode(['subfilter_tags['.$tag.'][]', $element['name']]).')'
-						)),
+						->setAttribute('data-tag', $tag_name)
+						->setAttribute('data-value', $element['name']),
 					' ',
 					new CSup($element['count'])
 				]))
 					->addClass(ZBX_STYLE_NOWRAP)
 					->addClass(ZBX_STYLE_SUBFILTER)
 					->addClass(ZBX_STYLE_SUBFILTER_ENABLED);
+
+				$selected_tags[$tag_name][] = $element['name'];
 			}
 			else {
 				if ($element['count'] == 0) {
-					return (new CSpan([
+					$tag_values_spans[] = (new CSpan([
 						(new CSpan($element_name))
 							->addStyle($element_style)
 							->addClass(ZBX_STYLE_GREY),
@@ -142,12 +150,12 @@ if (count($data['tags']) > 0) {
 					]))->addClass(ZBX_STYLE_SUBFILTER);
 				}
 				else {
-					return (new CSpan([
+					$tag_values_spans[] = (new CSpan([
 						(new CLinkAction($element_name))
+							->addClass('js-subfilter-set')
 							->addStyle($element_style)
-							->onClick(CHtml::encode(
-								'view.setSubfilter('.json_encode(['subfilter_tags['.$tag.'][]', $element['name']]).')'
-							)),
+							->setAttribute('data-tag', $tag_name)
+							->setAttribute('data-value', $element['name']),
 						' ',
 						new CSup(($subfilter_used ? '+' : '').$element['count'])
 					]))
@@ -155,15 +163,15 @@ if (count($data['tags']) > 0) {
 						->addClass(ZBX_STYLE_SUBFILTER);
 				}
 			}
-		}, $tag_values);
+		}
 
 		if ($tag_values) {
 			$tag_values_row = ($tag_values_count > count($tag_values))
-				? [$tag_values, new CSpan('...')]
-				: $tag_values;
+				? [$tag_values_spans, new CSpan('...')]
+				: $tag_values_spans;
 
-			$subfilter_options['tags'][$tag] = (new CDiv([
-				new CTag('label', true, $tag.': '),
+			$subfilter_options['tags'][$tag_name] = (new CDiv([
+				new CTag('label', true, $tag_name.': '),
 				(new CDiv($tag_values_row))->addClass('subfilter-options')
 			]))->addClass('subfilter-option-grid');
 		}
@@ -177,7 +185,7 @@ else {
 	$subfilter_options['tags'] = null;
 }
 
-$subfilter = (new CTableInfo())
+(new CTableInfo())
 	->addRow([[
 		new CTag('h4', true, [
 			_('Subfilter'), ' ', (new CSpan(_('affects only filtered data')))->addClass(ZBX_STYLE_GREY)
@@ -187,7 +195,8 @@ $subfilter = (new CTableInfo())
 		$subfilter_options['tagnames']
 			? [[
 			new CTag('h3', true, _('Tags')),
-			$subfilter_options['tagnames']
+			$subfilter_options['tagnames'],
+			new CVar('subfilter_tagnames', $selected_tagnames)
 		]]
 			: null
 	)
@@ -195,7 +204,8 @@ $subfilter = (new CTableInfo())
 		$subfilter_options['tags']
 			? [[
 			new CTag('h3', true, _('Tag values')),
-			$subfilter_options['tags']
+			$subfilter_options['tags'],
+			new CVar('subfilter_tags', $selected_tags)
 		]]
 			: null
 	)

@@ -34,7 +34,9 @@ class CControllerChartsViewJson extends CControllerCharts {
 			'to'                    => 'range_time',
 			'filter_hostids'        => 'required | array_id',
 			'filter_name'           => 'string',
-			'filter_show'           => 'in '.GRAPH_FILTER_ALL.','.GRAPH_FILTER_HOST.','.GRAPH_FILTER_SIMPLE
+			'filter_show'           => 'in '.GRAPH_FILTER_ALL.','.GRAPH_FILTER_HOST.','.GRAPH_FILTER_SIMPLE,
+			'subfilter_tagnames'    => 'array',
+			'subfilter_tags'        => 'array'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod();
@@ -76,6 +78,14 @@ class CControllerChartsViewJson extends CControllerCharts {
 		}
 
 		$graphs = array_merge($host_graphs, $simple_graphs);
+
+		$subfilters_fields = self::getSubfilterFields([
+			'subfilter_tagnames' => $this->getInput('subfilter_tagnames', []),
+			'subfilter_tags' => $this->getInput('subfilter_tags', [])
+		]);
+		$subfilters = self::getSubfilters($graphs, $subfilters_fields);
+		$graphs = self::applySubfilters($graphs);
+
 		CArrayHelper::sort($graphs, ['name', 'graphid', 'itemid']);
 
 		$view_url = (new CUrl('zabbix.php'))->setArgument('action', 'charts.view');
@@ -86,6 +96,7 @@ class CControllerChartsViewJson extends CControllerCharts {
 		$data = [
 			'charts' => $this->getCharts($graphs),
 			'timeline' => getTimeSelectorPeriod($timeselector_options),
+			'subfilter' => (new CPartial('monitoring.charts.subfilter', $subfilters))->getOutput(),
 			'paging' => $paging
 		];
 

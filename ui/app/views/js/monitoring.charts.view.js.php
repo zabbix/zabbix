@@ -24,6 +24,72 @@
  */
 ?>
 
+<script>
+	const view = {
+		filter_form: null,
+
+		init({filter_form_name}) {
+			this.filter_form = document.querySelector(`[name="${filter_form_name}"]`);
+
+			this.initSubfilter();
+		},
+
+		initSubfilter() {
+			this.filter_form.addEventListener('click', (e) => {
+				const link = e.target;
+
+				if (link.classList.contains('js-subfilter-set')) {
+					this.setSubfilter(link.getAttribute('data-tag'), link.getAttribute('data-value'));
+				}
+				else if (link.classList.contains('js-subfilter-unset')) {
+					this.unsetSubfilter(link.getAttribute('data-tag'), link.getAttribute('data-value'));
+				}
+			});
+		},
+
+		replaceSubfilter(subfilter) {
+			document.getElementById('latest-data-subfilter').outerHTML = subfilter; // TODO VM: change ID
+		},
+
+		setSubfilter(tag, value) {
+			if (value !== undefined) {
+				this.filterAddVar(`subfilter_tags[${tag}][]`, value);
+			}
+			else {
+				this.filterAddVar(`subfilter_tagnames[]`, tag);
+			}
+
+			this.submitSubfilter();
+		},
+
+		unsetSubfilter(tag, value) {
+			if (value !== undefined) {
+				document.querySelector(`[name^="subfilter_tags[${tag}]["][value="${value}"]`).remove();
+			}
+			else {
+				document.querySelector(`[name^="subfilter_tagnames["][value="${tag}"]`).remove();
+			}
+
+			this.submitSubfilter();
+		},
+
+		filterAddVar(name, value) {
+			const input = document.createElement('input');
+
+			input.type = 'hidden';
+			input.name = name;
+			input.value = value;
+
+			this.filter_form.appendChild(input);
+		},
+
+		submitSubfilter() {
+			this.filterAddVar('subfilter_set', '1');
+			this.filter_form.submit();
+		}
+	};
+</script>
+
 <script type="text/javascript">
 	window.addEventListener('load', e => {
 		/**
@@ -210,6 +276,11 @@
 			this.wrapper = wrapper;
 		}
 
+		ChartList.prototype.updateSubfilters = function(subfilter_tagnames, subfilter_tags) {
+			this.config.subfilter_tagnames = subfilter_tagnames;
+			this.config.subfilter_tags = subfilter_tags;
+		}
+
 		/**
 		 * Update currently listed charts.
 		 *
@@ -263,11 +334,16 @@
 			this.curl.setArgument('filter_name', this.config.filter_name);
 			this.curl.setArgument('filter_show', this.config.filter_show);
 
+			this.curl.setArgument('subfilter_tagnames', this.config.subfilter_tagnames);
+			this.curl.setArgument('subfilter_tags', this.config.subfilter_tags);
+
 			return fetch(this.curl.getUrl())
-				.then(resp => resp.json())
-				.then(resp_obj => {
-					this.timeline = resp_obj.timeline;
-					return resp_obj.charts;
+				.then((response) => response.json())
+				.then((response) => {
+					this.timeline = response.timeline;
+					view.replaceSubfilter(response.subfilter);
+
+					return response.charts;
 				});
 		};
 
@@ -351,16 +427,20 @@
 			this._prev_width = width;
 		};
 
-		var app = new ChartList($table, data.timeline, data.config, document.querySelector('.wrapper'));
+		ChartList.prototype.replaceSubfilter = function(subfilter) {
 
-		window.addEventListener('resize', app.onWindowResize.bind(app));
+		}
 
-		app.setCharts(data.charts);
-		app.refresh();
+		view.app = new ChartList($table, data.timeline, data.config, document.querySelector('.wrapper'));
+
+		window.addEventListener('resize', view.app.onWindowResize.bind(view.app));
+
+		view.app.setCharts(data.charts);
+		view.app.refresh();
 
 		$.subscribe('timeselector.rangeupdate', function(e, data) {
-			app.timeline = data;
-			app.updateCharts();
+			view.app.timeline = data;
+			view.app.updateCharts();
 		});
 	});
 </script>

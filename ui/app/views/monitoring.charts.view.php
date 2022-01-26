@@ -50,10 +50,7 @@ $filter = (new CFilter())
 	->addTimeSelector($data['timeline']['from'], $data['timeline']['to'],
 		$web_layout_mode != ZBX_LAYOUT_KIOSKMODE
 	)
-	->addFormItem((new CVar('view_as', $data['view_as']))->removeId())
-	->addFormItem((new CVar('action', 'charts.view'))->removeId())
-	->addVar('subfilter_tags', $data['filter_data']['subfilter_tagnames']) // TODO VM
-	->addVar('subfilter_tags', $data['filter_data']['subfilter_tags']);
+	->addFormItem((new CVar('action', 'charts.view'))->removeId());
 
 if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	$filter->addFilterTab(_('Filter'), [
@@ -110,9 +107,17 @@ $this->includeJsFile('monitoring.charts.view.js.php', [
 	'charts' => $data['charts'],
 	'timeline' => $data['timeline'],
 	'config' => [
-		'refresh_interval' => (int) CWebUser::getRefresh(),
+		'refresh_interval' => CWebUser::getRefresh(),
 		'filter_hostids' => $data['filter_hostids'],
 		'filter_name' => $data['filter_name'],
-		'filter_show' => $data['filter_show']
+		'filter_show' => $data['filter_show'],
+		'subfilter_tagnames' => $data['subfilter_tagnames'],
+		'subfilter_tags' => $data['subfilter_tags']
 	]
 ]);
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'filter_form_name' => 'zbx_filter' // TODO VM: ?
+	]).');
+'))->show();

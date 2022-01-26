@@ -38,6 +38,9 @@ class CControllerChartsView extends CControllerCharts {
 			'filter_hostids'        => 'array_id',
 			'filter_name'           => 'string',
 			'filter_show'           => 'in '.GRAPH_FILTER_ALL.','.GRAPH_FILTER_HOST.','.GRAPH_FILTER_SIMPLE,
+			'subfilter_set'         => 'in 1',
+			'subfilter_tagnames'    => 'array',
+			'subfilter_tags'        => 'array',
 			'page'                  => 'ge 1'
 		];
 
@@ -61,18 +64,27 @@ class CControllerChartsView extends CControllerCharts {
 			CProfile::deleteIdx('web.charts.filter.hostids');
 			CProfile::deleteIdx('web.charts.filter.name');
 			CProfile::deleteIdx('web.charts.filter.show');
+			CProfile::deleteIdx('web.charts.subfilter.tagnames');
+			CProfile::deleteIdx('web.charts.subfilter.tags');
+		}
+		elseif ($this->hasInput('subfilter_set')) {
+			CProfile::updateArray('web.charts.subfilter.tagnames', $this->getInput('subfilter_tagnames', []), PROFILE_TYPE_STR);
+			CProfile::update('web.charts.subfilter.tags', json_encode($this->getInput('subfilter_tags', [])), PROFILE_TYPE_STR);
 		}
 		elseif ($this->hasInput('filter_set')) {
 			CProfile::updateArray('web.charts.filter.hostids', $this->getInput('filter_hostids', []), PROFILE_TYPE_ID);
-			CProfile::update('web.charts.filter.name', $this->getInput('filter_name', ''), PROFILE_TYPE_INT);
+			CProfile::update('web.charts.filter.name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
 			CProfile::update('web.charts.filter.show',
 				$this->getInput('filter_show', GRAPH_FILTER_ALL), PROFILE_TYPE_INT
 			);
 		}
 
-		$filter_hostids = $this->getInput('filter_hostids', CProfile::getArray('web.charts.filter.hostids', []));
-		$filter_name = $this->getInput('filter_name', CProfile::get('web.charts.filter.name', ''));
-		$filter_show = (int) $this->getInput('filter_show', CProfile::get('web.charts.filter.show', GRAPH_FILTER_ALL));
+		$filter_hostids = CProfile::getArray('web.charts.filter.hostids', []);
+		$filter_name = CProfile::get('web.charts.filter.name', '');
+		$filter_show = (int) CProfile::get('web.charts.filter.show', GRAPH_FILTER_ALL);
+
+		$subfilter_tagnames = CProfile::get('web.charts.subfilter.tagnames', []);
+		$subfilter_tags = json_decode(CProfile::get('web.charts.subfilter.tags', '{}'), true);
 
 		$timeselector_options = [
 			'profileIdx' => 'web.charts.filter',
@@ -90,6 +102,8 @@ class CControllerChartsView extends CControllerCharts {
 			'filter_hostids' => $filter_hostids,
 			'filter_name' => $filter_name,
 			'filter_show' => $filter_show,
+			'subfilter_tagnames' => $subfilter_tagnames,
+			'subfilter_tags' => $subfilter_tags,
 			'error' => '',
 			'page' => $this->getInput('page', 1)
 		];
@@ -126,11 +140,10 @@ class CControllerChartsView extends CControllerCharts {
 
 		// Prepare subfilter data.
 
-		$filter = [ // TODO VM: replace by get from REQUEST
-			'subfilter_tagnames' => [],
-			'subfilter_tags' => []
-		];
-		$subfilters_fields = self::getSubfilterFields($filter);
+		$subfilters_fields = self::getSubfilterFields([
+			'subfilter_tagnames' => $subfilter_tagnames,
+			'subfilter_tags' => $subfilter_tags
+		]);
 		$data['subfilters'] = self::getSubfilters($graphs, $subfilters_fields);
 		$graphs = self::applySubfilters($graphs);
 
