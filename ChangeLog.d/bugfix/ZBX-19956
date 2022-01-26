@@ -1,1 +1,1 @@
-..F....... [ZBX-19956] fixed missing proxy address after cloning proxy; fixed proxy address trimming on save (miks)
+..F....... [ZBX-19956] fixed Proxy address and PSK field issues when cloning a proxy and fixed green indicator not showing in edit mode (Ivo, miks)
