@@ -280,7 +280,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 	 * @dataProvider getWidgetsData
 	 */
 	public function testDashboardDynamicItemWidgets_Layout($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=105');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1050');
 		$dashboard = CDashboardElement::find()->one();
 
 		if (CTestArrayHelper::get($data, 'host_filter', false)) {
