@@ -5,7 +5,6 @@
 		background: url($sprite-path) no-repeat -323px -411px;
 		border: 1px solid $form-border-color;
 		color: $font-color;
-		vertical-align: inherit;
 	}
 
 	.use-default {
@@ -18,23 +17,20 @@
 			right: 0;
 			left: 0;
 			text-align: center;
+			line-height: 22px;
 		}
 	}
 }
 
 .color-picker {
 	display: inline-block;
-	line-height: 1.2;
-	vertical-align: sub;
+	line-height: 24px;
 
 	.color-picker-preview {
 		padding: 0;
 		background-position: -321px -409px;
 		width: 24px;
-
-		&:after {
-			line-height: 22px;
-		}
+		vertical-align: top;
 	}
 
 	input:disabled + button {

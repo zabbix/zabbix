@@ -52,7 +52,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			'missingdatafunc'		=> ['type' => API_INT32, 'in' => implode(',', [SVG_GRAPH_MISSING_DATA_NONE, SVG_GRAPH_MISSING_DATA_CONNECTED, SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO])],
 			'axisy'					=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT])],
 			'timeshift'				=> ['type' => API_TIME_UNIT, 'flags' => API_REQUIRED, 'in' => implode(':', [ZBX_MIN_TIMESHIFT, ZBX_MAX_TIMESHIFT])],
-			'aggregate_function'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [GRAPH_AGGREGATE_NONE, GRAPH_AGGREGATE_MIN, GRAPH_AGGREGATE_MAX, GRAPH_AGGREGATE_AVG, GRAPH_AGGREGATE_COUNT, GRAPH_AGGREGATE_SUM, GRAPH_AGGREGATE_FIRST, GRAPH_AGGREGATE_LAST])],
+			'aggregate_function'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [AGGREGATE_NONE, AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_FIRST, AGGREGATE_LAST])],
 			'aggregate_interval'	=> ['type' => API_TIME_UNIT, 'flags' => API_TIME_UNIT_WITH_YEAR, 'in' => implode(':', [1, ZBX_MAX_TIMESHIFT])],
 			'aggregate_grouping'	=> ['type' => API_INT32, 'in' => implode(',', [GRAPH_AGGREGATE_BY_ITEM, GRAPH_AGGREGATE_BY_DATASET])]
 		]]);
@@ -117,7 +117,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			'axisy' => GRAPH_YAXIS_SIDE_LEFT,
 			'timeshift' => '',
 			'missingdatafunc' => SVG_GRAPH_MISSING_DATA_NONE,
-			'aggregate_function' => GRAPH_AGGREGATE_NONE,
+			'aggregate_function' => AGGREGATE_NONE,
 			'aggregate_interval' => GRAPH_AGGREGATE_DEFAULT_INTERVAL,
 			'aggregate_grouping'=> GRAPH_AGGREGATE_BY_ITEM
 		];

@@ -45,6 +45,29 @@ class CWidgetHelper {
 	 * @return CFormList
 	 */
 	public static function createFormList($name, $type, $view_mode, $known_widget_types, $field_rf_rate) {
+		$deprecated_types = array_intersect_key(
+			$known_widget_types,
+			array_flip(CWidgetConfig::DEPRECATED_WIDGETS)
+		);
+		$known_widget_types = array_diff_key($known_widget_types, $deprecated_types);
+		$types_select = (new CSelect('type'))
+			->setFocusableElementId('label-type')
+			->setId('type')
+			->setValue($type)
+			->setAttribute('autofocus', 'autofocus')
+			->addOptions(CSelect::createOptionsFromArray($known_widget_types));
+
+		if ($deprecated_types) {
+			$types_select->addOptionGroup(
+				(new CSelectOptionGroup(_('Deprecated')))->addOptions(
+					CSelect::createOptionsFromArray($deprecated_types)
+			));
+		}
+
+		if (array_key_exists($type, $deprecated_types)) {
+			$types_select = [$types_select, ' ', makeWarningIcon(_('Widget is deprecated.'))];
+		}
+
 		$form_list = (new CFormList())
 			->addItem((new CListItem([
 					(new CDiv(new CLabel(_('Type'), 'label-type')))->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
@@ -55,12 +78,7 @@ class CWidgetHelper {
 							->setId('show_header')
 							->setChecked($view_mode == ZBX_WIDGET_VIEW_MODE_NORMAL)
 						))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN),
-						(new CSelect('type'))
-							->setFocusableElementId('label-type')
-							->setId('type')
-							->setValue($type)
-							->setAttribute('autofocus', 'autofocus')
-							->addOptions(CSelect::createOptionsFromArray($known_widget_types))
+						$types_select
 					]))->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)
 				]))->addClass('table-forms-row-with-second-field')
 			)
@@ -554,6 +572,69 @@ class CWidgetHelper {
 		}
 
 		return $checkbox_list;
+	}
+
+	/**
+	 * @param CWidgetFieldColumnsList $field  Widget columns field.
+	 *
+	 * @return CDiv
+	 */
+	public static function getWidgetColumns(CWidgetFieldColumnsList $field) {
+		$columns = $field->getValue();
+		$header = [
+			'',
+			(new CColHeader(_('Name')))->addStyle('width: 39%'),
+			(new CColHeader(_('Data')))->addStyle('width: 59%'),
+			_('Action')
+		];
+		$row_actions = [
+			(new CButton('edit', _('Edit')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->removeId(),
+			(new CButton('remove', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->removeId()
+		];
+		$table = (new CTable())
+			->setId('list_'.$field->getName())
+			->setHeader((new CRowHeader($header))->addClass($columns ? null : ZBX_STYLE_DISPLAY_NONE));
+		$enabled = !($field->getFlags() & CWidgetField::FLAG_DISABLED);
+
+		foreach ($columns as $column_index => $column) {
+			$column_data = [new CVar('sortorder['.$field->getName().'][]', $column_index)];
+
+			foreach ($column as $key => $value) {
+				$column_data[] = new CVar($field->getName().'['.$column_index.']['.$key.']', $value);
+			}
+
+			$label = array_key_exists('item', $column) ? $column['item'] : '';
+
+			if ($column['data'] == CWidgetFieldColumnsList::DATA_HOST_NAME) {
+				$label = new CTag('em', true, _('Host name'));
+			}
+			else if ($column['data'] == CWidgetFieldColumnsList::DATA_TEXT) {
+				$label = new CTag('em', true, $column['text']);
+			}
+
+			$table->addRow((new CRow([
+				(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+				(new CDiv($column['name']))->addClass('text'),
+				(new CDiv($label))->addClass('text'),
+				(new CList(array_merge($row_actions, [$column_data])))->addClass(ZBX_STYLE_HOR_LIST)
+			]))->addClass('sortable'));
+		}
+
+		$table->addRow(
+			(new CCol(
+				(new CButton('add', _('Add')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->setEnabled($enabled)
+			))->setColSpan(count($header))
+		);
+
+		return (new CDiv($table))
+			->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px')
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR);
 	}
 
 	/**
@@ -1213,14 +1294,14 @@ class CWidgetHelper {
 									->setFocusableElementId('label-'.$field_name.'_'.$row_num.'_aggregate_function')
 									->setValue((int) $value['aggregate_function'])
 									->addOptions(CSelect::createOptionsFromArray([
-										GRAPH_AGGREGATE_NONE => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_NONE),
-										GRAPH_AGGREGATE_MIN => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_MIN),
-										GRAPH_AGGREGATE_MAX => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_MAX),
-										GRAPH_AGGREGATE_AVG => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_AVG),
-										GRAPH_AGGREGATE_COUNT => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_COUNT),
-										GRAPH_AGGREGATE_SUM => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_SUM),
-										GRAPH_AGGREGATE_FIRST => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_FIRST),
-										GRAPH_AGGREGATE_LAST => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_LAST)
+										AGGREGATE_NONE => graph_item_aggr_fnc2str(AGGREGATE_NONE),
+										AGGREGATE_MIN => graph_item_aggr_fnc2str(AGGREGATE_MIN),
+										AGGREGATE_MAX => graph_item_aggr_fnc2str(AGGREGATE_MAX),
+										AGGREGATE_AVG => graph_item_aggr_fnc2str(AGGREGATE_AVG),
+										AGGREGATE_COUNT => graph_item_aggr_fnc2str(AGGREGATE_COUNT),
+										AGGREGATE_SUM => graph_item_aggr_fnc2str(AGGREGATE_SUM),
+										AGGREGATE_FIRST => graph_item_aggr_fnc2str(AGGREGATE_FIRST),
+										AGGREGATE_LAST => graph_item_aggr_fnc2str(AGGREGATE_LAST)
 									]))
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							)
@@ -1229,7 +1310,7 @@ class CWidgetHelper {
 									$field_name.'['.$row_num.'][aggregate_interval]',
 									$value['aggregate_interval']
 								))
-									->setEnabled($value['aggregate_function'] != GRAPH_AGGREGATE_NONE)
+									->setEnabled($value['aggregate_function'] != AGGREGATE_NONE)
 									->setAttribute('placeholder', GRAPH_AGGREGATE_DEFAULT_INTERVAL)
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							)
@@ -1240,7 +1321,7 @@ class CWidgetHelper {
 								)
 									->addValue(_('Each item'), GRAPH_AGGREGATE_BY_ITEM)
 									->addValue(_('Data set'), GRAPH_AGGREGATE_BY_DATASET)
-									->setEnabled($value['aggregate_function'] != GRAPH_AGGREGATE_NONE)
+									->setEnabled($value['aggregate_function'] != AGGREGATE_NONE)
 									->setModern(true)
 							)
 					))
@@ -1346,7 +1427,7 @@ class CWidgetHelper {
 
 			'function changeDataSetAggregateFunction(obj) {'.
 				'var row_num = obj.id.replace("ds_", "").replace("_aggregate_function", "");'.
-				'var no_aggregation = (jQuery(obj).val() == '.GRAPH_AGGREGATE_NONE.');'.
+				'var no_aggregation = (jQuery(obj).val() == '.AGGREGATE_NONE.');'.
 				'jQuery("#ds_" + row_num + "_aggregate_interval").prop("disabled", no_aggregation);'.
 				'jQuery("#ds_" + row_num + "_aggregate_grouping_0").prop("disabled", no_aggregation);'.
 				'jQuery("#ds_" + row_num + "_aggregate_grouping_1").prop("disabled", no_aggregation);'.
