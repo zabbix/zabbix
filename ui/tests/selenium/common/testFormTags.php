@@ -30,6 +30,8 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  */
 class testFormTags extends CWebTest {
 
+	const EDIT_BUTTON_PATH = 'xpath:.//button[@title="Edit"]';
+
 	public $update_name;
 	public $clone_name;
 	public $remove_name;
@@ -245,12 +247,6 @@ class testFormTags extends CWebTest {
 		$old_hash = null;
 
 		switch ($object) {
-			case 'host':
-				$sql = 'SELECT * FROM hosts ORDER BY hostid';
-				$locator = 'id:host-form';
-				$fields = [ucfirst($object).' name' => $data['name'], 'Groups' => 'Zabbix servers'];
-				break;
-
 			case 'trigger':
 			case 'trigger prototype':
 				$sql = 'SELECT * FROM triggers ORDER BY triggerid';
@@ -456,18 +452,13 @@ class testFormTags extends CWebTest {
 	 * Check updating tags in different objects.
 	 *
 	 * @param array    $data     data provider
-	 * @param string   $object   host, template, trigger or prototype
+	 * @param string   $object   host, template, trigger, prototype, service etc.
 	 */
 	public function checkTagsUpdate($data, $object) {
 		$sql = null;
 		$old_hash = null;
 
 		switch ($object) {
-			case 'host':
-				$sql = 'SELECT * FROM hosts ORDER BY hostid';
-				$locator = 'id:host-form';
-				break;
-
 			case 'trigger':
 			case 'trigger prototype':
 				$sql = 'SELECT * FROM triggers ORDER BY triggerid';
@@ -507,8 +498,7 @@ class testFormTags extends CWebTest {
 
 		if ($object === 'service') {
 			$table = $this->query('class:list-table')->asTable()->one()->waitUntilPresent();
-			$table->findRow('Name', $data['name'], true)->query('xpath:.//button[@title="Edit"]')
-					->waitUntilClickable()->one()->click();
+			$table->findRow('Name', $data['name'], true)->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()->one()->click();
 		}
 		else {
 			$this->query('link', $this->update_name)->waitUntilClickable()->one()->click();
@@ -559,7 +549,6 @@ class testFormTags extends CWebTest {
 
 			if ($object === 'host' || $object === 'service') {
 				COverlayDialogElement::find()->one()->close();
-				COverlayDialogElement::ensureNotPresent();
 			}
 		}
 		else {
@@ -619,8 +608,7 @@ class testFormTags extends CWebTest {
 
 		if ($object === 'service') {
 			$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
-			$table->findRow('Name',  $this->clone_name)->query('xpath:.//button[@title="Edit"]')
-					->waitUntilClickable()->one()->click();
+			$table->findRow('Name',  $this->clone_name)->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()->one()->click();
 		}
 		else {
 			$this->query('link', $this->clone_name)->waitUntilClickable()->one()->click();
@@ -696,15 +684,7 @@ class testFormTags extends CWebTest {
 
 		// Find form again for cloned host and click Add host.
 		$form->invalidate();
-
-		// TODO: after ZBX-20288 is fixed remove this if and change to $form->submit();
-		if ($object === 'service') {
-			COverlayDialogElement::find()->one()->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
-		}
-		else {
-			$form->submit();
-		}
-
+		$form->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, (
 				($object === 'service')
@@ -720,8 +700,7 @@ class testFormTags extends CWebTest {
 		// Check created clone.
 		if ($object === 'service') {
 			$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
-			$table->findRow('Name',  $new_name)->query('xpath:.//button[@title="Edit"]')
-					->waitUntilClickable()->one()->click();
+			$table->findRow('Name',  $new_name)->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()->one()->click();
 		}
 		else {
 			$this->query('link', $new_name)->one()->click();
@@ -789,8 +768,7 @@ class testFormTags extends CWebTest {
 		if ($object === 'service') {
 			$this->page->open($this->link);
 			$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
-			$table->findRow('Name', $data['name'])->query('xpath:.//button[@title="Edit"]')
-					->waitUntilClickable()->one()->click();
+			$table->findRow('Name', $data['name'])->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()->one()->click();
 			$form = COverlayDialogElement::find()->asForm()->waitUntilReady()->one();
 		}
 		else {
@@ -992,8 +970,7 @@ class testFormTags extends CWebTest {
 
 		// Open host group, host or template and check object tags.
 		if ($target_type !== 'Host group') {
-			$this->page->open(
-					($target_type === 'Host') ? self::HOST_LIST_PAGE : 'templates.php')->waitUntilReady();
+			$this->page->open(($target_type === 'Host') ? self::HOST_LIST_PAGE : 'templates.php')->waitUntilReady();
 
 			if ($target_type === 'Host') {
 				$this->query('button:Reset')->one()->click();
@@ -1315,8 +1292,7 @@ class testFormTags extends CWebTest {
 
 		if ($object === 'service') {
 			$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
-			$table->findRow('Name', $data['name'], true)->query('xpath:.//button[@title="Edit"]')
-					->waitUntilClickable()->one()->click();
+			$table->findRow('Name', $data['name'], true)->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()->one()->click();
 		}
 		else {
 			$this->query('link', $this->remove_name)->waitUntilPresent()->one()->click();

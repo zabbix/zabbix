@@ -32,6 +32,7 @@ class testFormMonitoringServices extends CWebTest {
 	use TableTrait;
 
 	const UPDATE = true;
+	const EDIT_BUTTON_PATH = 'xpath:.//button[@title="Edit"]';
 
 	private static $service_sql = 'SELECT * FROM services ORDER BY serviceid';
 	private static $update_service = 'Update service';
@@ -348,8 +349,7 @@ class testFormMonitoringServices extends CWebTest {
 		$this->assertEquals(13, $children_dialog->query('class:list-table')->asTable()->one()->getRows()->count());
 
 		foreach (['Add', 'Cancel'] as $button) {
-			$this->assertTrue($dialog->query("xpath:.//div[@class='overlay-dialogue-footer']//button[text()=".
-					CXPathHelper::escapeQuotes($button)."]")->one()->isClickable());
+			$this->assertTrue($dialog->getFooter()->query('button', $button)->one()->isClickable());
 		}
 	}
 
@@ -460,7 +460,7 @@ class testFormMonitoringServices extends CWebTest {
 					'duplicate' => true
 				]
 			],
-			// This case should always be last, otherwise update sceanrio won't work.
+			// This case should always be last, otherwise update scenario won't work.
 			[
 				[
 					'fields' => [
@@ -506,8 +506,8 @@ class testFormMonitoringServices extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=service.list.edit');
 		if ($update) {
 			$table = $this->query('class:list-table')->asTable()->waitUntilVisible()->one();
-			$table->findRow('Name', self::$update_service, true)->query('xpath:.//button[@title="Edit"]')
-					->waitUntilClickable()->one()->click();
+			$table->findRow('Name', self::$update_service, true)->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()
+					->one()->click();
 		}
 		else {
 			$this->query('button:Create service')->waitUntilClickable()->one()->click();
@@ -570,14 +570,14 @@ class testFormMonitoringServices extends CWebTest {
 						$row->getColumn('Name')->getText()
 				);
 
-				$row->query('xpath:.//button[@title="Edit"]')->waitUntilClickable()->one()->click();
+				$row->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()->one()->click();
 				COverlayDialogElement::find()->one()->waitUntilReady();
 				$form->selectTab('Child services');
 				$this->assertTableData([$data['children']['Child services']], 'id:children');
 			}
 			else {
-				$table->findRow('Name', $data['fields']['Name'])->query('xpath:.//button[@title="Edit"]')
-						->waitUntilClickable()->one()->click();
+				$table->findRow('Name', $data['fields']['Name'])->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()
+						->one()->click();
 				COverlayDialogElement::find()->one()->waitUntilReady();
 			}
 			$form->invalidate();
@@ -632,9 +632,7 @@ class testFormMonitoringServices extends CWebTest {
 			$this->page->waitUntilReady();
 		}
 
-		$table->findRow('Name', $data['name'], true)->query('xpath:.//button[@title="Edit"]')
-				->waitUntilClickable()->one()->click();
-
+		$table->findRow('Name', $data['name'], true)->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $dialog->asForm();
 		$original_values = $form->getFields()->asValues();
@@ -660,8 +658,7 @@ class testFormMonitoringServices extends CWebTest {
 		}
 
 		// Check cloned service saved form.
-		$table->findRow('Name', $name, true)->query('xpath:.//button[@title="Edit"]')->waitUntilClickable()->one()->click();
-
+		$table->findRow('Name', $name, true)->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()->one()->click();
 		$form->invalidate();
 		$original_values['Name'] = $name;
 		$this->assertEquals($original_values, $form->getFields()->asValues());
@@ -689,6 +686,7 @@ class testFormMonitoringServices extends CWebTest {
 			]
 		];
 	}
+
 	/**
 	 * Test for cancelling form with changes.
 	 *
@@ -699,8 +697,8 @@ class testFormMonitoringServices extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=service.list.edit');
 		$table = $this->query('class:list-table')->asTable()->waitUntilVisible()->one();
-		$table->findRow('Name', 'Child2 with tags', true)->query('xpath:.//button[@title="Edit"]')
-				->waitUntilClickable()->one()->click();
+		$table->findRow('Name', 'Child2 with tags', true)->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()
+				->one()->click();
 
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$dialog->asForm()->fill([
@@ -746,8 +744,7 @@ class testFormMonitoringServices extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=service.list.edit');
 		$table = $this->query('class:list-table')->asTable()->waitUntilVisible()->one();
-		$table->findRow('Name', $data['name'], true)->query('xpath:.//button[@title="Edit"]')
-				->waitUntilClickable()->one()->click();
+		$table->findRow('Name', $data['name'], true)->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()->one()->click();
 
 		COverlayDialogElement::find()->waitUntilReady()->one();
 		$this->query('id:service-form')->asForm()->one()->waitUntilReady()->submit();
@@ -854,9 +851,8 @@ class testFormMonitoringServices extends CWebTest {
 			// Firstly click on parent.
 			$table->findRow('Name', $data['parent'], true)->query('link', $data['parent'])
 					->waitUntilClickable()->one()->click();
-			$table->findRow('Name', $data['fields']['Name'])->query('xpath:.//button[@title="Edit"]')
-					->waitUntilClickable()->one()->click();
-
+			$table->findRow('Name', $data['fields']['Name'])->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()
+					->one()->click();
 			COverlayDialogElement::find()->one()->waitUntilReady();
 			$form = $this->query('id:service-form')->asForm()->one();
 
@@ -917,7 +913,7 @@ class testFormMonitoringServices extends CWebTest {
 		$table->findRow('Name', $child, true)->query('xpath:.//button[contains(@class, "btn-edit")]')
 				->one()->waitUntilClickable()->click();
 
-		$form = $form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
 		$form->getField('Parent services')->asMultiselect()->clear();
 		$form->submit();
 

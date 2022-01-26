@@ -289,7 +289,7 @@ class testFormTagsServicesProblemTags extends testFormTags {
 							'action' => USER_ACTION_UPDATE,
 							'index' => 2,
 							'tag' => 'tag2',
-							'operator' => 'Contains',
+							'operator' => 'Contains'
 						],
 						[
 							'tag' => '{$MACRO:A}',

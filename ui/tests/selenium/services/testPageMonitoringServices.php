@@ -394,10 +394,11 @@ class testPageMonitoringServices extends CWebTest {
 		$this->assertFalse($this->query('xpath://button[@title="Kiosk mode"]')->exists());
 
 		// Check Info/Filter tabs switching.
-		$this->query('xpath://li[@role="tab"]//a[text()="Filter"]')->waitUntilClickable()->one()->click();
-		$this->assertTrue($this->query('id:tab_1')->waitUntilReady()->one()->isVisible());
-		$this->query('xpath://li[@role="tab"]//a[text()="Info"]')->waitUntilClickable()->one()->click();
-		$this->assertTrue($this->query('id:tab_info')->waitUntilReady()->one()->isVisible());
+		foreach (['Filter' => 'tab_1', 'Info' => 'tab_info'] as $tab => $id) {
+			$this->query("xpath://li[@role='tab']//a[text()=".CXpathHelper::escapeQuotes($tab)."]")
+					->waitUntilClickable()->one()->click();
+			$this->assertTrue($this->query('id', $id)->waitUntilReady()->one()->isVisible());
+		}
 	}
 
 	/**
@@ -444,8 +445,8 @@ class testPageMonitoringServices extends CWebTest {
 
 		$info_card = $this->query('id:tab_info')->waitUntilReady()->one();
 		foreach ([$service, 'Parent services', 'Status', 'Tags'] as $text) {
-			$this->assertTrue($info_card->query("xpath://div[@class='service-info-grid']//div[text()="
-					.CXPathHelper::escapeQuotes($text)."]")->one()->isVisible()
+			$this->assertTrue($info_card->query("xpath:.//div[@class='service-info-grid']//div[text()=".
+					CXPathHelper::escapeQuotes($text)."]")->one()->isVisible()
 			);
 		}
 
@@ -870,7 +871,7 @@ class testPageMonitoringServices extends CWebTest {
 		// Check breadcrumbs and "Parent services" headers disappeared.
 		if (CTestArrayHelper::get($data, 'check_breadcrumbs')) {
 			$this->assertFalse($selector->query('link:All services')->exists());
-			$this->assertFalse($selector->query('xpath://span[@class="selected" and text()="Filter results"]')->exists());
+			$this->assertFalse($selector->query('xpath:.//span[@class="selected" and text()="Filter results"]')->exists());
 			$table->invalidate();
 
 			$headers = ($edit)
