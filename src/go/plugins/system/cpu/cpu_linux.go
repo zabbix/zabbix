@@ -77,10 +77,13 @@ func (p *Plugin) Collect() (err error) {
 			if i, err = strconv.ParseInt(fields[0][3:], 10, 32); err != nil {
 				return
 			}
-			if index = int(i); index < 0 || index+1 >= len(p.cpus) {
+
+			if index = int(i); index < 0 {
 				p.Debugf("invalid CPU index %d", index)
 				continue
 			}
+
+			p.addOfflineCpu(index)
 
 			status = cpuStatusOnline
 		} else {
@@ -110,6 +113,22 @@ func (p *Plugin) Collect() (err error) {
 		}
 	}
 	return nil
+}
+
+func (p *Plugin) addOfflineCpu(index int) {
+	if p == nil || p.cpus == nil {
+		return
+	}
+
+	if index == 0 {
+		return
+	}
+
+	if index+1 >= len(p.cpus) {
+		for idx := p.cpus[len(p.cpus)-1].index; idx < index; idx++ {
+			p.cpus = append(p.cpus, &cpuUnit{index: idx + 1, status: cpuStatusOffline})
+		}
+	}
 }
 
 func numCPUConf() int {
