@@ -1520,11 +1520,6 @@ abstract class CHostBase extends CApiService {
 			'type' => DB::getDefault('hostmacro', 'type')
 		];
 
-		// Populating new host macro objects for correct inheritance.
-		if ($this instanceof CHostPrototype) {
-			$hostmacro_defaults['description'] = DB::getDefault('hostmacro', 'description');
-		}
-
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		foreach ($hosts as $i1 => &$host) {
@@ -1568,11 +1563,6 @@ abstract class CHostBase extends CApiService {
 						if ($hostmacro['type'] == ZBX_MACRO_TYPE_VAULT) {
 							$hostmacro += ['value' => $db_hostmacro['value']];
 						}
-					}
-
-					// Populating new host macro objects for correct inheritance.
-					if ($this instanceof CHostPrototype) {
-						$hostmacro += array_intersect_key($db_hostmacro, array_flip(['value', 'description']));
 					}
 
 					$macros[$hostmacro['hostmacroid']] = $hostmacro['macro'];
