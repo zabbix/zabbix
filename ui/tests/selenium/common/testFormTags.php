@@ -732,7 +732,6 @@ class testFormTags extends CWebTest {
 
 		if ($object === 'host') {
 			COverlayDialogElement::find()->one()->close();
-			COverlayDialogElement::ensureNotPresent();
 		}
 	}
 
@@ -1248,7 +1247,7 @@ class testFormTags extends CWebTest {
 	/**
 	 * Check removing tags from different objects.
 	 *
-	 * @param string   $object   host, template, trigger or prototype
+	 * @param string   $object   host, template, trigger, service etc.
 	 */
 	public function clearTags($object) {
 		$tags = (!$this->problem_tags)
