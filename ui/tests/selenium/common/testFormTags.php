@@ -1256,38 +1256,6 @@ class testFormTags extends CWebTest {
 				: [['tag' => '', 'operator' => 'Equals', 'value' => '']];
 
 		$data = ['name' => $this->remove_name, 'tags' => $tags];
-
-		switch ($object) {
-			case 'host':
-				$locator = 'id:host-form';
-				break;
-
-			case 'trigger':
-			case 'trigger prototype':
-				$locator = 'name:triggersForm';
-				break;
-
-			case 'item':
-			case 'item prototype':
-				$locator = 'name:itemForm';
-				break;
-
-			case 'web scenario':
-				$locator = 'name:httpForm';
-				break;
-
-			case 'service':
-				$locator = 'id:service-form';
-				break;
-
-			case 'host prototype':
-				$locator = 'name:hostPrototypeForm';
-				break;
-
-			case 'template':
-				$locator = 'name:templatesForm';
-		}
-
 		$this->page->login()->open($this->link);
 
 		if ($object === 'service') {
@@ -1298,9 +1266,21 @@ class testFormTags extends CWebTest {
 			$this->query('link', $this->remove_name)->waitUntilPresent()->one()->click();
 		}
 
+		$locators = [
+			'host' => 'id:host-form',
+			'trigger' => 'name:triggersForm',
+			'trigger prototype' => 'name:triggersForm',
+			'item' => 'name:itemForm',
+			'item prototype' => 'name:itemForm',
+			'web scenario' => 'name:httpForm',
+			'service' => 'id:service-form',
+			'host prototype' => 'name:hostPrototypeForm',
+			'template' => 'name:templatesForm'
+		];
+
 		$form = ($object === 'host' || $object === 'service')
 			? COverlayDialogElement::find()->asForm()->one()->waitUntilVisible()
-			: $this->query($locator)->asForm()->waitUntilPresent()->one();
+			: $this->query($locators[$object])->asForm()->waitUntilPresent()->one();
 
 		if (!$this->problem_tags) {
 			$form->selectTab('Tags');
