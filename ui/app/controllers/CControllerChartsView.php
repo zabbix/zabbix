@@ -83,7 +83,7 @@ class CControllerChartsView extends CControllerCharts {
 		$filter_name = CProfile::get('web.charts.filter.name', '');
 		$filter_show = (int) CProfile::get('web.charts.filter.show', GRAPH_FILTER_ALL);
 
-		$subfilter_tagnames = CProfile::get('web.charts.subfilter.tagnames', []);
+		$subfilter_tagnames = CProfile::getArray('web.charts.subfilter.tagnames', []);
 		$subfilter_tags = json_decode(CProfile::get('web.charts.subfilter.tags', '{}'), true);
 
 		$timeselector_options = [
@@ -139,7 +139,6 @@ class CControllerChartsView extends CControllerCharts {
 		$graphs = array_merge($host_graphs, $simple_graphs);
 
 		// Prepare subfilter data.
-
 		$subfilters_fields = self::getSubfilterFields([
 			'subfilter_tagnames' => $subfilter_tagnames,
 			'subfilter_tags' => $subfilter_tags

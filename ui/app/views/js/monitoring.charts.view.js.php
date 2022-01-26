@@ -52,7 +52,7 @@
 		},
 
 		setSubfilter(tag, value) {
-			if (value !== undefined) {
+			if (value !== null) {
 				this.filterAddVar(`subfilter_tags[${tag}][]`, value);
 			}
 			else {
@@ -63,7 +63,7 @@
 		},
 
 		unsetSubfilter(tag, value) {
-			if (value !== undefined) {
+			if (value !== null) {
 				document.querySelector(`[name^="subfilter_tags[${tag}]["][value="${value}"]`).remove();
 			}
 			else {
