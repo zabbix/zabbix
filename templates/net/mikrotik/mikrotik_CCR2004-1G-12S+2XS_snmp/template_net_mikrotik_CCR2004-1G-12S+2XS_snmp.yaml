@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T09:44:24Z'
+  date: '2022-01-26T14:34:12Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -1314,13 +1314,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#IFNAME}'
             -
               uuid: 410f18fab2a34f30b9bde48c53b0758c
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
@@ -1340,13 +1340,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#IFNAME}'
             -
               uuid: d813c68f3b974dae80d2bb8060b4916a
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
@@ -1371,13 +1371,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#IFNAME}'
             -
               uuid: f0b88262b4ea40cc86b98dab09a0c8e5
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
@@ -1401,13 +1401,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#IFNAME}'
             -
               uuid: 4bf81a1abe324c48b907e9f3f67152f2
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
@@ -1427,13 +1427,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#IFNAME}'
             -
               uuid: cd35bca00aaf4e4bbb577c4945dfb4cf
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
@@ -1458,13 +1458,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#IFNAME}'
             -
               uuid: b5642292e0064832b40a09cbec0027c5
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
@@ -1490,13 +1490,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#IFNAME}'
             -
               uuid: 274f221a50894d67ae7c8fa8f969811a
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
@@ -1519,13 +1519,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: cb6f6e2bddc0454eb142cc35344e7082
@@ -1571,13 +1571,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#IFNAME}'
           trigger_prototypes:
             -
               uuid: 127e4dfad7884ac782f9d31d0b84dfee

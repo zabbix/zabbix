@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:32:41Z'
+  date: '2022-01-26T13:39:33Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -79,13 +79,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: e6ae9fc7d4454d389d066450af3a3066
