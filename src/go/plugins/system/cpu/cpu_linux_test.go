@@ -24,7 +24,7 @@ import (
 	"testing"
 )
 
-func TestPlugin_addOfflineCpu(t *testing.T) {
+func TestPlugin_addCpu(t *testing.T) {
 	type fields struct {
 		cpus []*cpuUnit
 	}
@@ -126,10 +126,10 @@ func TestPlugin_addOfflineCpu(t *testing.T) {
 			p := &Plugin{
 				cpus: tt.fields.cpus,
 			}
-			p.addOfflineCpu(tt.args.index)
+			p.addCpu(tt.args.index)
 
 			if !reflect.DeepEqual(p.cpus, tt.want) {
-				t.Errorf("addOfflineCpu() got = %v, want %v", p.cpus, tt.want)
+				t.Errorf("addCpu() got = %v, want %v", p.cpus, tt.want)
 			}
 		})
 	}

@@ -83,7 +83,7 @@ func (p *Plugin) Collect() (err error) {
 				continue
 			}
 
-			p.addOfflineCpu(index)
+			p.addCpu(index)
 
 			status = cpuStatusOnline
 		} else {
@@ -115,7 +115,7 @@ func (p *Plugin) Collect() (err error) {
 	return nil
 }
 
-func (p *Plugin) addOfflineCpu(index int) {
+func (p *Plugin) addCpu(index int) {
 	if p == nil || p.cpus == nil {
 		return
 	}
