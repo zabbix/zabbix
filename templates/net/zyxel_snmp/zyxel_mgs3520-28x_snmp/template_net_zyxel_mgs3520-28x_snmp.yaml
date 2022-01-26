@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:43:57Z'
+  date: '2022-01-26T19:42:18Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -471,13 +471,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: de6bab43bf544489976261919ae52e98
               name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Interface name'
@@ -498,13 +498,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 01f3cc6551bb4703b199e6c996ad48ce
               name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Link speed'
@@ -528,13 +528,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 68b987f900c0467ea77a8c8eb661f6d0
               name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Incoming broadcast packages'
@@ -556,13 +556,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: ddcef9809ee34de5bec1acbdc8abc162
               name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Incoming multicast packages'
@@ -585,13 +585,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: e8c2a3a8ba654311bc90901502983b7a
               name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Incoming traffic'
@@ -616,13 +616,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 003eb52b5fe44f509b3c04eef9cc2aa7
               name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Incoming unicast packages'
@@ -644,13 +644,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 8e060cde0fae44d792080fbc7da5a2a1
               name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Incoming utilization'
@@ -675,13 +675,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 15a2c17e0bba4f0d824790c3caa9840f
               name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Link type'
@@ -702,13 +702,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: f42c5604726d4d21a840418e5668287c
               name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Interface description'
@@ -729,13 +729,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: cfd32eee855647b79c95d6f151f13407
               name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Operational status'
@@ -758,13 +758,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: abb9d47ee9624d6f9805e6eedd5532c5
@@ -807,13 +807,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 4227a6eb8cce4dd8ab582ffce2788e6e
               name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Outgoing multicast packages'
@@ -837,13 +837,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 9a7eb0b7569d4111a33d84d03b5018e4
               name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Outgoing traffic'
@@ -869,13 +869,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 768be526caa345b2b23996016a19e217
               name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Outgoing unicast packages'
@@ -898,13 +898,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: e2b22f4c39974628a4476120b310a6fb
               name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Outgoing utilization'
@@ -929,13 +929,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 285f30d057f8438ab0d94367bcd6bdfc
               name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Speed Duplex'
@@ -963,13 +963,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
           graph_prototypes:
             -
               uuid: a7a2aec27f0045eba26e86e8cb08853a
@@ -1106,13 +1106,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: 27cd25ea30fa4f1c9b7b431218241d0c
@@ -1208,13 +1208,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 743a5eaf2c1049d4bf517c7e6f1f350d
               name: 'ZYXEL MGS3520-28x: SFP {#SNMPINDEX}: Part number'
@@ -1236,13 +1236,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: e40f07be73ca4e15acc109f8565f491b
               name: 'ZYXEL MGS3520-28x: SFP {#SNMPINDEX}: Revision'
@@ -1264,13 +1264,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 42db7a2affe54f059015adeae188efea
               name: 'ZYXEL MGS3520-28x: SFP {#SNMPINDEX}: Serial number'
@@ -1292,13 +1292,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: b9c3894fed8140c684be7c1fe2bbca8d
@@ -1332,13 +1332,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: b11f1d31e3a04b39b6e9ec40a800a7d5
               name: 'ZYXEL MGS3520-28x: SFP {#SNMPINDEX}: Transceiver'
@@ -1360,13 +1360,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 2656c166a30d4ee19465c8e9b2986a10
               name: 'ZYXEL MGS3520-28x: SFP {#SNMPINDEX}: Vendor'
@@ -1388,13 +1388,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
         -
           uuid: 0fa2bd401cc14847a8fd366b895a6a51
           name: 'Temperature discovery'

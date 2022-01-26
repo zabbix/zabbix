@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T09:54:06Z'
+  date: '2022-01-26T19:42:08Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -439,13 +439,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 1daef38185b14a96b8f0fce757c48677
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Interface name'
@@ -466,13 +466,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 4de0488610054ed9bd869dc48a07174e
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Link speed'
@@ -496,13 +496,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 55cf0d86b8bc4a6fa6806c9f8bce7ee9
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Incoming broadcast packages'
@@ -524,13 +524,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 0ce5c7ae49284615a41aba4cdd0f565b
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Incoming multicast packages'
@@ -553,13 +553,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 34a86d17de7e4725aa6e5893c1e52526
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Incoming traffic'
@@ -584,13 +584,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: b1c630d6f06748b88d695dfdb734cd19
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Incoming unicast packages'
@@ -612,13 +612,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: f24ad30d48ca427eb3b19d4459cab733
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Incoming utilization'
@@ -643,13 +643,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 8c141ab269eb4a8891937a1847312890
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Link type'
@@ -670,13 +670,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 018c1028b7904fbea8b1bb0d2fac1621
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Interface description'
@@ -697,13 +697,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 4f75b84c02b4496db2cbedca8df00c04
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Operational status'
@@ -726,13 +726,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: 27ba4832c79d447186ae6de254aad9d7
@@ -775,13 +775,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 103385b00f6442beab10712ca42d5719
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Outgoing multicast packages'
@@ -805,13 +805,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 08cd8a42816040d582d3192a9d8c2fb7
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Outgoing traffic'
@@ -837,13 +837,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: df030eba0fd548d5be224e2fe120373c
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Outgoing unicast packages'
@@ -866,13 +866,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: cabb6da9aa3e4ae0ae6938b3f3d47138
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Outgoing utilization'
@@ -897,13 +897,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 5200e032f5f6438e8326799208072845
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Speed Duplex'
@@ -924,13 +924,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
           graph_prototypes:
             -
               uuid: a4b7fd4158464655a71732de5ebc9a9d
@@ -1067,13 +1067,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: 8ce109a9f09b41458a4e9d8698238ad0
@@ -1169,13 +1169,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 2b30a4497cbd497886c52ae79ad03a01
               name: 'ZYXEL ES3500-8PD: SFP {#SNMPINDEX}: Part number'
@@ -1197,13 +1197,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 25aa375ed4a345e6b975bcb238cf530d
               name: 'ZYXEL ES3500-8PD: SFP {#SNMPINDEX}: Revision'
@@ -1225,13 +1225,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 3f24d3aa58624ed0ad7a137fc9b1611a
               name: 'ZYXEL ES3500-8PD: SFP {#SNMPINDEX}: Serial number'
@@ -1253,13 +1253,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: 46739144d51b441886d544829749cf21
@@ -1293,13 +1293,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 7621973ef61b47c9bc034eec3d008957
               name: 'ZYXEL ES3500-8PD: SFP {#SNMPINDEX}: Transceiver'
@@ -1321,13 +1321,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 715feecd140b4e9ca350b41490f7c7f9
               name: 'ZYXEL ES3500-8PD: SFP {#SNMPINDEX}: Vendor'
@@ -1349,13 +1349,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
         -
           uuid: 9c8f5212222a42bcbd42f8d848476804
           name: 'Temperature discovery'

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T09:58:25Z'
+  date: '2022-01-26T19:42:12Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -400,13 +400,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: e719364c125048e8a1fb6712e507863b
               name: 'ZYXEL MES-3528: Port {#SNMPINDEX}: Interface name'
@@ -427,13 +427,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: b2225fa57c0d468b9b0a40b220d50639
               name: 'ZYXEL MES-3528: Port {#SNMPINDEX}: Link speed'
@@ -457,13 +457,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 9f1720f6286a4b038724563a32f97844
               name: 'ZYXEL MES-3528: Port {#SNMPINDEX}: Incoming broadcast packages'
@@ -485,13 +485,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 184f7cfcfe964ea9b2b310a666c77420
               name: 'ZYXEL MES-3528: Port {#SNMPINDEX}: Incoming multicast packages'
@@ -514,13 +514,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 41f4b8bb9e1c461e8ef834348589e468
               name: 'ZYXEL MES-3528: Port {#SNMPINDEX}: Incoming traffic'
@@ -545,13 +545,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 681460dffc9242fba072eacd503fd190
               name: 'ZYXEL MES-3528: Port {#SNMPINDEX}: Incoming unicast packages'
@@ -573,13 +573,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: c2792996d52045c9ad4c955f6330264e
               name: 'ZYXEL MES-3528: Port {#SNMPINDEX}: Incoming utilization'
@@ -604,13 +604,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 9a45866adc3043ad81c7778b4334b317
               name: 'ZYXEL MES-3528: Port {#SNMPINDEX}: Link type'
@@ -631,13 +631,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 5a30094c57b54d89b1d61a73616e186e
               name: 'ZYXEL MES-3528: Port {#SNMPINDEX}: Interface description'
@@ -658,13 +658,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 1ed72a56523b48e89b964f6c4afc8800
               name: 'ZYXEL MES-3528: Port {#SNMPINDEX}: Operational status'
@@ -687,13 +687,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: c23272db35f44fe6958e3b5e31a52974
@@ -736,13 +736,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 9dae4fa8d9c2494aa01478dc9605b066
               name: 'ZYXEL MES-3528: Port {#SNMPINDEX}: Outgoing multicast packages'
@@ -766,13 +766,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 63f92516450d4dbcbea481231caf89f6
               name: 'ZYXEL MES-3528: Port {#SNMPINDEX}: Outgoing traffic'
@@ -798,13 +798,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: d7b17c5521a94b13b3ef6528fedcf5e0
               name: 'ZYXEL MES-3528: Port {#SNMPINDEX}: Outgoing unicast packages'
@@ -827,13 +827,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 3dd1d62e9cdb402b888b7ccbe3cbb182
               name: 'ZYXEL MES-3528: Port {#SNMPINDEX}: Outgoing utilization'
@@ -858,13 +858,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 284e41a49397492590bbcf34e1881553
               name: 'ZYXEL MES-3528: Port {#SNMPINDEX}: Speed Duplex'
@@ -885,13 +885,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
           graph_prototypes:
             -
               uuid: d021344604284e9ca127851ae1cb95ff
@@ -1028,13 +1028,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: f9e2991ea38343c8b2c9815bf733aef8
@@ -1130,13 +1130,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 9d9e08755fa444efb408d3db30843098
               name: 'ZYXEL MES-3528: SFP {#SNMPINDEX}: Part number'
@@ -1158,13 +1158,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 90952405b1504eabb6e5436eaa179f5a
               name: 'ZYXEL MES-3528: SFP {#SNMPINDEX}: Revision'
@@ -1186,13 +1186,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 83d084e9a0554e8eae31b0bd38aefe72
               name: 'ZYXEL MES-3528: SFP {#SNMPINDEX}: Serial number'
@@ -1214,13 +1214,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: 5cd22f26211a428099d2a41c5c41efab
@@ -1254,13 +1254,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 049cbbcea720493f9638d08f928710cb
               name: 'ZYXEL MES-3528: SFP {#SNMPINDEX}: Transceiver'
@@ -1282,13 +1282,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 5ece25cae49f47169a335be40dee744a
               name: 'ZYXEL MES-3528: SFP {#SNMPINDEX}: Vendor'
@@ -1310,13 +1310,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
       tags:
         -
           tag: class

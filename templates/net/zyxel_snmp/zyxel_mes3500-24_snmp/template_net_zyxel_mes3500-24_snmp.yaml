@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T09:55:34Z'
+  date: '2022-01-26T19:42:14Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -439,13 +439,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 7309a7b73c2848088c282096c334d541
               name: 'ZYXEL MES3500-24: Port {#SNMPINDEX}: Interface name'
@@ -466,13 +466,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 72efe5b4f1584d438739298561b3c8ab
               name: 'ZYXEL MES3500-24: Port {#SNMPINDEX}: Link speed'
@@ -496,13 +496,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: f11f5928218a4b619b31b597895a13b2
               name: 'ZYXEL MES3500-24: Port {#SNMPINDEX}: Incoming broadcast packages'
@@ -524,13 +524,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 22a65221bc194c03909956179180808a
               name: 'ZYXEL MES3500-24: Port {#SNMPINDEX}: Incoming multicast packages'
@@ -553,13 +553,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: e759a09d0f504567bd2fc0dd9c0d8395
               name: 'ZYXEL MES3500-24: Port {#SNMPINDEX}: Incoming traffic'
@@ -584,13 +584,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 16df754a1ac94c0588e1b6be5e175ed7
               name: 'ZYXEL MES3500-24: Port {#SNMPINDEX}: Incoming unicast packages'
@@ -612,13 +612,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 5051b4a19bad47a8b546fbfb6d5ea85e
               name: 'ZYXEL MES3500-24: Port {#SNMPINDEX}: Incoming utilization'
@@ -643,13 +643,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 25f6b400af8a40b29bf83ac988bc3cd8
               name: 'ZYXEL MES3500-24: Port {#SNMPINDEX}: Link type'
@@ -670,13 +670,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 6d860666d83b4886b04bb1ff2ecb19d9
               name: 'ZYXEL MES3500-24: Port {#SNMPINDEX}: Interface description'
@@ -697,13 +697,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: adf6ce16961240a9a7775de2e41df3d1
               name: 'ZYXEL MES3500-24: Port {#SNMPINDEX}: Operational status'
@@ -726,13 +726,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: 5a9faa35f7d547a987e78075832cf38e
@@ -775,13 +775,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: b13b8fecada34eed8f40ee79e2a12295
               name: 'ZYXEL MES3500-24: Port {#SNMPINDEX}: Outgoing multicast packages'
@@ -805,13 +805,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: d15d6b6ab8af4d5d8501784bb590af08
               name: 'ZYXEL MES3500-24: Port {#SNMPINDEX}: Outgoing traffic'
@@ -837,13 +837,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 08e0d078c5224b0885ea8c03af9328e4
               name: 'ZYXEL MES3500-24: Port {#SNMPINDEX}: Outgoing unicast packages'
@@ -866,13 +866,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 40b0f81094014f6cb667c143b5345795
               name: 'ZYXEL MES3500-24: Port {#SNMPINDEX}: Outgoing utilization'
@@ -897,13 +897,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: a814c27268e648f18ac9c82d5a5f78cb
               name: 'ZYXEL MES3500-24: Port {#SNMPINDEX}: Speed Duplex'
@@ -924,13 +924,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
           graph_prototypes:
             -
               uuid: 2b07fe7c9bd14177b8cc8c05e3975ac9
@@ -1067,13 +1067,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: ef830e34f83347bebba87a72208d805b
@@ -1169,13 +1169,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: b8b4d20515d748ac9bc77f8223294861
               name: 'ZYXEL MES3500-24: SFP {#SNMPINDEX}: Part number'
@@ -1197,13 +1197,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 380d4a1f3aa041fea4108c08d7108344
               name: 'ZYXEL MES3500-24: SFP {#SNMPINDEX}: Revision'
@@ -1225,13 +1225,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 24dc72b317284f568e962b461bbb33de
               name: 'ZYXEL MES3500-24: SFP {#SNMPINDEX}: Serial number'
@@ -1253,13 +1253,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: f84b378d79b74174842cc49af29c2a0c
@@ -1293,13 +1293,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: cf254d7b5d0d4525b8f871863a1ced2d
               name: 'ZYXEL MES3500-24: SFP {#SNMPINDEX}: Transceiver'
@@ -1321,13 +1321,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: cda45fc5cf1d44779e1a5eda3f120df2
               name: 'ZYXEL MES3500-24: SFP {#SNMPINDEX}: Vendor'
@@ -1349,13 +1349,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
         -
           uuid: 034f5965d39940d29ac58641f3b01183
           name: 'Temperature discovery'

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T09:48:33Z'
+  date: '2022-01-26T19:42:09Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -453,13 +453,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 32abe2903d1c4652a74a44c5154f1451
               name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Interface name'
@@ -480,13 +480,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 42040f2ca85e4f80bdc4bdc9d0ef5966
               name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Link speed'
@@ -510,13 +510,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: a71a364726524a6e9d00eb4098fa5faa
               name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Incoming broadcast packages'
@@ -538,13 +538,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 8dda9a8e70bc44c5acca08284eb94bac
               name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Incoming multicast packages'
@@ -567,13 +567,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 7240d04927a742dd93844c1fcc68dba0
               name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Incoming traffic'
@@ -598,13 +598,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 4b7a80cf38d44dd9b270dcbc5c44ecfc
               name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Incoming unicast packages'
@@ -626,13 +626,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 8c0eca407f47404a86d26c5fb1885f87
               name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Incoming utilization'
@@ -657,13 +657,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: a63165d407e740c38cab55aefeccbca8
               name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Link type'
@@ -684,13 +684,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 5c439eae60184abd8ec9b209cda19f8b
               name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Interface description'
@@ -711,13 +711,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 033b0e5b141b437c805b845f2e3f54a0
               name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Operational status'
@@ -740,13 +740,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: 9c332411a6db46acaab2b49ccabd2970
@@ -789,13 +789,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 5ac33c29b537409cb6347548290e5ecc
               name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Outgoing multicast packages'
@@ -819,13 +819,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 69ab1d86cd0347b49e2500a1d8e7e6a8
               name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Outgoing traffic'
@@ -851,13 +851,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 870c54f85d57473c8b48ed896d5e2b2b
               name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Outgoing unicast packages'
@@ -880,13 +880,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 98fffdb492a149b7b684e3867b113d37
               name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Outgoing utilization'
@@ -911,13 +911,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
             -
               uuid: 64037c50f0344d02ae06690e91c7ead8
               name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Speed Duplex'
@@ -938,13 +938,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
-                -
-                  tag: component
                   value: network
                 -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
                   tag: interface
-                  value: 'port-{#SNMPINDEX}'
+                  value: '{#SNMPINDEX}'
           graph_prototypes:
             -
               uuid: 1cad0c1a40a8472da2edee9cd889e6cf
