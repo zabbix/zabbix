@@ -246,7 +246,7 @@ class testFormTemplate extends CLegacyWebTest {
 		$this->assertEquals(0, CDBHelper::getCount("SELECT dashboardid FROM dashboard WHERE templateid='".$template['hostid']."'"));
 	}
 
-	// TODO: need to find correct template.
+//	TODO: need to find correct template.
 //	public function testFormTemplate_FullCloneTemplate() {
 //		$cloned_template_name = 'Full cloned template';
 //
