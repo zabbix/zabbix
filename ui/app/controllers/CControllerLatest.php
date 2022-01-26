@@ -432,6 +432,9 @@ abstract class CControllerLatest extends CController {
 		 * Calculate how many additional items would match the filtering results after selecting each of provided host
 		 * subfilters. So item MUST match all subfilters except the tested one.
 		 */
+		$matching_items_by_tagnames = [];
+		$matching_items_by_tags = [];
+
 		foreach ($prepared_data['items'] as $item) {
 			// Hosts subfilter.
 			$item_matches = true;
@@ -447,32 +450,49 @@ abstract class CControllerLatest extends CController {
 			}
 
 			// Calculate the counters of tag existence subfilter options.
-			foreach ($item['tags'] as $tag) {
-				$item_matches = true;
-				foreach ($item['matching_subfilters'] as $filter_name => $match) {
-					if ($filter_name === 'tagnames') {
-						continue;
-					}
-					$item_matches &= $match;
+			$item_matches = true;
+			foreach ($item['matching_subfilters'] as $filter_name => $match) {
+				if ($filter_name === 'tagnames') {
+					continue;
 				}
+				$item_matches &= $match;
+			}
 
-				if ($item_matches) {
+			if ($item_matches) {
+				foreach ($item['tags'] as $tag) {
 					$subfilter_options['tagnames'][$tag['tag']]['count']++;
+
+					if (is_array($item['matching_subfilters']['tagnames'])
+							&& array_key_exists($tag['tag'], $item['matching_subfilters']['tagnames'])) {
+						$matching_items_by_tagnames[$item['itemid']] = true;
+					}
+					else {
+						$subfilter_options['tagnames'][$tag['tag']]['items'][$item['itemid']] = true;
+					}
 				}
 			}
 
 			// Calculate the same for the tag/value pair subfilter options.
-			foreach ($item['tags'] as $tag) {
-				$item_matches = true;
-				foreach ($item['matching_subfilters'] as $filter_name => $match) {
-					if ($filter_name === 'tags') {
-						continue;
-					}
-					$item_matches &= $match;
+			$item_matches = true;
+			foreach ($item['matching_subfilters'] as $filter_name => $match) {
+				if ($filter_name === 'tags') {
+					continue;
 				}
+				$item_matches &= $match;
+			}
 
-				if ($item_matches) {
+			if ($item_matches) {
+				foreach ($item['tags'] as $tag) {
 					$subfilter_options['tags'][$tag['tag']][$tag['value']]['count']++;
+
+					if (is_array($item['matching_subfilters']['tags'])
+							&& array_key_exists($tag['tag'], $item['matching_subfilters']['tags'])
+							&& array_key_exists($tag['value'], $item['matching_subfilters']['tags'][$tag['tag']])) {
+						$matching_items_by_tags[$item['itemid']] = true;
+					}
+					else {
+						$subfilter_options['tags'][$tag['tag']][$tag['value']]['items'][$item['itemid']] = true;
+					}
 				}
 			}
 
@@ -488,6 +508,22 @@ abstract class CControllerLatest extends CController {
 				&& (!$subfilter_options['data'][0]['count'] || !$subfilter_options['data'][1]['count'])) {
 			$subfilter_options['data'] = [];
 		}
+
+		array_walk($subfilter_options['tagnames'], function (&$tag) use ($matching_items_by_tagnames) {
+			if (!$tag['selected'] && $tag['items']) {
+				$tag['count'] = count(array_diff_key($tag['items'], $matching_items_by_tagnames));
+			}
+			unset($tag['items']);
+		});
+
+		array_walk($subfilter_options['tags'], function (&$tag_values) use ($matching_items_by_tags) {
+			array_walk($tag_values, function (&$tag) use ($matching_items_by_tags) {
+				if (!$tag['selected'] && $tag['items']) {
+					$tag['count'] = count(array_diff_key($tag['items'], $matching_items_by_tags));
+				}
+				unset($tag['items']);
+			});
+		});
 
 		return $subfilter_options;
 	}
@@ -531,6 +567,7 @@ abstract class CControllerLatest extends CController {
 					$subfilter_options['tagnames'][$tag['tag']] = [
 						'name' => $tag['tag'],
 						'selected' => array_key_exists($tag['tag'], $subfilter['tagnames']),
+						'items' => [],
 						'count' => 0
 					];
 
@@ -542,6 +579,7 @@ abstract class CControllerLatest extends CController {
 					'selected' => (array_key_exists($tag['tag'], $subfilter['tags'])
 						&& array_key_exists($tag['value'], $subfilter['tags'][$tag['tag']])
 					),
+					'items' => [],
 					'count' => 0
 				];
 			}
@@ -593,17 +631,16 @@ abstract class CControllerLatest extends CController {
 
 		foreach ($items as &$item) {
 			$match_hosts = (!$subfilter['hostids'] || array_key_exists($item['hostid'], $subfilter['hostids']));
-			$match_tagnames = (!$subfilter['tagnames']
-				|| (bool) array_intersect_key($subfilter['tagnames'], array_flip(array_column($item['tags'], 'tag')))
-			);
+			$match_tagnames = $subfilter['tagnames']
+				? array_intersect_key($subfilter['tagnames'], array_flip(array_column($item['tags'], 'tag')))
+				: true;
 
 			if ($subfilter['tags']) {
-				$match_tags = false;
+				$match_tags = [];
 				foreach ($item['tags'] as $tag) {
 					if (array_key_exists($tag['tag'], $subfilter['tags'])
 							&& array_key_exists($tag['value'], $subfilter['tags'][$tag['tag']])) {
-						$match_tags = true;
-						break;
+						$match_tags[$tag['tag']][$tag['value']] = true;
 					}
 				}
 			}
@@ -633,16 +670,37 @@ abstract class CControllerLatest extends CController {
 	}
 
 	/**
-	 * Unset items not matching selected subfilters.
+	 * Returns array of items matching selected subfilters.
 	 *
-	 * @param array $items
-	 * @param array $items['matching_subfilters']    Contains flags either items matches all selected subfilters.
+	 * @param array      $items
+	 * @param array      $items[]['matching_subfilters']
+	 * @param bool       $items[]['matching_subfilters']['hostids']   (optional) TRUE if item matches host subfilter.
+	 * @param array|bool $items[]['matching_subfilters']['tagnames']  (optional) TRUE if item matches tagname subfilter
+	 *                                                                or array of exactly matching tagnames.
+	 * @param array|bool $items[]['matching_subfilters']['tags']      (optional) TRUE if item matches tagname/value
+	 *                                                                subfilter or array of exactly matching
+	 *                                                                tagname/value pairs.
+	 * @param bool       $items[]['matching_subfilters']['data']      (optional) TRUE if item matches data subfilter.
 	 *
 	 * @return array
 	 */
 	protected static function applySubfilters(array $items): array {
 		return array_filter($items, function ($item) {
-			return array_sum($item['matching_subfilters']) == count($item['matching_subfilters']);
+			$matches = array_intersect_key($item['matching_subfilters'],
+				array_flip(['hostids', 'tagnames', 'tags', 'data'])
+			);
+
+			if (array_key_exists('tagnames', $matches)) {
+				$matches['tagnames'] = (bool) $matches['tagnames'];
+			}
+
+			if (array_key_exists('tags', $matches)) {
+				$matches['tags'] = (bool) $matches['tags'];
+			}
+
+			return (count(array_unique($matches)) === 1)
+				? current($matches)
+				: false;
 		});
 	}
 
