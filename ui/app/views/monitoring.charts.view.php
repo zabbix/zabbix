@@ -95,7 +95,9 @@ elseif ($data['charts']) {
 	$table = (new CTable())
 		->setAttribute('style', 'width: 100%;')
 		->setId('charts');
-	$widget->addItem($table);
+	$widget
+		->addItem($table)
+		->addItem($data['paging']);
 }
 else {
 	$widget->addItem(new CTableInfo());
@@ -112,7 +114,8 @@ $this->includeJsFile('monitoring.charts.view.js.php', [
 		'filter_name' => $data['filter_name'],
 		'filter_show' => $data['filter_show'],
 		'subfilter_tagnames' => $data['subfilter_tagnames'],
-		'subfilter_tags' => $data['subfilter_tags']
+		'subfilter_tags' => $data['subfilter_tags'],
+		'page' => $data['page']
 	]
 ]);
 

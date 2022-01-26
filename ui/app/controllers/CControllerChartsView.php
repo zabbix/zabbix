@@ -148,10 +148,9 @@ class CControllerChartsView extends CControllerCharts {
 
 		CArrayHelper::sort($graphs, ['name', 'graphid', 'itemid']);
 
-		$view_url = (new CUrl('zabbix.php'))->setArgument('action', 'charts.view');
-//		$paging_arguments = array_filter(array_intersect_key($filter, self::FILTER_FIELDS_DEFAULT)); // TODO VM: implement
-//		array_map([$view_url, 'setArgument'], array_keys($paging_arguments), $paging_arguments);
-		$data['paging'] = CPagerHelper::paginate($this->getInput('page', 1), $graphs, ZBX_SORT_UP, $view_url);
+		$data['paging'] = CPagerHelper::paginate($data['page'], $graphs, ZBX_SORT_UP,
+			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
+		);
 
 		$data['charts'] = $this->getCharts($graphs);
 

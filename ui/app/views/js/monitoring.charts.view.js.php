@@ -51,6 +51,11 @@
 			document.getElementById('latest-data-subfilter').outerHTML = subfilter; // TODO VM: change ID
 		},
 
+		replacePaging(paging) {
+			debugger;
+			document.querySelector('.<?= ZBX_STYLE_TABLE_PAGING ?>').outerHTML = paging;
+		},
+
 		setSubfilter(tag, value) {
 			if (value !== null) {
 				this.filterAddVar(`subfilter_tags[${tag}][]`, value);
@@ -337,11 +342,14 @@
 			this.curl.setArgument('subfilter_tagnames', this.config.subfilter_tagnames);
 			this.curl.setArgument('subfilter_tags', this.config.subfilter_tags);
 
+			this.curl.setArgument('page', this.config.page);
+
 			return fetch(this.curl.getUrl())
 				.then((response) => response.json())
 				.then((response) => {
 					this.timeline = response.timeline;
 					view.replaceSubfilter(response.subfilter);
+					view.replacePaging(response.paging);
 
 					return response.charts;
 				});
