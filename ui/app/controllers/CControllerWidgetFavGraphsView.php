@@ -41,23 +41,6 @@ class CControllerWidgetFavGraphsView extends CControllerWidget {
 			$ids[$favourite['source']][$favourite['value']] = true;
 		}
 
-		if ($ids['graphid']) {
-			$db_graphs = API::Graph()->get([
-				'output' => ['graphid', 'name'],
-				'selectHosts' => ['name'],
-				'expandName' => true,
-				'graphids' => array_keys($ids['graphid'])
-			]);
-
-			foreach ($db_graphs as $db_graph) {
-				$graphs[] = [
-					'graphid' => $db_graph['graphid'],
-					'label' => $db_graph['hosts'][0]['name'].NAME_DELIMITER.$db_graph['name'],
-					'simple' => false
-				];
-			}
-		}
-
 		if ($ids['itemid']) {
 			$db_items = API::Item()->get([
 				'output' => ['itemid', 'name'],
