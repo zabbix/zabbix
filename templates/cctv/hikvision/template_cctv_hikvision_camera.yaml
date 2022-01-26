@@ -1,19 +1,19 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-08-24T06:09:11Z'
+  date: '2022-01-26T10:31:50Z'
   groups:
     -
-      uuid: d37f71c7e3f7469bab645852a69a2018
-      name: 'Templates/Video surveillance'
+      uuid: 57b7ae836ca64446ba2c296389c009b7
+      name: Templates/Modules
   templates:
     -
       uuid: 3fb4020df2984b0ab64dfd8355ff5c65
       template: 'Hikvision camera by HTTP'
       name: 'Hikvision camera by HTTP'
-      description: 'Template tooling version used: 0.38'
+      description: 'Template tooling version used: 0.41'
       groups:
         -
-          name: 'Templates/Video surveillance'
+          name: Templates/Modules
       items:
         -
           uuid: e889b3a7e6044f0284081f9d6427b416
@@ -38,8 +38,8 @@ zabbix_export:
             key: hikvision_cam.get_info
           tags:
             -
-              tag: Application
-              value: 'Hikvision camera'
+              tag: component
+              value: system
         -
           uuid: 61c6f0073e604a449d8f724d762cfb7f
           name: 'Hikvision camera: Boot loader version'
@@ -64,8 +64,8 @@ zabbix_export:
             key: hikvision_cam.get_info
           tags:
             -
-              tag: Application
-              value: 'Hikvision camera'
+              tag: component
+              value: system
         -
           uuid: 247a70ed0cc543d69183a6a793cd9978
           name: 'Hikvision camera: CPU utilization'
@@ -90,8 +90,8 @@ zabbix_export:
             key: hikvision_cam.get_status
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
           triggers:
             -
               uuid: 0ae4dbcc05544fb7b67183fcf3b9654b
@@ -100,6 +100,10 @@ zabbix_export:
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 7e65f407b515429caf415820dd633b0e
           name: 'Hikvision camera: Current device time'
@@ -119,8 +123,8 @@ zabbix_export:
             key: hikvision_cam.get_status
           tags:
             -
-              tag: Application
-              value: 'Hikvision camera'
+              tag: component
+              value: system
         -
           uuid: 42b0f3ae08cf4730a52ea2ddda6f5bae
           name: 'Hikvision camera: Device description'
@@ -145,8 +149,8 @@ zabbix_export:
             key: hikvision_cam.get_info
           tags:
             -
-              tag: Application
-              value: 'Hikvision camera'
+              tag: component
+              value: system
         -
           uuid: 4abc7dcef6ec4b97bd1350d2e93f58d4
           name: 'Hikvision camera: Device ID'
@@ -170,8 +174,8 @@ zabbix_export:
             key: hikvision_cam.get_info
           tags:
             -
-              tag: Application
-              value: 'Hikvision camera'
+              tag: component
+              value: system
         -
           uuid: f4e6f9d05fea4489a9eaa47effe66ceb
           name: 'Hikvision camera: Device location'
@@ -196,8 +200,8 @@ zabbix_export:
             key: hikvision_cam.get_info
           tags:
             -
-              tag: Application
-              value: 'Hikvision camera'
+              tag: component
+              value: system
         -
           uuid: 278a04c86c22419886aa64fad8e05c9e
           name: 'Hikvision camera: Device name'
@@ -222,8 +226,8 @@ zabbix_export:
             key: hikvision_cam.get_info
           tags:
             -
-              tag: Application
-              value: 'Hikvision camera'
+              tag: component
+              value: system
         -
           uuid: 84d86e688a31402a82798f9e2ff04ab8
           name: 'Hikvision camera: Device type'
@@ -248,8 +252,8 @@ zabbix_export:
             key: hikvision_cam.get_info
           tags:
             -
-              tag: Application
-              value: 'Hikvision camera'
+              tag: component
+              value: system
         -
           uuid: 66ee550f4838455e9500561d790a76d1
           name: 'Hikvision camera: Encoder released date'
@@ -274,8 +278,8 @@ zabbix_export:
             key: hikvision_cam.get_info
           tags:
             -
-              tag: Application
-              value: 'Hikvision camera'
+              tag: component
+              value: system
         -
           uuid: 4798d54b70ee445293c12b3a8038b8c8
           name: 'Hikvision camera: Encoder version'
@@ -300,8 +304,8 @@ zabbix_export:
             key: hikvision_cam.get_info
           tags:
             -
-              tag: Application
-              value: 'Hikvision camera'
+              tag: component
+              value: system
         -
           uuid: ac6ee4d15c584709a7bdf2b89048aacc
           name: 'Hikvision camera: Firmware released date'
@@ -326,8 +330,8 @@ zabbix_export:
             key: hikvision_cam.get_info
           tags:
             -
-              tag: Application
-              value: 'Hikvision camera'
+              tag: component
+              value: system
         -
           uuid: eafe1a75a24c479cb5bf116be2272375
           name: 'Hikvision camera: Firmware version'
@@ -352,8 +356,8 @@ zabbix_export:
             key: hikvision_cam.get_info
           tags:
             -
-              tag: Application
-              value: 'Hikvision camera'
+              tag: component
+              value: system
           triggers:
             -
               uuid: 3c0b5a0046894a54803cd984cda13fa2
@@ -362,6 +366,10 @@ zabbix_export:
               priority: INFO
               description: 'Hikvision camera version has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 0ddd3af82fb64b75821dc1fab96c16ab
           name: 'Hikvision camera: Get device info'
@@ -391,8 +399,8 @@ zabbix_export:
           status_codes: '200,401'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: d0fc2ebf4ae140b68546e2425321f797
           name: 'Hikvision camera: Get device info: Login status'
@@ -411,9 +419,9 @@ zabbix_export:
                   
                   if ("html" in data){
                       if (data.html.head.title === "Document Error: Unauthorized")
-                         {return 1}
+                          {return 1}
                       else if (data.html.head.title === "Connection error")
-                         {return 2}
+                          {return 2}
                   }
                   return 0;
             -
@@ -424,8 +432,8 @@ zabbix_export:
             key: hikvision_cam.get_info
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
         -
           uuid: 1ad3e3c9f60043a58f63addc8768c887
           name: 'Hikvision camera: Get system status'
@@ -455,8 +463,8 @@ zabbix_export:
           status_codes: '200,401'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: ebca4ac32e2e4bfd8bf3cdae155a4ee6
           name: 'Hikvision camera: Get system status: Login status'
@@ -475,9 +483,9 @@ zabbix_export:
                   
                   if ("html" in data){
                       if (data.html.head.title === "Document Error: Unauthorized")
-                         {return 1}
+                          {return 1}
                       else if (data.html.head.title === "Connection error")
-                         {return 2}
+                          {return 2}
                   }
                   return 0;
             -
@@ -488,8 +496,8 @@ zabbix_export:
             key: hikvision_cam.get_status
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
         -
           uuid: 65f89830d9f041f9a1558936dfcffc5f
           name: 'Hikvision camera: Get streaming channels'
@@ -519,8 +527,8 @@ zabbix_export:
           status_codes: '200,401'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: c90527e1a2a948b5a5f678ec0d981954
           name: 'Hikvision camera: Get streaming channels: Login status'
@@ -539,9 +547,9 @@ zabbix_export:
                   
                   if ("html" in data){
                       if (data.html.head.title === "Document Error: Unauthorized")
-                         {return 1}
+                          {return 1}
                       else if (data.html.head.title === "Connection error")
-                         {return 2}
+                          {return 2}
                   }
                   return 0;
             -
@@ -552,8 +560,8 @@ zabbix_export:
             key: hikvision_cam.get_streaming
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
         -
           uuid: 03aecf4021c2402bb415798ef339b914
           name: 'Hikvision camera: Hardware version'
@@ -577,8 +585,8 @@ zabbix_export:
             key: hikvision_cam.get_info
           tags:
             -
-              tag: Application
-              value: 'Hikvision camera'
+              tag: component
+              value: system
         -
           uuid: da9ec53ecc6b4c25b6539666eb9f6544
           name: 'Hikvision camera: MACaddress'
@@ -603,8 +611,8 @@ zabbix_export:
             key: hikvision_cam.get_info
           tags:
             -
-              tag: Application
-              value: 'Hikvision camera'
+              tag: component
+              value: network
         -
           uuid: d1d026c6240c493387374b756b04452f
           name: 'Hikvision camera: Memory utilization'
@@ -629,8 +637,8 @@ zabbix_export:
             key: hikvision_cam.get_status
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
           triggers:
             -
               uuid: 62cfa0b87f234f1cb67b9b5b6b2fa8f2
@@ -638,6 +646,10 @@ zabbix_export:
               name: 'Hikvision camera: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: b295689d34934401b0eda407edaee426
           name: 'Hikvision camera: Model'
@@ -662,8 +674,8 @@ zabbix_export:
             key: hikvision_cam.get_info
           tags:
             -
-              tag: Application
-              value: 'Hikvision camera'
+              tag: component
+              value: system
         -
           uuid: b6715593c52a4255ae6a4f68c3de6b6d
           name: 'Hikvision camera: Serial number'
@@ -688,16 +700,20 @@ zabbix_export:
             key: hikvision_cam.get_info
           tags:
             -
-              tag: Application
-              value: 'Hikvision camera'
+              tag: component
+              value: system
           triggers:
             -
               uuid: 281999cbd6324aacbbb86b4945000c60
               expression: 'last(/Hikvision camera by HTTP/hikvision_cam.serial_number,#1)<>last(/Hikvision camera by HTTP/hikvision_cam.serial_number,#2) and length(last(/Hikvision camera by HTTP/hikvision_cam.serial_number))>0'
-              name: 'Hikvision camera: Camera has been replaced (new serial number received)'
+              name: 'Hikvision camera: __RESOURCE_TYPE__ has been replaced (new serial number received)'
               priority: INFO
-              description: 'Camera serial number has changed. Ack to close'
+              description: '__RESOURCE_TYPE__ serial number has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 72ffbe3d976b437ab5df06b32a5c4b12
           name: 'Hikvision camera: Supported beep'
@@ -721,8 +737,8 @@ zabbix_export:
             key: hikvision_cam.get_info
           tags:
             -
-              tag: Application
-              value: 'Hikvision camera'
+              tag: component
+              value: system
         -
           uuid: 03d220eb782346269de6b0867ed3acd3
           name: 'Hikvision camera: Supported video loss'
@@ -746,8 +762,8 @@ zabbix_export:
             key: hikvision_cam.get_info
           tags:
             -
-              tag: Application
-              value: 'Hikvision camera'
+              tag: component
+              value: system
         -
           uuid: d29814c630f94d5cabdc350d8b161b5b
           name: 'Hikvision camera: System contact'
@@ -772,8 +788,8 @@ zabbix_export:
             key: hikvision_cam.get_info
           tags:
             -
-              tag: Application
-              value: 'Hikvision camera'
+              tag: component
+              value: system
         -
           uuid: 8678cee9999b45f1975f9639c8c197af
           name: 'Hikvision camera: Telecontrol ID'
@@ -797,8 +813,8 @@ zabbix_export:
             key: hikvision_cam.get_info
           tags:
             -
-              tag: Application
-              value: 'Hikvision camera'
+              tag: component
+              value: system
         -
           uuid: 4e680a5e347948fe8118b58c2c62d55f
           name: 'Hikvision camera: Uptime'
@@ -819,8 +835,8 @@ zabbix_export:
             key: hikvision_cam.get_status
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: f46b43fe9b354990929e7fdb80b792ec
@@ -829,6 +845,10 @@ zabbix_export:
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
       discovery_rules:
         -
           uuid: 00647c38d30d44378bdcf573178063ec
@@ -858,9 +878,9 @@ zabbix_export:
                       
                       if ("html" in data){
                           if (data.html.head.title === "Document Error: Unauthorized")
-                             {return 1}
+                              {return 1}
                           else if (data.html.head.title === "Connection error")
-                             {return 2}
+                              {return 2}
                       }
                       return 0;
                 -
@@ -871,13 +891,13 @@ zabbix_export:
                 key: 'hikvision_cam.get_ptz[{#PTZ_CHANNEL_ID}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: system
               trigger_prototypes:
                 -
                   uuid: 7ce39ff8b5f14fcbb7b575f9c44a9efd
                   expression: 'last(/Hikvision camera by HTTP/hikvision_cam.get_ptz.login_status[{#PTZ_CHANNEL_ID}])=1'
-                  name: 'Hikvision camera:Authorisation error on get PTZ channels'
+                  name: 'Hikvision camera: Authorisation error on get PTZ channels'
                   priority: WARNING
                   description: 'Check the correctness of the authorization data'
                   manual_close: 'YES'
@@ -888,6 +908,10 @@ zabbix_export:
                         last(/Hikvision camera by HTTP/hikvision_cam.get_info.login_status)=1 or
                         last(/Hikvision camera by HTTP/hikvision_cam.get_streaming.login_status)=1 or
                         last(/Hikvision camera by HTTP/hikvision_cam.get_status.login_status)=1
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
                 -
                   uuid: c702b7321b664f5d950b0d879bbd7371
                   expression: 'last(/Hikvision camera by HTTP/hikvision_cam.get_ptz.login_status[{#PTZ_CHANNEL_ID}])=2'
@@ -902,6 +926,10 @@ zabbix_export:
                         last(/Hikvision camera by HTTP/hikvision_cam.get_info.login_status)=2 or
                         last(/Hikvision camera by HTTP/hikvision_cam.get_streaming.login_status)=2 or
                         last(/Hikvision camera by HTTP/hikvision_cam.get_status.login_status)=2
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 6799d99ad02743a1b294b80bbed52280
               name: 'Hikvision camera: Get PTZ info'
@@ -931,8 +959,8 @@ zabbix_export:
               status_codes: '200,401'
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: raw
             -
               uuid: 16225fb78f414308829d035cd32f8468
               name: 'Channel "{#PTZ_CHANNEL_ID}": Absolute zoom'
@@ -961,8 +989,11 @@ zabbix_export:
                 key: 'hikvision_cam.get_ptz[{#PTZ_CHANNEL_ID}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Hikvision camera: PTZ channel "{#PTZ_CHANNEL_ID}"'
+                  tag: component
+                  value: ptz
+                -
+                  tag: ptz-id
+                  value: '{#PTZ_CHANNEL_ID}'
             -
               uuid: 6282376b25a9462e84b748d011f2fbf6
               name: 'Channel "{#PTZ_CHANNEL_ID}": Azimuth'
@@ -991,8 +1022,11 @@ zabbix_export:
                 key: 'hikvision_cam.get_ptz[{#PTZ_CHANNEL_ID}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Hikvision camera: PTZ channel "{#PTZ_CHANNEL_ID}"'
+                  tag: component
+                  value: ptz
+                -
+                  tag: ptz-id
+                  value: '{#PTZ_CHANNEL_ID}'
             -
               uuid: da148a9826724869a58d286a07edc036
               name: 'Channel "{#PTZ_CHANNEL_ID}": Elevation'
@@ -1021,8 +1055,11 @@ zabbix_export:
                 key: 'hikvision_cam.get_ptz[{#PTZ_CHANNEL_ID}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Hikvision camera: PTZ channel "{#PTZ_CHANNEL_ID}"'
+                  tag: component
+                  value: ptz
+                -
+                  tag: ptz-id
+                  value: '{#PTZ_CHANNEL_ID}'
           trigger_prototypes:
             -
               uuid: dbf391b5e18b4e018d889e460b7acc74
@@ -1034,6 +1071,10 @@ zabbix_export:
               priority: INFO
               description: 'The direction of the camera has changed'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
           url: 'http://{HOST.CONN}:{$HIKVISION_ISAPI_PORT}/ISAPI/PTZCtrl/channels'
           status_codes: '200,401'
           preprocessing:
@@ -1099,8 +1140,11 @@ zabbix_export:
                 key: hikvision_cam.get_streaming
               tags:
                 -
-                  tag: Application
-                  value: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
+                  tag: component
+                  value: stream
+                -
+                  tag: stream-id
+                  value: '{#CHANNEL_ID}'
             -
               uuid: b992569a9db346ac85886fe7a5e55074
               name: 'Channel "{#CHANNEL_ID}": Fixed quality'
@@ -1128,8 +1172,11 @@ zabbix_export:
                 key: hikvision_cam.get_streaming
               tags:
                 -
-                  tag: Application
-                  value: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
+                  tag: component
+                  value: stream
+                -
+                  tag: stream-id
+                  value: '{#CHANNEL_ID}'
             -
               uuid: 7343f2206cfd4942976b5dca214a7558
               name: 'Channel "{#CHANNEL_ID}": GovLength'
@@ -1156,8 +1203,11 @@ zabbix_export:
                 key: hikvision_cam.get_streaming
               tags:
                 -
-                  tag: Application
-                  value: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
+                  tag: component
+                  value: stream
+                -
+                  tag: stream-id
+                  value: '{#CHANNEL_ID}'
             -
               uuid: ef1df8955ab84efab5ae9be340715431
               name: 'Channel "{#CHANNEL_ID}": H264Profile'
@@ -1186,8 +1236,11 @@ zabbix_export:
                 key: hikvision_cam.get_streaming
               tags:
                 -
-                  tag: Application
-                  value: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
+                  tag: component
+                  value: stream
+                -
+                  tag: stream-id
+                  value: '{#CHANNEL_ID}'
             -
               uuid: ce45290377cc402bacda95ea8a136946
               name: 'Channel "{#CHANNEL_ID}": Key frame interval'
@@ -1219,8 +1272,11 @@ zabbix_export:
                 key: hikvision_cam.get_streaming
               tags:
                 -
-                  tag: Application
-                  value: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
+                  tag: component
+                  value: stream
+                -
+                  tag: stream-id
+                  value: '{#CHANNEL_ID}'
             -
               uuid: 4d621b75e2ef432a9cab88b61718125d
               name: 'Channel "{#CHANNEL_ID}": Frame rate (max)'
@@ -1253,8 +1309,11 @@ zabbix_export:
                 key: hikvision_cam.get_streaming
               tags:
                 -
-                  tag: Application
-                  value: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
+                  tag: component
+                  value: stream
+                -
+                  tag: stream-id
+                  value: '{#CHANNEL_ID}'
             -
               uuid: 12f1fadb9d364e6b96ab01b468c94891
               name: 'Channel "{#CHANNEL_ID}": Smoothing'
@@ -1281,8 +1340,11 @@ zabbix_export:
                 key: hikvision_cam.get_streaming
               tags:
                 -
-                  tag: Application
-                  value: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
+                  tag: component
+                  value: stream
+                -
+                  tag: stream-id
+                  value: '{#CHANNEL_ID}'
             -
               uuid: 1854ab4fd6f14adf90c0ddb42712a4ef
               name: 'Channel "{#CHANNEL_ID}": Snapshot image type'
@@ -1311,8 +1373,11 @@ zabbix_export:
                 key: hikvision_cam.get_streaming
               tags:
                 -
-                  tag: Application
-                  value: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
+                  tag: component
+                  value: stream
+                -
+                  tag: stream-id
+                  value: '{#CHANNEL_ID}'
             -
               uuid: d1523faa362842ef9313ffc15a6d5e8c
               name: 'Channel "{#CHANNEL_ID}": VBR lower'
@@ -1340,8 +1405,11 @@ zabbix_export:
                 key: hikvision_cam.get_streaming
               tags:
                 -
-                  tag: Application
-                  value: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
+                  tag: component
+                  value: stream
+                -
+                  tag: stream-id
+                  value: '{#CHANNEL_ID}'
             -
               uuid: 725669dc6bfd4871a3133ab7fcd4c571
               name: 'Channel "{#CHANNEL_ID}": VBR upper'
@@ -1365,8 +1433,11 @@ zabbix_export:
                 key: hikvision_cam.get_streaming
               tags:
                 -
-                  tag: Application
-                  value: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
+                  tag: component
+                  value: stream
+                -
+                  tag: stream-id
+                  value: '{#CHANNEL_ID}'
             -
               uuid: 96ef96886e9244f08cf245f4253839b2
               name: 'Channel "{#CHANNEL_ID}": Video codec type'
@@ -1395,8 +1466,11 @@ zabbix_export:
                 key: hikvision_cam.get_streaming
               tags:
                 -
-                  tag: Application
-                  value: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
+                  tag: component
+                  value: stream
+                -
+                  tag: stream-id
+                  value: '{#CHANNEL_ID}'
             -
               uuid: 59e8f0440ec04306a0c79cc8c9a5c91f
               name: 'Channel "{#CHANNEL_ID}": Video quality control type'
@@ -1425,8 +1499,11 @@ zabbix_export:
                 key: hikvision_cam.get_streaming
               tags:
                 -
-                  tag: Application
-                  value: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
+                  tag: component
+                  value: stream
+                -
+                  tag: stream-id
+                  value: '{#CHANNEL_ID}'
             -
               uuid: 18f5eed445154a42828cea423db9ebec
               name: 'Channel "{#CHANNEL_ID}": Resolution height'
@@ -1454,8 +1531,11 @@ zabbix_export:
                 key: hikvision_cam.get_streaming
               tags:
                 -
-                  tag: Application
-                  value: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
+                  tag: component
+                  value: stream
+                -
+                  tag: stream-id
+                  value: '{#CHANNEL_ID}'
             -
               uuid: 13f343a9c3804846a31867e942602199
               name: 'Channel "{#CHANNEL_ID}": Resolution width'
@@ -1483,8 +1563,11 @@ zabbix_export:
                 key: hikvision_cam.get_streaming
               tags:
                 -
-                  tag: Application
-                  value: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
+                  tag: component
+                  value: stream
+                -
+                  tag: stream-id
+                  value: '{#CHANNEL_ID}'
             -
               uuid: 2ccd4b38faf046b88a0983249ca0c4f6
               name: 'Channel "{#CHANNEL_ID}": Video scan type'
@@ -1513,8 +1596,11 @@ zabbix_export:
                 key: hikvision_cam.get_streaming
               tags:
                 -
-                  tag: Application
-                  value: 'Hikvision camera: Streaming channel "{#CHANNEL_ID}"'
+                  tag: component
+                  value: stream
+                -
+                  tag: stream-id
+                  value: '{#CHANNEL_ID}'
           trigger_prototypes:
             -
               uuid: 16cf4d23b3c8410586703efca81ebe52
@@ -1527,6 +1613,10 @@ zabbix_export:
                 expected: {$HIKVISION_STREAM_WIDTH} px x {$HIKVISION_STREAM_HEIGHT} px
                 received: {ITEM.LASTVALUE2} x {ITEM.LASTVALUE1}
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
             -
               uuid: 4f2a512d8f95414495dec5670e5e9680
               expression: |
@@ -1538,6 +1628,10 @@ zabbix_export:
               name: 'Channel "{#CHANNEL_ID}": Parameters of video stream are changed'
               priority: INFO
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
           url: 'http://{HOST.CONN}:{$HIKVISION_ISAPI_PORT}/ISAPI/Streaming/channels'
           status_codes: '200,401'
           preprocessing:
@@ -1579,6 +1673,16 @@ zabbix_export:
                   value: 'Invalid video stream resolution parameters'
                   status: ENABLED
                   discover: NO_DISCOVER
+      tags:
+        -
+          tag: class
+          value: device
+        -
+          tag: target
+          value: cctv
+        -
+          tag: target
+          value: hikvision
       macros:
         -
           macro: '{$CPU.UTIL.CRIT}'
@@ -1633,6 +1737,10 @@ zabbix_export:
       priority: WARNING
       description: 'Check the correctness of the authorization data'
       manual_close: 'YES'
+      tags:
+        -
+          tag: scope
+          value: notice
     -
       uuid: 58b5d210fe24434b9aaa365fba764742
       expression: |
@@ -1643,6 +1751,10 @@ zabbix_export:
       priority: WARNING
       description: 'Check the availability of the HTTP port'
       manual_close: 'YES'
+      tags:
+        -
+          tag: scope
+          value: notice
   graphs:
     -
       uuid: 30cfa75b2afb490f8448a63366577144

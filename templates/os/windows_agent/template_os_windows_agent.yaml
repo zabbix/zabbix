@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-18T20:37:18Z'
+  date: '2022-01-26T10:41:09Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -39,8 +39,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: 'Monitoring agent'
+              tag: component
+              value: system
         -
           uuid: f81e2ce0d1104f9aaf1fc49284ed0ed4
           name: 'Zabbix agent ping'
@@ -51,8 +51,8 @@ zabbix_export:
             name: 'Zabbix agent ping status'
           tags:
             -
-              tag: Application
-              value: 'Monitoring agent'
+              tag: component
+              value: system
         -
           uuid: 5707443d739d4689bde192e75ff4bd0f
           name: 'Version of Zabbix agent running'
@@ -68,8 +68,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: 'Monitoring agent'
+              tag: component
+              value: application
         -
           uuid: 5219a246de0641a89685a961cdd08c0b
           name: 'Cache bytes'
@@ -82,8 +82,8 @@ zabbix_export:
             the last observed value only; it is not an average.
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: 2ea74fafb9334de095adcb47cced578d
           name: 'Free system page table entries'
@@ -94,8 +94,8 @@ zabbix_export:
             than 5,000, there may well be a memory leak or you running out of memory.
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
           triggers:
             -
               uuid: e3118e2e6109460f80cc2d56795ed42f
@@ -107,6 +107,10 @@ zabbix_export:
                 -
                   name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   expression: 'min(/Windows by Zabbix agent/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
         -
           uuid: 6c41d254585a4d7b81a0c5766a8913c1
           name: 'Memory page faults per second'
@@ -122,8 +126,8 @@ zabbix_export:
             which require disk access, can cause significant delays.
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: 287163bc5b0441c4bf51489432a278eb
           name: 'Memory pages per second'
@@ -135,8 +139,8 @@ zabbix_export:
             If the value is greater than 1,000, as a result of excessive paging, there may be a memory leak.
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
           triggers:
             -
               uuid: ab4c9a66d16f42e6a32f6144f4d2a3ca
@@ -148,6 +152,10 @@ zabbix_export:
                 -
                   name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   expression: 'min(/Windows by Zabbix agent/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
         -
           uuid: fb822cb2a17948208a61bd6661c496df
           name: 'Memory pool non-paged'
@@ -161,8 +169,8 @@ zabbix_export:
             A typical Event ID 2019 is recorded in the system event log.
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: b99a722d267d455fad3c07c53302b20f
           name: 'Used swap space in %'
@@ -173,8 +181,11 @@ zabbix_export:
           description: 'The used space of swap volume/file in percent.'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: storage
         -
           uuid: ee1f116fdab34969a6e6f5e1c25fc3d2
           name: 'CPU DPC time'
@@ -190,8 +201,8 @@ zabbix_export:
             significantly diminish overall system performance.
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
         -
           uuid: e403552481b04ebdba2e8a019f114f20
           name: 'CPU interrupt time'
@@ -207,8 +218,8 @@ zabbix_export:
             hardware failure. This should never be higher than 20%.
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
           triggers:
             -
               uuid: f67bedcb282349b2aac052baf4963480
@@ -226,6 +237,10 @@ zabbix_export:
                 -
                   name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   expression: 'min(/Windows by Zabbix agent/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 37448f05afe340a3891d05528c9d1adc
           name: 'CPU privileged time'
@@ -240,8 +255,8 @@ zabbix_export:
             functions of the Windows® Operating System.
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
           triggers:
             -
               uuid: 4d099256b3ba42f1b90143e2014900dd
@@ -256,6 +271,10 @@ zabbix_export:
                 -
                   name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   expression: 'min(/Windows by Zabbix agent/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 575912d512624143b564ca0fbfd0bb8f
           name: 'CPU user time'
@@ -268,8 +287,8 @@ zabbix_export:
             in User mode.
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
         -
           uuid: 2322a85bfc1049a3b5c892d83b5d5054
           name: 'Context switches per second'
@@ -283,8 +302,8 @@ zabbix_export:
             There are context switch counters on the System and Thread objects. This counter displays the difference between the values observed in the last two samples, divided by the duration of the sample interval.
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
         -
           uuid: 002af28df72f4a788c88bc022d88c6dd
           name: 'CPU queue length'
@@ -296,8 +315,8 @@ zabbix_export:
             and are waiting to be executed.
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
         -
           uuid: 630b7b2af6274936ab80b1dd774113e5
           name: 'Number of threads'
@@ -306,8 +325,8 @@ zabbix_export:
           description: 'The number of threads used by all running processes.'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: os
         -
           uuid: b305029532f84daf93c8da2d181ac3a1
           name: 'Number of processes'
@@ -316,8 +335,8 @@ zabbix_export:
           description: 'The number of processes.'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: os
         -
           uuid: c2ed8e2efab04564b6c70ee8ad14730f
           name: 'CPU utilization'
@@ -328,8 +347,8 @@ zabbix_export:
           description: 'CPU utilization in %'
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
           triggers:
             -
               uuid: 806aa232f56640ab98aacc79491fc4d7
@@ -338,6 +357,10 @@ zabbix_export:
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: cb056886ce72426e833a0445f9263906
           name: 'System name'
@@ -355,8 +378,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: 6b50d36a4e29468a9546e880f3004399
@@ -365,6 +388,10 @@ zabbix_export:
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 94c4dfe23e2e4c6e995a3a715941a8eb
           name: 'System local time'
@@ -374,8 +401,8 @@ zabbix_export:
           description: 'System local time of the host.'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: 37ca2366c8474cc8a49a605e93377601
@@ -384,6 +411,10 @@ zabbix_export:
               priority: WARNING
               description: 'The host system time is different from the Zabbix server time.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 7e8b3476db6d4322a10cd1a28cbdb7ea
           name: 'Operating system architecture'
@@ -400,8 +431,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: os
         -
           uuid: 11cac38334544e5cbb028cfd473cb39e
           name: 'Free swap space'
@@ -413,8 +444,11 @@ zabbix_export:
           description: 'The free space of swap volume/file in bytes.'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: storage
         -
           uuid: 9c7e3c843a3045df81dddc5d18de267c
           name: 'Free swap space in %'
@@ -434,8 +468,11 @@ zabbix_export:
             key: 'perf_counter_en["\Paging file(_Total)\% Usage"]'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: storage
         -
           uuid: f981835baf04494eaff2f33f159e0ab5
           name: 'Total swap space'
@@ -445,8 +482,11 @@ zabbix_export:
           description: 'The total space of swap volume/file in bytes.'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: storage
         -
           uuid: b103a2c22fe344f886e9dc9f4e4a65ec
           name: 'System description'
@@ -463,8 +503,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 12503fbf4400488e9b5ff0488f164cb6
           name: Uptime
@@ -476,8 +516,8 @@ zabbix_export:
           description: 'System uptime in ''N days, hh:mm:ss'' format.'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: d27b9eab4034439f91dff41fe6f043ab
@@ -486,6 +526,10 @@ zabbix_export:
               priority: WARNING
               description: 'The device uptime is less than 10 minutes.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 09e9a345a0f445b1a65685911f5eb9b0
           name: 'Total memory'
@@ -495,8 +539,8 @@ zabbix_export:
           description: 'Total memory in Bytes'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: 1cbf45e11dab453797fe291639aa0c01
           name: 'Used memory'
@@ -506,8 +550,8 @@ zabbix_export:
           description: 'Used memory in Bytes'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: 3b1e4ecaa04a46e9b0aee956918f0713
           name: 'Memory utilization'
@@ -520,8 +564,8 @@ zabbix_export:
           description: 'Memory utilization in %'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
           triggers:
             -
               uuid: b442993bb2a6404a8ebcb7be39d16ce6
@@ -529,6 +573,13 @@ zabbix_export:
               name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 08b70a5b80fd435ba393e3deb3ca5adb
           name: 'Network interfaces WMI get'
@@ -544,8 +595,8 @@ zabbix_export:
                 - 1h
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: 83c8c6f15b524a2fb04fc90d04d3e8a2
           name: 'Number of cores'
@@ -554,8 +605,8 @@ zabbix_export:
           description: 'The number of logical processors available on the computer.'
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
         -
           uuid: 3dcb0f79342b4ded97cdec0794472266
           name: 'Zabbix agent availability'
@@ -567,8 +618,8 @@ zabbix_export:
             name: zabbix.host.available
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: 05beb4500cae480892fad0739f99807d
@@ -577,6 +628,10 @@ zabbix_export:
               priority: AVERAGE
               description: 'For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: ba19d6566fdb4a668d4363769d1fee01
@@ -630,8 +685,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 6e1f3dfb91024095a20870ee94d01822
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
@@ -646,8 +707,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 82accc942f5747a2b399484466625051
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
@@ -667,8 +734,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 9ddb9aaf863a45c0affbd90e4a6fa393
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
@@ -683,8 +756,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 38c8a1aa95b343e39e23e7b508521dad
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
@@ -699,8 +778,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 3b090da19af842189bb6fa56d49ceec3
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
@@ -720,8 +805,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 0445b842d1ce4c7f9fd5716c78a079c4
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
@@ -751,8 +842,14 @@ zabbix_export:
                 key: 'wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus,GUID from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus>0"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: c495bffb7e244e5caf5dc013d839b758
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
@@ -777,8 +874,14 @@ zabbix_export:
                 key: 'wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus,GUID from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus>0"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: a9b1c61ac4a6481aab93d40c6fb93462
@@ -797,6 +900,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 11ce3d38745a49f58f713fcef1a913c5
               name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
@@ -821,8 +928,14 @@ zabbix_export:
                 key: 'wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus,GUID from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus>0"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
           trigger_prototypes:
             -
               uuid: b2191521a7a54985a19740e3ee2674f2
@@ -840,6 +953,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Windows by Zabbix agent/net.if.status["{#IFGUID}"])<>2 and (last(/Windows by Zabbix agent/net.if.status["{#IFGUID}"],#1)<>last(/Windows by Zabbix agent/net.if.status["{#IFGUID}"],#2))'
                   recovery_expression: 'last(/Windows by Zabbix agent/net.if.status["{#IFGUID}"])=2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
             -
               uuid: c93048183c3942808c60d6dd61963bc0
               expression: |
@@ -860,6 +977,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Windows by Zabbix agent/net.if.status["{#IFGUID}"])<>2 and (last(/Windows by Zabbix agent/net.if.status["{#IFGUID}"],#1)<>last(/Windows by Zabbix agent/net.if.status["{#IFGUID}"],#2))'
                   recovery_expression: 'last(/Windows by Zabbix agent/net.if.status["{#IFGUID}"])=2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: a4fa6e161bb64b98b25b1a2a501a83f4
               expression: |
@@ -879,6 +1000,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Windows by Zabbix agent/net.if.status["{#IFGUID}"])<>2 and (last(/Windows by Zabbix agent/net.if.status["{#IFGUID}"],#1)<>last(/Windows by Zabbix agent/net.if.status["{#IFGUID}"],#2))'
                   recovery_expression: 'last(/Windows by Zabbix agent/net.if.status["{#IFGUID}"])=2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
           graph_prototypes:
             -
               uuid: 5cbfad75590746718cf4eabbeeea43f3
@@ -978,8 +1103,11 @@ zabbix_export:
                     - 'return (100 - value)'
               tags:
                 -
-                  tag: Application
-                  value: 'Disk {#DEVNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: disk
+                  value: '{#DEVNAME}'
               trigger_prototypes:
                 -
                   uuid: 4777fa000fa9460baab1fd7bc7e40604
@@ -995,6 +1123,10 @@ zabbix_export:
                     -
                       name: '{#DEVNAME}: Disk write request responses are too high (write > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}s for 15m)'
                       expression: 'min(/Windows by Zabbix agent/perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Write",60],15m) > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 77e33448596a498ba211d23a1977e9ca
               name: '{#DEVNAME}: Average disk read queue length'
@@ -1004,8 +1136,11 @@ zabbix_export:
               description: 'Average disk read queue, the number of requests outstanding on the disk at the time the performance data is collected.'
               tags:
                 -
-                  tag: Application
-                  value: 'Disk {#DEVNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: disk
+                  value: '{#DEVNAME}'
             -
               uuid: 7d91ed70bc3b4ef2a7991b3a5ba3bde4
               name: '{#DEVNAME}: Disk read request avg waiting time'
@@ -1016,8 +1151,11 @@ zabbix_export:
               description: 'The average time for read requests issued to the device to be served. This includes the time spent by the requests in queue and the time spent servicing them.'
               tags:
                 -
-                  tag: Application
-                  value: 'Disk {#DEVNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: disk
+                  value: '{#DEVNAME}'
               trigger_prototypes:
                 -
                   uuid: 85a8c002b3d84121ad2e73c8aced0987
@@ -1026,6 +1164,10 @@ zabbix_export:
                   priority: WARNING
                   description: 'This trigger might indicate disk {#DEVNAME} saturation.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 898784d050664f8eaf197ebebc16077e
               name: '{#DEVNAME}: Disk write request avg waiting time'
@@ -1036,8 +1178,11 @@ zabbix_export:
               description: 'The average time for write requests issued to the device to be served. This includes the time spent by the requests in queue and the time spent servicing them.'
               tags:
                 -
-                  tag: Application
-                  value: 'Disk {#DEVNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: disk
+                  value: '{#DEVNAME}'
               trigger_prototypes:
                 -
                   uuid: db6809fd85e241948fb5ef76cb7cc17b
@@ -1046,6 +1191,10 @@ zabbix_export:
                   priority: WARNING
                   description: 'This trigger might indicate disk {#DEVNAME} saturation.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 71a2c065efaa437fb7296972f516bd82
               name: '{#DEVNAME}: Average disk write queue length'
@@ -1055,8 +1204,11 @@ zabbix_export:
               description: 'Average disk write queue, the number of requests outstanding on the disk at the time the performance data is collected.'
               tags:
                 -
-                  tag: Application
-                  value: 'Disk {#DEVNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: disk
+                  value: '{#DEVNAME}'
             -
               uuid: b49884669dbf43cc95ea3d27fb23698c
               name: '{#DEVNAME}: Disk average queue size (avgqu-sz)'
@@ -1066,8 +1218,11 @@ zabbix_export:
               description: 'Current average disk queue, the number of requests outstanding on the disk at the time the performance data is collected.'
               tags:
                 -
-                  tag: Application
-                  value: 'Disk {#DEVNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: disk
+                  value: '{#DEVNAME}'
             -
               uuid: 390c6e4f2c134ae2939810892eefd6f7
               name: '{#DEVNAME}: Disk read rate'
@@ -1078,8 +1233,11 @@ zabbix_export:
               description: 'Rate of read operations on the disk.'
               tags:
                 -
-                  tag: Application
-                  value: 'Disk {#DEVNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: disk
+                  value: '{#DEVNAME}'
             -
               uuid: 6353d621a9c4415c94247208fc996075
               name: '{#DEVNAME}: Disk write rate'
@@ -1090,8 +1248,11 @@ zabbix_export:
               description: 'Rate of write operations on the disk.'
               tags:
                 -
-                  tag: Application
-                  value: 'Disk {#DEVNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: disk
+                  value: '{#DEVNAME}'
           graph_prototypes:
             -
               uuid: 6d37f811023b4f65a071b1deb9b1b8ec
@@ -1200,8 +1361,14 @@ zabbix_export:
                 name: 'Windows service state'
               tags:
                 -
-                  tag: Application
-                  value: Services
+                  tag: component
+                  value: system
+                -
+                  tag: name
+                  value: '{#SERVICE.DISPLAYNAME}'
+                -
+                  tag: service
+                  value: '{#SERVICE.NAME}'
               trigger_prototypes:
                 -
                   uuid: 4708592603db4577b26cb6daade41754
@@ -1209,6 +1376,10 @@ zabbix_export:
                   name: '"{#SERVICE.NAME}" ({#SERVICE.DISPLAYNAME}) is not running (startup type {#SERVICE.STARTUPNAME})'
                   priority: AVERAGE
                   description: 'The service has a state other than "Running" for the last three times.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
         -
           uuid: c22b79b52f9148728095bda2796a753e
           name: 'Mounted filesystem discovery'
@@ -1256,8 +1427,11 @@ zabbix_export:
               description: 'Space utilization in % for {#FSNAME}'
               tags:
                 -
-                  tag: Application
-                  value: 'Filesystem {#FSNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
             -
               uuid: 69378521b7e844ec89afe753a7cba30e
               name: '{#FSLABEL}({#FSNAME}): Total space'
@@ -1267,8 +1441,11 @@ zabbix_export:
               description: 'Total space in Bytes'
               tags:
                 -
-                  tag: Application
-                  value: 'Filesystem {#FSNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
             -
               uuid: a29509b4b7f24c25a768e88e0c23c154
               name: '{#FSLABEL}({#FSNAME}): Used space'
@@ -1278,8 +1455,11 @@ zabbix_export:
               description: 'Used storage in Bytes'
               tags:
                 -
-                  tag: Application
-                  value: 'Filesystem {#FSNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
           trigger_prototypes:
             -
               uuid: d3e99134a1d04894918f2c92ff38cb92
@@ -1295,6 +1475,10 @@ zabbix_export:
                  - The disk free space is less than 5G.
                  - The disk will be full in less than 24 hours.
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
             -
               uuid: 97115bbe4f6b4a8cb2873b8fa01f95d3
               expression: |
@@ -1315,6 +1499,10 @@ zabbix_export:
                   expression: |
                     last(/Windows by Zabbix agent/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
                     ((last(/Windows by Zabbix agent/vfs.fs.size[{#FSNAME},total])-last(/Windows by Zabbix agent/vfs.fs.size[{#FSNAME},used]))<5G or timeleft(/Windows by Zabbix agent/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
+              tags:
+                -
+                  tag: scope
+                  value: capacity
           graph_prototypes:
             -
               uuid: f80e47b8d4db4c378f25056c02b72382
@@ -1338,6 +1526,13 @@ zabbix_export:
                   item:
                     host: 'Windows by Zabbix agent'
                     key: 'vfs.fs.size[{#FSNAME},used]'
+      tags:
+        -
+          tag: class
+          value: os
+        -
+          tag: target
+          value: windows
       macros:
         -
           macro: '{$AGENT.TIMEOUT}'
@@ -1841,8 +2036,8 @@ zabbix_export:
             significantly diminish overall system performance.
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
         -
           uuid: 609619e2b6364d9e90bef828610b23f8
           name: 'CPU interrupt time'
@@ -1858,8 +2053,8 @@ zabbix_export:
             hardware failure. This should never be higher than 20%.
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
           triggers:
             -
               uuid: 3f6cca07bc6c48f0b21fee3aeb89bf6b
@@ -1877,6 +2072,10 @@ zabbix_export:
                 -
                   name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   expression: 'min(/Windows CPU by Zabbix agent/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: eb5144d1e3cb4417ae0abcdeca10e0ed
           name: 'CPU privileged time'
@@ -1891,8 +2090,8 @@ zabbix_export:
             functions of the Windows® Operating System.
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
           triggers:
             -
               uuid: 999464a5a73540d3b7b7cd86efa5488e
@@ -1907,6 +2106,10 @@ zabbix_export:
                 -
                   name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   expression: 'min(/Windows CPU by Zabbix agent/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 5611c125bf01479fadc2e59db073cc9c
           name: 'CPU user time'
@@ -1919,8 +2122,8 @@ zabbix_export:
             in User mode.
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
         -
           uuid: 8ee61e8919984a3d9a7125fd4fe7c397
           name: 'Context switches per second'
@@ -1934,8 +2137,8 @@ zabbix_export:
             There are context switch counters on the System and Thread objects. This counter displays the difference between the values observed in the last two samples, divided by the duration of the sample interval.
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
         -
           uuid: 1a2b85fb8355459e9c5c723164d09d41
           name: 'CPU queue length'
@@ -1947,8 +2150,8 @@ zabbix_export:
             and are waiting to be executed.
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
         -
           uuid: 177e472955434cb19dadb06c0f34eb31
           name: 'CPU utilization'
@@ -1959,8 +2162,8 @@ zabbix_export:
           description: 'CPU utilization in %'
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
           triggers:
             -
               uuid: afd1711dca1542a5bec9091cbae2bcf0
@@ -1969,6 +2172,10 @@ zabbix_export:
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: d6b17d211ed746aaabac591a3dad5813
           name: 'Number of cores'
@@ -1977,8 +2184,8 @@ zabbix_export:
           description: 'The number of logical processors available on the computer.'
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
       macros:
         -
           macro: '{$CPU.INTERRUPT.CRIT.MAX}'
@@ -2052,8 +2259,11 @@ zabbix_export:
               description: 'Space utilization in % for {#FSNAME}'
               tags:
                 -
-                  tag: Application
-                  value: 'Filesystem {#FSNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
             -
               uuid: a1661dae47c640be9cfa9e807e125ff3
               name: '{#FSLABEL}({#FSNAME}): Total space'
@@ -2063,8 +2273,11 @@ zabbix_export:
               description: 'Total space in Bytes'
               tags:
                 -
-                  tag: Application
-                  value: 'Filesystem {#FSNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
             -
               uuid: ed0c1057b2704ab098847ae62fec9064
               name: '{#FSLABEL}({#FSNAME}): Used space'
@@ -2074,8 +2287,11 @@ zabbix_export:
               description: 'Used storage in Bytes'
               tags:
                 -
-                  tag: Application
-                  value: 'Filesystem {#FSNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
           trigger_prototypes:
             -
               uuid: 68544e02e3cc4d389269448f34ca66e1
@@ -2091,6 +2307,10 @@ zabbix_export:
                  - The disk free space is less than 5G.
                  - The disk will be full in less than 24 hours.
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
             -
               uuid: ba0e859e58c34107a792098cfe9d31a4
               expression: |
@@ -2111,6 +2331,10 @@ zabbix_export:
                   expression: |
                     last(/Windows filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
                     ((last(/Windows filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},total])-last(/Windows filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},used]))<5G or timeleft(/Windows filesystems by Zabbix agent/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
+              tags:
+                -
+                  tag: scope
+                  value: capacity
           graph_prototypes:
             -
               uuid: 78d604a4bde244c38bcfbabd7ef5e09d
@@ -2184,8 +2408,8 @@ zabbix_export:
           description: 'The number of threads used by all running processes.'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: os
         -
           uuid: 8401ea3152ea45269eeb6cc7fa70f1aa
           name: 'Number of processes'
@@ -2194,8 +2418,8 @@ zabbix_export:
           description: 'The number of processes.'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: os
         -
           uuid: 78ae4dbd2d894819a36a7d3d00f2e508
           name: 'System name'
@@ -2213,8 +2437,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: 13c5f9c0f7f645cc9dde522ff20a1860
@@ -2223,6 +2447,10 @@ zabbix_export:
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 25454c401bea41a4b3c49da3165f3d3d
           name: 'System local time'
@@ -2232,8 +2460,8 @@ zabbix_export:
           description: 'System local time of the host.'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: 3144a1b15227479e9ea4ce858faea74b
@@ -2242,6 +2470,10 @@ zabbix_export:
               priority: WARNING
               description: 'The host system time is different from the Zabbix server time.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 5ed680dff3154af58e7adc0571a6ee9d
           name: 'Operating system architecture'
@@ -2258,8 +2490,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: os
         -
           uuid: 76ef3297b4b740bfaf891e039f7d4dff
           name: 'System description'
@@ -2276,8 +2508,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 24411175d64f48a195ee4a2323d8e799
           name: Uptime
@@ -2289,8 +2521,8 @@ zabbix_export:
           description: 'System uptime in ''N days, hh:mm:ss'' format.'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: d24a0366e99c4e31815bbbaa3af71ac6
@@ -2299,6 +2531,10 @@ zabbix_export:
               priority: WARNING
               description: 'The device uptime is less than 10 minutes.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
       macros:
         -
           macro: '{$SYSTEM.FUZZYTIME.MAX}'
@@ -2325,8 +2561,8 @@ zabbix_export:
             the last observed value only; it is not an average.
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: bea4109baa6e425eaa7b8cb3bbb1c01a
           name: 'Free system page table entries'
@@ -2337,8 +2573,8 @@ zabbix_export:
             than 5,000, there may well be a memory leak or you running out of memory.
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
           triggers:
             -
               uuid: 5055a8fdc127479cbe97fdfd849831ea
@@ -2350,6 +2586,10 @@ zabbix_export:
                 -
                   name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   expression: 'min(/Windows memory by Zabbix agent/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
         -
           uuid: c54782d0e8384d9cba8fe79af050e7ac
           name: 'Memory page faults per second'
@@ -2365,8 +2605,8 @@ zabbix_export:
             which require disk access, can cause significant delays.
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: 1ce3e64002424f29b73a5159152ae529
           name: 'Memory pages per second'
@@ -2378,8 +2618,8 @@ zabbix_export:
             If the value is greater than 1,000, as a result of excessive paging, there may be a memory leak.
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
           triggers:
             -
               uuid: 045574e4dd814b7e97d292b134f0a755
@@ -2391,6 +2631,10 @@ zabbix_export:
                 -
                   name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   expression: 'min(/Windows memory by Zabbix agent/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
         -
           uuid: b4ae2ff5830b47f882744f5fbcfcca05
           name: 'Memory pool non-paged'
@@ -2404,8 +2648,8 @@ zabbix_export:
             A typical Event ID 2019 is recorded in the system event log.
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: d24566c5c0fc4c219f521a1d4ae18546
           name: 'Used swap space in %'
@@ -2416,8 +2660,11 @@ zabbix_export:
           description: 'The used space of swap volume/file in percent.'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: storage
         -
           uuid: 3b8acdfa9b744fb595590daa370b16a9
           name: 'Free swap space'
@@ -2429,8 +2676,11 @@ zabbix_export:
           description: 'The free space of swap volume/file in bytes.'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: storage
         -
           uuid: 88eb59f25fde40a49f3b35f576fab29d
           name: 'Free swap space in %'
@@ -2450,8 +2700,11 @@ zabbix_export:
             key: 'perf_counter_en["\Paging file(_Total)\% Usage"]'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: storage
         -
           uuid: 711aae9de25e43728bfc9c26f06c800a
           name: 'Total swap space'
@@ -2461,8 +2714,11 @@ zabbix_export:
           description: 'The total space of swap volume/file in bytes.'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: storage
         -
           uuid: 35f397ade625477eba0b557a58113761
           name: 'Total memory'
@@ -2472,8 +2728,8 @@ zabbix_export:
           description: 'Total memory in Bytes'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: 69f61ded5de04623be01a77e160a41e6
           name: 'Used memory'
@@ -2483,8 +2739,8 @@ zabbix_export:
           description: 'Used memory in Bytes'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: 97295c0987bd44f1af578a2e37f469f4
           name: 'Memory utilization'
@@ -2497,8 +2753,8 @@ zabbix_export:
           description: 'Memory utilization in %'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
           triggers:
             -
               uuid: 2766be7a10d444be9893dcdfab75f3be
@@ -2506,6 +2762,13 @@ zabbix_export:
               name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
       macros:
         -
           macro: '{$MEM.PAGE_SEC.CRIT.MAX}'
@@ -2547,8 +2810,8 @@ zabbix_export:
                 - 1h
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
       discovery_rules:
         -
           uuid: e4ea554f9a1c4d3db0233c8babdf9bc1
@@ -2602,8 +2865,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 29d94ac228794aa9a89a4147014c35d1
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
@@ -2618,8 +2887,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 18cb6d1cde06482a8adb10e78576b512
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
@@ -2639,8 +2914,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: e3065d25674045938470ce2e10fbd6c0
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
@@ -2655,8 +2936,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: b3472a08272143bead7b9dc366b4992f
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
@@ -2671,8 +2958,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 2e208f1d9ca949f582f24015350395b6
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
@@ -2692,8 +2985,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: db8d1c51fdcc4cffbff0c8974b5233f9
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
@@ -2723,8 +3022,14 @@ zabbix_export:
                 key: 'wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus,GUID from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus>0"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: efe5e7b10dbe4b5c8f86a60e6611c22f
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
@@ -2749,8 +3054,14 @@ zabbix_export:
                 key: 'wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus,GUID from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus>0"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: 36effba3975c408aba50096464719479
@@ -2769,6 +3080,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 9ea1818be4d7423fb7799b9cf1546491
               name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
@@ -2793,8 +3108,14 @@ zabbix_export:
                 key: 'wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus,GUID from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus>0"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
           trigger_prototypes:
             -
               uuid: 81cea5af79844f298849ca5ef6cde4b3
@@ -2812,6 +3133,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Windows network by Zabbix agent/net.if.status["{#IFGUID}"])<>2 and (last(/Windows network by Zabbix agent/net.if.status["{#IFGUID}"],#1)<>last(/Windows network by Zabbix agent/net.if.status["{#IFGUID}"],#2))'
                   recovery_expression: 'last(/Windows network by Zabbix agent/net.if.status["{#IFGUID}"])=2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
             -
               uuid: c0e8e89730f04d92b26dd5da215894e1
               expression: |
@@ -2832,6 +3157,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Windows network by Zabbix agent/net.if.status["{#IFGUID}"])<>2 and (last(/Windows network by Zabbix agent/net.if.status["{#IFGUID}"],#1)<>last(/Windows network by Zabbix agent/net.if.status["{#IFGUID}"],#2))'
                   recovery_expression: 'last(/Windows network by Zabbix agent/net.if.status["{#IFGUID}"])=2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 2a59eec0032a41e48e2443507cbd173d
               expression: |
@@ -2851,6 +3180,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Windows network by Zabbix agent/net.if.status["{#IFGUID}"])<>2 and (last(/Windows network by Zabbix agent/net.if.status["{#IFGUID}"],#1)<>last(/Windows network by Zabbix agent/net.if.status["{#IFGUID}"],#2))'
                   recovery_expression: 'last(/Windows network by Zabbix agent/net.if.status["{#IFGUID}"])=2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
           graph_prototypes:
             -
               uuid: 08ea837e8c2448018cff873dacd95dcb
@@ -3113,8 +3446,11 @@ zabbix_export:
                     - 'return (100 - value)'
               tags:
                 -
-                  tag: Application
-                  value: 'Disk {#DEVNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: disk
+                  value: '{#DEVNAME}'
               trigger_prototypes:
                 -
                   uuid: c194f813f0c5417aaac56875b955637a
@@ -3130,6 +3466,10 @@ zabbix_export:
                     -
                       name: '{#DEVNAME}: Disk write request responses are too high (write > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}s for 15m)'
                       expression: 'min(/Windows physical disks by Zabbix agent/perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Write",60],15m) > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 8122d6fd46a54d5f8b23c4b21a333959
               name: '{#DEVNAME}: Average disk read queue length'
@@ -3139,8 +3479,11 @@ zabbix_export:
               description: 'Average disk read queue, the number of requests outstanding on the disk at the time the performance data is collected.'
               tags:
                 -
-                  tag: Application
-                  value: 'Disk {#DEVNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: disk
+                  value: '{#DEVNAME}'
             -
               uuid: f6896b69665d4a9bb160b23a322919d4
               name: '{#DEVNAME}: Disk read request avg waiting time'
@@ -3151,8 +3494,11 @@ zabbix_export:
               description: 'The average time for read requests issued to the device to be served. This includes the time spent by the requests in queue and the time spent servicing them.'
               tags:
                 -
-                  tag: Application
-                  value: 'Disk {#DEVNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: disk
+                  value: '{#DEVNAME}'
               trigger_prototypes:
                 -
                   uuid: d96338f9104a4eb4bc7725a5736c96d0
@@ -3161,6 +3507,10 @@ zabbix_export:
                   priority: WARNING
                   description: 'This trigger might indicate disk {#DEVNAME} saturation.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 704680610f6a42dc9373db929a3d0d53
               name: '{#DEVNAME}: Disk write request avg waiting time'
@@ -3171,8 +3521,11 @@ zabbix_export:
               description: 'The average time for write requests issued to the device to be served. This includes the time spent by the requests in queue and the time spent servicing them.'
               tags:
                 -
-                  tag: Application
-                  value: 'Disk {#DEVNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: disk
+                  value: '{#DEVNAME}'
               trigger_prototypes:
                 -
                   uuid: 205acd9a37424bd78618ebdc197f251f
@@ -3181,6 +3534,10 @@ zabbix_export:
                   priority: WARNING
                   description: 'This trigger might indicate disk {#DEVNAME} saturation.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 9f5d1cdb629847ad97e0fa0804883e91
               name: '{#DEVNAME}: Average disk write queue length'
@@ -3190,8 +3547,11 @@ zabbix_export:
               description: 'Average disk write queue, the number of requests outstanding on the disk at the time the performance data is collected.'
               tags:
                 -
-                  tag: Application
-                  value: 'Disk {#DEVNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: disk
+                  value: '{#DEVNAME}'
             -
               uuid: 3565ad70600d4c8aa5ebbbebd3f67270
               name: '{#DEVNAME}: Disk average queue size (avgqu-sz)'
@@ -3201,8 +3561,11 @@ zabbix_export:
               description: 'Current average disk queue, the number of requests outstanding on the disk at the time the performance data is collected.'
               tags:
                 -
-                  tag: Application
-                  value: 'Disk {#DEVNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: disk
+                  value: '{#DEVNAME}'
             -
               uuid: 3485202f1e6b42ce8099ce6d6347a994
               name: '{#DEVNAME}: Disk read rate'
@@ -3213,8 +3576,11 @@ zabbix_export:
               description: 'Rate of read operations on the disk.'
               tags:
                 -
-                  tag: Application
-                  value: 'Disk {#DEVNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: disk
+                  value: '{#DEVNAME}'
             -
               uuid: 66e312629db1460c8b215d34d29f7418
               name: '{#DEVNAME}: Disk write rate'
@@ -3225,8 +3591,11 @@ zabbix_export:
               description: 'Rate of write operations on the disk.'
               tags:
                 -
-                  tag: Application
-                  value: 'Disk {#DEVNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: disk
+                  value: '{#DEVNAME}'
           graph_prototypes:
             -
               uuid: 5fcd9dc53cd34e4981bf5e48a88951a0
@@ -3368,8 +3737,14 @@ zabbix_export:
                 name: 'Windows service state'
               tags:
                 -
-                  tag: Application
-                  value: Services
+                  tag: component
+                  value: system
+                -
+                  tag: name
+                  value: '{#SERVICE.DISPLAYNAME}'
+                -
+                  tag: service
+                  value: '{#SERVICE.NAME}'
               trigger_prototypes:
                 -
                   uuid: 9fab20eab61d48c09682fe5c142cc917
@@ -3377,6 +3752,10 @@ zabbix_export:
                   name: '"{#SERVICE.NAME}" ({#SERVICE.DISPLAYNAME}) is not running (startup type {#SERVICE.STARTUPNAME})'
                   priority: AVERAGE
                   description: 'The service has a state other than "Running" for the last three times.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
       macros:
         -
           macro: '{$SERVICE.NAME.MATCHES}'
@@ -3437,6 +3816,10 @@ zabbix_export:
         -
           name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
           expression: 'min(/Windows by Zabbix agent/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
+      tags:
+        -
+          tag: scope
+          value: performance
     -
       uuid: cc301d844a7b42e79756d1bc74adf307
       expression: 'min(/Windows CPU by Zabbix agent/perf_counter_en["\System\Processor Queue Length"],5m) - last(/Windows CPU by Zabbix agent/wmi.get[root/cimv2,"Select NumberOfLogicalProcessors from Win32_ComputerSystem"]) * 2 > {$CPU.QUEUE.CRIT.MAX}'
@@ -3447,6 +3830,10 @@ zabbix_export:
         -
           name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
           expression: 'min(/Windows CPU by Zabbix agent/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
+      tags:
+        -
+          tag: scope
+          value: performance
     -
       uuid: 7c23e03060ce42b094aac2f8aea1a9ad
       expression: 'min(/Windows by Zabbix agent/system.swap.pfree,5m)<{$SWAP.PFREE.MIN.WARN} and last(/Windows by Zabbix agent/system.swap.size[,total])>0'
@@ -3458,6 +3845,10 @@ zabbix_export:
         -
           name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
           expression: 'min(/Windows by Zabbix agent/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
+      tags:
+        -
+          tag: scope
+          value: performance
     -
       uuid: b2a97432e79e4a999324d3fde7dacdeb
       expression: 'min(/Windows memory by Zabbix agent/system.swap.pfree,5m)<{$SWAP.PFREE.MIN.WARN} and last(/Windows memory by Zabbix agent/system.swap.size[,total])>0'
@@ -3469,22 +3860,11 @@ zabbix_export:
         -
           name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
           expression: 'min(/Windows memory by Zabbix agent/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
+      tags:
+        -
+          tag: scope
+          value: performance
   graphs:
-    -
-      uuid: e3029427b9124e30a9aa06000219f572
-      name: 'CPU jumps'
-      graph_items:
-        -
-          color: 1A7C11
-          item:
-            host: 'Windows CPU by Zabbix agent'
-            key: 'perf_counter_en["\System\Context Switches/sec"]'
-        -
-          sortorder: '1'
-          color: 2774A4
-          item:
-            host: 'Windows CPU by Zabbix agent'
-            key: 'perf_counter_en["\Processor Information(_total)\% Interrupt Time"]'
     -
       uuid: 02ec085b49614b30a45287a7e88a8da1
       name: 'CPU jumps'
@@ -3501,23 +3881,20 @@ zabbix_export:
             host: 'Windows by Zabbix agent'
             key: 'perf_counter_en["\Processor Information(_total)\% Interrupt Time"]'
     -
-      uuid: 0b520e68348e4c17983672c5ca4dffb1
-      name: 'CPU usage'
-      type: STACKED
-      ymin_type_1: FIXED
-      ymax_type_1: FIXED
+      uuid: e3029427b9124e30a9aa06000219f572
+      name: 'CPU jumps'
       graph_items:
         -
           color: 1A7C11
           item:
             host: 'Windows CPU by Zabbix agent'
-            key: 'perf_counter_en["\Processor Information(_total)\% User Time"]'
+            key: 'perf_counter_en["\System\Context Switches/sec"]'
         -
           sortorder: '1'
           color: 2774A4
           item:
             host: 'Windows CPU by Zabbix agent'
-            key: 'perf_counter_en["\Processor Information(_total)\% Privileged Time"]'
+            key: 'perf_counter_en["\Processor Information(_total)\% Interrupt Time"]'
     -
       uuid: 0c2db401fe574282ab0beb6955049330
       name: 'CPU usage'
@@ -3537,17 +3914,23 @@ zabbix_export:
             host: 'Windows by Zabbix agent'
             key: 'perf_counter_en["\Processor Information(_total)\% Privileged Time"]'
     -
-      uuid: d7543150b21e4678a29ca1072c8660df
-      name: 'CPU utilization'
+      uuid: 0b520e68348e4c17983672c5ca4dffb1
+      name: 'CPU usage'
+      type: STACKED
       ymin_type_1: FIXED
       ymax_type_1: FIXED
       graph_items:
         -
-          drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
             host: 'Windows CPU by Zabbix agent'
-            key: system.cpu.util
+            key: 'perf_counter_en["\Processor Information(_total)\% User Time"]'
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Windows CPU by Zabbix agent'
+            key: 'perf_counter_en["\Processor Information(_total)\% Privileged Time"]'
     -
       uuid: 5de711b16f3845659289483f6deb4761
       name: 'CPU utilization'
@@ -3561,8 +3944,8 @@ zabbix_export:
             host: 'Windows by Zabbix agent'
             key: system.cpu.util
     -
-      uuid: 61a375b6875641bf93145be801809ece
-      name: 'Memory utilization'
+      uuid: d7543150b21e4678a29ca1072c8660df
+      name: 'CPU utilization'
       ymin_type_1: FIXED
       ymax_type_1: FIXED
       graph_items:
@@ -3570,8 +3953,8 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'Windows memory by Zabbix agent'
-            key: vm.memory.util
+            host: 'Windows CPU by Zabbix agent'
+            key: system.cpu.util
     -
       uuid: 1b86c8f6fe3343e6838c5d02f4f64b2b
       name: 'Memory utilization'
@@ -3585,20 +3968,17 @@ zabbix_export:
             host: 'Windows by Zabbix agent'
             key: vm.memory.util
     -
-      uuid: 8891c435d3df489ea18847abb82054ca
-      name: 'Swap usage'
+      uuid: 61a375b6875641bf93145be801809ece
+      name: 'Memory utilization'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
       graph_items:
         -
+          drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
             host: 'Windows memory by Zabbix agent'
-            key: system.swap.free
-        -
-          sortorder: '1'
-          color: 2774A4
-          item:
-            host: 'Windows memory by Zabbix agent'
-            key: 'system.swap.size[,total]'
+            key: vm.memory.util
     -
       uuid: 518f6bcdcefc4cf493244798ccd09ec1
       name: 'Swap usage'
@@ -3613,4 +3993,19 @@ zabbix_export:
           color: 2774A4
           item:
             host: 'Windows by Zabbix agent'
+            key: 'system.swap.size[,total]'
+    -
+      uuid: 8891c435d3df489ea18847abb82054ca
+      name: 'Swap usage'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Windows memory by Zabbix agent'
+            key: system.swap.free
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Windows memory by Zabbix agent'
             key: 'system.swap.size[,total]'
