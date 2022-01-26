@@ -246,24 +246,25 @@ class testFormTemplate extends CLegacyWebTest {
 		$this->assertEquals(0, CDBHelper::getCount("SELECT dashboardid FROM dashboard WHERE templateid='".$template['hostid']."'"));
 	}
 
-//	TODO: need to find correct template.
-//	public function testFormTemplate_FullCloneTemplate() {
-//		$cloned_template_name = 'Full cloned template';
-//
-//		$this->zbxTestLogin('templates.php?page=2');
-//		$this->filterAndOpenTemplate($this->template_clone);
-//		$this->zbxTestClickWait('full_clone');
-//		$this->zbxTestInputTypeOverwrite('template_name', $cloned_template_name);
-//		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
-//		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template added');
-//		$this->assertEquals(1, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='".$cloned_template_name."'"));
-//		$this->assertEquals(1, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='$this->template_clone'"));
-//
-//		$template = CDBHelper::getRow("select hostid from hosts where host like '".$cloned_template_name."'");
-//		$this->assertEquals(66, CDBHelper::getCount("SELECT itemid FROM items WHERE hostid='".$template['hostid']."'"));
-//		$this->assertEquals(1, CDBHelper::getCount("SELECT dashboardid FROM dashboard WHERE templateid='".$template['hostid']."'"));
-//	}
-
+	/**	TODO: need to find correct template.
+	*
+	*	public function testFormTemplate_FullCloneTemplate() {
+	*		$cloned_template_name = 'Full cloned template';
+	*
+	*		$this->zbxTestLogin('templates.php?page=2');
+	*		$this->filterAndOpenTemplate($this->template_clone);
+	*		$this->zbxTestClickWait('full_clone');
+	*		$this->zbxTestInputTypeOverwrite('template_name', $cloned_template_name);
+	*		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
+	*		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template added');
+	*		$this->assertEquals(1, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='".$cloned_template_name."'"));
+	*		$this->assertEquals(1, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='$this->template_clone'"));
+	*
+	*		$template = CDBHelper::getRow("select hostid from hosts where host like '".$cloned_template_name."'");
+	*		$this->assertEquals(66, CDBHelper::getCount("SELECT itemid FROM items WHERE hostid='".$template['hostid']."'"));
+	*		$this->assertEquals(1, CDBHelper::getCount("SELECT dashboardid FROM dashboard WHERE templateid='".$template['hostid']."'"));
+	*	}
+	*/
 		public function testFormTemplate_Delete() {
 		$template = CDBHelper::getRow("select hostid from hosts where host like '".$this->template."'");
 
