@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:36:36Z'
+  date: '2022-01-26T19:09:53Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -142,8 +142,11 @@ zabbix_export:
               value: '{$CLICKHOUSE.PASSWORD}'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: dictionaries
+            -
+              tag: component
+              value: raw
         -
           uuid: b7bbca72bbd14b20930e60c3c1cdcb8e
           name: 'ClickHouse: Current distributed files to insert'
@@ -845,8 +848,11 @@ zabbix_export:
               value: '{$CLICKHOUSE.PASSWORD}'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
+            -
+              tag: component
+              value: replicas
         -
           uuid: 78ed9728eb634df1807c64637c862f9a
           name: 'ClickHouse: Replication lag across all tables'
@@ -1141,8 +1147,11 @@ zabbix_export:
               value: '{$CLICKHOUSE.PASSWORD}'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
+            -
+              tag: component
+              value: tables
         -
           uuid: 99b894b181b44a4f8ef10280b881b273
           name: 'ClickHouse: Uptime'

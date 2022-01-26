@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:48:01Z'
+  date: '2022-01-26T19:00:53Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -31,8 +31,8 @@ zabbix_export:
           description: 'Collect VMware event log. See also: https://www.zabbix.com/documentation/6.0/manual/config/items/preprocessing/examples#filtering_vmware_event_log_records'
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: log
         -
           uuid: ebb8417eceb541b1b51909c745642f05
           name: 'VMware: Full name'
@@ -52,8 +52,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: system
         -
           uuid: edfdedd78e9c4c299a1555bd13b2f677
           name: 'VMware: Version'
@@ -73,8 +73,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: VMware
+              tag: component
+              value: system
       discovery_rules:
         -
           uuid: dc0a844c06f7456b8643f9f9672e6b8e
@@ -99,8 +99,11 @@ zabbix_export:
                 name: 'VMware status'
               tags:
                 -
-                  tag: Application
-                  value: VMware
+                  tag: cluster
+                  value: '{#CLUSTER.NAME}'
+                -
+                  tag: component
+                  value: cluster
         -
           uuid: 3cd02594ee644dbe88bdfc4f4257ae05
           name: 'Discover VMware datastores'
@@ -121,8 +124,11 @@ zabbix_export:
               description: 'Amount of time for a read operation from the datastore (milliseconds).'
               tags:
                 -
-                  tag: Application
-                  value: VMware
+                  tag: component
+                  value: datastore
+                -
+                  tag: datastore
+                  value: '{#DATASTORE}'
             -
               uuid: a2b1785fc773404e9ce69bcd868c5b88
               name: 'VMware: Free space on datastore {#DATASTORE} (percentage)'
@@ -137,8 +143,11 @@ zabbix_export:
               description: 'VMware datastore space in percentage from total.'
               tags:
                 -
-                  tag: Application
-                  value: VMware
+                  tag: component
+                  value: datastore
+                -
+                  tag: datastore
+                  value: '{#DATASTORE}'
             -
               uuid: 78fb4b4b0eec44a99207f8354773269d
               name: 'VMware: Total size of datastore {#DATASTORE}'
@@ -152,8 +161,11 @@ zabbix_export:
               description: 'VMware datastore space in bytes.'
               tags:
                 -
-                  tag: Application
-                  value: VMware
+                  tag: component
+                  value: datastore
+                -
+                  tag: datastore
+                  value: '{#DATASTORE}'
             -
               uuid: d9570c0822cc4996a7dda1ddb9426404
               name: 'VMware: Average write latency of the datastore {#DATASTORE}'
@@ -165,8 +177,11 @@ zabbix_export:
               description: 'Amount of time for a write operation to the datastore (milliseconds).'
               tags:
                 -
-                  tag: Application
-                  value: VMware
+                  tag: component
+                  value: datastore
+                -
+                  tag: datastore
+                  value: '{#DATASTORE}'
         -
           uuid: 988bb85b325449b29780eeda15c73620
           name: 'Discover VMware hypervisors'

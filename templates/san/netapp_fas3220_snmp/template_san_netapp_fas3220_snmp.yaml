@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T14:49:37Z'
+  date: '2022-01-26T18:53:36Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -1201,7 +1201,7 @@ zabbix_export:
                   value: network
                 -
                   tag: description
-                  value: '{#IFALIAS}'
+                  value: '{#IFDESCR}'
                 -
                   tag: interface
                   value: '{#IFNAME}'
@@ -1227,7 +1227,7 @@ zabbix_export:
                   value: network
                 -
                   tag: description
-                  value: '{#IFALIAS}'
+                  value: '{#IFDESCR}'
                 -
                   tag: interface
                   value: '{#IFNAME}'
@@ -1251,8 +1251,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: network
+                -
+                  tag: description
                   value: '{#IFDESCR}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: b414bb327e744c4b932263502da396c1
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Outbound packets discarded'
@@ -1275,7 +1281,7 @@ zabbix_export:
                   value: network
                 -
                   tag: description
-                  value: '{#IFALIAS}'
+                  value: '{#IFDESCR}'
                 -
                   tag: interface
                   value: '{#IFNAME}'
@@ -1301,7 +1307,7 @@ zabbix_export:
                   value: network
                 -
                   tag: description
-                  value: '{#IFALIAS}'
+                  value: '{#IFDESCR}'
                 -
                   tag: interface
                   value: '{#IFNAME}'
@@ -1325,8 +1331,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: network
+                -
+                  tag: description
                   value: '{#IFDESCR}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: fc759bc9f1fd479498157c5ded9d1123
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Health degraded reason'
@@ -1344,8 +1356,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: network
+                -
+                  tag: description
                   value: '{#IFDESCR}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: d50375f621464117afa5c469d06aa3a6
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Health'
@@ -1364,8 +1382,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: network
+                -
+                  tag: description
                   value: '{#IFDESCR}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 13b38a463e7a49058ca6907a9430d49f
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): State'
@@ -1383,8 +1407,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: network
+                -
+                  tag: description
                   value: '{#IFDESCR}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: ba18b4cebd7547c1bd6f92bd9e0ca791
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Role'
@@ -1402,8 +1432,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: network
+                -
+                  tag: description
                   value: '{#IFDESCR}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 7e8816bdb15e4f1ab60c2c1b9706a34f
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Speed'
@@ -1421,8 +1457,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: network
+                -
+                  tag: description
                   value: '{#IFDESCR}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: ea7cd0c80dae43e3bfd871b8ce1c541b
               name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Up by an administrator'
@@ -1440,8 +1482,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
+                  tag: component
+                  value: network
+                -
+                  tag: description
                   value: '{#IFDESCR}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
           trigger_prototypes:
             -
               uuid: 9ea5b5b667df4bd1943892150c9f2fda

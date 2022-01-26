@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:03:10Z'
+  date: '2022-01-26T19:13:15Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -668,8 +668,8 @@ zabbix_export:
             key: vault.get_health
           tags:
             -
-              tag: Application
-              value: Vault
+              tag: component
+              value: health
           triggers:
             -
               uuid: ee9a561165b847c2a0719a767e5c4fe9
