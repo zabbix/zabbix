@@ -1872,11 +1872,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		if (-1 == ret && EINTR != errno)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
+			sig_exiting = ZBX_EXIT_FAILURE;
 			break;
 		}
 	}
 
-	if (!ZBX_IS_RUNNING() && SUCCEED == ZBX_EXIT_STATUS())
+	if (SUCCEED == ZBX_EXIT_STATUS())
 		zbx_rtc_shutdown_subs(&rtc);
 
 	if (SUCCEED != zbx_ha_pause(&error))

@@ -1438,7 +1438,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		}
 	}
 out:
-	if (!ZBX_IS_RUNNING() && SUCCEED == ZBX_EXIT_STATUS())
+	if (SUCCEED == ZBX_EXIT_STATUS())
 		zbx_rtc_shutdown_subs(&rtc);
 
 	zbx_on_exit(ZBX_EXIT_STATUS());
