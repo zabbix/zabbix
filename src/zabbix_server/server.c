@@ -1895,6 +1895,12 @@ void	zbx_on_exit(int ret)
 		zbx_free(threads_flags);
 	}
 
+	if (SUCCEED != zbx_ha_stop(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot stop HA manager: %s", error);
+		zbx_free(error);
+	}
+
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
 	{
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
@@ -1918,12 +1924,6 @@ void	zbx_on_exit(int ret)
 		zbx_vmware_destroy();
 
 		free_selfmon_collector();
-	}
-
-	if (SUCCEED != zbx_ha_stop(&error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot stop HA manager: %s", error);
-		zbx_free(error);
 	}
 
 	zbx_uninitialize_events();
