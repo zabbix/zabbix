@@ -935,15 +935,17 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'row_count' => 2
 				]
 			],
-			[
-				[
-					'field' =>  [
-						'Max count of elements to show inside table cell' => '2'
-					],
-					'link' => 'templates.php?filter_name=cisco',
-					'element_count' => 2
-				]
-			],
+//			TODO: link several tempaltes to check max count
+//									
+//			[
+//				[
+//					'field' =>  [
+//						'Max count of elements to show inside table cell' => '2'
+//					],
+//					'link' => 'templates.php?filter_name=cisco',
+//					'element_count' => 2
+//				]
+//			],
 			[
 				[
 					'field' =>  [
