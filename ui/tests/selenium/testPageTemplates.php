@@ -155,8 +155,9 @@ class testPageTemplates extends CLegacyWebTest {
 			'Windows SNMP'
 		];
 
-		if ($template['name'] === 'Cisco UCS Manager SNMP') {
-			return;
+		if (in_array($template['name'], $skip_templates)) {
+var_dump($template['name']);
+			return true;
 		}
 
 		$host = $template['host'];
