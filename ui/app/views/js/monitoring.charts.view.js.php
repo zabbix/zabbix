@@ -48,11 +48,10 @@
 		},
 
 		replaceSubfilter(subfilter) {
-			document.getElementById('latest-data-subfilter').outerHTML = subfilter; // TODO VM: change ID
+			document.getElementById('subfilter').outerHTML = subfilter;
 		},
 
 		replacePaging(paging) {
-			debugger;
 			document.querySelector('.<?= ZBX_STYLE_TABLE_PAGING ?>').outerHTML = paging;
 		},
 

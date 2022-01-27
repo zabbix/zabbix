@@ -38,7 +38,6 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 				' ',
 				new CSup($element['count'])
 			]))
-				->addClass(ZBX_STYLE_NOWRAP)
 				->addClass(ZBX_STYLE_SUBFILTER)
 				->addClass(ZBX_STYLE_SUBFILTER_ENABLED);
 		}
@@ -67,9 +66,7 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 					$link,
 					' ',
 					new CSup(($subfilter ? '+' : '').$element['count'])
-				]))
-					->addClass(ZBX_STYLE_NOWRAP)
-					->addClass(ZBX_STYLE_SUBFILTER);
+				]))->addClass(ZBX_STYLE_SUBFILTER);
 			}
 		}
 	}
@@ -111,7 +108,6 @@ function prepareTagsSubfilterOutput(array $data, array &$subfilter): array {
 				' ',
 				new CSup($tag['count'])
 			]))
-				->addClass(ZBX_STYLE_NOWRAP)
 				->addClass(ZBX_STYLE_SUBFILTER)
 				->addClass(ZBX_STYLE_SUBFILTER_ENABLED);
 		}
@@ -137,9 +133,7 @@ function prepareTagsSubfilterOutput(array $data, array &$subfilter): array {
 					$link,
 					' ',
 					new CSup(($subfilter ? '+' : '').$tag['count'])
-				]))
-					->addClass(ZBX_STYLE_NOWRAP)
-					->addClass(ZBX_STYLE_SUBFILTER);
+				]))->addClass(ZBX_STYLE_SUBFILTER);
 			}
 		}
 

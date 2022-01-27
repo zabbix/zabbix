@@ -59,7 +59,6 @@ foreach (['tagnames'] as $key) { // TODO VM: remove loop
 				' ',
 				new CSup($element['count'])
 			]))
-				->addClass(ZBX_STYLE_NOWRAP)
 				->addClass(ZBX_STYLE_SUBFILTER)
 				->addClass(ZBX_STYLE_SUBFILTER_ENABLED);
 
@@ -80,9 +79,7 @@ foreach (['tagnames'] as $key) { // TODO VM: remove loop
 						->setAttribute('data-tag', $tag_name),
 					' ',
 					new CSup(($subfilter_used ? '+' : '').$element['count'])
-				]))
-					->addClass(ZBX_STYLE_NOWRAP)
-					->addClass(ZBX_STYLE_SUBFILTER);
+				]))->addClass(ZBX_STYLE_SUBFILTER);
 			}
 		}
 	}
@@ -133,7 +130,6 @@ if (count($data['tags']) > 0) {
 					' ',
 					new CSup($element['count'])
 				]))
-					->addClass(ZBX_STYLE_NOWRAP)
 					->addClass(ZBX_STYLE_SUBFILTER)
 					->addClass(ZBX_STYLE_SUBFILTER_ENABLED);
 
@@ -158,9 +154,7 @@ if (count($data['tags']) > 0) {
 							->setAttribute('data-value', $element['name']),
 						' ',
 						new CSup(($subfilter_used ? '+' : '').$element['count'])
-					]))
-						->addClass(ZBX_STYLE_NOWRAP)
-						->addClass(ZBX_STYLE_SUBFILTER);
+					]))->addClass(ZBX_STYLE_SUBFILTER);
 				}
 			}
 		}
@@ -186,6 +180,7 @@ else {
 }
 
 (new CTableInfo())
+	->setId('subfilter')
 	->addRow([[
 		new CTag('h4', true, [
 			_('Subfilter'), ' ', (new CSpan(_('affects only filtered data')))->addClass(ZBX_STYLE_GREY)
@@ -194,21 +189,19 @@ else {
 	->addRow(
 		$subfilter_options['tagnames']
 			? [[
-			new CTag('h3', true, _('Tags')),
-			$subfilter_options['tagnames'],
-			new CVar('subfilter_tagnames', $selected_tagnames)
-		]]
+				new CTag('h3', true, _('Tags')),
+				$subfilter_options['tagnames'],
+				new CVar('subfilter_tagnames', $selected_tagnames)
+			]]
 			: null
 	)
 	->addRow(
 		$subfilter_options['tags']
 			? [[
-			new CTag('h3', true, _('Tag values')),
-			$subfilter_options['tags'],
-			new CVar('subfilter_tags', $selected_tags)
-		]]
+				new CTag('h3', true, _('Tag values')),
+				$subfilter_options['tags'],
+				new CVar('subfilter_tags', $selected_tags)
+			]]
 			: null
 	)
-	->addClass('tabfilter-subfilter') // TODO VM
-	->setId('latest-data-subfilter') // TODO VM
 	->show();
