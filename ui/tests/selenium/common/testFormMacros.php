@@ -20,7 +20,6 @@
 
 require_once 'vendor/autoload.php';
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../traits/MacrosTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
@@ -42,6 +41,9 @@ abstract class testFormMacros extends CLegacyWebTest {
 	public $vault_macro_index;
 	public $update_vault_macro;
 
+	public $revert_macro_1;
+	public $revert_macro_2;
+	public $revert_macro_object;
 	/**
 	 * Attach Behaviors to the test.
 	 *
@@ -1472,6 +1474,28 @@ abstract class testFormMacros extends CLegacyWebTest {
 			COverlayDialogElement::find()->one()->close();
 			COverlayDialogElement::ensureNotPresent();
 		}
+	}
+
+	public function getRevertSecretMacrosData() {
+		return [
+			[
+				[
+					'macro_fields' => [
+						'macro' => $this->revert_macro_1,
+						'value' => 'Secret '.$this->revert_macro_object.' value'
+					]
+				]
+			],
+			[
+				[
+					'macro_fields' => [
+						'macro' => $this->revert_macro_2,
+						'value' => 'Secret '.$this->revert_macro_object.' value 2'
+					],
+					'set_to_text' => true
+				]
+			]
+		];
 	}
 
 	/**

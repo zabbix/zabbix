@@ -53,9 +53,12 @@ class testFormMacrosHost extends testFormMacros {
 
 	public $vault_object = 'host';
 	public $vault_error_field = '/1/macros/6/value';
-
 	public $update_vault_macro = '{$VAULT_HOST_MACRO3_CHANGED}';
 	public $vault_macro_index = 2;
+
+	public $revert_macro_1 = '{$SECRET_HOST_MACRO_REVERT}';
+	public $revert_macro_2 = '{$SECRET_HOST_MACRO_2_TEXT_REVERT}';
+	public $revert_macro_object = 'host';
 
 	/**
 	 * @dataProvider getCreateMacrosData
@@ -239,28 +242,6 @@ class testFormMacrosHost extends testFormMacros {
 	 */
 	public function testFormMacrosHost_CreateSecretMacros($data) {
 		$this->createSecretMacros($data, 'zabbix.php?action=host.view', 'hosts', 'Available host');
-	}
-
-	public function getRevertSecretMacrosData() {
-		return [
-			[
-				[
-					'macro_fields' => [
-						'macro' => '{$SECRET_HOST_MACRO_REVERT}',
-						'value' => 'Secret host value'
-					]
-				]
-			],
-			[
-				[
-					'macro_fields' => [
-						'macro' => '{$SECRET_HOST_MACRO_2_TEXT_REVERT}',
-						'value' => 'Secret host value 2'
-					],
-					'set_to_text' => true
-				]
-			]
-		];
 	}
 
 	/**

@@ -50,9 +50,12 @@ class testFormMacrosTemplate extends testFormMacros {
 
 	public $vault_object = 'template';
 	public $vault_error_field = '/1/macros/6/value';
-
 	public $update_vault_macro = '{$VAULT_HOST_MACRO_CHANGED}';
 	public $vault_macro_index = 0;
+
+	public $revert_macro_1 = '{$SECRET_TEMPLATE_MACRO_REVERT}';
+	public $revert_macro_2 = '{$SECRET_TEMPLATE_MACRO_2_TEXT_REVERT}';
+	public $revert_macro_object = 'template';
 
 	/**
 	 * @dataProvider getCreateMacrosData
@@ -181,28 +184,6 @@ class testFormMacrosTemplate extends testFormMacros {
 	 */
 	public function testFormMacrosTemplate_CreateSecretMacros($data) {
 		$this->createSecretMacros($data, 'templates.php?form=update&templateid=99022', 'templates');
-	}
-
-	public function getRevertSecretMacrosData() {
-		return [
-			[
-				[
-					'macro_fields' => [
-						'macro' => '{$SECRET_TEMPLATE_MACRO_REVERT}',
-						'value' => 'Secret template value'
-					]
-				]
-			],
-			[
-				[
-					'macro_fields' => [
-						'macro' => '{$SECRET_TEMPLATE_MACRO_2_TEXT_REVERT}',
-						'value' => 'Secret template value 2'
-					],
-					'set_to_text' => true
-				]
-			]
-		];
 	}
 
 	/**
