@@ -593,13 +593,13 @@ abstract class CHostBase extends CApiService {
 		}
 		else {
 			foreach ($links[$hostid] as $templateid => $foo) {
-				if (!array_key_exists($hostid, $ins_links)
-						|| !array_key_exists($templateid, $ins_links[$hostid])) {
+				if (!array_key_exists($templateid, $ins_links[$hostid])) {
 					continue;
 				}
 
-				if (bccomp($templateid, $parent_templateid) != 0 && array_key_exists($templateid, $links)
-						&& self::isDoubleLinkageTemplate($links, $templateid, $parent_templateid)) {
+				if (bccomp($templateid, $parent_templateid) == 0
+						|| (array_key_exists($templateid, $links)
+							&& self::isDoubleLinkageTemplate($links, $templateid, $parent_templateid))) {
 					$ins_templateid = $templateid;
 					break;
 				}
