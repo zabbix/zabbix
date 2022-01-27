@@ -19,7 +19,6 @@
 
 #include "KERNEL_COMMON.h"
 #include "zbxmocktest.h"
-#include "zbxmockdata.h"
 
 void	zbx_mock_test_entry(void **state)
 {
