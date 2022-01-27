@@ -156,8 +156,7 @@ class testPageTemplates extends CLegacyWebTest {
 		];
 
 		if (in_array($template['name'], $skip_templates)) {
-var_dump($template['name']);
-			return true;
+			return;
 		}
 
 		$host = $template['host'];
