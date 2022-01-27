@@ -20,11 +20,9 @@
 #ifndef ZABBIX_DBCONFIG_H
 #define ZABBIX_DBCONFIG_H
 
-#ifndef ZBX_DBCONFIG_IMPL
-#	error This header must be used by configuration cache implementation
-#endif
-
 #include "mutexs.h"
+#include "zbxalgo.h"
+#include "dbcache.h"
 
 typedef struct
 {

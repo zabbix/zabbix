@@ -17,6 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "dbconfig.h"
+
 #include <stddef.h>
 
 #include "common.h"
@@ -35,8 +37,6 @@
 #include "zbxeval.h"
 
 #define ZBX_DBCONFIG_IMPL
-
-#include "dbconfig.h"
 
 #include "dbsync.h"
 #include "proxy.h"
