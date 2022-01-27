@@ -1586,7 +1586,7 @@ class CHostPrototype extends CHostBase {
 			}
 
 			$host_prototype['uuid'] = '';
-			$host_prototype = self::unsetNestedObjectsIds($host_prototype);
+			$host_prototype = self::unsetNestedObjectIds($host_prototype);
 
 			foreach ($upd_db_host_prototypes as $upd_db_host_prototype) {
 				if (bccomp($host_prototype['hostid'], $upd_db_host_prototype['templateid']) != 0) {
@@ -1666,7 +1666,7 @@ class CHostPrototype extends CHostBase {
 	 *
 	 * @return array
 	 */
-	private static function unsetNestedObjectsIds(array $host_prototype): array {
+	private static function unsetNestedObjectIds(array $host_prototype): array {
 		if (array_key_exists('interfaces', $host_prototype)) {
 			foreach ($host_prototype['interfaces'] as &$interface) {
 				unset($interface['interfaceid']);
@@ -1777,7 +1777,7 @@ class CHostPrototype extends CHostBase {
 			}
 
 			$host_prototype['uuid'] = '';
-			$host_prototype = self::unsetNestedObjectsIds($host_prototype);
+			$host_prototype = self::unsetNestedObjectIds($host_prototype);
 
 			foreach ($upd_db_host_prototypes as $upd_db_host_prototype) {
 				if (bccomp($host_prototype['ruleid'], $upd_db_host_prototype['parent_ruleid']) != 0
@@ -1897,7 +1897,7 @@ class CHostPrototype extends CHostBase {
 			}
 
 			$host_prototype['uuid'] = '';
-			$host_prototype = self::unsetNestedObjectsIds($host_prototype);
+			$host_prototype = self::unsetNestedObjectIds($host_prototype);
 
 			if (array_key_exists('macros', $host_prototype)) {
 				foreach ($host_prototype['macros'] as &$macro) {
