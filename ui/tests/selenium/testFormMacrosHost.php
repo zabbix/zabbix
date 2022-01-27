@@ -51,11 +51,11 @@ class testFormMacrosHost extends testFormMacros {
 	public $macro_resolve = '{$X_SECRET_HOST_MACRO_2_RESOLVE}';
 	public $macro_resolve_hostid = 99135;
 
-	public $valut_object = 'host';
-	public $valut_error_field = '/1/macros/6/value';
+	public $vault_object = 'host';
+	public $vault_error_field = '/1/macros/6/value';
 
-	public $update_valut_macro = '{$VAULT_HOST_MACRO3_CHANGED}';
-	public $valut_macro_index = 2;
+	public $update_vault_macro = '{$VAULT_HOST_MACRO3_CHANGED}';
+	public $vault_macro_index = 2;
 
 	/**
 	 * @dataProvider getCreateMacrosData

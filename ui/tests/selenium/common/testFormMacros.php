@@ -37,10 +37,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 	public $macro_resolve;
 	public $macro_resolve_hostid;
 
-	public $valut_object;
-	public $valut_error_field;
-	public $valut_macro_index;
-	public $update_valut_macro;
+	public $vault_object;
+	public $vault_error_field;
+	public $vault_macro_index;
+	public $update_vault_macro;
 
 	/**
 	 * Attach Behaviors to the test.
@@ -1646,7 +1646,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 						],
 						'description' => 'vault description'
 					],
-					'title' => ucfirst($this->valut_object).' updated'
+					'title' => ucfirst($this->vault_object).' updated'
 				]
 			],
 			[
@@ -1660,7 +1660,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 						],
 						'description' => 'vault description7'
 					],
-					'title' => ucfirst($this->valut_object).' updated'
+					'title' => ucfirst($this->vault_object).' updated'
 				]
 			],
 			[
@@ -1674,8 +1674,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 						],
 						'description' => 'vault description2'
 					],
-					'title' => 'Cannot update '.$this->valut_object,
-					'message' => 'Invalid parameter "'.$this->valut_error_field.'": incorrect syntax near "path:".'
+					'title' => 'Cannot update '.$this->vault_object,
+					'message' => 'Invalid parameter "'.$this->vault_error_field.'": incorrect syntax near "path:".'
 				]
 			],
 			[
@@ -1689,8 +1689,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 						],
 						'description' => 'vault description3'
 					],
-					'title' => 'Cannot update '.$this->valut_object,
-					'message' => 'Invalid parameter "'.$this->valut_error_field.'": incorrect syntax near "/path:key".'
+					'title' => 'Cannot update '.$this->vault_object,
+					'message' => 'Invalid parameter "'.$this->vault_error_field.'": incorrect syntax near "/path:key".'
 				]
 			],
 			[
@@ -1704,8 +1704,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 						],
 						'description' => 'vault description4'
 					],
-					'title' => 'Cannot update '.$this->valut_object,
-					'message' => 'Invalid parameter "'.$this->valut_error_field.'": incorrect syntax near "path:key".'
+					'title' => 'Cannot update '.$this->vault_object,
+					'message' => 'Invalid parameter "'.$this->vault_error_field.'": incorrect syntax near "path:key".'
 				]
 			],
 			[
@@ -1719,8 +1719,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 						],
 						'description' => 'vault description5'
 					],
-					'title' => 'Cannot update '.$this->valut_object,
-					'message' => 'Invalid parameter "'.$this->valut_error_field.'": incorrect syntax near ":key".'
+					'title' => 'Cannot update '.$this->vault_object,
+					'message' => 'Invalid parameter "'.$this->vault_error_field.'": incorrect syntax near ":key".'
 				]
 			],
 			[
@@ -1734,8 +1734,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 						],
 						'description' => 'vault description6'
 					],
-					'title' => 'Cannot update '.$this->valut_object,
-					'message' => 'Invalid parameter "'.$this->valut_error_field.'": incorrect syntax near "path".'
+					'title' => 'Cannot update '.$this->vault_object,
+					'message' => 'Invalid parameter "'.$this->vault_error_field.'": incorrect syntax near "path".'
 				]
 			],
 			[
@@ -1749,8 +1749,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 						],
 						'description' => 'vault description8'
 					],
-					'title' => 'Cannot update '.$this->valut_object,
-					'message' => 'Invalid parameter "'.$this->valut_error_field.'": incorrect syntax near "/secret/path:key".'
+					'title' => 'Cannot update '.$this->vault_object,
+					'message' => 'Invalid parameter "'.$this->vault_error_field.'": incorrect syntax near "/secret/path:key".'
 				]
 			],
 			[
@@ -1764,8 +1764,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 						],
 						'description' => 'vault description9'
 					],
-					'title' => 'Cannot update '.$this->valut_object,
-					'message' => 'Invalid parameter "'.$this->valut_error_field.'": cannot be empty.'
+					'title' => 'Cannot update '.$this->vault_object,
+					'message' => 'Invalid parameter "'.$this->vault_error_field.'": cannot be empty.'
 				]
 			]
 		];
@@ -1804,8 +1804,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 			[
 				[
 					'action' => USER_ACTION_UPDATE,
-					'index' => $this->valut_macro_index,
-					'macro' => $this->update_valut_macro,
+					'index' => $this->vault_macro_index,
+					'macro' => $this->update_vault_macro,
 					'value' => [
 						'text' => 'secret/path:key'
 					],
@@ -1815,8 +1815,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 			[
 				[
 					'action' => USER_ACTION_UPDATE,
-					'index' => $this->valut_macro_index,
-					'macro' => $this->update_valut_macro,
+					'index' => $this->vault_macro_index,
+					'macro' => $this->update_vault_macro,
 					'value' => [
 						'text' => 'new/path/to/secret:key'
 					],
@@ -1826,8 +1826,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 			[
 				[
 					'action' => USER_ACTION_UPDATE,
-					'index' => $this->valut_macro_index,
-					'macro' => $this->update_valut_macro,
+					'index' => $this->vault_macro_index,
+					'macro' => $this->update_vault_macro,
 					'value' => [
 						'text' => 'new/path/to/secret:key'
 					],

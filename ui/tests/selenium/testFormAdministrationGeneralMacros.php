@@ -68,11 +68,11 @@ class testFormAdministrationGeneralMacros extends testFormMacros {
 	public $macro_resolve = '{$Z_GLOBAL_MACRO_2_RESOLVE}';
 	public $macro_resolve_hostid = 99134;
 
-	public $valut_object = 'macros';
-	public $valut_error_field = '/1/value';
+	public $vault_object = 'macros';
+	public $vault_error_field = '/1/value';
 
-	public $update_valut_macro = '{$1_VAULT_MACRO_CHANGED}';
-	public $valut_macro_index = 1;
+	public $update_vault_macro = '{$1_VAULT_MACRO_CHANGED}';
+	public $vault_macro_index = 1;
 
 	private function openGlobalMacros() {
 		$this->zbxTestLogin('zabbix.php?action=macros.edit');

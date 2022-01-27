@@ -48,11 +48,11 @@ class testFormMacrosTemplate extends testFormMacros {
 	 */
 	protected static $templateid_remove_inherited;
 
-	public $valut_object = 'template';
-	public $valut_error_field = '/1/macros/6/value';
+	public $vault_object = 'template';
+	public $vault_error_field = '/1/macros/6/value';
 
-	public $update_valut_macro = '{$VAULT_HOST_MACRO_CHANGED}';
-	public $valut_macro_index = 0;
+	public $update_vault_macro = '{$VAULT_HOST_MACRO_CHANGED}';
+	public $vault_macro_index = 0;
 
 	/**
 	 * @dataProvider getCreateMacrosData
