@@ -1876,7 +1876,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		}
 	}
 
-	zbx_rtc_shutdown_subs(&rtc);
+	if (!ZBX_IS_RUNNING() && SUCCEED == ZBX_EXIT_STATUS())
+		zbx_rtc_shutdown_subs(&rtc);
 
 	if (SUCCEED != zbx_ha_pause(&error))
 	{
