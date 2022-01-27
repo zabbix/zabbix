@@ -54,14 +54,13 @@ class testTriggerDependencies extends CLegacyWebTest {
 
 	public function testTriggerDependenciesFromHost_SimpleTestProvider() {
 		return [
-//			TODO: fix this adding correct trigger and tempalte
-//			[
-//				'10050',
-//				'Zabbix agent is not available (for {$AGENT.TIMEOUT})',
-//				'FreeBSD by Zabbix agent',
-//				'/etc/passwd has been changed on FreeBSD by Zabbix agent',
-//				'Not all templates are linked to'
-//			],
+			[
+				'10050',
+				'Zabbix agent is not available (for {$AGENT.TIMEOUT})',
+				'FreeBSD by Zabbix agent',
+				'/etc/passwd has been changed on FreeBSD by Zabbix agent',
+				'Not all templates are linked to'
+			],
 			[
 				'10265',
 				'Apache: Service is down',
