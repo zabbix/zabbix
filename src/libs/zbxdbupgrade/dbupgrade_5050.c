@@ -1887,6 +1887,14 @@ static int	DBpatch_5050142(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_5050143(void)
+{
+	const ZBX_FIELD	old_field = {"parameters", "{}", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"parameters", "{}", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("alerts", &field, &old_field);
+}
+
 #endif
 
 DBPATCH_START(5050)
@@ -2023,5 +2031,6 @@ DBPATCH_ADD(5050139, 0, 1)
 DBPATCH_ADD(5050140, 0, 1)
 DBPATCH_ADD(5050141, 0, 1)
 DBPATCH_ADD(5050142, 0, 1)
+DBPATCH_ADD(5050143, 0, 1)
 
 DBPATCH_END()

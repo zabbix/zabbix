@@ -1642,11 +1642,11 @@ static int	eval_execute_function_trim(const zbx_eval_context_t *ctx, const zbx_e
 static int	eval_execute_function_concat(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
 		zbx_vector_var_t *output, char **error)
 {
-	int		ret;
-	zbx_variant_t	*str1, *str2, value;
-	char		*strval;
+	int		i, ret;
+	zbx_variant_t	value;
+	char		*result = NULL;
 
-	if (2 != token->opt)
+	if (2 > token->opt)
 	{
 		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"",
 				ctx->expression + token->loc.l);
@@ -1656,18 +1656,23 @@ static int	eval_execute_function_concat(const zbx_eval_context_t *ctx, const zbx
 	if (UNKNOWN != (ret = eval_validate_function_args(ctx, token, output, error)))
 		return ret;
 
-	str1 = &output->values[output->values_num - 2];
-	str2 = &output->values[output->values_num - 1];
-
-	if (SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_STR, str1, error) ||
-			SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_STR, str2, error))
+	for (i = output->values_num - (int)token->opt; i < output->values_num; i++)
 	{
-		return FAIL;
+		zbx_variant_t	*arg;
+
+		arg = &output->values[i];
+
+		if (SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_STR, arg, error))
+		{
+			zbx_free(result);
+			return FAIL;
+		}
+
+		result = zbx_strdcat(result, zbx_variant_value_desc(arg));
 	}
 
-	strval = zbx_strdup(NULL, str1->data.str);
-	zbx_variant_set_str(&value, zbx_strdcat(strval, str2->data.str));
-	eval_function_return(2, &value, output);
+	zbx_variant_set_str(&value, result);
+	eval_function_return(token->opt, &value, output);
 
 	return SUCCEED;
 }

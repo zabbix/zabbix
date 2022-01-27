@@ -607,7 +607,7 @@ class CHistoryManager {
 	}
 
 	/**
-	 * Returns history value aggregation for graphs.
+	 * Returns history value aggregation.
 	 *
 	 * The $item parameter must have the value_type, itemid and source properties set.
 	 *
@@ -617,20 +617,20 @@ class CHistoryManager {
 	 * @param string $function   Function for data aggregation.
 	 * @param string $interval   Aggregation interval in seconds.
 	 *
-	 * @return array  History value aggregation for graphs.
+	 * @return array  History value aggregation.
 	 */
-	public function getGraphAggregationByInterval(array $items, $time_from, $time_to, $function, $interval) {
+	public function getAggregationByInterval(array $items, $time_from, $time_to, $function, $interval) {
 		$grouped_items = $this->getItemsGroupedByStorage($items);
 
 		$results = [];
 		if (array_key_exists(ZBX_HISTORY_SOURCE_ELASTIC, $grouped_items)) {
-			$results = $this->getGraphAggregationByIntervalFromElasticsearch($grouped_items[ZBX_HISTORY_SOURCE_ELASTIC],
+			$results = $this->getAggregationByIntervalFromElasticsearch($grouped_items[ZBX_HISTORY_SOURCE_ELASTIC],
 				$time_from, $time_to, $function, $interval
 			);
 		}
 
 		if (array_key_exists(ZBX_HISTORY_SOURCE_SQL, $grouped_items)) {
-			$results += $this->getGraphAggregationByIntervalFromSql($grouped_items[ZBX_HISTORY_SOURCE_SQL],
+			$results += $this->getAggregationByIntervalFromSql($grouped_items[ZBX_HISTORY_SOURCE_SQL],
 				$time_from, $time_to, $function, $interval
 			);
 		}
@@ -639,11 +639,11 @@ class CHistoryManager {
 	}
 
 	/**
-	 * Elasticsearch specific implementation of getGraphAggregationByInterval.
+	 * Elasticsearch specific implementation of getAggregationByInterval.
 	 *
-	 * @see CHistoryManager::getGraphAggregationByInterval
+	 * @see CHistoryManager::getAggregationByInterval
 	 */
-	private function getGraphAggregationByIntervalFromElasticsearch(array $items, $time_from, $time_to, $function,
+	private function getAggregationByIntervalFromElasticsearch(array $items, $time_from, $time_to, $function,
 			$interval) {
 		$terms = [];
 
@@ -654,23 +654,23 @@ class CHistoryManager {
 		$aggs = ['clock' => ['max' => ['field' => 'clock']]];
 
 		switch ($function) {
-			case GRAPH_AGGREGATE_MIN:
+			case AGGREGATE_MIN:
 				$aggs['value'] = ['min' => ['field' => 'value']];
 				break;
-			case GRAPH_AGGREGATE_MAX:
+			case AGGREGATE_MAX:
 				$aggs['value'] = ['max' => ['field' => 'value']];
 				break;
-			case GRAPH_AGGREGATE_AVG:
+			case AGGREGATE_AVG:
 				$aggs['value'] = ['avg' => ['field' => 'value']];
 				break;
-			case GRAPH_AGGREGATE_SUM:
+			case AGGREGATE_SUM:
 				$aggs['value'] = ['sum' => ['field' => 'value']];
 				break;
-			case GRAPH_AGGREGATE_FIRST:
+			case AGGREGATE_FIRST:
 				$aggs['value'] = ['top_hits' => ['size' => 1, 'sort' => ['clock' => ['order' => 'asc']]]];
 				$aggs['clock'] = ['min' => ['field' => 'clock']];
 				break;
-			case GRAPH_AGGREGATE_LAST:
+			case AGGREGATE_LAST:
 				$aggs['value'] = ['top_hits' => ['size' => 1, 'sort' => ['clock' => ['order' => 'desc']]]];
 				break;
 		}
@@ -740,7 +740,7 @@ class CHistoryManager {
 						'clock' => (int)$point['clock']['value_as_string']
 					];
 
-					if ($function == GRAPH_AGGREGATE_FIRST || $function == GRAPH_AGGREGATE_LAST) {
+					if ($function == AGGREGATE_FIRST || $function == AGGREGATE_LAST) {
 						$row['value'] = $point['value']['hits']['hits'][0]['_source']['value'];
 					}
 					else {
@@ -760,11 +760,11 @@ class CHistoryManager {
 	}
 
 	/**
-	 * SQL specific implementation of getGraphAggregationByWidth.
+	 * SQL specific implementation of getAggregationByInterval.
 	 *
-	 * @see CHistoryManager::getGraphAggregationByInterval
+	 * @see CHistoryManager::getAggregationByInterval
 	 */
-	private function getGraphAggregationByIntervalFromSql(array $items, $time_from, $time_to, $function, $interval) {
+	private function getAggregationByIntervalFromSql(array $items, $time_from, $time_to, $function, $interval) {
 		$items_by_table = [];
 		foreach ($items as $item) {
 			$items_by_table[$item['value_type']][$item['source']][] = $item['itemid'];
@@ -783,25 +783,25 @@ class CHistoryManager {
 
 				if ($source === 'history') {
 					switch ($function) {
-						case GRAPH_AGGREGATE_MIN:
+						case AGGREGATE_MIN:
 							$sql_select[] = 'MIN(value) AS value, MAX(clock) AS clock';
 							break;
-						case GRAPH_AGGREGATE_MAX:
+						case AGGREGATE_MAX:
 							$sql_select[] = 'MAX(value) AS value, MAX(clock) AS clock';
 							break;
-						case GRAPH_AGGREGATE_AVG:
+						case AGGREGATE_AVG:
 							$sql_select[] = 'AVG(value) AS value, MAX(clock) AS clock';
 							break;
-						case GRAPH_AGGREGATE_COUNT:
+						case AGGREGATE_COUNT:
 							$sql_select[] = 'COUNT(*) AS count, MAX(clock) AS clock';
 							break;
-						case GRAPH_AGGREGATE_SUM:
+						case AGGREGATE_SUM:
 							$sql_select[] = 'SUM(value) AS value, MAX(clock) AS clock';
 							break;
-						case GRAPH_AGGREGATE_FIRST:
+						case AGGREGATE_FIRST:
 							$sql_select[] = 'MIN(clock) AS clock';
 							break;
-						case GRAPH_AGGREGATE_LAST:
+						case AGGREGATE_LAST:
 							$sql_select[] = 'MAX(clock) AS clock';
 							break;
 					}
@@ -809,26 +809,26 @@ class CHistoryManager {
 				}
 				else {
 					switch ($function) {
-						case GRAPH_AGGREGATE_MIN:
+						case AGGREGATE_MIN:
 							$sql_select[] = 'MIN(value_min) AS value, MAX(clock) AS clock';
 							break;
-						case GRAPH_AGGREGATE_MAX:
+						case AGGREGATE_MAX:
 							$sql_select[] = 'MAX(value_max) AS value, MAX(clock) AS clock';
 							break;
-						case GRAPH_AGGREGATE_AVG:
+						case AGGREGATE_AVG:
 							$sql_select[] = 'AVG(value_avg) AS value, MAX(clock) AS clock';
 							break;
-						case GRAPH_AGGREGATE_COUNT:
+						case AGGREGATE_COUNT:
 							$sql_select[] = 'SUM(num) AS count, MAX(clock) AS clock';
 							break;
-						case GRAPH_AGGREGATE_SUM:
+						case AGGREGATE_SUM:
 							$sql_select[] = '(value_avg * num) AS value, MAX(clock) AS clock';
 							$sql_group_by = array_merge($sql_group_by, ['value_avg', 'num']);
 							break;
-						case GRAPH_AGGREGATE_FIRST:
+						case AGGREGATE_FIRST:
 							$sql_select[] = 'MIN(clock) AS clock';
 							break;
-						case GRAPH_AGGREGATE_LAST:
+						case AGGREGATE_LAST:
 							$sql_select[] = 'MAX(clock) AS clock';
 							break;
 					}
@@ -842,7 +842,7 @@ class CHistoryManager {
 					' AND clock <= '.zbx_dbstr($time_to).
 					' GROUP BY '.implode(', ', $sql_group_by);
 
-				if ($function == GRAPH_AGGREGATE_FIRST || $function == GRAPH_AGGREGATE_LAST) {
+				if ($function == AGGREGATE_FIRST || $function == AGGREGATE_LAST) {
 					$sql = 'SELECT DISTINCT h.itemid, h.'.($source === 'history' ? 'value' : 'value_avg').' AS value, h.clock, hi.tick'.
 						' FROM '.$sql_from.' h'.
 						' JOIN('.$sql.') hi ON h.itemid = hi.itemid AND h.clock = hi.clock';

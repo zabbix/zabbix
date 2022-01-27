@@ -48,7 +48,8 @@ $triggersForm = (new CForm('post', $url))
 	->addVar('toggle_expression_constructor', '')
 	->addVar('toggle_recovery_expression_constructor', '')
 	->addVar('remove_expression', '')
-	->addVar('remove_recovery_expression', '');
+	->addVar('remove_recovery_expression', '')
+	->addVar('backurl', $data['backurl']);
 
 $discovered_trigger = false;
 
@@ -620,7 +621,7 @@ foreach ($data['db_dependencies'] as $dependency) {
 				$readonly
 					? null
 					: (new CButton('remove', _('Remove')))
-						->onClick('javascript: removeDependency("'.$dependency['triggerid'].'");')
+						->onClick('view.removeDependency('.json_encode($dependency['triggerid']).')')
 						->addClass(ZBX_STYLE_BTN_LINK)
 						->removeId()
 			))->addClass(ZBX_STYLE_NOWRAP)
@@ -652,21 +653,28 @@ $dependenciesFormList->addRow(_('Dependencies'),
 );
 $triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList, TAB_INDICATOR_DEPENDENCY);
 
+$cancelButton = $data['backurl']
+	? new CButtonCancel(null, "redirect('".$data['backurl']."');")
+	: new CButtonCancel(url_param('context'));
+
 // Append buttons to form list.
 if (!empty($data['triggerid'])) {
 	$triggersTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')), [
 			new CSubmit('clone', _('Clone')),
-			(new CButtonDelete(_('Delete trigger?'), url_params(['form', 'hostid', 'triggerid', 'context']), 'context'))
-				->setEnabled(!$data['limited']),
-			new CButtonCancel(url_param('context'))
+			(new CButtonDelete(
+				_('Delete trigger?'),
+				url_params(['form', 'hostid', 'triggerid', 'context', 'backurl']),
+				'context'
+			))->setEnabled(!$data['limited']),
+			$cancelButton
 		]
 	));
 }
 else {
 	$triggersTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel(url_param('context'))]
+		[$cancelButton]
 	));
 }
 
@@ -676,3 +684,11 @@ $triggersForm->addItem($triggersTab);
 $widget->addItem($triggersForm);
 
 $widget->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'form_name' => $triggersForm->getName()
+	]).');
+'))
+	->setOnDocumentReady()
+	->show();

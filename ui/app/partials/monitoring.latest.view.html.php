@@ -103,7 +103,8 @@ foreach ($data['items'] as $itemid => $item) {
 	$state_css = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? ZBX_STYLE_GREY : null;
 
 	$item_name = (new CDiv([
-		(new CSpan($item['name']))->addClass('label'),
+		(new CLinkAction($item['name']))
+			->setMenuPopup(CMenuPopupHelper::getItem(['itemid' => $itemid])),
 		($item['description_expanded'] !== '') ? makeDescriptionIcon($item['description_expanded']) : null
 	]))->addClass('action-container');
 
@@ -122,7 +123,7 @@ foreach ($data['items'] as $itemid => $item) {
 		$last_value = (new CSpan(formatHistoryValue($last_history['value'], $item, false)))
 			->addClass(ZBX_STYLE_CURSOR_POINTER)
 			->setHint(
-				(new CDiv(mb_substr($last_history['value'], 0, 8000)))->addClass(ZBX_STYLE_HINTBOX_WRAP),
+				(new CDiv(mb_substr($last_history['value'], 0, ZBX_HINTBOX_CONTENT_LIMIT)))->addClass(ZBX_STYLE_HINTBOX_WRAP),
 				'', true, '', 0
 			);
 
@@ -220,16 +221,7 @@ foreach ($data['items'] as $itemid => $item) {
 	}
 
 	if ($data['filter']['show_details']) {
-		$item_config_url = (new CUrl('items.php'))
-			->setArgument('form', 'update')
-			->setArgument('itemid', $itemid)
-			->setArgument('context', 'host');
-
-		$item_key = ($item['type'] == ITEM_TYPE_HTTPTEST)
-			? (new CSpan($item['key_expanded']))->addClass(ZBX_STYLE_GREEN)
-			: (new CLink($item['key_expanded'], $item_config_url))
-				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(ZBX_STYLE_GREEN);
+		$item_key = (new CSpan($item['key_expanded']))->addClass(ZBX_STYLE_GREEN);
 
 		if (in_array($item['type'], [ITEM_TYPE_SNMPTRAP, ITEM_TYPE_TRAPPER, ITEM_TYPE_DEPENDENT])
 				|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_expanded'], 'mqtt.get', 8) === 0)) {

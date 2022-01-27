@@ -17,10 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "rtc.h"
+
 #include "zbxtypes.h"
 #include "proxy.h"
-
-#include "rtc.h"
 
 extern int	CONFIG_PROXYMODE;
 
@@ -34,8 +34,9 @@ int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data, char 
 	return SUCCEED;
 }
 
-int	rtc_process_request_ex(int code, const unsigned char *data, char **result)
+int	rtc_process_request_ex(zbx_rtc_t *rtc, int code, const unsigned char *data, char **result)
 {
+	ZBX_UNUSED(rtc);
 	ZBX_UNUSED(data);
 
 	switch (code)

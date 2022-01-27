@@ -26,6 +26,7 @@
 #include "discovery.h"
 #include "zbxserver.h"
 #include "zbxself.h"
+#include "zbxrtc.h"
 
 #include "daemon.h"
 #include "discoverer.h"
@@ -38,10 +39,6 @@ extern int				CONFIG_DISCOVERER_FORKS;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
-
-#ifdef HAVE_NETSNMP
-static volatile sig_atomic_t	snmp_cache_reload_requested;
-#endif
 
 #define ZBX_DISCOVERER_IPRANGE_LIMIT	(1 << 16)
 
@@ -842,16 +839,6 @@ static int	get_minnextcheck(void)
 	return res;
 }
 
-static void	zbx_discoverer_sigusr_handler(int flags)
-{
-#ifdef HAVE_NETSNMP
-	if (ZBX_RTC_SNMP_CACHE_RELOAD == ZBX_RTC_GET_MSG(flags))
-		snmp_cache_reload_requested = 1;
-#else
-	ZBX_UNUSED(flags);
-#endif
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: periodically try to find new hosts and services                   *
@@ -859,9 +846,10 @@ static void	zbx_discoverer_sigusr_handler(int flags)
  ******************************************************************************/
 ZBX_THREAD_ENTRY(discoverer_thread, args)
 {
-	int	nextcheck, sleeptime = -1, rule_count = 0, old_rule_count = 0;
-	double	sec, total_sec = 0.0, old_total_sec = 0.0;
-	time_t	last_stat_time;
+	int			nextcheck = 0, sleeptime = -1, rule_count = 0, old_rule_count = 0;
+	double			sec, total_sec = 0.0, old_total_sec = 0.0;
+	time_t			last_stat_time;
+	zbx_ipc_async_socket_t	rtc;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -883,20 +871,15 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	zbx_set_sigusr_handler(zbx_discoverer_sigusr_handler);
+	zbx_rtc_subscribe(&rtc, process_type, process_num);
 
 	while (ZBX_IS_RUNNING())
 	{
+		zbx_uint32_t	rtc_cmd;
+		unsigned char	*rtc_data;
+
 		sec = zbx_time();
 		zbx_update_env(sec);
-
-#ifdef HAVE_NETSNMP
-		if (1 == snmp_cache_reload_requested)
-		{
-			zbx_clear_cache_snmp(process_type, process_num);
-			snmp_cache_reload_requested = 0;
-		}
-#endif
 
 		if (0 != sleeptime)
 		{
@@ -905,10 +888,15 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 					old_total_sec);
 		}
 
-		rule_count += process_discovery();
-		total_sec += zbx_time() - sec;
+		if ((int)sec >= nextcheck)
+		{
+			rule_count += process_discovery();
+			total_sec += zbx_time() - sec;
 
-		nextcheck = get_minnextcheck();
+			if (FAIL == (nextcheck = get_minnextcheck()))
+				nextcheck = time(NULL) + DISCOVERER_DELAY;
+		}
+
 		sleeptime = calculate_sleeptime(nextcheck, DISCOVERER_DELAY);
 
 		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
@@ -932,7 +920,16 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 			last_stat_time = time(NULL);
 		}
 
-		zbx_sleep_loop(sleeptime);
+		if (SUCCEED == zbx_rtc_wait(&rtc, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
+		{
+#ifdef HAVE_NETSNMP
+			if (ZBX_RTC_SNMP_CACHE_RELOAD == rtc_cmd)
+				zbx_clear_cache_snmp(process_type, process_num);
+#endif
+			if (ZBX_RTC_SHUTDOWN == rtc_cmd)
+				break;
+		}
+
 	}
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);

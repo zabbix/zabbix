@@ -40,6 +40,7 @@ if (!hasRequest('form_refresh')) {
 }
 
 $url = (new CUrl('host_prototypes.php'))
+	->setArgument('parent_discoveryid', $data['discovery_rule']['itemid'])
 	->setArgument('context', $data['context'])
 	->getUrl();
 

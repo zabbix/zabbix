@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-16T08:28:18Z'
+  date: '2022-01-18T20:38:41Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -16,7 +16,7 @@ zabbix_export:
         MIBs used:
         HOST-RESOURCES-MIB
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Modules
@@ -63,7 +63,7 @@ zabbix_export:
         MIBs used:
         HOST-RESOURCES-MIB
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Modules
@@ -202,17 +202,341 @@ zabbix_export:
       description: |
         HOST-RESOURCES-MIB: CPU, memory and storage(vfs.fs.file) linked together.
         
-        Template tooling version used: 0.40
-      templates:
-        -
-          name: 'HOST-RESOURCES-MIB CPU SNMP'
-        -
-          name: 'HOST-RESOURCES-MIB memory SNMP'
-        -
-          name: 'HOST-RESOURCES-MIB storage SNMP'
+        MIBs used:
+        HOST-RESOURCES-MIB
+        
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Modules
+      items:
+        -
+          uuid: a7e177fc60344bb59206102c14db6e65
+          name: 'CPU utilization'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#CPU.UTIL},1.3.6.1.2.1.25.3.3.1.2]'
+          key: system.cpu.util
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: |
+            MIB: HOST-RESOURCES-MIB
+            The average, over the last minute, of the percentage of time that processors was not idle.
+            Implementations may approximate this one minute smoothing period if necessary.
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$..[''{#CPU.UTIL}''].avg()'
+          tags:
+            -
+              tag: Application
+              value: CPU
+          triggers:
+            -
+              uuid: d1b02854c6cd473090735eabfbd4d908
+              expression: 'min(/HOST-RESOURCES-MIB SNMP/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
+              name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'CPU utilization is too high. The system might be slow to respond.'
+      discovery_rules:
+        -
+          uuid: 083012fc49c248cc8869484266c5bc35
+          name: 'Storage discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#FSNAME},1.3.6.1.2.1.25.2.3.1.3,{#FSTYPE},1.3.6.1.2.1.25.2.3.1.2,{#ALLOC_UNITS},1.3.6.1.2.1.25.2.3.1.4]'
+          key: 'vfs.fs.discovery[snmp]'
+          delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#FSTYPE}'
+                value: '{$VFS.FS.FSTYPE.MATCHES}'
+                formulaid: C
+              -
+                macro: '{#FSTYPE}'
+                value: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              -
+                macro: '{#FSNAME}'
+                value: '{$VFS.FS.FSNAME.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#FSNAME}'
+                value: '{$VFS.FS.FSNAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'HOST-RESOURCES-MIB::hrStorage discovery with storage filter.'
+          item_prototypes:
+            -
+              uuid: a9b4d7a5ea274c17b75cbc18a42734f5
+              name: '{#FSNAME}: Space utilization'
+              type: CALCULATED
+              key: 'vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              params: '(last(//vfs.fs.used[hrStorageUsed.{#SNMPINDEX}])/last(//vfs.fs.total[hrStorageSize.{#SNMPINDEX}]))*100'
+              description: 'Space utilization in % for {#FSNAME}'
+              tags:
+                -
+                  tag: Application
+                  value: 'Filesystem {#FSNAME}'
+            -
+              uuid: fe61fddd59e34574b4cde449a4a1bd0e
+              name: '{#FSNAME}: Total space'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.25.2.3.1.5.{#SNMPINDEX}'
+              key: 'vfs.fs.total[hrStorageSize.{#SNMPINDEX}]'
+              history: 7d
+              units: B
+              description: |
+                MIB: HOST-RESOURCES-MIB
+                The size of the storage represented by this entry, in units of hrStorageAllocationUnits.
+                This object is writable to allow remote configuration of the size of the storage area in those cases where such an operation makes sense and is possible on the underlying system.
+                For example, the amount of main storage allocated to a buffer pool might be modified or the amount of disk space allocated to virtual storage might be modified.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '{#ALLOC_UNITS}'
+              tags:
+                -
+                  tag: Application
+                  value: 'Filesystem {#FSNAME}'
+            -
+              uuid: 7e5e0fae3cd24a8fb0a526d726599915
+              name: '{#FSNAME}: Used space'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.25.2.3.1.6.{#SNMPINDEX}'
+              key: 'vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]'
+              history: 7d
+              units: B
+              description: |
+                MIB: HOST-RESOURCES-MIB
+                The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '{#ALLOC_UNITS}'
+              tags:
+                -
+                  tag: Application
+                  value: 'Filesystem {#FSNAME}'
+          trigger_prototypes:
+            -
+              uuid: 8283f8b8663f444aad85633010615c15
+              expression: |
+                last(/HOST-RESOURCES-MIB SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
+                ((last(/HOST-RESOURCES-MIB SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/HOST-RESOURCES-MIB SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<5G or timeleft(/HOST-RESOURCES-MIB SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
+              name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
+              opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
+              priority: AVERAGE
+              description: |
+                Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.
+                 Second condition should be one of the following:
+                 - The disk free space is less than 5G.
+                 - The disk will be full in less than 24 hours.
+              manual_close: 'YES'
+            -
+              uuid: 2d9c475d718b4c2ba14b129f66014f75
+              expression: |
+                last(/HOST-RESOURCES-MIB SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
+                ((last(/HOST-RESOURCES-MIB SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/HOST-RESOURCES-MIB SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<10G or timeleft(/HOST-RESOURCES-MIB SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
+              name: '{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
+              opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
+              priority: WARNING
+              description: |
+                Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}.
+                 Second condition should be one of the following:
+                 - The disk free space is less than 10G.
+                 - The disk will be full in less than 24 hours.
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
+                  expression: |
+                    last(/HOST-RESOURCES-MIB SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
+                    ((last(/HOST-RESOURCES-MIB SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/HOST-RESOURCES-MIB SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<5G or timeleft(/HOST-RESOURCES-MIB SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
+          graph_prototypes:
+            -
+              uuid: 347d802fcd114cad882a2299eb2b02de
+              name: '{#FSNAME}: Disk space usage'
+              width: '600'
+              height: '340'
+              type: PIE
+              show_3d: 'YES'
+              graph_items:
+                -
+                  color: '969696'
+                  calc_fnc: LAST
+                  type: GRAPH_SUM
+                  item:
+                    host: 'HOST-RESOURCES-MIB SNMP'
+                    key: 'vfs.fs.total[hrStorageSize.{#SNMPINDEX}]'
+                -
+                  sortorder: '1'
+                  color: C80000
+                  calc_fnc: LAST
+                  item:
+                    host: 'HOST-RESOURCES-MIB SNMP'
+                    key: 'vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]'
+        -
+          uuid: 16739aff044f4479a33e9157759e2980
+          name: 'Memory discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#MEMNAME},1.3.6.1.2.1.25.2.3.1.3,{#MEMTYPE},1.3.6.1.2.1.25.2.3.1.2,{#ALLOC_UNITS},1.3.6.1.2.1.25.2.3.1.4]'
+          key: vm.memory.discovery
+          delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#MEMTYPE}'
+                value: '{$MEMORY.TYPE.MATCHES}'
+                formulaid: C
+              -
+                macro: '{#MEMTYPE}'
+                value: '{$MEMORY.TYPE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              -
+                macro: '{#MEMNAME}'
+                value: '{$MEMORY.NAME.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#MEMNAME}'
+                value: '{$MEMORY.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'HOST-RESOURCES-MIB::hrStorage discovery with memory filter'
+          item_prototypes:
+            -
+              uuid: 3eadb443e39d41ac9f332cc7dce986be
+              name: '{#MEMNAME}: Total memory'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.25.2.3.1.5.{#SNMPINDEX}'
+              key: 'vm.memory.total[hrStorageSize.{#SNMPINDEX}]'
+              history: 7d
+              units: B
+              description: |
+                MIB: HOST-RESOURCES-MIB
+                The size of the storage represented by this entry, in units of hrStorageAllocationUnits.
+                This object is writable to allow remote configuration of the size of the storage area in those cases where such an operation makes sense and is possible on the underlying system.
+                For example, the amount of main memory allocated to a buffer pool might be modified or the amount of disk space allocated to virtual memory might be modified.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '{#ALLOC_UNITS}'
+              tags:
+                -
+                  tag: Application
+                  value: Memory
+            -
+              uuid: c555b61dfac744c3abb77d014efc8e0d
+              name: '{#MEMNAME}: Used memory'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.25.2.3.1.6.{#SNMPINDEX}'
+              key: 'vm.memory.used[hrStorageUsed.{#SNMPINDEX}]'
+              history: 7d
+              units: B
+              description: |
+                MIB: HOST-RESOURCES-MIB
+                The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '{#ALLOC_UNITS}'
+              tags:
+                -
+                  tag: Application
+                  value: Memory
+            -
+              uuid: 01e2f5515f2145a68d93a4637abfe4e9
+              name: '{#MEMNAME}: Memory utilization'
+              type: CALCULATED
+              key: 'vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              params: 'last(//vm.memory.used[hrStorageUsed.{#SNMPINDEX}])/last(//vm.memory.total[hrStorageSize.{#SNMPINDEX}])*100'
+              description: 'Memory utilization in %'
+              tags:
+                -
+                  tag: Application
+                  value: Memory
+              trigger_prototypes:
+                -
+                  uuid: 730a76bd19a24a55be24f72175251046
+                  expression: 'min(/HOST-RESOURCES-MIB SNMP/vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
+                  name: '{#MEMNAME}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+                  priority: AVERAGE
+                  description: 'The system is running out of free memory.'
+          graph_prototypes:
+            -
+              uuid: ce1f2938b1da4b1c9d78b99e9e1e3435
+              name: '{#MEMNAME}: Memory utilization'
+              ymin_type_1: FIXED
+              ymax_type_1: FIXED
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'HOST-RESOURCES-MIB SNMP'
+                    key: 'vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}]'
+      macros:
+        -
+          macro: '{$CPU.UTIL.CRIT}'
+          value: '90'
+        -
+          macro: '{$MEMORY.NAME.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in memory discovery. Can be overridden on the host or linked template level.'
+        -
+          macro: '{$MEMORY.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in memory discovery. Can be overridden on the host or linked template level if you need to filter out results.'
+        -
+          macro: '{$MEMORY.TYPE.MATCHES}'
+          value: '.*(\.2|hrStorageRam)$'
+          description: 'This macro is used in memory discovery. Can be overridden on the host or linked template level.'
+        -
+          macro: '{$MEMORY.TYPE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in memory discovery. Can be overridden on the host or linked template level if you need to filter out results.'
+        -
+          macro: '{$MEMORY.UTIL.MAX}'
+          value: '90'
+          description: 'The warning threshold of the "Physical memory: Memory utilization" item.'
+        -
+          macro: '{$VFS.FS.FSNAME.MATCHES}'
+          value: .+
+          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'
+        -
+          macro: '{$VFS.FS.FSNAME.NOT_MATCHES}'
+          value: ^(/dev|/sys|/run|/proc|.+/shm$)
+          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'
+        -
+          macro: '{$VFS.FS.FSTYPE.MATCHES}'
+          value: '.*(\.4|\.9|hrStorageFixedDisk|hrStorageFlashMemory)$'
+          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'
+        -
+          macro: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'
+        -
+          macro: '{$VFS.FS.PUSED.MAX.CRIT}'
+          value: '90'
+        -
+          macro: '{$VFS.FS.PUSED.MAX.WARN}'
+          value: '80'
       dashboards:
         -
           uuid: 623ea1bf76fc4e509e2b33b0642fb208
@@ -291,7 +615,7 @@ zabbix_export:
         MIBs used:
         HOST-RESOURCES-MIB
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Modules
@@ -475,4 +799,16 @@ zabbix_export:
           color: 1A7C11
           item:
             host: 'HOST-RESOURCES-MIB CPU SNMP'
+            key: system.cpu.util
+    -
+      uuid: f55018667c2242c5a9bb969bbcaf4770
+      name: 'CPU utilization'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'HOST-RESOURCES-MIB SNMP'
             key: system.cpu.util

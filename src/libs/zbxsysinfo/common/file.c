@@ -1150,29 +1150,19 @@ int	VFS_FILE_OWNER(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			struct group	*grp;
 
-			grp = getgrgid(st.st_gid);
-
-			if (NULL == grp)
-			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain group name."));
-				goto err;
-			}
-
-			SET_STR_RESULT(result, zbx_strdup(NULL, grp->gr_name));
+			if (NULL == (grp = getgrgid(st.st_gid)))
+				SET_STR_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_UI64, (zbx_uint64_t)st.st_gid));
+			else
+				SET_STR_RESULT(result, zbx_strdup(NULL, grp->gr_name));
 		}
 		else
 		{
 			struct passwd	*pwd;
 
-			pwd = getpwuid(st.st_uid);
-
-			if (NULL == pwd)
-			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain user name."));
-				goto err;
-			}
-
-			SET_STR_RESULT(result, zbx_strdup(NULL, pwd->pw_name));
+			if (NULL == (pwd = getpwuid(st.st_uid)))
+				SET_STR_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_UI64, (zbx_uint64_t)st.st_uid));
+			else
+				SET_STR_RESULT(result, zbx_strdup(NULL, pwd->pw_name));
 		}
 	}
 	else
@@ -1288,6 +1278,13 @@ static int	get_dir_names(const char *filename, char **basename, char **dirname, 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 	if (NULL == (*pathname = _fullpath(NULL, filename, 0)))
 		return FAIL;
+#elif defined(__hpux)
+	char resolved_path[PATH_MAX + 1];
+
+	if (NULL == (*pathname = realpath(filename, resolved_path)))
+		return FAIL;
+
+	*pathname = zbx_strdup(NULL, *pathname);
 #else
 	if (NULL == (*pathname = realpath(filename, NULL)))
 		return FAIL;
