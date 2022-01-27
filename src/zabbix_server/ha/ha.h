@@ -38,6 +38,7 @@ int	zbx_ha_pause(char **error);
 int	zbx_ha_stop(char **error);
 void	zbx_ha_kill(void);
 int	zbx_ha_get_status(int *ha_status, char **error);
+int	zbx_ha_update_parent(char **error);
 int	zbx_ha_dispatch_message(zbx_ipc_message_t *message, int *ha_status, char **error);
 
 int	zbx_ha_check_pid(pid_t pid);
