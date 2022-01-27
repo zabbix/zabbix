@@ -17,10 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "KERNEL_COMMON.h"
-#include "zbxmocktest.h"
+#ifndef ZABBIX_COMMON_TRIM_UTF8_H
+#define ZABBIX_COMMON_TRIM_UTF8_H
 
-void	zbx_mock_test_entry(void **state)
-{
-	zbx_mock_test_entry_KERNEL_COMMON(state, ZABBIX_MOCK_KERNEL_MAXFILES);
-}
+#define ZABBIX_MOCK_LTRIM_UTF8	0
+#define ZABBIX_MOCK_RTRIM_UTF8	1
+
+void	zbx_mock_test_entry_common_trim_utf8(void **state, int trim_utf8_func);
+#endif
