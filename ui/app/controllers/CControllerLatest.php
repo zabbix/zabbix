@@ -460,15 +460,12 @@ abstract class CControllerLatest extends CController {
 
 			if ($item_matches) {
 				foreach ($item['tags'] as $tag) {
-					$subfilter_options['tagnames'][$tag['tag']]['count']++;
-
 					if (is_array($item['matching_subfilters']['tagnames'])
 							&& array_key_exists($tag['tag'], $item['matching_subfilters']['tagnames'])) {
 						$matching_items_by_tagnames[$item['itemid']] = true;
 					}
-					else {
-						$subfilter_options['tagnames'][$tag['tag']]['items'][$item['itemid']] = true;
-					}
+
+					$subfilter_options['tagnames'][$tag['tag']]['items'][$item['itemid']] = true;
 				}
 			}
 
@@ -483,16 +480,13 @@ abstract class CControllerLatest extends CController {
 
 			if ($item_matches) {
 				foreach ($item['tags'] as $tag) {
-					$subfilter_options['tags'][$tag['tag']][$tag['value']]['count']++;
-
 					if (is_array($item['matching_subfilters']['tags'])
 							&& array_key_exists($tag['tag'], $item['matching_subfilters']['tags'])
 							&& array_key_exists($tag['value'], $item['matching_subfilters']['tags'][$tag['tag']])) {
 						$matching_items_by_tags[$item['itemid']] = true;
 					}
-					else {
-						$subfilter_options['tags'][$tag['tag']][$tag['value']]['items'][$item['itemid']] = true;
-					}
+
+					$subfilter_options['tags'][$tag['tag']][$tag['value']]['items'][$item['itemid']] = true;
 				}
 			}
 
@@ -513,6 +507,10 @@ abstract class CControllerLatest extends CController {
 			if (!$tag['selected'] && $tag['items']) {
 				$tag['count'] = count(array_diff_key($tag['items'], $matching_items_by_tagnames));
 			}
+			else {
+				$tag['count'] = count($tag['items']);
+			}
+
 			unset($tag['items']);
 		});
 
@@ -521,6 +519,10 @@ abstract class CControllerLatest extends CController {
 				if (!$tag['selected'] && $tag['items']) {
 					$tag['count'] = count(array_diff_key($tag['items'], $matching_items_by_tags));
 				}
+				else {
+					$tag['count'] = count($tag['items']);
+				}
+
 				unset($tag['items']);
 			});
 		});
