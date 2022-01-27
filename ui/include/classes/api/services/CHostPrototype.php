@@ -616,9 +616,6 @@ class CHostPrototype extends CHostBase {
 	 * @param array $db_host_prototypes
 	 */
 	protected function updateReal(array &$host_prototypes, array $db_host_prototypes): void {
-		file_put_contents('test.txt', print_r('New iteration:', true) . "\n", FILE_APPEND);
-		file_put_contents('test.txt', print_r($host_prototypes, true) . "\n", FILE_APPEND);
-		file_put_contents('test.txt', print_r($db_host_prototypes, true) . "\n\n", FILE_APPEND);
 		$upd_host_prototypes = [];
 
 		// save the host prototypes
@@ -1351,28 +1348,20 @@ class CHostPrototype extends CHostBase {
 	 * @param array
 	 */
 	private static function getTemplatedObjects(array $host_prototypes, array $db_host_prototypes = null): array {
-		$rule_indexes = [];
+		$templated_ruleids = DBfetchColumn(DBselect(
+			'SELECT DISTINCT i.itemid'.
+			' FROM items i,hosts_templates ht'.
+			' WHERE i.hostid=ht.templateid'.
+				' AND '.dbConditionId('i.itemid', array_unique(array_column($host_prototypes, 'ruleid')))
+		), 'itemid');
 
 		foreach ($host_prototypes as $i => $host_prototype) {
-			$rule_indexes[$host_prototype['ruleid']][] = $i;
-		}
-
-		$result = DBselect(
-			'SELECT i.itemid'.
-			' FROM items i,hosts h'.
-			' WHERE i.hostid=h.hostid'.
-				' AND '.dbConditionId('i.itemid', array_unique(array_column($host_prototypes, 'ruleid'))).
-				' AND '.dbConditionInt('h.status', [HOST_STATUS_TEMPLATE], true)
-		);
-
-		while ($row = DBfetch($result)) {
-			foreach ($rule_indexes[$row['itemid']] as $i) {
-				if ($db_host_prototypes !== null &&
-						array_key_exists($host_prototypes[$i]['hostid'], $db_host_prototypes)) {
-					unset($db_host_prototypes[$host_prototypes[$i]['hostid']]);
-				}
-
+			if (!in_array($host_prototype['ruleid'], $templated_ruleids)) {
 				unset($host_prototypes[$i]);
+
+				if ($db_host_prototypes !== null && array_key_exists($host_prototype['hostid'], $db_host_prototypes)) {
+					unset($db_host_prototypes[$host_prototype['hostid']]);
+				}
 			}
 		}
 
@@ -1406,7 +1395,7 @@ class CHostPrototype extends CHostBase {
 		$host_prototypes = [];
 
 		foreach ($db_host_prototypes as $db_host_prototype) {
-			$host_prototype = ['hostid' => $db_host_prototype['hostid']];
+			$host_prototype = array_intersect_key($db_host_prototype, array_flip(['hostid', 'custom_interfaces']));
 
 			if ($db_host_prototype['custom_interfaces'] == HOST_PROT_INTERFACES_CUSTOM) {
 				$host_prototype += ['interfaces' => []];
@@ -1455,10 +1444,10 @@ class CHostPrototype extends CHostBase {
 		$upd_db_host_prototypes = [];
 
 		if ($db_host_prototypes) {
-			$_upd_db_host_prototypes = $this->getChildObjectsByTemplateid($host_prototypes, $db_host_prototypes);
+			$_upd_db_host_prototypes = $this->getChildObjectsUsingTemplateid($host_prototypes, $db_host_prototypes);
 
 			if ($_upd_db_host_prototypes) {
-				$_upd_host_prototypes = self::getUpdChildObjectsByTemplateid($host_prototypes, $db_host_prototypes,
+				$_upd_host_prototypes = self::getUpdChildObjectsUsingTemplateid($host_prototypes, $db_host_prototypes,
 					$_upd_db_host_prototypes
 				);
 
@@ -1470,10 +1459,10 @@ class CHostPrototype extends CHostBase {
 		}
 
 		if (count($host_prototypes) != count($db_host_prototypes)) {
-			$_upd_db_host_prototypes = $this->getChildObjectsByName($host_prototypes, $hostids);
+			$_upd_db_host_prototypes = $this->getChildObjectsUsingName($host_prototypes, $hostids);
 
 			if ($_upd_db_host_prototypes) {
-				$_upd_host_prototypes = self::getUpdChildObjectsByName($host_prototypes, $db_host_prototypes,
+				$_upd_host_prototypes = self::getUpdChildObjectsUsingName($host_prototypes, $db_host_prototypes,
 					$_upd_db_host_prototypes
 				);
 
@@ -1507,7 +1496,7 @@ class CHostPrototype extends CHostBase {
 	 *
 	 * @return array
 	 */
-	private function getChildObjectsByTemplateid(array $host_prototypes, array $db_host_prototypes): array {
+	private function getChildObjectsUsingTemplateid(array $host_prototypes, array $db_host_prototypes): array {
 		$upd_db_host_prototypes = DBfetchArrayAssoc(DBselect(
 			'SELECT h.hostid,h.host,h.name,h.custom_interfaces,h.status,h.discover,h.templateid,'.
 				'hd.parent_itemid AS ruleid,'.
@@ -1528,12 +1517,12 @@ class CHostPrototype extends CHostBase {
 				$host_prototype = $host_prototypes[$upd_db_host_prototype['templateid']];
 				$db_host_prototype = $db_host_prototypes[$upd_db_host_prototype['templateid']];
 
-				$upd_host_prototype = ['hostid' => $upd_db_host_prototype['hostid']];
+				$upd_host_prototype = [
+					'hostid' => $upd_db_host_prototype['hostid'],
+					'custom_interfaces' => $host_prototype['custom_interfaces']
+				];
 
-				if (!array_key_exists('interfaces', $db_host_prototype)) {
-					$upd_host_prototype += ['custom_interfaces' => $host_prototype['custom_interfaces']];
-				}
-				else {
+				if (array_key_exists('interfaces', $host_prototype)) {
 					$upd_host_prototype += ['interfaces' => []];
 				}
 
@@ -1561,7 +1550,7 @@ class CHostPrototype extends CHostBase {
 	 *
 	 * @return array
 	 */
-	private static function getUpdChildObjectsByTemplateid(array $host_prototypes, array $db_host_prototypes,
+	private static function getUpdChildObjectsUsingTemplateid(array $host_prototypes, array $db_host_prototypes,
 			array $upd_db_host_prototypes): array {
 		$upd_host_prototypes = [];
 
@@ -1570,7 +1559,8 @@ class CHostPrototype extends CHostBase {
 				continue;
 			}
 
-			$host_prototype = self::unsetObjectsIds($host_prototype);
+			$host_prototype['uuid'] = '';
+			$host_prototype = self::unsetNestedObjectsIds($host_prototype);
 
 			foreach ($upd_db_host_prototypes as $upd_db_host_prototype) {
 				if (bccomp($host_prototype['hostid'], $upd_db_host_prototype['templateid']) != 0) {
@@ -1650,9 +1640,7 @@ class CHostPrototype extends CHostBase {
 	 *
 	 * @return array
 	 */
-	private static function unsetObjectsIds(array $host_prototype): array {
-		$host_prototype['uuid'] = '';
-
+	private static function unsetNestedObjectsIds(array $host_prototype): array {
 		if (array_key_exists('interfaces', $host_prototype)) {
 			foreach ($host_prototype['interfaces'] as &$interface) {
 				unset($interface['interfaceid']);
@@ -1683,11 +1671,11 @@ class CHostPrototype extends CHostBase {
 	 *
 	 * @return array
 	 */
-	private function getChildObjectsByName(array $host_prototypes, ?array $hostids): array {
+	private function getChildObjectsUsingName(array $host_prototypes, ?array $hostids): array {
 		$upd_db_host_prototypes = [];
 		$parent_indexes = [];
 
-		$hostids_condition = ($hostids !== null) ? ' AND '.dbConditionId('h.hostid', $hostids) : '';
+		$hostids_condition = ($hostids !== null) ? ' AND '.dbConditionId('i.hostid', $hostids) : '';
 
 		$result = DBselect(
 			'SELECT i.templateid AS parent_ruleid,i.itemid AS ruleid,hd.hostid,h.uuid,h.host,h.name,'.
@@ -1719,12 +1707,13 @@ class CHostPrototype extends CHostBase {
 
 			foreach ($upd_db_host_prototypes as $upd_db_host_prototype) {
 				$host_prototype = $host_prototypes[$parent_indexes[$upd_db_host_prototype['hostid']]];
-				$upd_host_prototype = ['hostid' => $upd_db_host_prototype['hostid']];
 
-				if (!array_key_exists('interfaces', $host_prototype)) {
-					$upd_host_prototype += ['custom_interfaces' => $host_prototype['custom_interfaces']];
-				}
-				else {
+				$upd_host_prototype = [
+					'hostid' => $upd_db_host_prototype['hostid'],
+					'custom_interfaces' => $host_prototype['custom_interfaces']
+				];
+
+				if (array_key_exists('interfaces', $host_prototype)) {
 					$upd_host_prototype += ['interfaces' => []];
 				}
 
@@ -1740,8 +1729,6 @@ class CHostPrototype extends CHostBase {
 			}
 
 			$this->addAffectedObjects($upd_host_prototypes, $upd_db_host_prototypes);
-
-
 		}
 
 		return $upd_db_host_prototypes;
@@ -1754,7 +1741,7 @@ class CHostPrototype extends CHostBase {
 	 *
 	 * @return array
 	 */
-	private static function getUpdChildObjectsByName(array $host_prototypes, array $db_host_prototypes,
+	private static function getUpdChildObjectsUsingName(array $host_prototypes, array $db_host_prototypes,
 			array $upd_db_host_prototypes): array {
 		$upd_host_prototypes = [];
 
@@ -1763,7 +1750,8 @@ class CHostPrototype extends CHostBase {
 				continue;
 			}
 
-			$host_prototype = self::unsetObjectsIds($host_prototype);
+			$host_prototype['uuid'] = '';
+			$host_prototype = self::unsetNestedObjectsIds($host_prototype);
 
 			foreach ($upd_db_host_prototypes as $upd_db_host_prototype) {
 				if (bccomp($host_prototype['ruleid'], $upd_db_host_prototype['parent_ruleid']) != 0
@@ -1775,10 +1763,13 @@ class CHostPrototype extends CHostBase {
 				$upd_host_prototype += ['templateid' => $host_prototype['hostid']];
 				$upd_host_prototype += $host_prototype;
 
-				$upd_host_prototype += ($upd_db_host_prototype['interfaces']) ? ['interfaces' => []] : []
-					+ ($upd_db_host_prototype['groupPrototypes']) ? ['groupPrototypes' => []] : []
-					+ ($upd_db_host_prototype['templates']) ? ['templates' => []] : []
-					+ ($upd_db_host_prototype['tags']) ? ['tags' => []] : [];
+				if (array_key_exists('interfaces', $upd_db_host_prototype)) {
+					$upd_host_prototype += $upd_db_host_prototype['interfaces'] ? ['interfaces' => []] : [];
+				}
+
+				$upd_host_prototype += $upd_db_host_prototype['groupPrototypes'] ? ['groupPrototypes' => []] : [];
+				$upd_host_prototype += $upd_db_host_prototype['templates'] ? ['templates' => []] : [];
+				$upd_host_prototype += $upd_db_host_prototype['tags'] ? ['tags' => []] : [];
 
 				if (array_key_exists('groupLinks', $upd_host_prototype)) {
 					foreach ($upd_host_prototype['groupLinks'] as &$group_link) {
@@ -1879,7 +1870,8 @@ class CHostPrototype extends CHostBase {
 				continue;
 			}
 
-			$host_prototype = self::unsetObjectsIds($host_prototype);
+			$host_prototype['uuid'] = '';
+			$host_prototype = self::unsetNestedObjectsIds($host_prototype);
 
 			if (array_key_exists('macros', $host_prototype)) {
 				foreach ($host_prototype['macros'] as &$macro) {
