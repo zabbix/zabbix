@@ -805,20 +805,46 @@ class CHostPrototype extends CHostBase {
 				$where[] = '('.dbConditionId('i.itemid', [$ruleid]).' AND '.dbConditionString('h.host', $names).')';
 			}
 
-			$duplicates = DBfetchArray(DBselect(
-				'SELECT i.name AS rule,h.host'.
-				' FROM items i,host_discovery hd,hosts h'.
-				' WHERE i.itemid=hd.parent_itemid'.
-					' AND hd.hostid=h.hostid'.
-					' AND ('.implode(' OR ', $where).')',
-				1
-			));
-
-			if ($duplicates) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Host prototype with host name "%1$s" already exists in discovery rule "%2$s".',
-					$duplicates[0]['host'], $duplicates[0]['rule']
+			if (!$inherited) {
+				$duplicates = DBfetchArray(DBselect(
+					'SELECT i.name AS rule,h.host'.
+					' FROM items i,host_discovery hd,hosts h'.
+					' WHERE i.itemid=hd.parent_itemid'.
+						' AND hd.hostid=h.hostid'.
+						' AND ('.implode(' OR ', $where).')',
+					1
 				));
+
+				if ($duplicates) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Host prototype with host name "%1$s" already exists in discovery rule "%2$s".',
+						$duplicates[0]['host'], $duplicates[0]['rule']
+					));
+				}
+			}
+			else {
+				$duplicates = DBfetchArray(DBselect(
+					'SELECT i.name AS rule,h.host,hh.host AS parent_host,hh.status'.
+					' FROM items i,host_discovery hd,hosts h,hosts hh'.
+					' WHERE i.itemid=hd.parent_itemid'.
+						' AND hd.hostid=h.hostid'.
+						' AND i.hostid=hh.hostid'.
+						' AND ('.implode(' OR ', $where).')',
+					1
+				));
+
+				if ($duplicates) {
+					if ($duplicates[0]['status'] == HOST_STATUS_TEMPLATE) {
+						$error = _('Host prototype with host name "%1$s" already exists in discovery rule "%2$s" of template "%3$s".');
+					}
+					else {
+						$error = _('Host prototype with host name "%1$s" already exists in discovery rule "%2$s" of host "%3$s".');
+					}
+
+					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $duplicates[0]['host'],
+						$duplicates[0]['rule'], $duplicates[0]['parent_host']
+					));
+				}
 			}
 		}
 
