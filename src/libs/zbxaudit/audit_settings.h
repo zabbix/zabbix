@@ -20,7 +20,7 @@
 #ifndef ZABBIX_AUDIT_SETTINGS_H
 #define ZABBIX_AUDIT_SETTINGS_H
 
-#include "zbxalgo.h"
+#include "zbxtypes.h"
 
 void	zbx_audit_settings_create_entry(int audit_action, zbx_uint64_t configid);
 

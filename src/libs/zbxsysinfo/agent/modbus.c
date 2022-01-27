@@ -21,8 +21,9 @@
 
 #ifdef HAVE_LIBMODBUS
 
-#include "modbus.h"
 #include "modbtype.h"
+
+#include "modbus.h"
 #include "mutexs.h"
 
 #ifdef _WINDOWS
