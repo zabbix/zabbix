@@ -31,6 +31,8 @@ $this->addJsFile('layout.mode.js');
 $this->addJsFile('class.calendar.js');
 $this->addJsFile('gtlc.js');
 
+$this->includeJsFile('monitoring.charts.view.js.php');
+
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
 
@@ -105,22 +107,21 @@ else {
 
 $widget->show();
 
-$this->includeJsFile('monitoring.charts.view.js.php', [
-	'charts' => $data['charts'],
-	'timeline' => $data['timeline'],
-	'config' => [
-		'refresh_interval' => CWebUser::getRefresh(),
-		'filter_hostids' => $data['filter_hostids'],
-		'filter_name' => $data['filter_name'],
-		'filter_show' => $data['filter_show'],
-		'subfilter_tagnames' => $data['subfilter_tagnames'],
-		'subfilter_tags' => $data['subfilter_tags'],
-		'page' => $data['page']
-	]
-]);
-
 (new CScriptTag('
 	view.init('.json_encode([
-		'filter_form_name' => 'zbx_filter' // TODO VM: ?
+		'filter_form_name' => 'zbx_filter', // TODO VM: ?
+		'data' => [
+			'charts' => $data['charts'],
+			'timeline' => $data['timeline'],
+			'config' => [
+				'refresh_interval' => CWebUser::getRefresh(),
+				'filter_hostids' => $data['filter_hostids'],
+				'filter_name' => $data['filter_name'],
+				'filter_show' => $data['filter_show'],
+				'subfilter_tagnames' => $data['subfilter_tagnames'],
+				'subfilter_tags' => $data['subfilter_tags'],
+				'page' => $data['page']
+			]
+		]
 	]).');
 '))->show();
