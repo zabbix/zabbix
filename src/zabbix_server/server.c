@@ -1895,6 +1895,10 @@ void	zbx_on_exit(int ret)
 		zbx_free(threads_flags);
 	}
 
+#ifdef HAVE_PTHREAD_PROCESS_SHARED
+		zbx_locks_disable();
+#endif
+
 	if (SUCCEED != zbx_ha_stop(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot stop HA manager: %s", error);
@@ -1903,9 +1907,6 @@ void	zbx_on_exit(int ret)
 
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
 	{
-#ifdef HAVE_PTHREAD_PROCESS_SHARED
-		zbx_locks_disable();
-#endif
 		free_metrics();
 		zbx_ipc_service_free_env();
 

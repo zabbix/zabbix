@@ -178,8 +178,8 @@ static void	ha_update_parent(zbx_ipc_async_socket_t *rtc_socket, zbx_ha_info_t *
 	const char	*error = info->error;
 	int		ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ha_status:%s info:%s", __func__, zbx_ha_status_str(info->ha_status),
-			ZBX_NULL2EMPTY_STR(info->error));
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ha_status:%s failover_delay:%d info:%s", __func__,
+			zbx_ha_status_str(info->ha_status),  info->failover_delay, ZBX_NULL2EMPTY_STR(info->error));
 
 	zbx_serialize_prepare_value(len, info->ha_status);
 	zbx_serialize_prepare_value(len, info->failover_delay);
