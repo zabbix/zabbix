@@ -755,9 +755,13 @@ abstract class CControllerLatest extends CController {
 		// All selected subfilters must always be included.
 		foreach ($tags as $tag => $values) {
 			if ((bool) array_sum(array_column($values, 'selected'))) {
+				$values = array_filter($values, function ($field) {
+					return ($field['selected'] || $field['count'] != 0);
+				});
+
 				$top_priority_fields[] = [
 					'name' => $tag,
-					'values' => $values
+					'values' => self::getTopPrioritySubfilters($values)
 				];
 				unset($tags[$tag]);
 			}
@@ -774,7 +778,7 @@ abstract class CControllerLatest extends CController {
 				}
 
 				$tag_values = array_filter($tags[$tag_name], function ($field) {
-					return ($field['count'] != 0);
+					return ($field['selected'] || $field['count'] != 0);
 				});
 
 				if ($tag_values) {
