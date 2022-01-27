@@ -155,7 +155,7 @@ class testPageTemplates extends CLegacyWebTest {
 			'Windows SNMP'
 		];
 
-		if (in_array($template['name'], $skip_templates)) {
+		if (in_array($template['host'], $skip_templates)) {
 			return;
 		}
 
