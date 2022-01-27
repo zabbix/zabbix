@@ -66,7 +66,7 @@
 			this._resize_observer = new ResizeObserver(this._app.onResize.bind(this._app));
 			this._resize_observer.observe(this._wrapper);
 
-			$.subscribe('timeselector.rangeupdate', function(e, data) {
+			$.subscribe('timeselector.rangeupdate', (e, data) => {
 				this._app.timeline = data;
 				this._app.updateCharts();
 			});
