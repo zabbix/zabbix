@@ -436,8 +436,18 @@ int	zbx_rtc_wait_config_sync(zbx_rtc_t *rtc)
 			/* client process has exited */
 			if (NULL == message)
 			{
+				int	i;
+
 				rtc_unsubscribe(rtc, client);
-				return FAIL;
+
+				for (i = 0; i < rtc->subs.values_num; i++)
+				{
+					if (rtc->subs.values[i]->client == client &&
+							rtc->subs.values[i]->process_type == ZBX_PROCESS_TYPE_CONFSYNCER)
+					{
+						return FAIL;
+					}
+				}
 			}
 		}
 	}
