@@ -24,6 +24,8 @@
 #	error This header must be used by configuration cache implementation
 #endif
 
+#include "mutexs.h"
+
 typedef struct
 {
 	zbx_uint64_t		triggerid;

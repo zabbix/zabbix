@@ -18,6 +18,7 @@
 **/
 
 #include "common.h"
+#include "mutexs.h"
 
 /* LIBXML2 is used */
 #ifdef HAVE_LIBXML2
