@@ -232,6 +232,7 @@ abstract class CControllerCharts extends CController {
 	 */
 	protected static function getSubfilters(array &$graphs, array $subfilters): array {
 		$subfilter_options = self::getSubfilterOptions($graphs, $subfilters);
+		$subfilters = self::clearSubfilters($subfilters, $subfilter_options);
 		$graphs = self::getGraphMatchings($graphs, $subfilters);
 
 		/*
@@ -329,6 +330,29 @@ abstract class CControllerCharts extends CController {
 		});
 
 		return $subfilter_options;
+	}
+
+	protected static function clearSubfilters(array $subfilter, array $subfilter_options): array {
+		foreach (array_keys($subfilter['tagnames']) as $tagname) {
+			if (!array_key_exists($tagname, $subfilter_options['tagnames'])) {
+				unset($subfilter['tagnames'][$tagname]);
+			}
+		}
+
+		foreach ($subfilter['tags'] as $tag => $values) {
+			if (!array_key_exists($tag, $subfilter_options['tags'])) {
+				unset($subfilter['tags'][$tag]);
+				continue;
+			}
+
+			foreach (array_keys($values) as $value) {
+				if (!array_key_exists($value, $subfilter_options['tags'][$tag])) {
+					unset($subfilter['tags'][$tag][$value]);
+				}
+			}
+		}
+
+		return $subfilter;
 	}
 
 	/**

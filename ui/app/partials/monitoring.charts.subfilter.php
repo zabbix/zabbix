@@ -182,10 +182,13 @@ else {
 (new CTableInfo())
 	->setId('subfilter')
 	->addRow([[
-		new CTag('h4', true, [
-			_('Subfilter'), ' ', (new CSpan(_('affects only filtered data')))->addClass(ZBX_STYLE_GREY)
-		])
-	]])
+		$subfilter_options['tags'] || $subfilter_options['tagnames']
+			? new CTag('h4', true, [
+				_('Subfilter'), ' ', (new CSpan(_('affects only filtered data')))->addClass(ZBX_STYLE_GREY)
+			])
+			: null
+		]]
+	)
 	->addRow(
 		$subfilter_options['tagnames']
 			? [[
