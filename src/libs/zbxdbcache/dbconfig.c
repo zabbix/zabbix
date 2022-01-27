@@ -35,6 +35,7 @@
 #include "zbxeval.h"
 
 #define ZBX_DBCONFIG_IMPL
+
 #include "dbconfig.h"
 
 #include "dbsync.h"
