@@ -120,6 +120,8 @@ class CWidget extends CBaseComponent {
 		this._update_abort_controller = null;
 		this._is_updating_paused = false;
 		this._update_retry_sec = 3;
+		this._preloader_timeout = null;
+		this._preloader_timeout_sec = 10;
 		this._show_preloader_asap = true;
 		this._resizable_handles = [];
 	}
@@ -512,7 +514,7 @@ class CWidget extends CBaseComponent {
 		if (delay_sec > 0) {
 			this._update_timeout_id = setTimeout(() => {
 				this._update_timeout_id = null;
-				this._startUpdating(0, {do_update_once});
+				this._startUpdating(0, {do_update_once: do_update_once});
 			}, delay_sec * 1000);
 		}
 		else {
@@ -552,7 +554,7 @@ class CWidget extends CBaseComponent {
 
 	_update(do_update_once) {
 		if (this._update_abort_controller !== null || this._is_updating_paused || this.isUserInteracting()) {
-			this._startUpdating(1, {do_update_once});
+			this._startUpdating(1, {do_update_once: do_update_once});
 
 			return;
 		}
@@ -580,7 +582,7 @@ class CWidget extends CBaseComponent {
 					this._hidePreloader();
 				}
 				else {
-					this._startUpdating(this._update_retry_sec, {do_update_once});
+					this._startUpdating(this._update_retry_sec, {do_update_once: do_update_once});
 				}
 			})
 			.finally(() => {
@@ -780,16 +782,38 @@ class CWidget extends CBaseComponent {
 	}
 
 	_showPreloader() {
+		if (this._preloader_timeout !== null) {
+			clearTimeout(this._preloader_timeout);
+			this._preloader_timeout = null;
+		}
+
 		this._content_body.classList.add('is-loading');
-		this._content_body.classList.remove('is-loading-fadein', 'delayed-15s');
 	}
 
 	_hidePreloader() {
-		this._content_body.classList.remove('is-loading', 'is-loading-fadein', 'delayed-15s');
+		if (this._preloader_timeout !== null) {
+			clearTimeout(this._preloader_timeout);
+			this._preloader_timeout = null;
+		}
+
+		this._content_body.classList.remove('is-loading');
 	}
 
-	_schedulePreloader() {
-		this._content_body.classList.add('is-loading', 'is-loading-fadein', 'delayed-15s');
+	_schedulePreloader(delay_sec = this._preloader_timeout_sec) {
+		if (this._preloader_timeout !== null) {
+			return;
+		}
+
+		const is_showing_preloader = this._content_body.classList.contains('is-loading');
+
+		if (is_showing_preloader) {
+			return;
+		}
+
+		this._preloader_timeout = setTimeout(() => {
+			this._preloader_timeout = null;
+			this._showPreloader();
+		}, delay_sec * 1000);
 	}
 
 	_makeView() {
