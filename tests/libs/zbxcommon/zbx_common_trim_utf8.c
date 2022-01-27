@@ -60,7 +60,7 @@ void	zbx_mock_test_entry_common_trim_utf8(void **state, int trim_utf8_func)
 	else
 		fail_msg("Invalid trim_utf8_func");
 
-	const	*expected = read_utf8("out.str", "out.hex");
+	const char	*expected = read_utf8("out.str", "out.hex");
 
 	zbx_mock_assert_str_eq("trimmed value", expected, in);
 	zbx_free(in);
