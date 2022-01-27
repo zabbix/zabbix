@@ -934,8 +934,11 @@ function getConditionFormula(conditions, evalType) {
 				$row.find('z-select[name$="[' + counter + '][' + name + ']"]').val(data[name]);
 
 				// Set 'radio' value.
-				$row.find('[type="radio"][name$="[' + counter + '][' + name + ']"][value="' + data[name] + '"]')
-					.attr('checked', 'checked');
+				$row.find('[type="radio"][name$="[' + counter + '][' + name + ']"]').each(function() {
+					if ($(this).is('[value="' + data[name] + '"]')) {
+						$(this).attr('checked', 'checked');
+					}
+				});
 			}
 
 			before_row.before($row);
