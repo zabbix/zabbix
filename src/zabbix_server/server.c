@@ -1770,13 +1770,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		}
 	}
 
-	if (SUCCEED != zbx_ha_update_parent(&error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot request ha manager status update: %s", error);
-		zbx_free(error);
-		sig_exiting = ZBX_EXIT_FAILURE;
-	}
-
 	ha_status_old = ha_status;
 
 	if (ZBX_NODE_STATUS_STANDBY == ha_status)

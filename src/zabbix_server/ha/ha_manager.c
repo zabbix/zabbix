@@ -1489,30 +1489,6 @@ int	zbx_ha_get_status(int *ha_status, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: request HA manager to send ha_status/failover update to main      *
- *          process                                                           *
- *                                                                            *
- ******************************************************************************/
-int	zbx_ha_update_parent(char **error)
-{
-	int		ret;
-	unsigned char	*result = NULL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	ret = zbx_ipc_async_exchange(ZBX_IPC_SERVICE_HA, ZBX_IPC_SERVICE_HA_UPDATE_PARENT, ZBX_HA_SERVICE_TIMEOUT, NULL,
-			0, &result, error);
-	zbx_free(result);
-
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
-
-
-/******************************************************************************
- *                                                                            *
  * Purpose: handle HA manager notifications                                   *
  *                                                                            *
  * Comments: This function also monitors heartbeat notifications and          *
@@ -1787,6 +1763,8 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 			goto pause;
 	}
 
+	ha_update_parent(&rtc_socket, &info);
+
 	nextcheck = ZBX_HA_POLL_PERIOD;
 
 	/* double the initial database check delay in standby mode to avoid the same node becoming active */
@@ -1858,10 +1836,6 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 					break;
 				case ZBX_IPC_SERVICE_HA_REMOVE_NODE:
 					ha_remove_node(&info, client, message);
-					break;
-				case ZBX_IPC_SERVICE_HA_UPDATE_PARENT:
-					zbx_ipc_client_send(client, ZBX_IPC_SERVICE_HA_UPDATE_PARENT, NULL, 0);
-					ha_update_parent(&rtc_socket, &info);
 					break;
 				case ZBX_IPC_SERVICE_HA_SET_FAILOVER_DELAY:
 					ha_set_failover_delay(&info, client, message);
