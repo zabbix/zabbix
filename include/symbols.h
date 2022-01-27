@@ -22,6 +22,8 @@
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 
+#include "sysinc.h"
+
 /* some definitions which are not available on older MS Windows versions */
 typedef enum {
 	/* we only use below values, the rest of enumerated values are omitted here */
