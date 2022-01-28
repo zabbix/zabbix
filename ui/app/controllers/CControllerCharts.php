@@ -53,29 +53,33 @@ abstract class CControllerCharts extends CController {
 			}
 		}
 
+		$filter_items = [];
 		if ($name !== '') {
-			$graph_items += API::Item()->get([
+			$filter_items = API::Item()->get([
 				'output' => ['itemid'],
 				'hostids' => $hostids,
 				'search' => ['name' => $name],
 				'preservekeys' => true
 			]);
+
+			if ($filter_items) {
+				$graphs += API::Graph()->get([
+					'output' => ['graphid', 'name'],
+					'hostids' => $hostids,
+					'itemids' => array_keys($filter_items),
+					'selectItems' => ['itemid'],
+					'preservekeys' => true
+				]);
+			}
 		}
 
-		$items = API::Item()->get([
-			'output' => ['itemid', 'name'],
-			'hostids' => $hostids,
-			'itemids' => array_keys($graph_items),
-			'selectTags' => ['tag', 'value'],
-			'preservekeys' => true
-		]);
-
-		if ($name !== '') {
-			$graphs = API::Graph()->get([
-				'output' => ['graphid', 'name'],
+		$items = [];
+		if ($graph_items || $filter_items) {
+			$items = API::Item()->get([
+				'output' => ['itemid', 'name'],
 				'hostids' => $hostids,
-				'itemids' => array_keys($items),
-				'selectItems' => ['itemid'],
+				'itemids' => array_keys($graph_items + $filter_items),
+				'selectTags' => ['tag', 'value'],
 				'preservekeys' => true
 			]);
 		}
