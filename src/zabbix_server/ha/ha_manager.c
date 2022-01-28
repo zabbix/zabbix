@@ -1752,8 +1752,6 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 			goto pause;
 	}
 
-	ha_update_parent(&rtc_socket, &info);
-
 	nextcheck = ZBX_HA_POLL_PERIOD;
 
 	/* double the initial database check delay in standby mode to avoid the same node becoming active */
