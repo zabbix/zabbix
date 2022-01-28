@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-27T18:36:09Z'
+  date: '2022-01-28T12:03:30Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -233,8 +233,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: scope
-              value: available
+              tag: component
+              value: temperature
         -
           uuid: f61796d773b94de6b5177102cfb72005
           name: 'Overall system health status'
