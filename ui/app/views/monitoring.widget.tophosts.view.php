@@ -65,8 +65,7 @@ foreach ($data['rows'] as $columns) {
 						->addClass('item-value')
 						->addClass(ZBX_STYLE_CURSOR_POINTER)
 						->setHint(
-							(new CDiv(mb_substr($column['value'], 0, ZBX_HINTBOX_CONTENT_LIMIT)))
-								->addClass(ZBX_STYLE_HINTBOX_WRAP)
+							(new CDiv($column['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP)
 						);
 
 					break;
@@ -74,7 +73,11 @@ foreach ($data['rows'] as $columns) {
 
 				$cell = (new CBarGauge())
 					->setValue($column['value'])
-					->addClass('item-value');
+					->addClass('item-value')
+					->setHint(
+						(new CDiv(formatHistoryValue($column['value'], $column['item'])))
+							->addClass(ZBX_STYLE_HINTBOX_WRAP)
+					);
 
 				if (array_key_exists('thresholds', $column_config)) {
 					foreach ($column_config['thresholds'] as $threshold) {
