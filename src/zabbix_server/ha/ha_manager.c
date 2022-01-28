@@ -42,8 +42,6 @@ extern char	*CONFIG_NODE_ADDRESS;
 
 extern zbx_cuid_t	ha_sessionid;
 
-#define ZBX_HA_IS_CLUSTER()	(NULL != CONFIG_HA_NODE_NAME && '\0' != *CONFIG_HA_NODE_NAME)
-
 typedef struct
 {
 	zbx_cuid_t	ha_nodeid;
@@ -1436,6 +1434,10 @@ out:
  *                                                                            *
  * Purpose: get HA manager status                                             *
  *                                                                            *
+ * Comments: In the case of timeout the ha_status will be force to:           *
+ *   standby - for cluster setup                                              *
+ *   active  - for standalone setup                                           *
+ *                                                                            *
  ******************************************************************************/
 int	zbx_ha_get_status(int *ha_status, int *ha_failover_delay, char **error)
 {
@@ -1462,7 +1464,12 @@ int	zbx_ha_get_status(int *ha_status, int *ha_failover_delay, char **error)
 				ret = FAIL;
 		}
 		else
-			*ha_status = ZBX_NODE_STATUS_STANDBY;
+		{
+			if (ZBX_HA_IS_CLUSTER())
+				*ha_status = ZBX_NODE_STATUS_STANDBY;
+			else
+				*ha_status = ZBX_NODE_STATUS_ACTIVE;
+		}
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));

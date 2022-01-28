@@ -1472,7 +1472,6 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 	/* killed during logging. The locks will be re-enabled after logger is reinitialized   */
 	zbx_locks_disable();
 #endif
-
 	zbx_ha_kill();
 
 	for (i = 0; i < threads_num; i++)
@@ -1757,12 +1756,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	if (ZBX_NODE_STATUS_ERROR != ha_status)
 	{
-		if (NULL == CONFIG_HA_NODE_NAME || '\0' == *CONFIG_HA_NODE_NAME)
-		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "standalone node started in \"%s\" mode",
-					zbx_ha_status_str(ha_status));
-		}
-		else
+		if (ZBX_HA_IS_CLUSTER())
 		{
 			zabbix_log(LOG_LEVEL_INFORMATION, "\"%s\" node started in \"%s\" mode", CONFIG_HA_NODE_NAME,
 					zbx_ha_status_str(ha_status));
@@ -1830,8 +1824,10 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 					}
 
 					if (ZBX_NODE_STATUS_ACTIVE != ha_status)
+					{
 						server_teardown(&rtc, &listen_sock);
-
+						ha_status_old = ha_status;
+					}
 					break;
 				case ZBX_NODE_STATUS_STANDBY:
 					server_teardown(&rtc, &listen_sock);
@@ -1905,6 +1901,7 @@ void	zbx_on_exit(int ret)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot stop HA manager: %s", error);
 		zbx_free(error);
+		zbx_ha_kill();
 	}
 
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
