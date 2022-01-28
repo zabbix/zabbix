@@ -931,14 +931,14 @@ function getConditionFormula(conditions, evalType) {
 
 			for (const name in data) {
 				// Set 'z-select' value.
-				$row.find('z-select[name$="[' + counter + '][' + name + ']"]').val(data[name]);
+				$row
+					.find(`z-select[name$="[${counter}][${name}]"]`)
+					.val(data[name]);
 
 				// Set 'radio' value.
-				$row.find('[type="radio"][name$="[' + counter + '][' + name + ']"]').each(function() {
-					if ($(this).is('[value="' + data[name] + '"]')) {
-						$(this).attr('checked', 'checked');
-					}
-				});
+				$row
+					.find(`[type="radio"][name$="[${counter}][${name}]"][value="${$.escapeSelector(data[name])}"]`)
+					.attr('checked', 'checked');
 			}
 
 			before_row.before($row);
