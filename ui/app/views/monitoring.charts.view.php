@@ -75,7 +75,7 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 				]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 			)
 			->addRow((new CLabel(_('Name'), 'filter_name')),
-				(new CTextBox('filter_name', $data['filter_name']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				(new CTextBox('filter_name', $data['filter_name']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 			)
 			->addRow((new CLabel(_('Show'), 'filter_show')),
 				(new CRadioButtonList('filter_show', $data['filter_show']))
