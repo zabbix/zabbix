@@ -58,7 +58,6 @@ abstract class CControllerCharts extends CController {
 				'output' => ['itemid'],
 				'hostids' => $hostids,
 				'search' => ['name' => $name],
-				// TODO VM: filter by tags
 				'preservekeys' => true
 			]);
 		}
@@ -67,12 +66,11 @@ abstract class CControllerCharts extends CController {
 			'output' => ['itemid', 'name'],
 			'hostids' => $hostids,
 			'itemids' => array_keys($graph_items),
-			// TODO VM: filter by tags
 			'selectTags' => ['tag', 'value'],
 			'preservekeys' => true
 		]);
 
-		if ($name !== '' /* TODO VM: OR filter by tags */) {
+		if ($name !== '') {
 			$graphs = API::Graph()->get([
 				'output' => ['graphid', 'name'],
 				'hostids' => $hostids,
@@ -239,7 +237,6 @@ abstract class CControllerCharts extends CController {
 		 * Calculate how many additional items would match the filtering results after selecting each of provided host
 		 * subfilters. So item MUST match all subfilters except the tested one.
 		 */
-		// TODO VM: recheck
 		foreach ($graphs as $graph) {
 			// Calculate the counters of tag existence subfilter options.
 			foreach ($graph['tags'] as $tag) {

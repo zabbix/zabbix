@@ -24,35 +24,32 @@
  * @var array    $data
  */
 
-$subfilter_options = [];
+$subfilter_options = [
+	'tagnames' => [],
+	'tags' => []
+];
 
 $selected_tagnames = [];
 $selected_tags = [];
 
-foreach (['tagnames'] as $key) { // TODO VM: remove loop
-	if (!array_key_exists($key, $data) || count($data[$key]) <= 1) {
-		$subfilter_options[$key] = null;
-		continue;
-	}
-	else {
-		$subfilter_options[$key] = [];
-	}
+
+if (count($data['tagnames']) > 0) {
 
 	// Remove non-selected filter options with 0 occurrences.
-	$data[$key] = array_filter($data[$key], function ($elmnt) {
-		return ($elmnt['selected'] || $elmnt['count'] != 0);
+	$data['tagnames'] = array_filter($data['tagnames'], static function ($element) {
+		return ($element['selected'] || $element['count'] != 0);
 	});
 
-	$subfilter_used = (bool) array_filter($data[$key], function ($elmnt) {
-		return $elmnt['selected'];
+	$subfilter_used = (bool) array_filter($data['tagnames'], static function ($element) {
+		return $element['selected'];
 	});
 
-	$subfilter_options_count = count($data[$key]);
-	$data[$key] = CControllerCharts::getMostSevereSubfilters($data[$key]);
+	$subfilter_options_count = count($data['tagnames']);
+	$data['tagnames'] = CControllerCharts::getMostSevereSubfilters($data['tagnames']);
 
-	foreach ($data[$key] as $tag_name => $element) {
+	foreach ($data['tagnames'] as $tag_name => $element) {
 		if ($element['selected']) {
-			$subfilter_options[$key][] = (new CSpan([
+			$subfilter_options['tagnames'][] = (new CSpan([
 				(new CLinkAction($element['name']))
 					->addClass('js-subfilter-unset')
 					->setAttribute('data-tag', $tag_name),
@@ -66,14 +63,14 @@ foreach (['tagnames'] as $key) { // TODO VM: remove loop
 		}
 		else {
 			if ($element['count'] == 0) {
-				$subfilter_options[$key][] = (new CSpan([
+				$subfilter_options['tagnames'][] = (new CSpan([
 					(new CSpan($element['name']))->addClass(ZBX_STYLE_GREY),
 					' ',
 					new CSup($element['count'])
 				]))->addClass(ZBX_STYLE_SUBFILTER);
 			}
 			else {
-				$subfilter_options[$key][] = (new CSpan([
+				$subfilter_options['tagnames'][] = (new CSpan([
 					(new CLinkAction($element['name']))
 						->addClass('js-subfilter-set')
 						->setAttribute('data-tag', $tag_name),
@@ -84,16 +81,14 @@ foreach (['tagnames'] as $key) { // TODO VM: remove loop
 		}
 	}
 
-	if ($subfilter_options_count > count($subfilter_options[$key])) {
-		$subfilter_options[$key][] = new CSpan('...');
+	if ($subfilter_options_count > count($subfilter_options['tagnames'])) {
+		$subfilter_options['tagnames'][] = new CSpan('...');
 	}
 }
 
 if (count($data['tags']) > 0) {
-	$subfilter_options['tags'] = [];
-
-	$subfilter_used = (bool) array_filter($data['tags'], function ($elmnt) {
-		return (bool) array_sum(array_column($elmnt, 'selected'));
+	$subfilter_used = (bool) array_filter($data['tags'], static function ($element) {
+		return (bool) array_sum(array_column($element, 'selected'));
 	});
 
 	$tags_count = count($data['tags']);
@@ -102,8 +97,8 @@ if (count($data['tags']) > 0) {
 	foreach ($data['tags'] as $tag_name => $tag_values) {
 
 		// Remove non-selected filter options with 0 occurrences.
-		$tag_values = array_filter($tag_values, function ($elmnt) {
-			return ($elmnt['selected'] || $elmnt['count'] != 0);
+		$tag_values = array_filter($tag_values, static function ($element) {
+			return ($element['selected'] || $element['count'] != 0);
 		});
 
 		$tag_values_count = count($tag_values);

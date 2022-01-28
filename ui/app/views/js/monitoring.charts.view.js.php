@@ -53,7 +53,7 @@
 		initCharts() {
 			this._$tmpl_row = $('<tr>').append(
 				$('<div>', {class: 'flickerfreescreen'}).append(
-					$('<div>', {class: '<?= ZBX_STYLE_CENTER ?>', style: 'min-height: 350px;'}).append(
+					$('<div>', {class: '<?= ZBX_STYLE_CENTER ?>', style: 'min-height: 300px;'}).append(
 						$('<img>')
 					)
 				)
@@ -217,7 +217,11 @@
 	 * @return {Promise}
 	 */
 	Chart.prototype.refresh = function(delay_loading) {
-		const width = this.wrapper.clientWidth - (this.dimensions.shiftXright + this.dimensions.shiftXleft + 23);
+		let width = this.wrapper.clientWidth - 20;
+
+		if (this.use_sbox) {
+			width -= this.dimensions.shiftXright + this.dimensions.shiftXleft + 1;
+		}
 
 		this.curl.setArgument('from', this.timeline.from);
 		this.curl.setArgument('to', this.timeline.to);

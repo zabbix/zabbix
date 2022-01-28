@@ -80,8 +80,8 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 			->addRow((new CLabel(_('Show'), 'filter_show')),
 				(new CRadioButtonList('filter_show', $data['filter_show']))
 					->addValue(_('All graphs'), GRAPH_FILTER_ALL)
-					->addValue(_('Host graphs'), GRAPH_FILTER_HOST) // TODO VM: new translation
-					->addValue(_('Simple graphs'), GRAPH_FILTER_SIMPLE) // TODO VM: new translation
+					->addValue(_('Host graphs'), GRAPH_FILTER_HOST)
+					->addValue(_('Simple graphs'), GRAPH_FILTER_SIMPLE)
 					->setModern(true)
 			)
 	],
@@ -109,7 +109,7 @@ $widget->show();
 
 (new CScriptTag('
 	view.init('.json_encode([
-		'filter_form_name' => 'zbx_filter', // TODO VM: ?
+		'filter_form_name' => 'zbx_filter',
 		'data' => [
 			'charts' => $data['charts'],
 			'timeline' => $data['timeline'],

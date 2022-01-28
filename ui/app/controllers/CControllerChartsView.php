@@ -58,8 +58,6 @@ class CControllerChartsView extends CControllerCharts {
 	}
 
 	protected function doAction() {
-		// TODO VM: dbpatch to remove profiles: web.charts.filter.search_type, web.charts.filter.graphids, web.charts.filter.graph_patterns
-
 		if ($this->hasInput('filter_rst')) {
 			CProfile::deleteIdx('web.charts.filter.hostids');
 			CProfile::deleteIdx('web.charts.filter.name');
