@@ -3160,6 +3160,7 @@ void	zbx_tls_free(void)
  *                        or empty string if not important) or PSK            *
  *                        (in hex-string) to connect with depending on value  *
  *                        of 'tls_connect'.                                   *
+ *     server_name - [IN] optional server name indication for TLS             *
  *                                                                            *
  * Return value:                                                              *
  *     SUCCEED - successful TLS handshake with a valid certificate or PSK     *
