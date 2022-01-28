@@ -1277,6 +1277,11 @@ zabbix_export:
               expression: 'last(/Kubernetes nodes by HTTP/kube.node.limits.cpu[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.cpu[{#NAME}]) > 1'
               name: 'Node [{#NAME}] Limits: Total CPU limits are too high (more than 100% of allocatable)'
               opdata: 'Limits: {ITEM.LASTVALUE1}, Allocatable: {ITEM.LASTVALUE2}'
+              priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 5d0d803cfbbe42edb7d32d731ae5f741
               expression: 'last(/Kubernetes nodes by HTTP/kube.node.limits.memory[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.memory[{#NAME}]) > 0.9'
@@ -1297,6 +1302,10 @@ zabbix_export:
               name: 'Node [{#NAME}] Limits: Total memory limits are too high (more than 100% of allocatable)'
               opdata: 'Limits: {ITEM.LASTVALUE1}, Allocatable: {ITEM.LASTVALUE2}'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 256cf876a4674dd09123bb388c1a9d32
               expression: 'last(/Kubernetes nodes by HTTP/kube.node.requests.cpu[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.cpu[{#NAME}]) > 0.5'
@@ -1317,6 +1326,10 @@ zabbix_export:
               name: 'Node [{#NAME}] Requests:  Total CPU requests are too high (more than 80% of allocatable)'
               opdata: 'Requests: {ITEM.LASTVALUE1}, Allocatable: {ITEM.LASTVALUE2}'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: d73aa5aa2a9b424789181033630bb432
               expression: 'last(/Kubernetes nodes by HTTP/kube.node.requests.memory[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.memory[{#NAME}]) > 0.5'
@@ -1337,6 +1350,10 @@ zabbix_export:
               name: 'Node [{#NAME}] Requests: Total memory requests are too high (more than 80% of allocatable)'
               opdata: 'Requests: {ITEM.LASTVALUE1}, Allocatable: {ITEM.LASTVALUE2}'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 0126dfbfa9d949499e0f7689b714c855
               expression: 'last(/Kubernetes nodes by HTTP/kube.node.used.pods[{#NAME}])/ last(/Kubernetes nodes by HTTP/kube.node.capacity.pods[{#NAME}]) > 0.9'
