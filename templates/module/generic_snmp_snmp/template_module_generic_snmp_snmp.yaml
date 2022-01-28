@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:32:00Z'
+  date: '2022-01-28T13:22:58Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -335,13 +335,6 @@ zabbix_export:
                 -
                   tag: scope
                   value: availability
-      tags:
-        -
-          tag: class
-          value: device
-        -
-          tag: target
-          value: generic
       macros:
         -
           macro: '{$ICMP_LOSS_WARN}'

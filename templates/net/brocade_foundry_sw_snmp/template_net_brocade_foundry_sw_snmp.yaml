@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T13:54:02Z'
+  date: '2022-01-28T13:10:51Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -2364,16 +2364,6 @@ zabbix_export:
                 -
                   tag: scope
                   value: performance
-      tags:
-        -
-          tag: class
-          value: network
-        -
-          tag: target
-          value: brocade
-        -
-          tag: target
-          value: brocade-foundry
       macros:
         -
           macro: '{$CPU.UTIL.CRIT}'

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:47:13Z'
+  date: '2022-01-28T13:15:42Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -40,13 +40,6 @@ zabbix_export:
                 -
                   tag: scope
                   value: availability
-      tags:
-        -
-          tag: class
-          value: service
-        -
-          tag: target
-          value: imap
       valuemaps:
         -
           uuid: 17353d47bd0a4a03a8f3ab799207e157
