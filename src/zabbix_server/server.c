@@ -1184,7 +1184,7 @@ static void	zbx_check_db(void)
  * Purpose: initialize shared resources and start processes                   *
  *                                                                            *
  ******************************************************************************/
-static int	server_startup(zbx_socket_t *listen_sock, zbx_rtc_t *rtc)
+static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failover, zbx_rtc_t *rtc)
 {
 	int	i, ret = SUCCEED;
 	char	*error = NULL;
@@ -1284,14 +1284,14 @@ static int	server_startup(zbx_socket_t *listen_sock, zbx_rtc_t *rtc)
 				if (FAIL == (ret = zbx_rtc_wait_config_sync(rtc)))
 					goto out;
 
-				if (SUCCEED != (ret = zbx_ha_get_status(&ha_status, &ha_failover_delay, &error)))
+				if (SUCCEED != (ret = zbx_ha_get_status(ha_stat, ha_failover, &error)))
 				{
 					zabbix_log(LOG_LEVEL_CRIT, "cannot obtain HA status: %s", error);
 					zbx_free(error);
 					goto out;
 				}
 
-				if (ZBX_NODE_STATUS_ACTIVE != ha_status)
+				if (ZBX_NODE_STATUS_ACTIVE != *ha_stat)
 					goto out;
 
 				DBconnect(ZBX_DB_CONNECT_NORMAL);
@@ -1426,7 +1426,7 @@ static int	server_startup(zbx_socket_t *listen_sock, zbx_rtc_t *rtc)
 	}
 
 	/* startup/postinit tasks can take a long time, update status */
-	if (SUCCEED != (ret = zbx_ha_get_status(&ha_status, &ha_failover_delay, &error)))
+	if (SUCCEED != (ret = zbx_ha_get_status(ha_stat, ha_failover, &error)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot obtain HA status: %s", error);
 		zbx_free(error);
@@ -1530,6 +1530,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	char		*error = NULL;
 	int		i, db_type, ret, ha_status_old;
+
 	zbx_socket_t	listen_sock;
 	time_t		standby_warning_time;
 	zbx_rtc_t	rtc;
@@ -1741,7 +1742,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
 	{
-		if (SUCCEED != server_startup(&listen_sock, &rtc))
+		if (SUCCEED != server_startup(&listen_sock, &ha_status, &ha_failover_delay, &rtc))
 		{
 			sig_exiting = ZBX_EXIT_FAILURE;
 			ha_status = ZBX_NODE_STATUS_ERROR;
@@ -1816,7 +1817,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			switch (ha_status)
 			{
 				case ZBX_NODE_STATUS_ACTIVE:
-					if (SUCCEED != server_startup(&listen_sock, &rtc))
+					if (SUCCEED != server_startup(&listen_sock, &ha_status, &ha_failover_delay, &rtc))
 					{
 						sig_exiting = ZBX_EXIT_FAILURE;
 						ha_status = ZBX_NODE_STATUS_ERROR;
