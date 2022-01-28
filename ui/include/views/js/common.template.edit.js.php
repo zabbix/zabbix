@@ -224,6 +224,6 @@
 			proxy_form.appendChild(formdata_input);
 
 			proxy_form.submit();
-		});
-	}, {passive: false});
+		}, {passive: false});
+	});
 </script>
