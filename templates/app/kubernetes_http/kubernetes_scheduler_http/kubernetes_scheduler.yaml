@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-13T15:25:00Z'
+  date: '2022-01-27T09:52:19Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -18,7 +18,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -87,7 +87,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of HTTP requests with 2XX status code per second.'
+          description: 'Number of HTTP requests with 2xx status code per second.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -108,7 +108,7 @@ zabbix_export:
               value: rest
             -
               tag: http-code
-              value: 2XX
+              value: 2xx
         -
           uuid: b790f8c9a6b44f54837a6b3cb1dcec41
           name: 'Kubernetes Scheduler: REST Client requests: 3xx, rate'
@@ -117,7 +117,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of HTTP requests with 3XX status code per second.'
+          description: 'Number of HTTP requests with 3xx status code per second.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -138,7 +138,7 @@ zabbix_export:
               value: rest
             -
               tag: http-code
-              value: 3XX
+              value: 3xx
         -
           uuid: 84e09cb3134b492b983649bc29da11ee
           name: 'Kubernetes Scheduler: REST Client requests: 4xx, rate'
@@ -147,7 +147,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of HTTP requests with 4XX status code per second.'
+          description: 'Number of HTTP requests with 4xx status code per second.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -168,7 +168,7 @@ zabbix_export:
               value: rest
             -
               tag: http-code
-              value: 4XX
+              value: 4xx
         -
           uuid: d94fce6ae59b4735b93e1ccfb9084dc2
           name: 'Kubernetes Scheduler: REST Client requests: 5xx, rate'
@@ -177,7 +177,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of HTTP requests with 5XX status code per second.'
+          description: 'Number of HTTP requests with 5xx status code per second.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -198,7 +198,7 @@ zabbix_export:
               value: rest
             -
               tag: http-code
-              value: 5XX
+              value: 5xx
           triggers:
             -
               uuid: ea92474a61214053b2cd20775817010e
@@ -883,7 +883,7 @@ zabbix_export:
           value: software
         -
           tag: target
-          value: kubernetes-scheduler
+          value: 'kubernetes scheduler'
       macros:
         -
           macro: '{$KUBE.SCHEDULER.ERROR}'

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-13T15:24:43Z'
+  date: '2022-01-27T09:51:58Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -18,7 +18,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -31,7 +31,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of HTTP requests with 2XX status code per second.'
+          description: 'Number of HTTP requests with 2xx status code per second.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -52,7 +52,7 @@ zabbix_export:
               value: rest
             -
               tag: http-code
-              value: 2XX
+              value: 2xx
         -
           uuid: ace0d156101b481d9f53c3f48e84bd38
           name: 'Kubernetes Controller Manager: REST Client requests: 3xx, rate'
@@ -61,7 +61,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of HTTP requests with 3XX status code per second.'
+          description: 'Number of HTTP requests with 3xx status code per second.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -82,7 +82,7 @@ zabbix_export:
               value: rest
             -
               tag: http-code
-              value: 3XX
+              value: 3xx
         -
           uuid: c6b67e4330184ca98281773c69925d98
           name: 'Kubernetes Controller Manager: REST Client requests: 4xx, rate'
@@ -91,7 +91,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of HTTP requests with 4XX status code per second.'
+          description: 'Number of HTTP requests with 4xx status code per second.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -112,7 +112,7 @@ zabbix_export:
               value: rest
             -
               tag: http-code
-              value: 4XX
+              value: 4xx
         -
           uuid: ac6397e9f62749199f857e6c859daa59
           name: 'Kubernetes Controller Manager: REST Client requests: 5xx, rate'
@@ -121,7 +121,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of HTTP requests with 5XX status code per second.'
+          description: 'Number of HTTP requests with 5xx status code per second.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -142,7 +142,7 @@ zabbix_export:
               value: rest
             -
               tag: http-code
-              value: 5XX
+              value: 5xx
           triggers:
             -
               uuid: 13c32daebddd454bb5908a9a27c3a76f
@@ -814,9 +814,9 @@ zabbix_export:
                 - |
                   var lookup = {},
                       result = [];
-
+                  
                   JSON.parse(value).forEach(function (item) {
-                      if (item.name === 'workqueue_adds_total') {
+                      if (item.name === "workqueue_adds_total"){
                           var label_name = item.labels.name;
                   
                           if (lookup[label_name]) {
@@ -827,8 +827,9 @@ zabbix_export:
                               '{#TYPE}': 'totals',
                               '{#NAME}': label_name
                           });
-                      }
-                      else if  (item.name === 'workqueue_work_duration_seconds_bucket') {
+                  
+                        }
+                      else if  (item.name === "workqueue_work_duration_seconds_bucket"){
                           result.push({
                               '{#TYPE}': 'buckets',
                               '{#NAME}': item.labels.name,
@@ -836,7 +837,7 @@ zabbix_export:
                           });
                       }
                   });
-
+                  
                   return JSON.stringify(result);
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -881,7 +882,7 @@ zabbix_export:
           value: software
         -
           tag: target
-          value: kubernetes-controller-manager
+          value: 'kubernetes controller manager'
       macros:
         -
           macro: '{$KUBE.CONTROLLER.HTTP.CLIENT.ERROR}'

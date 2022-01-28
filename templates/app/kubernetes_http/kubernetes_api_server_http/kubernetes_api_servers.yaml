@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-19T15:46:44Z'
+  date: '2022-01-27T09:51:32Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -109,7 +109,7 @@ zabbix_export:
               value: requests
             -
               tag: http-code
-              value: 2XX
+              value: 2xx
         -
           uuid: 453852b621ca4a7cbc4d80e5327c80da
           name: 'Kubernetes API: API server requests: 3xx, rate'
@@ -139,7 +139,7 @@ zabbix_export:
               value: requests
             -
               tag: http-code
-              value: 3XX
+              value: 3xx
         -
           uuid: 1f72779899f94620bc55870f5e2c2ca0
           name: 'Kubernetes API: API server requests: 4xx, rate'
@@ -169,7 +169,7 @@ zabbix_export:
               value: requests
             -
               tag: http-code
-              value: 4XX
+              value: 4xx
         -
           uuid: 1c24d58b28bc423e868a965d689cf146
           name: 'Kubernetes API: API server requests: 5xx, rate'
@@ -199,7 +199,7 @@ zabbix_export:
               value: requests
             -
               tag: http-code
-              value: 5XX
+              value: 5xx
           triggers:
             -
               uuid: 0e1ef1630b5d4cb98270564f324f5382
@@ -580,7 +580,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of HTTP requests with 2XX status code per second.'
+          description: 'Number of HTTP requests with 2xx status code per second.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -601,7 +601,7 @@ zabbix_export:
               value: requests
             -
               tag: http-code
-              value: 2XX
+              value: 2xx
         -
           uuid: 450607dda045428fb6d4a96ca8888c19
           name: 'Kubernetes API: HTTP requests: 3xx, rate'
@@ -610,7 +610,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of HTTP requests with 3XX status code per second.'
+          description: 'Number of HTTP requests with 3xx status code per second.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -631,7 +631,7 @@ zabbix_export:
               value: requests
             -
               tag: http-code
-              value: 3XX
+              value: 3xx
         -
           uuid: f11b87e0bc5a41ff956391b6cb7115c5
           name: 'Kubernetes API: HTTP requests: 4xx, rate'
@@ -640,7 +640,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of HTTP requests with 4XX status code per second.'
+          description: 'Number of HTTP requests with 4xx status code per second.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -661,7 +661,7 @@ zabbix_export:
               value: requests
             -
               tag: http-code
-              value: 4XX
+              value: 4xx
         -
           uuid: 2588c2332fea48f8bae414e8b7c42184
           name: 'Kubernetes API: HTTP requests: 5xx, rate'
@@ -670,7 +670,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of HTTP requests with 5XX status code per second.'
+          description: 'Number of HTTP requests with 5xx status code per second.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -691,7 +691,7 @@ zabbix_export:
               value: requests
             -
               tag: http-code
-              value: 5XX
+              value: 5xx
           triggers:
             -
               uuid: 4c79888da91448738092c86e5f427a6a
@@ -1054,7 +1054,7 @@ zabbix_export:
                 - |
                   var lookup = {},
                       result = [];
-
+                  
                   JSON.parse(value).forEach(function (item) {
                       var grpc_code = item.labels.grpc_code;
                       if (!(lookup[grpc_code])) {
@@ -1114,7 +1114,7 @@ zabbix_export:
                 - |
                   var lookup = {},
                       result = [];
-
+                  
                   JSON.parse(value).forEach(function (item) {
                       var request_kind = item.labels.request_kind;
                       if (!(lookup[request_kind])) {
@@ -1181,7 +1181,7 @@ zabbix_export:
                 - |
                   var lookup = {},
                       result = [];
-
+                  
                   JSON.parse(value).forEach(function (item) {
                       var request_kind = item.labels.resource + item.labels.scope + item.labels.verb;
                       if (!(lookup[request_kind])) {
@@ -1348,7 +1348,7 @@ zabbix_export:
                       result = [];
                   
                   JSON.parse(value).forEach(function (item) {
-                      if (item.name === 'apiserver_request_duration_seconds_count') {
+                      if (item.name === "apiserver_request_duration_seconds_count"){
                           var label_verb = item.labels.verb;
                           if (lookup[label_verb]) {
                               return;
@@ -1360,13 +1360,12 @@ zabbix_export:
                           });
                   
                         }
-                      else if  (item.name === 'apiserver_request_duration_seconds_bucket') {
-                          var labels = item.labels.verb + item.labels.le;
-                    
+                      else if  (item.name === "apiserver_request_duration_seconds_bucket"){
+                       var labels = item.labels.verb + item.labels.le;
+                  
                           if (lookup_histogram[labels]) {
                               return;
                           }
-
                           lookup_histogram[labels] = 1;
                           result.push({
                               '{#TYPE}': 'buckets',
