@@ -199,33 +199,31 @@
 		});
 
 		document.getElementById('templates-form').addEventListener('submit', (e) => {
-			const form = e.target;
-
-			if (form.length < <?= ini_get('max_input_vars') ?>) {
-				return true;
-			}
-
 			e.preventDefault();
 
-			const proxy_form = document.createElement('form'),
-				submit_input = document.createElement('input'),
-				formdata_input = document.createElement('input');
+			const form = e.target;
+			const form_fields = getFormFields(form);
 
-			submit_input.name = e.submitter.name;
-			submit_input.value = e.submitter.value;
-			submit_input.hidden = true;
-			form.append(submit_input);
+			let submitter = document.activeElement;
 
+			if (submitter.tagName !== 'BUTTON') {
+				submitter = form.querySelector('button[type="submit"]');
+			}
+
+			form_fields[submitter.name] = submitter.value;
+
+			const proxy_form = document.createElement('form');
 			proxy_form.action = form.action;
 			proxy_form.method = 'post';
 			proxy_form.hidden = true;
+			document.body.appendChild(proxy_form);
 
+			const formdata_input = document.createElement('input');
 			formdata_input.name = 'formdata_json';
-			formdata_input.value = JSON.stringify(getFormFields(form));
-			proxy_form.append(formdata_input);
+			formdata_input.value = JSON.stringify(form_fields);
+			proxy_form.appendChild(formdata_input);
 
-			document.body.append(proxy_form);
 			proxy_form.submit();
 		});
-	});
+	}, {passive: false});
 </script>

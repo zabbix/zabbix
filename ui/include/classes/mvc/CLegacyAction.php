@@ -28,14 +28,6 @@ class CLegacyAction extends CAction {
 	 */
 	protected function init(): void {
 		$this->disableSIDvalidation();
-
-		if (hasRequest('formdata_json')) {
-			global $_REQUEST, $_GET, $_POST;
-
-			$_REQUEST = json_decode($_REQUEST['formdata_json'], true);
-			$_GET = $_REQUEST;
-			$_POST = $_REQUEST;
-		}
 	}
 
 	public function doAction(): void {
@@ -47,6 +39,12 @@ class CLegacyAction extends CAction {
 	 * @return bool
 	 */
 	public function checkInput(): bool {
+		$json_actions = ['templates.php'];
+
+		if (in_array($this->getAction(), $json_actions) && array_key_exists('formdata_json', $_REQUEST)) {
+			$_REQUEST = json_decode($_REQUEST['formdata_json'], true);
+		}
+
 		return true;
 	}
 
