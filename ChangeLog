@@ -3,6 +3,11 @@ Changes for 6.0.0rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-19356] fixed failure when editing Templates caused by exceeding max_input_vars limit (jfreibergs)
+..F....... [ZBX-20267] fixed browser error when using dynamic rows (rdetlavs)
+..F....... [ZBX-20485] fixed cancel button not working when creating a new discovery rule (rdetlavs)
+..F....... [ZBX-20494] fixed multiple hintbox issue upon widget updates (averza)
+..F....... [ZBX-20432] fixed impossibility to import templates with triggers mapping to hosts with numeric names (averza)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.0beta3
