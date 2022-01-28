@@ -184,6 +184,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		'discover' => getRequest('discover', DB::getDefault('hosts', 'discover')),
 		'groupLinks' => [],
 		'groupPrototypes' => [],
+		'tags' => $tags,
+		'macros' => $macros,
 		'templates' => array_merge(getRequest('templates', []), getRequest('add_templates', [])),
 		'custom_interfaces' => getRequest('custom_interfaces', DB::getDefault('hosts', 'custom_interfaces'))
 	];
@@ -192,20 +194,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$newHostPrototype['inventory_mode'] = getRequest('inventory_mode');
 	}
 
-	if ($tags) {
-		$newHostPrototype['tags'] = $tags;
-	}
-
-	if ($macros) {
-		$newHostPrototype['macros'] = $macros;
-	}
-
 	// API requires 'templateid' property.
 	if ($newHostPrototype['templates']) {
 		$newHostPrototype['templates'] = zbx_toObject($newHostPrototype['templates'], 'templateid');
-	}
-	else {
-		unset($newHostPrototype['templates']);
 	}
 
 	// add custom group prototypes
@@ -223,31 +214,30 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		foreach ($interfaces as &$interface) {
 			// Process SNMP interface fields.
 			if ($interface['type'] == INTERFACE_TYPE_SNMP) {
-				if (!array_key_exists('details', $interface)) {
-					$interface['details'] = [];
-				}
-
 				$interface['details']['bulk'] = array_key_exists('bulk', $interface['details'])
 					? SNMP_BULK_ENABLED
 					: SNMP_BULK_DISABLED;
 
-				if ($interface['details']['version'] == SNMP_V1 || $interface['details']['version'] == SNMP_V2C) {
-					unset($interface['details']['securityname'], $interface['details']['securitylevel'],
-						$interface['details']['authpassphrase'], $interface['details']['privpassphrase'],
-						$interface['details']['authprotocol'], $interface['details']['privprotocol'],
-						$interface['details']['contextname']
-					);
-				}
-				else {
-					switch ($interface['details']['securitylevel']) {
-						case ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV:
-							unset($interface['details']['authprotocol'], $interface['details']['authpassphrase']);
-							// break; is not missing here
-						case ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV:
-							unset($interface['details']['privprotocol'], $interface['details']['privpassphrase']);
-					}
+				switch ($interface['details']['version']) {
+					case SNMP_V1:
+					case SNMP_V2C:
+						$interface['details'] =
+							array_intersect_key($interface['details'], array_flip(['version', 'bulk', 'community']));
+						break;
 
-					unset($interface['details']['community']);
+					case SNMP_V3:
+						$field_names = array_flip(['version', 'bulk', 'contextname', 'securityname', 'securitylevel']);
+
+						if ($interface['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV) {
+							$field_names += array_flip(['authprotocol', 'authpassphrase']);
+						}
+						elseif ($interface['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
+							$field_names +=
+								array_flip(['authprotocol', 'authpassphrase', 'privprotocol', 'privpassphrase']);
+						}
+
+						$interface['details'] = array_intersect_key($interface['details'], $field_names);
+						break;
 				}
 			}
 
