@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T13:44:43Z'
+  date: '2022-01-28T12:41:43Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -503,13 +503,6 @@ zabbix_export:
                   item:
                     host: 'Interfaces SNMP'
                     key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
-      tags:
-        -
-          tag: class
-          value: network
-        -
-          tag: target
-          value: interfaces
       macros:
         -
           macro: '{$IF.ERRORS.WARN}'
