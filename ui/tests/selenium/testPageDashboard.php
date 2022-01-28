@@ -30,9 +30,9 @@ class testPageDashboard extends CLegacyWebTest {
 	public $graphCpu = 'CPU usage';
 	public $hostGroup = 'Zabbix servers';
 	public $hostName = 'ЗАББИКС Сервер';
-	public $graphCpuId = 910;
+	public $graphCpuId = 2231;
 	public $graphMemory = 'Memory usage';
-	public $graphMemoryId = 919;
+	public $graphMemoryId = 2233;
 	public $screenClock = 'Test screen (clock)';
 	public $screenClockId = 200001;
 	public $mapTest = 'Test map 1';

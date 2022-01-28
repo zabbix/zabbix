@@ -940,7 +940,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'field' =>  [
 						'Max count of elements to show inside table cell' => '2'
 					],
-					'link' => 'templates.php?filter_name=cisco',
+					'link' => 'hostgroups.php?filter_name=Templates&filter_set=1',
 					'element_count' => 2
 				]
 			],
@@ -991,7 +991,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 
 			case 'Max count of elements to show inside table cell':
 				$table = $this->query('class:list-table')->waitUntilPresent()->asTable()->one();
-				$element_count = $table->findRow('Name', 'Alcatel Timetra TiMOS SNMP')->getColumn('Linked templates')
+				$element_count = $table->findRow('Name', 'Templates/Applications')->getColumn('Members')
 						->query('xpath:.//a[@class="link-alt grey"]')->all()->count();
 				$this->assertEquals(CTestArrayHelper::get($data, 'element_count'), $element_count);
 				break;
