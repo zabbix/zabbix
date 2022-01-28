@@ -708,7 +708,7 @@ abstract class CControllerLatest extends CController {
 				$matches['tags'] = (bool) $matches['tags'];
 			}
 
-			return (count(array_unique($matches)) === 1)
+			return (count(array_unique($matches)) == 1)
 				? current($matches)
 				: false;
 		});
