@@ -32,6 +32,11 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
           timeout: 10s
           url: 'https://{$KUBE.API.HOST}:{$KUBE.API.PORT}/api/v1/componentstatuses'
           status_codes: '200, 403'
