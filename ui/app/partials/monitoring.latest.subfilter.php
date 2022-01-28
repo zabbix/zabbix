@@ -111,9 +111,10 @@ if (count($data['tags']) > 0) {
 				return (new CSpan([
 					(new CLinkAction($element_name))
 						->addStyle($element_style)
-						->onClick(CHtml::encode(
-							'view.unsetSubfilter('.json_encode(['subfilter_tags['.$tag.'][]', $element['name']]).')'
-						)),
+						->onClick('view.unsetSubfilter('.json_encode([
+							'subfilter_tags['.$tag.'][]',
+							$element['name']
+						]).')'),
 					' ',
 					new CSup($element['count'])
 				]))
@@ -122,28 +123,18 @@ if (count($data['tags']) > 0) {
 					->addClass(ZBX_STYLE_SUBFILTER_ENABLED);
 			}
 			else {
-				if ($element['count'] == 0) {
-					return (new CSpan([
-						(new CSpan($element_name))
-							->addStyle($element_style)
-							->addClass(ZBX_STYLE_GREY),
-						' ',
-						new CSup($element['count'])
-					]))->addClass(ZBX_STYLE_SUBFILTER);
-				}
-				else {
-					return (new CSpan([
-						(new CLinkAction($element_name))
-							->addStyle($element_style)
-							->onClick(CHtml::encode(
-								'view.setSubfilter('.json_encode(['subfilter_tags['.$tag.'][]', $element['name']]).')'
-							)),
-						' ',
-						new CSup(($subfilter_used ? '+' : '').$element['count'])
-					]))
-						->addClass(ZBX_STYLE_NOWRAP)
-						->addClass(ZBX_STYLE_SUBFILTER);
-				}
+				return (new CSpan([
+					(new CLinkAction($element_name))
+						->addStyle($element_style)
+						->onClick('view.setSubfilter('.json_encode([
+							'subfilter_tags['.$tag.'][]',
+							$element['name']
+						]).')'),
+					' ',
+					new CSup(($subfilter_used ? '+' : '').$element['count'])
+				]))
+					->addClass(ZBX_STYLE_NOWRAP)
+					->addClass(ZBX_STYLE_SUBFILTER);
 			}
 		}, $tags_group['values']);
 
