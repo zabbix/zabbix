@@ -96,8 +96,8 @@ There are no template links in this template.
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |Database discovery |<p>Scanning databases in DBMS.</p> |ZABBIX_PASSIVE |mysql.db.discovery["{$MYSQL.HOST}","{$MYSQL.PORT}"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return JSON.stringify(value.split("\n").map(function (name) {     return ({"{#DBNAME}": name}); }));`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p><p>**Filter**:</p>AND_OR <p>- {#DBNAME} NOT_MATCHES_REGEX `information_schema`</p> |
-|Replication discovery |<p>If "show slave status" returns Master_Host, "Replication: *" items are created.</p> |ZABBIX_PASSIVE |mysql.replication.discovery["{$MYSQL.HOST}","{$MYSQL.PORT}"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |MariaDB discovery |<p>Additional metrics if MariaDB is used.</p> |DEPENDENT |mysql.extra_metric.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return JSON.stringify(value.search('MariaDB')>-1 ? [{'{#SINGLETON}': ''}] : []);`</p> |
+|Replication discovery |<p>If "show slave status" returns Master_Host, "Replication: *" items are created.</p> |ZABBIX_PASSIVE |mysql.replication.discovery["{$MYSQL.HOST}","{$MYSQL.PORT}"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 
 ## Items collected
 
@@ -158,10 +158,10 @@ There are no template links in this template.
 |MySQL |MySQL: Master GTID wait count |<p>The number of times MASTER_GTID_WAIT called.</p> |DEPENDENT |mysql.master_gtid_wait_count[{#SINGLETON}]<p>**Preprocessing**:</p><p>- XMLPATH: `/resultset/row[field/text()='Master_gtid_wait_count']/field[@name='Value']/text()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |MySQL |MySQL: Master GTID wait time |<p>Total number of time spent in MASTER_GTID_WAIT.</p> |DEPENDENT |mysql.master_gtid_wait_time[{#SINGLETON}]<p>**Preprocessing**:</p><p>- XMLPATH: `/resultset/row[field/text()='Master_gtid_wait_time']/field[@name='Value']/text()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |MySQL |MySQL: Master GTID wait timeouts |<p>Number of timeouts occurring in MASTER_GTID_WAIT.</p> |DEPENDENT |mysql.master_gtid_wait_timeouts[{#SINGLETON}]<p>**Preprocessing**:</p><p>- XMLPATH: `/resultset/row[field/text()='Master_gtid_wait_timeouts']/field[@name='Value']/text()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
-|Zabbix_raw_items |MySQL: Get status variables |<p>The item gets server global status information.</p> |ZABBIX_PASSIVE |mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"] |
-|Zabbix_raw_items |MySQL: InnoDB buffer pool read requests |<p>Number of logical read requests.</p> |DEPENDENT |mysql.innodb_buffer_pool_read_requests<p>**Preprocessing**:</p><p>- XMLPATH: `/resultset/row[field/text()='Innodb_buffer_pool_read_requests']/field[@name='Value']/text()`</p> |
-|Zabbix_raw_items |MySQL: InnoDB buffer pool reads |<p>Number of logical reads that InnoDB could not satisfy from the buffer pool, and had to read directly from the disk.</p> |DEPENDENT |mysql.innodb_buffer_pool_reads<p>**Preprocessing**:</p><p>- XMLPATH: `/resultset/row[field/text()='Innodb_buffer_pool_reads']/field[@name='Value']/text()`</p> |
-|Zabbix_raw_items |MySQL: Replication Slave status {#MASTERHOST} |<p>The item gets status information on the essential parameters of the slave threads.</p> |ZABBIX_PASSIVE |mysql.slave_status["{$MYSQL.HOST}","{$MYSQL.PORT}","{#MASTERHOST}"] |
+|Zabbix raw items |MySQL: Get status variables |<p>The item gets server global status information.</p> |ZABBIX_PASSIVE |mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"] |
+|Zabbix raw items |MySQL: InnoDB buffer pool read requests |<p>Number of logical read requests.</p> |DEPENDENT |mysql.innodb_buffer_pool_read_requests<p>**Preprocessing**:</p><p>- XMLPATH: `/resultset/row[field/text()='Innodb_buffer_pool_read_requests']/field[@name='Value']/text()`</p> |
+|Zabbix raw items |MySQL: InnoDB buffer pool reads |<p>Number of logical reads that InnoDB could not satisfy from the buffer pool, and had to read directly from the disk.</p> |DEPENDENT |mysql.innodb_buffer_pool_reads<p>**Preprocessing**:</p><p>- XMLPATH: `/resultset/row[field/text()='Innodb_buffer_pool_reads']/field[@name='Value']/text()`</p> |
+|Zabbix raw items |MySQL: Replication Slave status {#MASTERHOST} |<p>The item gets status information on the essential parameters of the slave threads.</p> |ZABBIX_PASSIVE |mysql.slave_status["{$MYSQL.HOST}","{$MYSQL.PORT}","{#MASTERHOST}"] |
 
 ## Triggers
 
@@ -187,5 +187,5 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384189-discussion-thread-for-official-zabbix-template-db-mysql).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384189-discussion-thread-for-official-zabbix-template-db-mysql).
 

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T14:35:07Z'
+  date: '2022-01-27T08:30:23Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -810,7 +810,7 @@ zabbix_export:
                   value: network
                 -
                   tag: interface
-                  value: 'port-{#IFNAME}'
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: 9e5b175a657040acb532677e5e3efd4e
@@ -845,7 +845,7 @@ zabbix_export:
                   value: network
                 -
                   tag: interface
-                  value: 'port-{#IFNAME}'
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: 3e5f0494aec9433ab7d7637fab2095f2
@@ -880,7 +880,7 @@ zabbix_export:
                   value: network
                 -
                   tag: interface
-                  value: 'port-{#IFNAME}'
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: 52cfc831296f4ebbb9bb9d66a164c129
@@ -915,7 +915,7 @@ zabbix_export:
                   value: network
                 -
                   tag: interface
-                  value: 'port-{#IFNAME}'
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: 22da96573bbd471785f694bbdbca7cd1
@@ -996,7 +996,7 @@ zabbix_export:
                   value: network
                 -
                   tag: interface
-                  value: 'port-{#IFNAME}'
+                  value: '{#IFNAME}'
             -
               uuid: 7a0f50f929db4a38985261b221885ea2
               name: 'Interface {#IFNAME}({#IFALIAS}): AP band'
@@ -1023,7 +1023,7 @@ zabbix_export:
                   value: network
                 -
                   tag: interface
-                  value: 'port-{#IFNAME}'
+                  value: '{#IFNAME}'
             -
               uuid: e2113b513f02404c81ae0a924d51596d
               name: 'Interface {#IFNAME}({#IFALIAS}): SSID'
@@ -1050,7 +1050,7 @@ zabbix_export:
                   value: network
                 -
                   tag: interface
-                  value: 'port-{#IFNAME}'
+                  value: '{#IFNAME}'
             -
               uuid: 18cb28a2ab264dc1acbb998f94a505ec
               name: 'Interface {#IFNAME}({#IFALIAS}): AP noise floor'
@@ -1076,7 +1076,7 @@ zabbix_export:
                   value: network
                 -
                   tag: interface
-                  value: 'port-{#IFNAME}'
+                  value: '{#IFNAME}'
             -
               uuid: ff5d2e77f98e444690506781950f0421
               name: 'Interface {#IFNAME}({#IFALIAS}): AP registered clients'
@@ -1096,7 +1096,7 @@ zabbix_export:
                   value: network
                 -
                   tag: interface
-                  value: 'port-{#IFNAME}'
+                  value: '{#IFNAME}'
         -
           uuid: ed8e11b608b84f5a803e37c11d22253c
           name: 'CAPsMAN AP channel discovery'
@@ -1136,7 +1136,7 @@ zabbix_export:
                   value: network
                 -
                   tag: interface
-                  value: 'port-{#IFNAME}'
+                  value: '{#IFNAME}'
             -
               uuid: b931d7192a004ec9bd0986617bf7d61e
               name: 'Interface {#IFNAME}({#IFALIAS}): AP channel'
@@ -1163,7 +1163,7 @@ zabbix_export:
                   value: network
                 -
                   tag: interface
-                  value: 'port-{#IFNAME}'
+                  value: '{#IFNAME}'
             -
               uuid: d09039bc2f7f4f8b8ba5263c5e44bde1
               name: 'Interface {#IFNAME}({#IFALIAS}): AP registered clients'
@@ -1183,7 +1183,7 @@ zabbix_export:
                   value: network
                 -
                   tag: interface
-                  value: 'port-{#IFNAME}'
+                  value: '{#IFNAME}'
             -
               uuid: 6939f8f2f12342ca8ef18c87ed5e78d0
               name: 'Interface {#IFNAME}({#IFALIAS}): AP state'
@@ -1210,7 +1210,7 @@ zabbix_export:
                   value: network
                 -
                   tag: interface
-                  value: 'port-{#IFNAME}'
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: c5d53608ecb34d68a3d1ffbe5807dabb
@@ -1711,7 +1711,7 @@ zabbix_export:
           uuid: 18663281a59f4b2190affab16310ce72
           name: 'Storage discovery'
           type: SNMP_AGENT
-          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.2.1.25.2.3.1.3,{#ALLOC_UNITS},1.3.6.1.2.1.25.2.3.1.4,{#STORAGE_TYPE},1.3.6.1.2.1.25.2.3.1.2]'
+          snmp_oid: 'discovery[{#FSNAME},1.3.6.1.2.1.25.2.3.1.3,{#ALLOC_UNITS},1.3.6.1.2.1.25.2.3.1.4,{#STORAGE_TYPE},1.3.6.1.2.1.25.2.3.1.2]'
           key: storage.discovery
           delay: 1h
           filter:

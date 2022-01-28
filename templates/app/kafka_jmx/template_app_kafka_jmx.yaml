@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T09:59:20Z'
+  date: '2022-01-27T14:13:28Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1054,6 +1054,10 @@ zabbix_export:
               name: 'Kafka: There are under replicated partitions'
               priority: AVERAGE
               description: 'The Under replicated partitions metric displays the number of partitions that do not have enough replicas to meet the desired replication factor. A partition will also be considered under-replicated if the correct number of replicas exist, but one or more of the replicas have fallen significantly behind the partition leader. The two most common causes of under-replicated partitions are that one or more brokers is unresponsive, or the cluster is experiencing performance issues and one or more brokers have fallen behind.'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: c2086b19fcf84c1f948ec80726054dcd
           name: 'Kafka: Request queue size'

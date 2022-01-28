@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T18:53:36Z'
+  date: '2022-01-27T08:33:00Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -847,6 +847,9 @@ zabbix_export:
                     - '1024'
               tags:
                 -
+                  tag: component
+                  value: filesystem
+                -
                   tag: filesystem
                   value: '{#FSNAME}'
                 -
@@ -881,6 +884,9 @@ zabbix_export:
                     - '1024'
               tags:
                 -
+                  tag: component
+                  value: filesystem
+                -
                   tag: filesystem
                   value: '{#FSNAME}'
                 -
@@ -902,6 +908,9 @@ zabbix_export:
                     - '1024'
               tags:
                 -
+                  tag: component
+                  value: filesystem
+                -
                   tag: filesystem
                   value: '{#FSNAME}'
                 -
@@ -918,6 +927,9 @@ zabbix_export:
               units: '%'
               description: 'Provides the percentage of compression savings in a volume, which is ((compr_saved/used)) * 10(compr_saved + 0). This is only returned for volumes.'
               tags:
+                -
+                  tag: component
+                  value: filesystem
                 -
                   tag: filesystem
                   value: '{#FSNAME}'
@@ -936,6 +948,9 @@ zabbix_export:
               description: 'Provides the percentage of deduplication savings in a volume, which is ((dedup_saved/(dedup_saved + used)) * 100). This is only returned for volumes.'
               tags:
                 -
+                  tag: component
+                  value: filesystem
+                -
                   tag: filesystem
                   value: '{#FSNAME}'
                 -
@@ -951,6 +966,9 @@ zabbix_export:
               units: '%'
               description: 'The percentage of disk space currently in use on {#FSNAME}.'
               tags:
+                -
+                  tag: component
+                  value: filesystem
                 -
                   tag: filesystem
                   value: '{#FSNAME}'

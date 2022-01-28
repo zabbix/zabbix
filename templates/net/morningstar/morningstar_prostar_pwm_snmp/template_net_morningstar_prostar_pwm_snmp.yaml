@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T09:52:22Z'
+  date: '2022-01-27T18:30:49Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -445,6 +445,10 @@ zabbix_export:
               name: 'Status: Device has "eepromAccessFailure" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
             -
               uuid: fefea5daa03d453c8c5148ddb39997f9
               expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","fp10SupplyOutOfRange")=2'

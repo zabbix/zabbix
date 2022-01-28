@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:01:54Z'
+  date: '2022-01-27T19:00:06Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -684,8 +684,8 @@ zabbix_export:
               description: '"Too many  Redis client exceptions during  to requests to  Redis instance shared_state."'
               tags:
                 -
-                  tag: component
-                  value: redis
+                  tag: scope
+                  value: availability
         -
           uuid: 7dcc638e1c174dd5975f85551211a3ba
           name: 'GitLab: Redis: Client requests rate, cache'

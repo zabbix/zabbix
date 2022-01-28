@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:37:32Z'
+  date: '2022-01-27T09:45:15Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -2324,7 +2324,7 @@ zabbix_export:
                   value: '{#DBNAME}'
                 -
                   tag: type
-                  value: PDB
+                  value: pdb
               trigger_prototypes:
                 -
                   uuid: 3dbb9379f8024924b197037acfbbdac4

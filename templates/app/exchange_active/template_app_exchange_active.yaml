@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:48:49Z'
+  date: '2022-01-27T08:51:06Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -193,6 +193,10 @@ zabbix_export:
                   name: 'Information Store [{#INSTANCE}]: Page faults is too high (>{$MS.EXCHANGE.DB.FAULTS.WARN} for {$MS.EXCHANGE.DB.FAULTS.TIME})'
                   priority: AVERAGE
                   description: 'Too much page faults stalls for database "{#INSTANCE}". This counter should be 0 on production servers.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 8c1ca3d79ef445668e8a5ba04a278e6f
               name: 'Information Store [{#INSTANCE}]: Log records stalled'
@@ -213,6 +217,10 @@ zabbix_export:
                   name: 'Information Store [{#INSTANCE}]: Log records stalls is too high (>{$MS.EXCHANGE.LOG.STALLS.WARN} for {$MS.EXCHANGE.LOG.STALLS.TIME})'
                   priority: AVERAGE
                   description: 'Stalled log records too high. The average value should be less than 10 threads waiting.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 9173dba68e55434aaa324b3e38ba22bb
               name: 'Information Store [{#INSTANCE}]: Log threads waiting'
@@ -265,6 +273,10 @@ zabbix_export:
                   name: 'Database Counters [{#INSTANCE}]: Average read time latency is too high (>{$MS.EXCHANGE.DB.ACTIVE.READ.WARN}s for {$MS.EXCHANGE.DB.ACTIVE.READ.TIME})'
                   priority: WARNING
                   description: 'Should be less than 20ms on average.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 8381c3c3971f4b3380cfe5d663e31416
               name: 'Database Counters [{#INSTANCE}]: Passive database read operations latency'
@@ -291,6 +303,10 @@ zabbix_export:
                   name: 'Database Counters [{#INSTANCE}]: Average read time latency is too high (>{$MS.EXCHANGE.DB.PASSIVE.READ.WARN}s for {$MS.EXCHANGE.DB.PASSIVE.READ.TIME})'
                   priority: WARNING
                   description: 'Should be less than 200ms on average.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: defb4f7dfb6f4a97a4928bab82897845
               name: 'Database Counters [{#INSTANCE}]: Active database write operations per second'
@@ -330,6 +346,10 @@ zabbix_export:
                   name: 'Database Counters [{#INSTANCE}]: Average write time latency is too high for {$MS.EXCHANGE.DB.ACTIVE.WRITE.TIME}'
                   priority: WARNING
                   description: 'Should be less than 50ms on average.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: a53596604a4c4a49bd04bfda30064d78
               name: 'Database Counters [{#INSTANCE}]: Passive database write operations latency'
@@ -412,6 +432,10 @@ zabbix_export:
                   name: 'Information Store [{#INSTANCE}]: RPC Requests latency is too high (>{$MS.EXCHANGE.RPC.WARN}s for {$MS.EXCHANGE.RPC.TIME})'
                   priority: WARNING
                   description: 'Should be less than 50ms at all times, with spikes less than 100ms.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: c423048154634eb29f4fe56c306f5b04
               name: 'Information Store [{#INSTANCE}]: RPC requests per second'
@@ -445,6 +469,10 @@ zabbix_export:
                   name: 'Information Store [{#INSTANCE}]: RPC Requests total count is too high (>{$MS.EXCHANGE.RPC.COUNT.WARN} for {$MS.EXCHANGE.RPC.COUNT.TIME})'
                   priority: WARNING
                   description: 'Should be below 70 at all times.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
           trigger_prototypes:
             -
               uuid: 9c9732c8d3314c12aecd268aa445e8bc
@@ -452,6 +480,10 @@ zabbix_export:
               name: 'Database Counters [{#INSTANCE}]: Average write time latency is higher than read time latency for {$MS.EXCHANGE.DB.PASSIVE.WRITE.TIME}'
               priority: WARNING
               description: 'Should be less than the read latency for the same instance, as measured by the MSExchange Database ==> Instances({#INF.STORE}/_Total)\I/O Database Reads (Recovery) Average Latency counter.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
           graph_prototypes:
             -
               uuid: 3749d38f7b7f478486c1181aeabd19c1
@@ -545,6 +577,10 @@ zabbix_export:
                   name: 'Domain Controller [{#INSTANCE}]: LDAP read time is too high (>{$MS.EXCHANGE.LDAP.WARN}s for {$MS.EXCHANGE.LDAP.TIME})'
                   priority: AVERAGE
                   description: 'Should be less than 50ms at all times, with spikes less than 100ms.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 1c94a8c06c5a4d4894060b68fc44a093
               name: 'Domain Controller [{#INSTANCE}]: Search time'
@@ -571,6 +607,10 @@ zabbix_export:
                   name: 'Domain Controller [{#INSTANCE}]: LDAP search time is too high (>{$MS.EXCHANGE.LDAP.WARN}s for {$MS.EXCHANGE.LDAP.TIME})'
                   priority: AVERAGE
                   description: 'Should be less than 50ms at all times, with spikes less than 100ms.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: 004b61b0e602483780f7c944219cf110

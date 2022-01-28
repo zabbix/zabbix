@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T13:53:50Z'
+  date: '2022-01-27T08:40:02Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -242,6 +242,10 @@ zabbix_export:
               priority: INFO
               description: 'Firmware version has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 3c68a1be050d4c1287e63eb7b3b81f8f
           name: 'Hardware serial number'
