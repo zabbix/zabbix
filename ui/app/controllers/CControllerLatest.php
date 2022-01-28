@@ -293,7 +293,7 @@ abstract class CControllerLatest extends CController {
 
 		if (array_key_exists('subfilter_tagnames', $filter) && $filter['subfilter_tagnames']
 				|| array_key_exists('subfilter_tags', $filter) && $filter['subfilter_tags']) {
-			$filter['evaltype'] = TAG_EVAL_TYPE_AND_OR;
+			$filter['evaltype'] = TAG_EVAL_TYPE_OR;
 
 			$filter['tags'] = [];
 			if (array_key_exists('subfilter_tagnames', $filter)) {
