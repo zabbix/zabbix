@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-25 11:38+0200\n"
+"POT-Creation-Date: 2022-01-28 19:55+0200\n"
 "PO-Revision-Date: 2022-01-13 01:11+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -809,7 +809,7 @@ msgstr "Активно до"
 #: include/views/configuration.host.discovery.edit.php:843
 #: include/views/configuration.host.discovery.edit.php:917
 #: include/views/configuration.host.discovery.edit.php:946
-#: include/views/configuration.host.discovery.edit.php:1008
+#: include/views/configuration.host.discovery.edit.php:1012
 #: include/views/configuration.hostgroups.edit.php:55
 #: include/views/configuration.host.prototype.edit.php:217
 #: include/views/configuration.host.prototype.edit.php:257
@@ -9386,8 +9386,8 @@ msgstr "Некорректное значение для \"%1$s\" поля."
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:41
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:47
 #: app/controllers/CControllerUserUpdateGeneral.php:111
-#: app/controllers/CControllerWidgetTopHostsView.php:364
-#: app/controllers/CControllerWidgetTopHostsView.php:376
+#: app/controllers/CControllerWidgetTopHostsView.php:395
+#: app/controllers/CControllerWidgetTopHostsView.php:407
 #: include/classes/api/services/CConfiguration.php:167
 #: include/classes/api/services/CDiscoveryRule.php:1866
 #: include/classes/api/services/CDiscoveryRule.php:2280
@@ -17498,7 +17498,7 @@ msgstr "Шаблоны обновлены"
 #: app/views/popup.mediatypetest.edit.php:99
 #: app/views/popup.testtriggerexpr.php:124 include/forms.inc.php:1493
 #: include/views/configuration.host.discovery.edit.php:997
-#: include/views/configuration.host.discovery.edit.php:1010
+#: include/views/configuration.host.discovery.edit.php:1014
 #: include/views/configuration.item.edit.php:1064
 #: include/views/configuration.item.edit.php:1085
 #: include/views/configuration.item.prototype.edit.php:920
@@ -21282,7 +21282,7 @@ msgstr "недопустимый первый параметр в функции
 msgid "invalid fourth parameter in function \"%1$s\""
 msgstr "недопустимый четвертый параметр в функции \"%1$s\""
 
-#: app/controllers/CControllerWidgetTopHostsView.php:365
+#: app/controllers/CControllerWidgetTopHostsView.php:396
 #: include/classes/graphdraw/CLineGraphDraw.php:240
 #: include/classes/graphdraw/CPieGraphDraw.php:166
 #: include/classes/helpers/CSvgGraphHelper.php:369
@@ -21334,7 +21334,7 @@ msgstr "ошибочный шестой параметр в функции \"%1$
 msgid "invalid third parameter in function \"%1$s\""
 msgstr "недопустимый третий параметр в функции \"%1$s\""
 
-#: app/controllers/CControllerWidgetTopHostsView.php:377
+#: app/controllers/CControllerWidgetTopHostsView.php:408
 #: include/classes/graphdraw/CLineGraphDraw.php:250
 #: include/classes/graphdraw/CPieGraphDraw.php:176
 #: include/classes/helpers/CSvgGraphHelper.php:381

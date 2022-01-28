@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-25 11:38+0200\n"
-"PO-Revision-Date: 2022-01-24 02:28+0300\n"
+"POT-Creation-Date: 2022-01-28 19:55+0200\n"
+"PO-Revision-Date: 2022-01-26 08:03+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1642984112.000000\n"
+"X-POOTLE-MTIME: 1643177017.000000\n"
 
 #: app/controllers/CControllerSlaReportList.php:181
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:104
@@ -765,7 +765,7 @@ msgstr "設定有効期間の終了日時"
 #: include/views/configuration.host.discovery.edit.php:843
 #: include/views/configuration.host.discovery.edit.php:917
 #: include/views/configuration.host.discovery.edit.php:946
-#: include/views/configuration.host.discovery.edit.php:1008
+#: include/views/configuration.host.discovery.edit.php:1012
 #: include/views/configuration.hostgroups.edit.php:55
 #: include/views/configuration.host.prototype.edit.php:217
 #: include/views/configuration.host.prototype.edit.php:257
@@ -846,7 +846,7 @@ msgstr "ホストを追加"
 
 #: include/classes/widgets/views/widget.tophosts.form.view.php:75
 msgid "Add item column"
-msgstr ""
+msgstr "アイテムの列を追加"
 
 #: app/partials/massupdate.macros.tab.php:95
 #: app/partials/massupdate.valuemaps.tab.php:37
@@ -1480,7 +1480,7 @@ msgstr "認可"
 
 #: app/views/popup.tophosts.column.edit.php:162
 msgid "Auto"
-msgstr ""
+msgstr "自動"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:48
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:156
@@ -1711,7 +1711,7 @@ msgstr "下"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:133
 msgid "Bottom N"
-msgstr ""
+msgstr "下位Nホスト"
 
 #: jsLoader.php:276
 msgid "Bring forward"
@@ -5323,7 +5323,7 @@ msgstr "配布ステータス"
 
 #: include/classes/widgets/CWidgetHelper.php:62
 msgid "Deprecated"
-msgstr ""
+msgstr "廃止予定"
 
 #: app/controllers/CControllerAuditLogList.php:287
 #: app/partials/configuration.host.edit.html.php:261
@@ -5773,7 +5773,7 @@ msgstr "ディスク書き込み統計。typeがsectors、operations、bytesの�
 
 #: app/views/popup.tophosts.column.edit.php:147
 msgid "Display"
-msgstr ""
+msgstr "表示"
 
 #: app/views/administration.trigdisplay.edit.php:89
 msgid "Display OK triggers for"
@@ -7709,7 +7709,7 @@ msgstr "ヒストリの削除には時間を要します。実行しますか？
 
 #: app/views/popup.tophosts.column.edit.php:159
 msgid "History data"
-msgstr ""
+msgstr "ヒストリデータ"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:47
 msgid "History data selection"
@@ -8057,7 +8057,7 @@ msgstr "ホストのサブネットマスク"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:91
 msgid "Host tags"
-msgstr ""
+msgstr "ホストのタグ"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:34
 msgid "Host time"
@@ -9198,8 +9198,8 @@ msgstr "\"%1$s\"フィールドのための値が正しくありません。"
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:41
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:47
 #: app/controllers/CControllerUserUpdateGeneral.php:111
-#: app/controllers/CControllerWidgetTopHostsView.php:364
-#: app/controllers/CControllerWidgetTopHostsView.php:376
+#: app/controllers/CControllerWidgetTopHostsView.php:395
+#: app/controllers/CControllerWidgetTopHostsView.php:407
 #: include/classes/api/services/CConfiguration.php:167
 #: include/classes/api/services/CDiscoveryRule.php:1866
 #: include/classes/api/services/CDiscoveryRule.php:2280
@@ -9397,7 +9397,7 @@ msgstr "深刻度を増やす"
 
 #: app/views/popup.tophosts.column.edit.php:152
 msgid "Indicators"
-msgstr ""
+msgstr "インジケーター"
 
 #: include/locales.inc.php:60
 msgid "Indonesian (id_ID)"
@@ -12041,7 +12041,7 @@ msgstr "新規追加ルール"
 
 #: app/views/popup.tophosts.column.edit.php:249
 msgid "New column"
-msgstr ""
+msgstr "新規列"
 
 #: app/controllers/CControllerPopupConditionActions.php:94
 #: app/controllers/CControllerPopupConditionEventCorr.php:87
@@ -13247,11 +13247,11 @@ msgstr "Or"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:131
 msgid "Order"
-msgstr ""
+msgstr "表示順序"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:145
 msgid "Order column"
-msgstr ""
+msgstr "順序用列"
 
 #: app/partials/massupdate.macros.tab.php:119
 #: app/partials/massupdate.valuemaps.tab.php:89
@@ -17250,7 +17250,7 @@ msgstr "テンプレートを更新しました"
 #: app/views/popup.mediatypetest.edit.php:99
 #: app/views/popup.testtriggerexpr.php:124 include/forms.inc.php:1493
 #: include/views/configuration.host.discovery.edit.php:997
-#: include/views/configuration.host.discovery.edit.php:1010
+#: include/views/configuration.host.discovery.edit.php:1014
 #: include/views/configuration.item.edit.php:1064
 #: include/views/configuration.item.edit.php:1085
 #: include/views/configuration.item.prototype.edit.php:920
@@ -17327,7 +17327,7 @@ msgstr "テキスト"
 
 #: app/views/popup.tophosts.column.edit.php:75
 msgid "Text, supports {INVENTORY.*}, {HOST.*} macros"
-msgstr ""
+msgstr "テキスト、マクロの{INVENTORY.*}と{HOST.*}をサポート"
 
 #: include/classes/api/clients/CLocalApiClient.php:89
 #, c-format
@@ -17504,7 +17504,7 @@ msgstr "閾値"
 
 #: app/views/popup.tophosts.column.edit.php:232
 msgid "Thresholds"
-msgstr ""
+msgstr "閾値"
 
 #: include/items.inc.php:1892 include/items.inc.php:1896
 msgid "Throttling"
@@ -17665,11 +17665,11 @@ msgstr "上"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:132
 msgid "Top N"
-msgstr ""
+msgstr "上位Nホスト"
 
 #: include/classes/widgets/CWidgetConfig.php:75
 msgid "Top hosts"
-msgstr ""
+msgstr "上位ホスト"
 
 #: app/views/administration.queue.overview.proxy.php:97
 #: app/views/monitoring.widget.hostavail.view.php:34
@@ -18496,7 +18496,7 @@ msgstr "更新"
 
 #: app/views/popup.tophosts.column.edit.php:249
 msgid "Update column"
-msgstr ""
+msgstr "列の変更"
 
 #: app/partials/massupdate.macros.tab.php:86
 #: app/partials/massupdate.valuemaps.tab.php:33 app/views/popup.import.php:129
@@ -19598,7 +19598,7 @@ msgstr "ダッシュボード\"%1$s\"のページ#%2$d上の X:%3$d, Y:%4$d の�
 
 #: include/classes/widgets/CWidgetHelper.php:68
 msgid "Widget is deprecated."
-msgstr ""
+msgstr "ウィジェットは廃止予定です。"
 
 #: jsLoader.php:196
 msgid "Widget is too small for the specified number of columns and rows."
@@ -21006,7 +21006,7 @@ msgstr "関数\"%1$s\"内の最初のパラメーターが正しくありませ�
 msgid "invalid fourth parameter in function \"%1$s\""
 msgstr "関数\"%1$s\"内の4番目のパラメーターが正しくありません"
 
-#: app/controllers/CControllerWidgetTopHostsView.php:365
+#: app/controllers/CControllerWidgetTopHostsView.php:396
 #: include/classes/graphdraw/CLineGraphDraw.php:240
 #: include/classes/graphdraw/CPieGraphDraw.php:166
 #: include/classes/helpers/CSvgGraphHelper.php:369
@@ -21058,7 +21058,7 @@ msgstr "関数\"%1$s\"内の6番目のパラメーターが正しくありませ
 msgid "invalid third parameter in function \"%1$s\""
 msgstr "関数\"%1$s\"内の3番目のパラメーターが正しくありません"
 
-#: app/controllers/CControllerWidgetTopHostsView.php:377
+#: app/controllers/CControllerWidgetTopHostsView.php:408
 #: include/classes/graphdraw/CLineGraphDraw.php:250
 #: include/classes/graphdraw/CPieGraphDraw.php:176
 #: include/classes/helpers/CSvgGraphHelper.php:381

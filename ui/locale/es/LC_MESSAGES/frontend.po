@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-25 11:38+0200\n"
-"PO-Revision-Date: 2022-01-20 21:56+0300\n"
+"POT-Creation-Date: 2022-01-28 19:55+0200\n"
+"PO-Revision-Date: 2022-01-28 12:08+0300\n"
 "Last-Translator: cesar.fernandez <cesar.fernandez@mrinformatica.es>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1642708570.000000\n"
+"X-POOTLE-MTIME: 1643364496.000000\n"
 
 #: app/controllers/CControllerSlaReportList.php:181
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:104
@@ -787,7 +787,7 @@ msgstr "Activo hasta"
 #: include/views/configuration.host.discovery.edit.php:843
 #: include/views/configuration.host.discovery.edit.php:917
 #: include/views/configuration.host.discovery.edit.php:946
-#: include/views/configuration.host.discovery.edit.php:1008
+#: include/views/configuration.host.discovery.edit.php:1012
 #: include/views/configuration.hostgroups.edit.php:55
 #: include/views/configuration.host.prototype.edit.php:217
 #: include/views/configuration.host.prototype.edit.php:257
@@ -1504,7 +1504,7 @@ msgstr "Autorización"
 
 #: app/views/popup.tophosts.column.edit.php:162
 msgid "Auto"
-msgstr ""
+msgstr "Auto"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:48
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:156
@@ -1597,7 +1597,7 @@ msgstr ""
 
 #: include/classes/widgets/views/widget.svggraph.form.view.php:307
 msgid "Axes"
-msgstr ""
+msgstr "Ejes"
 
 #: include/classes/setup/CSetupWizard.php:334
 #: include/classes/setup/CSetupWizard.php:753
@@ -1613,7 +1613,7 @@ msgstr "Fondo"
 #: include/classes/widgets/forms/CWidgetFormItem.php:384
 #: include/views/js/monitoring.sysmaps.js.php:564
 msgid "Background color"
-msgstr ""
+msgstr "Color de fondo"
 
 #: include/views/monitoring.sysmap.edit.php:121
 msgid "Background image"
@@ -1624,7 +1624,7 @@ msgstr "Imagen de fondo"
 #: include/classes/widgets/CWidgetHelper.php:971
 #: include/classes/widgets/CWidgetHelper.php:1219
 msgid "Bar"
-msgstr ""
+msgstr "Barra"
 
 #: app/views/administration.authentication.edit.php:175
 msgid "Base DN"
@@ -1634,7 +1634,7 @@ msgstr "DN Base"
 #: include/classes/widgets/CWidgetHelper.php:954
 #: include/classes/widgets/CWidgetHelper.php:1210
 msgid "Base color"
-msgstr ""
+msgstr "Color de base"
 
 #: include/httptest.inc.php:28
 msgid "Basic"
@@ -1642,11 +1642,11 @@ msgstr "Básico"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:250
 msgid "Before value"
-msgstr ""
+msgstr "Valor anterior"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:253
 msgid "Below value"
-msgstr ""
+msgstr "Valor inferior"
 
 #: app/views/administration.authentication.edit.php:187
 msgid "Bind DN"
@@ -1659,7 +1659,7 @@ msgstr "Contraseña del enlace"
 #: app/controllers/CControllerPopupTriggerExpr.php:428
 #: app/controllers/CControllerPopupTriggerExpr.php:461
 msgid "Bits to shift"
-msgstr ""
+msgstr "Bits a desplazar"
 
 #: app/views/popup.triggerexpr.php:110
 msgid "Bitwise functions"
@@ -9295,8 +9295,8 @@ msgstr ""
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:41
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:47
 #: app/controllers/CControllerUserUpdateGeneral.php:111
-#: app/controllers/CControllerWidgetTopHostsView.php:364
-#: app/controllers/CControllerWidgetTopHostsView.php:376
+#: app/controllers/CControllerWidgetTopHostsView.php:395
+#: app/controllers/CControllerWidgetTopHostsView.php:407
 #: include/classes/api/services/CConfiguration.php:167
 #: include/classes/api/services/CDiscoveryRule.php:1866
 #: include/classes/api/services/CDiscoveryRule.php:2280
@@ -17378,7 +17378,7 @@ msgstr ""
 #: app/views/popup.mediatypetest.edit.php:99
 #: app/views/popup.testtriggerexpr.php:124 include/forms.inc.php:1493
 #: include/views/configuration.host.discovery.edit.php:997
-#: include/views/configuration.host.discovery.edit.php:1010
+#: include/views/configuration.host.discovery.edit.php:1014
 #: include/views/configuration.item.edit.php:1064
 #: include/views/configuration.item.edit.php:1085
 #: include/views/configuration.item.prototype.edit.php:920
@@ -21145,7 +21145,7 @@ msgstr ""
 msgid "invalid fourth parameter in function \"%1$s\""
 msgstr ""
 
-#: app/controllers/CControllerWidgetTopHostsView.php:365
+#: app/controllers/CControllerWidgetTopHostsView.php:396
 #: include/classes/graphdraw/CLineGraphDraw.php:240
 #: include/classes/graphdraw/CPieGraphDraw.php:166
 #: include/classes/helpers/CSvgGraphHelper.php:369
@@ -21197,7 +21197,7 @@ msgstr ""
 msgid "invalid third parameter in function \"%1$s\""
 msgstr ""
 
-#: app/controllers/CControllerWidgetTopHostsView.php:377
+#: app/controllers/CControllerWidgetTopHostsView.php:408
 #: include/classes/graphdraw/CLineGraphDraw.php:250
 #: include/classes/graphdraw/CPieGraphDraw.php:176
 #: include/classes/helpers/CSvgGraphHelper.php:381
