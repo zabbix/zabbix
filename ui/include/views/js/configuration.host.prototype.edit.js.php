@@ -43,6 +43,14 @@
 	<?= (new CPartial('configuration.host.interface.row'))->getOutput() ?>
 </script>
 
+<script>
+	const view = {
+		editHost(e, hostid) {
+			return;
+		}
+	}
+</script>
+
 <script type="text/javascript">
 	class InterfaceSourceSwitcher extends CBaseComponent {
 		constructor(target, source_input, add_button, data) {

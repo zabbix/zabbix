@@ -588,23 +588,34 @@ function prepareItemHttpAgentFormData(array $item) {
 
 		foreach ($item['query_fields']['name'] as $index => $key) {
 			$value = $item['query_fields']['value'][$index];
+			$sortorder = $item['query_fields']['sortorder'][$index];
 
 			if ($key !== '' || $value !== '') {
-				$query_fields[] = [$key => $value];
+				$query_fields[$sortorder] = [$key => $value];
 			}
 		}
+
+		ksort($query_fields);
 		$item['query_fields'] = $query_fields;
 	}
 
 	if ($item['headers']) {
-		$headers = [];
+		$tmp_headers = [];
 
 		foreach ($item['headers']['name'] as $index => $key) {
 			$value = $item['headers']['value'][$index];
+			$sortorder = $item['headers']['sortorder'][$index];
 
 			if ($key !== '' || $value !== '') {
-				$headers[$key] = $value;
+				$tmp_headers[$sortorder] = [$key => $value];
 			}
+		}
+
+		ksort($tmp_headers);
+		$headers = [];
+
+		foreach ($tmp_headers as $key_value_pair) {
+			$headers[key($key_value_pair)] = reset($key_value_pair);
 		}
 
 		$item['headers'] = $headers;
@@ -777,10 +788,12 @@ function getItemFormData(array $item = [], array $options = []) {
 					&& array_key_exists('value', $data[$property])) {
 				foreach ($data[$property]['name'] as $index => $key) {
 					if (array_key_exists($index, $data[$property]['value'])) {
-						$values[] = [$key => $data[$property]['value'][$index]];
+						$sortorder = $data[$property]['sortorder'][$index];
+						$values[$sortorder] = [$key => $data[$property]['value'][$index]];
 					}
 				}
 			}
+			ksort($values);
 			$data[$property] = $values;
 		}
 
@@ -1462,7 +1475,7 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 		$preprocessing_list->addItem(
 			(new CListItem([
 				(new CDiv([
-					(new CDiv())
+					(new CDiv(new CVar('preprocessing['.$i.'][sortorder]', $step['sortorder'])))
 						->addClass(ZBX_STYLE_DRAG_ICON)
 						->addClass(!$sortable ? ZBX_STYLE_DISABLED : null),
 					(new CDiv($preproc_types_select))

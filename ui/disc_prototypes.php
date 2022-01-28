@@ -644,6 +644,7 @@ if (hasRequest('form') || (hasRequest('clone') && getRequest('itemid') != 0)) {
 		]);
 		$itemPrototype = reset($itemPrototype);
 
+		$i = 0;
 		foreach ($itemPrototype['preprocessing'] as &$step) {
 			if ($step['type'] == ZBX_PREPROC_SCRIPT) {
 				$step['params'] = [$step['params'], ''];
@@ -651,6 +652,7 @@ if (hasRequest('form') || (hasRequest('clone') && getRequest('itemid') != 0)) {
 			else {
 				$step['params'] = explode("\n", $step['params']);
 			}
+			$step['sortorder'] = $i++;
 		}
 		unset($step);
 
@@ -697,6 +699,7 @@ if (hasRequest('form') || (hasRequest('clone') && getRequest('itemid') != 0)) {
 
 	$form_action = (hasRequest('clone') && getRequest('itemid') != 0) ? 'clone' : getRequest('form');
 	$data = getItemFormData($itemPrototype, ['form' => $form_action]);
+	CArrayHelper::sort($data['preprocessing'], ['sortorder']);
 	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM_PROTOTYPE;
 	$data['preprocessing_types'] = CItemPrototype::SUPPORTED_PREPROCESSING_TYPES;
 	$data['trends_default'] = DB::getDefault('items', 'trends');

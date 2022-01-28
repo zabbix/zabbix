@@ -26,6 +26,7 @@
 #include "dbcache.h"
 #include "zbxcrypto.h"
 #include "zbxdiag.h"
+#include "zbxrtc.h"
 
 #include "../../zabbix_server/scripts/scripts.h"
 #include "taskmanager.h"
@@ -38,10 +39,6 @@
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
-
-#ifdef HAVE_NETSNMP
-static volatile sig_atomic_t	snmp_cache_reload_requested;
-#endif
 
 /******************************************************************************
  *                                                                            *
@@ -384,22 +381,13 @@ static void	tm_remove_old_tasks(int now)
 	DBcommit();
 }
 
-static void	zbx_taskmanager_sigusr_handler(int flags)
-{
-#ifdef HAVE_NETSNMP
-	if (ZBX_RTC_SNMP_CACHE_RELOAD == ZBX_RTC_GET_MSG(flags))
-		snmp_cache_reload_requested = 1;
-#else
-	ZBX_UNUSED(flags);
-#endif
-}
-
 ZBX_THREAD_ENTRY(taskmanager_thread, args)
 {
 	static int	cleanup_time = 0;
 
-	double	sec1, sec2;
-	int	tasks_num, sleeptime, nextcheck;
+	double			sec1, sec2;
+	int			tasks_num, sleeptime, nextcheck;
+	zbx_ipc_async_socket_t	rtc;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -422,22 +410,25 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 
 	zbx_setproctitle("%s [started, idle %d sec]", get_process_type_string(process_type), sleeptime);
 
-	zbx_set_sigusr_handler(zbx_taskmanager_sigusr_handler);
+	zbx_rtc_subscribe(&rtc, process_type, process_num);
 
 	while (ZBX_IS_RUNNING())
 	{
-		zbx_sleep_loop(sleeptime);
+		zbx_uint32_t	rtc_cmd;
+		unsigned char	*rtc_data;
+
+		if (SUCCEED == zbx_rtc_wait(&rtc, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
+		{
+#ifdef HAVE_NETSNMP
+			if (ZBX_RTC_SNMP_CACHE_RELOAD == rtc_cmd)
+				zbx_clear_cache_snmp(process_type, process_num);
+#endif
+			if (ZBX_RTC_SHUTDOWN == rtc_cmd)
+				break;
+		}
 
 		sec1 = zbx_time();
 		zbx_update_env(sec1);
-
-#ifdef HAVE_NETSNMP
-		if (1 == snmp_cache_reload_requested)
-		{
-			zbx_clear_cache_snmp(process_type, process_num);
-			snmp_cache_reload_requested = 0;
-		}
-#endif
 
 		zbx_setproctitle("%s [processing tasks]", get_process_type_string(process_type));
 

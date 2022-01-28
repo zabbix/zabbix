@@ -37,6 +37,7 @@ else {
 }
 
 $url = (new CUrl('graphs.php'))
+	->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 	->setArgument('context', $data['context'])
 	->getUrl();
 
@@ -206,7 +207,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 					'with_webitems' => '1',
 					'numeric' => '1',
 					'writeonly' => '1'
-				]).', getOnlyHostParam()), {dialogue_class: "modal-popup-generic"});'
+				]).', view.getOnlyHostParam()), {dialogue_class: "modal-popup-generic"});'
 			)
 			->setEnabled(!$readonly);
 
@@ -281,7 +282,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 					'with_webitems' => '1',
 					'numeric' => '1',
 					'writeonly' => '1'
-				]).', getOnlyHostParam()), {dialogue_class: "modal-popup-generic"});'
+				]).', view.getOnlyHostParam()), {dialogue_class: "modal-popup-generic"});'
 			)
 			->setEnabled(!$readonly);
 
@@ -399,43 +400,23 @@ $items_table->addRow(
 					(new CButton('add_item', _('Add')))
 						->onClick(
 							'return PopUp("popup.generic",
-								jQuery.extend('.json_encode($parameters_add).', getOnlyHostParam())
+								jQuery.extend('.json_encode($parameters_add).', view.getOnlyHostParam())
 							);'
 						)
 						->addClass(ZBX_STYLE_BTN_LINK),
 					$data['parent_discoveryid']
 						? (new CButton('add_protoitem', _('Add prototype')))
-							->onClick('return PopUp("popup.generic", '.json_encode($parameters_add_prototype).',
-								{dialogue_class: "modal-popup-generic"}
-							);')
+							->onClick(
+								'return PopUp("popup.generic", '.json_encode($parameters_add_prototype).',
+									{dialogue_class: "modal-popup-generic"}
+								);'
+							)
 							->addClass(ZBX_STYLE_BTN_LINK)
 						: null
 				])
 			))->setColSpan(8)
 	))->setId('itemButtonsRow')
 );
-
-foreach ($this->data['items'] as $n => $item) {
-	$name = $item['host'].NAME_DELIMITER.$item['name'];
-
-	if (zbx_empty($item['drawtype'])) {
-		$item['drawtype'] = 0;
-	}
-
-	if (zbx_empty($item['yaxisside'])) {
-		$item['yaxisside'] = 0;
-	}
-
-	if (!array_key_exists('gitemid', $item)) {
-		$item['gitemid'] = '';
-	}
-
-	insert_js('loadItem('.$n.', '.json_encode($item['gitemid']).', '.$item['itemid'].', '.
-		json_encode($name).', '.$item['type'].', '.$item['calc_fnc'].', '.$item['drawtype'].', '.
-		$item['yaxisside'].', \''.$item['color'].'\', '.$item['flags'].');',
-		true
-	);
-}
 
 $graphFormList->addRow(
 	(new CLabel(_('Items'), $items_table->getId()))->setAsteriskMark(),
@@ -512,3 +493,21 @@ $graphForm->addItem($graphTab);
 $widget->addItem($graphForm);
 
 $widget->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'form_name' => $graphForm->getName(),
+		'theme_colors' => explode(',', getUserGraphTheme()['colorpalette']),
+		'graphs' => [
+			'graphtype' =>  $data['graphtype'],
+			'readonly' => $readonly,
+			'hostid' => $data['hostid'],
+			'is_template' => $data['is_template'],
+			'normal_only' => $data['normal_only'],
+			'parent_discoveryid' => $data['parent_discoveryid']
+		],
+		'items' => $data['items']
+	]).');
+'))
+	->setOnDocumentReady()
+	->show();

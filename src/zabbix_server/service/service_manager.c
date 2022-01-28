@@ -39,8 +39,6 @@ extern int				CONFIG_SERVICEMAN_SYNC_FREQUENCY;
 #define ZBX_PROBLEM_CLEANUP_AGE		(SEC_PER_HOUR * 2)
 #define ZBX_PROBLEM_CLEANUP_FREQUENCY	SEC_PER_HOUR
 
-static volatile sig_atomic_t	service_cache_reload_requested;
-
 typedef struct
 {
 	zbx_uint64_t		eventid;
@@ -3255,22 +3253,6 @@ static void	cleanup_deleted_problems(zbx_service_manager_t *service_manager, int
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	zbx_serviceman_sigusr_handler(int flags)
-{
-	if (ZBX_RTC_SERVICE_CACHE_RELOAD != ZBX_RTC_GET_MSG(flags))
-		return;
-
-	if (1 == service_cache_reload_requested)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "service manager cache reloading is already in progress");
-	}
-	else
-	{
-		service_cache_reload_requested = 1;
-		zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the service manager cache");
-	}
-}
-
 ZBX_THREAD_ENTRY(service_manager_thread, args)
 {
 	zbx_ipc_service_t	service;
@@ -3282,6 +3264,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 	double			time_stat, time_idle = 0, time_now, time_flush = 0, time_cleanup = 0, sec;
 	zbx_service_manager_t	service_manager;
 	zbx_timespec_t		timeout = {1, 0};
+	int			service_cache_reload_requested = 0;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -3298,8 +3281,6 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
-
-	zbx_set_sigusr_handler(zbx_serviceman_sigusr_handler);
 
 	if (FAIL == zbx_ipc_service_start(&service, ZBX_IPC_SERVICE_SERVICE, &error))
 	{
@@ -3344,7 +3325,11 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 		{
 			int	updated = 0, revision;
 
-			service_cache_reload_requested = 0;
+			if (1 == service_cache_reload_requested)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the service manager cache");
+				service_cache_reload_requested = 0;
+			}
 
 			do
 			{
@@ -3426,6 +3411,15 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 					break;
 				case ZBX_IPC_SERVICE_EVENT_SEVERITIES:
 					process_event_severities(message, &service_manager);
+					break;
+				case ZBX_IPC_SERVICE_RELOAD_CACHE:
+					if (0 != service_cache_reload_requested)
+					{
+						zabbix_log(LOG_LEVEL_WARNING, "service manager cache reloading is"
+								" already in progress");
+					}
+					else
+						service_cache_reload_requested = 1;
 					break;
 				default:
 					THIS_SHOULD_NEVER_HAPPEN;

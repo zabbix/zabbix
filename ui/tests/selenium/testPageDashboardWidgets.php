@@ -130,7 +130,7 @@ class testPageDashboardWidgets extends CWebTest {
 	 */
 	public function testPageDashboardWidgets_checkProblemHostsWidget() {
 		// Authorize user and open the page 'zabbix.php?action=dashboard.view&dashboardid=100'.
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=100');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1000');
 
 		// Find dashboard element.
 		$dashboard = CDashboardElement::find()->one();

@@ -130,7 +130,7 @@ class testDashboardPages extends CWebTest {
 									[
 										'type' => 4,
 										'name' => 'itemid',
-										'value' => 40041
+										'value' => 400410
 									]
 								]
 							]
