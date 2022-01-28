@@ -33,8 +33,6 @@
 
 #define ZBX_HA_POLL_PERIOD	5
 
-#define ZBX_HA_DEFAULT_FAILOVER_DELAY	SEC_PER_MIN
-
 #define ZBX_HA_NODE_LOCK	1
 
 static pid_t			ha_pid = ZBX_THREAD_ERROR;
@@ -1439,10 +1437,8 @@ out:
  * Purpose: get HA manager status                                             *
  *                                                                            *
  ******************************************************************************/
-int	zbx_ha_get_status(int *ha_status, char **error)
+int	zbx_ha_get_status(int *ha_status, int *ha_failover_delay, char **error)
 {
-	static time_t	last_update;
-	static int	ha_failover_delay = ZBX_HA_DEFAULT_FAILOVER_DELAY;
 	int		ret;
 	unsigned char	*result = NULL;
 
@@ -1457,29 +1453,16 @@ int	zbx_ha_get_status(int *ha_status, char **error)
 			zbx_uint32_t	len;
 
 			ptr += zbx_deserialize_value(ptr, ha_status);
-			ptr += zbx_deserialize_value(ptr, &ha_failover_delay);
+			ptr += zbx_deserialize_value(ptr, ha_failover_delay);
 			(void)zbx_deserialize_str(ptr, error, len);
 
 			zbx_free(result);
-			last_update = time(NULL);
 
 			if (ZBX_NODE_STATUS_ERROR == *ha_status)
 				ret = FAIL;
 		}
 		else
-		{
-			time_t	now;
-
-			now = time(NULL);
-
-			/* in the case of timeout switch status to standby if enough time has */
-			/* passed since last successful update                                */
-			if (ZBX_HA_IS_CLUSTER() && *ha_status == ZBX_NODE_STATUS_ACTIVE && 0 != last_update)
-			{
-				if (last_update + ha_failover_delay - ZBX_HA_POLL_PERIOD <= now || now < last_update)
-					*ha_status = ZBX_NODE_STATUS_STANDBY;
-			}
-		}
+			*ha_status = ZBX_NODE_STATUS_STANDBY;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
@@ -1497,10 +1480,9 @@ int	zbx_ha_get_status(int *ha_status, char **error)
  *           process to switch to standby mode and initiate teardown process  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_ha_dispatch_message(zbx_ipc_message_t *message, int *ha_status, char **error)
+int	zbx_ha_dispatch_message(zbx_ipc_message_t *message, int *ha_status, int *ha_failover_delay, char **error)
 {
 	static time_t	last_hb;
-	static int	ha_failover_delay = ZBX_HA_DEFAULT_FAILOVER_DELAY;
 	int		ret = SUCCEED, ha_status_old;
 	time_t		now;
 	unsigned char	*ptr;
@@ -1519,7 +1501,7 @@ int	zbx_ha_dispatch_message(zbx_ipc_message_t *message, int *ha_status, char **e
 
 				ptr = message->data;
 				ptr += zbx_deserialize_value(ptr, ha_status);
-				ptr += zbx_deserialize_value(ptr, &ha_failover_delay);
+				ptr += zbx_deserialize_value(ptr, ha_failover_delay);
 				(void)zbx_deserialize_str(ptr, error, len);
 
 				if (ZBX_NODE_STATUS_ERROR == *ha_status)
@@ -1542,7 +1524,7 @@ int	zbx_ha_dispatch_message(zbx_ipc_message_t *message, int *ha_status, char **e
 
 	if (ZBX_HA_IS_CLUSTER() && *ha_status == ZBX_NODE_STATUS_ACTIVE && 0 != last_hb)
 	{
-		if (last_hb + ha_failover_delay - ZBX_HA_POLL_PERIOD <= now || now < last_hb)
+		if (last_hb + *ha_failover_delay - ZBX_HA_POLL_PERIOD <= now || now < last_hb)
 			*ha_status = ZBX_NODE_STATUS_STANDBY;
 	}
 out:
