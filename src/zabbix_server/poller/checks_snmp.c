@@ -351,6 +351,11 @@ end:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+#define COPY_OID(proto_name, proto_len)					\
+	session->securityAuthProto = snmp_duplicate_objid(proto_name,	\
+			OID_LENGTH(proto_name));			\
+	session->securityAuthProtoLen = proto_len;
+
 static int	zbx_snmpv3_set_auth_protocol(const DC_ITEM *item, struct snmp_session *session)
 {
 	int	ret = SUCCEED;
@@ -358,35 +363,29 @@ static int	zbx_snmpv3_set_auth_protocol(const DC_ITEM *item, struct snmp_session
 	switch (item->snmpv3_authprotocol)
 	{
 		case ITEM_SNMPV3_AUTHPROTOCOL_MD5:
-			session->securityAuthProto = usmHMACMD5AuthProtocol;
-			session->securityAuthProtoLen = USM_AUTH_PROTO_MD5_LEN;
+			COPY_OID(usmHMACMD5AuthProtocol, USM_AUTH_PROTO_MD5_LEN)
 			break;
 		case ITEM_SNMPV3_AUTHPROTOCOL_SHA1:
-			session->securityAuthProto = usmHMACSHA1AuthProtocol;
-			session->securityAuthProtoLen = USM_AUTH_PROTO_SHA_LEN;
+			COPY_OID(usmHMACSHA1AuthProtocol, USM_AUTH_PROTO_SHA_LEN)
 			break;
 #ifdef HAVE_NETSNMP_STRONG_AUTH
 		case ITEM_SNMPV3_AUTHPROTOCOL_SHA224:
-			session->securityAuthProto = usmHMAC128SHA224AuthProtocol;
-			session->securityAuthProtoLen = OID_LENGTH(usmHMAC128SHA224AuthProtocol);
+			COPY_OID(usmHMAC128SHA224AuthProtocol, OID_LENGTH(usmHMAC128SHA224AuthProtocol))
 			break;
 		case ITEM_SNMPV3_AUTHPROTOCOL_SHA256:
-			session->securityAuthProto = usmHMAC192SHA256AuthProtocol;
-			session->securityAuthProtoLen = OID_LENGTH(usmHMAC192SHA256AuthProtocol);
+			COPY_OID(usmHMAC192SHA256AuthProtocol, OID_LENGTH(usmHMAC192SHA256AuthProtocol))
 			break;
 		case ITEM_SNMPV3_AUTHPROTOCOL_SHA384:
-			session->securityAuthProto = usmHMAC256SHA384AuthProtocol;
-			session->securityAuthProtoLen = OID_LENGTH(usmHMAC256SHA384AuthProtocol);
+			COPY_OID(usmHMAC256SHA384AuthProtocol, OID_LENGTH(usmHMAC256SHA384AuthProtocol))
 			break;
 		case ITEM_SNMPV3_AUTHPROTOCOL_SHA512:
-			session->securityAuthProto = usmHMAC384SHA512AuthProtocol;
-			session->securityAuthProtoLen = OID_LENGTH(usmHMAC384SHA512AuthProtocol);
+			COPY_OID(usmHMAC384SHA512AuthProtocol, OID_LENGTH(usmHMAC384SHA512AuthProtocol))
 			break;
 #endif
 		default:
 			ret = FAIL;
 	}
-
+#undef COPY_OID
 	return ret;
 }
 
@@ -576,40 +575,41 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 					goto end;
 				}
 
+#define COPY_OID(proto_name, proto_len)								\
+				session.securityPrivProto = snmp_duplicate_objid(proto_name,	\
+						OID_LENGTH(proto_name));			\
+				session.securityPrivProtoLen = proto_len;
+
 				switch (item->snmpv3_privprotocol)
 				{
 #ifdef HAVE_NETSNMP_SESSION_DES
 					case ITEM_SNMPV3_PRIVPROTOCOL_DES:
 						/* set the privacy protocol to DES */
-						session.securityPrivProto = usmDESPrivProtocol;
-						session.securityPrivProtoLen = USM_PRIV_PROTO_DES_LEN;
+						COPY_OID(usmDESPrivProtocol, USM_PRIV_PROTO_DES_LEN)
 						break;
 #endif
 					case ITEM_SNMPV3_PRIVPROTOCOL_AES128:
 						/* set the privacy protocol to AES128 */
-						session.securityPrivProto = usmAESPrivProtocol;
-						session.securityPrivProtoLen = USM_PRIV_PROTO_AES_LEN;
+						COPY_OID(usmAESPrivProtocol, USM_PRIV_PROTO_AES_LEN)
 						break;
 #ifdef HAVE_NETSNMP_STRONG_PRIV
 					case ITEM_SNMPV3_PRIVPROTOCOL_AES192:
 						/* set the privacy protocol to AES192 */
-						session.securityPrivProto = usmAES192PrivProtocol;
-						session.securityPrivProtoLen = OID_LENGTH(usmAES192PrivProtocol);
+						COPY_OID(usmAES192PrivProtocol, OID_LENGTH(usmAES192PrivProtocol))
 						break;
 					case ITEM_SNMPV3_PRIVPROTOCOL_AES256:
 						/* set the privacy protocol to AES256 */
-						session.securityPrivProto = usmAES256PrivProtocol;
-						session.securityPrivProtoLen = OID_LENGTH(usmAES256PrivProtocol);
+						COPY_OID(usmAES256PrivProtocol, OID_LENGTH(usmAES256PrivProtocol))
 						break;
 					case ITEM_SNMPV3_PRIVPROTOCOL_AES192C:
 						/* set the privacy protocol to AES192 (Cisco version) */
-						session.securityPrivProto = usmAES192CiscoPrivProtocol;
-						session.securityPrivProtoLen = OID_LENGTH(usmAES192CiscoPrivProtocol);
+						COPY_OID(usmAES192CiscoPrivProtocol,
+								OID_LENGTH(usmAES192CiscoPrivProtocol))
 						break;
 					case ITEM_SNMPV3_PRIVPROTOCOL_AES256C:
 						/* set the privacy protocol to AES256 (Cisco version) */
-						session.securityPrivProto = usmAES256CiscoPrivProtocol;
-						session.securityPrivProtoLen = OID_LENGTH(usmAES256CiscoPrivProtocol);
+						COPY_OID(usmAES256CiscoPrivProtocol,
+								OID_LENGTH(usmAES256CiscoPrivProtocol))
 						break;
 #endif
 					default:
@@ -618,7 +618,7 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 								item->snmpv3_privprotocol);
 						goto end;
 				}
-
+#undef COPY_OID
 				session.securityPrivKeyLen = USM_PRIV_KU_LEN;
 
 				if (SNMPERR_SUCCESS != generate_Ku(session.securityAuthProto,
