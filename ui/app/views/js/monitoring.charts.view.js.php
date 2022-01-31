@@ -428,13 +428,20 @@
 	ChartList.prototype.onResize = function() {
 		const width = this.wrapper.clientWidth;
 
-		if (this._resize_timeoutid) {
-			clearTimeout(this._resize_timeoutid);
+		if (this._prev_width === undefined) {
+			this._prev_width = width;
+			this.updateCharts();
+
+			return;
 		}
 
+		clearTimeout(this._resize_timeoutid);
+
 		if (this._prev_width != width) {
-			this._prev_width = width;
-			this._resize_timeoutid = setTimeout(_ => this.updateCharts(), 500);
+			this._resize_timeoutid = setTimeout(() => {
+				this._prev_width = width;
+				this.updateCharts();
+			}, 500);
 		}
 	};
 </script>
