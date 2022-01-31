@@ -32,9 +32,18 @@ class testPageLatestData extends CWebTest {
 	}
 
 	public function testPageLatestData_CheckLayout() {
-		// Add data to item to see With data/Without data subfilter.
 		$time = time() - 100;
-		DBexecute("INSERT INTO history_uint (itemid, clock, value, ns) VALUES (23287, ".zbx_dbstr($time).", 1, 0)");
+		$hostname = 'ЗАББИКС Сервер';
+
+		$id = CDBHelper::getValue('SELECT itemid'.
+			' FROM items WHERE hostid in ('.
+				'SELECT hostid FROM hosts'.
+				' WHERE name='.zbx_dbstr($hostname).
+			') AND name ="Zabbix agent ping"'
+		);
+
+		// Add data to item agent.ping to see "With data"/"Without data" subfilter.
+		DBexecute("INSERT INTO history_uint (itemid, clock, value, ns) VALUES (".zbx_dbstr($id).", ".zbx_dbstr($time).", 1, 0)");
 
 		$this->page->login()->open('zabbix.php?action=latest.view');
 		$this->page->assertTitle('Latest data');
@@ -49,7 +58,7 @@ class testPageLatestData extends CWebTest {
 			$this->assertEquals($status, $this->query('link:With data')->one(false)->isValid());
 			$this->assertEquals($status, $this->query('link:Without data')->one(false)->isValid());
 			if (!$status) {
-				$form->fill(['Hosts' => 'ЗАББИКС Сервер']);
+				$form->fill(['Hosts' => $hostname]);
 				$form->submit();
 				$this->page->waitUntilReady();
 			}
