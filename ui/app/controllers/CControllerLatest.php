@@ -264,6 +264,8 @@ abstract class CControllerLatest extends CController {
 	 * Get items count for passed filter.
 	 *
 	 * @param array  $filter                        Filter options.
+	 * @param string $filter['sort']                Sort name.
+	 * @param string $filter['sortorder']           Sort order.
 	 * @param string $filter['name']                Filter items by name.
 	 * @param array  $filter['groupids']            Filter items by host groups.
 	 * @param array  $filter['hostids']             Filter items by host groups.
@@ -277,94 +279,12 @@ abstract class CControllerLatest extends CController {
 	 * @return int
 	 */
 	protected function getCount(array $filter): int {
-		$groupids = $filter['groupids'] ? getSubGroups($filter['groupids']) : null;
+		$prepared_data = $this->prepareData($filter, $filter['sort'], $filter['sortorder']);
+		$subfilters_fields = self::getSubfilterFields($filter, (count($filter['hostids']) == 1));
+		$subfilters = self::getSubfilters($subfilters_fields, $prepared_data);
+		$prepared_data['items'] = self::applySubfilters($prepared_data['items']);
 
-		$hosts = API::Host()->get([
-			'output' => [],
-			'groupids' => $groupids,
-			'hostids' => $filter['hostids'] ? $filter['hostids'] : null,
-			'monitored_hosts' => true,
-			'preservekeys' => true
-		]);
-
-		if (array_key_exists('subfilter_hostids', $filter) && $filter['subfilter_hostids']) {
-			$hosts = array_intersect_key($hosts, array_flip($filter['subfilter_hostids']));
-		}
-
-		if (array_key_exists('subfilter_tagnames', $filter) && $filter['subfilter_tagnames']
-				|| array_key_exists('subfilter_tags', $filter) && $filter['subfilter_tags']) {
-			$filter['evaltype'] = TAG_EVAL_TYPE_OR;
-
-			$filter['tags'] = [];
-			if (array_key_exists('subfilter_tagnames', $filter)) {
-				foreach ($filter['subfilter_tagnames'] as $tagname) {
-					$filter['tags'][] = [
-						'tag' => $tagname,
-						'operator' => TAG_OPERATOR_EXISTS
-					];
-				}
-			}
-			if (array_key_exists('subfilter_tags', $filter)) {
-				foreach ($filter['subfilter_tags'] as $tagname => $values) {
-					foreach ($values as $value) {
-						$filter['tags'][] = [
-							'tag' => $tagname,
-							'value' => $value,
-							'operator' => TAG_OPERATOR_EQUAL
-						];
-					}
-				}
-			}
-		}
-
-		$subfilter_data = (array_key_exists('subfilter_data', $filter) && count($filter['subfilter_data']) == 1)
-			? reset($filter['subfilter_data'])
-			: -1;
-
-		$search_limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
-		$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
-		$select_items_cnt = 0;
-
-		foreach (array_keys($hosts) as $hostid) {
-			if ($select_items_cnt >= $search_limit) {
-				break;
-			}
-
-			$host_items = API::Item()->get([
-				'output' => ['itemid', 'value_type'],
-				'hostids' => [$hostid],
-				'webitems' => true,
-				'evaltype' => $filter['evaltype'],
-				'tags' => $filter['tags'] ? $filter['tags'] : null,
-				'filter' => [
-					'status' => [ITEM_STATUS_ACTIVE]
-				],
-				'search' => ($filter['name'] === '') ? null : [
-					'name' => $filter['name']
-				],
-				'preservekeys' => true
-			]);
-
-			if ($subfilter_data != -1) {
-				$items_having_values = Manager::History()->getItemsHavingValues($host_items, $history_period);
-
-				switch ($subfilter_data) {
-					// Items without data only.
-					case 0:
-						$host_items = array_diff_key($host_items, $items_having_values);
-						break;
-
-					// Items having data only.
-					case 1:
-						$host_items = $items_having_values;
-						break;
-				}
-			}
-
-			$select_items_cnt += count($host_items);
-		}
-
-		return min($select_items_cnt, $search_limit);
+		return count($prepared_data['items']);
 	}
 
 	/**
