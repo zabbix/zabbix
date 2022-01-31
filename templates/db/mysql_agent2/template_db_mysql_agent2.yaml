@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:38:48Z'
+  date: '2022-01-31T15:01:10Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -794,7 +794,7 @@ zabbix_export:
           key: mysql.innodb_log_file_size
           history: 7d
           value_type: FLOAT
-          params: '(last(//mysql.innodb_os_log_written) - first(//mysql.innodb_os_log_written,1h)) / {$MYSQL.INNODB_LOG_FILES}'
+          params: '(last(//mysql.innodb_os_log_written) - last(//mysql.innodb_os_log_written,#1:now-1h)) / {$MYSQL.INNODB_LOG_FILES}'
           description: 'Calculated by (innodb_os_log_written-innodb_os_log_written(time shift -1h))/{$MYSQL.INNODB_LOG_FILES} value of the innodb_log_file_size. Innodb_log_file_size is the size in bytes of the each InnoDB redo log file in the log group. The combined size can be no more than 512GB. Larger values mean less disk I/O due to less flushing checkpoint activity, but also slower recovery from a crash.'
           preprocessing:
             -
