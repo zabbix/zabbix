@@ -113,6 +113,10 @@ class testPageDashboard extends CLegacyWebTest {
 	}
 
 	public function testPageDashboard_AddFavouriteGraphs() {
+		$item_ids = CDBHelper::getAll('SELECT itemid FROM items WHERE hostid=10084 AND name IN ('.
+				zbx_dbstr($this->graphCpu).','.zbx_dbstr($this->graphMemory).')'
+		);
+
 		$this->zbxTestLogin('zabbix.php?action=latest.view');
 		$this->zbxTestCheckHeader('Latest data');
 
@@ -121,7 +125,7 @@ class testPageDashboard extends CLegacyWebTest {
 		$filter->getField('Name')->fill($this->graphCpu);
 		$filter->submit();
 		$cpu_link = $this->query('link:Graph')->one();
-		$cpu_url = $cpu_link->getAttribute('href');
+		$cpu_url = 'history.php?action=showgraph&itemids%5B0%5D='.$item_ids[0]['itemid'];
 		$cpu_link->click();
 
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//button[@id='addrm_fav']"));
@@ -136,7 +140,7 @@ class testPageDashboard extends CLegacyWebTest {
 		$filter->getField('Name')->fill($this->graphMemory);
 		$filter->submit();
 		$memory_link = $this->query('link:Graph')->one();
-		$memory_url = $memory_link->getAttribute('href');
+		$memory_url = 'history.php?action=showgraph&itemids%5B0%5D='.$item_ids[1]['itemid'];
 		$memory_link->click();
 
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//button[@id='addrm_fav']"));
@@ -150,7 +154,6 @@ class testPageDashboard extends CLegacyWebTest {
 		$url_xpath = '//div[@class="dashboard-grid"]/div[8]//a[@href=';
 
 		foreach ([$this->graphCpu => $cpu_url, $this->graphMemory => $memory_url] as $graph => $graph_url) {
-			$graph_url = str_replace('%5B%5D', '%5B0%5D', $graph_url);
 			$this->zbxTestAssertElementText($url_xpath.CXPathHelper::escapeQuotes($graph_url).']', 'ЗАББИКС Сервер: '.$graph);
 			$graph_id = str_replace('history.php?action=showgraph&itemids%5B0%5D=', '', $graph_url);
 			$this->assertEquals(1, CDBHelper::getCount('SELECT profileid FROM profiles WHERE idx='

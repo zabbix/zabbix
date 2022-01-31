@@ -587,14 +587,6 @@ class testUrlParameters extends CLegacyWebTest {
 						'url' => 'zabbix.php?action=charts.view&filter_hostids%5B%5D=99012&filter_hostids%5B%5D=66666&'.
 								'filter_show=1&filter_set=1',
 						'text_present' => [
-							'No permissions to referred object or it does not exist!',
-							'Host to check graph 1: Check graph 1',
-							'Host to check graph 1: Check graph 2'
-						]
-					],
-					[
-						'url' => 'history.php?action=showgraph&itemids%5B%5D=66666',
-						'text_present' => [
 							'No permissions to referred object or it does not exist!'
 						]
 					],
@@ -602,8 +594,7 @@ class testUrlParameters extends CLegacyWebTest {
 						'url' => 'zabbix.php?action=charts.view&filter_hostids%5B%5D=50011&filter_hostids%5B%5D=66666&'.
 						'filter_name=2_item&filter_show=0&filter_set=1',
 						'text_present' => [
-							'No permissions to referred object or it does not exist!',
-							'1_Host_to_check_Monitoring_Overview: 2_item'
+							'No permissions to referred object or it does not exist!'
 						]
 					],
 					[
@@ -622,6 +613,19 @@ class testUrlParameters extends CLegacyWebTest {
 						'text_present' => [
 							'Fatal error, please report to the Zabbix team',
 							'Incorrect value for "filter_hostids" field.'
+						]
+					]
+				]
+			],
+			[
+				'title' => 'History [refreshed every 30 sec.]',
+				'check_server_name' => true,
+				'server_name_on_page' => false,
+				'test_cases' => [
+					[
+						'url' => 'history.php?action=showgraph&itemids%5B%5D=66666',
+						'text_present' => [
+							'No permissions to referred object or it does not exist!'
 						]
 					],
 					[
