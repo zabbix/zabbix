@@ -886,11 +886,10 @@ class testPageMonitoringHosts extends CWebTest {
 			case 'Dynamic widgets H1':
 			case 'Host ZBX6663':
 			case 'Available host':
-				$field = ($data['name'] == 'Dynamic widgets H1') ? 'Host' : 'Hosts';
 				$this->selectLink($data['name'], $data['link_name'], $data['page_header']);
 				$this->page->waitUntilReady();
 				$filter_form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
-				$filter_form->checkValue([$field => $data['name']]);
+				$filter_form->checkValue(['Hosts' => $data['name']]);
 				$this->query('button:Reset')->one()->click();
 				break;
 			case 'ЗАББИКС Сервер':

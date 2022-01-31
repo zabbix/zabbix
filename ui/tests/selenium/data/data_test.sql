@@ -1403,7 +1403,7 @@ INSERT INTO users_groups (id, usrgrpid, userid) VALUES (7, 7, 5);
 
 -- testPageDashboard Favorites
 INSERT INTO profiles (profileid,userid,idx,value_id,value_str,source,type) VALUES (1,1,'web.favorite.sysmapids',1,'','sysmapid',1);
-INSERT INTO profiles (profileid,userid,idx,value_id,value_str,source,type) VALUES (2,1,'web.favorite.graphids',519,'','graphid',1);
+INSERT INTO profiles (profileid,userid,idx,value_id,value_str,source,type) VALUES (2,1,'web.favorite.graphids',42258,'','itemid',1);
 
 -- testFormAdministrationUserGroups
 INSERT INTO usrgrp (usrgrpid, name) VALUES (13, 'Selenium user group');
