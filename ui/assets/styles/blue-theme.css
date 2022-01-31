@@ -1600,8 +1600,6 @@ div.dashboard-grid-widget-tophosts td {
   line-height: 20px; }
 div.dashboard-grid-widget-tophosts .link-action {
   white-space: nowrap; }
-div.dashboard-grid-widget-tophosts .item-value {
-  text-align: center; }
 div.dashboard-grid-widget-tophosts z-bar-gauge {
   min-width: 64px;
   height: 20px; }
