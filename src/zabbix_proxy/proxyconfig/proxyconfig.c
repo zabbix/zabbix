@@ -84,7 +84,10 @@ static void	process_configuration_sync(size_t *data_size)
 	update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
 	if (FAIL == connect_to_server(&sock, 600, CONFIG_PROXYCONFIG_RETRY))	/* retry till have a connection */
+	{
+		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 		goto out;
+	}
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
@@ -139,7 +142,6 @@ static void	process_configuration_sync(size_t *data_size)
 error:
 	disconnect_server(&sock);
 out:
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 	zbx_free(error);
 	zbx_free(buffer);
 	zbx_json_free(&j);
