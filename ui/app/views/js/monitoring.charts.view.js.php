@@ -26,11 +26,11 @@
 		_filter_form: null,
 		_data: null,
 		_resize_observer: null,
-		_wrapper: null,
+		_container: null,
 
 		init({filter_form_name, data}) {
 			this._filter_form = document.querySelector(`[name="${filter_form_name}"]`);
-			this._wrapper = document.querySelector('main');
+			this._container = document.querySelector('main');
 			this._data = data;
 
 			this.initSubfilter();
@@ -59,12 +59,12 @@
 				)
 			);
 
-			this._app = new ChartList( $('#charts'), this._data.timeline, this._data.config, this._wrapper);
+			this._app = new ChartList( $('#charts'), this._data.timeline, this._data.config, this._container);
 			this._app.setCharts(this._data.charts);
 			this._app.onResize();
 
 			this._resize_observer = new ResizeObserver(this._app.onResize.bind(this._app));
-			this._resize_observer.observe(this._wrapper);
+			this._resize_observer.observe(this._container);
 
 			$.subscribe('timeselector.rangeupdate', (e, data) => {
 				this._app.timeline = data;
@@ -403,7 +403,7 @@
 		raw_charts.forEach(function(chart) {
 			chart = this.charts_map[chart.chartid]
 				? this.charts_map[chart.chartid]
-				: new Chart(chart, this.timeline, view._$tmpl_row, view._wrapper);
+				: new Chart(chart, this.timeline, view._$tmpl_row, view._container);
 
 			// Existing chart nodes are assured to be in correct order.
 			this.$el.append(chart.$el);
