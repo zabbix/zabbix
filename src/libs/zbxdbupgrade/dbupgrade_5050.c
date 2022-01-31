@@ -1898,6 +1898,50 @@ static int	DBpatch_5050143(void)
 	return DBmodify_field_type("alerts", &field, &old_field);
 }
 
+static int	DBpatch_5050144(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.charts.filter.search_type'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5050145(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.charts.filter.graphids'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5050146(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.charts.filter.graph_patterns'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5050147(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.favorite.graphids' and source='graphid'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(5050)
@@ -2035,5 +2079,9 @@ DBPATCH_ADD(5050140, 0, 1)
 DBPATCH_ADD(5050141, 0, 1)
 DBPATCH_ADD(5050142, 0, 1)
 DBPATCH_ADD(5050143, 0, 1)
+DBPATCH_ADD(5050144, 0, 1)
+DBPATCH_ADD(5050145, 0, 1)
+DBPATCH_ADD(5050146, 0, 1)
+DBPATCH_ADD(5050147, 0, 1)
 
 DBPATCH_END()

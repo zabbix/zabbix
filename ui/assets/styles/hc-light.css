@@ -2302,6 +2302,40 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
       background-color: var(--severity-color-disaster-bg);
       color: #4b0c0c; }
 
+.subfilter-option-grid {
+  grid-template-columns: minmax(75px, max-content) auto;
+  display: grid;
+  margin: 5px 0; }
+  .subfilter-option-grid .subfilter-options {
+    grid-column: 2 / -1; }
+
+.subfilter,
+.subfilter-enabled {
+  display: inline-block;
+  height: 18px;
+  position: relative; }
+
+.subfilter {
+  margin-right: 10px;
+  white-space: nowrap; }
+
+.subfilter-enabled {
+  background-color: #333333;
+  border-radius: 2px;
+  color: #ffffff;
+  padding: 0 4px; }
+  .subfilter-enabled .link-action {
+    color: #ffffff;
+    text-decoration: none; }
+    .subfilter-enabled .link-action:focus {
+      color: #ffffff;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.7); }
+    .subfilter-enabled .link-action:hover {
+      color: #ffffff;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.7); }
+  .subfilter-enabled sup {
+    color: #737373; }
+
 .filter-container.tabfilter-container {
   padding: 0;
   border: 0 none;
@@ -2320,12 +2354,6 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
     .filter-container.tabfilter-container .tabfilter-content-container.tabfilter-collapsed .tabfilter-tabs-container,
     .filter-container.tabfilter-container .tabfilter-content-container.tabfilter-collapsed .form-buttons {
       display: none; }
-  .filter-container.tabfilter-container .subfilter-option-grid {
-    grid-template-columns: minmax(75px, max-content) auto;
-    display: grid;
-    margin: 5px 0; }
-    .filter-container.tabfilter-container .subfilter-option-grid .subfilter-options {
-      grid-column: 2 / -1; }
   .filter-container.tabfilter-container nav > ul {
     display: flex;
     flex: 1;
@@ -3212,32 +3240,6 @@ form.is-loading {
       color: initial;
       padding: 8px 5px 5px;
       border-bottom-width: 1px; }
-
-.subfilter,
-.subfilter-enabled {
-  display: inline-block;
-  height: 18px;
-  position: relative; }
-
-.subfilter {
-  margin-right: 10px; }
-
-.subfilter-enabled {
-  background-color: #333333;
-  border-radius: 2px;
-  color: #ffffff;
-  padding: 0 4px; }
-  .subfilter-enabled .link-action {
-    color: #ffffff;
-    text-decoration: none; }
-    .subfilter-enabled .link-action:focus {
-      color: #ffffff;
-      border-bottom: 2px solid rgba(255, 255, 255, 0.7); }
-    .subfilter-enabled .link-action:hover {
-      color: #ffffff;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.7); }
-  .subfilter-enabled sup {
-    color: #737373; }
 
 .filter-forms {
   margin: 0 auto;

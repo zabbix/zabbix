@@ -56,7 +56,6 @@ foreach (['hostids', 'tagnames', 'data'] as $key) {
 				' ',
 				new CSup($element['count'])
 			]))
-				->addClass(ZBX_STYLE_NOWRAP)
 				->addClass(ZBX_STYLE_SUBFILTER)
 				->addClass(ZBX_STYLE_SUBFILTER_ENABLED);
 		}
@@ -75,9 +74,7 @@ foreach (['hostids', 'tagnames', 'data'] as $key) {
 					)),
 					' ',
 					new CSup(($subfilter_used ? '+' : '').$element['count'])
-				]))
-					->addClass(ZBX_STYLE_NOWRAP)
-					->addClass(ZBX_STYLE_SUBFILTER);
+				]))->addClass(ZBX_STYLE_SUBFILTER);
 			}
 		}
 	}
@@ -118,7 +115,6 @@ if (count($data['tags']) > 0) {
 					' ',
 					new CSup($element['count'])
 				]))
-					->addClass(ZBX_STYLE_NOWRAP)
 					->addClass(ZBX_STYLE_SUBFILTER)
 					->addClass(ZBX_STYLE_SUBFILTER_ENABLED);
 			}
@@ -132,9 +128,7 @@ if (count($data['tags']) > 0) {
 						]).')'),
 					' ',
 					new CSup(($subfilter_used ? '+' : '').$element['count'])
-				]))
-					->addClass(ZBX_STYLE_NOWRAP)
-					->addClass(ZBX_STYLE_SUBFILTER);
+				]))->addClass(ZBX_STYLE_SUBFILTER);
 			}
 		}, $tags_group['values']);
 
