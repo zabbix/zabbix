@@ -33,6 +33,8 @@
 		refresh_interval: null,
 		refresh_counters: null,
 
+		subfilters_expanded: [],
+
 		running: false,
 		timeout: null,
 		_refresh_message_box: null,
@@ -66,6 +68,8 @@
 			this.filter.on(TABFILTER_EVENT_URLSET, () => {
 				this.reloadPartialAndTabCounters();
 			});
+
+			document.querySelectorAll('.expandable-subfilter').forEach(el => new CExpandableSubfilter(el));
 		},
 
 		createCountersRefresh(timeout) {
@@ -172,6 +176,8 @@
 					return post_data;
 				}, {});
 
+			post_data['subfilters_expanded'] = this.subfilters_expanded;
+
 			var deferred = $.ajax({
 				url: this.refresh_simple_url,
 				data: post_data,
@@ -219,6 +225,8 @@
 			if ('messages' in response) {
 				this._addRefreshMessage(response.messages);
 			}
+
+			document.querySelectorAll('.expandable-subfilter').forEach(el => new CExpandableSubfilter(el));
 		},
 
 		onDataFail(jqXHR) {

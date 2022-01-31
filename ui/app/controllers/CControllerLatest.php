@@ -28,10 +28,10 @@ abstract class CControllerLatest extends CController {
 	const FILTER_IDX = 'web.monitoring.latest';
 
 	// Number of subfilter values per row.
-	const SUBFILTERS_VALUES_PER_ROW = 100;
+	const SUBFILTERS_VALUES_PER_ROW = 1000;
 
 	// Number of tag value rows allowed to be included in subfilter.
-	const SUBFILTERS_TAG_VALUE_ROWS = 20;
+	const SUBFILTERS_TAG_VALUE_ROWS = 10;
 
 	// Filter fields default values.
 	const FILTER_FIELDS_DEFAULT = [

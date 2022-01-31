@@ -6980,3 +6980,23 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .leaflet-container {
   height: 100%;
   z-index: 1; }
+
+.expandable-subfilter {
+  position: relative;
+  overflow: hidden;
+  word-break: break-word;
+  max-height: 1.5em;
+  line-height: 1.5em; }
+  .expandable-subfilter.three-lines {
+    max-height: calc(1.5em * 3); }
+  .expandable-subfilter > div {
+    display: inline; }
+    .expandable-subfilter > div > .hidden {
+      display: none; }
+  .expandable-subfilter.expanded {
+    max-height: none;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 10; }
+    .expandable-subfilter.expanded > div > .hidden {
+      display: unset; }

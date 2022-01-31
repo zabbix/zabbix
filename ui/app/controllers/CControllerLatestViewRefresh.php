@@ -83,7 +83,8 @@ class CControllerLatestViewRefresh extends CControllerLatestView {
 						(int) $filter['tag_name_format'], $filter['tag_priority']
 					)
 				] + $prepared_data,
-				'subfilters' => $subfilters
+				'subfilters' => $subfilters,
+				'subfilters_expanded' => array_flip($this->getInput('subfilters_expanded', []))
 			];
 
 			$response = new CControllerResponseData($data);
