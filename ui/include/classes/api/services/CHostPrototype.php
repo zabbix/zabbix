@@ -550,9 +550,7 @@ class CHostPrototype extends CHostBase {
 		$db_host_prototypes = DBfetchArrayAssoc(DBselect(
 			'SELECT h.hostid,h.host,h.name,h.custom_interfaces,h.status,h.discover,h.templateid,'.
 				'hd.parent_itemid AS ruleid,'.
-				dbConditionCoalesce('hi.inventory_mode', DB::getDefault('host_inventory', 'inventory_mode'),
-					'inventory_mode'
-				).
+				dbConditionCoalesce('hi.inventory_mode', HOST_INVENTORY_DISABLED, 'inventory_mode').
 			' FROM hosts h'.
 			' INNER JOIN host_discovery hd ON h.hostid=hd.hostid'.
 			' LEFT JOIN host_inventory hi ON h.hostid=hi.hostid'.
@@ -1405,9 +1403,7 @@ class CHostPrototype extends CHostBase {
 	public function syncTemplates(array $ruleids, array $hostids): void {
 		$db_host_prototypes = DBfetchArrayAssoc(DBselect(
 			'SELECT hd.parent_itemid AS ruleid,h.hostid,h.host,h.name,h.custom_interfaces,h.status,h.discover,'.
-				dbConditionCoalesce('hi.inventory_mode', DB::getDefault('host_inventory', 'inventory_mode'),
-					'inventory_mode'
-				).
+				dbConditionCoalesce('hi.inventory_mode', HOST_INVENTORY_DISABLED, 'inventory_mode').
 			' FROM host_discovery hd'.
 			' INNER JOIN hosts h ON hd.hostid=h.hostid'.
 			' LEFT JOIN host_inventory hi ON h.hostid=hi.hostid'.
@@ -1526,9 +1522,7 @@ class CHostPrototype extends CHostBase {
 		$upd_db_host_prototypes = DBfetchArrayAssoc(DBselect(
 			'SELECT h.hostid,h.host,h.name,h.custom_interfaces,h.status,h.discover,h.templateid,'.
 				'hd.parent_itemid AS ruleid,'.
-				dbConditionCoalesce('hi.inventory_mode', DB::getDefault('host_inventory', 'inventory_mode'),
-					'inventory_mode'
-				).
+				dbConditionCoalesce('hi.inventory_mode', HOST_INVENTORY_DISABLED, 'inventory_mode').
 			' FROM hosts h'.
 			' INNER JOIN host_discovery hd ON h.hostid=hd.hostid'.
 			' LEFT JOIN host_inventory hi ON h.hostid=hi.hostid'.
@@ -1706,9 +1700,7 @@ class CHostPrototype extends CHostBase {
 		$result = DBselect(
 			'SELECT i.templateid AS parent_ruleid,i.itemid AS ruleid,hd.hostid,h.uuid,h.host,h.name,'.
 				'h.custom_interfaces,h.status,h.discover,h.templateid,'.
-				dbConditionCoalesce('hi.inventory_mode', DB::getDefault('host_inventory', 'inventory_mode'),
-					'inventory_mode'
-				).
+				dbConditionCoalesce('hi.inventory_mode', HOST_INVENTORY_DISABLED, 'inventory_mode').
 			' FROM items i'.
 			' INNER JOIN host_discovery hd ON i.itemid=hd.parent_itemid'.
 			' INNER JOIN hosts h ON hd.hostid=h.hostid'.
