@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-15T06:58:41Z'
+  date: '2022-01-26T10:01:43Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -17,7 +17,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -40,8 +40,8 @@ zabbix_export:
             key: zookeeper.get_metrics
           tags:
             -
-              tag: Application
-              value: Zookeeper
+              tag: component
+              value: disk
         -
           uuid: 260f60267bda40099f323292d7f0b8fd
           name: 'Zookeeper: Election time, avg'
@@ -67,8 +67,8 @@ zabbix_export:
             key: zookeeper.get_metrics
           tags:
             -
-              tag: Application
-              value: Zookeeper
+              tag: component
+              value: application
         -
           uuid: 28aa45a47df64503a9553a05794f512a
           name: 'Zookeeper: Fsync time, avg'
@@ -94,8 +94,8 @@ zabbix_export:
             key: zookeeper.get_metrics
           tags:
             -
-              tag: Application
-              value: Zookeeper
+              tag: component
+              value: disk
         -
           uuid: 243ea1e324d5464a88c8847e721cd38b
           name: 'Zookeeper: Latency, avg'
@@ -115,8 +115,8 @@ zabbix_export:
             key: zookeeper.get_metrics
           tags:
             -
-              tag: Application
-              value: Zookeeper
+              tag: component
+              value: requests
         -
           uuid: 6195a64eb23341f0964d8d9ffbf9e624
           name: 'Zookeeper: Snapshot write time, avg'
@@ -142,8 +142,8 @@ zabbix_export:
             key: zookeeper.get_metrics
           tags:
             -
-              tag: Application
-              value: Zookeeper
+              tag: component
+              value: disk
         -
           uuid: f227c61a498f47f6ba1862a741da3789
           name: 'Zookeeper: Bytes received per sec'
@@ -167,8 +167,8 @@ zabbix_export:
             key: zookeeper.get_metrics
           tags:
             -
-              tag: Application
-              value: Zookeeper
+              tag: component
+              value: network
         -
           uuid: b9a97ebbaf7d416998e24553cee3559c
           name: 'Zookeeper: Elections'
@@ -193,8 +193,8 @@ zabbix_export:
             key: zookeeper.get_metrics
           tags:
             -
-              tag: Application
-              value: Zookeeper
+              tag: component
+              value: application
         -
           uuid: 01d490987f954950b7ce3a107aefa200
           name: 'Zookeeper: Fsync'
@@ -214,8 +214,8 @@ zabbix_export:
             key: zookeeper.get_metrics
           tags:
             -
-              tag: Application
-              value: Zookeeper
+              tag: component
+              value: disk
         -
           uuid: 159bf1c1f29846a582e201c143239182
           name: 'Zookeeper: Snapshot writes'
@@ -235,8 +235,8 @@ zabbix_export:
             key: zookeeper.get_metrics
           tags:
             -
-              tag: Application
-              value: Zookeeper
+              tag: component
+              value: disk
         -
           uuid: 10b17f0682c44e2391b8ee191ed355c1
           name: 'Zookeeper: Commit per sec'
@@ -259,8 +259,8 @@ zabbix_export:
             key: zookeeper.get_metrics
           tags:
             -
-              tag: Application
-              value: Zookeeper
+              tag: component
+              value: operations
         -
           uuid: 1c0ff2c8d4844ed4b815f2a793dd6e7b
           name: 'Zookeeper: Drop connections per sec'
@@ -283,8 +283,8 @@ zabbix_export:
             key: zookeeper.get_metrics
           tags:
             -
-              tag: Application
-              value: Zookeeper
+              tag: component
+              value: connections
         -
           uuid: 640195274cda47ed83faa4f0c6529818
           name: 'Zookeeper: Rejected connections per sec'
@@ -307,8 +307,8 @@ zabbix_export:
             key: zookeeper.get_metrics
           tags:
             -
-              tag: Application
-              value: Zookeeper
+              tag: component
+              value: connections
         -
           uuid: 1498099b44d3424093f7cea55cb256e8
           name: 'Zookeeper: Revalidate connections per sec'
@@ -331,8 +331,8 @@ zabbix_export:
             key: zookeeper.get_metrics
           tags:
             -
-              tag: Application
-              value: Zookeeper
+              tag: component
+              value: connections
         -
           uuid: 3e8e3bc9910e4c3c898e1371790a35f0
           name: 'Zookeeper: Diff syncs per sec'
@@ -355,8 +355,8 @@ zabbix_export:
             key: zookeeper.get_metrics
           tags:
             -
-              tag: Application
-              value: Zookeeper
+              tag: component
+              value: operations
         -
           uuid: 1a581bf18a364868b6eb47bbafcaa105
           name: 'Zookeeper: Ephemeral nodes count'
@@ -374,8 +374,8 @@ zabbix_export:
             key: zookeeper.get_metrics
           tags:
             -
-              tag: Application
-              value: Zookeeper
+              tag: component
+              value: application
         -
           uuid: f682f5d6e1664f919872f309371e4079
           name: 'Zookeeper: Get connections stats'
@@ -388,8 +388,11 @@ zabbix_export:
           url: '{$ZOOKEEPER.SCHEME}://{HOST.CONN}:{$ZOOKEEPER.PORT}/{$ZOOKEEPER.COMMAND_URL}/connections'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: connections
+            -
+              tag: component
+              value: raw
         -
           uuid: cf7e83297d6343fb87dcd7848f62ce41
           name: 'Zookeeper: Get server metrics'
@@ -401,8 +404,8 @@ zabbix_export:
           url: '{$ZOOKEEPER.SCHEME}://{HOST.CONN}:{$ZOOKEEPER.PORT}/{$ZOOKEEPER.COMMAND_URL}/monitor'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: 0f8e7ac6f753483d86744b2ab6aa28dd
           name: 'Zookeeper: Global sessions'
@@ -420,8 +423,8 @@ zabbix_export:
             key: zookeeper.get_metrics
           tags:
             -
-              tag: Application
-              value: Zookeeper
+              tag: component
+              value: sessions
         -
           uuid: 72519325755b4c27931c674756313ebb
           name: 'Zookeeper: Local sessions'
@@ -439,8 +442,8 @@ zabbix_export:
             key: zookeeper.get_metrics
           tags:
             -
-              tag: Application
-              value: Zookeeper
+              tag: component
+              value: sessions
         -
           uuid: 8a784676586d4b719a0b5c1327a0645f
           name: 'Zookeeper: Looking per sec'
@@ -463,8 +466,8 @@ zabbix_export:
             key: zookeeper.get_metrics
           tags:
             -
-              tag: Application
-              value: Zookeeper
+              tag: component
+              value: operations
         -
           uuid: 350a5b566e054e8390bb43ce0b2916c6
           name: 'Zookeeper: File descriptors, max'
@@ -486,8 +489,8 @@ zabbix_export:
             key: zookeeper.get_metrics
           tags:
             -
-              tag: Application
-              value: Zookeeper
+              tag: component
+              value: fds
         -
           uuid: 185f5c3fdfde43afa55ed4c38c0878dc
           name: 'Zookeeper: Latency, max'
@@ -507,8 +510,8 @@ zabbix_export:
             key: zookeeper.get_metrics
           tags:
             -
-              tag: Application
-              value: Zookeeper
+              tag: component
+              value: requests
         -
           uuid: a4b3d6d9cfb14454b83475b89fe44e06
           name: 'Zookeeper: Latency, min'
@@ -528,8 +531,8 @@ zabbix_export:
             key: zookeeper.get_metrics
           tags:
             -
-              tag: Application
-              value: Zookeeper
+              tag: component
+              value: requests
         -
           uuid: 86ba6a7967e8462cb6ff4be126e21a44
           name: 'Zookeeper: Alive connections'
@@ -547,8 +550,8 @@ zabbix_export:
             key: zookeeper.get_metrics
           tags:
             -
-              tag: Application
-              value: Zookeeper
+              tag: component
+              value: connections
         -
           uuid: e441c926d2f947708b39d7615520405d
           name: 'Zookeeper: File descriptors, open'
@@ -566,8 +569,8 @@ zabbix_export:
             key: zookeeper.get_metrics
           tags:
             -
-              tag: Application
-              value: Zookeeper
+              tag: component
+              value: fds
         -
           uuid: 88ede9687323440183d665d38938212e
           name: 'Zookeeper: Outstanding requests'
@@ -585,8 +588,8 @@ zabbix_export:
             key: zookeeper.get_metrics
           tags:
             -
-              tag: Application
-              value: Zookeeper
+              tag: component
+              value: requests
           triggers:
             -
               uuid: ac27f2d8b34546d1bdc6d7ab858c04a1
@@ -595,6 +598,10 @@ zabbix_export:
               priority: AVERAGE
               description: 'Number of queued requests in the server. This goes up when the server receives more requests than it can process.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 3295ed3fdb504014b351eba81bf55ccf
           name: 'Zookeeper: Packets received per sec'
@@ -617,8 +624,8 @@ zabbix_export:
             key: zookeeper.get_metrics
           tags:
             -
-              tag: Application
-              value: Zookeeper
+              tag: component
+              value: network
         -
           uuid: ecef658cb34247e2838e0f7313dba0bf
           name: 'Zookeeper: Packets sent per sec'
@@ -641,8 +648,8 @@ zabbix_export:
             key: zookeeper.get_metrics
           tags:
             -
-              tag: Application
-              value: Zookeeper
+              tag: component
+              value: network
         -
           uuid: 8295b8c4c1f44ba48987f36b54b43ab8
           name: 'Zookeeper: Revalidate per sec'
@@ -665,8 +672,8 @@ zabbix_export:
             key: zookeeper.get_metrics
           tags:
             -
-              tag: Application
-              value: Zookeeper
+              tag: component
+              value: operations
         -
           uuid: 44a1f40fb3604fcda9fedc4beeb87baf
           name: 'Zookeeper: Server mode'
@@ -690,8 +697,8 @@ zabbix_export:
             key: zookeeper.get_metrics
           tags:
             -
-              tag: Application
-              value: Zookeeper
+              tag: component
+              value: application
           triggers:
             -
               uuid: 494624353875401eaf65f7eb0273ca35
@@ -700,6 +707,10 @@ zabbix_export:
               priority: INFO
               description: 'Zookeeper node state has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: d143981fdaee4c51bcbb773579be25f0
           name: 'Zookeeper: Snap syncs per sec'
@@ -722,8 +733,8 @@ zabbix_export:
             key: zookeeper.get_metrics
           tags:
             -
-              tag: Application
-              value: Zookeeper
+              tag: component
+              value: operations
         -
           uuid: cea535cfb32940f29aee3c17734e8c51
           name: 'Zookeeper: Uptime'
@@ -746,8 +757,8 @@ zabbix_export:
             key: zookeeper.get_metrics
           tags:
             -
-              tag: Application
-              value: Zookeeper
+              tag: component
+              value: application
           triggers:
             -
               uuid: db35b5c75fc543ef8ffe766a0671fd6d
@@ -756,6 +767,10 @@ zabbix_export:
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
             -
               uuid: d023c72f35e441d2bf5bbc3c1f9d0dad
               expression: 'last(/Zookeeper by HTTP/zookeeper.uptime)<10m'
@@ -763,6 +778,10 @@ zabbix_export:
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 86a65edd19e14fa9aea1ff40220f895c
           name: 'Zookeeper: Version'
@@ -791,8 +810,8 @@ zabbix_export:
             key: zookeeper.get_metrics
           tags:
             -
-              tag: Application
-              value: Zookeeper
+              tag: component
+              value: application
           triggers:
             -
               uuid: 2a091bcfafe84ea9aee5238ce5e25651
@@ -801,6 +820,10 @@ zabbix_export:
               priority: INFO
               description: 'Zookeeper version has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 5cbc4414c19146ff87e15f21c77808c9
           name: 'Zookeeper: Watch count'
@@ -818,8 +841,8 @@ zabbix_export:
             key: zookeeper.get_metrics
           tags:
             -
-              tag: Application
-              value: Zookeeper
+              tag: component
+              value: application
         -
           uuid: 07925b71e3fe421eac9b338fc23713d0
           name: 'Zookeeper: Znode count'
@@ -841,8 +864,8 @@ zabbix_export:
             key: zookeeper.get_metrics
           tags:
             -
-              tag: Application
-              value: Zookeeper
+              tag: component
+              value: application
       discovery_rules:
         -
           uuid: e0f576ea5ae44289866fb726079ddbf8
@@ -873,8 +896,17 @@ zabbix_export:
                 key: zookeeper.get_connections_stats
               tags:
                 -
-                  tag: Application
-                  value: 'Zookeeper {#TYPE} {#CLIENT}'
+                  tag: client
+                  value: '{#CLIENT}'
+                -
+                  tag: component
+                  value: clients
+                -
+                  tag: component
+                  value: requests
+                -
+                  tag: type
+                  value: '{#TYPE}'
             -
               uuid: 2a36ecfb56754bcb8bdc91da76316fb4
               name: 'Zookeeper client {#TYPE} [{#CLIENT}]: Latency, max'
@@ -894,8 +926,17 @@ zabbix_export:
                 key: zookeeper.get_connections_stats
               tags:
                 -
-                  tag: Application
-                  value: 'Zookeeper {#TYPE} {#CLIENT}'
+                  tag: client
+                  value: '{#CLIENT}'
+                -
+                  tag: component
+                  value: clients
+                -
+                  tag: component
+                  value: requests
+                -
+                  tag: type
+                  value: '{#TYPE}'
             -
               uuid: 6a245634ec9b4aa0b2df8360b42ac8aa
               name: 'Zookeeper client {#TYPE} [{#CLIENT}]: Latency, min'
@@ -915,8 +956,17 @@ zabbix_export:
                 key: zookeeper.get_connections_stats
               tags:
                 -
-                  tag: Application
-                  value: 'Zookeeper {#TYPE} {#CLIENT}'
+                  tag: client
+                  value: '{#CLIENT}'
+                -
+                  tag: component
+                  value: clients
+                -
+                  tag: component
+                  value: requests
+                -
+                  tag: type
+                  value: '{#TYPE}'
             -
               uuid: 89805694583b453e99f833e850b5c5dc
               name: 'Zookeeper client {#TYPE} [{#CLIENT}]: Outstanding requests'
@@ -934,8 +984,17 @@ zabbix_export:
                 key: zookeeper.get_connections_stats
               tags:
                 -
-                  tag: Application
-                  value: 'Zookeeper {#TYPE} {#CLIENT}'
+                  tag: client
+                  value: '{#CLIENT}'
+                -
+                  tag: component
+                  value: clients
+                -
+                  tag: component
+                  value: requests
+                -
+                  tag: type
+                  value: '{#TYPE}'
             -
               uuid: e68a429aa986477e894b2a4437b6ec4a
               name: 'Zookeeper client {#TYPE} [{#CLIENT}]: Packets received per sec'
@@ -958,8 +1017,17 @@ zabbix_export:
                 key: zookeeper.get_connections_stats
               tags:
                 -
-                  tag: Application
-                  value: 'Zookeeper {#TYPE} {#CLIENT}'
+                  tag: client
+                  value: '{#CLIENT}'
+                -
+                  tag: component
+                  value: clients
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: type
+                  value: '{#TYPE}'
             -
               uuid: c748207b3f3e4a7ca6bb8ff3ecc8959b
               name: 'Zookeeper client {#TYPE} [{#CLIENT}]: Packets sent per sec'
@@ -982,8 +1050,17 @@ zabbix_export:
                 key: zookeeper.get_connections_stats
               tags:
                 -
-                  tag: Application
-                  value: 'Zookeeper {#TYPE} {#CLIENT}'
+                  tag: client
+                  value: '{#CLIENT}'
+                -
+                  tag: component
+                  value: clients
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: type
+                  value: '{#TYPE}'
           graph_prototypes:
             -
               uuid: 9ea4e5af47124317ba7f4502af97bc9c
@@ -1071,8 +1148,8 @@ zabbix_export:
                 key: zookeeper.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: Zookeeper
+                  tag: component
+                  value: cluster
             -
               uuid: c6ae1476b69f43108f843508a02343a7
               name: 'Zookeeper: Pending syncs{#SINGLETON}'
@@ -1090,8 +1167,8 @@ zabbix_export:
                 key: zookeeper.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: Zookeeper
+                  tag: component
+                  value: operations
               trigger_prototypes:
                 -
                   uuid: 004e26cca4934d1992b3c894f36b5643
@@ -1099,6 +1176,10 @@ zabbix_export:
                   name: 'Zookeeper: Too many pending syncs (over {$ZOOKEEPER.PENDING_SYNCS.MAX.WARN}% for 5 min)'
                   priority: AVERAGE
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: d5297a5598e94ef5acb1f6affdf51eee
               name: 'Zookeeper: Quorum size{#SINGLETON}'
@@ -1115,8 +1196,8 @@ zabbix_export:
                 key: zookeeper.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: Zookeeper
+                  tag: component
+                  value: cluster
             -
               uuid: 406d13a8d38a47498e939a118ec0329a
               name: 'Zookeeper: Synced followers{#SINGLETON}'
@@ -1134,8 +1215,8 @@ zabbix_export:
                 key: zookeeper.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: Zookeeper
+                  tag: component
+                  value: cluster
             -
               uuid: 71c9de2ed85d4a5fb2306b24b9ca67d3
               name: 'Zookeeper: Synced non-voting follower{#SINGLETON}'
@@ -1153,8 +1234,8 @@ zabbix_export:
                 key: zookeeper.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: Zookeeper
+                  tag: component
+                  value: cluster
             -
               uuid: 299da1a6343b47a4a25efe2d8581965e
               name: 'Zookeeper: Synced observers{#SINGLETON}'
@@ -1172,8 +1253,8 @@ zabbix_export:
                 key: zookeeper.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: Zookeeper
+                  tag: component
+                  value: cluster
           trigger_prototypes:
             -
               uuid: 4b0df830eef84e78a04a6980b627b8d0
@@ -1181,6 +1262,10 @@ zabbix_export:
               name: 'Zookeeper: Too few active followers'
               priority: AVERAGE
               description: 'The number of followers should equal the total size of your ZooKeeper ensemble, minus 1 (the leader is not included in the follower count). If the ensemble fails to maintain quorum, all automatic failover features are suspended.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
           master_item:
             key: zookeeper.get_metrics
           preprocessing:
@@ -1192,6 +1277,13 @@ zabbix_export:
               type: JAVASCRIPT
               parameters:
                 - 'return JSON.stringify(value == ''leader'' ? [{''{#SINGLETON}'': ''''}] : []);'
+      tags:
+        -
+          tag: class
+          value: application
+        -
+          tag: target
+          value: zookeper
       macros:
         -
           macro: '{$ZOOKEEPER.COMMAND_URL}'
@@ -1224,6 +1316,10 @@ zabbix_export:
       name: 'Zookeeper: Too many file descriptors used (over {$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}% for 5 min)'
       priority: WARNING
       description: 'Number of file descriptors used more than {$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}% of the available number of file descriptors.'
+      tags:
+        -
+          tag: scope
+          value: capacity
   graphs:
     -
       uuid: 0553c91abfac4f8fb452b6b367055261

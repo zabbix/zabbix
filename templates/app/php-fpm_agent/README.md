@@ -122,8 +122,8 @@ There are no template links in this template.
 |PHP-FPM |PHP-FPM: Listen queue, max |<p>The maximum number of requests in the queue of pending connections since this FPM pool has started.</p> |DEPENDENT |php-fpm.listen_queue_max<p>**Preprocessing**:</p><p>- JSONPATH: `$.['max listen queue']`</p> |
 |PHP-FPM |PHP-FPM: Listen queue, len |<p>Size of the socket queue of pending connections.</p> |DEPENDENT |php-fpm.listen_queue_len<p>**Preprocessing**:</p><p>- JSONPATH: `$.['listen queue len']`</p> |
 |PHP-FPM |PHP-FPM: Max children reached |<p>The number of times that pm.max_children has been reached since the php-fpm pool started </p> |DEPENDENT |php-fpm.max_children<p>**Preprocessing**:</p><p>- JSONPATH: `$.['max children reached']`</p><p>- SIMPLE_CHANGE</p> |
-|Zabbix_raw_items |PHP-FPM: php-fpm_ping |<p>-</p> |ZABBIX_PASSIVE |web.page.get["{$PHP_FPM.HOST}","{$PHP_FPM.PING.PAGE}","{$PHP_FPM.PORT}"] |
-|Zabbix_raw_items |PHP-FPM: Get status page |<p>-</p> |ZABBIX_PASSIVE |web.page.get["{$PHP_FPM.HOST}","{$PHP_FPM.STATUS.PAGE}?json","{$PHP_FPM.PORT}"]<p>**Preprocessing**:</p><p>- REGEX: `^[.\s\S]*({.+}) \1`</p> |
+|Zabbix raw items |PHP-FPM: php-fpm_ping |<p>-</p> |ZABBIX_PASSIVE |web.page.get["{$PHP_FPM.HOST}","{$PHP_FPM.PING.PAGE}","{$PHP_FPM.PORT}"] |
+|Zabbix raw items |PHP-FPM: Get status page |<p>-</p> |ZABBIX_PASSIVE |web.page.get["{$PHP_FPM.HOST}","{$PHP_FPM.STATUS.PAGE}?json","{$PHP_FPM.PORT}"]<p>**Preprocessing**:</p><p>- REGEX: `^[.\s\S]*({.+}) \1`</p> |
 
 ## Triggers
 

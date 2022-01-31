@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-18T20:43:03Z'
+  date: '2022-01-26T14:26:34Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -33,8 +33,11 @@ zabbix_export:
             name: 'Service state'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: a3a6c95c0a32405d81b1bc7690f1bd1f
@@ -42,6 +45,10 @@ zabbix_export:
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 81af3843a1e44469affca02640f22b77
           name: 'ICMP loss'
@@ -52,8 +59,11 @@ zabbix_export:
           units: '%'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 9c78f78339724840b7ab6db4c62f5aa0
@@ -65,6 +75,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Intel_Qlogic Infiniband SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 771d21b9c40b426d97eff54c6ac5227e
           name: 'ICMP response time'
@@ -75,8 +92,11 @@ zabbix_export:
           units: s
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 3c5e0b2660764386ac162ed5d2778a56
@@ -91,6 +111,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Intel_Qlogic Infiniband SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 5bb2ef0f72244294bcc469710a0a1225
           name: 'SNMP traps (fallback)'
@@ -103,8 +130,8 @@ zabbix_export:
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: network
         -
           uuid: 8570bf70c217434cb40b9efa74d7e070
           name: 'System contact details'
@@ -126,8 +153,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 1c17fbf4b11b45f087668eefa9438341
           name: 'System description'
@@ -150,8 +177,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 9cfafe1389af4e569886c5acd8d95de9
           name: 'Firmware version'
@@ -175,8 +202,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
           triggers:
             -
               uuid: 1ca7574040da41a3bf416daa8172d952
@@ -186,6 +213,10 @@ zabbix_export:
               priority: INFO
               description: 'Firmware version has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 656086e221e84a9a90cc16855f564571
           name: 'Hardware model name'
@@ -210,8 +241,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
         -
           uuid: d1ee46aa709d43919ae3727e4d55af42
           name: 'System location'
@@ -233,8 +264,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 7f06f097558d4ef3801207031e660756
           name: 'System name'
@@ -256,8 +287,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: cfcabcb7d9ca4fd59ed79775bcf059bb
@@ -266,6 +297,13 @@ zabbix_export:
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: security
         -
           uuid: c4c4e044967a432a829ca88d8dcd8c2e
           name: 'System object ID'
@@ -286,8 +324,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: db4c4bc058b147a293b12f8737e42a53
           name: Uptime
@@ -308,8 +346,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: 20166f9c8d5448a494b6b578471df8cc
@@ -322,6 +360,10 @@ zabbix_export:
                 -
                   name: 'No SNMP data collection'
                   expression: 'max(/Intel_Qlogic Infiniband SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: a182c41cf58b465895ff677ca96e5b65
           name: 'SNMP agent availability'
@@ -338,8 +380,11 @@ zabbix_export:
             name: zabbix.host.available
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: ccbd4c4da58f4b72a82371c2f3eaf4e1
@@ -352,6 +397,10 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Intel_Qlogic Infiniband SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: 74e3c6efb7f24ffaa2b59c3518d37b32
@@ -378,8 +427,8 @@ zabbix_export:
                 name: 'ICS-CHASSIS-MIB::icsChassisFanOperStatus'
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
               trigger_prototypes:
                 -
                   uuid: 7ceeb8d2ec314fc1b8dbe9746e9a667a
@@ -388,6 +437,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: 10fcb5ff857448bf88ebfb02d1bea505
           name: 'Network interfaces discovery'
@@ -476,8 +532,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 8a6b75dab396460b85b2b0a5c545a163
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
@@ -496,8 +558,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: ab73df14ab8d4d00994d0fad4abe0cf2
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
@@ -521,8 +589,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 7edbc6d440c94857818fed946ee74ef0
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
@@ -545,8 +619,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: ae4ac83054d344d6be098d4c70c9cbf7
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
@@ -565,8 +645,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 88f432e3c475431c8295497d68ec904b
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
@@ -590,8 +676,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: ae55937ae3084131b58263805ba6d3ad
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
@@ -616,8 +708,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: a0818a565e9e4ac69312a04b69de9c95
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
@@ -639,8 +737,14 @@ zabbix_export:
                 name: 'IF-MIB::ifOperStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: 18cef8eb4ade4e15bd04ad476e95a185
@@ -658,6 +762,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: f979174f556c4906825d9373f60f22ab
               name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
@@ -681,8 +789,14 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
           trigger_prototypes:
             -
               uuid: ead4b546caa5429197d566010e3a4a43
@@ -712,6 +826,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Intel_Qlogic Infiniband SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Intel_Qlogic Infiniband SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Intel_Qlogic Infiniband SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Intel_Qlogic Infiniband SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 9d5d70c272a641c0ae63aca365cdb103
               expression: |
@@ -732,6 +850,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Intel_Qlogic Infiniband SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Intel_Qlogic Infiniband SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Intel_Qlogic Infiniband SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Intel_Qlogic Infiniband SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: fba9e43d9fcb43fb9cf5128f1287ac7c
               expression: |
@@ -751,6 +873,13 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Intel_Qlogic Infiniband SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Intel_Qlogic Infiniband SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Intel_Qlogic Infiniband SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Intel_Qlogic Infiniband SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
           graph_prototypes:
             -
               uuid: 148e429035204c199b146850c94dae71
@@ -830,8 +959,8 @@ zabbix_export:
                 name: 'ICS-CHASSIS-MIB::icsChassisPowerSupplyOperStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Power supply'
+                  tag: component
+                  value: power
               trigger_prototypes:
                 -
                   uuid: 1d0c9610cd984124bb7fed812e9edb16
@@ -840,6 +969,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 7ae4943842ea491c899ce0f84210e202
                   expression: 'count(/Intel_Qlogic Infiniband SNMP/sensor.psu.status[icsChassisPowerSupplyEntry.{#SNMPINDEX}],#1,"eq","{$PSU_WARN_STATUS}")=1'
@@ -851,6 +987,13 @@ zabbix_export:
                     -
                       name: '{#SNMPVALUE}: Power supply is in critical state'
                       expression: 'count(/Intel_Qlogic Infiniband SNMP/sensor.psu.status[icsChassisPowerSupplyEntry.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: 9c408be55f0b4b1384191275f1b624a8
           name: 'Temperature Discovery'
@@ -883,8 +1026,8 @@ zabbix_export:
                 name: 'ICS-CHASSIS-MIB::icsChassisSensorSlotOperStatus'
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
             -
               uuid: 943a4862c1e34cc1a30364a2677b327b
               name: '{#SENSOR_INFO}: Temperature'
@@ -899,8 +1042,8 @@ zabbix_export:
                 The current value read from the sensor.
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: 03e351b056504735b02da8c37dad6bf0
@@ -910,6 +1053,13 @@ zabbix_export:
                   name: '{#SENSOR_INFO}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
           trigger_prototypes:
             -
               uuid: 61c220a2ae9a4074baf4051214679e77
@@ -923,6 +1073,13 @@ zabbix_export:
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: d6f38aebdcde46e688350b40d5cbe85b
               expression: |
@@ -943,6 +1100,13 @@ zabbix_export:
                     or
                     last(/Intel_Qlogic Infiniband SNMP/sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}])={$TEMP_CRIT_STATUS}
                   recovery_expression: 'max(/Intel_Qlogic Infiniband SNMP/sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 1b369978fa354767834598c87c0df1e0
           name: 'Unit Discovery'
@@ -977,8 +1141,8 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: Inventory
+                  tag: component
+                  value: system
               trigger_prototypes:
                 -
                   uuid: 90778aeb97244258a830e89eeb263e54
@@ -987,6 +1151,20 @@ zabbix_export:
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+      tags:
+        -
+          tag: class
+          value: network
+        -
+          tag: target
+          value: intel
+        -
+          tag: target
+          value: qlogic-infiniband
       macros:
         -
           macro: '{$FAN_CRIT_STATUS}'
