@@ -53,12 +53,12 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|QPS metrics discovery |<p>Discovery QPS specific metrics.</p> |DEPENDENT |tidb.qps.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="tidb_server_query_total")]`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Statement metrics discovery |<p>Discovery statement specific metrics.</p> |DEPENDENT |tidb.statement.discover<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="tidb_executor_statement_total")]`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|GC action results discovery |<p>Discovery GC action results metrics.</p> |DEPENDENT |tidb.tikvclient_gc_action.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="tidb_tikvclient_gc_action_result")]`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Overrides:**</p><p>Failed GC-related operations trigger<br> - {#TYPE} MATCHES_REGEX `failed`<br>  - TRIGGER_PROTOTYPE LIKE `Too many failed GC-related operations` - DISCOVER</p> |
+|KV backoff discovery |<p>Discovery KV backoff specific metrics.</p> |DEPENDENT |tidb.tikvclient_backoff.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="tidb_tikvclient_backoff_total")]`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |KV metrics discovery |<p>Discovery KV specific metrics.</p> |DEPENDENT |tidb.kv_ops.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="tidb_tikvclient_txn_cmd_duration_seconds_count")]`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Lock resolves discovery |<p>Discovery lock resolves specific metrics.</p> |DEPENDENT |tidb.tikvclient_lock_resolver_action.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="tidb_tikvclient_lock_resolver_actions_total")]`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|KV backoff discovery |<p>Discovery KV backoff specific metrics.</p> |DEPENDENT |tidb.tikvclient_backoff.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="tidb_tikvclient_backoff_total")]`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|GC action results discovery |<p>Discovery GC action results metrics.</p> |DEPENDENT |tidb.tikvclient_gc_action.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="tidb_tikvclient_gc_action_result")]`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Overrides:**</p><p>Failed GC-related operations trigger<br> - {#TYPE} MATCHES_REGEX `failed`<br>  - TRIGGER_PROTOTYPE LIKE `Too many failed GC-related operations` - DISCOVER</p> |
+|QPS metrics discovery |<p>Discovery QPS specific metrics.</p> |DEPENDENT |tidb.qps.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="tidb_server_query_total")]`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Statement metrics discovery |<p>Discovery statement specific metrics.</p> |DEPENDENT |tidb.statement.discover<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="tidb_executor_statement_total")]`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 
 ## Items collected
 
@@ -101,8 +101,8 @@ There are no template links in this template.
 |TiDB node |TiDB: Lock resolves: {#TYPE}, rate |<p>The number of TiDB operations that resolve locks per second. When TiDB's read or write request encounters a lock, it tries to resolve the lock.</p> |DEPENDENT |tidb.tikvclient_lock_resolver_action.rate[{#TYPE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="tidb_tikvclient_lock_resolver_actions_total" && @.labels.type == "{#TYPE}")].value.first()`</p><p>- CHANGE_PER_SECOND</p> |
 |TiDB node |TiDB: KV backoff: {#TYPE}, rate |<p>The number of TiDB operations that resolve locks per second. When TiDB's read or write request encounters a lock, it tries to resolve the lock.</p> |DEPENDENT |tidb.tikvclient_backoff.rate[{#TYPE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="tidb_tikvclient_backoff_total" && @.labels.type == "{#TYPE}")].value.first()`</p><p>- CHANGE_PER_SECOND</p> |
 |TiDB node |TiDB: GC action result: {#TYPE}, rate |<p>The number of results of GC-related operations per second.</p> |DEPENDENT |tidb.tikvclient_gc_action.rate[{#TYPE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="tidb_tikvclient_gc_action_result" && @.labels.type == "{#TYPE}")].value.first()`</p><p>- CHANGE_PER_SECOND</p> |
-|Zabbix_raw_items |TiDB: Get instance metrics |<p>Get TiDB instance metrics.</p> |HTTP_AGENT |tidb.get_metrics<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- PROMETHEUS_TO_JSON</p> |
-|Zabbix_raw_items |TiDB: Get instance status |<p>Get TiDB instance status info.</p> |HTTP_AGENT |tidb.get_status<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> {"status": "0"}`</p> |
+|Zabbix raw items |TiDB: Get instance metrics |<p>Get TiDB instance metrics.</p> |HTTP_AGENT |tidb.get_metrics<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- PROMETHEUS_TO_JSON</p> |
+|Zabbix raw items |TiDB: Get instance status |<p>Get TiDB instance status info.</p> |HTTP_AGENT |tidb.get_status<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> {"status": "0"}`</p> |
 
 ## Triggers
 
@@ -126,5 +126,5 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
 

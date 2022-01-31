@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-15T08:07:14Z'
+  date: '2022-01-26T10:00:19Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -15,7 +15,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/435429-discussion-thread-for-official-zabbix-template-docker
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -42,8 +42,8 @@ zabbix_export:
             key: docker.info
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: os
         -
           uuid: 32c441b73b90400fa0e6972798ae1f4c
           name: 'Docker: Cgroup driver'
@@ -66,8 +66,8 @@ zabbix_export:
             key: docker.info
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: os
         -
           uuid: 6edcd2fbe7c446738d323ce7f1c11810
           name: 'Docker: Get containers'
@@ -77,8 +77,8 @@ zabbix_export:
           value_type: TEXT
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: 75f55b1f18c54af6ad0b3045cb230bd3
           name: 'Docker: Containers paused'
@@ -96,8 +96,8 @@ zabbix_export:
             key: docker.info
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: containers
         -
           uuid: 976bf10901404fd290b6628af437e8e4
           name: 'Docker: Containers running'
@@ -115,8 +115,8 @@ zabbix_export:
             key: docker.info
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: containers
         -
           uuid: 40179a84ffd14742b9df87f48a2eaa90
           name: 'Docker: Containers stopped'
@@ -134,8 +134,8 @@ zabbix_export:
             key: docker.info
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: containers
         -
           uuid: cacbbf17fd0144c79ecdcbf9e3ef9290
           name: 'Docker: Containers total'
@@ -153,8 +153,8 @@ zabbix_export:
             key: docker.info
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: containers
         -
           uuid: 4d116791a88d4d4e8dd4a9013f9bc39f
           name: 'Docker: Containers size'
@@ -172,8 +172,11 @@ zabbix_export:
             key: docker.data_usage
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: containers
+            -
+              tag: component
+              value: storage
         -
           uuid: fcf42585b871488f91a92d04b0cc748d
           name: 'Docker: CPU CFS Period enabled'
@@ -201,8 +204,8 @@ zabbix_export:
             key: docker.info
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: cpu
         -
           uuid: 54d3fa0099f24f75a6a414b7caf1b85a
           name: 'Docker: CPU CFS Quota enabled'
@@ -230,8 +233,8 @@ zabbix_export:
             key: docker.info
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: cpu
         -
           uuid: ceddc2b06f4a4cb4acec3dc74c02ce3f
           name: 'Docker: CPU Set enabled'
@@ -259,8 +262,8 @@ zabbix_export:
             key: docker.info
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: cpu
         -
           uuid: 2ad923020baf48c5a43f6c875ad45561
           name: 'Docker: CPU Shares enabled'
@@ -288,8 +291,8 @@ zabbix_export:
             key: docker.info
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: cpu
         -
           uuid: 4f7221691d494c60b40abb6dd5c14719
           name: 'Docker: Get data_usage'
@@ -299,8 +302,8 @@ zabbix_export:
           value_type: TEXT
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: 0a258c42f6aa4eeeb355fec491710764
           name: 'Docker: Debug enabled'
@@ -327,8 +330,8 @@ zabbix_export:
             key: docker.info
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: application
         -
           uuid: edb61f5ce3504f57bf32ddf2e50e4e3d
           name: 'Docker: Default runtime'
@@ -351,8 +354,8 @@ zabbix_export:
             key: docker.info
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: application
         -
           uuid: 1ce2471ca651487288ad1aef9286da5f
           name: 'Docker: Storage driver'
@@ -378,8 +381,8 @@ zabbix_export:
             key: docker.info
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: storage
         -
           uuid: 14a7686d3bd74533aa8406297d419dfd
           name: 'Docker: Goroutines'
@@ -397,8 +400,8 @@ zabbix_export:
             key: docker.info
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: system
         -
           uuid: 8b2be6316b8d4d019443062f0809b579
           name: 'Docker: Get images'
@@ -408,8 +411,8 @@ zabbix_export:
           value_type: TEXT
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: ab4a4d92e4c04ff685b687cf14414b06
           name: 'Docker: Images available'
@@ -427,8 +430,8 @@ zabbix_export:
             key: docker.images
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: images
         -
           uuid: d83337b0ea2c4f16be4b5b9c3a48755b
           name: 'Docker: Images total'
@@ -446,8 +449,8 @@ zabbix_export:
             key: docker.info
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: images
         -
           uuid: bf4f531b727c47f0aa30de14d4b41b49
           name: 'Docker: Images size'
@@ -465,8 +468,11 @@ zabbix_export:
             key: docker.data_usage
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: images
+            -
+              tag: component
+              value: storage
         -
           uuid: 3d8265e0495d4cbe97535f281a957b3e
           name: 'Docker: Get info'
@@ -476,8 +482,8 @@ zabbix_export:
           value_type: TEXT
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: 3545c86b7db9494c94dcda09386ac827
           name: 'Docker: IPv4 Forwarding enabled'
@@ -504,8 +510,8 @@ zabbix_export:
             key: docker.info
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: network
         -
           uuid: cb1e486a170b4d668a77d0918f22e51c
           name: 'Docker: Kernel memory enabled'
@@ -532,8 +538,8 @@ zabbix_export:
             key: docker.info
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: memory
         -
           uuid: 77a61a63d6ed4583a0c39ce377b11d4f
           name: 'Docker: Kernel memory TCP enabled'
@@ -560,8 +566,8 @@ zabbix_export:
             key: docker.info
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: memory
         -
           uuid: d645713e25c74686a47cf859725e655f
           name: 'Docker: Kernel version'
@@ -584,8 +590,8 @@ zabbix_export:
             key: docker.info
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: system
         -
           uuid: 2f512e64ba414e86806f19c0be803a3e
           name: 'Docker: Layers size'
@@ -603,8 +609,8 @@ zabbix_export:
             key: docker.data_usage
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: storage
         -
           uuid: 671cd65ddae046f5ba9b0f83241976ac
           name: 'Docker: Live restore enabled'
@@ -631,8 +637,8 @@ zabbix_export:
             key: docker.info
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: application
         -
           uuid: be0cb2d07d12497b8b411e094fed6087
           name: 'Docker: Logging driver'
@@ -655,8 +661,8 @@ zabbix_export:
             key: docker.info
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: application
         -
           uuid: e0da86d370a049e3a2d6a82e49ea1f37
           name: 'Docker: Memory total'
@@ -674,8 +680,8 @@ zabbix_export:
             key: docker.info
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: memory
         -
           uuid: b08c91f28e094c4faa3e004d3fb3057d
           name: 'Docker: Memory limit enabled'
@@ -702,8 +708,8 @@ zabbix_export:
             key: docker.info
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: memory
         -
           uuid: 812a6b9902a44dd7a803c7218555afe7
           name: 'Docker: Name'
@@ -722,8 +728,8 @@ zabbix_export:
             key: docker.info
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: system
           triggers:
             -
               uuid: 2c62bb4d95684e6984447027d117ff4d
@@ -736,6 +742,10 @@ zabbix_export:
                 -
                   name: 'Docker: Service is down'
                   expression: 'last(/Docker by Zabbix agent 2/docker.ping)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 5e4999067e6948f893dc465f8e5a2b5f
           name: 'Docker: NCPU'
@@ -752,8 +762,8 @@ zabbix_export:
             key: docker.info
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: cpu
         -
           uuid: f64919a3a5dc4f429f2992eb7ae5223c
           name: 'Docker: NEvents listener'
@@ -770,8 +780,8 @@ zabbix_export:
             key: docker.info
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: application
         -
           uuid: ce025599e68d447f9a1f5c076502e2f2
           name: 'Docker: Nfd'
@@ -789,8 +799,8 @@ zabbix_export:
             key: docker.info
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: os
         -
           uuid: e164279251ce471abaae599bf1885bbb
           name: 'Docker: OomKill disabled'
@@ -817,8 +827,8 @@ zabbix_export:
             key: docker.info
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: system
         -
           uuid: 78a5af9aa6a741d4ac976d0949414b68
           name: 'Docker: Operating system'
@@ -841,8 +851,8 @@ zabbix_export:
             key: docker.info
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: os
         -
           uuid: 3acc93aa0fe64696a5560adcb3dd5acc
           name: 'Docker: OS type'
@@ -865,8 +875,8 @@ zabbix_export:
             key: docker.info
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: os
         -
           uuid: 58ecaf4ae7f04316b6bf019cabadfd3e
           name: 'Docker: Pids limit enabled'
@@ -891,8 +901,8 @@ zabbix_export:
             key: docker.info
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: system
         -
           uuid: 3c8f26e4b80f4356bde061ccddb95f2c
           name: 'Docker: Ping'
@@ -907,8 +917,11 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: application
+            -
+              tag: component
+              value: health
           triggers:
             -
               uuid: a4f00b4d25b54acfa61475c94651d8a5
@@ -916,6 +929,10 @@ zabbix_export:
               name: 'Docker: Service is down'
               priority: AVERAGE
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 864eae0a62374f729143d6efc4f1655a
           name: 'Docker: Docker root dir'
@@ -938,8 +955,8 @@ zabbix_export:
             key: docker.info
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: system
         -
           uuid: a7e5441fe4d64848a7c5e374ea99ad54
           name: 'Docker: Server version'
@@ -962,8 +979,8 @@ zabbix_export:
             key: docker.info
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: application
           triggers:
             -
               uuid: f5f4fb1337264ac2bec6b6505dfe180b
@@ -972,6 +989,10 @@ zabbix_export:
               priority: INFO
               description: 'Docker version has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: fcbe64ee979a4787a4b0f06836b258bd
           name: 'Docker: Swap limit enabled'
@@ -998,8 +1019,11 @@ zabbix_export:
             key: docker.info
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: storage
         -
           uuid: 6c81479dba77465ebcd335a5f3d08e19
           name: 'Docker: Volumes size'
@@ -1017,8 +1041,8 @@ zabbix_export:
             key: docker.data_usage
           tags:
             -
-              tag: Application
-              value: Docker
+              tag: component
+              value: storage
       discovery_rules:
         -
           uuid: 6f379dce9d3440018deb2c2cbaa91c06
@@ -1065,8 +1089,11 @@ zabbix_export:
                 key: 'docker.container_info["{#NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Container {#NAME}'
+                  tag: component
+                  value: system
+                -
+                  tag: container
+                  value: '{#NAME}'
             -
               uuid: 1c481ac2b05e4b53b85b7fd37a39bc4a
               name: 'Container {#NAME}: Finished at'
@@ -1089,8 +1116,11 @@ zabbix_export:
                 key: 'docker.container_info["{#NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Container {#NAME}'
+                  tag: component
+                  value: system
+                -
+                  tag: container
+                  value: '{#NAME}'
             -
               uuid: ee9da156a6134760af1762236d08e566
               name: 'Container {#NAME}: Image'
@@ -1113,8 +1143,11 @@ zabbix_export:
                 key: docker.containers
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Container {#NAME}'
+                  tag: component
+                  value: images
+                -
+                  tag: container
+                  value: '{#NAME}'
             -
               uuid: 72de0e4e056a4d3799d61cb3ac19a306
               name: 'Container {#NAME}: Restart count'
@@ -1131,8 +1164,11 @@ zabbix_export:
                 key: 'docker.container_info["{#NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Container {#NAME}'
+                  tag: component
+                  value: system
+                -
+                  tag: container
+                  value: '{#NAME}'
             -
               uuid: 0b6ce9bd73244e79bc9c4e00f56c2465
               name: 'Container {#NAME}: Started at'
@@ -1155,8 +1191,11 @@ zabbix_export:
                 key: 'docker.container_info["{#NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Container {#NAME}'
+                  tag: component
+                  value: system
+                -
+                  tag: container
+                  value: '{#NAME}'
             -
               uuid: fd9d315125fb40738c00bab16c145255
               name: 'Container {#NAME}: Dead'
@@ -1179,8 +1218,11 @@ zabbix_export:
                 key: 'docker.container_info["{#NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Container {#NAME}'
+                  tag: component
+                  value: system
+                -
+                  tag: container
+                  value: '{#NAME}'
             -
               uuid: be3eed62681045aaa667a417a7383a58
               name: 'Container {#NAME}: Error'
@@ -1203,8 +1245,11 @@ zabbix_export:
                 key: 'docker.container_info["{#NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Container {#NAME}'
+                  tag: component
+                  value: system
+                -
+                  tag: container
+                  value: '{#NAME}'
               trigger_prototypes:
                 -
                   uuid: ee70b91196494eccb54772b22051a456
@@ -1213,6 +1258,10 @@ zabbix_export:
                   priority: WARNING
                   description: 'Container {#NAME} has an error. Ack to close.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 65d5ac15043446658cd8e0d326b1bf04
               name: 'Container {#NAME}: Exit code'
@@ -1233,8 +1282,11 @@ zabbix_export:
                 key: 'docker.container_info["{#NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Container {#NAME}'
+                  tag: component
+                  value: system
+                -
+                  tag: container
+                  value: '{#NAME}'
             -
               uuid: 69381dd6116f4b0d9d957dd1e768748b
               name: 'Container {#NAME}: OOMKilled'
@@ -1257,8 +1309,11 @@ zabbix_export:
                 key: 'docker.container_info["{#NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Container {#NAME}'
+                  tag: component
+                  value: system
+                -
+                  tag: container
+                  value: '{#NAME}'
             -
               uuid: 000375ca6899443cac7e02e1239d879e
               name: 'Container {#NAME}: Paused'
@@ -1281,8 +1336,11 @@ zabbix_export:
                 key: 'docker.container_info["{#NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Container {#NAME}'
+                  tag: component
+                  value: system
+                -
+                  tag: container
+                  value: '{#NAME}'
             -
               uuid: 15dffc2d2aeb4a15954b624c7c273155
               name: 'Container {#NAME}: Pid'
@@ -1303,8 +1361,11 @@ zabbix_export:
                 key: 'docker.container_info["{#NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Container {#NAME}'
+                  tag: component
+                  value: system
+                -
+                  tag: container
+                  value: '{#NAME}'
             -
               uuid: 38829fadf7f246c99c9776945022fac1
               name: 'Container {#NAME}: Restarting'
@@ -1327,8 +1388,11 @@ zabbix_export:
                 key: 'docker.container_info["{#NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Container {#NAME}'
+                  tag: component
+                  value: system
+                -
+                  tag: container
+                  value: '{#NAME}'
             -
               uuid: 6d8d5a7523f64968b72f4861e9ae867a
               name: 'Container {#NAME}: Running'
@@ -1351,8 +1415,11 @@ zabbix_export:
                 key: 'docker.container_info["{#NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Container {#NAME}'
+                  tag: component
+                  value: system
+                -
+                  tag: container
+                  value: '{#NAME}'
             -
               uuid: c7f1d81836d54a528184c7d4be60b792
               name: 'Container {#NAME}: Status'
@@ -1375,8 +1442,11 @@ zabbix_export:
                 key: 'docker.container_info["{#NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Container {#NAME}'
+                  tag: component
+                  value: system
+                -
+                  tag: container
+                  value: '{#NAME}'
             -
               uuid: 743e2c9545de49c89472e343bf8d38da
               name: 'Container {#NAME}: Get info'
@@ -1387,8 +1457,11 @@ zabbix_export:
               description: 'Return low-level information about a container'
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Container {#NAME}'
+                  tag: component
+                  value: raw
+                -
+                  tag: container
+                  value: '{#NAME}'
             -
               uuid: d54b82d76c7b44ca8995486e4bf46298
               name: 'Container {#NAME}: CPU percent usage'
@@ -1407,8 +1480,11 @@ zabbix_export:
                 key: 'docker.container_stats["{#NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Container {#NAME}'
+                  tag: component
+                  value: cpu
+                -
+                  tag: container
+                  value: '{#NAME}'
             -
               uuid: 92510799a44b4b93921d7b4d308ef10d
               name: 'Container {#NAME}: CPU kernelmode usage per second'
@@ -1435,8 +1511,11 @@ zabbix_export:
                 key: 'docker.container_stats["{#NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Container {#NAME}'
+                  tag: component
+                  value: cpu
+                -
+                  tag: container
+                  value: '{#NAME}'
             -
               uuid: 4c71c95c86d2433da78b0cd3ba5d56fa
               name: 'Container {#NAME}: Throttled periods'
@@ -1454,8 +1533,11 @@ zabbix_export:
                 key: 'docker.container_stats["{#NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Container {#NAME}'
+                  tag: component
+                  value: cpu
+                -
+                  tag: container
+                  value: '{#NAME}'
             -
               uuid: ff834b708f764ce6b08fcfbc1dfacb60
               name: 'Container {#NAME}: Throttled time'
@@ -1479,8 +1561,11 @@ zabbix_export:
                 key: 'docker.container_stats["{#NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Container {#NAME}'
+                  tag: component
+                  value: cpu
+                -
+                  tag: container
+                  value: '{#NAME}'
             -
               uuid: 151f2f36bfb2429b8c8e500067489694
               name: 'Container {#NAME}: Throttling periods'
@@ -1498,8 +1583,11 @@ zabbix_export:
                 key: 'docker.container_stats["{#NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Container {#NAME}'
+                  tag: component
+                  value: cpu
+                -
+                  tag: container
+                  value: '{#NAME}'
             -
               uuid: 2c21d9b3968c43e68231ddc5b2d05808
               name: 'Container {#NAME}: CPU total usage per second'
@@ -1526,8 +1614,11 @@ zabbix_export:
                 key: 'docker.container_stats["{#NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Container {#NAME}'
+                  tag: component
+                  value: cpu
+                -
+                  tag: container
+                  value: '{#NAME}'
             -
               uuid: 801467fe7cbe48b8b05c5005680b934a
               name: 'Container {#NAME}: CPU usermode usage per second'
@@ -1554,8 +1645,11 @@ zabbix_export:
                 key: 'docker.container_stats["{#NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Container {#NAME}'
+                  tag: component
+                  value: cpu
+                -
+                  tag: container
+                  value: '{#NAME}'
             -
               uuid: bd57aed03daa47e68acc4dc38a1697b7
               name: 'Container {#NAME}: Memory commit bytes'
@@ -1573,8 +1667,11 @@ zabbix_export:
                 key: 'docker.container_stats["{#NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Container {#NAME}'
+                  tag: component
+                  value: memory
+                -
+                  tag: container
+                  value: '{#NAME}'
             -
               uuid: 1e110d4d78e74ca8b12a1923f73543f1
               name: 'Container {#NAME}: Memory commit peak bytes'
@@ -1592,8 +1689,11 @@ zabbix_export:
                 key: 'docker.container_stats["{#NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Container {#NAME}'
+                  tag: component
+                  value: memory
+                -
+                  tag: container
+                  value: '{#NAME}'
             -
               uuid: b463f79d6c0644a394c3c0ba8f1d29d1
               name: 'Container {#NAME}: Memory maximum usage'
@@ -1611,8 +1711,11 @@ zabbix_export:
                 key: 'docker.container_stats["{#NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Container {#NAME}'
+                  tag: component
+                  value: memory
+                -
+                  tag: container
+                  value: '{#NAME}'
             -
               uuid: 763c8878d2c74d069567cbcd1d53544c
               name: 'Container {#NAME}: Memory private working set'
@@ -1630,8 +1733,11 @@ zabbix_export:
                 key: 'docker.container_stats["{#NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Container {#NAME}'
+                  tag: component
+                  value: memory
+                -
+                  tag: container
+                  value: '{#NAME}'
             -
               uuid: 6f39422b278b4a4398bfbd993f247fd0
               name: 'Container {#NAME}: Memory usage'
@@ -1649,8 +1755,11 @@ zabbix_export:
                 key: 'docker.container_stats["{#NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Container {#NAME}'
+                  tag: component
+                  value: memory
+                -
+                  tag: container
+                  value: '{#NAME}'
             -
               uuid: a5999dfeccca44ca8679ef71876da773
               name: 'Container {#NAME}: Online CPUs'
@@ -1667,8 +1776,11 @@ zabbix_export:
                 key: 'docker.container_stats["{#NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Container {#NAME}'
+                  tag: component
+                  value: cpu
+                -
+                  tag: container
+                  value: '{#NAME}'
             -
               uuid: 4192b5b8be2545568637b7121c1466c1
               name: 'Container {#NAME}: Get stats'
@@ -1679,8 +1791,11 @@ zabbix_export:
               description: 'Get container stats based on resource usage'
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Container {#NAME}'
+                  tag: component
+                  value: raw
+                -
+                  tag: container
+                  value: '{#NAME}'
             -
               uuid: 4ab3f13ab7714367b971eada3f01c611
               name: 'Container {#NAME}: Networks bytes received per second'
@@ -1705,8 +1820,11 @@ zabbix_export:
                 key: 'docker.container_stats["{#NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Container {#NAME}'
+                  tag: component
+                  value: network
+                -
+                  tag: container
+                  value: '{#NAME}'
             -
               uuid: cf4517565e3f4fc49e7d6d411302a732
               name: 'Container {#NAME}: Networks incoming packets dropped per second'
@@ -1730,8 +1848,11 @@ zabbix_export:
                 key: 'docker.container_stats["{#NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Container {#NAME}'
+                  tag: component
+                  value: network
+                -
+                  tag: container
+                  value: '{#NAME}'
             -
               uuid: 9d139e59dc1b46d39832ca668d5a6ce1
               name: 'Container {#NAME}: Networks errors received per second'
@@ -1755,8 +1876,11 @@ zabbix_export:
                 key: 'docker.container_stats["{#NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Container {#NAME}'
+                  tag: component
+                  value: network
+                -
+                  tag: container
+                  value: '{#NAME}'
             -
               uuid: 13fb8c2c3843481492af82c3308e1257
               name: 'Container {#NAME}: Networks packets received per second'
@@ -1780,8 +1904,11 @@ zabbix_export:
                 key: 'docker.container_stats["{#NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Container {#NAME}'
+                  tag: component
+                  value: network
+                -
+                  tag: container
+                  value: '{#NAME}'
             -
               uuid: da4bf99b26e540fdafc0ee99d50e1c6c
               name: 'Container {#NAME}: Networks bytes sent per second'
@@ -1806,8 +1933,11 @@ zabbix_export:
                 key: 'docker.container_stats["{#NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Container {#NAME}'
+                  tag: component
+                  value: network
+                -
+                  tag: container
+                  value: '{#NAME}'
             -
               uuid: 1f4d7848ecfd44ae958cc1bd64d61078
               name: 'Container {#NAME}: Networks outgoing packets dropped per second'
@@ -1831,8 +1961,11 @@ zabbix_export:
                 key: 'docker.container_stats["{#NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Container {#NAME}'
+                  tag: component
+                  value: network
+                -
+                  tag: container
+                  value: '{#NAME}'
             -
               uuid: bc7273bd3a7d4c9d9d6d6b3a019af947
               name: 'Container {#NAME}: Networks errors sent per second'
@@ -1856,8 +1989,11 @@ zabbix_export:
                 key: 'docker.container_stats["{#NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Container {#NAME}'
+                  tag: component
+                  value: network
+                -
+                  tag: container
+                  value: '{#NAME}'
             -
               uuid: 9191bd95da9a4ee9a7315d20de23c977
               name: 'Container {#NAME}: Networks packets sent per second'
@@ -1881,8 +2017,11 @@ zabbix_export:
                 key: 'docker.container_stats["{#NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Container {#NAME}'
+                  tag: component
+                  value: network
+                -
+                  tag: container
+                  value: '{#NAME}'
           trigger_prototypes:
             -
               uuid: db675ff608a14b12bcc02e6b500c557f
@@ -1891,6 +2030,10 @@ zabbix_export:
               opdata: 'Exit code: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
           graph_prototypes:
             -
               uuid: 72e32a60dc064affb3bb6785bae50e37
@@ -2036,8 +2179,11 @@ zabbix_export:
                 key: docker.images
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Image {#NAME}'
+                  tag: component
+                  value: system
+                -
+                  tag: image
+                  value: '{#NAME}'
             -
               uuid: 4eb812ba952e417185f6ac499d6cb85a
               name: 'Image {#NAME}: Size'
@@ -2055,8 +2201,18 @@ zabbix_export:
                 key: docker.images
               tags:
                 -
-                  tag: Application
-                  value: 'Docker: Image {#NAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: image
+                  value: '{#NAME}'
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: docker
       macros:
         -
           macro: '{$DOCKER.LLD.FILTER.CONTAINER.MATCHES}'

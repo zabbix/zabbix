@@ -20,7 +20,7 @@ This template was tested on:
 > See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 Internal service metrics are collected from /metrics endpoint.
-Template need to use Authorization via API token. 
+Template needs to use Authorization via API token. 
 
 Don't forget change macros {$KUBE.KUBELET.URL}, {$KUBE.API.TOKEN}.
 *NOTE.* Some metrics may not be collected depending on your Kubernetes instance version and configuration.

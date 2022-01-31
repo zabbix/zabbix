@@ -3,6 +3,11 @@ Changes for 6.0.0rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-19356] fixed failure when editing Templates caused by exceeding max_input_vars limit (jfreibergs)
+..F....... [ZBX-20267] fixed browser error when using dynamic rows (rdetlavs)
+..F....... [ZBX-20485] fixed cancel button not working when creating a new discovery rule (rdetlavs)
+..F....... [ZBX-20494] fixed multiple hintbox issue upon widget updates (averza)
+..F....... [ZBX-20432] fixed impossibility to import templates with triggers mapping to hosts with numeric names (averza)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.0beta3
@@ -359,6 +364,11 @@ A.F....... [ZBXNEXT-6528,ZBXNEXT-6669] moved auditlog calls from frontend sectio
 
 Bug fixes:
 .........T [ZBX-19395] changed version in links of the templates and the media (mchudinov)
+
+--------------------------------------------------------------------------------
+Changes for 5.4.10
+
+5.4.10rc1 was released as 5.4.10 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.4.10rc1
@@ -1569,6 +1579,11 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.20
+
+5.0.20rc1 was released as 5.0.20 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.0.20rc1
@@ -3949,6 +3964,11 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.38
+
+4.0.38rc1 was released as 4.0.38 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.0.38rc1

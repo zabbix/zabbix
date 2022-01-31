@@ -1674,6 +1674,9 @@ static int	DBpatch_5050128(void)
 	char			*default_timezone;
 	sla_t			*sla;
 
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
 	zbx_vector_sla_create(&slas);
 	zbx_vector_sla_create(&uniq_slas);
 

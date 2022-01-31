@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-18T20:43:07Z'
+  date: '2022-01-26T14:27:45Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -35,8 +35,11 @@ zabbix_export:
             name: 'Service state'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: d90e80fd900246dcab90447ee2a6a7a1
@@ -44,6 +47,10 @@ zabbix_export:
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 3a1c4412bb9340169827209df2554a50
           name: 'ICMP loss'
@@ -54,8 +61,11 @@ zabbix_export:
           units: '%'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: d3911ede372e4eb3b89b30e8e340a716
@@ -67,6 +77,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Juniper SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: ad350f912d2f4ead90aacdefa245cdf3
           name: 'ICMP response time'
@@ -77,8 +94,11 @@ zabbix_export:
           units: s
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 751d9855903f4f00b674b511fe992121
@@ -93,6 +113,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Juniper SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: e5470bc511a5499e9b8dc8bf4de8f054
           name: 'SNMP traps (fallback)'
@@ -105,8 +132,8 @@ zabbix_export:
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: network
         -
           uuid: b8583eaf0353493ba18e751c9355dfa7
           name: 'System contact details'
@@ -128,8 +155,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: ca8d30d561184ff4bf1b4ef07feb7302
           name: 'System description'
@@ -152,8 +179,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 7a472141ebcf4816bffe9bb49f003db6
           name: 'Hardware model name'
@@ -175,8 +202,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
         -
           uuid: b836efdbd3ac4becac319030250c1beb
           name: 'Hardware serial number'
@@ -198,8 +225,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
           triggers:
             -
               uuid: 9f1f3316ed6f4d50a4c9f71a15f35d50
@@ -208,6 +235,10 @@ zabbix_export:
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 7a0062fa788c4abdbeb83df30276a0fd
           name: 'System location'
@@ -229,8 +260,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 87d8d5844b044be1a2a3261f98116fb0
           name: 'System name'
@@ -252,8 +283,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: 97157acd882944e29d6fb9fa1a2d9506
@@ -262,6 +293,13 @@ zabbix_export:
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: security
         -
           uuid: ebfd8c6f87d3401197bb8d9835206878
           name: 'System object ID'
@@ -282,8 +320,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 414a29c595b2439dacb15b4fa0734ab4
           name: 'Overall system health status'
@@ -308,8 +346,8 @@ zabbix_export:
             name: 'JUNIPER-ALARM-MIB::jnxRedAlarmState'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: 1190bb9c05424ac5a0052bd191c274f2
@@ -318,6 +356,13 @@ zabbix_export:
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Please check the device for errors'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 24cd5862c2de4cbaad0b3bbce7f26a65
           name: 'Operating system'
@@ -342,8 +387,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: os
           triggers:
             -
               uuid: 9249511ecf4a4a2d952aa0c4fe55a5d0
@@ -356,6 +401,10 @@ zabbix_export:
                 -
                   name: 'System name has changed (new name: {ITEM.VALUE})'
                   expression: 'last(/Juniper SNMP/system.name,#1)<>last(/Juniper SNMP/system.name,#2) and length(last(/Juniper SNMP/system.name))>0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: bd29b0df96ac4b93bbd0746257d3601d
           name: Uptime
@@ -376,8 +425,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: 23e25e580543411ab8ffc2a4c1ca3c54
@@ -390,6 +439,10 @@ zabbix_export:
                 -
                   name: 'No SNMP data collection'
                   expression: 'max(/Juniper SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 80ff69518e07493aac6059e1009d9a9f
           name: 'SNMP agent availability'
@@ -406,8 +459,11 @@ zabbix_export:
             name: zabbix.host.available
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 417527b3749c4a1c891d761c0978fb2e
@@ -420,6 +476,10 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Juniper SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: 3ce46d56008248cf960c6bf689ea7c0b
@@ -453,8 +513,8 @@ zabbix_export:
                 Reference: http://kb.juniper.net/library/CUSTOMERSERVICE/GLOBAL_JTAC/BK26199/SRX%20SNMP%20Monitoring%20Guide_v1.1.pdf
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
               trigger_prototypes:
                 -
                   uuid: 248c49bc4f47437b9b91e20b57da197d
@@ -463,6 +523,10 @@ zabbix_export:
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'CPU utilization is too high. The system might be slow to respond.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: f60e29b4392e4a3e882a4175e618890c
               name: '{#SNMPVALUE}: Memory utilization'
@@ -478,8 +542,8 @@ zabbix_export:
                 Reference: http://kb.juniper.net/library/CUSTOMERSERVICE/GLOBAL_JTAC/BK26199/SRX%20SNMP%20Monitoring%20Guide_v1.1.pdf
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
               trigger_prototypes:
                 -
                   uuid: ab1f3dcba55d41da974c3ac60ca5b8f2
@@ -487,6 +551,13 @@ zabbix_export:
                   name: '{#SNMPVALUE}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: 7cc53c92b6be4fc59d2928e73f6fe8c3
@@ -535,8 +606,8 @@ zabbix_export:
                 name: 'JUNIPER-ALARM-MIB::jnxOperatingState'
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
               trigger_prototypes:
                 -
                   uuid: f8f1dee0b0ff465d98c6f6bcdfaff17f
@@ -545,6 +616,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: aa36adb11a874374a739d96a2f9a0b3d
           name: 'PSU Discovery'
@@ -571,8 +649,8 @@ zabbix_export:
                 name: 'JUNIPER-ALARM-MIB::jnxOperatingState'
               tags:
                 -
-                  tag: Application
-                  value: 'Power supply'
+                  tag: component
+                  value: power
               trigger_prototypes:
                 -
                   uuid: e577226331f6483fbd1e414bb7d365f7
@@ -581,6 +659,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: e28a9bc06ada4427a7e135aa41c4f76b
           name: 'Temperature discovery'
@@ -612,8 +697,8 @@ zabbix_export:
                 The temperature in Celsius (degrees C) of {#SENSOR_INFO}
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: c82ca2b550f540b7a4c8f9548e15cfb0
@@ -624,6 +709,13 @@ zabbix_export:
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 51113c80e4bd46de8ea247e0bd3b19dd
                   expression: 'avg(/Juniper SNMP/sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}],5m)>{$TEMP_WARN:""}'
@@ -638,6 +730,13 @@ zabbix_export:
                       name: '{#SENSOR_INFO}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
                       expression: 'avg(/Juniper SNMP/sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
                       recovery_expression: 'max(/Juniper SNMP/sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 35b56753b2424f0989ca09cb67f7d9a3
                   expression: 'avg(/Juniper SNMP/sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
@@ -646,6 +745,13 @@ zabbix_export:
                   name: '{#SENSOR_INFO}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: 8ec2a60b8bfe43e7b9227042da1cf2ac
           name: 'Network interfaces discovery'
@@ -734,8 +840,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 3d94079eddb141ceac3b6a134168e422
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
@@ -754,8 +866,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 0cde648550284243a078965f165a069a
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
@@ -779,8 +897,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: d440b154c6194043a657fca8c4ed3179
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
@@ -803,8 +927,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: e9ed9d3d6b8b4340b7f1e22ca066a61d
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
@@ -823,8 +953,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 9c2bd3364f984af498b7bedbccc23c77
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
@@ -848,8 +984,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 339529dba51f4ae5abe508a2461e0e71
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
@@ -874,8 +1016,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 51cda26d008e458790fd722a95072814
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
@@ -897,8 +1045,14 @@ zabbix_export:
                 name: 'IF-MIB::ifOperStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: c993121dca984691bd2cdf0d41c318b4
@@ -916,6 +1070,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 68dd9241092f4f2994d6e5d53cec96b7
               name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
@@ -939,8 +1097,14 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
           trigger_prototypes:
             -
               uuid: faabf122af7e4cca8fdc6e57060b2e69
@@ -970,6 +1134,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Juniper SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Juniper SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Juniper SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Juniper SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: f937622c6f7540579a60328398430f00
               expression: |
@@ -990,6 +1158,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Juniper SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Juniper SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Juniper SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Juniper SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 5731e4345a544b45b6a70a71284b878d
               expression: |
@@ -1009,6 +1181,13 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Juniper SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Juniper SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Juniper SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Juniper SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
           graph_prototypes:
             -
               uuid: bdb09ef524a34b65aaee2c574cd77bde
@@ -1112,8 +1291,14 @@ zabbix_export:
                 name: 'EtherLike-MIB::dot3StatsDuplexStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: a2f686bf06cc4e0a8aa24675abd5d557
@@ -1122,6 +1307,10 @@ zabbix_export:
                   priority: WARNING
                   description: 'Please check autonegotiation settings and cabling'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
           preprocessing:
             -
               type: JAVASCRIPT
@@ -1140,6 +1329,13 @@ zabbix_export:
                       });
                   });
                   return JSON.stringify(data);
+      tags:
+        -
+          tag: class
+          value: network
+        -
+          tag: target
+          value: juniper
       macros:
         -
           macro: '{$CPU.UTIL.CRIT}'

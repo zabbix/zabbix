@@ -27,14 +27,25 @@
 $subfilter_options = [];
 
 foreach (['hostids', 'tagnames', 'data'] as $key) {
-	if (count($data[$key]) <= 1) {
+	if (!array_key_exists($key, $data) || count($data[$key]) <= 1) {
 		$subfilter_options[$key] = null;
 		continue;
 	}
+	else {
+		$subfilter_options[$key] = [];
+	}
 
-	$subfilter_used = (bool) array_filter($data[$key], function ($elmnt) {
-		return $elmnt['selected'];
+	// Remove non-selected filter fields with 0 occurrences.
+	$data[$key] = array_filter($data[$key], function ($field) {
+		return ($field['selected'] || $field['count'] != 0);
 	});
+
+	$subfilter_used = (bool) array_filter($data[$key], function ($field) {
+		return $field['selected'];
+	});
+
+	$subfilter_options_count = count($data[$key]);
+	$data[$key] = CControllerLatest::getTopPrioritySubfilters($data[$key]);
 
 	foreach ($data[$key] as $value => $element) {
 		if ($element['selected']) {
@@ -67,16 +78,22 @@ foreach (['hostids', 'tagnames', 'data'] as $key) {
 			}
 		}
 	}
+
+	if ($subfilter_options_count > count($subfilter_options[$key])) {
+		$subfilter_options[$key][] = new CSpan('...');
+	}
 }
 
 if (count($data['tags']) > 0) {
 	$subfilter_options['tags'] = [];
 
-	$subfilter_used = (bool) array_filter($data['tags'], function ($elmnt) {
-		return (bool) array_sum(array_column($elmnt, 'selected'));
+	$subfilter_used = (bool) array_filter($data['tags'], function ($field) {
+		return (bool) array_sum(array_column($field, 'selected'));
 	});
 
-	foreach ($data['tags'] as $tag => $tag_values) {
+	foreach (CControllerLatest::getTopPriorityTagValueSubfilters($data['tags']) as $tags_group) {
+		$tag = $tags_group['name'];
+
 		$tag_values = array_map(function ($element) use ($tag, $subfilter_used) {
 			if ($element['name'] === '') {
 				$element_name = _('None');
@@ -91,9 +108,10 @@ if (count($data['tags']) > 0) {
 				return (new CSpan([
 					(new CLinkAction($element_name))
 						->addStyle($element_style)
-						->onClick(CHtml::encode(
-							'view.unsetSubfilter('.json_encode(['subfilter_tags['.$tag.'][]', $element['name']]).')'
-						)),
+						->onClick('view.unsetSubfilter('.json_encode([
+							'subfilter_tags['.$tag.'][]',
+							$element['name']
+						]).')'),
 					' ',
 					new CSup($element['count'])
 				]))
@@ -101,40 +119,38 @@ if (count($data['tags']) > 0) {
 					->addClass(ZBX_STYLE_SUBFILTER_ENABLED);
 			}
 			else {
-				if ($element['count'] == 0) {
-					return (new CSpan([
-						(new CSpan($element_name))
-							->addStyle($element_style)
-							->addClass(ZBX_STYLE_GREY),
-						' ',
-						new CSup($element['count'])
-					]))->addClass(ZBX_STYLE_SUBFILTER);
-				}
-				else {
-					return (new CSpan([
-						(new CLinkAction($element_name))
-							->addStyle($element_style)
-							->onClick(CHtml::encode(
-								'view.setSubfilter('.json_encode(['subfilter_tags['.$tag.'][]', $element['name']]).')'
-							)),
-						' ',
-						new CSup(($subfilter_used ? '+' : '').$element['count'])
-					]))->addClass(ZBX_STYLE_SUBFILTER);
-				}
+				return (new CSpan([
+					(new CLinkAction($element_name))
+						->addStyle($element_style)
+						->onClick('view.setSubfilter('.json_encode([
+							'subfilter_tags['.$tag.'][]',
+							$element['name']
+						]).')'),
+					' ',
+					new CSup(($subfilter_used ? '+' : '').$element['count'])
+				]))->addClass(ZBX_STYLE_SUBFILTER);
 			}
-		}, $tag_values);
+		}, $tags_group['values']);
+
+		$tag_values_row = (count($data['tags'][$tag]) > CControllerLatest::SUBFILTERS_VALUES_PER_ROW)
+			? [$tag_values, new CSpan('...')]
+			: $tag_values;
 
 		$subfilter_options['tags'][$tag] = (new CDiv([
 			new CTag('label', true, $tag.': '),
-			(new CDiv($tag_values))->addClass('subfilter-options')
+			(new CDiv($tag_values_row))->addClass('subfilter-options')
 		]))->addClass('subfilter-option-grid');
+	}
+
+	if (count($data['tags']) > CControllerLatest::SUBFILTERS_TAG_VALUE_ROWS) {
+		$subfilter_options['tags'][] = new CSpan('...');
 	}
 }
 else {
 	$subfilter_options['tags'] = null;
 }
 
-$subfilter = (new CTableInfo())
+(new CTableInfo())
 	->addRow([[
 		new CTag('h4', true, [
 			_('Subfilter'), ' ', (new CSpan(_('affects only filtered data')))->addClass(ZBX_STYLE_GREY)

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-18T20:46:10Z'
+  date: '2022-01-27T08:29:03Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -35,8 +35,11 @@ zabbix_export:
             name: 'Service state'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: c187031a85c340219bf773e53b1eb70b
@@ -44,6 +47,10 @@ zabbix_export:
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 71383adcc92c44d3866c0c8592c3e99c
           name: 'ICMP loss'
@@ -54,8 +61,11 @@ zabbix_export:
           units: '%'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: c30d9d87e01d4a4fb5f859b9b96a9597
@@ -67,6 +77,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/MikroTik hEX PoE SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: ed501823d99341b88d17ecd8b0b83fc4
           name: 'ICMP response time'
@@ -77,8 +94,11 @@ zabbix_export:
           units: s
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 71bd6b58f328466fa8855e45f98d9148
@@ -93,6 +113,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/MikroTik hEX PoE SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 977608b526c843f2aca7dcd9a18d9334
           name: 'SNMP traps (fallback)'
@@ -105,8 +132,8 @@ zabbix_export:
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: network
         -
           uuid: a1f09e41ce824318be6b2852c82d5ea2
           name: 'System contact details'
@@ -128,8 +155,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 27f4de9554c44842a118ed22da40897f
           name: 'System description'
@@ -152,8 +179,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 3521c975bbb443b1b66ec32ea561745f
           name: 'Firmware version'
@@ -174,8 +201,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
           triggers:
             -
               uuid: fe1e4e312e5a4ee48fecb03895b51201
@@ -185,6 +212,10 @@ zabbix_export:
               priority: INFO
               description: 'Firmware version has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 6178d9f5c5e947fe8e3fb774cc5a373a
           name: 'Hardware model name'
@@ -203,8 +234,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
         -
           uuid: c449cc37420643ee8493419bde54aac6
           name: 'Hardware serial number'
@@ -226,8 +257,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
           triggers:
             -
               uuid: 250374059d8a45f78107f1f5b9bda7b1
@@ -236,6 +267,10 @@ zabbix_export:
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 433dfca6d6fd4b4b903c48a3cf862052
           name: 'System location'
@@ -257,8 +292,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 47326c2cd58242e18397d522df49ad76
           name: 'System name'
@@ -280,8 +315,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: 689814337c114068a71c0d510b6ffdee
@@ -290,6 +325,13 @@ zabbix_export:
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: security
         -
           uuid: e4807c61ed6841eb8b96a0e058343b42
           name: 'System object ID'
@@ -310,8 +352,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 65da6e280942476e842effb8a08e2c6f
           name: 'Operating system'
@@ -333,8 +375,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: os
           triggers:
             -
               uuid: 2615116273594f659184fdc9f2612c91
@@ -347,6 +389,10 @@ zabbix_export:
                 -
                   name: 'System name has changed (new name: {ITEM.VALUE})'
                   expression: 'last(/MikroTik hEX PoE SNMP/system.name,#1)<>last(/MikroTik hEX PoE SNMP/system.name,#2) and length(last(/MikroTik hEX PoE SNMP/system.name))>0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 88c412ccc0944b96be165b4de91e5ee9
           name: Uptime
@@ -367,8 +413,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: 6919d6afa065438b976979a4f782414e
@@ -381,6 +427,10 @@ zabbix_export:
                 -
                   name: 'No SNMP data collection'
                   expression: 'max(/MikroTik hEX PoE SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: b4ce328c64a2471e98a1f608028797d5
           name: 'Total memory'
@@ -407,8 +457,8 @@ zabbix_export:
                 - '1024'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: 9a7746065ea84c8da33740d3552c7073
           name: 'Used memory'
@@ -427,8 +477,8 @@ zabbix_export:
                 - '1024'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: d294f3fa005b4c90a82fbc3fd5037fb7
           name: 'Memory utilization'
@@ -441,8 +491,8 @@ zabbix_export:
           description: 'Memory utilization in %'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
           triggers:
             -
               uuid: 851e15f5b81a43b3be5d3eda921c9430
@@ -450,6 +500,13 @@ zabbix_export:
               name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 18941d2b2b45432f9114b7ff69844ec1
           name: 'SNMP agent availability'
@@ -466,8 +523,11 @@ zabbix_export:
             name: zabbix.host.available
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: dbe7f9e93602427e81932c39b4383974
@@ -480,6 +540,10 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/MikroTik hEX PoE SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: 9311078329d04ea5a752806a0ee89918
@@ -504,8 +568,8 @@ zabbix_export:
                 The average, over the last minute, of the percentage of time that this processor was not idle. Implementations may approximate this one minute smoothing period if necessary.
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
               trigger_prototypes:
                 -
                   uuid: 87ea6ae2f5374f68acfbd4d368c8aae8
@@ -514,6 +578,10 @@ zabbix_export:
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'CPU utilization is too high. The system might be slow to respond.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: 1646642b07fd4dcaa99e1ad91cf34b52
@@ -558,8 +626,8 @@ zabbix_export:
                     - '0.1'
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: 89ccd80168694f6cb7742f79ab2f02ae
@@ -570,6 +638,13 @@ zabbix_export:
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: a27c393597ac4618846b7c9d906167c7
                   expression: 'avg(/MikroTik hEX PoE SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"CPU"}'
@@ -584,6 +659,13 @@ zabbix_export:
                       name: 'CPU: Temperature is above critical threshold: >{$TEMP_CRIT:"CPU"}'
                       expression: 'avg(/MikroTik hEX PoE SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"CPU"}'
                       recovery_expression: 'max(/MikroTik hEX PoE SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"CPU"}-3'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 648519d0cc5b4795ab917893a71f1872
                   expression: 'avg(/MikroTik hEX PoE SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"CPU"}'
@@ -592,6 +674,13 @@ zabbix_export:
                   name: 'CPU: Temperature is too low: <{$TEMP_CRIT_LOW:"CPU"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: 361b9a2d66864d14806c8ef41ddf958a
           name: 'Temperature sensor discovery'
@@ -601,8 +690,7 @@ zabbix_export:
           delay: 1h
           description: |
             MIKROTIK-MIB::mtxrHlTemperature
-            Since temperature sensor is not available on all Mikrotik hardware,
-            this is done to avoid unsupported items.
+            Since temperature sensor is not available on all Mikrotik hardware, this is done to avoid unsupported items.
           item_prototypes:
             -
               uuid: edd3813705ad49cf84ee609e51c0b04e
@@ -626,8 +714,8 @@ zabbix_export:
                     - '0.1'
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: 48244ed562b144c192177e64b06d268c
@@ -638,6 +726,13 @@ zabbix_export:
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 1b239ec1f0834b6ebe1ebc974121504b
                   expression: 'avg(/MikroTik hEX PoE SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"Device"}'
@@ -652,6 +747,13 @@ zabbix_export:
                       name: 'Device: Temperature is above critical threshold: >{$TEMP_CRIT:"Device"}'
                       expression: 'avg(/MikroTik hEX PoE SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Device"}'
                       recovery_expression: 'max(/MikroTik hEX PoE SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Device"}-3'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: d31b9428aef346d49ec00acd2388f657
                   expression: 'avg(/MikroTik hEX PoE SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"Device"}'
@@ -660,6 +762,13 @@ zabbix_export:
                   name: 'Device: Temperature is too low: <{$TEMP_CRIT_LOW:"Device"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: 2dd64ba5c59643f78d472e2281870390
           name: 'LTE modem discovery'
@@ -694,14 +803,27 @@ zabbix_export:
                 mtxrLTEModemSignalRSRP Reference Signal Received Power.
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: 573a668131014af2bc2989edbcdbf8b8
                   expression: 'max(/MikroTik hEX PoE SNMP/lte.modem.rsrp[mtxrLTEModemSignalRSRP.{#SNMPINDEX}],5m) < {$LTEMODEM.RSRP.MIN.WARN}'
                   name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSRP is low (below {$LTEMODEM.RSRP.MIN.WARN}dbm for 5m)'
                   priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 0a022c73ee604112a46dac1d80312b35
               name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSRQ'
@@ -716,14 +838,27 @@ zabbix_export:
                 mtxrLTEModemSignalRSRQ Reference Signal Received Quality.
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: 8b6d36e582d34ed7bdec1aaa406d0939
                   expression: 'max(/MikroTik hEX PoE SNMP/lte.modem.rsrq[mtxrLTEModemSignalRSRQ.{#SNMPINDEX}],5m) < {$LTEMODEM.RSRQ.MIN.WARN}'
                   name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSRQ is low (below {$LTEMODEM.RSRQ.MIN.WARN}db for 5m)'
                   priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: d51b890123044db4bbbbbb2bf8255f11
               name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSSI'
@@ -738,14 +873,27 @@ zabbix_export:
                 mtxrLTEModemSignalRSSI Received Signal Strength Indicator.
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: 7e8ac19ee7aa43d7bc849f5a093e846a
                   expression: 'max(/MikroTik hEX PoE SNMP/lte.modem.rssi[mtxrLTEModemSignalRSSI.{#SNMPINDEX}],5m) < {$LTEMODEM.RSSI.MIN.WARN}'
                   name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSSI is low (below {$LTEMODEM.RSSI.MIN.WARN}dbm for 5m)'
                   priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 6a60892c64f44ba39ac4db3ea3b06a76
               name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem SINR'
@@ -760,14 +908,27 @@ zabbix_export:
                 mtxrLTEModemSignalSINR Signal to Interference & Noise Ratio.
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: 36404ef697ea49329f0572be3940fbd6
                   expression: 'max(/MikroTik hEX PoE SNMP/lte.modem.sinr[mtxrLTEModemSignalSINR.{#SNMPINDEX}],5m) < {$LTEMODEM.SINR.MIN.WARN}'
                   name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem SINR is low (below {$LTEMODEM.SINR.MIN.WARN}db for 5m)'
                   priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: d96cc35ffec845a0bfdc742d9c789011
@@ -828,8 +989,14 @@ zabbix_export:
                 mtxrWlApAuthClientCount Number of authentication clients.
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 38db6983c1044493ba02a2ca204ed981
               name: 'Interface {#IFNAME}({#IFALIAS}): AP band'
@@ -849,8 +1016,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 58ba2fb7ac314593924d11dfddf96dcc
               name: 'Interface {#IFNAME}({#IFALIAS}): SSID'
@@ -870,8 +1043,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: e6b23b9175eb4a97bce37e07d33891d0
               name: 'Interface {#IFNAME}({#IFALIAS}): AP noise floor'
@@ -890,8 +1069,14 @@ zabbix_export:
                     - 15m
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: b80ecc7de8714f48831cf1c6bb1870b9
               name: 'Interface {#IFNAME}({#IFALIAS}): AP registered clients'
@@ -904,8 +1089,14 @@ zabbix_export:
                 mtxrWlApClientCount Client established connection to AP, but didn't finish all authentication procedures for full connection.
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
         -
           uuid: ba0e7757c7b645c98b67fda025e7c1d6
           name: 'CAPsMAN AP channel discovery'
@@ -938,8 +1129,14 @@ zabbix_export:
                 mtxrWlCMAuthClientCount Number of authentication clients.
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 6be247ddc3a94489b25bee5595e7efea
               name: 'Interface {#IFNAME}({#IFALIAS}): AP channel'
@@ -959,8 +1156,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 1ea73c7d20834a168ebb4a5afca21e32
               name: 'Interface {#IFNAME}({#IFALIAS}): AP registered clients'
@@ -973,8 +1176,14 @@ zabbix_export:
                 mtxrWlCMRegClientCount Client established connection to AP, but didn't finish all authentication procedures for full connection.
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 767c4c5614ff4802b8447079b31bbd42
               name: 'Interface {#IFNAME}({#IFALIAS}): AP state'
@@ -994,8 +1203,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: f75775427c074c83a1002b716733aa7f
@@ -1003,6 +1218,13 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): AP interface {#IFNAME}({#IFALIAS}) is not running'
                   priority: WARNING
                   description: 'Access point interface can be not running by different reasons - disabled interface, power off, network link down.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: 69471c3749694f3083a04ff02e396f34
           name: 'Network interfaces discovery'
@@ -1091,8 +1313,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 369c88f8e6fc48498f42feb7480a51b3
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
@@ -1111,8 +1339,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: d646ae15a461418aa8e8da230c5782eb
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
@@ -1136,8 +1370,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 3e6a5520bc15470da4ac5a4c8a294728
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
@@ -1160,8 +1400,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 340ea8c167bf44479c564e46a515fad0
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
@@ -1180,8 +1426,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: a63fbf01f29b46c19f6c8af8711e18f4
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
@@ -1205,8 +1457,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: a4bf8af96225494886df5fe116af2ada
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
@@ -1231,8 +1489,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 31f8c6c9170b490586ff13e88d33ef53
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
@@ -1254,8 +1518,14 @@ zabbix_export:
                 name: 'IF-MIB::ifOperStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: 28bc939657054f55a94e3818cba84344
@@ -1273,6 +1543,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 76233c986f8e4e0d9c7262e5a20f3576
               name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
@@ -1296,8 +1570,14 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
           trigger_prototypes:
             -
               uuid: f65d4d21623e4b0cb8a98f088e304de7
@@ -1327,6 +1607,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/MikroTik hEX PoE SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/MikroTik hEX PoE SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/MikroTik hEX PoE SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/MikroTik hEX PoE SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 98c16c4da816482195fc9a3c43f4cc2b
               expression: |
@@ -1347,6 +1631,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/MikroTik hEX PoE SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/MikroTik hEX PoE SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/MikroTik hEX PoE SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/MikroTik hEX PoE SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: e24c732a680c4f7fac04eb4fd20e3839
               expression: |
@@ -1366,6 +1654,13 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/MikroTik hEX PoE SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/MikroTik hEX PoE SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/MikroTik hEX PoE SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/MikroTik hEX PoE SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
           graph_prototypes:
             -
               uuid: 50f1876239d24cfc93478d4839fa2956
@@ -1416,7 +1711,7 @@ zabbix_export:
           uuid: e626b00e480f4ff8a059be7e85934bf8
           name: 'Storage discovery'
           type: SNMP_AGENT
-          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.2.1.25.2.3.1.3,{#ALLOC_UNITS},1.3.6.1.2.1.25.2.3.1.4,{#STORAGE_TYPE},1.3.6.1.2.1.25.2.3.1.2]'
+          snmp_oid: 'discovery[{#FSNAME},1.3.6.1.2.1.25.2.3.1.3,{#ALLOC_UNITS},1.3.6.1.2.1.25.2.3.1.4,{#STORAGE_TYPE},1.3.6.1.2.1.25.2.3.1.2]'
           key: storage.discovery
           delay: 1h
           filter:
@@ -1444,8 +1739,11 @@ zabbix_export:
               description: 'Space utilization in % for Disk-{#SNMPINDEX}'
               tags:
                 -
-                  tag: Application
-                  value: Storage
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
             -
               uuid: 05023f80d98c4234830e56c2c42059f7
               name: 'Disk-{#SNMPINDEX}: Total space'
@@ -1472,8 +1770,11 @@ zabbix_export:
                     - '1024'
               tags:
                 -
-                  tag: Application
-                  value: Storage
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
             -
               uuid: f6dd161551a0414ca51e4f7c5b1de616
               name: 'Disk-{#SNMPINDEX}: Used space'
@@ -1492,8 +1793,11 @@ zabbix_export:
                     - '1024'
               tags:
                 -
-                  tag: Application
-                  value: Storage
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
           trigger_prototypes:
             -
               uuid: 6d5b2060b6c946c7835867727dec0f87
@@ -1509,6 +1813,13 @@ zabbix_export:
                  - The disk free space is less than 5G.
                  - The disk will be full in less than 24 hours.
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: capacity
             -
               uuid: e05e7d6b7b6c45f7974f39a258a754f8
               expression: |
@@ -1529,6 +1840,13 @@ zabbix_export:
                   expression: |
                     last(/MikroTik hEX PoE SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"} and
                     ((last(/MikroTik hEX PoE SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/MikroTik hEX PoE SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<5G or timeleft(/MikroTik hEX PoE SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: capacity
           graph_prototypes:
             -
               uuid: afe07c8019d5460f9624577328d8c3a6
@@ -1552,6 +1870,16 @@ zabbix_export:
                   item:
                     host: 'MikroTik hEX PoE SNMP'
                     key: 'vfs.fs.used[hrStorageSize.{#SNMPINDEX}]'
+      tags:
+        -
+          tag: class
+          value: network
+        -
+          tag: target
+          value: hex-poe
+        -
+          tag: target
+          value: mikrotik
       macros:
         -
           macro: '{$CPU.UTIL.CRIT}'

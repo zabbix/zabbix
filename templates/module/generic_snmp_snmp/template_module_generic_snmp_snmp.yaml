@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-18T20:38:37Z'
+  date: '2022-01-28T13:22:58Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -31,8 +31,11 @@ zabbix_export:
             name: 'Service state'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 085d6f785f1e46faa447d6921036d01d
@@ -40,6 +43,10 @@ zabbix_export:
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 5d306c51188e496ba19b75b99e28cc7b
           name: 'ICMP loss'
@@ -50,8 +57,11 @@ zabbix_export:
           units: '%'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: d1bd868814ba4ace9b5034ac4e303259
@@ -63,6 +73,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Generic SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 9ad39c8c6ede46e6953aa6f9466eaf69
           name: 'ICMP response time'
@@ -73,8 +90,11 @@ zabbix_export:
           units: s
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: ecd74ec29b484a499414293bf671160b
@@ -89,6 +109,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Generic SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 2cda26906f254e13985cecdbb7901d1a
           name: 'SNMP traps (fallback)'
@@ -101,8 +128,8 @@ zabbix_export:
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: network
         -
           uuid: 62da59c7aae54df7976f327119fe7cc2
           name: 'System contact details'
@@ -124,8 +151,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 29a3e5277de94386a5985fcf38a09364
           name: 'System description'
@@ -148,8 +175,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 02b453f44c014f2bb1054e801058b381
           name: 'System location'
@@ -171,8 +198,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 3996a3a8d927473aa07c47e63a09b865
           name: 'System name'
@@ -194,8 +221,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: 072bf35ea9d04c559ada5cb13d4b6802
@@ -204,6 +231,13 @@ zabbix_export:
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: security
         -
           uuid: 9dbcc5a1cd7240c896e2ea718f9ccb35
           name: 'System object ID'
@@ -224,8 +258,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 000b97abddcd44bfb57e0eeb1b77f69e
           name: Uptime
@@ -246,8 +280,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: 6f00359af55f45909bdecbad234c7654
@@ -260,6 +294,10 @@ zabbix_export:
                 -
                   name: 'No SNMP data collection'
                   expression: 'max(/Generic SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 3e8c2d440441416b9ccec7dd90e21503
           name: 'SNMP agent availability'
@@ -276,8 +314,11 @@ zabbix_export:
             name: zabbix.host.available
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: d3aba975ec574b258c7f971152c5d4cd
@@ -290,6 +331,10 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Generic SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       macros:
         -
           macro: '{$ICMP_LOSS_WARN}'
