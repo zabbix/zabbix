@@ -30,7 +30,7 @@
 
 		init({filter_form_name, data}) {
 			this._filter_form = document.querySelector(`[name="${filter_form_name}"]`);
-			this._wrapper = document.querySelector('.wrapper');
+			this._wrapper = document.querySelector('main');
 			this._data = data;
 
 			this.initSubfilter();
@@ -60,8 +60,8 @@
 			);
 
 			this._app = new ChartList( $('#charts'), this._data.timeline, this._data.config, this._wrapper);
-
 			this._app.setCharts(this._data.charts);
+			this._app.onResize();
 
 			this._resize_observer = new ResizeObserver(this._app.onResize.bind(this._app));
 			this._resize_observer.observe(this._wrapper);
@@ -428,13 +428,9 @@
 	ChartList.prototype.onResize = function() {
 		const width = this.wrapper.clientWidth;
 
-		if (this._resize_timeoutid) {
-			clearTimeout(this._resize_timeoutid);
-		}
-
 		if (this._prev_width != width) {
 			this._prev_width = width;
-			this._resize_timeoutid = setTimeout(_ => this.updateCharts(), 500);
+			this.updateCharts();
 		}
 	};
 </script>
