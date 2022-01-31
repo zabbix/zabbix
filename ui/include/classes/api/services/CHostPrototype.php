@@ -388,16 +388,14 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * Creates the given host prototypes.
-	 *
 	 * @param array $host_prototypes
 	 *
 	 * @return array
 	 */
-	public function create(array $host_prototypes) {
+	public function create(array $host_prototypes): array {
 		$this->validateCreate($host_prototypes);
 
-		$this->createReal($host_prototypes);
+		$this->createForce($host_prototypes);
 		[$tpl_host_prototypes] = $this->getTemplatedObjects($host_prototypes);
 
 		if ($tpl_host_prototypes) {
@@ -408,8 +406,6 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * Validates the input parameters for the create() method.
-	 *
 	 * @param array $host_prototypes
 	 *
 	 * @throws APIException if the input is invalid.
@@ -462,12 +458,10 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * Creates the host prototypes and inherits them to linked hosts and templates.
-	 *
 	 * @param array $host_prototypes
 	 * @param bool  $inherited
 	 */
-	protected function createReal(array &$host_prototypes, bool $inherited = false): void {
+	protected function createForce(array &$host_prototypes, bool $inherited = false): void {
 		foreach ($host_prototypes as &$host_prototype) {
 			$host_prototype['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 		}
@@ -498,8 +492,6 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * Updates the given host prototypes.
-	 *
 	 * @param array $host_prototypes
 	 *
 	 * @return array
@@ -507,7 +499,7 @@ class CHostPrototype extends CHostBase {
 	public function update(array $host_prototypes): array {
 		$this->validateUpdate($host_prototypes, $db_host_prototypes);
 
-		$this->updateReal($host_prototypes, $db_host_prototypes);
+		$this->updateForce($host_prototypes, $db_host_prototypes);
 
 		[$tpl_host_prototypes, $tpl_db_host_prototypes] =
 			$this->getTemplatedObjects($host_prototypes, $db_host_prototypes);
@@ -520,8 +512,6 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * Validates the input parameters for the update() method.
-	 *
 	 * @param array      $host_prototypes
 	 * @param array|null $db_host_prototypes
 	 *
@@ -608,12 +598,73 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * Updates the host prototypes and propagates the changes to linked hosts and templates.
-	 *
+	 * @return array
+	 */
+	private static function getInterfacesValidationRules(): array {
+		return ['type' => API_MULTIPLE, 'rules' => [
+			['if' => ['field' => 'custom_interfaces', 'in' => HOST_PROT_INTERFACES_CUSTOM], 'type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
+				'type' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_IPMI, INTERFACE_TYPE_JMX])],
+				'useip' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [INTERFACE_USE_DNS, INTERFACE_USE_IP])],
+				'ip' =>			['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'useip', 'in' => INTERFACE_USE_IP], 'type' => API_IP, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO | API_ALLOW_MACRO, 'length' => DB::getFieldLength('interface', 'ip')],
+									['else' => true, 'type' => API_IP, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO | API_ALLOW_MACRO, 'length' => DB::getFieldLength('interface', 'ip')]
+				]],
+				'dns' =>		['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'useip', 'in' => INTERFACE_USE_DNS], 'type' => API_DNS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO | API_ALLOW_MACRO, 'length' => DB::getFieldLength('interface', 'dns')],
+									['else' => true, 'type' => API_DNS, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO | API_ALLOW_MACRO, 'length' => DB::getFieldLength('interface', 'dns')]
+				]],
+				'port' =>		['type' => API_PORT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO, 'length' => DB::getFieldLength('interface', 'port')],
+				'main' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [INTERFACE_SECONDARY, INTERFACE_PRIMARY])],
+				'details' =>	['type' => API_MULTIPLE, 'rules' => [
+					['if' => ['field' => 'type', 'in' => INTERFACE_TYPE_SNMP], 'type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
+						'version' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SNMP_V1, SNMP_V2C, SNMP_V3])],
+						'bulk' =>			['type' => API_INT32, 'in' => implode(',', [SNMP_BULK_DISABLED, SNMP_BULK_ENABLED])],
+						'community' =>		['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'version', 'in' => implode(',', [SNMP_V1, SNMP_V2C])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('interface_snmp', 'community')],
+												['else' => true, 'type' => API_UNEXPECTED]
+						]],
+						'contextname' =>	['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'version', 'in' => SNMP_V3], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'contextname')],
+												['else' => true, 'type' => API_UNEXPECTED]
+						]],
+						'securityname' =>	['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'version', 'in' => SNMP_V3], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'securityname')],
+												['else' => true, 'type' => API_UNEXPECTED]
+						]],
+						'securitylevel' =>	['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'version', 'in' => SNMP_V3], 'type' => API_INT32, 'in' => implode(',', [ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]), 'default' => DB::getDefault('interface_snmp', 'securitylevel')],
+												['else' => true, 'type' => API_UNEXPECTED]
+						]],
+						'authprotocol' =>	['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'securitylevel', 'in' => implode(',', [ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV])], 'type' => API_INT32, 'in' => implode(',', array_keys(getSnmpV3AuthProtocols()))],
+												['else' => true, 'type' => API_UNEXPECTED]
+						]],
+						'authpassphrase' =>	['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'securitylevel', 'in' => implode(',', [ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'authpassphrase')],
+												['else' => true, 'type' => API_UNEXPECTED]
+						]],
+						'privprotocol' =>	['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'securitylevel', 'in' => ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV], 'type' => API_INT32, 'in' => implode(',', array_keys(getSnmpV3PrivProtocols()))],
+												['else' => true, 'type' => API_UNEXPECTED]
+						]],
+						'privpassphrase' =>	['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'securitylevel', 'in' => ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'privpassphrase')],
+												['else' => true, 'type' => API_UNEXPECTED]
+						]]
+					]],
+					['else' => true, 'type' => API_UNEXPECTED]
+				]]
+			]],
+			['else' => true, 'type' => API_UNEXPECTED]
+		]];
+	}
+
+
+	/**
 	 * @param array $host_prototypes
 	 * @param array $db_host_prototypes
 	 */
-	protected function updateReal(array &$host_prototypes, array $db_host_prototypes): void {
+	protected function updateForce(array &$host_prototypes, array $db_host_prototypes): void {
 		$upd_host_prototypes = [];
 
 		// save the host prototypes
@@ -648,123 +699,129 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * @param array $host_prototypeids
+	 * @param array $host_prototypes
+	 * @param array $db_host_prototypes
 	 */
-	public static function deleteForce(array $host_prototypeids): void {
-		$host_prototypeids = array_merge($host_prototypeids, self::getChildIds($host_prototypeids));
-
-		// Lock host prototypes before delete to prevent server from adding new LLD hosts.
-		$db_host_prototypes = DBfetchArray(DBselect(
-			'SELECT hostid,host'.
-			' FROM hosts h'.
-			' WHERE '.dbConditionId('h.hostid', $host_prototypeids).
-			' FOR UPDATE'
-		));
-
-		$db_hosts = DB::select('host_discovery', [
-			'output' => [],
-			'filter' => [
-				'parent_hostid' => $host_prototypeids
-			],
-			'preservekeys' => true
-		]);
-
-		if ($db_hosts) {
-			API::Host()->delete(array_keys($db_hosts), true);
-		}
-
-		$db_group_prototypes = DB::select('group_prototype', [
-			'output' => [],
-			'filter' => [
-				'hostid' => $host_prototypeids
-			],
-			'preservekeys' => true
-		]);
-
-		if ($db_group_prototypes) {
-			self::deleteGroupPrototypes(array_keys($db_group_prototypes));
-		}
-
-		DB::delete('hosts', ['hostid' => $host_prototypeids]);
-
-		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_HOST_PROTOTYPE, $db_host_prototypes);
+	protected function addAffectedObjects(array $host_prototypes, array &$db_host_prototypes): void {
+		self::addAffectedInterfaces($host_prototypes, $db_host_prototypes);
+		self::addAffectedGroupLinks($host_prototypes, $db_host_prototypes);
+		self::addAffectedGroupPrototypes($host_prototypes, $db_host_prototypes);
+		parent::addAffectedObjects($host_prototypes, $db_host_prototypes);
 	}
 
 	/**
-	 * Delete host prototypes.
-	 *
-	 * @param array $host_prototypeids
-	 *
-	 * @return array
+	 * @param array $host_prototypes
+	 * @param array $db_host_prototypes
 	 */
-	public function delete(array $host_prototypeids): array {
-		$this->validateDelete($host_prototypeids);
+	private static function addAffectedInterfaces(array $host_prototypes, array &$db_host_prototypes): void {
+		$hostids = [];
 
-		self::deleteForce($host_prototypeids);
+		foreach ($host_prototypes as $host_prototype) {
+			$db_custom_interfaces = $db_host_prototypes[$host_prototype['hostid']]['custom_interfaces'];
 
-		return ['hostids' => $host_prototypeids];
-	}
-
-	/**
-	 * Validates the input parameters for the delete() method.
-	 *
-	 * @param array $host_prototypeids
-	 *
-	 * @throws APIException  if the input is invalid
-	 */
-	private function validateDelete(array &$host_prototypeids) : void {
-		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
-
-		if (!CApiInputValidator::validate($api_input_rules, $host_prototypeids, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			if (array_key_exists('interfaces', $host_prototype)
+					|| ($host_prototype['custom_interfaces'] != $db_custom_interfaces
+						&& $db_custom_interfaces == HOST_PROT_INTERFACES_CUSTOM)) {
+				$hostids[] = $host_prototype['hostid'];
+				$db_host_prototypes[$host_prototype['hostid']]['interfaces'] = [];
+			}
 		}
 
-		$count = $this->get([
-			'countOutput' => true,
-			'hostids' => $host_prototypeids,
-			'editable' => true
-		]);
-
-		if ($count != count($host_prototypeids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		if (!$hostids) {
+			return;
 		}
 
-		$db_host_prototype = DBfetch(DBSelect(
-			'SELECT h.hostid'.
-			' FROM hosts h'.
-			' WHERE h.templateid>0'.
-				' AND '.dbConditionId('h.hostid', $host_prototypeids),
-			1
-		));
+		$details_interfaces = [];
+		$options = [
+			'output' => ['interfaceid', 'hostid', 'main', 'type', 'useip', 'ip', 'dns', 'port'],
+			'filter' => ['hostid' => $hostids]
+		];
+		$db_interfaces = DBselect(DB::makeSql('interface', $options));
 
-		if ($db_host_prototype) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete templated host prototype.'));
+		while ($db_interface = DBfetch($db_interfaces)) {
+			$db_host_prototypes[$db_interface['hostid']]['interfaces'][$db_interface['interfaceid']] =
+				array_diff_key($db_interface, array_flip(['hostid']));
+
+			if ($db_interface['type'] == INTERFACE_TYPE_SNMP) {
+				$details_interfaces[$db_interface['interfaceid']] = $db_interface['hostid'];
+			}
 		}
-	}
 
-	/**
-	 * @param array $host_prototypeids
-	 *
-	 * @return array
-	 */
-	private static function getChildIds(array $host_prototypeids): array {
-		$child_host_prototypeids = [];
-
-		do {
-			$db_host_prototypes = DB::select('hosts', [
-				'output' => [],
-				'filter' => [
-					'templateid' => $host_prototypeids
+		if ($details_interfaces) {
+			$options = [
+				'output' => ['interfaceid', 'version', 'bulk', 'community', 'securityname', 'securitylevel',
+					'authpassphrase', 'privpassphrase', 'authprotocol', 'privprotocol', 'contextname'
 				],
-				'preservekeys' => true
-			]);
+				'filter' => ['interfaceid' => array_keys($details_interfaces)]
+			];
+			$result = DBselect(DB::makeSql('interface_snmp', $options));
 
-			$host_prototypeids = array_keys($db_host_prototypes);
-			$child_host_prototypeids += $db_host_prototypes;
+			while ($db_details = DBfetch($result)) {
+				$hostid = $details_interfaces[$db_details['interfaceid']];
+				$db_host_prototypes[$hostid]['interfaces'][$db_details['interfaceid']]['details'] =
+					array_diff_key($db_details, array_flip(['interfaceid']));
+			}
 		}
-		while ($host_prototypeids);
+	}
 
-		return array_keys($child_host_prototypeids);
+	/**
+	 * @param array $host_prototypes
+	 * @param array $db_host_prototypes
+	 */
+	private static function addAffectedGroupLinks(array $host_prototypes, array &$db_host_prototypes): void {
+		$hostids = [];
+
+		foreach ($host_prototypes as $host_prototype) {
+			if (array_key_exists('groupLinks', $host_prototype)) {
+				$hostids[] = $host_prototype['hostid'];
+				$db_host_prototypes[$host_prototype['hostid']]['groupLinks'] = [];
+			}
+		}
+
+		if (!$hostids) {
+			return;
+		}
+
+		$options = [
+			'output' => ['group_prototypeid', 'hostid', 'groupid', 'templateid'],
+			'filter' => ['hostid' => $hostids, 'name' => '']
+		];
+		$db_links = DBselect(DB::makeSql('group_prototype', $options));
+
+		while ($db_link = DBfetch($db_links)) {
+			$db_host_prototypes[$db_link['hostid']]['groupLinks'][$db_link['group_prototypeid']] =
+				array_diff_key($db_link, array_flip(['hostid']));
+		}
+	}
+
+	/**
+	 * @param array $host_prototypes
+	 * @param array $db_host_prototypes
+	 */
+	private static function addAffectedGroupPrototypes(array $host_prototypes, array &$db_host_prototypes): void {
+		$hostids = [];
+
+		foreach ($host_prototypes as $host_prototype) {
+			if (array_key_exists('groupPrototypes', $host_prototype)) {
+				$hostids[] = $host_prototype['hostid'];
+				$db_host_prototypes[$host_prototype['hostid']]['groupPrototypes'] = [];
+			}
+		}
+
+		if (!$hostids) {
+			return;
+		}
+
+		$options = [
+			'output' => ['group_prototypeid', 'hostid', 'name', 'templateid'],
+			'filter' => ['hostid' => $hostids, 'groupid' => '0']
+		];
+		$db_groups = DBselect(DB::makeSql('group_prototype', $options));
+
+		while ($db_link = DBfetch($db_groups)) {
+			$db_host_prototypes[$db_link['hostid']]['groupPrototypes'][$db_link['group_prototypeid']] =
+				array_diff_key($db_link, array_flip(['hostid']));
+		}
 	}
 
 	/**
@@ -1050,39 +1107,21 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * Deletes the given group prototype and all discovered groups.
-	 * Deletes also group prototype children.
-	 *
-	 * @param array $group_prototypeids
+	 * @param array $host_prototypes
 	 */
-	private static function deleteGroupPrototypes(array $group_prototypeids): void {
-		// Lock group prototypes before delete to prevent server from adding new LLD elements.
-		DBselect(
-			'SELECT NULL'.
-			' FROM group_prototype gp'.
-			' WHERE '.dbConditionId('gp.group_prototypeid', $group_prototypeids).
-			' FOR UPDATE'
-		);
+	private static function createHostDiscoveries(array $host_prototypes): void {
+		$host_discoveries = [];
 
-		$child_group_prototypeids = DB::select('group_prototype', [
-			'output' => [],
-			'filter' => ['templateid' => $group_prototypeids],
-			'preservekeys' => true
-		]);
-		if ($child_group_prototypeids) {
-			self::deleteGroupPrototypes(array_keys($child_group_prototypeids));
+		foreach ($host_prototypes as $host_prototype) {
+			$host_discoveries[] = [
+				'hostid' => $host_prototype['hostid'],
+				'parent_itemid' => $host_prototype['ruleid']
+			];
 		}
 
-		$host_groups = DB::select('group_discovery', [
-			'output' => ['groupid'],
-			'filter' => ['parent_group_prototypeid' => $group_prototypeids]
-		]);
-		if ($host_groups) {
-			API::HostGroup()->delete(array_column($host_groups, 'groupid'), true);
+		if ($host_discoveries) {
+			DB::insertBatch('host_discovery', $host_discoveries, false);
 		}
-
-		// delete group prototypes
-		DB::delete('group_prototype', ['group_prototypeid' => $group_prototypeids]);
 	}
 
 	/**
@@ -1496,11 +1535,11 @@ class CHostPrototype extends CHostBase {
 		}
 
 		if ($upd_host_prototypes) {
-			$this->updateReal($upd_host_prototypes, $upd_db_host_prototypes);
+			$this->updateForce($upd_host_prototypes, $upd_db_host_prototypes);
 		}
 
 		if ($ins_host_prototypes) {
-			$this->createReal($ins_host_prototypes, true);
+			$this->createForce($ins_host_prototypes, true);
 		}
 
 		[$tpl_host_prototypes, $tpl_db_host_prototypes] = $this->getTemplatedObjects(
@@ -1933,208 +1972,155 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * @param array $host_prototypes
-	 */
-	private static function createHostDiscoveries(array $host_prototypes): void {
-		$host_discoveries = [];
-
-		foreach ($host_prototypes as $host_prototype) {
-			$host_discoveries[] = [
-				'hostid' => $host_prototype['hostid'],
-				'parent_itemid' => $host_prototype['ruleid']
-			];
-		}
-
-		if ($host_discoveries) {
-			DB::insertBatch('host_discovery', $host_discoveries, false);
-		}
-	}
-
-	/**
+	 * @param array $host_prototypeids
+	 *
 	 * @return array
 	 */
-	private static function getInterfacesValidationRules(): array {
-		return ['type' => API_MULTIPLE, 'rules' => [
-			['if' => ['field' => 'custom_interfaces', 'in' => HOST_PROT_INTERFACES_CUSTOM], 'type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
-				'type' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_IPMI, INTERFACE_TYPE_JMX])],
-				'useip' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [INTERFACE_USE_DNS, INTERFACE_USE_IP])],
-				'ip' =>			['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'useip', 'in' => INTERFACE_USE_IP], 'type' => API_IP, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO | API_ALLOW_MACRO, 'length' => DB::getFieldLength('interface', 'ip')],
-									['else' => true, 'type' => API_IP, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO | API_ALLOW_MACRO, 'length' => DB::getFieldLength('interface', 'ip')]
-				]],
-				'dns' =>		['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'useip', 'in' => INTERFACE_USE_DNS], 'type' => API_DNS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO | API_ALLOW_MACRO, 'length' => DB::getFieldLength('interface', 'dns')],
-									['else' => true, 'type' => API_DNS, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO | API_ALLOW_MACRO, 'length' => DB::getFieldLength('interface', 'dns')]
-				]],
-				'port' =>		['type' => API_PORT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO, 'length' => DB::getFieldLength('interface', 'port')],
-				'main' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [INTERFACE_SECONDARY, INTERFACE_PRIMARY])],
-				'details' =>	['type' => API_MULTIPLE, 'rules' => [
-					['if' => ['field' => 'type', 'in' => INTERFACE_TYPE_SNMP], 'type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
-						'version' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SNMP_V1, SNMP_V2C, SNMP_V3])],
-						'bulk' =>			['type' => API_INT32, 'in' => implode(',', [SNMP_BULK_DISABLED, SNMP_BULK_ENABLED])],
-						'community' =>		['type' => API_MULTIPLE, 'rules' => [
-												['if' => ['field' => 'version', 'in' => implode(',', [SNMP_V1, SNMP_V2C])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('interface_snmp', 'community')],
-												['else' => true, 'type' => API_UNEXPECTED]
-						]],
-						'contextname' =>	['type' => API_MULTIPLE, 'rules' => [
-												['if' => ['field' => 'version', 'in' => SNMP_V3], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'contextname')],
-												['else' => true, 'type' => API_UNEXPECTED]
-						]],
-						'securityname' =>	['type' => API_MULTIPLE, 'rules' => [
-												['if' => ['field' => 'version', 'in' => SNMP_V3], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'securityname')],
-												['else' => true, 'type' => API_UNEXPECTED]
-						]],
-						'securitylevel' =>	['type' => API_MULTIPLE, 'rules' => [
-												['if' => ['field' => 'version', 'in' => SNMP_V3], 'type' => API_INT32, 'in' => implode(',', [ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]), 'default' => DB::getDefault('interface_snmp', 'securitylevel')],
-												['else' => true, 'type' => API_UNEXPECTED]
-						]],
-						'authprotocol' =>	['type' => API_MULTIPLE, 'rules' => [
-												['if' => ['field' => 'securitylevel', 'in' => implode(',', [ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV])], 'type' => API_INT32, 'in' => implode(',', array_keys(getSnmpV3AuthProtocols()))],
-												['else' => true, 'type' => API_UNEXPECTED]
-						]],
-						'authpassphrase' =>	['type' => API_MULTIPLE, 'rules' => [
-												['if' => ['field' => 'securitylevel', 'in' => implode(',', [ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'authpassphrase')],
-												['else' => true, 'type' => API_UNEXPECTED]
-						]],
-						'privprotocol' =>	['type' => API_MULTIPLE, 'rules' => [
-												['if' => ['field' => 'securitylevel', 'in' => ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV], 'type' => API_INT32, 'in' => implode(',', array_keys(getSnmpV3PrivProtocols()))],
-												['else' => true, 'type' => API_UNEXPECTED]
-						]],
-						'privpassphrase' =>	['type' => API_MULTIPLE, 'rules' => [
-												['if' => ['field' => 'securitylevel', 'in' => ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'privpassphrase')],
-												['else' => true, 'type' => API_UNEXPECTED]
-						]]
-					]],
-					['else' => true, 'type' => API_UNEXPECTED]
-				]]
-			]],
-			['else' => true, 'type' => API_UNEXPECTED]
-		]];
+	public function delete(array $host_prototypeids): array {
+		$this->validateDelete($host_prototypeids);
+
+		self::deleteForce($host_prototypeids);
+
+		return ['hostids' => $host_prototypeids];
 	}
 
 	/**
-	 * @param array $host_prototypes
-	 * @param array $db_host_prototypes
+	 * @param array $host_prototypeids
+	 *
+	 * @throws APIException if the input is invalid.
 	 */
-	protected function addAffectedObjects(array $host_prototypes, array &$db_host_prototypes): void {
-		self::addAffectedInterfaces($host_prototypes, $db_host_prototypes);
-		self::addAffectedGroupLinks($host_prototypes, $db_host_prototypes);
-		self::addAffectedGroupPrototypes($host_prototypes, $db_host_prototypes);
-		parent::addAffectedObjects($host_prototypes, $db_host_prototypes);
+	private function validateDelete(array &$host_prototypeids) : void {
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+
+		if (!CApiInputValidator::validate($api_input_rules, $host_prototypeids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$count = $this->get([
+			'countOutput' => true,
+			'hostids' => $host_prototypeids,
+			'editable' => true
+		]);
+
+		if ($count != count($host_prototypeids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		$db_host_prototype = DBfetch(DBSelect(
+			'SELECT h.hostid'.
+			' FROM hosts h'.
+			' WHERE h.templateid>0'.
+				' AND '.dbConditionId('h.hostid', $host_prototypeids),
+			1
+		));
+
+		if ($db_host_prototype) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete templated host prototype.'));
+		}
 	}
 
 	/**
-	 * @param array $host_prototypes
-	 * @param array $db_host_prototypes
+	 * @param array $host_prototypeids
 	 */
-	private static function addAffectedInterfaces(array $host_prototypes, array &$db_host_prototypes): void {
-		$hostids = [];
+	public static function deleteForce(array $host_prototypeids): void {
+		$host_prototypeids = array_merge($host_prototypeids, self::getChildIds($host_prototypeids));
 
-		foreach ($host_prototypes as $host_prototype) {
-			$db_custom_interfaces = $db_host_prototypes[$host_prototype['hostid']]['custom_interfaces'];
+		// Lock host prototypes before delete to prevent server from adding new LLD hosts.
+		$db_host_prototypes = DBfetchArray(DBselect(
+			'SELECT hostid,host'.
+			' FROM hosts h'.
+			' WHERE '.dbConditionId('h.hostid', $host_prototypeids).
+			' FOR UPDATE'
+		));
 
-			if (array_key_exists('interfaces', $host_prototype)
-					|| ($host_prototype['custom_interfaces'] != $db_custom_interfaces
-						&& $db_custom_interfaces == HOST_PROT_INTERFACES_CUSTOM)) {
-				$hostids[] = $host_prototype['hostid'];
-				$db_host_prototypes[$host_prototype['hostid']]['interfaces'] = [];
-			}
+		$db_hosts = DB::select('host_discovery', [
+			'output' => [],
+			'filter' => [
+				'parent_hostid' => $host_prototypeids
+			],
+			'preservekeys' => true
+		]);
+
+		if ($db_hosts) {
+			API::Host()->delete(array_keys($db_hosts), true);
 		}
 
-		if (!$hostids) {
-			return;
+		$db_group_prototypes = DB::select('group_prototype', [
+			'output' => [],
+			'filter' => [
+				'hostid' => $host_prototypeids
+			],
+			'preservekeys' => true
+		]);
+
+		if ($db_group_prototypes) {
+			self::deleteGroupPrototypes(array_keys($db_group_prototypes));
 		}
 
-		$details_interfaces = [];
-		$options = [
-			'output' => ['interfaceid', 'hostid', 'main', 'type', 'useip', 'ip', 'dns', 'port'],
-			'filter' => ['hostid' => $hostids]
-		];
-		$db_interfaces = DBselect(DB::makeSql('interface', $options));
+		DB::delete('hosts', ['hostid' => $host_prototypeids]);
 
-		while ($db_interface = DBfetch($db_interfaces)) {
-			$db_host_prototypes[$db_interface['hostid']]['interfaces'][$db_interface['interfaceid']] =
-				array_diff_key($db_interface, array_flip(['hostid']));
+		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_HOST_PROTOTYPE, $db_host_prototypes);
+	}
 
-			if ($db_interface['type'] == INTERFACE_TYPE_SNMP) {
-				$details_interfaces[$db_interface['interfaceid']] = $db_interface['hostid'];
-			}
-		}
+	/**
+	 * @param array $host_prototypeids
+	 *
+	 * @return array
+	 */
+	private static function getChildIds(array $host_prototypeids): array {
+		$child_host_prototypeids = [];
 
-		if ($details_interfaces) {
-			$options = [
-				'output' => ['interfaceid', 'version', 'bulk', 'community', 'securityname', 'securitylevel',
-					'authpassphrase', 'privpassphrase', 'authprotocol', 'privprotocol', 'contextname'
+		do {
+			$db_host_prototypes = DB::select('hosts', [
+				'output' => [],
+				'filter' => [
+					'templateid' => $host_prototypeids
 				],
-				'filter' => ['interfaceid' => array_keys($details_interfaces)]
-			];
-			$result = DBselect(DB::makeSql('interface_snmp', $options));
+				'preservekeys' => true
+			]);
 
-			while ($db_details = DBfetch($result)) {
-				$hostid = $details_interfaces[$db_details['interfaceid']];
-				$db_host_prototypes[$hostid]['interfaces'][$db_details['interfaceid']]['details'] =
-					array_diff_key($db_details, array_flip(['interfaceid']));
-			}
+			$host_prototypeids = array_keys($db_host_prototypes);
+			$child_host_prototypeids += $db_host_prototypes;
 		}
+		while ($host_prototypeids);
+
+		return array_keys($child_host_prototypeids);
 	}
 
-	/**
-	 * @param array $host_prototypes
-	 * @param array $db_host_prototypes
-	 */
-	private static function addAffectedGroupLinks(array $host_prototypes, array &$db_host_prototypes): void {
-		$hostids = [];
-
-		foreach ($host_prototypes as $host_prototype) {
-			if (array_key_exists('groupLinks', $host_prototype)) {
-				$hostids[] = $host_prototype['hostid'];
-				$db_host_prototypes[$host_prototype['hostid']]['groupLinks'] = [];
-			}
-		}
-
-		if (!$hostids) {
-			return;
-		}
-
-		$options = [
-			'output' => ['group_prototypeid', 'hostid', 'groupid', 'templateid'],
-			'filter' => ['hostid' => $hostids, 'name' => '']
-		];
-		$db_links = DBselect(DB::makeSql('group_prototype', $options));
-
-		while ($db_link = DBfetch($db_links)) {
-			$db_host_prototypes[$db_link['hostid']]['groupLinks'][$db_link['group_prototypeid']] =
-				array_diff_key($db_link, array_flip(['hostid']));
-		}
-	}
 
 	/**
-	 * @param array $host_prototypes
-	 * @param array $db_host_prototypes
+	 * Deletes the given group prototype and all discovered groups.
+	 * Deletes also group prototype children.
+	 *
+	 * @param array $group_prototypeids
 	 */
-	private static function addAffectedGroupPrototypes(array $host_prototypes, array &$db_host_prototypes): void {
-		$hostids = [];
+	private static function deleteGroupPrototypes(array $group_prototypeids): void {
+		// Lock group prototypes before delete to prevent server from adding new LLD elements.
+		DBselect(
+			'SELECT NULL'.
+			' FROM group_prototype gp'.
+			' WHERE '.dbConditionId('gp.group_prototypeid', $group_prototypeids).
+			' FOR UPDATE'
+		);
 
-		foreach ($host_prototypes as $host_prototype) {
-			if (array_key_exists('groupPrototypes', $host_prototype)) {
-				$hostids[] = $host_prototype['hostid'];
-				$db_host_prototypes[$host_prototype['hostid']]['groupPrototypes'] = [];
-			}
+		$child_group_prototypeids = DB::select('group_prototype', [
+			'output' => [],
+			'filter' => ['templateid' => $group_prototypeids],
+			'preservekeys' => true
+		]);
+		if ($child_group_prototypeids) {
+			self::deleteGroupPrototypes(array_keys($child_group_prototypeids));
 		}
 
-		if (!$hostids) {
-			return;
+		$host_groups = DB::select('group_discovery', [
+			'output' => ['groupid'],
+			'filter' => ['parent_group_prototypeid' => $group_prototypeids]
+		]);
+		if ($host_groups) {
+			API::HostGroup()->delete(array_column($host_groups, 'groupid'), true);
 		}
 
-		$options = [
-			'output' => ['group_prototypeid', 'hostid', 'name', 'templateid'],
-			'filter' => ['hostid' => $hostids, 'groupid' => '0']
-		];
-		$db_groups = DBselect(DB::makeSql('group_prototype', $options));
-
-		while ($db_link = DBfetch($db_groups)) {
-			$db_host_prototypes[$db_link['hostid']]['groupPrototypes'][$db_link['group_prototypeid']] =
-				array_diff_key($db_link, array_flip(['hostid']));
-		}
+		// delete group prototypes
+		DB::delete('group_prototype', ['group_prototypeid' => $group_prototypeids]);
 	}
 }
