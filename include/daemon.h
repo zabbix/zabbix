@@ -28,7 +28,6 @@
 
 extern char			*CONFIG_PID_FILE;
 extern volatile sig_atomic_t	sig_exiting;
-#include "threads.h"
 
 #define ZBX_EXIT_NONE		0
 #define ZBX_EXIT_SUCCESS	1
