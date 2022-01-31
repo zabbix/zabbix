@@ -113,9 +113,10 @@ class testFormAdministrationGeneral extends CWebTest {
 					$this->assertEquals('#'.$value, $this->query($colorid)->one()->getAttribute('title'));
 				}
 				$color_status = ($action === 'Cancel') ? $this->color_custom : $this->color_default;
+				$this->resetConfiguration($form, $this->default, $action, $other, $this->custom, $color_status);
 			}
 
-			$this->resetConfiguration($form, $this->default, $action, $other, $this->custom, $color_status);
+			$this->resetConfiguration($form, $this->default, $action, $other, $this->custom);
 			$config = ($action === 'Reset defaults') ? $default_config : $custom_config;
 			$this->assertEquals($config, CDBHelper::getRow('SELECT * FROM config'));
 		}
@@ -182,7 +183,7 @@ class testFormAdministrationGeneral extends CWebTest {
 	 * @param boolean    $other		  If it is Other configuration parameters form
 	 * @param boolean    $colorpick   If it is Trigger displaying options form
 	 */
-	public function executeCheckForm($data, $other = false, $colorpick = false) {
+	public function executeCheckForm($data, $other = false) {
 		$this->page->login()->open($this->config_link);
 		$form = $this->query($this->form_selector)->waitUntilReady()->asForm()->one();
 		// Reset form in case of previous test case.
@@ -193,7 +194,7 @@ class testFormAdministrationGeneral extends CWebTest {
 		}
 		$form->fill($data['fields']);
 
-		if ($colorpick) {
+		if (array_key_exists('color', $data)) {
 			foreach($data['color'] as $selector => $color) {
 				$form->query($selector)->one()->click()->waitUntilReady();
 				$this->query('xpath://div[@id="color_picker"]')->asColorPicker()->one()->fill($color);

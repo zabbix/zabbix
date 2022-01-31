@@ -686,31 +686,9 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'Display OK triggers for' => 'test',
 						'On status change triggers blink for' => 'test'
 					],
-					'color' => [
-						'id:lbl_problem_unack_color' => 'test',
-						'id:lbl_problem_ack_color' => 'test',
-						'id:lbl_ok_unack_color' => 'test',
-						'id:lbl_ok_ack_color' => 'test',
-						'id:lbl_severity_color_0' => 'test',
-						'id:lbl_severity_color_1' => 'test',
-						'id:lbl_severity_color_2' => 'test' ,
-						'id:lbl_severity_color_3' => 'test',
-						'id:lbl_severity_color_4' => 'test',
-						'id:lbl_severity_color_5' => 'test'
-					],
 					'details' => [
-						'Incorrect value for field "problem_unack_color": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "problem_ack_color": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "ok_unack_color": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "ok_ack_color": a hexadecimal color code (6 symbols) is expected.',
 						'Incorrect value for field "ok_period": a time unit is expected.',
-						'Incorrect value for field "blink_period": a time unit is expected.',
-						'Incorrect value for field "severity_color_0": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_1": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_2": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_3": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_4": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_5": a hexadecimal color code (6 symbols) is expected.'
+						'Incorrect value for field "blink_period": a time unit is expected.'
 					]
 				]
 			],
@@ -847,6 +825,6 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 	 * @dataProvider getCheckFormData
 	 */
 	public function testFormAdministrationGeneralTrigDisplOptions_CheckForm($data) {
-		$this->executeCheckForm($data, false, true);
+		$this->executeCheckForm($data, false);
 	}
 }
