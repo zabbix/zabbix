@@ -153,7 +153,7 @@ foreach ($data['mediatypes'] as $mediaType) {
 		->setEnabled(MEDIA_TYPE_STATUS_ACTIVE == $mediaType['status'])
 		->onClick('
 			return PopUp("popup.mediatypetest.edit", '.json_encode(['mediatypeid' => $mediaType['mediatypeid']]).', {
-				dialogue_id: "mediatypetest_edit",
+				dialogueid: "mediatypetest_edit",
 				dialogue_class: "modal-popup-medium"
 			});'
 		);
