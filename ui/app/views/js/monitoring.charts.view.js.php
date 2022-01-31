@@ -428,9 +428,13 @@
 	ChartList.prototype.onResize = function() {
 		const width = this.wrapper.clientWidth;
 
+		if (this._resize_timeoutid) {
+			clearTimeout(this._resize_timeoutid);
+		}
+
 		if (this._prev_width != width) {
 			this._prev_width = width;
-			this.updateCharts();
+			this._resize_timeoutid = setTimeout(_ => this.updateCharts(), 500);
 		}
 	};
 </script>
