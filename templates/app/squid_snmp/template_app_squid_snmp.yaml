@@ -1,10 +1,10 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T09:59:31Z'
+  date: '2022-01-31T08:52:21Z'
   groups:
     -
-      uuid: 57b7ae836ca64446ba2c296389c009b7
-      name: Templates/Modules
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
   templates:
     -
       uuid: 8e5236f799b347a8ae90a979198be85e
@@ -18,7 +18,7 @@ zabbix_export:
         Template tooling version used: 0.41
       groups:
         -
-          name: Templates/Modules
+          name: Templates/Applications
       items:
         -
           uuid: 86cc718ce21b4ff9b0a09479ae3fc130
