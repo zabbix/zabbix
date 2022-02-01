@@ -50,8 +50,8 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Jobs discovery |<p>-</p> |HTTP_AGENT |jenkins.jobs<p>**Preprocessing**:</p><p>- JSONPATH: `$.jobs.[*]`</p> |
 |Computers discovery |<p>-</p> |HTTP_AGENT |jenkins.computers<p>**Preprocessing**:</p><p>- JSONPATH: `$.computer.[*]`</p> |
+|Jobs discovery |<p>-</p> |HTTP_AGENT |jenkins.jobs<p>**Preprocessing**:</p><p>- JSONPATH: `$.jobs.[*]`</p> |
 
 ## Items collected
 
@@ -123,7 +123,7 @@ There are no template links in this template.
 |Jenkins |Jenkins: HTTP requests, p95 |<p>The time spent generating the corresponding responses.</p> |DEPENDENT |jenkins.http.requests_p95.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.timers.['http.requests'].p95`</p> |
 |Jenkins |Jenkins: HTTP requests, median |<p>The time spent generating the corresponding responses.</p> |DEPENDENT |jenkins.http.requests_p50.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.timers.['http.requests'].p50`</p> |
 |Jenkins |Jenkins: Version |<p>Version of Jenkins server.</p> |DEPENDENT |jenkins.version<p>**Preprocessing**:</p><p>- JSONPATH: `$.gauges.['jenkins.versions.core'].value`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
-|Jenkins |Jenkins: CPU Load |<p>The system load on the Jenkins master as reported by the JVM’s Operating System JMX bean. The calculation of system load is operating system dependent. Typically this is the sum of the number of processes that are currently running plus the number that are waiting to run. This is typically comparable against the number of CPU cores.</p> |DEPENDENT |jenkins.system.cpu.load<p>**Preprocessing**:</p><p>- JSONPATH: `$.gauges.['system.cpu.load'].value`</p> |
+|Jenkins |Jenkins: CPU Load |<p>The system load on the Jenkins master as reported by the JVM's Operating System JMX bean. The calculation of system load is operating system dependent. Typically this is the sum of the number of processes that are currently running plus the number that are waiting to run. This is typically comparable against the number of CPU cores.</p> |DEPENDENT |jenkins.system.cpu.load<p>**Preprocessing**:</p><p>- JSONPATH: `$.gauges.['system.cpu.load'].value`</p> |
 |Jenkins |Jenkins: Uptime |<p>The number of seconds since the Jenkins master JVM started.</p> |DEPENDENT |jenkins.system.uptime<p>**Preprocessing**:</p><p>- JSONPATH: `$.gauges.['vm.uptime.milliseconds'].value`</p><p>- MULTIPLIER: `0.001`</p> |
 |Jenkins |Jenkins: File descriptor ratio |<p>The ratio of used to total file descriptors</p> |DEPENDENT |jenkins.descriptor.ratio<p>**Preprocessing**:</p><p>- JSONPATH: `$.gauges.['vm.file.descriptor.ratio'].value`</p><p>- MULTIPLIER: `100`</p> |
 |Jenkins |Jenkins: Service ping | |HTTP_AGENT |jenkins.ping<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- REGEX: `{$JENKINS.PING.REPLY}$ 1`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `30m`</p> |
@@ -151,10 +151,10 @@ There are no template links in this template.
 |Jenkins |Jenkins: Computer [{#DISPLAY_NAME}]: Total physical memory |<p>Total physical memory of the system, in bytes.</p> |DEPENDENT |jenkins.computer.total_physical_memory[{#DISPLAY_NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.computer.[?(@.displayName == "{#DISPLAY_NAME}")].monitorData['hudson.node_monitors.SwapSpaceMonitor'].totalPhysicalMemory.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Jenkins |Jenkins: Computer [{#DISPLAY_NAME}]: Total swap space |<p>Total number of swap space in bytes.</p> |DEPENDENT |jenkins.computer.total_swap_space[{#DISPLAY_NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.computer.[?(@.displayName == "{#DISPLAY_NAME}")].monitorData['hudson.node_monitors.SwapSpaceMonitor'].totalSwapSpace.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Jenkins |Jenkins: Computer [{#DISPLAY_NAME}]: Clock difference |<p>The clock difference between the master and nodes.</p> |DEPENDENT |jenkins.computer.clock_difference[{#DISPLAY_NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.computer.[?(@.displayName == "{#DISPLAY_NAME}")].monitorData['hudson.node_monitors.ClockMonitor'].diff.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.001`</p> |
-|Zabbix_raw_items |Jenkins: Get service metrics |<p>-</p> |HTTP_AGENT |jenkins.get_metrics<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Zabbix_raw_items |Jenkins: Get healthcheck | |HTTP_AGENT |jenkins.healthcheck<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Zabbix_raw_items |Jenkins: Get jobs info |<p>-</p> |HTTP_AGENT |jenkins.job_info<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Zabbix_raw_items |Jenkins: Get computer info |<p>-</p> |HTTP_AGENT |jenkins.computer_info<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Zabbix raw items |Jenkins: Get service metrics |<p>-</p> |HTTP_AGENT |jenkins.get_metrics<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Zabbix raw items |Jenkins: Get healthcheck | |HTTP_AGENT |jenkins.healthcheck<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Zabbix raw items |Jenkins: Get jobs info |<p>-</p> |HTTP_AGENT |jenkins.job_info<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Zabbix raw items |Jenkins: Get computer info |<p>-</p> |HTTP_AGENT |jenkins.computer_info<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 
 ## Triggers
 
@@ -177,5 +177,5 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
 

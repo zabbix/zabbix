@@ -70,7 +70,7 @@ There are no template links in this template.
 |General |Cloudflare: Unencrypted requests |<p>The number of unencrypted requests.</p> |DEPENDENT |cloudflare.requests.ssl.unencrypted<p>**Preprocessing**:</p><p>- JSONPATH: `$.requests.unencrypted`</p> |
 |General |Cloudflare: Total threats |<p>The number of all threats.</p> |DEPENDENT |cloudflare.threats.all<p>**Preprocessing**:</p><p>- JSONPATH: `$.threats.all`</p> |
 |General |Cloudflare: Unique visitors |<p>The number of all visitors IPs.</p> |DEPENDENT |cloudflare.uniques.all<p>**Preprocessing**:</p><p>- JSONPATH: `$.uniques.all`</p> |
-|Zabbix_raw_items |Cloudflare: Get data |<p>The JSON with result of Cloudflare API request.</p> |SCRIPT |cloudflare.get<p>**Expression**:</p>`The text is too long. Please see the template.` |
+|Zabbix raw items |Cloudflare: Get data |<p>The JSON with result of Cloudflare API request.</p> |SCRIPT |cloudflare.get<p>**Expression**:</p>`The text is too long. Please see the template.` |
 
 ## Triggers
 

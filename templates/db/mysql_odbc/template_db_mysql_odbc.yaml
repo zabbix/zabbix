@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-16T07:08:45Z'
+  date: '2022-01-31T15:01:16Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -21,7 +21,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384189-discussion-thread-for-official-zabbix-template-db-mysql
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Databases
@@ -40,8 +40,8 @@ zabbix_export:
           description: 'The item gets server global status information.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: 5b7c14e38799427cb6520f47bf8afe6c
           name: 'MySQL: Status'
@@ -60,14 +60,21 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: application
+            -
+              tag: component
+              value: health
           triggers:
             -
               uuid: e664e41d7b4f4336a3e5ef4720f6ee41
               expression: 'last(/MySQL by ODBC/db.odbc.select[ping,"{$MYSQL.DSN}"])=0'
               name: 'MySQL: Service is down'
               priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: b9fb80ca366e4d33801472bcd013f881
           name: 'MySQL: Version'
@@ -87,8 +94,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: application
           triggers:
             -
               uuid: 4090a1d3d82d47ac85964baeae121b2b
@@ -97,6 +104,10 @@ zabbix_export:
               priority: INFO
               description: 'MySQL version has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 73235748ba4742c0aa3c4f29509a162d
           name: 'MySQL: Aborted clients per second'
@@ -119,8 +130,8 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: connections
         -
           uuid: b6185e79abd744f78ce579a83381ba87
           name: 'MySQL: Aborted connections per second'
@@ -143,8 +154,8 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: connections
           triggers:
             -
               uuid: 5934cb80f9c3442d978c63780b1ebc9f
@@ -156,6 +167,10 @@ zabbix_export:
                 -
                   name: 'MySQL: Refused connections (max_connections limit reached)'
                   expression: 'last(/MySQL by ODBC/mysql.connection_errors_max_connections.rate)>0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 9db77e72fd9d404a8e1fd4e72c92d75c
           name: 'MySQL: Binlog cache disk use'
@@ -178,8 +193,8 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: cache
         -
           uuid: 05e7e91206bb4138a945ea0de2d8c01d
           name: 'MySQL: Buffer pool efficiency'
@@ -196,8 +211,8 @@ zabbix_export:
           description: 'The item shows how effectively the buffer pool is serving reads.'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: memory
         -
           uuid: ad5520e067ea405eb939d319fa9690e9
           name: 'MySQL: Buffer pool utilization'
@@ -215,8 +230,8 @@ zabbix_export:
           description: 'Ratio of used to total pages in the buffer pool.'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: memory
           triggers:
             -
               uuid: f4c2e4edf0c34bb1856ed392f2bc7c87
@@ -224,6 +239,10 @@ zabbix_export:
               name: 'MySQL: Buffer pool utilization is too low (less than {$MYSQL.BUFF_UTIL.MIN.WARN}% for 5m)'
               priority: WARNING
               description: 'The buffer pool utilization is less than {$MYSQL.BUFF_UTIL.MIN.WARN}% in the last 5 minutes. This means that there is a lot of unused RAM allocated for the buffer pool, which you can easily reallocate at the moment.'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: f05d592e6ae74e64bc54c649418761a6
           name: 'MySQL: Bytes received'
@@ -247,8 +266,8 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: network
         -
           uuid: ce737bc186f24014a70c75da2386986d
           name: 'MySQL: Bytes sent'
@@ -272,8 +291,8 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: network
         -
           uuid: a43ec23dad9345a5a1b0ff8bda12ed77
           name: 'MySQL: Command Delete per second'
@@ -296,8 +315,8 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: operations
         -
           uuid: cd924e3b51074b3baf642a7aa1eeb474
           name: 'MySQL: Command Insert per second'
@@ -320,8 +339,8 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: operations
         -
           uuid: 31e6372d1249442ab3ebdd993f397e26
           name: 'MySQL: Command Select per second'
@@ -344,8 +363,8 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: operations
         -
           uuid: 0f5f638777284093bcdc5f2dacc8e951
           name: 'MySQL: Command Update per second'
@@ -368,8 +387,8 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: operations
         -
           uuid: fad5f4e1885341d1958f653afb85ff07
           name: 'MySQL: Connections per second'
@@ -392,8 +411,8 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: connections
         -
           uuid: 4b67e0e6291b4e0c841334ac052d7253
           name: 'MySQL: Connection errors accept per second'
@@ -416,8 +435,8 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: connections
         -
           uuid: 76ad3a39e89e44daad08cc00174d4918
           name: 'MySQL: Connection errors internal per second'
@@ -440,8 +459,8 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: connections
         -
           uuid: 83dfb916c7674e1fbd300be444241e25
           name: 'MySQL: Connection errors max connections per second'
@@ -464,8 +483,8 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: connections
           triggers:
             -
               uuid: ac781c951ac0453a9c1008b2cf801518
@@ -473,6 +492,10 @@ zabbix_export:
               name: 'MySQL: Refused connections (max_connections limit reached)'
               priority: AVERAGE
               description: 'Number of refused connections due to the max_connections limit being reached.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 9be4cb9e209344d0869a56082d16ec53
           name: 'MySQL: Connection errors peer address per second'
@@ -495,8 +518,8 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: connections
         -
           uuid: e50b9fea89cc440abc0155dc25346f05
           name: 'MySQL: Connection errors select per second'
@@ -519,8 +542,8 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: connections
         -
           uuid: a82a7ada012141c6bdff63bc8d615786
           name: 'MySQL: Connection errors tcpwrap per second'
@@ -543,8 +566,8 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: connections
         -
           uuid: 84d748ab80444e10bdb60bcfbdfa850a
           name: 'MySQL: Created tmp tables on disk per second'
@@ -567,8 +590,11 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: storage
+            -
+              tag: component
+              value: tables
           triggers:
             -
               uuid: 8aec6a51fa3e4320b3c7c40858ac7f96
@@ -576,6 +602,10 @@ zabbix_export:
               name: 'MySQL: Number of on-disk temporary tables created per second is high (over {$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN} for 5m)'
               priority: WARNING
               description: 'Possibly the application using the database is in need of query optimization.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: c5f2ae1ef46e4f65842ab4a31625906a
           name: 'MySQL: Created tmp files on disk per second'
@@ -598,8 +628,8 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: storage
           triggers:
             -
               uuid: c1dbcf829bdf43fda3b4c2add576c8f0
@@ -607,6 +637,10 @@ zabbix_export:
               name: 'MySQL: Number of temporary files created per second is high (over {$MYSQL.CREATED_TMP_FILES.MAX.WARN} for 5m)'
               priority: WARNING
               description: 'Possibly the application using the database is in need of query optimization.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 95fa4f4f1db44b2bb65889da246c03b5
           name: 'MySQL: Created tmp tables on memory per second'
@@ -629,8 +663,11 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: tables
           triggers:
             -
               uuid: d65c3ec6cacd41c58f5e2b209ca5a810
@@ -638,6 +675,10 @@ zabbix_export:
               name: 'MySQL: Number of internal temporary tables created per second is high (over {$MYSQL.CREATED_TMP_TABLES.MAX.WARN} for 5m)'
               priority: WARNING
               description: 'Possibly the application using the database is in need of query optimization.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: e31f66bbc32b404c92debc4d9367162d
           name: 'MySQL: InnoDB buffer pool pages free'
@@ -655,8 +696,11 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: innodb
+            -
+              tag: component
+              value: memory
         -
           uuid: 41019c084618404db183326c215d71f6
           name: 'MySQL: InnoDB buffer pool pages total'
@@ -678,8 +722,11 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: innodb
+            -
+              tag: component
+              value: memory
         -
           uuid: 441b718148974e289db93299f869feba
           name: 'MySQL: InnoDB buffer pool reads'
@@ -697,8 +744,11 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: innodb
+            -
+              tag: component
+              value: memory
         -
           uuid: 22ae5946fc2548cf8eee39a57ce8512b
           name: 'MySQL: InnoDB buffer pool reads per second'
@@ -721,8 +771,11 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: innodb
+            -
+              tag: component
+              value: memory
         -
           uuid: 0a1775a7de33464e9ce8134950527021
           name: 'MySQL: InnoDB buffer pool read requests'
@@ -740,8 +793,11 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: innodb
+            -
+              tag: component
+              value: memory
         -
           uuid: 98684abf32e642bd8784e68e64357dc9
           name: 'MySQL: InnoDB buffer pool read requests per second'
@@ -764,8 +820,11 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: innodb
+            -
+              tag: component
+              value: memory
         -
           uuid: 4e829cbb3cc2485dac2757867badd0f4
           name: 'MySQL: Innodb buffer pool wait free'
@@ -788,8 +847,11 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: innodb
+            -
+              tag: component
+              value: memory
         -
           uuid: 4680fd31a2514e3f827b0060a6d5bfc4
           name: 'MySQL: Calculated value of innodb_log_file_size'
@@ -797,7 +859,7 @@ zabbix_export:
           key: mysql.innodb_log_file_size
           history: 7d
           value_type: FLOAT
-          params: '(last(//mysql.innodb_os_log_written) - first(//mysql.innodb_os_log_written,1h)) / {$MYSQL.INNODB_LOG_FILES}'
+          params: '(last(//mysql.innodb_os_log_written) - last(//mysql.innodb_os_log_written,#1:now-1h)) / {$MYSQL.INNODB_LOG_FILES}'
           description: 'Calculated by (innodb_os_log_written-innodb_os_log_written(time shift -1h))/{$MYSQL.INNODB_LOG_FILES} value of the innodb_log_file_size. Innodb_log_file_size is the size in bytes of the each InnoDB redo log file in the log group. The combined size can be no more than 512GB. Larger values mean less disk I/O due to less flushing checkpoint activity, but also slower recovery from a crash.'
           preprocessing:
             -
@@ -806,8 +868,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: system
         -
           uuid: 79218a1068394ce69dfc6eeb626e83bc
           name: 'MySQL: Innodb number open files'
@@ -830,8 +892,11 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: innodb
+            -
+              tag: component
+              value: system
         -
           uuid: fc561c5392bb43a4842977bdf4b882a8
           name: 'MySQL: Innodb log written'
@@ -855,8 +920,8 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: system
         -
           uuid: a62951afcfbd44e595a4d294b24056e5
           name: 'MySQL: InnoDB row lock time'
@@ -884,8 +949,11 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: innodb
+            -
+              tag: component
+              value: tables
         -
           uuid: 22277695b7154c019a76ca730e68e833
           name: 'MySQL: InnoDB row lock time max'
@@ -913,8 +981,11 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: innodb
+            -
+              tag: component
+              value: tables
         -
           uuid: 17c4270927a74d8388da8c25d9065556
           name: 'MySQL: InnoDB row lock waits'
@@ -932,8 +1003,11 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: innodb
+            -
+              tag: component
+              value: tables
         -
           uuid: 6106ebf4cae842c1a5acc2f13518de4f
           name: 'MySQL: Max used connections'
@@ -955,8 +1029,8 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: connections
         -
           uuid: 85e17b6b196e4916838e0318992fe33c
           name: 'MySQL: Open tables'
@@ -979,8 +1053,8 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: tables
         -
           uuid: c23ce7b2689745728465c5b405d7b3ba
           name: 'MySQL: Open table definitions'
@@ -1003,8 +1077,8 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: tables
         -
           uuid: 2f0ced88c4524455bf790b3bc6512d04
           name: 'MySQL: Queries per second'
@@ -1027,8 +1101,8 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: queries
         -
           uuid: 8d0fc2eb0be94d68966e09fca88e8deb
           name: 'MySQL: Questions per second'
@@ -1051,8 +1125,8 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: queries
         -
           uuid: b0227399437f4219b65ab1511d5e67c6
           name: 'MySQL: Slow queries per second'
@@ -1075,8 +1149,8 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: queries
           triggers:
             -
               uuid: b981c7a2ffed4eddbc9f1d6913c2e4b0
@@ -1084,6 +1158,10 @@ zabbix_export:
               name: 'MySQL: Server has slow queries (over {$MYSQL.SLOW_QUERIES.MAX.WARN} for 5m)'
               priority: WARNING
               description: 'The number of slow queries is more than {$MYSQL.SLOW_QUERIES.MAX.WARN} in the last 5 minutes.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: b675fd71138a4845965309dc5d6428d9
           name: 'MySQL: Threads cached'
@@ -1101,8 +1179,8 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: threads
         -
           uuid: af56c636c8b94e4f9976d0d6cf60fcbb
           name: 'MySQL: Threads connected'
@@ -1120,8 +1198,8 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: threads
         -
           uuid: 8a50d5788f8a449b994dbe76536076a2
           name: 'MySQL: Threads created per second'
@@ -1144,8 +1222,8 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: threads
         -
           uuid: c41afa83f6a94efda34d7b41c95c89ac
           name: 'MySQL: Threads running'
@@ -1163,8 +1241,8 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: threads
         -
           uuid: 8fbad224ebdf46e7b25a0be015f21972
           name: 'MySQL: Uptime'
@@ -1183,8 +1261,8 @@ zabbix_export:
             key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           tags:
             -
-              tag: Application
-              value: MySQL
+              tag: component
+              value: application
           triggers:
             -
               uuid: ba9eb4fc244b41a6a30237e7a382fa54
@@ -1196,12 +1274,20 @@ zabbix_export:
                 -
                   name: 'MySQL: Service is down'
                   expression: 'last(/MySQL by ODBC/db.odbc.select[ping,"{$MYSQL.DSN}"])=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
             -
               uuid: cd8f5996bd85434998595e041d6b0908
               expression: 'last(/MySQL by ODBC/mysql.uptime)<10m'
               name: 'MySQL: Service has been restarted (uptime < 10m)'
               priority: INFO
               description: 'MySQL uptime is less than 10 minutes.'
+              tags:
+                -
+                  tag: scope
+                  value: notice
       discovery_rules:
         -
           uuid: 0987fb6afdae4587bc32864fa42728f2
@@ -1239,8 +1325,11 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: MySQL
+                  tag: component
+                  value: storage
+                -
+                  tag: database
+                  value: '{#DATABASE}'
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1271,8 +1360,8 @@ zabbix_export:
               description: 'The item gets status information on the essential parameters of the slave threads.'
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: raw
             -
               uuid: 15f7b22867f54551afbed139d746e210
               name: 'MySQL: Replication Seconds Behind Master {#MASTER_HOST}'
@@ -1304,14 +1393,18 @@ zabbix_export:
                 key: 'db.odbc.get["{#MASTER_HOST}","{$MYSQL.DSN}"]'
               tags:
                 -
-                  tag: Application
-                  value: MySQL
+                  tag: component
+                  value: replication
               trigger_prototypes:
                 -
                   uuid: f2188a73bbf34ffcb95b3e11e2824feb
                   expression: 'min(/MySQL by ODBC/mysql.seconds_behind_master["{#MASTER_HOST}"],5m)>{$MYSQL.REPL_LAG.MAX.WARN}'
                   name: 'MySQL: Replication lag is too high (over {$MYSQL.REPL_LAG.MAX.WARN} for 5m)'
                   priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: e063b116753d4124a88443fe4de20d41
               name: 'MySQL: Replication Slave IO Running {#MASTER_HOST}'
@@ -1338,8 +1431,8 @@ zabbix_export:
                 key: 'db.odbc.get["{#MASTER_HOST}","{$MYSQL.DSN}"]'
               tags:
                 -
-                  tag: Application
-                  value: MySQL
+                  tag: component
+                  value: replication
               trigger_prototypes:
                 -
                   uuid: 6f216036f4f14ae7adc8c70126bb315a
@@ -1350,12 +1443,20 @@ zabbix_export:
                     -
                       name: 'MySQL: The slave I/O thread is not running'
                       expression: 'count(/MySQL by ODBC/mysql.slave_io_running["{#MASTER_HOST}"],#1,"eq","No")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: ba08061a61df4bbb8bac516ecec91b70
                   expression: 'count(/MySQL by ODBC/mysql.slave_io_running["{#MASTER_HOST}"],#1,"eq","No")=1'
                   name: 'MySQL: The slave I/O thread is not running'
                   priority: AVERAGE
                   description: 'Whether the I/O thread for reading the master''s binary log is running.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 113be79554c14c2aad08036febb15d71
               name: 'MySQL: Replication Slave SQL Running {#MASTER_HOST}'
@@ -1381,8 +1482,8 @@ zabbix_export:
                 key: 'db.odbc.get["{#MASTER_HOST}","{$MYSQL.DSN}"]'
               tags:
                 -
-                  tag: Application
-                  value: MySQL
+                  tag: component
+                  value: replication
               trigger_prototypes:
                 -
                   uuid: 39d229e5e3f34e8b828b4a0e2eaa0026
@@ -1394,6 +1495,10 @@ zabbix_export:
                     -
                       name: 'MySQL: The slave I/O thread is not running'
                       expression: 'count(/MySQL by ODBC/mysql.slave_io_running["{#MASTER_HOST}"],#1,"eq","No")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: a88eb463bb9740a4a4256306f11816bf
               name: 'MySQL: Replication Slave SQL Running State {#MASTER_HOST}'
@@ -1417,8 +1522,8 @@ zabbix_export:
                 key: 'db.odbc.get["{#MASTER_HOST}","{$MYSQL.DSN}"]'
               tags:
                 -
-                  tag: Application
-                  value: MySQL
+                  tag: component
+                  value: replication
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1450,8 +1555,8 @@ zabbix_export:
                 key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
               tags:
                 -
-                  tag: Application
-                  value: MySQL
+                  tag: component
+                  value: transactions
             -
               uuid: cbb7c1fadd934420b47950f52751795f
               name: 'MySQL: Binlog group commits'
@@ -1470,8 +1575,8 @@ zabbix_export:
                 key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
               tags:
                 -
-                  tag: Application
-                  value: MySQL
+                  tag: component
+                  value: transactions
             -
               uuid: 278488a9c0f543f6815a24592766d9bb
               name: 'MySQL: Master GTID wait count'
@@ -1494,8 +1599,8 @@ zabbix_export:
                 key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
               tags:
                 -
-                  tag: Application
-                  value: MySQL
+                  tag: component
+                  value: transactions
             -
               uuid: 93ad282dc3b24dba9f0351b0d0a59d39
               name: 'MySQL: Master GTID wait timeouts'
@@ -1518,8 +1623,8 @@ zabbix_export:
                 key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
               tags:
                 -
-                  tag: Application
-                  value: MySQL
+                  tag: component
+                  value: transactions
             -
               uuid: fd8bf7e639af4d3291030cdb9dd37bc9
               name: 'MySQL: Master GTID wait time'
@@ -1542,8 +1647,8 @@ zabbix_export:
                 key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
               tags:
                 -
-                  tag: Application
-                  value: MySQL
+                  tag: component
+                  value: transactions
           master_item:
             key: 'db.odbc.select[version,"{$MYSQL.DSN}"]'
           preprocessing:
@@ -1551,6 +1656,13 @@ zabbix_export:
               type: JAVASCRIPT
               parameters:
                 - 'return JSON.stringify(value.search(''MariaDB'')>-1 ? [{''{#SINGLETON}'': ''''}] : []);'
+      tags:
+        -
+          tag: class
+          value: database
+        -
+          tag: target
+          value: mysql
       macros:
         -
           macro: '{$MYSQL.ABORTED_CONN.MAX.WARN}'

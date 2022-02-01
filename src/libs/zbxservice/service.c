@@ -72,3 +72,8 @@ void	zbx_service_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size,
 		exit(EXIT_FAILURE);
 	}
 }
+
+void	zbx_service_reload_cache(void)
+{
+	zbx_service_send(ZBX_IPC_SERVICE_RELOAD_CACHE, NULL, 0, NULL);
+}

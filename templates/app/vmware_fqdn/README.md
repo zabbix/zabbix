@@ -27,12 +27,17 @@ For additional information please check https://www.zabbix.com/documentation/6.0
 
 No specific Zabbix configuration is required.
 
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$VMWARE.PASSWORD} |<p>VMware service {$USERNAME} user password</p> |`` |
+|{$VMWARE.URL} |<p>VMware service (vCenter or ESX hypervisor) SDK URL (https://servername/sdk)</p> |`` |
+|{$VMWARE.USERNAME} |<p>VMware service user name</p> |`` |
 
 ## Template links
 
-|Name|
-|----|
-|VMware macros |
+There are no template links in this template.
 
 ## Discovery rules
 
@@ -65,7 +70,7 @@ No specific Zabbix configuration is required.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/).
 
 # VMware Guest
 
@@ -81,20 +86,25 @@ Refer to the vendor documentation.
 
 No specific Zabbix configuration is required.
 
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$VMWARE.PASSWORD} |<p>VMware service {$USERNAME} user password</p> |`` |
+|{$VMWARE.URL} |<p>VMware service (vCenter or ESX hypervisor) SDK URL (https://servername/sdk)</p> |`` |
+|{$VMWARE.USERNAME} |<p>VMware service user name</p> |`` |
 
 ## Template links
 
-|Name|
-|----|
-|VMware macros |
+There are no template links in this template.
 
 ## Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Network device discovery |<p>Discovery of all network devices.</p> |SIMPLE |vmware.vm.net.if.discovery[{$VMWARE.URL},{$VMWARE.VM.UUID}] |
 |Disk device discovery |<p>Discovery of all disk devices.</p> |SIMPLE |vmware.vm.vfs.dev.discovery[{$VMWARE.URL},{$VMWARE.VM.UUID}] |
 |Mounted filesystem discovery |<p>Discovery of all guest file systems.</p> |SIMPLE |vmware.vm.vfs.fs.discovery[{$VMWARE.URL},{$VMWARE.VM.UUID}] |
+|Network device discovery |<p>Discovery of all network devices.</p> |SIMPLE |vmware.vm.net.if.discovery[{$VMWARE.URL},{$VMWARE.VM.UUID}] |
 
 ## Items collected
 
@@ -169,12 +179,17 @@ Refer to the vendor documentation.
 
 No specific Zabbix configuration is required.
 
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$VMWARE.PASSWORD} |<p>VMware service {$USERNAME} user password</p> |`` |
+|{$VMWARE.URL} |<p>VMware service (vCenter or ESX hypervisor) SDK URL (https://servername/sdk)</p> |`` |
+|{$VMWARE.USERNAME} |<p>VMware service user name</p> |`` |
 
 ## Template links
 
-|Name|
-|----|
-|VMware macros |
+There are no template links in this template.
 
 ## Discovery rules
 
@@ -229,49 +244,6 @@ No specific Zabbix configuration is required.
 |VMware: The {$VMWARE.HV.UUID} health is Yellow |<p>One or more components in the appliance might become overloaded soon.</p> |`last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=2` |AVERAGE |<p>**Depends on**:</p><p>- VMware: The {$VMWARE.HV.UUID} health is Red</p> |
 |VMware: Hypervisor has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/VMware Hypervisor/vmware.hv.uptime[{$VMWARE.URL},{$VMWARE.HV.UUID}])<10m` |WARNING |<p>Manual close: YES</p> |
 |VMware: The multipath count has been changed |<p>The number of available datastore paths less than registered ({#MULTIPATH.COUNT}).</p> |`last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}],#1)<>last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}],#2) and last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}])<{#MULTIPATH.COUNT}` |AVERAGE |<p>Manual close: YES</p> |
-
-## Feedback
-
-Please report any issues with the template at https://support.zabbix.com
-
-# VMware macros
-
-## Overview
-
-For Zabbix version: 6.0 and higher  
-
-## Setup
-
-Refer to the vendor documentation.
-
-## Zabbix configuration
-
-No specific Zabbix configuration is required.
-
-### Macros used
-
-|Name|Description|Default|
-|----|-----------|-------|
-|{$VMWARE.PASSWORD} |<p>VMware service {$USERNAME} user password</p> |`` |
-|{$VMWARE.URL} |<p>VMware service (vCenter or ESX hypervisor) SDK URL (https://servername/sdk)</p> |`` |
-|{$VMWARE.USERNAME} |<p>VMware service user name</p> |`` |
-
-## Template links
-
-There are no template links in this template.
-
-## Discovery rules
-
-
-## Items collected
-
-|Group|Name|Description|Type|Key and additional info|
-|-----|----|-----------|----|---------------------|
-
-## Triggers
-
-|Name|Description|Expression|Severity|Dependencies and additional info|
-|----|-----------|----|----|----|
 
 ## Feedback
 

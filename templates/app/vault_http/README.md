@@ -53,11 +53,11 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Storage metrics discovery |<p>Storage backend metrics discovery.</p> |DEPENDENT |vault.storage.discovery<p>**Filter**:</p>AND <p>- {#STORAGE} MATCHES_REGEX `{$VAULT.LLD.FILTER.STORAGE.MATCHES}`</p> |
 |Mountpoint metrics discovery |<p>Mountpoint metrics discovery.</p> |DEPENDENT |vault.mountpoint.discovery |
-|WAL metrics discovery |<p>Discovery for WAL metrics.</p> |DEPENDENT |vault.wal.discovery |
 |Replication metrics discovery |<p>Discovery for replication metrics.</p> |DEPENDENT |vault.replication.discovery |
+|Storage metrics discovery |<p>Storage backend metrics discovery.</p> |DEPENDENT |vault.storage.discovery<p>**Filter**:</p>AND <p>- {#STORAGE} MATCHES_REGEX `{$VAULT.LLD.FILTER.STORAGE.MATCHES}`</p> |
 |Token metrics discovery |<p>Tokens metrics discovery.</p> |DEPENDENT |vault.tokens.discovery |
+|WAL metrics discovery |<p>Discovery for WAL metrics.</p> |DEPENDENT |vault.wal.discovery |
 
 ## Items collected
 
@@ -159,15 +159,15 @@ There are no template links in this template.
 |Vault |Vault: Token [{#TOKEN_NAME}] error |<p>Token lookup error text.</p> |DEPENDENT |vault.token_via_accessor.error["{#ACCESSOR}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.accessor == "{#ACCESSOR}")].error.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Vault |Vault: Token [{#TOKEN_NAME}] has TTL |<p>The Token has TTL.</p> |DEPENDENT |vault.token_via_accessor.has_ttl["{#ACCESSOR}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.accessor == "{#ACCESSOR}")].has_ttl.first()`</p><p>- BOOL_TO_DECIMAL</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Vault |Vault: Token [{#TOKEN_NAME}] TTL |<p>The TTL period of the token.</p> |DEPENDENT |vault.token_via_accessor.ttl["{#ACCESSOR}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.accessor == "{#ACCESSOR}")].ttl.first()`</p> |
-|Zabbix_raw_items |Vault: Get health |<p>-</p> |HTTP_AGENT |vault.get_health<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> {"healthcheck": 0}`</p> |
-|Zabbix_raw_items |Vault: Get leader |<p>-</p> |HTTP_AGENT |vault.get_leader<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p> |
-|Zabbix_raw_items |Vault: Get metrics |<p>-</p> |HTTP_AGENT |vault.get_metrics<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p> |
-|Zabbix_raw_items |Vault: Clear metrics |<p>-</p> |DEPENDENT |vault.clear_metrics<p>**Preprocessing**:</p><p>- CHECK_JSON_ERROR: `$.errors`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Zabbix_raw_items |Vault: Get tokens |<p>Get information about tokens via their accessors. Accessors are defined in the macro "{$VAULT.TOKEN.ACCESSORS}".</p> |SCRIPT |vault.get_tokens<p>**Expression**:</p>`The text is too long. Please see the template.` |
-|Zabbix_raw_items |Vault: Check WAL discovery |<p>-</p> |DEPENDENT |vault.check_wal_discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~"^vault_wal_(?:.+)$"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `return JSON.stringify(value !== "[]" ? [{'{#SINGLETON}': ''}] : []);`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
-|Zabbix_raw_items |Vault: Check replication discovery |<p>-</p> |DEPENDENT |vault.check_replication_discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~"^replication_(?:.+)$"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `return JSON.stringify(value !== "[]" ? [{'{#SINGLETON}': ''}] : []);`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
-|Zabbix_raw_items |Vault: Check storage discovery |<p>-</p> |DEPENDENT |vault.check_storage_discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~"^vault_(?:.+)_(?:get|put|list|delete)_count$"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
-|Zabbix_raw_items |Vault: Check mountpoint discovery |<p>-</p> |DEPENDENT |vault.check_mountpoint_discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~"^vault_rollback_attempt_(?:.+?)_count$"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
+|Zabbix raw items |Vault: Get health |<p>-</p> |HTTP_AGENT |vault.get_health<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> {"healthcheck": 0}`</p> |
+|Zabbix raw items |Vault: Get leader |<p>-</p> |HTTP_AGENT |vault.get_leader<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p> |
+|Zabbix raw items |Vault: Get metrics |<p>-</p> |HTTP_AGENT |vault.get_metrics<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p> |
+|Zabbix raw items |Vault: Clear metrics |<p>-</p> |DEPENDENT |vault.clear_metrics<p>**Preprocessing**:</p><p>- CHECK_JSON_ERROR: `$.errors`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Zabbix raw items |Vault: Get tokens |<p>Get information about tokens via their accessors. Accessors are defined in the macro "{$VAULT.TOKEN.ACCESSORS}".</p> |SCRIPT |vault.get_tokens<p>**Expression**:</p>`The text is too long. Please see the template.` |
+|Zabbix raw items |Vault: Check WAL discovery |<p>-</p> |DEPENDENT |vault.check_wal_discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~"^vault_wal_(?:.+)$"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `return JSON.stringify(value !== "[]" ? [{'{#SINGLETON}': ''}] : []);`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
+|Zabbix raw items |Vault: Check replication discovery |<p>-</p> |DEPENDENT |vault.check_replication_discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~"^replication_(?:.+)$"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `return JSON.stringify(value !== "[]" ? [{'{#SINGLETON}': ''}] : []);`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
+|Zabbix raw items |Vault: Check storage discovery |<p>-</p> |DEPENDENT |vault.check_storage_discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~"^vault_(?:.+)_(?:get|put|list|delete)_count$"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
+|Zabbix raw items |Vault: Check mountpoint discovery |<p>-</p> |DEPENDENT |vault.check_mountpoint_discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~"^vault_rollback_attempt_(?:.+?)_count$"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
 
 ## Triggers
 
@@ -190,5 +190,5 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
 

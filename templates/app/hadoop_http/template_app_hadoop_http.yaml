@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-15T08:32:52Z'
+  date: '2022-01-26T10:49:32Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -15,7 +15,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/413459-discussion-thread-for-official-zabbix-template-hadoop
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -61,8 +61,8 @@ zabbix_export:
           url: '{$HADOOP.NAMENODE.HOST}:{$HADOOP.NAMENODE.PORT}/jmx?qry=Hadoop:service=NameNode,name=NameNodeInfo'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: 2cb55b7ed9cd41878dc985497f45e084
           name: 'NameNode: Total blocks'
@@ -80,8 +80,8 @@ zabbix_export:
             key: hadoop.namenode.get
           tags:
             -
-              tag: Application
-              value: Hadoop
+              tag: component
+              value: namenode
         -
           uuid: 1d098dc6fa134053b6c6be0e7618092e
           name: 'NameNode: Blocks allocable'
@@ -99,8 +99,8 @@ zabbix_export:
             key: hadoop.namenode.get
           tags:
             -
-              tag: Application
-              value: Hadoop
+              tag: component
+              value: namenode
         -
           uuid: 26ca0bbd18e04b49b9eb8d2a74f4fd15
           name: 'NameNode: Capacity remaining'
@@ -119,8 +119,8 @@ zabbix_export:
             key: hadoop.namenode.get
           tags:
             -
-              tag: Application
-              value: Hadoop
+              tag: component
+              value: namenode
         -
           uuid: c73c2b6c24b846e49bdb68c3f5a01419
           name: 'NameNode: Corrupt blocks'
@@ -138,8 +138,8 @@ zabbix_export:
             key: hadoop.namenode.get
           tags:
             -
-              tag: Application
-              value: Hadoop
+              tag: component
+              value: namenode
         -
           uuid: 82198b21427a4e39a173369db42d9de3
           name: 'NameNode: Total files'
@@ -157,8 +157,8 @@ zabbix_export:
             key: hadoop.namenode.get
           tags:
             -
-              tag: Application
-              value: Hadoop
+              tag: component
+              value: namenode
         -
           uuid: 687406d06ce94a8291b2e72bb2f8bec4
           name: 'Get NameNode stats'
@@ -170,8 +170,8 @@ zabbix_export:
           url: '{$HADOOP.NAMENODE.HOST}:{$HADOOP.NAMENODE.PORT}/jmx'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: 30ee7e09067e4f00a4f26ad6c00454b2
           name: 'NameNode: Missing blocks'
@@ -189,8 +189,8 @@ zabbix_export:
             key: hadoop.namenode.get
           tags:
             -
-              tag: Application
-              value: Hadoop
+              tag: component
+              value: namenode
           triggers:
             -
               uuid: 3b92daaaddb74105a5e57c4b381e3060
@@ -198,6 +198,10 @@ zabbix_export:
               name: 'NameNode: Cluster has missing blocks'
               priority: AVERAGE
               description: 'A missing block is far worse than a corrupt block, because a missing block cannot be recovered by copying a replica.'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 3473bad0a7c94c8b9fd35cd4398e6215
           name: 'NameNode: Dead DataNodes'
@@ -219,8 +223,8 @@ zabbix_export:
             key: hadoop.namenode.get
           tags:
             -
-              tag: Application
-              value: Hadoop
+              tag: component
+              value: namenode
           triggers:
             -
               uuid: b2d1a26791aa4b16865b4410c50c7ceb
@@ -228,6 +232,10 @@ zabbix_export:
               name: 'NameNode: Cluster has DataNodes in Dead state'
               priority: AVERAGE
               description: 'The death of a DataNode causes a flurry of network activity, as the NameNode initiates replication of blocks lost on the dead nodes.'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 398a8c95db3248b684f222fe7b912fe3
           name: 'NameNode: Alive DataNodes'
@@ -249,8 +257,8 @@ zabbix_export:
             key: hadoop.namenode.get
           tags:
             -
-              tag: Application
-              value: Hadoop
+              tag: component
+              value: namenode
         -
           uuid: 15bcb22fdc7f4e2c8f24560ef641d63d
           name: 'NameNode: Stale DataNodes'
@@ -272,8 +280,8 @@ zabbix_export:
             key: hadoop.namenode.get
           tags:
             -
-              tag: Application
-              value: Hadoop
+              tag: component
+              value: namenode
         -
           uuid: b72d54b849fc48fd8e7cdacd75943c23
           name: 'NameNode: Block Pool Renaming'
@@ -291,8 +299,8 @@ zabbix_export:
             key: hadoop.namenode.get
           tags:
             -
-              tag: Application
-              value: Hadoop
+              tag: component
+              value: namenode
         -
           uuid: 3cfbf084a31b479c91be356556d43c0d
           name: 'NameNode: Percent capacity remaining'
@@ -316,8 +324,8 @@ zabbix_export:
             key: hadoop.namenode.get
           tags:
             -
-              tag: Application
-              value: Hadoop
+              tag: component
+              value: namenode
           triggers:
             -
               uuid: 3104295848c5497085f397b8f3e06ef6
@@ -325,6 +333,10 @@ zabbix_export:
               name: 'NameNode: Cluster capacity remaining is low (below {$HADOOP.CAPACITY_REMAINING.MIN.WARN}% for 15m)'
               priority: WARNING
               description: 'A good practice is to ensure that disk use never exceeds 80 percent capacity.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
         -
           uuid: a9e6c1e2f9544c71844785b4baa9c017
           name: 'NameNode: RPC queue & processing time'
@@ -344,8 +356,8 @@ zabbix_export:
             key: hadoop.namenode.get
           tags:
             -
-              tag: Application
-              value: Hadoop
+              tag: component
+              value: namenode
         -
           uuid: 9f00149ef0c2444ebbc9327b24acd7b9
           name: 'NameNode: Total load'
@@ -363,8 +375,8 @@ zabbix_export:
             key: hadoop.namenode.get
           tags:
             -
-              tag: Application
-              value: Hadoop
+              tag: component
+              value: namenode
         -
           uuid: 6abfe537a36646a0b10fe2c72586d249
           name: 'NameNode: Transactions since last checkpoint'
@@ -382,8 +394,8 @@ zabbix_export:
             key: hadoop.namenode.get
           tags:
             -
-              tag: Application
-              value: Hadoop
+              tag: component
+              value: namenode
         -
           uuid: 249098bbeb7a43cdac59f1297ca95104
           name: 'NameNode: Under-replicated blocks'
@@ -401,8 +413,8 @@ zabbix_export:
             key: hadoop.namenode.get
           tags:
             -
-              tag: Application
-              value: Hadoop
+              tag: component
+              value: namenode
         -
           uuid: 7e8769eb77304b6f9c6e1d5bbd420fd0
           name: 'NameNode: Uptime'
@@ -425,8 +437,8 @@ zabbix_export:
             key: hadoop.namenode.get
           tags:
             -
-              tag: Application
-              value: Hadoop
+              tag: component
+              value: system
           triggers:
             -
               uuid: 9fac0ae651ab40a08551945eb0a93b68
@@ -439,6 +451,10 @@ zabbix_export:
                 -
                   name: 'NameNode: Service is unavailable'
                   expression: 'last(/Hadoop by HTTP/net.tcp.service["tcp","{$HADOOP.NAMENODE.HOST}","{$HADOOP.NAMENODE.PORT}"])=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
             -
               uuid: 84d866bc0dc3486d9c5dc9beefec8d31
               expression: 'last(/Hadoop by HTTP/hadoop.namenode.uptime)<10m'
@@ -446,6 +462,10 @@ zabbix_export:
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 396eb8f791d54254b08ddee553d3d944
           name: 'NameNode: Failed volumes'
@@ -463,8 +483,8 @@ zabbix_export:
             key: hadoop.namenode.get
           tags:
             -
-              tag: Application
-              value: Hadoop
+              tag: component
+              value: namenode
           triggers:
             -
               uuid: fcf791b6d0594dbb9ddfc3f93bc94825
@@ -472,6 +492,10 @@ zabbix_export:
               name: 'NameNode: Cluster has volume failures'
               priority: AVERAGE
               description: 'HDFS now allows for disks to fail in place, without affecting DataNode operations, until a threshold value is reached. This is set on each DataNode via the dfs.datanode.failed.volumes.tolerated property; it defaults to 0, meaning that any volume failure will shut down the DataNode; on a production cluster where DataNodes typically have 6, 8, or 12 disks, setting this parameter to 1 or 2 is typically the best practice.'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 6d7546c5d15d4e478b2e87e35d5306b0
           name: 'Get NodeManagers states'
@@ -488,8 +512,8 @@ zabbix_export:
           url: '{$HADOOP.RESOURCEMANAGER.HOST}:{$HADOOP.RESOURCEMANAGER.PORT}/jmx?qry=Hadoop:service=ResourceManager,name=RMNMInfo'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: e693cff98ec74cc198ec6b5e973f116c
           name: 'Get ResourceManager stats'
@@ -501,8 +525,8 @@ zabbix_export:
           url: '{$HADOOP.RESOURCEMANAGER.HOST}:{$HADOOP.RESOURCEMANAGER.PORT}/jmx'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: 63d4fe7384044027b08b99698355fd8b
           name: 'ResourceManager: Active NMs'
@@ -524,8 +548,8 @@ zabbix_export:
             key: hadoop.resourcemanager.get
           tags:
             -
-              tag: Application
-              value: Hadoop
+              tag: component
+              value: resourcemanager
           triggers:
             -
               uuid: eb02a30f45394e4d84d9d7239002ed40
@@ -533,6 +557,10 @@ zabbix_export:
               name: 'ResourceManager: Cluster has no active NodeManagers'
               priority: HIGH
               description: 'Cluster is unable to execute any jobs without at least one NodeManager.'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 3fccfdd8738544ca8969ade842430fc8
           name: 'ResourceManager: Decommissioned NMs'
@@ -550,8 +578,8 @@ zabbix_export:
             key: hadoop.resourcemanager.get
           tags:
             -
-              tag: Application
-              value: Hadoop
+              tag: component
+              value: resourcemanager
         -
           uuid: 9aad193a9e074575878e44aa96ff4237
           name: 'ResourceManager: Decommissioning NMs'
@@ -573,8 +601,8 @@ zabbix_export:
             key: hadoop.resourcemanager.get
           tags:
             -
-              tag: Application
-              value: Hadoop
+              tag: component
+              value: resourcemanager
         -
           uuid: c4bbf5295b2a44619e2b641468071f9b
           name: 'ResourceManager: Lost NMs'
@@ -596,8 +624,8 @@ zabbix_export:
             key: hadoop.resourcemanager.get
           tags:
             -
-              tag: Application
-              value: Hadoop
+              tag: component
+              value: resourcemanager
         -
           uuid: b7791ce30e8f4aa7b5eea2ee7ca7eef9
           name: 'ResourceManager: Rebooted NMs'
@@ -615,8 +643,8 @@ zabbix_export:
             key: hadoop.resourcemanager.get
           tags:
             -
-              tag: Application
-              value: Hadoop
+              tag: component
+              value: resourcemanager
         -
           uuid: 666152b3bf544a29b9e58a9f417c0ab8
           name: 'ResourceManager: Shutdown NMs'
@@ -634,8 +662,8 @@ zabbix_export:
             key: hadoop.resourcemanager.get
           tags:
             -
-              tag: Application
-              value: Hadoop
+              tag: component
+              value: resourcemanager
         -
           uuid: e6aa4b4b29414f2fb1f06bd536552c1c
           name: 'ResourceManager: Unhealthy NMs'
@@ -653,8 +681,8 @@ zabbix_export:
             key: hadoop.resourcemanager.get
           tags:
             -
-              tag: Application
-              value: Hadoop
+              tag: component
+              value: resourcemanager
           triggers:
             -
               uuid: 0f35a0fa7a404559a3df225b906f0653
@@ -662,6 +690,10 @@ zabbix_export:
               name: 'ResourceManager: Cluster has unhealthy NodeManagers'
               priority: AVERAGE
               description: 'YARN considers any node with disk utilization exceeding the value specified under the property yarn.nodemanager.disk-health-checker.max-disk-utilization-per-disk-percentage (in yarn-site.xml) to be unhealthy. Ample disk space is critical to ensure uninterrupted operation of a Hadoop cluster, and large numbers of unhealthyNodes (the number to alert on depends on the size of your cluster) should be quickly investigated and resolved.'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: c4c3195326e34ebcb57e5039beffce7c
           name: 'ResourceManager: RPC queue & processing time'
@@ -681,8 +713,8 @@ zabbix_export:
             key: hadoop.resourcemanager.get
           tags:
             -
-              tag: Application
-              value: Hadoop
+              tag: component
+              value: resourcemanager
         -
           uuid: 4e74ca69a84d441e95e2c20afd25fada
           name: 'ResourceManager: Uptime'
@@ -705,8 +737,8 @@ zabbix_export:
             key: hadoop.resourcemanager.get
           tags:
             -
-              tag: Application
-              value: Hadoop
+              tag: component
+              value: system
           triggers:
             -
               uuid: 7d4d026992344602a199966a8308a571
@@ -719,6 +751,10 @@ zabbix_export:
                 -
                   name: 'ResourceManager: Service is unavailable'
                   expression: 'last(/Hadoop by HTTP/net.tcp.service["tcp","{$HADOOP.RESOURCEMANAGER.HOST}","{$HADOOP.RESOURCEMANAGER.PORT}"])=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
             -
               uuid: ade7cc30a4184ef89ed896bae56e0b18
               expression: 'last(/Hadoop by HTTP/hadoop.resourcemanager.uptime)<10m'
@@ -726,6 +762,10 @@ zabbix_export:
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 66a87b21d32c436bb2d2eb23ec328f91
           name: 'NameNode: Service response time'
@@ -737,8 +777,8 @@ zabbix_export:
           description: 'Hadoop NameNode API performance.'
           tags:
             -
-              tag: Application
-              value: Hadoop
+              tag: component
+              value: network
           triggers:
             -
               uuid: 4e4a6ab28fe5492d8fe4e291b8a586dc
@@ -750,6 +790,10 @@ zabbix_export:
                 -
                   name: 'NameNode: Service is unavailable'
                   expression: 'last(/Hadoop by HTTP/net.tcp.service["tcp","{$HADOOP.NAMENODE.HOST}","{$HADOOP.NAMENODE.PORT}"])=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 98b11f1156dc472fbce27ca053e01d4e
           name: 'ResourceManager: Service response time'
@@ -761,8 +805,8 @@ zabbix_export:
           description: 'Hadoop ResourceManager API performance.'
           tags:
             -
-              tag: Application
-              value: Hadoop
+              tag: component
+              value: network
           triggers:
             -
               uuid: e8e55f4c7e9e4823927a8c1345d3b941
@@ -774,6 +818,10 @@ zabbix_export:
                 -
                   name: 'ResourceManager: Service is unavailable'
                   expression: 'last(/Hadoop by HTTP/net.tcp.service["tcp","{$HADOOP.RESOURCEMANAGER.HOST}","{$HADOOP.RESOURCEMANAGER.PORT}"])=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 2c52d856e07e4524abf3c2ae4b47c6b6
           name: 'NameNode: Service status'
@@ -790,8 +838,11 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: Hadoop
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: f7e16c4ec91e4c04b13b73ee817c71d7
@@ -799,6 +850,10 @@ zabbix_export:
               name: 'NameNode: Service is unavailable'
               priority: AVERAGE
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 615b75c42ebe471da798a0613667d499
           name: 'ResourceManager: Service status'
@@ -815,8 +870,11 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: Hadoop
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: a9ac7ede0c004fe18ab9f1fee36ad2b2
@@ -824,6 +882,10 @@ zabbix_export:
               name: 'ResourceManager: Service is unavailable'
               priority: AVERAGE
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: 0f05e90a6fc547d18f291ae2264db9d1
@@ -855,8 +917,8 @@ zabbix_export:
                 key: hadoop.datanodes.get
               tags:
                 -
-                  tag: Application
-                  value: 'Hadoop DataNode {#HOSTNAME}'
+                  tag: component
+                  value: datanode
             -
               uuid: 14904ca75991456784d2082c14b7ec88
               name: '{#HOSTNAME}: Used'
@@ -875,8 +937,8 @@ zabbix_export:
                 key: 'hadoop.datanode.get[{#HOSTNAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Hadoop DataNode {#HOSTNAME}'
+                  tag: component
+                  value: capacity
             -
               uuid: 6d2d030b3ddb41a394faede737329bbb
               name: 'Hadoop DataNode {#HOSTNAME}: Get stats'
@@ -888,8 +950,8 @@ zabbix_export:
               url: '{#INFOADDR}/jmx'
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: raw
             -
               uuid: 01bc20e53e314089a55b270961062c00
               name: '{#HOSTNAME}: JVM Garbage collection time'
@@ -908,8 +970,8 @@ zabbix_export:
                 key: 'hadoop.datanode.get[{#HOSTNAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Hadoop DataNode {#HOSTNAME}'
+                  tag: component
+                  value: datanode
             -
               uuid: 4cae9eef95f24810a6607de5348b7b54
               name: '{#HOSTNAME}: JVM Heap usage'
@@ -929,8 +991,8 @@ zabbix_export:
                 key: 'hadoop.datanode.get[{#HOSTNAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Hadoop DataNode {#HOSTNAME}'
+                  tag: component
+                  value: capacity
             -
               uuid: dc30742dba2e4e5d99ca237615ffaef3
               name: '{#HOSTNAME}: JVM Threads'
@@ -948,8 +1010,8 @@ zabbix_export:
                 key: 'hadoop.datanode.get[{#HOSTNAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Hadoop DataNode {#HOSTNAME}'
+                  tag: component
+                  value: datanode
             -
               uuid: 57c00b46aef94c018806cdae43adfab5
               name: '{#HOSTNAME}: Number of failed volumes'
@@ -967,8 +1029,8 @@ zabbix_export:
                 key: 'hadoop.datanode.get[{#HOSTNAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Hadoop DataNode {#HOSTNAME}'
+                  tag: component
+                  value: datanode
             -
               uuid: a6541492d4f7426b8016d1a8932b87ce
               name: '{#HOSTNAME}: Oper state'
@@ -992,8 +1054,8 @@ zabbix_export:
                 key: hadoop.datanodes.get
               tags:
                 -
-                  tag: Application
-                  value: 'Hadoop DataNode {#HOSTNAME}'
+                  tag: component
+                  value: datanode
               trigger_prototypes:
                 -
                   uuid: 9f657289a04041e5bcaa1947f62f607d
@@ -1001,6 +1063,10 @@ zabbix_export:
                   name: '{#HOSTNAME}: DataNode has state {ITEM.VALUE}.'
                   priority: AVERAGE
                   description: 'The state is different from normal.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 5a46ec3c89eb40d4ad57cec2080c66f8
               name: '{#HOSTNAME}: Remaining'
@@ -1019,8 +1085,8 @@ zabbix_export:
                 key: 'hadoop.datanode.get[{#HOSTNAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Hadoop DataNode {#HOSTNAME}'
+                  tag: component
+                  value: capacity
             -
               uuid: 2ac19ff8ee7f480f9974be56ab06eaaf
               name: '{#HOSTNAME}: Uptime'
@@ -1043,8 +1109,8 @@ zabbix_export:
                 key: 'hadoop.datanode.get[{#HOSTNAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Hadoop DataNode {#HOSTNAME}'
+                  tag: component
+                  value: system
               trigger_prototypes:
                 -
                   uuid: 3eccb9daf76f4bde88b424cf6f2d21f6
@@ -1057,6 +1123,10 @@ zabbix_export:
                     -
                       name: '{#HOSTNAME}: DataNode has state {ITEM.VALUE}.'
                       expression: 'last(/Hadoop by HTTP/hadoop.datanode.oper_state[{#HOSTNAME}])<>"Live"'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: e40298d300764251abcf93d5df3d9a67
                   expression: 'last(/Hadoop by HTTP/hadoop.datanode.uptime[{#HOSTNAME}])<10m'
@@ -1064,6 +1134,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Uptime is less than 10 minutes'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 62b4ca9b1e8a43aa89fbeb78ac16c8cf
               name: '{#HOSTNAME}: Version'
@@ -1087,8 +1161,8 @@ zabbix_export:
                 key: hadoop.datanodes.get
               tags:
                 -
-                  tag: Application
-                  value: 'Hadoop DataNode {#HOSTNAME}'
+                  tag: component
+                  value: system
           graph_prototypes:
             -
               uuid: c497416bcce1416ebcede7fc491ccdba
@@ -1161,8 +1235,8 @@ zabbix_export:
                 key: hadoop.nodemanagers.get
               tags:
                 -
-                  tag: Application
-                  value: 'Hadoop NodeManager {#HOSTNAME}'
+                  tag: component
+                  value: memory
             -
               uuid: e8d0ea2c96b643f899e370ab73c5c262
               name: '{#HOSTNAME}: Container launch avg duration'
@@ -1180,8 +1254,8 @@ zabbix_export:
                 key: 'hadoop.nodemanager.get[{#HOSTNAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Hadoop NodeManager {#HOSTNAME}'
+                  tag: component
+                  value: nodemanager
             -
               uuid: 23c89dfb26a34b77bf34fcf543f719f2
               name: 'Hadoop NodeManager {#HOSTNAME}: Get stats'
@@ -1193,8 +1267,8 @@ zabbix_export:
               url: '{#NODEHTTPADDRESS}/jmx'
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: raw
             -
               uuid: 82e289c999a246a6bd1feb85349d0348
               name: '{#HOSTNAME}: JVM Garbage collection time'
@@ -1213,8 +1287,8 @@ zabbix_export:
                 key: 'hadoop.nodemanager.get[{#HOSTNAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Hadoop NodeManager {#HOSTNAME}'
+                  tag: component
+                  value: nodemanager
             -
               uuid: 4032f0a266c44b34896e8179bbed2419
               name: '{#HOSTNAME}: JVM Heap usage'
@@ -1234,8 +1308,8 @@ zabbix_export:
                 key: 'hadoop.nodemanager.get[{#HOSTNAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Hadoop NodeManager {#HOSTNAME}'
+                  tag: component
+                  value: nodemanager
             -
               uuid: d7485913b2db4e31a8f02f63f8c18913
               name: '{#HOSTNAME}: JVM Threads'
@@ -1253,8 +1327,8 @@ zabbix_export:
                 key: 'hadoop.nodemanager.get[{#HOSTNAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Hadoop NodeManager {#HOSTNAME}'
+                  tag: component
+                  value: nodemanager
             -
               uuid: 662cafd31e194db8808c75789bf712eb
               name: '{#HOSTNAME}: Number of containers'
@@ -1273,8 +1347,8 @@ zabbix_export:
                 key: hadoop.nodemanagers.get
               tags:
                 -
-                  tag: Application
-                  value: 'Hadoop NodeManager {#HOSTNAME}'
+                  tag: component
+                  value: nodemanager
             -
               uuid: 01a5bcdbfc1c4a84a471738998aed372
               name: '{#HOSTNAME}: RPC queue & processing time'
@@ -1293,8 +1367,8 @@ zabbix_export:
                 key: 'hadoop.nodemanager.get[{#HOSTNAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Hadoop NodeManager {#HOSTNAME}'
+                  tag: component
+                  value: nodemanager
             -
               uuid: bab9c705d31e42ce9af65b396e18504b
               name: '{#HOSTNAME}: State'
@@ -1318,8 +1392,8 @@ zabbix_export:
                 key: hadoop.nodemanagers.get
               tags:
                 -
-                  tag: Application
-                  value: 'Hadoop NodeManager {#HOSTNAME}'
+                  tag: component
+                  value: nodemanager
               trigger_prototypes:
                 -
                   uuid: 8752a292093347fcb16d3f06dd97c5c3
@@ -1327,6 +1401,10 @@ zabbix_export:
                   name: '{#HOSTNAME}: NodeManager has state {ITEM.VALUE}.'
                   priority: AVERAGE
                   description: 'The state is different from normal.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: f8f6799130d34848a7dfb65815939c48
               name: '{#HOSTNAME}: Uptime'
@@ -1349,8 +1427,8 @@ zabbix_export:
                 key: 'hadoop.nodemanager.get[{#HOSTNAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Hadoop NodeManager {#HOSTNAME}'
+                  tag: component
+                  value: system
               trigger_prototypes:
                 -
                   uuid: 6f8a6308d4334dd9bebe7af2fa3fb831
@@ -1363,6 +1441,10 @@ zabbix_export:
                     -
                       name: '{#HOSTNAME}: NodeManager has state {ITEM.VALUE}.'
                       expression: 'last(/Hadoop by HTTP/hadoop.nodemanager.state[{#HOSTNAME}])<>"RUNNING"'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: 05f3cf8ed34f4a708df508f0e50e119d
                   expression: 'last(/Hadoop by HTTP/hadoop.nodemanager.uptime[{#HOSTNAME}])<10m'
@@ -1370,6 +1452,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Uptime is less than 10 minutes'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: d92b66e61a5244a995693ab8aedee96e
               name: '{#HOSTNAME}: Used memory'
@@ -1387,8 +1473,8 @@ zabbix_export:
                 key: hadoop.nodemanagers.get
               tags:
                 -
-                  tag: Application
-                  value: 'Hadoop NodeManager {#HOSTNAME}'
+                  tag: component
+                  value: memory
             -
               uuid: c4d46de2d6d341f5a2c1826236f94e5e
               name: '{#HOSTNAME}: Version'
@@ -1411,8 +1497,8 @@ zabbix_export:
                 key: hadoop.nodemanagers.get
               tags:
                 -
-                  tag: Application
-                  value: 'Hadoop NodeManager {#HOSTNAME}'
+                  tag: component
+                  value: system
           url: '{$HADOOP.RESOURCEMANAGER.HOST}:{$HADOOP.RESOURCEMANAGER.PORT}/jmx?qry=Hadoop:service=ResourceManager,name=RMNMInfo'
           preprocessing:
             -
@@ -1439,6 +1525,13 @@ zabbix_export:
                   catch (error) {
                     throw 'Failed to process response received from Hadoop.';
                   }
+      tags:
+        -
+          tag: class
+          value: application
+        -
+          tag: target
+          value: hadoop
       macros:
         -
           macro: '{$HADOOP.CAPACITY_REMAINING.MIN.WARN}'

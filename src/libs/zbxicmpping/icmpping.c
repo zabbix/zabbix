@@ -90,7 +90,8 @@ static void	get_source_ip_option(const char *fping, const char **option, unsigne
  * Purpose: detect minimal possible fping packet interval                     *
  *                                                                            *
  * Parameters: fping         - [IN] the location of fping program             *
- *             dst           - [IN] the ip address for test                   *
+ *             hosts         - [IN] list of hosts to test                     *
+ *             hosts_count   - [IN] number of target hosts                    *
  *             value         - [OUT] interval between sending ping packets    *
  *                                   (in millisec)                            *
  *             error         - [OUT] error string if function fails           *
@@ -113,96 +114,103 @@ static void	get_source_ip_option(const char *fping, const char **option, unsigne
  *           "safe limits".                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	get_interval_option(const char *fping, const char *dst, int *value, char *error, size_t max_error_len)
+static int	get_interval_option(const char *fping, ZBX_FPING_HOST *hosts, int hosts_count, int *value, char *error,
+		size_t max_error_len)
 {
 	char		*out = NULL;
 	unsigned int	intervals[] = {0, 1, 10};
-	size_t		i, out_len;
-	int		ret = FAIL;
+	size_t		out_len;
+	int		ret = FAIL, i;
 
-	for (i = 0; i < ARRSIZE(intervals); i++)
+	for (i = 0; i < hosts_count; i++)
 	{
-		int		ret_exec;
-		char		tmp[MAX_STRING_LEN], err[255];
-		const char	*p;
+		size_t		j;
+		const char	*dst = hosts[i].addr;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "testing fping interval %u ms", intervals[i]);
-
-		zbx_snprintf(tmp, sizeof(tmp), "%s -c1 -t50 -i%u %s", fping, intervals[i], dst);
-
-		zbx_free(out);
-
-		/* call fping, ignore its exit code but mind execution failures */
-		if (TIMEOUT_ERROR == (ret_exec = zbx_execute(tmp, &out, err, sizeof(err), 1,
-				ZBX_EXIT_CODE_CHECKS_DISABLED, NULL)))
+		for (j = 0; j < ARRSIZE(intervals); j++)
 		{
-			zbx_snprintf(error, max_error_len, "Timeout while executing \"%s\"", tmp);
-			goto out;
-		}
+			int		ret_exec;
+			char		tmp[MAX_STRING_LEN], err[255];
+			const char	*p;
 
-		if (FAIL == ret_exec)
-		{
-			zbx_snprintf(error, max_error_len, "Cannot execute \"%s\": %s", tmp, err);
-			goto out;
-		}
+			zabbix_log(LOG_LEVEL_DEBUG, "testing fping interval %u ms", intervals[j]);
 
-		/* First, check the output for suggested interval option, e. g.:          */
-		/*                                                                        */
-		/* /usr/sbin/fping: these options are too risky for mere mortals.         */
-		/* /usr/sbin/fping: You need i >= 1, p >= 20, r < 20, and t >= 50         */
+			zbx_snprintf(tmp, sizeof(tmp), "%s -c1 -t50 -i%u %s", fping, intervals[j], dst);
 
-#define FPING_YOU_NEED_PREFIX	"You need i >= "
+			zbx_free(out);
 
-		if (NULL != (p = strstr(out, FPING_YOU_NEED_PREFIX)))
-		{
-			p += ZBX_CONST_STRLEN(FPING_YOU_NEED_PREFIX);
-
-			*value = atoi(p);
-			ret = SUCCEED;
-
-			goto out;
-		}
-
-#undef FPING_YOU_NEED_PREFIX
-
-		/* in fping 3.16 they changed "You need i >=" to "You need -i >=" */
-
-#define FPING_YOU_NEED_PREFIX	"You need -i >= "
-
-		if (NULL != (p = strstr(out, FPING_YOU_NEED_PREFIX)))
-		{
-			p += ZBX_CONST_STRLEN(FPING_YOU_NEED_PREFIX);
-
-			*value = atoi(p);
-			ret = SUCCEED;
-
-			goto out;
-		}
-
-#undef FPING_YOU_NEED_PREFIX
-
-		/* if we get dst in the beginning of the output, the used interval is allowed, */
-		/* unless we hit the help message which is always bigger than 1 Kb             */
-		if (ZBX_KIBIBYTE > strlen(out))
-		{
-			/* skip white spaces */
-			for (p = out; '\0' != *p && isspace(*p); p++)
-				;
-
-			if (strlen(p) >= strlen(dst) && 0 == strncmp(p, dst, strlen(dst)))
+			/* call fping, ignore its exit code but mind execution failures */
+			if (TIMEOUT_ERROR == (ret_exec = zbx_execute(tmp, &out, err, sizeof(err), 1,
+					ZBX_EXIT_CODE_CHECKS_DISABLED, NULL)))
 			{
-				*value = intervals[i];
+				zbx_snprintf(error, max_error_len, "Timeout while executing \"%s\"", tmp);
+				goto out;
+			}
+
+			if (FAIL == ret_exec)
+			{
+				zbx_snprintf(error, max_error_len, "Cannot execute \"%s\": %s", tmp, err);
+				goto out;
+			}
+
+			/* First, check the output for suggested interval option, e. g.:          */
+			/*                                                                        */
+			/* /usr/sbin/fping: these options are too risky for mere mortals.         */
+			/* /usr/sbin/fping: You need i >= 1, p >= 20, r < 20, and t >= 50         */
+
+	#define FPING_YOU_NEED_PREFIX	"You need i >= "
+
+			if (NULL != (p = strstr(out, FPING_YOU_NEED_PREFIX)))
+			{
+				p += ZBX_CONST_STRLEN(FPING_YOU_NEED_PREFIX);
+
+				*value = atoi(p);
 				ret = SUCCEED;
 
 				goto out;
 			}
 
-			/* check if we hit the error message */
-			if (NULL != strstr(out, " as root"))
+	#undef FPING_YOU_NEED_PREFIX
+
+			/* in fping 3.16 they changed "You need i >=" to "You need -i >=" */
+
+	#define FPING_YOU_NEED_PREFIX	"You need -i >= "
+
+			if (NULL != (p = strstr(out, FPING_YOU_NEED_PREFIX)))
 			{
-				zbx_rtrim(out, "\n");
-				zbx_strlcpy(error, out, max_error_len);
+				p += ZBX_CONST_STRLEN(FPING_YOU_NEED_PREFIX);
+
+				*value = atoi(p);
+				ret = SUCCEED;
+
 				goto out;
+			}
+
+	#undef FPING_YOU_NEED_PREFIX
+
+			/* if we get dst in the beginning of the output, the used interval is allowed, */
+			/* unless we hit the help message which is always bigger than 1 Kb             */
+			if (ZBX_KIBIBYTE > strlen(out))
+			{
+				/* skip white spaces */
+				for (p = out; '\0' != *p && isspace(*p); p++)
+					;
+
+				if (strlen(p) >= strlen(dst) && 0 == strncmp(p, dst, strlen(dst)))
+				{
+					*value = (int)intervals[j];
+					ret = SUCCEED;
+
+					goto out;
+				}
+
+				/* check if we hit the error message */
+				if (NULL != strstr(out, " as root"))
+				{
+					zbx_rtrim(out, "\n");
+					zbx_strlcpy(error, out, max_error_len);
+					goto out;
+				}
 			}
 		}
 	}
@@ -356,7 +364,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	{
 		if (FPING_UNINITIALIZED_VALUE == packet_interval)
 		{
-			if (SUCCEED != get_interval_option(CONFIG_FPING_LOCATION, hosts[0].addr, &packet_interval,
+			if (SUCCEED != get_interval_option(CONFIG_FPING_LOCATION, hosts, hosts_count, &packet_interval,
 					error, max_error_len))
 			{
 				goto out;
@@ -373,8 +381,8 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	{
 		if (FPING_UNINITIALIZED_VALUE == packet_interval6)
 		{
-			if (SUCCEED != get_interval_option(CONFIG_FPING6_LOCATION, hosts[0].addr, &packet_interval6,
-					error, max_error_len))
+			if (SUCCEED != get_interval_option(CONFIG_FPING6_LOCATION, hosts, hosts_count,
+					&packet_interval6, error, max_error_len))
 			{
 				goto out;
 			}
@@ -390,7 +398,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	{
 		if (FPING_UNINITIALIZED_VALUE == packet_interval)
 		{
-			if (SUCCEED != get_interval_option(CONFIG_FPING_LOCATION, hosts[0].addr, &packet_interval,
+			if (SUCCEED != get_interval_option(CONFIG_FPING_LOCATION, hosts, hosts_count, &packet_interval,
 					error, max_error_len))
 			{
 				goto out;

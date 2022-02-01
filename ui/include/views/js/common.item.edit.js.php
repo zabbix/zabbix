@@ -124,7 +124,7 @@
 
 		new CViewSwitcher('authtype', 'change', item_form.field_switches.for_authtype);
 
-		new CViewSwitcher('type', 'change', item_form.field_switches.for_type, item_form.field_switches.disable_for_type);
+		new CViewSwitcher('type', 'change', item_form.field_switches.for_type);
 
 		if ($('#http_authtype').length) {
 			new CViewSwitcher('http_authtype', 'change', item_form.field_switches.for_http_auth_type);
@@ -173,22 +173,24 @@
 		});
 
 		$('[data-action="parse_url"]').click(function(e) {
-			var url_node = $(this).siblings('[name="url"]'),
-				table = $('#query_fields_pairs').data('editableTable'),
-				url = parseUrlString(url_node.val())
+			const url_node = $(this).siblings('[name="url"]');
+			const table = $('#query_fields_pairs').data('editableTable');
+			const url = parseUrlString(url_node.val());
 
 			if (typeof url === 'object') {
 				if (url.pairs.length > 0) {
 					table.addRows(url.pairs);
-					table.getTableRows().map(function() {
-						var empty = $(this).find('input[type="text"]').map(function() {
-							return $(this).val() == '' ? this : null;
-						});
+					table.getTableRows()
+						.map(function() {
+							const empty = $(this).find('input[type="text"]').map(function() {
+								return ($(this).val() === '') ? this : null;
+							});
 
-						return empty.length == 2 ? this : null;
-					}).map(function() {
-						table.removeRow(this);
-					});
+							return (empty.length == 2) ? this : null;
+						})
+						.map(function() {
+							table.removeRow(this);
+						});
 				}
 
 				url_node.val(url.url);
@@ -249,11 +251,19 @@
 			this.item_tab_type_field.addEventListener('change', (e) => {
 				this.preprocessing_tab_type_field.value = this.item_tab_type_field.value;
 
-				this.form.querySelector('#js-item-type-hint')
-					.classList.toggle(<?= json_encode(ZBX_STYLE_DISPLAY_NONE) ?>, (
-						this.preprocessing_active || this.inferred_type === null
-							|| this.item_tab_type_field.value == this.inferred_type
-					));
+				this.updateHintDisplay();
+
+				// 'Do not keep trends' for Calculated with string-types of information is forced on Item save.
+				if (this.form.querySelector('[name=type]').value == <?=ITEM_TYPE_CALCULATED ?>) {
+					if (e.target.value == <?= ITEM_VALUE_TYPE_FLOAT ?>
+							|| e.target.value == <?= ITEM_VALUE_TYPE_UINT64 ?>) {
+						this.form.querySelector('#trends_mode_1').disabled = false;
+					}
+					else {
+						this.form.querySelector('#trends_mode_0').checked = true;
+						this.form.querySelector('#trends_mode_1').disabled = true;
+					}
+				}
 			});
 
 			['change', 'input', 'help_items.paste'].forEach((event_type) => {
@@ -270,9 +280,22 @@
 				this.updatePreprocessingState();
 			});
 
+			this.form.querySelector('[name=type]').addEventListener('change', () => {
+				this.updateHintDisplay();
+			});
+
 			this.updatePreprocessingState();
 
 			this.lookup(this.key_field.value, false);
+		},
+
+		updateHintDisplay() {
+			this.form.querySelector('#js-item-type-hint')
+				.classList.toggle(<?= json_encode(ZBX_STYLE_DISPLAY_NONE) ?>, (
+					this.form.querySelector('[name=type]').value == <?=ITEM_TYPE_CALCULATED ?>
+						|| this.preprocessing_active || this.inferred_type === null
+						|| this.item_tab_type_field.value == this.inferred_type
+				));
 		},
 
 		updatePreprocessingState() {

@@ -555,12 +555,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 				if ($simple_interval_parser->parse($interval['delay']) != CParser::PARSE_SUCCESS) {
 					$result = false;
-					info(_s('Invalid interval "%1$s".', $interval['delay']));
+					error(_s('Invalid interval "%1$s".', $interval['delay']));
 					break;
 				}
 				elseif ($time_period_parser->parse($interval['period']) != CParser::PARSE_SUCCESS) {
 					$result = false;
-					info(_s('Invalid interval "%1$s".', $interval['period']));
+					error(_s('Invalid interval "%1$s".', $interval['period']));
 					break;
 				}
 
@@ -573,7 +573,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 				if ($scheduling_interval_parser->parse($interval['schedule']) != CParser::PARSE_SUCCESS) {
 					$result = false;
-					info(_s('Invalid interval "%1$s".', $interval['schedule']));
+					error(_s('Invalid interval "%1$s".', $interval['schedule']));
 					break;
 				}
 
@@ -1049,6 +1049,7 @@ if (getRequest('form') === 'create' || getRequest('form') === 'update'
 		$host = $item['hosts'][0];
 		unset($item['hosts']);
 
+		$i = 0;
 		foreach ($item['preprocessing'] as &$step) {
 			if ($step['type'] == ZBX_PREPROC_SCRIPT) {
 				$step['params'] = [$step['params'], ''];
@@ -1056,6 +1057,7 @@ if (getRequest('form') === 'create' || getRequest('form') === 'update'
 			else {
 				$step['params'] = explode("\n", $step['params']);
 			}
+			$step['sortorder'] = $i++;
 		}
 		unset($step);
 
@@ -1109,6 +1111,7 @@ if (getRequest('form') === 'create' || getRequest('form') === 'update'
 
 	$form_action = (hasRequest('clone') && getRequest('itemid') != 0) ? 'clone' : getRequest('form');
 	$data = getItemFormData($item, ['form' => $form_action]);
+	CArrayHelper::sort($data['preprocessing'], ['sortorder']);
 	$data['inventory_link'] = getRequest('inventory_link');
 	$data['host'] = $host;
 	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM;
