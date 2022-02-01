@@ -3310,15 +3310,15 @@ int	check_vcenter_vm_vfs_dev_discovery(AGENT_REQUEST *request, const char *usern
 int	check_vcenter_vm_vfs_dev_read(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return check_vcenter_vm_common(request, username, password, result, "virtualDisk/read[average]",
-			"virtualDisk/numberReadAveraged[average]", "ops", __func__);
+	return check_vcenter_vm_common(request, username, password, result, "ops",
+			"virtualDisk/numberReadAveraged[average]", "virtualDisk/read[average]", __func__);
 }
 
 int	check_vcenter_vm_vfs_dev_write(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return check_vcenter_vm_common(request, username, password, result, "virtualDisk/write[average]",
-			"virtualDisk/numberWriteAveraged[average]", "ops", __func__);
+	return check_vcenter_vm_common(request, username, password, result, "ops",
+			"virtualDisk/numberWriteAveraged[average]", "virtualDisk/write[average]", __func__);
 }
 
 int	check_vcenter_vm_vfs_fs_discovery(AGENT_REQUEST *request, const char *username, const char *password,
