@@ -42,13 +42,14 @@ class testTriggerDependencies extends CLegacyWebTest {
 	 */
 	public static function prepareTemplateData() {
 		$template_ids = CDBHelper::getAll('SELECT hostid FROM hosts WHERE host IN ('.zbx_dbstr(self::TEMPLATE_AGENT).','.
-				zbx_dbstr(self::TEMPLATE_FREEBSD).','.zbx_dbstr(self::TEMPLATE_APACHE).')'
+				zbx_dbstr(self::TEMPLATE_FREEBSD).','.zbx_dbstr(self::TEMPLATE_APACHE).') ORDER BY host ASC'
 		);
-		self::$agent_templateid = $template_ids[0]['hostid'];
-		self::$freebsd_templateid = $template_ids[1]['hostid'];
-		self::$apache_templateid = $template_ids[2]['hostid'];
 
-		$response = CDataHelper::call('template.update', [
+		self::$apache_templateid = $template_ids[0]['hostid'];
+		self::$freebsd_templateid = $template_ids[1]['hostid'];
+		self::$agent_templateid = $template_ids[2]['hostid'];
+
+		CDataHelper::call('template.update', [
 			[
 				'templateid' => self::$freebsd_templateid,
 				'templates' => [
@@ -64,7 +65,7 @@ class testTriggerDependencies extends CLegacyWebTest {
 	 * @dataProvider getTriggerDependenciesData
 	 */
 	public function testTriggerDependenciesFromHost_SimpleTest($trigger, $template, $dependencies, $expected) {
-		// Get the id of template to be updated baced on the template that owns the trigger in dependencies tab.
+		// Get the id of template to be updated based on the template that owns the trigger in dependencies tab.
 		$ids = [
 			self::TEMPLATE_AGENT => self::$agent_templateid,
 			self::TEMPLATE_APACHE => self::$apache_templateid
