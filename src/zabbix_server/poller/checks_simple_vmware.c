@@ -1027,7 +1027,7 @@ int	check_vcenter_hv_power(AGENT_REQUEST *request, const char *username, const c
 	const char		*path, *url, *uuid, *max;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
-	int 			ret = SYSINFO_RET_FAIL;
+	int			ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1531,14 +1531,14 @@ out:
 }
 
 static int	check_vcenter_hv_network_common(AGENT_REQUEST *request, const char *username, const char *password,
-		AGENT_RESULT *result, const char *counter_name)
+		AGENT_RESULT *result, const char *counter_name, const char *func_parent)
 {
 	const char		*url, *mode, *uuid;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	int			ret = SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(), func_parent:'%s'", __func__, func_parent);
 
 	if (2 > request->nparam || request->nparam > 3)
 	{
@@ -1572,7 +1572,8 @@ static int	check_vcenter_hv_network_common(AGENT_REQUEST *request, const char *u
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(), func_parent:'%s', ret: %s", __func__, func_parent,
+			zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1580,13 +1581,15 @@ out:
 int	check_vcenter_hv_network_in(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return	check_vcenter_hv_network_common(request, username, password, result, "net/received[average]");
+	return	check_vcenter_hv_network_common(request, username, password, result, "net/received[average]",
+			__func__);
 }
 
 int	check_vcenter_hv_network_out(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return	check_vcenter_hv_network_common(request, username, password, result, "net/transmitted[average]");
+	return	check_vcenter_hv_network_common(request, username, password, result, "net/transmitted[average]",
+			__func__);
 }
 
 int	check_vcenter_hv_datacenter_name(AGENT_REQUEST *request, const char *username, const char *password,
@@ -3084,7 +3087,8 @@ int	check_vcenter_vm_powerstate(AGENT_REQUEST *request, const char *username, co
 }
 
 static int	check_vcenter_vm_discovery_common(AGENT_REQUEST *request, const char *username, const char *password,
-		AGENT_RESULT *result, int dev_type, const char *json_name, const char *json_desc)
+		AGENT_RESULT *result, int dev_type, const char *json_name, const char *json_desc,
+		const char *func_parent)
 {
 	struct zbx_json		json_data;
 	zbx_vmware_service_t	*service;
@@ -3093,7 +3097,7 @@ static int	check_vcenter_vm_discovery_common(AGENT_REQUEST *request, const char 
 	const char		*url, *uuid;
 	int			i, ret = SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(), func_parent:'%s'", __func__, func_parent);
 
 	if (2 != request->nparam)
 	{
@@ -3148,7 +3152,8 @@ static int	check_vcenter_vm_discovery_common(AGENT_REQUEST *request, const char 
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(), func_parent:'%s', ret: %s", __func__, func_parent,
+			zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -3157,18 +3162,19 @@ int	check_vcenter_vm_net_if_discovery(AGENT_REQUEST *request, const char *userna
 		AGENT_RESULT *result)
 {
 	return check_vcenter_vm_discovery_common(request, username, password, result, ZBX_VMWARE_DEV_TYPE_NIC,
-			"{#IFNAME}", "{#IFDESC}");
+			"{#IFNAME}", "{#IFDESC}", __func__);
 }
 
 static int	check_vcenter_vm_common(AGENT_REQUEST *request, const char *username, const char *password,
-		AGENT_RESULT *result, const char *path_mode, const char *path1, const char *path2)
+		AGENT_RESULT *result, const char *mode_in, const char *countername_mode, const char *countername_def,
+		const char *func_parent)
 {
 	zbx_vmware_service_t	*service;
 	const char		*path, *url, *uuid, *instance, *mode;
 	unsigned int		coeff;
 	int			ret = SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(), func_parent:'%s'", __func__, func_parent);
 
 	if (3 > request->nparam || request->nparam > 4)
 	{
@@ -3200,12 +3206,12 @@ static int	check_vcenter_vm_common(AGENT_REQUEST *request, const char *username,
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bps"))
 	{
-		path = path1;
+		path = countername_def;
 		coeff = ZBX_KIBIBYTE;
 	}
-	else if (0 == strcmp(mode, path_mode))
+	else if (0 == strcmp(mode, mode_in))
 	{
-		path = path2;
+		path = countername_mode;
 		coeff = 1;
 	}
 	else
@@ -3218,7 +3224,8 @@ static int	check_vcenter_vm_common(AGENT_REQUEST *request, const char *username,
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(), func_parent:'%s', ret: %s", __func__, func_parent,
+			zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -3226,15 +3233,15 @@ out:
 int	check_vcenter_vm_net_if_in(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return check_vcenter_vm_common(request, username, password, result, "pps", "net/received[average]",
-			"net/packetsRx[summation]");
+	return check_vcenter_vm_common(request, username, password, result, "pps", "net/packetsRx[summation]",
+			"net/received[average]", __func__);
 }
 
 int	check_vcenter_vm_net_if_out(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return check_vcenter_vm_common(request, username, password, result, "pps", "net/transmitted[average]",
-			"net/packetsTx[summation]");
+	return check_vcenter_vm_common(request, username, password, result, "pps", "net/packetsTx[summation]",
+			"net/transmitted[average]",  __func__);
 }
 
 int	check_vcenter_vm_storage_committed(AGENT_REQUEST *request, const char *username, const char *password,
@@ -3297,21 +3304,21 @@ int	check_vcenter_vm_vfs_dev_discovery(AGENT_REQUEST *request, const char *usern
 		AGENT_RESULT *result)
 {
 	return check_vcenter_vm_discovery_common(request, username, password, result, ZBX_VMWARE_DEV_TYPE_DISK,
-			"{#DISKNAME}", "{#DISKDESC}");
+			"{#DISKNAME}", "{#DISKDESC}", __func__);
 }
 
 int	check_vcenter_vm_vfs_dev_read(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return check_vcenter_vm_common(request, username, password, result, "virtualDisk/read[average]","ops",
-			"virtualDisk/numberReadAveraged[average]");
+	return check_vcenter_vm_common(request, username, password, result, "virtualDisk/read[average]",
+			"virtualDisk/numberReadAveraged[average]", "ops", __func__);
 }
 
 int	check_vcenter_vm_vfs_dev_write(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return check_vcenter_vm_common(request, username, password, result, "virtualDisk/write[average]", "ops",
-			"virtualDisk/numberWriteAveraged[average]");
+	return check_vcenter_vm_common(request, username, password, result, "virtualDisk/write[average]",
+			"virtualDisk/numberWriteAveraged[average]", "ops", __func__);
 }
 
 int	check_vcenter_vm_vfs_fs_discovery(AGENT_REQUEST *request, const char *username, const char *password,
@@ -3458,7 +3465,7 @@ out:
 int	check_vcenter_vm_perfcounter(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char 		*instance, *url, *uuid, *path;
+	const char		*instance, *url, *uuid, *path;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_vm_t		*vm;
 	zbx_uint64_t		counterid;
@@ -3882,13 +3889,13 @@ out:
 }
 
 static int	check_vcenter_vm_storage_common(AGENT_REQUEST *request, const char *username, const char *password,
-		AGENT_RESULT *result, const char *counter_name)
+		AGENT_RESULT *result, const char *counter_name,  const char *func_parent)
 {
 	zbx_vmware_service_t	*service;
 	int			ret = SYSINFO_RET_FAIL;
 	const char		*url, *uuid, *instance;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(), func_parent:'%s'", __func__, func_parent);
 
 	if (3 != request->nparam)
 	{
@@ -3921,7 +3928,8 @@ static int	check_vcenter_vm_storage_common(AGENT_REQUEST *request, const char *u
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(), func_parent:'%s', ret: %s", __func__, func_parent,
+			zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -3929,27 +3937,29 @@ out:
 int	check_vcenter_vm_storage_readoio(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return check_vcenter_vm_storage_common(request, username, password, result, "virtualDisk/readOIO[latest]");
+	return check_vcenter_vm_storage_common(request, username, password, result, "virtualDisk/readOIO[latest]",
+			__func__);
 }
 
 int	check_vcenter_vm_storage_writeoio(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return check_vcenter_vm_storage_common(request, username, password, result, "virtualDisk/writeOIO[latest]");
+	return check_vcenter_vm_storage_common(request, username, password, result, "virtualDisk/writeOIO[latest]",
+			__func__);
 }
 
 int	check_vcenter_vm_storage_totalwritelatency(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
 	return check_vcenter_vm_storage_common(request, username, password, result,
-			"virtualDisk/totalWriteLatency[average]");
+			"virtualDisk/totalWriteLatency[average]", __func__);
 }
 
 int	check_vcenter_vm_storage_totalreadlatency(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
 	return check_vcenter_vm_storage_common(request, username, password, result,
-		"virtualDisk/totalReadLatency[average]");
+			"virtualDisk/totalReadLatency[average]", __func__);
 }
 
 int	check_vcenter_vm_guest_uptime(AGENT_REQUEST *request, const char *username, const char *password,
