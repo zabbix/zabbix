@@ -138,6 +138,9 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 		return nil, err
 	}
 
+	// fmt.Println("basicDev", basicDev)
+	// fmt.Println("raidDev", raidDev)
+
 	r := &runner{
 		names:    make(chan string, len(basicDev)),
 		err:      make(chan error, cpuCount),
@@ -165,16 +168,12 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 		return nil, err
 	}
 
-	raidTypes := []string{"3ware", "areca", "cciss", "megaraid", "sat"}
-
-	r.raids = make(chan raidParameters, len(raidDev)*len(raidTypes))
+	r.raids = make(chan raidParameters, len(raidDev))
 
 	r.startRaidRunners(jsonRunner)
 
 	for _, rDev := range raidDev {
-		for _, rType := range raidTypes {
-			r.raids <- raidParameters{rDev.Name, rType}
-		}
+		r.raids <- raidParameters{rDev.Name, rDev.DevType}
 	}
 
 	close(r.raids)
@@ -309,6 +308,7 @@ func (r *runner) getBasicDevices(jsonRunner bool) {
 	defer r.wg.Done()
 
 	for name := range r.names {
+		fmt.Println("name", name)
 		devices, err := r.plugin.executeSmartctl(fmt.Sprintf("-a %s -j", name), false)
 		if err != nil {
 			r.err <- fmt.Errorf("Failed to execute smartctl: %s.", err.Error())
@@ -356,68 +356,46 @@ runner:
 			return
 		}
 
-		var i int
+		name := fmt.Sprintf("%s -d %s", raid.name, raid.rType)
+		device, err := r.plugin.executeSmartctl(fmt.Sprintf("-a %s -j ", name), false)
+		if err != nil {
+			r.plugin.Tracef(
+				"stopped looking for RAID devices of %s type, err:",
+				raid.rType, fmt.Errorf("failed to get RAID disk data from smartctl: %s", err.Error()),
+			)
 
-		if raid.rType == "areca" {
-			i = 1
+			continue runner
 		}
 
-		for {
-			var name string
+		var dp deviceParser
+		if err = json.Unmarshal(device, &dp); err != nil {
+			r.plugin.Tracef(
+				"stopped looking for RAID devices of %s type, err:",
+				raid.rType, fmt.Errorf("failed to get RAID disk data from smartctl: %s", err.Error()),
+			)
 
-			if raid.rType == satType {
-				name = fmt.Sprintf("%s -d %s", raid.name, raid.rType)
-			} else {
-				name = fmt.Sprintf("%s -d %s,%d", raid.name, raid.rType, i)
-			}
+			continue runner
+		}
 
-			device, err := r.plugin.executeSmartctl(fmt.Sprintf("-a %s -j ", name), false)
-			if err != nil {
-				r.plugin.Tracef(
-					"stopped looking for RAID devices of %s type, err:",
-					raid.rType, fmt.Errorf("failed to get RAID disk data from smartctl: %s", err.Error()),
-				)
+		err = dp.checkErr()
+		if err != nil {
+			r.plugin.Tracef(
+				"stopped looking for RAID devices of %s type, err:",
+				raid.rType, fmt.Errorf("failed to get disk data from smartctl: %s", err.Error()),
+			)
 
+			continue runner
+		}
+
+		if dp.SmartStatus != nil {
+			dp.Info.Name = fmt.Sprintf("%s %s", raid.name, raid.rType)
+			if r.setRaidDevices(dp, device, raid.rType, jsonRunner) {
 				continue runner
 			}
+		}
 
-			var dp deviceParser
-			if err = json.Unmarshal(device, &dp); err != nil {
-				r.plugin.Tracef(
-					"stopped looking for RAID devices of %s type, err:",
-					raid.rType, fmt.Errorf("failed to get RAID disk data from smartctl: %s", err.Error()),
-				)
-
-				continue runner
-			}
-
-			err = dp.checkErr()
-			if err != nil {
-				r.plugin.Tracef(
-					"stopped looking for RAID devices of %s type, err:",
-					raid.rType, fmt.Errorf("failed to get disk data from smartctl: %s", err.Error()),
-				)
-
-				continue runner
-			}
-
-			if dp.SmartStatus != nil {
-				if raid.rType == satType {
-					dp.Info.Name = fmt.Sprintf("%s %s", raid.name, raid.rType)
-				} else {
-					dp.Info.Name = fmt.Sprintf("%s %s,%d", raid.name, raid.rType, i)
-				}
-
-				if r.setRaidDevices(dp, device, raid.rType, jsonRunner) {
-					continue runner
-				}
-			}
-
-			if raid.rType == satType {
-				continue runner
-			}
-
-			i++
+		if raid.rType == satType {
+			continue runner
 		}
 	}
 }
@@ -551,27 +529,7 @@ func (p *Plugin) scanDevices(args string) ([]deviceInfo, error) {
 		return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
 	}
 
-	var names []string
-	for _, info := range d.Info {
-		names = append(names, info.Name)
-	}
-
-	sort.Strings(names)
-
-	var out []deviceInfo
-
-names:
-	for _, name := range names {
-		for _, info := range d.Info {
-			if name == info.Name {
-				out = append(out, info)
-
-				continue names
-			}
-		}
-	}
-
-	return out, nil
+	return d.Info, nil
 }
 
 func init() {
