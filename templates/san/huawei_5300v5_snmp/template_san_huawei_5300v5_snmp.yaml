@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-18T20:39:05Z'
+  date: '2022-01-26T10:39:52Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -38,8 +38,11 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Huawei
+              tag: component
+              value: health
+            -
+              tag: component
+              value: system
         -
           uuid: 04c8d7f53668449ea32c4ed611b71237
           name: 'OceanStor 5300 V5: Capacity total'
@@ -60,8 +63,8 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: Huawei
+              tag: component
+              value: storage
         -
           uuid: ef77f126052b4f9e9cddafdab20577d1
           name: 'OceanStor 5300 V5: Capacity used'
@@ -78,8 +81,8 @@ zabbix_export:
                 - '1048576'
           tags:
             -
-              tag: Application
-              value: Huawei
+              tag: component
+              value: storage
         -
           uuid: 0a2e129d84d14e88bf953f3a9ca76b46
           name: 'OceanStor 5300 V5: Version'
@@ -97,8 +100,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Huawei
+              tag: component
+              value: system
           triggers:
             -
               uuid: b6eb791cc14644dfb0a69a2cce150ab1
@@ -107,6 +110,10 @@ zabbix_export:
               priority: INFO
               description: 'OceanStor 5300 V5 version has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 030530f5193246f4b983ec802030e49b
           name: 'ICMP ping'
@@ -117,8 +124,11 @@ zabbix_export:
             name: 'Service state'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: ef6b5dc40f9a49599aae97c2cf68d3cb
@@ -126,6 +136,10 @@ zabbix_export:
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: c82fa3f20c7443e4849ea8e8aec1e49d
           name: 'ICMP loss'
@@ -136,8 +150,11 @@ zabbix_export:
           units: '%'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: c9765f7f271d46c99ad7dd45efa79849
@@ -149,6 +166,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Huawei OceanStor 5300 V5 SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 0a95c43c70e54ad49f073fee69a2452d
           name: 'ICMP response time'
@@ -159,8 +183,11 @@ zabbix_export:
           units: s
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: b8815a9e952047e09d1e657cea5d538e
@@ -175,6 +202,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Huawei OceanStor 5300 V5 SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 2ec396a7adf64637ae453d7f26cd5b20
           name: 'SNMP traps (fallback)'
@@ -187,8 +221,8 @@ zabbix_export:
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: network
         -
           uuid: e98719af84414ef5ab3dd788c7d2d72f
           name: 'System contact details'
@@ -210,8 +244,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: cf59fb53834d4b14bdb0251e66c5143f
           name: 'System description'
@@ -234,8 +268,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: fed7a954ea614cb086b901b2e6957621
           name: 'System location'
@@ -257,8 +291,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 354fe7cd2632425b9f937e8714d79798
           name: 'System name'
@@ -280,8 +314,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: 72a31faa805b40e795a57649c724da1e
@@ -290,6 +324,13 @@ zabbix_export:
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: security
         -
           uuid: bf571c06cc264eca89d68f0b0b7559f7
           name: 'System object ID'
@@ -310,8 +351,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: f14eaa207ac9480995d2a2a10bea1467
           name: Uptime
@@ -332,8 +373,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: 0e3713bdf52e40d692cf256ac2a01988
@@ -346,6 +387,10 @@ zabbix_export:
                 -
                   name: 'No SNMP data collection'
                   expression: 'max(/Huawei OceanStor 5300 V5 SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 197767da1b3c4c4f8f3c59ab3c3fc5b8
           name: 'SNMP agent availability'
@@ -362,8 +407,11 @@ zabbix_export:
             name: zabbix.host.available
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: b0c4103eac9447ee9f7f31627baf4eea
@@ -376,6 +424,10 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Huawei OceanStor 5300 V5 SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: 6de9606d1f594546b76e79bbb72a8a56
@@ -405,14 +457,27 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'BBU {#ID}'
+                  tag: bbu
+                  value: '{#ID}'
+                -
+                  tag: component
+                  value: health
+                -
+                  tag: component
+                  value: power
+                -
+                  tag: location
+                  value: '{#LOCATION}'
               trigger_prototypes:
                 -
                   uuid: fb73cddd30164af8aa243bd3e2b2f803
                   expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoBBUHealthStatus, "{#ID}:{#LOCATION}"])<>1'
                   name: 'BBU {#ID} on {#LOCATION}: Health status is not Normal'
                   priority: HIGH
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: a861b76edde842448f39afd9788fa852
               name: 'BBU {#ID} on {#LOCATION}: Running status'
@@ -432,14 +497,27 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'BBU {#ID}'
+                  tag: bbu
+                  value: '{#ID}'
+                -
+                  tag: component
+                  value: health
+                -
+                  tag: component
+                  value: power
+                -
+                  tag: location
+                  value: '{#LOCATION}'
               trigger_prototypes:
                 -
                   uuid: 15d809b0be1c4d1da9158a83d303789c
                   expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoBBURunningStatus, "{#ID}:{#LOCATION}"])<>2'
                   name: 'BBU {#ID} on {#LOCATION}: Running status is not Online'
                   priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
         -
           uuid: c676eae5d7c548e788f7addc2343389f
           name: 'Controllers discovery'
@@ -461,8 +539,11 @@ zabbix_export:
               description: 'CPU usage of a controller {#ID}.'
               tags:
                 -
-                  tag: Application
-                  value: 'Controller {#ID}'
+                  tag: component
+                  value: cpu
+                -
+                  tag: controller
+                  value: '{#ID}'
               trigger_prototypes:
                 -
                   uuid: a51b4e42efaa4924b6c2990c9c0abf30
@@ -471,6 +552,10 @@ zabbix_export:
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'CPU utilization is too high. The system might be slow to respond.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 99798c647f2344d2896b644f2bd7e1c0
               name: 'Controller {#ID}: Health status'
@@ -490,14 +575,21 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Controller {#ID}'
+                  tag: component
+                  value: health
+                -
+                  tag: controller
+                  value: '{#ID}'
               trigger_prototypes:
                 -
                   uuid: 52cf517dd30146578b32fd1399ec81cc
                   expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerHealthStatus, "{#ID}"])<>1'
                   name: 'Controller {#ID}: Health status is not Normal'
                   priority: HIGH
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 42b61bf322fb495d94802c23f85f22b2
               name: 'Controller {#ID}: Memory utilization'
@@ -509,14 +601,21 @@ zabbix_export:
               description: 'Memory usage of a controller {#ID}.'
               tags:
                 -
-                  tag: Application
-                  value: 'Controller {#ID}'
+                  tag: component
+                  value: memory
+                -
+                  tag: controller
+                  value: '{#ID}'
               trigger_prototypes:
                 -
                   uuid: 8d4fe305737f41a595c1d2efb3e8a153
                   expression: 'min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerMemoryUsage, "{#ID}"],{$HUAWEI.5300.MEM.MAX.TIME})>{$HUAWEI.5300.MEM.MAX.WARN}'
                   name: 'Controller {#ID}: Memory usage is too high (over {$HUAWEI.5300.MEM.MAX.WARN} for {$HUAWEI.5300.MEM.MAX.TIME})'
                   priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 4797e9608d2445e385ad9db6097feeeb
               name: 'Controller {#ID}: Role'
@@ -534,8 +633,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Controller {#ID}'
+                  tag: component
+                  value: system
+                -
+                  tag: controller
+                  value: '{#ID}'
               trigger_prototypes:
                 -
                   uuid: 8b8ec3f843e74533a43f24393004cc84
@@ -543,6 +645,10 @@ zabbix_export:
                   name: 'Controller {#ID}: Role has been changed'
                   priority: WARNING
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: b9a0053b16c04cefbdfc320659d79754
               name: 'Controller {#ID}: Running status'
@@ -562,14 +668,21 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Controller {#ID}'
+                  tag: component
+                  value: health
+                -
+                  tag: controller
+                  value: '{#ID}'
               trigger_prototypes:
                 -
                   uuid: 6ab64eb5e1c146838ad48b7b9b063587
                   expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerRunningStatus, "{#ID}"])<>27'
                   name: 'Controller {#ID}: Running status is not Online'
                   priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           graph_prototypes:
             -
               uuid: ac083f05484846e6a8c4799410e1f566
@@ -607,8 +720,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Disk {#MODEL}'
+                  tag: component
+                  value: health
+                -
+                  tag: disk
+                  value: '{#MODEL}'
+                -
+                  tag: location
+                  value: '{#LOCATION}'
             -
               uuid: d30c2d9d18d54af08c18bd35b5664a0d
               name: 'Disk {#MODEL} on {#LOCATION}: Health status'
@@ -628,14 +747,24 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Disk {#NAME}'
+                  tag: component
+                  value: health
+                -
+                  tag: disk
+                  value: '{#MODEL}'
+                -
+                  tag: location
+                  value: '{#LOCATION}'
               trigger_prototypes:
                 -
                   uuid: fc1c8d30f09c49a3999e282bff6ea370
                   expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoDiskHealthStatus, "{#ID}"])<>1'
                   name: 'Disk {#MODEL} on {#LOCATION}: Health status is not Normal'
                   priority: HIGH
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: d5f1c54d524847ebae2015968e772d92
               name: 'Disk {#MODEL} on {#LOCATION}: Running status'
@@ -655,14 +784,24 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Disk {#MODEL}'
+                  tag: component
+                  value: health
+                -
+                  tag: disk
+                  value: '{#MODEL}'
+                -
+                  tag: location
+                  value: '{#LOCATION}'
               trigger_prototypes:
                 -
                   uuid: 53aaf06848a346f188799d1cbb5d948f
                   expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoDiskRunningStatus, "{#ID}"])<>27'
                   name: 'Disk {#MODEL} on {#LOCATION}: Running status is not Online'
                   priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 769abd2f1a8d43cda52c8021c20fe3c4
               name: 'Disk {#MODEL} on {#LOCATION}: Temperature'
@@ -674,8 +813,14 @@ zabbix_export:
               description: 'Disk temperature.'
               tags:
                 -
-                  tag: Application
-                  value: 'Disk {#MODEL}'
+                  tag: component
+                  value: environment
+                -
+                  tag: disk
+                  value: '{#MODEL}'
+                -
+                  tag: location
+                  value: '{#LOCATION}'
               trigger_prototypes:
                 -
                   uuid: 906de152d3594f1d8cc15b4b717d6202
@@ -683,6 +828,13 @@ zabbix_export:
                   name: 'Disk {#MODEL} on {#LOCATION}: Temperature is too high (over {$HUAWEI.5300.DISK.TEMP.MAX.WARN:"{#MODEL}"} for {$HUAWEI.5300.DISK.TEMP.MAX.TIME})'
                   opdata: 'Current value: {ITEM.LASTVALUE}'
                   priority: HIGH
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: notice
         -
           uuid: 21e6235b6b314ce6a6392aafc9a3de07
           name: 'Enclosure discovery'
@@ -711,14 +863,21 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Enclosure {#NAME}'
+                  tag: component
+                  value: health
+                -
+                  tag: enclosure
+                  value: '{#NAME}'
               trigger_prototypes:
                 -
                   uuid: 9b8fb5b02b0b4158a2b564f47281f716
                   expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoEnclosureHealthStatus, "{#NAME}"])<>1'
                   name: 'Enclosure {#NAME}: Health status is not Normal'
                   priority: HIGH
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: b96af65318d64932bc13e8e81155644c
               name: 'Enclosure {#NAME}: Running status'
@@ -738,14 +897,21 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Enclosure {#NAME}'
+                  tag: component
+                  value: health
+                -
+                  tag: enclosure
+                  value: '{#NAME}'
               trigger_prototypes:
                 -
                   uuid: 3c430a2073ff42d9908490858c9c2817
                   expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoEnclosureRunningStatus, "{#NAME}"])<>27'
                   name: 'Enclosure {#NAME}: Running status is not Online'
                   priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 37fa5a5f2d7d440dbb38781bddf5cd46
               name: 'Enclosure {#NAME}: Temperature'
@@ -757,8 +923,11 @@ zabbix_export:
               description: 'Enclosure temperature.'
               tags:
                 -
-                  tag: Application
-                  value: 'Enclosure {#NAME}'
+                  tag: component
+                  value: environment
+                -
+                  tag: enclosure
+                  value: '{#NAME}'
               trigger_prototypes:
                 -
                   uuid: 622fcc16c03e4ba4ad8371ea5c1c314f
@@ -766,6 +935,13 @@ zabbix_export:
                   name: 'Enclosure {#NAME}: Temperature is too high (over {$HUAWEI.5300.TEMP.MAX.WARN} for {$HUAWEI.5300.TEMP.MAX.TIME})'
                   opdata: 'Current value: {ITEM.LASTVALUE}'
                   priority: HIGH
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: notice
         -
           uuid: ae390e1c100d490ab4e878bac8951744
           name: 'FANs discovery'
@@ -794,14 +970,24 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'FAN {#ID}'
+                  tag: component
+                  value: health
+                -
+                  tag: fan
+                  value: '{#ID}'
+                -
+                  tag: location
+                  value: '{#LOCATION}'
               trigger_prototypes:
                 -
                   uuid: 1f41c20696d44eb29a1273718c9faf2f
                   expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoFanHealthStatus, "{#ID}:{#LOCATION}"])<>1'
                   name: 'FAN {#ID} on {#LOCATION}: Health status is not Normal'
                   priority: HIGH
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 800d348ca4394215800c227b421e9bea
               name: 'FAN {#ID} on {#LOCATION}: Running status'
@@ -821,14 +1007,24 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'FAN {#ID}'
+                  tag: component
+                  value: health
+                -
+                  tag: fan
+                  value: '{#ID}'
+                -
+                  tag: location
+                  value: '{#LOCATION}'
               trigger_prototypes:
                 -
                   uuid: c225c9d853184d579d18c27f7e906fd2
                   expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoFanRunningStatus, "{#ID}:{#LOCATION}"])<>2'
                   name: 'FAN {#ID} on {#LOCATION}: Running status is not Running'
                   priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
         -
           uuid: aeb30b2aec4842bfb0a9f946988783a2
           name: 'LUNs discovery'
@@ -854,14 +1050,21 @@ zabbix_export:
                     - '0.001'
               tags:
                 -
-                  tag: Application
-                  value: 'LUN {#NAME}'
+                  tag: component
+                  value: operations
+                -
+                  tag: lun
+                  value: '{#NAME}'
               trigger_prototypes:
                 -
                   uuid: aae494cb840049fb83df354c13daaf53
                   expression: 'min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwPerfLunAverageIOResponseTime, "{#NAME}"],{$HUAWEI.5300.LUN.IO.TIME.MAX.TIME})>{$HUAWEI.5300.LUN.IO.TIME.MAX.WARN}'
                   name: 'LUN {#NAME}: Average I/O response time is too high (over {$HUAWEI.5300.LUN.IO.TIME.MAX.WARN}ms for {$HUAWEI.5300.LUN.IO.TIME.MAX.TIME})'
                   priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 75e6ce80f06c4b3b86a13de4aadf25d7
               name: 'LUN {#NAME}: Average read I/O latency'
@@ -878,8 +1081,11 @@ zabbix_export:
                     - '0.001'
               tags:
                 -
-                  tag: Application
-                  value: 'LUN {#NAME}'
+                  tag: component
+                  value: operations
+                -
+                  tag: lun
+                  value: '{#NAME}'
             -
               uuid: b639b6cc20524fe1a5c415a6218b5382
               name: 'LUN {#NAME}: Average write I/O latency'
@@ -896,8 +1102,11 @@ zabbix_export:
                     - '0.001'
               tags:
                 -
-                  tag: Application
-                  value: 'LUN {#NAME}'
+                  tag: component
+                  value: operations
+                -
+                  tag: lun
+                  value: '{#NAME}'
             -
               uuid: 6e2c299282f045cca7a07dedd30b5f89
               name: 'LUN {#NAME}: Read operations per second'
@@ -909,8 +1118,11 @@ zabbix_export:
               description: 'Read IOPS of the node.'
               tags:
                 -
-                  tag: Application
-                  value: 'LUN {#NAME}'
+                  tag: component
+                  value: operations
+                -
+                  tag: lun
+                  value: '{#NAME}'
             -
               uuid: 8e376b38196b4954895b10aefbdf65ba
               name: 'LUN {#NAME}: Read traffic per second'
@@ -927,8 +1139,11 @@ zabbix_export:
                     - '1048576'
               tags:
                 -
-                  tag: Application
-                  value: 'LUN {#NAME}'
+                  tag: component
+                  value: traffic
+                -
+                  tag: lun
+                  value: '{#NAME}'
             -
               uuid: 4d83d160c92845c9ac0f51f5f0158c3b
               name: 'LUN {#NAME}: Total I/O per second'
@@ -940,8 +1155,11 @@ zabbix_export:
               description: 'Current IOPS of the LUN.'
               tags:
                 -
-                  tag: Application
-                  value: 'LUN {#NAME}'
+                  tag: component
+                  value: operations
+                -
+                  tag: lun
+                  value: '{#NAME}'
             -
               uuid: 1bbe8185981349dcb8a867955ff19c2f
               name: 'LUN {#NAME}: Total traffic per second'
@@ -958,8 +1176,11 @@ zabbix_export:
                     - '1048576'
               tags:
                 -
-                  tag: Application
-                  value: 'LUN {#NAME}'
+                  tag: component
+                  value: traffic
+                -
+                  tag: lun
+                  value: '{#NAME}'
             -
               uuid: 1aed4e060c9743caa13d1ace2cee16f3
               name: 'LUN {#NAME}: Write operations per second'
@@ -971,8 +1192,11 @@ zabbix_export:
               description: 'Write IOPS of the node.'
               tags:
                 -
-                  tag: Application
-                  value: 'LUN {#NAME}'
+                  tag: component
+                  value: operations
+                -
+                  tag: lun
+                  value: '{#NAME}'
             -
               uuid: 4a21edb8ea37437f8435565e04c5ce28
               name: 'LUN {#NAME}: Write traffic per second'
@@ -989,8 +1213,11 @@ zabbix_export:
                     - '1048576'
               tags:
                 -
-                  tag: Application
-                  value: 'LUN {#NAME}'
+                  tag: component
+                  value: traffic
+                -
+                  tag: lun
+                  value: '{#NAME}'
             -
               uuid: 4c85003e7f7441adb4490efcb03e477e
               name: 'LUN {#NAME}: Capacity'
@@ -1011,8 +1238,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'LUN {#NAME}'
+                  tag: component
+                  value: traffic
+                -
+                  tag: lun
+                  value: '{#NAME}'
             -
               uuid: f613af109f2846c88e845f626743232b
               name: 'LUN {#NAME}: Status'
@@ -1030,14 +1260,21 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'LUN {#NAME}'
+                  tag: component
+                  value: health
+                -
+                  tag: lun
+                  value: '{#NAME}'
               trigger_prototypes:
                 -
                   uuid: 757eef04912d44b4b4f9e1abab54fb4d
                   expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwStorageLunStatus, "{#NAME}"])<>1'
                   name: 'LUN {#NAME}: Status is not Normal'
                   priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           graph_prototypes:
             -
               uuid: 36d1eb7893f54db28afb1f4725aef1a1
@@ -1123,8 +1360,11 @@ zabbix_export:
               description: 'CPU usage of the node {#NODE}.'
               tags:
                 -
-                  tag: Application
-                  value: 'Node {#NODE}'
+                  tag: component
+                  value: cpu
+                -
+                  tag: node
+                  value: '{#NODE}'
               trigger_prototypes:
                 -
                   uuid: 8495a55d6549460d9b132675a39b818b
@@ -1133,6 +1373,10 @@ zabbix_export:
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'CPU utilization is too high. The system might be slow to respond.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 336022218b44497f84056fce4ed4d2bf
               name: 'Node {#NODE}: Average I/O latency'
@@ -1145,14 +1389,21 @@ zabbix_export:
               description: 'Average I/O latency of the node.'
               tags:
                 -
-                  tag: Application
-                  value: 'Node {#NODE}'
+                  tag: component
+                  value: operations
+                -
+                  tag: node
+                  value: '{#NODE}'
               trigger_prototypes:
                 -
                   uuid: 8f54bfe029fe43c7a049c6a97c8598bf
                   expression: 'min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwPerfNodeDelay, "{#NODE}"],{$HUAWEI.5300.NODE.IO.DELAY.MAX.TIME})>{$HUAWEI.5300.NODE.IO.DELAY.MAX.WARN}'
                   name: 'Node {#NODE}: Average I/O latency is too high (over {$HUAWEI.5300.NODE.IO.DELAY.MAX.WARN}ms for {$HUAWEI.5300.NODE.IO.DELAY.MAX.TIME})'
                   priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 3019a48ac4d34552a00c3344d04ec055
               name: 'Node {#NODE}: Read operations per second'
@@ -1164,8 +1415,11 @@ zabbix_export:
               description: 'Read IOPS of the node.'
               tags:
                 -
-                  tag: Application
-                  value: 'Node {#NODE}'
+                  tag: component
+                  value: operations
+                -
+                  tag: node
+                  value: '{#NODE}'
             -
               uuid: e0c9807e30cc49c480f4862bf7228da8
               name: 'Node {#NODE}: Read traffic per second'
@@ -1182,8 +1436,11 @@ zabbix_export:
                     - '1048576'
               tags:
                 -
-                  tag: Application
-                  value: 'Node {#NODE}'
+                  tag: component
+                  value: traffic
+                -
+                  tag: node
+                  value: '{#NODE}'
             -
               uuid: 1c3d8562d32d4412b649738c05350c4d
               name: 'Node {#NODE}: Total I/O per second'
@@ -1195,8 +1452,11 @@ zabbix_export:
               description: 'Total IOPS of the node.'
               tags:
                 -
-                  tag: Application
-                  value: 'Node {#NODE}'
+                  tag: component
+                  value: operations
+                -
+                  tag: node
+                  value: '{#NODE}'
             -
               uuid: 604ab970767b4a4e80e5e2e29d30f9a1
               name: 'Node {#NODE}: Total traffic per second'
@@ -1213,8 +1473,11 @@ zabbix_export:
                     - '1048576'
               tags:
                 -
-                  tag: Application
-                  value: 'Node {#NODE}'
+                  tag: component
+                  value: traffic
+                -
+                  tag: node
+                  value: '{#NODE}'
             -
               uuid: bd0c930ef95b4bb6838cac49dd38bf6f
               name: 'Node {#NODE}: Write operations per second'
@@ -1226,8 +1489,11 @@ zabbix_export:
               description: 'Write IOPS of the node.'
               tags:
                 -
-                  tag: Application
-                  value: 'Node {#NODE}'
+                  tag: component
+                  value: operations
+                -
+                  tag: node
+                  value: '{#NODE}'
             -
               uuid: 4f5105903075422cb6643dca913df933
               name: 'Node {#NODE}: Write traffic per second'
@@ -1244,8 +1510,11 @@ zabbix_export:
                     - '1048576'
               tags:
                 -
-                  tag: Application
-                  value: 'Node {#NODE}'
+                  tag: component
+                  value: traffic
+                -
+                  tag: node
+                  value: '{#NODE}'
           graph_prototypes:
             -
               uuid: 62f3a059a92a454eba1a71fb3a62b787
@@ -1326,8 +1595,11 @@ zabbix_export:
                     - '1048576'
               tags:
                 -
-                  tag: Application
-                  value: 'Pool {#MODEL}'
+                  tag: component
+                  value: storage
+                -
+                  tag: pool
+                  value: '{#NAME}'
             -
               uuid: a800b047bda64f528ad4d22698efaa7d
               name: 'Pool {#NAME}: Capacity used percentage'
@@ -1339,14 +1611,21 @@ zabbix_export:
               description: 'Used capacity of a storage pool in percents.'
               tags:
                 -
-                  tag: Application
-                  value: 'Pool {#MODEL}'
+                  tag: component
+                  value: storage
+                -
+                  tag: pool
+                  value: '{#NAME}'
               trigger_prototypes:
                 -
                   uuid: 2ea46713fe664a64a851edca422257f8
                   expression: 'min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoStoragePoolFreeCapacityPct, "{#NAME}"],{$HUAWEI.5300.POOL.CAPACITY.THRESH.TIME})>{#THRESHOLD}'
                   name: 'Pool {#NAME}: Used capacity is too high (over {#THRESHOLD}%)'
                   priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
             -
               uuid: 8a8bb086e75b4476af3686e5d28d8cfc
               name: 'Pool {#NAME}: Health status'
@@ -1366,14 +1645,21 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Pool {#NAME}'
+                  tag: component
+                  value: health
+                -
+                  tag: pool
+                  value: '{#NAME}'
               trigger_prototypes:
                 -
                   uuid: 8089b48aafb4403fa3187164685f8ca3
                   expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoStoragePoolHealthStatus, "{#NAME}"])<>1'
                   name: 'Pool {#NAME}: Health status is not Normal'
                   priority: HIGH
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: a5e886744b82456e8a028f01d458307a
               name: 'Pool {#NAME}: Running status'
@@ -1393,14 +1679,21 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Pool {#MODEL}'
+                  tag: component
+                  value: health
+                -
+                  tag: pool
+                  value: '{#NAME}'
               trigger_prototypes:
                 -
                   uuid: 5ff1d6b5d90040928b90908859c2e8cd
                   expression: 'last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoStoragePoolRunningStatus, "{#NAME}"])<>27'
                   name: 'Pool {#NAME}: Running status is not Online'
                   priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 8e59b01ae52b403a8e0da860c909faa1
               name: 'Pool {#NAME}: Capacity used'
@@ -1417,8 +1710,11 @@ zabbix_export:
                     - '1048576'
               tags:
                 -
-                  tag: Application
-                  value: 'Pool {#MODEL}'
+                  tag: component
+                  value: storage
+                -
+                  tag: pool
+                  value: '{#NAME}'
             -
               uuid: e82a9a0946814522a517694df270a400
               name: 'Pool {#NAME}: Capacity total'
@@ -1439,8 +1735,11 @@ zabbix_export:
                     - 10m
               tags:
                 -
-                  tag: Application
-                  value: 'Pool {#MODEL}'
+                  tag: component
+                  value: storage
+                -
+                  tag: pool
+                  value: '{#NAME}'
           graph_prototypes:
             -
               uuid: 6a2ef2bf36e44139b8550d7f1950669a
@@ -1463,6 +1762,19 @@ zabbix_export:
                   item:
                     host: 'Huawei OceanStor 5300 V5 SNMP'
                     key: 'huawei.5300.v5[hwInfoStoragePoolFreeCapacity, "{#NAME}"]'
+      tags:
+        -
+          tag: class
+          value: hardware
+        -
+          tag: class
+          value: storage
+        -
+          tag: target
+          value: huawei
+        -
+          tag: target
+          value: huawei-oceanstor-5300-v5
       macros:
         -
           macro: '{$CPU.UTIL.CRIT}'

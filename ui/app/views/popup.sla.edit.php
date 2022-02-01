@@ -251,14 +251,23 @@ if ($data['slaid'] !== null) {
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-clone']),
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'sla_edit_popup.clone('.json_encode(_('New SLA')).');'
-		],
-		[
-			'title' => _('Add'),
-			'class' => implode(' ', [ZBX_STYLE_DISPLAY_NONE, 'js-add']),
-			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'sla_edit_popup.submit();'
+			'action' => 'sla_edit_popup.clone('.json_encode([
+				'title' => _('New SLA'),
+				'buttons' => [
+					[
+						'title' => _('Add'),
+						'class' => 'js-add',
+						'keepOpen' => true,
+						'isSubmit' => true,
+						'action' => 'sla_edit_popup.submit();'
+					],
+					[
+						'title' => _('Cancel'),
+						'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-cancel']),
+						'cancel' => true
+					]
+				]
+			]).');'
 		],
 		[
 			'title' => _('Delete'),

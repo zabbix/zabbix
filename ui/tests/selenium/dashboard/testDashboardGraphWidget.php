@@ -95,7 +95,7 @@ class testDashboardGraphWidget extends CWebTest {
 	 * @browsers chrome
 	 */
 	public function testDashboardGraphWidget_FormLayout() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
 		$dashboard = CDashboardElement::find()->one()->edit();
 		$overlay = $dashboard->addWidget();
 		$form = $overlay->asForm();
@@ -136,7 +136,7 @@ class testDashboardGraphWidget extends CWebTest {
 	private function validate($data, $tab) {
 		$old_hash = CDBHelper::getHash($this->sql);
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
 		$form = $this->openGraphWidgetConfiguration(CTestArrayHelper::get($data, 'Widget name'));
 
 		$this->fillDatasets(CTestArrayHelper::get($data, 'Data set'));
@@ -1579,7 +1579,7 @@ class testDashboardGraphWidget extends CWebTest {
 	 * @dataProvider getCreateData
 	 */
 	public function testDashboardGraphWidget_Create($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
 		$form = $this->openGraphWidgetConfiguration();
 
 		$this->fillForm($data, $form);
@@ -1880,7 +1880,7 @@ class testDashboardGraphWidget extends CWebTest {
 	 * @backup widget
 	 */
 	public function testDashboardGraphWidget_Update($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
 		$form = $this->openGraphWidgetConfiguration('Test cases for update');
 
 		$this->fillForm($data, $form);
@@ -1903,7 +1903,7 @@ class testDashboardGraphWidget extends CWebTest {
 		$name = 'Test cases for simple update and deletion';
 		$old_hash = CDBHelper::getHash($this->sql);
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
 		$form = $this->openGraphWidgetConfiguration($name);
 		$form->submit();
 		COverlayDialogElement::ensureNotPresent();
@@ -2229,7 +2229,7 @@ class testDashboardGraphWidget extends CWebTest {
 	public function testDashboardGraphWidget_cancelDashboardUpdate($data) {
 		$old_hash = CDBHelper::getHash($this->sql);
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
 		$form = $this->openGraphWidgetConfiguration(CTestArrayHelper::get($data, 'Existing widget', []));
 		$form->fill(CTestArrayHelper::get($data, 'main_fields', []));
 		$this->fillDataSets($data['Data set']);
@@ -2283,7 +2283,7 @@ class testDashboardGraphWidget extends CWebTest {
 	public function testDashboardGraphWidget_cancelWidgetEditing($data) {
 		$old_hash = CDBHelper::getHash($this->sql);
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
 		$form = $this->openGraphWidgetConfiguration(CTestArrayHelper::get($data, 'Existing widget', []));
 		$form->fill($data['main_fields']);
 		$this->fillDataSets($data['Data set']);
@@ -2308,7 +2308,7 @@ class testDashboardGraphWidget extends CWebTest {
 	public function testDashboardGraphWidget_Delete() {
 		$name = 'Test cases for simple update and deletion';
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
 		$dashboard = CDashboardElement::find()->one();
 		$widget = $dashboard->edit()->getWidget($name);
 		$this->assertEquals(true, $widget->isEditable());
@@ -2331,7 +2331,7 @@ class testDashboardGraphWidget extends CWebTest {
 	 * Test disabled fields in "Data set" tab.
 	 */
 	public function testDashboardGraphWidget_DatasetDisabledFields() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
 		$form = $this->openGraphWidgetConfiguration();
 
 		foreach (['Line', 'Points', 'Staircase', 'Bar'] as $option) {
@@ -2366,7 +2366,7 @@ class testDashboardGraphWidget extends CWebTest {
 	 * Test "From" and "To" fields in tab "Time period" by check/uncheck "Set custom time period".
 	 */
 	public function testDashboardGraphWidget_TimePeriodDisabledFields() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
 		$form = $this->openGraphWidgetConfiguration();
 		$form->selectTab('Time period');
 
@@ -2381,7 +2381,7 @@ class testDashboardGraphWidget extends CWebTest {
 	 * Test enable/disable "Number of rows" field by check/uncheck "Show legend".
 	 */
 	public function testDashboardGraphWidget_LegendDisabledFields() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
 		$form = $this->openGraphWidgetConfiguration();
 		$form->selectTab('Legend');
 		$this->assertEnabledFields('Number of rows');
@@ -2390,7 +2390,7 @@ class testDashboardGraphWidget extends CWebTest {
 	}
 
 	public function testDashboardGraphWidget_ProblemsDisabledFields() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
 		$form = $this->openGraphWidgetConfiguration();
 		$form->selectTab('Problems');
 
@@ -2460,7 +2460,7 @@ class testDashboardGraphWidget extends CWebTest {
 	 * @dataProvider getAxesDisabledFieldsData
 	 */
 	public function testDashboardGraphWidget_AxesDisabledFields($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
 		$form = $this->openGraphWidgetConfiguration();
 
 		$form->fill($data['Data set']);

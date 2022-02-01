@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-15T06:57:27Z'
+  date: '2022-01-26T10:29:54Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -17,7 +17,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -41,8 +41,11 @@ zabbix_export:
           url: '{$JENKINS.URL}/computer/api/json'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: computers
+            -
+              tag: component
+              value: raw
         -
           uuid: 790aedce97be4e7dae6f4de8238340a7
           name: 'Jenkins: File descriptor ratio'
@@ -66,14 +69,18 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: fds
           triggers:
             -
               uuid: 5ec22ac264d445769039bd4c13e41bf7
               expression: 'min(/Jenkins by HTTP/jenkins.descriptor.ratio,5m)>{$JENKINS.FILE_DESCRIPTORS.MAX.WARN}'
               name: 'Jenkins: Current number of used files is too high (over {$JENKINS.FILE_DESCRIPTORS.MAX.WARN}% for 5m)'
               priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: capacity
         -
           uuid: 0b3cf1992122407795eef5ab9474101d
           name: 'Jenkins: Disk space check'
@@ -101,8 +108,8 @@ zabbix_export:
             key: jenkins.healthcheck
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: disk
         -
           uuid: 8095797fe6ef478db4a8acb60e1dcc54
           name: 'Jenkins: Disk space check message'
@@ -127,8 +134,8 @@ zabbix_export:
             key: jenkins.healthcheck
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: disk
         -
           uuid: 26902068daf94cf3a5aec360be9abc18
           name: 'Jenkins: Executors count'
@@ -150,8 +157,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: executors
         -
           uuid: 7b672586e5194370a0c141570174d21a
           name: 'Jenkins: Executors free'
@@ -169,8 +176,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: executors
         -
           uuid: 197470fead89470f94a910e9405498fe
           name: 'Jenkins: Executors in use'
@@ -188,8 +195,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: executors
         -
           uuid: db4c0de52dca4c8a853edf918b35bbe4
           name: 'Jenkins: Get service metrics'
@@ -206,8 +213,8 @@ zabbix_export:
           url: '{$JENKINS.URL}/metrics/{$JENKINS.API.KEY}/metrics'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: 4be0216b409d46a2a12e2929a9a03295
           name: 'Jenkins: Get healthcheck'
@@ -224,8 +231,8 @@ zabbix_export:
           url: '{$JENKINS.URL}/metrics/{$JENKINS.API.KEY}/healthcheck'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: health
         -
           uuid: d9677f596dae43e4984838061fe19d45
           name: 'Jenkins: HTTP active requests, rate'
@@ -249,8 +256,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: requests
         -
           uuid: d95c9a1b19ed4da38bec3217eee2e590
           name: 'Jenkins: HTTP response 400, rate'
@@ -274,8 +281,11 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: requests
+            -
+              tag: http-code
+              value: '400'
         -
           uuid: b3d77a909487431bab2b0b7f7c89bf90
           name: 'Jenkins: HTTP response 201, rate'
@@ -299,8 +309,11 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: requests
+            -
+              tag: http-code
+              value: '201'
         -
           uuid: 3265515d32f840e9ade25c0d2892b372
           name: 'Jenkins: HTTP response 403, rate'
@@ -324,8 +337,11 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: requests
+            -
+              tag: http-code
+              value: '403'
         -
           uuid: 22b8fc85f441484cad8b2641748d75a1
           name: 'Jenkins: HTTP response 404, rate'
@@ -349,8 +365,11 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: requests
+            -
+              tag: http-code
+              value: '404'
         -
           uuid: 1a9a6b663aaa48bbacfc56c1569521c0
           name: 'Jenkins: HTTP response 304, rate'
@@ -374,8 +393,11 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: requests
+            -
+              tag: http-code
+              value: '304'
         -
           uuid: 2a79c1139b44402fa8f31d6b61a0d739
           name: 'Jenkins: HTTP response 204, rate'
@@ -399,8 +421,11 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: requests
+            -
+              tag: http-code
+              value: '204'
         -
           uuid: c4c1dfcf2d904985a0ca6956724adf41
           name: 'Jenkins: HTTP response 200, rate'
@@ -424,8 +449,11 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: requests
+            -
+              tag: http-code
+              value: '200'
         -
           uuid: afdab05416084124887bcec705f2603d
           name: 'Jenkins: HTTP response other, rate'
@@ -449,8 +477,11 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: requests
+            -
+              tag: http-code
+              value: other
         -
           uuid: 5169a969034b4da29eaab59c7c3aa719
           name: 'Jenkins: HTTP requests, rate'
@@ -474,8 +505,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: requests
         -
           uuid: 9a4ad856db02403b8b523179bf4b3699
           name: 'Jenkins: HTTP requests, median'
@@ -495,8 +526,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: requests
         -
           uuid: 6766b45e349e4a4d88593207df6b35ba
           name: 'Jenkins: HTTP requests, p95'
@@ -516,8 +547,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: requests
         -
           uuid: 320cc4d7fafc4c87ab8d92bd76901982
           name: 'Jenkins: HTTP response 500, rate'
@@ -541,8 +572,11 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: requests
+            -
+              tag: http-code
+              value: '500'
         -
           uuid: d4ad6574138443a18e721f3d518d5e61
           name: 'Jenkins: HTTP response 503, rate'
@@ -566,8 +600,11 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: requests
+            -
+              tag: http-code
+              value: '503'
         -
           uuid: ecca8e2341c14ede9e397ddc39df5592
           name: 'Jenkins: Job blocked duration, median'
@@ -587,8 +624,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: jobs
         -
           uuid: 859a7845f3d8483ba3378f7077509784
           name: 'Jenkins: Job blocked duration, p95'
@@ -608,8 +645,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: jobs
         -
           uuid: ca4e141c83344aeeb32d9ea2d9017cbf
           name: 'Jenkins: Job blocked, m1 rate'
@@ -628,8 +665,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: jobs
         -
           uuid: d0a242007b424a0e80dbfb90577eaab2
           name: 'Jenkins: Job blocked, m5 rate'
@@ -648,8 +685,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: jobs
         -
           uuid: 3c2ba170a89040089b226871512e237b
           name: 'Jenkins: Job buildable duration, median'
@@ -669,8 +706,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: jobs
         -
           uuid: 9047881efcb84822b7da852f4c66dbff
           name: 'Jenkins: Job buildable duration, p95'
@@ -690,8 +727,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: jobs
         -
           uuid: 1d8e643a0ddc44aa951ee516372e587b
           name: 'Jenkins: Job buildable, m1 rate'
@@ -710,8 +747,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: jobs
         -
           uuid: 0e1d712b9a854922b28e3ddf871bf7b1
           name: 'Jenkins: Job buildable, m5 rate'
@@ -730,8 +767,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: jobs
         -
           uuid: c0c0335fd8654cfaa9534c816fbee967
           name: 'Jenkins: Job building duration, median'
@@ -751,8 +788,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: jobs
         -
           uuid: 61fb13ee0d0f4e1bb5fdab1ea35371ef
           name: 'Jenkins: Job building duration, p95'
@@ -772,8 +809,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: jobs
         -
           uuid: 08ebe2359c4f4134aaf610b50bcba8fe
           name: 'Jenkins: Job building, m1 rate'
@@ -792,8 +829,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: jobs
         -
           uuid: 36f551fd55814000b76b5b63c05051d7
           name: 'Jenkins: Job building, m5 rate'
@@ -812,8 +849,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: jobs
         -
           uuid: 39bc5fdfbe884c72816d34045438ea7d
           name: 'Jenkins: Jobs count'
@@ -835,8 +872,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: jobs
         -
           uuid: af40fcdb50c545bd9b49a6f4b7a26fea
           name: 'Jenkins: Job queuing duration, median'
@@ -856,8 +893,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: jobs
         -
           uuid: f797a4698f1b41f885a8cdd3d98924e2
           name: 'Jenkins: Job queuing duration, p95'
@@ -877,8 +914,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: jobs
         -
           uuid: d9f785e6f2e148ee98d922524f014037
           name: 'Jenkins: Job queuing, m1 rate'
@@ -897,8 +934,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: jobs
         -
           uuid: 10c80e91b2214ab2b43458a1d65c3a18
           name: 'Jenkins: Job queuing, m5 rate'
@@ -917,8 +954,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: jobs
         -
           uuid: ff842a648bcc4aaa89f2200e0d4bb661
           name: 'Jenkins: Job scheduled, m1 rate'
@@ -937,8 +974,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: jobs
         -
           uuid: bc2de2ce8e9d474d8e2591d76adecabe
           name: 'Jenkins: Jobs scheduled, m5 rate'
@@ -957,8 +994,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: jobs
         -
           uuid: 975124750e3e4c969711185ea58bcb49
           name: 'Jenkins: Job total duration, median'
@@ -978,8 +1015,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: jobs
         -
           uuid: dbc0aeedccb740b4a7c1b5f84eb2513b
           name: 'Jenkins: Job total duration, p95'
@@ -999,8 +1036,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: jobs
         -
           uuid: 19c5a45a673c4af2be5808faf35a3892
           name: 'Jenkins: Job total, m1 rate'
@@ -1019,8 +1056,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: jobs
         -
           uuid: 58067833af494a66b4a44bc25ac17a0e
           name: 'Jenkins: Job total, m5 rate'
@@ -1039,8 +1076,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: jobs
         -
           uuid: dd7a1e8142f94ef099f6aa0ed1facce3
           name: 'Jenkins: Job waiting duration, median'
@@ -1060,8 +1097,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: jobs
         -
           uuid: bb339169024b4461a39261f3fe36de4f
           name: 'Jenkins: Job waiting duration, p95'
@@ -1081,8 +1118,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: jobs
         -
           uuid: 2d21f74757374b769ae8e76d4d7afa79
           name: 'Jenkins: Job waiting, m1 rate'
@@ -1101,8 +1138,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: jobs
         -
           uuid: 9e16580148964e9aae3a660b18721bee
           name: 'Jenkins: Job waiting, m5 rate'
@@ -1121,8 +1158,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: jobs
         -
           uuid: dc47555812a0485e9d77da3e5a1c1227
           name: 'Jenkins: Get jobs info'
@@ -1147,8 +1184,11 @@ zabbix_export:
               value: 'jobs[name,description,url,healthReport[score],lastBuild[number,result,duration,timestamp],lastSuccessfulBuild[number,result,duration,timestamp],lastFailedBuild[number,result,duration,timestamp]]'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: jobs
+            -
+              tag: component
+              value: raw
         -
           uuid: 930fa76b32484155ae3ec8964e3952a1
           name: 'Jenkins: Nodes count'
@@ -1170,8 +1210,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: nodes
         -
           uuid: 440bdc39d2444b9e83cc863e34f3b416
           name: 'Jenkins: Nodes offline'
@@ -1193,8 +1233,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: nodes
         -
           uuid: 758ead9ea71646be882b9bff280ce4d6
           name: 'Jenkins: Nodes online'
@@ -1216,14 +1256,18 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: nodes
           triggers:
             -
               uuid: 4cee7d0f5faf4595a67c6c0e33153f4d
               expression: 'last(/Jenkins by HTTP/jenkins.node.online)=0'
               name: 'Jenkins: Service has no online nodes'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 21cad39b9c914516827b09d04716a71f
           name: 'Jenkins: Service ping'
@@ -1253,8 +1297,8 @@ zabbix_export:
           url: '{$JENKINS.URL}/metrics/{$JENKINS.API.KEY}/ping'
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: health
           triggers:
             -
               uuid: ae12ac7aa5c54858a794eb8fc888f90c
@@ -1262,6 +1306,10 @@ zabbix_export:
               name: 'Jenkins: Service is down'
               priority: AVERAGE
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 81609d18d2004fe28f9cb096cdb03995
           name: 'Jenkins: Plugins check'
@@ -1289,8 +1337,8 @@ zabbix_export:
             key: jenkins.healthcheck
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: plugins
         -
           uuid: e3fae3ddf1fa47db9925106098bc31eb
           name: 'Jenkins: Plugins active'
@@ -1312,8 +1360,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: plugins
         -
           uuid: e8a9f7bd98004939b75749c29227859c
           name: 'Jenkins: Plugins failed'
@@ -1335,8 +1383,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: plugins
         -
           uuid: 0b2ad285bc2b4ef5a01633d57099434c
           name: 'Jenkins: Plugins inactive'
@@ -1358,8 +1406,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: plugins
         -
           uuid: d678faf0377a4024a930adcdb1c2db2f
           name: 'Jenkins: Plugins check message'
@@ -1384,8 +1432,8 @@ zabbix_export:
             key: jenkins.healthcheck
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: plugins
         -
           uuid: f1bf69d134a848178b21a050c830aa8a
           name: 'Jenkins: Plugins with update'
@@ -1407,8 +1455,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: plugins
         -
           uuid: a5b58789e54b43f896d4d7e64f8415d3
           name: 'Jenkins: Projects count'
@@ -1430,8 +1478,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: application
         -
           uuid: db758cf660c14d69b37f724545de7662
           name: 'Jenkins: Build queue, blocked'
@@ -1449,8 +1497,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: queue
         -
           uuid: 1160d4150fa840b5a4628eeb6e8cdaab
           name: 'Jenkins: Build queue, buildable'
@@ -1468,8 +1516,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: queue
         -
           uuid: 456ddd17c4044d578a11d8cac80d229b
           name: 'Jenkins: Build queue, pending'
@@ -1487,8 +1535,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: queue
         -
           uuid: f99d731f466445dcb3aeda3f306a5de6
           name: 'Jenkins: Build queue, size'
@@ -1506,8 +1554,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: queue
         -
           uuid: 90387bb3b3384adcafa66b4c9543d1ab
           name: 'Jenkins: Build queue, stuck'
@@ -1525,8 +1573,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: queue
         -
           uuid: 9c97e12efa624176b95aef3413aec1a8
           name: 'Jenkins: CPU Load'
@@ -1535,7 +1583,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The system load on the Jenkins master as reported by the JVM’s Operating System JMX bean. The calculation of system load is operating system dependent. Typically this is the sum of the number of processes that are currently running plus the number that are waiting to run. This is typically comparable against the number of CPU cores.'
+          description: 'The system load on the Jenkins master as reported by the JVM''s Operating System JMX bean. The calculation of system load is operating system dependent. Typically this is the sum of the number of processes that are currently running plus the number that are waiting to run. This is typically comparable against the number of CPU cores.'
           preprocessing:
             -
               type: JSONPATH
@@ -1545,8 +1593,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: cpu
         -
           uuid: ca81bc28fbc14dbc9eb7b0fa6a46a65d
           name: 'Jenkins: Uptime'
@@ -1569,8 +1617,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: application
           triggers:
             -
               uuid: 7d20942598a648ebb2e03f9acdb3e5e3
@@ -1579,6 +1627,10 @@ zabbix_export:
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: ea80ab8045a44f96a5cb2736c009258f
           name: 'Jenkins: Temporary space check'
@@ -1606,8 +1658,8 @@ zabbix_export:
             key: jenkins.healthcheck
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: disk
         -
           uuid: d884c3a9662e48eeaf6c9ba50641a2cb
           name: 'Jenkins: Temporary space check message'
@@ -1632,8 +1684,8 @@ zabbix_export:
             key: jenkins.healthcheck
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: disk
         -
           uuid: 39f474c3c6f841af9b14113df04bf078
           name: 'Jenkins: Thread deadlock check'
@@ -1661,8 +1713,8 @@ zabbix_export:
             key: jenkins.healthcheck
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: threads
         -
           uuid: 64f62df61b6b4f4c9963e09b827850e1
           name: 'Jenkins: Thread deadlock check message'
@@ -1687,8 +1739,8 @@ zabbix_export:
             key: jenkins.healthcheck
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: system
         -
           uuid: ae836e5439cf494a9ed0681836da854e
           name: 'Jenkins: Version'
@@ -1712,8 +1764,8 @@ zabbix_export:
             key: jenkins.get_metrics
           tags:
             -
-              tag: Application
-              value: Jenkins
+              tag: component
+              value: application
           triggers:
             -
               uuid: 3dd66b51ed1b4fc2a250daf3e9999e4f
@@ -1722,6 +1774,10 @@ zabbix_export:
               priority: INFO
               description: 'Jenkins version has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
       discovery_rules:
         -
           uuid: eb3e35534745476c8b205acb88382c77
@@ -1752,8 +1808,14 @@ zabbix_export:
                 key: jenkins.computer_info
               tags:
                 -
-                  tag: Application
-                  value: 'Jenkins: Computer [{#DISPLAY_NAME}]'
+                  tag: component
+                  value: computers
+                -
+                  tag: component
+                  value: memory
+                -
+                  tag: computer
+                  value: '{#DISPLAY_NAME}'
             -
               uuid: 4d00cdff0ed0442ab419754264d78ec9
               name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Available swap space'
@@ -1773,8 +1835,14 @@ zabbix_export:
                 key: jenkins.computer_info
               tags:
                 -
-                  tag: Application
-                  value: 'Jenkins: Computer [{#DISPLAY_NAME}]'
+                  tag: component
+                  value: computers
+                -
+                  tag: component
+                  value: memory
+                -
+                  tag: computer
+                  value: '{#DISPLAY_NAME}'
             -
               uuid: ff5a78519c834902ae607832b67f2558
               name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Clock difference'
@@ -1799,8 +1867,11 @@ zabbix_export:
                 key: jenkins.computer_info
               tags:
                 -
-                  tag: Application
-                  value: 'Jenkins: Computer [{#DISPLAY_NAME}]'
+                  tag: component
+                  value: computers
+                -
+                  tag: computer
+                  value: '{#DISPLAY_NAME}'
             -
               uuid: 4dcf897c9c2c4ce58483ef6de6786000
               name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Available disk space'
@@ -1820,8 +1891,14 @@ zabbix_export:
                 key: jenkins.computer_info
               tags:
                 -
-                  tag: Application
-                  value: 'Jenkins: Computer [{#DISPLAY_NAME}]'
+                  tag: component
+                  value: computers
+                -
+                  tag: component
+                  value: disk
+                -
+                  tag: computer
+                  value: '{#DISPLAY_NAME}'
             -
               uuid: 1bca0941b2d24de5980eeb5cb3516b2c
               name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Idle'
@@ -1849,8 +1926,11 @@ zabbix_export:
                 key: jenkins.computer_info
               tags:
                 -
-                  tag: Application
-                  value: 'Jenkins: Computer [{#DISPLAY_NAME}]'
+                  tag: component
+                  value: computers
+                -
+                  tag: computer
+                  value: '{#DISPLAY_NAME}'
             -
               uuid: 38a5eb0b4fb44b93b9f764edcd3f6c49
               name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Executors'
@@ -1869,8 +1949,11 @@ zabbix_export:
                 key: jenkins.computer_info
               tags:
                 -
-                  tag: Application
-                  value: 'Jenkins: Computer [{#DISPLAY_NAME}]'
+                  tag: component
+                  value: computers
+                -
+                  tag: computer
+                  value: '{#DISPLAY_NAME}'
             -
               uuid: 8ddcfbf9b9d84fb290e9f30db7406ea1
               name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Offline cause reason'
@@ -1894,8 +1977,11 @@ zabbix_export:
                 key: jenkins.computer_info
               tags:
                 -
-                  tag: Application
-                  value: 'Jenkins: Computer [{#DISPLAY_NAME}]'
+                  tag: component
+                  value: computers
+                -
+                  tag: computer
+                  value: '{#DISPLAY_NAME}'
             -
               uuid: a2068445af644089be8501da5b02144a
               name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Response time average'
@@ -1919,8 +2005,11 @@ zabbix_export:
                 key: jenkins.computer_info
               tags:
                 -
-                  tag: Application
-                  value: 'Jenkins: Computer [{#DISPLAY_NAME}]'
+                  tag: component
+                  value: computers
+                -
+                  tag: computer
+                  value: '{#DISPLAY_NAME}'
             -
               uuid: b8af2fb1f6d646978739b9c44ea85a27
               name: 'Jenkins: Computer [{#DISPLAY_NAME}]: State'
@@ -1950,8 +2039,11 @@ zabbix_export:
                 key: jenkins.computer_info
               tags:
                 -
-                  tag: Application
-                  value: 'Jenkins: Computer [{#DISPLAY_NAME}]'
+                  tag: component
+                  value: computers
+                -
+                  tag: computer
+                  value: '{#DISPLAY_NAME}'
             -
               uuid: f1318d38fa5a469a999265896e4546dd
               name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Temporarily offline'
@@ -1979,8 +2071,11 @@ zabbix_export:
                 key: jenkins.computer_info
               tags:
                 -
-                  tag: Application
-                  value: 'Jenkins: Computer [{#DISPLAY_NAME}]'
+                  tag: component
+                  value: computers
+                -
+                  tag: computer
+                  value: '{#DISPLAY_NAME}'
             -
               uuid: 5704446ab4f34eb2bc33b8ed6d8da691
               name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Available temp space'
@@ -2000,8 +2095,14 @@ zabbix_export:
                 key: jenkins.computer_info
               tags:
                 -
-                  tag: Application
-                  value: 'Jenkins: Computer [{#DISPLAY_NAME}]'
+                  tag: component
+                  value: computers
+                -
+                  tag: component
+                  value: disk
+                -
+                  tag: computer
+                  value: '{#DISPLAY_NAME}'
             -
               uuid: 5c3dc14eb6264153a0cd7ddd8effb869
               name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Total physical memory'
@@ -2021,8 +2122,14 @@ zabbix_export:
                 key: jenkins.computer_info
               tags:
                 -
-                  tag: Application
-                  value: 'Jenkins: Computer [{#DISPLAY_NAME}]'
+                  tag: component
+                  value: computers
+                -
+                  tag: component
+                  value: memory
+                -
+                  tag: computer
+                  value: '{#DISPLAY_NAME}'
             -
               uuid: c18b82a205d345fa9c1b92e59521735a
               name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Total swap space'
@@ -2042,8 +2149,14 @@ zabbix_export:
                 key: jenkins.computer_info
               tags:
                 -
-                  tag: Application
-                  value: 'Jenkins: Computer [{#DISPLAY_NAME}]'
+                  tag: component
+                  value: computers
+                -
+                  tag: component
+                  value: memory
+                -
+                  tag: computer
+                  value: '{#DISPLAY_NAME}'
           trigger_prototypes:
             -
               uuid: a2347420d1f14fd2b55cbb0865282268
@@ -2058,6 +2171,10 @@ zabbix_export:
                 -
                   name: 'Jenkins: Service has no online nodes'
                   expression: 'last(/Jenkins by HTTP/jenkins.node.online)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
             -
               uuid: bf04115784bc48ffa27d5d2d65176853
               expression: 'last(/Jenkins by HTTP/jenkins.computer.temp_offline[{#DISPLAY_NAME}])=1 and length(last(/Jenkins by HTTP/jenkins.computer.offline.reason[{#DISPLAY_NAME}]))>0'
@@ -2065,6 +2182,10 @@ zabbix_export:
               priority: INFO
               description: 'Node is temporarily Offline with reason: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
           graph_prototypes:
             -
               uuid: 6296f12b13934006bd462eb4937ca248
@@ -2148,8 +2269,14 @@ zabbix_export:
                 key: jenkins.job_info
               tags:
                 -
-                  tag: Application
-                  value: 'Jenkins job [{#NAME}]'
+                  tag: component
+                  value: health
+                -
+                  tag: component
+                  value: jobs
+                -
+                  tag: job
+                  value: '{#NAME}'
               trigger_prototypes:
                 -
                   uuid: c440cd7d92884c9594c8616f1ac99d74
@@ -2157,6 +2284,10 @@ zabbix_export:
                   name: 'Jenkins job [{#NAME}]: Job is unhealthy'
                   priority: WARNING
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: a0fa8864c536408895f13758eacb486f
               name: 'Jenkins job [{#NAME}]: Last Build duration'
@@ -2184,8 +2315,11 @@ zabbix_export:
                 key: jenkins.job_info
               tags:
                 -
-                  tag: Application
-                  value: 'Jenkins job [{#NAME}]'
+                  tag: component
+                  value: jobs
+                -
+                  tag: job
+                  value: '{#NAME}'
             -
               uuid: 338020d76f8e4b28b1e1c02f97b889f4
               name: 'Jenkins job [{#NAME}]: Last Build number'
@@ -2208,8 +2342,11 @@ zabbix_export:
                 key: jenkins.job_info
               tags:
                 -
-                  tag: Application
-                  value: 'Jenkins job [{#NAME}]'
+                  tag: component
+                  value: jobs
+                -
+                  tag: job
+                  value: '{#NAME}'
             -
               uuid: a3a70807138548a29e9212f48f07946d
               name: 'Jenkins job [{#NAME}]: Last Build result'
@@ -2233,8 +2370,11 @@ zabbix_export:
                 key: jenkins.job_info
               tags:
                 -
-                  tag: Application
-                  value: 'Jenkins job [{#NAME}]'
+                  tag: component
+                  value: jobs
+                -
+                  tag: job
+                  value: '{#NAME}'
             -
               uuid: d53a3f165052440098d087d4f2b868b6
               name: 'Jenkins job [{#NAME}]: Last Build timestamp'
@@ -2261,8 +2401,11 @@ zabbix_export:
                 key: jenkins.job_info
               tags:
                 -
-                  tag: Application
-                  value: 'Jenkins job [{#NAME}]'
+                  tag: component
+                  value: jobs
+                -
+                  tag: job
+                  value: '{#NAME}'
             -
               uuid: 907e48fadc6e4a04a076ca9368f73395
               name: 'Jenkins job [{#NAME}]: Last Failed Build duration'
@@ -2290,8 +2433,11 @@ zabbix_export:
                 key: jenkins.job_info
               tags:
                 -
-                  tag: Application
-                  value: 'Jenkins job [{#NAME}]'
+                  tag: component
+                  value: jobs
+                -
+                  tag: job
+                  value: '{#NAME}'
             -
               uuid: 2e4afc599bf54ea29b1b8734f5aea121
               name: 'Jenkins job [{#NAME}]: Last Failed Build number'
@@ -2314,8 +2460,11 @@ zabbix_export:
                 key: jenkins.job_info
               tags:
                 -
-                  tag: Application
-                  value: 'Jenkins job [{#NAME}]'
+                  tag: component
+                  value: jobs
+                -
+                  tag: job
+                  value: '{#NAME}'
             -
               uuid: e1885df4d7a440c0805207f0afb28cb5
               name: 'Jenkins job [{#NAME}]: Last Failed Build timestamp'
@@ -2342,8 +2491,11 @@ zabbix_export:
                 key: jenkins.job_info
               tags:
                 -
-                  tag: Application
-                  value: 'Jenkins job [{#NAME}]'
+                  tag: component
+                  value: jobs
+                -
+                  tag: job
+                  value: '{#NAME}'
             -
               uuid: d750d312fa424215931375963100217d
               name: 'Jenkins job [{#NAME}]: Last Successful Build duration'
@@ -2371,8 +2523,11 @@ zabbix_export:
                 key: jenkins.job_info
               tags:
                 -
-                  tag: Application
-                  value: 'Jenkins job [{#NAME}]'
+                  tag: component
+                  value: jobs
+                -
+                  tag: job
+                  value: '{#NAME}'
             -
               uuid: 701c272b59c046e4948a7dc814374d59
               name: 'Jenkins job [{#NAME}]: Last Successful Build number'
@@ -2395,8 +2550,11 @@ zabbix_export:
                 key: jenkins.job_info
               tags:
                 -
-                  tag: Application
-                  value: 'Jenkins job [{#NAME}]'
+                  tag: component
+                  value: jobs
+                -
+                  tag: job
+                  value: '{#NAME}'
             -
               uuid: 1adbf52ee3f946118f8a37cf2487262d
               name: 'Jenkins job [{#NAME}]: Last Successful Build timestamp'
@@ -2423,8 +2581,11 @@ zabbix_export:
                 key: jenkins.job_info
               tags:
                 -
-                  tag: Application
-                  value: 'Jenkins job [{#NAME}]'
+                  tag: component
+                  value: jobs
+                -
+                  tag: job
+                  value: '{#NAME}'
           url: '{$JENKINS.URL}/api/json'
           query_fields:
             -
@@ -2445,6 +2606,13 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - '$.jobs.[*]'
+      tags:
+        -
+          tag: class
+          value: application
+        -
+          tag: target
+          value: jenkins
       macros:
         -
           macro: '{$JENKINS.API.KEY}'
@@ -2521,6 +2689,10 @@ zabbix_export:
       description: |
         Jenkins disk space monitors are reporting the disk space as less than the configured threshold. The message will reference the first node which fails this check.
         Health check message: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}
+      tags:
+        -
+          tag: scope
+          value: capacity
     -
       uuid: 121e23bd172d447cb975595685495a93
       expression: 'last(/Jenkins by HTTP/jenkins.plugins)=0 and length(last(/Jenkins by HTTP/jenkins.plugins.message))>0'
@@ -2530,6 +2702,10 @@ zabbix_export:
         A failure is typically indicative of a potential issue within the Jenkins installation that will either be solved by explicitly disabling the failing plugin(s) or by resolving the corresponding plugin dependency issues.
         Health check message: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}
       manual_close: 'YES'
+      tags:
+        -
+          tag: scope
+          value: notice
     -
       uuid: 34de8503a2c84fffb1beb701a4a991ab
       expression: 'last(/Jenkins by HTTP/jenkins.temporary_space)=0 and length(last(/Jenkins by HTTP/jenkins.temporary_space.message))>0'
@@ -2538,6 +2714,10 @@ zabbix_export:
       description: |
         Jenkins temporary space monitors are reporting the temporary space as less than the configured threshold. The message will reference the first node which fails this check.
         Health check message: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}
+      tags:
+        -
+          tag: scope
+          value: capacity
     -
       uuid: f0a09eb0743948bb8f52a4c28aa728c5
       expression: 'last(/Jenkins by HTTP/jenkins.thread_deadlock)=0 and length(last(/Jenkins by HTTP/jenkins.thread_deadlock.message))>0'
@@ -2546,6 +2726,10 @@ zabbix_export:
       description: |
         There are any deadlocked threads in the Jenkins master JVM.
         Health check message: {{ITEM.LASTVALUE2}.regsub('(.*)',\1)}
+      tags:
+        -
+          tag: scope
+          value: performance
   graphs:
     -
       uuid: 3fdcf5d5d81f4bf3b854984917cb3d32

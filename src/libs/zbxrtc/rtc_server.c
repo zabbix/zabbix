@@ -23,9 +23,9 @@
 #include "zbxha.h"
 #include "zbxtypes.h"
 #include "common.h"
-#include "daemon.h"
 
 #include "rtc.h"
+#include "zbxservice.h"
 
 int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data, char **error)
 {
@@ -210,17 +210,7 @@ static void	rtc_process_diaginfo(const char *data, char **result)
 	}
 
 	if (0 == strcmp(buf, "all"))
-	{
-		scope = (1 << ZBX_DIAGINFO_HISTORYCACHE) | (1 << ZBX_DIAGINFO_PREPROCESSING) |
-				(1 << ZBX_DIAGINFO_LOCKS) | (1 << ZBX_DIAGINFO_VALUECACHE) |
-				(1 << ZBX_DIAGINFO_LLD) | (1 << ZBX_DIAGINFO_ALERTING);
-	}
-	else if (0 == strcmp(buf, ZBX_DIAG_HISTORYCACHE))
-		scope = 1 << ZBX_DIAGINFO_HISTORYCACHE;
-	else if (0 == strcmp(buf, ZBX_DIAG_PREPROCESSING))
-		scope = 1 << ZBX_DIAGINFO_PREPROCESSING;
-	else if (0 == strcmp(buf, ZBX_DIAG_LOCKS))
-		scope = 1 << ZBX_DIAGINFO_LOCKS;
+		scope = (1 << ZBX_DIAGINFO_VALUECACHE) | (1 << ZBX_DIAGINFO_LLD) | (1 << ZBX_DIAGINFO_ALERTING);
 	else if (0 == strcmp(buf, ZBX_DIAG_VALUECACHE))
 		scope = 1 << ZBX_DIAGINFO_VALUECACHE;
 	else if (0 == strcmp(buf, ZBX_DIAG_LLD))
@@ -412,7 +402,8 @@ static void	rtc_ha_failover_delay(const char *data, char **out)
  *                                                                            *
  * Purpose: process runtime control option                                    *
  *                                                                            *
- * Parameters: code   - [IN] the request code                                 *
+ * Parameters: rtc    - [IN] the RTC service                                  *
+ *             code   - [IN] the request code                                 *
  *             data   - [IN] the runtime control parameter (optional)         *
  *             result - [OUT] the runtime control result                      *
  *                                                                            *
@@ -421,7 +412,7 @@ static void	rtc_ha_failover_delay(const char *data, char **out)
  *                         rtc command handler                                *
  *                                                                            *
  ******************************************************************************/
-int	rtc_process_request_ex(int code, const unsigned char *data, char **result)
+int	rtc_process_request_ex(zbx_rtc_t *rtc, int code, const unsigned char *data, char **result)
 {
 	ZBX_UNUSED(data);
 
@@ -432,23 +423,20 @@ int	rtc_process_request_ex(int code, const unsigned char *data, char **result)
 			return rtc_process_loglevel(1, (const char *)data, result);
 		case ZBX_RTC_LOG_LEVEL_DECREASE:
 			return rtc_process_loglevel(-1, (const char *)data, result);
+#endif
 		case ZBX_RTC_CONFIG_CACHE_RELOAD:
-			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_SERVICEMAN, 1,
-					ZBX_RTC_MAKE_MESSAGE(ZBX_RTC_SERVICE_CACHE_RELOAD, 0, 0), result);
+			zbx_service_reload_cache();
 			return FAIL;
 		case ZBX_RTC_SERVICE_CACHE_RELOAD:
-			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_SERVICEMAN, 1,
-					ZBX_RTC_MAKE_MESSAGE(ZBX_RTC_SERVICE_CACHE_RELOAD, 0, 0), result);
+			zbx_service_reload_cache();
 			return SUCCEED;
 		case ZBX_RTC_SECRETS_RELOAD:
-			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_CONFSYNCER, 1, ZBX_RTC_MAKE_MESSAGE(code, 0, 0),
-					result);
+			rtc_notify(rtc, ZBX_PROCESS_TYPE_CONFSYNCER, 0, ZBX_RTC_SECRETS_RELOAD, NULL, 0);
 			return SUCCEED;
 		case ZBX_RTC_TRIGGER_HOUSEKEEPER_EXECUTE:
-			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_PROBLEMHOUSEKEEPER, 1,
-					ZBX_RTC_MAKE_MESSAGE(code, 0, 0), result);
+			rtc_notify(rtc, ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER, 0, ZBX_RTC_TRIGGER_HOUSEKEEPER_EXECUTE,
+					NULL, 0);
 			return SUCCEED;
-#endif
 		case ZBX_RTC_DIAGINFO:
 			rtc_process_diaginfo((const char *)data, result);
 			return FAIL;

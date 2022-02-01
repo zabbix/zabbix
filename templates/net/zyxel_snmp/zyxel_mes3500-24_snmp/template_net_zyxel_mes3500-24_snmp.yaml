@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-17T06:34:33Z'
+  date: '2022-01-26T19:42:14Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -27,7 +27,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/422668-discussion-thread-for-official-zabbix-templates-for-zyxel
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: 'Templates/Network devices'
@@ -47,8 +47,8 @@ zabbix_export:
                 - 1h
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: network
           triggers:
             -
               uuid: 96435fde17384c6bb4f9811ad9ca184a
@@ -57,6 +57,10 @@ zabbix_export:
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 7e1745e5130f4b7cb2b31814fecd6792
           name: 'ZYXEL MES3500-24: Contact'
@@ -80,8 +84,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
         -
           uuid: 31029f8a8cc541908b8f765b27254ecd
           name: 'ZYXEL MES3500-24: CPU utilization'
@@ -97,8 +101,8 @@ zabbix_export:
             getting the values.
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
           triggers:
             -
               uuid: 911d1c7e921f43af8ab3c0035be57a27
@@ -107,6 +111,10 @@ zabbix_export:
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 53e694b360254f2896301e78cf982650
           name: 'ZYXEL MES3500-24: ZyNOS F/W Version'
@@ -139,8 +147,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
           triggers:
             -
               uuid: f3daea29a34b4cf992d3c23ba8a64d2e
@@ -150,6 +158,10 @@ zabbix_export:
               priority: INFO
               description: 'Firmware version has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 5aa2128d8530415f855a0d33b7fb9c7f
           name: 'ZYXEL MES3500-24: Location'
@@ -172,8 +184,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
         -
           uuid: a8209492e29040a3896abf35019e6cdd
           name: 'ZYXEL MES3500-24: MAC address'
@@ -199,8 +211,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
         -
           uuid: 1820c7b7d903402dab0d7c8fb251f9bc
           name: 'ZYXEL MES3500-24: Hardware model name'
@@ -227,8 +239,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
           triggers:
             -
               uuid: ab363c150ecd447ea4d3a3a9c311b992
@@ -236,6 +248,10 @@ zabbix_export:
               name: 'ZYXEL MES3500-24: Template does not match hardware'
               priority: INFO
               description: 'This template is for Zyxel MES3500-24, but connected to {ITEM.VALUE}'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: b5fc886ab5b94f929e866d4a2e9c5648
           name: 'ZYXEL MES3500-24: Host name'
@@ -259,8 +275,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
         -
           uuid: b5243eb2c7664203acb4f5e6bc8da296
           name: 'ZYXEL MES3500-24: Hardware serial number'
@@ -282,8 +298,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
           triggers:
             -
               uuid: a475d29129664eec82fc7ed85cb74df9
@@ -292,6 +308,10 @@ zabbix_export:
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 00c831c6cc9d415e91319b6bec15423d
           name: 'ZYXEL MES3500-24: Uptime'
@@ -314,8 +334,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: c389b0db83bc404e8cb84ce65db79700
@@ -324,6 +344,10 @@ zabbix_export:
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
       discovery_rules:
         -
           uuid: 263079e9c77c4539b248a5b62b5f1b0f
@@ -351,8 +375,8 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
               trigger_prototypes:
                 -
                   uuid: 66802198e0764ee29cdf557378b5566b
@@ -360,6 +384,10 @@ zabbix_export:
                   name: 'ZYXEL MES3500-24: High memory utilization in "{#ZYXEL.MEMORY.NAME}" pool (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: 0f57f2a82f764b908fbc8f4d828203c6
           name: 'Interface discovery'
@@ -410,8 +438,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 7309a7b73c2848088c282096c334d541
               name: 'ZYXEL MES3500-24: Port {#SNMPINDEX}: Interface name'
@@ -431,8 +465,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 72efe5b4f1584d438739298561b3c8ab
               name: 'ZYXEL MES3500-24: Port {#SNMPINDEX}: Link speed'
@@ -455,8 +495,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: f11f5928218a4b619b31b597895a13b2
               name: 'ZYXEL MES3500-24: Port {#SNMPINDEX}: Incoming broadcast packages'
@@ -477,8 +523,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 22a65221bc194c03909956179180808a
               name: 'ZYXEL MES3500-24: Port {#SNMPINDEX}: Incoming multicast packages'
@@ -500,8 +552,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: e759a09d0f504567bd2fc0dd9c0d8395
               name: 'ZYXEL MES3500-24: Port {#SNMPINDEX}: Incoming traffic'
@@ -525,8 +583,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 16df754a1ac94c0588e1b6be5e175ed7
               name: 'ZYXEL MES3500-24: Port {#SNMPINDEX}: Incoming unicast packages'
@@ -547,8 +611,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 5051b4a19bad47a8b546fbfb6d5ea85e
               name: 'ZYXEL MES3500-24: Port {#SNMPINDEX}: Incoming utilization'
@@ -572,8 +642,14 @@ zabbix_export:
                     - 'return +parseFloat(value).toFixed(0);'
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 25f6b400af8a40b29bf83ac988bc3cd8
               name: 'ZYXEL MES3500-24: Port {#SNMPINDEX}: Link type'
@@ -593,8 +669,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 6d860666d83b4886b04bb1ff2ecb19d9
               name: 'ZYXEL MES3500-24: Port {#SNMPINDEX}: Interface description'
@@ -614,8 +696,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: adf6ce16961240a9a7775de2e41df3d1
               name: 'ZYXEL MES3500-24: Port {#SNMPINDEX}: Operational status'
@@ -637,8 +725,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: 5a9faa35f7d547a987e78075832cf38e
@@ -655,6 +749,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 9119a0ba755e426580310376d6a70b5f
               name: 'ZYXEL MES3500-24: Port {#SNMPINDEX}: Outgoing broadcast packages'
@@ -676,8 +774,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: b13b8fecada34eed8f40ee79e2a12295
               name: 'ZYXEL MES3500-24: Port {#SNMPINDEX}: Outgoing multicast packages'
@@ -700,8 +804,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: d15d6b6ab8af4d5d8501784bb590af08
               name: 'ZYXEL MES3500-24: Port {#SNMPINDEX}: Outgoing traffic'
@@ -726,8 +836,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 08e0d078c5224b0885ea8c03af9328e4
               name: 'ZYXEL MES3500-24: Port {#SNMPINDEX}: Outgoing unicast packages'
@@ -749,8 +865,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 40b0f81094014f6cb667c143b5345795
               name: 'ZYXEL MES3500-24: Port {#SNMPINDEX}: Outgoing utilization'
@@ -774,8 +896,14 @@ zabbix_export:
                     - 'return +parseFloat(value).toFixed(0);'
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: a814c27268e648f18ac9c82d5a5f78cb
               name: 'ZYXEL MES3500-24: Port {#SNMPINDEX}: Speed Duplex'
@@ -795,8 +923,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
           graph_prototypes:
             -
               uuid: 2b07fe7c9bd14177b8cc8c05e3975ac9
@@ -932,8 +1066,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#ZYXEL.SFP.PORT}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: ef830e34f83347bebba87a72208d805b
@@ -941,12 +1081,20 @@ zabbix_export:
                   name: 'ZYXEL MES3500-24: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION} (over {#ZYXEL.SFP.WARN.MAX}{#ZYXEL.SFP.UNIT})'
                   priority: WARNING
                   description: 'The upper threshold value of the parameter is exceeded'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
                 -
                   uuid: 229f44666e6043a1a8e34437ad24e3ae
                   expression: 'last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.sfp.ddm[{#SNMPINDEX}]) < {#ZYXEL.SFP.WARN.MIN}'
                   name: 'ZYXEL MES3500-24: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} (less than {#ZYXEL.SFP.WARN.MIN}{#ZYXEL.SFP.UNIT})'
                   priority: WARNING
                   description: 'The parameter values are less than the lower threshold'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           graph_prototypes:
             -
               uuid: 14b916383368427cad794b92d5d706e9
@@ -1020,8 +1168,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: b8b4d20515d748ac9bc77f8223294861
               name: 'ZYXEL MES3500-24: SFP {#SNMPINDEX}: Part number'
@@ -1042,8 +1196,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 380d4a1f3aa041fea4108c08d7108344
               name: 'ZYXEL MES3500-24: SFP {#SNMPINDEX}: Revision'
@@ -1064,8 +1224,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 24dc72b317284f568e962b461bbb33de
               name: 'ZYXEL MES3500-24: SFP {#SNMPINDEX}: Serial number'
@@ -1086,8 +1252,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: f84b378d79b74174842cc49af29c2a0c
@@ -1096,6 +1268,10 @@ zabbix_export:
                   priority: INFO
                   description: 'SFP {#SNMPINDEX} serial number has changed. Ack to close'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 0b8041b750ed4734b70cce707c4782ad
               name: 'ZYXEL MES3500-24: SFP {#SNMPINDEX}: Status'
@@ -1116,8 +1292,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: cf254d7b5d0d4525b8f871863a1ced2d
               name: 'ZYXEL MES3500-24: SFP {#SNMPINDEX}: Transceiver'
@@ -1138,8 +1320,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: cda45fc5cf1d44779e1a5eda3f120df2
               name: 'ZYXEL MES3500-24: SFP {#SNMPINDEX}: Vendor'
@@ -1160,8 +1348,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
         -
           uuid: 034f5965d39940d29ac58641f3b01183
           name: 'Temperature discovery'
@@ -1191,8 +1385,11 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: sensor
+                -
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: 9963d3848c774563881689da1bcddefc
@@ -1201,6 +1398,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the temperature'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           graph_prototypes:
             -
               uuid: 5e06e88aca5b492aa9c623e4ef727b5d
@@ -1256,8 +1457,11 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Power supply'
+                  tag: component
+                  value: sensor
+                -
+                  tag: component
+                  value: voltage
               trigger_prototypes:
                 -
                   uuid: 2eef8cabb2e141dd8b6d1868ebc79db4
@@ -1266,6 +1470,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           graph_prototypes:
             -
               uuid: 40f7ab2435d345279b8a7a52bad06dcd
@@ -1289,6 +1497,19 @@ zabbix_export:
                   outArr.push(item)
                   });
                   return JSON.stringify(outArr);
+      tags:
+        -
+          tag: class
+          value: network
+        -
+          tag: target
+          value: mes3500-24
+        -
+          tag: target
+          value: switch
+        -
+          tag: target
+          value: zyxel
       macros:
         -
           macro: '{$CPU.UTIL.CRIT}'

@@ -65,8 +65,8 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Health Check 3.8.10+ discovery |<p>Version 3.8.10+ specific metrics</p> |DEPENDENT |rabbitmq.healthcheck.v3810.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.management_version`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |Exchanges discovery |<p>Individual exchange metrics</p> |DEPENDENT |rabbitmq.exchanges.discovery<p>**Filter**:</p>AND <p>- {#EXCHANGE} MATCHES_REGEX `{$RABBITMQ.LLD.FILTER.EXCHANGE.MATCHES}`</p><p>- {#EXCHANGE} NOT_MATCHES_REGEX `{$RABBITMQ.LLD.FILTER.EXCHANGE.NOT_MATCHES}`</p> |
+|Health Check 3.8.10+ discovery |<p>Version 3.8.10+ specific metrics</p> |DEPENDENT |rabbitmq.healthcheck.v3810.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.management_version`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 
 ## Items collected
 
@@ -113,8 +113,8 @@ There are no template links in this template.
 |RabbitMQ |RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages returned unroutable per second |<p>Rate of messages returned to publisher as unroutable per second</p> |DEPENDENT |rabbitmq.exchange.messages.return_unroutable.rate["{#VHOST}/{#EXCHANGE}/{#TYPE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name == "{#EXCHANGE}" && @.vhost == "{#VHOST}" && @.type =="{#TYPE}")].message_stats.return_unroutable_details.rate.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
 |RabbitMQ |RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages redelivered |<p>Count of subset of messages in deliver_get which had the redelivered flag set</p> |DEPENDENT |rabbitmq.exchange.messages.redeliver["{#VHOST}/{#EXCHANGE}/{#TYPE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name == "{#EXCHANGE}" && @.vhost == "{#VHOST}" && @.type =="{#TYPE}")].message_stats.redeliver.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
 |RabbitMQ |RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages redelivered per second |<p>Rate of subset of messages in deliver_get which had the redelivered flag set per second</p> |DEPENDENT |rabbitmq.exchange.messages.redeliver.rate["{#VHOST}/{#EXCHANGE}/{#TYPE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name == "{#EXCHANGE}" && @.vhost == "{#VHOST}" && @.type =="{#TYPE}")].message_stats.redeliver_details.rate.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
-|Zabbix_raw_items |RabbitMQ: Get overview |<p>The HTTP API endpoint that returns cluster-wide metrics</p> |ZABBIX_PASSIVE |web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]<p>**Preprocessing**:</p><p>- REGEX: `\n\s?\n(.*) \1`</p> |
-|Zabbix_raw_items |RabbitMQ: Get exchanges |<p>The HTTP API endpoint that returns exchanges metrics</p> |ZABBIX_PASSIVE |web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]<p>**Preprocessing**:</p><p>- REGEX: `\n\s?\n(.*) \1`</p> |
+|Zabbix raw items |RabbitMQ: Get overview |<p>The HTTP API endpoint that returns cluster-wide metrics</p> |ZABBIX_PASSIVE |web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]<p>**Preprocessing**:</p><p>- REGEX: `\n\s?\n(.*) \1`</p> |
+|Zabbix raw items |RabbitMQ: Get exchanges |<p>The HTTP API endpoint that returns exchanges metrics</p> |ZABBIX_PASSIVE |web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]<p>**Preprocessing**:</p><p>- REGEX: `\n\s?\n(.*) \1`</p> |
 
 ## Triggers
 
@@ -127,7 +127,7 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387226-discussion-thread-for-official-zabbix-template-rabbitmq).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387226-discussion-thread-for-official-zabbix-template-rabbitmq).
 
 # RabbitMQ node by Zabbix agent
 
@@ -248,9 +248,9 @@ There are no template links in this template.
 |RabbitMQ |RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages published per second |<p>Rate per second of messages published</p> |DEPENDENT |rabbitmq.queue.messages.publish.rate["{#VHOST}/{#QUEUE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].message_stats.publish_details.rate.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
 |RabbitMQ |RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages redelivered |<p>Count of subset of messages in deliver_get which had the redelivered flag set</p> |DEPENDENT |rabbitmq.queue.messages.redeliver["{#VHOST}/{#QUEUE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].message_stats.redeliver.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
 |RabbitMQ |RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages redelivered per second |<p>Rate per second of subset of messages in deliver_get which had the redelivered flag set</p> |DEPENDENT |rabbitmq.queue.messages.redeliver.rate["{#VHOST}/{#QUEUE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].message_stats.redeliver_details.rate.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
-|Zabbix_raw_items |RabbitMQ: Get node overview |<p>The HTTP API endpoint that returns cluster-wide metrics</p> |ZABBIX_PASSIVE |web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/overview"]<p>**Preprocessing**:</p><p>- REGEX: `\n\s?\n(.*) \1`</p> |
-|Zabbix_raw_items |RabbitMQ: Get nodes |<p>The HTTP API endpoint that returns nodes metrics</p> |ZABBIX_PASSIVE |web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]<p>**Preprocessing**:</p><p>- REGEX: `\n\s?\n(.*) \1`</p> |
-|Zabbix_raw_items |RabbitMQ: Get queues |<p>The HTTP API endpoint that returns queues metrics</p> |ZABBIX_PASSIVE |web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]<p>**Preprocessing**:</p><p>- REGEX: `\n\s?\n(.*) \1`</p> |
+|Zabbix raw items |RabbitMQ: Get node overview |<p>The HTTP API endpoint that returns cluster-wide metrics</p> |ZABBIX_PASSIVE |web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/overview"]<p>**Preprocessing**:</p><p>- REGEX: `\n\s?\n(.*) \1`</p> |
+|Zabbix raw items |RabbitMQ: Get nodes |<p>The HTTP API endpoint that returns nodes metrics</p> |ZABBIX_PASSIVE |web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]<p>**Preprocessing**:</p><p>- REGEX: `\n\s?\n(.*) \1`</p> |
+|Zabbix raw items |RabbitMQ: Get queues |<p>The HTTP API endpoint that returns queues metrics</p> |ZABBIX_PASSIVE |web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]<p>**Preprocessing**:</p><p>- REGEX: `\n\s?\n(.*) \1`</p> |
 
 ## Triggers
 
@@ -278,5 +278,5 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387226-discussion-thread-for-official-zabbix-template-rabbitmq).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387226-discussion-thread-for-official-zabbix-template-rabbitmq).
 

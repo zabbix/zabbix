@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-15T07:19:56Z'
+  date: '2022-01-26T10:02:35Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -16,7 +16,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/428309-discussion-thread-for-official-zabbix-template-tls-ssl-certificates-monitoring
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -40,17 +40,8 @@ zabbix_export:
             key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
           tags:
             -
-              tag: resource
-              value: general
-            -
-              tag: target
+              tag: component
               value: cert
-            -
-              tag: transport
-              value: dependent
-            -
-              tag: type
-              value: gauge
         -
           uuid: 946e205aaa84433a8bf1fe46b9362acd
           name: 'Cert: Issuer'
@@ -70,17 +61,8 @@ zabbix_export:
             key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
           tags:
             -
-              tag: resource
-              value: general
-            -
-              tag: target
+              tag: component
               value: cert
-            -
-              tag: transport
-              value: dependent
-            -
-              tag: type
-              value: gauge
         -
           uuid: f124443debb447a792beb8265d2918ee
           name: 'Cert: Last validation status'
@@ -100,17 +82,8 @@ zabbix_export:
             key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
           tags:
             -
-              tag: resource
-              value: general
-            -
-              tag: target
+              tag: component
               value: cert
-            -
-              tag: transport
-              value: dependent
-            -
-              tag: type
-              value: gauge
         -
           uuid: e34bffac86ef41e2865fe8410c2d0aa0
           name: 'Cert: Expires on'
@@ -129,17 +102,8 @@ zabbix_export:
             key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
           tags:
             -
-              tag: resource
-              value: general
-            -
-              tag: target
+              tag: component
               value: cert
-            -
-              tag: transport
-              value: dependent
-            -
-              tag: type
-              value: gauge
           triggers:
             -
               uuid: 8a0e3e73527a45618afe94707234f4c6
@@ -151,6 +115,10 @@ zabbix_export:
                 -
                   name: 'Cert: SSL certificate is invalid'
                   expression: 'find(/Website certificate by Zabbix agent 2/cert.validation,,"like","invalid")=1'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: c3ba835b28db4f1486ae4be87c3fe55f
           name: 'Cert: Valid from'
@@ -169,17 +137,8 @@ zabbix_export:
             key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
           tags:
             -
-              tag: resource
-              value: general
-            -
-              tag: target
+              tag: component
               value: cert
-            -
-              tag: transport
-              value: dependent
-            -
-              tag: type
-              value: gauge
         -
           uuid: 08b47b376f0f4f999bd1110696465fd9
           name: 'Cert: Public key algorithm'
@@ -199,17 +158,8 @@ zabbix_export:
             key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
           tags:
             -
-              tag: resource
-              value: general
-            -
-              tag: target
+              tag: component
               value: cert
-            -
-              tag: transport
-              value: dependent
-            -
-              tag: type
-              value: gauge
         -
           uuid: d7d4e592cc6741fcba9c21b5195b8544
           name: 'Cert: Serial number'
@@ -229,17 +179,8 @@ zabbix_export:
             key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
           tags:
             -
-              tag: resource
-              value: general
-            -
-              tag: target
+              tag: component
               value: cert
-            -
-              tag: transport
-              value: dependent
-            -
-              tag: type
-              value: gauge
         -
           uuid: 848cd98e80764f61bbe526316c70da11
           name: 'Cert: Fingerprint'
@@ -259,17 +200,8 @@ zabbix_export:
             key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
           tags:
             -
-              tag: resource
-              value: general
-            -
-              tag: target
+              tag: component
               value: cert
-            -
-              tag: transport
-              value: dependent
-            -
-              tag: type
-              value: gauge
           triggers:
             -
               uuid: 7a4c69a5235e444cb7294e6b7189b2b6
@@ -280,6 +212,10 @@ zabbix_export:
                 The SSL certificate fingerprint has changed. If you did not update the certificate, it may mean your certificate has been hacked. Ack to close.
                 There could be multiple valid certificates on some installations. In this case, the trigger will have a false positive. You can ignore it or disable the trigger.
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 67d4cb73b1e74c5f9e63423e9bbdd3a6
           name: 'Cert: Signature algorithm'
@@ -299,17 +235,8 @@ zabbix_export:
             key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
           tags:
             -
-              tag: resource
-              value: general
-            -
-              tag: target
+              tag: component
               value: cert
-            -
-              tag: transport
-              value: dependent
-            -
-              tag: type
-              value: gauge
         -
           uuid: b44c554d025446c6b1761a5fde250f9f
           name: 'Cert: Subject'
@@ -329,17 +256,8 @@ zabbix_export:
             key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
           tags:
             -
-              tag: resource
-              value: general
-            -
-              tag: target
+              tag: component
               value: cert
-            -
-              tag: transport
-              value: dependent
-            -
-              tag: type
-              value: gauge
         -
           uuid: 4fc3c39291ea4e3aa6ee04fcec4e1a8d
           name: 'Cert: Validation result'
@@ -359,17 +277,8 @@ zabbix_export:
             key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
           tags:
             -
-              tag: resource
-              value: general
-            -
-              tag: target
+              tag: component
               value: cert
-            -
-              tag: transport
-              value: dependent
-            -
-              tag: type
-              value: gauge
           triggers:
             -
               uuid: 854c791b765a4ae2982ce6436d6e78ca
@@ -377,6 +286,10 @@ zabbix_export:
               name: 'Cert: SSL certificate is invalid'
               priority: HIGH
               description: 'SSL certificate has expired or it is issued for another domain.'
+              tags:
+                -
+                  tag: scope
+                  value: security
         -
           uuid: a8b04dfe285d47e39c9d360ea43fcdbe
           name: 'Cert: Version'
@@ -396,17 +309,8 @@ zabbix_export:
             key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
           tags:
             -
-              tag: resource
-              value: general
-            -
-              tag: target
+              tag: component
               value: cert
-            -
-              tag: transport
-              value: dependent
-            -
-              tag: type
-              value: gauge
         -
           uuid: ec072b3b1c6847b79acac9f18d14df8a
           name: 'Cert: Get'
@@ -423,14 +327,15 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: data
+              tag: component
               value: raw
-            -
-              tag: target
-              value: cert
-            -
-              tag: transport
-              value: agent
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: certificate
       macros:
         -
           macro: '{$CERT.EXPIRY.WARN}'

@@ -28,7 +28,7 @@ setupLocale(array_key_exists('lang', $_GET) ? (string) $_GET['lang'] : 'en_GB');
 require_once dirname(__FILE__).'/include/js.inc.php';
 
 // available scripts 'scriptFileName' => 'path relative to js/'
-$available_js_cripts = [
+$available_js = [
 	'common.js' => '',
 	'class.dashboard.js' => '',
 	'class.dashboard.page.js' => '',
@@ -70,6 +70,7 @@ $available_js_cripts = [
 	'leaflet.js' => 'vendors/Leaflet/Leaflet/',
 	'leaflet.markercluster.js' => 'vendors/Leaflet/Leaflet.markercluster/',
 	// classes
+	'component.z-bar-gauge.js' => '',
 	'component.z-select.js' => '',
 	'class.base-component.js' => '',
 	'class.bbcode.js' => '',
@@ -417,7 +418,7 @@ $translate_strings = [
 		'value' => _('value')
 	],
 	'popup.condition.common.js' => [
-		'Add parent services' => _('Add parent services')
+		'Services' => _('Services')
 	]
 ];
 
@@ -427,6 +428,7 @@ if (empty($_GET['files'])) {
 		'jquery.js',
 		'jquery-ui.js',
 		'common.js',
+		'component.z-bar-gauge.js',
 		'component.z-select.js',
 		'class.base-component.js',
 		'class.cdebug.js',
@@ -494,8 +496,8 @@ foreach ($files as $file) {
 }
 
 foreach ($files as $file) {
-	if (array_key_exists($file, $available_js_cripts)) {
-		$js .= file_get_contents('js/'.$available_js_cripts[$file].$file)."\n";
+	if (array_key_exists($file, $available_js)) {
+		$js .= file_get_contents('js/'.$available_js[$file].$file)."\n";
 	}
 }
 

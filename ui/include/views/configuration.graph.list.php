@@ -23,6 +23,8 @@
  * @var CView $this
  */
 
+$this->includeJsFile('configuration.graph.list.js.php');
+
 if (!empty($this->data['parent_discoveryid'])) {
 	$widget = (new CWidget())
 		->setTitle(_('Graph prototypes'))
