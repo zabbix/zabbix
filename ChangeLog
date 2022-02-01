@@ -1,8 +1,16 @@
 Changes for 6.0.0rc1
 
 New features:
+.........T [ZBXNEXT-7414] added new tags to all templates (vkhaliev)
 
 Bug fixes:
+.........T [ZBX-20509] changed host group in Squid, Hikvision, Morningstar templates (mchudinov)
+.........T [ZBX-20396] fixed expression for "Calculated value of innodb_log_file_size" item in MySQL templates (mchudinov)
+..F....... [ZBX-20415] fixed host list page showing incorrect default interface (Ivo)
+..F....... [ZBX-17748] improved host graphs page (ashubin, epulke, vmurzins)
+..F....... [ZBX-20508] fixed console error when creating or editing host prototypes (averza)
+..F....... [ZBX-20504] fixed impossibility to select a service in conditions of service actions (averza)
+.......P.. [ZBX-20481] fixed warning in log when updgrading Zabbix proxy database (vso)
 ..F....... [ZBX-19356] fixed failure when editing Templates caused by exceeding max_input_vars limit (jfreibergs)
 ..F....... [ZBX-20267] fixed browser error when using dynamic rows (rdetlavs)
 ..F....... [ZBX-20485] fixed cancel button not working when creating a new discovery rule (rdetlavs)
