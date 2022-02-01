@@ -4287,6 +4287,11 @@ out1:
 /* SSL_MODE_AUTO_RETRY flag in zbx_tls_init_child() */
 #endif
 
+static int	tls_write(zbx_socket_t *s, const char *buf, size_t len)
+{
+	return ZBX_TLS_WRITE(s->tls_ctx->ctx, buf, len);
+}
+
 ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error)
 {
 #if defined(_WINDOWS)
@@ -4307,7 +4312,7 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error
 #endif
 	do
 	{
-		res = ZBX_TLS_WRITE(s->tls_ctx->ctx, buf, len);
+		res = tls_write(s->tls_ctx->ctx, buf, len);
 #if defined(_WINDOWS)
 		if (s->timeout < zbx_time() - sec)
 			zbx_alarm_flag_set();
@@ -4358,6 +4363,11 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error
 	return (ssize_t)res;
 }
 
+static int	tls_read(zbx_socket_t *s, char *buf, size_t len)
+{
+	return ZBX_TLS_READ(s->tls_ctx->ctx, buf, len);
+}
+
 ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
 {
 #if defined(_WINDOWS)
@@ -4378,7 +4388,7 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
 #endif
 	do
 	{
-		res = ZBX_TLS_READ(s->tls_ctx->ctx, buf, len);
+		res = tls_read(s->tls_ctx->ctx, buf, len);
 #if defined(_WINDOWS)
 		if (s->timeout < zbx_time() - sec)
 			zbx_alarm_flag_set();
