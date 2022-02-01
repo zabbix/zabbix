@@ -4312,7 +4312,7 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error
 #endif
 	do
 	{
-		res = tls_write(s->tls_ctx->ctx, buf, len);
+		res = tls_write(s, buf, len);
 #if defined(_WINDOWS)
 		if (s->timeout < zbx_time() - sec)
 			zbx_alarm_flag_set();
@@ -4388,7 +4388,7 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
 #endif
 	do
 	{
-		res = tls_read(s->tls_ctx->ctx, buf, len);
+		res = tls_read(s, buf, len);
 #if defined(_WINDOWS)
 		if (s->timeout < zbx_time() - sec)
 			zbx_alarm_flag_set();
