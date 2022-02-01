@@ -1,0 +1,32 @@
+.expandable-subfilter {
+	$line-height: 18px;
+
+	position: relative;
+	overflow: hidden;
+	word-break: break-word;
+	max-height: $line-height;
+	line-height: $line-height;
+
+	&.three-lines {
+		max-height: calc(#{$line-height} * 3);
+	}
+
+	> div {
+		display: inline;
+	}
+
+	.hidden {
+		display: none;
+	}
+
+	&.expanded {
+		max-height: none;
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 10;
+
+		.hidden {
+			display: unset;
+		}
+	}
+}

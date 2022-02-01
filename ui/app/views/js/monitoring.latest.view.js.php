@@ -50,6 +50,7 @@
 			this.refresh_simple_url = url.getUrl();
 
 			this.initTabFilter(filter_options);
+			this.initExpandableSubfilter();
 
 			if (this.refresh_interval != 0) {
 				this.running = true;
@@ -68,8 +69,15 @@
 			this.filter.on(TABFILTER_EVENT_URLSET, () => {
 				this.reloadPartialAndTabCounters();
 			});
+		},
 
-			document.querySelectorAll('.expandable-subfilter').forEach(el => new CExpandableSubfilter(el));
+		initExpandableSubfilter() {
+			document.querySelectorAll('.expandable-subfilter').forEach((element) => {
+				const subfilter = new CExpandableSubfilter(element);
+				subfilter.on(EXPANDABLE_SUBFILTER_EVENT_EXPAND, (e) => {
+					this.subfilters_expanded.push(e.detail.name);
+				});
+			});
 		},
 
 		createCountersRefresh(timeout) {
@@ -226,7 +234,7 @@
 				this._addRefreshMessage(response.messages);
 			}
 
-			document.querySelectorAll('.expandable-subfilter').forEach(el => new CExpandableSubfilter(el));
+			this.initExpandableSubfilter();
 		},
 
 		onDataFail(jqXHR) {

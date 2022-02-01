@@ -33,6 +33,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20211222';
 @import "components/dashboard/widget-item";
 @import "components/dashboard/widget-tophosts";
 @import "components/diff";
+@import "components/expandable-subfilter";
 @import "components/form-search";
 @import "components/inline-filter";
 @import "components/menu-main";
@@ -6584,35 +6585,4 @@ z-select,
 .leaflet-container {
 	height: 100%;
 	z-index: 1;
-}
-
-.expandable-subfilter {
-	position: relative;
-	overflow: hidden;
-	word-break: break-word;
-	max-height: 1.5em;
-	line-height: 1.5em;
-
-	&.three-lines {
-		max-height: calc(1.5em * 3);
-	}
-
-	> div {
-		display: inline;
-
-		> .hidden {
-			display: none;
-		}
-	}
-
-	&.expanded {
-		max-height: none;
-		display: -webkit-box;
-		-webkit-box-orient: vertical;
-		-webkit-line-clamp: 10;
-
-		> div > .hidden {
-			display: unset;
-		}
-	}
 }

@@ -18,6 +18,8 @@
 **/
 
 
+const EXPANDABLE_SUBFILTER_EVENT_EXPAND = 'expand';
+
 const ZBX_STYLE_ICON_WZRD_ACTION = 'icon-wzrd-action';
 const ZBX_STYLE_EXPANDED = 'expanded';
 const ZBX_STYLE_HIDDEN = 'hidden';
@@ -35,26 +37,25 @@ class CExpandableSubfilter extends CBaseComponent {
 			return;
 		}
 
-		this.hideOverflown();
 		this._target.append(this.makeExpandButton());
 
-		window.addEventListener('resize', () => {
-			this._target.querySelectorAll('div > .' + ZBX_STYLE_HIDDEN).forEach(el => {
-				el.classList.remove(ZBX_STYLE_HIDDEN);
-			});
-			this.hideOverflown();
-		});
+		const resize_observer = new ResizeObserver(() => this.hideOverflown());
+		resize_observer.observe(this._target);
 	}
 
 	hideOverflown() {
-		const isOverflown = el => {
-			return (el.offsetTop + el.offsetHeight > this._target.offsetHeight
-				|| 40 > this._target.offsetWidth - el.offsetLeft - el.offsetWidth
+		const isOverflown = (element) => {
+			return (element.offsetTop + element.offsetHeight > this._target.offsetHeight
+				|| 40 > this._target.offsetWidth - element.offsetLeft - element.offsetWidth
 			);
 		};
 
+		this._target.querySelectorAll(`.subfilter.${ZBX_STYLE_HIDDEN}`).forEach((element) => {
+			element.classList.remove(ZBX_STYLE_HIDDEN);
+		});
+
 		let last = this._target.querySelector('div').lastChild;
-		while (isOverflown(last)) {
+		while (last !== null && isOverflown(last)) {
 			last.classList.add(ZBX_STYLE_HIDDEN);
 			last = last.previousSibling;
 		}
@@ -63,10 +64,11 @@ class CExpandableSubfilter extends CBaseComponent {
 	makeExpandButton() {
 		this.btn_expand = document.createElement('button');
 		this.btn_expand.classList.add(ZBX_STYLE_ICON_WZRD_ACTION);
-		this.btn_expand.addEventListener('click', e => {
-			view.subfilters_expanded.push(this._target.dataset.name);
+		this.btn_expand.addEventListener('click', () => {
 			this._target.classList.add(ZBX_STYLE_EXPANDED);
 			this.btn_expand.remove();
+
+			this.fire(EXPANDABLE_SUBFILTER_EVENT_EXPAND, {name: this._target.dataset.name});
 		});
 
 		return this.btn_expand;
