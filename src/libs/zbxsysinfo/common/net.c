@@ -20,7 +20,6 @@
 #include "net.h"
 
 #include "common.h"
-#include "module.h"
 #include "comms.h"
 #include "log.h"
 #include "cfg.h"

@@ -22,7 +22,6 @@
 #include "common.h"
 #include "log.h"
 #include "zbxjson.h"
-#include "zbxembed.h"
 #include "embed.h"
 #include "duktape.h"
 

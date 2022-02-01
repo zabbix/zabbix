@@ -19,11 +19,8 @@
 
 #include "valuecache.h"
 
-#include "common.h"
 #include "log.h"
-#include "memalloc.h"
 #include "dbcache.h"
-#include "zbxhistory.h"
 #include "vectorimpl.h"
 #include "mutexs.h"
 

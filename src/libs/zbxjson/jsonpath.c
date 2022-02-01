@@ -20,7 +20,6 @@
 #include "jsonpath.h"
 
 #include "common.h"
-#include "zbxalgo.h"
 #include "zbxregexp.h"
 #include "zbxjson.h"
 #include "json.h"

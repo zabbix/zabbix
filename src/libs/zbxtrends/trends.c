@@ -22,7 +22,6 @@
 #include "common.h"
 #include "db.h"
 #include "log.h"
-#include "zbxtrends.h"
 
 static char	*trends_errors[ZBX_TREND_STATE_COUNT] = {
 		"unknown error",

@@ -20,7 +20,6 @@
 #include "global.h"
 
 #include "common.h"
-#include "zbxembed.h"
 #include "embed.h"
 #include "duktape.h"
 #include "base64.h"

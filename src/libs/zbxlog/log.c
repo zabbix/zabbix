@@ -19,7 +19,6 @@
 
 #include "log.h"
 
-#include "common.h"
 #include "mutexs.h"
 #include "threads.h"
 #include "cfg.h"

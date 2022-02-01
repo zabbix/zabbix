@@ -19,8 +19,6 @@
 
 #include "get_host_from_event.h"
 
-#include "db.h"
-#include "dbcache.h"
 #include "log.h"
 
 #ifdef HAVE_OPENIPMI

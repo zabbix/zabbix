@@ -17,6 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZABBIX_CONFIGCACHE_H
+#define ZABBIX_CONFIGCACHE_H
+
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 #include "zbxmockassert.h"
@@ -27,14 +30,8 @@
 #include "zbxalgo.h"
 #include "dbcache.h"
 #include "mutexs.h"
-
-#define ZBX_DBCONFIG_IMPL
 #include "dbconfig.h"
-
 #include "configcache_mock.h"
-
-#ifndef ZABBIX_CONFIGCACHE_H
-#define ZABBIX_CONFIGCACHE_H
 
 typedef struct
 {

@@ -17,7 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "vmware.h"
+
 #include "mutexs.h"
 
 /* LIBXML2 is used */
@@ -32,8 +33,6 @@
 #include "zbxalgo.h"
 #include "daemon.h"
 #include "zbxself.h"
-
-#include "vmware.h"
 #include "../../libs/zbxalgo/vectorimpl.h"
 
 /*

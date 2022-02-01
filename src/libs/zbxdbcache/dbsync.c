@@ -17,17 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "dbsync.h"
+
+#include "zbxtypes.h"
 #include "log.h"
 #include "dbcache.h"
 #include "zbxserialize.h"
 #include "base64.h"
 #include "zbxeval.h"
-
-#define ZBX_DBCONFIG_IMPL
-#include "dbsync.h"
-
-#include "dbconfig.h"
 
 typedef struct
 {

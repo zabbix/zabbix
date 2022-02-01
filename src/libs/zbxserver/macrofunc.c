@@ -19,7 +19,6 @@
 
 #include "macrofunc.h"
 
-#include "common.h"
 #include "zbxregexp.h"
 #include "log.h"
 

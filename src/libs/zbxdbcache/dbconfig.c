@@ -19,27 +19,16 @@
 
 #include "dbconfig.h"
 
-#include <stddef.h>
-
-#include "common.h"
 #include "log.h"
-#include "dbcache.h"
-#include "mutexs.h"
-#include "memalloc.h"
+#include "zbxtasks.h"
 #include "zbxserver.h"
-#include "zbxalgo.h"
 #include "zbxregexp.h"
 #include "cfg.h"
-#include "zbxtasks.h"
 #include "../zbxcrypto/tls_tcp_active.h"
 #include "../zbxalgo/vectorimpl.h"
 #include "base64.h"
-#include "zbxeval.h"
-
-#define ZBX_DBCONFIG_IMPL
-
+#include "db.h"
 #include "dbsync.h"
-#include "proxy.h"
 #include "actions.h"
 #include "zbxtrends.h"
 #include "zbxvault.h"

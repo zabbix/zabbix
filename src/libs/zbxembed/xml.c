@@ -20,8 +20,6 @@
 #include "xml.h"
 
 #include "zbxvariant.h"
-#include "zbxembed.h"
-
 #include "embed.h"
 
 /******************************************************************************

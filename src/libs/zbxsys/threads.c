@@ -19,7 +19,6 @@
 
 #include "threads.h"
 
-#include "common.h"
 #include "log.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)

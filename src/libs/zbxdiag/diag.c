@@ -19,8 +19,6 @@
 
 #include "diag.h"
 
-#include "common.h"
-#include "zbxalgo.h"
 #include "dbcache.h"
 #include "preproc.h"
 #include "zbxdiag.h"

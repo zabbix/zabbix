@@ -20,11 +20,9 @@
 #include "db.h"
 
 #include "log.h"
-#include "common.h"
 #include "events.h"
 #include "threads.h"
 #include "dbcache.h"
-#include "zbxalgo.h"
 #include "cfg.h"
 
 #if defined(HAVE_POSTGRESQL)

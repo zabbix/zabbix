@@ -20,8 +20,6 @@ Released into the Public Domain by Ulrich Drepper <drepper@redhat.com>.  */
 #include <stdio.h>
 #include <string.h>
 
-#include "common.h"
-
 /* Structure to save state of computation between the single steps.  */
 struct sha512_ctx
 {

@@ -20,7 +20,6 @@
 #include "telnet.h"
 
 #include "common.h"
-#include "comms.h"
 #include "log.h"
 
 static char	prompt_char = '\0';

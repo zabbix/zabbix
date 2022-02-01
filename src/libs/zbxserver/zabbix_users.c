@@ -19,7 +19,6 @@
 
 #include "zabbix_users.h"
 
-#include "common.h"
 #include "db.h"
 #include "log.h"
 

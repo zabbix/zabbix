@@ -25,7 +25,6 @@
 #include "zbxserver.h"
 #include "zbxtasks.h"
 
-#include "dbcache.h"
 #include "discovery.h"
 #include "zbxalgo.h"
 #include "preproc.h"

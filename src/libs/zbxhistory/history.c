@@ -21,9 +21,6 @@
 
 #include "common.h"
 #include "log.h"
-#include "zbxalgo.h"
-#include "zbxhistory.h"
-
 #include "../zbxalgo/vectorimpl.h"
 
 ZBX_VECTOR_IMPL(history_record, zbx_history_record_t)
