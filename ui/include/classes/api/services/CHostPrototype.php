@@ -2064,6 +2064,8 @@ class CHostPrototype extends CHostBase {
 		}
 		while ($_db_host_prototypes);
 
+		$hostids = array_keys($db_host_prototypes);
+
 		$discovered_hosts = DBfetchArrayAssoc(DBselect(
 			'SELECT hd.hostid,h.host'.
 			' FROM host_discovery hd,hosts h'.
@@ -2094,7 +2096,12 @@ class CHostPrototype extends CHostBase {
 			self::deleteDiscoveredGroups($group_prototypeids);
 		}
 
+		DB::delete('interface', ['hostid' => $hostids]);
 		DB::delete('group_prototype', ['group_prototypeid' => array_column($db_host_prototypes, 'group_prototypeid')]);
+		DB::delete('hosts_templates', ['hostid' => $hostids]);
+		DB::delete('host_tag', ['hostid' => $hostids]);
+		DB::delete('hostmacro', ['hostid' => $hostids]);
+		DB::delete('host_inventory', ['hostid' => $hostids]);
 
 		DB::delete('hosts', ['hostid' => $hostids]);
 
