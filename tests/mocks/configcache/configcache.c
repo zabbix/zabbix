@@ -18,6 +18,7 @@
 **/
 
 #include "configcache.h"
+#include "configcache_mock.h"
 
 zbx_mock_config_t	mock_config;
 
