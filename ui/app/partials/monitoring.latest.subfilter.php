@@ -140,7 +140,7 @@ if (count($subfilters['tags']) > 0) {
 		$subfilter_options['tags'][$tag] = (new CDiv([
 			new CTag('label', true, $tag.': '),
 			(new CExpandableSubfilter('tagnames', $tag_values, array_key_exists('tagnames', $subfilters_expanded)))
-				->addClass(CExpandableSubfilter::ZBX_STYLE_EXPANDABLE_THREE_LINES)
+				->addClass(CExpandableSubfilter::ZBX_STYLE_EXPANDABLE_TEN_LINES)
 				->addClass('subfilter-options')
 		]))->addClass('subfilter-option-grid');
 
@@ -171,7 +171,7 @@ else {
 				new CTag('h3', true, _('Hosts')),
 				(new CExpandableSubfilter('hostids', $subfilter_options['hostids'],
 					array_key_exists('hostids', $subfilters_expanded)
-				))->addClass(CExpandableSubfilter::ZBX_STYLE_EXPANDABLE_THREE_LINES)
+				))->addClass(CExpandableSubfilter::ZBX_STYLE_EXPANDABLE_TEN_LINES)
 			]]
 			: null
 	)
@@ -181,7 +181,7 @@ else {
 				new CTag('h3', true, _('Tags')),
 				(new CExpandableSubfilter('tagnames', $subfilter_options['tagnames'],
 					array_key_exists('tagnames', $subfilters_expanded)
-				))->addClass(CExpandableSubfilter::ZBX_STYLE_EXPANDABLE_THREE_LINES)
+				))->addClass(CExpandableSubfilter::ZBX_STYLE_EXPANDABLE_TEN_LINES)
 			]]
 			: null
 	)

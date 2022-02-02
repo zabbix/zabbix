@@ -7,8 +7,8 @@
 	max-height: $line-height;
 	line-height: $line-height;
 
-	&.three-lines {
-		max-height: calc(#{$line-height} * 3);
+	&.ten-lines {
+		max-height: calc(#{$line-height} * 10);
 	}
 
 	> div {
@@ -21,9 +21,6 @@
 
 	&.expanded {
 		max-height: none;
-		display: -webkit-box;
-		-webkit-box-orient: vertical;
-		-webkit-line-clamp: 10;
 
 		.hidden {
 			display: unset;

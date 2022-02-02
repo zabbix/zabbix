@@ -26,7 +26,7 @@ class CExpandableSubfilter extends CDiv {
 
 	private const ZBX_STYLE_EXPANDABLE = 'expandable-subfilter';
 	private const ZBX_STYLE_EXPANDED = 'expanded';
-	public const ZBX_STYLE_EXPANDABLE_THREE_LINES = 'three-lines';
+	public const ZBX_STYLE_EXPANDABLE_TEN_LINES = 'ten-lines';
 
 	/**
 	 * CExpandableSubfilter constructor.

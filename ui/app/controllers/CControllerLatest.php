@@ -27,9 +27,6 @@ abstract class CControllerLatest extends CController {
 	// Filter idx prefix.
 	const FILTER_IDX = 'web.monitoring.latest';
 
-	// Number of subfilter values per row.
-	const SUBFILTERS_VALUES_PER_ROW = 1000;
-
 	// Number of tag value rows allowed to be included in subfilter.
 	const SUBFILTERS_TAG_VALUE_ROWS = 10;
 
@@ -657,14 +654,14 @@ abstract class CControllerLatest extends CController {
 	public static function getTopPrioritySubfilters(array $subfilters): array {
 		$top_priority_fields = [];
 
-		if (self::SUBFILTERS_VALUES_PER_ROW < count($subfilters)) {
+		if (SUBFILTER_VALUES_PER_GROUP < count($subfilters)) {
 			// All selected subfilters must always be included.
 			$top_priority_fields = array_filter($subfilters, function ($field) {
 				return $field['selected'];
 			});
 
 			// Add first non-selected subfilter values in case limit is not exceeded.
-			$remaining = self::SUBFILTERS_VALUES_PER_ROW - count($top_priority_fields);
+			$remaining = SUBFILTER_VALUES_PER_GROUP - count($top_priority_fields);
 			if ($remaining > 0) {
 				$subfilters = array_diff_key($subfilters, $top_priority_fields);
 				CArrayHelper::sort($subfilters, ['name']);
