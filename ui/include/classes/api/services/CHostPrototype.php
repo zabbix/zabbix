@@ -2056,7 +2056,7 @@ class CHostPrototype extends CHostBase {
 			$_db_host_prototypes = DBfetchArrayAssoc(DBselect(
 				'SELECT hostid,host'.
 				' FROM hosts h'.
-				' WHERE '.dbConditionId('h.hostid', array_keys($_db_host_prototypes)).
+				' WHERE '.dbConditionId('h.templateid', array_keys($_db_host_prototypes)).
 				' FOR UPDATE'
 			), 'hostid');
 
