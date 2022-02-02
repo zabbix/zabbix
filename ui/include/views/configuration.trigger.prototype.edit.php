@@ -651,7 +651,7 @@ $dependenciesFormList->addRow(_('Dependencies'),
 );
 $triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList, TAB_INDICATOR_DEPENDENCY);
 
-$cancelButton = $data['backurl']
+$cancelButton = $data['backurl'] !== null
 	? new CButtonCancel(null, "redirect('".$data['backurl']."');")
 	: new CButtonCancel(url_params(['parent_discoveryid', 'context']));
 

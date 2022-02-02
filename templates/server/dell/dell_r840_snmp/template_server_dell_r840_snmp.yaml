@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-16T20:03:33Z'
+  date: '2022-01-27T18:35:54Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -19,7 +19,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/426752-discussion-thread-for-official-zabbix-dell-templates
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: 'Templates/Server hardware'
@@ -45,8 +45,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: cc2480186fee4b81b2c6f2094b772642
           name: 'Dell R840: System description'
@@ -69,8 +69,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 090e35f3537244fb92ddc85d1afc757f
           name: 'Dell R840: Firmware version'
@@ -91,8 +91,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
           triggers:
             -
               uuid: c8e3831037544a87abbd671fe191ab98
@@ -102,6 +102,10 @@ zabbix_export:
               priority: INFO
               description: 'Firmware version has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 6ddb21512bc84a0698b0b52c6b43a670
           name: 'Dell R840: Hardware model name'
@@ -122,8 +126,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
         -
           uuid: ecbbcab2c41e4ce7aeafb08229102365
           name: 'Dell R840: Hardware serial number'
@@ -144,8 +148,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
           triggers:
             -
               uuid: 89f591b666d34aceb71715bfcdda6bff
@@ -154,6 +158,10 @@ zabbix_export:
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 500dc5a80d934ae78d4f088d8120b7cc
           name: 'Dell R840: System location'
@@ -175,8 +183,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 4c32406c2d1046d9bb33c3c0844198d7
           name: 'Dell R840: System name'
@@ -198,8 +206,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: 7a56b961a858470d82c6fdef62f88f43
@@ -208,6 +216,10 @@ zabbix_export:
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 761781c399a14befb3eeed3af4039b77
           name: 'Dell R840: System object ID'
@@ -228,8 +240,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: eba6c6f1e7c44ed8a85288ed5ea9f193
           name: 'Dell R840: Overall system health status'
@@ -250,8 +262,11 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: system
           triggers:
             -
               uuid: db2cabad4c3048d692333ae02ec125fe
@@ -260,6 +275,10 @@ zabbix_export:
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: DISASTER
               description: 'Please check the device for faults.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
             -
               uuid: 65c0bb42f06c463abbf667480cafa40f
               expression: 'last(/DELL PowerEdge R840 SNMP/dell.server.status[globalSystemStatus])={$HEALTH.STATUS.CRIT}'
@@ -267,6 +286,10 @@ zabbix_export:
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Please check the device for errors.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
             -
               uuid: 4f8b4ed834504bb5bb6d7c7b9d22700e
               expression: 'last(/DELL PowerEdge R840 SNMP/dell.server.status[globalSystemStatus])={$HEALTH.STATUS.WARN}'
@@ -278,6 +301,10 @@ zabbix_export:
                 -
                   name: 'Dell R840: System status is in critical state'
                   expression: 'last(/DELL PowerEdge R840 SNMP/dell.server.status[globalSystemStatus])={$HEALTH.STATUS.CRIT}'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 5a33de4af38042f3bd27066a519f9996
           name: 'Dell R840: Operating system'
@@ -299,8 +326,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
           triggers:
             -
               uuid: 09a2b4ec3e1943b598347358b442b662
@@ -309,6 +336,10 @@ zabbix_export:
               priority: INFO
               description: 'Operating system description has changed. Possibly, the system has been updated or replaced. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: afb22553880b4e85a3cdc910413cc26d
           name: 'Dell R840: Uptime'
@@ -328,8 +359,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: def9f4b7093f421893d2a65f6416cfe5
@@ -338,6 +369,10 @@ zabbix_export:
               priority: WARNING
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 1b1f301b2c5f4e5d8fc5e8dcfad63be0
           name: 'Dell R840: SNMP traps (fallback)'
@@ -350,8 +385,8 @@ zabbix_export:
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: network
         -
           uuid: a988dcd503a54238815cb57aac22a991
           name: 'Dell R840: SNMP agent availability'
@@ -367,8 +402,11 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: system
           triggers:
             -
               uuid: c428f917029346679f8763611f5357f0
@@ -377,6 +415,10 @@ zabbix_export:
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: 2e089f4c080945289f60bdc814ef743b
@@ -415,8 +457,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Disk arrays'
+                  tag: component
+                  value: battery
+                -
+                  tag: component
+                  value: diskarray
               trigger_prototypes:
                 -
                   uuid: 8d4d468bddf14d659ecbf002e37dcafc
@@ -425,6 +470,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the device for faults.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: afcd3be7b0e343bdbeff78f87ba4f803
                   expression: 'last(/DELL PowerEdge R840 SNMP/dell.server.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.WARN}'
@@ -436,6 +485,10 @@ zabbix_export:
                     -
                       name: 'Dell R840: {#BATTERY_NAME} is in critical state'
                       expression: 'last(/DELL PowerEdge R840 SNMP/dell.server.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: ab4482d1d0244a25a5dccf787af77fe0
                   expression: 'last(/DELL PowerEdge R840 SNMP/dell.server.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}])<>{$DISK.ARRAY.CACHE.BATTERY.STATUS.OK}'
@@ -450,6 +503,10 @@ zabbix_export:
                     -
                       name: 'Dell R840: {#BATTERY_NAME} is in warning state'
                       expression: 'last(/DELL PowerEdge R840 SNMP/dell.server.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.WARN}'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -483,8 +540,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Disk arrays'
+                  tag: component
+                  value: diskarray
+                -
+                  tag: component
+                  value: storage
             -
               uuid: 4ac7263337f74fdbad25f33d2ab1bcb4
               name: 'Dell R840: {#CNTLR_NAME} Status'
@@ -512,8 +572,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Disk arrays'
+                  tag: component
+                  value: diskarray
+                -
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: d3111ea966db4b4993d119eb92c5362b
@@ -526,6 +589,10 @@ zabbix_export:
                     -
                       name: 'Dell R840: {#CNTLR_NAME} is in unrecoverable state'
                       expression: 'last(/DELL PowerEdge R840 SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.FAIL}'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: ee5704a6f6fc4e5396a90fc51293fbe6
                   expression: 'last(/DELL PowerEdge R840 SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.FAIL}'
@@ -533,6 +600,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: DISASTER
                   description: 'Please check the device for faults.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: 3bd0b53f65114218b4ce01b4923add3b
                   expression: 'last(/DELL PowerEdge R840 SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.WARN}'
@@ -547,6 +618,10 @@ zabbix_export:
                     -
                       name: 'Dell R840: {#CNTLR_NAME} is in unrecoverable state'
                       expression: 'last(/DELL PowerEdge R840 SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.FAIL}'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -585,8 +660,8 @@ zabbix_export:
                 coolingDeviceSubTypeIsDiscrete, a value is not returned for this attribute.
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
             -
               uuid: 5c0e76019b144272b9321f8c4978dfa5
               name: 'Dell R840: {#FAN_DESCR} Status'
@@ -607,8 +682,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
               trigger_prototypes:
                 -
                   uuid: c35ca42a1b304ef6a279c959970ce205
@@ -617,6 +692,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: c5f641ddfb9547188d937f9a5554931a
                   expression: 'last(/DELL PowerEdge R840 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.WARN:"nonCriticalUpper"} or last(/DELL PowerEdge R840 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.WARN:"nonCriticalLower"}'
@@ -628,6 +707,10 @@ zabbix_export:
                     -
                       name: 'Dell R840: {#FAN_DESCR} is in critical state'
                       expression: 'last(/DELL PowerEdge R840 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R840 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R840 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R840 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"nonRecoverableLower"} or last(/DELL PowerEdge R840 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"failed"}'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -665,8 +748,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: physicaldisk
+                -
+                  tag: component
+                  value: storage
             -
               uuid: 18bca784665445d38bd8feb95cca2bf8
               name: 'Dell R840: {#DISK_NAME} Model name'
@@ -686,8 +772,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: physicaldisk
+                -
+                  tag: component
+                  value: storage
             -
               uuid: d4a5a97a7b134f3aa4e52e7512428efb
               name: 'Dell R840: {#DISK_NAME} Serial number'
@@ -707,8 +796,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: physicaldisk
+                -
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: 98c1eb636c534d20ba14d19efe174d9c
@@ -717,6 +809,10 @@ zabbix_export:
                   priority: INFO
                   description: '{#DISK_NAME} serial number has changed. Ack to close'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: ce34bb1a25364543aeefc8728fddab26
               name: 'Dell R840: {#DISK_NAME} Size'
@@ -740,8 +836,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: physicaldisk
+                -
+                  tag: component
+                  value: storage
             -
               uuid: 783739113d0a46e4ab3b77aed900500e
               name: 'Dell R840: {#DISK_NAME} S.M.A.R.T. Status'
@@ -762,8 +861,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: physicaldisk
+                -
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: f86285d7142e494998da999d56173dd7
@@ -776,6 +878,10 @@ zabbix_export:
                     -
                       name: 'Dell R840: {#DISK_NAME} failed'
                       expression: 'last(/DELL PowerEdge R840 SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"critical"} or last(/DELL PowerEdge R840 SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"nonRecoverable"}'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: d55a705be2df4770bdcab2c8691d8db1
               name: 'Dell R840: {#DISK_NAME} Status'
@@ -803,8 +909,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: physicaldisk
+                -
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: 034509befd5e497ba9c255034171b6c0
@@ -813,6 +922,10 @@ zabbix_export:
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check physical disk for warnings or errors.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: be7cfc31a83a4ab9a91150e480c2a1f0
                   expression: 'last(/DELL PowerEdge R840 SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.WARN:"nonCritical"}'
@@ -824,6 +937,10 @@ zabbix_export:
                     -
                       name: 'Dell R840: {#DISK_NAME} failed'
                       expression: 'last(/DELL PowerEdge R840 SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"critical"} or last(/DELL PowerEdge R840 SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"nonRecoverable"}'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -858,8 +975,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Power supply'
+                  tag: component
+                  value: psu
               trigger_prototypes:
                 -
                   uuid: 2228b8364d12446181b79a7d5efdc598
@@ -868,6 +985,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: c661b2832e1d4c0392e24bbb2c8eaca5
                   expression: 'last(/DELL PowerEdge R840 SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$PSU.STATUS.WARN:"nonCritical"}'
@@ -879,6 +1000,10 @@ zabbix_export:
                     -
                       name: 'Dell R840: Power supply {#PSU_DESCR} is in critical state'
                       expression: 'last(/DELL PowerEdge R840 SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$PSU.STATUS.CRIT:"critical"} or last(/DELL PowerEdge R840 SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$PSU.STATUS.CRIT:"nonRecoverable"}'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -925,8 +1050,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: 5b552c02873e4ae39b378362c083fb8b
@@ -935,6 +1060,10 @@ zabbix_export:
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the device for faults.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: 34638bcb7b3940e7ad69c7cf2f2c330d
                   expression: 'last(/DELL PowerEdge R840 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.WARN:"nonCriticalUpper"} or last(/DELL PowerEdge R840 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.WARN:"nonCriticalLower"}'
@@ -946,6 +1075,10 @@ zabbix_export:
                     -
                       name: 'Dell R840: Probe {#SENSOR_LOCALE} is in critical status'
                       expression: 'last(/DELL PowerEdge R840 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R840 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R840 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R840 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"nonRecoverableLower"}'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: 0f7c75277fb64927943339a8b32d7dfb
                   expression: 'last(/DELL PowerEdge R840 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])<>{$SENSOR.TEMP.STATUS.OK}'
@@ -961,6 +1094,10 @@ zabbix_export:
                     -
                       name: 'Dell R840: Probe {#SENSOR_LOCALE} is in warning status'
                       expression: 'last(/DELL PowerEdge R840 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.WARN:"nonCriticalUpper"} or last(/DELL PowerEdge R840 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.WARN:"nonCriticalLower"}'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: bc5758288a7f4cdc802f01d6a0041c95
               name: 'Dell R840: {#SENSOR_LOCALE} Value'
@@ -984,8 +1121,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1030,8 +1167,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: virtualdisk
             -
               uuid: a26ef2f0b1364a4fb3372f9038b377b7
               name: 'Dell R840: {#DISK_NAME} Read policy'
@@ -1051,8 +1191,11 @@ zabbix_export:
                 name: 'IDRAC-MIB-SMIv2::virtualDiskReadPolicy'
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: virtualdisk
             -
               uuid: 23fddb41194f4497b140f210d3a91450
               name: 'Dell R840: {#DISK_NAME} Size'
@@ -1076,8 +1219,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: virtualdisk
             -
               uuid: 602c22ba4876450aacde99e08205c5d8
               name: 'Dell R840: {#DISK_NAME} Current state'
@@ -1099,8 +1245,11 @@ zabbix_export:
                 name: 'IDRAC-MIB-SMIv2::virtualDiskOperationalState'
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: virtualdisk
             -
               uuid: 14c253cbc8174d1584bcb30f13c63050
               name: 'Dell R840: {#DISK_NAME} Status'
@@ -1126,8 +1275,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: virtualdisk
               trigger_prototypes:
                 -
                   uuid: 96f488d383e9445b9646ff18f69eea9a
@@ -1136,6 +1288,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the virtual disk for warnings or errors.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: 37777a2664ea46399847736412b937c5
                   expression: 'last(/DELL PowerEdge R840 SNMP/dell.server.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}])={$VDISK.STATUS.WARN:"degraded"}'
@@ -1147,6 +1303,10 @@ zabbix_export:
                     -
                       name: 'Dell R840: {#DISK_NAME} failed'
                       expression: 'last(/DELL PowerEdge R840 SNMP/dell.server.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}])={$VDISK.STATUS.CRIT:"failed"}'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 1e6bb77e2d114879b86c0afa07161079
               name: 'Dell R840: {#DISK_NAME} Write policy'
@@ -1166,13 +1326,26 @@ zabbix_export:
                 name: 'IDRAC-MIB-SMIv2::virtualDiskWritePolicy'
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: virtualdisk
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+      tags:
+        -
+          tag: class
+          value: hardware
+        -
+          tag: target
+          value: dell
+        -
+          tag: target
+          value: 'dell poweredge'
       macros:
         -
           macro: '{$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}'

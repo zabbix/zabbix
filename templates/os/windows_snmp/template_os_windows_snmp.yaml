@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-18T20:37:28Z'
+  date: '2022-01-26T10:40:36Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -49,8 +49,11 @@ zabbix_export:
             name: 'Service state'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 08e22bd77606469d9e03183ec70dc89d
@@ -58,6 +61,10 @@ zabbix_export:
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 9e311b1e5e8841da85c5ec6145d9c75f
           name: 'ICMP loss'
@@ -68,8 +75,11 @@ zabbix_export:
           units: '%'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: fa81e50132464ec486ea72929d18d778
@@ -81,6 +91,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Windows SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: fba6328e6e6240f28c1b901a9c2fc376
           name: 'ICMP response time'
@@ -91,8 +108,11 @@ zabbix_export:
           units: s
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: fba819f734de4b469fb7851501e55b21
@@ -107,6 +127,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Windows SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: b75c480b7ec648a5b2762b20fc5c2ed8
           name: 'SNMP traps (fallback)'
@@ -119,8 +146,8 @@ zabbix_export:
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: network
         -
           uuid: dd26c7a0a46240279bb907b8a1253029
           name: 'System contact details'
@@ -142,8 +169,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 16a592f6b9f64403999f92d677f1cd2e
           name: 'CPU utilization'
@@ -164,8 +191,8 @@ zabbix_export:
                 - '$..[''{#CPU.UTIL}''].avg()'
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
           triggers:
             -
               uuid: ad2261f1ab77449cb1279725e8cf02f9
@@ -174,6 +201,10 @@ zabbix_export:
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: e95e030765e84abfa5a51194e81ac719
           name: 'System description'
@@ -196,8 +227,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: d19b9bfdfe7344a28eaf69a1b7961adb
           name: 'System location'
@@ -219,8 +250,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 9feb2f561b3d4356bc6ef2cac955a495
           name: 'System name'
@@ -242,8 +273,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: e257b5cf5d9949028c690722e4153612
@@ -252,6 +283,13 @@ zabbix_export:
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: security
         -
           uuid: c9e67b57c15747e8ab4f67e24837ce49
           name: 'System object ID'
@@ -272,8 +310,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: af7f47f4cf884282bbd9d296ba61b1c2
           name: Uptime
@@ -294,8 +332,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: b7a0b390f8844d2aa05ee849d12495f7
@@ -308,6 +346,10 @@ zabbix_export:
                 -
                   name: 'No SNMP data collection'
                   expression: 'max(/Windows SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 4863042ade2143a0b34e1fc9403742b0
           name: 'SNMP agent availability'
@@ -324,8 +366,11 @@ zabbix_export:
             name: zabbix.host.available
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: a20254c09f7a4d4d9793da7b075121f3
@@ -338,6 +383,10 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Windows SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: 3c6bc0ce8a4c4452a3bd0c0c67a6995c
@@ -427,8 +476,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 758aca2642c146ddad89ed9934077533
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
@@ -447,8 +502,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 713b5c5067174b90b686737606616664
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
@@ -472,8 +533,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 2d76edd04b2c4d35a15fc04749edfedc
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
@@ -496,8 +563,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 40fe302325ff452997f34cb05d517c59
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
@@ -516,8 +589,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 48652cf9a87142d39df11617f354df36
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
@@ -541,8 +620,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 389b55d85fcc49219a055d0db005c715
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
@@ -567,8 +652,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 71e55a8fd22c443e8a39a44c4c22433b
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
@@ -590,8 +681,14 @@ zabbix_export:
                 name: 'IF-MIB::ifOperStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: 101b888ea92348689bbc499bbe15b212
@@ -609,6 +706,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: ad62c98e35b24d0082c07ea4543963ad
               name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
@@ -632,8 +733,14 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
           trigger_prototypes:
             -
               uuid: fe3e2d20c6eb475ba9f0e8f0c5766720
@@ -663,6 +770,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 5ab179badc3747438cf988c437b7b735
               expression: |
@@ -683,6 +794,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 8acdf247d86b4b2785c92266291682ac
               expression: |
@@ -702,6 +817,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
           graph_prototypes:
             -
               uuid: 616105fbea704079b1257feb370367a5
@@ -790,8 +909,11 @@ zabbix_export:
               description: 'Space utilization in % for {#FSNAME}'
               tags:
                 -
-                  tag: Application
-                  value: 'Filesystem {#FSNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
             -
               uuid: 19d244950a414faa86cbcaf0d2859cbd
               name: '{#FSNAME}: Total space'
@@ -812,8 +934,11 @@ zabbix_export:
                     - '{#ALLOC_UNITS}'
               tags:
                 -
-                  tag: Application
-                  value: 'Filesystem {#FSNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
             -
               uuid: 2d00ecfcea564fef8b94d293d023b709
               name: '{#FSNAME}: Used space'
@@ -832,8 +957,11 @@ zabbix_export:
                     - '{#ALLOC_UNITS}'
               tags:
                 -
-                  tag: Application
-                  value: 'Filesystem {#FSNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
           trigger_prototypes:
             -
               uuid: 597ea2f6059746c0b2e5b7312f764224
@@ -849,6 +977,13 @@ zabbix_export:
                  - The disk free space is less than 5G.
                  - The disk will be full in less than 24 hours.
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: capacity
             -
               uuid: 028b24edaf9c4640a2316845f50a4a7e
               expression: |
@@ -869,6 +1004,13 @@ zabbix_export:
                   expression: |
                     last(/Windows SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
                     ((last(/Windows SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Windows SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<5G or timeleft(/Windows SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: capacity
           graph_prototypes:
             -
               uuid: 2c1a1d995f8646dd82739a56e411ccf4
@@ -942,8 +1084,8 @@ zabbix_export:
                     - '{#ALLOC_UNITS}'
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
             -
               uuid: 71453175f6f54027a8e428b7438af99a
               name: '{#MEMNAME}: Used memory'
@@ -962,8 +1104,8 @@ zabbix_export:
                     - '{#ALLOC_UNITS}'
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
             -
               uuid: 5ccc66d7a78f4501b794bd46759c738b
               name: '{#MEMNAME}: Memory utilization'
@@ -976,8 +1118,8 @@ zabbix_export:
               description: 'Memory utilization in %'
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
               trigger_prototypes:
                 -
                   uuid: ab4b4ad08664454096f5e2cf3b7da1e9
@@ -985,6 +1127,13 @@ zabbix_export:
                   name: '{#MEMNAME}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: 864bc9c487984f68b4da443b8af6c448
@@ -998,6 +1147,13 @@ zabbix_export:
                   item:
                     host: 'Windows SNMP'
                     key: 'vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}]'
+      tags:
+        -
+          tag: class
+          value: os
+        -
+          tag: target
+          value: windows
       macros:
         -
           macro: '{$CPU.UTIL.CRIT}'

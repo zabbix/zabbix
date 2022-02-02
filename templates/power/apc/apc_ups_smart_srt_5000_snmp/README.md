@@ -51,12 +51,12 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Input phases discovery |<p>The input phase identifier. OID upsPhaseInputPhaseIndex.1.1</p> |SNMP |input.phases.discovery |
-|Output phases discovery |<p>The output phase identifier. OID upsPhaseOutputPhaseIndex.1.1</p> |SNMP |output.phases.discovery |
-|External battery packs discovery |<p>-</p> |SNMP |battery.packs.discovery<p>**Filter**:</p>AND <p>- {#CARTRIDGE_STATUS} NOT_MATCHES_REGEX `^$`</p> |
 |External bad battery packs discovery |<p>Discovery of the number of external defective battery packs.</p> |SNMP |battery.packs.bad.discovery |
+|External battery packs discovery |<p>-</p> |SNMP |battery.packs.discovery<p>**Filter**:</p>AND <p>- {#CARTRIDGE_STATUS} NOT_MATCHES_REGEX `^$`</p> |
 |External sensor port 1 discovery |<p>uioSensorStatusTable</p> |SNMP |external.sensor1.discovery<p>**Overrides:**</p><p>Temp<br> - {#EXTERNAL_SENSOR1_NAME} MATCHES_REGEX `Temp`<br>  - ITEM_PROTOTYPE LIKE `Humidity` - NO_DISCOVER</p> |
 |External sensor port 2 discovery |<p>uioSensorStatusTable</p> |SNMP |external.sensor2.discovery<p>**Overrides:**</p><p>Temp<br> - {#EXTERNAL_SENSOR2_NAME} MATCHES_REGEX `Temp`<br>  - ITEM_PROTOTYPE LIKE `Humidity` - NO_DISCOVER</p> |
+|Input phases discovery |<p>The input phase identifier. OID upsPhaseInputPhaseIndex.1.1</p> |SNMP |input.phases.discovery |
+|Output phases discovery |<p>The output phase identifier. OID upsPhaseOutputPhaseIndex.1.1</p> |SNMP |output.phases.discovery |
 
 ## Items collected
 
@@ -115,8 +115,8 @@ There are no template links in this template.
 |Battery has low capacity (below {$BATTERY.CAPACITY.MIN.WARN}%) |<p>-</p> |`last(/APC Smart-UPS SRT 5000 SNMP/battery.capacity[upsHighPrecBatteryCapacity]) < {$BATTERY.CAPACITY.MIN.WARN}` |HIGH | |
 |Battery needs replacement |<p>A battery installed has an internal error condition.</p> |`last(/APC Smart-UPS SRT 5000 SNMP/battery.replace_indicator[upsAdvBatteryReplaceIndicator])=2` |HIGH | |
 |Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for {$TIME.PERIOD}) |<p>-</p> |`min(/APC Smart-UPS SRT 5000 SNMP/battery.temperature[upsHighPrecBatteryTemperature],{$TIME.PERIOD}) > {$BATTERY.TEMP.MAX.WARN}` |HIGH | |
-|Unacceptable input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD}) |<p>-</p> |`min(/APC Smart-UPS SRT 5000 SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) > 0 and ((min(/APC Smart-UPS SRT 5000 SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) > {$UPS.INPUT_VOLT.MAX.WARN} or max(/APC Smart-UPS SRT 5000 SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) < {$UPS.INPUT_VOLT.MIN.WARN}))` |HIGH | |
-|Unacceptable input frequency (out of range {$UPS.INPUT_FREQ.MIN.WARN}-{$UPS.INPUT_FREQ.MAX.WARN}Hz for {$TIME.PERIOD}) |<p>-</p> |`min(/APC Smart-UPS SRT 5000 SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) > 0 and ((min(/APC Smart-UPS SRT 5000 SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) > {$UPS.INPUT_FREQ.MAX.WARN} or max(/APC Smart-UPS SRT 5000 SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) < {$UPS.INPUT_FREQ.MIN.WARN}))` |HIGH | |
+|Unacceptable input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD}) |<p>-</p> |`min(/APC Smart-UPS SRT 5000 SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) > 0 and (min(/APC Smart-UPS SRT 5000 SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) > {$UPS.INPUT_VOLT.MAX.WARN} or max(/APC Smart-UPS SRT 5000 SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) < {$UPS.INPUT_VOLT.MIN.WARN})` |HIGH | |
+|Unacceptable input frequency (out of range {$UPS.INPUT_FREQ.MIN.WARN}-{$UPS.INPUT_FREQ.MAX.WARN}Hz for {$TIME.PERIOD}) |<p>-</p> |`min(/APC Smart-UPS SRT 5000 SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) > 0 and (min(/APC Smart-UPS SRT 5000 SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) > {$UPS.INPUT_FREQ.MAX.WARN} or max(/APC Smart-UPS SRT 5000 SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) < {$UPS.INPUT_FREQ.MIN.WARN})` |HIGH | |
 |Output load is high (over {$UPS.OUTPUT.MAX.WARN}% for {$TIME.PERIOD}) |<p>A battery installed has an internal error condition.</p> |`min(/APC Smart-UPS SRT 5000 SNMP/output.load[upsHighPrecOutputLoad],{$TIME.PERIOD}) > {$UPS.OUTPUT.MAX.WARN}` |HIGH | |
 |UPS is Timed Sleeping |<p>-</p> |`last(/APC Smart-UPS SRT 5000 SNMP/output.status[upsBasicOutputStatus])=5` |AVERAGE | |
 |UPS is Switched Bypass |<p>-</p> |`last(/APC Smart-UPS SRT 5000 SNMP/output.status[upsBasicOutputStatus])=9` |AVERAGE | |
@@ -147,5 +147,5 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/420730-discussion-thread-for-official-zabbix-template-apc-ups).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/420730-discussion-thread-for-official-zabbix-template-apc-ups).
 

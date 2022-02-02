@@ -67,11 +67,11 @@ There are no template links in this template.
 |Travis |Travis: Repo [{#SLUG}]: Last build state |<p>Last build state in {#SLUG} repo.</p> |DEPENDENT |travis.repo.last_build.state[{#SLUG}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.builds[0].state`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Travis |Travis: Repo [{#SLUG}]: Last build number |<p>Last build number in {#SLUG} repo.</p> |DEPENDENT |travis.repo.last_build.number[{#SLUG}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.builds[0].number`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Travis |Travis: Repo [{#SLUG}]: Last build id |<p>Last build id in {#SLUG} repo.</p> |DEPENDENT |travis.repo.last_build.id[{#SLUG}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.builds[0].id`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Zabbix_raw_items |Travis: Get repos |<p>Getting repos using Travis API.</p> |HTTP_AGENT |travis.get_repos |
-|Zabbix_raw_items |Travis: Get builds |<p>Getting builds using Travis API.</p> |HTTP_AGENT |travis.get_builds |
-|Zabbix_raw_items |Travis: Get jobs |<p>Getting jobs using Travis API.</p> |HTTP_AGENT |travis.get_jobs |
-|Zabbix_raw_items |Travis: Repo [{#SLUG}]: Get builds |<p>Getting builds of {#SLUG} using Travis API.</p> |HTTP_AGENT |travis.repo.get_builds[{#SLUG}] |
-|Zabbix_raw_items |Travis: Repo [{#SLUG}]: Get caches |<p>Getting caches of {#SLUG} using Travis API.</p> |HTTP_AGENT |travis.repo.get_caches[{#SLUG}] |
+|Zabbix raw items |Travis: Get repos |<p>Getting repos using Travis API.</p> |HTTP_AGENT |travis.get_repos |
+|Zabbix raw items |Travis: Get builds |<p>Getting builds using Travis API.</p> |HTTP_AGENT |travis.get_builds |
+|Zabbix raw items |Travis: Get jobs |<p>Getting jobs using Travis API.</p> |HTTP_AGENT |travis.get_jobs |
+|Zabbix raw items |Travis: Repo [{#SLUG}]: Get builds |<p>Getting builds of {#SLUG} using Travis API.</p> |HTTP_AGENT |travis.repo.get_builds[{#SLUG}] |
+|Zabbix raw items |Travis: Repo [{#SLUG}]: Get caches |<p>Getting caches of {#SLUG} using Travis API.</p> |HTTP_AGENT |travis.repo.get_caches[{#SLUG}] |
 
 ## Triggers
 
@@ -86,5 +86,5 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/).
 

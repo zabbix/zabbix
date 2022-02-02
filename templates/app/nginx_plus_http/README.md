@@ -74,14 +74,14 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|HTTP server zones discovery |<p>-</p> |DEPENDENT |nginx.http.server_zones.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `30m`</p><p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$NGINX.LLD.FILTER.HTTP.ZONE.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$NGINX.LLD.FILTER.HTTP.ZONE.NOT_MATCHES}`</p> |
 |HTTP location zones discovery |<p>-</p> |DEPENDENT |nginx.http.location_zones.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `30m`</p><p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$NGINX.LLD.FILTER.HTTP.LOCATION.ZONE.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$NGINX.LLD.FILTER.HTTP.LOCATION.ZONE.NOT_MATCHES}`</p> |
-|HTTP upstreams discovery |<p>-</p> |DEPENDENT |nginx.http.upstreams.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `30m`</p><p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$NGINX.LLD.FILTER.HTTP.UPSTREAM.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$NGINX.LLD.FILTER.HTTP.UPSTREAM.NOT_MATCHES}`</p> |
+|HTTP server zones discovery |<p>-</p> |DEPENDENT |nginx.http.server_zones.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `30m`</p><p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$NGINX.LLD.FILTER.HTTP.ZONE.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$NGINX.LLD.FILTER.HTTP.ZONE.NOT_MATCHES}`</p> |
 |HTTP upstream peers discovery |<p>-</p> |DEPENDENT |nginx.http.upstream.peers.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `30m`</p><p>**Filter**:</p>AND <p>- {#UPSTREAM} MATCHES_REGEX `{$NGINX.LLD.FILTER.HTTP.UPSTREAM.MATCHES}`</p><p>- {#UPSTREAM} NOT_MATCHES_REGEX `{$NGINX.LLD.FILTER.HTTP.UPSTREAM.NOT_MATCHES}`</p> |
-|Stream server zones discovery |<p>-</p> |DEPENDENT |nginx.stream.server_zones.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `30m`</p><p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$NGINX.LLD.FILTER.STREAM.ZONE.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$NGINX.LLD.FILTER.STREAM.ZONE.NOT_MATCHES}`</p> |
-|Stream upstreams discovery |<p>-</p> |DEPENDENT |nginx.stream.upstreams.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `30m`</p><p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$NGINX.LLD.FILTER.STREAM.UPSTREAM.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$NGINX.LLD.FILTER.STREAM.UPSTREAM.NOT_MATCHES}`</p> |
-|Stream upstream peers discovery |<p>-</p> |DEPENDENT |nginx.stream.upstream.peers.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `30m`</p><p>**Filter**:</p>AND <p>- {#UPSTREAM} MATCHES_REGEX `{$NGINX.LLD.FILTER.STREAM.UPSTREAM.MATCHES}`</p><p>- {#UPSTREAM} NOT_MATCHES_REGEX `{$NGINX.LLD.FILTER.STREAM.UPSTREAM.NOT_MATCHES}`</p> |
+|HTTP upstreams discovery |<p>-</p> |DEPENDENT |nginx.http.upstreams.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `30m`</p><p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$NGINX.LLD.FILTER.HTTP.UPSTREAM.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$NGINX.LLD.FILTER.HTTP.UPSTREAM.NOT_MATCHES}`</p> |
 |Resolvers discovery |<p>-</p> |DEPENDENT |nginx.resolvers.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `30m`</p><p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$NGINX.LLD.FILTER.RESOLVER.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$NGINX.LLD.FILTER.RESOLVER.NOT_MATCHES}`</p> |
+|Stream server zones discovery |<p>-</p> |DEPENDENT |nginx.stream.server_zones.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `30m`</p><p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$NGINX.LLD.FILTER.STREAM.ZONE.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$NGINX.LLD.FILTER.STREAM.ZONE.NOT_MATCHES}`</p> |
+|Stream upstream peers discovery |<p>-</p> |DEPENDENT |nginx.stream.upstream.peers.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `30m`</p><p>**Filter**:</p>AND <p>- {#UPSTREAM} MATCHES_REGEX `{$NGINX.LLD.FILTER.STREAM.UPSTREAM.MATCHES}`</p><p>- {#UPSTREAM} NOT_MATCHES_REGEX `{$NGINX.LLD.FILTER.STREAM.UPSTREAM.NOT_MATCHES}`</p> |
+|Stream upstreams discovery |<p>-</p> |DEPENDENT |nginx.stream.upstreams.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `30m`</p><p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$NGINX.LLD.FILTER.STREAM.UPSTREAM.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$NGINX.LLD.FILTER.STREAM.UPSTREAM.NOT_MATCHES}`</p> |
 
 ## Items collected
 
@@ -124,7 +124,7 @@ There are no template links in this template.
 |Nginx |Nginx: HTTP location zone [{#NAME}]: Sent, rate |<p>The total number of bytes sent to clients per second.</p> |DEPENDENT |nginx.http.location_zones.sent.rate[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#NAME}'].sent`</p><p>- CHANGE_PER_SECOND</p> |
 |Nginx |Nginx: HTTP upstream [{#NAME}]: Keepalive |<p>The current number of idle keepalive connections.</p> |DEPENDENT |nginx.http.upstreams.keepalive[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#NAME}'].keepalive`</p> |
 |Nginx |Nginx: HTTP upstream [{#NAME}]: Zombies |<p>The current number of servers removed from the group but still processing active client requests.</p> |DEPENDENT |nginx.http.upstreams.zombies[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#NAME}'].zombies`</p> |
-|Nginx |Nginx: HTTP upstream [{#NAME}]: Zone |<p>The name of the shared memory zone that keeps the group’s configuration and run-time state.</p> |DEPENDENT |nginx.http.upstreams.zone[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#NAME}'].zone`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Nginx |Nginx: HTTP upstream [{#NAME}]: Zone |<p>The name of the shared memory zone that keeps the group's configuration and run-time state.</p> |DEPENDENT |nginx.http.upstreams.zone[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#NAME}'].zone`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |Nginx |Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: State |<p>Current state, which may be one of “up”, “draining”, “down”, “unavail”, “checking”, and “unhealthy”.</p> |DEPENDENT |nginx.http.upstream.peer.state[{#UPSTREAM},{#PEER}]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#UPSTREAM}'].peers[?(@.server == '{#PEER}')].state.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |Nginx |Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Active |<p>The current number of active connections.</p> |DEPENDENT |nginx.http.upstream.peer.active[{#UPSTREAM},{#PEER}]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#UPSTREAM}'].peers[?(@.server == '{#PEER}')].active.first()`</p> |
 |Nginx |Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Requests, rate |<p>The total number of client requests forwarded to this server per second.</p> |DEPENDENT |nginx.http.upstream.peer.requests.rate[{#UPSTREAM},{#PEER}]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#UPSTREAM}'].peers[?(@.server == '{#PEER}')].requests.first()`</p><p>- CHANGE_PER_SECOND</p> |
@@ -178,16 +178,16 @@ There are no template links in this template.
 |Nginx |Nginx: Resolver [{#NAME}]: Responses refused, rate |<p>The total number of REFUSED (Operation refused) responses per second.</p> |DEPENDENT |nginx.resolvers.responses.refused.rate[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#NAME}'].responses.refused`</p><p>- CHANGE_PER_SECOND</p> |
 |Nginx |Nginx: Resolver [{#NAME}]: Responses timedout, rate |<p>The total number of timed out requests per second.</p> |DEPENDENT |nginx.resolvers.responses.timedout.rate[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#NAME}'].responses.timedout`</p><p>- CHANGE_PER_SECOND</p> |
 |Nginx |Nginx: Resolver [{#NAME}]: Responses unknown, rate |<p>The total number of requests completed with an unknown error per second.</p> |DEPENDENT |nginx.resolvers.responses.unknown.rate[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#NAME}'].responses.unknown`</p><p>- CHANGE_PER_SECOND</p> |
-|Zabbix_raw_items |Nginx: Get info |<p>Return status of nginx running instance.</p> |HTTP_AGENT |nginx.info |
-|Zabbix_raw_items |Nginx: Get connections |<p>Returns statistics of client connections.</p> |HTTP_AGENT |nginx.connections |
-|Zabbix_raw_items |Nginx: Get SSL |<p>Returns SSL statistics.</p> |HTTP_AGENT |nginx.ssl |
-|Zabbix_raw_items |Nginx: Get requests |<p>Returns status of client HTTP requests.</p> |HTTP_AGENT |nginx.requests |
-|Zabbix_raw_items |Nginx: Get HTTP zones |<p>Returns status information for each HTTP server zone.</p> |HTTP_AGENT |nginx.http.server_zones |
-|Zabbix_raw_items |Nginx: Get HTTP location zones |<p>Returns status information for each HTTP location zone.</p> |HTTP_AGENT |nginx.http.location_zones |
-|Zabbix_raw_items |Nginx: Get HTTP upstreams |<p>Returns status of each HTTP upstream server group and its servers.</p> |HTTP_AGENT |nginx.http.upstreams |
-|Zabbix_raw_items |Nginx: Get Stream server zones |<p>Returns status information for each stream server zone.</p> |HTTP_AGENT |nginx.stream.server_zones |
-|Zabbix_raw_items |Nginx: Get Stream upstreams |<p>Returns status of each stream upstream server group and its servers.</p> |HTTP_AGENT |nginx.stream.upstreams |
-|Zabbix_raw_items |Nginx: Get resolvers |<p>Returns status information for each resolver zone.</p> |HTTP_AGENT |nginx.resolvers |
+|Zabbix raw items |Nginx: Get info |<p>Return status of nginx running instance.</p> |HTTP_AGENT |nginx.info |
+|Zabbix raw items |Nginx: Get connections |<p>Returns statistics of client connections.</p> |HTTP_AGENT |nginx.connections |
+|Zabbix raw items |Nginx: Get SSL |<p>Returns SSL statistics.</p> |HTTP_AGENT |nginx.ssl |
+|Zabbix raw items |Nginx: Get requests |<p>Returns status of client HTTP requests.</p> |HTTP_AGENT |nginx.requests |
+|Zabbix raw items |Nginx: Get HTTP zones |<p>Returns status information for each HTTP server zone.</p> |HTTP_AGENT |nginx.http.server_zones |
+|Zabbix raw items |Nginx: Get HTTP location zones |<p>Returns status information for each HTTP location zone.</p> |HTTP_AGENT |nginx.http.location_zones |
+|Zabbix raw items |Nginx: Get HTTP upstreams |<p>Returns status of each HTTP upstream server group and its servers.</p> |HTTP_AGENT |nginx.http.upstreams |
+|Zabbix raw items |Nginx: Get Stream server zones |<p>Returns status information for each stream server zone.</p> |HTTP_AGENT |nginx.stream.server_zones |
+|Zabbix raw items |Nginx: Get Stream upstreams |<p>Returns status of each stream upstream server group and its servers.</p> |HTTP_AGENT |nginx.stream.upstreams |
+|Zabbix raw items |Nginx: Get resolvers |<p>Returns status information for each resolver zone.</p> |HTTP_AGENT |nginx.resolvers |
 
 ## Triggers
 
@@ -207,5 +207,5 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
 

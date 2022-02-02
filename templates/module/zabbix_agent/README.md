@@ -30,9 +30,9 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Monitoring_agent |Version of Zabbix agent running |<p>-</p> |ZABBIX_PASSIVE |agent.version<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
-|Monitoring_agent |Host name of Zabbix agent running |<p>-</p> |ZABBIX_PASSIVE |agent.hostname<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
-|Monitoring_agent |Zabbix agent ping |<p>The agent always returns 1 for this item. It could be used in combination with nodata() for availability check.</p> |ZABBIX_PASSIVE |agent.ping |
+|Monitoring agent |Version of Zabbix agent running |<p>-</p> |ZABBIX_PASSIVE |agent.version<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
+|Monitoring agent |Host name of Zabbix agent running |<p>-</p> |ZABBIX_PASSIVE |agent.hostname<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
+|Monitoring agent |Zabbix agent ping |<p>The agent always returns 1 for this item. It could be used in combination with nodata() for availability check.</p> |ZABBIX_PASSIVE |agent.ping |
 |Status |Zabbix agent availability |<p>Monitoring agent availability status</p> |INTERNAL |zabbix[host,agent,available] |
 
 ## Triggers
@@ -76,8 +76,8 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Monitoring_agent |Version of Zabbix agent running |<p>-</p> |ZABBIX_ACTIVE |agent.version<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
-|Monitoring_agent |Host name of Zabbix agent running |<p>-</p> |ZABBIX_ACTIVE |agent.hostname<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
+|Monitoring agent |Version of Zabbix agent running |<p>-</p> |ZABBIX_ACTIVE |agent.version<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
+|Monitoring agent |Host name of Zabbix agent running |<p>-</p> |ZABBIX_ACTIVE |agent.hostname<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |Status |Zabbix agent ping |<p>The agent always returns 1 for this item. It could be used in combination with nodata() for availability check.</p> |ZABBIX_ACTIVE |agent.ping |
 
 ## Triggers

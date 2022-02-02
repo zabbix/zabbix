@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-18T20:49:58Z'
+  date: '2022-01-26T13:49:11Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -35,8 +35,11 @@ zabbix_export:
             name: 'Service state'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 72f8bcb4dfde4d338c31c83b72a36129
@@ -44,6 +47,10 @@ zabbix_export:
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 959946f1885c4e7fbde7ab7200c60858
           name: 'ICMP loss'
@@ -54,8 +61,11 @@ zabbix_export:
           units: '%'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 0c0a32b98df84c07acbe51caabc8c012
@@ -67,6 +77,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Alcatel Timetra TiMOS SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 7f858a8bc36746be89b2e36608cbb643
           name: 'ICMP response time'
@@ -77,8 +94,11 @@ zabbix_export:
           units: s
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 06fd317938784236b3e17b2b4080925d
@@ -93,6 +113,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Alcatel Timetra TiMOS SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 8f5bdb3fde9142a9892db396c040f8dd
           name: 'SNMP traps (fallback)'
@@ -105,8 +132,8 @@ zabbix_export:
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: network
         -
           uuid: 0471357a58ff437e835e02175d6e6ca1
           name: 'System contact details'
@@ -128,8 +155,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: e28cb751b37e42d29be9f0295bd030b6
           name: 'CPU utilization'
@@ -144,8 +171,8 @@ zabbix_export:
             The value of sgiCpuUsage indicates the current CPU utilization for the system.
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
           triggers:
             -
               uuid: 4167b064eb19478da13531f629082ef1
@@ -154,6 +181,10 @@ zabbix_export:
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 757c85110dc34eb88265832aba8e7fbf
           name: 'System description'
@@ -176,8 +207,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 2183a57a2c904632bf813c15610765f7
           name: 'Hardware model name'
@@ -202,8 +233,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
         -
           uuid: 597b68e7ddb8482280122de489424041
           name: 'System location'
@@ -225,8 +256,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 0b1d37d4950d40c79433f47dea9677d4
           name: 'System name'
@@ -248,8 +279,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: 5f11cacfd4a94cf696897b3f3fa80601
@@ -258,6 +289,13 @@ zabbix_export:
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: security
         -
           uuid: f0df5a577f5c46689578302df065a3d6
           name: 'System object ID'
@@ -278,8 +316,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 9f1c8827a9ef4948808bac9d76add9a8
           name: 'Operating system'
@@ -304,8 +342,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: os
           triggers:
             -
               uuid: dd5dc3541a3d402c98a60b25d9e48dd6
@@ -318,6 +356,10 @@ zabbix_export:
                 -
                   name: 'System name has changed (new name: {ITEM.VALUE})'
                   expression: 'last(/Alcatel Timetra TiMOS SNMP/system.name,#1)<>last(/Alcatel Timetra TiMOS SNMP/system.name,#2) and length(last(/Alcatel Timetra TiMOS SNMP/system.name))>0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: e80e3dfbf1a447be87f1b6853c66555b
           name: Uptime
@@ -338,8 +380,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: 3b6324116e5940b5aaea72adca4dbbf6
@@ -352,6 +394,10 @@ zabbix_export:
                 -
                   name: 'No SNMP data collection'
                   expression: 'max(/Alcatel Timetra TiMOS SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 3f2769066a184d29afd26047039b633c
           name: 'Available memory'
@@ -370,8 +416,8 @@ zabbix_export:
                 - '1024'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: 9005685cea194d7c9702f19040df7b80
           name: 'Total memory'
@@ -383,8 +429,8 @@ zabbix_export:
           description: 'Total memory in Bytes'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: f5cd1ed0f61f464f86a97485f833d832
           name: 'Used memory'
@@ -403,8 +449,8 @@ zabbix_export:
                 - '1024'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: f223ac289a99469e8861219f4254dea6
           name: 'Memory utilization'
@@ -417,8 +463,8 @@ zabbix_export:
           description: 'Memory utilization in %'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
           triggers:
             -
               uuid: a22f13e245b944e991c2c9850a731a3c
@@ -426,6 +472,13 @@ zabbix_export:
               name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: cbcc156906774a109dd3d0cf09c512e9
           name: 'SNMP agent availability'
@@ -442,8 +495,11 @@ zabbix_export:
             name: zabbix.host.available
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 60187191b268499784a70ef1dfe058ae
@@ -456,6 +512,10 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Alcatel Timetra TiMOS SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: fe7fa4ab68b8430c86a3adf6ba2fd048
@@ -490,8 +550,8 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: Inventory
+                  tag: component
+                  value: system
               trigger_prototypes:
                 -
                   uuid: ccdcfdbe1a6243949857c764aed9c9ea
@@ -500,6 +560,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
         -
           uuid: 0fa1180b594e401a83927f6c20809a86
           name: 'FAN Discovery'
@@ -530,8 +594,8 @@ zabbix_export:
                 name: 'TIMETRA-CHASSIS-MIB::TmnxDeviceState'
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
               trigger_prototypes:
                 -
                   uuid: 10f9f5cd2f1b4d09abba3ae48b482eb8
@@ -540,6 +604,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: 0caa510db5f54ee5a57c9a40c9d20140
           name: 'Network interfaces discovery'
@@ -628,8 +699,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: ddabc629599f43f494b67225ccaef4cd
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
@@ -648,8 +725,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: cc041e8f15eb48c098871bfa91c9edef
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
@@ -673,8 +756,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: abdd315e75154954a8d8323a35d42029
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
@@ -697,8 +786,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 91b4d7e0133049049efa24835e00b061
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
@@ -717,8 +812,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: be432b00cdc044c0a1190e31aecc2b2c
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
@@ -742,8 +843,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 67971f7787444822b9ee370a3cc2d3ec
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
@@ -768,8 +875,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 92ac574cd0354d9fa886cfcf0f2f048d
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
@@ -791,8 +904,14 @@ zabbix_export:
                 name: 'IF-MIB::ifOperStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: a4bcc6d80080415698d8fd323ff5d484
@@ -810,6 +929,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 201dd2baef0647f58fbcec0205cce318
               name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
@@ -833,8 +956,14 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
           trigger_prototypes:
             -
               uuid: a9467162f7434b8e97cb6645b6a060ae
@@ -864,6 +993,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Alcatel Timetra TiMOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Alcatel Timetra TiMOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Alcatel Timetra TiMOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Alcatel Timetra TiMOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 27e0b7fcaf664410962dc768e0ef7267
               expression: |
@@ -884,6 +1017,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Alcatel Timetra TiMOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Alcatel Timetra TiMOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Alcatel Timetra TiMOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Alcatel Timetra TiMOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: ee8dccabf5df45b48a503320131b152e
               expression: |
@@ -903,6 +1040,13 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Alcatel Timetra TiMOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Alcatel Timetra TiMOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Alcatel Timetra TiMOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Alcatel Timetra TiMOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
           graph_prototypes:
             -
               uuid: 58eba6a5a57f49608fb62b9d270e98c6
@@ -1006,8 +1150,14 @@ zabbix_export:
                 name: 'EtherLike-MIB::dot3StatsDuplexStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: e5d6ba20229044b98ee8cb33e00de8b0
@@ -1016,6 +1166,10 @@ zabbix_export:
                   priority: WARNING
                   description: 'Please check autonegotiation settings and cabling'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
           preprocessing:
             -
               type: JAVASCRIPT
@@ -1062,8 +1216,8 @@ zabbix_export:
                 name: 'TIMETRA-CHASSIS-MIB::TmnxDeviceState'
               tags:
                 -
-                  tag: Application
-                  value: 'Power supply'
+                  tag: component
+                  value: power
               trigger_prototypes:
                 -
                   uuid: afbc2020a9f74d6abe52469ac663e057
@@ -1072,6 +1226,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: b73b01d720c7431085657548d620f76e
               name: '#{#SNMPINDEX}: Power supply status'
@@ -1092,8 +1253,8 @@ zabbix_export:
                 name: 'TIMETRA-CHASSIS-MIB::TmnxDeviceState'
               tags:
                 -
-                  tag: Application
-                  value: 'Power supply'
+                  tag: component
+                  value: power
               trigger_prototypes:
                 -
                   uuid: fcbc0ef8f55146daaed6be4ccbd324e7
@@ -1102,6 +1263,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: 6382c9595cb446778d23bb273143b27c
           name: 'Temperature Discovery'
@@ -1130,8 +1298,8 @@ zabbix_export:
                 The current temperature reading in degrees celsius from this hardware component's temperature sensor.  If this component does not contain a temperature sensor, then the value -1 is returned.
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: 8f478386378349e7a4e4586c5ba74c78
@@ -1142,6 +1310,13 @@ zabbix_export:
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 90ba726922f74d1d971b3f07781fc035
                   expression: 'avg(/Alcatel Timetra TiMOS SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:""}'
@@ -1156,6 +1331,13 @@ zabbix_export:
                       name: '{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
                       expression: 'avg(/Alcatel Timetra TiMOS SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
                       recovery_expression: 'max(/Alcatel Timetra TiMOS SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 6035fc6733614ae1b4ed22c7d73466b0
                   expression: 'avg(/Alcatel Timetra TiMOS SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
@@ -1164,6 +1346,23 @@ zabbix_export:
                   name: '{#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
+      tags:
+        -
+          tag: class
+          value: network
+        -
+          tag: target
+          value: alcatel
+        -
+          tag: target
+          value: alcatel-timetra
       macros:
         -
           macro: '{$CPU.UTIL.CRIT}'
