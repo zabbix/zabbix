@@ -68,7 +68,8 @@ window.token_edit_popup = {
 							success: response.success
 						}
 					}));
-				} else {
+				}
+				else {
 					this.overlay.setProperties({
 						title: t('API token'),
 						content: response.data,

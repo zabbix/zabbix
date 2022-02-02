@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -20,8 +19,7 @@
 **/
 
 
-class CControllerTokenCreate extends CController
-{
+class CControllerTokenCreate extends CController {
 
 	protected function checkInput() {
 		$fields = [
@@ -100,7 +98,8 @@ class CControllerTokenCreate extends CController
 
 			$output['data'] = (new CPartial('administration.token.view.html', $data))->getOutput();
 
-		} else {
+		}
+		else {
 			$output['error'] = [
 				'title' => _('Cannot add API token'),
 				'messages' => array_column(get_and_clear_messages(), 'message')

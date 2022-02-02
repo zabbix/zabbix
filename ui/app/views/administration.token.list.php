@@ -202,7 +202,7 @@ $token_form->addItem([
 				->onClick('view.massDeleteToken(this);')
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('no-chkbxrange')
-				->removeAttribute('id')
+				->removeid()
 		]
 	], 'token')
 ]);
