@@ -695,9 +695,13 @@ abstract class CControllerLatest extends CController {
 					return ($field['selected'] || $field['count'] != 0);
 				});
 
+				$values_count = count($values);
+				$values = self::getTopPrioritySubfilters($values);
+
 				$top_priority_fields[] = [
 					'name' => $tag,
-					'values' => self::getTopPrioritySubfilters($values)
+					'values' => $values,
+					'trimmed' => ($values_count > count($values))
 				];
 				unset($tags[$tag]);
 			}
@@ -718,9 +722,13 @@ abstract class CControllerLatest extends CController {
 				});
 
 				if ($tag_values) {
+					$tag_values_count = count($tag_values);
+					$tag_values = self::getTopPrioritySubfilters($tag_values);
+
 					$top_priority_fields[] = [
 						'name' => $tag_name,
-						'values' => self::getTopPrioritySubfilters($tag_values)
+						'values' => $tag_values,
+						'trimmed' => ($tag_values_count > count($tag_values))
 					];
 				}
 			} while (self::SUBFILTERS_TAG_VALUE_ROWS_EXPANDED > count($top_priority_fields));

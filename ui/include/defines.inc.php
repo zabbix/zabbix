@@ -63,6 +63,8 @@ define('ZBX_GEOMAP_MAX_ZOOM', 30); // Max zoom level for geomap.
 
 define('ZBX_MAX_GRAPHS_PER_PAGE', 20);
 
+define('SUBFILTER_VALUES_PER_GROUP', 1000); // Number of subfilter values per group.
+
 // Date and time format separators must be synced with setSDateFromOuterObj() in class.calendar.js.
 define('ZBX_FULL_DATE_TIME',	'Y-m-d H:i:s'); // Time selector full date and time presentation format.
 define('ZBX_DATE_TIME',			'Y-m-d H:i'); // Time selector date and time without seconds presentation format.

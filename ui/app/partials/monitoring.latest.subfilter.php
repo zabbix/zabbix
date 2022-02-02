@@ -137,6 +137,8 @@ if (count($subfilters['tags']) > 0) {
 			}
 		}, $tags_group['values']);
 
+		$tag_values = $tags_group['trimmed'] ? [$tag_values, new CSpan('...')] : $tag_values;
+
 		$subfilter_options['tags'][$tag] = (new CDiv([
 			new CTag('label', true, $tag.': '),
 			(new CExpandableSubfilter('tagnames', $tag_values, array_key_exists('tagnames', $subfilters_expanded)))
