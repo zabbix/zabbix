@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * Base class for Tags function tests.
@@ -120,7 +120,6 @@ class testFormGeographicalMaps extends CWebTest {
 
 		// Open hintboxes and compare text.
 		$hintboxes = [
-			[
 				'Tile URL' => "The URL template is used to load and display the tile layer on geographical maps.".
 						"\n".
 						"\nExample: https://{s}.example.com/{z}/{x}/{y}{r}.png".
@@ -129,14 +128,9 @@ class testFormGeographicalMaps extends CWebTest {
 						"\n{s} represents one of the available subdomains;".
 						"\n{z} represents zoom level parameter in the URL;".
 						"\n{x} and {y} represent tile coordinates;".
-						"\n{r} can be used to add \"@2x\" to the URL to load retina tiles."
-			],
-			[
-				'Attribution' => 'Tile provider attribution data displayed in a small text box on the map.'
-			],
-			[
+						"\n{r} can be used to add \"@2x\" to the URL to load retina tiles.",
+				'Attribution' => 'Tile provider attribution data displayed in a small text box on the map.',
 				'Max zoom level' => 'Maximum zoom level of the map.'
-			]
 		];
 
 		foreach ($hintboxes as $field => $text) {
@@ -163,7 +157,7 @@ class testFormGeographicalMaps extends CWebTest {
 		if ($data['Tile provider'] === 'Other') {
 			$form->fill(['Tile provider' => 'OpenStreetMap Mapnik']);
 			$form->fill(['Tile provider' => 'Other']);
-			$form->checkValue(['Max zoom level' => '']);;
+			$form->checkValue(['Max zoom level' => '']);
 		}
 		else {
 			// Take all fields except dropdown and check they are disabled.
@@ -365,7 +359,7 @@ class testFormGeographicalMaps extends CWebTest {
 		else {
 			$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
-			// Check frontend form.
+			// Check values in frontend form.
 			$this->page->login()->open('zabbix.php?action=geomaps.edit');
 			$form->invalidate();
 			$form->checkValue($data['fields']);
@@ -390,8 +384,7 @@ class testFormGeographicalMaps extends CWebTest {
 
 			$this->assertEquals($expected_db, CDBHelper::getAll('SELECT geomaps_tile_provider, geomaps_tile_url, '.
 					'geomaps_attribution, geomaps_max_zoom FROM config'
-				)
-			);
+			));
 		}
 	}
 }

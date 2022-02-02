@@ -94,7 +94,6 @@ require_once dirname(__FILE__).'/testFormApiTokensUserSettings.php';
 require_once dirname(__FILE__).'/testFormEventCorrelation.php';
 require_once dirname(__FILE__).'/testFormFilterHosts.php';
 require_once dirname(__FILE__).'/testFormFilterProblems.php';
-require_once dirname(__FILE__).'/testFormGeographicalMaps.php';
 require_once dirname(__FILE__).'/testFormGraph.php';
 require_once dirname(__FILE__).'/testFormGraphPrototype.php';
 require_once dirname(__FILE__).'/hosts/testFormHostConfiguration.php';
@@ -184,6 +183,8 @@ require_once dirname(__FILE__).'/dashboard/testDashboardSystemInformationWidget.
 require_once dirname(__FILE__).'/dashboard/testDashboardPages.php';
 require_once dirname(__FILE__).'/dashboard/testFormTemplateDashboards.php';
 require_once dirname(__FILE__).'/dashboard/testPageTemplateDashboards.php';
+require_once dirname(__FILE__).'/geomaps/testFormGeographicalMaps.php';
+require_once dirname(__FILE__).'/geomaps/testFormGeomapWidget.php';
 require_once dirname(__FILE__).'/reports/testPageReportsActionLog.php';
 require_once dirname(__FILE__).'/reports/testPageReportsAudit.php';
 require_once dirname(__FILE__).'/reports/testPageReportsNotifications.php';
@@ -282,6 +283,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormFilterHosts');
 		$suite->addTestSuite('testFormFilterProblems');
 		$suite->addTestSuite('testFormGeographicalMaps');
+		$suite->addTestSuite('testFormGeomapWidget');
 		$suite->addTestSuite('testFormGraph');
 		$suite->addTestSuite('testFormGraphPrototype');
 		$suite->addTestSuite('testFormHostConfiguration');
