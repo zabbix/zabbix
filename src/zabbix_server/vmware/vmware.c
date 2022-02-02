@@ -30,7 +30,6 @@
 
 #include "memalloc.h"
 #include "log.h"
-#include "zbxalgo.h"
 #include "daemon.h"
 #include "zbxself.h"
 #include "../../libs/zbxalgo/vectorimpl.h"

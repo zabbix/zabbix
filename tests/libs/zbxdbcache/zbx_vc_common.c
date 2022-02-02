@@ -20,7 +20,6 @@
 #include "zbx_vc_common.h"
 
 #include "zbxmocktest.h"
-#include "zbxmockdata.h"
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 

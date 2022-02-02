@@ -20,18 +20,9 @@
 #ifndef ZABBIX_CONFIGCACHE_H
 #define ZABBIX_CONFIGCACHE_H
 
-#include "zbxmocktest.h"
-#include "zbxmockdata.h"
-#include "zbxmockassert.h"
-#include "zbxmockutil.h"
-
-#include "zbxserver.h"
 #include "common.h"
 #include "zbxalgo.h"
-#include "dbcache.h"
-#include "mutexs.h"
 #include "dbconfig.h"
-#include "configcache_mock.h"
 
 typedef struct
 {
