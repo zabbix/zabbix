@@ -467,10 +467,10 @@ class CHostPrototype extends CHostBase {
 		}
 		unset($host_prototype);
 
-		$host_prototypeids = DB::insert($this->tableName(), $host_prototypes);
+		$hostids = DB::insert('hosts', $host_prototypes);
 
 		foreach ($host_prototypes as $index => &$host_prototype) {
-			$host_prototype['hostid'] = $host_prototypeids[$index];
+			$host_prototype['hostid'] = $hostids[$index];
 		}
 		unset($host_prototype);
 
@@ -1272,7 +1272,15 @@ class CHostPrototype extends CHostBase {
 		unset($host_prototype);
 
 		if ($del_group_prototypeids) {
-			self::deleteGroupPrototypes($del_group_prototypeids);
+			// Lock group prototypes before delete to prevent server from adding new LLD elements.
+			DBselect(
+				'SELECT NULL'.
+				' FROM group_prototype gp'.
+				' WHERE '.dbConditionId('gp.group_prototypeid', $del_group_prototypeids).
+				' FOR UPDATE'
+			);
+
+			DB::delete('group_prototype', ['group_prototypeid' => $del_group_prototypeids]);
 		}
 
 		if ($ins_group_links) {
@@ -1330,7 +1338,17 @@ class CHostPrototype extends CHostBase {
 		unset($host_prototype);
 
 		if ($del_group_prototypeids) {
-			self::deleteGroupPrototypes($del_group_prototypeids);
+			// Lock group prototypes before delete to prevent server from adding new LLD elements.
+			DBselect(
+				'SELECT NULL'.
+				' FROM group_prototype gp'.
+				' WHERE '.dbConditionId('gp.group_prototypeid', $del_group_prototypeids).
+				' FOR UPDATE'
+			);
+
+			self::deleteDiscoveredGroups($del_group_prototypeids);
+
+			DB::delete('group_prototype', ['group_prototypeid' => $del_group_prototypeids]);
 		}
 
 		if ($ins_group_prototypes) {
@@ -1972,155 +1990,133 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * @param array $host_prototypeids
+	 * @param array $hostids
 	 *
 	 * @return array
 	 */
-	public function delete(array $host_prototypeids): array {
-		$this->validateDelete($host_prototypeids);
+	public function delete(array $hostids): array {
+		$this->validateDelete($hostids, $db_host_prototypes);
 
-		self::deleteForce($host_prototypeids);
+		self::deleteForce($db_host_prototypes);
 
-		return ['hostids' => $host_prototypeids];
+		return ['hostids' => $hostids];
 	}
 
 	/**
-	 * @param array $host_prototypeids
+	 * @param array      $hostids
+	 * @param array|null $db_host_prototypes
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateDelete(array &$host_prototypeids) : void {
+	private function validateDelete(array &$hostids, array &$db_host_prototypes = null): void {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
-		if (!CApiInputValidator::validate($api_input_rules, $host_prototypeids, '/', $error)) {
+		if (!CApiInputValidator::validate($api_input_rules, $hostids, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$count = $this->get([
-			'countOutput' => true,
-			'hostids' => $host_prototypeids,
-			'editable' => true
+		$db_host_prototypes = $this->get([
+			'output' => ['hostid', 'host', 'templateid'],
+			'hostids' => $hostids,
+			'editable' => true,
+			'preservekeys' => true
 		]);
 
-		if ($count != count($host_prototypeids)) {
+		if (count($db_host_prototypes) != count($hostids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$db_host_prototype = DBfetch(DBSelect(
-			'SELECT h.hostid'.
-			' FROM hosts h'.
-			' WHERE h.templateid>0'.
-				' AND '.dbConditionId('h.hostid', $host_prototypeids),
-			1
-		));
-
-		if ($db_host_prototype) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete templated host prototype.'));
+		foreach ($hostids as $i => $hostid) {
+			if ($db_host_prototypes[$hostid]['templateid'] != 0) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.$i,
+					_('cannot delete templated host prototype')
+				));
+			}
 		}
 	}
 
 	/**
-	 * @param array $host_prototypeids
+	 * @param array $db_host_prototypes
 	 */
-	public static function deleteForce(array $host_prototypeids): void {
-		$host_prototypeids = array_merge($host_prototypeids, self::getChildIds($host_prototypeids));
+	public static function deleteForce(array $db_host_prototypes): void {
+		$hostids = array_keys($db_host_prototypes);
 
 		// Lock host prototypes before delete to prevent server from adding new LLD hosts.
-		$db_host_prototypes = DBfetchArray(DBselect(
-			'SELECT hostid,host'.
+		DBselect(
+			'SELECT NULL'.
 			' FROM hosts h'.
-			' WHERE '.dbConditionId('h.hostid', $host_prototypeids).
+			' WHERE '.dbConditionId('h.hostid', $hostids).
+			' FOR UPDATE'
+		);
+
+		$_db_host_prototypes = $db_host_prototypes;
+
+		do {
+			// Lock also inherited host prototypes before delete to prevent server from adding new LLD hosts.
+			$_db_host_prototypes = DBfetchArrayAssoc(DBselect(
+				'SELECT hostid,host'.
+				' FROM hosts h'.
+				' WHERE '.dbConditionId('h.hostid', array_keys($_db_host_prototypes)).
+				' FOR UPDATE'
+			), 'hostid');
+
+			$db_host_prototypes += $_db_host_prototypes;
+		}
+		while ($_db_host_prototypes);
+
+		$discovered_hosts = DBfetchArrayAssoc(DBselect(
+			'SELECT hd.hostid,h.host'.
+			' FROM host_discovery hd,hosts h'.
+			' WHERE hd.hostid=h.hostid'.
+				' AND '.dbConditionId('hd.parent_hostid', $hostids)
+		), 'hostid');
+
+		CHost::validateDeleteForce($discovered_hosts);
+		CHost::deleteForce($discovered_hosts);
+
+		// Lock group prototypes before delete to prevent server from adding new LLD elements.
+		$db_group_prototypes = DBfetchArray(DBselect(
+			'SELECT gp.group_prototypeid,gp.name'.
+			' FROM group_prototype gp'.
+			' WHERE '.dbConditionId('gp.hostid', $hostids).
 			' FOR UPDATE'
 		));
 
-		$db_hosts = DB::select('host_discovery', [
-			'output' => [],
-			'filter' => [
-				'parent_hostid' => $host_prototypeids
-			],
-			'preservekeys' => true
-		]);
+		$group_prototypeids = [];
 
-		if ($db_hosts) {
-			API::Host()->delete(array_keys($db_hosts), true);
+		foreach ($db_group_prototypes as $db_group_prototype) {
+			if ($db_group_prototype['name'] !== '') {
+				$group_prototypeids[] = $db_group_prototype['group_prototypeid'];
+			}
 		}
 
-		$db_group_prototypes = DB::select('group_prototype', [
-			'output' => [],
-			'filter' => [
-				'hostid' => $host_prototypeids
-			],
-			'preservekeys' => true
-		]);
-
-		if ($db_group_prototypes) {
-			self::deleteGroupPrototypes(array_keys($db_group_prototypes));
+		if ($group_prototypeids) {
+			self::deleteDiscoveredGroups($group_prototypeids);
 		}
 
-		DB::delete('hosts', ['hostid' => $host_prototypeids]);
+		DB::delete('group_prototype', ['group_prototypeid' => array_column($db_host_prototypes, 'group_prototypeid')]);
+
+		DB::delete('hosts', ['hostid' => $hostids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_HOST_PROTOTYPE, $db_host_prototypes);
 	}
 
 	/**
-	 * @param array $host_prototypeids
-	 *
-	 * @return array
-	 */
-	private static function getChildIds(array $host_prototypeids): array {
-		$child_host_prototypeids = [];
-
-		do {
-			$db_host_prototypes = DB::select('hosts', [
-				'output' => [],
-				'filter' => [
-					'templateid' => $host_prototypeids
-				],
-				'preservekeys' => true
-			]);
-
-			$host_prototypeids = array_keys($db_host_prototypes);
-			$child_host_prototypeids += $db_host_prototypes;
-		}
-		while ($host_prototypeids);
-
-		return array_keys($child_host_prototypeids);
-	}
-
-
-	/**
-	 * Deletes the given group prototype and all discovered groups.
-	 * Deletes also group prototype children.
+	 * Delete the discovered host groups of the given group prototypes.
 	 *
 	 * @param array $group_prototypeids
 	 */
-	private static function deleteGroupPrototypes(array $group_prototypeids): void {
-		// Lock group prototypes before delete to prevent server from adding new LLD elements.
-		DBselect(
-			'SELECT NULL'.
-			' FROM group_prototype gp'.
-			' WHERE '.dbConditionId('gp.group_prototypeid', $group_prototypeids).
-			' FOR UPDATE'
-		);
+	private static function deleteDiscoveredGroups(array $group_prototypeids): void {
+		$db_groups = DBfetchArrayAssoc(DBselect(
+			'SELECT gd.groupid,g.name'.
+			' FROM group_discovery gd,hstgrp g'.
+			' WHERE gd.groupid=g.groupid'.
+				' AND '.dbConditionId('gd.parent_group_prototypeid', $group_prototypeids)
+		), 'groupid');
 
-		$child_group_prototypeids = DB::select('group_prototype', [
-			'output' => [],
-			'filter' => ['templateid' => $group_prototypeids],
-			'preservekeys' => true
-		]);
-		if ($child_group_prototypeids) {
-			self::deleteGroupPrototypes(array_keys($child_group_prototypeids));
+		if ($db_groups) {
+			CHostGroup::validateDeleteForce($db_groups);
+			CHostGroup::deleteForce($db_groups);
 		}
-
-		$host_groups = DB::select('group_discovery', [
-			'output' => ['groupid'],
-			'filter' => ['parent_group_prototypeid' => $group_prototypeids]
-		]);
-		if ($host_groups) {
-			API::HostGroup()->delete(array_column($host_groups, 'groupid'), true);
-		}
-
-		// delete group prototypes
-		DB::delete('group_prototype', ['group_prototypeid' => $group_prototypeids]);
 	}
 }
