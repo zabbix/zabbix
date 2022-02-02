@@ -36,6 +36,8 @@ This guide describes how to integrate your Zabbix 5.0 installation with Redmine 
 - **redmine_project** to your numeric Project ID or its name. Important: if you specify a project name, each time an additional API call will be made to get its identifier.<br>
 You can find Project ID on *http://&lt;YOR_REDMINE_URL&gt;/projects.xml*
 - **redmine_tracker_id** to your Tracker ID
+- **redmine_close_issue** to _true_ if you like to close issues on trigger resolve.
+- **redmine_close_status_id** to your numeric close Status ID, in case if you set **redmine_close_issue** to _true_.
 
 [![](images/thumb.05.png?raw=true)](images/05.png)
 
