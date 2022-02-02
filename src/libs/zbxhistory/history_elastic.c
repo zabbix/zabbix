@@ -42,15 +42,6 @@ static zbx_uint32_t	ZBX_ELASTIC_SVERSION = ZBX_DBVERSION_UNDEFINED;
 
 typedef struct
 {
-	char	*base_url;
-	char	*post_url;
-	char	*buf;
-	CURL	*handle;
-}
-zbx_elastic_data_t;
-
-typedef struct
-{
 	unsigned char		initialized;
 	zbx_vector_ptr_t	ifaces;
 
@@ -227,7 +218,7 @@ static void	elastic_log_error(CURL *handle, CURLcode error, const char *errbuf)
  ************************************************************************************/
 static void	elastic_close(zbx_history_iface_t *hist)
 {
-	zbx_elastic_data_t	*data = (zbx_elastic_data_t *)hist->data;
+	zbx_elastic_data_t	*data = hist->elastic_data;
 
 	zbx_free(data->buf);
 	zbx_free(data->post_url);
@@ -367,7 +358,7 @@ static void	elastic_writer_release(void)
  ************************************************************************************/
 static void	elastic_writer_add_iface(zbx_history_iface_t *hist)
 {
-	zbx_elastic_data_t	*data = (zbx_elastic_data_t *)hist->data;
+	zbx_elastic_data_t	*data = hist->elastic_data;
 	CURLoption		opt;
 	CURLcode		err;
 
@@ -445,7 +436,7 @@ static int	elastic_writer_flush(void)
 	for (i = 0; i < writer.ifaces.values_num; i++)
 	{
 		zbx_history_iface_t	*hist = (zbx_history_iface_t *)writer.ifaces.values[i];
-		zbx_elastic_data_t	*data = (zbx_elastic_data_t *)hist->data;
+		zbx_elastic_data_t	*data = hist->elastic_data;
 
 		if (CURLE_OK != (err = curl_easy_setopt(data->handle, CURLOPT_HTTPHEADER, curl_headers)))
 		{
@@ -595,7 +586,7 @@ end:
  ************************************************************************************/
 static void	elastic_destroy(zbx_history_iface_t *hist)
 {
-	zbx_elastic_data_t	*data = (zbx_elastic_data_t *)hist->data;
+	zbx_elastic_data_t	*data = hist->elastic_data;
 
 	elastic_close(hist);
 
@@ -624,7 +615,7 @@ static void	elastic_destroy(zbx_history_iface_t *hist)
 static int	elastic_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid, int start, int count, int end,
 		zbx_vector_history_record_t *values)
 {
-	zbx_elastic_data_t	*data = (zbx_elastic_data_t *)hist->data;
+	zbx_elastic_data_t	*data = hist->elastic_data;
 	size_t			url_alloc = 0, url_offset = 0, id_alloc = 0, scroll_alloc = 0, scroll_offset = 0;
 	int			total, empty, ret;
 	CURLcode		err;
@@ -859,7 +850,7 @@ out:
  ************************************************************************************/
 static int	elastic_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t *history)
 {
-	zbx_elastic_data_t	*data = (zbx_elastic_data_t *)hist->data;
+	zbx_elastic_data_t	*data = hist->elastic_data;
 	int			i, num = 0;
 	ZBX_DC_HISTORY		*h;
 	struct zbx_json		json_idx, json;
@@ -981,7 +972,7 @@ int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type
 	data->handle = NULL;
 
 	hist->value_type = value_type;
-	hist->data = data;
+	hist->elastic_data = data;
 	hist->destroy = elastic_destroy;
 	hist->add_values = elastic_add_values;
 	hist->flush = elastic_flush;
