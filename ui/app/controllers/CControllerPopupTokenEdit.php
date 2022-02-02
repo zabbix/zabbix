@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerTokenEdit extends CController {
+class CControllerPopupTokenEdit extends CController {
 
 	protected function init() {
 		$this->disableSIDValidation();
