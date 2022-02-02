@@ -31,11 +31,10 @@ $token_form = (new CForm())
 	->setName('token')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action_src', $data['action_src'])
-	->addVar('action_dst', ($data['tokenid'] == 0) ? 'token.view' : 'token.list')
 	->addVar('action', ($data['tokenid'] == 0) ? 'token.create' : 'token.update')
 	->addVar('tokenid', $data['tokenid']);
 
-if ($data['action_src'] === 'user.token.edit') {
+if ($data['action_src'] === 'user.token.list') {
 	$token_form->addVar('userid', CWebUser::$data['userid']);
 }
 
@@ -53,7 +52,7 @@ $token_from_grid = (new CFormGrid())
 			->setAriaRequired()
 	]);
 
-if ($data['action_src'] === 'token.edit') {
+if ($data['action_src'] === 'token.list') {
 	$token_from_grid->addItem([
 		(new CLabel(_('User'), 'userid_ms'))->setAsteriskMark(),
 		new CFormField(

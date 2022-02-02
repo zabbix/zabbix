@@ -44,7 +44,7 @@ $token_from_grid = (new CFormGrid())
 		new CDiv($data['name'])
 	]);
 
-if ($data['action_src'] === 'token.edit') {
+if ($data['action_src'] === 'token.list') {
 	$token_from_grid->addItem([
 		(new CDiv(_('User') . ':'))->addClass(ZBX_STYLE_RIGHT),
 		new CDiv($data['user'])

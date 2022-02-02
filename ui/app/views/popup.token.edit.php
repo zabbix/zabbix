@@ -25,19 +25,8 @@
  */
 
 $data['form_name'] = 'token_form';
-$popup_url = (new CUrl('zabbix.php'));
-
-if ($data['action_src'] === 'token.list') {
-	$data['action_src'] = 'token.edit';
-	$popup_url->setArgument('action', 'token.edit');
-}
-else {
-	$data['action_src'] = 'user.token.edit';
-	$popup_url->setArgument('action', 'user.token.edit');
-}
 
 if ($data['tokenid'] != 0) {
-	$popup_url->setArgument('tokenid', $data['tokenid']);
 
 	$buttons = [
 		[
@@ -83,7 +72,6 @@ $output = [
 	'script_inline' => getPagePostJs().
 		$this->readJsFile('popup.token.edit.js.php').
 		'token_edit_popup.init('.json_encode([
-			'popup_url' => $popup_url->getUrl(),
 			'form_name' => $data['form_name']
 		]).');',
 	'buttons' => $buttons

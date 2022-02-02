@@ -36,8 +36,6 @@ window.token_edit_popup = {
 
 		this.addEventListeners();
 
-		history.replaceState({}, '', popup_url);
-
 		token_edit.init({form_name});
 	},
 
