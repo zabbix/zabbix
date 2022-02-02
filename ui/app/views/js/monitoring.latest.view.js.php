@@ -33,8 +33,6 @@
 		refresh_interval: null,
 		refresh_counters: null,
 
-		subfilters_expanded: [],
-
 		running: false,
 		timeout: null,
 		_refresh_message_box: null,
@@ -75,7 +73,7 @@
 			document.querySelectorAll('.expandable-subfilter').forEach((element) => {
 				const subfilter = new CExpandableSubfilter(element);
 				subfilter.on(EXPANDABLE_SUBFILTER_EVENT_EXPAND, (e) => {
-					this.subfilters_expanded.push(e.detail.name);
+					this.filter.setExpandedSubfilters(e.detail.name);
 				});
 			});
 
@@ -86,7 +84,7 @@
 						element.classList.remove('display-none');
 					});
 
-					this.subfilters_expanded.push(expand_tags.dataset['name']);
+					this.filter.setExpandedSubfilters(expand_tags.dataset['name']);
 					expand_tags.remove();
 				});
 			}
@@ -196,7 +194,7 @@
 					return post_data;
 				}, {});
 
-			post_data['subfilters_expanded'] = this.subfilters_expanded;
+			post_data['subfilters_expanded'] = this.filter.getExpandedSubfilters();
 
 			var deferred = $.ajax({
 				url: this.refresh_simple_url,
