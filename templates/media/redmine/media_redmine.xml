@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2022-02-02T13:00:33Z</date>
+    <date>2022-02-02T15:52:08Z</date>
     <media_types>
         <media_type>
             <name>Redmine</name>
@@ -42,14 +42,6 @@
                 <parameter>
                     <name>redmine_access_key</name>
                     <value>&lt;PUT YOUR ACCESS KEY&gt;</value>
-                </parameter>
-                <parameter>
-                    <name>redmine_close_issue</name>
-                    <value>false</value>
-                </parameter>
-                <parameter>
-                    <name>redmine_close_status_id</name>
-                    <value>&lt;PUT YOUR CLOSE STATUS ID&gt;</value>
                 </parameter>
                 <parameter>
                     <name>redmine_issue_key</name>
@@ -255,10 +247,6 @@
 &#13;
 };&#13;
 &#13;
-function isTrue(value) {&#13;
-    return value.toLowerCase() === 'true';&#13;
-};&#13;
-&#13;
 try {&#13;
     var params = JSON.parse(value),&#13;
         params_redmine = {},&#13;
@@ -312,8 +300,8 @@ try {&#13;
         throw 'Incorrect &quot;event_update_status&quot; parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';&#13;
     }&#13;
 &#13;
-    if (isTrue(params_redmine.close_issue) &amp;&amp; !parseInt(params_redmine.close_status_id, 10)) {&#13;
-        throw '&quot;redmine_close_issue&quot; is set to &quot;true&quot;, but mandatory field &quot;redmine_close_status_id&quot; have no valid id value! Must be an integer.';&#13;
+    if (typeof params_redmine.close_status_id !== 'undefined' &amp;&amp; !parseInt(params_redmine.close_status_id, 10)) {&#13;
+        throw 'Incorrect &quot;redmine_close_status_id&quot; parameter given! Must be an integer.';&#13;
     }&#13;
 &#13;
     if (params.event_source !== '0' &amp;&amp; params.event_value === '0') {&#13;
@@ -361,8 +349,8 @@ try {&#13;
         result.tags.__zbx_redmine_issuelink = params.redmine_url +&#13;
             (params.redmine_url.endsWith('/') ? '' : '/') + 'issues/' + issue_id;&#13;
     }&#13;
-    // Close issue if close_issue set true and it is a recovery operation&#13;
-    else if (params.event_value === '0' &amp;&amp; isTrue(params_redmine.close_issue)) {&#13;
+    // Close issue if close_status_id is set and it is a recovery operation&#13;
+    else if (params.event_value === '0' &amp;&amp; typeof params_redmine.close_status_id !== 'undefined') {&#13;
         Redmine.updateIssue(params.alert_subject + '\n' + params.alert_message, params_fields, params_redmine.close_status_id);&#13;
     }&#13;
     // Update created issue for trigger-based event.&#13;
