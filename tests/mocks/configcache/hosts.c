@@ -29,6 +29,7 @@
 #include "mutexs.h"
 #include "dbconfig.h"
 #include "configcache.h"
+#include "configcache_mock.h"
 
 extern zbx_mock_config_t	mock_config;
 
