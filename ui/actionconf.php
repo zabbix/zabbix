@@ -37,7 +37,7 @@ $fields = [
 	'name' =>							[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})',
 											_('Name')
 										],
-	'eventsource' =>					[T_ZBX_INT, O_OPT, null,
+	'eventsource' =>					[T_ZBX_INT, O_MAND, P_SYS,
 											IN([EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY,
 												EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL
 											]),
@@ -102,7 +102,7 @@ $dataValid = check_fields($fields);
 $edit_ack_operationid = null;
 $new_ack_operation = getRequest('new_ack_operation', []);
 $ack_operations = getRequest('ack_operations', []);
-$eventsource = getRequest('eventsource', EVENT_SOURCE_TRIGGERS);
+$eventsource = getRequest('eventsource');
 
 if (hasRequest('actionid')) {
 	$actionPermissions = API::Action()->get([
@@ -563,7 +563,7 @@ else {
 	];
 
 	$data = [
-		'eventsource' => getRequest('eventsource', EVENT_SOURCE_TRIGGERS),
+		'eventsource' => $eventsource,
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
 		'filter' => $filter,
