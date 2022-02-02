@@ -153,10 +153,8 @@ $token_table = (new CTableInfo())
 	]);
 
 foreach ($data['tokens'] as $token) {
-	$name = (new CLink($token['name'], (new CUrl('zabbix.php'))
-		->setArgument('action', 'token.edit')
-		->setArgument('tokenid', $token['tokenid'])
-	))->onClick('view.editToken(event, ' . json_decode($token['tokenid']) . ')');
+	$name = (new CLink($token['name'], 'javascript:void(0)')
+	)->onClick('view.editToken(event, ' . json_decode($token['tokenid']) . ')');
 
 	$token_table->addRow([
 		new CCheckBox('tokenids['.$token['tokenid'].']', $token['tokenid']),
