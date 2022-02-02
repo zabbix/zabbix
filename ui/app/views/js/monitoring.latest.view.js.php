@@ -78,6 +78,18 @@
 					this.subfilters_expanded.push(e.detail.name);
 				});
 			});
+
+			const expand_tags = document.getElementById('expand_tag_values');
+			if (expand_tags !== null) {
+				expand_tags.addEventListener('click', () => {
+					document.querySelectorAll('.subfilter-option-grid.display-none').forEach((element) => {
+						element.classList.remove('display-none');
+					});
+
+					this.subfilters_expanded.push(expand_tags.dataset['name']);
+					expand_tags.remove();
+				});
+			}
 		},
 
 		createCountersRefresh(timeout) {

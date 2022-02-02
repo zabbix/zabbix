@@ -93,7 +93,9 @@ if (count($subfilters['tags']) > 0) {
 	$subfilter_used = (bool) array_filter($subfilters['tags'], function ($field) {
 		return (bool) array_sum(array_column($field, 'selected'));
 	});
+	$tags_expanded = array_key_exists('tags', $subfilters_expanded);
 
+	$index = 0;
 	foreach (CControllerLatest::getTopPriorityTagValueSubfilters($subfilters['tags']) as $tags_group) {
 		$tag = $tags_group['name'];
 
@@ -141,10 +143,16 @@ if (count($subfilters['tags']) > 0) {
 				->addClass(CExpandableSubfilter::ZBX_STYLE_EXPANDABLE_THREE_LINES)
 				->addClass('subfilter-options')
 		]))->addClass('subfilter-option-grid');
+
+		if (!$tags_expanded && ++$index > CControllerLatest::SUBFILTERS_TAG_VALUE_ROWS) {
+			$subfilter_options['tags'][$tag]->addClass('display-none');
+		}
 	}
 
-	if (count($subfilters['tags']) > CControllerLatest::SUBFILTERS_TAG_VALUE_ROWS) {
-		$subfilter_options['tags'][] = new CSpan('...');
+	if (!$tags_expanded && count($subfilters['tags']) > CControllerLatest::SUBFILTERS_TAG_VALUE_ROWS) {
+		$subfilter_options['tags'][] = (new CButton('expand_tag_values'))
+			->setAttribute('data-name', 'tags')
+			->addClass(ZBX_STYLE_ICON_WZRD_ACTION);
 	}
 }
 else {

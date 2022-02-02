@@ -33,6 +33,9 @@ abstract class CControllerLatest extends CController {
 	// Number of tag value rows allowed to be included in subfilter.
 	const SUBFILTERS_TAG_VALUE_ROWS = 10;
 
+	// Number of tag value rows when tag values subfilter is expanded.
+	const SUBFILTERS_TAG_VALUE_ROWS_EXPANDED = 200;
+
 	// Filter fields default values.
 	const FILTER_FIELDS_DEFAULT = [
 		'groupids' => [],
@@ -704,7 +707,7 @@ abstract class CControllerLatest extends CController {
 		}
 
 		// Add first non-selected subfilter values in case limit is not exceeded.
-		if (self::SUBFILTERS_TAG_VALUE_ROWS > count($top_priority_fields)) {
+		if (self::SUBFILTERS_TAG_VALUE_ROWS_EXPANDED > count($top_priority_fields)) {
 			$tags_names = array_keys($tags);
 			uasort($tags_names, 'strnatcasecmp');
 
@@ -723,7 +726,7 @@ abstract class CControllerLatest extends CController {
 						'values' => self::getTopPrioritySubfilters($tag_values)
 					];
 				}
-			} while (self::SUBFILTERS_TAG_VALUE_ROWS > count($top_priority_fields));
+			} while (self::SUBFILTERS_TAG_VALUE_ROWS_EXPANDED > count($top_priority_fields));
 		}
 
 		CArrayHelper::sort($top_priority_fields, ['name']);
