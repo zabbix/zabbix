@@ -49,7 +49,7 @@ window.token_edit_popup = {
 	submit() {
 		this.removePopupMessages();
 
-		const fields = token_edit.trimFields(getFormFields(this.form));
+		const fields = token_edit.preprocessFormFields(getFormFields(this.form));
 		const curl = new Curl(this.form.getAttribute('action'), false);
 
 		fetch(curl.getUrl(), {
@@ -94,7 +94,7 @@ window.token_edit_popup = {
 	regenerate() {
 		this.removePopupMessages();
 
-		const fields = token_edit.trimFields(getFormFields(this.form));
+		const fields = token_edit.preprocessFormFields(getFormFields(this.form));
 		fields.regenerate = '1';
 
 		const curl = new Curl(this.form.getAttribute('action'), false);

@@ -48,6 +48,12 @@
 			this.expiresAtHandler();
 		},
 
+		preprocessFormFields(fields) {
+			this.trimFields(fields);
+			fields.status = fields.status || <?= ZBX_AUTH_TOKEN_DISABLED ?>;
+			return fields;
+		},
+
 		trimFields(fields) {
 			const fields_to_trim = ['name', 'description'];
 			for (const field of fields_to_trim) {

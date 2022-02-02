@@ -108,7 +108,6 @@ $token_from_grid->addItem([
 		new CFormField(
 			(new CCheckBox('status', ZBX_AUTH_TOKEN_ENABLED))
 				->setChecked($data['status'] == ZBX_AUTH_TOKEN_ENABLED)
-				->setUncheckedValue(ZBX_AUTH_TOKEN_DISABLED)
 		)
 
 	]);
