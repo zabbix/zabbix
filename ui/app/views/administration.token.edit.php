@@ -35,7 +35,6 @@ $token_form = (new CForm())
 	->setId('token_form')
 	->setName('token')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
-	->addVar('action_dst', ($data['tokenid'] == 0) ? 'token.view' : 'token.list')
 	->addVar('action', ($data['tokenid'] == 0) ? 'token.create' : 'token.update')
 	->addVar('tokenid', $data['tokenid']);
 
