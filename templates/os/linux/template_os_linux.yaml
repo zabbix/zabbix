@@ -1409,11 +1409,7 @@ zabbix_export:
       uuid: 18ecfb2a7e754315bb8d7f71917153da
       template: 'Linux network interfaces by Zabbix agent'
       name: 'Linux network interfaces by Zabbix agent'
-      description: |
-        Known Issues:
-        
-          Description: High interface utilization trigger is removed since currently it is not possible to retrieve interface speed to determine the max bandwidth.
-        
+      description: |        
         Template tooling version used: 0.40
       groups:
         -
@@ -1621,11 +1617,36 @@ zabbix_export:
                 -
                   tag: Application
                   value: 'Interface {#IFNAME}'
+            -
+              uuid: 4644f15077474647bc7104431cf1bb74
+              name: 'Interface {#IFNAME}: Speed'
+              key: 'vfs.file.contents["/sys/class/net/{#IFNAME}/speed"]'
+              delay: 5m
+              history: 7d
+              trends: 0d
+              units: bps
+              description: |
+                Indicates the interface latest or current speed value. Value is an integer representing the link speed in bits/sec.
+                This attribute is only valid for interfaces that implement the ethtool get_link_ksettings method (mostly Ethernet).
+                Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1000000'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}'
           trigger_prototypes:
             -
               uuid: 42ba7cc36b734d4a933ed4f7ceb8f3a4
               expression: |
-                change(/Linux network interfaces by Zabbix agent/vfs.file.contents["/sys/class/net/{#IFNAME}/type"])<0 and last(/Linux network interfaces by Zabbix agent/vfs.file.contents["/sys/class/net/{#IFNAME}/type"])>0
+                change(/Linux network interfaces by Zabbix agent/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"])<0 and last(/Linux network interfaces by Zabbix agent/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"])>0
                 and
                 (last(/Linux network interfaces by Zabbix agent/vfs.file.contents["/sys/class/net/{#IFNAME}/type"])=6
                 or last(/Linux network interfaces by Zabbix agent/vfs.file.contents["/sys/class/net/{#IFNAME}/type"])=1)
@@ -1633,7 +1654,7 @@ zabbix_export:
                 (last(/Linux network interfaces by Zabbix agent/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"])<>2)
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                (change(/Linux network interfaces by Zabbix agent/vfs.file.contents["/sys/class/net/{#IFNAME}/type"])>0 and last(/Linux network interfaces by Zabbix agent/vfs.file.contents["/sys/class/net/{#IFNAME}/type"],#2)>0) or
+                (change(/Linux network interfaces by Zabbix agent/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"])>0 and last(/Linux network interfaces by Zabbix agent/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"],#2)>0) or
                 (last(/Linux network interfaces by Zabbix agent/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"])=2)
               name: 'Interface {#IFNAME}: Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
@@ -1658,6 +1679,26 @@ zabbix_export:
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'Interface {#IFNAME}: Link down'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Linux network interfaces by Zabbix agent/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"])=2 and (last(/Linux network interfaces by Zabbix agent/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"],#1)<>last(/Linux network interfaces by Zabbix agent/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"],#2))'
+                  recovery_expression: 'last(/Linux network interfaces by Zabbix agent/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+            -
+              uuid: 678d795a043a4f5a84fc9690d0d29783
+              expression: |
+                (avg(/Linux network interfaces by Zabbix agent/net.if.in["{#IFNAME}"],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Linux network interfaces by Zabbix agent/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"]) or
+                avg(/Linux network interfaces by Zabbix agent/net.if.out["{#IFNAME}"],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Linux network interfaces by Zabbix agent/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"])) and
+                last(/Linux network interfaces by Zabbix agent/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"])>0
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: |
+                avg(/Linux network interfaces by Zabbix agent/net.if.in["{#IFNAME}"],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Linux network interfaces by Zabbix agent/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"]) and
+                avg(/Linux network interfaces by Zabbix agent/net.if.out["{#IFNAME}"],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Linux network interfaces by Zabbix agent/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"])
+              name: 'Interface {#IFNAME}: High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
+              opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
+              priority: WARNING
+              description: 'The network interface utilization is close to its estimated maximum bandwidth.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -1714,6 +1755,10 @@ zabbix_export:
         -
           macro: '{$IF.ERRORS.WARN}'
           value: '2'
+        -
+          macro: '{$IF.UTIL.MAX}'
+          value: '90'
+          description: 'This macro is used as a threshold in interface utilization trigger.'
         -
           macro: '{$IFCONTROL}'
           value: '1'
