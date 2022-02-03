@@ -26,5 +26,4 @@ void	mock_config_free(void);
 void	mock_config_load_user_macros(const char *path);
 void	mock_config_load_hosts(const char *path);
 
-
 #endif
