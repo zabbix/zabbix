@@ -824,9 +824,6 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 	zbx_vector_str_t		hostnames;
 	cfg_custom_parameter_parser_t	parser_load_enable_remove_commands, parser_load_key_access_rule;
 
-	parser_load_enable_remove_commands.cfg_custom_parameter_parser_func = load_enable_remote_commands;
-	parser_load_key_access_rule.cfg_custom_parameter_parser_func = load_key_access_rule;
-
 	struct cfg_line	cfg[] =
 	{
 		/* PARAMETER,			VAR,					TYPE,
@@ -945,6 +942,9 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	0,			INT_MAX},
 		{NULL}
 	};
+
+	parser_load_enable_remove_commands.cfg_custom_parameter_parser_func = load_enable_remote_commands;
+	parser_load_key_access_rule.cfg_custom_parameter_parser_func = load_key_access_rule;
 
 	/* initialize multistrings */
 	zbx_strarr_init(&CONFIG_ALIASES);
