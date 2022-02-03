@@ -1192,6 +1192,7 @@ class CConfigurationImport {
 							));
 						}
 					}
+					unset($item_prototype['interface_ref']);
 
 					if ($item_prototype['valuemap']) {
 						$valuemapid = $this->referencer->findValuemapidByName($hostid,
@@ -1209,8 +1210,8 @@ class CConfigurationImport {
 						}
 
 						$item_prototype['valuemapid'] = $valuemapid;
-						unset($item_prototype['valuemap']);
 					}
+					unset($item_prototype['valuemap']);
 
 					if ($item_prototype['type'] == ITEM_TYPE_DEPENDENT) {
 						if (!array_key_exists('key', $item_prototype[$master_item_key])) {
@@ -1254,17 +1255,99 @@ class CConfigurationImport {
 						? $this->referencer->findItemidByUuid($item_prototype['uuid'])
 						: $this->referencer->findItemidByKey($hostid, $item_prototype['key_']);
 
-					$item_prototype['rule'] = [
-						'hostid' => $hostid,
-						'key' => $discovery_rule['key_']
-					];
 					$item_prototype['ruleid'] = $itemid;
 
-					foreach ($item_prototype['preprocessing'] as &$preprocessing_step) {
-						$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
-						unset($preprocessing_step['parameters']);
+					if (!$item_prototype['preprocessing']) {
+						unset($item_prototype['preprocessing']);
 					}
-					unset($preprocessing_step);
+					else {
+						foreach ($item_prototype['preprocessing'] as &$preprocessing_step) {
+							$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
+							unset($preprocessing_step['parameters']);
+						}
+						unset($preprocessing_step);
+
+						$item_prototype['preprocessing'] = normalizeItemPreprocessingSteps(
+							$item_prototype['preprocessing']
+						);
+					}
+
+					unset($item_prototype['trigger_prototypes']);
+
+					if ($item_prototype['type'] != ITEM_TYPE_HTTPAGENT) {
+						unset($item_prototype['allow_traps']);
+						unset($item_prototype['url']);
+						unset($item_prototype['query_fields']);
+						unset($item_prototype['post_type']);
+						unset($item_prototype['posts']);
+						unset($item_prototype['status_codes']);
+						unset($item_prototype['follow_redirects']);
+						unset($item_prototype['http_proxy']);
+						unset($item_prototype['headers']);
+						unset($item_prototype['retrieve_mode']);
+						unset($item_prototype['request_method']);
+						unset($item_prototype['output_format']);
+						unset($item_prototype['ssl_cert_file']);
+						unset($item_prototype['ssl_key_file']);
+						unset($item_prototype['ssl_key_password']);
+						unset($item_prototype['verify_peer']);
+						unset($item_prototype['verify_host']);
+					}
+
+					if ($item_prototype['type'] != ITEM_TYPE_SNMP) {
+						unset($item_prototype['snmp_oid']);
+					}
+
+					if ($item_prototype['type'] != ITEM_TYPE_IPMI) {
+						unset($item_prototype['ipmi_sensor']);
+					}
+
+					if ($item_prototype['type'] != ITEM_TYPE_JMX) {
+						unset($item_prototype['jmx_endpoint']);
+					}
+
+					if ($item_prototype['type'] != ITEM_TYPE_SSH) {
+						unset($item_prototype['publickey']);
+						unset($item_prototype['privatekey']);
+					}
+
+					if ($item_prototype['type'] != ITEM_TYPE_SCRIPT) {
+						unset($item_prototype['parameters']);
+					}
+
+					if ($item_prototype['value_type'] != ITEM_VALUE_TYPE_LOG) {
+						unset($item_prototype['logtimefmt']);
+					}
+
+					if (!in_array($item_prototype['type'], [ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+								ITEM_TYPE_SCRIPT, ITEM_TYPE_CALCULATED
+							])) {
+						unset($item_prototype['params']);
+					}
+
+					if (!in_array($item_prototype['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
+						unset($item_prototype['trends']);
+						unset($item_prototype['units']);
+					}
+
+					if ($item_prototype['type'] != ITEM_TYPE_HTTPAGENT && $item_prototype['type'] != ITEM_TYPE_TRAPPER) {
+						unset($item_prototype['trapper_hosts']);
+					}
+
+					if ($item_prototype['type'] != ITEM_TYPE_HTTPAGENT && $item_prototype['type'] != ITEM_TYPE_SSH) {
+						unset($item_prototype['authtype']);
+					}
+
+					if ($item_prototype['type'] != ITEM_TYPE_HTTPAGENT && $item_prototype['type'] != ITEM_TYPE_SCRIPT) {
+						unset($item_prototype['timeout']);
+					}
+
+					if (!in_array($item_prototype['type'], [ITEM_TYPE_SIMPLE, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+								ITEM_TYPE_DB_MONITOR, ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT
+							])) {
+						unset($item_prototype['password']);
+						unset($item_prototype['username']);
+					}
 
 					if ($item_prototypeid !== null) {
 						if (!array_key_exists($level, $item_prototypes_to_update)) {

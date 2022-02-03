@@ -591,7 +591,7 @@ function copyItems($srcHostId, $dstHostId) {
 	$srcItems = API::Item()->get([
 		'output' => ['type', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status', 'value_type',
 			'trapper_hosts', 'units', 'logtimefmt', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username',
-			'password', 'publickey', 'privatekey', 'flags', 'description', 'inventory_link', 'jmx_endpoint',
+			'password', 'publickey', 'privatekey', 'description', 'inventory_link', 'jmx_endpoint',
 			'master_itemid', 'templateid', 'url', 'query_fields', 'timeout', 'posts', 'status_codes',
 			'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method',
 			'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host',
@@ -689,6 +689,7 @@ function copyItems($srcHostId, $dstHostId) {
 				? $valuemap_map[$srcItem['valuemap']['name']]
 				: 0;
 		}
+		unset($srcItem['valuemap']);
 
 		if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
 			// find a matching interface
@@ -708,6 +709,9 @@ function copyItems($srcHostId, $dstHostId) {
 		if (!$srcItem['preprocessing']) {
 			unset($srcItem['preprocessing']);
 		}
+		else {
+			$srcItem['preprocessing'] = normalizeItemPreprocessingSteps($srcItem['preprocessing']);
+		}
 
 		if ($srcItem['type'] == ITEM_TYPE_DEPENDENT) {
 			if ($srcItems[$srcItem['master_itemid']]['type'] == ITEM_TYPE_HTTPTEST) {
@@ -722,6 +726,81 @@ function copyItems($srcHostId, $dstHostId) {
 		}
 		else {
 			unset($srcItem['master_itemid']);
+		}
+
+		if ($srcItem['type'] != ITEM_TYPE_HTTPAGENT) {
+			unset($srcItem['allow_traps']);
+			unset($srcItem['url']);
+			unset($srcItem['query_fields']);
+			unset($srcItem['post_type']);
+			unset($srcItem['posts']);
+			unset($srcItem['status_codes']);
+			unset($srcItem['follow_redirects']);
+			unset($srcItem['http_proxy']);
+			unset($srcItem['headers']);
+			unset($srcItem['retrieve_mode']);
+			unset($srcItem['request_method']);
+			unset($srcItem['output_format']);
+			unset($srcItem['ssl_cert_file']);
+			unset($srcItem['ssl_key_file']);
+			unset($srcItem['ssl_key_password']);
+			unset($srcItem['verify_peer']);
+			unset($srcItem['verify_host']);
+		}
+
+		if ($srcItem['type'] != ITEM_TYPE_SNMP) {
+			unset($srcItem['snmp_oid']);
+		}
+
+		if ($srcItem['type'] != ITEM_TYPE_IPMI) {
+			unset($srcItem['ipmi_sensor']);
+		}
+
+		if ($srcItem['type'] != ITEM_TYPE_JMX) {
+			unset($srcItem['jmx_endpoint']);
+		}
+
+		if ($srcItem['type'] != ITEM_TYPE_SSH) {
+			unset($srcItem['publickey']);
+			unset($srcItem['privatekey']);
+		}
+
+		if ($srcItem['type'] != ITEM_TYPE_SCRIPT) {
+			unset($srcItem['parameters']);
+		}
+
+		if ($srcItem['value_type'] != ITEM_VALUE_TYPE_LOG) {
+			unset($srcItem['logtimefmt']);
+		}
+
+		if (!in_array($srcItem['type'], [ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SCRIPT,
+					ITEM_TYPE_CALCULATED
+				])) {
+			unset($srcItem['params']);
+		}
+
+		if (!in_array($srcItem['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
+			unset($srcItem['trends']);
+			unset($srcItem['units']);
+		}
+
+		if ($srcItem['type'] != ITEM_TYPE_HTTPAGENT && $srcItem['type'] != ITEM_TYPE_TRAPPER) {
+			unset($srcItem['trapper_hosts']);
+		}
+
+		if ($srcItem['type'] != ITEM_TYPE_HTTPAGENT && $srcItem['type'] != ITEM_TYPE_SSH) {
+			unset($srcItem['authtype']);
+		}
+
+		if ($srcItem['type'] != ITEM_TYPE_HTTPAGENT && $srcItem['type'] != ITEM_TYPE_SCRIPT) {
+			unset($srcItem['timeout']);
+		}
+
+		if (!in_array($srcItem['type'], [ITEM_TYPE_SIMPLE, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_DB_MONITOR,
+					ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT
+				])) {
+			unset($srcItem['password']);
+			unset($srcItem['username']);
 		}
 
 		$create_items[] = $srcItem;

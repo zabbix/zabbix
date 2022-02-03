@@ -469,6 +469,10 @@ abstract class CItemGeneral extends CApiService {
 
 			$item['flags'] = $db_item['flags'];
 			$item['hostid'] = $db_item['hostid'];
+
+			if ($this instanceof CItemPrototype) {
+				$item['ruleid'] = $db_item['discoveryRule']['itemid'];
+			}
 		}
 		unset($item);
 
@@ -858,7 +862,7 @@ abstract class CItemGeneral extends CApiService {
 					break;
 
 				case ITEM_TYPE_SSH:
-					if ($item['authtype'] == ITEM_AUTHTYPE_PUBLICKEY) {
+					if (array_key_exists('authtype', $item) && $item['authtype'] == ITEM_AUTHTYPE_PUBLICKEY) {
 						if ($item['publickey'] === '') {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('No public key file specified.'));
 						}
@@ -2342,15 +2346,28 @@ abstract class CItemGeneral extends CApiService {
 			}
 		}
 
-		$db_items = $this->get([
+		$options = [
 			'output' => $output,
 			'itemids' => array_column($items, 'itemid'),
 			'editable' => true,
 			'preservekeys' => true
-		]);
+		];
+
+		if ($this instanceof CItemPrototype) {
+			$options['selectDiscoveryRule'] = ['itemid'];
+		}
+
+		$db_items = $this->get($options);
 
 		if ($check_permissions && count($items) != count($db_items)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		if ($this instanceof CItemPrototype) {
+			foreach ($db_items as &$db_item) {
+				$db_item['ruleid'] = $db_item['discoveryRule']['itemid'];
+			}
+			unset($db_item);
 		}
 
 		static::addAffectedObjects($items, $db_items);

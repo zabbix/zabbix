@@ -177,6 +177,9 @@ class C54ImportConverter extends CConverter {
 
 			if (array_key_exists('item_prototypes', $discovery_rule)) {
 				$discovery_rule['item_prototypes'] = self::convertItems($discovery_rule['item_prototypes']);
+				$discovery_rule['item_prototypes'] = self::unsetItemPrototypesInventoryLink(
+					$discovery_rule['item_prototypes']
+				);
 			}
 		}
 		unset($discovery_rule);
@@ -265,5 +268,25 @@ class C54ImportConverter extends CConverter {
 		unset($media_type);
 
 		return $media_types;
+	}
+
+	/**
+	 * Unset inventory_link from item prototypes.
+	 *
+	 * @static
+	 *
+	 * @param array       $items
+	 *
+	 * @return array
+	 */
+	private static function unsetItemPrototypesInventoryLink(array $items): array {
+		foreach ($items as &$item) {
+			if (array_key_exists('inventory_link', $item)) {
+				unset($item['inventory_link']);
+			}
+		}
+		unset($item);
+
+		return $items;
 	}
 }

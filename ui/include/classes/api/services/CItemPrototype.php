@@ -386,7 +386,7 @@ class CItemPrototype extends CItemGeneral {
 									['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'interfaceid' =>	['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'type', 'in' => implode(',', [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_SNMP])], 'type' => API_ID],
+									['if' => ['field' => 'type', 'in' => implode(',', [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP])], 'type' => API_ID],
 									['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'discover' =>		['type' => API_INT32, 'in' => implode(',', [ITEM_DISCOVER, ITEM_NO_DISCOVER])],
@@ -459,7 +459,7 @@ class CItemPrototype extends CItemGeneral {
 			$type_change = ($item['type'] != $db_items[$item['itemid']]['type']);
 
 			if ($item['type'] != ITEM_TYPE_DEPENDENT && $db_items[$item['itemid']]['master_itemid'] != 0) {
-				$item['master_itemid'] = 0;
+				$item['master_itemid'] = null;
 			}
 
 			if ($type_change && $db_items[$item['itemid']]['type'] == ITEM_TYPE_HTTPAGENT) {
@@ -477,8 +477,12 @@ class CItemPrototype extends CItemGeneral {
 			}
 
 			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
+				$authtype = array_key_exists('authtype', $item)
+					? $item['authtype']
+					: $db_items[$item['itemid']]['authtype'];
+
 				// Clean username and password when authtype is set to HTTPTEST_AUTH_NONE.
-				if ($item['authtype'] == HTTPTEST_AUTH_NONE) {
+				if ($authtype == HTTPTEST_AUTH_NONE) {
 					$item['username'] = '';
 					$item['password'] = '';
 				}
@@ -567,7 +571,7 @@ class CItemPrototype extends CItemGeneral {
 									['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'interfaceid' =>	['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'type', 'in' => implode(',', [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_SNMP])], 'type' => API_ID],
+									['if' => ['field' => 'type', 'in' => implode(',', [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP])], 'type' => API_ID],
 									['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'discover' =>		['type' => API_INT32, 'in' => implode(',', [ITEM_DISCOVER, ITEM_NO_DISCOVER])],
@@ -612,6 +616,18 @@ class CItemPrototype extends CItemGeneral {
 		self::updatePreprocessing($items, $db_items);
 		self::updateTags($items, $db_items);
 
+		// Fix for audit log, because field type in object is different from field type in db object.
+		foreach ($db_items as &$item) {
+			if (array_key_exists('query_fields', $item)) {
+				$item['query_fields'] = json_encode($item['query_fields']);
+			}
+
+			if (array_key_exists('headers', $item)) {
+				$item['headers'] = self::headersArrayToString($item['headers']);
+			}
+		}
+		unset($item);
+
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_ITEM_PROTOTYPE, $items, $db_items);
 	}
 
@@ -638,7 +654,7 @@ class CItemPrototype extends CItemGeneral {
 	 *
 	 * @throws APIException
 	 */
-	private function validateDelete(array &$itemids, ?array &$db_items): void {
+	private function validateDelete(array $itemids, ?array &$db_items): void {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $itemids, '/', $error)) {
@@ -652,16 +668,12 @@ class CItemPrototype extends CItemGeneral {
 			'preservekeys' => true
 		]);
 
+		if (count($db_items) != count($itemids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
 		foreach ($itemids as $itemid) {
-			if (!array_key_exists($itemid, $db_items)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-
-			$db_item = $db_items[$itemid];
-
-			if ($db_item['templateid'] != 0) {
+			if ($db_items[$itemid]['templateid'] != 0) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete templated item prototype.'));
 			}
 		}

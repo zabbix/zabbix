@@ -2211,7 +2211,7 @@ class CDiscoveryRule extends CItemGeneralOld {
 		$item_prototypes = API::ItemPrototype()->get([
 			'output' => ['itemid', 'type', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
 				'value_type', 'trapper_hosts', 'units', 'logtimefmt', 'valuemapid', 'params', 'ipmi_sensor', 'authtype',
-				'username', 'password', 'publickey', 'privatekey', 'interfaceid', 'port', 'description', 'jmx_endpoint',
+				'username', 'password', 'publickey', 'privatekey', 'port', 'description', 'jmx_endpoint',
 				'master_itemid', 'templateid', 'url', 'query_fields', 'timeout', 'posts', 'status_codes',
 				'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method',
 				'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host',
@@ -2333,6 +2333,11 @@ class CDiscoveryRule extends CItemGeneralOld {
 						? $valuemap_map[$item_prototype['valuemap']['name']]
 						: 0;
 				}
+				unset($item_prototype['valuemap']);
+
+				if (!$item_prototype['valuemapid']) {
+					unset($item_prototype['valuemapid']);
+				}
 
 				// map prototype interfaces
 				if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
@@ -2353,6 +2358,11 @@ class CDiscoveryRule extends CItemGeneralOld {
 
 				if (!$item_prototype['preprocessing']) {
 					unset($item_prototype['preprocessing']);
+				}
+				else {
+					$item_prototype['preprocessing'] = normalizeItemPreprocessingSteps(
+						$item_prototype['preprocessing']
+					);
 				}
 
 				if ($item_prototype['type'] == ITEM_TYPE_DEPENDENT) {
@@ -2377,7 +2387,84 @@ class CDiscoveryRule extends CItemGeneralOld {
 					unset($item_prototype['master_itemid']);
 				}
 
+				unset($item_prototype['itemid']);
 				unset($item_prototype['templateid']);
+
+				if ($item_prototype['type'] != ITEM_TYPE_HTTPAGENT) {
+					unset($item_prototype['allow_traps']);
+					unset($item_prototype['url']);
+					unset($item_prototype['query_fields']);
+					unset($item_prototype['post_type']);
+					unset($item_prototype['posts']);
+					unset($item_prototype['status_codes']);
+					unset($item_prototype['follow_redirects']);
+					unset($item_prototype['http_proxy']);
+					unset($item_prototype['headers']);
+					unset($item_prototype['retrieve_mode']);
+					unset($item_prototype['request_method']);
+					unset($item_prototype['output_format']);
+					unset($item_prototype['ssl_cert_file']);
+					unset($item_prototype['ssl_key_file']);
+					unset($item_prototype['ssl_key_password']);
+					unset($item_prototype['verify_peer']);
+					unset($item_prototype['verify_host']);
+				}
+
+				if ($item_prototype['type'] != ITEM_TYPE_SNMP) {
+					unset($item_prototype['snmp_oid']);
+				}
+
+				if ($item_prototype['type'] != ITEM_TYPE_IPMI) {
+					unset($item_prototype['ipmi_sensor']);
+				}
+
+				if ($item_prototype['type'] != ITEM_TYPE_JMX) {
+					unset($item_prototype['jmx_endpoint']);
+				}
+
+				if ($item_prototype['type'] != ITEM_TYPE_SSH) {
+					unset($item_prototype['publickey']);
+					unset($item_prototype['privatekey']);
+				}
+
+				if ($item_prototype['type'] != ITEM_TYPE_SCRIPT) {
+					unset($item_prototype['parameters']);
+				}
+
+				if ($item_prototype['value_type'] != ITEM_VALUE_TYPE_LOG) {
+					unset($item_prototype['logtimefmt']);
+				}
+
+				if (!in_array($item_prototype['type'], [ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+							ITEM_TYPE_SCRIPT, ITEM_TYPE_CALCULATED
+						])) {
+					unset($item_prototype['params']);
+				}
+
+				if (!in_array($item_prototype['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
+					unset($item_prototype['trends']);
+					unset($item_prototype['units']);
+				}
+
+				if ($item_prototype['type'] != ITEM_TYPE_HTTPAGENT && $item_prototype['type'] != ITEM_TYPE_TRAPPER) {
+					unset($item_prototype['trapper_hosts']);
+				}
+
+				if ($item_prototype['type'] != ITEM_TYPE_HTTPAGENT && $item_prototype['type'] != ITEM_TYPE_SSH) {
+					unset($item_prototype['authtype']);
+				}
+
+				if ($item_prototype['type'] != ITEM_TYPE_HTTPAGENT && $item_prototype['type'] != ITEM_TYPE_SCRIPT) {
+					unset($item_prototype['timeout']);
+				}
+
+				if (!in_array($item_prototype['type'], [ITEM_TYPE_SIMPLE, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+							ITEM_TYPE_DB_MONITOR, ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT
+						])) {
+					unset($item_prototype['password']);
+					unset($item_prototype['username']);
+				}
+
 				$create_items[] = $item_prototype;
 			}
 
