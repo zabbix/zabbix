@@ -56,5 +56,4 @@ import (
 	_ "zabbix.com/plugins/windows/wmi"
 	_ "zabbix.com/plugins/zabbix/async"
 	_ "zabbix.com/plugins/zabbix/stats"
-	_ "zabbix.com/plugins/zabbix/sync"
 )
