@@ -21,6 +21,8 @@ package zabbixsync
 
 func getMetrics() []string {
 	return []string{
+		"vfs.dir.count", "Directory entry count.",
+		"vfs.dir.size", "Directory size (in bytes).",
 		"net.dns", "Checks if DNS service is up.",
 		"net.dns.record", "Performs DNS query.",
 		"vfs.dir.get", "Directory entry list.",
