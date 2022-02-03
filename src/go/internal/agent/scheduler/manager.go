@@ -460,8 +460,11 @@ run:
 	monitor.Unregister(monitor.Scheduler)
 }
 
-type pluginCapacity struct {
+type capacity struct {
 	Capacity int `conf:"optional"`
+	System   struct {
+		Capacity int `conf:"optional"`
+	} `conf:"optional"`
 }
 
 func (m *Manager) init() {
@@ -483,21 +486,7 @@ func (m *Manager) init() {
 	pagent := &pluginAgent{}
 	for _, metric := range metrics {
 		if metric.Plugin != pagent.impl {
-			capacity := metric.Plugin.Capacity()
-			var opts pluginCapacity
-			optsRaw := agent.Options.Plugins[metric.Plugin.Name()]
-			if optsRaw != nil {
-				if err := conf.Unmarshal(optsRaw, &opts, false); err != nil {
-					log.Warningf("invalid plugin %s configuration: %s", metric.Plugin.Name(), err)
-					log.Warningf("using default plugin capacity settings: %d", plugin.DefaultCapacity)
-					capacity = plugin.DefaultCapacity
-				} else {
-					if opts.Capacity != 0 {
-						capacity = opts.Capacity
-					}
-				}
-			}
-
+			capacity := getCapacity(agent.Options.Plugins[metric.Plugin.Name()], metric.Plugin.Name())
 			if capacity > metric.Plugin.Capacity() {
 				log.Warningf("lowering the plugin %s capacity to %d as the configured capacity %d exceeds limits",
 					metric.Plugin.Name(), metric.Plugin.Capacity(), capacity)
@@ -544,6 +533,7 @@ func (m *Manager) init() {
 		m.plugins[metric.Key] = pagent
 	}
 }
+
 func (m *Manager) Start() {
 	monitor.Register(monitor.Scheduler)
 	go m.run()
@@ -677,4 +667,54 @@ func peekTask(tasks performerHeap) performer {
 	}
 
 	return tasks[0]
+}
+
+func getCapacity(optsRaw interface{}, name string) int {
+	if optsRaw == nil {
+		return plugin.DefaultCapacity
+	}
+
+	pluginCap, pluginSystemCap := getPluginCap(optsRaw, name)
+	if pluginCap > 0 && pluginSystemCap > 0 {
+		log.Warningf("both Plugins.%s.Capacity and Plugins.%s.System.Capacity configuration parameters are set, using System.Capacity: %d",
+			name, name, pluginSystemCap)
+
+		return pluginSystemCap
+	}
+
+	if pluginSystemCap > 0 {
+		return pluginSystemCap
+	}
+
+	if pluginCap > 0 {
+		return pluginCap
+	}
+
+	log.Warningf(
+		"using default plugin capacity settings `%d` for plugin %s",
+		plugin.DefaultCapacity, name,
+	)
+
+	return plugin.DefaultCapacity
+}
+
+func getPluginCap(optsRaw interface{}, name string) (pluginCap, pluginSystemCap int) {
+	var cap capacity
+	if err := conf.Unmarshal(optsRaw, &cap, false); err != nil {
+		log.Warningf("invalid plugin %s configuration: %s", name, err)
+
+		return
+	}
+
+	pluginCap = cap.Capacity
+	pluginSystemCap = cap.System.Capacity
+
+	if pluginCap > 0 {
+		log.Warningf(
+			"plugin %s configuration parameter Plugins.%s.Capacity is deprecated, use Plugins.%s.System.Capacity instead",
+			name, name, name,
+		)
+	}
+
+	return
 }

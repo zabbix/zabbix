@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-18T20:50:09Z'
+  date: '2022-01-27T08:40:02Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -39,8 +39,11 @@ zabbix_export:
             name: 'Service state'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 0c73f37e7ffc4acf83a7edeb84398aba
@@ -48,6 +51,10 @@ zabbix_export:
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 4ae37446cb1e4a2d95f55a41dd295bdf
           name: 'ICMP loss'
@@ -58,8 +65,11 @@ zabbix_export:
           units: '%'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: eea2256c85764c12b1da83dd8d1a9fe3
@@ -71,6 +81,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Brocade FC SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 4c8f61f10759487087d5942756f478b2
           name: 'ICMP response time'
@@ -81,8 +98,11 @@ zabbix_export:
           units: s
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 17df26093a5f42fdb19715371c85f733
@@ -97,6 +117,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Brocade FC SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: c7e6790a311c4b4582093cd28341306a
           name: 'SNMP traps (fallback)'
@@ -109,8 +136,8 @@ zabbix_export:
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: network
         -
           uuid: 62ae879ca6ab46aebc8655534acbba06
           name: 'System contact details'
@@ -132,8 +159,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: b17a06635cb2400f9c6d0f848fd38868
           name: 'CPU utilization'
@@ -148,8 +175,8 @@ zabbix_export:
             System's CPU usage.
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
           triggers:
             -
               uuid: 68a50684095941cb90f22fbc8d632e7a
@@ -158,6 +185,10 @@ zabbix_export:
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 8340ccd92ba940b497375aba810394a4
           name: 'System description'
@@ -180,8 +211,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: c6e2d4c076b14ed19fbcb08caa32e5be
           name: 'Firmware version'
@@ -200,8 +231,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
           triggers:
             -
               uuid: 9c5ae10dbafb45658f25f0279a8a1934
@@ -211,6 +242,10 @@ zabbix_export:
               priority: INFO
               description: 'Firmware version has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 3c68a1be050d4c1287e63eb7b3b81f8f
           name: 'Hardware serial number'
@@ -230,8 +265,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
           triggers:
             -
               uuid: 9939f98da99c435a9b5505e55e8abb5f
@@ -240,6 +275,10 @@ zabbix_export:
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 88c5304ddeca47779b76d9806b1edc68
           name: 'System location'
@@ -261,8 +300,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: d8d912cb5c924f6587c83f08aa0c8ae1
           name: 'System name'
@@ -284,8 +323,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: 0e624c73fdca490e809ffe9235cda610
@@ -294,6 +333,13 @@ zabbix_export:
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: security
         -
           uuid: 939c63320b8e4199b87cc4759011da3c
           name: 'System object ID'
@@ -314,8 +360,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 29f1dda8042d4fd18d7da9eb95fea76c
           name: 'Overall system health status'
@@ -336,8 +382,8 @@ zabbix_export:
             name: 'SW-MIB::swOperStatus'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: b91af8b94e2047538376be9911beadee
@@ -346,6 +392,13 @@ zabbix_export:
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Please check the device for errors'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: b17d4a2bae804c968984b763fa4562fc
               expression: 'count(/Brocade FC SNMP/system.status[swOperStatus.0],#1,"eq","{$HEALTH_WARN_STATUS:\"offline\"}")=1 or count(/Brocade FC SNMP/system.status[swOperStatus.0],#1,"eq","{$HEALTH_WARN_STATUS:\"testing\"}")=1'
@@ -357,6 +410,13 @@ zabbix_export:
                 -
                   name: 'System status is in critical state'
                   expression: 'count(/Brocade FC SNMP/system.status[swOperStatus.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 237a5614cb634773853f6d5f42096773
           name: Uptime
@@ -377,8 +437,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: 42bb10d788484b92ac7290e171ee28a2
@@ -391,6 +451,10 @@ zabbix_export:
                 -
                   name: 'No SNMP data collection'
                   expression: 'max(/Brocade FC SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 9a8441cae4fb4c698502a20d5ce23ddf
           name: 'Memory utilization'
@@ -405,8 +469,8 @@ zabbix_export:
             Memory utilization in %
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
           triggers:
             -
               uuid: 1991ae08b008488380db02160b15160e
@@ -414,6 +478,13 @@ zabbix_export:
               name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 00b66dbea9464b55bbab004e0eb57c7b
           name: 'SNMP agent availability'
@@ -430,8 +501,11 @@ zabbix_export:
             name: zabbix.host.available
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 1c67a764531b48f1a931a9a928a8708d
@@ -444,6 +518,10 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Brocade FC SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: 721801e236e34b02b5430d115b23817e
@@ -473,8 +551,8 @@ zabbix_export:
                 The fan value will be in RPM(revolution per minute)
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
             -
               uuid: ee2569161ad146b392bb8f331a7f7d19
               name: '{#SENSOR_INFO}: Fan status'
@@ -489,8 +567,8 @@ zabbix_export:
                 name: 'SW-MIB::swSensorStatus'
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
               trigger_prototypes:
                 -
                   uuid: 75003433a8304644a20d11b82dcbae14
@@ -499,6 +577,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 83e8182fd7034edca8317fa91776b6d2
                   expression: 'count(/Brocade FC SNMP/sensor.fan.status[swSensorStatus.{#SNMPINDEX}],#1,"ne","{$FAN_OK_STATUS}")=1'
@@ -510,6 +595,10 @@ zabbix_export:
                     -
                       name: '{#SENSOR_INFO}: Fan is in critical state'
                       expression: 'count(/Brocade FC SNMP/sensor.fan.status[swSensorStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
         -
           uuid: 58ece372fefb4881ace97a40c5fb09c2
           name: 'Network interfaces discovery'
@@ -598,8 +687,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 04b7026dd1704074b9a18e154d10ef7f
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
@@ -618,8 +713,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: efe5a3957efd4d989809db22ad9cff9d
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
@@ -643,8 +744,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: a087793253314286a0bfab36a27898bd
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
@@ -667,8 +774,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 67d8b40449a24ad28e31ef0363d8b76d
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
@@ -687,8 +800,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 3c557f4086bc455eb6185878e50b72d9
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
@@ -712,8 +831,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: de0920aa56b740ab89118016cdacbc5e
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
@@ -738,8 +863,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 1e9a9d3ea4d24922b8c4b7acc20a3c4f
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
@@ -761,8 +892,14 @@ zabbix_export:
                 name: 'IF-MIB::ifOperStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: e5391912a6b84c1bb41832e88df4fb96
@@ -780,6 +917,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 391fe664d0e44ed99b2b966c647e1e55
               name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
@@ -803,8 +944,14 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
           trigger_prototypes:
             -
               uuid: 5a98171af6b342ab97e0c6c9de0bd589
@@ -834,6 +981,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Brocade FC SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Brocade FC SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Brocade FC SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Brocade FC SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: a16b52f43a224a11861813be5a11697c
               expression: |
@@ -854,6 +1005,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Brocade FC SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Brocade FC SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Brocade FC SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Brocade FC SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 9f42c5a5ed1341c1a26263642e4dabe4
               expression: |
@@ -873,6 +1028,13 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Brocade FC SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Brocade FC SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Brocade FC SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Brocade FC SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
           graph_prototypes:
             -
               uuid: 0ca148aeaadd45b6bd32e9ecde4127df
@@ -947,8 +1109,8 @@ zabbix_export:
                 name: 'SW-MIB::swSensorStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Power supply'
+                  tag: component
+                  value: power
               trigger_prototypes:
                 -
                   uuid: 649e7344411242738d9824f861b3c49a
@@ -957,6 +1119,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: bfe2f4085f6840da9e8d30f37bb29fdb
                   expression: 'count(/Brocade FC SNMP/sensor.psu.status[swSensorStatus.{#SNMPINDEX}],#1,"ne","{$PSU_OK_STATUS}")=1'
@@ -968,6 +1137,10 @@ zabbix_export:
                     -
                       name: '{#SENSOR_INFO}: Power supply is in critical state'
                       expression: 'count(/Brocade FC SNMP/sensor.psu.status[swSensorStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
         -
           uuid: efaa3e2dfb5b405d99998bd6f8a08697
           name: 'Temperature Discovery'
@@ -998,8 +1171,8 @@ zabbix_export:
                 name: 'SW-MIB::swSensorStatus'
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
             -
               uuid: ee48ef951f124c569327670a2a0f2152
               name: '{#SENSOR_INFO}: Temperature'
@@ -1014,8 +1187,8 @@ zabbix_export:
                 Temperature readings of testpoint: {#SENSOR_INFO}
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: 5ee4c1931e244d638b58f945f8a7565c
@@ -1026,6 +1199,13 @@ zabbix_export:
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: fc68b3a0ea6643f988c26e3e735d7491
                   expression: 'avg(/Brocade FC SNMP/sensor.temp.value[swSensorValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
@@ -1034,6 +1214,13 @@ zabbix_export:
                   name: '{#SENSOR_INFO}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
           trigger_prototypes:
             -
               uuid: 726afdedb08848bd86ab4161cef29f42
@@ -1052,6 +1239,23 @@ zabbix_export:
                   name: '{#SENSOR_INFO}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
                   expression: 'avg(/Brocade FC SNMP/sensor.temp.value[swSensorValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
                   recovery_expression: 'max(/Brocade FC SNMP/sensor.temp.value[swSensorValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
+      tags:
+        -
+          tag: class
+          value: network
+        -
+          tag: target
+          value: brocade
+        -
+          tag: target
+          value: brocade-fc
       macros:
         -
           macro: '{$CPU.UTIL.CRIT}'

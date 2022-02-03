@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-18T20:39:29Z'
+  date: '2022-01-26T10:34:37Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -32,8 +32,11 @@ zabbix_export:
             name: 'Service state'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: a6e3c67a99104c6f8672e3826cba009f
@@ -41,6 +44,10 @@ zabbix_export:
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 98ab999f96db4eceb4f347baf2df80a9
           name: 'ICMP loss'
@@ -51,8 +58,11 @@ zabbix_export:
           units: '%'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 145ea57d03d3460cb86272493e99356a
@@ -64,6 +74,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Dell iDRAC SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 52b385efc0a54f5590f55716e4a179bf
           name: 'ICMP response time'
@@ -74,8 +91,11 @@ zabbix_export:
           units: s
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: cd49c04001c74051b585f519503861d0
@@ -90,6 +110,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Dell iDRAC SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 2f3d32242b0740e7830a4dff872308ac
           name: 'SNMP traps (fallback)'
@@ -102,8 +129,8 @@ zabbix_export:
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: network
         -
           uuid: ca82831e78f74372bb9be8f2c97ee9ac
           name: 'System contact details'
@@ -125,8 +152,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 13bd109b9a814ba4837eb98b8daf98a5
           name: 'System description'
@@ -149,8 +176,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: e49f14d4a51f4018b17bd200d4819975
           name: 'Firmware version'
@@ -171,8 +198,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
           triggers:
             -
               uuid: e816b86474e6471eb48cbda563dfddd6
@@ -182,6 +209,10 @@ zabbix_export:
               priority: INFO
               description: 'Firmware version has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 9fc4348dc3c641dcbd0bb04b58145c91
           name: 'Hardware model name'
@@ -203,8 +234,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
         -
           uuid: 4951ab6260b145ccb0c21abdcf5bb361
           name: 'Hardware serial number'
@@ -226,8 +257,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
           triggers:
             -
               uuid: 6f5b00a889804fbeb41c4246b29bd5f1
@@ -236,6 +267,10 @@ zabbix_export:
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 59a77e7fe66f4412bb117f8283216ce3
           name: 'System location'
@@ -257,8 +292,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 2f76314dc3204e898df338f238f7d407
           name: 'System name'
@@ -280,8 +315,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: ce1b064b2a07450d9b51b6b12bd752a9
@@ -290,6 +325,13 @@ zabbix_export:
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: security
         -
           uuid: 737d790ef008450b81a69559ed1ee963
           name: 'System object ID'
@@ -310,8 +352,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 9750f3ffa5d648ce9e99adea1d92b54c
           name: 'Overall system health status'
@@ -328,8 +370,8 @@ zabbix_export:
             name: 'IDRAC-MIB-SMIv2::ObjectStatusEnum'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: 6d07848a4ded4e4fb0383ff12234ed25
@@ -338,6 +380,13 @@ zabbix_export:
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Please check the device for faults'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: b47601a02003409896d79e3c99093aca
               expression: 'count(/Dell iDRAC SNMP/system.status[globalSystemStatus.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1'
@@ -349,6 +398,13 @@ zabbix_export:
                 -
                   name: 'System is in unrecoverable state!'
                   expression: 'count(/Dell iDRAC SNMP/system.status[globalSystemStatus.0],#1,"eq","{$HEALTH_DISASTER_STATUS}")=1'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: a323c8f5ca8d4517b0451677bd43c4db
               expression: 'count(/Dell iDRAC SNMP/system.status[globalSystemStatus.0],#1,"eq","{$HEALTH_WARN_STATUS}")=1'
@@ -363,6 +419,13 @@ zabbix_export:
                 -
                   name: 'System status is in critical state'
                   expression: 'count(/Dell iDRAC SNMP/system.status[globalSystemStatus.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 83ebf3d38c92457a9d0462e3849d83ce
           name: 'Operating system'
@@ -384,8 +447,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: os
           triggers:
             -
               uuid: fba72cbc4f12495b9f35d0f77a9330b8
@@ -398,6 +461,10 @@ zabbix_export:
                 -
                   name: 'System name has changed (new name: {ITEM.VALUE})'
                   expression: 'last(/Dell iDRAC SNMP/system.name,#1)<>last(/Dell iDRAC SNMP/system.name,#2) and length(last(/Dell iDRAC SNMP/system.name))>0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 522c04c2c624478b8de4287f863ea67a
           name: Uptime
@@ -418,8 +485,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: c0efbe61effc494a970e0e02b9ce8f55
@@ -432,6 +499,10 @@ zabbix_export:
                 -
                   name: 'No SNMP data collection'
                   expression: 'max(/Dell iDRAC SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 6bcba0816ea942f6a87078070c82e7c3
           name: 'SNMP agent availability'
@@ -448,8 +519,11 @@ zabbix_export:
             name: zabbix.host.available
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 22ae441fffdd48919be0041e1507a479
@@ -462,6 +536,10 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Dell iDRAC SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: 2bb1759d46264c92b7cb70e7a1d18236
@@ -495,8 +573,14 @@ zabbix_export:
                 name: 'IDRAC-MIB-SMIv2::batteryState'
               tags:
                 -
-                  tag: Application
-                  value: 'Disk arrays'
+                  tag: component
+                  value: array
+                -
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: 7b9a7b970ac049589912d8e208baf2e2
@@ -505,6 +589,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the device for faults'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: fc2eeac871464a65930bbbb2341c803f
                   expression: 'count(/Dell iDRAC SNMP/system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_BATTERY_WARN_STATUS}")=1'
@@ -516,6 +607,13 @@ zabbix_export:
                     -
                       name: 'Battery {#BATTERY_NUM}: Disk array cache controller battery is in critical state!'
                       expression: 'count(/Dell iDRAC SNMP/system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS}")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: d36acb231d99493b9a760bf231001b4d
                   expression: 'count(/Dell iDRAC SNMP/system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}],#1,"ne","{$DISK_ARRAY_CACHE_BATTERY_OK_STATUS}")=1'
@@ -530,6 +628,13 @@ zabbix_export:
                     -
                       name: 'Battery {#BATTERY_NUM}: Disk array cache controller battery is in warning state'
                       expression: 'count(/Dell iDRAC SNMP/system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_BATTERY_WARN_STATUS}")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: 10eaaac3051e47d9bf8fd5e6f0ff840e
           name: 'FAN Discovery'
@@ -562,8 +667,8 @@ zabbix_export:
                 coolingDeviceSubTypeIsDiscrete, a value is not returned for this attribute.
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
             -
               uuid: 363a909cc7eb4dc6a225417b2487bad8
               name: '{#FAN_DESCR}: Fan status'
@@ -580,8 +685,8 @@ zabbix_export:
                 name: 'IDRAC-MIB-SMIv2::StatusProbeEnum'
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
               trigger_prototypes:
                 -
                   uuid: a1bca91682e84a7b8866ce443cfcbd44
@@ -590,6 +695,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 981f52ec4ba44b558bdbc5775622bc0c
                   expression: 'count(/Dell iDRAC SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_WARN_STATUS:\"nonCriticalUpper\"}")=1 or count(/Dell iDRAC SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_WARN_STATUS:\"nonCriticalLower\"}")=1'
@@ -601,6 +713,13 @@ zabbix_export:
                     -
                       name: '{#FAN_DESCR}: Fan is in critical state'
                       expression: 'count(/Dell iDRAC SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"criticalUpper\"}")=1 or count(/Dell iDRAC SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"nonRecoverableUpper\"}")=1 or count(/Dell iDRAC SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"criticalLower\"}")=1 or count(/Dell iDRAC SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"nonRecoverableLower\"}")=1 or count(/Dell iDRAC SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"failed\"}")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: 49d6570731ad4cd9a33bf4afa660eaf8
           name: 'Array Controller Discovery'
@@ -624,8 +743,14 @@ zabbix_export:
                 The controller's name as represented in Storage Management.
               tags:
                 -
-                  tag: Application
-                  value: 'Disk arrays'
+                  tag: component
+                  value: array
+                -
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
             -
               uuid: 55504ef472384a8689a72ae70881fe71
               name: '{#CNTLR_NAME}: Disk array controller status'
@@ -648,8 +773,14 @@ zabbix_export:
                 name: 'IDRAC-MIB-SMIv2::ObjectStatusEnum'
               tags:
                 -
-                  tag: Application
-                  value: 'Disk arrays'
+                  tag: component
+                  value: array
+                -
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: b037fad011764721a030bdde50f6ede3
@@ -662,6 +793,13 @@ zabbix_export:
                     -
                       name: '{#CNTLR_NAME}: Disk array controller is in unrecoverable state!'
                       expression: 'count(/Dell iDRAC SNMP/system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_FAIL_STATUS:\"nonRecoverable\"}")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 55a0631d0ab24bc6ad5a6c4ef7d1be30
                   expression: 'count(/Dell iDRAC SNMP/system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_FAIL_STATUS:\"nonRecoverable\"}")=1'
@@ -669,6 +807,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: DISASTER
                   description: 'Please check the device for faults'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 226ab2efc25d46c9adda8f763fe4a65f
                   expression: 'count(/Dell iDRAC SNMP/system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_WARN_STATUS:\"nonCritical\"}")=1'
@@ -683,6 +828,13 @@ zabbix_export:
                     -
                       name: '{#CNTLR_NAME}: Disk array controller is in unrecoverable state!'
                       expression: 'count(/Dell iDRAC SNMP/system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_FAIL_STATUS:\"nonRecoverable\"}")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: 3a7ac779581345b9b4791390dee3baf4
           name: 'Physical Disk Discovery'
@@ -711,8 +863,11 @@ zabbix_export:
                 name: 'IDRAC-MIB-SMIv2::physicalDiskMediaType'
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
             -
               uuid: f094adc420fc49b19e23a3071b8dc15f
               name: '{#DISK_NAME}: Physical disk model name'
@@ -728,8 +883,11 @@ zabbix_export:
                 The model number of the physical disk.
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
             -
               uuid: 6a6a8198b9c6485290acb703d87ec7c9
               name: '{#DISK_NAME}: Physical disk part number'
@@ -745,8 +903,11 @@ zabbix_export:
                 The part number of the disk.
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
             -
               uuid: 1cfaa7f506144a06a3ee159528a1a8fb
               name: '{#DISK_NAME}: Physical disk serial number'
@@ -761,8 +922,11 @@ zabbix_export:
                 The physical disk's unique identification number from the manufacturer.
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: eb26b6915b9f4ce6983566df9ee4db96
@@ -771,6 +935,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Disk serial number has changed. Ack to close'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 17b6d1e6664e4c3e90f3e68df2316fb4
               name: '{#DISK_NAME}: Disk size'
@@ -791,8 +959,11 @@ zabbix_export:
                     - '1048576'
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
             -
               uuid: 5c9de9677d214c8fa6ba706a57c46f9f
               name: '{#DISK_NAME}: Physical disk S.M.A.R.T. status'
@@ -808,8 +979,11 @@ zabbix_export:
                 name: 'IDRAC-MIB-SMIv2::BooleanType'
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: 7dc1a088ebd74702b0fb4e0a20edbed2
@@ -822,6 +996,13 @@ zabbix_export:
                     -
                       name: '{#DISK_NAME}: Physical disk failed'
                       expression: 'count(/Dell iDRAC SNMP/system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_FAIL_STATUS:\"critical\"}")=1 or count(/Dell iDRAC SNMP/system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_FAIL_STATUS:\"nonRecoverable\"}")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 7b1d2992683d404db552abd870c6c627
               name: '{#DISK_NAME}: Physical disk status'
@@ -844,8 +1025,11 @@ zabbix_export:
                 name: 'IDRAC-MIB-SMIv2::physicalDiskComponentStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: 5eedc39db9a348df8e547be6401c0814
@@ -854,6 +1038,13 @@ zabbix_export:
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check physical disk for warnings or errors'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 6defa44f91ee4fb5b11b92ba64f07b48
                   expression: 'count(/Dell iDRAC SNMP/system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_WARN_STATUS:\"nonCritical\"}")=1'
@@ -865,6 +1056,13 @@ zabbix_export:
                     -
                       name: '{#DISK_NAME}: Physical disk failed'
                       expression: 'count(/Dell iDRAC SNMP/system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_FAIL_STATUS:\"critical\"}")=1 or count(/Dell iDRAC SNMP/system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_FAIL_STATUS:\"nonRecoverable\"}")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: 2a4ea81f9ecd4d04ad508c50395551da
           name: 'PSU Discovery'
@@ -890,8 +1088,8 @@ zabbix_export:
                 name: 'IDRAC-MIB-SMIv2::ObjectStatusEnum'
               tags:
                 -
-                  tag: Application
-                  value: 'Power supply'
+                  tag: component
+                  value: power
               trigger_prototypes:
                 -
                   uuid: 9f57b49984864af188b178dc2da85b71
@@ -900,6 +1098,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: d7d1b3d889254ae288348cd6b77bad5f
                   expression: 'count(/Dell iDRAC SNMP/sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}],#1,"eq","{$PSU_WARN_STATUS:\"nonCritical\"}")=1'
@@ -911,6 +1116,13 @@ zabbix_export:
                     -
                       name: '{#PSU_DESCR}: Power supply is in critical state'
                       expression: 'count(/Dell iDRAC SNMP/sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"critical\"}")=1 or count(/Dell iDRAC SNMP/sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"nonRecoverable\"}")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: c3769c4cc3f3480ebad7b7c6e458c1c0
           name: 'Temperature Ambient Discovery'
@@ -942,8 +1154,8 @@ zabbix_export:
                 name: 'IDRAC-MIB-SMIv2::StatusProbeEnum'
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
             -
               uuid: 406352e7250740939c22dd5cba8cd361
               name: '{#SENSOR_LOCALE}: Temperature'
@@ -965,8 +1177,8 @@ zabbix_export:
                     - '0.1'
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: 992e0a871cef40f6b859e251fd5d75fd
@@ -976,6 +1188,13 @@ zabbix_export:
                   name: '{#SENSOR_LOCALE}: Temperature is too low: <{$TEMP_CRIT_LOW:"Ambient"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
           trigger_prototypes:
             -
               uuid: 8d659cefdff143bbaff8d6cdc8bbf7a3
@@ -991,6 +1210,13 @@ zabbix_export:
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 45ab3beb5a3b4271861330632ff37c55
               expression: |
@@ -1013,6 +1239,13 @@ zabbix_export:
                     or
                     last(/Dell iDRAC SNMP/sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}])={$TEMP_DISASTER_STATUS}
                   recovery_expression: 'max(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Ambient"}-3'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 3e79192b1bba479faaf852cb15fe9e26
           name: 'Temperature CPU Discovery'
@@ -1044,8 +1277,8 @@ zabbix_export:
                 name: 'IDRAC-MIB-SMIv2::StatusProbeEnum'
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
             -
               uuid: 9b4381f5a34a4ff4bde7294fb34f2a27
               name: '{#SENSOR_LOCALE}: Temperature'
@@ -1067,8 +1300,8 @@ zabbix_export:
                     - '0.1'
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: edb89d83ecc144cdbccdb41f8842d572
@@ -1078,6 +1311,13 @@ zabbix_export:
                   name: '{#SENSOR_LOCALE}: Temperature is too low: <{$TEMP_CRIT_LOW:"CPU"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
           trigger_prototypes:
             -
               uuid: 54c2b7095b7d4550a2d1dbe14990dd0a
@@ -1093,6 +1333,13 @@ zabbix_export:
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: eb2182b46c294fa381b35ab31c7ac6d4
               expression: |
@@ -1115,6 +1362,13 @@ zabbix_export:
                     or
                     last(/Dell iDRAC SNMP/sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}])={$TEMP_DISASTER_STATUS}
                   recovery_expression: 'max(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"CPU"}-3'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 57a914e4d66d4babaadde1b0787ba734
           name: 'Virtual Disk Discovery'
@@ -1150,8 +1404,11 @@ zabbix_export:
                 name: 'IDRAC-MIB-SMIv2::virtualDiskLayout'
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
             -
               uuid: 5859b6822849438fa355694f42cc0b12
               name: 'Disk {#SNMPVALUE}({#DISK_NAME}): Read policy'
@@ -1169,8 +1426,11 @@ zabbix_export:
                 3: Adaptive Read Ahead.
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
             -
               uuid: f42ea3af24564ba09c306e16580df656
               name: 'Disk {#SNMPVALUE}({#DISK_NAME}): Disk size'
@@ -1191,8 +1451,11 @@ zabbix_export:
                     - '1048576'
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
             -
               uuid: 3134da694a68466cbe811c1658be24af
               name: 'Disk {#SNMPVALUE}({#DISK_NAME}): Current state'
@@ -1214,8 +1477,11 @@ zabbix_export:
                 name: 'IDRAC-MIB-SMIv2::virtualDiskOperationalState'
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
             -
               uuid: 1e749a7717b94b42ad52d45bebaf9dd5
               name: 'Disk {#SNMPVALUE}({#DISK_NAME}): Status'
@@ -1237,8 +1503,11 @@ zabbix_export:
                 name: 'IDRAC-MIB-SMIv2::virtualDiskState'
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: 457783fb014a4cae9d47a1cb17d8d31e
@@ -1247,6 +1516,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check virtual disk for warnings or errors'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: d0c6dbaa042f40559d855acb1b61977a
                   expression: 'count(/Dell iDRAC SNMP/system.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}],#1,"eq","{$VDISK_WARN_STATUS:\"degraded\"}")=1'
@@ -1258,6 +1534,13 @@ zabbix_export:
                     -
                       name: 'Disk {#SNMPVALUE}({#DISK_NAME}): Virtual disk failed'
                       expression: 'count(/Dell iDRAC SNMP/system.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}],#1,"eq","{$VDISK_CRIT_STATUS:\"failed\"}")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 0e469e2e2a7c40998a72a986ef61a4e6
               name: 'Disk {#SNMPVALUE}({#DISK_NAME}): Write policy'
@@ -1277,8 +1560,21 @@ zabbix_export:
                 name: 'IDRAC-MIB-SMIv2::virtualDiskWritePolicy'
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
+      tags:
+        -
+          tag: class
+          value: hardware
+        -
+          tag: target
+          value: dell
+        -
+          tag: target
+          value: idrac
       macros:
         -
           macro: '{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS}'

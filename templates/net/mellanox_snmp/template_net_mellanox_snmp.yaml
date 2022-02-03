@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-10T07:57:02Z'
+  date: '2022-01-26T14:31:57Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -21,7 +21,7 @@ zabbix_export:
         ENTITY-MIB
         IF-MIB
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: 'Templates/Network devices'
@@ -36,8 +36,11 @@ zabbix_export:
             name: 'Service state'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: fe4c81a386814dfa80ffc76e1b7da9a1
@@ -45,6 +48,10 @@ zabbix_export:
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 50e85be3969447c58fcfeca5d9a1a9bb
           name: 'ICMP loss'
@@ -55,12 +62,15 @@ zabbix_export:
           units: '%'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 52b307324c37481693d419df236cbbd7
-              expression: 'min(/Mellanox SNMP/icmppingloss,5m)>{$ICMP.LOSS.WARN} and min(/Mellanox SNMP/icmppingloss,5m)<100'
+              expression: 'min(/Mellanox SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Mellanox SNMP/icmppingloss,5m)<100'
               name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -68,6 +78,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Mellanox SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 7567e999d75442379066babdc9b50894
           name: 'ICMP response time'
@@ -78,22 +95,32 @@ zabbix_export:
           units: s
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 39a9cff305074e1a8b7c6ed0c526fda9
-              expression: 'avg(/Mellanox SNMP/icmppingsec,5m)>{$ICMP.RESPONSE_TIME.WARN}'
+              expression: 'avg(/Mellanox SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
               name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'High ICMP ping loss'
-                  expression: 'min(/Mellanox SNMP/icmppingloss,5m)>{$ICMP.LOSS.WARN} and min(/Mellanox SNMP/icmppingloss,5m)<100'
+                  expression: 'min(/Mellanox SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Mellanox SNMP/icmppingloss,5m)<100'
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Mellanox SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 0cb8aadeb5554583a65c3496cfed2c1b
           name: 'SNMP traps (fallback)'
@@ -106,8 +133,8 @@ zabbix_export:
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: network
         -
           uuid: f62a8b653c3d44d09864a4a4c910aeb1
           name: 'System contact details'
@@ -129,8 +156,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: c33470549bda45e88ecb8ded7d0b5e87
           name: 'CPU utilization'
@@ -151,8 +178,8 @@ zabbix_export:
                 - '$..[''{#CPU.UTIL}''].avg()'
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
           triggers:
             -
               uuid: 26913093ab414fe69ff157102ae54796
@@ -161,6 +188,10 @@ zabbix_export:
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 64c4f3e890ec4c29be07ba2d06345534
           name: 'System description'
@@ -183,8 +214,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: e0d2149e1a114f3a971c324673beae2f
           name: 'System location'
@@ -206,8 +237,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: f63d1f71a97e45b0ab5716299ef298ea
           name: 'System name'
@@ -229,8 +260,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: ff7ad0676a774cf49a4568e752dd916b
@@ -239,6 +270,13 @@ zabbix_export:
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: security
         -
           uuid: f1535f45138b472c945e231a9beb9cc5
           name: 'System object ID'
@@ -259,8 +297,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: d7f06d23f6b14677b5183f2cc94fc10d
           name: Uptime
@@ -281,8 +319,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: 667856dcaad04a108cb0a5150e825a50
@@ -295,6 +333,10 @@ zabbix_export:
                 -
                   name: 'No SNMP data collection'
                   expression: 'max(/Mellanox SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: aba117057e824b6789fca847cae9e0fc
           name: 'SNMP agent availability'
@@ -311,8 +353,11 @@ zabbix_export:
             name: zabbix.host.available
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 6e476399963a414a847c4c514055bf43
@@ -325,6 +370,10 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Mellanox SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: 55a44fb2235f4e25b960422338674193
@@ -358,8 +407,8 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: Inventory
+                  tag: component
+                  value: system
             -
               uuid: 9f2e2fd678e94554be29654a5746099f
               name: '{#ENT_NAME}: Hardware serial number'
@@ -378,8 +427,8 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: Inventory
+                  tag: component
+                  value: system
               trigger_prototypes:
                 -
                   uuid: 585db2b2a42b4eb09770ca2241a557d0
@@ -388,6 +437,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -423,8 +476,8 @@ zabbix_export:
                 entPhySensorScale, and entPhySensorPrecision objects must also be examined.
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
             -
               uuid: 401d26902e6f4080ab2b0123d95a08ba
               name: '{#SENSOR_INFO}: Fan status'
@@ -441,16 +494,23 @@ zabbix_export:
                 name: 'ENTITY-SENSORS-MIB::EntitySensorStatus'
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
               trigger_prototypes:
                 -
                   uuid: de81ef4f2c3f4f44a745a1fa1f179784
-                  expression: 'count(/Mellanox SNMP/sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN.STATUS.CRIT}")=1'
+                  expression: 'count(/Mellanox SNMP/sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                   name: '{#SENSOR_INFO}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
           preprocessing:
             -
               type: JAVASCRIPT
@@ -553,8 +613,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: c625b20266a04a1ba0421b4a64629dcc
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
@@ -573,8 +639,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 262f5aa5582441ecb93fd7df6a59a76d
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
@@ -598,8 +670,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: b7c510be904e4d06830ae13a16bc9668
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
@@ -622,8 +700,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 67b4b6520bbd45fd96d78a5942b54c09
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
@@ -642,8 +726,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 8e149281afb742758a00b699a281a584
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
@@ -667,8 +757,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: ddbde55ce98f465a8973d60b1ecb0f8c
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
@@ -693,8 +789,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 6a1429de015640768d2cdd2adc4b09d7
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
@@ -716,8 +818,14 @@ zabbix_export:
                 name: 'IF-MIB::ifOperStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: 46918cfc713a4b1da7eed32cead0070b
@@ -735,6 +843,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 7ecba23625b64d94873b938ebbce500b
               name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
@@ -758,8 +870,14 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
           trigger_prototypes:
             -
               uuid: 2dc62fe3cd624e2ba99caa9ff94273f6
@@ -789,6 +907,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 20e8f28ebc304ba185d475dbba51c4b8
               expression: |
@@ -809,6 +931,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 6740479821cd49c199c345dd736a11f7
               expression: |
@@ -828,6 +954,13 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
           graph_prototypes:
             -
               uuid: cabe6db1b71f42d9bc3cef730221a14b
@@ -907,8 +1040,8 @@ zabbix_export:
                 name: 'ENTITY-STATE-MIB::EntityOperState'
               tags:
                 -
-                  tag: Application
-                  value: 'Power supply'
+                  tag: component
+                  value: power
               trigger_prototypes:
                 -
                   uuid: 5d2d688ad68343ff8884c11e9d233b98
@@ -917,6 +1050,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -961,8 +1101,8 @@ zabbix_export:
                 name: 'ENTITY-SENSORS-MIB::EntitySensorStatus'
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
             -
               uuid: ffe7f6dff12f4b4ba24ddc28c6d1182b
               name: '{#SENSOR_INFO}: Temperature'
@@ -984,8 +1124,8 @@ zabbix_export:
                     - '0.1'
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: 7259bdafbe7f4227999d7365a99e536d
@@ -996,6 +1136,13 @@ zabbix_export:
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 7bfa2bd0177940f4aff8dc95867ceb44
                   expression: 'avg(/Mellanox SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)<{$TEMP.MIN.CRIT:"{#SENSOR_INFO}"}'
@@ -1004,6 +1151,13 @@ zabbix_export:
                   name: '{#SENSOR_INFO}: Temperature is too low: <{$TEMP.MIN.CRIT:"{#SENSOR_INFO}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
           trigger_prototypes:
             -
               uuid: 352650536eef4858be1437a720712932
@@ -1022,6 +1176,13 @@ zabbix_export:
                   name: '{#SENSOR_INFO}: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"{#SENSOR_INFO}"}'
                   expression: 'avg(/Mellanox SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"{#SENSOR_INFO}"}'
                   recovery_expression: 'max(/Mellanox SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"{#SENSOR_INFO}"}-3'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
           preprocessing:
             -
               type: JAVASCRIPT
@@ -1078,8 +1239,11 @@ zabbix_export:
               description: 'Space utilization in % for {#FSNAME}'
               tags:
                 -
-                  tag: Application
-                  value: 'Filesystem {#FSNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
             -
               uuid: 1a743f5b617f4800b5b2b9672f34693c
               name: '{#FSNAME}: Total space'
@@ -1100,8 +1264,11 @@ zabbix_export:
                     - '{#ALLOC_UNITS}'
               tags:
                 -
-                  tag: Application
-                  value: 'Filesystem {#FSNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
             -
               uuid: 82fadd771c3040c9ba001a9a40a83163
               name: '{#FSNAME}: Used space'
@@ -1120,8 +1287,11 @@ zabbix_export:
                     - '{#ALLOC_UNITS}'
               tags:
                 -
-                  tag: Application
-                  value: 'Filesystem {#FSNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
           trigger_prototypes:
             -
               uuid: f1eb2ddb27d24cd99d8aba4485dfeeb9
@@ -1137,6 +1307,13 @@ zabbix_export:
                  - The disk free space is less than 5G.
                  - The disk will be full in less than 24 hours.
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: capacity
             -
               uuid: b2e084f280434a3a8291e5dc691dfd7b
               expression: |
@@ -1157,6 +1334,13 @@ zabbix_export:
                   expression: |
                     last(/Mellanox SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
                     ((last(/Mellanox SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Mellanox SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<5G or timeleft(/Mellanox SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: capacity
           graph_prototypes:
             -
               uuid: 323ae8e8795543958fe6affc78a3853c
@@ -1235,8 +1419,8 @@ zabbix_export:
                     - '{#ALLOC_UNITS}'
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
             -
               uuid: e661062e7fcb45968ca1e9a1306f4848
               name: '{#MEMNAME}: Used memory'
@@ -1255,8 +1439,8 @@ zabbix_export:
                     - '{#ALLOC_UNITS}'
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
             -
               uuid: cedea4befd6a47b8983eff5dee9feed9
               name: '{#MEMNAME}: Memory utilization'
@@ -1269,8 +1453,8 @@ zabbix_export:
               description: 'Memory utilization in %'
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
               trigger_prototypes:
                 -
                   uuid: 912430a103414c6eb9c8e55c45246f48
@@ -1278,6 +1462,13 @@ zabbix_export:
                   name: '{#MEMNAME}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: bc2042eaf8244d28891e6d71414847da
@@ -1296,12 +1487,19 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+      tags:
+        -
+          tag: class
+          value: network
+        -
+          tag: target
+          value: mellanox
       macros:
         -
           macro: '{$CPU.UTIL.CRIT}'
           value: '90'
         -
-          macro: '{$FAN.STATUS.CRIT}'
+          macro: '{$FAN_CRIT_STATUS}'
           value: '3'
           description: 'The critical value of the FAN sensor for trigger expression.'
         -
@@ -1309,6 +1507,12 @@ zabbix_export:
           value: '20'
         -
           macro: '{$ICMP.RESPONSE_TIME.WARN}'
+          value: '0.15'
+        -
+          macro: '{$ICMP_LOSS_WARN}'
+          value: '20'
+        -
+          macro: '{$ICMP_RESPONSE_TIME_WARN}'
           value: '0.15'
         -
           macro: '{$IF.ERRORS.WARN}'

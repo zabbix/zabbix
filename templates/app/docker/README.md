@@ -45,8 +45,8 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Images discovery |<p>Discovery for images metrics</p> |ZABBIX_PASSIVE |docker.images.discovery<p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$DOCKER.LLD.FILTER.IMAGE.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$DOCKER.LLD.FILTER.IMAGE.NOT_MATCHES}`</p> |
 |Containers discovery |<p>Discovery for containers metrics</p><p>Parameter:</p><p>true  - Returns all containers</p><p>false - Returns only running containers</p> |ZABBIX_PASSIVE |docker.containers.discovery[false]<p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$DOCKER.LLD.FILTER.CONTAINER.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$DOCKER.LLD.FILTER.CONTAINER.NOT_MATCHES}`</p> |
+|Images discovery |<p>Discovery for images metrics</p> |ZABBIX_PASSIVE |docker.images.discovery<p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$DOCKER.LLD.FILTER.IMAGE.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$DOCKER.LLD.FILTER.IMAGE.NOT_MATCHES}`</p> |
 
 ## Items collected
 
@@ -131,10 +131,10 @@ There are no template links in this template.
 |Docker |Container {#NAME}: Error |<p>-</p> |DEPENDENT |docker.container_info.state.error["{#NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.State.Error`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |Docker |Container {#NAME}: Started at |<p>-</p> |DEPENDENT |docker.container_info.started["{#NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.State.StartedAt`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |Docker |Container {#NAME}: Finished at |<p>-</p> |DEPENDENT |docker.container_info.finished["{#NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.State.FinishedAt`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
-|Zabbix_raw_items |Docker: Get info | |ZABBIX_PASSIVE |docker.info |
-|Zabbix_raw_items |Docker: Get containers | |ZABBIX_PASSIVE |docker.containers |
-|Zabbix_raw_items |Docker: Get images | |ZABBIX_PASSIVE |docker.images |
-|Zabbix_raw_items |Docker: Get data_usage | |ZABBIX_PASSIVE |docker.data_usage |
+|Zabbix raw items |Docker: Get info | |ZABBIX_PASSIVE |docker.info |
+|Zabbix raw items |Docker: Get containers | |ZABBIX_PASSIVE |docker.containers |
+|Zabbix raw items |Docker: Get images | |ZABBIX_PASSIVE |docker.images |
+|Zabbix raw items |Docker: Get data_usage | |ZABBIX_PASSIVE |docker.data_usage |
 
 ## Triggers
 
@@ -150,5 +150,5 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/435429-discussion-thread-for-official-zabbix-template-docker).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/435429-discussion-thread-for-official-zabbix-template-docker).
 
