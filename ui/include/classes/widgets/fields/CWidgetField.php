@@ -179,7 +179,9 @@ class CWidgetField {
 	 */
 	protected static function setValidationRuleFlag(array &$validation_rule, $flag) {
 		if (array_key_exists('flags', $validation_rule)) {
-			$validation_rule['flags'] |= $flag;
+			if ($flag) {
+				$validation_rule['flags'] = true;
+			}
 		}
 		else {
 			$validation_rule['flags'] = $flag;

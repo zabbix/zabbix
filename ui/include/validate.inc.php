@@ -152,7 +152,10 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 		$err = ZBX_VALID_OK;
 
 		foreach ($var as $v) {
-			$err |= check_type($field, $flags, $v, $type);
+			if (check_type($field, $flags, $v, $type)) {
+				$err = true;
+				break;
+			}
 		}
 
 		return $err;
@@ -401,7 +404,10 @@ function check_fields_raw(&$fields) {
 
 	$err = ZBX_VALID_OK;
 	foreach ($fields as $field => $checks) {
-		$err |= check_field($fields, $field, $checks);
+		if (check_field($fields, $field, $checks)) {
+			$err = true;
+			break;
+		}
 	}
 
 	unset_not_in_list($fields);

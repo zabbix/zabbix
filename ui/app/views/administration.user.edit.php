@@ -219,7 +219,10 @@ else {
 
 		$lang_select->addOption((new CSelectOption($localeid, $locale['name']))->setDisabled(!$locale_available));
 
-		$has_unavailable_locale |= !$locale_available;
+		if (!$locale_available) {
+			$has_unavailable_locale = true;
+			break;
+		}
 	}
 
 	// Restoring original locale.

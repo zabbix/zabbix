@@ -1668,7 +1668,9 @@ abstract class CTriggerGeneral extends CApiService {
 					$lld_ruleids[$key['lld_ruleid']] = true;
 				}
 
-				$status_mask |= ($host_keys['status'] == HOST_STATUS_TEMPLATE ? 0x01 : 0x02);
+				if ($host_keys['status'] == HOST_STATUS_TEMPLATE ? 0x01 : 0x02) {
+					$status_mask = true;
+				}
 				$hostids[$host_keys['hostid']] = true;
 				$hosts[$host] = true;
 			}
