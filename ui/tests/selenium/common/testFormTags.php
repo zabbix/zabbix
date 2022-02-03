@@ -505,7 +505,7 @@ class testFormTags extends CWebTest {
 		}
 
 		$form = ($object === 'host' || $object === 'service')
-			? COverlayDialogElement::find()->asForm()->one()->waitUntilVisible()
+			? COverlayDialogElement::find()->waitUntilVisible()->asForm()->one()
 			: $this->query($locator)->asForm()->waitUntilPresent()->one();
 
 		if (!$this->problem_tags) {
@@ -607,7 +607,7 @@ class testFormTags extends CWebTest {
 		$this->page->login()->open($this->link);
 
 		if ($object === 'service') {
-			$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
+			$table = $this->query('class:list-table')->asTable()->one();
 			$table->findRow('Name',  $this->clone_name)->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()->one()->click();
 		}
 		else {
@@ -768,7 +768,7 @@ class testFormTags extends CWebTest {
 			$this->page->open($this->link);
 			$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
 			$table->findRow('Name', $data['name'])->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()->one()->click();
-			$form = COverlayDialogElement::find()->asForm()->waitUntilReady()->one();
+			$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 		}
 		else {
 			$this->page->open($this->saved_link.$id);
@@ -1278,7 +1278,7 @@ class testFormTags extends CWebTest {
 		];
 
 		$form = ($object === 'host' || $object === 'service')
-			? COverlayDialogElement::find()->asForm()->one()->waitUntilVisible()
+			? COverlayDialogElement::find()->waitUntilVisible()->asForm()->one()
 			: $this->query($locators[$object])->asForm()->waitUntilPresent()->one();
 
 		if (!$this->problem_tags) {

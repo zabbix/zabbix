@@ -555,7 +555,7 @@ class testPageMonitoringServicesMassUpdate extends CWebTest {
 		$this->selectTableRows($data['names']);
 		$this->query('button:Mass update')->one()->click();
 
-		$dialog = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 		$dialog->getLabel('Tags')->click();
 		$dialog->query('id:mass_update_tags')->asSegmentedRadio()->one()->fill($data['Tags']['action']);
 
@@ -648,7 +648,7 @@ class testPageMonitoringServicesMassUpdate extends CWebTest {
 		$dialog->asForm()->getLabel('Tags')->click();
 		$this->query('id:tags-table')->asMultifieldTable()->one()->fill($new_tags);
 
-		$dialog->query('button:Cancel')->one()->waitUntilClickable()->click();
+		$dialog->query('button:Cancel')->waitUntilClickable()->one()->click();
 		COverlayDialogElement::ensureNotPresent();
 
 		// Check that UI returned to previous page and hash remained unchanged.
