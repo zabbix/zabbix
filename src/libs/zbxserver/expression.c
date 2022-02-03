@@ -4147,13 +4147,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 			}
 			else if (0 == strcmp(m, MVAR_HOST_NAME))
 			{
-				if (0 != (MACRO_TYPE_QUERY_FILTER & macro_type))
-				{
-					zbx_free(replace_to);
-					replace_to = zbx_dyn_escape_string(dc_item->host.name, "\\");
-				}
-				else
-					replace_to = zbx_strdup(replace_to, dc_item->host.name);
+				replace_to = zbx_strdup(replace_to, dc_item->host.name);
 			}
 			else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
 			{
@@ -4572,6 +4566,15 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 
 		if (0 != (macro_type & MACRO_TYPE_HTTP_JSON) && NULL != replace_to)
 			zbx_json_escape(&replace_to);
+
+		if (0 != (macro_type & MACRO_TYPE_QUERY_FILTER) && NULL != replace_to)
+		{
+			char	*esc;
+
+			esc = zbx_dyn_escape_string(replace_to, "\\");
+			zbx_free(replace_to);
+			replace_to = esc;
+		}
 
 		if (ZBX_TOKEN_FUNC_MACRO == token.type && NULL != replace_to)
 		{
