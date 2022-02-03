@@ -63,3 +63,8 @@ func (b *Base) IsExternal() bool {
 func (b *Base) SetExternal(isExternal bool) {
 	b.external = isExternal
 }
+
+type SystemOptions struct {
+	Path     string `conf:"optional"`
+	Capacity string `conf:"optional"`
+}
