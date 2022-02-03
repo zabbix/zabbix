@@ -3697,7 +3697,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 			}
 		}
 
-		if (FAIL == zbx_tls_get_error(s->tls_ctx->ctx, res, __func__, &error_alloc, &error_offset, error))
+		if (FAIL == zbx_tls_get_error(s->tls_ctx->ctx, res, "SSL_connect", &error_alloc, &error_offset, error))
 			goto out;
 	}
 
