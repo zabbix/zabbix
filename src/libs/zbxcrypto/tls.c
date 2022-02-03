@@ -3304,13 +3304,10 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 		}
 	}
 
-	if (NULL != server_name && ZBX_TCP_SEC_UNENCRYPTED != tls_connect)
+	if (NULL != server_name && ZBX_TCP_SEC_UNENCRYPTED != tls_connect && GNUTLS_E_SUCCESS != gnutls_server_name_set(
+			s->tls_ctx->ctx, GNUTLS_NAME_DNS, server_name, strlen(server_name)))
 	{
-		if (GNUTLS_E_SUCCESS != gnutls_server_name_set(s->tls_ctx->ctx, GNUTLS_NAME_DNS, server_name,
-				strlen(server_name)))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot set %s tls host name", server_name);
-		}
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set %s tls host name", server_name);
 	}
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
@@ -3546,12 +3543,10 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 		goto out1;
 	}
 
-	if (NULL != server_name && ZBX_TCP_SEC_UNENCRYPTED != tls_connect)
+	if (NULL != server_name && ZBX_TCP_SEC_UNENCRYPTED != tls_connect && 1 != SSL_set_tlsext_host_name(
+			s->tls_ctx->ctx, server_name))
 	{
-		if (1 != SSL_set_tlsext_host_name(s->tls_ctx->ctx, server_name))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot set %s tls host name", server_name);
-		}
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set %s tls host name", server_name);
 	}
 
 	/* set our connected TCP socket to TLS context */
