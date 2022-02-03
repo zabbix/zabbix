@@ -3,8 +3,8 @@ zabbix_export:
   date: '2021-12-20T08:19:26Z'
   groups:
     -
-      uuid: 57b7ae836ca64446ba2c296389c009b7
-      name: Templates/Modules
+      uuid: 36bff6c29af64692839d077febfc7079
+      name: 'Templates/Network devices'
   templates:
     -
       uuid: 24bed6339f0a492fab86fe757394b937
@@ -17,7 +17,7 @@ zabbix_export:
         Template tooling version used: 0.40
       groups:
         -
-          name: Templates/Modules
+          name: 'Templates/Network devices'
       items:
         -
           uuid: 953fb8b3c23f420bb6132874ce3e33e2
