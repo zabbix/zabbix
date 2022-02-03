@@ -4289,34 +4289,25 @@ out1:
 
 ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error)
 {
-#if defined(_WINDOWS)
-	double	sec;
-#endif
 #if defined(HAVE_GNUTLS)
 	ssize_t	res;
 #elif defined(HAVE_OPENSSL)
 	int	res;
 #endif
 
-#if defined(_WINDOWS)
-	zbx_alarm_flag_clear();
-	sec = zbx_time();
-#endif
 #if defined(HAVE_OPENSSL)
 	info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_cb() messages */
 #endif
 	do
 	{
 		res = ZBX_TLS_WRITE(s->tls_ctx->ctx, buf, len);
-#if defined(_WINDOWS)
-		if (s->timeout < zbx_time() - sec)
-			zbx_alarm_flag_set();
-#endif
+#if !defined(_WINDOWS)
 		if (SUCCEED == zbx_alarm_timed_out())
 		{
 			*error = zbx_strdup(*error, ZBX_TLS_WRITE_FUNC_NAME "() timed out");
 			return ZBX_PROTO_ERROR;
 		}
+#endif
 	}
 	while (SUCCEED == ZBX_TLS_WANT_WRITE(res));
 
@@ -4360,34 +4351,25 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error
 
 ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
 {
-#if defined(_WINDOWS)
-	double	sec;
-#endif
 #if defined(HAVE_GNUTLS)
 	ssize_t	res;
 #elif defined(HAVE_OPENSSL)
 	int	res;
 #endif
 
-#if defined(_WINDOWS)
-	zbx_alarm_flag_clear();
-	sec = zbx_time();
-#endif
 #if defined(HAVE_OPENSSL)
 	info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_cb() messages */
 #endif
 	do
 	{
 		res = ZBX_TLS_READ(s->tls_ctx->ctx, buf, len);
-#if defined(_WINDOWS)
-		if (s->timeout < zbx_time() - sec)
-			zbx_alarm_flag_set();
-#endif
+#if !defined(_WINDOWS)
 		if (SUCCEED == zbx_alarm_timed_out())
 		{
 			*error = zbx_strdup(*error, ZBX_TLS_READ_FUNC_NAME "() timed out");
 			return ZBX_PROTO_ERROR;
 		}
+#endif
 	}
 	while (SUCCEED == ZBX_TLS_WANT_READ(res));
 
