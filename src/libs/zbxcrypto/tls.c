@@ -3498,7 +3498,7 @@ out1:
 	return ret;
 }
 #elif defined(HAVE_OPENSSL)
-static int	zbx_tls_handle_ret(const SSL *s, int res, char *func, size_t *error_alloc, size_t *error_offset,
+static int	zbx_tls_get_error(const SSL *s, int res, const char *func, size_t *error_alloc, size_t *error_offset,
 		char **error)
 {
 	int	result_code;
@@ -3674,8 +3674,6 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 #endif
 	if (1 != (res = SSL_connect(s->tls_ctx->ctx)))
 	{
-		int	result_code;
-
 #if defined(_WINDOWS)
 		if (s->timeout < zbx_time() - sec)
 			zbx_alarm_flag_set();
@@ -3699,7 +3697,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 			}
 		}
 
-		if (FAIL == zbx_tls_handle_ret(s->tls_ctx->ctx, res, __func__, &error_alloc, &error_offset, error))
+		if (FAIL == zbx_tls_get_error(s->tls_ctx->ctx, res, __func__, &error_alloc, &error_offset, error))
 			goto out;
 	}
 
@@ -4333,7 +4331,7 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error
 	{
 		size_t	error_alloc = 0, error_offset = 0;
 
-		if (SUCCEED == zbx_tls_handle_ret(s->tls_ctx->ctx, res, ZBX_TLS_WRITE_FUNC_NAME, &error_alloc,
+		if (SUCCEED == zbx_tls_get_error(s->tls_ctx->ctx, res, ZBX_TLS_WRITE_FUNC_NAME, &error_alloc,
 				&error_offset, error))
 		{
 			*error = zbx_strdup(*error, ZBX_TLS_WRITE_FUNC_NAME "() unexpected result code");
@@ -4384,7 +4382,7 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
 	{
 		size_t	error_alloc = 0, error_offset = 0;
 
-		if (SUCCEED == zbx_tls_handle_ret(s->tls_ctx->ctx, res, ZBX_TLS_READ_FUNC_NAME, &error_alloc,
+		if (SUCCEED == zbx_tls_get_error(s->tls_ctx->ctx, res, ZBX_TLS_READ_FUNC_NAME, &error_alloc,
 				&error_offset, error))
 		{
 			*error = zbx_strdup(*error, ZBX_TLS_READ_FUNC_NAME "() unexpected result code");
