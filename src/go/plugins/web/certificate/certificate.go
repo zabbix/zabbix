@@ -66,7 +66,8 @@ type ValidationResult struct {
 }
 
 type Options struct {
-	Timeout int `conf:"optional,range=1:30"`
+	plugin.SystemOptions `conf:"optional"`
+	Timeout              int `conf:"optional,range=1:30"`
 }
 
 type Plugin struct {

@@ -52,7 +52,8 @@ type Plugin struct {
 
 // Options -
 type Options struct {
-	Timeout int
+	plugin.SystemOptions `conf:"optional"`
+	Timeout              int
 }
 
 var impl Plugin
