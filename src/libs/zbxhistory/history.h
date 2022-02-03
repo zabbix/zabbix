@@ -35,20 +35,11 @@ typedef int (*zbx_history_flush_func_t)(struct zbx_history_iface *hist);
 
 typedef void (*zbx_history_func_t)(const zbx_vector_ptr_t *);
 
-typedef struct
-{
-	char	*base_url;
-	char	*post_url;
-	char	*buf;
-	CURL	*handle;
-}
-zbx_elastic_data_t;
-
 struct zbx_history_iface
 {
 	unsigned char			value_type;
 	unsigned char			requires_trends;
-	zbx_elastic_data_t		*elastic_data;
+	void				*elastic_data;
 	zbx_history_func_t		sql_history_func;
 
 	zbx_history_destroy_func_t	destroy;

@@ -42,6 +42,15 @@ static zbx_uint32_t	ZBX_ELASTIC_SVERSION = ZBX_DBVERSION_UNDEFINED;
 
 typedef struct
 {
+	char	*base_url;
+	char	*post_url;
+	char	*buf;
+	CURL	*handle;
+}
+zbx_elastic_data_t;
+
+typedef struct
+{
 	unsigned char		initialized;
 	zbx_vector_ptr_t	ifaces;
 
