@@ -40,8 +40,6 @@ class CHostPrototype extends CHostBase {
 		$output_fields = ['hostid', 'host', 'name', 'status', 'templateid', 'inventory_mode', 'discover',
 			'custom_interfaces', 'uuid'
 		];
-		$link_fields = ['group_prototypeid', 'groupid', 'hostid', 'templateid'];
-		$group_fields = ['group_prototypeid', 'name', 'hostid', 'templateid'];
 		$discovery_fields = array_keys($this->getTableSchema('items')['fields']);
 		$hostmacro_fields = array_keys($this->getTableSchema('hostmacro')['fields']);
 		$interface_fields = ['type', 'useip', 'ip', 'dns', 'port', 'main', 'details'];
@@ -70,8 +68,8 @@ class CHostPrototype extends CHostBase {
 			'output' =>					['type' => API_OUTPUT, 'in' => 'inventory_mode,'.implode(',', $output_fields), 'default' => $output_fields],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
 			'groupCount' =>				['type' => API_FLAG, 'default' => false],
-			'selectGroupLinks' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $link_fields), 'default' => null],
-			'selectGroupPrototypes' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $group_fields), 'default' => null],
+			'selectGroupLinks' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['groupid']), 'default' => null],
+			'selectGroupPrototypes' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['name']), 'default' => null],
 			'selectDiscoveryRule' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $discovery_fields), 'default' => null],
 			'selectParentHost' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $hosts_fields), 'default' => null],
 			'selectInterfaces' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $interface_fields), 'default' => null],
@@ -234,7 +232,7 @@ class CHostPrototype extends CHostBase {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
-		$hostPrototypeIds = array_keys($result);
+		$hostids = array_keys($result);
 
 		// adding discovery rule
 		if ($options['selectDiscoveryRule'] !== null && $options['selectDiscoveryRule'] != API_OUTPUT_COUNT) {
@@ -248,47 +246,8 @@ class CHostPrototype extends CHostBase {
 			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
 		}
 
-		// adding group links
-		if ($options['selectGroupLinks'] !== null && $options['selectGroupLinks'] != API_OUTPUT_COUNT) {
-			$groupPrototypes = DBFetchArray(DBselect(
-				'SELECT hg.group_prototypeid,hg.hostid'.
-					' FROM group_prototype hg'.
-					' WHERE '.dbConditionId('hg.hostid', $hostPrototypeIds).
-					' AND hg.groupid IS NOT NULL'
-			));
-			$relationMap = $this->createRelationMap($groupPrototypes, 'hostid', 'group_prototypeid');
-			$groupPrototypes = API::getApiService()->select('group_prototype', [
-				'output' => $options['selectGroupLinks'],
-				'group_prototypeids' => $relationMap->getRelatedIds(),
-				'preservekeys' => true
-			]);
-			foreach ($groupPrototypes as &$groupPrototype) {
-				unset($groupPrototype['name']);
-			}
-			unset($groupPrototype);
-			$result = $relationMap->mapMany($result, $groupPrototypes, 'groupLinks');
-		}
-
-		// adding group prototypes
-		if ($options['selectGroupPrototypes'] !== null && $options['selectGroupPrototypes'] != API_OUTPUT_COUNT) {
-			$groupPrototypes = DBFetchArray(DBselect(
-				'SELECT hg.group_prototypeid,hg.hostid'.
-				' FROM group_prototype hg'.
-				' WHERE '.dbConditionId('hg.hostid', $hostPrototypeIds).
-					' AND hg.groupid IS NULL'
-			));
-			$relationMap = $this->createRelationMap($groupPrototypes, 'hostid', 'group_prototypeid');
-			$groupPrototypes = API::getApiService()->select('group_prototype', [
-				'output' => $options['selectGroupPrototypes'],
-				'group_prototypeids' => $relationMap->getRelatedIds(),
-				'preservekeys' => true
-			]);
-			foreach ($groupPrototypes as &$groupPrototype) {
-				unset($groupPrototype['groupid']);
-			}
-			unset($groupPrototype);
-			$result = $relationMap->mapMany($result, $groupPrototypes, 'groupPrototypes');
-		}
+		self::addRelatedGroupLinks($options, $result);
+		self::addRelatedGroupPrototypes($options, $result);
 
 		// adding host
 		if ($options['selectParentHost'] !== null && $options['selectParentHost'] != API_OUTPUT_COUNT) {
@@ -297,7 +256,7 @@ class CHostPrototype extends CHostBase {
 			$dbRules = DBselect(
 				'SELECT hd.hostid,i.hostid AS parent_hostid'.
 					' FROM host_discovery hd,items i'.
-					' WHERE '.dbConditionId('hd.hostid', $hostPrototypeIds).
+					' WHERE '.dbConditionId('hd.hostid', $hostids).
 					' AND hd.parent_itemid=i.itemid'
 			);
 			while ($relation = DBfetch($dbRules)) {
@@ -338,7 +297,7 @@ class CHostPrototype extends CHostBase {
 			}
 			else {
 				$templates = API::Template()->get([
-					'hostids' => $hostPrototypeIds,
+					'hostids' => $hostids,
 					'countOutput' => true,
 					'groupCount' => true
 				]);
@@ -355,7 +314,7 @@ class CHostPrototype extends CHostBase {
 		if ($options['selectTags'] !== null && $options['selectTags'] !== API_OUTPUT_COUNT) {
 			$tags = API::getApiService()->select('host_tag', [
 				'output' => $this->outputExtend($options['selectTags'], ['hostid', 'hosttagid']),
-				'filter' => ['hostid' => $hostPrototypeIds],
+				'filter' => ['hostid' => $hostids],
 				'preservekeys' => true
 			]);
 
@@ -367,7 +326,7 @@ class CHostPrototype extends CHostBase {
 		if ($options['selectInterfaces'] !== null && $options['selectInterfaces'] != API_OUTPUT_COUNT) {
 			$interfaces = API::HostInterface()->get([
 				'output' => $this->outputExtend($options['selectInterfaces'], ['hostid', 'interfaceid']),
-				'hostids' => $hostPrototypeIds,
+				'hostids' => $hostids,
 				'sortfield' => 'interfaceid',
 				'nopermissions' => true,
 				'preservekeys' => true
@@ -385,6 +344,90 @@ class CHostPrototype extends CHostBase {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * @param array $options
+	 * @param array $result
+	 */
+	private static function addRelatedGroupLinks(array $options, array &$result): void {
+		if ($options['selectGroupLinks'] === null) {
+			return;
+		}
+
+		foreach ($result as &$host_prototype) {
+			$host_prototype['selectGroupLinks'] = [];
+		}
+		unset($host_prototype);
+
+		if ($options['selectGroupLinks'] === API_OUTPUT_EXTEND) {
+			$output = ['hostid', 'groupid'];
+		}
+		else {
+			$output = array_unique(array_merge(['hostid'], $options['selectGroupLinks']));
+		}
+
+		foreach ($output as &$field_name) {
+			$field_name = 'gp.'.$field_name;
+		}
+		unset($field_name);
+
+		$db_group_prototypes = DBselect(
+			'SELECT '.implode(',', $output).
+			' FROM group_prototype gp'.
+			' WHERE '.dbConditionId('gp.hostid', array_keys($result)).
+				' AND '.dbConditionId('gp.groupid', [0], true)
+		);
+
+		while ($db_group_prototype = DBfetch($db_group_prototypes)) {
+			$hostid = $db_group_prototype['hostid'];
+
+			unset($db_group_prototype['hostid']);
+
+			$result[$hostid]['groupLinks'][] = $db_group_prototype;
+		}
+	}
+
+	/**
+	 * @param array $options
+	 * @param array $result
+	 */
+	private static function addRelatedGroupPrototypes(array $options, array &$result): void {
+		if ($options['selectGroupPrototypes'] === null) {
+			return;
+		}
+
+		foreach ($result as &$host_prototype) {
+			$host_prototype['groupPrototypes'] = [];
+		}
+		unset($host_prototype);
+
+		if ($options['selectGroupPrototypes'] === API_OUTPUT_EXTEND) {
+			$output = ['hostid', 'name'];
+		}
+		else {
+			$output = array_unique(array_merge(['hostid'], $options['selectGroupPrototypes']));
+		}
+
+		foreach ($output as &$field_name) {
+			$field_name = 'gp.'.$field_name;
+		}
+		unset($field_name);
+
+		$db_group_prototypes = DBselect(
+			'SELECT '.implode(',', $output).
+			' FROM group_prototype gp'.
+			' WHERE '.dbConditionId('gp.hostid', array_keys($result)).
+				' AND '.dbConditionString('gp.name', [''], true)
+		);
+
+		while ($db_group_prototype = DBfetch($db_group_prototypes)) {
+			$hostid = $db_group_prototype['hostid'];
+
+			unset($db_group_prototype['hostid']);
+
+			$result[$hostid]['groupPrototypes'][] = $db_group_prototype;
+		}
 	}
 
 	/**

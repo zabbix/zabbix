@@ -2547,16 +2547,6 @@ class CDiscoveryRule extends CItemGeneral {
 				$prototype['ruleid'] = $dstDiscovery['itemid'];
 				unset($prototype['hostid'], $prototype['inventory']['hostid']);
 
-				foreach ($prototype['groupLinks'] as &$groupLinks) {
-					unset($groupLinks['group_prototypeid']);
-				}
-				unset($groupLinks);
-
-				foreach ($prototype['groupPrototypes'] as &$groupPrototype) {
-					unset($groupPrototype['group_prototypeid']);
-				}
-				unset($groupPrototype);
-
 				foreach ($prototype['macros'] as &$macro) {
 					$macro['type'] = ($macro['type'] == ZBX_MACRO_TYPE_SECRET) ? ZBX_MACRO_TYPE_TEXT : $macro['type'];
 					$macro += ['value' => ''];

@@ -90,8 +90,8 @@ if (getRequest('parent_discoveryid')) {
 	if ($hostid != 0) {
 		$hostPrototype = API::HostPrototype()->get([
 			'output' => API_OUTPUT_EXTEND,
-			'selectGroupLinks' => API_OUTPUT_EXTEND,
-			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
+			'selectGroupLinks' => ['groupid'],
+			'selectGroupPrototypes' => ['name'],
 			'selectTemplates' => ['templateid', 'name'],
 			'selectParentHost' => ['hostid'],
 			'selectMacros' => ['hostmacroid', 'macro', 'value', 'type', 'description'],
@@ -150,12 +150,6 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])) {
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])) {
 	unset($_REQUEST['hostid']);
-	if (hasRequest('group_prototypes')) {
-		foreach ($_REQUEST['group_prototypes'] as &$groupPrototype) {
-			unset($groupPrototype['group_prototypeid']);
-		}
-		unset($groupPrototype);
-	}
 
 	if ($macros && in_array(ZBX_MACRO_TYPE_SECRET, array_column($macros, 'type'))) {
 		// Reset macro type and value.
@@ -201,8 +195,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 	// add custom group prototypes
 	foreach (getRequest('group_prototypes', []) as $groupPrototype) {
-		unset($groupPrototype['group_prototypeid']);
-
 		if ($groupPrototype['name'] !== '') {
 			$newHostPrototype['groupPrototypes'][] = $groupPrototype;
 		}
