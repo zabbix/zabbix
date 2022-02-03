@@ -17,29 +17,28 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
-
-/**
- * @var CView $this
- */
 ?>
 
-window.service_edit_popup = {
-	status_rule_template: null,
-	child_template: null,
 
-	serviceid: null,
-	children: new Map(),
+window.service_edit_popup = new class {
 
-	create_url: null,
-	update_url: null,
-	delete_url: null,
-	search_limit: null,
+	constructor() {
+		this.status_rule_template = null;
+		this.child_template = null;
 
-	overlay: null,
-	dialogue: null,
-	form: null,
-	footer: null,
+		this.serviceid = null;
+		this.children = new Map();
+
+		this.create_url = null;
+		this.update_url = null;
+		this.delete_url = null;
+		this.search_limit = null;
+
+		this.overlay = null;
+		this.dialogue = null;
+		this.form = null;
+		this.footer = null;
+	}
 
 	init({tabs_id, serviceid, children, children_problem_tags_html, problem_tags, status_rules, create_url, update_url,
 			delete_url, search_limit}) {
@@ -177,7 +176,7 @@ window.service_edit_popup = {
 		}
 
 		this.update();
-	},
+	}
 
 	initTemplates() {
 		this.status_rule_template = new Template(`
@@ -211,7 +210,7 @@ window.service_edit_popup = {
 				</td>
 			</tr>
 		`);
-	},
+	}
 
 	update() {
 		const advanced_configuration = document.getElementById('advanced_configuration').checked;
@@ -264,7 +263,7 @@ window.service_edit_popup = {
 		}
 
 		document.querySelector('#children .js-add').disabled = has_problem_tags;
-	},
+	}
 
 	editStatusRule(row = null) {
 		let parameters;
@@ -301,18 +300,18 @@ window.service_edit_popup = {
 				this.addStatusRule(e.detail);
 			}
 		});
-	},
+	}
 
 	addStatusRule(status_rule) {
 		document
 			.querySelector('#status_rules tbody')
 			.insertAdjacentHTML('beforeend', this.status_rule_template.evaluate(status_rule));
-	},
+	}
 
 	updateStatusRule(row, status_rule) {
 		row.insertAdjacentHTML('afterend', this.status_rule_template.evaluate(status_rule));
 		row.remove();
-	},
+	}
 
 	renderChild(service) {
 		document
@@ -322,7 +321,7 @@ window.service_edit_popup = {
 				name: service.name,
 				problem_tags_html: service.problem_tags_html
 			}));
-	},
+	}
 
 	removeChild(serviceid) {
 		const child = this.form.querySelector(`#children tbody tr[data-serviceid="${serviceid}"]`);
@@ -335,7 +334,7 @@ window.service_edit_popup = {
 		this.updateChildrenFilterStats();
 		this.updateTabIndicator();
 		this.update();
-	},
+	}
 
 	removeAllChildren() {
 		document.querySelector('#children tbody').innerHTML = '';
@@ -344,7 +343,7 @@ window.service_edit_popup = {
 		this.updateChildrenFilterStats();
 		this.updateTabIndicator();
 		this.update();
-	},
+	}
 
 	filterChildren() {
 		const container = document.querySelector('#children tbody');
@@ -369,7 +368,7 @@ window.service_edit_popup = {
 
 		this.updateChildrenFilterStats();
 		this.updateTabIndicator();
-	},
+	}
 
 	updateChildrenFilterStats() {
 		const container = document.querySelector('#children tbody');
@@ -379,13 +378,13 @@ window.service_edit_popup = {
 		document.querySelector('#children tfoot .inline-filter-stats').textContent = this.children.size > 0
 			? sprintf(stats_template, container.childElementCount, this.children.size)
 			: '';
-	},
+	}
 
 	updateTabIndicator() {
 		document
 			.querySelector('#children')
 			.setAttribute('data-tab-indicator', this.children.size);
-	},
+	}
 
 	selectChildren() {
 		const exclude_serviceids = [];
@@ -415,7 +414,7 @@ window.service_edit_popup = {
 			this.updateTabIndicator();
 			this.update();
 		});
-	},
+	}
 
 	selectParents() {
 		const exclude_serviceids = [];
@@ -442,7 +441,7 @@ window.service_edit_popup = {
 
 			jQuery('#parent_serviceids_').multiSelect('addData', data);
 		});
-	},
+	}
 
 	clone(dialog_title) {
 		this.serviceid = null;
@@ -459,7 +458,7 @@ window.service_edit_popup = {
 		for (const element of this.footer.querySelectorAll('.js-add')) {
 			element.classList.remove('<?= ZBX_STYLE_DISPLAY_NONE ?>');
 		}
-	},
+	}
 
 	delete() {
 		for (const el of this.form.parentNode.children) {
@@ -510,7 +509,7 @@ window.service_edit_popup = {
 
 				this.form.parentNode.insertBefore(message_box, this.form);
 			})
-	},
+	}
 
 	submit() {
 		const fields = getFormFields(this.form);
@@ -585,4 +584,4 @@ window.service_edit_popup = {
 				this.overlay.unsetLoading();
 			});
 	}
-};
+}();
