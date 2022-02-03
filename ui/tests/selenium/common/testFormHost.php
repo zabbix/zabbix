@@ -351,6 +351,20 @@ class testFormHost extends CWebTest {
 					'error' => 'Incorrect characters used for host name "@#$%^&*()_+".'
 				]
 			],
+			// UTF8MB4 check.
+			[
+				[
+					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Groups' => 'Zabbix servers'
+					],
+					'error_title' => 'Cannot add host',
+					'error' => 'Incorrect characters used for host name "😀".',
+					'utf_fields' => [
+						'id:host' => '😀'
+					]
+				]
+			],
 			// Interface fields validation.
 			[
 				[
@@ -566,6 +580,19 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
+			// UTF8MB4 check.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'host_fields' => [
+						'Host name' => 'Host with utf8mb4 visible name',
+						'Groups' => 'Zabbix servers'
+					],
+					'utf_fields' => [
+						'id:visiblename' => '😀'
+					]
+				]
+			],
 			// Default values of all interfaces.
 			[
 				[
@@ -774,6 +801,13 @@ class testFormHost extends CWebTest {
 		}
 
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
+
+		if (array_key_exists('utf_fields', $data)) {
+			foreach ($data['utf_fields'] as $id => $value) {
+				$element = $form->query($id)->one();
+				CElementQuery::getDriver()->executeScript('arguments[0].value = '.json_encode($value).';', [$element]);
+			}
+		}
 
 		// Set name for field "Default".
 		$names = ['1' => 'default'];
