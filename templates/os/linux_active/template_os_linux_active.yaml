@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T19:22:42Z'
+  date: '2022-02-01T07:21:31Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -1170,9 +1170,6 @@ zabbix_export:
                   tag: component
                   value: network
                 -
-                  tag: description
-                  value: '{#IFALIAS}'
-                -
                   tag: interface
                   value: '{#IFNAME}'
             -
@@ -1191,9 +1188,6 @@ zabbix_export:
                 -
                   tag: component
                   value: network
-                -
-                  tag: description
-                  value: '{#IFALIAS}'
                 -
                   tag: interface
                   value: '{#IFNAME}'
@@ -1219,9 +1213,6 @@ zabbix_export:
                   tag: component
                   value: network
                 -
-                  tag: description
-                  value: '{#IFALIAS}'
-                -
                   tag: interface
                   value: '{#IFNAME}'
             -
@@ -1241,9 +1232,6 @@ zabbix_export:
                   tag: component
                   value: network
                 -
-                  tag: description
-                  value: '{#IFALIAS}'
-                -
                   tag: interface
                   value: '{#IFNAME}'
             -
@@ -1262,9 +1250,6 @@ zabbix_export:
                 -
                   tag: component
                   value: network
-                -
-                  tag: description
-                  value: '{#IFALIAS}'
                 -
                   tag: interface
                   value: '{#IFNAME}'
@@ -1289,9 +1274,6 @@ zabbix_export:
                 -
                   tag: component
                   value: network
-                -
-                  tag: description
-                  value: '{#IFALIAS}'
                 -
                   tag: interface
                   value: '{#IFNAME}'
@@ -1341,9 +1323,6 @@ zabbix_export:
                   tag: component
                   value: network
                 -
-                  tag: description
-                  value: '{#IFALIAS}'
-                -
                   tag: interface
                   value: '{#IFNAME}'
               trigger_prototypes:
@@ -1368,6 +1347,36 @@ zabbix_export:
                       tag: scope
                       value: availability
             -
+              uuid: 86dd61015ecc43428803b309bdfa9691
+              name: 'Interface {#IFNAME}: Speed'
+              type: ZABBIX_ACTIVE
+              key: 'vfs.file.contents["/sys/class/net/{#IFNAME}/speed"]'
+              delay: 5m
+              history: 7d
+              trends: 0d
+              units: bps
+              description: |
+                Indicates the interface latest or current speed value. Value is an integer representing the link speed in bits/sec.
+                This attribute is only valid for interfaces that implement the ethtool get_link_ksettings method (mostly Ethernet).
+                
+                Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1000000'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+            -
               uuid: e675114e23414b9dbc2d19d00f32bc70
               name: 'Interface {#IFNAME}: Interface type'
               type: ZABBIX_ACTIVE
@@ -1391,29 +1400,49 @@ zabbix_export:
                   tag: component
                   value: network
                 -
-                  tag: description
-                  value: '{#IFALIAS}'
-                -
                   tag: interface
                   value: '{#IFNAME}'
           trigger_prototypes:
             -
               uuid: c0fd4630351f424aa6c8b7f2e85f0f9e
               expression: |
-                change(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/type"])<0 and last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/type"])>0
+                change(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"])<0 and last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"])>0
                 and
-                (last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/type"])=6
-                or last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/type"])=1)
+                (last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/type"])=6 or last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/type"])=1)
                 and
                 (last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"])<>2)
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                (change(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/type"])>0 and last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/type"],#2)>0) or
+                (change(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"])>0 and last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"],#2)>0) or
                 (last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"])=2)
               name: 'Interface {#IFNAME}: Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
               description: 'This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Ack to close.'
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'Interface {#IFNAME}: Link down'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"])=2 and (last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"],#1)<>last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"],#2))'
+                  recovery_expression: 'last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
+            -
+              uuid: 5370cb085c454077a2dd6c39890f706a
+              expression: |
+                (avg(/Linux by Zabbix agent active/net.if.in["{#IFNAME}"],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"]) or
+                avg(/Linux by Zabbix agent active/net.if.out["{#IFNAME}"],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"])) and
+                last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"])>0
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: |
+                avg(/Linux by Zabbix agent active/net.if.in["{#IFNAME}"],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"]) and
+                avg(/Linux by Zabbix agent active/net.if.out["{#IFNAME}"],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Linux by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"])
+              name: 'Interface {#IFNAME}: High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
+              opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
+              priority: WARNING
+              description: 'The network interface utilization is close to its estimated maximum bandwidth.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -2036,6 +2065,10 @@ zabbix_export:
         -
           macro: '{$IF.ERRORS.WARN}'
           value: '2'
+        -
+          macro: '{$IF.UTIL.MAX}'
+          value: '90'
+          description: 'This macro is used as a threshold in interface utilization trigger.'
         -
           macro: '{$IFCONTROL}'
           value: '1'
@@ -3569,12 +3602,7 @@ zabbix_export:
       uuid: fac8b6986be24a8c91f7b0b15439bccf
       template: 'Linux network interfaces by Zabbix agent active'
       name: 'Linux network interfaces by Zabbix agent active'
-      description: |
-        Known Issues:
-        
-          Description: High interface utilization trigger is removed since currently it is not possible to retrieve interface speed to determine the max bandwidth.
-        
-        Template tooling version used: 0.41
+      description: 'Template tooling version used: 0.41'
       groups:
         -
           name: Templates/Modules
@@ -3616,9 +3644,6 @@ zabbix_export:
                   tag: component
                   value: network
                 -
-                  tag: description
-                  value: '{#IFALIAS}'
-                -
                   tag: interface
                   value: '{#IFNAME}'
             -
@@ -3637,9 +3662,6 @@ zabbix_export:
                 -
                   tag: component
                   value: network
-                -
-                  tag: description
-                  value: '{#IFALIAS}'
                 -
                   tag: interface
                   value: '{#IFNAME}'
@@ -3665,9 +3687,6 @@ zabbix_export:
                   tag: component
                   value: network
                 -
-                  tag: description
-                  value: '{#IFALIAS}'
-                -
                   tag: interface
                   value: '{#IFNAME}'
             -
@@ -3687,9 +3706,6 @@ zabbix_export:
                   tag: component
                   value: network
                 -
-                  tag: description
-                  value: '{#IFALIAS}'
-                -
                   tag: interface
                   value: '{#IFNAME}'
             -
@@ -3708,9 +3724,6 @@ zabbix_export:
                 -
                   tag: component
                   value: network
-                -
-                  tag: description
-                  value: '{#IFALIAS}'
                 -
                   tag: interface
                   value: '{#IFNAME}'
@@ -3735,9 +3748,6 @@ zabbix_export:
                 -
                   tag: component
                   value: network
-                -
-                  tag: description
-                  value: '{#IFALIAS}'
                 -
                   tag: interface
                   value: '{#IFNAME}'
@@ -3787,9 +3797,6 @@ zabbix_export:
                   tag: component
                   value: network
                 -
-                  tag: description
-                  value: '{#IFALIAS}'
-                -
                   tag: interface
                   value: '{#IFNAME}'
               trigger_prototypes:
@@ -3814,6 +3821,36 @@ zabbix_export:
                       tag: scope
                       value: availability
             -
+              uuid: 7b3413b3321a4756b8f369a9633a393e
+              name: 'Interface {#IFNAME}: Speed'
+              type: ZABBIX_ACTIVE
+              key: 'vfs.file.contents["/sys/class/net/{#IFNAME}/speed"]'
+              delay: 5m
+              history: 7d
+              trends: 0d
+              units: bps
+              description: |
+                Indicates the interface latest or current speed value. Value is an integer representing the link speed in bits/sec.
+                This attribute is only valid for interfaces that implement the ethtool get_link_ksettings method (mostly Ethernet).
+                
+                Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1000000'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+            -
               uuid: 1506d09010fc48378b35b434e0eb18c1
               name: 'Interface {#IFNAME}: Interface type'
               type: ZABBIX_ACTIVE
@@ -3837,29 +3874,49 @@ zabbix_export:
                   tag: component
                   value: network
                 -
-                  tag: description
-                  value: '{#IFALIAS}'
-                -
                   tag: interface
                   value: '{#IFNAME}'
           trigger_prototypes:
             -
               uuid: 6ce7c1f3b54641bb87684f9c5336d1da
               expression: |
-                change(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/type"])<0 and last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/type"])>0
+                change(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"])<0 and last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"])>0
                 and
-                (last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/type"])=6
-                or last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/type"])=1)
+                (last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/type"])=6 or last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/type"])=1)
                 and
                 (last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"])<>2)
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                (change(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/type"])>0 and last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/type"],#2)>0) or
+                (change(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"])>0 and last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"],#2)>0) or
                 (last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"])=2)
               name: 'Interface {#IFNAME}: Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
               description: 'This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Ack to close.'
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'Interface {#IFNAME}: Link down'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"])=2 and (last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"],#1)<>last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"],#2))'
+                  recovery_expression: 'last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
+            -
+              uuid: 57ff0d15e1634b88920cb6ddccd804c7
+              expression: |
+                (avg(/Linux network interfaces by Zabbix agent active/net.if.in["{#IFNAME}"],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"]) or
+                avg(/Linux network interfaces by Zabbix agent active/net.if.out["{#IFNAME}"],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"])) and
+                last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"])>0
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: |
+                avg(/Linux network interfaces by Zabbix agent active/net.if.in["{#IFNAME}"],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"]) and
+                avg(/Linux network interfaces by Zabbix agent active/net.if.out["{#IFNAME}"],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Linux network interfaces by Zabbix agent active/vfs.file.contents["/sys/class/net/{#IFNAME}/speed"])
+              name: 'Interface {#IFNAME}: High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
+              opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
+              priority: WARNING
+              description: 'The network interface utilization is close to its estimated maximum bandwidth.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -3946,6 +4003,10 @@ zabbix_export:
         -
           macro: '{$IF.ERRORS.WARN}'
           value: '2'
+        -
+          macro: '{$IF.UTIL.MAX}'
+          value: '90'
+          description: 'This macro is used as a threshold in interface utilization trigger.'
         -
           macro: '{$IFCONTROL}'
           value: '1'
@@ -4633,35 +4694,6 @@ zabbix_export:
             host: 'Linux by Zabbix agent active'
             key: 'system.swap.size[,total]'
     -
-      uuid: d47109e977ec4362a3f3bb5e7708b48a
-      name: 'System load'
-      ymin_type_1: FIXED
-      graph_items:
-        -
-          color: 1A7C11
-          item:
-            host: 'Linux by Zabbix agent active'
-            key: 'system.cpu.load[all,avg1]'
-        -
-          sortorder: '1'
-          color: 2774A4
-          item:
-            host: 'Linux by Zabbix agent active'
-            key: 'system.cpu.load[all,avg5]'
-        -
-          sortorder: '2'
-          color: F63100
-          item:
-            host: 'Linux by Zabbix agent active'
-            key: 'system.cpu.load[all,avg15]'
-        -
-          sortorder: '3'
-          color: A54F10
-          yaxisside: RIGHT
-          item:
-            host: 'Linux by Zabbix agent active'
-            key: system.cpu.num
-    -
       uuid: aa2447f0256d4985af78af8e1cf7e7bd
       name: 'System load'
       ymin_type_1: FIXED
@@ -4689,4 +4721,33 @@ zabbix_export:
           yaxisside: RIGHT
           item:
             host: 'Linux CPU by Zabbix agent active'
+            key: system.cpu.num
+    -
+      uuid: d47109e977ec4362a3f3bb5e7708b48a
+      name: 'System load'
+      ymin_type_1: FIXED
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Linux by Zabbix agent active'
+            key: 'system.cpu.load[all,avg1]'
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Linux by Zabbix agent active'
+            key: 'system.cpu.load[all,avg5]'
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Linux by Zabbix agent active'
+            key: 'system.cpu.load[all,avg15]'
+        -
+          sortorder: '3'
+          color: A54F10
+          yaxisside: RIGHT
+          item:
+            host: 'Linux by Zabbix agent active'
             key: system.cpu.num
