@@ -822,8 +822,15 @@ class testFormHost extends CWebTest {
 				$this->page->assertTitle($this->monitoring ? 'Hosts' : 'Configuration of hosts');
 
 				// Check host fields.
-				$host = CTestArrayHelper::get($data, 'host_fields.Visible name', $data['host_fields']['Host name']);
-				$form = $this->filterAndSelectHost($host);
+				if (array_key_exists('utf_fields', $data) && array_key_exists('id:visiblename', $data['utf_fields'])) {
+					$host = $data['utf_fields']['id:visiblename'];
+					$utf = true;
+				}
+				else {
+					$host = CTestArrayHelper::get($data, 'host_fields.Visible name', $data['host_fields']['Host name']);
+				}
+
+				$form = $this->filterAndSelectHost($host, $utf);
 				$form->checkValue($data['host_fields']);
 
 				foreach ($interfaces as &$interface) {
@@ -1649,9 +1656,13 @@ class testFormHost extends CWebTest {
 				zbx_dbstr($data['host_fields']['Host name'])
 		);
 
-		if (CTestArrayHelper::get($data, 'host_fields.Visible name') === "") {
+		if (array_key_exists('utf_fields', $data) && array_key_exists('id:visiblename', $data['utf_fields'])) {
+			$data['host_fields']['Visible name'] =  $data['utf_fields']['id:visiblename'];
+		}
+		elseif (CTestArrayHelper::get($data, 'host_fields.Visible name') === "") {
 			$data['host_fields']['Visible name'] = $data['host_fields']['Host name'];
 		}
+
 		$fields = ['Host name' => 'host', 'Visible name' => 'name', 'Description' => 'description', 'Enabled' => 'status'];
 		foreach ($fields as $ui_field => $db_field) {
 			if (array_key_exists($ui_field, $data['host_fields'])) {
@@ -1869,9 +1880,18 @@ class testFormHost extends CWebTest {
 	 *
 	 * @return CFormElement
 	 */
-	public function filterAndSelectHost($host) {
+	public function filterAndSelectHost($host, $utf = false) {
 		$this->query('button:Reset')->one()->click();
-		$this->query('name:zbx_filter')->asForm()->waitUntilReady()->one()->fill(['Name' => $host]);
+		$filter_form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+
+		if ($utf) {
+			$element = $filter_form->query('xpath:.//input[@id="filter_host" or @name="name"]')->one();
+			CElementQuery::getDriver()->executeScript('arguments[0].value = '.json_encode($host).';', [$element]);
+		}
+		else {
+			$filter_form->fill(['Name' => $host]);
+		}
+
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$this->page->waitUntilReady();
 
