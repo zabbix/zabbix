@@ -218,6 +218,7 @@
 &#13;
         if (priority) {&#13;
             data.issue.priority_id = priority;&#13;
+            data.issue.due_date = new Date().toISOString().split('T')[0];&#13;
         }&#13;
 &#13;
         result = Redmine.request('post', 'issues.json', Redmine.addCustomFields(data, fields));&#13;
