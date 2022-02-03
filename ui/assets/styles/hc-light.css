@@ -5315,13 +5315,13 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
     /* Special styling for WebKit/Blink */ }
     .range-control input[type=range]:focus {
       outline: none; }
-    .range-control input[type=range]::-webkit-slider-thumb {
+    .range-control input[type=range]::-webkit-slider-thumb, .range-control input[type=range]::-moz-range-thumb {
       margin-top: 1px;
       /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
       height: 10px;
       width: 10px;
       opacity: 0; }
-    .range-control input[type=range]::-webkit-slider-runnable-track {
+    .range-control input[type=range]::-webkit-slider-runnable-track, .range-control input[type=range]::-moz-range-track {
       height: 10px;
       opacity: 0; }
   .range-control input[type=text] {
