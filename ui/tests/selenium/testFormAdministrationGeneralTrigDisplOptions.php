@@ -28,7 +28,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 	public $config_link = 'zabbix.php?action=trigdisplay.edit';
 	public $form_selector = 'xpath://form[contains(@action, "trigdisplay.update")]';
 
-	public $default = [
+	public $default_values = [
 		'Use custom event status colors' => false,
 		'Unacknowledged PROBLEM events' => true,
 		'Acknowledged PROBLEM events' => true,
@@ -58,7 +58,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 		'id:lbl_severity_color_5' => 'E45959'
 	];
 
-	public $db_default = [
+	public $db_default_values = [
 		'custom_color' => 0,
 		'problem_unack_style' => 1,
 		'problem_ack_style'=> 1,
@@ -84,17 +84,12 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 		'severity_color_5' => 'E45959'
 	];
 
-	public $custom = [
+	public $custom_values = [
 		'Use custom event status colors' => true,
 		'Unacknowledged PROBLEM events' => false,
 		'Acknowledged PROBLEM events' => false,
 		'Unacknowledged RESOLVED events' => false,
 		'Acknowledged RESOLVED events' => false,
-//		// This should be changed to really custom values after DEV-1673 is fixed.
-//		'id:problem_unack_color' => 'D81B60',
-//		'id:problem_ack_color' => 'F8BBD0',
-//		'id:ok_unack_color' => '1A237E',
-//		'id:ok_ack_color' => 'B3E5FC',
 		'Display OK triggers for' => '23h',
 		'On status change triggers blink for' => '17h',
 		'Not classified' => 'Custom Not classified',
@@ -106,10 +101,10 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 	];
 
 	public $color_custom = [
-		'id:lbl_problem_unack_color' => 'CC0000',
-		'id:lbl_problem_ack_color'=> 'CC0000',
-		'id:lbl_ok_unack_color'=> '009900',
-		'id:lbl_ok_ack_color'=> '009900',
+		'id:lbl_problem_unack_color' => 'D81B60',
+		'id:lbl_problem_ack_color'=> 'F8BBD0',
+		'id:lbl_ok_unack_color'=> '1A237E',
+		'id:lbl_ok_ack_color'=> 'B3E5FC',
 		'id:lbl_severity_color_0' => 'E8EAF6',
 		'id:lbl_severity_color_1' => 'D1C4E9',
 		'id:lbl_severity_color_2' => 'B39DDB' ,
@@ -211,6 +206,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 	 * Test for checking 'Reset defaults' button.
 	 */
 	public function testFormAdministrationGeneralTrigDisplOptions_ResetButton() {
+		// For this method variable $other sent as false and $trigger_disp as true.
 		$this->executeResetButtonTest(false, true);
 	}
 

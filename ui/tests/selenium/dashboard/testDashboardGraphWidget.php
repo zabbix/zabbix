@@ -30,6 +30,15 @@ class testDashboardGraphWidget extends CWebTest {
 
 	use FilterTrait;
 
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
+
 	/*
 	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
 	 * because it can change.
@@ -104,9 +113,7 @@ class testDashboardGraphWidget extends CWebTest {
 
 		$errors = [];
 
-		$tabs = ['Displaying options', 'Time period', 'Axes', 'Legend', 'Problems', 'Overrides'];
-// TODO: fix hex field - return this array and change screenshot.
-//		$tabs = ['Data set', 'Displaying options', 'Time period', 'Axes', 'Legend', 'Problems', 'Overrides'];
+		$tabs = ['Data set', 'Displaying options', 'Time period', 'Axes', 'Legend', 'Problems', 'Overrides'];
 		foreach ($tabs as $tab) {
 			$form->selectTab($tab);
 			if ($tab === 'Overrides') {
@@ -167,9 +174,8 @@ class testDashboardGraphWidget extends CWebTest {
 
 		sleep(2);
 		if (array_key_exists('color_error', $data)) {
-			$message = $form->getOverlayMessage();
-			$this->assertTrue($message->isBad());
-			$this->assertTrue($message->hasLine($data['color_error']));
+			// Check colorpick error message.
+			$this->assertMessage(TEST_BAD, null, $data['color_error']);
 		}
 		$form->submit();
 		COverlayDialogElement::find()->one()->waitUntilReady()->query('xpath:div[@class="overlay-dialogue-footer"]'.
@@ -180,15 +186,7 @@ class testDashboardGraphWidget extends CWebTest {
 				$data['error'] = [$data['error']];
 			}
 			// Check error message.
-			$message = $form->getOverlayMessage();
-			$this->assertTrue($message->isBad());
-			$count = count($data['error']);
-			$message->query('xpath:./div[@class="msg-details"]/ul/li['.$count.']')->waitUntilPresent();
-			$this->assertEquals($count, $message->getLines()->count());
-
-			foreach ($data['error'] as $error) {
-				$this->assertTrue($message->hasLine($error));
-			}
+			$this->assertMessage(TEST_BAD, null, $data['error']);
 		}
 
 		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
@@ -239,7 +237,6 @@ class testDashboardGraphWidget extends CWebTest {
 					'color_error' => 'Invalid parameter "Data set/1/color": a hexadecimal color code (6 symbols) is expected.'
 				]
 			],
-
 			// Time shift field validation.
 			[
 				[
@@ -964,7 +961,6 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Overrides' => [
 						[
-
 							'options' => [
 								'Base color'
 							],
@@ -1499,7 +1495,7 @@ class testDashboardGraphWidget extends CWebTest {
 					'Time period' => [
 						'Set custom time period' => true,
 						'From' => '2018-11-15',
-						'To' => '2018-11-15 14:20'
+						'To' => '2018-11-15 14:20:00'
 					],
 					'Axes' => [
 						'id:lefty_min' => '5',
@@ -1984,7 +1980,6 @@ class testDashboardGraphWidget extends CWebTest {
 						$data_set = [$selector => $data_set[$field]] + $data_set;
 						unset($data_set[$field]);
 					}
-
 				}
 
 				$form->fill($data_set);
@@ -2026,7 +2021,6 @@ class testDashboardGraphWidget extends CWebTest {
 			$last = count($overrides) - 1;
 
 			foreach ($overrides as $i => $override) {
-
 				// Prepare non-standard fields.
 				$mapping = [
 					'options' => [
