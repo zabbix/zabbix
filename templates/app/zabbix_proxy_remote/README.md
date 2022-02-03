@@ -33,7 +33,7 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Zabbix_raw_items |Remote Zabbix proxy: Zabbix stats |<p>Zabbix server statistics master item.</p> |INTERNAL |zabbix[stats,{$ZABBIX.PROXY.ADDRESS},{$ZABBIX.PROXY.PORT}] |
+|Zabbix raw items |Remote Zabbix proxy: Zabbix stats |<p>Zabbix server statistics master item.</p> |INTERNAL |zabbix[stats,{$ZABBIX.PROXY.ADDRESS},{$ZABBIX.PROXY.PORT}] |
 |Zabbix proxy |Remote Zabbix proxy: Zabbix stats queue over 10m |<p>Number of monitored items in the queue which are delayed at least by 10 minutes.</p> |INTERNAL |zabbix[stats,{$ZABBIX.PROXY.ADDRESS},{$ZABBIX.PROXY.PORT},queue,10m]<p>**Preprocessing**:</p><p>- JSONPATH: `$.queue`</p> |
 |Zabbix proxy |Remote Zabbix proxy: Zabbix stats queue |<p>Number of monitored items in the queue which are delayed at least by 6 seconds.</p> |INTERNAL |zabbix[stats,{$ZABBIX.PROXY.ADDRESS},{$ZABBIX.PROXY.PORT},queue]<p>**Preprocessing**:</p><p>- JSONPATH: `$.queue`</p> |
 |Zabbix proxy |Remote Zabbix proxy: Utilization of data sender internal processes, in % |<p>Average percentage of time data sender processes have been busy in the last minute.</p> |DEPENDENT |process.data_sender.avg.busy<p>**Preprocessing**:</p><p>- JSONPATH: `$.data.process['data sender'].busy.avg`</p><p>⛔️ON_FAIL: `CUSTOM_ERROR -> Processes data sender not started`</p> |

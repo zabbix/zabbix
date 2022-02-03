@@ -30,8 +30,9 @@ import (
 
 // Options -
 type Options struct {
-	Timeout int    `conf:"optional,range=1:30"`
-	Path    string `conf:"optional"`
+	plugin.SystemOptions `conf:"optional,name=System"`
+	Timeout              int    `conf:"optional,range=1:30"`
+	Path                 string `conf:"optional"`
 }
 
 // Plugin -

@@ -368,14 +368,23 @@ if ($data['serviceid'] !== null) {
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-clone']),
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'service_edit_popup.clone('.json_encode(_('New service')).');'
-		],
-		[
-			'title' => _('Add'),
-			'class' => implode(' ', [ZBX_STYLE_DISPLAY_NONE, 'js-add']),
-			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'service_edit_popup.submit();'
+			'action' => 'service_edit_popup.clone('.json_encode([
+				'title' => _('New service'),
+				'buttons' => [
+					[
+						'title' => _('Add'),
+						'class' => 'js-add',
+						'keepOpen' => true,
+						'isSubmit' => true,
+						'action' => 'service_edit_popup.submit();'
+					],
+					[
+						'title' => _('Cancel'),
+						'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-cancel']),
+						'cancel' => true
+					]
+				]
+			]).');'
 		],
 		[
 			'title' => _('Delete'),

@@ -140,4 +140,29 @@ class CHtmlUrlValidatorTest extends TestCase {
 	public function test_validateURL($url, $options, $expected) {
 		$this->assertSame($expected, CHtmlUrlValidator::validate($url, $options));
 	}
+
+	public function dataProviderValidateSameSiteURL() {
+		return [
+			['items.php',								true],
+			['items.php?',								true],
+			['items.php?context=host',					true],
+			['items.php?context=host&itemids=12345',	true],
+			['items.php?context=host#id=12345',			true],
+
+			['items1.php',								false],
+			['items.html',								false],
+			['items.php&itemids=12345',					false],
+			['http://www.zabbix.com/items.php',			false],
+			['http://www.zabbix.com',					false],
+			['www.zabbix.com',							false],
+			['zabbix.com',								false]
+		];
+	}
+
+	/**
+	 * @dataProvider dataProviderValidateSameSiteURL
+	 */
+	public function testValidateSameSiteURL($url, $expected) {
+		$this->assertSame($expected, CHtmlUrlValidator::validateSameSite($url));
+	}
 }

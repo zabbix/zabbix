@@ -28,24 +28,81 @@
 	<?= CTagFilterFieldHelper::getTemplate(); ?>
 </script>
 
-<script type="text/javascript">
-	jQuery(function($) {
-		$('#filter-tags')
-			.dynamicRows({template: '#filter-tag-row-tmpl'})
-			.on('afteradd.dynamicRows', function() {
-				var rows = this.querySelectorAll('.form_row');
-				new CTagFilterItem(rows[rows.length - 1]);
+<script>
+	const view = {
+		init() {
+			$('#filter-tags')
+				.dynamicRows({template: '#filter-tag-row-tmpl'})
+				.on('afteradd.dynamicRows', function() {
+					const rows = this.querySelectorAll('.form_row');
+					new CTagFilterItem(rows[rows.length - 1]);
+				});
+
+			// Init existing fields once loaded.
+			document.querySelectorAll('#filter-tags .form_row').forEach(row => {
+				new CTagFilterItem(row);
 			});
 
-		// Init existing fields once loaded.
-		document.querySelectorAll('#filter-tags .form_row').forEach(row => {
-			new CTagFilterItem(row);
-		});
+			$('#filter_state')
+				.on('change', function() {
+					$('input[name=filter_status]').prop('disabled', $('input[name=filter_state]:checked').val() != -1);
+				})
+				.trigger('change');
+		},
 
-		$('#filter_state')
-			.on('change', function() {
-				$('input[name=filter_status]').prop('disabled', $('input[name=filter_state]:checked').val() != -1);
-			})
-			.trigger('change');
-	});
+		editHost(e, hostid) {
+			e.preventDefault();
+			const host_data = {hostid};
+
+			this.openHostPopup(host_data);
+		},
+
+		openHostPopup(host_data) {
+			const original_url = location.href;
+			const overlay = PopUp('popup.host.edit', host_data, {
+				dialogueid: 'host_edit',
+				dialogue_class: 'modal-popup-large'
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete, {once: true});
+			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+				history.replaceState({}, '', original_url);
+			}, {once: true});
+		},
+
+		events: {
+			hostSuccess(e) {
+				const data = e.detail;
+
+				if ('success' in data) {
+					postMessageOk(data.success.title);
+
+					if ('messages' in data.success) {
+						postMessageDetails('success', data.success.messages);
+					}
+				}
+
+				location.href = location.href;
+			},
+
+			hostDelete(e) {
+				const data = e.detail;
+
+				if ('success' in data) {
+					postMessageOk(data.success.title);
+
+					if ('messages' in data.success) {
+						postMessageDetails('success', data.success.messages);
+					}
+				}
+
+				const curl = new Curl('zabbix.php', false);
+				curl.setArgument('action', 'host.list');
+
+				location.href = curl.getUrl();
+			}
+		}
+	};
 </script>

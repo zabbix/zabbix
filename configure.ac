@@ -1963,7 +1963,7 @@ if test "x$HAVE_START_GROUP" = "xyes"; then
 fi
 
 if test "x$agent2" = "xyes"; then
-	CGO_CFLAGS=$TLS_CFLAGS
+	CGO_CFLAGS="$TLS_CFLAGS $LIBPCRE_CFLAGS $LIBPCRE2_CFLAGS"
 	CGO_LDFLAGS="$AGENT2_LDFLAGS $LD_START_GROUP \
 		\${abs_top_builddir}/src/zabbix_agent/logfiles/libzbxlogfiles.a \
 		\${abs_top_builddir}/src/libs/zbxcomms/libzbxcomms.a \
@@ -2052,7 +2052,7 @@ dnl *                 Output configuration results                  *
 dnl *                                                               *
 dnl *****************************************************************
 
-m4_ifdef([CONF_TESTS],[CONF_TESTS(ZBXCMOCKA)])
+m4_ifdef([CONF_TESTS],[CONF_TESTS])
 
 AC_OUTPUT([
 	Makefile

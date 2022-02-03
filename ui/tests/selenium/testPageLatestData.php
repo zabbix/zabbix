@@ -21,47 +21,77 @@
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 
 /**
- * @backup history_uint
+ * @backup history_uint, profiles
  */
 class testPageLatestData extends CWebTest {
 
+	private function getTable() {
+		$table_path = '//table['.CXPathHelper::fromClass('overflow-ellipsis').']';
+
+		return $this->query('xpath', $table_path)->asTable()->one();
+	}
+
 	public function testPageLatestData_CheckLayout() {
+		$time = time() - 100;
+		$hostname = 'ЗАББИКС Сервер';
+
+		$id = CDBHelper::getValue('SELECT itemid'.
+			' FROM items WHERE hostid in ('.
+				'SELECT hostid FROM hosts'.
+				' WHERE name='.zbx_dbstr($hostname).
+			') AND name='.zbx_dbstr('Zabbix agent ping')
+		);
+
+		// Add data to item agent.ping to see "With data"/"Without data" subfilter.
+		DBexecute("INSERT INTO history_uint (itemid, clock, value, ns) VALUES (".zbx_dbstr($id).", ".zbx_dbstr($time).", 1, 0)");
+
 		$this->page->login()->open('zabbix.php?action=latest.view');
 		$this->page->assertTitle('Latest data');
 		$this->page->assertHeader('Latest data');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
-		$this->assertEquals(['Host groups', 'Hosts', 'Name', 'Tags', 'Show details'],
-				$form->getLabels()->asText());
-		$this->assertTrue($form->query('xpath:.//label[text()="Show items without data"]')->one()->isValid());
+		$this->assertEquals(['Host groups', 'Hosts', 'Name', 'Tags', 'Show tags', 'Tag display priority', 'Show details'],
+				$form->getLabels()->asText()
+		);
 
-		// Show item without data is checked/disabled without Hosts in filter and checked/enabled with Hosts in filter.
+		// With data/Without data subfilter shows only when some host is filtered.
 		foreach ([false, true] as $status) {
-			$form->query('id:filter_show_without_data')->one()->isEnabled($status);
-			$form->query('id:filter_show_without_data')->one()->isAttributePresent('checked');
+			$this->assertEquals($status, $this->query('link:With data')->one(false)->isValid());
+			$this->assertEquals($status, $this->query('link:Without data')->one(false)->isValid());
 			if (!$status) {
-				$form->fill(['Hosts' => 'Host 1 from first group']);
+				$form->fill(['Hosts' => $hostname]);
+				$form->submit();
+				$this->page->waitUntilReady();
 			}
 		}
 
-		// Check filter buttons.
-		foreach (['Apply', 'Reset'] as $button) {
-			$this->assertTrue($form->query('button', $button)->one()->isClickable());
-		}
+		$this->assertTrue($this->query('button:Apply')->one()->isClickable());
+		$this->query('button:Reset')->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
 
 		// Check table headers.
-		$table = $this->query('class:list-table')->asTable()->one();
-		$this->assertEquals(['', 'Host', 'Name', 'Last check', 'Last value', 'Change', 'Tags', '', 'Info'],
-				$table->getHeadersText());
+		$details_headers = [
+			true => ['', 'Host', 'Name', 'Interval', 'History', 'Trends', 'Type', 'Last check', 'Last value',
+				'Change', 'Tags', '', 'Info'],
+			false => ['', 'Host', 'Name', 'Last check', 'Last value', 'Change', 'Tags', '', 'Info']
+		];
+
+		foreach ($details_headers as $status => $headers) {
+			$this->query('name:show_details')->one()->asCheckbox()->set($status);
+			$form->submit();
+			$this->page->waitUntilReady();
+			$this->assertEquals($headers, $this->getTable()->getHeadersText());
+		}
 
 		// Check that sortable headers are clickable.
 		foreach (['Host', 'Name'] as $header) {
-			$this->assertTrue($table->query('xpath:.//th/a[text()="'.$header.'"]')->one()->isClickable());
+			$this->assertTrue($this->getTable()->query('xpath:.//th/a[text()="'.$header.'"]')->one()->isClickable());
 		}
 
 		// Check filter collapse/expand.
-		$filter_tab = $this->query('xpath://a[contains(@class, "filter-trigger")]')->one();
-		foreach ([true, false] as $status) {
-			$this->assertEquals($status, $this->query('xpath://div[contains(@class, "filter-container")]')->one()->isDisplayed());
+		$filter_tab = $this->query('xpath://a[contains(@class, "tabfilter-item-link")]')->one();
+		foreach ([false, true] as $status) {
+			$this->assertEquals($status, $this->query('xpath://div[contains(@class, "tabfilter-collapsed")]')
+					->one(false)->isValid());
 			$filter_tab->click();
 		}
 	}
@@ -75,9 +105,8 @@ class testPageLatestData extends CWebTest {
 				' AND name <> host'
 		);
 		$this->page->login()->open('zabbix.php?action=latest.view');
-		$table = $this->query('class:list-table')->asTable()->one();
 		foreach ($result as $hostname) {
-			$this->assertFalse($table->query('xpath://td/a[text()='.CXPathHelper::escapeQuotes($hostname['host']).']')
+			$this->assertFalse($this->getTable()->query('xpath://td/a[text()='.CXPathHelper::escapeQuotes($hostname['host']).']')
 					->one(false)->isDisplayed());
 		}
 	}
@@ -87,14 +116,14 @@ class testPageLatestData extends CWebTest {
 			// Item without description.
 			[
 				[
-					'host group' => '15003',
+					'hostid' => '15003',
 					'Item name' => 'item_testPageHistory_CheckLayout_Log'
 				]
 			],
 			// Item with plain text in the description.
 			[
 				[
-					'host group' => '15003',
+					'hostid' => '15003',
 					'Item name' => 'item_testPageHistory_CheckLayout_Log_2',
 					'description' => 'Non-clickable description'
 				]
@@ -102,7 +131,7 @@ class testPageLatestData extends CWebTest {
 			// Item with only 1 url in description.
 			[
 				[
-					'host group' => '15003',
+					'hostid' => '15003',
 					'Item name' => 'item_testPageHistory_CheckLayout_Eventlog',
 					'description' => 'https://zabbix.com'
 				]
@@ -110,7 +139,7 @@ class testPageLatestData extends CWebTest {
 			// Item with text and url in description.
 			[
 				[
-					'host group' => '15003',
+					'hostid' => '15003',
 					'Item name' => 'item_testPageHistory_CheckLayout_Eventlog_2',
 					'description' => 'The following url should be clickable: https://zabbix.com'
 				]
@@ -118,7 +147,7 @@ class testPageLatestData extends CWebTest {
 			// Item with multiple urls in description.
 			[
 				[
-					'host group' => '15003',
+					'hostid' => '15003',
 					'Item name' => 'item_testPageHistory_CheckLayout_Character',
 					'description' => 'http://zabbix.com https://www.zabbix.com/career https://www.zabbix.com/contact'
 				]
@@ -126,7 +155,7 @@ class testPageLatestData extends CWebTest {
 			// Item with text and 2 urls in description.
 			[
 				[
-					'host group' => '15003',
+					'hostid' => '15003',
 					'Item name' => 'item_testPageHistory_CheckLayout_Text',
 					'description' => 'These urls should be clickable: https://zabbix.com https://www.zabbix.com/career'
 				]
@@ -134,7 +163,7 @@ class testPageLatestData extends CWebTest {
 			// Item with underscore in macros name and one non existing macros  in description .
 			[
 				[
-					'host group' => '50010',
+					'hostid' => '50010',
 					'Item name' => 'Http agent item form',
 					'description' => 'Underscore {$NONEXISTING}'
 				]
@@ -142,7 +171,7 @@ class testPageLatestData extends CWebTest {
 			// Item with 2 macros in description.
 			[
 				[
-					'host group' => '50010',
+					'hostid' => '50010',
 					'Item name' => 'Http agent item for update',
 					'description' => '127.0.0.1 Some text'
 				]
@@ -150,7 +179,7 @@ class testPageLatestData extends CWebTest {
 			// Item with 2 macros and text in description.
 			[
 				[
-					'host group' => '50010',
+					'hostid' => '50010',
 					'Item name' => 'Http agent item for delete',
 					'description' => 'Some text and IP number 127.0.0.1'
 				]
@@ -158,7 +187,7 @@ class testPageLatestData extends CWebTest {
 			// Item with macros inside curly brackets.
 			[
 				[
-					'host group' => '50007',
+					'hostid' => '50007',
 					'Item name' => 'Item-layout-test-002',
 					'description' => '{Some text}'
 				]
@@ -166,7 +195,7 @@ class testPageLatestData extends CWebTest {
 			// Item with macros in description.
 			[
 				[
-					'host group' => '99027',
+					'hostid' => '99027',
 					'Item name' => 'Item to check graph',
 					'description' => 'Some text'
 				]
@@ -179,11 +208,10 @@ class testPageLatestData extends CWebTest {
 	 */
 	public function testPageLatestData_checkItemDescription($data) {
 		// Open Latest data for host 'testPageHistory_CheckLayout'
-		$this->page->login()->open('zabbix.php?action=latest.view&filter_hostids%5B%5D='.$data['host group'].'&filter_select=&filter_show_without_data=1&filter_set=1');
-		$table = $this->query('class:list-table')->asTable()->one();
+		$this->page->login()->open('zabbix.php?&action=latest.view&show_details=0&hostids%5B%5D='.$data['hostid']);
 
 		// Find rows from the data provider and click on the description icon if such should persist.
-		$row = $table->findRow('Name', $data['Item name'], true);
+		$row = $this->getTable()->findRow('Name', $data['Item name'], true);
 
 		if (CTestArrayHelper::get($data,'description', false)) {
 			$row->query('class:icon-description')->one()->click()->waitUntilReady();
@@ -239,15 +267,14 @@ class testPageLatestData extends CWebTest {
 		$true_time = date("Y-m-d H:i:s", $time);
 		$this->page->login()->open('zabbix.php?action=latest.view');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
-		$form->query('button:Reset')->one()->click();
+		$this->query('button:Reset')->one()->click();
 		$form->fill(['Name' => '4_item'])->submit();
-		$table = $this->query('class:list-table')->asTable()->one();
 
 		foreach (['Last check', 'Last value'] as $column) {
 			if ($column === 'Last value') {
-				$this->assertEquals('15 UNIT', $table->getRow(0)->getColumn($column)->getText());
+				$this->assertEquals('15 UNIT', $this->getTable()->getRow(0)->getColumn($column)->getText());
 			}
-			$table->getRow(0)->getColumn($column)->query('class:cursor-pointer')->one()->click();
+			$this->getTable()->getRow(0)->getColumn($column)->query('class:cursor-pointer')->one()->click();
 			$hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last()->getText();
 			$compare_hint = ($column === 'Last check') ? $true_time : $value;
 			$this->assertEquals($compare_hint, $hint);

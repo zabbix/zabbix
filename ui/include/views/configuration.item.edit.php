@@ -164,12 +164,21 @@ $item_tab
 $query_fields_data = [];
 
 if (is_array($data['query_fields']) && $data['query_fields']) {
+	$i = 0;
 	foreach ($data['query_fields'] as $pair) {
-		$query_fields_data[] = ['name' => key($pair), 'value' => reset($pair)];
+		$query_fields_data[] = [
+			'name' => key($pair),
+			'value' => reset($pair),
+			'sortorder' => $i++
+		];
 	}
 }
 elseif (!$readonly) {
-	$query_fields_data[] = ['name' => '', 'value' => ''];
+	$query_fields_data[] = [
+		'name' => '',
+		'value' => '',
+		'sortorder' => 0
+	];
 }
 
 $query_fields = (new CTag('script', true))->setAttribute('type', 'text/json');
@@ -242,7 +251,11 @@ $item_tab
 				(new CTag('script', true))
 					->setAttribute('type', 'text/x-jquery-tmpl')
 					->addItem(new CRow([
-						(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+						(new CCol(
+							(new CDiv(
+								new CVar('query_fields[sortorder][#{index}]', '#{sortorder}')
+							))->addClass(ZBX_STYLE_DRAG_ICON)
+						))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 						(new CTextBox('query_fields[name][#{index}]', '#{name}', $readonly))
 							->setAttribute('placeholder', _('name'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
@@ -356,12 +369,21 @@ $item_tab
 $headers_data = [];
 
 if (is_array($data['headers']) && $data['headers']) {
+	$i = 0;
 	foreach ($data['headers'] as $pair) {
-		$headers_data[] = ['name' => key($pair), 'value' => reset($pair)];
+		$headers_data[] = [
+			'name' => key($pair),
+			'value' => reset($pair),
+			'sortorder' => $i++
+		];
 	}
 }
 elseif (!$readonly) {
-	$headers_data[] = ['name' => '', 'value' => ''];
+	$headers_data[] = [
+		'name' => '',
+		'value' => '',
+		'sortorder' => 0
+	];
 }
 
 $headers = (new CTag('script', true))->setAttribute('type', 'text/json');
@@ -387,7 +409,11 @@ $item_tab
 				(new CTag('script', true))
 					->setAttribute('type', 'text/x-jquery-tmpl')
 					->addItem(new CRow([
-						(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+						(new CCol(
+							(new CDiv(
+								new CVar('headers[sortorder][#{index}]', '#{sortorder}')
+							))->addClass(ZBX_STYLE_DRAG_ICON)
+						))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 						(new CTextBox('headers[name][#{index}]', '#{name}', $readonly))
 							->setAttribute('placeholder', _('name'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
@@ -970,6 +996,20 @@ $item_tab
 		new CFormField((new CCheckBox('status', ITEM_STATUS_ACTIVE))->setChecked($data['status'] == ITEM_STATUS_ACTIVE))
 	]);
 
+	// Add link to Latest data.
+if (CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA) && $data['itemid'] != 0
+		&& $data['context'] === 'host') {
+	$item_tab->addItem(
+		(new CFormField((new CLink(_('Latest data'),
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'latest.view')
+				->setArgument('hostids[]', $data['hostid'])
+				->setArgument('name', $data['name'])
+				->setArgument('filter_name', '')
+		))->setTarget('_blank')))
+	);
+}
+
 // Append tabs to form.
 $item_tabs = (new CTabView())
 	->addTab('itemTab', $data['caption'], $item_tab)
@@ -1062,3 +1102,11 @@ $widget->show();
 		'interface_types' => itemTypeInterface()
 	]).');
 '))->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'form_name' => $form->getName()
+	]).');
+'))
+	->setOnDocumentReady()
+	->show();

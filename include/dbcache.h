@@ -207,6 +207,7 @@ typedef struct
 	zbx_uint64_t	itemid;
 	char		*function;
 	char		*parameter;
+	unsigned char	type;
 }
 DC_FUNCTION;
 
