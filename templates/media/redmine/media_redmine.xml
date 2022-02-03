@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2022-02-02T15:52:08Z</date>
+    <date>2022-02-03T12:08:11Z</date>
     <media_types>
         <media_type>
             <name>Redmine</name>
@@ -300,7 +300,8 @@ try {&#13;
         throw 'Incorrect &quot;event_update_status&quot; parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';&#13;
     }&#13;
 &#13;
-    if (typeof params_redmine.close_status_id !== 'undefined' &amp;&amp; !parseInt(params_redmine.close_status_id, 10)) {&#13;
+&#13;
+    if (typeof params_redmine.close_status_id === 'string' &amp;&amp; params_redmine.close_status_id.trim() !== '' &amp;&amp; !parseInt(params_redmine.close_status_id, 10)) {&#13;
         throw 'Incorrect &quot;redmine_close_status_id&quot; parameter given! Must be an integer.';&#13;
     }&#13;
 &#13;
@@ -314,7 +315,7 @@ try {&#13;
                 &amp;&amp; (params.event_update_status === '0' || params.event_update_status === '1')))&#13;
         &amp;&amp; (isNaN(parseInt(params.redmine_issue_key)) || parseInt(params.redmine_issue_key) &lt; 1 )) {&#13;
         throw 'Incorrect &quot;redmine_issue_key&quot; parameter given: ' + params.redmine_issue_key +&#13;
-            '\nMust be positive integer.';&#13;
+        '\nMust be positive integer.';&#13;
     }&#13;
 &#13;
     if ([0, 1, 2, 3, 4, 5].indexOf(parseInt(params.event_nseverity)) === -1) {&#13;
@@ -349,8 +350,8 @@ try {&#13;
         result.tags.__zbx_redmine_issuelink = params.redmine_url +&#13;
             (params.redmine_url.endsWith('/') ? '' : '/') + 'issues/' + issue_id;&#13;
     }&#13;
-    // Close issue if close_status_id is set and it is a recovery operation&#13;
-    else if (params.event_value === '0' &amp;&amp; typeof params_redmine.close_status_id !== 'undefined') {&#13;
+    // Close issue if parameter close_status_id is set and it is a recovery operation&#13;
+    else if (params.event_value === '0' &amp;&amp; typeof params_redmine.close_status_id === 'string' &amp;&amp; params_redmine.close_status_id.trim() !== '') {&#13;
         Redmine.updateIssue(params.alert_subject + '\n' + params.alert_message, params_fields, params_redmine.close_status_id);&#13;
     }&#13;
     // Update created issue for trigger-based event.&#13;
