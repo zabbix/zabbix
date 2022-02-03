@@ -71,7 +71,9 @@ class CWebUser {
 				CProfile::update('web.login.attempt.failed', self::$data['attempt_failed'], PROFILE_TYPE_INT);
 				CProfile::update('web.login.attempt.ip', self::$data['attempt_ip'], PROFILE_TYPE_STR);
 				CProfile::update('web.login.attempt.clock', self::$data['attempt_clock'], PROFILE_TYPE_INT);
-				$result &= CProfile::flush();
+				if (!CProfile::flush()) {
+					$result = false;
+				}
 			}
 
 			return $result;

@@ -388,7 +388,10 @@ class CSetupWizard extends CForm {
 
 			$lang_select->addOption((new CSelectOption($localeid, $locale['name']))->setDisabled(!$locale_available));
 
-			$all_locales_available &= (int) $locale_available;
+			if (!((int) $locale_available)) {
+				$all_locales_available = false;
+				break;
+			}
 		}
 
 		// Restoring original locale.

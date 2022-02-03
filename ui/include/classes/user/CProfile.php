@@ -65,7 +65,10 @@ class CProfile {
 
 			foreach (self::$insert as $idx => $profile) {
 				foreach ($profile as $idx2 => $data) {
-					$result &= self::insertDB($idx, $data['value'], $data['type'], $idx2);
+					if (!(self::insertDB($idx, $data['value'], $data['type'], $idx2))) {
+						$result = false;
+						break;
+					}
 				}
 			}
 
@@ -73,7 +76,10 @@ class CProfile {
 			foreach (self::$update as $idx => $profile) {
 				ksort($profile);
 				foreach ($profile as $idx2 => $data) {
-					$result &= self::updateDB($idx, $data['value'], $data['type'], $idx2);
+					if (!(self::insertDB($idx, $data['value'], $data['type'], $idx2))) {
+						$result = false;
+						break;
+					}
 				}
 			}
 
