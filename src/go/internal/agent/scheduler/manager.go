@@ -676,7 +676,7 @@ func getCapacity(optsRaw interface{}, name string) int {
 
 	pluginCap, pluginSystemCap := getPluginCap(optsRaw, name)
 	if pluginCap > 0 && pluginSystemCap > 0 {
-		log.Warningf("both Plugins.%s.Capacity and Plugins.%s.System.Capacity set using System.Capacity: %d",
+		log.Warningf("both Plugins.%s.Capacity and Plugins.%s.System.Capacity configuration parameters are set, using System.Capacity: %d",
 			name, name, pluginSystemCap)
 
 		return pluginSystemCap
@@ -711,7 +711,7 @@ func getPluginCap(optsRaw interface{}, name string) (pluginCap, pluginSystemCap 
 
 	if pluginCap > 0 {
 		log.Warningf(
-			"plugin %s configuration field Plugins.%s.Capacity is deprecated, use Plugins.%s.System.Capacity instead: %s",
+			"plugin %s configuration parameter Plugins.%s.Capacity is deprecated, use Plugins.%s.System.Capacity instead",
 			name, name, name,
 		)
 	}
