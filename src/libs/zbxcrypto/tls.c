@@ -4307,7 +4307,6 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error
 #endif
 	do
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "sleeping kill -SIGALRM %d", zbx_get_thread_id()); sleep(15);
 		res = ZBX_TLS_WRITE(s->tls_ctx->ctx, buf, len);
 #if !defined(_WINDOWS)
 		if (SUCCEED == zbx_alarm_timed_out())
