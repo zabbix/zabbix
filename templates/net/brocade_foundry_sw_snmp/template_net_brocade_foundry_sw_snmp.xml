@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-05T01:29:12Z</date>
+   <date>2021-12-23T13:48:16Z</date>
    <groups>
       <group>
          <name>Templates/Modules</name>
@@ -19,7 +19,7 @@
 MIBs used:&#13;
 FOUNDRY-SN-AGENT-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -105,7 +105,7 @@ For NI platforms, refer to snAgentBrdMemoryUtil100thPercent</description>
 MIBs used:&#13;
 FOUNDRY-SN-AGENT-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.39</description>
          <templates>
             <template>
                <name>Template Module Brocade_Foundry Performance SNMP</name>
@@ -337,6 +337,15 @@ For those non-applicable management module, it returns no-such-name.</descriptio
                      </preprocessing>
                      <trigger_prototypes>
                         <trigger_prototype>
+                           <expression>{avg(5m)}&gt;{$TEMP_CRIT:"Chassis"}</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:"Chassis"}-3</recovery_expression>
+                           <name>Chassis #{#SNMPINDEX}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Chassis"}</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
                            <expression>{avg(5m)}&gt;{$TEMP_WARN:"Chassis"}</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_WARN:"Chassis"}-3</recovery_expression>
@@ -351,15 +360,6 @@ For those non-applicable management module, it returns no-such-name.</descriptio
                                  <recovery_expression>{Template Net Brocade_Foundry Nonstackable SNMP:sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Chassis"}-3</recovery_expression>
                               </dependency>
                            </dependencies>
-                        </trigger_prototype>
-                        <trigger_prototype>
-                           <expression>{avg(5m)}&gt;{$TEMP_CRIT:"Chassis"}</expression>
-                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                           <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:"Chassis"}-3</recovery_expression>
-                           <name>Chassis #{#SNMPINDEX}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Chassis"}</name>
-                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                           <priority>HIGH</priority>
-                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{avg(5m)}&lt;{$TEMP_CRIT_LOW:"Chassis"}</expression>
@@ -404,6 +404,15 @@ Temperature of the sensor represented by this row. Each unit is 0.5 degrees Cels
                      </preprocessing>
                      <trigger_prototypes>
                         <trigger_prototype>
+                           <expression>{avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                           <name>{#SENSOR_DESCR}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
                            <expression>{avg(5m)}&gt;{$TEMP_WARN:""}</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
@@ -418,15 +427,6 @@ Temperature of the sensor represented by this row. Each unit is 0.5 degrees Cels
                                  <recovery_expression>{Template Net Brocade_Foundry Nonstackable SNMP:sensor.temp.value[snAgentTempValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                               </dependency>
                            </dependencies>
-                        </trigger_prototype>
-                        <trigger_prototype>
-                           <expression>{avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                           <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
-                           <name>{#SENSOR_DESCR}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                           <priority>HIGH</priority>
-                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
@@ -487,7 +487,7 @@ Known Issues:&#13;
   Version: Version 08.0.40b and above&#13;
   Device: ICX 7750 in stack&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.39</description>
          <templates>
             <template>
                <name>Template Module Brocade_Foundry Performance SNMP</name>
@@ -760,6 +760,15 @@ Temperature of the sensor represented by this row. Each unit is 0.5 degrees Cels
                      </preprocessing>
                      <trigger_prototypes>
                         <trigger_prototype>
+                           <expression>{avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                           <name>{#SENSOR_DESCR}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
                            <expression>{avg(5m)}&gt;{$TEMP_WARN:""}</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
@@ -774,15 +783,6 @@ Temperature of the sensor represented by this row. Each unit is 0.5 degrees Cels
                                  <recovery_expression>{Template Net Brocade_Foundry Stackable SNMP:sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                               </dependency>
                            </dependencies>
-                        </trigger_prototype>
-                        <trigger_prototype>
-                           <expression>{avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                           <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
-                           <name>{#SENSOR_DESCR}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                           <priority>HIGH</priority>
-                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
@@ -863,7 +863,7 @@ Temperature of the sensor represented by this row. Each unit is 0.5 degrees Cels
    </graphs>
    <value_maps>
       <value_map>
-         <name>FOUNDRY-SN-AGENT-MIB::snChasPwrSupplyOperStatus</name>
+         <name>FOUNDRY-SN-AGENT-MIB::snChasFanOperStatus</name>
          <mappings>
             <mapping>
                <value>1</value>
@@ -880,7 +880,7 @@ Temperature of the sensor represented by this row. Each unit is 0.5 degrees Cels
          </mappings>
       </value_map>
       <value_map>
-         <name>FOUNDRY-SN-AGENT-MIB::snChasFanOperStatus</name>
+         <name>FOUNDRY-SN-AGENT-MIB::snChasPwrSupplyOperStatus</name>
          <mappings>
             <mapping>
                <value>1</value>

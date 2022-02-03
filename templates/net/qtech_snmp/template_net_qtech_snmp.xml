@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-10-20T07:21:54Z</date>
+   <date>2021-12-23T18:26:43Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -17,7 +17,7 @@ MIBs used:&#13;
 QTECH-MIB&#13;
 ENTITY-MIB&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <templates>
             <template>
                <name>Template Module EtherLike-MIB SNMP</name>
@@ -72,6 +72,15 @@ Temperature readings of testpoint: __RESOURCE__</description>
                </applications>
                <triggers>
                   <trigger>
+                     <expression>{avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                     <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                     <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                     <name>Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                     <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                  </trigger>
+                  <trigger>
                      <expression>{avg(5m)}&gt;{$TEMP_WARN:""}</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                      <recovery_expression>{max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
@@ -86,15 +95,6 @@ Temperature readings of testpoint: __RESOURCE__</description>
                            <recovery_expression>{Template Net QTech QSW SNMP:sensor.temp.value[switchTemperature.0].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                         </dependency>
                      </dependencies>
-                  </trigger>
-                  <trigger>
-                     <expression>{avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                     <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                     <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
-                     <name>Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                     <priority>HIGH</priority>
-                     <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                   </trigger>
                   <trigger>
                      <expression>{avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
@@ -362,7 +362,6 @@ Used memory in Bytes</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>PSU Discovery</name>
@@ -399,7 +398,6 @@ Used memory in Bytes</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
          <macros>

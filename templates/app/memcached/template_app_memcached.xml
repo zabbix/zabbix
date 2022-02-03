@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-04-02T13:36:12Z</date>
+   <date>2021-12-21T18:04:13Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -15,7 +15,7 @@
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/398623-discussion-thread-for-official-zabbix-template-memcached&#13;
 &#13;
-Template tooling version used: 0.35</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -37,7 +37,7 @@ Template tooling version used: 0.35</description>
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
-               <description>The flush_all command invalidates all items in the database. This operation incurs a performance penalty and shouldn’t take place in production, so check your debug scripts.</description>
+               <description>The flush_all command invalidates all items in the database. This operation incurs a performance penalty and shouldn't take place in production, so check your debug scripts.</description>
                <applications>
                   <application>
                      <name>Memcached</name>

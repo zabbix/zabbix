@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Zabbix 4.2\n"
+"Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-22 17:22+0200\n"
+"POT-Creation-Date: 2022-01-21 19:52+0200\n"
 "PO-Revision-Date: 2021-11-07 10:00+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
@@ -297,7 +297,7 @@ msgstr "(רק מנהלי על יכולים ליצור קבוצות)"
 msgid "(no proxy)"
 msgstr "(אין מתווך)"
 
-#: include/classes/setup/CSetupWizard.php:250
+#: include/classes/setup/CSetupWizard.php:248
 msgid "0 - use default port"
 msgstr "0 - שימוש בפתחת בררת המחדל"
 
@@ -958,7 +958,7 @@ msgstr "לאפשר סגירה ידנית"
 msgid "Allowed hosts"
 msgstr "מארחים מורשים"
 
-#: include/classes/setup/CSetupWizard.php:489
+#: include/classes/setup/CSetupWizard.php:473
 msgid "Alternatively, you can install it manually:"
 msgstr "לחלופין, ניתן להתקין ידנית:"
 
@@ -1317,6 +1317,7 @@ msgid "Authentication protocol"
 msgstr "פרוטוקול אימות"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:313
+#: app/controllers/CControllerAuthenticationUpdate.php:322
 msgid "Authentication settings updated"
 msgstr "הגדרות האימות עודכנו"
 
@@ -1409,8 +1410,8 @@ msgstr "ממוצע"
 msgid "Axes"
 msgstr "צירים"
 
-#: include/classes/setup/CSetupWizard.php:134
-#: include/classes/setup/CSetupWizard.php:423
+#: include/classes/setup/CSetupWizard.php:132
+#: include/classes/setup/CSetupWizard.php:421
 msgid "Back"
 msgstr "חזרה"
 
@@ -1634,7 +1635,7 @@ msgstr "אין אפשרות להסיר"
 #: app/views/js/administration.trigseverity.edit.js.php:37
 #: app/views/monitoring.dashboard.view.php:114
 #: include/classes/html/CButtonCancel.php:25
-#: include/classes/setup/CSetupWizard.php:116
+#: include/classes/setup/CSetupWizard.php:114
 #: include/views/conf.import.php:131 include/views/js/conf.import.js.php:42
 #: include/views/monitoring.slideconf.edit.php:281 jsLoader.php:122
 #: jsLoader.php:139 jsLoader.php:243 jsLoader.php:324 jsLoader.php:336
@@ -1887,7 +1888,7 @@ msgstr "לא ניתן לסגור את התקלה: %1$s."
 msgid "Cannot connect to LDAP server."
 msgstr "לא ניתן להתחבר אל שרת ה־LDAP."
 
-#: include/classes/setup/CSetupWizard.php:323
+#: include/classes/setup/CSetupWizard.php:321
 msgid "Cannot connect to the database."
 msgstr "לא ניתן להתחבר למסד הנתונים."
 
@@ -1952,7 +1953,7 @@ msgstr "לא ניתן ליצור מפת סמלים"
 msgid "Cannot create new application, web scenario is already assigned to application."
 msgstr "לא ניתן ליצור יישום חדש, תרחיש הרשת כבר מוקצה ליישום."
 
-#: include/classes/setup/CSetupWizard.php:485
+#: include/classes/setup/CSetupWizard.php:469
 msgid "Cannot create the configuration file."
 msgstr "לא ניתן ליצור קובץ תצורה."
 
@@ -3166,7 +3167,7 @@ msgid "Check for error using regular expression"
 msgstr "בדיקה לאיתור שגיאות בעזרת ביטויים רגולריים"
 
 #: include/classes/setup/CSetupWizard.php:46
-#: include/classes/setup/CSetupWizard.php:217
+#: include/classes/setup/CSetupWizard.php:215
 msgid "Check of pre-requisites"
 msgstr "בדיקת דרישות הקדם"
 
@@ -3518,7 +3519,7 @@ msgstr "הגדרות"
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "הגדרות זיכרון מטמון לסטטיסטיקה. זיכרון מטמון - buffer (מצבים: pfree,‏ total,‏ used,‏ free)."
 
-#: include/classes/setup/CSetupWizard.php:516
+#: include/classes/setup/CSetupWizard.php:488
 #, c-format
 msgid "Configuration file \"%1$s\" created."
 msgstr "קובץ ההגדרות „%1$s“ נוצר."
@@ -3691,7 +3692,7 @@ msgid "Configuration updated"
 msgstr "ההגדרות עודכנו"
 
 #: include/classes/setup/CSetupWizard.php:50
-#: include/classes/setup/CSetupWizard.php:332
+#: include/classes/setup/CSetupWizard.php:330
 msgid "Configure DB connection"
 msgstr "הגדרת חיבור למסד הנתונים"
 
@@ -3699,7 +3700,7 @@ msgstr "הגדרת חיבור למסד הנתונים"
 msgid "Confirmation text"
 msgstr "טקסט אימות"
 
-#: include/classes/setup/CSetupWizard.php:514
+#: include/classes/setup/CSetupWizard.php:486
 msgid "Congratulations! You have successfully installed Zabbix frontend."
 msgstr "ברכותינו! התקנת בהצלחה את מנשק המשתמש של Zabbix."
 
@@ -3762,7 +3763,7 @@ msgstr ""
 "1. ה־IP/DNS של השרת שגוי ב־„zabbix.conf.php”;\n"
 "2. חומת האש חוסמת חיבורי TCP.\n"
 
-#: include/classes/setup/CSetupWizard.php:275
+#: include/classes/setup/CSetupWizard.php:273
 msgid "Connection will not be encrypted because it uses a socket file (on Unix) or shared memory (Windows)."
 msgstr "החיבור לא יוצפן כיוון שהוא משתמש בקובץ שקע (ביוניקס) או בזיכרון שיתופי (Windows)."
 
@@ -4196,7 +4197,7 @@ msgstr "קריטי"
 msgid "Current host"
 msgstr "מארח נוכחי"
 
-#: include/classes/setup/CSetupWizard.php:175
+#: include/classes/setup/CSetupWizard.php:173
 msgid "Current value"
 msgstr "ערך נוכחי"
 
@@ -4391,16 +4392,16 @@ msgstr "ערכת נתונים"
 msgid "Data storage period"
 msgstr "תקופת אחסון נתונים"
 
-#: include/classes/setup/CSetupWizard.php:290
-#: include/classes/setup/CSetupWizard.php:391
-#: include/classes/setup/CSetupWizard.php:555
+#: include/classes/setup/CSetupWizard.php:288
+#: include/classes/setup/CSetupWizard.php:389
+#: include/classes/setup/CSetupWizard.php:528
 msgid "Database TLS CA file"
 msgstr "קובץ CA ל־TLS של מסד הנתונים"
 
 #: include/classes/setup/CFrontendSetup.php:686
-#: include/classes/setup/CSetupWizard.php:302
-#: include/classes/setup/CSetupWizard.php:397
-#: include/classes/setup/CSetupWizard.php:563
+#: include/classes/setup/CSetupWizard.php:300
+#: include/classes/setup/CSetupWizard.php:395
+#: include/classes/setup/CSetupWizard.php:536
 msgid "Database TLS certificate file"
 msgstr "קובץ אישור ל־TLS של מסד הנתונים"
 
@@ -4408,19 +4409,19 @@ msgstr "קובץ אישור ל־TLS של מסד הנתונים"
 msgid "Database TLS certificate files must be read-only"
 msgstr "קובצי האישורים ל־TLS של מסד הנתונים חייבים להיות לקריאה בלבד"
 
-#: include/classes/setup/CSetupWizard.php:314
-#: include/classes/setup/CSetupWizard.php:404
+#: include/classes/setup/CSetupWizard.php:312
+#: include/classes/setup/CSetupWizard.php:402
 msgid "Database TLS cipher list"
 msgstr "רשימת צפנים ל־TLS של מסד הנתונים"
 
-#: include/classes/setup/CSetupWizard.php:272
-#: include/classes/setup/CSetupWizard.php:387
+#: include/classes/setup/CSetupWizard.php:270
+#: include/classes/setup/CSetupWizard.php:385
 msgid "Database TLS encryption"
 msgstr "הצפנת TLS של מסד הנתונים"
 
-#: include/classes/setup/CSetupWizard.php:296
-#: include/classes/setup/CSetupWizard.php:394
-#: include/classes/setup/CSetupWizard.php:559
+#: include/classes/setup/CSetupWizard.php:294
+#: include/classes/setup/CSetupWizard.php:392
+#: include/classes/setup/CSetupWizard.php:532
 msgid "Database TLS key file"
 msgstr "קובץ מפתח TLS של מסד הנתונים"
 
@@ -4428,12 +4429,12 @@ msgstr "קובץ מפתח TLS של מסד הנתונים"
 msgid "Database history tables upgraded"
 msgstr "טבלאות ההיסטוריה של מסד הנתונים שודרגו"
 
-#: include/classes/setup/CSetupWizard.php:240
+#: include/classes/setup/CSetupWizard.php:238
 msgid "Database host"
 msgstr "מארח מסד נתונים"
 
-#: include/classes/setup/CSetupWizard.php:308
-#: include/classes/setup/CSetupWizard.php:400
+#: include/classes/setup/CSetupWizard.php:306
+#: include/classes/setup/CSetupWizard.php:398
 msgid "Database host verification"
 msgstr "אימות מארח מסד נתונים"
 
@@ -4441,35 +4442,35 @@ msgstr "אימות מארח מסד נתונים"
 msgid "Database monitor"
 msgstr "מנטר מסד נתונים"
 
-#: include/classes/setup/CSetupWizard.php:253
-#: include/classes/setup/CSetupWizard.php:381 setup.php:44
+#: include/classes/setup/CSetupWizard.php:251
+#: include/classes/setup/CSetupWizard.php:379 setup.php:44
 msgid "Database name"
 msgstr "שם מסד הנתונים"
 
-#: include/classes/setup/CSetupWizard.php:383
+#: include/classes/setup/CSetupWizard.php:381
 msgid "Database password"
 msgstr "ססמת מסד הנתונים"
 
-#: include/classes/setup/CSetupWizard.php:245
-#: include/classes/setup/CSetupWizard.php:380 setup.php:43
+#: include/classes/setup/CSetupWizard.php:243
+#: include/classes/setup/CSetupWizard.php:378 setup.php:43
 msgid "Database port"
 msgstr "פתחת מסד הנתונים"
 
-#: include/classes/setup/CSetupWizard.php:258
-#: include/classes/setup/CSetupWizard.php:385
+#: include/classes/setup/CSetupWizard.php:256
+#: include/classes/setup/CSetupWizard.php:383
 msgid "Database schema"
 msgstr "סכמת מסד הנתונים"
 
-#: include/classes/setup/CSetupWizard.php:379
+#: include/classes/setup/CSetupWizard.php:377
 msgid "Database server"
 msgstr "שרת מסד הנתונים"
 
-#: include/classes/setup/CSetupWizard.php:232
-#: include/classes/setup/CSetupWizard.php:374
+#: include/classes/setup/CSetupWizard.php:230
+#: include/classes/setup/CSetupWizard.php:372
 msgid "Database type"
 msgstr "סוג מסד הנתונים"
 
-#: include/classes/setup/CSetupWizard.php:382
+#: include/classes/setup/CSetupWizard.php:380
 msgid "Database user"
 msgstr "שם המשתמש במסד הנתונים"
 
@@ -5455,7 +5456,7 @@ msgstr "למטה"
 msgid "Download image"
 msgstr "הורדת תמונה"
 
-#: include/classes/setup/CSetupWizard.php:491
+#: include/classes/setup/CSetupWizard.php:475
 msgid "Download the configuration file"
 msgstr "הורדת קובץ ההגדרות"
 
@@ -6279,7 +6280,7 @@ msgstr "שקר"
 msgid "FTP"
 msgstr "FTP"
 
-#: include/classes/setup/CSetupWizard.php:191
+#: include/classes/setup/CSetupWizard.php:189
 msgid "Fail"
 msgstr "כשל"
 
@@ -6510,7 +6511,7 @@ msgstr "חיפוש מחרוזת בקובץ. מחזירה שורה שמכילה �
 msgid "Find string on a web page. Returns the matched string, or as specified by the optional output parameter"
 msgstr "חיפוש מחרוזת באתר. מחזירה את המחרוזת שנמצאה או כפי שצוין על ידי פרמטר הפלט כרשות"
 
-#: include/classes/setup/CSetupWizard.php:131
+#: include/classes/setup/CSetupWizard.php:129
 msgid "Finish"
 msgstr "סיום"
 
@@ -7311,7 +7312,7 @@ msgstr "יישור אופקי"
 #: include/classes/screens/CScreenProblem.php:893
 #: include/classes/screens/CScreenProblem.php:1142
 #: include/classes/screens/CScreenTriggersInfo.php:40
-#: include/classes/setup/CSetupWizard.php:344
+#: include/classes/setup/CSetupWizard.php:342
 #: include/classes/widgets/forms/CWidgetFormProblems.php:206
 #: include/classes/widgets/forms/CWidgetFormProblems.php:207
 #: include/hostgroups.inc.php:249 include/maps.inc.php:24
@@ -8480,9 +8481,9 @@ msgstr "שם או ערך שגוי לשדה „%1$s” בביטוי where בטב�
 msgid "Incorrect fields for sysmap."
 msgstr "שדות שגויים למערכת המפות."
 
-#: include/classes/setup/CSetupWizard.php:555
-#: include/classes/setup/CSetupWizard.php:559
-#: include/classes/setup/CSetupWizard.php:563
+#: include/classes/setup/CSetupWizard.php:528
+#: include/classes/setup/CSetupWizard.php:532
+#: include/classes/setup/CSetupWizard.php:536
 #, c-format
 msgid "Incorrect file path for \"%1$s\": %2$s."
 msgstr "נתיב הקובץ של „%1$s” שגוי: %2$s."
@@ -9319,12 +9320,11 @@ msgid "Insert expression"
 msgstr "הוספת ביטוי"
 
 #: include/classes/setup/CSetupWizard.php:62
-#: include/classes/setup/CSetupWizard.php:497
-#: include/classes/setup/CSetupWizard.php:520
+#: include/classes/setup/CSetupWizard.php:493
 msgid "Install"
 msgstr "התקנה"
 
-#: setup.php:92
+#: setup.php:108
 msgid "Installation"
 msgstr "התקנה"
 
@@ -11805,9 +11805,9 @@ msgstr "הקפצות חדשות"
 msgid "Next page"
 msgstr "העמוד הבא"
 
-#: include/classes/setup/CSetupWizard.php:128
-#: include/classes/setup/CSetupWizard.php:334
-#: include/classes/setup/CSetupWizard.php:423
+#: include/classes/setup/CSetupWizard.php:126
+#: include/classes/setup/CSetupWizard.php:332
+#: include/classes/setup/CSetupWizard.php:421
 msgid "Next step"
 msgstr "השלב הבא"
 
@@ -13495,7 +13495,7 @@ msgstr "פאסיבי"
 #: app/views/administration.user.edit.php:111
 #: app/views/administration.user.edit.php:126 disc_prototypes.php:232
 #: host_discovery.php:184 httpconf.php:64
-#: include/classes/setup/CSetupWizard.php:268
+#: include/classes/setup/CSetupWizard.php:266
 #: include/views/configuration.host.discovery.edit.php:303
 #: include/views/configuration.host.discovery.edit.php:428
 #: include/views/configuration.host.discovery.edit.php:458
@@ -13638,7 +13638,7 @@ msgstr "ניגון"
 msgid "Play sound"
 msgstr "ניגון צליל"
 
-#: include/classes/setup/CSetupWizard.php:423
+#: include/classes/setup/CSetupWizard.php:421
 #, c-format
 msgid "Please check configuration parameters. If all is correct, press \"%1$s\" button, or \"%2$s\" button to change configuration parameters."
 msgstr "נא לבדוק את משתני התצורה. אם כולם נכונים, יש ללחוץ על הכפתור „%1$s” או לחלופין על הכפתור „%2$s” כדי לשנות משתני תצורה."
@@ -13647,12 +13647,12 @@ msgstr "נא לבדוק את משתני התצורה. אם כולם נכונים
 msgid "Please confirm that you want to remove all macros."
 msgstr "נא לאשר שברצונך להסיר את כל תסריטי המאקרו."
 
-#: include/classes/setup/CSetupWizard.php:334
+#: include/classes/setup/CSetupWizard.php:332
 #, c-format
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
 msgstr "נא ליצור מסד נתונים ידנית ולהגדיר את משתני התצורה לחיבור למסד הנתונים הזה. יש ללחוץ על הכפתור „%1$s” לאחר סיום הפעולה."
 
-#: include/classes/setup/CSetupWizard.php:363
+#: include/classes/setup/CSetupWizard.php:361
 msgid "Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional)."
 msgstr "נא להזין את שם המארח או את כתובת ה־IP ומספר הפתחה של שרת ה־Zabbix כמו גם את שם ההתקנה (רשות)."
 
@@ -13697,7 +13697,7 @@ msgstr "ממלא שדה במאגר המארח"
 #: app/views/administration.proxy.edit.php:47
 #: app/views/monitoring.host.view.php:131
 #: app/views/popup.itemtestedit.view.php:123
-#: include/classes/setup/CSetupWizard.php:349 include/hosts.inc.php:1444
+#: include/classes/setup/CSetupWizard.php:347 include/hosts.inc.php:1444
 #: include/views/configuration.host.list.php:141
 #: include/views/inventory.host.view.php:79 setup.php:57
 msgid "Port"
@@ -13728,7 +13728,7 @@ msgid "Post type"
 msgstr "סוג Post"
 
 #: include/classes/setup/CSetupWizard.php:58
-#: include/classes/setup/CSetupWizard.php:421
+#: include/classes/setup/CSetupWizard.php:419
 msgid "Pre-installation summary"
 msgstr "תקציר טרום התקנה"
 
@@ -14556,7 +14556,7 @@ msgstr "הבקשה נשלחה בהצלחה"
 msgid "Request type"
 msgstr "סוג בקשה"
 
-#: include/classes/setup/CSetupWizard.php:175
+#: include/classes/setup/CSetupWizard.php:173
 #: include/views/configuration.httpconf.edit.php:221
 msgid "Required"
 msgstr "נדרש"
@@ -15107,7 +15107,7 @@ msgstr "שבת"
 msgid "Save changes"
 msgstr "שמירת השינויים"
 
-#: include/classes/setup/CSetupWizard.php:492
+#: include/classes/setup/CSetupWizard.php:476
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "שמירה בתור „%1$s“"
@@ -18061,7 +18061,7 @@ msgstr "בשימוש בפריטים"
 #: app/views/administration.user.edit.php:220
 #: app/views/reports.auditlog.list.php:87 httpconf.php:58
 #: include/actions.inc.php:1725 include/actions.inc.php:1780
-#: include/actions.inc.php:2001 include/classes/setup/CSetupWizard.php:265
+#: include/actions.inc.php:2001 include/classes/setup/CSetupWizard.php:263
 #: include/hosts.inc.php:61 include/views/configuration.httpconf.edit.php:181
 msgid "User"
 msgstr "משתמש"
@@ -18742,7 +18742,7 @@ msgstr "יצרן"
 msgid "Verbose"
 msgstr "מפורט"
 
-#: include/classes/setup/CSetupWizard.php:284
+#: include/classes/setup/CSetupWizard.php:282
 msgid "Verify database certificate"
 msgstr "אימות אישור מסד נתונים"
 
@@ -18815,7 +18815,7 @@ msgstr "ד׳"
 msgid "Warning"
 msgstr "אזהרה"
 
-#: include/classes/setup/CSetupWizard.php:187
+#: include/classes/setup/CSetupWizard.php:185
 msgctxt "setup"
 msgid "Warning"
 msgstr "אזהרה"
@@ -18926,7 +18926,7 @@ msgstr "שבועי"
 msgid "Welcome"
 msgstr "ברוך בואך"
 
-#: include/classes/setup/CSetupWizard.php:167
+#: include/classes/setup/CSetupWizard.php:165
 msgid "Welcome to"
 msgstr "ברוך בואך אל"
 
@@ -19370,7 +19370,7 @@ msgstr "טופס כניסה ל־Zabbix"
 
 #: app/partials/popup.operations.php:235
 #: app/views/administration.script.edit.php:57 include/actions.inc.php:880
-#: include/classes/setup/CSetupWizard.php:412
+#: include/classes/setup/CSetupWizard.php:410
 msgid "Zabbix server"
 msgstr "שרת Zabbix"
 
@@ -19391,7 +19391,7 @@ msgid "Zabbix server (proxy)"
 msgstr "שרת Zabbix (מתווך)"
 
 #: include/classes/setup/CSetupWizard.php:54
-#: include/classes/setup/CSetupWizard.php:361
+#: include/classes/setup/CSetupWizard.php:359
 msgid "Zabbix server details"
 msgstr "פרטי שרת ה־Zabbix"
 
@@ -19408,11 +19408,11 @@ msgstr "שרת ה־Zabbix פעיל"
 msgid "Zabbix server is running check interval \"%1$s\"."
 msgstr "הפרשי העדכון בין הבדיקות בשרת ה־Zabbix הם „%1$s”."
 
-#: include/classes/setup/CSetupWizard.php:416
+#: include/classes/setup/CSetupWizard.php:414
 msgid "Zabbix server name"
 msgstr "שם שרת ה־Zabbix"
 
-#: include/classes/setup/CSetupWizard.php:413
+#: include/classes/setup/CSetupWizard.php:411
 msgid "Zabbix server port"
 msgstr "פתחת שרת ה־Zabbix"
 
@@ -19880,7 +19880,7 @@ msgid "days"
 msgstr "ימים"
 
 #: app/controllers/CControllerMapView.php:124
-#: include/classes/setup/CSetupWizard.php:376
+#: include/classes/setup/CSetupWizard.php:374
 #: include/classes/widgets/CWidgetHelper.php:70
 #: include/views/js/monitoring.slideconf.edit.js.php:40
 #: include/views/monitoring.slideconf.edit.php:136

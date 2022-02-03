@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-11-16T14:48:01Z</date>
+   <date>2022-01-12T15:45:39Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -53,7 +53,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                  <key>pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                </master_item>
             </item>
             <item>
@@ -80,7 +80,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                  <key>pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                </master_item>
             </item>
             <item>
@@ -108,7 +108,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                  <key>pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                </master_item>
             </item>
             <item>
@@ -136,7 +136,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                  <key>pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                </master_item>
             </item>
             <item>
@@ -164,7 +164,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                  <key>pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                </master_item>
             </item>
             <item>
@@ -196,7 +196,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                  <key>pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                </master_item>
             </item>
             <item>
@@ -228,7 +228,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                  <key>pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                </master_item>
             </item>
             <item>
@@ -255,7 +255,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                  <key>pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                </master_item>
                <triggers>
                   <trigger>
@@ -291,7 +291,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                  <key>pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                </master_item>
             </item>
             <item>
@@ -318,12 +318,12 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                  <key>pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                </master_item>
             </item>
             <item>
                <name>PostgreSQL: Get bgwriter</name>
-               <key>pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+               <key>pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                <history>1h</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
@@ -342,7 +342,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
                      <dependencies>
                         <dependency>
                            <name>PostgreSQL: Service is down</name>
-                           <expression>{Template DB PostgreSQL by user parameters:pgsql.ping["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"].last()} = 0</expression>
+                           <expression>{Template DB PostgreSQL by user parameters:pgsql.ping["{$PG.HOST}","{$PG.PORT}"].last()} = 0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -350,7 +350,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
             </item>
             <item>
                <name>Status: Cache hit ratio %</name>
-               <key>pgsql.cache.hit["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+               <key>pgsql.cache.hit["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
@@ -370,7 +370,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
             </item>
             <item>
                <name>Status: Config hash</name>
-               <key>pgsql.config.hash["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+               <key>pgsql.config.hash["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                <delay>15m</delay>
                <history>7d</history>
                <trends>0</trends>
@@ -414,7 +414,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                  <key>pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                </master_item>
             </item>
             <item>
@@ -436,7 +436,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                  <key>pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                </master_item>
             </item>
             <item>
@@ -458,7 +458,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                  <key>pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                </master_item>
             </item>
             <item>
@@ -481,7 +481,7 @@ https://www.postgresql.org/docs/current/sql-prepare-transaction.html</descriptio
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                  <key>pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                </master_item>
             </item>
             <item>
@@ -503,7 +503,7 @@ https://www.postgresql.org/docs/current/sql-prepare-transaction.html</descriptio
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                  <key>pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                </master_item>
             </item>
             <item>
@@ -526,7 +526,7 @@ https://www.postgresql.org/docs/current/sql-prepare-transaction.html</descriptio
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                  <key>pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                </master_item>
                <triggers>
                   <trigger>
@@ -556,12 +556,12 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#WAIT-EVENT-TABLE</
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                  <key>pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                </master_item>
             </item>
             <item>
                <name>PostgreSQL: Get connections sum</name>
-               <key>pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+               <key>pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                <history>1h</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
@@ -575,7 +575,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
             </item>
             <item>
                <name>PostgreSQL: Get dbstat</name>
-               <key>pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+               <key>pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                <history>1h</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
@@ -589,7 +589,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-V
             </item>
             <item>
                <name>PostgreSQL: Get locks</name>
-               <key>pgsql.locks["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+               <key>pgsql.locks["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                <history>1h</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
@@ -603,7 +603,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
             </item>
             <item>
                <name>Status: Ping time</name>
-               <key>pgsql.ping.time["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+               <key>pgsql.ping.time["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>s</units>
@@ -631,7 +631,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                      <dependencies>
                         <dependency>
                            <name>PostgreSQL: Service is down</name>
-                           <expression>{Template DB PostgreSQL by user parameters:pgsql.ping["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"].last()} = 0</expression>
+                           <expression>{Template DB PostgreSQL by user parameters:pgsql.ping["{$PG.HOST}","{$PG.PORT}"].last()} = 0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -639,7 +639,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
             </item>
             <item>
                <name>Status: Ping</name>
-               <key>pgsql.ping["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+               <key>pgsql.ping["{$PG.HOST}","{$PG.PORT}"]</key>
                <history>7d</history>
                <applications>
                   <application>
@@ -669,7 +669,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
             </item>
             <item>
                <name>PostgreSQL: Get queries</name>
-               <key>pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]</key>
+               <key>pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]</key>
                <history>1h</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
@@ -682,7 +682,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
             </item>
             <item>
                <name>Replication: standby count</name>
-               <key>pgsql.replication.count["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+               <key>pgsql.replication.count["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                <history>7d</history>
                <description>Number of standby servers</description>
                <applications>
@@ -693,7 +693,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
             </item>
             <item>
                <name>Replication: lag in seconds</name>
-               <key>pgsql.replication.lag.sec["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+               <key>pgsql.replication.lag.sec["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                <history>7d</history>
                <units>s</units>
                <description>Replication lag with Master in seconds</description>
@@ -712,7 +712,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
             </item>
             <item>
                <name>Replication: recovery role</name>
-               <key>pgsql.replication.recovery_role["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+               <key>pgsql.replication.recovery_role["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                <history>7d</history>
                <description>Replication role: 1 — recovery is still in progress (standby mode), 0 — master mode.</description>
                <applications>
@@ -726,7 +726,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
             </item>
             <item>
                <name>Replication: status</name>
-               <key>pgsql.replication.status["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+               <key>pgsql.replication.status["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                <history>7d</history>
                <description>Replication status: 0 — streaming is down, 1 — streaming is up, 2 — master mode</description>
                <applications>
@@ -766,7 +766,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.transactions["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                  <key>pgsql.transactions["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                </master_item>
             </item>
             <item>
@@ -790,7 +790,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.transactions["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                  <key>pgsql.transactions["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                </master_item>
             </item>
             <item>
@@ -814,7 +814,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.transactions["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                  <key>pgsql.transactions["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                </master_item>
             </item>
             <item>
@@ -838,12 +838,12 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.transactions["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                  <key>pgsql.transactions["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                </master_item>
             </item>
             <item>
                <name>PostgreSQL: Get transactions</name>
-               <key>pgsql.transactions["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+               <key>pgsql.transactions["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                <history>1h</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
@@ -856,7 +856,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
             </item>
             <item>
                <name>Status: Uptime</name>
-               <key>pgsql.uptime["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+               <key>pgsql.uptime["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                <history>7d</history>
                <units>uptime</units>
                <applications>
@@ -875,7 +875,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
             </item>
             <item>
                <name>Status: Version</name>
-               <key>pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+               <key>pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                <delay>15m</delay>
                <history>7d</history>
                <trends>0</trends>
@@ -919,12 +919,12 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.wal.stat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                  <key>pgsql.wal.stat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                </master_item>
             </item>
             <item>
                <name>PostgreSQL: Get WAL</name>
-               <key>pgsql.wal.stat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+               <key>pgsql.wal.stat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                <delay>5m</delay>
                <history>1h</history>
                <trends>0</trends>
@@ -960,14 +960,14 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.wal.stat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                  <key>pgsql.wal.stat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                </master_item>
             </item>
          </items>
          <discovery_rules>
             <discovery_rule>
                <name>Database discovery</name>
-               <key>pgsql.discovery.db["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+               <key>pgsql.discovery.db["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                <delay>1h</delay>
                <filter>
                   <conditions>
@@ -981,7 +981,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                <item_prototypes>
                   <item_prototype>
                      <name>DB {#DBNAME}: Database size</name>
-                     <key>pgsql.db.size["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{#DBNAME}"]</key>
+                     <key>pgsql.db.size["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{#DBNAME}"]</key>
                      <delay>15m</delay>
                      <history>7d</history>
                      <units>B</units>
@@ -1016,7 +1016,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                        <key>pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1043,7 +1043,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                        <key>pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1070,7 +1070,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                        <key>pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -1106,7 +1106,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                        <key>pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -1140,7 +1140,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                        <key>pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1166,7 +1166,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                        <key>pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1193,7 +1193,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                        <key>pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1220,7 +1220,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                        <key>pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1247,7 +1247,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                        <key>pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1274,7 +1274,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                        <key>pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1301,7 +1301,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                        <key>pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1328,7 +1328,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                        <key>pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1355,7 +1355,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                        <key>pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1380,7 +1380,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.frozenxid["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{#DBNAME}"]</key>
+                        <key>pgsql.frozenxid["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1405,12 +1405,12 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.frozenxid["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{#DBNAME}"]</key>
+                        <key>pgsql.frozenxid["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()}&lt;{$PG.FROZENXID_PCT_STOP.MIN.HIGH:"{#DBNAME}"}</expression>
-                           <name>DB {#DBNAME}: VACUUM FREEZE is required to prevent wraparound (frozen XID less then {$PG.FROZENXID_PCT_STOP.MIN.HIGH:"{#DBNAME}"} %)</name>
+                           <name>DB {#DBNAME}: VACUUM FREEZE is required to prevent wraparound (frozen XID less than {$PG.FROZENXID_PCT_STOP.MIN.HIGH:"{#DBNAME}"} %)</name>
                            <priority>AVERAGE</priority>
                            <description>Preventing Transaction ID Wraparound Failures&#13;
 https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAROUND</description>
@@ -1419,7 +1419,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                   </item_prototype>
                   <item_prototype>
                      <name>DB {#DBNAME}: Get frozen XID</name>
-                     <key>pgsql.frozenxid["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{#DBNAME}"]</key>
+                     <key>pgsql.frozenxid["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]</key>
                      <history>1h</history>
                      <trends>0</trends>
                      <value_type>TEXT</value_type>
@@ -1448,7 +1448,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.locks["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                        <key>pgsql.locks["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -1477,7 +1477,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]</key>
+                        <key>pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1500,7 +1500,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]</key>
+                        <key>pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1523,7 +1523,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]</key>
+                        <key>pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1545,7 +1545,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]</key>
+                        <key>pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -1575,7 +1575,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]</key>
+                        <key>pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1598,7 +1598,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]</key>
+                        <key>pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1620,7 +1620,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]</key>
+                        <key>pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1643,7 +1643,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]</key>
+                        <key>pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1666,7 +1666,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]</key>
+                        <key>pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1692,7 +1692,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.scans["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{#DBNAME}"]</key>
+                        <key>pgsql.scans["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1719,12 +1719,12 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.scans["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{#DBNAME}"]</key>
+                        <key>pgsql.scans["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
                      <name>DB {#DBNAME}: Get scans</name>
-                     <key>pgsql.scans["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{#DBNAME}"]</key>
+                     <key>pgsql.scans["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]</key>
                      <history>1h</history>
                      <trends>0</trends>
                      <value_type>TEXT</value_type>
@@ -1766,7 +1766,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                            <color>1A7C11</color>
                            <item>
                               <host>Template DB PostgreSQL by user parameters</host>
-                              <key>pgsql.db.size["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{#DBNAME}"]</key>
+                              <key>pgsql.db.size["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{#DBNAME}"]</key>
                            </item>
                         </graph_item>
                      </graph_items>
@@ -2028,6 +2028,10 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
             <macro>
                <macro>{$PG.LOCKS.MAX.WARN}</macro>
                <value>100</value>
+            </macro>
+            <macro>
+               <macro>{$PG.PASSWORD}</macro>
+               <description>Please set user's password in this macro.</description>
             </macro>
             <macro>
                <macro>{$PG.PING_TIME.MAX.WARN}</macro>
@@ -2610,7 +2614,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                <color>1A7C11</color>
                <item>
                   <host>Template DB PostgreSQL by user parameters</host>
-                  <key>pgsql.ping["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                  <key>pgsql.ping["{$PG.HOST}","{$PG.PORT}"]</key>
                </item>
             </graph_item>
             <graph_item>
@@ -2619,7 +2623,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                <yaxisside>RIGHT</yaxisside>
                <item>
                   <host>Template DB PostgreSQL by user parameters</host>
-                  <key>pgsql.ping.time["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                  <key>pgsql.ping.time["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                </item>
             </graph_item>
          </graph_items>
@@ -2632,7 +2636,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                <color>1A7C11</color>
                <item>
                   <host>Template DB PostgreSQL by user parameters</host>
-                  <key>pgsql.replication.lag.sec["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                  <key>pgsql.replication.lag.sec["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                </item>
             </graph_item>
          </graph_items>
@@ -2687,7 +2691,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                <color>1A7C11</color>
                <item>
                   <host>Template DB PostgreSQL by user parameters</host>
-                  <key>pgsql.uptime["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                  <key>pgsql.uptime["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                </item>
             </graph_item>
             <graph_item>
@@ -2696,7 +2700,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                <yaxisside>RIGHT</yaxisside>
                <item>
                   <host>Template DB PostgreSQL by user parameters</host>
-                  <key>pgsql.cache.hit["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]</key>
+                  <key>pgsql.cache.hit["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]</key>
                </item>
             </graph_item>
          </graph_items>

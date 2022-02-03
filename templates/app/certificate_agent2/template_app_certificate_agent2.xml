@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-08-09T16:55:38Z</date>
+   <date>2021-12-21T18:00:04Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -38,7 +38,6 @@ Template tooling version used: 0.39</description>
                <delay>0</delay>
                <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>TEXT</value_type>
                <description>The subject alternative name extension allows identities to be bound to the subject of the certificate.  These identities may be included in addition to or in place of the identity in the subject field of the certificate.  Defined options include an Internet electronic mail address, a DNS name, an IP address, and a Uniform Resource Identifier (URI).</description>
                <applications>
@@ -63,7 +62,6 @@ Template tooling version used: 0.39</description>
                <delay>0</delay>
                <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>TEXT</value_type>
                <description>The field identifies the entity that has signed and issued the certificate.</description>
                <applications>
@@ -88,7 +86,6 @@ Template tooling version used: 0.39</description>
                <delay>0</delay>
                <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>TEXT</value_type>
                <description>Last check result message.</description>
                <applications>
@@ -112,7 +109,6 @@ Template tooling version used: 0.39</description>
                <key>cert.not_after</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <units>unixtime</units>
                <description>The date on which the certificate validity period ends.</description>
                <applications>
@@ -150,7 +146,6 @@ Template tooling version used: 0.39</description>
                <key>cert.not_before</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <units>unixtime</units>
                <description>The date on which the certificate validity period begins.</description>
                <applications>
@@ -175,7 +170,6 @@ Template tooling version used: 0.39</description>
                <delay>0</delay>
                <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>The digital signature algorithm is used to verify the signature of a certificate.</description>
                <applications>
@@ -200,7 +194,6 @@ Template tooling version used: 0.39</description>
                <delay>0</delay>
                <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>The serial number is a positive integer assigned by the CA to each certificate. It is unique for each certificate issued by a given CA. Non-conforming CAs may issue certificates with serial numbers that are negative or zero.</description>
                <applications>
@@ -225,7 +218,6 @@ Template tooling version used: 0.39</description>
                <delay>0</delay>
                <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>The Certificate Signature (SHA1 Fingerprint or Thumbprint) is the hash of the entire certificate in DER form.</description>
                <applications>
@@ -260,7 +252,6 @@ There could be multiple valid certificates on some installations. In this case, 
                <delay>0</delay>
                <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>The algorithm identifier for the algorithm used by the CA to sign the certificate.</description>
                <applications>
@@ -285,7 +276,6 @@ There could be multiple valid certificates on some installations. In this case, 
                <delay>0</delay>
                <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>TEXT</value_type>
                <description>The field identifies the entity associated with the public key stored in the subject public key field.</description>
                <applications>
@@ -310,7 +300,6 @@ There could be multiple valid certificates on some installations. In this case, 
                <delay>0</delay>
                <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>The certificate validation result. Possible values: valid/invalid/valid-but-self-signed</description>
                <applications>
@@ -343,7 +332,6 @@ There could be multiple valid certificates on some installations. In this case, 
                <delay>0</delay>
                <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>The version of the encoded certificate.</description>
                <applications>
@@ -367,7 +355,6 @@ There could be multiple valid certificates on some installations. In this case, 
                <delay>15m</delay>
                <history>0h</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>TEXT</value_type>
                <description>Returns the JSON with attributes of a certificate of the requested site.</description>
                <applications>

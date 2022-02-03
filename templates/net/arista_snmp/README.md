@@ -1,5 +1,5 @@
 
-# Arista SNMP
+# Template Net Arista SNMP
 
 ## Overview
 
@@ -40,9 +40,9 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Temperature discovery |<p>ENTITY-SENSORS-MIB::EntitySensorDataType discovery with celsius filter</p> |DEPENDENT |temp.discovery<p>**Filter**:</p>AND <p>- B: {#SENSOR_TYPE} MATCHES_REGEX `8`</p><p>- B: {#SENSOR_PRECISION} MATCHES_REGEX `1`</p> |
-|Fan discovery |<p>ENTITY-SENSORS-MIB::EntitySensorDataType discovery with rpm filter</p> |DEPENDENT |fan.discovery<p>**Filter**:</p>OR <p>- B: {#SENSOR_TYPE} MATCHES_REGEX `10`</p> |
-|Voltage discovery |<p>ENTITY-SENSORS-MIB::EntitySensorDataType discovery with volts filter</p> |DEPENDENT |voltage.discovery<p>**Filter**:</p>OR <p>- B: {#SENSOR_TYPE} MATCHES_REGEX `3|4`</p> |
+|Temperature discovery |<p>ENTITY-SENSORS-MIB::EntitySensorDataType discovery with celsius filter</p> |DEPENDENT |temp.discovery<p>**Filter**:</p>AND <p>- B: {#SENSOR_TYPE} MATCHES_REGEX `8`</p><p>- B: {#SENSOR_PRECISION} MATCHES_REGEX `1`</p><p>**Overrides:**</p><p>trigger THRESHOLD_LO_WARN<br> - {#THRESHOLD_LO_WARN} MATCHES_REGEX `^$`<br>  - TRIGGER_PROTOTYPE REGEXP `Temperature is below the warning threshold` - NO_DISCOVER</p><p>trigger THRESHOLD_LO_CRIT<br> - {#THRESHOLD_LO_CRIT} MATCHES_REGEX `^$`<br>  - TRIGGER_PROTOTYPE REGEXP `Temperature is below the critical threshold` - NO_DISCOVER</p><p>trigger THRESHOLD_HI_WARN<br> - {#THRESHOLD_HI_WARN} MATCHES_REGEX `^$`<br>  - TRIGGER_PROTOTYPE REGEXP `Temperature is above the warning threshold` - NO_DISCOVER</p><p>trigger THRESHOLD_HI_CRIT<br> - {#THRESHOLD_HI_CRIT} MATCHES_REGEX `^$`<br>  - TRIGGER_PROTOTYPE REGEXP `Temperature is above the critical threshold` - NO_DISCOVER</p> |
+|Fan discovery |<p>ENTITY-SENSORS-MIB::EntitySensorDataType discovery with rpm filter</p> |DEPENDENT |fan.discovery<p>**Filter**:</p>OR <p>- B: {#SENSOR_TYPE} MATCHES_REGEX `10`</p><p>**Overrides:**</p><p>trigger THRESHOLD_LO_WARN<br> - {#THRESHOLD_LO_WARN} MATCHES_REGEX `^$`<br>  - TRIGGER_PROTOTYPE REGEXP `Fan speed is below the warning threshold` - NO_DISCOVER</p><p>trigger THRESHOLD_LO_CRIT<br> - {#THRESHOLD_LO_CRIT} MATCHES_REGEX `^$`<br>  - TRIGGER_PROTOTYPE REGEXP `Fan speed is below the critical threshold` - NO_DISCOVER</p><p>trigger THRESHOLD_HI_WARN<br> - {#THRESHOLD_HI_WARN} MATCHES_REGEX `^$`<br>  - TRIGGER_PROTOTYPE REGEXP `Fan speed is above the warning threshold` - NO_DISCOVER</p><p>trigger THRESHOLD_HI_CRIT<br> - {#THRESHOLD_HI_CRIT} MATCHES_REGEX `^$`<br>  - TRIGGER_PROTOTYPE REGEXP `Fan speed is above the critical threshold` - NO_DISCOVER</p> |
+|Voltage discovery |<p>ENTITY-SENSORS-MIB::EntitySensorDataType discovery with volts filter</p> |DEPENDENT |voltage.discovery<p>**Filter**:</p>OR <p>- B: {#SENSOR_TYPE} MATCHES_REGEX `3|4`</p><p>**Overrides:**</p><p>trigger THRESHOLD_LO_WARN<br> - {#THRESHOLD_LO_WARN} MATCHES_REGEX `^$`<br>  - TRIGGER_PROTOTYPE REGEXP `Voltage is below the warning threshold` - NO_DISCOVER</p><p>trigger THRESHOLD_LO_CRIT<br> - {#THRESHOLD_LO_CRIT} MATCHES_REGEX `^$`<br>  - TRIGGER_PROTOTYPE REGEXP `Voltage is below the critical threshold` - NO_DISCOVER</p><p>trigger THRESHOLD_HI_WARN<br> - {#THRESHOLD_HI_WARN} MATCHES_REGEX `^$`<br>  - TRIGGER_PROTOTYPE REGEXP `Voltage is above the warning threshold` - NO_DISCOVER</p><p>trigger THRESHOLD_HI_CRIT<br> - {#THRESHOLD_HI_CRIT} MATCHES_REGEX `^$`<br>  - TRIGGER_PROTOTYPE REGEXP `Voltage is above the critical threshold` - NO_DISCOVER</p> |
 |Entity discovery |<p>-</p> |SNMP |entity.discovery<p>**Filter**:</p>AND_OR <p>- A: {#ENT_CLASS} MATCHES_REGEX `3`</p> |
 |PSU discovery |<p>-</p> |SNMP |psu.discovery<p>**Filter**:</p>AND_OR <p>- A: {#ENT_CLASS} MATCHES_REGEX `6`</p> |
 
@@ -58,7 +58,7 @@ No specific Zabbix configuration is required.
 |Temperature |{#SENSOR_INFO}: Temperature |<p>MIB: ENTITY-SENSORS-MIB</p><p>The most recent measurement obtained by the agent for this sensor.</p><p>To correctly interpret the value of this object, the associated entPhySensorType,</p><p>entPhySensorScale, and entPhySensorPrecision objects must also be examined.</p> |SNMP |sensor.temp.value[entPhySensorValue.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.1`</p> |
 |Temperature |{#SENSOR_INFO}: Temperature status |<p>MIB: ENTITY-SENSORS-MIB</p><p>The operational status of the sensor {#SENSOR_INFO}</p> |SNMP |sensor.temp.status[entPhySensorOperStatus.{#SNMPINDEX}] |
 |Voltage |{#SENSOR_INFO}: Voltage |<p>MIB: ENTITY-SENSORS-MIB</p><p>The most recent measurement obtained by the agent for this sensor.</p><p>To correctly interpret the value of this object, the associated entPhySensorType,</p><p>entPhySensorScale, and entPhySensorPrecision objects must also be examined.</p> |SNMP |sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}] |
-|Zabbix_raw_items |Get sensors |<p>Gets sensors with type, description, and thresholds.</p> |SNMP |sensors.get<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
+|Zabbix_raw_items |Get sensors |<p>Gets sensors with type, description, and thresholds.</p> |SNMP |sensors.get<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 
 ## Triggers
 
