@@ -34,7 +34,7 @@ import (
 )
 
 type Options struct {
-	plugin.SystemOptions `conf:"optional"`
+	plugin.SystemOptions `conf:"optional,name=System"`
 	MaxLinesPerSecond    int `conf:"range=1:1000,default=20"`
 }
 

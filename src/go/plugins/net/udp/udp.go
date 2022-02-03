@@ -54,7 +54,7 @@ const (
 )
 
 type Options struct {
-	plugin.SystemOptions `conf:"optional"`
+	plugin.SystemOptions `conf:"optional,name=System"`
 	Timeout              time.Duration `conf:"optional,range=1:30"`
 }
 

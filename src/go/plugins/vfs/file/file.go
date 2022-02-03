@@ -26,7 +26,7 @@ import (
 )
 
 type Options struct {
-	plugin.SystemOptions `conf:"optional"`
+	plugin.SystemOptions `conf:"optional,name=System"`
 	Timeout              int `conf:"optional,range=1:30"`
 	Capacity             int `conf:"optional,range=1:100"`
 }

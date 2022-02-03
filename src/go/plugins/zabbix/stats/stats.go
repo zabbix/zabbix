@@ -13,7 +13,7 @@ import (
 )
 
 type Options struct {
-	plugin.SystemOptions `conf:"optional"`
+	plugin.SystemOptions `conf:"optional,name=System"`
 	Timeout              int    `conf:"optional,range=1:30"`
 	SourceIP             string `conf:"optional"`
 }
