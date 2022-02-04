@@ -2796,6 +2796,10 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 					zbx_hashset_remove_direct(&config->items_hk, item_hk);
 				}
 			}
+			else
+				item->triggers = NULL;
+
+			dc_item_reset_triggers(item);
 
 			item_hk_local.hostid = hostid;
 			item_hk_local.key = row[5];
@@ -2806,7 +2810,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			else
 				update_index = 1;
 		}
-
 		/* store new information in item structure */
 
 		item->hostid = hostid;
@@ -4128,6 +4131,9 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now)
 		if (NULL == (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers, &function->triggerid)))
 			continue;
 
+		if (NULL == zbx_hashset_search(&config->items, &function->itemid))
+			continue;
+
 		if (TRIGGER_STATUS_ENABLED != trigger->status || TRIGGER_FUNCTIONAL_TRUE != trigger->functional)
 			continue;
 
@@ -4205,16 +4211,7 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 		ZBX_STR2UINT64(functionid, row[1]);
 		ZBX_STR2UINT64(triggerid, row[4]);
 
-		if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))
-		{
-			/* Item could have been created after we have selected them in the             */
-			/* previous queries. However, we shall avoid the check for functions being the */
-			/* same as in the trigger expression, because that is somewhat expensive, not  */
-			/* 100% (think functions keeping their functionid, but changing their function */
-			/* or parameters), and even if there is an inconsistency, we can live with it. */
-
-			continue;
-		}
+		item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid);
 
 		/* process function information */
 
@@ -4241,7 +4238,8 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 		function->type = zbx_get_function_type(function->function);
 		function->revision = config->sync_start_ts;
 
-		dc_item_reset_triggers(item);
+		if (NULL != item)
+			dc_item_reset_triggers(item);
 	}
 
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
@@ -5792,7 +5790,6 @@ static void	dc_trigger_update_cache(void)
 	zbx_hashset_iter_reset(&config->functions, &iter);
 	while (NULL != (function = (ZBX_DC_FUNCTION *)zbx_hashset_iter_next(&iter)))
 	{
-
 		if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &function->itemid)) ||
 				NULL == (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers, &function->triggerid)))
 		{
@@ -13822,12 +13819,16 @@ const char	*zbx_dc_get_instanceid(void)
  * Return value: The function parameters with expanded user macros.           *
  *                                                                            *
  ******************************************************************************/
-char	*dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t hostid)
+char	*dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t itemid)
 {
 	const char	*ptr;
 	size_t		params_len;
 	char		*buf;
 	size_t		buf_alloc, buf_offset = 0, sep_pos;
+	ZBX_DC_ITEM	*item;
+
+	if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))
+		return zbx_strdup(NULL, "");
 
 	if ('\0' == *params)
 		return zbx_strdup(NULL, params);
@@ -13844,7 +13845,7 @@ char	*dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t host
 		zbx_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
 
 		param = zbx_function_param_unquote_dyn(ptr + param_pos, param_len, &quoted);
-		resolved_param = dc_expand_user_macros(param, &hostid, 1);
+		resolved_param = dc_expand_user_macros(param, &item->hostid, 1);
 
 		if (SUCCEED == zbx_function_param_quote(&resolved_param, quoted))
 			zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, resolved_param);

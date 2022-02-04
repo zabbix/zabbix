@@ -2518,7 +2518,6 @@ static int	dbsync_compare_function(const ZBX_DC_FUNCTION *function, const DB_ROW
  ******************************************************************************/
 static char	**dbsync_function_preproc_row(char **row)
 {
-	zbx_uint64_t	hostid;
 	const char	*row3;
 
 	/* first parameter is /host/key placeholder $, don't cache it */
@@ -2530,10 +2529,11 @@ static char	**dbsync_function_preproc_row(char **row)
 	/* return the original row if user macros are not used in target columns */
 	if (SUCCEED == dbsync_check_row_macros(row, 3))
 	{
+		zbx_uint64_t	itemid;
 		/* get associated host identifier */
-		ZBX_STR2UINT64(hostid, row[5]);
+		ZBX_STR2UINT64(itemid, row[0]);
 
-		row[3] = dc_expand_user_macros_in_func_params(row3, hostid);
+		row[3] = dc_expand_user_macros_in_func_params(row3, itemid);
 	}
 	else
 		row[3] = zbx_strdup(NULL, row3);
@@ -2561,21 +2561,10 @@ int	zbx_dbsync_compare_functions(zbx_dbsync_t *sync)
 	ZBX_DC_FUNCTION		*function;
 	char			**row;
 
-	if (NULL == (result = DBselect(
-			"select i.itemid,f.functionid,f.name,f.parameter,t.triggerid,i.hostid"
-			" from hosts h,items i,functions f,triggers t"
-			" where h.hostid=i.hostid"
-				" and i.itemid=f.itemid"
-				" and f.triggerid=t.triggerid"
-				" and h.status in (%d,%d)"
-				" and t.flags<>%d",
-			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
-			ZBX_FLAG_DISCOVERY_PROTOTYPE)))
-	{
+	if (NULL == (result = DBselect("select itemid,functionid,name,parameter,triggerid from functions")))
 		return FAIL;
-	}
 
-	dbsync_prepare(sync, 6, dbsync_function_preproc_row);
+	dbsync_prepare(sync, 5, dbsync_function_preproc_row);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{

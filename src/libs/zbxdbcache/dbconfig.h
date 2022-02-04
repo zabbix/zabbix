@@ -930,7 +930,7 @@ void	DCsync_maintenance_hosts(zbx_dbsync_t *sync);
 		((CONFIG_TIMER_FORKS + sizeof(uint64_t) * 8 - 1) / (sizeof(uint64_t) * 8))
 
 char	*dc_expand_user_macros_in_expression(const char *text, zbx_uint64_t *hostids, int hostids_num);
-char	*dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t hostid);
+char	*dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t itemid);
 char	*dc_expand_user_macros_in_calcitem(const char *formula, zbx_uint64_t hostid);
 
 char	*dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids_num);
