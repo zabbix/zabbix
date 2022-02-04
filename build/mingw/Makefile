@@ -41,12 +41,8 @@ OBJS = \
 	$(OUTPUTDIR)\eventlog.o \
 	$(TARGETDIR)\resource.syso
 
-CFLAGS := $(CFLAGS) -O2 -g -Wall -std=gnu99 -pedantic -Wunreachable-code -Wformat-extra-args		\
-	-Wno-missing-field-initializers -Wdeprecated-declarations -Wuninitialized -Wunreachable-code	\
-	-Wformat-extra-args -Wextra -Wunused -Wshadow -Wstrict-prototypes				\
-	-Wno-missing-field-initializers-Wincompatible-pointer-types -DHAVE_STDINT_H=1			\
-	-DZBX_BUILD_AGENT2=1 -DHAVE_THREAD_LOCAL=1 -I$(TOPDIR)\build\win32\include			\
-	-I$(TOPDIR)\build\mingw -I$(TOPDIR)\include
+CFLAGS := $(CFLAGS) -O2 -g -DHAVE_STDINT_H=1 -DZBX_BUILD_AGENT2=1  -DHAVE_THREAD_LOCAL=1 \
+	-I$(TOPDIR)\build\win32\include -I$(TOPDIR)\build\mingw -I$(TOPDIR)\include
 
 RFLAGS := $(RFLAGS) --input-format=rc -O coff
 GOPATH := $(GOPATH);$(TOPDIR)\go
