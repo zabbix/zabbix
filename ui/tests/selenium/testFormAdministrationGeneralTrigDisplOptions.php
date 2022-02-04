@@ -206,7 +206,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 	 * Test for checking 'Reset defaults' button.
 	 */
 	public function testFormAdministrationGeneralTrigDisplOptions_ResetButton() {
-		// For this method variable $other sent as false and $trigger_disp as true.
+		// Variable $check_color set as true because color hex value should be checked.
 		$this->executeResetButtonTest(false, true);
 	}
 

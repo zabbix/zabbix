@@ -55,7 +55,7 @@ class testFormAdministrationGeneral extends CWebTest {
 	public function executeSimpleUpdate($trigger_disp = false) {
 		$config = CDBHelper::getRow('SELECT * FROM config ORDER BY configid');
 		$this->page->login()->open($this->config_link);
-		$form = $this->query($this->form_selector)->waitUntilReady()->asForm()->one();
+		$form = $this->query($this->form_selector)->waitUntilVisible()->asForm()->one();
 		$values = $form->getFields()->asValues();
 		$form->submit();
 		$this->page->waitUntilReady();
@@ -68,7 +68,7 @@ class testFormAdministrationGeneral extends CWebTest {
 		$this->assertEquals($config, CDBHelper::getRow('SELECT * FROM config ORDER BY configid'));
 		// Check that Frontend form is not changed.
 		$this->assertEquals($values, $form->getFields()->asValues());
-		// Check that Frontend colors is not changed.
+		// Check that Frontend colors are not changed.
 		if ($trigger_disp) {
 			foreach ($this->color_default as $colorid => $value) {
 				$this->assertEquals('#'.$value, $this->query($colorid)->one()->getAttribute('title'));
@@ -79,12 +79,12 @@ class testFormAdministrationGeneral extends CWebTest {
 	/**
 	 * Test for checking 'Reset defaults' button.
 	 *
-	 * @param boolean    $other		  If it is Other configuration parameters form
-	 * @param boolean    $trigger_disp   If it is Trigger displaying options form
+	 * @param boolean    $other			 If it is Other configuration parameters form
+	 * @param boolean    $check_color	 Determines whether the color hex value should be checked in the form
 	 */
-	public function executeResetButtonTest($other = false, $trigger_disp = false) {
+	public function executeResetButtonTest($other = false, $check_color = false) {
 		$this->page->login()->open($this->config_link);
-		$form = $this->query($this->form_selector)->waitUntilReady()->asForm()->one();
+		$form = $this->query($this->form_selector)->waitUntilVisible()->asForm()->one();
 		// Reset form in case of some previous scenario.
 		$this->resetConfiguration($form, $this->default_values, 'Reset defaults', $other, $this->color_default);
 		$default_config = CDBHelper::getRow('SELECT * FROM config');
@@ -93,13 +93,12 @@ class testFormAdministrationGeneral extends CWebTest {
 		foreach (['Cancel', 'Reset defaults'] as $action) {
 			// Fill form with custom data.
 			$form->fill($this->custom_values);
-			if ($trigger_disp) {
+			if ($check_color) {
 				foreach($this->color_custom as $selector => $color) {
-					$form->query($selector)->one()->click()->waitUntilReady();
+					$form->query($selector)->one()->click();
 					$this->query('xpath://div[@id="color_picker"]')->asColorPicker()->one()->fill($color);
 				}
 			}
-
 
 			$form->submit();
 			$this->assertMessage(TEST_GOOD, 'Configuration updated');
@@ -108,12 +107,12 @@ class testFormAdministrationGeneral extends CWebTest {
 			$this->page->refresh()->waitUntilReady();
 			$form->invalidate();
 			$form->checkValue($this->custom_values);
-			if ($trigger_disp) {
+			if ($check_color) {
 				foreach ($this->color_custom as $colorid => $value) {
 					$this->assertEquals('#'.$value, $this->query($colorid)->one()->getAttribute('title'));
 				}
 				$color_status = ($action === 'Cancel') ? $this->color_custom : $this->color_default;
-				$this->resetConfiguration($form, $this->default_values, $action, $other, $this->custom, $color_status);
+				$this->resetConfiguration($form, $this->default_values, $action, $other, $this->custom_values, $color_status);
 			}
 
 			$this->resetConfiguration($form, $this->default_values, $action, $other, $this->custom_values);
@@ -130,14 +129,14 @@ class testFormAdministrationGeneral extends CWebTest {
 	 * @param string   $action		 Reset defaults or Cancel
 	 * @param boolean  $other		 Is this Other parameters form or not
 	 * @param array    $custom		 Custom values for filling into settings form
-	 * @param array    $colorpick    Color values for filling into settings form
+	 * @param array    $colors		 Color values for filling into settings form
 	 */
-	public function resetConfiguration($form, $default, $action, $other = false, $custom = null, $colorpick = null) {
+	public function resetConfiguration($form, $default, $action, $other = false, $custom = null, $colors = null) {
 		if (CTestArrayHelper::get($default, 'Default time zone')) {
 			$default['Default time zone'] = CDateTimeHelper::getTimeZoneFormat($default['Default time zone']);
 		}
 		$form->query('button:Reset defaults')->one()->click();
-		COverlayDialogElement::find()->waitUntilReady()->one()->query('button', $action)->one()->click();
+		COverlayDialogElement::find()->waitUntilVisible()->one()->query('button', $action)->one()->click();
 		switch ($action) {
 			case 'Reset defaults':
 				if ($other) {
@@ -162,8 +161,8 @@ class testFormAdministrationGeneral extends CWebTest {
 				$form->invalidate();
 				// Check reset form.
 				$form->checkValue($default);
-				if ($colorpick !== null) {
-					foreach ($colorpick as $colorid => $value) {
+				if ($colors !== null) {
+					foreach ($colors as $colorid => $value) {
 						$this->assertEquals('#'.$value, $this->query($colorid)->one()->getAttribute('title'));
 					}
 				}
@@ -184,7 +183,7 @@ class testFormAdministrationGeneral extends CWebTest {
 	 */
 	public function executeCheckForm($data, $other = false) {
 		$this->page->login()->open($this->config_link);
-		$form = $this->query($this->form_selector)->waitUntilReady()->asForm()->one();
+		$form = $this->query($this->form_selector)->waitUntilVisible()->asForm()->one();
 		// Reset form in case of previous test case.
 		$this->resetConfiguration($form, $this->default_values, 'Reset defaults', $other, $this->color_default);
 		// Fill form with new data.
