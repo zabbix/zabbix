@@ -165,11 +165,9 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 	var maxDataId, maxLogId uint64
 
 	cacheLock.Lock()
-	rows, err = c.database.Query(fmt.Sprintf("SELECT "+
+	if rows, err = c.database.Query(fmt.Sprintf("SELECT "+
 		"id,itemid,lastlogsize,mtime,state,value,eventsource,eventid,eventseverity,eventtimestamp,clock,ns"+
-		" FROM data_%d ORDER BY id LIMIT ?", c.serverID), DataLimit)
-
-	if err != nil {
+		" FROM data_%d ORDER BY id LIMIT ?", c.serverID), DataLimit); err != nil {
 		c.Errf("cannot select from data table: %s", err.Error())
 		cacheLock.Unlock()
 		return
@@ -203,10 +201,9 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 
 	if dataLen != DataLimit {
 		cacheLock.Lock()
-		rows, err = c.database.Query(fmt.Sprintf("SELECT "+
+		if rows, err = c.database.Query(fmt.Sprintf("SELECT "+
 			"id,itemid,lastlogsize,mtime,state,value,eventsource,eventid,eventseverity,eventtimestamp,clock,ns"+
-			" FROM log_%d ORDER BY id LIMIT ?", c.serverID), DataLimit-len(results))
-		if err != nil {
+			" FROM log_%d ORDER BY id LIMIT ?", c.serverID), DataLimit-len(results)); err != nil {
 			c.Errf("cannot select from log table: %s", err.Error())
 			cacheLock.Unlock()
 			return
@@ -267,8 +264,7 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 	cacheLock.Lock()
 	defer cacheLock.Unlock()
 	if maxDataId != 0 {
-		_, err = c.database.Exec(fmt.Sprintf("DELETE FROM data_%d WHERE id<=?", c.serverID), maxDataId)
-		if err != nil {
+		if _, err = c.database.Exec(fmt.Sprintf("DELETE FROM data_%d WHERE id<=?", c.serverID), maxDataId); err != nil {
 			return fmt.Errorf("cannot delete from data_%d: %s", c.serverID, err)
 		}
 		if err = c.updateDataRange(); err != nil {
@@ -276,8 +272,7 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 		}
 	}
 	if maxLogId != 0 {
-		_, err = c.database.Exec(fmt.Sprintf("DELETE FROM log_%d WHERE id<=?", c.serverID), maxLogId)
-		if err != nil {
+		if _, err = c.database.Exec(fmt.Sprintf("DELETE FROM log_%d WHERE id<=?", c.serverID), maxLogId); err != nil {
 			return fmt.Errorf("cannot delete from log_%d: %s", c.serverID, err)
 		}
 		if err = c.updateLogRange(); err != nil {
@@ -363,7 +358,6 @@ func (c *DiskCache) write(r *plugin.Result) {
 		if (now - c.oldestLog) > c.storagePeriod {
 			atomic.StoreUint32(&c.persistFlag, 1)
 		}
-
 		stmt, err = c.database.Prepare(c.insertResultTable(fmt.Sprintf("log_%d", c.serverID)))
 
 		if err != nil {
@@ -379,8 +373,7 @@ func (c *DiskCache) write(r *plugin.Result) {
 
 		if (now - c.oldestData) > c.storagePeriod+StorageTolerance {
 			query := fmt.Sprintf("DELETE FROM data_%d WHERE clock<?", c.serverID)
-			_, err = c.database.Exec(query, now-c.storagePeriod)
-			if err != nil {
+			if _, err = c.database.Exec(query, now-c.storagePeriod); err != nil {
 				c.Errf("cannot delete old data from data_%d : %s", c.serverID, err)
 			}
 
