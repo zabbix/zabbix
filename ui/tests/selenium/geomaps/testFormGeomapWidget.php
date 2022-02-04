@@ -119,22 +119,15 @@ class testFormGeomapWidget extends CWebTest {
 								]
 							]
 						],
-//						[
-//							'type' => 'geomap',
-//							'name' => 'Geomap for deleting',
-//							'x' => 0,
-//							'y' => 0,
-//							'width' => 11,
-//							'height' => 5,
-//							'view_mode' => 0,
-//							'fields' => [
-//								[
-//									'type' => '1',
-//									'name' => 'default_view',
-//									'value' => '51.5537236445998, -0.43871069125537776'
-//								]
-//							]
-//						]
+						[
+							'type' => 'geomap',
+							'name' => 'Geomap for delete',
+							'x' => 11,
+							'y' => 0,
+							'width' => 10,
+							'height' => 5,
+							'view_mode' => 0
+						]
 					]
 				]
 			]
@@ -530,13 +523,13 @@ class testFormGeomapWidget extends CWebTest {
 
 		if ($cancel) {
 			$form->fill(
-				[
-					'Name' => 'new name',
-					'Refresh interval' => '10 minutes',
-					'Host groups' => 'Group for Host availability widget',
-					'Hosts' => 'Available host',
-					'Initial view' => '56.95090, 24.115,7'
-				]
+					[
+						'Name' => 'new name',
+						'Refresh interval' => '10 minutes',
+						'Host groups' => 'Group for Host availability widget',
+						'Hosts' => 'Available host',
+						'Initial view' => '56.95090, 24.115,7'
+					]
 			);
 			$form->getField('id:evaltype')->fill('Or');
 			$form->getField('id:tags_table_tags')->asMultifieldTable()->fill([
@@ -573,5 +566,25 @@ class testFormGeomapWidget extends CWebTest {
 
 		// Check that DB hash is not changed.
 		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
+	}
+
+	public function testFormGeomapWidget_Delete() {
+		$name = 'Geomap for delete';
+
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
+		$dashboard = CDashboardElement::find()->one();
+		$this->assertTrue($dashboard->edit()->getWidget($name)->isEditable());
+		$dashboard->deleteWidget($name);
+		$dashboard->save();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+
+		// Check that widget is not present on dashboard and in DB.
+		$this->assertFalse($dashboard->getWidget($name, false)->isValid());
+		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM widget_field wf'.
+				' LEFT JOIN widget w'.
+					' ON w.widgetid=wf.widgetid'.
+					' WHERE w.name='.zbx_dbstr($name)
+		));
 	}
 }
