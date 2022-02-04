@@ -28,19 +28,17 @@ class CControllerPopupTokenEdit extends CController {
 	protected function checkInput() {
 		$fields = [
 			'tokenid'       => 'db token.tokenid',
-			'name'          => 'db token.name',
-			'description'   => 'db token.description',
-			'userid'        => 'db users.userid',
-			'expires_state' => 'in 0,1',
-			'expires_at'    => 'string',
-			'status'        => 'db token.status|in '.ZBX_AUTH_TOKEN_ENABLED.','.ZBX_AUTH_TOKEN_DISABLED,
-			'action_src'    => 'fatal|required|in token.list,user.token.list'
+			'action_src'    => 'required|in token.list,user.token.list'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			$this->setResponse(
+				(new CControllerResponseData([
+					'main_block' => json_encode(['errors' => getMessages()->toString()])
+				]))->disableView()
+			);
 		}
 
 		return $ret;
