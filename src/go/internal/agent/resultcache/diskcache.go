@@ -96,9 +96,7 @@ func (c *DiskCache) resultFetch(rows *sql.Rows) (d *AgentData, err error) {
 }
 
 func (c *DiskCache) getOldestWriteClock(table string) (clock int64, err error) {
-	cacheLock.Lock()
 	rows, err := c.database.Query(fmt.Sprintf("SELECT MIN(write_clock) FROM %s", table))
-	cacheLock.Unlock()
 	if err != nil {
 		return
 	}
@@ -119,9 +117,7 @@ func (c *DiskCache) getOldestWriteClock(table string) (clock int64, err error) {
 }
 
 func (c *DiskCache) getLastID(table string) (id uint64, err error) {
-	cacheLock.Lock()
 	rows, err := c.database.Query(fmt.Sprintf("SELECT MAX(id) FROM %s", table))
-	cacheLock.Unlock()
 	if err != nil {
 		return
 	}
@@ -172,10 +168,10 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 	rows, err = c.database.Query(fmt.Sprintf("SELECT "+
 		"id,itemid,lastlogsize,mtime,state,value,eventsource,eventid,eventseverity,eventtimestamp,clock,ns"+
 		" FROM data_%d ORDER BY id LIMIT ?", c.serverID), DataLimit)
-	cacheLock.Unlock()
 
 	if err != nil {
 		c.Errf("cannot select from data table: %s", err.Error())
+		cacheLock.Unlock()
 		return
 	}
 
@@ -186,7 +182,6 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 		}
 	}()
 
-	cacheLock.Lock()
 	for rows.Next() {
 		if result, err = c.resultFetch(rows); err != nil {
 			rows.Close()
@@ -197,6 +192,7 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 		results = append(results, result)
 	}
 	cacheLock.Unlock()
+
 	if err = rows.Err(); err != nil {
 		return
 	}
@@ -210,13 +206,11 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 		rows, err = c.database.Query(fmt.Sprintf("SELECT "+
 			"id,itemid,lastlogsize,mtime,state,value,eventsource,eventid,eventseverity,eventtimestamp,clock,ns"+
 			" FROM log_%d ORDER BY id LIMIT ?", c.serverID), DataLimit-len(results))
-		cacheLock.Unlock()
 		if err != nil {
 			c.Errf("cannot select from log table: %s", err.Error())
+			cacheLock.Unlock()
 			return
 		}
-
-		cacheLock.Lock()
 		for rows.Next() {
 			if result, err = c.resultFetch(rows); err != nil {
 				rows.Close()
@@ -270,10 +264,10 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 		c.Warningf("history upload to [%s] is working again", u.Addr())
 		c.lastError = nil
 	}
+	cacheLock.Lock()
+	defer cacheLock.Unlock()
 	if maxDataId != 0 {
-		cacheLock.Lock()
 		_, err = c.database.Exec(fmt.Sprintf("DELETE FROM data_%d WHERE id<=?", c.serverID), maxDataId)
-		cacheLock.Unlock()
 		if err != nil {
 			return fmt.Errorf("cannot delete from data_%d: %s", c.serverID, err)
 		}
@@ -282,9 +276,7 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 		}
 	}
 	if maxLogId != 0 {
-		cacheLock.Lock()
 		_, err = c.database.Exec(fmt.Sprintf("DELETE FROM log_%d WHERE id<=?", c.serverID), maxLogId)
-		cacheLock.Unlock()
 		if err != nil {
 			return fmt.Errorf("cannot delete from log_%d: %s", c.serverID, err)
 		}
@@ -360,16 +352,19 @@ func (c *DiskCache) write(r *plugin.Result) {
 	var stmt *sql.Stmt
 
 	now := time.Now().Unix()
+	cacheLock.Lock()
+	defer cacheLock.Unlock()
+
 	if r.Persistent {
+
 		if c.oldestLog == 0 {
 			c.oldestLog = clock
 		}
 		if (now - c.oldestLog) > c.storagePeriod {
 			atomic.StoreUint32(&c.persistFlag, 1)
 		}
-		cacheLock.Lock()
+
 		stmt, err = c.database.Prepare(c.insertResultTable(fmt.Sprintf("log_%d", c.serverID)))
-		cacheLock.Unlock()
 
 		if err != nil {
 			c.Errf("cannot prepare SQL query to insert history in log_%d : %s", c.serverID, err)
@@ -384,20 +379,17 @@ func (c *DiskCache) write(r *plugin.Result) {
 
 		if (now - c.oldestData) > c.storagePeriod+StorageTolerance {
 			query := fmt.Sprintf("DELETE FROM data_%d WHERE clock<?", c.serverID)
-			cacheLock.Lock()
 			_, err = c.database.Exec(query, now-c.storagePeriod)
-			cacheLock.Unlock()
 			if err != nil {
 				c.Errf("cannot delete old data from data_%d : %s", c.serverID, err)
 			}
+
 			c.oldestData, err = c.getOldestWriteClock(tableName("data", c.serverID))
 			if err != nil {
 				c.Errf("cannot query minimum write clock from data_%d : %s", c.serverID, err)
 			}
 		}
-		cacheLock.Lock()
 		stmt, err = c.database.Prepare(c.insertResultTable(fmt.Sprintf("data_%d", c.serverID)))
-		cacheLock.Unlock()
 		if err != nil {
 			c.Errf("cannot prepare SQL query to insert history in data_%d : %s", c.serverID, err)
 		} else {
@@ -405,10 +397,8 @@ func (c *DiskCache) write(r *plugin.Result) {
 		}
 	}
 	if stmt != nil {
-		cacheLock.Lock()
 		_, err = stmt.Exec(c.lastDataID, now, r.Itemid, LastLogsize, Mtime, State, Value,
 			EventSource, EventID, EventSeverity, EventTimestamp, clock, ns)
-		cacheLock.Unlock()
 		if err != nil {
 			c.Errf("cannot execute SQL statement : %s", err)
 		}
@@ -462,27 +452,24 @@ func (c *DiskCache) init(options *agent.AgentOptions) {
 
 	var err error
 	cacheLock.Lock()
+	defer cacheLock.Unlock()
+
 	c.database, err = sql.Open("sqlite3", agent.Options.PersistentBufferFile)
-	cacheLock.Unlock()
 	if err != nil {
 		return
 	}
 
-	cacheLock.Lock()
 	rows, err := c.database.Query(fmt.Sprintf("SELECT id FROM registry WHERE address = '%s'", c.uploader.Addr()))
-	cacheLock.Unlock()
 
 	if err == nil {
 		defer rows.Close()
 
-		cacheLock.Lock()
 		for rows.Next() {
 			if err = rows.Scan(&c.serverID); err != nil {
 				c.Errf("cannot retrieve diskcache server ID ")
 				c.serverID = 0
 			}
 		}
-		cacheLock.Unlock()
 	}
 
 	/* log history is removed before disk cache is initialized, so only data history needs to be checked */
