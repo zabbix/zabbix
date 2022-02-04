@@ -35,7 +35,8 @@ $token_form = (new CForm())
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action_src', $data['action_src'])
 	->addVar('action', ($data['tokenid'] == 0) ? 'token.create' : 'token.update')
-	->addVar('tokenid', $data['tokenid']);
+	->addVar('tokenid', $data['tokenid'])
+	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
 if ($data['action_src'] === 'user.token.list') {
 	$token_form->addVar('userid', CWebUser::$data['userid']);
