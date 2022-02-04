@@ -358,11 +358,12 @@ class testFormHost extends CWebTest {
 					'host_fields' => [
 						'Groups' => 'Zabbix servers'
 					],
-					'error_title' => 'Cannot add host',
-					'error' => 'Incorrect characters used for host name "😀".',
 					'utf_fields' => [
 						'id:host' => '😀'
-					]
+					],
+					'error_title' => 'Cannot add host',
+					'error' => 'Incorrect characters used for host name "😀".'
+
 				]
 			],
 			// Interface fields validation.
@@ -824,14 +825,12 @@ class testFormHost extends CWebTest {
 				// Check host fields.
 				if (array_key_exists('utf_fields', $data) && array_key_exists('id:visiblename', $data['utf_fields'])) {
 					$host = $data['utf_fields']['id:visiblename'];
-					$utf = true;
 				}
 				else {
 					$host = CTestArrayHelper::get($data, 'host_fields.Visible name', $data['host_fields']['Host name']);
-					$utf = false;
 				}
 
-				$form = $this->filterAndSelectHost($host, $utf);
+				$form = $this->filterAndSelectHost($host, CTestArrayHelper::get($data, 'utf_fields', false));
 				$form->checkValue($data['host_fields']);
 
 				foreach ($interfaces as &$interface) {
@@ -1327,10 +1326,10 @@ class testFormHost extends CWebTest {
 					'host_fields' => [
 						'Host name' => 'Update host with utf8 visible name',
 						'Groups' => 'Linux servers',
-						'Description' => 'Update description'
 					],
 					'utf_fields' => [
-						'id:visiblename' => '😀😀'
+						'id:visiblename' => '😀😀',
+						'id:description' => '😀😀😀😀😀😀😀'
 					],
 					'interfaces' => [
 						[
@@ -1503,16 +1502,14 @@ class testFormHost extends CWebTest {
 
 				if (array_key_exists('utf_fields', $data) && array_key_exists('id:visiblename', $data['utf_fields'])) {
 					$host = $data['utf_fields']['id:visiblename'];
-					$utf = true;
 				}
 				else {
 					$host = (CTestArrayHelper::get($data, 'host_fields.Visible name') === "")
 						? CTestArrayHelper::get($data, 'host_fields.Host name', 'testFormHost_Update')
 						: CTestArrayHelper::get($data, 'host_fields.Visible name', 'testFormHost_Update Visible name');
-					$utf = false;
 				}
 
-				$form = $this->filterAndSelectHost($host, $utf);
+				$form = $this->filterAndSelectHost($host, CTestArrayHelper::get($data, 'utf_fields', false));
 
 				// Update or add new source data from host data.
 				foreach (CTestArrayHelper::get($data, 'host_fields', []) as $key => $value) {
@@ -1520,7 +1517,11 @@ class testFormHost extends CWebTest {
 				}
 
 				if (array_key_exists('utf_fields', $data) && array_key_exists('id:visiblename', $data['utf_fields'])) {
-				$source['host_fields']['Visible name'] = $data['utf_fields']['id:visiblename'];
+					$source['host_fields']['Visible name'] = $data['utf_fields']['id:visiblename'];
+				}
+
+				if (array_key_exists('utf_fields', $data) && array_key_exists('id:description', $data['utf_fields'])) {
+					$source['host_fields']['Description'] = $data['utf_fields']['id:description'];
 				}
 
 				// Check host fields.
@@ -1668,8 +1669,10 @@ class testFormHost extends CWebTest {
 						]
 					],
 					'utf_fields' => [
-							'id:visiblename' => microtime().'😀😀😀'
-						]
+						'id:visiblename' => microtime().'😀😀😀',
+						'xpath://input[contains(@id,"community")]' => '{😀😀😀😀}',
+						'id:description' => '😀😀😀😀😀😀😀'
+					]
 				]
 			]
 		];
@@ -1712,15 +1715,11 @@ class testFormHost extends CWebTest {
 
 		// Check the values of the original host with the cloned host.
 
-		if (array_key_exists('utf_fields', $data) && array_key_exists('id:visiblename', $data['utf_fields'])) {
-			$host = $data['utf_fields']['id:visiblename'];
-		}
-		else {
-			$host = $data['host_fields']['Host name'];
-		}
+		$host = (array_key_exists('utf_fields', $data) && array_key_exists('id:visiblename', $data['utf_fields'])) ?
+			$data['utf_fields']['id:visiblename'] :
+			$data['host_fields']['Host name'];
 
-		$this->filterAndSelectHost($host, true)->checkValue($original);
-
+		$this->filterAndSelectHost($host, CTestArrayHelper::get($data, 'utf_fields', false))->checkValue($original);
 		COverlayDialogElement::find()->one()->close();
 	}
 
