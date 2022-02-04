@@ -46,10 +46,15 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 	];
 
 	public $color_default = [
-		'id:lbl_problem_unack_color' => 'CC0000',
-		'id:lbl_problem_ack_color'=> 'CC0000',
-		'id:lbl_ok_unack_color'=> '009900',
-		'id:lbl_ok_ack_color'=> '009900',
+//		This should be changed to really custom values after DEV-1673 is fixed.
+//		'id:lbl_problem_unack_color' => 'CC0000',
+//		'id:lbl_problem_ack_color'=> 'CC0000',
+//		'id:lbl_ok_unack_color'=> '009900',
+//		'id:lbl_ok_ack_color'=> '009900',
+		'id:lbl_problem_unack_color' => 'D81B60',
+		'id:lbl_problem_ack_color'=> 'F8BBD0',
+		'id:lbl_ok_unack_color'=> '1A237E',
+		'id:lbl_ok_ack_color'=> 'B3E5FC',
 		'id:lbl_severity_color_0' => '97AAB3',
 		'id:lbl_severity_color_1' => '7499FF',
 		'id:lbl_severity_color_2' => 'FFC859' ,

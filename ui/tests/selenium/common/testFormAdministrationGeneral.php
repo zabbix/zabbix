@@ -94,7 +94,7 @@ class testFormAdministrationGeneral extends CWebTest {
 			// Fill form with custom data.
 			$form->fill($this->custom_values);
 			if ($check_color) {
-				foreach($this->color_custom as $selector => $color) {
+				foreach ($this->color_custom as $selector => $color) {
 					$form->query($selector)->one()->click();
 					$this->query('xpath://div[@id="color_picker"]')->asColorPicker()->one()->fill($color);
 				}
@@ -114,8 +114,10 @@ class testFormAdministrationGeneral extends CWebTest {
 				$color_status = ($action === 'Cancel') ? $this->color_custom : $this->color_default;
 				$this->resetConfiguration($form, $this->default_values, $action, $other, $this->custom_values, $color_status);
 			}
+			else {
+				$this->resetConfiguration($form, $this->default_values, $action, $other, $this->custom_values);
+			}
 
-			$this->resetConfiguration($form, $this->default_values, $action, $other, $this->custom_values);
 			$config = ($action === 'Reset defaults') ? $default_config : $custom_config;
 			$this->assertEquals($config, CDBHelper::getRow('SELECT * FROM config'));
 		}
