@@ -104,9 +104,7 @@ class CControllerPopupTokenEdit extends CController {
 			$data['ms_user'] = [['id' => $user['userid'], 'name' => getUserFullname($user)]];
 		}
 
-		if ($this->hasInput('action_src')) {
-			$data['action_src'] = $this->getInput('action_src');
-		}
+		$data['action_src'] = $this->getInput('action_src');
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('API tokens'));
