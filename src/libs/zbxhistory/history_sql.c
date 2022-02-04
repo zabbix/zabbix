@@ -642,7 +642,7 @@ static int	sql_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t *his
 	{
 		zbx_history_func_t	add_history_func;
 
-		add_history_func = hist->sql_history_func;
+		add_history_func = hist->data.sql_history_func;
 		add_history_func(history);
 	}
 
@@ -692,19 +692,19 @@ int	zbx_history_sql_init(zbx_history_iface_t *hist, unsigned char value_type, ch
 	switch (value_type)
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
-			hist->sql_history_func = add_history_dbl;
+			hist->data.sql_history_func = add_history_dbl;
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
-			hist->sql_history_func = add_history_uint;
+			hist->data.sql_history_func = add_history_uint;
 			break;
 		case ITEM_VALUE_TYPE_STR:
-			hist->sql_history_func = add_history_str;
+			hist->data.sql_history_func = add_history_str;
 			break;
 		case ITEM_VALUE_TYPE_TEXT:
-			hist->sql_history_func = add_history_text;
+			hist->data.sql_history_func = add_history_text;
 			break;
 		case ITEM_VALUE_TYPE_LOG:
-			hist->sql_history_func = add_history_log;
+			hist->data.sql_history_func = add_history_log;
 			break;
 	}
 
