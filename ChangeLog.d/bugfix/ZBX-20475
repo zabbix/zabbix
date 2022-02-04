@@ -1,1 +1,0 @@
-...G...... [ZBX-20475] fixed panic when Plugins.Smart.Path is set in Zabbix agent 2, by inroducing System config keywords (esneiders)
