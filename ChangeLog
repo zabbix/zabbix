@@ -1,3 +1,14 @@
+Changes for 6.0.0rc2
+
+Bug fixes:
+.........T [ZBX-16896] added interface speed metric to linux by agent templates and fixed interfaces tags (vkhaliev)
+..F....... [ZBX-20370] fixed textarea tags not expanding in service editing form (averza)
+..F....... [ZBX-20466] fixed context menu, which was not appearing for numeric discovered items (epulke)
+...G...... [ZBX-20475] fixed panic when Plugins.Smart.Path is set in Zabbix agent 2, by inroducing System config keywords (esneiders)
+..F....... [ZBX-20524] fixed usage of history source and extra data selection in Top hosts widget (averza)
+........S. [ZBX-20490] fixed initial ha failover delay update, improved RTC and HA service communications (wiper)
+
+--------------------------------------------------------------------------------
 Changes for 6.0.0rc1
 
 New features:
@@ -377,8 +388,17 @@ Bug fixes:
 Changes for 5.4.11rc1
 
 New features:
+...G...... [ZBXNEXT-7408] added native support for the net.dns and net.dns.record keys in Zabbix agent 2, fixed Zabbix agent 1 SOA response formatting (esneiders, ssimonenko)
 
 Bug fixes:
+.........T [ZBX-20499] removed unsupported items in Zabbix server health template (abakaldin)
+...G...... [ZBX-20030] fixed system.cpu.num runtime cpu change in Zabbix agent 2 (esneiders)
+.........T [ZBX-16896] added interface speed metric to linux by agent templates (vkhaliev)
+...GI..... [ZBX-20290] fixed missing HTTP metrics support for Windows Agent (ssimonenko)
+.........T [ZBX-20396] fixed expression for "Calculated value of innodb_log_file_size" item in MySQL templates (mchudinov)
+.........T [ZBX-20509] changed host group in Squid, Morningstar templates (mchudinov)
+..F....... [ZBX-20494] fixed multiple hintbox issue upon widget updates (averza)
+..F....... [ZBX-20432] fixed impossibility to import templates with triggers mapping to hosts with numeric names (averza)
 
 --------------------------------------------------------------------------------
 Changes for 5.4.10
@@ -1599,8 +1619,13 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.21rc1
 
 New features:
+...G...... [ZBXNEXT-7408] added native support for the net.dns and net.dns.record keys in Zabbix agent 2, fixed Zabbix agent 1 SOA response formatting (esneiders, ssimonenko)
 
 Bug fixes:
+.........T [ZBX-16896] added interface speed metric to linux by agent templates (vkhaliev)
+...G...... [ZBX-20030] fixed system.cpu.num runtime cpu change in Zabbix agent 2 (esneiders)
+.........T [ZBX-20396] fixed expression for "Calculated value of innodb_log_file_size" item in MySQL templates (mchudinov)
+.........T [ZBX-20509] changed host group in Squid, Morningstar templates (mchudinov)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.20
