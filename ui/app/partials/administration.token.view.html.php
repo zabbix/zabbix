@@ -27,33 +27,25 @@
 $token_form = (new CForm())
 	->setId('token_form')
 	->setName('token')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
-
-$success_message = (array_key_exists('regenerate', $data))
-	? makeMessageBox(ZBX_STYLE_MSG_GOOD, [[
-		'message' => _('API token updated')
-	]])
-	: makeMessageBox(ZBX_STYLE_MSG_GOOD, [[
-		'message' => _('API token added')
-	]]);
-$token_form->addItem($success_message);
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->addItem(makeMessageBox(ZBX_STYLE_MSG_GOOD, [['message' => $data['message']]]));
 
 $token_from_grid = (new CFormGrid())
 	->addItem([
-		(new CDiv(_('Name') . ':'))->addClass(ZBX_STYLE_RIGHT),
-		new CDiv($data['name'])
+		new CLabel(_('Name') . ':'),
+		new CFormField($data['name'])
 	]);
 
 if ($data['action_src'] === 'token.list') {
 	$token_from_grid->addItem([
-		(new CDiv(_('User') . ':'))->addClass(ZBX_STYLE_RIGHT),
-		new CDiv($data['user'])
+		new CLabel(_('User') . ':'),
+		new CFormField($data['user'])
 	]);
 }
 
 $token_from_grid->addItem([
-		(new CDiv(_('Auth token') . ':'))->addClass(ZBX_STYLE_RIGHT),
-		new CDiv([
+		new CLabel(_('Auth token') . ':'),
+		new CFormField([
 			$data['auth_token'],
 			'&nbsp;',
 			makeWarningIcon(
@@ -66,8 +58,8 @@ $token_from_grid->addItem([
 		])
 	])
 	->addItem([
-		(new CDiv(_('Expires at') . ':'))->addClass(ZBX_STYLE_RIGHT),
-		new CDiv([
+		new CLabel(_('Expires at') . ':'),
+		new CFormField([
 			($data['expires_at'] == 0) ? '-' : date(DATE_TIME_FORMAT_SECONDS, (int)$data['expires_at']),
 			($data['expires_at'] != 0 && time() > $data['expires_at'])
 				? ['&nbsp;', makeErrorIcon(_('The token has expired. Please update the expiry date to use the token.'))]
@@ -75,12 +67,12 @@ $token_from_grid->addItem([
 		])
 	])
 	->addItem([
-		(new CDiv(_('Description') . ':'))->addClass(ZBX_STYLE_RIGHT),
-		(new CDiv($data['description']))->addClass(ZBX_STYLE_WORDBREAK)
+		new CLabel(_('Description') . ':'),
+		(new CFormField($data['description']))->addClass(ZBX_STYLE_WORDBREAK)
 	])
 	->addItem([
-		(new CDiv(_('Enabled') . ':'))->addClass(ZBX_STYLE_RIGHT),
-		new CDiv((new CCheckBox('enabled'))
+		new CLabel(_('Enabled') . ':'),
+		new CFormField((new CCheckBox('enabled'))
 			->setChecked($data['status'] == ZBX_AUTH_TOKEN_ENABLED)
 			->setEnabled(false)
 		)

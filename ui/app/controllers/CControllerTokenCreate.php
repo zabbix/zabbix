@@ -93,6 +93,7 @@ class CControllerTokenCreate extends CController {
 				'expires_at' => $token['expires_at'],
 				'description' => $token['description'],
 				'status' => $token['status'],
+				'message' => _('API token added'),
 				'action_src' => $this->getInput('action_src')
 			];
 

@@ -99,7 +99,7 @@ class CControllerTokenUpdate extends CController {
 					'expires_at' => $token['expires_at'],
 					'description' => $token['description'],
 					'status' => $token['status'],
-					'regenerate' => '1',
+					'message' => _('API token updated'),
 					'action_src' => $this->getInput('action_src')
 				];
 
