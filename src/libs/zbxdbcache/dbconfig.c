@@ -2769,9 +2769,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 		/* template item */
 		ZBX_DBROW2UINT64(item->templateid, row[48]);
 
-		/* LLD item prototype */
-		ZBX_DBROW2UINT64(item->parent_itemid, row[49]);
-
 		if (0 != found && ITEM_TYPE_SNMPTRAP == item->type)
 			dc_interface_snmpitems_remove(item);
 
@@ -3534,6 +3531,45 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 		}
 
 		zbx_hashset_remove_direct(&config->items, item);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+static void	DCsync_item_discovery(zbx_dbsync_t *sync)
+{
+	char			**row;
+	zbx_uint64_t		rowid, itemid;
+	unsigned char		tag;
+	int			ret, found;
+	ZBX_DC_ITEM_DISCOVERY	*item_discovery;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
+	{
+		/* removed rows will be always added at the end */
+		if (ZBX_DBSYNC_ROW_REMOVE == tag)
+			break;
+
+		ZBX_STR2UINT64(itemid, row[0]);
+		item_discovery = (ZBX_DC_ITEM_DISCOVERY *)DCfind_id(&config->item_discovery, itemid,
+				sizeof(ZBX_DC_ITEM_DISCOVERY), &found);
+
+		/* LLD item prototype */
+		ZBX_STR2UINT64(item_discovery->parent_itemid, row[1]);
+	}
+
+	/* remove deleted template items from buffer */
+	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
+	{
+		if (NULL == (item_discovery = (ZBX_DC_ITEM_DISCOVERY *)zbx_hashset_search(&config->item_discovery,
+				&rowid)))
+		{
+			continue;
+		}
+
+		zbx_hashset_remove_direct(&config->item_discovery, item_discovery);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -5913,8 +5949,8 @@ static void	dc_load_trigger_queue(zbx_hashset_t *trend_functions)
 void	DCsync_configuration(unsigned char mode)
 {
 	int		i, flags;
-	double		sec, csec, hsec, hisec, htsec, gmsec, hmsec, ifsec, isec, tsec, dsec, fsec, expr_sec, csec2,
-			hsec2, hisec2, htsec2, gmsec2, hmsec2, ifsec2, isec2, tsec2, dsec2, fsec2, expr_sec2,
+	double		sec, csec, hsec, hisec, htsec, gmsec, hmsec, ifsec, idsec, isec, tsec, dsec, fsec, expr_sec,
+			csec2, hsec2, hisec2, htsec2, gmsec2, hmsec2, ifsec2, idsec2, isec2, tsec2, dsec2, fsec2, expr_sec2,
 			action_sec, action_sec2, action_op_sec, action_op_sec2, action_condition_sec,
 			action_condition_sec2, trigger_tag_sec, trigger_tag_sec2, host_tag_sec, host_tag_sec2,
 			correlation_sec, correlation_sec2, corr_condition_sec, corr_condition_sec2, corr_operation_sec,
@@ -5922,7 +5958,7 @@ void	DCsync_configuration(unsigned char mode)
 			itemscrp_sec2, total, total2, update_sec, maintenance_sec, maintenance_sec2, item_tag_sec,
 			item_tag_sec2;
 
-	zbx_dbsync_t	config_sync, hosts_sync, hi_sync, htmpl_sync, gmacro_sync, hmacro_sync, if_sync, items_sync,
+	zbx_dbsync_t	config_sync, hosts_sync, hi_sync, htmpl_sync, gmacro_sync, hmacro_sync, if_sync, items_sync, item_discovery_sync,
 			template_items_sync, prototype_items_sync, triggers_sync, tdep_sync, func_sync, expr_sync,
 			action_sync, action_op_sync, action_condition_sync, trigger_tag_sync, item_tag_sync,
 			host_tag_sync, correlation_sync, corr_condition_sync, corr_operation_sync, hgroups_sync,
@@ -5956,6 +5992,7 @@ void	DCsync_configuration(unsigned char mode)
 	zbx_dbsync_init(&gmacro_sync, mode);
 	zbx_dbsync_init(&hmacro_sync, mode);
 	zbx_dbsync_init(&if_sync, mode);
+	zbx_dbsync_init(&item_discovery_sync, mode);
 	zbx_dbsync_init(&items_sync, mode);
 	zbx_dbsync_init(&template_items_sync, mode);
 	zbx_dbsync_init(&prototype_items_sync, mode);
@@ -6135,6 +6172,11 @@ void	DCsync_configuration(unsigned char mode)
 	ifsec = zbx_time() - sec;
 
 	sec = zbx_time();
+	if (FAIL == zbx_dbsync_compare_item_discovery(&item_discovery_sync))
+		goto out;
+	idsec = zbx_time() - sec;
+
+	sec = zbx_time();
 	if (FAIL == zbx_dbsync_compare_items(&items_sync))
 		goto out;
 
@@ -6163,6 +6205,10 @@ void	DCsync_configuration(unsigned char mode)
 	ifsec2 = zbx_time() - sec;
 
 	/* relies on hosts, proxies and interfaces, must be after DCsync_{hosts,interfaces}() */
+	sec = zbx_time();
+	DCsync_item_discovery(&item_discovery_sync);
+	idsec2 = zbx_time() - sec;
+
 	sec = zbx_time();
 	DCsync_items(&items_sync, flags);
 	DCsync_template_items(&template_items_sync);
@@ -6334,14 +6380,14 @@ void	DCsync_configuration(unsigned char mode)
 	}
 
 	update_sec = zbx_time() - sec;
-
+	zabbix_increase_log_level();
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
-		total = csec + hsec + hisec + htsec + gmsec + hmsec + ifsec + isec + tsec + dsec + fsec + expr_sec +
+		total = csec + hsec + hisec + htsec + gmsec + hmsec + ifsec + idsec + isec + tsec + dsec + fsec + expr_sec +
 				action_sec + action_op_sec + action_condition_sec + trigger_tag_sec + correlation_sec +
 				corr_condition_sec + corr_operation_sec + hgroups_sec + itempp_sec + maintenance_sec +
 				item_tag_sec;
-		total2 = csec2 + hsec2 + hisec2 + htsec2 + gmsec2 + hmsec2 + ifsec2 + isec2 + tsec2 + dsec2 + fsec2 +
+		total2 = csec2 + hsec2 + hisec2 + htsec2 + gmsec2 + hmsec2 + ifsec2 + idsec2 + isec2 + tsec2 + dsec2 + fsec2 +
 				expr_sec2 + action_op_sec2 + action_sec2 + action_condition_sec2 + trigger_tag_sec2 +
 				correlation_sec2 + corr_condition_sec2 + corr_operation_sec2 + hgroups_sec2 +
 				itempp_sec2 + maintenance_sec2 + item_tag_sec2 + update_sec;
@@ -6382,6 +6428,10 @@ void	DCsync_configuration(unsigned char mode)
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__func__, ifsec, ifsec2, if_sync.add_num, if_sync.update_num,
 				if_sync.remove_num);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() item_discovery      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
+				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, idsec, idsec2, item_discovery_sync.add_num, template_items_sync.update_num,
+				template_items_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() items      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__func__, isec, isec2, items_sync.add_num, items_sync.update_num,
@@ -6506,6 +6556,8 @@ void	DCsync_configuration(unsigned char mode)
 				config->interface_snmpitems.num_data, config->interface_snmpitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() if_snmpaddr: %d (%d slots)", __func__,
 				config->interface_snmpaddrs.num_data, config->interface_snmpaddrs.num_slots);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() item_discovery : %d (%d slots)", __func__,
+				config->item_discovery.num_data, config->item_discovery.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() items      : %d (%d slots)", __func__,
 				config->items.num_data, config->items.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() items_hk   : %d (%d slots)", __func__,
@@ -6596,6 +6648,7 @@ void	DCsync_configuration(unsigned char mode)
 
 		zbx_mem_dump_stats(LOG_LEVEL_DEBUG, config_mem);
 	}
+	zabbix_decrease_log_level();
 out:
 	if (0 == sync_in_progress)
 	{
@@ -6618,6 +6671,7 @@ out:
 	zbx_dbsync_clear(&hmacro_sync);
 	zbx_dbsync_clear(&host_tag_sync);
 	zbx_dbsync_clear(&if_sync);
+	zbx_dbsync_clear(&item_discovery_sync);
 	zbx_dbsync_clear(&items_sync);
 	zbx_dbsync_clear(&template_items_sync);
 	zbx_dbsync_clear(&prototype_items_sync);
@@ -7017,6 +7071,7 @@ int	init_configuration_cache(char **error)
 	CREATE_HASHSET(config->scriptitems, 0);
 	CREATE_HASHSET(config->itemscript_params, 0);
 	CREATE_HASHSET(config->template_items, 0);
+	CREATE_HASHSET(config->item_discovery, 0);
 	CREATE_HASHSET(config->prototype_items, 0);
 	CREATE_HASHSET(config->functions, 100);
 	CREATE_HASHSET(config->triggers, 100);
@@ -13549,7 +13604,6 @@ static void	zbx_gather_tags_from_template_chain(zbx_uint64_t itemid, zbx_vector_
 static void	zbx_get_item_tags(zbx_uint64_t itemid, zbx_vector_ptr_t *item_tags)
 {
 	ZBX_DC_ITEM		*item;
-	ZBX_DC_PROTOTYPE_ITEM	*lld_item;
 	zbx_item_tag_t		*tag;
 	int			n, i;
 
@@ -13566,13 +13620,21 @@ static void	zbx_get_item_tags(zbx_uint64_t itemid, zbx_vector_ptr_t *item_tags)
 		zbx_gather_tags_from_template_chain(item->templateid, item_tags);
 
 	/* check for discovered item */
-	if (0 != item->parent_itemid && 4 == item->flags)
+	if (ZBX_FLAG_DISCOVERY_CREATED == item->flags)
 	{
-		if (NULL != (lld_item = (ZBX_DC_PROTOTYPE_ITEM *)zbx_hashset_search(&config->prototype_items,
-				&item->parent_itemid)))
+		ZBX_DC_ITEM_DISCOVERY	*item_discovery;
+
+		if (NULL != (item_discovery = (ZBX_DC_ITEM_DISCOVERY *)zbx_hashset_search(&config->item_discovery,
+				&itemid)))
 		{
-			if (0 != lld_item->templateid)
-				zbx_gather_tags_from_template_chain(lld_item->templateid, item_tags);
+			ZBX_DC_PROTOTYPE_ITEM	*lld_item;
+
+			if (NULL != (lld_item = (ZBX_DC_PROTOTYPE_ITEM *)zbx_hashset_search(&config->prototype_items,
+					&item_discovery->parent_itemid)))
+			{
+				if (0 != lld_item->templateid)
+					zbx_gather_tags_from_template_chain(lld_item->templateid, item_tags);
+			}
 		}
 	}
 
