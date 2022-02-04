@@ -2244,6 +2244,36 @@ zabbix_export:
                   tag: phase
                   value: '{#NAME}'
             -
+              uuid: 4c40f651f72446efb48cd50cdc2a32bb
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] PVC [{#NAME}] Resource: Requests storage'
+              type: DEPENDENT
+              key: 'kube.pvc.requests_storage[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'The capacity of storage requested by the persistent volume claim.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_persistentvolumeclaim_resource_requests_storage_bytes{namespace="{#NAMESPACE}", persistentvolumeclaim="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: pvc
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: pvc
+                  value: '{#NAME}'
+            -
               uuid: 6bbe0a1846834467b6147ecfe0c53035
               name: 'Kubernetes: Namespace [{#NAMESPACE}] Status phase: Active, sum'
               type: DEPENDENT
