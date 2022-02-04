@@ -86,8 +86,6 @@ $token_from_grid->addItem([
 		)
 	]);
 
-$token_view = (new CTabView())->addTab('token', '', $token_from_grid);
-
-$token_form->addItem($token_view);
+$token_form->addItem($token_from_grid);
 $token_form
 	->show();
