@@ -6172,11 +6172,6 @@ void	DCsync_configuration(unsigned char mode)
 	ifsec = zbx_time() - sec;
 
 	sec = zbx_time();
-	if (FAIL == zbx_dbsync_compare_item_discovery(&item_discovery_sync))
-		goto out;
-	idsec = zbx_time() - sec;
-
-	sec = zbx_time();
 	if (FAIL == zbx_dbsync_compare_items(&items_sync))
 		goto out;
 
@@ -6186,6 +6181,11 @@ void	DCsync_configuration(unsigned char mode)
 	if (FAIL == zbx_dbsync_compare_prototype_items(&prototype_items_sync))
 		goto out;
 	isec = zbx_time() - sec;
+
+	sec = zbx_time();
+	if (FAIL == zbx_dbsync_compare_item_discovery(&item_discovery_sync))
+		goto out;
+	idsec = zbx_time() - sec;
 
 	sec = zbx_time();
 	if (FAIL == zbx_dbsync_compare_item_preprocs(&itempp_sync))
