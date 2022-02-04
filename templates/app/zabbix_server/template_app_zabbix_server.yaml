@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-12-19T15:20:00Z'
+  date: '2022-02-01T06:28:24Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -10,7 +10,7 @@ zabbix_export:
       uuid: e2d2b4e4ac28483996cc11fe42823d57
       template: 'Zabbix server health'
       name: 'Zabbix server health'
-      description: 'Template tooling version used: 0.40'
+      description: 'Template tooling version used: 0.41'
       groups:
         -
           name: Templates/Applications
@@ -1118,123 +1118,6 @@ zabbix_export:
             -
               tag: Application
               value: 'Zabbix server'
-      discovery_rules:
-        -
-          uuid: 32bf5c3b8f1f4d10b26806ae0d2adb25
-          name: 'High availability cluster node discovery'
-          type: DEPENDENT
-          key: zabbix.nodes.discovery
-          delay: '0'
-          description: 'LLD rule with item and trigger prototypes for node discovery.'
-          item_prototypes:
-            -
-              uuid: c5cb7ffbd314494cb1801ae804e9c76e
-              name: 'Cluster node [{#NODE.NAME}]: Address'
-              type: DEPENDENT
-              key: 'zabbix.nodes.address[{#NODE.ID}]'
-              delay: '0'
-              history: 1w
-              trends: '0'
-              value_type: CHAR
-              description: 'Node IPv4 address.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$.[?(@.id=="{#NODE.ID}")].address.first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 12h
-              master_item:
-                key: 'zabbix[cluster,discovery,nodes]'
-              tags:
-                -
-                  tag: Application
-                  value: 'Cluster node [{#NODE.NAME}]'
-            -
-              uuid: f444de7cdd7a4f3bb7f4b1f2e86e16d7
-              name: 'Cluster node [{#NODE.NAME}]: Last access age'
-              type: DEPENDENT
-              key: 'zabbix.nodes.lastaccess.age[{#NODE.ID}]'
-              delay: '0'
-              history: 1w
-              units: uptime
-              description: 'Time between database unix_timestamp() and last access time.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$.[?(@.id=="{#NODE.ID}")].lastaccess_age.first()'
-              master_item:
-                key: 'zabbix[cluster,discovery,nodes]'
-              tags:
-                -
-                  tag: Application
-                  value: 'Cluster node [{#NODE.NAME}]'
-            -
-              uuid: 2e33f747803b45d7a9b94c171bf36f61
-              name: 'Cluster node [{#NODE.NAME}]: Last access time'
-              type: DEPENDENT
-              key: 'zabbix.nodes.lastaccess.time[{#NODE.ID}]'
-              delay: '0'
-              history: 1w
-              units: unixtime
-              description: 'Last access time.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$.[?(@.id=="{#NODE.ID}")].lastaccess.first()'
-              master_item:
-                key: 'zabbix[cluster,discovery,nodes]'
-              tags:
-                -
-                  tag: Application
-                  value: 'Cluster node [{#NODE.NAME}]'
-            -
-              uuid: 1e4de6a913764a22862c0265d329b592
-              name: 'Cluster node [{#NODE.NAME}]: Status'
-              type: DEPENDENT
-              key: 'zabbix.nodes.status[{#NODE.ID}]'
-              delay: '0'
-              history: 1w
-              description: 'Cluster node status.'
-              valuemap:
-                name: 'Cluster node status'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$.[?(@.id=="{#NODE.ID}")].status.first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 12h
-              master_item:
-                key: 'zabbix[cluster,discovery,nodes]'
-              tags:
-                -
-                  tag: Application
-                  value: 'Cluster node [{#NODE.NAME}]'
-              trigger_prototypes:
-                -
-                  uuid: 8d48978fb5724d19a950aa6eb8a3dd75
-                  expression: 'last(/Zabbix server health/zabbix.nodes.status[{#NODE.ID}],#1)<>last(/Zabbix server health/zabbix.nodes.status[{#NODE.ID}],#2)'
-                  name: 'Cluster node [{#NODE.NAME}]: Status changed'
-                  opdata: 'Current value: {ITEM.LASTVALUE1}'
-                  priority: INFO
-                  description: 'The state of the node has changed. Confirm to close.'
-                  manual_close: 'YES'
-          master_item:
-            key: 'zabbix[cluster,discovery,nodes]'
-          lld_macro_paths:
-            -
-              lld_macro: '{#NODE.ID}'
-              path: $.id
-            -
-              lld_macro: '{#NODE.NAME}'
-              path: $.name
       dashboards:
         -
           uuid: 6815a90fb9b745fd8f1b1f47697893d6
@@ -1410,22 +1293,6 @@ zabbix_export:
                         name: 'Zabbix server: Data gathering processes'
                         host: 'Zabbix server health'
       valuemaps:
-        -
-          uuid: cee1681b12ff49b6b7d442a851e870b4
-          name: 'Cluster node status'
-          mappings:
-            -
-              value: '0'
-              newvalue: Standby
-            -
-              value: '1'
-              newvalue: Stopped
-            -
-              value: '2'
-              newvalue: Unavailable
-            -
-              value: '3'
-              newvalue: Active
         -
           uuid: 97bbea700550483bbd8405b4dd9d8005
           name: 'Value cache operating mode'
