@@ -51,6 +51,10 @@ class CControllerPopupTokenEdit extends CController {
 			return false;
 		}
 
+		if ($this->getInput('action_src') === 'user.token.list') {
+			return $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS);
+		}
+
 		return ($this->checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS)
 			&& $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)
 		);
