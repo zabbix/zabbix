@@ -28,15 +28,24 @@ window.token_edit_popup = {
 	overlay: null,
 	dialogue: null,
 	form: null,
+	form_name: null,
+	expires_at_row: null,
+	expires_at_label: null,
+	expires_at: null,
+	expires_state: null,
 
-	init({popup_url, form_name}) {
+	init() {
 		this.overlay = overlays_stack.getById('token_edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
 		this.addEventListeners();
 
-		token_edit.init({form_name});
+		this.expires_at_row = document.getElementById('expires-at-row');
+		this.expires_at_label = this.expires_at_row.previousSibling;
+		this.expires_at = document.getElementById('expires_at');
+		this.expires_state = document.getElementById('expires_state');
+		this.expiresAtHandler();
 	},
 
 	addEventListeners() {
@@ -47,7 +56,7 @@ window.token_edit_popup = {
 	submit() {
 		this.removePopupMessages();
 
-		const fields = token_edit.preprocessFormFields(getFormFields(this.form));
+		const fields = this.preprocessFormFields(getFormFields(this.form));
 		const curl = new Curl(this.form.getAttribute('action'), false);
 
 		fetch(curl.getUrl(), {
@@ -93,7 +102,7 @@ window.token_edit_popup = {
 	regenerate() {
 		this.removePopupMessages();
 
-		const fields = token_edit.preprocessFormFields(getFormFields(this.form));
+		const fields = this.preprocessFormFields(getFormFields(this.form));
 		fields.regenerate = '1';
 
 		const curl = new Curl(this.form.getAttribute('action'), false);
@@ -200,6 +209,46 @@ window.token_edit_popup = {
 		const message_box = makeMessageBox('bad', messages, title, true, true)[0];
 
 		form.parentNode.insertBefore(message_box, form);
+	},
+
+	preprocessFormFields(fields) {
+		this.trimFields(fields);
+		fields.status = fields.status || <?= ZBX_AUTH_TOKEN_DISABLED ?>;
+		return fields;
+	},
+
+	trimFields(fields) {
+		const fields_to_trim = ['name', 'description'];
+		for (const field of fields_to_trim) {
+			if (field in fields) {
+				fields[field] = fields[field].trim();
+			}
+		}
+		return fields;
+	},
+
+	expiresAtHandler() {
+		if (this.expires_state.checked == false) {
+			let expires_state_hidden = document.createElement('input');
+			expires_state_hidden.setAttribute('type', 'hidden');
+			expires_state_hidden.setAttribute('name', 'expires_state');
+			expires_state_hidden.setAttribute('value', '0');
+			expires_state_hidden.setAttribute('id', 'expires_state_hidden');
+			this.expires_state.append(expires_state_hidden);
+
+			this.expires_at_row.style.display = 'none';
+			this.expires_at_label.style.display = 'none';
+			this.expires_at.disabled = true;
+		}
+		else {
+			this.expires_at_row.style.display = "";
+			this.expires_at_label.style.display = "";
+			this.expires_at.disabled = false;
+			let expires_state_hidden = document.getElementById('expires_state_hidden');
+			if (expires_state_hidden) {
+				expires_state_hidden.parentNode.removeChild(expires_state_hidden);
+			}
+		}
 	},
 
 	events: {
