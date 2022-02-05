@@ -362,7 +362,7 @@ class testFormMonitoringServices extends CWebTest {
 						'Name' => ''
 					],
 					'error' => 'Incorrect value for field "name": cannot be empty.'
-				],
+				]
 			],
 			[
 				[
@@ -455,7 +455,7 @@ class testFormMonitoringServices extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Name' => 'Child1',
+						'Name' => 'Child1'
 					],
 					'duplicate' => true
 				]
@@ -768,7 +768,7 @@ class testFormMonitoringServices extends CWebTest {
 					'circular' => true,
 					'parent' => 'Child3',
 					'fields' => [
-						'Name' => 'Circular dependency',
+						'Name' => 'Circular dependency'
 					],
 					'Child services' => 'Parent2',
 					'error' => 'Services form a circular dependency.'
