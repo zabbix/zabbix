@@ -2069,7 +2069,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$this->calcDimensions();
 
 		$this->selectData();
-		if (hasErrorMesssages()) {
+		if (hasErrorMessages()) {
 			show_messages();
 		}
 
