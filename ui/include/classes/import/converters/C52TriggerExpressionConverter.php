@@ -221,7 +221,7 @@ class C52TriggerExpressionConverter extends CConverter {
 	/**
 	 * Convert function parameters to new syntax.
 	 *
-	 * @param array $parameters                List of parameters according previous syntax.
+	 * @param array $parameters                List of parameters according to the previous syntax.
 	 * @param array $param_dets
 	 * @param array $param_dets['unquotable']  List of numeric indexes for parameters that don't need to be quoted.
 	 * @param array $param_dets['indicated']   List of numeric indexes for parameters that are especially indicated and
@@ -513,8 +513,8 @@ class C52TriggerExpressionConverter extends CConverter {
 	}
 
 	/**
-	 * Check if each particular host reference would be linked through at least one functions according the new trigger
-	 * expression syntax.
+	 * Check if each particular host reference would be linked through at least one functions according to the new
+	 * trigger expression syntax.
 	 *
 	 * @param array $tokens
 	 *

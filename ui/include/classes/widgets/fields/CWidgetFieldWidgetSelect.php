@@ -24,7 +24,7 @@ class CWidgetFieldWidgetSelect extends CWidgetField {
 	private $search_by_value;
 
 	/**
-	 * Field that creates a select of widgets in current dashboard, filtered by given key of widget array.
+	 * Field that creates a selection of widgets in current dashboard, filtered by given key of widget array.
 	 *
 	 * @param string $name         Name of field in config form and widget['fields'] array.
 	 * @param string $label        Field label in config form.

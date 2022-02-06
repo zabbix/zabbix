@@ -522,7 +522,7 @@ ZBX_Notifications.prototype.renderAudio = function() {
 
 /**
  * @param {string} resource  A value for 'action' parameter.
- * @param {object} params    Form data to be send.
+ * @param {object} params    Form data to be sent.
  *
  * @return {Promise}
  */

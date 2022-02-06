@@ -193,7 +193,7 @@ class testFormFilter extends CWebTest {
 			$this->page->waitUntilReady();
 			array_shift($filters);
 
-			// Checking that deleted filter doesn't exists in filters tab list.
+			// Checking that deleted filter doesn't exist in filters tab list.
 			if ($filters !== []) {
 				$this->assertEquals($filters, $filter_container->getTitles());
 			}
@@ -201,7 +201,7 @@ class testFormFilter extends CWebTest {
 				$this->assertEquals(null, $filter_container->getTitles());
 			}
 
-			// Checking that deleted filter doesn't exists in filters dropdown list.
+			// Checking that deleted filter doesn't exist in filters dropdown list.
 			$this->assertEquals($filters, $this->getDropdownFilterNames());
 		}
 	}

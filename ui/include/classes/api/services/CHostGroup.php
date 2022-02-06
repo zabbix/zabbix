@@ -796,13 +796,13 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
-	 * Validates if host groups may be deleted, due to maintenance constrain.
+	 * Validates if host groups may be deleted, due to maintenance constraint.
 	 *
 	 * @static
 	 *
 	 * @param array $groupids
 	 *
-	 * @throws APIException if a constrain failed
+	 * @throws APIException if a constraint failed
 	 */
 	private static function validateDeleteCheckMaintenances(array $groupids): void {
 		$maintenance = DBfetch(DBselect(
