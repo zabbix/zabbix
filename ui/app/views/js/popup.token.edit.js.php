@@ -101,7 +101,7 @@ window.token_edit_popup = {
 
 		this.postData(curl, {
 			tokenids: [tokenid],
-			action_src: 'token.list'
+			admin_mode: '1'
 		}).then((response) => {
 			if ('error' in response) {
 				throw {error: response.error};

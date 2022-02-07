@@ -29,7 +29,7 @@ class CControllerTokenCreate extends CController {
 			'expires_state' => 'in 0,1|required',
 			'expires_at'	=> 'range_time',
 			'status' 		=> 'db token.status|required|in ' . ZBX_AUTH_TOKEN_ENABLED . ',' . ZBX_AUTH_TOKEN_DISABLED,
-			'action_src'	=> 'fatal|required|in token.list,user.token.list',
+			'admin_mode'	=> 'required|in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -95,7 +95,7 @@ class CControllerTokenCreate extends CController {
 				'description' => $token['description'],
 				'status' => $token['status'],
 				'message' => _('API token added'),
-				'action_src' => $this->getInput('action_src')
+				'admin_mode' => $this->getInput('admin_mode')
 			];
 
 			$output['data'] = $data;

@@ -30,7 +30,7 @@ class CControllerPopupTokenView extends CController {
 			'expires_at'  => 'required',
 			'status'      => 'db token.status|in '.ZBX_AUTH_TOKEN_ENABLED.','.ZBX_AUTH_TOKEN_DISABLED.'|required',
 			'message'     => 'required',
-			'action_src'  => 'required|in token.list,user.token.list'
+			'admin_mode'  => 'required|in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -54,7 +54,7 @@ class CControllerPopupTokenView extends CController {
 			return false;
 		}
 
-		if ($this->getInput('action_src') === 'user.token.list') {
+		if ($this->getInput('admin_mode') === '0') {
 			return $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS);
 		}
 

@@ -24,21 +24,16 @@
  * @var array $data
  */
 
-/**
- * @var CPartial $this
- * @var array    $data
- */
-
 $token_form = (new CForm())
 	->setId('token_form')
 	->setName('token')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
-	->addVar('action_src', $data['action_src'])
+	->addVar('admin_mode', $data['admin_mode'])
 	->addVar('action', ($data['tokenid'] == 0) ? 'token.create' : 'token.update')
 	->addVar('tokenid', $data['tokenid'])
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
-if ($data['action_src'] === 'user.token.list') {
+if ($data['admin_mode'] === '0') {
 	$token_form->addVar('userid', CWebUser::$data['userid']);
 }
 
@@ -56,7 +51,7 @@ $token_from_grid = (new CFormGrid())
 			->setAriaRequired()
 	]);
 
-if ($data['action_src'] === 'token.list') {
+if ($data['admin_mode'] === '1') {
 	$token_from_grid->addItem([
 		(new CLabel(_('User'), 'userid_ms'))->setAsteriskMark(),
 		new CFormField(

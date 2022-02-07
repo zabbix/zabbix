@@ -36,7 +36,7 @@ $token_from_grid = (new CFormGrid())
 		new CFormField($data['name'])
 	]);
 
-if ($data['action_src'] === 'token.list') {
+if ($data['admin_mode'] === '1') {
 	$token_from_grid->addItem([
 		new CLabel(_('User') . ':'),
 		new CFormField($data['user'])

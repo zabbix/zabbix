@@ -24,7 +24,7 @@ class CControllerTokenDelete extends CController {
 	protected function checkInput() {
 		$fields = [
 			'tokenids'   => 'required|array_db token.tokenid',
-			'action_src' => 'required|in token.list,user.token.list'
+			'admin_mode' => 'required|in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);

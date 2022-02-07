@@ -28,7 +28,7 @@ class CControllerPopupTokenEdit extends CController {
 	protected function checkInput() {
 		$fields = [
 			'tokenid'       => 'db token.tokenid',
-			'action_src'    => 'required|in token.list,user.token.list'
+			'admin_mode'    => 'required|in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -49,7 +49,7 @@ class CControllerPopupTokenEdit extends CController {
 			return false;
 		}
 
-		if ($this->getInput('action_src') === 'user.token.list') {
+		if ($this->getInput('admin_mode') === '1') {
 			return $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS);
 		}
 
@@ -106,7 +106,7 @@ class CControllerPopupTokenEdit extends CController {
 			$data['ms_user'] = [['id' => $user['userid'], 'name' => getUserFullname($user)]];
 		}
 
-		$data['action_src'] = $this->getInput('action_src');
+		$data['admin_mode'] = $this->getInput('admin_mode');
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('API tokens'));

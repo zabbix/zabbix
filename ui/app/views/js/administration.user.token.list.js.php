@@ -45,13 +45,12 @@
 		},
 
 		createUserToken() {
-			const action_src = {action_src: 'user.token.list'};
-			this.openUserTokenPopup(action_src);
+			this.openUserTokenPopup({admin_mode: '0'});
 		},
 
 		editUserToken(e, tokenid) {
 			e.preventDefault();
-			const user_token_data = {tokenid, action_src: 'user.token.list'};
+			const user_token_data = {tokenid, admin_mode: '0'};
 			this.openUserTokenPopup(user_token_data);
 		},
 
@@ -86,7 +85,7 @@
 				headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
 				body: urlEncodeData({
 					tokenids: chkbxRange.getSelectedIds(),
-					action_src: 'user.token.list'
+					admin_mode: '0'
 				})
 			})
 				.then((response) => response.json())
