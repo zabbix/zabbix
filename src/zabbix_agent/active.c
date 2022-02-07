@@ -557,7 +557,7 @@ static void process_config_item(struct zbx_json *json, char *config, size_t leng
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot get host %s using \"%s\" item specified by"
 					" \"%s\" configuration parameter: returned value is not"
-					" an UTF-8 string",config_type, config, config_name);
+					" a UTF-8 string",config_type, config, config_name);
 		}
 		else
 		{

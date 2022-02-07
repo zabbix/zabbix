@@ -885,7 +885,7 @@ clean:
  *             operationid - [IN] the operation identifier                    *
  *             event       - [IN] the event                                   *
  *             r_event     - [IN] the recover event (optional, can be NULL)   *
- *             ack         - [IN] the acknowledge (optional, can be NULL)     *
+ *             ack         - [IN] (optional, can be NULL) *
  *             evt_src     - [IN] the action event source                     *
  *             op_mode     - [IN] the operation mode                          *
  *                                                                            *
@@ -1077,14 +1077,14 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: adds message to be sent to all who added acknowlegment and        *
+ * Purpose: adds message to be sent to all who added acknowledgment and       *
  *          involved in discussion                                            *
  *                                                                            *
  * Parameters: user_msg    - [IN/OUT] the message list                        *
  *             actionid    - [IN] the action identifie                        *
  *             operationid - [IN] the operation id                            *
  *             event       - [IN] the event                                   *
- *             ack         - [IN] the acknowlegment                           *
+ *             ack         - [IN]                                             *
  *             evt_src     - [IN] the action event source                     *
  *                                                                            *
  ******************************************************************************/
@@ -2031,7 +2031,7 @@ static void	escalation_execute_recovery_operations(const DB_EVENT *event, const 
  *                                                                            *
  * Parameters: event  - [IN] the event                                        *
  *             action - [IN] the action                                       *
- *             ack    - [IN] the acknowledge                                  *
+ *             ack    - [IN] the acknowledgement                              *
  *                                                                            *
  * Comments: Action update operations have a single escalation step, so       *
  *           alerts created by escalation update operations must have         *
@@ -2469,7 +2469,7 @@ static void	escalation_recover(DB_ESCALATION *escalation, const DB_ACTION *actio
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process escalation acknowledge                                    *
+ * Purpose: process escalation acknowledgement                                *
  *                                                                            *
  * Parameters: escalation - [IN/OUT] the escalation to recovery               *
  *             action     - [IN]     the action                               *

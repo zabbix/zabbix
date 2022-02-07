@@ -2317,7 +2317,7 @@ static int	DBmass_add_history(ZBX_DC_HISTORY *history, int history_num)
  *                                                                            *
  * Purpose: helper function for DCmass_proxy_add_history()                    *
  *                                                                            *
- * Comment: this function is meant for items with value_type other other than *
+ * Comment: this function is meant for items with value_type other       than *
  *          ITEM_VALUE_TYPE_LOG not containing meta information in result     *
  *                                                                            *
  ******************************************************************************/
@@ -2384,7 +2384,7 @@ static void	dc_add_proxy_history(ZBX_DC_HISTORY *history, int history_num)
  *                                                                            *
  * Purpose: helper function for DCmass_proxy_add_history()                    *
  *                                                                            *
- * Comment: this function is meant for items with value_type other other than *
+ * Comment: this function is meant for items with value_type other than       *
  *          ITEM_VALUE_TYPE_LOG containing meta information in result         *
  *                                                                            *
  ******************************************************************************/
@@ -4382,7 +4382,7 @@ static void	hc_pop_items(zbx_vector_ptr_t *history_items)
  *                                                                            *
  * Purpose: gets item history values                                          *
  *                                                                            *
- * Parameters: history       - [OUT] the history valeus                       *
+ * Parameters: history       - [OUT] the history values                       *
  *             history_items - [IN] the history items                         *
  *                                                                            *
  ******************************************************************************/

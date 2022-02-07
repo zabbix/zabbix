@@ -136,7 +136,8 @@ int	zbx_hashset_reserve(zbx_hashset_t *hs, int num_slots_req)
 {
 	if (0 == hs->num_slots)
 	{
-		/* correction for prevent the second relocation in the case that requires the same number of slots */
+		/* correction for the prevention of the second relocation for the case that requires the same number */
+		/* of slots */
 		if (SUCCEED != zbx_hashset_init_slots(hs, MAX(ZBX_HASHSET_DEFAULT_SLOTS,
 				num_slots_req * (2 - CRIT_LOAD_FACTOR) + 1)))
 		{

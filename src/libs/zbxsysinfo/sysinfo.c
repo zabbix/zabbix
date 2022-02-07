@@ -1386,7 +1386,7 @@ static char	**get_result_str_value(AGENT_RESULT *result)
 		/* NOTE: copy only line */
 		for (p = result->text; '\0' != *p && '\r' != *p && '\n' != *p; p++);
 		tmp = *p; /* remember result->text character */
-		*p = '\0'; /* replace to NUL */
+		*p = '\0'; /* replace to NULL */
 		SET_STR_RESULT(result, zbx_strdup(NULL, result->text)); /* copy line */
 		*p = tmp; /* restore result->text character */
 	}

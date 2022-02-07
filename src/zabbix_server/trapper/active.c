@@ -526,8 +526,8 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	struct zbx_json		json;
 	int			ret = FAIL, i, version;
 	zbx_uint64_t		hostid;
-	size_t			host_metadata_alloc = 1;	/* for at least NUL-termination char */
-	size_t			interface_alloc = 1;		/* for at least NUL-termination char */
+	size_t			host_metadata_alloc = 1;	/* for at least NULL-terminated string */
+	size_t			interface_alloc = 1;		/* for at least NULL-terminated string */
 	size_t			buffer_size, reserved = 0;
 	unsigned short		port;
 	zbx_vector_uint64_t	itemids;

@@ -8667,7 +8667,7 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 			{
 				/* DCconfig_get_triggers_by_itemids() function is called during trigger processing */
 				/* when syncing history cache. A trigger cannot be processed by two syncers at the */
-				/* same time, so its safe to update trigger timespec within read lock.             */
+				/* same time, so it is safe to update trigger timespec within read lock.           */
 				trigger->timespec = timespecs[i];
 			}
 		}
@@ -10212,7 +10212,7 @@ out:
  * Purpose: update availability of interfaces in configuration cache and      *
  *          return the updated field flags                                    *
  *                                                                            *
- * Parameters: availabilities - [IN/OUT] the interfacess availability data    *
+ * Parameters: availabilities - [IN/OUT] the interfaces availability data     *
  *                                                                            *
  * Return value: SUCCEED - at least one interface availability data           *
  *                         was updated                                        *
@@ -13358,8 +13358,8 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 			if (ps_win->flags != ds_win->flags)
 				ps_win->flags = ds_win->flags;
 
-			if (0 > ps_win->values_num)	/* some new values was processed faster than old */
-				ps_win->values_num = 0;	/* we will suppress more                         */
+			if (0 > ps_win->values_num)	/* some new values were processed faster than old */
+				ps_win->values_num = 0;	/* we will suppress more                          */
 
 			ps_win->values_num += ds_win->values_num;
 			diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN);

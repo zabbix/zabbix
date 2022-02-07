@@ -602,7 +602,7 @@ void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check is function to be evaluated for NOTSUPPORTED items          *
+ * Purpose: check if function is to be evaluated for NOTSUPPORTED items       *
  *                                                                            *
  * Parameters: fn - [IN] function name                                        *
  *                                                                            *

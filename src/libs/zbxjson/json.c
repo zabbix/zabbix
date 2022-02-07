@@ -477,9 +477,7 @@ int	zbx_json_close(struct zbx_json *j)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: return type of pointed value                                      *
- *                                                                            *
- * Return value: type of pointed value                                        *
+ * Return value: type of input value                                          *
  *                                                                            *
  ******************************************************************************/
 static zbx_json_type_t	__zbx_json_type(const char *p)
@@ -505,8 +503,6 @@ static zbx_json_type_t	__zbx_json_type(const char *p)
 }
 
 /******************************************************************************
- *                                                                            *
- * Purpose: return position of right bracket                                  *
  *                                                                            *
  * Return value: position of right bracket                                    *
  *               NULL - an error occurred                                     *

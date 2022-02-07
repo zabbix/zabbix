@@ -1933,7 +1933,7 @@ char	*DBget_unique_hostname_by_sample(const char *host_name_sample, const char *
 		if (num > nums.values[i])
 			continue;
 
-		if (num < nums.values[i])	/* found, all other will be bigger */
+		if (num < nums.values[i])	/* found, all others will be bigger */
 			break;
 
 		num++;
