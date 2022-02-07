@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-18T20:36:31Z'
+  date: '2022-01-26T10:42:28Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -35,8 +35,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: 'Monitoring agent'
+              tag: component
+              value: system
         -
           uuid: 05849e0fb6504d339f2aebe159427bec
           name: 'Zabbix agent ping'
@@ -47,8 +47,8 @@ zabbix_export:
             name: 'Zabbix agent ping status'
           tags:
             -
-              tag: Application
-              value: 'Monitoring agent'
+              tag: component
+              value: system
         -
           uuid: fe4731720ba64eebbf125929e499209b
           name: 'Version of Zabbix agent running'
@@ -64,8 +64,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: 'Monitoring agent'
+              tag: component
+              value: application
         -
           uuid: 2c2d08ab5833493ba45ebfe5154f04c1
           name: 'Number of running processes'
@@ -74,14 +74,21 @@ zabbix_export:
           description: 'Number of processes in running state.'
           tags:
             -
-              tag: Application
-              value: Processes
+              tag: component
+              value: os
+            -
+              tag: component
+              value: processes
           triggers:
             -
               uuid: 458180bc0f14468386429964f877cce7
               expression: 'avg(/AIX by Zabbix agent/proc.num[,,run],5m)>30'
               name: 'Too many processes running'
               priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 7c64480f840a4778bde5278e1c0a083f
           name: 'Number of processes'
@@ -90,14 +97,21 @@ zabbix_export:
           description: 'Total number of processes in any state.'
           tags:
             -
-              tag: Application
-              value: Processes
+              tag: component
+              value: os
+            -
+              tag: component
+              value: processes
           triggers:
             -
               uuid: 874ef8fe4a6445ff971800d2d9a50541
               expression: 'avg(/AIX by Zabbix agent/proc.num[],5m)>300'
               name: 'Too many processes'
               priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 4a15778222a24f129b8ae7c240a32ded
           name: 'Interrupts per second'
@@ -111,11 +125,8 @@ zabbix_export:
                 - ''
           tags:
             -
-              tag: Application
-              value: CPU
-            -
-              tag: Application
-              value: Performance
+              tag: component
+              value: cpu
         -
           uuid: 4f8665f48aff4fa39e85639fed7b71c5
           name: 'Processor load (1 min average per core)'
@@ -125,17 +136,18 @@ zabbix_export:
           description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
           tags:
             -
-              tag: Application
-              value: CPU
-            -
-              tag: Application
-              value: Performance
+              tag: component
+              value: cpu
           triggers:
             -
               uuid: fdbedf15fe474fd18c045c62cf8cc7d6
               expression: 'avg(/AIX by Zabbix agent/system.cpu.load[percpu,avg1],5m)>5'
               name: 'Processor load is too high'
               priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 6fa2275f1f83456abfe786c8565c7a2d
           name: 'Processor load (5 min average per core)'
@@ -145,11 +157,8 @@ zabbix_export:
           description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
           tags:
             -
-              tag: Application
-              value: CPU
-            -
-              tag: Application
-              value: Performance
+              tag: component
+              value: cpu
         -
           uuid: 02210ac2faaa4f7bb74e995726706abc
           name: 'Processor load (15 min average per core)'
@@ -159,11 +168,8 @@ zabbix_export:
           description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
           tags:
             -
-              tag: Application
-              value: CPU
-            -
-              tag: Application
-              value: Performance
+              tag: component
+              value: cpu
         -
           uuid: 1ad486947da9428abdebcecb83ca3d8b
           name: 'Context switches per second'
@@ -177,11 +183,8 @@ zabbix_export:
                 - ''
           tags:
             -
-              tag: Application
-              value: CPU
-            -
-              tag: Application
-              value: Performance
+              tag: component
+              value: cpu
         -
           uuid: f4d10d49fa3c4dababf03d2cb80f044c
           name: 'Host name'
@@ -199,17 +202,18 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: General
-            -
-              tag: Application
-              value: OS
+              tag: component
+              value: os
           triggers:
             -
               uuid: d1e70b7f465447a3ab575b3fd28755a1
               expression: 'last(/AIX by Zabbix agent/system.hostname,#1)<>last(/AIX by Zabbix agent/system.hostname,#2)'
               name: 'Hostname was changed'
               priority: INFO
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: aebc5bb0264a4f55985c96445964dfc4
           name: 'Host local time'
@@ -218,11 +222,8 @@ zabbix_export:
           units: unixtime
           tags:
             -
-              tag: Application
-              value: General
-            -
-              tag: Application
-              value: OS
+              tag: component
+              value: os
         -
           uuid: 081f8986446d43e7a3b72f7084576600
           name: 'CPU available physical processors in the shared pool'
@@ -232,14 +233,8 @@ zabbix_export:
           units: '%'
           tags:
             -
-              tag: Application
-              value: CPU
-            -
-              tag: Application
-              value: 'Logical partitions'
-            -
-              tag: Application
-              value: Performance
+              tag: component
+              value: cpu
         -
           uuid: 6a97d56a6c2e45e1b10b97e2395ff30d
           name: 'CPU entitled capacity consumed'
@@ -248,14 +243,8 @@ zabbix_export:
           value_type: FLOAT
           tags:
             -
-              tag: Application
-              value: CPU
-            -
-              tag: Application
-              value: 'Logical partitions'
-            -
-              tag: Application
-              value: Performance
+              tag: component
+              value: cpu
         -
           uuid: 142f33d7b2c3469c9664fedf4f053616
           name: 'CPU idle time'
@@ -265,11 +254,8 @@ zabbix_export:
           units: '%'
           tags:
             -
-              tag: Application
-              value: CPU
-            -
-              tag: Application
-              value: Performance
+              tag: component
+              value: cpu
         -
           uuid: 752c952fb18e4a0e8e5e3415b107b9f1
           name: 'CPU logical processor utilization'
@@ -279,14 +265,8 @@ zabbix_export:
           units: '%'
           tags:
             -
-              tag: Application
-              value: CPU
-            -
-              tag: Application
-              value: 'Logical partitions'
-            -
-              tag: Application
-              value: Performance
+              tag: component
+              value: cpu
         -
           uuid: 748f1316a33b48658b11dca8f45cfcce
           name: 'CPU number of physical processors consumed'
@@ -295,14 +275,8 @@ zabbix_export:
           value_type: FLOAT
           tags:
             -
-              tag: Application
-              value: CPU
-            -
-              tag: Application
-              value: 'Logical partitions'
-            -
-              tag: Application
-              value: Performance
+              tag: component
+              value: cpu
         -
           uuid: 2647132edb6647ca9ef43a00ca09ecbd
           name: 'CPU system time'
@@ -312,11 +286,8 @@ zabbix_export:
           units: '%'
           tags:
             -
-              tag: Application
-              value: CPU
-            -
-              tag: Application
-              value: Performance
+              tag: component
+              value: cpu
         -
           uuid: e990898ddbb74c7b9a8c1c67cb9544cf
           name: 'CPU user time'
@@ -326,11 +297,8 @@ zabbix_export:
           units: '%'
           tags:
             -
-              tag: Application
-              value: CPU
-            -
-              tag: Application
-              value: Performance
+              tag: component
+              value: cpu
         -
           uuid: 2cd7a00570ad487d9cdf39fd198b2c0b
           name: 'CPU iowait time'
@@ -340,11 +308,8 @@ zabbix_export:
           units: '%'
           tags:
             -
-              tag: Application
-              value: CPU
-            -
-              tag: Application
-              value: Performance
+              tag: component
+              value: cpu
           triggers:
             -
               uuid: c030cc99975d4fe3911789e58bbd5050
@@ -352,6 +317,10 @@ zabbix_export:
               name: 'Disk I/O is overloaded'
               priority: WARNING
               description: 'OS spends significant time waiting for I/O (input/output) operations. It could be indicator of performance issues with storage system.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 6748e4c87589472ca1474f3c7b729e0c
           name: 'Amount of data transferred'
@@ -361,11 +330,8 @@ zabbix_export:
           units: B
           tags:
             -
-              tag: Application
-              value: Filesystems
-            -
-              tag: Application
-              value: Performance
+              tag: component
+              value: storage
         -
           uuid: bf0180d8f109451db616749990a113a6
           name: 'Number of transfers'
@@ -374,11 +340,8 @@ zabbix_export:
           value_type: FLOAT
           tags:
             -
-              tag: Application
-              value: Filesystems
-            -
-              tag: Application
-              value: Performance
+              tag: component
+              value: storage
         -
           uuid: 3e1af0261f6a421d8ca554f8eb222716
           name: 'Processor units is entitled to receive'
@@ -388,11 +351,8 @@ zabbix_export:
           value_type: FLOAT
           tags:
             -
-              tag: Application
-              value: CPU
-            -
-              tag: Application
-              value: 'Logical partitions'
+              tag: component
+              value: cpu
         -
           uuid: 0fe71698a3c74c93a8cb3a937dc7226c
           name: 'Kernel thread context switches'
@@ -401,11 +361,8 @@ zabbix_export:
           value_type: FLOAT
           tags:
             -
-              tag: Application
-              value: CPU
-            -
-              tag: Application
-              value: Performance
+              tag: component
+              value: cpu
         -
           uuid: a1e13d2dbd8b4086974ea32a2cd743b1
           name: 'Device interrupts'
@@ -414,11 +371,8 @@ zabbix_export:
           value_type: FLOAT
           tags:
             -
-              tag: Application
-              value: CPU
-            -
-              tag: Application
-              value: Performance
+              tag: component
+              value: cpu
         -
           uuid: 883c7a12b1d54f4d8189ca0d9cc43102
           name: 'System calls'
@@ -427,11 +381,8 @@ zabbix_export:
           value_type: FLOAT
           tags:
             -
-              tag: Application
-              value: CPU
-            -
-              tag: Application
-              value: Performance
+              tag: component
+              value: cpu
         -
           uuid: f027ed1c43464d4ab9a13d4b9f647e7e
           name: 'Length of the swap queue'
@@ -440,11 +391,8 @@ zabbix_export:
           value_type: FLOAT
           tags:
             -
-              tag: Application
-              value: Memory
-            -
-              tag: Application
-              value: Performance
+              tag: component
+              value: memory
         -
           uuid: 6795c2b6914d4303bf30c71c7405ff7d
           name: 'Length of the run queue'
@@ -453,11 +401,8 @@ zabbix_export:
           value_type: FLOAT
           tags:
             -
-              tag: Application
-              value: CPU
-            -
-              tag: Application
-              value: Performance
+              tag: component
+              value: cpu
         -
           uuid: 12142f133863448c9c937c671e183bbb
           name: 'Active virtual pages'
@@ -465,8 +410,8 @@ zabbix_export:
           history: 1w
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: 3b4a5ff768654ff5a87b955684a0d7b5
           name: 'Free real memory'
@@ -474,8 +419,8 @@ zabbix_export:
           history: 1w
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: bf890bf5cd1748a5af9528a111ba43c4
           name: 'File page-ins per second'
@@ -484,8 +429,8 @@ zabbix_export:
           value_type: FLOAT
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: 19c4f7132b6c46aa9522bd46da3e8f03
           name: 'File page-outs per second'
@@ -494,8 +439,8 @@ zabbix_export:
           value_type: FLOAT
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: 9ff3f7faa76c414aae7c5babb91fe065
           name: 'Pages freed (page replacement)'
@@ -504,8 +449,8 @@ zabbix_export:
           value_type: FLOAT
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: 6009d8a0fc2f486db979b226eb975e78
           name: 'Pages paged in from paging space'
@@ -514,8 +459,8 @@ zabbix_export:
           value_type: FLOAT
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: 26fb1471e08c4c46800e4887d8bccd80
           name: 'Pages paged out to paging space'
@@ -524,8 +469,8 @@ zabbix_export:
           value_type: FLOAT
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: 83b1456726d448d6a756e03c0ec02342
           name: 'Pages scanned by page-replacement algorithm'
@@ -534,8 +479,8 @@ zabbix_export:
           value_type: FLOAT
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: d0ef675d313849269890d06c7e003c9e
           name: 'System information'
@@ -553,17 +498,18 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: General
-            -
-              tag: Application
-              value: OS
+              tag: component
+              value: os
           triggers:
             -
               uuid: 3a736e64211744aea480a60b2c48a036
               expression: 'last(/AIX by Zabbix agent/system.uname,#1)<>last(/AIX by Zabbix agent/system.uname,#2)'
               name: 'Host information was changed'
               priority: INFO
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 2e0ff86c992c4a098af8cb1bee0f0001
           name: 'System uptime'
@@ -573,17 +519,18 @@ zabbix_export:
           units: uptime
           tags:
             -
-              tag: Application
-              value: General
-            -
-              tag: Application
-              value: OS
+              tag: component
+              value: os
           triggers:
             -
               uuid: 03a2cd88b6a64d3ea4c9bb2abbc4ae2d
               expression: 'change(/AIX by Zabbix agent/system.uptime)<0'
               name: 'Server has just been restarted'
               priority: INFO
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 980a59760ef9481298ed35322841f939
           name: 'Number of logged in users'
@@ -592,11 +539,8 @@ zabbix_export:
           description: 'Number of users who are currently logged in.'
           tags:
             -
-              tag: Application
-              value: OS
-            -
-              tag: Application
-              value: Security
+              tag: component
+              value: os
         -
           uuid: 4771d6d33c2247d6843198152a7065a8
           name: 'Checksum of /etc/passwd'
@@ -605,14 +549,18 @@ zabbix_export:
           history: 1w
           tags:
             -
-              tag: Application
-              value: Security
+              tag: component
+              value: security
           triggers:
             -
               uuid: c75ee957fd6c43b2aba9919d5e1af4a1
               expression: 'last(/AIX by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/AIX by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#2)'
               name: '/etc/passwd has been changed'
               priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: security
         -
           uuid: 6d4d9deab17b42f4a953c5210acac6f1
           name: 'Available memory'
@@ -622,14 +570,21 @@ zabbix_export:
           description: 'Available memory is defined as free+cached+buffers memory.'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
           triggers:
             -
               uuid: 80b6406fb8474fa9801e9dffb2ccd368
               expression: 'last(/AIX by Zabbix agent/vm.memory.size[available])<20M'
               name: 'Lack of available memory on server'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 57d30ccd5db64dc8b9498a36efe768e9
           name: 'Total memory'
@@ -639,8 +594,8 @@ zabbix_export:
           units: B
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: 304a3e9bb7594c83b027a32c34aeab28
           name: 'Zabbix agent availability'
@@ -652,8 +607,8 @@ zabbix_export:
             name: zabbix.host.available
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: f0b9ecafede8476b94fd8dcab74cea87
@@ -662,6 +617,10 @@ zabbix_export:
               priority: AVERAGE
               description: 'For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: 409cce8967b4494bbcc5193a26c69b06
@@ -693,8 +652,11 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Network interfaces'
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 0704fb302aa94f73bedade3a998a0fa3
               name: 'Interface {#IFNAME}: Outgoing network traffic'
@@ -712,8 +674,11 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Network interfaces'
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
           graph_prototypes:
             -
               uuid: 366a988491344fd487561d02ed499fe0
@@ -752,14 +717,24 @@ zabbix_export:
               units: '%'
               tags:
                 -
-                  tag: Application
-                  value: Filesystems
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
               trigger_prototypes:
                 -
                   uuid: 6ce467d05e8745409a177799bed34bb3
                   expression: 'last(/AIX by Zabbix agent/vfs.fs.inode[{#FSNAME},pfree])<20'
                   name: '{#FSNAME}: Free inodes is less than 20%'
                   priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 13e212598f744a7fa535c23731190c61
               name: '{#FSNAME}: Free disk space'
@@ -768,8 +743,11 @@ zabbix_export:
               units: B
               tags:
                 -
-                  tag: Application
-                  value: Filesystems
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
             -
               uuid: 428b0314dd574df1970dd2cae7e8889b
               name: '{#FSNAME}: Free disk space, %'
@@ -779,14 +757,24 @@ zabbix_export:
               units: '%'
               tags:
                 -
-                  tag: Application
-                  value: Filesystems
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
               trigger_prototypes:
                 -
                   uuid: 74a1fc62bfe24b7eabe4e244c70dc384
                   expression: 'last(/AIX by Zabbix agent/vfs.fs.size[{#FSNAME},pfree])<20'
                   name: '{#FSNAME}: Free disk space is less than 20%'
                   priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 6f6c92bc72014612b2efb92d12d8c425
               name: '{#FSNAME}: Total disk space'
@@ -796,8 +784,11 @@ zabbix_export:
               units: B
               tags:
                 -
-                  tag: Application
-                  value: Filesystems
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
             -
               uuid: 915e72271f134684b2d10d05d4035962
               name: '{#FSNAME}: Used disk space'
@@ -806,8 +797,11 @@ zabbix_export:
               units: B
               tags:
                 -
-                  tag: Application
-                  value: Filesystems
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
           graph_prototypes:
             -
               uuid: 460b553fcd924b6abbde0b00a5525445
@@ -824,6 +818,13 @@ zabbix_export:
                   item:
                     host: 'AIX by Zabbix agent'
                     key: 'vfs.fs.size[{#FSNAME},free]'
+      tags:
+        -
+          tag: class
+          value: os
+        -
+          tag: target
+          value: aix
       macros:
         -
           macro: '{$AGENT.TIMEOUT}'

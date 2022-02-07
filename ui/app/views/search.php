@@ -92,8 +92,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 		? new CLink(_('Graphs'),
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'charts.view')
-				->setArgument('view_as', HISTORY_GRAPH)
-				->setArgument('filter_hostids[]', $hostid)
+				->setArgument('filter_hostids', (array) $hostid)
 				->setArgument('filter_set', '1')
 		)
 		: _('Graphs');

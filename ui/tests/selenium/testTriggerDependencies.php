@@ -19,21 +19,60 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
 /**
- * @backup trigger_depends
+ * @backup trigger_depends, hosts_templates
+ *
+ * @onBefore prepareTemplateData
  */
 class testTriggerDependencies extends CLegacyWebTest {
+	const TEMPLATE_AGENT = 'Zabbix agent';
+	const TEMPLATE_FREEBSD = 'FreeBSD by Zabbix agent';
+	const TEMPLATE_APACHE = 'Apache by HTTP';
+
+	protected static $agent_templateid;
+	protected static $freebsd_templateid;
+	protected static $apache_templateid;
 
 	/**
-	* @dataProvider testTriggerDependenciesFromHost_SimpleTestProvider
-	*/
-	public function testTriggerDependenciesFromHost_SimpleTest($hostId, $trigger, $template, $dependencies, $expected) {
-		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
+	 * Function links Zabbix agent template to FreeBSD by Zabbix agent template.
+	 */
+	public static function prepareTemplateData() {
+		$template_ids = CDBHelper::getAll('SELECT hostid FROM hosts WHERE host IN ('.zbx_dbstr(self::TEMPLATE_AGENT).','.
+				zbx_dbstr(self::TEMPLATE_FREEBSD).','.zbx_dbstr(self::TEMPLATE_APACHE).') ORDER BY host ASC'
+		);
 
-		$this->zbxTestLogin('triggers.php?filter_set=1&context=template&filter_hostids[0]='.$hostId);
+		self::$apache_templateid = $template_ids[0]['hostid'];
+		self::$freebsd_templateid = $template_ids[1]['hostid'];
+		self::$agent_templateid = $template_ids[2]['hostid'];
+
+		CDataHelper::call('template.update', [
+			[
+				'templateid' => self::$freebsd_templateid,
+				'templates' => [
+					[
+						'templateid' => self::$agent_templateid
+					]
+				]
+			]
+		]);
+	}
+
+	/**
+	 * @dataProvider getTriggerDependenciesData
+	 */
+	public function testTriggerDependenciesFromHost_SimpleTest($trigger, $template, $dependencies, $expected) {
+		// Get the id of template to be updated based on the template that owns the trigger in dependencies tab.
+		$ids = [
+			self::TEMPLATE_AGENT => self::$agent_templateid,
+			self::TEMPLATE_APACHE => self::$apache_templateid
+		];
+		$update_id = ($template === self::TEMPLATE_APACHE) ? $ids[self::TEMPLATE_APACHE] : $ids[self::TEMPLATE_AGENT];
+
+		$this->zbxTestLogin('triggers.php?filter_set=1&context=template&filter_hostids[0]='.$update_id);
 		$this->zbxTestCheckTitle('Configuration of triggers');
 
 		$this->zbxTestClickLinkTextWait($trigger);
@@ -52,33 +91,29 @@ class testTriggerDependencies extends CLegacyWebTest {
 		$this->zbxTestTextPresent($expected);
 	}
 
-	public function testTriggerDependenciesFromHost_SimpleTestProvider() {
+	public function getTriggerDependenciesData() {
 		return [
 			[
-				'10050',
 				'Zabbix agent is not available (for {$AGENT.TIMEOUT})',
-				'FreeBSD',
-				'/etc/passwd has been changed on FreeBSD',
+				self::TEMPLATE_FREEBSD,
+				'/etc/passwd has been changed on FreeBSD by Zabbix agent',
 				'Not all templates are linked to'
 			],
 			[
-				'10265',
 				'Apache: Service is down',
-				'Apache by HTTP',
+				self::TEMPLATE_APACHE,
 				'Apache: Service response time is too high (over 10s for 5m)',
 				'Cannot create circular dependencies.'
 			],
 			[
-				'10265',
 				'Apache: has been restarted (uptime < 10m)',
-				'Apache by HTTP',
+				self::TEMPLATE_APACHE,
 				'Apache: has been restarted (uptime < 10m)',
 				'Cannot create dependency on trigger itself.'
 			],
 			[
-				'10265',
 				'Apache: has been restarted (uptime < 10m)',
-				'Apache by HTTP',
+				self::TEMPLATE_APACHE,
 				'Apache: Service is down',
 				'Trigger updated'
 			]

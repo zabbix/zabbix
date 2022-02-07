@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-18T20:42:20Z'
+  date: '2022-01-26T14:15:36Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -34,8 +34,11 @@ zabbix_export:
             name: 'Service state'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: f186488b337f4b1b8971992e8118d9cc
@@ -43,6 +46,10 @@ zabbix_export:
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: ef0432ffcf0546bf82177193866861cf
           name: 'ICMP loss'
@@ -53,8 +60,11 @@ zabbix_export:
           units: '%'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 46798adec54c47a38cb599773767a2a7
@@ -66,6 +76,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Dell Force S-Series SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 9b56a2a725bf4632bc28c6a5d0c3d64b
           name: 'ICMP response time'
@@ -76,8 +93,11 @@ zabbix_export:
           units: s
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 04828676081147b4bfad0ad03385986e
@@ -92,6 +112,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Dell Force S-Series SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: ba8178338b0e41ac97b0265f98b90770
           name: 'SNMP traps (fallback)'
@@ -104,8 +131,8 @@ zabbix_export:
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: network
         -
           uuid: d4df70f2c5f04ad2b7f1b4e8ab9a9993
           name: 'System contact details'
@@ -127,8 +154,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 804476e771374e22b8767f90f271654a
           name: 'System description'
@@ -151,8 +178,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: f3d1970fc4404b4fa50a855433681105
           name: 'System location'
@@ -174,8 +201,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: a36cccdaf24c4e82801ebb44eaa5e25a
           name: 'System name'
@@ -197,8 +224,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: 2dc35c5813b042fd96f2ebc53f565799
@@ -207,6 +234,13 @@ zabbix_export:
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: security
         -
           uuid: 651059497914431f827ad82a982e139b
           name: 'System object ID'
@@ -227,8 +261,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 26a0a117545f4b17986f0b48996fec47
           name: Uptime
@@ -249,8 +283,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: 4246a064d33f428c8441491402ae8090
@@ -263,6 +297,10 @@ zabbix_export:
                 -
                   name: 'No SNMP data collection'
                   expression: 'max(/Dell Force S-Series SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 7ce4f98cdc6741bbb03f6e2ea03432c4
           name: 'SNMP agent availability'
@@ -279,8 +317,11 @@ zabbix_export:
             name: zabbix.host.available
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: da99689aa1394d17af5008e5678915bc
@@ -293,6 +334,10 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Dell Force S-Series SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: f35cb754ebd748b7842c67461264f48d
@@ -318,8 +363,8 @@ zabbix_export:
                 name: 'F10-S-SERIES-CHASSIS-MIB::chSysFanTrayOperStatus'
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
               trigger_prototypes:
                 -
                   uuid: aecc6fdd58404347b3074b0c1db63f09
@@ -328,6 +373,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: a53271304dcf418aa5afdaa145436b70
                   expression: 'count(/Dell Force S-Series SNMP/sensor.fan.status[chSysFanTrayOperStatus.{#SNMPINDEX}],#1,"ne","{$FAN_OK_STATUS}")=1'
@@ -339,6 +391,10 @@ zabbix_export:
                     -
                       name: 'Fan {#SNMPVALUE}: Fan is in critical state'
                       expression: 'count(/Dell Force S-Series SNMP/sensor.fan.status[chSysFanTrayOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
         -
           uuid: ff38ddf97a2a47c88ad93d590dedc22a
           name: 'CPU and Memory and Flash Discovery'
@@ -361,8 +417,8 @@ zabbix_export:
                 CPU utilization in percentage for last 1 minute.
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
               trigger_prototypes:
                 -
                   uuid: 002c0f19cfe54fe08da2183654752470
@@ -371,6 +427,10 @@ zabbix_export:
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'CPU utilization is too high. The system might be slow to respond.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 3571d6508f07442983936fdcc2ba733f
               name: '#{#SNMPINDEX}: Memory utilization'
@@ -385,8 +445,8 @@ zabbix_export:
                 Total memory usage in percentage.
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
               trigger_prototypes:
                 -
                   uuid: 41baaaa2eb6246b7982ac76928fbd0f8
@@ -394,6 +454,13 @@ zabbix_export:
                   name: '#{#SNMPINDEX}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: d5ec0b9ce1f04b0abd0b4bfe6aa28f6b
@@ -507,8 +574,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 5a61f0168e034e8baf6794cf5cc5ce70
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
@@ -527,8 +600,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 19e183dbf814471e885f2fef4b84e759
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
@@ -552,8 +631,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 26135962ebd246ce82b3d101e7eb92a4
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
@@ -576,8 +661,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: e3b1efbafa204424b0a61cf877ad168b
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
@@ -596,8 +687,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 6994853a31054989b1e0fc25420f88b1
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
@@ -621,8 +718,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: cd36f7b9176349d1a5b69c7eef672986
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
@@ -647,8 +750,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: cf571531ada84121a94e1084070560c0
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
@@ -670,8 +779,14 @@ zabbix_export:
                 name: 'IF-MIB::ifOperStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: b7b55335f42b4ace8434588bc70f7e60
@@ -689,6 +804,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: ec1b53ae24ff443083ab691e1826734f
               name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
@@ -712,8 +831,14 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
           trigger_prototypes:
             -
               uuid: f4903edf173f470482174ee9937cbb32
@@ -743,6 +868,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Dell Force S-Series SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Dell Force S-Series SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Dell Force S-Series SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Dell Force S-Series SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: e85a287c2e0e48e19cb43bf74d3f3535
               expression: |
@@ -763,6 +892,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Dell Force S-Series SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Dell Force S-Series SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Dell Force S-Series SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Dell Force S-Series SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 00d2988bdd084719ba781562920d20fa
               expression: |
@@ -782,6 +915,13 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Dell Force S-Series SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Dell Force S-Series SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Dell Force S-Series SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Dell Force S-Series SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
           graph_prototypes:
             -
               uuid: 2841f46964a74c56b5d16233c924bc58
@@ -885,8 +1025,14 @@ zabbix_export:
                 name: 'EtherLike-MIB::dot3StatsDuplexStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: edc143c44b2d465cac94c4cf0fb588a6
@@ -895,6 +1041,10 @@ zabbix_export:
                   priority: WARNING
                   description: 'Please check autonegotiation settings and cabling'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
           preprocessing:
             -
               type: JAVASCRIPT
@@ -938,8 +1088,8 @@ zabbix_export:
                 name: 'F10-S-SERIES-CHASSIS-MIB::chSysPowerSupplyOperStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Power supply'
+                  tag: component
+                  value: power
               trigger_prototypes:
                 -
                   uuid: 764f08ab7a29481fa73a63ae256ff154
@@ -948,6 +1098,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: a7d4ac882ec24cce9839c6012c7fa562
                   expression: 'count(/Dell Force S-Series SNMP/sensor.psu.status[chSysPowerSupplyOperStatus.{#SNMPINDEX}],#1,"ne","{$PSU_OK_STATUS}")=1'
@@ -959,6 +1116,10 @@ zabbix_export:
                     -
                       name: 'PSU {#SNMPVALUE}: Power supply is in critical state'
                       expression: 'count(/Dell Force S-Series SNMP/sensor.psu.status[chSysPowerSupplyOperStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
         -
           uuid: a619474b839642f69e583a2c63e8b4ba
           name: 'Stack Unit Discovery'
@@ -981,8 +1142,8 @@ zabbix_export:
                 The temperature of the unit.
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: dc1064de6a6b4533be812e590b96927b
@@ -993,6 +1154,13 @@ zabbix_export:
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: f4d0a2c0b1a9468990e1f6dbfef1ab75
                   expression: 'avg(/Dell Force S-Series SNMP/sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}],5m)>{$TEMP_WARN:""}'
@@ -1007,6 +1175,13 @@ zabbix_export:
                       name: 'Device {#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
                       expression: 'avg(/Dell Force S-Series SNMP/sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
                       recovery_expression: 'max(/Dell Force S-Series SNMP/sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: f1bbf02af05041ef95ff80ff18fc02a7
                   expression: 'avg(/Dell Force S-Series SNMP/sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
@@ -1015,6 +1190,13 @@ zabbix_export:
                   name: 'Device {#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: d6e3d7bb74b84e0c895a1b1b740f0e14
               name: '#{#SNMPVALUE}: Hardware model name'
@@ -1035,8 +1217,8 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: Inventory
+                  tag: component
+                  value: system
             -
               uuid: eb6853c30dd04581b2e362d7747b40b5
               name: '#{#SNMPVALUE}: Hardware serial number'
@@ -1057,8 +1239,8 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: Inventory
+                  tag: component
+                  value: system
               trigger_prototypes:
                 -
                   uuid: 6f02e903dab24bf294015f43e0b52504
@@ -1067,6 +1249,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: bd68fcd8247744cb8c10e3dfc699bc7f
               name: '#{#SNMPVALUE}: Hardware version(revision)'
@@ -1087,8 +1273,8 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: Inventory
+                  tag: component
+                  value: system
             -
               uuid: 67cce945315e426f9b12456fe95a6c1a
               name: '#{#SNMPVALUE}: Operating system'
@@ -1109,8 +1295,8 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: Inventory
+                  tag: component
+                  value: os
               trigger_prototypes:
                 -
                   uuid: 66049aa1d7cb45ebac1fe5292c309ba2
@@ -1123,6 +1309,20 @@ zabbix_export:
                     -
                       name: 'System name has changed (new name: {ITEM.VALUE})'
                       expression: 'last(/Dell Force S-Series SNMP/system.name,#1)<>last(/Dell Force S-Series SNMP/system.name,#2) and length(last(/Dell Force S-Series SNMP/system.name))>0'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+      tags:
+        -
+          tag: class
+          value: network
+        -
+          tag: target
+          value: dell
+        -
+          tag: target
+          value: force-s-series
       macros:
         -
           macro: '{$CPU.UTIL.CRIT}'

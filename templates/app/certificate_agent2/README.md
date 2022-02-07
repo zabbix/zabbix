@@ -58,7 +58,7 @@ There are no template links in this template.
 |General |Cert: Subject alternative name |<p>The subject alternative name extension allows identities to be bound to the subject of the certificate.  These identities may be included in addition to or in place of the identity in the subject field of the certificate.  Defined options include an Internet electronic mail address, a DNS name, an IP address, and a Uniform Resource Identifier (URI).</p> |DEPENDENT |cert.alternative_names<p>**Preprocessing**:</p><p>- JSONPATH: `$.x509.alternative_names`</p> |
 |General |Cert: Public key algorithm |<p>The digital signature algorithm is used to verify the signature of a certificate.</p> |DEPENDENT |cert.public_key_algorithm<p>**Preprocessing**:</p><p>- JSONPATH: `$.x509.public_key_algorithm`</p> |
 |General |Cert: Fingerprint |<p>The Certificate Signature (SHA1 Fingerprint or Thumbprint) is the hash of the entire certificate in DER form.</p> |DEPENDENT |cert.sha1_fingerprint<p>**Preprocessing**:</p><p>- JSONPATH: `$.sha1_fingerprint`</p> |
-|Zabbix_raw_items |Cert: Get |<p>Returns the JSON with attributes of a certificate of the requested site.</p> |ZABBIX_PASSIVE |web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
+|Zabbix raw items |Cert: Get |<p>Returns the JSON with attributes of a certificate of the requested site.</p> |ZABBIX_PASSIVE |web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 
 ## Triggers
 
@@ -72,5 +72,5 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/428309-discussion-thread-for-official-zabbix-template-tls-ssl-certificates-monitoring).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/428309-discussion-thread-for-official-zabbix-template-tls-ssl-certificates-monitoring).
 

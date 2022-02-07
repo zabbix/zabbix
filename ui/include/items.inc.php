@@ -2283,7 +2283,8 @@ function normalizeItemPreprocessingSteps(array $preprocessing): array {
 			'error_handler_params' => ''
 		];
 
-		unset($step['on_fail']);
+		// Remove fictional fields that don't belong to DB and API.
+		unset($step['sortorder'], $step['on_fail']);
 	}
 	unset($step);
 

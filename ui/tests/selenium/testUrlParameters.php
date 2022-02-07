@@ -578,65 +578,68 @@ class testUrlParameters extends CLegacyWebTest {
 				'server_name_on_page' => false,
 				'test_cases' => [
 					[
-						'url' => 'zabbix.php?view_as=showgraph&action=charts.view&filter_graphids%5B%5D=524&filter_set=1',
+						'url' => 'zabbix.php?action=charts.view&filter_hostids%5B%5D=66666&filter_show=2&filter_set=1',
 						'text_present' => [
 							'No permissions to referred object or it does not exist!'
 						]
 					],
 					[
-						'url' => 'zabbix.php?view_as=showgraph&action=charts.view&filter_graphids%5B%5D=524&'.
-								'filter_graphids%5B%5D=700018&filter_set=1',
-						'text_present' => [
-							'No permissions to referred object or it does not exist!',
-							'Host to check graph 1: Check graph 1'
-						]
-					],
-					[
-						'url' => 'zabbix.php?view_as=showgraph&action=charts.view&filter_hostids%5B%5D=666666&filter_set=1',
+						'url' => 'zabbix.php?action=charts.view&filter_hostids%5B%5D=99012&filter_hostids%5B%5D=66666&'.
+								'filter_show=1&filter_set=1',
 						'text_present' => [
 							'No permissions to referred object or it does not exist!'
 						]
 					],
 					[
-						'url' => 'zabbix.php?view_as=showgraph&action=charts.view&filter_hostids%5B%5D=50011&'.
-						'filter_graphids%5B%5D=524&filter_set=1',
+						'url' => 'zabbix.php?action=charts.view&filter_hostids%5B%5D=50011&filter_hostids%5B%5D=66666&'.
+						'filter_name=2_item&filter_show=0&filter_set=1',
 						'text_present' => [
-							'No permissions to referred object or it does not exist!',
-							'1_Host_to_check_Monitoring_Overview'
+							'No permissions to referred object or it does not exist!'
 						]
 					],
 					[
-						'url' => 'zabbix.php?view_as=showgraph&action=charts.view&filter_graphids%5B%5D=abc&filter_set=1',
+						'url' => 'zabbix.php?action=charts.view&filter_hostids%5B0%5D=abc&filter_show=1&filter_set=1',
 						'text_not_present' => 'Graphs',
 						'fatal_error' => true,
 						'text_present' => [
 							'Fatal error, please report to the Zabbix team',
-							'Incorrect value for "filter_graphids" field.'
+							'Incorrect value for "filter_hostids" field.'
 						]
 					],
 					[
-						'url' => 'zabbix.php?view_as=showgraph&action=charts.view&filter_graphids%5B%5D=&filter_set=1',
+						'url' => 'zabbix.php?action=charts.view&filter_hostids%5B0%5D=-1&filter_show=1&filter_set=1',
 						'text_not_present' => 'Graphs',
 						'fatal_error' => true,
 						'text_present' => [
 							'Fatal error, please report to the Zabbix team',
-							'Incorrect value for "filter_graphids" field.'
+							'Incorrect value for "filter_hostids" field.'
+						]
+					]
+				]
+			],
+			[
+				'title' => 'History [refreshed every 30 sec.]',
+				'check_server_name' => true,
+				'server_name_on_page' => false,
+				'test_cases' => [
+					[
+						'url' => 'history.php?action=showgraph&itemids%5B%5D=66666',
+						'text_present' => [
+							'No permissions to referred object or it does not exist!'
 						]
 					],
 					[
-						'url' => 'zabbix.php?view_as=showgraph&action=charts.view&filter_graphids%5B%5D=-1&filter_set=1',
-						'text_not_present' => 'Graphs',
-						'fatal_error' => true,
+						'url' => 'history.php?action=showgraph&itemids%5B%5D=',
 						'text_present' => [
-							'Fatal error, please report to the Zabbix team',
-							'Incorrect value for "filter_graphids" field.'
+							'Zabbix has received an incorrect request.',
+							'Field "itemids" is not integer.'
 						]
 					],
 					[
-						'url' => 'zabbix.php?action=charts.view&filter_set=1',
+						'url' => 'history.php?action=showgraph&itemids%5B%5D=abc',
 						'text_present' => [
-							'Graphs',
-							'Specify host to see the graphs.'
+							'Zabbix has received an incorrect request.',
+							'Field "itemids" is not integer.'
 						]
 					]
 				]

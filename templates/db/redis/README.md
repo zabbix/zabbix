@@ -51,11 +51,11 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Keyspace discovery |<p>Individual keyspace metrics</p> |DEPENDENT |redis.keyspace.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>**Filter**:</p>AND <p>- {#DB} MATCHES_REGEX `{$REDIS.LLD.FILTER.DB.MATCHES}`</p><p>- {#DB} NOT_MATCHES_REGEX `{$REDIS.LLD.FILTER.DB.NOT_MATCHES}`</p> |
 |AOF metrics discovery |<p>If AOF is activated, additional metrics will be added</p> |DEPENDENT |redis.persistence.aof.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
-|Slave metrics discovery |<p>If the instance is a replica, additional metrics are provided</p> |DEPENDENT |redis.replication.slave.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
-|Replication metrics discovery |<p>If the instance is the master and the slaves are connected, additional metrics are provided</p> |DEPENDENT |redis.replication.master.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
+|Keyspace discovery |<p>Individual keyspace metrics</p> |DEPENDENT |redis.keyspace.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>**Filter**:</p>AND <p>- {#DB} MATCHES_REGEX `{$REDIS.LLD.FILTER.DB.MATCHES}`</p><p>- {#DB} NOT_MATCHES_REGEX `{$REDIS.LLD.FILTER.DB.NOT_MATCHES}`</p> |
 |Process metrics discovery |<p>Collect metrics by Zabbix agent if it exists</p> |ZABBIX_PASSIVE |proc.num["{$REDIS.LLD.PROCESS_NAME}"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return JSON.stringify(value > 0 ? [{'{#SINGLETON}': ''}] : []);`</p> |
+|Replication metrics discovery |<p>If the instance is the master and the slaves are connected, additional metrics are provided</p> |DEPENDENT |redis.replication.master.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
+|Slave metrics discovery |<p>If the instance is a replica, additional metrics are provided</p> |DEPENDENT |redis.replication.slave.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |Version 4+ metrics discovery |<p>Additional metrics for versions 4+</p> |DEPENDENT |redis.metrics.v4.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.Server.redis_version`</p><p>- JAVASCRIPT: `return JSON.stringify(parseInt(value.split('.')[0]) >= 4 ? [{'{#SINGLETON}': ''}] : []);`</p> |
 |Version 5+ metrics discovery |<p>Additional metrics for versions 5+</p> |DEPENDENT |redis.metrics.v5.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.Server.redis_version`</p><p>- JAVASCRIPT: `return JSON.stringify(parseInt(value.split('.')[0]) >= 5 ? [{'{#SINGLETON}': ''}] : []);`</p> |
 
@@ -186,8 +186,8 @@ There are no template links in this template.
 |Redis |Redis: Memory clients normal{#SINGLETON} |<p>-</p> |DEPENDENT |redis.memory.mem_clients_normal[{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Memory.mem_clients_normal`</p> |
 |Redis |Redis: Memory clients slaves{#SINGLETON} |<p>-</p> |DEPENDENT |redis.memory.mem_clients_slaves[{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Memory.mem_clients_slaves`</p> |
 |Redis |Redis: Memory AOF buffer{#SINGLETON} |<p>Size of the AOF buffer</p> |DEPENDENT |redis.memory.mem_aof_buffer[{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Memory.mem_aof_buffer`</p> |
-|Zabbix_raw_items |Redis: Get info | |ZABBIX_PASSIVE |redis.info["{$REDIS.CONN.URI}"] |
-|Zabbix_raw_items |Redis: Get config | |ZABBIX_PASSIVE |redis.config["{$REDIS.CONN.URI}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Zabbix raw items |Redis: Get info | |ZABBIX_PASSIVE |redis.info["{$REDIS.CONN.URI}"] |
+|Zabbix raw items |Redis: Get config | |ZABBIX_PASSIVE |redis.config["{$REDIS.CONN.URI}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 
 ## Triggers
 
@@ -214,5 +214,5 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/389050-discussion-thread-for-official-zabbix-template-redis).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/389050-discussion-thread-for-official-zabbix-template-redis).
 

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-16T08:28:32Z'
+  date: '2022-01-26T10:32:20Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -13,7 +13,7 @@ zabbix_export:
       description: |
         Use this template for agents reachable from Zabbix server/proxy (passive mode).
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Modules
@@ -33,8 +33,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: 'Monitoring agent'
+              tag: component
+              value: system
         -
           uuid: 37a952edc12f47d6ac6f3ca04eb41326
           name: 'Zabbix agent ping'
@@ -45,8 +45,8 @@ zabbix_export:
             name: 'Zabbix agent ping status'
           tags:
             -
-              tag: Application
-              value: 'Monitoring agent'
+              tag: component
+              value: system
         -
           uuid: 3a6af03a083b4366bd1d4c6ccf06ca88
           name: 'Version of Zabbix agent running'
@@ -62,8 +62,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: 'Monitoring agent'
+              tag: component
+              value: application
         -
           uuid: 49708b126e3844b898d2625f77c0030c
           name: 'Zabbix agent availability'
@@ -75,8 +75,8 @@ zabbix_export:
             name: zabbix.host.available
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: 6767f9c764bb42dfa961baacf879f45c
@@ -85,6 +85,17 @@ zabbix_export:
               priority: AVERAGE
               description: 'For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: zabbix-agent
       macros:
         -
           macro: '{$AGENT.TIMEOUT}'
@@ -118,7 +129,7 @@ zabbix_export:
       description: |
         Use this template instead of 'Template Module Zabbix agent' for agents running in active mode only.
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Modules
@@ -139,8 +150,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: 'Monitoring agent'
+              tag: component
+              value: system
         -
           uuid: 0f86ec6cde2249f7946c678f9fd2665a
           name: 'Zabbix agent ping'
@@ -152,8 +163,8 @@ zabbix_export:
             name: 'Zabbix agent ping status'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: 6bbb74c522d44baea8c6ceb666423da2
@@ -162,6 +173,10 @@ zabbix_export:
               priority: AVERAGE
               description: 'For active agents, nodata() with agent.ping is used with {$AGENT.NODATA_TIMEOUT} as time threshold.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 41fb0f76fa1d464f8ab67f744fc29e8b
           name: 'Version of Zabbix agent running'
@@ -178,8 +193,15 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: 'Monitoring agent'
+              tag: component
+              value: application
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: zabbix-agent
       macros:
         -
           macro: '{$AGENT.NODATA_TIMEOUT}'
