@@ -138,9 +138,6 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 		return nil, err
 	}
 
-	// fmt.Println("basicDev", basicDev)
-	// fmt.Println("raidDev", raidDev)
-
 	r := &runner{
 		names:    make(chan string, len(basicDev)),
 		err:      make(chan error, cpuCount),
