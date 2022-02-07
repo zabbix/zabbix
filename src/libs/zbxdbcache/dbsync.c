@@ -1831,7 +1831,7 @@ static char	**dbsync_item_preproc_row(char **row)
 			}
 		}
 
-		row[50] = encode_expression(&ctx);
+		row[49] = encode_expression(&ctx);
 		zbx_eval_clear(&ctx);
 	}
 
