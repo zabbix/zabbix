@@ -185,6 +185,7 @@ require_once dirname(__FILE__).'/dashboard/testFormTemplateDashboards.php';
 require_once dirname(__FILE__).'/dashboard/testPageTemplateDashboards.php';
 require_once dirname(__FILE__).'/geomaps/testFormGeographicalMaps.php';
 require_once dirname(__FILE__).'/geomaps/testFormGeomapWidget.php';
+require_once dirname(__FILE__).'/geomaps/testGeomapWidgetScreenshots.php';
 require_once dirname(__FILE__).'/reports/testPageReportsActionLog.php';
 require_once dirname(__FILE__).'/reports/testPageReportsAudit.php';
 require_once dirname(__FILE__).'/reports/testPageReportsNotifications.php';
@@ -284,6 +285,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormFilterProblems');
 		$suite->addTestSuite('testFormGeographicalMaps');
 		$suite->addTestSuite('testFormGeomapWidget');
+		$suite->addTestSuite('testGeomapWidgetScreenshots');
 		$suite->addTestSuite('testFormGraph');
 		$suite->addTestSuite('testFormGraphPrototype');
 		$suite->addTestSuite('testFormHostConfiguration');
