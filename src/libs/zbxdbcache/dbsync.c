@@ -3785,8 +3785,8 @@ int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync)
 	char			**row;
 
 	if (NULL == (result = DBselect(
-			"select pp.item_preprocid,pp.itemid,pp.type,pp.params,pp.step,i.hostid,pp.error_handler,"
-				"pp.error_handler_params,i.type,i.key_,h.proxy_hostid"
+			"select pp.item_preprocid,pp.itemid,pp.type,pp.params,pp.step,h.hostid,pp.error_handler,"
+				"pp.error_handler_params"
 			" from item_preproc pp,items i,hosts h"
 			" where pp.itemid=i.itemid"
 				" and i.hostid=h.hostid"
@@ -3816,17 +3816,6 @@ int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync)
 	while (NULL != (dbrow = DBfetch(result)))
 	{
 		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
-		unsigned char	type;
-
-		ZBX_STR2UCHAR(type, dbrow[8]);
-
-		/* Sync preproccessing for all dependent items as they can depend on item processed by Zabbx server, */
-		/* avoid syncing preprocessing for internal items monitored by Zabbix proxy                          */
-		if (type != ITEM_TYPE_DEPENDENT && SUCCEED != DBis_null(dbrow[10]) &&
-				SUCCEED != is_item_processed_by_server(type, dbrow[9]))
-		{
-			continue;
-		}
 
 		ZBX_STR2UINT64(rowid, dbrow[0]);
 		zbx_hashset_insert(&ids, &rowid, sizeof(rowid));
