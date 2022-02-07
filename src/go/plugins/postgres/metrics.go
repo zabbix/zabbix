@@ -246,7 +246,7 @@ var metrics = metric.MetricSet{
 
 	keyQueries: metric.New("Returns queries statistic.",
 		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase,
-			metric.NewParam("TimePeriod", "Time period limit for count of slow queries.").SetRequired(),
+			metric.NewParam("TimePeriod", "Execution time limit for count of slow queries.").SetRequired(),
 			paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
 
 	keyReplicationCount: metric.New("Returns number of standby servers.",
