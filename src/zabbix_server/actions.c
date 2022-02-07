@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "actions.h"
 #include "common.h"
 #include "db.h"
 #include "log.h"
@@ -25,7 +26,6 @@
 #include "zbxregexp.h"
 #include "../../libs/zbxaudit/audit.h"
 
-#include "actions.h"
 
 /******************************************************************************
  *                                                                            *

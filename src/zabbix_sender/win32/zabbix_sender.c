@@ -17,12 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zabbix_sender.h"
 #include "common.h"
 #include "zbxjson.h"
 #include "comms.h"
 #include "cfg.h"
 
-#include "zabbix_sender.h"
 
 const char	*progname = NULL;
 const char	title_message[] = "";

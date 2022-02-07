@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "active.h"
 #include "common.h"
 #include "db.h"
 #include "dbcache.h"
@@ -27,7 +28,6 @@
 
 #include "../../libs/zbxcrypto/tls_tcp_active.h"
 
-#include "active.h"
 
 extern unsigned char	program_type;
 

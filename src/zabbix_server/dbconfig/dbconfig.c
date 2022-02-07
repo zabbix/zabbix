@@ -17,13 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "dbconfig.h"
 #include "common.h"
 
 #include "db.h"
 #include "daemon.h"
 #include "zbxself.h"
 #include "log.h"
-#include "dbconfig.h"
 #include "dbcache.h"
 #include "zbxrtc.h"
 

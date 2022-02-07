@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "lld_worker.h"
 #include "common.h"
 #include "daemon.h"
 #include "db.h"
@@ -27,7 +28,6 @@
 #include "proxy.h"
 #include "../events.h"
 
-#include "lld_worker.h"
 #include "lld_protocol.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;

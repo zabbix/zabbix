@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "pinger.h"
 #include "common.h"
 
 #include "dbcache.h"
@@ -27,7 +28,6 @@
 #include "zbxself.h"
 #include "preproc.h"
 
-#include "pinger.h"
 
 /* defines for `fping' and `fping6' to successfully process pings */
 #define MIN_COUNT	1

@@ -17,9 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "preproc_history.h"
 #include "common.h"
 
-#include "preproc_history.h"
 
 void	zbx_preproc_op_history_free(zbx_preproc_op_history_t *ophistory)
 {

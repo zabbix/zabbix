@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "escalator.h"
 #include "common.h"
 #include "db.h"
 #include "log.h"
@@ -34,7 +35,6 @@
 #include "service_protocol.h"
 #include "dbcache.h"
 
-#include "escalator.h"
 
 extern int	CONFIG_ESCALATOR_FORKS;
 

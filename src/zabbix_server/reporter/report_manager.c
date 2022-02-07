@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "report_manager.h"
 #include "common.h"
 #include "log.h"
 #include "zbxself.h"
@@ -35,7 +36,6 @@
 #include "zbxserver.h"
 #include "report_protocol.h"
 
-#include "report_manager.h"
 
 #define ZBX_REPORT_INCLUDE_USER		0
 #define ZBX_REPORT_EXCLUDE_USER		1

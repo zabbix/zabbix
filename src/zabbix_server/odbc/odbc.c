@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "odbc.h"
 #include "common.h"
 
 #ifdef HAVE_UNIXODBC
@@ -24,7 +25,6 @@
 #include <sql.h>
 #include <sqlext.h>
 
-#include "odbc.h"
 #include "log.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"

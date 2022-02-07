@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "poller.h"
 #include "common.h"
 
 #include "db.h"
@@ -27,7 +28,6 @@
 #include "preproc.h"
 #include "zbxrtc.h"
 
-#include "poller.h"
 
 #include "checks_agent.h"
 #include "checks_external.h"

@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "httptest.h"
 #include "common.h"
 
 #include "db.h"
@@ -29,7 +30,6 @@
 #include "zbxregexp.h"
 #include "zbxhttp.h"
 
-#include "httptest.h"
 #include "httpmacro.h"
 
 typedef struct

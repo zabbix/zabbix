@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "listener.h"
 #include "common.h"
 #include "comms.h"
 #include "cfg.h"
@@ -24,7 +25,6 @@
 #include "sysinfo.h"
 #include "log.h"
 
-#include "listener.h"
 
 extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;

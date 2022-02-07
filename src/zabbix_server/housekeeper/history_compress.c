@@ -17,11 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "history_compress.h"
 #include "common.h"
 #include "zbxdb.h"
 #include "dbcache.h"
 #include "log.h"
-#include "history_compress.h"
 
 #if defined(HAVE_POSTGRESQL)
 

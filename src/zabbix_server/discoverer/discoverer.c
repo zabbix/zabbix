@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "discoverer.h"
 #include "common.h"
 
 #include "db.h"
@@ -29,7 +30,6 @@
 #include "zbxrtc.h"
 
 #include "daemon.h"
-#include "discoverer.h"
 #include "../poller/checks_agent.h"
 #include "../poller/checks_snmp.h"
 #include "zbxcrypto.h"

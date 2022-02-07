@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "nodecommand.h"
 #include "common.h"
 #include "comms.h"
 #include "zbxserver.h"
@@ -29,7 +30,6 @@
 #include "../../libs/zbxserver/get_host_from_event.h"
 #include "../../libs/zbxserver/zabbix_users.h"
 
-#include "nodecommand.h"
 
 /******************************************************************************
  *                                                                            *

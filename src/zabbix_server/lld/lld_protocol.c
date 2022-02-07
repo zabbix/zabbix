@@ -17,11 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "lld_protocol.h"
 #include "common.h"
 #include "log.h"
 #include "zbxserialize.h"
 #include "zbxipcservice.h"
-#include "lld_protocol.h"
 #include "sysinfo.h"
 #include "zbxlld.h"
 #include "lld_manager.h"

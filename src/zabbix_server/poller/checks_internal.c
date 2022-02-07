@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "checks_internal.h"
 #include "common.h"
 #include "checks_java.h"
 #include "dbcache.h"
@@ -27,7 +28,6 @@
 #include "../../libs/zbxserver/zabbix_stats.h"
 #include "../../libs/zbxsysinfo/common/zabbix_stats.h"
 
-#include "checks_internal.h"
 
 extern unsigned char	program_type;
 

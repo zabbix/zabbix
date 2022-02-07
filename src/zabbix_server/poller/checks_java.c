@@ -17,13 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "checks_java.h"
 #include "common.h"
 #include "comms.h"
 #include "log.h"
 
 #include "zbxjson.h"
 
-#include "checks_java.h"
 
 static int	parse_response(AGENT_RESULT *results, int *errcodes, int num, char *response,
 		char *error, int max_error_len)

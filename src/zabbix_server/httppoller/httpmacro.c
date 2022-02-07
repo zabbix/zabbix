@@ -17,12 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "httpmacro.h"
 #include "common.h"
 #include "log.h"
 #include "zbxregexp.h"
 #include "zbxhttp.h"
 
-#include "httpmacro.h"
 
 #define REGEXP_PREFIX		"regex:"
 #define REGEXP_PREFIX_SIZE	ZBX_CONST_STRLEN(REGEXP_PREFIX)

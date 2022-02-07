@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "checks_simple_vmware.h"
 #include "common.h"
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
@@ -24,7 +25,6 @@
 #include "log.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"
-#include "checks_simple_vmware.h"
 #include"../vmware/vmware.h"
 
 #define ZBX_VMWARE_DATASTORE_SIZE_TOTAL		0

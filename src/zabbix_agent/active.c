@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "active.h"
 #include "common.h"
 #include "zbxconf.h"
 
@@ -31,7 +32,6 @@
 #include "metrics.h"
 #include "zbxregexp.h"
 
-#include "active.h"
 
 extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;

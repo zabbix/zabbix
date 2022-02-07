@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "proxydata.h"
 #include "common.h"
 #include "db.h"
 #include "log.h"
@@ -27,7 +28,6 @@
 #include "daemon.h"
 #include "zbxcompress.h"
 
-#include "proxydata.h"
 
 extern unsigned char	program_type;
 static zbx_mutex_t	proxy_lock = ZBX_MUTEX_NULL;

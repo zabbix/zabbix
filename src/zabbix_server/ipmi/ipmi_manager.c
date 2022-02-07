@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "ipmi_manager.h"
 #include "common.h"
 
 #ifdef HAVE_OPENIPMI
@@ -33,7 +34,6 @@
 #include "../poller/poller.h"
 #include "zbxavailability.h"
 
-#include "ipmi_manager.h"
 
 #define ZBX_IPMI_MANAGER_DELAY	1
 

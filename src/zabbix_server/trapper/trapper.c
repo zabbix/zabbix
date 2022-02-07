@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "trapper.h"
 #include "common.h"
 
 #include "log.h"
@@ -45,7 +46,6 @@
 #	include "zbxrtc.h"
 #endif
 
-#include "trapper.h"
 
 #define ZBX_MAX_SECTION_ENTRIES		4
 #define ZBX_MAX_ENTRY_ATTRIBUTES	3

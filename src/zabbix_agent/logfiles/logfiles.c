@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "logfiles.h"
 #include "common.h"
 #include "log.h"
 #include "sysinfo.h"
@@ -24,7 +25,6 @@
 #include "cfg.h"
 #include "zbxregexp.h"
 
-#include "logfiles.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #	include "symbols.h"

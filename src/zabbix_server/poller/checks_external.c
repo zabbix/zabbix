@@ -17,11 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "checks_external.h"
 #include "common.h"
 #include "log.h"
 #include "zbxexec.h"
 
-#include "checks_external.h"
 
 extern char	*CONFIG_EXTERNALSCRIPTS;
 

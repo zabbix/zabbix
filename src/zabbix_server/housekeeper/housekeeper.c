@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "housekeeper.h"
 #include "common.h"
 #include "db.h"
 #include "dbcache.h"
@@ -31,7 +32,6 @@
 #include "history_compress.h"
 #include "../../libs/zbxdbcache/valuecache.h"
 
-#include "housekeeper.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;

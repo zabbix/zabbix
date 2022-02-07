@@ -17,10 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "stats.h"
 #include "common.h"
 #include "log.h"
 
-#include "stats.h"
 
 #ifndef _WINDOWS
 #	include "diskdevices.h"

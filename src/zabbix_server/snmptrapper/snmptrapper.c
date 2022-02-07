@@ -17,13 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "snmptrapper.h"
 #include "common.h"
 #include "dbcache.h"
 #include "zbxself.h"
 #include "daemon.h"
 #include "log.h"
 #include "proxy.h"
-#include "snmptrapper.h"
 #include "zbxserver.h"
 #include "zbxregexp.h"
 #include "preproc.h"

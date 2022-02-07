@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "taskmanager.h"
 #include "common.h"
 #include "daemon.h"
 #include "zbxself.h"
@@ -27,7 +28,6 @@
 #include "../events.h"
 #include "../actions.h"
 #include "export.h"
-#include "taskmanager.h"
 #include "zbxdiag.h"
 #include "service_protocol.h"
 

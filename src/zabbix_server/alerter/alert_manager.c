@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "alert_manager.h"
 #include "common.h"
 
 #include "daemon.h"
@@ -26,7 +27,6 @@
 #include "zbxalgo.h"
 #include "zbxserver.h"
 #include "alerter_protocol.h"
-#include "alert_manager.h"
 #include "zbxmedia.h"
 #include "zbxembed.h"
 #include "zbxserialize.h"

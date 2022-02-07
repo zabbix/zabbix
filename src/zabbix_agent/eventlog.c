@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "eventlog.h"
 #include "common.h"
 #include "log.h"
 #include "logfiles/logfiles.h"
@@ -24,7 +25,6 @@
 #include "zbxregexp.h"
 #include "winmeta.h"
 #include <strsafe.h>
-#include "eventlog.h"
 #include <delayimp.h>
 #include <sddl.h>
 

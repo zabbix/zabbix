@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "proxy.h"
 #include "common.h"
 
 #include "cfg.h"
@@ -27,7 +28,6 @@
 #include "log.h"
 #include "zbxgetopt.h"
 #include "mutexs.h"
-#include "proxy.h"
 
 #include "sysinfo.h"
 #include "zbxmodules.h"

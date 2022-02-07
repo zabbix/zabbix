@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "item_preproc.h"
 #include "zbxregexp.h"
 #include "log.h"
 #include "zbxembed.h"
@@ -31,7 +32,6 @@
 
 #include "preproc_history.h"
 
-#include "item_preproc.h"
 
 extern zbx_es_t	es_engine;
 /******************************************************************************

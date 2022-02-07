@@ -17,12 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "checks_aggregate.h"
 #include "common.h"
 #include "log.h"
 #include "valuecache.h"
 #include "dbcache.h"
 
-#include "checks_aggregate.h"
 
 #define ZBX_VALUE_FUNC_MIN	0
 #define ZBX_VALUE_FUNC_AVG	1

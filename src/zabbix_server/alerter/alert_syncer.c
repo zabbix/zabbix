@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "alert_syncer.h"
 #include "common.h"
 #include "daemon.h"
 #include "zbxself.h"
@@ -29,7 +30,6 @@
 #include "service_protocol.h"
 #include "../../libs/zbxalgo/vectorimpl.h"
 
-#include "alert_syncer.h"
 
 #define ZBX_POLL_INTERVAL	1
 

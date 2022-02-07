@@ -17,11 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "persistent_state.h"
 #include "common.h"
 #include "md5.h"
 #include "log.h"
 #include "logfiles.h"
-#include "persistent_state.h"
 #include "zbxjson.h"
 #include "../../libs/zbxalgo/vectorimpl.h"
 
