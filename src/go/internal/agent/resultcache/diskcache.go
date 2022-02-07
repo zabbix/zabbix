@@ -158,20 +158,64 @@ func (c *DiskCache) updateLogRange() (err error) {
 	return
 }
 
-func (c *DiskCache) upload(u Uploader) (err error) {
-	var results []*AgentData
+func (c *DiskCache) resultsGet() (results []*AgentData, maxDataId uint64, maxLogId uint64, err error) {
 	var result *AgentData
 	var rows *sql.Rows
-	var maxDataId, maxLogId uint64
 
 	cacheLock.Lock()
+	defer cacheLock.Unlock()
+
 	if rows, err = c.database.Query(fmt.Sprintf("SELECT "+
 		"id,itemid,lastlogsize,mtime,state,value,eventsource,eventid,eventseverity,eventtimestamp,clock,ns"+
 		" FROM data_%d ORDER BY id LIMIT ?", c.serverID), DataLimit); err != nil {
 		c.Errf("cannot select from data table: %s", err.Error())
-		cacheLock.Unlock()
-		return
+		return nil, 0, 0, err
 	}
+	for rows.Next() {
+		if result, err = c.resultFetch(rows); err != nil {
+			rows.Close()
+			return nil, 0, 0, err
+		}
+		result.persistent = false
+		results = append(results, result)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, 0, 0, err
+	}
+	dataLen := len(results)
+	if dataLen != 0 {
+		maxDataId = results[dataLen-1].Id
+	}
+
+	if dataLen != DataLimit {
+		if rows, err = c.database.Query(fmt.Sprintf("SELECT "+
+			"id,itemid,lastlogsize,mtime,state,value,eventsource,eventid,eventseverity,eventtimestamp,clock,ns"+
+			" FROM log_%d ORDER BY id LIMIT ?", c.serverID), DataLimit-len(results)); err != nil {
+			c.Errf("cannot select from log table: %s", err.Error())
+			return nil, 0, 0, err
+		}
+		for rows.Next() {
+			if result, err = c.resultFetch(rows); err != nil {
+				rows.Close()
+				return nil, 0, 0, err
+			}
+			result.persistent = true
+			results = append(results, result)
+		}
+		if err = rows.Err(); err != nil {
+			return nil, 0, 0, err
+		}
+		if len(results) != dataLen {
+			maxLogId = results[len(results)-1].Id
+		}
+	}
+
+	return results, maxDataId, maxLogId, nil
+}
+
+func (c *DiskCache) upload(u Uploader) (err error) {
+	var results []*AgentData
+	var maxDataId, maxLogId uint64
 
 	defer func() {
 		if err != nil && (c.lastError == nil || err.Error() != c.lastError.Error()) {
@@ -180,50 +224,8 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 		}
 	}()
 
-	for rows.Next() {
-		if result, err = c.resultFetch(rows); err != nil {
-			rows.Close()
-			cacheLock.Unlock()
-			return
-		}
-		result.persistent = false
-		results = append(results, result)
-	}
-	cacheLock.Unlock()
-
-	if err = rows.Err(); err != nil {
+	if results, maxDataId, maxLogId, err = c.resultsGet(); err != nil {
 		return
-	}
-	dataLen := len(results)
-	if dataLen != 0 {
-		maxDataId = results[dataLen-1].Id
-	}
-
-	if dataLen != DataLimit {
-		cacheLock.Lock()
-		if rows, err = c.database.Query(fmt.Sprintf("SELECT "+
-			"id,itemid,lastlogsize,mtime,state,value,eventsource,eventid,eventseverity,eventtimestamp,clock,ns"+
-			" FROM log_%d ORDER BY id LIMIT ?", c.serverID), DataLimit-len(results)); err != nil {
-			c.Errf("cannot select from log table: %s", err.Error())
-			cacheLock.Unlock()
-			return
-		}
-		for rows.Next() {
-			if result, err = c.resultFetch(rows); err != nil {
-				rows.Close()
-				cacheLock.Unlock()
-				return
-			}
-			result.persistent = true
-			results = append(results, result)
-		}
-		cacheLock.Unlock()
-		if err = rows.Err(); err != nil {
-			return
-		}
-		if len(results) != dataLen {
-			maxLogId = results[len(results)-1].Id
-		}
 	}
 
 	if len(results) == 0 {
