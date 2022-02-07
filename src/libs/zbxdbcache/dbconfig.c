@@ -2796,10 +2796,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 					zbx_hashset_remove_direct(&config->items_hk, item_hk);
 				}
 			}
-			else
-				item->triggers = NULL;
-
-			dc_item_reset_triggers(item);
 
 			item_hk_local.hostid = hostid;
 			item_hk_local.key = row[5];
@@ -2810,6 +2806,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			else
 				update_index = 1;
 		}
+
 		/* store new information in item structure */
 
 		item->hostid = hostid;
@@ -4131,9 +4128,6 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now)
 		if (NULL == (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers, &function->triggerid)))
 			continue;
 
-		if (NULL == zbx_hashset_search(&config->items, &function->itemid))
-			continue;
-
 		if (TRIGGER_STATUS_ENABLED != trigger->status || TRIGGER_FUNCTIONAL_TRUE != trigger->functional)
 			continue;
 
@@ -4211,7 +4205,16 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 		ZBX_STR2UINT64(functionid, row[1]);
 		ZBX_STR2UINT64(triggerid, row[4]);
 
-		item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid);
+		if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))
+		{
+			/* Item could have been created after we have selected them in the             */
+			/* previous queries. However, we shall avoid the check for functions being the */
+			/* same as in the trigger expression, because that is somewhat expensive, not  */
+			/* 100% (think functions keeping their functionid, but changing their function */
+			/* or parameters), and even if there is an inconsistency, we can live with it. */
+
+			continue;
+		}
 
 		/* process function information */
 
@@ -4238,8 +4241,7 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 		function->type = zbx_get_function_type(function->function);
 		function->revision = config->sync_start_ts;
 
-		if (NULL != item)
-			dc_item_reset_triggers(item);
+		dc_item_reset_triggers(item);
 	}
 
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))

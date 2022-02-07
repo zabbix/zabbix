@@ -2557,7 +2557,7 @@ int	zbx_dbsync_compare_functions(zbx_dbsync_t *sync)
 	DB_RESULT		result;
 	zbx_hashset_t		ids;
 	zbx_hashset_iter_t	iter;
-	zbx_uint64_t		rowid;
+	zbx_uint64_t		rowid, itemid;
 	ZBX_DC_FUNCTION		*function;
 	char			**row;
 
@@ -2578,6 +2578,10 @@ int	zbx_dbsync_compare_functions(zbx_dbsync_t *sync)
 	while (NULL != (dbrow = DBfetch(result)))
 	{
 		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
+
+		ZBX_STR2UINT64(itemid, dbrow[0]);
+		if (NULL == (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid))
+			continue;
 
 		ZBX_STR2UINT64(rowid, dbrow[1]);
 		zbx_hashset_insert(&ids, &rowid, sizeof(rowid));
