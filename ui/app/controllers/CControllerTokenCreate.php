@@ -69,6 +69,7 @@ class CControllerTokenCreate extends CController {
 		if ($result) {
 			['tokenids' => $tokenids] = $result;
 			[['token' => $auth_token]] = API::Token()->generate($tokenids);
+
 			$output = [];
 
 			$success = ['title' => _('API token added')];
@@ -97,10 +98,10 @@ class CControllerTokenCreate extends CController {
 				'action_src' => $this->getInput('action_src')
 			];
 
-			$output['data'] = (new CPartial('administration.token.view.html', $data))->getOutput();
-
+			$output['data'] = $data;
 		}
 		else {
+
 			$output['error'] = [
 				'title' => _('Cannot add API token'),
 				'messages' => array_column(get_and_clear_messages(), 'message')
@@ -109,5 +110,4 @@ class CControllerTokenCreate extends CController {
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
-
 }

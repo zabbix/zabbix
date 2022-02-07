@@ -79,5 +79,17 @@ $token_from_grid->addItem([
 	]);
 
 $token_form->addItem($token_from_grid);
-$token_form
-	->show();
+
+$output = [
+	'title' => ('API token'),
+	'content' => $token_form->toString(),
+	'buttons' => [[
+		'title' => _('Close'),
+		'class' => '',
+		'keepOpen' => true,
+		'isSubmit' => true,
+		'action' => 'token_edit_popup.close();'
+	]]
+];
+
+echo json_encode($output);

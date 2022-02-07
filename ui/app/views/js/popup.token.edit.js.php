@@ -59,43 +59,23 @@ window.token_edit_popup = {
 		const fields = this.preprocessFormFields(getFormFields(this.form));
 		const curl = new Curl(this.form.getAttribute('action'), false);
 
-		fetch(curl.getUrl(), {
-			method: 'POST',
-			headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-			body: urlEncodeData(fields)
-		})
-			.then((response) => response.json())
+		this.postData(curl, fields)
 			.then((response) => {
-				if ('error' in response) {
-					throw {error: response.error};
-				}
+					if ('error' in response) {
+						throw {error: response.error};
+					}
 
-				if (fields.tokenid !== '0') {
-					overlayDialogueDestroy(this.overlay.dialogueid);
-					this.dialogue.dispatchEvent(new CustomEvent('dialogue.update', {
-						detail: {
-							success: response.success
-						}
-					}));
-				}
-				else {
-					this.overlay.setProperties({
-						title: t('API token'),
-						content: response.data,
-						buttons: [{
-							title: t('Close'),
-							class: '',
-							keepOpen: true,
-							isSubmit: true,
-							action: 'token_edit_popup.close();'
-						}],
-						data: response.data
-					});
-				}
-			})
-			.catch(this.ajaxExceptionHandler)
-			.finally(() => {
-				this.overlay.unsetLoading();
+					if (fields.tokenid !== '0') {
+						overlayDialogueDestroy(this.overlay.dialogueid);
+						this.dialogue.dispatchEvent(new CustomEvent('dialogue.update', {
+							detail: {
+								success: response.success
+							}
+						}));
+					}
+					else {
+						this.getTokenView(response.data);
+					}
 			});
 	},
 
@@ -107,34 +87,9 @@ window.token_edit_popup = {
 
 		const curl = new Curl(this.form.getAttribute('action'), false);
 
-		fetch(curl.getUrl(), {
-			method: 'POST',
-			headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-			body: urlEncodeData(fields)
-		})
-			.then((response) => response.json())
+		this.postData(curl, fields)
 			.then((response) => {
-				if ('error' in response) {
-					throw {error: response.error};
-				}
-
-				this.overlay.setProperties({
-					title: t('API token'),
-					content: response.data,
-					buttons: [{
-						title: t('Close'),
-						class: '',
-						keepOpen: true,
-						isSubmit: true,
-						action: 'token_edit_popup.close();'
-					}],
-					data: response.data
-				});
-
-			})
-			.catch(this.ajaxExceptionHandler)
-			.finally(() => {
-				this.overlay.unsetLoading();
+				this.getTokenView(response.data);
 			});
 	},
 
@@ -249,6 +204,31 @@ window.token_edit_popup = {
 				expires_state_hidden.parentNode.removeChild(expires_state_hidden);
 			}
 		}
+	},
+
+	postData(url, data) {
+		return fetch(url.getUrl(), {
+			method: 'POST',
+			headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+			body: urlEncodeData(data)
+		})
+			.then((response) => response.json())
+			.catch(this.ajaxExceptionHandler)
+			.finally(() => {
+				this.overlay.unsetLoading()
+			});
+	},
+
+	getTokenView(data) {
+		const curl = new Curl('zabbix.php');
+		curl.setArgument('action', 'popup.token.view');
+		return this.postData(curl, data)
+			.then((response) => {
+				if ('error' in response) {
+					throw {error: response.error};
+				}
+				this.overlay.setProperties(response);
+			});
 	},
 
 	events: {

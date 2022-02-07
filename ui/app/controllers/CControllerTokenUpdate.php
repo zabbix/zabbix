@@ -103,7 +103,7 @@ class CControllerTokenUpdate extends CController {
 					'action_src' => $this->getInput('action_src')
 				];
 
-				$output['data'] = (new CPartial('administration.token.view.html', $data))->getOutput();
+				$output['data'] = $data;
 			}
 		}
 		else {

@@ -204,6 +204,7 @@ class CRouter {
 		'popup.massupdate.trigger'					=> ['CControllerPopupMassupdateTrigger',				'layout.json',			'popup.massupdate.trigger'],
 		'popup.massupdate.triggerprototype'			=> ['CControllerPopupMassupdateTrigger',				'layout.json',			'popup.massupdate.trigger'],
 		'popup.token.edit'							=> ['CControllerPopupTokenEdit',						'layout.json',			'popup.token.edit'],
+		'popup.token.view'							=> ['CControllerPopupTokenView',						'layout.json',			'popup.token.view'],
 		'popup.valuemap.edit'						=> ['CControllerPopupValueMapEdit',						'layout.json',			'popup.valuemap.edit'],
 		'popup.valuemap.update'						=> ['CControllerPopupValueMapUpdate',					'layout.json',			null],
 		'problem.view'								=> ['CControllerProblemView',							'layout.htmlpage',		'monitoring.problem.view'],
