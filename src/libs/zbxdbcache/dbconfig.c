@@ -3151,7 +3151,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			if (1 == found && NULL != calcitem->formula_bin)
 				__config_mem_free_func((void *)calcitem->formula_bin);
 
-			calcitem->formula_bin = config_decode_serialized_expression(row[50]);
+			calcitem->formula_bin = config_decode_serialized_expression(row[49]);
 		}
 		else if (NULL != (calcitem = (ZBX_DC_CALCITEM *)zbx_hashset_search(&config->calcitems, &itemid)))
 		{
