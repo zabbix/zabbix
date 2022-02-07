@@ -169,7 +169,8 @@ class testFormHost extends CWebTest {
 			],
 			[
 				'host' => 'testFormHost with items',
-				'description' => 'Created host via API to test clone functionality in host form and interfaces',
+				'visiblename' => '😀-😀-😀',
+				'description' => 'Created host via API to test clone functionality in host form and interfaces 😀',
 				'interfaces' => $interfaces,
 				'groups' => $groups,
 				'proxy_hostid' => 20001,
@@ -363,7 +364,6 @@ class testFormHost extends CWebTest {
 					],
 					'error_title' => 'Cannot add host',
 					'error' => 'Incorrect characters used for host name "😀".'
-
 				]
 			],
 			// Interface fields validation.
@@ -979,7 +979,10 @@ class testFormHost extends CWebTest {
 					'error_title' => 'Cannot update host',
 					'error' => 'Incorrect characters used for host name "😀".',
 					'utf_fields' => [
-						'id:host' => '😀'
+						'Host name' => [
+							'locator' => 'id:host',
+							'text' => '😀'
+						]
 					]
 				]
 			],
@@ -1328,8 +1331,14 @@ class testFormHost extends CWebTest {
 						'Groups' => 'Linux servers',
 					],
 					'utf_fields' => [
-						'id:visiblename' => '😀😀',
-						'id:description' => '😀😀😀😀😀😀😀'
+						'Visible name' => [
+							'locator' => 'id:visiblename',
+							'text' => '😀😀'
+						],
+						'Description' => [
+							'locator' => 'id:description',
+							'text' => '😀😀😀😀😀😀😀'
+						]
 					],
 					'interfaces' => [
 						[
@@ -1484,9 +1493,9 @@ class testFormHost extends CWebTest {
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
 
 		if (array_key_exists('utf_fields', $data)) {
-			foreach ($data['utf_fields'] as $id => $value) {
-				$element = $form->query($id)->one();
-				CElementQuery::getDriver()->executeScript('arguments[0].value = '.json_encode($value).';', [$element]);
+			foreach ($data['utf_fields'] as $field => $value) {
+				$element = $form->query($value['locator'])->one();
+				CElementQuery::getDriver()->executeScript('arguments[0].value = '.json_encode($value['text']).';', [$element]);
 			}
 		}
 
@@ -1500,8 +1509,8 @@ class testFormHost extends CWebTest {
 			case TEST_GOOD:
 				$this->assertMessage(TEST_GOOD, 'Host updated');
 
-				if (array_key_exists('utf_fields', $data) && array_key_exists('id:visiblename', $data['utf_fields'])) {
-					$host = $data['utf_fields']['id:visiblename'];
+				if (array_key_exists('utf_fields', $data) && ($data['utf_fields']['Visible name']['locator']= 'id:visiblename')) {
+					$host = $data['utf_fields']['Visible name']['text'];
 				}
 				else {
 					$host = (CTestArrayHelper::get($data, 'host_fields.Visible name') === "")
@@ -1516,12 +1525,10 @@ class testFormHost extends CWebTest {
 					$source['host_fields'][$key] = $value;
 				}
 
-				if (array_key_exists('utf_fields', $data) && array_key_exists('id:visiblename', $data['utf_fields'])) {
-					$source['host_fields']['Visible name'] = $data['utf_fields']['id:visiblename'];
-				}
-
-				if (array_key_exists('utf_fields', $data) && array_key_exists('id:description', $data['utf_fields'])) {
-					$source['host_fields']['Description'] = $data['utf_fields']['id:description'];
+				if (array_key_exists('utf_fields', $data)) {
+					foreach ($data['utf_fields'] as $field => $value) {
+						$source['host_fields'][$field] = $value['text'];
+					}
 				}
 
 				// Check host fields.
@@ -1687,7 +1694,6 @@ class testFormHost extends CWebTest {
 	public function cloneHost($data, $button = 'Clone') {
 		$host = 'testFormHost with items';
 		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($host));
-
 		$form = $this->openForm(($this->standalone ? 'zabbix.php?action=host.edit&hostid='.$hostid : $this->link), $host);
 
 		// Get values from form.
@@ -1704,22 +1710,18 @@ class testFormHost extends CWebTest {
 
 		// Clone host.
 		$this->query('button', $button)->waitUntilClickable()->one()->click();
-
 		$cloned_form = (!$this->standalone)
 			? COverlayDialogElement::find()->asForm()->waitUntilPresent()->one()
 			: $this->query('id:host-form')->asForm()->waitUntilReady()->one();
-
 		$cloned_form->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Host added');
 
 		// Check the values of the original host with the cloned host.
-
-		$host = (array_key_exists('utf_fields', $data) && array_key_exists('id:visiblename', $data['utf_fields'])) ?
+		$visible_name = (array_key_exists('utf_fields', $data) && array_key_exists('id:visiblename', $data['utf_fields'])) ?
 			$data['utf_fields']['id:visiblename'] :
 			$data['host_fields']['Host name'];
-
-		$this->filterAndSelectHost($host, CTestArrayHelper::get($data, 'utf_fields', false))->checkValue($original);
+		$this->filterAndSelectHost($visible_name, CTestArrayHelper::get($data, 'utf_fields', false))->checkValue($original);
 		COverlayDialogElement::find()->one()->close();
 	}
 
