@@ -6452,8 +6452,8 @@ void	DCsync_configuration(unsigned char mode)
 				prototype_items_sync.update_num, prototype_items_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() item_discovery      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, idsec, idsec2, item_discovery_sync.add_num, template_items_sync.update_num,
-				template_items_sync.remove_num);
+				__func__, idsec, idsec2, item_discovery_sync.add_num, item_discovery_sync.update_num,
+				item_discovery_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() triggers   : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__func__, tsec, tsec2, triggers_sync.add_num, triggers_sync.update_num,
