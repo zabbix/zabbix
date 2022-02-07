@@ -3044,11 +3044,8 @@ int	zbx_dbsync_compare_trigger_tags(zbx_dbsync_t *sync)
 	zbx_uint64_t		rowid;
 	zbx_dc_trigger_tag_t	*trigger_tag;
 
-	if (NULL == (result = DBselect(
-			"select triggertagid,triggerid,tag,value from trigger_tag")))
-	{
+	if (NULL == (result = DBselect("select triggertagid,triggerid,tag,value from trigger_tag")))
 		return FAIL;
-	}
 
 	dbsync_prepare(sync, 4, NULL);
 
@@ -3134,21 +3131,11 @@ int	zbx_dbsync_compare_item_tags(zbx_dbsync_t *sync)
 	DB_RESULT		result;
 	zbx_hashset_t		ids;
 	zbx_hashset_iter_t	iter;
-	zbx_uint64_t		rowid;
+	zbx_uint64_t		rowid, itemid;
 	zbx_dc_item_tag_t	*item_tag;
 
-	if (NULL == (result = DBselect(
-			"select distinct it.itemtagid,it.itemid,it.tag,it.value"
-			" from item_tag it,items i,hosts h"
-			" where i.itemid=it.itemid"
-				" and i.flags in (%d,%d)"
-				" and h.hostid=i.hostid"
-				" and h.status in (%d,%d)",
-				ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED,
-				HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED)))
-	{
+	if (NULL == (result = DBselect("select itemtagid,itemid,tag,value from item_tag")))
 		return FAIL;
-	}
 
 	dbsync_prepare(sync, 4, NULL);
 
@@ -3164,6 +3151,10 @@ int	zbx_dbsync_compare_item_tags(zbx_dbsync_t *sync)
 	while (NULL != (dbrow = DBfetch(result)))
 	{
 		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
+
+		ZBX_STR2UINT64(itemid, dbrow[1]);
+		if (NULL == zbx_hashset_search(&dbsync_env.cache->items, &itemid))
+			continue;
 
 		ZBX_STR2UINT64(rowid, dbrow[0]);
 		zbx_hashset_insert(&ids, &rowid, sizeof(rowid));
