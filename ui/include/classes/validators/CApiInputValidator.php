@@ -301,13 +301,11 @@ class CApiInputValidator {
 					if ($data !== null && array_key_exists($field_name, $data)) {
 						if ($field_rule['type'] === API_MULTIPLE) {
 							foreach ($field_rule['rules'] as $multiple_rule) {
-								if (array_key_exists('if', $multiple_rule)
-										&& !array_key_exists($multiple_rule['if']['field'], $data)) {
-									continue;
-								}
-
 								if (array_key_exists('else', $multiple_rule)
-										|| self::isInRange($data[$multiple_rule['if']['field']], $multiple_rule['if']['in'])) {
+										|| (is_array($multiple_rule['if'])
+											&& self::isInRange($data[$multiple_rule['if']['field']], $multiple_rule['if']['in']))
+										|| ($multiple_rule['if'] instanceof Closure
+											&& call_user_func($multiple_rule['if'], $data))) {
 									$field_rule = $multiple_rule;
 									break;
 								}
@@ -1202,13 +1200,11 @@ class CApiInputValidator {
 		foreach ($rule['fields'] as $field_name => $field_rule) {
 			if ($field_rule['type'] === API_MULTIPLE) {
 				foreach ($field_rule['rules'] as $multiple_rule) {
-					if (array_key_exists('if', $multiple_rule)
-							&& !array_key_exists($multiple_rule['if']['field'], $data)) {
-						continue;
-					}
-
 					if (array_key_exists('else', $multiple_rule)
-							|| self::isInRange($data[$multiple_rule['if']['field']], $multiple_rule['if']['in'])) {
+							|| (is_array($multiple_rule['if'])
+								&& self::isInRange($data[$multiple_rule['if']['field']], $multiple_rule['if']['in']))
+							|| ($multiple_rule['if'] instanceof Closure
+								&& call_user_func($multiple_rule['if'], $data))) {
 						if ($multiple_rule['type'] == API_UNEXPECTED && array_key_exists($field_name, $data)) {
 							$error = _s('Invalid parameter "%1$s": %2$s.', $path,
 								_s('unexpected parameter "%1$s"', $field_name)
@@ -2094,13 +2090,11 @@ class CApiInputValidator {
 				if (array_key_exists($field_name, $object)) {
 					if ($field_rule['type'] === API_MULTIPLE) {
 						foreach ($field_rule['rules'] as $multiple_rule) {
-							if (array_key_exists('if', $multiple_rule)
-									&& !array_key_exists($multiple_rule['if']['field'], $object)) {
-								continue;
-							}
-
 							if (array_key_exists('else', $multiple_rule)
-									|| self::isInRange($object[$multiple_rule['if']['field']], $multiple_rule['if']['in'])) {
+									|| (is_array($multiple_rule['if'])
+										&& self::isInRange($object[$multiple_rule['if']['field']], $multiple_rule['if']['in']))
+									|| ($multiple_rule['if'] instanceof Closure
+										&& call_user_func($multiple_rule['if'], $object))) {
 								$field_rule = $multiple_rule;
 								break;
 							}
