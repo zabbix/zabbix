@@ -20,7 +20,7 @@ This template was tested on:
 > See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 Internal service metrics are collected from /metrics endpoint.
-Template need to use Authorization via API token. 
+Template needs to use Authorization via API token.
 
 Don't forget change macros {$KUBE.SCHEDULER.SERVER.URL}, {$KUBE.SCHEDULER.TOKEN}.
 Also, see the Macros section for a list of macros used to set trigger values.
@@ -49,9 +49,9 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Scheduling algorithm histogram |<p>Discovery raw data of scheduling algorithm latency.</p> |DEPENDENT |kubernetes.scheduler.scheduling_algorithm.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `scheduler_scheduling_algorithm_duration_seconds_bucket`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Binding histogram |<p>Discovery raw data of binding latency.</p> |DEPENDENT |kubernetes.scheduler.binding.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `scheduler_binding_duration_seconds_bucket`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |e2e scheduling histogram |<p>Discovery raw data and percentile items of e2e scheduling latency.</p> |DEPENDENT |kubernetes.controller.e2e_scheduling.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~ "scheduler_e2e_scheduling_duration_*", result =~ ".*"}`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Overrides:**</p><p>bucket item<br> - {#TYPE} MATCHES_REGEX `buckets`<br>  - ITEM_PROTOTYPE LIKE `bucket` - DISCOVER</p><p>total item<br> - {#TYPE} MATCHES_REGEX `totals`<br>  - ITEM_PROTOTYPE NOT_LIKE `bucket` - DISCOVER</p> |
+|Scheduling algorithm histogram |<p>Discovery raw data of scheduling algorithm latency.</p> |DEPENDENT |kubernetes.scheduler.scheduling_algorithm.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `scheduler_scheduling_algorithm_duration_seconds_bucket`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 
 ## Items collected
 
@@ -64,10 +64,10 @@ There are no template links in this template.
 |Kubernetes Scheduler |Kubernetes Scheduler: Go threads |<p>Number of OS threads created.</p> |DEPENDENT |kubernetes.scheduler.go_threads<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `go_threads`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Kubernetes Scheduler |Kubernetes Scheduler: Fds open |<p>Number of open file descriptors.</p> |DEPENDENT |kubernetes.scheduler.open_fds<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `process_open_fds`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Kubernetes Scheduler |Kubernetes Scheduler: Fds max |<p>Maximum allowed open file descriptors.</p> |DEPENDENT |kubernetes.scheduler.max_fds<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `process_max_fds`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Kubernetes Scheduler |Kubernetes Scheduler: REST Client requests: 2xx, rate |<p>Number of HTTP requests with 2XX status code per second.</p> |DEPENDENT |kubernetes.scheduler.client_http_requests_200.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `rest_client_requests_total{code =~ "2.."}`: `function`: `sum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
-|Kubernetes Scheduler |Kubernetes Scheduler: REST Client requests: 3xx, rate |<p>Number of HTTP requests with 3XX status code per second.</p> |DEPENDENT |kubernetes.scheduler.client_http_requests_300.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `rest_client_requests_total{code =~ "3.."}`: `function`: `sum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
-|Kubernetes Scheduler |Kubernetes Scheduler: REST Client requests: 4xx, rate |<p>Number of HTTP requests with 4XX status code per second.</p> |DEPENDENT |kubernetes.scheduler.client_http_requests_400.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `rest_client_requests_total{code =~ "4.."}`: `function`: `sum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
-|Kubernetes Scheduler |Kubernetes Scheduler: REST Client requests: 5xx, rate |<p>Number of HTTP requests with 5XX status code per second.</p> |DEPENDENT |kubernetes.scheduler.client_http_requests_500.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `rest_client_requests_total{code =~ "5.."}`: `function`: `sum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
+|Kubernetes Scheduler |Kubernetes Scheduler: REST Client requests: 2xx, rate |<p>Number of HTTP requests with 2xx status code per second.</p> |DEPENDENT |kubernetes.scheduler.client_http_requests_200.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `rest_client_requests_total{code =~ "2.."}`: `function`: `sum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
+|Kubernetes Scheduler |Kubernetes Scheduler: REST Client requests: 3xx, rate |<p>Number of HTTP requests with 3xx status code per second.</p> |DEPENDENT |kubernetes.scheduler.client_http_requests_300.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `rest_client_requests_total{code =~ "3.."}`: `function`: `sum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
+|Kubernetes Scheduler |Kubernetes Scheduler: REST Client requests: 4xx, rate |<p>Number of HTTP requests with 4xx status code per second.</p> |DEPENDENT |kubernetes.scheduler.client_http_requests_400.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `rest_client_requests_total{code =~ "4.."}`: `function`: `sum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
+|Kubernetes Scheduler |Kubernetes Scheduler: REST Client requests: 5xx, rate |<p>Number of HTTP requests with 5xx status code per second.</p> |DEPENDENT |kubernetes.scheduler.client_http_requests_500.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `rest_client_requests_total{code =~ "5.."}`: `function`: `sum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
 |Kubernetes Scheduler |Kubernetes Scheduler: Schedule attempts: scheduled |<p>Number of attempts to schedule pods with result "scheduled" per second.</p> |DEPENDENT |kubernetes.scheduler.scheduler_schedule_attempts.scheduled.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `scheduler_schedule_attempts_total{result = "scheduled"}`: `function`: `sum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
 |Kubernetes Scheduler |Kubernetes Scheduler: Schedule attempts: unschedulable |<p>Number of attempts to schedule pods with result "unschedulable" per second.</p> |DEPENDENT |kubernetes.scheduler.scheduler_schedule_attempts.unschedulable.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `scheduler_schedule_attempts_total{result = "unschedulable"}`: `function`: `sum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
 |Kubernetes Scheduler |Kubernetes Scheduler: Schedule attempts: error |<p>Number of attempts to schedule pods with result "error" per second.</p> |DEPENDENT |kubernetes.scheduler.scheduler_schedule_attempts.error.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `scheduler_schedule_attempts_total{result = "error"}`: `function`: `sum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
@@ -86,7 +86,7 @@ There are no template links in this template.
 |Kubernetes Scheduler |Kubernetes Scheduler: ["{#RESULT}"]: e2e scheduling, p90 |<p>90 percentile of e2e scheduling latency.</p> |CALCULATED |kubernetes.scheduler.e2e_scheduling_p90["{#RESULT}"]<p>**Expression**:</p>`bucket_percentile(//kubernetes.scheduler.e2e_scheduling_bucket[*,"{#RESULT}"],5m,90)` |
 |Kubernetes Scheduler |Kubernetes Scheduler: ["{#RESULT}"]: e2e scheduling, p90 |<p>95 percentile of e2e scheduling latency.</p> |CALCULATED |kubernetes.scheduler.e2e_scheduling_p95["{#RESULT}"]<p>**Expression**:</p>`bucket_percentile(//kubernetes.scheduler.e2e_scheduling_bucket[*,"{#RESULT}"],5m,95)` |
 |Kubernetes Scheduler |Kubernetes Scheduler: ["{#RESULT}"]: e2e scheduling, p99 |<p>95 percentile of e2e scheduling latency.</p> |CALCULATED |kubernetes.scheduler.e2e_scheduling_p99["{#RESULT}"]<p>**Expression**:</p>`bucket_percentile(//kubernetes.scheduler.e2e_scheduling_bucket[*,"{#RESULT}"],5m,99)` |
-|Zabbix_raw_items |Kubernetes Scheduler: Get Scheduler metrics |<p>Get raw metrics from Scheduler instance /metrics endpoint</p> |HTTP_AGENT |kubernetes.scheduler.get_metrics<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Zabbix raw items |Kubernetes Scheduler: Get Scheduler metrics |<p>Get raw metrics from Scheduler instance /metrics endpoint</p> |HTTP_AGENT |kubernetes.scheduler.get_metrics<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 
 ## Triggers
 
@@ -100,5 +100,5 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
 

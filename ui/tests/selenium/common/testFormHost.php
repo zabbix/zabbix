@@ -1588,7 +1588,7 @@ class testFormHost extends CWebTest {
 
 		$cloned_form = (!$this->standalone)
 			? COverlayDialogElement::find()->asForm()->waitUntilPresent()->one()
-			: $this->query('id:host-form')->asForm()->waitUntilReady()->one();
+			: $this->query('id:host-form')->asForm()->waitUntilVisible()->one();
 
 		$cloned_form->submit();
 		$this->page->waitUntilReady();

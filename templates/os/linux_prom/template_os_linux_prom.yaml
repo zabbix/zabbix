@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-14T17:44:19Z'
+  date: '2022-01-26T14:29:54Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -24,7 +24,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387225-discussion-thread-for-official-zabbix-template-for-linux
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: 'Templates/Operating systems'
@@ -53,8 +53,8 @@ zabbix_export:
             key: node_exporter.get
           tags:
             -
-              tag: Application
-              value: 'Monitoring agent'
+              tag: component
+              value: application
         -
           uuid: d3631bd7effc4cd1bc45c991b3c3038f
           name: 'Number of open file descriptors'
@@ -74,8 +74,8 @@ zabbix_export:
             key: node_exporter.get
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: a8b78e776e1d4011bbcb6dd54e32b40b
           name: 'Maximum number of open file descriptors'
@@ -100,8 +100,8 @@ zabbix_export:
             key: node_exporter.get
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: c0002ad071d7497ab32633c93624e0c2
@@ -112,6 +112,10 @@ zabbix_export:
                 -
                   name: 'Running out of file descriptors (less than < 20% free)'
                   expression: 'last(/Linux by Prom/fd.open[node_exporter])/last(/Linux by Prom/kernel.maxfiles[node_exporter])*100>80'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 8b2fffcba0b24ca8a687361645ffaa1d
           name: 'Get node_exporter metrics'
@@ -123,8 +127,8 @@ zabbix_export:
           url: 'http://{HOST.CONN}:{$NODE_EXPORTER_PORT}/metrics'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
           triggers:
             -
               uuid: e33fafc8476e404aa4150d0d491f4c83
@@ -133,6 +137,10 @@ zabbix_export:
               priority: WARNING
               description: 'Failed to fetch system metrics from node_exporter in time.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 75afcb39d2d7496e9490cd14f1431600
           name: 'System boot time'
@@ -153,8 +161,8 @@ zabbix_export:
             key: node_exporter.get
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: a732c4df8af047fbb874e1fb363b5e9e
           name: 'CPU guest time'
@@ -191,8 +199,8 @@ zabbix_export:
             key: node_exporter.get
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
         -
           uuid: 759809ee6c9e43cf8ff44f987221a90e
           name: 'CPU guest nice time'
@@ -229,8 +237,8 @@ zabbix_export:
             key: node_exporter.get
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
         -
           uuid: 7bb99c606c6b497aaef279663b60829b
           name: 'CPU idle time'
@@ -267,8 +275,8 @@ zabbix_export:
             key: node_exporter.get
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
         -
           uuid: 4d3f64c79c684d55bcde14ca5bf3022a
           name: 'CPU interrupt time'
@@ -305,8 +313,8 @@ zabbix_export:
             key: node_exporter.get
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
         -
           uuid: 76206cf435fd4a979dbbf74807b532de
           name: 'Interrupts per second'
@@ -330,8 +338,8 @@ zabbix_export:
             key: node_exporter.get
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
         -
           uuid: 6a727e148a2c4956bcfb6de0a3486c2d
           name: 'CPU iowait time'
@@ -368,8 +376,8 @@ zabbix_export:
             key: node_exporter.get
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
         -
           uuid: 78fb393fe3d64cd7bf79be5427715add
           name: 'Load average (1m avg)'
@@ -389,8 +397,8 @@ zabbix_export:
             key: node_exporter.get
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
         -
           uuid: 7fc62b26b9ff43429632f1985dc07851
           name: 'Load average (5m avg)'
@@ -410,8 +418,8 @@ zabbix_export:
             key: node_exporter.get
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
         -
           uuid: 35fb0319c599403bbea0e616c9066e27
           name: 'Load average (15m avg)'
@@ -431,8 +439,8 @@ zabbix_export:
             key: node_exporter.get
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
         -
           uuid: 86de794832794f57ba428cca31031005
           name: 'CPU nice time'
@@ -469,8 +477,8 @@ zabbix_export:
             key: node_exporter.get
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
         -
           uuid: d7db65cfeaac4541bd98d06dc35f89e2
           name: 'Number of CPUs'
@@ -493,8 +501,8 @@ zabbix_export:
             key: node_exporter.get
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
         -
           uuid: cf3cd5840b91477d8e9254820896b978
           name: 'CPU softirq time'
@@ -531,8 +539,8 @@ zabbix_export:
             key: node_exporter.get
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
         -
           uuid: 2ee5885c4de646c0926f0c1a48890e68
           name: 'CPU steal time'
@@ -569,8 +577,8 @@ zabbix_export:
             key: node_exporter.get
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
         -
           uuid: b873e0d178d144fca3597d617fc119e7
           name: 'Context switches per second'
@@ -594,8 +602,8 @@ zabbix_export:
             key: node_exporter.get
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
         -
           uuid: e296be976c5944b19a7178304ed6140c
           name: 'CPU system time'
@@ -632,8 +640,8 @@ zabbix_export:
             key: node_exporter.get
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
         -
           uuid: 832698e707d14bad8171ca71a2533350
           name: 'CPU user time'
@@ -670,8 +678,8 @@ zabbix_export:
             key: node_exporter.get
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
         -
           uuid: 76f60c7e4f1a482198ff4f101020bbcc
           name: 'CPU utilization'
@@ -693,8 +701,8 @@ zabbix_export:
             key: 'system.cpu.idle[node_exporter]'
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
           triggers:
             -
               uuid: 4c924f8243a7431886a2d69368cb7142
@@ -710,6 +718,10 @@ zabbix_export:
                     min(/Linux by Prom/system.cpu.load.avg1[node_exporter],5m)/last(/Linux by Prom/system.cpu.num[node_exporter])>{$LOAD_AVG_PER_CPU.MAX.WARN}
                     and last(/Linux by Prom/system.cpu.load.avg5[node_exporter])>0
                     and last(/Linux by Prom/system.cpu.load.avg15[node_exporter])>0
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: c47995760ef3458eb6237e434ef4eef8
           name: 'System description'
@@ -739,8 +751,8 @@ zabbix_export:
             key: node_exporter.get
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 9fcb3dd70dc244f2b2ff86560b37ec7e
           name: 'System local time'
@@ -762,8 +774,8 @@ zabbix_export:
             key: node_exporter.get
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: e91c10be1c4a4c3fadfe06aec6c1e4e4
@@ -772,6 +784,13 @@ zabbix_export:
               priority: WARNING
               description: 'The host system time is different from the Zabbix server time.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: c70cfa2ad5754089935883c5b3172656
           name: 'System name'
@@ -798,8 +817,8 @@ zabbix_export:
             key: node_exporter.get
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: e827e944568b46e284820630482317bd
@@ -808,6 +827,13 @@ zabbix_export:
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: security
         -
           uuid: ce4bb6c485cc4b739dce31b631634790
           name: 'Operating system architecture'
@@ -833,8 +859,8 @@ zabbix_export:
             key: node_exporter.get
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: os
         -
           uuid: 11ff4e02245f4c2e9ce00e55c1a77b39
           name: 'Operating system'
@@ -854,8 +880,8 @@ zabbix_export:
             key: 'system.descr[node_exporter]'
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: os
           triggers:
             -
               uuid: 00974d5b128c4b1db64ca100770fb11b
@@ -868,6 +894,10 @@ zabbix_export:
                 -
                   name: 'System name has changed (new name: {ITEM.VALUE})'
                   expression: 'last(/Linux by Prom/system.name[node_exporter],#1)<>last(/Linux by Prom/system.name[node_exporter],#2) and length(last(/Linux by Prom/system.name[node_exporter]))>0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: ccc3c4d69fef412aa53c6a7320ef44fb
           name: 'Free swap space'
@@ -889,8 +919,11 @@ zabbix_export:
             key: node_exporter.get
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: storage
         -
           uuid: 99feb76b7da04b00a0d191b92bf979a1
           name: 'Free swap space in %'
@@ -903,8 +936,11 @@ zabbix_export:
           description: 'The free space of swap volume/file in percent.'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: storage
         -
           uuid: d0c1ef0a679546d780df30a02a27df44
           name: 'Total swap space'
@@ -926,8 +962,11 @@ zabbix_export:
             key: node_exporter.get
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: storage
         -
           uuid: 7eeabdb6bf44483bab91faaab8bb24d5
           name: 'System uptime'
@@ -955,8 +994,8 @@ zabbix_export:
             key: node_exporter.get
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: 83311a7c73c441d39d88fe0fc7b55af9
@@ -965,6 +1004,10 @@ zabbix_export:
               priority: WARNING
               description: 'The device uptime is less than 10 minutes.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 70a75efafbc84cbebd1bb262ec797523
           name: 'Available memory'
@@ -986,8 +1029,8 @@ zabbix_export:
             key: node_exporter.get
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: e3ad296f16084e9caa923b449d8c725f
           name: 'Total memory'
@@ -1009,8 +1052,8 @@ zabbix_export:
             key: node_exporter.get
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: 60c716c692fb482f9abffb0fc9ce4324
           name: 'Memory utilization'
@@ -1023,8 +1066,8 @@ zabbix_export:
           description: 'Memory used percentage is calculated as (total-available)/total*100.'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
           triggers:
             -
               uuid: 72304b3a167e41ccbcdb75568c65294a
@@ -1035,7 +1078,14 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
-                  expression: 'min(/Linux by Prom/vm.memory.available[node_exporter],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux by Prom/vm.memory.total[node_exporter])>0'
+                  expression: 'max(/Linux by Prom/vm.memory.available[node_exporter],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux by Prom/vm.memory.total[node_exporter])>0'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
       discovery_rules:
         -
           uuid: 91531a7a68564860976096df6899fe88
@@ -1098,8 +1148,14 @@ zabbix_export:
                 key: node_exporter.get
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: f6b39f743bb6438d876236ae651f68ee
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
@@ -1123,8 +1179,14 @@ zabbix_export:
                 key: node_exporter.get
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: eea37c3779994ac5b35bb3b125429340
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
@@ -1153,8 +1215,14 @@ zabbix_export:
                 key: node_exporter.get
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: aec995b7fe724823bdb41f134594b648
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
@@ -1178,8 +1246,14 @@ zabbix_export:
                 key: node_exporter.get
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 4ffe74b94eb14a4ea61c0df790d0920f
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
@@ -1203,8 +1277,14 @@ zabbix_export:
                 key: node_exporter.get
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: ddc4111fefec473e8d8b079f6eb50c05
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
@@ -1233,8 +1313,14 @@ zabbix_export:
                 key: node_exporter.get
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 51f9a39ad6d940ae914cd0a350d83dab
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
@@ -1262,8 +1348,14 @@ zabbix_export:
                 key: node_exporter.get
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 4097f76d86cd417db586c5973e1da90b
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
@@ -1316,8 +1408,14 @@ zabbix_export:
                 key: node_exporter.get
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: e35b59dc09754451a721793831edc3d4
@@ -1335,6 +1433,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: ce9cfd9880c44aaea18cfa2ab2fdf0e1
               name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
@@ -1357,8 +1459,14 @@ zabbix_export:
                 key: node_exporter.get
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
           trigger_prototypes:
             -
               uuid: 96bbb9726ef149a5b97f96d54502593a
@@ -1388,6 +1496,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])=2 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#1)<>last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#2))'
                   recovery_expression: 'last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 08d5857e474042b5906288156c8c5d52
               expression: |
@@ -1411,6 +1523,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])=2 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#1)<>last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#2))'
                   recovery_expression: 'last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 11e2c8023463482da878cdad5bb7de76
               expression: |
@@ -1431,6 +1547,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])=2 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#1)<>last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#2))'
                   recovery_expression: 'last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 6e8269b2260e42de97aec08043a768df
               expression: |
@@ -1443,13 +1563,20 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
-              description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold.'
+              description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
               manual_close: 'YES'
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])=2 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#1)<>last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#2))'
                   recovery_expression: 'last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
           graph_prototypes:
             -
               uuid: cf143a7bb6d548fc9d3b089dcbb47ccf
@@ -1559,8 +1686,11 @@ zabbix_export:
                 key: node_exporter.get
               tags:
                 -
-                  tag: Application
-                  value: 'Disk {#DEVNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: disk
+                  value: '{#DEVNAME}'
             -
               uuid: 9d158ecffdaa43f6bd0ab867ca68620b
               name: '{#DEVNAME}: Disk read request avg waiting time (r_await)'
@@ -1573,8 +1703,11 @@ zabbix_export:
               description: 'This formula contains two boolean expressions that evaluates to 1 or 0 in order to set calculated metric to zero and to avoid division by zero exception.'
               tags:
                 -
-                  tag: Application
-                  value: 'Disk {#DEVNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: disk
+                  value: '{#DEVNAME}'
             -
               uuid: dcd6f61ffb2f491ba78845514654a8cf
               name: '{#DEVNAME}: Disk read rate'
@@ -1600,8 +1733,11 @@ zabbix_export:
                 key: node_exporter.get
               tags:
                 -
-                  tag: Application
-                  value: 'Disk {#DEVNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: disk
+                  value: '{#DEVNAME}'
             -
               uuid: 73940f30ea2b4b88b0047e54b773b747
               name: '{#DEVNAME}: Disk read time (rate)'
@@ -1626,8 +1762,11 @@ zabbix_export:
                 key: node_exporter.get
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: storage
+                -
+                  tag: disk
+                  value: '{#DEVNAME}'
             -
               uuid: d087a0525500450c9a307ff21f58482a
               name: '{#DEVNAME}: Disk utilization'
@@ -1657,8 +1796,11 @@ zabbix_export:
                 key: node_exporter.get
               tags:
                 -
-                  tag: Application
-                  value: 'Disk {#DEVNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: disk
+                  value: '{#DEVNAME}'
             -
               uuid: 94203a49081047b6bc76cd66aecd55ce
               name: '{#DEVNAME}: Disk write request avg waiting time (w_await)'
@@ -1671,8 +1813,11 @@ zabbix_export:
               description: 'This formula contains two boolean expressions that evaluates to 1 or 0 in order to set calculated metric to zero and to avoid division by zero exception.'
               tags:
                 -
-                  tag: Application
-                  value: 'Disk {#DEVNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: disk
+                  value: '{#DEVNAME}'
             -
               uuid: 806ba0a56fab4b5094008c98bb817e2b
               name: '{#DEVNAME}: Disk write rate'
@@ -1698,8 +1843,11 @@ zabbix_export:
                 key: node_exporter.get
               tags:
                 -
-                  tag: Application
-                  value: 'Disk {#DEVNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: disk
+                  value: '{#DEVNAME}'
             -
               uuid: 601cc30457934b7f8f050b2cea13ccea
               name: '{#DEVNAME}: Disk write time (rate)'
@@ -1724,8 +1872,11 @@ zabbix_export:
                 key: node_exporter.get
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: storage
+                -
+                  tag: disk
+                  value: '{#DEVNAME}'
           trigger_prototypes:
             -
               uuid: 412381f71bba441b955898839f81d51c
@@ -1734,6 +1885,10 @@ zabbix_export:
               priority: WARNING
               description: 'This trigger might indicate disk {#DEVNAME} saturation.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: performance
           graph_prototypes:
             -
               uuid: 13a5a74a99734449b08075bbb25bb498
@@ -1856,8 +2011,11 @@ zabbix_export:
                 key: node_exporter.get
               tags:
                 -
-                  tag: Application
-                  value: 'Filesystem {#FSNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
             -
               uuid: ee1dad3677214561baafa6d930358ee0
               name: '{#FSNAME}: Free inodes in %'
@@ -1891,8 +2049,11 @@ zabbix_export:
                 key: node_exporter.get
               tags:
                 -
-                  tag: Application
-                  value: 'Filesystem {#FSNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
               trigger_prototypes:
                 -
                   uuid: 27cabcc9d9644ba6b7bd8c92a740e3cc
@@ -1903,6 +2064,13 @@ zabbix_export:
                   description: |
                     It may become impossible to write to disk if there are no index nodes left.
                     As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even though free space is available.
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: c639215f6dd94c71aebf97265a282a0d
                   expression: 'min(/Linux by Prom/vfs.fs.inode.pfree[node_exporter,"{#FSNAME}"],5m)<{$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}'
@@ -1916,6 +2084,13 @@ zabbix_export:
                     -
                       name: '{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)'
                       expression: 'min(/Linux by Prom/vfs.fs.inode.pfree[node_exporter,"{#FSNAME}"],5m)<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 89afe41bb0d74c579a9cff8b036d30dc
               name: '{#FSNAME}: Space utilization'
@@ -1928,8 +2103,11 @@ zabbix_export:
               description: 'Space utilization in % for {#FSNAME}'
               tags:
                 -
-                  tag: Application
-                  value: 'Filesystem {#FSNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
             -
               uuid: acb3d42ae23b48cbacd0e99c27697798
               name: '{#FSNAME}: Total space'
@@ -1951,8 +2129,11 @@ zabbix_export:
                 key: node_exporter.get
               tags:
                 -
-                  tag: Application
-                  value: 'Filesystem {#FSNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
             -
               uuid: 89e559a7ff364dd78b638454896692c5
               name: '{#FSNAME}: Used space'
@@ -1965,8 +2146,11 @@ zabbix_export:
               description: 'Used storage in Bytes'
               tags:
                 -
-                  tag: Application
-                  value: 'Filesystem {#FSNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
           trigger_prototypes:
             -
               uuid: d5687d7aa0484b389f0bd168d50ee1e6
@@ -1982,6 +2166,13 @@ zabbix_export:
                  - The disk free space is less than 5G.
                  - The disk will be full in less than 24 hours.
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: capacity
             -
               uuid: 8f765148cfd64d5ebda93f39d0b20e36
               expression: |
@@ -2002,6 +2193,13 @@ zabbix_export:
                   expression: |
                     last(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
                     ((last(/Linux by Prom/vfs.fs.total[node_exporter,"{#FSNAME}"])-last(/Linux by Prom/vfs.fs.used[node_exporter,"{#FSNAME}"]))<5G or timeleft(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"],1h,100)<1d)
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: capacity
           graph_prototypes:
             -
               uuid: aa350a426fcd40af96cd15f778cdf62d
@@ -2045,6 +2243,13 @@ zabbix_export:
               type: PROMETHEUS_TO_JSON
               parameters:
                 - '{__name__=~"^node_filesystem_size(?:_bytes)?$", mountpoint=~".+"}'
+      tags:
+        -
+          tag: class
+          value: os
+        -
+          tag: target
+          value: linux
       macros:
         -
           macro: '{$CPU.UTIL.CRIT}'
@@ -2598,24 +2803,35 @@ zabbix_export:
   triggers:
     -
       uuid: 16e6a4d340164dee9379a3fc0aac0576
-      expression: 'min(/Linux by Prom/system.swap.pfree[node_exporter],5m)<{$SWAP.PFREE.MIN.WARN} and last(/Linux by Prom/system.swap.total[node_exporter])>0'
+      expression: 'max(/Linux by Prom/system.swap.pfree[node_exporter],5m)<{$SWAP.PFREE.MIN.WARN} and last(/Linux by Prom/system.swap.total[node_exporter])>0'
       name: 'High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)'
       opdata: 'Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: WARNING
-      description: 'This trigger is ignored, if there is no swap configured.'
+      description: 'This trigger is ignored, if there is no swap configured'
       dependencies:
         -
           name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
           expression: 'min(/Linux by Prom/vm.memory.util[node_exporter],5m)>{$MEMORY.UTIL.MAX}'
         -
           name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
-          expression: 'min(/Linux by Prom/vm.memory.available[node_exporter],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux by Prom/vm.memory.total[node_exporter])>0'
+          expression: 'max(/Linux by Prom/vm.memory.available[node_exporter],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux by Prom/vm.memory.total[node_exporter])>0'
+      tags:
+        -
+          tag: scope
+          value: capacity
     -
       uuid: f78ed17586964a46a9de0c4f183984f6
-      expression: 'min(/Linux by Prom/vm.memory.available[node_exporter],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux by Prom/vm.memory.total[node_exporter])>0'
+      expression: 'max(/Linux by Prom/vm.memory.available[node_exporter],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux by Prom/vm.memory.total[node_exporter])>0'
       name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
       opdata: 'Available: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: AVERAGE
+      tags:
+        -
+          tag: scope
+          value: capacity
+        -
+          tag: scope
+          value: performance
     -
       uuid: e5897641e5594bf6b7b18ae4e107bd50
       expression: |
@@ -2626,12 +2842,23 @@ zabbix_export:
       opdata: 'Load averages(1m 5m 15m): ({ITEM.LASTVALUE1} {ITEM.LASTVALUE3} {ITEM.LASTVALUE4}), # of CPUs: {ITEM.LASTVALUE2}'
       priority: AVERAGE
       description: 'Per CPU load average is too high. Your system may be slow to respond.'
+      tags:
+        -
+          tag: scope
+          value: capacity
+        -
+          tag: scope
+          value: performance
     -
       uuid: 7effa63c9c994a6786279802aa7328ad
       expression: 'last(/Linux by Prom/fd.open[node_exporter])/last(/Linux by Prom/kernel.maxfiles[node_exporter])*100>80'
       name: 'Running out of file descriptors (less than < 20% free)'
       opdata: '{ITEM.LASTVALUE1} of {ITEM.LASTVALUE2} file descriptors are in use.'
       priority: WARNING
+      tags:
+        -
+          tag: scope
+          value: performance
   graphs:
     -
       uuid: bb8bb267b32b46bfa2a6277b65730396

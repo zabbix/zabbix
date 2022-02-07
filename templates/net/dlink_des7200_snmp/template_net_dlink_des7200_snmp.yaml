@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-18T20:42:25Z'
+  date: '2022-01-26T14:08:29Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -14,12 +14,13 @@ zabbix_export:
         Template D-Link DES 7200
         
         MIBs used:
+        ENTITY-MIBdescription has changed
+        IF-MIB
         MY-PROCESS-MIB
         SNMPv2-MIB
         MY-MEMORY-MIB
         ENTITY-MIB
         MY-SYSTEM-MIB
-        IF-MIB
         
         Template tooling version used: 0.41
       groups:
@@ -36,8 +37,11 @@ zabbix_export:
             name: 'Service state'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: a568e0a3c0074e6dbad92890067976f3
@@ -45,6 +49,10 @@ zabbix_export:
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: d18c1a0dbab64f238e82025d2c27b392
           name: 'ICMP loss'
@@ -55,8 +63,11 @@ zabbix_export:
           units: '%'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 12dea4dbaa3c4ef1a53456090ae3eb0e
@@ -68,6 +79,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/D-Link DES 7200 SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 117fec4f68ad4782a0b0407bc465a31b
           name: 'ICMP response time'
@@ -78,8 +96,11 @@ zabbix_export:
           units: s
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 88f2c517c1ba4f7881491a4b2b7f7ad0
@@ -94,6 +115,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/D-Link DES 7200 SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 2a3acf94555d457d8837c6e75abbbf34
           name: 'SNMP traps (fallback)'
@@ -106,8 +134,8 @@ zabbix_export:
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: network
         -
           uuid: aba1f89a56504dde9d0d6a60bafa9552
           name: 'System contact details'
@@ -129,8 +157,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: ec0e7cc71b39447087f580569559a6d6
           name: 'CPU utilization'
@@ -145,8 +173,8 @@ zabbix_export:
             CPU utilization in %
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
           triggers:
             -
               uuid: 6e12ba6b60b94ec6bf531b4bb234dc80
@@ -155,6 +183,10 @@ zabbix_export:
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 26752257ad0f4bc58f678c247524c4cc
           name: 'System description'
@@ -177,8 +209,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: c48928c7392d472d950804ee30936f0f
           name: 'Firmware version'
@@ -189,7 +221,7 @@ zabbix_export:
           history: 2w
           trends: '0'
           value_type: CHAR
-          description: 'MIB: ENTITY-MIB'
+          description: 'MIB: ENTITY-MIBdescription has changed'
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -197,8 +229,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
           triggers:
             -
               uuid: 7d8f92f3c5df4b5091f49e07e50fae44
@@ -208,6 +240,10 @@ zabbix_export:
               priority: INFO
               description: 'Firmware version has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 9461071bb9fa44909aa181779c894a7b
           name: 'Hardware model name'
@@ -231,8 +267,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
         -
           uuid: fd86860f9ebc42b1970a845b7940daed
           name: 'Hardware version(revision)'
@@ -251,8 +287,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
         -
           uuid: 64e931125c274e788b2f68dcb21725d8
           name: 'System location'
@@ -274,8 +310,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: fcf0be13144245568817543cfc47c006
           name: 'System name'
@@ -297,8 +333,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: 0c7a629e028e489c89647bf3ca51850e
@@ -307,6 +343,13 @@ zabbix_export:
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: security
         -
           uuid: f50184058d4549a1be9bae19c0743a84
           name: 'System object ID'
@@ -327,8 +370,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 8d31f35a9d8842f086a123014bfd27ad
           name: 'Operating system'
@@ -348,8 +391,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: os
           triggers:
             -
               uuid: 01ca34ebe7a94ed3b3e5ee8320ebce73
@@ -362,6 +405,10 @@ zabbix_export:
                 -
                   name: 'System name has changed (new name: {ITEM.VALUE})'
                   expression: 'last(/D-Link DES 7200 SNMP/system.name,#1)<>last(/D-Link DES 7200 SNMP/system.name,#2) and length(last(/D-Link DES 7200 SNMP/system.name))>0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: fb250daeb7e643f4b2f78ede9e26b8ec
           name: Uptime
@@ -382,8 +429,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: 6b200163bfcd4899a82bcf98aa026aa2
@@ -396,6 +443,10 @@ zabbix_export:
                 -
                   name: 'No SNMP data collection'
                   expression: 'max(/D-Link DES 7200 SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 4ca2130529464dc9ba9355a915c7e539
           name: 'SNMP agent availability'
@@ -412,8 +463,11 @@ zabbix_export:
             name: zabbix.host.available
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: dc5b0dda2d684665a5444e39db5e2257
@@ -426,6 +480,10 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/D-Link DES 7200 SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: 5e0940a9219c4d3094c85777e89c63a6
@@ -449,8 +507,8 @@ zabbix_export:
                 name: 'MY-SYSTEM-MIB::mySystemFanIsNormal'
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
               trigger_prototypes:
                 -
                   uuid: a5cb052573394829877fdc6bf3d501c0
@@ -459,6 +517,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: 80a71c76148f4408993f4d2fba2aac4c
           name: 'Memory Discovery'
@@ -481,8 +546,8 @@ zabbix_export:
                 This is the memory pool utilization currently.
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
               trigger_prototypes:
                 -
                   uuid: fd484f9b3a6a414fb2bba47d5804cc62
@@ -490,6 +555,13 @@ zabbix_export:
                   name: '{#SNMPINDEX}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: b1d8dafbce0c4b6abc0ad18f2a91d1e3
@@ -591,8 +663,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: afc0471bfc314108b01544fac5acd62e
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
@@ -611,8 +689,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: ad7d24d91cb94c44849ecb6452f8015d
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
@@ -636,8 +720,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 42fd86abfb7542ef98d1aa38a2b2296a
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
@@ -660,8 +750,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 85c4804fcef04f8d8dc5d85c0e304144
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
@@ -680,8 +776,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 663d3019261746c8893449dbc68facca
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
@@ -705,8 +807,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: aa85e35f21e2466798b15f98ac95837c
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
@@ -731,8 +839,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: bca43e91bec842b6b0c29b9ce55eb1a2
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
@@ -754,8 +868,14 @@ zabbix_export:
                 name: 'IF-MIB::ifOperStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: 8d5d2b10f5c541d9858b124ca3ea23aa
@@ -773,6 +893,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: fb1305c657c34021adbc6e260d880495
               name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
@@ -796,8 +920,14 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
           trigger_prototypes:
             -
               uuid: 04d35a5ff5d34caf91f354b76677f78e
@@ -827,6 +957,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/D-Link DES 7200 SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/D-Link DES 7200 SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/D-Link DES 7200 SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/D-Link DES 7200 SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 76191d56356c4f389e3b7ca182ac28b2
               expression: |
@@ -847,6 +981,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/D-Link DES 7200 SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/D-Link DES 7200 SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/D-Link DES 7200 SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/D-Link DES 7200 SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: d9f6f23364c54fd1984fe049a4fc16e4
               expression: |
@@ -866,6 +1004,13 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/D-Link DES 7200 SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/D-Link DES 7200 SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/D-Link DES 7200 SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/D-Link DES 7200 SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
           graph_prototypes:
             -
               uuid: 688599e428b04777be52f49a860d8ba6
@@ -934,8 +1079,8 @@ zabbix_export:
                 name: 'MY-SYSTEM-MIB::mySystemFanIsNormal'
               tags:
                 -
-                  tag: Application
-                  value: 'Power supply'
+                  tag: component
+                  value: power
               trigger_prototypes:
                 -
                   uuid: 4cc6f58430374fc4b2f1bced4e2097f6
@@ -944,6 +1089,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: d596adf697c1431cbe1244fe2737ca55
           name: 'Temperature Discovery'
@@ -966,8 +1118,8 @@ zabbix_export:
                 Return the current temperature of the FastSwitch.The temperature display is not supported for the current temperature returns to 0.
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: b675df20392d458f9a53dace6bde978a
@@ -978,6 +1130,13 @@ zabbix_export:
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 8486ed430ee24b13b65786e5b4857684
                   expression: 'avg(/D-Link DES 7200 SNMP/sensor.temp.value[mySystemTemperatureCurrent.{#SNMPINDEX}],5m)>{$TEMP_WARN:""}'
@@ -992,6 +1151,13 @@ zabbix_export:
                       name: '{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
                       expression: 'avg(/D-Link DES 7200 SNMP/sensor.temp.value[mySystemTemperatureCurrent.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
                       recovery_expression: 'max(/D-Link DES 7200 SNMP/sensor.temp.value[mySystemTemperatureCurrent.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: ef5a9113e96d4cc095d384cbeeef9bc5
                   expression: 'avg(/D-Link DES 7200 SNMP/sensor.temp.value[mySystemTemperatureCurrent.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
@@ -1000,6 +1166,23 @@ zabbix_export:
                   name: '{#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
+      tags:
+        -
+          tag: class
+          value: network
+        -
+          tag: target
+          value: des7200
+        -
+          tag: target
+          value: dlink
       macros:
         -
           macro: '{$CPU.UTIL.CRIT}'

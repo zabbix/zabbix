@@ -70,7 +70,7 @@ There are no template links in this template.
 |Temperature |Temperature: Ambient |<p>MIB: PROSTAR-MPPT</p><p>Ambient Temperature</p><p> Description:Ambient Temperature</p><p> Scaling Factor:1.0</p><p> Units:deg C</p><p> Range:[-128, 127]</p><p> Modbus address:0x001C</p> |SNMP |temp.ambient[ambientTemperature.0] |
 |Temperature |Temperature: Battery |<p>MIB: PROSTAR-MPPT</p><p>Battery Temperature</p><p>  Description:Battery Temperature</p><p>  Scaling Factor:1.0</p><p>  Units:deg C</p><p>  Range:[-128, 127]</p><p>  Modbus address:0x001B</p> |SNMP |temp.battery[batteryTemperature.0] |
 |Temperature |Temperature: Heatsink |<p>MIB: PROSTAR-MPPT</p><p>Heatsink Temperature</p><p> Description:Heatsink Temperature</p><p> Scaling Factor:1.0</p><p> Units:deg C</p><p> Range:[-128, 127]</p><p> Modbus address:0x001A</p> |SNMP |temp.heatsink[heatsinkTemperature.0] |
-|Zabbix_raw_items |Battery: Battery Voltage discovery |<p>MIB: PROSTAR-MPPT</p> |SNMP |battery.voltage.discovery[batteryTerminalVoltage.0] |
+|Zabbix raw items |Battery: Battery Voltage discovery |<p>MIB: PROSTAR-MPPT</p> |SNMP |battery.voltage.discovery[batteryTerminalVoltage.0] |
 
 ## Triggers
 

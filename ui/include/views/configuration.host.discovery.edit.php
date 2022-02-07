@@ -1004,11 +1004,15 @@ if (!empty($data['itemid'])) {
 	$tab->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
 }
 else {
+	$cancel_button = $data['backurl'] !== null
+		? new CButtonCancel(null, "redirect('".$data['backurl']."');")
+		: new CButtonCancel(url_param('context'));
+
 	$tab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		[
 			(new CSimpleButton(_('Test')))->setId('test_item'),
-			new CButtonCancel(url_param('context'), "redirect('".$data['backurl']."');")
+			$cancel_button
 		]
 	));
 }

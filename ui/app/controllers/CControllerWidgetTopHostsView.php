@@ -47,6 +47,8 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 	/**
 	 * @param array $fields
 	 *
+	 * @throws Exception
+	 *
 	 * @return array
 	 */
 	private static function getData(array $fields): array {
@@ -106,6 +108,8 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 			$master_hostids[$master_items[$itemid]['hostid']] = true;
 		}
 
+		$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
+
 		$item_values = [];
 
 		foreach ($configuration as $column_index => &$column) {
@@ -115,6 +119,25 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 
 			$calc_extremes = $column['display'] == CWidgetFieldColumnsList::DISPLAY_BAR
 				|| $column['display'] == CWidgetFieldColumnsList::DISPLAY_INDICATORS;
+
+			if ($calc_extremes) {
+				if ($column['min'] !== '' && $number_parser->parse($column['min']) == CParser::PARSE_SUCCESS) {
+					$column['min'] = $number_parser->calcValue();
+				}
+
+				if ($column['max'] !== '' && $number_parser->parse($column['max']) == CParser::PARSE_SUCCESS) {
+					$column['max'] = $number_parser->calcValue();
+				}
+			}
+
+			if (array_key_exists('thresholds', $column)) {
+				foreach ($column['thresholds'] as &$threshold) {
+					if ($number_parser->parse($threshold['threshold']) == CParser::PARSE_SUCCESS) {
+						$threshold['threshold'] = $number_parser->calcValue();
+					}
+				}
+				unset($threshold);
+			}
 
 			if ($column_index == $fields['column']) {
 				$column_items = $master_items;
@@ -200,8 +223,7 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 
 					case CWidgetFieldColumnsList::DATA_TEXT:
 						$row[] = [
-							'value' => $text_columns[$column_index][$hostid_to_itemid[$hostid]],
-							'hostid' => $hostid
+							'value' => $text_columns[$column_index][$hostid_to_itemid[$hostid]]
 						];
 
 						break;
@@ -243,8 +265,9 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 			'monitored' => true,
 			'webitems' => true,
 			'filter' => [
+				'name' => $name,
 				'status' => ITEM_STATUS_ACTIVE,
-				'name' => $name
+				'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]
 			],
 			'sortfield' => 'key_',
 			'preservekeys' => true
@@ -265,37 +288,59 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 
 	/**
 	 * @param array $items
-	 * @param array $column_fields
+	 * @param array $column
 	 * @param int   $time_now
 	 *
 	 * @return array
 	 */
-	private static function getItemValues(array $items, array $column_fields, int $time_now): array {
-		$timeshift = $column_fields['timeshift'] !== '' ? timeUnitToSeconds($column_fields['timeshift']) : 0;
+	private static function getItemValues(array $items, array $column, int $time_now): array {
+		static $history_period;
 
-		if ($timeshift == 0 && $column_fields['aggregate_function'] == AGGREGATE_NONE) {
-			$data = Manager::History()->getLastValues($items);
-
-			return array_column(array_column($data, 0), 'value', 'itemid');
+		if ($history_period === null) {
+			$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
 		}
+
+		$timeshift = $column['timeshift'] !== '' ? timeUnitToSeconds($column['timeshift']) : 0;
 
 		$time_to = $time_now + $timeshift;
 
-		$time_from = $column_fields['aggregate_function'] != AGGREGATE_NONE
-			? $time_to - timeUnitToSeconds($column_fields['aggregate_interval'])
-			: $time_to - timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
+		$time_from = $column['aggregate_function'] != AGGREGATE_NONE
+			? $time_to - timeUnitToSeconds($column['aggregate_interval'])
+			: $time_to - $history_period;
 
-		self::addDataSource($items, $time_from, $time_now, $column_fields['data']);
-
-		$function = $column_fields['aggregate_function'] != AGGREGATE_NONE
-			? $column_fields['aggregate_function']
+		$function = $column['aggregate_function'] != AGGREGATE_NONE
+			? $column['aggregate_function']
 			: AGGREGATE_LAST;
 
 		$interval = $time_to;
 
-		$data = Manager::History()->getAggregationByInterval($items, $time_from, $time_to, $function, $interval);
+		self::addDataSource($items, $time_from, $time_now, $column['history']);
 
-		return array_column(array_column(array_column($data, 'data'), 0), 'value', 'itemid');
+		$result = [];
+
+		if ($timeshift == 0 && $column['aggregate_function'] == AGGREGATE_NONE) {
+			$items_by_source = ['history' => [], 'trends' => []];
+
+			foreach ($items as $itemid => $item) {
+				$items_by_source[$item['source']][$itemid] = $item;
+			}
+
+			$values = Manager::History()->getLastValues($items_by_source['history'], 1, $history_period);
+			$values = array_column(array_column($values, 0), 'value', 'itemid');
+
+			$result += $values;
+
+			$items = $items_by_source['trends'];
+		}
+
+		$values = Manager::History()->getAggregationByInterval($items, $time_from, $time_to, $function, $interval);
+		$values = array_column(array_column(array_column($values, 'data'), 0),
+			$function == AGGREGATE_COUNT ? 'count' : 'value', 'itemid'
+		);
+
+		$result += $values;
+
+		return $result;
 	}
 
 	/**

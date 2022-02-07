@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-18T20:42:49Z'
+  date: '2022-01-26T14:22:01Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -41,8 +41,11 @@ zabbix_export:
             name: 'Service state'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 1bd6a4748e29498e99ccd3b23d83cdf7
@@ -50,6 +53,10 @@ zabbix_export:
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 49b86b6d17394b859b02ea79c6d28b30
           name: 'ICMP loss'
@@ -60,8 +67,11 @@ zabbix_export:
           units: '%'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: d41edaea369d40d2944af72a3ee76850
@@ -73,6 +83,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/HP Comware HH3C SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 1560f8f1509040a783e4149845ce38a3
           name: 'ICMP response time'
@@ -83,8 +100,11 @@ zabbix_export:
           units: s
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 2698115b6f014e8cbdb11c2d5eeb8f08
@@ -99,6 +119,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/HP Comware HH3C SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: fa164b01a218494dab454126b4f561a9
           name: 'SNMP traps (fallback)'
@@ -111,8 +138,8 @@ zabbix_export:
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: network
         -
           uuid: 6f340c49d4364b8096a49c3fa52e2745
           name: 'System contact details'
@@ -134,8 +161,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 85e404c0181143f28b1187acb08cfa04
           name: 'System description'
@@ -158,8 +185,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 3e4feed03de941c98e88e17b3e81b5e4
           name: 'System location'
@@ -181,8 +208,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: b57179ad3e5f41f5805e93ff9e68d631
           name: 'System name'
@@ -204,8 +231,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: cf1d0aa58a194904902899dbba814514
@@ -214,6 +241,13 @@ zabbix_export:
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: security
         -
           uuid: 72139a34e0cf4357b86a52cf8430ee8c
           name: 'System object ID'
@@ -234,8 +268,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: ac039d3041cc439eb1c3184ed78554d0
           name: Uptime
@@ -256,8 +290,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: c1372deba2b148f4ac8be6493f0b9868
@@ -270,6 +304,10 @@ zabbix_export:
                 -
                   name: 'No SNMP data collection'
                   expression: 'max(/HP Comware HH3C SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: c407deea6e0f41b18d84ccbe7fcbca63
           name: 'SNMP agent availability'
@@ -286,8 +324,11 @@ zabbix_export:
             name: zabbix.host.available
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: bc6e9c399c3d4d43aaeb5a1b03deb7d4
@@ -300,6 +341,10 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/HP Comware HH3C SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: ab903dd9cb4b49daba7a1bb0c2c65a1f
@@ -333,8 +378,8 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: Inventory
+                  tag: component
+                  value: system
               trigger_prototypes:
                 -
                   uuid: 17e0f72418f4432d852b5c39ddf675bd
@@ -344,6 +389,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Firmware version has changed. Ack to close'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: cc241e313bde48e1bd23f3eefb667439
               name: '{#ENT_NAME}: Hardware model name'
@@ -362,8 +411,8 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: Inventory
+                  tag: component
+                  value: system
             -
               uuid: 9ebc80e149fc4db7a4fb7df2322aad86
               name: '{#ENT_NAME}: Hardware serial number'
@@ -382,8 +431,8 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: Inventory
+                  tag: component
+                  value: system
               trigger_prototypes:
                 -
                   uuid: d3633f4584344570a1c0570f0b082590
@@ -392,6 +441,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: a63db3df3939447397df5bf9a58edde1
               name: '{#ENT_NAME}: Hardware version(revision)'
@@ -410,8 +463,8 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: Inventory
+                  tag: component
+                  value: system
             -
               uuid: a54f57e58f494300b99161b1fb8f2edf
               name: '{#ENT_NAME}: Operating system'
@@ -430,8 +483,8 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: Inventory
+                  tag: component
+                  value: os
               trigger_prototypes:
                 -
                   uuid: 9e6cccf7daec4405ac3bb1a27670fcee
@@ -444,6 +497,10 @@ zabbix_export:
                     -
                       name: 'System name has changed (new name: {ITEM.VALUE})'
                       expression: 'last(/HP Comware HH3C SNMP/system.name,#1)<>last(/HP Comware HH3C SNMP/system.name,#2) and length(last(/HP Comware HH3C SNMP/system.name))>0'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
         -
           uuid: fdd2fcda49ab4f00861f1a2dcee1dcad
           name: 'FAN Discovery'
@@ -476,8 +533,8 @@ zabbix_export:
                 name: 'HH3C-ENTITY-EXT-MIB::hh3cEntityExtErrorStatus'
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
               trigger_prototypes:
                 -
                   uuid: b0821c8e75e14e53906c3a3f209a2785
@@ -486,6 +543,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: 268421e66ba94cecac8fdeac7dfbffbb
           name: 'Module Discovery'
@@ -522,8 +586,8 @@ zabbix_export:
                 is not sensible with the number of CPU on the entity
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
               trigger_prototypes:
                 -
                   uuid: 37a4a248c89240fe82c5fd6622123aa0
@@ -532,6 +596,10 @@ zabbix_export:
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'CPU utilization is too high. The system might be slow to respond.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 3021126f556f4c62b335c8108ba1cff1
               name: '{#MODULE_NAME}: Memory utilization'
@@ -547,8 +615,8 @@ zabbix_export:
                 percent of memory are used.
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
               trigger_prototypes:
                 -
                   uuid: e8d3cb45afea4cbd935c9ea668746260
@@ -556,6 +624,13 @@ zabbix_export:
                   name: '{#MODULE_NAME}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: 2f7801aa39bd486bb9d2ff751c98559b
@@ -669,8 +744,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 442bc76f9f4441f6b3c7ff60b9359e2b
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
@@ -689,8 +770,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: ac12b0e85f3b49239838c6625d62d8a9
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
@@ -714,8 +801,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: ed6e19e8821349f380a3c0d4fdd2f4e0
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
@@ -738,8 +831,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: d077353aafbb43678bed7dba795923ce
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
@@ -758,8 +857,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: e76bb270115240d8b0fdb17b1b010418
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
@@ -783,8 +888,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 61b52d6ce511476a8baeaf302476e831
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
@@ -809,8 +920,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 4391767dc38e4f4fbc1cd2dc186beb82
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
@@ -832,8 +949,14 @@ zabbix_export:
                 name: 'IF-MIB::ifOperStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: d0a5ea31836946f28abe357440ebdbea
@@ -851,6 +974,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 2733e5694b544bb98ff981b2ed8371ec
               name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
@@ -874,8 +1001,14 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
           trigger_prototypes:
             -
               uuid: b672a06043664dafa8f69d7d530a8723
@@ -905,6 +1038,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/HP Comware HH3C SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/HP Comware HH3C SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/HP Comware HH3C SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/HP Comware HH3C SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 98c74ed2d41941218802f4c472331f46
               expression: |
@@ -925,6 +1062,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/HP Comware HH3C SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/HP Comware HH3C SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/HP Comware HH3C SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/HP Comware HH3C SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: d7d8ad2b63ac41e6b84852c312c2a8d9
               expression: |
@@ -944,6 +1085,13 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/HP Comware HH3C SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/HP Comware HH3C SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/HP Comware HH3C SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/HP Comware HH3C SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
           graph_prototypes:
             -
               uuid: 220602812c8e4507a236a945fe3ec539
@@ -1047,8 +1195,14 @@ zabbix_export:
                 name: 'EtherLike-MIB::dot3StatsDuplexStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: 0ff624a6250b431498e4747678149e4b
@@ -1057,6 +1211,10 @@ zabbix_export:
                   priority: WARNING
                   description: 'Please check autonegotiation settings and cabling'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
           preprocessing:
             -
               type: JAVASCRIPT
@@ -1108,8 +1266,8 @@ zabbix_export:
                 name: 'HH3C-ENTITY-EXT-MIB::hh3cEntityExtErrorStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Power supply'
+                  tag: component
+                  value: power
               trigger_prototypes:
                 -
                   uuid: 0c3cb88352e2417fb2b80bb78448fb35
@@ -1118,6 +1276,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: 14606d314fc24002a0a4cda2fa009d45
           name: 'Temperature Discovery'
@@ -1156,8 +1321,8 @@ zabbix_export:
                 The temperature for the {#SNMPVALUE}.
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: bbad03018e8e408c952cca2615b4eab3
@@ -1168,6 +1333,13 @@ zabbix_export:
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: cda6a4e305fe41239462d2f85acc5590
                   expression: 'avg(/HP Comware HH3C SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:""}'
@@ -1182,6 +1354,13 @@ zabbix_export:
                       name: '{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
                       expression: 'avg(/HP Comware HH3C SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
                       recovery_expression: 'max(/HP Comware HH3C SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 340a9c397bff4ac5a37a2ada9d0c1e69
                   expression: 'avg(/HP Comware HH3C SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
@@ -1190,6 +1369,23 @@ zabbix_export:
                   name: '{#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
+      tags:
+        -
+          tag: class
+          value: network
+        -
+          tag: target
+          value: hp
+        -
+          tag: target
+          value: hp-comware
       macros:
         -
           macro: '{$CPU.UTIL.CRIT}'
