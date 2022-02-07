@@ -39,7 +39,7 @@ class testPageLatestData extends CWebTest {
 			' FROM items WHERE hostid in ('.
 				'SELECT hostid FROM hosts'.
 				' WHERE name='.zbx_dbstr($hostname).
-			') AND name ="Zabbix agent ping"'
+			') AND name='.zbx_dbstr('Zabbix agent ping')
 		);
 
 		// Add data to item agent.ping to see "With data"/"Without data" subfilter.

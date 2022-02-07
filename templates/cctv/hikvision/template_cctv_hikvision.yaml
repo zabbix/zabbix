@@ -1,10 +1,10 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:31:50Z'
+  date: '2022-01-31T08:51:43Z'
   groups:
     -
-      uuid: 57b7ae836ca64446ba2c296389c009b7
-      name: Templates/Modules
+      uuid: d37f71c7e3f7469bab645852a69a2018
+      name: 'Templates/Video surveillance'
   templates:
     -
       uuid: 3fb4020df2984b0ab64dfd8355ff5c65
@@ -13,7 +13,7 @@ zabbix_export:
       description: 'Template tooling version used: 0.41'
       groups:
         -
-          name: Templates/Modules
+          name: 'Templates/Video surveillance'
       items:
         -
           uuid: e889b3a7e6044f0284081f9d6427b416
