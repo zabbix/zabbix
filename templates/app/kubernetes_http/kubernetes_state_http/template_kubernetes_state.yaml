@@ -603,20 +603,18 @@ zabbix_export:
                     workerNodes = [];
             
                 for (idx in nodes.items) {
-                    for (label in nodes.items[idx].metadata.labels) {
-                        var internalIPs = nodes.items[idx].status.addresses.filter(function (addr) {
-                            return addr.type === 'InternalIP';
-                        });
+                    var internalIPs = nodes.items[idx].status.addresses.filter(function (addr) {
+                        return addr.type === 'InternalIP';
+                    });
             
-                        var internalIP = internalIPs.length && internalIPs[0].address;
+                    var internalIP = internalIPs.length && internalIPs[0].address;
             
-                        workerNodes.push({
-                            '{#NAME}': nodes.items[idx].metadata.name,
-                            '{#IP}': internalIP,
-                            '{#KUBE.KUBELET.URL}': Kube.params.kubelet_scheme + '://' + internalIP + ':' + Kube.params.kubelet_port,
-                            '{#ROLE.WORKER}' : 'Worker'
-                        });
-                    }
+                    workerNodes.push({
+                        '{#NAME}': nodes.items[idx].metadata.name,
+                        '{#IP}': internalIP,
+                        '{#KUBE.KUBELET.URL}': Kube.params.kubelet_scheme + '://' + internalIP + ':' + Kube.params.kubelet_port,
+                        '{#ROLE.WORKER}' : 'Worker'
+                    });
                 }
             
                 return JSON.stringify(workerNodes);
@@ -1680,6 +1678,9 @@ zabbix_export:
                   tag: component
                   value: pod
                 -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
                   tag: pod
                   value: '{#NAME}'
             -
@@ -1707,6 +1708,9 @@ zabbix_export:
                   tag: component
                   value: pod
                 -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
                   tag: pod
                   value: '{#NAME}'
             -
@@ -1732,6 +1736,9 @@ zabbix_export:
                 -
                   tag: component
                   value: pod
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
                 -
                   tag: pod
                   value: '{#NAME}'
@@ -1760,6 +1767,9 @@ zabbix_export:
                   tag: component
                   value: pod
                 -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
                   tag: pod
                   value: '{#NAME}'
             -
@@ -1786,6 +1796,9 @@ zabbix_export:
                   tag: component
                   value: pod
                 -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
                   tag: pod
                   value: '{#NAME}'
             -
@@ -1811,6 +1824,9 @@ zabbix_export:
                 -
                   tag: component
                   value: pod
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
                 -
                   tag: pod
                   value: '{#NAME}'
@@ -1847,6 +1863,9 @@ zabbix_export:
                   tag: component
                   value: pod
                 -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
                   tag: pod
                   value: '{#NAME}'
             -
@@ -1872,6 +1891,9 @@ zabbix_export:
                 -
                   tag: component
                   value: pod
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
                 -
                   tag: pod
                   value: '{#NAME}'
@@ -1899,6 +1921,9 @@ zabbix_export:
                   tag: component
                   value: pod
                 -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
                   tag: pod
                   value: '{#NAME}'
             -
@@ -1924,6 +1949,9 @@ zabbix_export:
                 -
                   tag: component
                   value: pod
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
                 -
                   tag: pod
                   value: '{#NAME}'
@@ -1951,6 +1979,9 @@ zabbix_export:
                   tag: component
                   value: pod
                 -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
                   tag: pod
                   value: '{#NAME}'
             -
@@ -1976,6 +2007,9 @@ zabbix_export:
                 -
                   tag: component
                   value: pod
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
                 -
                   tag: pod
                   value: '{#NAME}'
@@ -2003,6 +2037,9 @@ zabbix_export:
                   tag: component
                   value: pod
                 -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
                   tag: pod
                   value: '{#NAME}'
             -
@@ -2028,6 +2065,9 @@ zabbix_export:
                 -
                   tag: component
                   value: pod
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
                 -
                   tag: pod
                   value: '{#NAME}'
@@ -2055,6 +2095,9 @@ zabbix_export:
                   tag: component
                   value: pod
                 -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
                   tag: pod
                   value: '{#NAME}'
             -
@@ -2081,6 +2124,9 @@ zabbix_export:
                   tag: component
                   value: pod
                 -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
                   tag: pod
                   value: '{#NAME}'
             -
@@ -2106,6 +2152,9 @@ zabbix_export:
                 -
                   tag: component
                   value: pod
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
                 -
                   tag: pod
                   value: '{#NAME}'
@@ -2195,10 +2244,40 @@ zabbix_export:
                   tag: phase
                   value: '{#NAME}'
             -
+              uuid: 4c40f651f72446efb48cd50cdc2a32bb
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] PVC [{#NAME}] Resource: Requests storage'
+              type: DEPENDENT
+              key: 'kube.pvc.requests_storage[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'The capacity of storage requested by the persistent volume claim.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_persistentvolumeclaim_resource_requests_storage_bytes{namespace="{#NAMESPACE}", persistentvolumeclaim="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: pvc
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: pvc
+                  value: '{#NAME}'
+            -
               uuid: 6bbe0a1846834467b6147ecfe0c53035
               name: 'Kubernetes: Namespace [{#NAMESPACE}] Status phase: Active, sum'
               type: DEPENDENT
-              key: 'kube.pvc.status_phase.active.sum[{#NAMESPACE}]'
+              key: 'kube.pvc.status_phase.active.sum[{#NAMESPACE}/{#NAME}]'
               delay: '0'
               history: 7d
               value_type: FLOAT
@@ -2256,7 +2335,7 @@ zabbix_export:
               uuid: c6560c039b894af6a264a0f509491c1f
               name: 'Kubernetes: Namespace [{#NAMESPACE}] Status phase: Bound, sum'
               type: DEPENDENT
-              key: 'kube.pvc.status_phase.bound.sum[{#NAMESPACE}]'
+              key: 'kube.pvc.status_phase.bound.sum[{#NAMESPACE}/{#NAME}]'
               delay: '0'
               history: 7d
               value_type: FLOAT
@@ -2314,7 +2393,7 @@ zabbix_export:
               uuid: 6810603a92d941afa29dc2e9314d92ae
               name: 'Kubernetes: Namespace [{#NAMESPACE}] Status phase: Lost, sum'
               type: DEPENDENT
-              key: 'kube.pvc.status_phase.lost.sum[{#NAMESPACE}]'
+              key: 'kube.pvc.status_phase.lost.sum[{#NAMESPACE}/{#NAME}]'
               delay: '0'
               history: 7d
               value_type: FLOAT
@@ -2372,7 +2451,7 @@ zabbix_export:
               uuid: 1227e04d6b374154bbf07f1cf64eebeb
               name: 'Kubernetes: Namespace [{#NAMESPACE}] Status phase: Pending, sum'
               type: DEPENDENT
-              key: 'kube.pvc.status_phase.pending.sum[{#NAMESPACE}]'
+              key: 'kube.pvc.status_phase.pending.sum[{#NAMESPACE}/{#NAME}]'
               delay: '0'
               history: 7d
               value_type: FLOAT

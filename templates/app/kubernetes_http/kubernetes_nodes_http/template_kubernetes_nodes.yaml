@@ -36,10 +36,9 @@ zabbix_export:
             var Kube = {
                   params: {},
                   pods_limit: 1000,
-                  endpoint_name: 'zabbix-agent',
             
                   setParams: function (params) {
-                      ['api_endpoint', 'token'].forEach(function (field) {
+                      ['api_endpoint', 'token', 'endpoint_name'].forEach(function (field) {
                           if (typeof params !== 'object' || typeof params[field] === 'undefined'
                               || params[field] === '') {
                               throw 'Required param is not set: "' + field + '".';
@@ -129,7 +128,7 @@ zabbix_export:
                       };
             
                       result.response.items.forEach(function (ep) {
-                          if (ep.metadata.name === Kube.endpoint_name && Array.isArray(ep.subsets)) {
+                          if (ep.metadata.name === Kube.params.endpoint_name && Array.isArray(ep.subsets)) {
                               ep.subsets.forEach(function (subset) {
                                   if (Array.isArray(subset.addresses)) {
                                       subset.addresses.forEach(function (addr) {
@@ -284,6 +283,9 @@ zabbix_export:
             -
               name: token
               value: '{$KUBE.API.TOKEN}'
+            -
+              name: endpoint_name
+              value: '{$KUBE.NODES.ENDPOINT.NAME}'
           tags:
             -
               tag: component
@@ -1812,7 +1814,7 @@ zabbix_export:
                           output = [];
                   
                       if (typeof input !== 'object' || typeof input.items === 'undefined') {
-                          Zabbix.log(4, '[ Kubernetes ] Received incorrect JSON: ' + {0});
+                          Zabbix.log(4, '[ Kubernetes ] Received incorrect JSON: ' + input);
                           throw 'Incorrect JSON. Check debug log for more information.';
                       }
                   
@@ -1911,6 +1913,10 @@ zabbix_export:
         -
           macro: '{$KUBE.NODE.FILTER.LABELS}'
           description: 'Labels to filter nodes (regex in values are supported)'
+        -
+          macro: '{$KUBE.NODES.ENDPOINT.NAME}'
+          value: zabbix-agent
+          description: 'Kubenetes nodes endpoint name'
         -
           macro: '{$KUBE.POD.FILTER.ANNOTATIONS}'
           description: 'Annotations to filter pods (regex in values are supported)'
