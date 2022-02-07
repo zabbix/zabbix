@@ -3,9 +3,9 @@
 
 	<taskdef resource="net/sf/antcontrib/antlib.xml" />
 
-	<!-- oracle oci library has functions declarations without arguments: f() instead of f(void), so it triggers pedantic warning -->
-	<property name="COMP_FLAGS_ORACLE" value="-g -std=gnu99 -Wall -Wextra -Wunused -Wshadow -Wstrict-prototypes -Wdeclaration-after-statement -Wpointer-arith -Wno-maybe-uninitialized -Wformat -Wmissing-prototypes -Wunreachable-code -Wformat-extra-args -Wno-missing-field-initializers -Wno-missing-field-initializers-Wincompatible-pointer-types"/>
-	<property name="COMP_FLAGS" value="-pedantic ${COMP_FLAGS_ORACLE}"/>
+	<!-- oracle oci library has functions declarations without arguments: f() instead of f(void), so it triggers -Wstrict-prototypes warning -->
+	<property name="COMP_FLAGS_ORACLE" value="-g -std=gnu99 -pedantic -Wall -Wextra -Wunused -Wshadow -Wdeclaration-after-statement -Wpointer-arith -Wno-maybe-uninitialized -Wformat -Wmissing-prototypes -Wunreachable-code -Wformat-extra-args -Wno-missing-field-initializers -Wno-missing-field-initializers-Wincompatible-pointer-types"/>
+	<property name="COMP_FLAGS" value="-Wstrict-prototypes ${COMP_FLAGS_ORACLE}"/>
 
 	<!-- Initialize database related options based on the database type -->
 	<switch value="${DBTYPE}" caseinsensitive="true">
