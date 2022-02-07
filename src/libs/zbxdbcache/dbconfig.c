@@ -5948,8 +5948,8 @@ static void	dc_load_trigger_queue(zbx_hashset_t *trend_functions)
 void	DCsync_configuration(unsigned char mode)
 {
 	int		i, flags;
-	double		sec, csec, hsec, hisec, htsec, gmsec, hmsec, ifsec, idsec, isec, tsec, dsec, fsec, expr_sec,
-			csec2, hsec2, hisec2, htsec2, gmsec2, hmsec2, ifsec2, idsec2, isec2, tsec2, dsec2, fsec2, expr_sec2,
+	double		sec, csec, hsec, hisec, htsec, gmsec, hmsec, ifsec, idsec, isec, tisec, pisec, tsec, dsec, fsec, expr_sec,
+			csec2, hsec2, hisec2, htsec2, gmsec2, hmsec2, ifsec2, idsec2, isec2, tisec2, pisec2, tsec2, dsec2, fsec2, expr_sec2,
 			action_sec, action_sec2, action_op_sec, action_op_sec2, action_condition_sec,
 			action_condition_sec2, trigger_tag_sec, trigger_tag_sec2, host_tag_sec, host_tag_sec2,
 			correlation_sec, correlation_sec2, corr_condition_sec, corr_condition_sec2, corr_operation_sec,
@@ -6173,13 +6173,17 @@ void	DCsync_configuration(unsigned char mode)
 	sec = zbx_time();
 	if (FAIL == zbx_dbsync_compare_items(&items_sync))
 		goto out;
+	isec = zbx_time() - sec;
 
+	sec = zbx_time();
 	if (FAIL == zbx_dbsync_compare_template_items(&template_items_sync))
 		goto out;
+	tisec = zbx_time() - sec;
 
+	sec = zbx_time();
 	if (FAIL == zbx_dbsync_compare_prototype_items(&prototype_items_sync))
 		goto out;
-	isec = zbx_time() - sec;
+	pisec = zbx_time() - sec;
 
 	sec = zbx_time();
 	if (FAIL == zbx_dbsync_compare_item_discovery(&item_discovery_sync))
@@ -6207,9 +6211,15 @@ void	DCsync_configuration(unsigned char mode)
 
 	sec = zbx_time();
 	DCsync_items(&items_sync, flags);
-	DCsync_template_items(&template_items_sync);
-	DCsync_prototype_items(&prototype_items_sync);
 	isec2 = zbx_time() - sec;
+
+	sec = zbx_time();
+	DCsync_template_items(&template_items_sync);
+	tisec2 = zbx_time() - sec;
+
+	sec = zbx_time();
+	DCsync_prototype_items(&prototype_items_sync);
+	pisec2 = zbx_time() - sec;
 
 	sec = zbx_time();
 	DCsync_item_discovery(&item_discovery_sync);
@@ -6383,11 +6393,11 @@ void	DCsync_configuration(unsigned char mode)
 	zabbix_increase_log_level();
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
-		total = csec + hsec + hisec + htsec + gmsec + hmsec + ifsec + idsec + isec + tsec + dsec + fsec + expr_sec +
+		total = csec + hsec + hisec + htsec + gmsec + hmsec + ifsec + idsec + isec +  tisec + pisec + tsec + dsec + fsec + expr_sec +
 				action_sec + action_op_sec + action_condition_sec + trigger_tag_sec + correlation_sec +
 				corr_condition_sec + corr_operation_sec + hgroups_sec + itempp_sec + maintenance_sec +
 				item_tag_sec;
-		total2 = csec2 + hsec2 + hisec2 + htsec2 + gmsec2 + hmsec2 + ifsec2 + idsec2 + isec2 + tsec2 + dsec2 + fsec2 +
+		total2 = csec2 + hsec2 + hisec2 + htsec2 + gmsec2 + hmsec2 + ifsec2 + idsec2 + isec2 + tisec2 + pisec2 + tsec2 + dsec2 + fsec2 +
 				expr_sec2 + action_op_sec2 + action_sec2 + action_condition_sec2 + trigger_tag_sec2 +
 				correlation_sec2 + corr_condition_sec2 + corr_operation_sec2 + hgroups_sec2 +
 				itempp_sec2 + maintenance_sec2 + item_tag_sec2 + update_sec;
@@ -6434,11 +6444,11 @@ void	DCsync_configuration(unsigned char mode)
 				items_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() template_items      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, isec, isec2, template_items_sync.add_num,
+				__func__, tisec, tisec2, template_items_sync.add_num,
 				template_items_sync.update_num, template_items_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() prototype_items      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, isec, isec2, prototype_items_sync.add_num,
+				__func__, pisec, pisec2, prototype_items_sync.add_num,
 				prototype_items_sync.update_num, prototype_items_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() item_discovery      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
