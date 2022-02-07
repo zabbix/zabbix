@@ -3,6 +3,10 @@
 
 	<taskdef resource="net/sf/antcontrib/antlib.xml" />
 
+	<!-- oracle oci library has functions declarations without arguments: f() instead of f(void), so it triggers pedantic warning -->
+	<property name="COMP_FLAGS_ORACLE" value="-g -std=gnu99 -pedantic -Wall -Wextra -Wunused -Wshadow -Wstrict-prototypes -Wdeclaration-after-statement -Wpointer-arith -Wno-maybe-uninitialized -Wformat -Wmissing-prototypes -Wunreachable-code -Wformat-extra-args -Wno-missing-field-initializers -Wno-missing-field-initializers-Wincompatible-pointer-types"/>
+	<property name="COMP_FLAGS" value="-pedantic ${COMP_FLAGS_ORACLE}"/>
+
 	<!-- Initialize database related options based on the database type -->
 	<switch value="${DBTYPE}" caseinsensitive="true">
 		<case value="POSTGRESQL">
@@ -113,7 +117,7 @@
 			<property name="common.cflags" value="-O2 -g"/>
 			<switch value="@{cc}">
 				<case value="gcc">
-					<property name="cc.cflags" value="-std=gnu99 -pedantic -Wall -Wextra -Wunused -Wshadow -Wstrict-prototypes -Wdeclaration-after-statement -Wpointer-arith -Wno-maybe-uninitialized -Wformat -Wmissing-prototypes -Wunreachable-code -Wformat-extra-args -Wno-missing-field-initializers -Wno-missing-field-initializers-Wincompatible-pointer-types "/>
+					<property name="cc.cflags" value="${COMP_FLAGS_ORACLE}"/>
 				</case>
 				<case value="clang">
 					<property name="cc.cflags" value=""/>
@@ -158,7 +162,7 @@
 	</macrodef>
 
 	<target name="make-db-mysql" unless="${with.mysql}">
-		<!-- Build Zabbix with postgresql database -->
+		<!-- Build Zabbix with mysql database -->
 		<sequential>
 			<make args="--enable-server --enable-agent --enable-proxy --with-mysql --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap  --with-libcurl"/>
 		</sequential>
@@ -224,11 +228,11 @@
 		<!-- Zabbix various configuration parameters for cmocka tests -->
 		<!-- Configuration option name must consist of prefix 'cmocka-', configuration order number
 			and configuration title: cmocka-<number>-<title> -->
-		<property name="cmocka-1-default" value="-q CFLAGS='-Wall -Wextra -Wdeclaration-after-statement -Wpointer-arith -Wno-maybe-uninitialized -Wformat -Wmissing-prototypes' --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap --with-libcurl --with-iconv --with-libpcre"/>
-		<property name="cmocka-2-agent-only" value="-q --enable-agent"/>
-		<property name="cmocka-3-server-only" value="-q --enable-server --with-mysql"/>
-		<property name="cmocka-4-proxy-only" value="-q --enable-proxy --with-sqlite3"/>
-		<property name="cmocka-5-sanitizer" value="CC=clang CFLAGS='-Wall -Wextra -Wenum-conversion -g -fsanitize=leak,address' LDFLAGS='-fsanitize=leak,address' -q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap --with-libcurl --with-iconv --with-libpcre"/>
+		<property name="cmocka-1-default" value="-q CFLAGS='${COMP_FLAGS}' --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap --with-libcurl --with-iconv --with-libpcre"/>
+		<property name="cmocka-2-agent-only" value="-q CFLAGS='${COMP_FLAGS}' --enable-agent"/>
+		<property name="cmocka-3-server-only" value="-q CFLAGS='${COMP_FLAGS}' --enable-server --with-mysql"/>
+		<property name="cmocka-4-proxy-only" value="-q CFLAGS='${COMP_FLAGS}' --enable-proxy --with-sqlite3"/>
+		<property name="cmocka-5-sanitizer" value="CC=clang CFLAGS='${COMP_FLAGS} -Wenum-conversion -fsanitize=leak,address' LDFLAGS='-fsanitize=leak,address' -q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap --with-libcurl --with-iconv --with-libpcre"/>
 	</target>
 
 	<target name="cmocka-tests" depends="init-cmocka-test-conf-options">
@@ -254,10 +258,10 @@
 		<!-- Zabbix various configuration parameters for cmocka Oracle tests -->
 		<!-- Configuration option name must consist of prefix 'cmocka-ora-', configuration order number
 			and configuration title: cmocka-<number>-<title> -->
-		<property name="cmocka-ora-1-default" value="-q CFLAGS='-Wall -Wextra -Wdeclaration-after-statement -Wpointer-arith -Wno-maybe-uninitialized -Wformat -Wmissing-prototypes' --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap --with-libcurl --with-iconv --with-libpcre --with-oracle --with-oracle-include=${ORA_INCLUDE} --with-oracle-lib=${ORA_LIB}"/>
-		<property name="cmocka-ora-2-server-only" value="-q --enable-server --with-oracle --with-oracle-include=${ORA_INCLUDE} --with-oracle-lib=${ORA_LIB}"/>
-		<property name="cmocka-ora-3-proxy-only" value="-q --enable-proxy --with-oracle --with-oracle-include=${ORA_INCLUDE} --with-oracle-lib=${ORA_LIB}"/>
-		<property name="cmocka-ora-4-sanitizer" value="CC=clang CFLAGS='-Wall -Wextra -Wenum-conversion -g -O2 -fsanitize=leak,address' LDFLAGS='-fsanitize=leak,address' -q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap --with-libcurl --with-iconv --with-libpcre --with-oracle --with-oracle-include=${ORA_INCLUDE} --with-oracle-lib=${ORA_LIB}"/>
+		<property name="cmocka-ora-1-default" value="-q CFLAGS='${COMP_FLAGS_ORACLE}' --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap --with-libcurl --with-iconv --with-libpcre --with-oracle --with-oracle-include=${ORA_INCLUDE} --with-oracle-lib=${ORA_LIB}"/>
+		<property name="cmocka-ora-2-server-only" value="-q CFLAGS='${COMP_FLAGS_ORACLE}' --enable-server --with-oracle --with-oracle-include=${ORA_INCLUDE} --with-oracle-lib=${ORA_LIB}"/>
+		<property name="cmocka-ora-3-proxy-only" value="-q CFLAGS='${COMP_FLAGS_ORACLE}' --enable-proxy --with-oracle --with-oracle-include=${ORA_INCLUDE} --with-oracle-lib=${ORA_LIB}"/>
+		<property name="cmocka-ora-4-sanitizer" value="CC=clang CFLAGS='${COMP_FLAGS_ORACLE} -Wenum-conversion -O2 -fsanitize=leak,address' LDFLAGS='-fsanitize=leak,address' -q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap --with-libcurl --with-iconv --with-libpcre --with-oracle --with-oracle-include=${ORA_INCLUDE} --with-oracle-lib=${ORA_LIB}"/>
 	</target>
 
 	<target name="cmocka-ora-tests" depends="init-cmocka-ora-test-conf-options">
