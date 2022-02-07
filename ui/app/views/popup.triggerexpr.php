@@ -138,7 +138,7 @@ if (array_key_exists('params', $data['functions'][$data['selectedFunction']])) {
 	$count_functions = [
 		'acos', 'ascii', 'asin', 'atan', 'atan2', 'between', 'bitand', 'bitlength', 'bitlshift', 'bitnot', 'bitor',
 		'bitrshift', 'bitxor', 'bytelength', 'cbrt', 'ceil', 'char', 'concat', 'cos', 'cosh', 'cot', 'degrees', 'exp',
-		'expm1', 'floor', 'in', 'insert', 'last', 'left', 'log', 'log10', 'ltrim', 'mid', 'mod', 'power', 'radians',
+		'expm1', 'floor', 'in', 'insert', 'last', 'left', 'length', 'log', 'log10', 'ltrim', 'mid', 'mod', 'power', 'radians',
 		'repeat', 'replace', 'right', 'round', 'rtrim', 'signum', 'sin', 'sinh', 'sqrt', 'tan', 'trim', 'truncate'
 	];
 
