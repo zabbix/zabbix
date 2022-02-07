@@ -130,7 +130,7 @@ class testFormHost extends CWebTest {
 				'details' => [
 					'version' => 1,
 					'bulk' => 0,
-					'community' => 'zabbix'
+					'community' => '🙃zabbix🙃'
 				]
 			],
 			[
@@ -169,7 +169,6 @@ class testFormHost extends CWebTest {
 			],
 			[
 				'host' => 'testFormHost with items',
-				'visiblename' => '😀-😀-😀',
 				'description' => 'Created host via API to test clone functionality in host form and interfaces 😀',
 				'interfaces' => $interfaces,
 				'groups' => $groups,
@@ -587,10 +586,11 @@ class testFormHost extends CWebTest {
 					'expected' => TEST_GOOD,
 					'host_fields' => [
 						'Host name' => 'Host with utf8mb4 visible name',
-						'Groups' => 'Zabbix servers'
+						'Groups' => 'Zabbix servers',
 					],
 					'utf_fields' => [
-						'id:visiblename' => '😀'
+						'id:visiblename' => '😀',
+						'id:description' => '😀🙃😀'
 					]
 				]
 			],
@@ -823,12 +823,9 @@ class testFormHost extends CWebTest {
 				$this->page->assertTitle($this->monitoring ? 'Hosts' : 'Configuration of hosts');
 
 				// Check host fields.
-				if (array_key_exists('utf_fields', $data) && array_key_exists('id:visiblename', $data['utf_fields'])) {
-					$host = $data['utf_fields']['id:visiblename'];
-				}
-				else {
-					$host = CTestArrayHelper::get($data, 'host_fields.Visible name', $data['host_fields']['Host name']);
-				}
+				$host = (array_key_exists('utf_fields', $data) && array_key_exists('id:visiblename', $data['utf_fields']))
+					? $host = $data['utf_fields']['id:visiblename']
+					: $host = CTestArrayHelper::get($data, 'host_fields.Visible name', $data['host_fields']['Host name']);
 
 				$form = $this->filterAndSelectHost($host, CTestArrayHelper::get($data, 'utf_fields', false));
 				$form->checkValue($data['host_fields']);
@@ -1461,7 +1458,7 @@ class testFormHost extends CWebTest {
 						'Connect to' => 'IP',
 						'port' => '122',
 						'SNMP version' => 'SNMPv1',
-						'SNMP community' => 'zabbix',
+						'SNMP community' => '🙃zabbix🙃',
 						'Use bulk requests' => false
 					]
 				],
@@ -1710,9 +1707,11 @@ class testFormHost extends CWebTest {
 
 		// Clone host.
 		$this->query('button', $button)->waitUntilClickable()->one()->click();
+
 		$cloned_form = (!$this->standalone)
 			? COverlayDialogElement::find()->asForm()->waitUntilPresent()->one()
 			: $this->query('id:host-form')->asForm()->waitUntilReady()->one();
+
 		$cloned_form->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Host added');
@@ -1745,6 +1744,13 @@ class testFormHost extends CWebTest {
 		}
 		elseif (CTestArrayHelper::get($data, 'host_fields.Visible name') === "") {
 			$data['host_fields']['Visible name'] = $data['host_fields']['Host name'];
+		}
+
+		if (array_key_exists('utf_fields', $data) && array_key_exists('id:description', $data['utf_fields'])) {
+			$data['host_fields']['Description'] =  $data['utf_fields']['id:description'];
+		}
+		elseif (CTestArrayHelper::get($data, 'host_fields.Description') === "") {
+			$data['host_fields']['Description'] = $data['host_fields']['Description'];
 		}
 
 		$fields = ['Host name' => 'host', 'Visible name' => 'name', 'Description' => 'description', 'Enabled' => 'status'];
@@ -1961,6 +1967,7 @@ class testFormHost extends CWebTest {
 	 * Function for filtering necessary host on page.
 	 *
 	 * @param string	$host    host name to be filtered
+	 * @param boolean	$utf     utf8mb4 characters are present
 	 *
 	 * @return CFormElement
 	 */
