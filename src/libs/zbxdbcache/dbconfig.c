@@ -5957,12 +5957,12 @@ void	DCsync_configuration(unsigned char mode)
 			itemscrp_sec2, total, total2, update_sec, maintenance_sec, maintenance_sec2, item_tag_sec,
 			item_tag_sec2;
 
-	zbx_dbsync_t	config_sync, hosts_sync, hi_sync, htmpl_sync, gmacro_sync, hmacro_sync, if_sync, items_sync, item_discovery_sync,
-			template_items_sync, prototype_items_sync, triggers_sync, tdep_sync, func_sync, expr_sync,
-			action_sync, action_op_sync, action_condition_sync, trigger_tag_sync, item_tag_sync,
-			host_tag_sync, correlation_sync, corr_condition_sync, corr_operation_sync, hgroups_sync,
-			itempp_sync, itemscrp_sync, maintenance_sync, maintenance_period_sync, maintenance_tag_sync,
-			maintenance_group_sync, maintenance_host_sync, hgroup_host_sync;
+	zbx_dbsync_t	config_sync, hosts_sync, hi_sync, htmpl_sync, gmacro_sync, hmacro_sync, if_sync, items_sync,
+			template_items_sync, prototype_items_sync, item_discovery_sync, triggers_sync, tdep_sync,
+			func_sync, expr_sync, action_sync, action_op_sync, action_condition_sync, trigger_tag_sync,
+			item_tag_sync, host_tag_sync, correlation_sync, corr_condition_sync, corr_operation_sync,
+			hgroups_sync, itempp_sync, itemscrp_sync, maintenance_sync, maintenance_period_sync,
+			maintenance_tag_sync, maintenance_group_sync, maintenance_host_sync, hgroup_host_sync;
 
 	double		autoreg_csec, autoreg_csec2;
 	zbx_dbsync_t	autoreg_config_sync;
@@ -5991,10 +5991,10 @@ void	DCsync_configuration(unsigned char mode)
 	zbx_dbsync_init(&gmacro_sync, mode);
 	zbx_dbsync_init(&hmacro_sync, mode);
 	zbx_dbsync_init(&if_sync, mode);
-	zbx_dbsync_init(&item_discovery_sync, mode);
 	zbx_dbsync_init(&items_sync, mode);
 	zbx_dbsync_init(&template_items_sync, mode);
 	zbx_dbsync_init(&prototype_items_sync, mode);
+	zbx_dbsync_init(&item_discovery_sync, mode);
 	zbx_dbsync_init(&triggers_sync, mode);
 	zbx_dbsync_init(&tdep_sync, mode);
 	zbx_dbsync_init(&func_sync, mode);
@@ -6204,15 +6204,16 @@ void	DCsync_configuration(unsigned char mode)
 	ifsec2 = zbx_time() - sec;
 
 	/* relies on hosts, proxies and interfaces, must be after DCsync_{hosts,interfaces}() */
-	sec = zbx_time();
-	DCsync_item_discovery(&item_discovery_sync);
-	idsec2 = zbx_time() - sec;
 
 	sec = zbx_time();
 	DCsync_items(&items_sync, flags);
 	DCsync_template_items(&template_items_sync);
 	DCsync_prototype_items(&prototype_items_sync);
 	isec2 = zbx_time() - sec;
+
+	sec = zbx_time();
+	DCsync_item_discovery(&item_discovery_sync);
+	idsec2 = zbx_time() - sec;
 
 	/* relies on items, must be after DCsync_items() */
 	sec = zbx_time();
@@ -6427,10 +6428,6 @@ void	DCsync_configuration(unsigned char mode)
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__func__, ifsec, ifsec2, if_sync.add_num, if_sync.update_num,
 				if_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() item_discovery      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, idsec, idsec2, item_discovery_sync.add_num, template_items_sync.update_num,
-				template_items_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() items      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__func__, isec, isec2, items_sync.add_num, items_sync.update_num,
@@ -6443,6 +6440,10 @@ void	DCsync_configuration(unsigned char mode)
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__func__, isec, isec2, prototype_items_sync.add_num,
 				prototype_items_sync.update_num, prototype_items_sync.remove_num);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() item_discovery      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
+				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, idsec, idsec2, item_discovery_sync.add_num, template_items_sync.update_num,
+				template_items_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() triggers   : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__func__, tsec, tsec2, triggers_sync.add_num, triggers_sync.update_num,
@@ -6670,10 +6671,10 @@ out:
 	zbx_dbsync_clear(&hmacro_sync);
 	zbx_dbsync_clear(&host_tag_sync);
 	zbx_dbsync_clear(&if_sync);
-	zbx_dbsync_clear(&item_discovery_sync);
 	zbx_dbsync_clear(&items_sync);
 	zbx_dbsync_clear(&template_items_sync);
 	zbx_dbsync_clear(&prototype_items_sync);
+	zbx_dbsync_clear(&item_discovery_sync);
 	zbx_dbsync_clear(&triggers_sync);
 	zbx_dbsync_clear(&tdep_sync);
 	zbx_dbsync_clear(&func_sync);
