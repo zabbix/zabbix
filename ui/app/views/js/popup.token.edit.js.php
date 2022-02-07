@@ -99,32 +99,22 @@ window.token_edit_popup = {
 		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'token.delete');
 
-		fetch(curl.getUrl(), {
-			method: 'POST',
-			headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-			body: urlEncodeData({
-				tokenids: [tokenid],
-				action_src: 'token.list'
-			})
-		})
-			.then((response) => response.json())
-			.then((response) => {
-				if ('error' in response) {
-					throw {error: response.error};
+		this.postData(curl, {
+			tokenids: [tokenid],
+			action_src: 'token.list'
+		}).then((response) => {
+			if ('error' in response) {
+				throw {error: response.error};
+			}
+
+			overlayDialogueDestroy(this.overlay.dialogueid);
+
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {
+				detail: {
+					success: response.success
 				}
-
-				overlayDialogueDestroy(this.overlay.dialogueid);
-
-				this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {
-					detail: {
-						success: response.success
-					}
-				}));
-			})
-			.catch(this.ajaxExceptionHandler)
-			.finally(() => {
-				this.overlay.unsetLoading();
-			});
+			}));
+		})
 	},
 
 	close() {
