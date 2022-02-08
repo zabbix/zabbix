@@ -269,31 +269,33 @@ var chkbxRange = {
 		});
 	},
 
-	// check if all checkboxes are selected and select main checkbox, else disable checkbox, select options and button
+	/**
+	 * Select main checkbox if all other checkboxes are selected.
+	 *
+	 * @param {string} object
+	 */
 	updateMainCheckbox: function(object) {
-		const checkboxTable = $(this.getObjectCheckboxes(object)[0]).parents('table');
-		let mainCheckbox = $(checkboxTable).find('thead input[type=checkbox]:not(:disabled)');
-		if (!mainCheckbox.length) {
+		const checkbox_list = this.getObjectCheckboxes(object);
+		const $main_checkbox = $(checkbox_list)
+			.parents('table')
+			.find('thead input[type=checkbox]');
+
+		if ($main_checkbox.length == 0) {
 			return;
 		}
 
-		const countAvailable = this.getObjectCheckboxes(object).length;
+		const count_available = checkbox_list.length;
 
-		if (countAvailable > 0) {
-			let checked = [];
-			jQuery.each(this.getObjectCheckboxes(object), function (i, checkbox) {
-				if (checkbox.checked === true) {
+		if (count_available > 0) {
+			const checked = [];
+
+			jQuery.each(checkbox_list, (i, checkbox) => {
+				if (checkbox.checked) {
 					checked.push(checkbox);
 				}
 			});
-			const countChecked = checked.length;
 
-			mainCheckbox = mainCheckbox[0];
-			mainCheckbox.checked = (countChecked == countAvailable);
-
-		}
-		else {
-			mainCheckbox.disabled = true;
+			$main_checkbox[0].checked = (checked.length == count_available);
 		}
 	},
 
