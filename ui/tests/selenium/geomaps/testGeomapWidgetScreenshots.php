@@ -271,9 +271,6 @@ class testGeomapWidgetScreenshots extends CWebTest {
 		$this->page->waitUntilReady();
 		$this->query("xpath://div[contains(@class,\"is-loading\")]/..//h4")->all()->waitUntilNotPresent();
 
-		// This sleep is needed because after loader ring disappeared map image needs to load anyway.
-		sleep(1);
-
 		if ($data['Tile provider'] === 'default') {
 			$this->assertWidgetScreenshot($data);
 		}
@@ -286,9 +283,6 @@ class testGeomapWidgetScreenshots extends CWebTest {
 			$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$zoom_dashboardid);
 			$this->page->waitUntilReady();
 			$this->query("xpath://div[contains(@class,\"is-loading\")]/..//h4")->all()->waitUntilNotPresent();
-
-			// This sleep is needed because after loader ring disappeared map image needs to load anyway.
-			sleep(1);
 			$this->assertWidgetScreenshot($data);
 		}
 	}
@@ -302,9 +296,31 @@ class testGeomapWidgetScreenshots extends CWebTest {
 		];
 
 		foreach ($widgets as $widget) {
+			$this->waitUntilMapIsLoaded($widget);
+
+			// This sleep is needed because after loader ring disappeared map image needs to load anyway.
+			sleep(1);
 			$this->assertScreenshot($this->query("xpath:.//div[@class=\"dashboard-grid-widget\"]//h4[text()=".
 					CXPathHelper::escapeQuotes($widget)."]/../..")->waitUntilVisible()->one(), $widget.' '.$data['Tile provider']
 			);
 		}
 	}
+
+	/**
+	 * Function for waiting loader ring.
+	 */
+	private function waitUntilMapIsLoaded($widget) {
+		try {
+			$this->query("xpath://h4[text()=".CXPathHelper::escapeQuotes($widget).
+					"]/../../div[contains(@class,\"is-loading\")]")->waitUntilPresent();
+		}
+		catch (\Exception $ex) {
+			// Code is not missing here.
+		}
+
+		return $this->query("xpath://h4[text()=".CXPathHelper::escapeQuotes($widget).
+					"]/../../div[not(contains(@class,\"is-loading\"))]")->waitUntilPresent()->one();
+	}
+
+
 }
