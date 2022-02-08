@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-02-03T22:22:22Z'
+  date: '2022-02-07T14:35:13Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -2644,9 +2644,11 @@ zabbix_export:
         -
           macro: '{$PG.QUERY_ETIME.MAX.WARN}'
           value: '30'
+          description: 'Execution time limit for count of slow queries'
         -
           macro: '{$PG.SLOW_QUERIES.MAX.WARN}'
           value: '5'
+          description: 'Slow queries count treshold for a trigger'
         -
           macro: '{$PG.URI}'
           value: 'tcp://localhost:5432'
