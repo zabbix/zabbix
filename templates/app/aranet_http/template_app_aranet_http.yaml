@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-15T13:50:35Z'
+  date: '2022-01-26T10:47:29Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -10,7 +10,7 @@ zabbix_export:
       uuid: af21edc47557400583e537904ea632aa
       template: 'Aranet Cloud'
       name: 'Aranet Cloud'
-      description: 'Template tooling version used: 0.40'
+      description: 'Template tooling version used: 0.41'
       groups:
         -
           name: Templates/Applications
@@ -302,8 +302,8 @@ zabbix_export:
               value: '{$ARANET.API.USERNAME}'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: 92fb73948fa74de8a6a219397b77b570
           name: 'Aranet: Sensors discovery'
@@ -346,8 +346,11 @@ zabbix_export:
             key: aranet.get_data
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: discovery
+            -
+              tag: component
+              value: raw
       discovery_rules:
         -
           uuid: c4d177c29cb34e87b6bec0d22bd3ae23
@@ -408,7 +411,7 @@ zabbix_export:
                 key: aranet.get_data
               tags:
                 -
-                  tag: Application
+                  tag: component
                   value: '{#METRIC}'
               trigger_prototypes:
                 -
@@ -416,6 +419,10 @@ zabbix_export:
                   expression: 'max(/Aranet Cloud/aranet.battery.voltage["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) < {$ARANET.BATT.VOLTAGE.MIN.CRIT:"{#SENSOR_NAME}"}'
                   name: '{#METRIC}: Critically low battery voltage on "[{#GATEWAY_NAME}] {#SENSOR_NAME}" (below {$ARANET.BATT.VOLTAGE.MIN.CRIT:"{#SENSOR_NAME}"}{#UNIT} for 5m)'
                   priority: HIGH
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
                 -
                   uuid: d729130760f9418baa40fb9eeb8a3ca4
                   expression: 'max(/Aranet Cloud/aranet.battery.voltage["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) < {$ARANET.BATT.VOLTAGE.MIN.WARN:"{#SENSOR_NAME}"}'
@@ -425,6 +432,10 @@ zabbix_export:
                     -
                       name: '{#METRIC}: Critically low battery voltage on "[{#GATEWAY_NAME}] {#SENSOR_NAME}" (below {$ARANET.BATT.VOLTAGE.MIN.CRIT:"{#SENSOR_NAME}"}{#UNIT} for 5m)'
                       expression: 'max(/Aranet Cloud/aranet.battery.voltage["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) < {$ARANET.BATT.VOLTAGE.MIN.CRIT:"{#SENSOR_NAME}"}'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
           master_item:
             key: aranet.sensor.discovery
         -
@@ -486,7 +497,7 @@ zabbix_export:
                 key: aranet.get_data
               tags:
                 -
-                  tag: Application
+                  tag: component
                   value: '{#METRIC}'
               trigger_prototypes:
                 -
@@ -494,6 +505,10 @@ zabbix_export:
                   expression: 'min(/Aranet Cloud/aranet.co2["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) > {$ARANET.CO2.MAX.CRIT:"{#SENSOR_NAME}"}'
                   name: '{#METRIC}: Critically high CO2 level on "[{#GATEWAY_NAME}] {#SENSOR_NAME}" (over {$ARANET.CO2.MAX.CRIT:"{#SENSOR_NAME}"}{#UNIT} for 5m)'
                   priority: HIGH
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
                 -
                   uuid: cc54c75ee607485981388da0f7f99ea2
                   expression: 'min(/Aranet Cloud/aranet.co2["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) > {$ARANET.CO2.MAX.WARN:"{#SENSOR_NAME}"}'
@@ -503,6 +518,10 @@ zabbix_export:
                     -
                       name: '{#METRIC}: Critically high CO2 level on "[{#GATEWAY_NAME}] {#SENSOR_NAME}" (over {$ARANET.CO2.MAX.CRIT:"{#SENSOR_NAME}"}{#UNIT} for 5m)'
                       expression: 'min(/Aranet Cloud/aranet.co2["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) > {$ARANET.CO2.MAX.CRIT:"{#SENSOR_NAME}"}'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           master_item:
             key: aranet.sensor.discovery
         -
@@ -564,7 +583,7 @@ zabbix_export:
                 key: aranet.get_data
               tags:
                 -
-                  tag: Application
+                  tag: component
                   value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
@@ -627,7 +646,7 @@ zabbix_export:
                 key: aranet.get_data
               tags:
                 -
-                  tag: Application
+                  tag: component
                   value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
@@ -690,7 +709,7 @@ zabbix_export:
                 key: aranet.get_data
               tags:
                 -
-                  tag: Application
+                  tag: component
                   value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
@@ -753,7 +772,7 @@ zabbix_export:
                 key: aranet.get_data
               tags:
                 -
-                  tag: Application
+                  tag: component
                   value: '{#METRIC}'
               trigger_prototypes:
                 -
@@ -761,6 +780,10 @@ zabbix_export:
                   expression: 'min(/Aranet Cloud/aranet.humidity["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) > {$ARANET.HUMIDITY.MAX.WARN:"{#SENSOR_NAME}"}'
                   name: '{#METRIC}: High humidity on "[{#GATEWAY_NAME}] {#SENSOR_NAME}" (over {$ARANET.HUMIDITY.MAX.WARN:"{#SENSOR_NAME}"}{#UNIT} for 5m)'
                   priority: HIGH
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
                 -
                   uuid: 85c1be625bc940588671bc43e6ed6a8a
                   expression: 'max(/Aranet Cloud/aranet.humidity["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) < {$ARANET.HUMIDITY.MIN.WARN:"{#SENSOR_NAME}"}'
@@ -770,6 +793,10 @@ zabbix_export:
                     -
                       name: '{#METRIC}: High humidity on "[{#GATEWAY_NAME}] {#SENSOR_NAME}" (over {$ARANET.HUMIDITY.MAX.WARN:"{#SENSOR_NAME}"}{#UNIT} for 5m)'
                       expression: 'min(/Aranet Cloud/aranet.humidity["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) > {$ARANET.HUMIDITY.MAX.WARN:"{#SENSOR_NAME}"}'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           master_item:
             key: aranet.sensor.discovery
         -
@@ -831,7 +858,7 @@ zabbix_export:
                 key: aranet.get_data
               tags:
                 -
-                  tag: Application
+                  tag: component
                   value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
@@ -897,7 +924,7 @@ zabbix_export:
                 key: aranet.get_data
               tags:
                 -
-                  tag: Application
+                  tag: component
                   value: '{#METRIC}'
               trigger_prototypes:
                 -
@@ -905,6 +932,10 @@ zabbix_export:
                   expression: 'last(/Aranet Cloud/aranet.last_update["{#GATEWAY_ID}", "{#SENSOR_ID}"]) > {$ARANET.LAST_UPDATE.MAX.WARN:"{#SENSOR_NAME}"}'
                   name: '{#METRIC}: Sensor data "[{#GATEWAY_NAME}] {#SENSOR_NAME}" is not updated (more than {$ARANET.LAST_UPDATE.MAX.WARN:"{#SENSOR_NAME}"})'
                   priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           master_item:
             key: aranet.sensor.discovery
         -
@@ -965,7 +996,7 @@ zabbix_export:
                 key: aranet.get_data
               tags:
                 -
-                  tag: Application
+                  tag: component
                   value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
@@ -1028,7 +1059,7 @@ zabbix_export:
                 key: aranet.get_data
               tags:
                 -
-                  tag: Application
+                  tag: component
                   value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
@@ -1091,7 +1122,7 @@ zabbix_export:
                 key: aranet.get_data
               tags:
                 -
-                  tag: Application
+                  tag: component
                   value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
@@ -1154,7 +1185,7 @@ zabbix_export:
                 key: aranet.get_data
               tags:
                 -
-                  tag: Application
+                  tag: component
                   value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
@@ -1217,7 +1248,7 @@ zabbix_export:
                 key: aranet.get_data
               tags:
                 -
-                  tag: Application
+                  tag: component
                   value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
@@ -1280,7 +1311,7 @@ zabbix_export:
                 key: aranet.get_data
               tags:
                 -
-                  tag: Application
+                  tag: component
                   value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
@@ -1343,7 +1374,7 @@ zabbix_export:
                 key: aranet.get_data
               tags:
                 -
-                  tag: Application
+                  tag: component
                   value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
@@ -1406,7 +1437,7 @@ zabbix_export:
                 key: aranet.get_data
               tags:
                 -
-                  tag: Application
+                  tag: component
                   value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
@@ -1469,7 +1500,7 @@ zabbix_export:
                 key: aranet.get_data
               tags:
                 -
-                  tag: Application
+                  tag: component
                   value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
@@ -1532,7 +1563,7 @@ zabbix_export:
                 key: aranet.get_data
               tags:
                 -
-                  tag: Application
+                  tag: component
                   value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
@@ -1595,7 +1626,7 @@ zabbix_export:
                 key: aranet.get_data
               tags:
                 -
-                  tag: Application
+                  tag: component
                   value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
@@ -1658,7 +1689,7 @@ zabbix_export:
                 key: aranet.get_data
               tags:
                 -
-                  tag: Application
+                  tag: component
                   value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
@@ -1721,10 +1752,17 @@ zabbix_export:
                 key: aranet.get_data
               tags:
                 -
-                  tag: Application
+                  tag: component
                   value: '{#METRIC}'
           master_item:
             key: aranet.sensor.discovery
+      tags:
+        -
+          tag: class
+          value: service
+        -
+          tag: target
+          value: aranet
       macros:
         -
           macro: '{$ARANET.API.ENDPOINT}'

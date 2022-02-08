@@ -72,7 +72,8 @@ type Plugin struct {
 var impl Plugin
 
 type Options struct {
-	Timeout int `conf:"optional,range=1:30"`
+	plugin.SystemOptions `conf:"optional"`
+	Timeout              int `conf:"optional,range=1:30"`
 }
 
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {

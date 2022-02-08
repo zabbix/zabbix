@@ -114,9 +114,10 @@ class CExpressionParserResult extends CParserResult {
 		$hosts = [];
 
 		foreach ($hist_functions as $hist_function) {
-			$hosts[$hist_function['data']['parameters'][0]['data']['host']] = true;
+			$host = $hist_function['data']['parameters'][0]['data']['host'];
+			$hosts[$host] = $host;
 		}
 
-		return array_keys($hosts);
+		return array_values($hosts);
 	}
 }

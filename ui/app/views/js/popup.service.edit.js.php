@@ -17,31 +17,30 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
-
-/**
- * @var CView $this
- */
 ?>
 
-window.service_edit_popup = {
-	status_rule_template: null,
-	child_template: null,
 
-	serviceid: null,
-	children: new Map(),
+window.service_edit_popup = new class {
 
-	create_url: null,
-	update_url: null,
-	delete_url: null,
-	search_limit: null,
+	constructor() {
+		this.status_rule_template = null;
+		this.child_template = null;
 
-	overlay: null,
-	dialogue: null,
-	form: null,
-	footer: null,
+		this.serviceid = null;
+		this.children = new Map();
 
-	init({serviceid, children, children_problem_tags_html, problem_tags, status_rules, create_url, update_url,
+		this.create_url = null;
+		this.update_url = null;
+		this.delete_url = null;
+		this.search_limit = null;
+
+		this.overlay = null;
+		this.dialogue = null;
+		this.form = null;
+		this.footer = null;
+	}
+
+	init({tabs_id, serviceid, children, children_problem_tags_html, problem_tags, status_rules, create_url, update_url,
 			delete_url, search_limit}) {
 		this.initTemplates();
 
@@ -71,30 +70,16 @@ window.service_edit_popup = {
 
 		this.filterChildren();
 
+		// Setup parent services.
+
 		jQuery('#parent_serviceids_')
 			.multiSelect('getSelectButton')
 			.addEventListener('click', () => {
 				this.selectParents();
 			});
 
-		const $tags = jQuery(document.getElementById('tags-table'));
+		// Setup problem tags.
 
-		$tags.dynamicRows({template: '#tag-row-tmpl'});
-		$tags.on('click', '.element-table-add', () => {
-			$tags
-				.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
-				.textareaFlexible();
-		});
-
-		// Update form field state according to the form data.
-
-		for (const id of ['advanced_configuration', 'propagation_rule', 'algorithm']) {
-			document
-				.getElementById(id)
-				.addEventListener('change', () => this.update());
-		}
-
-		// Setup Problem tags.
 		const $problem_tags = jQuery(document.getElementById('problem_tags'));
 
 		$problem_tags.dynamicRows({
@@ -106,7 +91,8 @@ window.service_edit_popup = {
 
 		document.getElementById('problem_tags').addEventListener('change', () => this.update());
 
-		// Setup Service rules.
+		// Setup service rules.
+
 		document
 			.getElementById('status_rules')
 			.addEventListener('click', (e) => {
@@ -121,7 +107,34 @@ window.service_edit_popup = {
 				}
 			});
 
-		// Setup Child services.
+		// Setup tags tab.
+
+		const tabs = jQuery('#' + tabs_id);
+
+		const initialize_tags = (event, ui) => {
+			const $panel = event.type === 'tabscreate' ? ui.panel : ui.newPanel;
+
+			if ($panel.attr('id') === 'tags-tab') {
+				const $tags = jQuery('#tags-table');
+
+				$tags
+					.dynamicRows({template: '#tag-row-tmpl'})
+					.on('afteradd.dynamicRows', () => {
+						$tags
+							.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
+							.textareaFlexible();
+					})
+					.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
+					.textareaFlexible();
+
+					tabs.off('tabscreate tabsactivate', initialize_tags);
+			}
+		};
+
+		tabs.on('tabscreate tabsactivate', initialize_tags);
+
+		// Setup child services.
+
 		document
 			.getElementById('children-filter')
 			.addEventListener('click', (e) => {
@@ -154,8 +167,16 @@ window.service_edit_popup = {
 				}
 			});
 
+		// Update form field state according to the form data.
+
+		for (const id of ['advanced_configuration', 'propagation_rule', 'algorithm']) {
+			document
+				.getElementById(id)
+				.addEventListener('change', () => this.update());
+		}
+
 		this.update();
-	},
+	}
 
 	initTemplates() {
 		this.status_rule_template = new Template(`
@@ -189,7 +210,7 @@ window.service_edit_popup = {
 				</td>
 			</tr>
 		`);
-	},
+	}
 
 	update() {
 		const advanced_configuration = document.getElementById('advanced_configuration').checked;
@@ -242,7 +263,7 @@ window.service_edit_popup = {
 		}
 
 		document.querySelector('#children .js-add').disabled = has_problem_tags;
-	},
+	}
 
 	editStatusRule(row = null) {
 		let parameters;
@@ -279,18 +300,18 @@ window.service_edit_popup = {
 				this.addStatusRule(e.detail);
 			}
 		});
-	},
+	}
 
 	addStatusRule(status_rule) {
 		document
 			.querySelector('#status_rules tbody')
 			.insertAdjacentHTML('beforeend', this.status_rule_template.evaluate(status_rule));
-	},
+	}
 
 	updateStatusRule(row, status_rule) {
 		row.insertAdjacentHTML('afterend', this.status_rule_template.evaluate(status_rule));
 		row.remove();
-	},
+	}
 
 	renderChild(service) {
 		document
@@ -300,7 +321,7 @@ window.service_edit_popup = {
 				name: service.name,
 				problem_tags_html: service.problem_tags_html
 			}));
-	},
+	}
 
 	removeChild(serviceid) {
 		const child = this.form.querySelector(`#children tbody tr[data-serviceid="${serviceid}"]`);
@@ -313,7 +334,7 @@ window.service_edit_popup = {
 		this.updateChildrenFilterStats();
 		this.updateTabIndicator();
 		this.update();
-	},
+	}
 
 	removeAllChildren() {
 		document.querySelector('#children tbody').innerHTML = '';
@@ -322,7 +343,7 @@ window.service_edit_popup = {
 		this.updateChildrenFilterStats();
 		this.updateTabIndicator();
 		this.update();
-	},
+	}
 
 	filterChildren() {
 		const container = document.querySelector('#children tbody');
@@ -347,7 +368,7 @@ window.service_edit_popup = {
 
 		this.updateChildrenFilterStats();
 		this.updateTabIndicator();
-	},
+	}
 
 	updateChildrenFilterStats() {
 		const container = document.querySelector('#children tbody');
@@ -357,13 +378,13 @@ window.service_edit_popup = {
 		document.querySelector('#children tfoot .inline-filter-stats').textContent = this.children.size > 0
 			? sprintf(stats_template, container.childElementCount, this.children.size)
 			: '';
-	},
+	}
 
 	updateTabIndicator() {
 		document
 			.querySelector('#children')
 			.setAttribute('data-tab-indicator', this.children.size);
-	},
+	}
 
 	selectChildren() {
 		const exclude_serviceids = [];
@@ -393,7 +414,7 @@ window.service_edit_popup = {
 			this.updateTabIndicator();
 			this.update();
 		});
-	},
+	}
 
 	selectParents() {
 		const exclude_serviceids = [];
@@ -420,7 +441,7 @@ window.service_edit_popup = {
 
 			jQuery('#parent_serviceids_').multiSelect('addData', data);
 		});
-	},
+	}
 
 	clone({title, buttons}) {
 		this.serviceid = null;
@@ -429,7 +450,7 @@ window.service_edit_popup = {
 
 		this.overlay.unsetLoading();
 		this.overlay.setProperties({title, buttons});
-	},
+	}
 
 	delete() {
 		for (const el of this.form.parentNode.children) {
@@ -480,7 +501,7 @@ window.service_edit_popup = {
 
 				this.form.parentNode.insertBefore(message_box, this.form);
 			})
-	},
+	}
 
 	submit() {
 		const fields = getFormFields(this.form);
@@ -555,4 +576,4 @@ window.service_edit_popup = {
 				this.overlay.unsetLoading();
 			});
 	}
-};
+}();

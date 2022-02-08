@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-18T20:48:37Z'
+  date: '2022-01-26T14:56:40Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -35,8 +35,11 @@ zabbix_export:
             name: 'Service state'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: fd05f449cbc64dcba10029c246594568
@@ -44,6 +47,10 @@ zabbix_export:
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 8f355d66881c47b5be8097dbd1f950d1
           name: 'ICMP loss'
@@ -54,8 +61,11 @@ zabbix_export:
           units: '%'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 4b2e2d168a0b4da3b5999263f52f3c36
@@ -67,6 +77,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/QTech QSW SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 6138402da32a40259bb26f217be2df59
           name: 'ICMP response time'
@@ -77,8 +94,11 @@ zabbix_export:
           units: s
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 18f41db36192463eabaa3797034e578a
@@ -93,6 +113,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/QTech QSW SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: ddb9ac31893d4b1d882b0e500d2d6ad7
           name: Temperature
@@ -107,8 +134,8 @@ zabbix_export:
             Temperature readings of testpoint: __RESOURCE__
           tags:
             -
-              tag: Application
-              value: Temperature
+              tag: component
+              value: temperature
           triggers:
             -
               uuid: 8ca8b9dfed0e4af898d9182150bb1ad0
@@ -119,6 +146,13 @@ zabbix_export:
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: b9122f253bf440ccb413d577790e46a0
               expression: 'avg(/QTech QSW SNMP/sensor.temp.value[switchTemperature.0],5m)>{$TEMP_WARN:""}'
@@ -133,6 +167,13 @@ zabbix_export:
                   name: 'Temperature is above critical threshold: >{$TEMP_CRIT:""}'
                   expression: 'avg(/QTech QSW SNMP/sensor.temp.value[switchTemperature.0],5m)>{$TEMP_CRIT:""}'
                   recovery_expression: 'max(/QTech QSW SNMP/sensor.temp.value[switchTemperature.0],5m)<{$TEMP_CRIT:""}-3'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: d7607e97e2f549caaefa184c9fee8220
               expression: 'avg(/QTech QSW SNMP/sensor.temp.value[switchTemperature.0],5m)<{$TEMP_CRIT_LOW:""}'
@@ -141,6 +182,13 @@ zabbix_export:
               name: 'Temperature is too low: <{$TEMP_CRIT_LOW:""}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 568c2b550b944dd084ec4e4486e7ec72
           name: 'SNMP traps (fallback)'
@@ -153,8 +201,8 @@ zabbix_export:
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: network
         -
           uuid: b821576134ff4185a3e11b35763b7d1d
           name: 'System contact details'
@@ -176,8 +224,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: daab52a7d91b431b8ec579200e53a0c4
           name: 'CPU utilization'
@@ -192,8 +240,8 @@ zabbix_export:
             CPU utilization in %
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
           triggers:
             -
               uuid: 57bf78318ded4574bde08adfafe94454
@@ -202,6 +250,10 @@ zabbix_export:
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 3701b10845d449a3b1a5d67a7d743ca4
           name: 'System description'
@@ -224,8 +276,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: e7dda2d7f577404dbe8e5beba7609617
           name: 'Firmware version'
@@ -244,8 +296,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
           triggers:
             -
               uuid: e4682afd0cc547eea9605452b7df79f4
@@ -255,6 +307,10 @@ zabbix_export:
               priority: INFO
               description: 'Firmware version has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 5ff90f06a84a43ac937d3798b360bbd9
           name: 'Hardware model name'
@@ -274,8 +330,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
         -
           uuid: 684868048c1645aea9d8ad94514bd4c6
           name: 'Hardware serial number'
@@ -295,8 +351,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
           triggers:
             -
               uuid: 83db3bd248994482a92ba86e5d3ae5ab
@@ -305,6 +361,10 @@ zabbix_export:
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: a842a44da43a4d2c906d0c642eb11411
           name: 'Hardware version(revision)'
@@ -323,8 +383,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
         -
           uuid: de9a507ae83247398a4708fff2889862
           name: 'System location'
@@ -346,8 +406,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: aa2a90f772154d0e9354d496afae9939
           name: 'System name'
@@ -369,8 +429,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: 27fa16e646224f88ad3b35ce7a71a18a
@@ -379,6 +439,13 @@ zabbix_export:
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: security
         -
           uuid: 237a5f0537a549b3a63ed7f81d0b6122
           name: 'System object ID'
@@ -399,8 +466,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: ea6000232033495babf9157a67b89bcc
           name: 'Operating system'
@@ -420,8 +487,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: os
           triggers:
             -
               uuid: 6431f9a46fcb4a42ab3e04c8289bd07d
@@ -434,6 +501,10 @@ zabbix_export:
                 -
                   name: 'System name has changed (new name: {ITEM.VALUE})'
                   expression: 'last(/QTech QSW SNMP/system.name,#1)<>last(/QTech QSW SNMP/system.name,#2) and length(last(/QTech QSW SNMP/system.name))>0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 0123f7f4eab541a786130af4fbb2a534
           name: Uptime
@@ -454,8 +525,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: 44d6c66a6a1641f8816031c0d5bf4040
@@ -468,6 +539,10 @@ zabbix_export:
                 -
                   name: 'No SNMP data collection'
                   expression: 'max(/QTech QSW SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 609971d1876444659f779ef28ed81ce7
           name: 'Total memory'
@@ -481,8 +556,8 @@ zabbix_export:
             Total memory in Bytes
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: 8821718704db4ab4a8af8fbeb61dde93
           name: 'Used memory'
@@ -496,8 +571,8 @@ zabbix_export:
             Used memory in Bytes
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
         -
           uuid: f2271ace8bd040618f10ec651a634cbc
           name: 'Memory utilization'
@@ -510,8 +585,8 @@ zabbix_export:
           description: 'Memory utilization in %'
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
           triggers:
             -
               uuid: 082a768e190d4e8e97e0857cd3412ea1
@@ -519,6 +594,13 @@ zabbix_export:
               name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 3e44eea15b2a4b2c994fb3372c538466
           name: 'SNMP agent availability'
@@ -535,8 +617,11 @@ zabbix_export:
             name: zabbix.host.available
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 7a7c0c7501ca484491394fe82c75b401
@@ -549,6 +634,10 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/QTech QSW SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: 58e5512df6204f7b9b7156055cfa35d4
@@ -572,8 +661,8 @@ zabbix_export:
                 name: 'QTECH-MIB::sysFanStatus'
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
               trigger_prototypes:
                 -
                   uuid: 9961328558a74e45a3154559ed582e41
@@ -582,6 +671,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: 868afe31f18b401f9af17050f7b4f797
           name: 'Network interfaces discovery'
@@ -670,8 +766,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 7834edab485241e1bf065c0b314fcfc7
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
@@ -690,8 +792,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: f6d6b81658db4ba1b4edc2bf245816ce
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
@@ -715,8 +823,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 1d1e8f319cf84bc4813e07b4d1637e83
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
@@ -739,8 +853,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 69fddbf678284814ba8ec7f68314be5c
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
@@ -759,8 +879,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: dfc2d7184bd84c6592072857fc2abc48
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
@@ -784,8 +910,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 1aade0dd9063467e9fd1841b84e710f5
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
@@ -810,8 +942,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 37fffae80d9243d0863909fdae8683a2
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
@@ -833,8 +971,14 @@ zabbix_export:
                 name: 'IF-MIB::ifOperStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: efa56904fcf54fa5bbd0ba21381dc415
@@ -852,6 +996,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 950d69eedab445a09d53f002a499d25c
               name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
@@ -875,8 +1023,14 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
           trigger_prototypes:
             -
               uuid: cb39728aac4940dda2b3a307d12be813
@@ -906,6 +1060,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/QTech QSW SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/QTech QSW SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/QTech QSW SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/QTech QSW SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 303873dbb6224b4abc2f678100a72eda
               expression: |
@@ -926,6 +1084,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/QTech QSW SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/QTech QSW SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/QTech QSW SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/QTech QSW SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 0e0544466c6845349078ca2a72d2cf6c
               expression: |
@@ -945,6 +1107,13 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/QTech QSW SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/QTech QSW SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/QTech QSW SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/QTech QSW SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
           graph_prototypes:
             -
               uuid: 986751c7fdb14537a5b525a0829f3b63
@@ -1048,8 +1217,14 @@ zabbix_export:
                 name: 'EtherLike-MIB::dot3StatsDuplexStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: 8688cff304604fd7b015e92ef9f98647
@@ -1058,6 +1233,10 @@ zabbix_export:
                   priority: WARNING
                   description: 'Please check autonegotiation settings and cabling'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
           preprocessing:
             -
               type: JAVASCRIPT
@@ -1098,8 +1277,8 @@ zabbix_export:
                 name: 'QTECH-MIB::sysPowerStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Power supply'
+                  tag: component
+                  value: power
               trigger_prototypes:
                 -
                   uuid: d047cf0b9e9f4e169e4a62c60358178d
@@ -1108,6 +1287,23 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
+      tags:
+        -
+          tag: class
+          value: network
+        -
+          tag: target
+          value: qsw
+        -
+          tag: target
+          value: qtech
       macros:
         -
           macro: '{$CPU.UTIL.CRIT}'

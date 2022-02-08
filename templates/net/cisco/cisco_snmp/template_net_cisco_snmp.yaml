@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-18T20:42:16Z'
+  date: '2022-01-26T14:03:25Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -47,8 +47,8 @@ zabbix_export:
                 name: 'CISCO-ENVMON-MIB::CiscoEnvMonState'
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
               trigger_prototypes:
                 -
                   uuid: a9f5e9e2a65143298910e354e832bf2f
@@ -57,6 +57,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 58cf2c24afd74e5cb048557e8e52138e
                   expression: 'count(/Cisco CISCO-ENVMON-MIB SNMP/sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}],#1,"eq","{$FAN_WARN_STATUS:\"warning\"}")=1 or count(/Cisco CISCO-ENVMON-MIB SNMP/sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}],#1,"eq","{$FAN_WARN_STATUS:\"notFunctioning\"}")=1'
@@ -68,6 +75,13 @@ zabbix_export:
                     -
                       name: '{#SENSOR_INFO}: Fan is in critical state'
                       expression: 'count(/Cisco CISCO-ENVMON-MIB SNMP/sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"critical\"}")=1 or count(/Cisco CISCO-ENVMON-MIB SNMP/sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"shutdown\"}")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: 932817396a5b47f29af28e439711ef59
           name: 'PSU Discovery'
@@ -91,8 +105,8 @@ zabbix_export:
                 name: 'CISCO-ENVMON-MIB::CiscoEnvMonState'
               tags:
                 -
-                  tag: Application
-                  value: 'Power supply'
+                  tag: component
+                  value: power
               trigger_prototypes:
                 -
                   uuid: 5796e1e85ea949d0b86ce83f5daae958
@@ -101,6 +115,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 93892fed243f4f0b8c26ab67fa6e1800
                   expression: 'count(/Cisco CISCO-ENVMON-MIB SNMP/sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}],#1,"eq","{$PSU_WARN_STATUS:\"warning\"}")=1 or count(/Cisco CISCO-ENVMON-MIB SNMP/sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}],#1,"eq","{$PSU_WARN_STATUS:\"notFunctioning\"}")=1'
@@ -112,6 +133,13 @@ zabbix_export:
                     -
                       name: '{#SENSOR_INFO}: Power supply is in critical state'
                       expression: 'count(/Cisco CISCO-ENVMON-MIB SNMP/sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"critical\"}")=1 or count(/Cisco CISCO-ENVMON-MIB SNMP/sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"shutdown\"}")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: e61bb682818b4f31a669acd31335160c
           name: 'Temperature Discovery'
@@ -139,8 +167,8 @@ zabbix_export:
                 name: 'CISCO-ENVMON-MIB::CiscoEnvMonState'
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
             -
               uuid: 4859221e53d7485485db1c9060d7f705
               name: '{#SNMPVALUE}: Temperature'
@@ -155,8 +183,8 @@ zabbix_export:
                 The current measurement of the test point being instrumented.
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: 2bb01154728b47c69514f7399f3bfabc
@@ -166,6 +194,13 @@ zabbix_export:
                   name: '{#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
           trigger_prototypes:
             -
               uuid: f356f7fbc2de423db3bac09bc4683ae2
@@ -181,6 +216,13 @@ zabbix_export:
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 2c151dd93b7f4096b9eb6c73c315ffec
               expression: |
@@ -203,6 +245,13 @@ zabbix_export:
                     or
                     last(/Cisco CISCO-ENVMON-MIB SNMP/sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}])={$TEMP_DISASTER_STATUS}
                   recovery_expression: 'max(/Cisco CISCO-ENVMON-MIB SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
       macros:
         -
           macro: '{$FAN_CRIT_STATUS:"critical"}'
@@ -315,8 +364,8 @@ zabbix_export:
                 Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
             -
               uuid: 32d6bbb06c624f9e9a236fb53507948c
               name: '{#SNMPVALUE}: Used memory'
@@ -331,8 +380,8 @@ zabbix_export:
                 Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
             -
               uuid: 5065203cb8244befadc54cdb004d4b40
               name: '{#SNMPVALUE}: Memory utilization'
@@ -345,8 +394,8 @@ zabbix_export:
               description: 'Memory utilization in %'
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
               trigger_prototypes:
                 -
                   uuid: 74c44bdc890f467cb1a8cdc175a54a76
@@ -354,6 +403,13 @@ zabbix_export:
                   name: '{#SNMPVALUE}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: 754f4378d0fb43c288e891285efee8a5
@@ -420,8 +476,8 @@ zabbix_export:
                 Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15215-collect-cpu-util-snmp.html
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
               trigger_prototypes:
                 -
                   uuid: be863abc1e3440a9bd35c4db77f83961
@@ -430,6 +486,10 @@ zabbix_export:
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'CPU utilization is too high. The system might be slow to respond.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: 8e045ff24e564afc9a55d4bd08529d22
@@ -492,8 +552,8 @@ zabbix_export:
                 Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15215-collect-cpu-util-snmp.html
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
               trigger_prototypes:
                 -
                   uuid: 52d3b9d4d52e4f289221f4b5ade177d7
@@ -502,6 +562,10 @@ zabbix_export:
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'CPU utilization is too high. The system might be slow to respond.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: 6fed03a2555949178f96550fcdb449ca
@@ -554,8 +618,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
         -
           uuid: 3b54e3692fe643e99704767f9a58a1c2
           name: 'Hardware serial number'
@@ -575,8 +639,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
           triggers:
             -
               uuid: 4100a7125272484c81c4f599eff82793
@@ -585,6 +649,10 @@ zabbix_export:
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 51b1c178adff415bbe36a4363d6e06c1
           name: 'Operating system'
@@ -609,8 +677,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: os
           triggers:
             -
               uuid: e417e0edd4eb417d99816dd9cf4f20e9
@@ -619,6 +687,10 @@ zabbix_export:
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
       discovery_rules:
         -
           uuid: 0908cfd197214f6c8092bbd426ef83bf
@@ -657,8 +729,8 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: Inventory
+                  tag: component
+                  value: system
               trigger_prototypes:
                 -
                   uuid: ff15aaac7c4947b6a07a38dec4d1466d
@@ -667,6 +739,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
     -
       uuid: 1bb42fbdb9054645a62ff81f14ba3b99
       template: 'Cisco IOS prior to 12.0_3_T SNMP'
@@ -696,8 +772,11 @@ zabbix_export:
             name: 'Service state'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: fd317d3e8d3d45bf97322b8578f30c04
@@ -705,6 +784,10 @@ zabbix_export:
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 2af7b5f79fc44d7d992b0bf6277c12bb
           name: 'ICMP loss'
@@ -715,8 +798,11 @@ zabbix_export:
           units: '%'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 3576c96601ef40abbeedbde11768141a
@@ -728,6 +814,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Cisco IOS prior to 12.0_3_T SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 1afa1e8ca21c430598845806bbf0e7a2
           name: 'ICMP response time'
@@ -738,8 +831,11 @@ zabbix_export:
           units: s
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 2941d30058b14d52bd9a723889c8be26
@@ -754,6 +850,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Cisco IOS prior to 12.0_3_T SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 53eb0288c9e54490942cedd4ce5f376e
           name: 'SNMP traps (fallback)'
@@ -766,8 +869,8 @@ zabbix_export:
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: network
         -
           uuid: bba5be8b3fa54bfbb354b7a2c20fd353
           name: 'System contact details'
@@ -789,8 +892,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 693b0c779f574d869f47b44c4b3ecd58
           name: 'CPU utilization'
@@ -807,8 +910,8 @@ zabbix_export:
             Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15215-collect-cpu-util-snmp.html
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
           triggers:
             -
               uuid: 74773fc279864e7daf89cffe9cb2067c
@@ -817,6 +920,10 @@ zabbix_export:
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 495b26e876a04819a02cf22eaba04e0b
           name: 'System description'
@@ -839,8 +946,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: b5121a382d0245f0906bba4530a82ac4
           name: 'Hardware model name'
@@ -860,8 +967,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
         -
           uuid: 5934a35b54464f66ab19152ca393b882
           name: 'Hardware serial number'
@@ -881,8 +988,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
           triggers:
             -
               uuid: d53c0d22a67544cf8a2fcd2c8de4d4eb
@@ -891,6 +998,10 @@ zabbix_export:
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 30df666e80bd4875ac761306781061da
           name: 'System location'
@@ -912,8 +1023,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 2e55e75a7baa4195b012e750bac90dcb
           name: 'System name'
@@ -935,8 +1046,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: 33b42b1aa448408fa3fb5aadf7375cf8
@@ -945,6 +1056,13 @@ zabbix_export:
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: security
         -
           uuid: cc6e5a6e4f604b639815d9397264c6af
           name: 'System object ID'
@@ -965,8 +1083,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 70ef7ce7561640b7bc6b5d30235c0ecc
           name: 'Operating system'
@@ -991,8 +1109,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: os
           triggers:
             -
               uuid: abe57415ff574b878a2ce2a318be86ee
@@ -1005,6 +1123,10 @@ zabbix_export:
                 -
                   name: 'System name has changed (new name: {ITEM.VALUE})'
                   expression: 'last(/Cisco IOS prior to 12.0_3_T SNMP/system.name,#1)<>last(/Cisco IOS prior to 12.0_3_T SNMP/system.name,#2) and length(last(/Cisco IOS prior to 12.0_3_T SNMP/system.name))>0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 7ecd28b73c0f43a98c3a58467b1cbdc7
           name: Uptime
@@ -1025,8 +1147,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: f278b8b4eb784107a6d8d3e8437e8a66
@@ -1039,6 +1161,10 @@ zabbix_export:
                 -
                   name: 'No SNMP data collection'
                   expression: 'max(/Cisco IOS prior to 12.0_3_T SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 5a156e9ca10c49bbb87cf3de1b686cff
           name: 'SNMP agent availability'
@@ -1055,8 +1181,11 @@ zabbix_export:
             name: zabbix.host.available
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 86d8603903504287b07a25530c8eda2b
@@ -1069,6 +1198,10 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Cisco IOS prior to 12.0_3_T SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: fbeef9c16d9d45b7a5c50f530a697f76
@@ -1107,8 +1240,8 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: Inventory
+                  tag: component
+                  value: system
               trigger_prototypes:
                 -
                   uuid: e8c328ad70a146219a8ae62f101cfc00
@@ -1117,6 +1250,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
         -
           uuid: 109cd000cd044e4096bf98dbf57b72d1
           name: 'FAN Discovery'
@@ -1140,8 +1277,8 @@ zabbix_export:
                 name: 'CISCO-ENVMON-MIB::CiscoEnvMonState'
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
               trigger_prototypes:
                 -
                   uuid: ddd7015dd3204514beea29edc45c3cd4
@@ -1150,6 +1287,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 4eb7ea3405d74740a12095a07d91d48f
                   expression: 'count(/Cisco IOS prior to 12.0_3_T SNMP/sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}],#1,"eq","{$FAN_WARN_STATUS:\"warning\"}")=1 or count(/Cisco IOS prior to 12.0_3_T SNMP/sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}],#1,"eq","{$FAN_WARN_STATUS:\"notFunctioning\"}")=1'
@@ -1161,6 +1305,13 @@ zabbix_export:
                     -
                       name: '{#SENSOR_INFO}: Fan is in critical state'
                       expression: 'count(/Cisco IOS prior to 12.0_3_T SNMP/sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"critical\"}")=1 or count(/Cisco IOS prior to 12.0_3_T SNMP/sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"shutdown\"}")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: 727adcf658d141ff9e45744107a58c38
           name: 'Memory Discovery'
@@ -1186,8 +1337,8 @@ zabbix_export:
                 Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
             -
               uuid: 25471f4acc4348bf978792fcfaff6acc
               name: '{#SNMPVALUE}: Used memory'
@@ -1202,8 +1353,8 @@ zabbix_export:
                 Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
             -
               uuid: 9a03c1b1c6ae42e5ab1886c172b2e3ac
               name: '{#SNMPVALUE}: Memory utilization'
@@ -1216,8 +1367,8 @@ zabbix_export:
               description: 'Memory utilization in %'
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
               trigger_prototypes:
                 -
                   uuid: 8793ba7767cc415a80a6a206aaf01f11
@@ -1225,6 +1376,13 @@ zabbix_export:
                   name: '{#SNMPVALUE}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: dd0520d162fe4230900d33472944677f
@@ -1261,8 +1419,8 @@ zabbix_export:
                 name: 'CISCO-ENVMON-MIB::CiscoEnvMonState'
               tags:
                 -
-                  tag: Application
-                  value: 'Power supply'
+                  tag: component
+                  value: power
               trigger_prototypes:
                 -
                   uuid: fc4b6f155d3646c3bb8b27d35c18604b
@@ -1271,6 +1429,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 58e9514d75f84c989b052cfd76ceed4a
                   expression: 'count(/Cisco IOS prior to 12.0_3_T SNMP/sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}],#1,"eq","{$PSU_WARN_STATUS:\"warning\"}")=1 or count(/Cisco IOS prior to 12.0_3_T SNMP/sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}],#1,"eq","{$PSU_WARN_STATUS:\"notFunctioning\"}")=1'
@@ -1282,6 +1447,13 @@ zabbix_export:
                     -
                       name: '{#SENSOR_INFO}: Power supply is in critical state'
                       expression: 'count(/Cisco IOS prior to 12.0_3_T SNMP/sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"critical\"}")=1 or count(/Cisco IOS prior to 12.0_3_T SNMP/sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"shutdown\"}")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: 73d10f48886443248f7d2d9167fcfee5
           name: 'Temperature Discovery'
@@ -1309,8 +1481,8 @@ zabbix_export:
                 name: 'CISCO-ENVMON-MIB::CiscoEnvMonState'
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
             -
               uuid: ea0d56dd49104257ba6c14ce3bdb753a
               name: '{#SNMPVALUE}: Temperature'
@@ -1325,8 +1497,8 @@ zabbix_export:
                 The current measurement of the test point being instrumented.
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: 716dee103c9f4e9da5f83d6cc338617d
@@ -1336,6 +1508,13 @@ zabbix_export:
                   name: '{#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
           trigger_prototypes:
             -
               uuid: 82fa9473dc7d49d4a3a230ef6238cd2c
@@ -1351,6 +1530,13 @@ zabbix_export:
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: a0199088767f43c0990f5ac8793267b1
               expression: |
@@ -1373,6 +1559,26 @@ zabbix_export:
                     or
                     last(/Cisco IOS prior to 12.0_3_T SNMP/sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}])={$TEMP_DISASTER_STATUS}
                   recovery_expression: 'max(/Cisco IOS prior to 12.0_3_T SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
+      tags:
+        -
+          tag: class
+          value: network
+        -
+          tag: target
+          value: cisco
+        -
+          tag: target
+          value: cisco-prior
+        -
+          tag: target
+          value: cisco-prior-12.0-3-t
       macros:
         -
           macro: '{$CPU.UTIL.CRIT}'
@@ -1520,8 +1726,11 @@ zabbix_export:
             name: 'Service state'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 77e52d690bc043e389ad8d705dbb86b9
@@ -1529,6 +1738,10 @@ zabbix_export:
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 0c081f94e6094ad29e1fbc2a3424bedb
           name: 'ICMP loss'
@@ -1539,8 +1752,11 @@ zabbix_export:
           units: '%'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 62b3c0a2654f4372a1bad40a0fd2898d
@@ -1552,6 +1768,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Cisco IOS SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: dab9ef1df04d403faa4910bf51559035
           name: 'ICMP response time'
@@ -1562,8 +1785,11 @@ zabbix_export:
           units: s
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 1ba34b5e344147d5b27431906037bc04
@@ -1578,6 +1804,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Cisco IOS SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 8684622dc8d446f0b17ba7687d47b09d
           name: 'SNMP traps (fallback)'
@@ -1590,8 +1823,8 @@ zabbix_export:
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: network
         -
           uuid: 622767f4dbab49039c63990e4fc58eaa
           name: 'System contact details'
@@ -1613,8 +1846,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: ae8e0ecf937c4a9492fe67cc5cd07d6f
           name: 'System description'
@@ -1637,8 +1870,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: a8062a554b8d447f81f7b9ef3229c7e9
           name: 'Hardware model name'
@@ -1658,8 +1891,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
         -
           uuid: 223fd2fe9699419c824ae310f1c8a631
           name: 'Hardware serial number'
@@ -1679,8 +1912,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
           triggers:
             -
               uuid: 7d1460eaf7ad46fd8a1b5df3c20051ba
@@ -1689,6 +1922,10 @@ zabbix_export:
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 361ca9979352405a9dfb9bc13e542a2f
           name: 'System location'
@@ -1710,8 +1947,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 2ddace242ffe487a8641e035cf04dcdd
           name: 'System name'
@@ -1733,8 +1970,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: 2105744d4efd4a239c5b6ab615746a40
@@ -1743,6 +1980,13 @@ zabbix_export:
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: security
         -
           uuid: 290d095f8fbc4cd1aa5ed3d304434f4b
           name: 'System object ID'
@@ -1763,8 +2007,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 5fe7bc2d46a748d3ace7d1dd0de8127b
           name: 'Operating system'
@@ -1789,8 +2033,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: os
           triggers:
             -
               uuid: 2d97173405594074bfe2cc6f3d0cae70
@@ -1803,6 +2047,10 @@ zabbix_export:
                 -
                   name: 'System name has changed (new name: {ITEM.VALUE})'
                   expression: 'last(/Cisco IOS SNMP/system.name,#1)<>last(/Cisco IOS SNMP/system.name,#2) and length(last(/Cisco IOS SNMP/system.name))>0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: fe1dbb23a8794ce9ae3f6c37e63082f8
           name: Uptime
@@ -1823,8 +2071,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: b98092ddf87247ff91710e2f310dbfb9
@@ -1837,6 +2085,10 @@ zabbix_export:
                 -
                   name: 'No SNMP data collection'
                   expression: 'max(/Cisco IOS SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: cf9bd75166704b2f93446ece0c2d0fab
           name: 'SNMP agent availability'
@@ -1853,8 +2105,11 @@ zabbix_export:
             name: zabbix.host.available
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: df7c9ed5d3164e73a792f82ecad6ba13
@@ -1867,6 +2122,10 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Cisco IOS SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: f7404c15a9dc497b8e67ab014ca43890
@@ -1898,8 +2157,8 @@ zabbix_export:
                 Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15215-collect-cpu-util-snmp.html
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
               trigger_prototypes:
                 -
                   uuid: 89b292f6748f49fa8b0f23f5378944b2
@@ -1908,6 +2167,10 @@ zabbix_export:
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'CPU utilization is too high. The system might be slow to respond.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: e93fccb08b3a4150b986a54eaccbd1c5
@@ -1958,8 +2221,8 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: Inventory
+                  tag: component
+                  value: system
               trigger_prototypes:
                 -
                   uuid: e5477e6803974060ba3ce8a131d97d40
@@ -1968,6 +2231,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
         -
           uuid: 98eebfb8ed28460c8e5982af61f18931
           name: 'FAN Discovery'
@@ -1991,8 +2258,8 @@ zabbix_export:
                 name: 'CISCO-ENVMON-MIB::CiscoEnvMonState'
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
               trigger_prototypes:
                 -
                   uuid: e64b0790509c4a21b7ead959fa1b7951
@@ -2001,6 +2268,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 33207a0c65e14a5d9355690c8d9d54e2
                   expression: 'count(/Cisco IOS SNMP/sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}],#1,"eq","{$FAN_WARN_STATUS:\"warning\"}")=1 or count(/Cisco IOS SNMP/sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}],#1,"eq","{$FAN_WARN_STATUS:\"notFunctioning\"}")=1'
@@ -2012,6 +2286,13 @@ zabbix_export:
                     -
                       name: '{#SENSOR_INFO}: Fan is in critical state'
                       expression: 'count(/Cisco IOS SNMP/sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"critical\"}")=1 or count(/Cisco IOS SNMP/sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"shutdown\"}")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: d7144482448b4bb5b4f59f18365ecb04
           name: 'Memory Discovery'
@@ -2037,8 +2318,8 @@ zabbix_export:
                 Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
             -
               uuid: 58e8eeb2ddf74c6e86e02845f0d38784
               name: '{#SNMPVALUE}: Used memory'
@@ -2053,8 +2334,8 @@ zabbix_export:
                 Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
             -
               uuid: 5407d019461f45b895663de105d75298
               name: '{#SNMPVALUE}: Memory utilization'
@@ -2067,8 +2348,8 @@ zabbix_export:
               description: 'Memory utilization in %'
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
               trigger_prototypes:
                 -
                   uuid: ee300a1f9f644bdbb545bd65d59d4837
@@ -2076,6 +2357,13 @@ zabbix_export:
                   name: '{#SNMPVALUE}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: 9b18855195cc45a8a84550544bc6d7e7
@@ -2177,8 +2465,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 1cdd9e77a6f9420da700b903e2fc0966
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
@@ -2197,8 +2491,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 22cb1c9d188c4274a4f9ac815832fc21
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
@@ -2222,8 +2522,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 75182ac83419420194cf34c4e5f92a62
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
@@ -2246,8 +2552,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: c31a98b3b9784cd699b5d0dadbc3dc4a
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
@@ -2266,8 +2578,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 973dbf88a72d4f5897bb199b5d41941a
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
@@ -2291,8 +2609,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: e24cccb1e89446268b30830ac01d59f8
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
@@ -2317,8 +2641,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 6ecd6a8ec5fa487c836adb69e72915e7
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
@@ -2340,8 +2670,14 @@ zabbix_export:
                 name: 'IF-MIB::ifOperStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: 6bf13b6cac1b438bbfe384a746646597
@@ -2359,6 +2695,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 51e3b46e009944d594fd4bdadeac83aa
               name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
@@ -2382,8 +2722,14 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
           trigger_prototypes:
             -
               uuid: 3783d41e790f4d1e9ebb7340d82edc1f
@@ -2413,6 +2759,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Cisco IOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Cisco IOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Cisco IOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Cisco IOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 17a07d8b87c04874bfbf12009e1da65f
               expression: |
@@ -2433,6 +2783,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Cisco IOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Cisco IOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Cisco IOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Cisco IOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 0c1c6f8fc17849a68a12813389da6373
               expression: |
@@ -2452,6 +2806,13 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Cisco IOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Cisco IOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Cisco IOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Cisco IOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
           graph_prototypes:
             -
               uuid: 171ff5fe2b1543aa869ab56f800b52a5
@@ -2555,8 +2916,14 @@ zabbix_export:
                 name: 'EtherLike-MIB::dot3StatsDuplexStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: 251a80d2f6824e33b8edfca94e0f335d
@@ -2565,6 +2932,10 @@ zabbix_export:
                   priority: WARNING
                   description: 'Please check autonegotiation settings and cabling'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
           preprocessing:
             -
               type: JAVASCRIPT
@@ -2606,8 +2977,8 @@ zabbix_export:
                 name: 'CISCO-ENVMON-MIB::CiscoEnvMonState'
               tags:
                 -
-                  tag: Application
-                  value: 'Power supply'
+                  tag: component
+                  value: power
               trigger_prototypes:
                 -
                   uuid: 3068fc8f0b0749d4b76d97d7f500e36d
@@ -2616,6 +2987,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 194444afb5d143a0a0734120e26066e4
                   expression: 'count(/Cisco IOS SNMP/sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}],#1,"eq","{$PSU_WARN_STATUS:\"warning\"}")=1 or count(/Cisco IOS SNMP/sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}],#1,"eq","{$PSU_WARN_STATUS:\"notFunctioning\"}")=1'
@@ -2627,6 +3005,13 @@ zabbix_export:
                     -
                       name: '{#SENSOR_INFO}: Power supply is in critical state'
                       expression: 'count(/Cisco IOS SNMP/sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"critical\"}")=1 or count(/Cisco IOS SNMP/sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"shutdown\"}")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: 2751c1ff3f334145971aa400440631fe
           name: 'Temperature Discovery'
@@ -2654,8 +3039,8 @@ zabbix_export:
                 name: 'CISCO-ENVMON-MIB::CiscoEnvMonState'
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
             -
               uuid: c1fb8e8099ed496a9af8d3e36d6d3c8b
               name: '{#SNMPVALUE}: Temperature'
@@ -2670,8 +3055,8 @@ zabbix_export:
                 The current measurement of the test point being instrumented.
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: 64888770ef6a44089593e78d4d2c528d
@@ -2681,6 +3066,13 @@ zabbix_export:
                   name: '{#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
           trigger_prototypes:
             -
               uuid: 95f562a5b2fb4e17b091eaed07c77d4a
@@ -2696,6 +3088,13 @@ zabbix_export:
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 5809893fb23a452ebad327c595322619
               expression: |
@@ -2718,6 +3117,23 @@ zabbix_export:
                     or
                     last(/Cisco IOS SNMP/sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}])={$TEMP_DISASTER_STATUS}
                   recovery_expression: 'max(/Cisco IOS SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
+      tags:
+        -
+          tag: class
+          value: network
+        -
+          tag: target
+          value: cisco
+        -
+          tag: target
+          value: cisco-ios
       macros:
         -
           macro: '{$CPU.UTIL.CRIT}'
@@ -3834,8 +4250,11 @@ zabbix_export:
             name: 'Service state'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: f6fae61d08644d5fa3929f526aee34e4
@@ -3843,6 +4262,10 @@ zabbix_export:
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 39baf182f6724813a951b25f6ff5aab4
           name: 'ICMP loss'
@@ -3853,8 +4276,11 @@ zabbix_export:
           units: '%'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 5c7eae9701be4661a34bbcdb99c094fe
@@ -3866,6 +4292,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 85748657f67e45189256e7704c6e7a9c
           name: 'ICMP response time'
@@ -3876,8 +4309,11 @@ zabbix_export:
           units: s
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 9aebe4a1cfa34c5d92178abc8a6ce06e
@@ -3892,6 +4328,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 0f50837172ad475d9d5a27c95be19ab2
           name: 'SNMP traps (fallback)'
@@ -3904,8 +4347,8 @@ zabbix_export:
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: network
         -
           uuid: 22406c415a0a4f6bbd9d44707631f42c
           name: 'System contact details'
@@ -3927,8 +4370,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 5a37d2e4f308475c932a6bb856d0ffb4
           name: 'System description'
@@ -3951,8 +4394,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 12b69d0a3b844906a950bcedcbb8b9b8
           name: 'Hardware model name'
@@ -3972,8 +4415,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
         -
           uuid: 991021da67c84f96a76154078c45f3be
           name: 'Hardware serial number'
@@ -3993,8 +4436,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
           triggers:
             -
               uuid: 78723249679b4a288861f4ad8621fd77
@@ -4003,6 +4446,10 @@ zabbix_export:
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: d8ed796e88f3478ea72d95ddcc68f9ed
           name: 'System location'
@@ -4024,8 +4471,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: a26d3babf5674a5e9d9afff94518e6c6
           name: 'System name'
@@ -4047,8 +4494,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: 3e09d5d308e449a4974393650b33e64d
@@ -4057,6 +4504,13 @@ zabbix_export:
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: security
         -
           uuid: da41d408448d4b1aa323e0046ff97598
           name: 'System object ID'
@@ -4077,8 +4531,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: cf4af497970a415aa45aa66b2ba48115
           name: 'Operating system'
@@ -4103,8 +4557,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: os
           triggers:
             -
               uuid: df85813bb6af4accab8d5191cd452329
@@ -4117,6 +4571,10 @@ zabbix_export:
                 -
                   name: 'System name has changed (new name: {ITEM.VALUE})'
                   expression: 'last(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/system.name,#1)<>last(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/system.name,#2) and length(last(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/system.name))>0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 182fd7bfd7b74331b9f3cf8f4a7646cb
           name: Uptime
@@ -4137,8 +4595,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: 806f54999d064eb68a3f46a0d84ee4df
@@ -4151,6 +4609,10 @@ zabbix_export:
                 -
                   name: 'No SNMP data collection'
                   expression: 'max(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 92fa54c5c28b4244b0d22c9041064d15
           name: 'SNMP agent availability'
@@ -4167,8 +4629,11 @@ zabbix_export:
             name: zabbix.host.available
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 778749b260bb45c3a926d6bb49c07257
@@ -4181,6 +4646,10 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: 1d8d76707b1049cabfda668257c257b6
@@ -4216,8 +4685,8 @@ zabbix_export:
                 Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15215-collect-cpu-util-snmp.html
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
               trigger_prototypes:
                 -
                   uuid: b964834d4f6549c7ae0f0c0c2646dfbc
@@ -4226,6 +4695,10 @@ zabbix_export:
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'CPU utilization is too high. The system might be slow to respond.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: 9e61506351cf4f16be21dcbed8875293
@@ -4276,8 +4749,8 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: Inventory
+                  tag: component
+                  value: system
               trigger_prototypes:
                 -
                   uuid: 75ee6ab1f0c84946a4f4d6e87007ec25
@@ -4286,6 +4759,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
         -
           uuid: 0906581023f54a0b95102288e8ed4714
           name: 'FAN Discovery'
@@ -4309,8 +4786,8 @@ zabbix_export:
                 name: 'CISCO-ENVMON-MIB::CiscoEnvMonState'
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
               trigger_prototypes:
                 -
                   uuid: 907502bbdeee45bbbfb84d43c2dc4f20
@@ -4319,6 +4796,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 4b2a4eb4cb2a43758048cc05d63f37a4
                   expression: 'count(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}],#1,"eq","{$FAN_WARN_STATUS:\"warning\"}")=1 or count(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}],#1,"eq","{$FAN_WARN_STATUS:\"notFunctioning\"}")=1'
@@ -4330,6 +4814,13 @@ zabbix_export:
                     -
                       name: '{#SENSOR_INFO}: Fan is in critical state'
                       expression: 'count(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"critical\"}")=1 or count(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"shutdown\"}")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: 4831ae0d8acc47e7bb9c3a4a94678472
           name: 'Memory Discovery'
@@ -4355,8 +4846,8 @@ zabbix_export:
                 Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
             -
               uuid: 260d3d59256040fd808d5d4c6a549d07
               name: '{#SNMPVALUE}: Used memory'
@@ -4371,8 +4862,8 @@ zabbix_export:
                 Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
             -
               uuid: fb17d61634254c108d98ea28f5c5fb54
               name: '{#SNMPVALUE}: Memory utilization'
@@ -4385,8 +4876,8 @@ zabbix_export:
               description: 'Memory utilization in %'
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
               trigger_prototypes:
                 -
                   uuid: 0f8d70ef5e704483a49d7b635e74dfc6
@@ -4394,6 +4885,13 @@ zabbix_export:
                   name: '{#SNMPVALUE}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: bf9a1faae91243b18133486b0421314b
@@ -4495,8 +4993,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: a2c7793712e549cbad6e37da30754b58
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
@@ -4515,8 +5019,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: a77450c8292a483b86e72156af6e7ec7
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
@@ -4540,8 +5050,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 33e86cf0c2374d0d932a8e3c9b6ebf1a
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
@@ -4564,8 +5080,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 6960110871dd40f89f344ab90cdb03f9
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
@@ -4584,8 +5106,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: fe427d3bbef7420880906cc52c07c706
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
@@ -4609,8 +5137,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: c03404b9c68749b3bef5de34a8815cce
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
@@ -4635,8 +5169,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: ec072a91a34244d5ba434f592e9cb72d
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
@@ -4658,8 +5198,14 @@ zabbix_export:
                 name: 'IF-MIB::ifOperStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: c99f0efcc30749e79cce0efe2fdd574f
@@ -4677,6 +5223,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 6dec04a0c0fc453ebc103e28daea731d
               name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
@@ -4700,8 +5250,14 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
           trigger_prototypes:
             -
               uuid: 60809b6c94d74e34b5f29525d77c75b5
@@ -4731,6 +5287,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 21d475be7fa24ba2b946e4ec31371df5
               expression: |
@@ -4751,6 +5311,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 5a2bc4c9bf344948a52ce256daa1258e
               expression: |
@@ -4770,6 +5334,13 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
           graph_prototypes:
             -
               uuid: fc6dd0ab86e7496d9b43103c13ba6a65
@@ -4839,8 +5410,8 @@ zabbix_export:
                 name: 'CISCO-ENVMON-MIB::CiscoEnvMonState'
               tags:
                 -
-                  tag: Application
-                  value: 'Power supply'
+                  tag: component
+                  value: power
               trigger_prototypes:
                 -
                   uuid: 7c5269ac98e847f28da8d3d97e52a28e
@@ -4849,6 +5420,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 616059e289694181aea6a076ecb093c1
                   expression: 'count(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}],#1,"eq","{$PSU_WARN_STATUS:\"warning\"}")=1 or count(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}],#1,"eq","{$PSU_WARN_STATUS:\"notFunctioning\"}")=1'
@@ -4860,6 +5438,13 @@ zabbix_export:
                     -
                       name: '{#SENSOR_INFO}: Power supply is in critical state'
                       expression: 'count(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"critical\"}")=1 or count(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"shutdown\"}")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: eb482b3a03b74dc494632be0728f953b
           name: 'Temperature Discovery'
@@ -4887,8 +5472,8 @@ zabbix_export:
                 name: 'CISCO-ENVMON-MIB::CiscoEnvMonState'
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
             -
               uuid: 7c68ab13b881467e863b28776c0da571
               name: '{#SNMPVALUE}: Temperature'
@@ -4903,8 +5488,8 @@ zabbix_export:
                 The current measurement of the test point being instrumented.
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: 67fad9e835f9466ab368bbdad6544e7e
@@ -4914,6 +5499,13 @@ zabbix_export:
                   name: '{#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
           trigger_prototypes:
             -
               uuid: f138f708723a4ca49b21cb992798da7f
@@ -4929,6 +5521,13 @@ zabbix_export:
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 281f7afca6ed4d3bb866430ec89e862e
               expression: |
@@ -4951,6 +5550,26 @@ zabbix_export:
                     or
                     last(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}])={$TEMP_DISASTER_STATUS}
                   recovery_expression: 'max(/Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
+      tags:
+        -
+          tag: class
+          value: network
+        -
+          tag: target
+          value: cisco
+        -
+          tag: target
+          value: cisco-ios
+        -
+          tag: target
+          value: cisco-ios-12.0-12.2
       macros:
         -
           macro: '{$CPU.UTIL.CRIT}'
@@ -6055,8 +6674,8 @@ zabbix_export:
             Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15215-collect-cpu-util-snmp.html
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
           triggers:
             -
               uuid: 0833b9a8f2ba4c009ca038cc409236d8
@@ -6065,6 +6684,10 @@ zabbix_export:
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
       macros:
         -
           macro: '{$CPU.UTIL.CRIT}'
