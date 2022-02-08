@@ -3560,7 +3560,6 @@ static void	DCsync_item_discovery(zbx_dbsync_t *sync)
 		ZBX_STR2UINT64(item_discovery->parent_itemid, row[1]);
 	}
 
-	/* remove deleted template items from buffer */
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
 		if (NULL == (item_discovery = (ZBX_DC_ITEM_DISCOVERY *)zbx_hashset_search(&config->item_discovery,
@@ -13636,13 +13635,13 @@ static void	zbx_get_item_tags(zbx_uint64_t itemid, zbx_vector_ptr_t *item_tags)
 		if (NULL != (item_discovery = (ZBX_DC_ITEM_DISCOVERY *)zbx_hashset_search(&config->item_discovery,
 				&itemid)))
 		{
-			ZBX_DC_PROTOTYPE_ITEM	*lld_item;
+			ZBX_DC_PROTOTYPE_ITEM	*prototype_item;
 
-			if (NULL != (lld_item = (ZBX_DC_PROTOTYPE_ITEM *)zbx_hashset_search(&config->prototype_items,
+			if (NULL != (prototype_item = (ZBX_DC_PROTOTYPE_ITEM *)zbx_hashset_search(&config->prototype_items,
 					&item_discovery->parent_itemid)))
 			{
-				if (0 != lld_item->templateid)
-					zbx_gather_tags_from_template_chain(lld_item->templateid, item_tags);
+				if (0 != prototype_item->templateid)
+					zbx_gather_tags_from_template_chain(prototype_item->templateid, item_tags);
 			}
 		}
 	}
