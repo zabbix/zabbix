@@ -18,6 +18,7 @@
 **/
 
 #include "report_manager.h"
+
 #include "common.h"
 #include "log.h"
 #include "zbxself.h"

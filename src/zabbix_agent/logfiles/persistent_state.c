@@ -18,6 +18,7 @@
 **/
 
 #include "persistent_state.h"
+
 #include "common.h"
 #include "md5.h"
 #include "log.h"

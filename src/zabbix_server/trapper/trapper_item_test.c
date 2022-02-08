@@ -18,6 +18,7 @@
 **/
 
 #include "trapper_item_test.h"
+
 #include "log.h"
 #include "zbxjson.h"
 #include "dbcache.h"

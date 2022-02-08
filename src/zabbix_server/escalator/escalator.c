@@ -18,6 +18,7 @@
 **/
 
 #include "escalator.h"
+
 #include "common.h"
 #include "db.h"
 #include "log.h"

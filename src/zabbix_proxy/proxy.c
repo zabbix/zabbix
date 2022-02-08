@@ -18,8 +18,8 @@
 **/
 
 #include "proxy.h"
-#include "common.h"
 
+#include "common.h"
 #include "cfg.h"
 #include "pid.h"
 #include "db.h"

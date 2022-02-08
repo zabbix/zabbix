@@ -18,6 +18,7 @@
 **/
 
 #include "snmptrapper.h"
+
 #include "common.h"
 #include "dbcache.h"
 #include "zbxself.h"

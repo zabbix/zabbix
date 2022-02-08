@@ -18,6 +18,7 @@
 **/
 
 #include "item_preproc.h"
+
 #include "zbxregexp.h"
 #include "log.h"
 #include "zbxembed.h"
@@ -31,7 +32,6 @@
 #endif
 
 #include "preproc_history.h"
-
 
 extern zbx_es_t	es_engine;
 /******************************************************************************

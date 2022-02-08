@@ -18,6 +18,7 @@
 **/
 
 #include "vmstats.h"
+
 #include "common.h"
 
 #ifdef _AIX

@@ -18,8 +18,8 @@
 **/
 
 #include "poller.h"
-#include "common.h"
 
+#include "common.h"
 #include "db.h"
 #include "dbcache.h"
 #include "daemon.h"
@@ -27,7 +27,6 @@
 #include "zbxself.h"
 #include "preproc.h"
 #include "zbxrtc.h"
-
 
 #include "checks_agent.h"
 #include "checks_external.h"

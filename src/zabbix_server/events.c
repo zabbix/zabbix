@@ -18,10 +18,10 @@
 **/
 
 #include "events.h"
+
 #include "common.h"
 #include "db.h"
 #include "log.h"
-
 #include "actions.h"
 #include "zbxserver.h"
 #include "export.h"

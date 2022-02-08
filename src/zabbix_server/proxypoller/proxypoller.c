@@ -18,11 +18,11 @@
 **/
 
 #include "proxypoller.h"
+
 #include "common.h"
 #include "daemon.h"
 #include "comms.h"
 #include "zbxself.h"
-
 #include "zbxserver.h"
 #include "dbcache.h"
 #include "db.h"

@@ -18,6 +18,7 @@
 **/
 
 #include "checks_internal.h"
+
 #include "common.h"
 #include "checks_java.h"
 #include "dbcache.h"
@@ -27,7 +28,6 @@
 #include "../vmware/vmware.h"
 #include "../../libs/zbxserver/zabbix_stats.h"
 #include "../../libs/zbxsysinfo/common/zabbix_stats.h"
-
 
 extern unsigned char	program_type;
 

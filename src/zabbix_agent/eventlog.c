@@ -18,6 +18,7 @@
 **/
 
 #include "eventlog.h"
+
 #include "common.h"
 #include "log.h"
 #include "logfiles/logfiles.h"

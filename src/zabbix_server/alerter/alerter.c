@@ -18,6 +18,7 @@
 **/
 
 #include "alerter.h"
+
 #include "common.h"
 #include "log.h"
 #include "daemon.h"

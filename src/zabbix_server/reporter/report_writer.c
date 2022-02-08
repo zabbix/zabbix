@@ -18,6 +18,7 @@
 **/
 
 #include "report_writer.h"
+
 #include "common.h"
 #include "daemon.h"
 #include "zbxself.h"
@@ -27,7 +28,6 @@
 #include "zbxalert.h"
 #include "db.h"
 #include "report_protocol.h"
-
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;

@@ -18,11 +18,11 @@
 **/
 
 #include "httpmacro.h"
+
 #include "common.h"
 #include "log.h"
 #include "zbxregexp.h"
 #include "zbxhttp.h"
-
 
 #define REGEXP_PREFIX		"regex:"
 #define REGEXP_PREFIX_SIZE	ZBX_CONST_STRLEN(REGEXP_PREFIX)

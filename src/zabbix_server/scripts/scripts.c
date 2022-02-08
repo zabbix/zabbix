@@ -18,6 +18,7 @@
 **/
 
 #include "scripts.h"
+
 #include "common.h"
 #include "../poller/checks_agent.h"
 #include "../ipmi/ipmi.h"
@@ -30,7 +31,6 @@
 #include "zbxtasks.h"
 #include "zbxjson.h"
 #include "zbxembed.h"
-
 
 extern int	CONFIG_TRAPPER_TIMEOUT;
 extern int	CONFIG_IPMIPOLLER_FORKS;

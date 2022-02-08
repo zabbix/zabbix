@@ -18,8 +18,8 @@
 **/
 
 #include "pinger.h"
-#include "common.h"
 
+#include "common.h"
 #include "dbcache.h"
 #include "log.h"
 #include "zbxserver.h"
@@ -27,7 +27,6 @@
 #include "daemon.h"
 #include "zbxself.h"
 #include "preproc.h"
-
 
 /* defines for `fping' and `fping6' to successfully process pings */
 #define MIN_COUNT	1

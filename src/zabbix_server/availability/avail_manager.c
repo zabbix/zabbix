@@ -18,6 +18,7 @@
 **/
 
 #include "avail_manager.h"
+
 #include "log.h"
 #include "zbxself.h"
 #include "zbxavailability.h"

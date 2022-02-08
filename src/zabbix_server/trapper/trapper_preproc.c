@@ -18,12 +18,12 @@
 **/
 
 #include "trapper_preproc.h"
+
 #include "common.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"
 #include "preproc.h"
 #include "../preprocessor/preproc_history.h"
-
 #include "trapper_auth.h"
 
 #define ZBX_STATE_NOT_SUPPORTED	1

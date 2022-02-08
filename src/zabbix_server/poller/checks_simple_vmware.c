@@ -18,6 +18,7 @@
 **/
 
 #include "checks_simple_vmware.h"
+
 #include "common.h"
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)

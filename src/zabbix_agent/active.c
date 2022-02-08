@@ -18,6 +18,7 @@
 **/
 
 #include "active.h"
+
 #include "common.h"
 #include "zbxconf.h"
 

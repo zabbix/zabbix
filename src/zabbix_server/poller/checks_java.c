@@ -18,12 +18,11 @@
 **/
 
 #include "checks_java.h"
+
 #include "common.h"
 #include "comms.h"
 #include "log.h"
-
 #include "zbxjson.h"
-
 
 static int	parse_response(AGENT_RESULT *results, int *errcodes, int num, char *response,
 		char *error, int max_error_len)

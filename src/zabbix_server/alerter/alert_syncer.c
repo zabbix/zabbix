@@ -18,6 +18,7 @@
 **/
 
 #include "alert_syncer.h"
+
 #include "common.h"
 #include "daemon.h"
 #include "zbxself.h"

@@ -18,6 +18,7 @@
 **/
 
 #include "active.h"
+
 #include "common.h"
 #include "db.h"
 #include "dbcache.h"
@@ -27,7 +28,6 @@
 #include "zbxcompress.h"
 
 #include "../../libs/zbxcrypto/tls_tcp_active.h"
-
 
 extern unsigned char	program_type;
 

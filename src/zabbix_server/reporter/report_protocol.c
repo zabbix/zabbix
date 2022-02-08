@@ -18,6 +18,7 @@
 **/
 
 #include "report_protocol.h"
+
 #include "common.h"
 #include "zbxreport.h"
 #include "zbxipcservice.h"
@@ -25,7 +26,6 @@
 #include "zbxalgo.h"
 #include "db.h"
 #include "zbxalert.h"
-
 
 static int	json_uint_by_tag(const struct zbx_json_parse *jp, const char *tag, zbx_uint64_t *value, char **error)
 {

@@ -18,6 +18,7 @@
 **/
 
 #include "history_compress.h"
+
 #include "common.h"
 #include "zbxdb.h"
 #include "dbcache.h"

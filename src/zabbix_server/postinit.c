@@ -18,6 +18,7 @@
 **/
 
 #include "postinit.h"
+
 #include "common.h"
 #include "db.h"
 #include "zbxtasks.h"

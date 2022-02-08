@@ -18,8 +18,8 @@
 **/
 
 #include "dbconfig.h"
-#include "common.h"
 
+#include "common.h"
 #include "db.h"
 #include "daemon.h"
 #include "zbxself.h"

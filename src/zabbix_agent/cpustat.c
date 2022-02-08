@@ -18,6 +18,7 @@
 **/
 
 #include "cpustat.h"
+
 #include "common.h"
 #include "stats.h"
 #ifdef _WINDOWS

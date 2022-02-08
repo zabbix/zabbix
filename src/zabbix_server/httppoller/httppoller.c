@@ -18,13 +18,12 @@
 **/
 
 #include "httppoller.h"
-#include "common.h"
 
+#include "common.h"
 #include "db.h"
 #include "log.h"
 #include "daemon.h"
 #include "zbxself.h"
-
 #include "httptest.h"
 
 extern int		CONFIG_HTTPPOLLER_FORKS;

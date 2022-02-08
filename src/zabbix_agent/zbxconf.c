@@ -18,6 +18,7 @@
 **/
 
 #include "zbxconf.h"
+
 #include "common.h"
 #include "cfg.h"
 #include "log.h"

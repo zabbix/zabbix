@@ -18,10 +18,10 @@
 **/
 
 #include "trapper_expressions_evaluate.h"
+
 #include "common.h"
 #include "zbxalgo.h"
 #include "dbcache.h"
-
 #include "trapper_auth.h"
 
 static int	trapper_parse_expressions_evaluate(const struct zbx_json_parse *jp, zbx_vector_ptr_t *expressions,

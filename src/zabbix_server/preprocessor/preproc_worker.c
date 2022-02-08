@@ -18,6 +18,7 @@
 **/
 
 #include "preproc_worker.h"
+
 #include "common.h"
 #include "daemon.h"
 #include "zbxself.h"
@@ -27,7 +28,6 @@
 #include "zbxembed.h"
 #include "item_preproc.h"
 #include "preproc_history.h"
-
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;

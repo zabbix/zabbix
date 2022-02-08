@@ -18,8 +18,8 @@
 **/
 
 #include "preproc_history.h"
-#include "common.h"
 
+#include "common.h"
 
 void	zbx_preproc_op_history_free(zbx_preproc_op_history_t *ophistory)
 {

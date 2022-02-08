@@ -17,10 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "ipmi_poller.h"
 #include "common.h"
 
 #ifdef HAVE_OPENIPMI
+
+#include "ipmi_poller.h"
 
 #include "daemon.h"
 #include "zbxself.h"

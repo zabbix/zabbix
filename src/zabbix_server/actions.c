@@ -18,6 +18,7 @@
 **/
 
 #include "actions.h"
+
 #include "common.h"
 #include "db.h"
 #include "log.h"
@@ -25,7 +26,6 @@
 #include "operations.h"
 #include "zbxregexp.h"
 #include "../../libs/zbxaudit/audit.h"
-
 
 /******************************************************************************
  *                                                                            *

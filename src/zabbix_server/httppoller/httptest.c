@@ -18,18 +18,16 @@
 **/
 
 #include "httptest.h"
-#include "common.h"
 
+#include "common.h"
 #include "db.h"
 #include "log.h"
 #include "dbcache.h"
 #include "preproc.h"
 #include "daemon.h"
-
 #include "zbxserver.h"
 #include "zbxregexp.h"
 #include "zbxhttp.h"
-
 #include "httpmacro.h"
 
 typedef struct
