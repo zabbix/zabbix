@@ -269,7 +269,6 @@ class testGeomapWidgetScreenshots extends CWebTest {
 	public function testGeomapWidgetScreenshots_Zoom($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$zoom_dashboardid);
 		$this->page->waitUntilReady();
-		$this->query("xpath://div[contains(@class,\"is-loading\")]/..//h4")->all()->waitUntilNotPresent();
 
 		if ($data['Tile provider'] === 'default') {
 			$this->assertWidgetScreenshot($data);
