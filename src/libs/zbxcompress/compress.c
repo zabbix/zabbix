@@ -18,11 +18,12 @@
 **/
 
 #include "common.h"
-#include "log.h"
-
-#include "zbxcompress.h"
 
 #ifdef HAVE_ZLIB
+
+#include "zbxcompress.h"
+#include "log.h"
+
 #include "zlib.h"
 
 #define ZBX_COMPRESS_STRERROR_LEN	512

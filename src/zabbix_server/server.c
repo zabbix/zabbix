@@ -24,7 +24,6 @@
 #endif
 
 #include "cfg.h"
-#include "pid.h"
 #include "db.h"
 #include "dbcache.h"
 #include "zbxdbupgrade.h"
@@ -39,7 +38,6 @@
 #include "zbxnix.h"
 #include "daemon.h"
 #include "zbxself.h"
-#include "../libs/zbxnix/control.h"
 
 #include "alerter/alerter.h"
 #include "alerter/alert_manager.h"

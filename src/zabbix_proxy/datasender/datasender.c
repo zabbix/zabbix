@@ -27,7 +27,6 @@
 #include "zbxjson.h"
 #include "proxy.h"
 #include "zbxself.h"
-#include "dbcache.h"
 #include "zbxtasks.h"
 #include "zbxcrypto.h"
 #include "zbxcompress.h"
