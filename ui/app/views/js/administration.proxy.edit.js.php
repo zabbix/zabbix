@@ -81,10 +81,10 @@
 		}
 
 		/*
-		 * Calling 'click' would reverse the propery that was just set, and calling a manual 'click' even is just a not
+		 * Calling 'click' would reverse the property that was just set, and calling a manual 'click' even is just a not
 		 * good idea for checkboxes. For some reason jQuery .trigger('change') doesn't work on checkboxes. The event
 		 * listener in class.tab-indicators.js is not registering a change to it, so this is a workaround. So after the
-		 * propery has changed by script, the tab indicator should update.
+		 * property has changed by script, the tab indicator should update.
 		 */
 		if (($('#tls_accept').val() & <?= HOST_ENCRYPTION_PSK ?>) == <?= HOST_ENCRYPTION_PSK ?>) {
 			$('#tls_in_psk').prop('checked', true);
