@@ -142,9 +142,10 @@ class testFormGeomapWidget extends CWebTest {
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->addWidget()->asForm();
 
-		$this->assertEquals('Add widget', COverlayDialogElement::find()->waitUntilReady()->one()->getTitle());
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$this->assertEquals('Add widget', $dialog->getTitle());
 		$form->fill(['Type' => 'Geomap']);
-		$form->waitUntilReady();
+		$dialog->waitUntilReady();
 		$form->checkValue(['id:show_header' => true]);
 
 		// Check fields' lengths and placeholders.
