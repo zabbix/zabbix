@@ -599,12 +599,6 @@ class CItemPrototype extends CItemGeneral {
 					'where' => ['itemid' => $item['itemid']]
 				];
 			}
-
-			foreach (['query_fields', 'headers'] as $field) {
-				if (array_key_exists($field, $item) && $item[$field] === '') {
-					$item[$field] = [];
-				}
-			}
 		}
 		unset($item);
 
@@ -615,18 +609,6 @@ class CItemPrototype extends CItemGeneral {
 		self::updateParameters($items, $db_items);
 		self::updatePreprocessing($items, $db_items);
 		self::updateTags($items, $db_items);
-
-		// Fix for audit log, because field type in object is different from field type in db object.
-		foreach ($db_items as &$item) {
-			if (array_key_exists('query_fields', $item)) {
-				$item['query_fields'] = json_encode($item['query_fields']);
-			}
-
-			if (array_key_exists('headers', $item)) {
-				$item['headers'] = self::headersArrayToString($item['headers']);
-			}
-		}
-		unset($item);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_ITEM_PROTOTYPE, $items, $db_items);
 	}

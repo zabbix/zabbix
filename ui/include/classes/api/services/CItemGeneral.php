@@ -917,20 +917,25 @@ abstract class CItemGeneral extends CApiService {
 					}
 
 					if (array_key_exists('query_fields', $item)) {
-						foreach ($item['query_fields'] as $v) {
-							if (!is_array($v) || count($v) > 1 || key($v) === '') {
+						if ($item['query_fields']) {
+							foreach ($item['query_fields'] as $v) {
+								if (!is_array($v) || count($v) > 1 || key($v) === '') {
+									self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+										'query_fields', _('nonempty key and value pair expected'))
+									);
+								}
+							}
+
+							$item['query_fields'] = json_encode($item['query_fields']);
+
+							if (strlen($item['query_fields']) > DB::getFieldLength('items', 'query_fields')) {
 								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-									'query_fields', _('nonempty key and value pair expected'))
-								);
+									'query_fields', _('cannot convert to JSON, result value too long')
+								));
 							}
 						}
-
-						$item['query_fields'] = json_encode($item['query_fields']);
-
-						if (strlen($item['query_fields']) > DB::getFieldLength('items', 'query_fields')) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-								'query_fields', _('cannot convert to JSON, result value too long')
-							));
+						else {
+							$item['query_fields'] = '';
 						}
 					}
 
@@ -2380,6 +2385,13 @@ abstract class CItemGeneral extends CApiService {
 	 * @param array $db_items
 	 */
 	protected static function addAffectedObjects(array $items, array &$db_items): void {
+		// Fix for audit log, because field type in object is different from field type in DB object.
+		foreach ($db_items as &$db_item) {
+			$db_item['query_fields'] = $db_item['query_fields'] ? json_encode($db_item['query_fields']) : '';
+			$db_item['headers'] = self::headersArrayToString($db_item['headers']);
+		}
+		unset($db_item);
+
 		self::addAffectedParameters($items, $db_items);
 		self::addAffectedPreprocessing($items, $db_items);
 	}
