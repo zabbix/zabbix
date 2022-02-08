@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
- * @backup widget, hosts
+ * @backup config, widget, hosts
  *
  * @onBefore prepareZoomData
  *
@@ -258,36 +258,36 @@ class testGeomapWidgetScreenshots extends CWebTest {
 					'Tile provider' => 'default'
 				]
 			],
-			[
-				[
-					'Tile provider' => 'OpenStreetMap Mapnik'
-				]
-			],
-			[
-				[
-					'Tile provider' => 'OpenTopoMap'
-				]
-			],
-			[
-				[
-					'Tile provider' => 'Stamen Toner Lite'
-				]
-			],
-			[
-				[
-					'Tile provider' => 'Stamen Terrain'
-				]
-			],
-			[
-				[
-					'Tile provider' => 'USGS US Topo'
-				]
-			],
-			[
-				[
-					'Tile provider' => 'USGS US Imagery'
-				]
-			],
+//			[
+//				[
+//					'Tile provider' => 'OpenStreetMap Mapnik'
+//				]
+//			],
+//			[
+//				[
+//					'Tile provider' => 'OpenTopoMap'
+//				]
+//			],
+//			[
+//				[
+//					'Tile provider' => 'Stamen Toner Lite'
+//				]
+//			],
+//			[
+//				[
+//					'Tile provider' => 'Stamen Terrain'
+//				]
+//			],
+//			[
+//				[
+//					'Tile provider' => 'USGS US Topo'
+//				]
+//			],
+//			[
+//				[
+//					'Tile provider' => 'USGS US Imagery'
+//				]
+//			],
 			[
 				[
 					'Tile provider' => 'Other',
@@ -344,19 +344,17 @@ class testGeomapWidgetScreenshots extends CWebTest {
 			$form = $this->query('id:geomaps-form')->waitUntilReady()->asForm()->one();
 			$form->fill($data);
 			$form->submit();
-
-			$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$zoom_dashboardid);
-			$this->page->waitUntilReady();
 			$this->assertWidgetScreenshot($data);
 		}
 		else {
-			$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$zoom_dashboardid);
-			$this->page->waitUntilReady();
 			$this->assertWidgetScreenshot($data);
 		}
 	}
 
 	private function assertWidgetScreenshot($data) {
+		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$zoom_dashboardid);
+		$this->page->waitUntilReady();
+
 		$widgets = [
 			'Geomap for screenshots, 5',
 			'Geomap for screenshots, 10',
@@ -366,31 +364,15 @@ class testGeomapWidgetScreenshots extends CWebTest {
 		];
 
 		foreach ($widgets as $widget) {
-//			$this->waitUntilMapIsLoaded($widget);
+			// Wait until loader disappears.
 			$this->query("xpath://h4[text()=".CXPathHelper::escapeQuotes($widget).
 					"]/../../div[not(contains(@class,\"is-loading\"))]")->waitUntilPresent()->one();
 
 			// This sleep is needed because after loader ring disappeared map image needs to load anyway.
-			sleep(1);
+			sleep(2);
 			$this->assertScreenshot($this->query("xpath:.//div[@class=\"dashboard-grid-widget\"]//h4[text()=".
 					CXPathHelper::escapeQuotes($widget)."]/../..")->waitUntilVisible()->one(), $widget.' '.$data['Tile provider']
 			);
 		}
-	}
-
-	/**
-	 * Function for waiting loader ring.
-	 */
-	private function waitUntilMapIsLoaded($widget) {
-		try {
-			$this->query("xpath://h4[text()=".CXPathHelper::escapeQuotes($widget).
-					"]/../../div[contains(@class,\"is-loading\")]")->waitUntilPresent();
-		}
-		catch (\Exception $ex) {
-			// Code is not missing here.
-		}
-
-		return $this->query("xpath://h4[text()=".CXPathHelper::escapeQuotes($widget).
-				"]/../../div[not(contains(@class,\"is-loading\"))]")->waitUntilPresent()->one();
 	}
 }

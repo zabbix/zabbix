@@ -211,6 +211,18 @@ class testFormGeomapWidget extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Type' => 'Geomap',
+						'Name' => 'Zoom more than 30 in coordinates',
+						'Initial view' => '56.95008,24.11509,31'
+					],
+					'error' => 'Invalid zoomparameter "Initial view": zoom level must be between "0" and "30".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => 'Geomap',
+						'Name' => 'Text in coordinates',
 						'Initial view' => 'test'
 					],
 					'error' => 'Invalid parameter "Initial view": geographical coordinates (values of'.
@@ -290,6 +302,15 @@ class testFormGeomapWidget extends CWebTest {
 						'Type' => 'Geomap',
 						'Name' => 'Short coordinates with zoom',
 						'Initial view' => '56.95008, 24.11509,25'
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Type' => 'Geomap',
+						'Name' => 'Short coordinates with zoom 0',
+						'Initial view' => '56.95008, 24.11509,0'
 					]
 				]
 			],
