@@ -12882,8 +12882,8 @@ void	zbx_dc_update_passive_proxy_nextcheck(zbx_uint64_t proxyid)
 
 	if (NULL == (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &proxyid)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to reload configuration cache on proxy with id %i: failed to "
-				"update nextcheck", proxyid);
+		zabbix_log(LOG_LEVEL_WARNING, "failed to reload configuration cache on proxy with id " ZBX_FS_UI64
+				": failed to update nextcheck", proxyid);
 		goto out;
 	}
 

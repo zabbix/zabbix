@@ -503,7 +503,7 @@ int	rtc_process_request_ex(zbx_rtc_t *rtc, int code, const unsigned char *data, 
 			return SUCCEED;
 		case ZBX_RTC_PROXY_CONFIG_CACHE_RELOAD:
 			rtc_notify(rtc, ZBX_PROCESS_TYPE_TASKMANAGER, 0, ZBX_RTC_PROXY_CONFIG_CACHE_RELOAD,
-					data, (zbx_uint32_t)strlen(data) + 1);
+					(const char *)data, (zbx_uint32_t)strlen(data) + 1);
 			return SUCCEED;
 	}
 
