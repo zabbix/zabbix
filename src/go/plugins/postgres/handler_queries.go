@@ -39,6 +39,12 @@ func queriesHandler(ctx context.Context, conn PostgresClient,
 		)
 	}
 
+	if period < 1 {
+		return nil, zbxerr.ErrorInvalidParams.Wrap(
+			fmt.Errorf("TimePeriod must be greater than 0"),
+		)
+	}
+
 	query := fmt.Sprintf(`
 WITH T AS
 	(SELECT db.datname,

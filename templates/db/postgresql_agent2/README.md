@@ -56,8 +56,8 @@ No specific Zabbix configuration is required.
 |{$PG.LLD.FILTER.APPLICATION} |<p>-</p> |`(.+)` |
 |{$PG.LLD.FILTER.DBNAME} |<p>-</p> |`(.+)` |
 |{$PG.PASSWORD} |<p>-</p> |`postgres` |
-|{$PG.QUERY_ETIME.MAX.WARN} |<p>-</p> |`30` |
-|{$PG.SLOW_QUERIES.MAX.WARN} |<p>-</p> |`5` |
+|{$PG.QUERY_ETIME.MAX.WARN} |<p>Execution time limit for count of slow queries.</p> |`30` |
+|{$PG.SLOW_QUERIES.MAX.WARN} |<p>Slow queries count treshold for a trigger.</p> |`5` |
 |{$PG.URI} |<p>-</p> |`tcp://localhost:5432` |
 |{$PG.USER} |<p>-</p> |`postgres` |
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2022-02-04T00:54:08Z</date>
+   <date>2022-02-08T13:48:49Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -2888,10 +2888,12 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
             <macro>
                <macro>{$PG.QUERY_ETIME.MAX.WARN}</macro>
                <value>30</value>
+               <description>Execution time limit for count of slow queries.</description>
             </macro>
             <macro>
                <macro>{$PG.SLOW_QUERIES.MAX.WARN}</macro>
                <value>5</value>
+               <description>Slow queries count treshold for a trigger.</description>
             </macro>
             <macro>
                <macro>{$PG.URI}</macro>
