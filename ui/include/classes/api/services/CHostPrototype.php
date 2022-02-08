@@ -975,7 +975,7 @@ class CHostPrototype extends CHostBase {
 			if ($duplicates) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 					'Host prototype with visible name "%1$s" already exists in discovery rule "%2$s".',
-					$duplicates[0]['host'], $duplicates[0]['rule']
+					$duplicates[0]['name'], $duplicates[0]['rule']
 				));
 			}
 		}
