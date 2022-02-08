@@ -79,8 +79,8 @@ class CControllerProxyCreate extends CController {
 		]);
 
 		if ($this->hasInput('clone_proxyid')
-				&& (array_key_exists('tls_connect', $proxy) && $proxy['tls_connect'] == HOST_ENCRYPTION_PSK)
-					|| (array_key_exists('tls_accept', $proxy) && $proxy['tls_accept'] & HOST_ENCRYPTION_PSK)) {
+				&& ((array_key_exists('tls_connect', $proxy) && $proxy['tls_connect'] == HOST_ENCRYPTION_PSK)
+					|| (array_key_exists('tls_accept', $proxy) && $proxy['tls_accept'] & HOST_ENCRYPTION_PSK))) {
 			$clone_proxies = API::Proxy()->get([
 				'output' => ['tls_psk_identity', 'tls_psk'],
 				'proxyids' => $this->getInput('clone_proxyid'),
