@@ -356,7 +356,7 @@ class CHostPrototype extends CHostBase {
 		}
 
 		foreach ($result as &$host_prototype) {
-			$host_prototype['selectGroupLinks'] = [];
+			$host_prototype['groupLinks'] = [];
 		}
 		unset($host_prototype);
 
