@@ -1161,7 +1161,7 @@ func NewClient(nc net.Conn, cfg *Config, timeout time.Duration, shiftDeadline bo
 
 	if url, err := uri.New(address, nil); err == nil {
 		hostname := url.Host()
-		if addr := net.ParseIP(hostname); addr == nil {
+		if nil == net.ParseIP(hostname) {
 			cHostname = C.CString(hostname)
 			defer C.free(unsafe.Pointer(cHostname))
 		}
