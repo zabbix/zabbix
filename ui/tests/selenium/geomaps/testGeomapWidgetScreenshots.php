@@ -297,7 +297,7 @@ class testGeomapWidgetScreenshots extends CWebTest {
 			$this->waitUntilMapIsLoaded($widget);
 
 			// This sleep is needed because after loader ring disappeared map image needs to load anyway.
-			sleep(1);
+			sleep(2);
 			$this->assertScreenshot($this->query("xpath:.//div[@class=\"dashboard-grid-widget\"]//h4[text()=".
 					CXPathHelper::escapeQuotes($widget)."]/../..")->waitUntilVisible()->one(), $widget.' '.$data['Tile provider']
 			);
