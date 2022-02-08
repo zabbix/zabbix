@@ -33,7 +33,11 @@ class CControllerChartsViewJson extends CControllerCharts {
 			'from'                  => 'range_time',
 			'to'                    => 'range_time',
 			'filter_hostids'        => 'required | array_id',
-			'filter_graph_patterns' => 'array'
+			'filter_name'           => 'string',
+			'filter_show'           => 'in '.GRAPH_FILTER_ALL.','.GRAPH_FILTER_HOST.','.GRAPH_FILTER_SIMPLE,
+			'subfilter_tagnames'    => 'array',
+			'subfilter_tags'        => 'array',
+			'page'                  => 'ge 1'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod();
@@ -58,13 +62,42 @@ class CControllerChartsViewJson extends CControllerCharts {
 		];
 		updateTimeSelectorPeriod($timeselector_options);
 
-		$graphids = $this->getGraphidsByPatterns($this->getInput('filter_graph_patterns', []),
-			$this->getInput('filter_hostids')
+		$filter_hostids = $this->getInput('filter_hostids', []);
+		$filter_name = $this->getInput('filter_name', '');
+		$filter_show = $this->getInput('filter_show', GRAPH_FILTER_ALL);
+		$host_graphs = [];
+		$simple_graphs = [];
+
+		if ($filter_hostids) {
+			if (in_array($filter_show, [GRAPH_FILTER_ALL, GRAPH_FILTER_HOST])) {
+				$host_graphs = $this->getHostGraphs($filter_hostids, $filter_name);
+			}
+
+			if (in_array($filter_show, [GRAPH_FILTER_ALL, GRAPH_FILTER_SIMPLE])) {
+				$simple_graphs = $this->getSimpleGraphs($filter_hostids, $filter_name);
+			}
+		}
+
+		$graphs = array_merge($host_graphs, $simple_graphs);
+
+		$subfilters_fields = self::getSubfilterFields([
+			'subfilter_tagnames' => $this->getInput('subfilter_tagnames', []),
+			'subfilter_tags' => $this->getInput('subfilter_tags', [])
+		]);
+		$subfilters = self::getSubfilters($graphs, $subfilters_fields);
+		$graphs = self::applySubfilters($graphs);
+
+		CArrayHelper::sort($graphs, ['name', 'graphid', 'itemid']);
+
+		$paging = CPagerHelper::paginate($this->getInput('page', 1), $graphs, ZBX_SORT_UP,
+			(new CUrl('zabbix.php'))->setArgument('action', 'charts.view')
 		);
 
 		$data = [
-			'charts' => $this->getChartsById($graphids),
-			'timeline' => getTimeSelectorPeriod($timeselector_options)
+			'charts' => $this->getCharts($graphs),
+			'timeline' => getTimeSelectorPeriod($timeselector_options),
+			'subfilter' => (new CPartial('monitoring.charts.subfilter', $subfilters))->getOutput(),
+			'paging' => $paging->toString()
 		];
 
 		$this->setResponse(new CControllerResponseData($data));

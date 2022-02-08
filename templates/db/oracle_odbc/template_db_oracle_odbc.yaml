@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-14T17:44:06Z'
+  date: '2022-01-27T09:45:15Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -22,7 +22,7 @@ zabbix_export:
         The "Service's TCP port state" item uses {HOST.CONN} and {$ORACLE.PORT} macros to check the availability of the listener.
         
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Databases
@@ -47,8 +47,11 @@ zabbix_export:
           password: '{$ORACLE.PASSWORD}'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: archive-log
+            -
+              tag: component
+              value: raw
         -
           uuid: 63fad55a2ced487aa30017b33bf1692e
           name: 'Oracle: Get ASM stats'
@@ -69,8 +72,11 @@ zabbix_export:
           description: 'Get ASM disk groups stats.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: asm
+            -
+              tag: component
+              value: raw
         -
           uuid: 5de7c786988d49d0b50f28d2d622db62
           name: 'Oracle: Get CDB and No-CDB info'
@@ -88,11 +94,14 @@ zabbix_export:
             FROM v$database
           username: '{$ORACLE.USER}'
           password: '{$ORACLE.PASSWORD}'
-          description: 'Get info about CDB and  No-CDB databases on instance.'
+          description: 'Get info about CDB and  No-CDB databases on instansce.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: cdb
+            -
+              tag: component
+              value: raw
         -
           uuid: dde19b79507648bd80a82a0575bf8671
           name: 'Oracle: Get instance state'
@@ -116,8 +125,8 @@ zabbix_export:
           description: 'The item gets state of the current instance.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: cedcebd0b7ce474c9681022fcc75df1c
           name: 'Oracle: Get PDB info'
@@ -133,11 +142,14 @@ zabbix_export:
             FROM v$pdbs;
           username: '{$ORACLE.USER}'
           password: '{$ORACLE.PASSWORD}'
-          description: 'Get info about PDB databases on instance.'
+          description: 'Get info about PDB databases on instansce.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: pdb
+            -
+              tag: component
+              value: raw
         -
           uuid: 3839683749974cdeafd9178bdccb38d6
           name: 'Oracle: Get system metrics'
@@ -210,8 +222,8 @@ zabbix_export:
           description: 'The item gets system metric values.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: 972be2e777e44c539d0ddd7918b79e88
           name: 'Oracle: Get tablespaces stats'
@@ -255,9 +267,9 @@ zabbix_export:
               NVL(SUM(Y.MAX_BYTES), 0) AS MAX_BYTES,
               NVL(MAX(NVL(Y.FREE_BYTES, 0)), 0) AS FREE,
               SUM(Y.BYTES)-MAX(Y.FREE_BYTES) AS USED_BYTES,
-              ROUND(DECODE(SUM(Y.MAX_BYTES), 0, 0, (SUM(Y.BYTES) / SUM(Y.MAX_BYTES) * 100)), 2) AS USED_PCT_MAX, 
+              ROUND(DECODE(SUM(Y.MAX_BYTES), 0, 0, (SUM(Y.BYTES) / SUM(Y.MAX_BYTES) * 100)), 2) AS USED_PCT_MAX,
               ROUND(DECODE(SUM(Y.BYTES), 0, 0,(SUM(Y.BYTES)-MAX(Y.FREE_BYTES))/ SUM(Y.BYTES)* 100), 2) AS USED_FILE_PCT,
-              DECODE(Y.TBS_STATUS, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0) AS STATUS 
+              DECODE(Y.TBS_STATUS, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0) AS STATUS
                FROM ( SELECT
                  dtf.tablespace_name AS name,
                  dt.contents AS TYPE,
@@ -289,8 +301,11 @@ zabbix_export:
           description: 'Get tablespaces stats.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
+            -
+              tag: component
+              value: tablespaces
         -
           uuid: 7ee99dfbd8dd4048bc2867aaa2fc335e
           name: 'Oracle: Service''s TCP port state'
@@ -307,8 +322,11 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
         -
           uuid: 6b6ce717919e45df93015a8f65337055
           name: 'Oracle: Active parallel sessions'
@@ -327,8 +345,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: sessions
         -
           uuid: 928b095ffe57404eb6863b06b466524d
           name: 'Oracle: Active serial sessions'
@@ -347,8 +365,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: sessions
         -
           uuid: 70633c6c4e27410dabcf035dd583f820
           name: 'Oracle: Average active sessions'
@@ -367,8 +385,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: sessions
         -
           uuid: eb9f4179a87249fc9df9989f58502a12
           name: 'Oracle: Archiver state'
@@ -388,8 +406,8 @@ zabbix_export:
             key: 'db.odbc.get[get_instance_state,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: application
         -
           uuid: 836e01f5247a468dbf1866a744979376
           name: 'Oracle: Buffer cache hit ratio'
@@ -409,8 +427,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: cache
         -
           uuid: dedafce88267427a8f0b51d74de28c58
           name: 'Oracle: Global cache blocks corrupted'
@@ -418,6 +436,7 @@ zabbix_export:
           key: oracle.cache_blocks_corrupt
           delay: '0'
           history: 7d
+          units: Rps
           description: 'The number of blocks that encountered a corruption or checksum failure during interconnect.'
           preprocessing:
             -
@@ -428,8 +447,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: cache
         -
           uuid: d0d0dbbf1869487d957e60d03e8e3512
           name: 'Oracle: Global cache blocks lost'
@@ -437,6 +456,7 @@ zabbix_export:
           key: oracle.cache_blocks_lost
           delay: '0'
           history: 7d
+          units: Rps
           description: 'The number of global cache blocks lost'
           preprocessing:
             -
@@ -447,8 +467,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: cache
         -
           uuid: 50ea6f52e01c44e5b9039add026faaa2
           name: 'Oracle: Cursor cache hit ratio'
@@ -468,8 +488,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: cache
         -
           uuid: 82228fbb70bf4660aa64bdde2f57686d
           name: 'Oracle: Database CPU time ratio'
@@ -489,8 +509,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: cpu
         -
           uuid: 877272b0b9424d279b1efaa6536eb19b
           name: 'Oracle: Database wait time ratio'
@@ -510,8 +530,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: application
         -
           uuid: 751fe010337e40a5a12fc24d327ffcee
           name: 'Oracle: Datafiles count'
@@ -529,8 +549,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: datafiles
         -
           uuid: a0e263bf207042058b5d9d2e735e05eb
           name: 'Oracle: Datafiles limit'
@@ -548,8 +568,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: datafiles
         -
           uuid: 22d9cccf44924f99aaf444c80b3beab9
           name: 'Oracle: Disk sort per second'
@@ -569,8 +589,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: application
         -
           uuid: 46e0598b703a412e96a3b18e2248e754
           name: 'Oracle: Enqueue timeouts per second'
@@ -590,8 +610,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: application
         -
           uuid: beca246cadb44e48a20bc8809624a6f4
           name: 'Oracle: FRA, Number of files'
@@ -611,8 +631,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: fra
         -
           uuid: 61eb041ea3b349df88cb3495b383fbe4
           name: 'Oracle: FRA, Number of restore points'
@@ -630,8 +650,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: fra
         -
           uuid: 375e094a1a024a19b8e69e4f362c0163
           name: 'Oracle: FRA, Space limit'
@@ -652,8 +672,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: fra
         -
           uuid: 4028e389cc9e4b24946657f1ded1ba47
           name: 'Oracle: FRA, Space reclaimable'
@@ -674,8 +694,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: fra
         -
           uuid: 40b03e917c3c4c0385536336e48affcb
           name: 'Oracle: FRA, Used space'
@@ -696,8 +716,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: fra
         -
           uuid: b29c93eecf9d4d1b8c5de1ce9721801f
           name: 'Oracle: FRA, Usable space in %'
@@ -718,8 +738,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: fra
         -
           uuid: 3243beb0fe70425f8d71938a52f765ae
           name: 'Oracle: GC CR block received per second'
@@ -739,8 +759,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: cache
         -
           uuid: cc3c9200deed42e5a8e187e82c123009
           name: 'Oracle: Instance role'
@@ -760,8 +780,8 @@ zabbix_export:
             key: 'db.odbc.get[get_instance_state,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: application
         -
           uuid: 3da27d558e034236a42b3b94bfa13159
           name: 'Oracle: Instance hostname'
@@ -781,8 +801,8 @@ zabbix_export:
             key: 'db.odbc.get[get_instance_state,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: application
           triggers:
             -
               uuid: 618a3e3c82dc4ccba82477afdd100a98
@@ -791,6 +811,10 @@ zabbix_export:
               priority: INFO
               description: 'Oracle DB Instance hostname has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 4e5df3339a2940c6b3cdad6f5b65234b
           name: 'Oracle: Instance name'
@@ -810,8 +834,8 @@ zabbix_export:
             key: 'db.odbc.get[get_instance_state,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: application
           triggers:
             -
               uuid: 2fe53d1d931e4eb38fef10a3171c1665
@@ -820,6 +844,10 @@ zabbix_export:
               priority: INFO
               description: 'Oracle DB Instance name has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 632a953eead74114bdaf640bbf5929a5
           name: 'Oracle: Instance status'
@@ -839,8 +867,8 @@ zabbix_export:
             key: 'db.odbc.get[get_instance_state,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: application
         -
           uuid: 9a3084287a354fb0b0eb5de377a6de92
           name: 'Oracle: Library cache hit ratio'
@@ -860,8 +888,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: cache
         -
           uuid: ac44884b2518485eae4bc7caf46799a8
           name: 'Oracle: Logons per second'
@@ -881,8 +909,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: application
         -
           uuid: f7691a5d7ef74a4d99cac61835052fba
           name: 'Oracle: Long table scans per second'
@@ -902,8 +930,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: application
         -
           uuid: 49445baea18640ea844f869c51aee565
           name: 'Oracle: Memory sorts ratio'
@@ -923,8 +951,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: application
         -
           uuid: 786188c7719048cb863450f98ab921ac
           name: 'Oracle: PGA, Global memory bound'
@@ -943,8 +971,11 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: pga
         -
           uuid: 1f532b6599f34db285b60a8879638d75
           name: 'Oracle: PGA, Aggregate target parameter'
@@ -963,8 +994,11 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: pga
         -
           uuid: 001bf0d526cb455386f5a63e6bb8f410
           name: 'Oracle: Physical reads per second'
@@ -984,8 +1018,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: disk
         -
           uuid: 2f305e09eafd4f7a9360f138be20a631
           name: 'Oracle: Physical reads bytes per second'
@@ -1005,8 +1039,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: disk
         -
           uuid: d20f81d99e6647479abcc9ffcbc208fc
           name: 'Oracle: Physical writes per second'
@@ -1026,8 +1060,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: disk
         -
           uuid: e2e21384fbae431a88f1eef610b0307b
           name: 'Oracle: Physical writes bytes per second'
@@ -1047,8 +1081,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: disk
         -
           uuid: 533ae91bb94e4077870aa362a8cea7e5
           name: 'Oracle: Number of processes'
@@ -1065,8 +1099,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: system
         -
           uuid: 721c04b5f3ba42d0ae7acceb5876c360
           name: 'Oracle: Processes limit'
@@ -1084,8 +1118,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: system
         -
           uuid: 65064008eef54657b7b7f2beeba70b0a
           name: 'Oracle: Redo logs available to switch'
@@ -1103,8 +1137,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: application
           triggers:
             -
               uuid: 1348b1e854e64d34b6b00be118f045c3
@@ -1112,6 +1146,10 @@ zabbix_export:
               name: 'Oracle: Number of REDO logs available for switching is too low (less {$ORACLE.REDO.MIN.WARN} for 5 min)'
               priority: WARNING
               description: 'Number of available for log switching inactive/unused REDOs is low (Database down risk)'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
         -
           uuid: ab298981f26a4ec6849e1155ce35ee76
           name: 'Oracle: Rows per sort'
@@ -1130,8 +1168,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: application
         -
           uuid: ddbdd3d7d40d42b9b9711470516a5aec
           name: 'Oracle: SQL service response time'
@@ -1155,8 +1193,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: application
         -
           uuid: e269a27f3c3f47ae86fef231da2a6fce
           name: 'Oracle: Active background sessions'
@@ -1177,8 +1215,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: sessions
         -
           uuid: 6e8defc1e3e2485784d8bef6e2b988c7
           name: 'Oracle: Active user sessions'
@@ -1199,8 +1237,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: sessions
         -
           uuid: a3f2b314a6354d238d6604afa2333ae6
           name: 'Oracle: Sessions concurrency'
@@ -1210,7 +1248,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The percentage of concurrency. Concurrency is a DB behaviour when different transactions request to change the same resource - in case of modifying data transactions sequentially block temporarily the right to change data, the rest of the transactions are waiting for access. In the case when access for resource is locked for a long time, then the concurrency grows (like the transaction queue) and this often has an extremely negative impact on performance. A high contention value does not indicate the root cause of the problem, but is a signal to search for it.'
+          description: 'The percentage of concurrency. Concurrency is a DB behavior when different transactions request to change the same resource - in case of modifying data transactions sequentially block temporarily the right to change data, the rest of the transactions are waiting for access. In the case when access for resource is locked for a long time, then the concurrency grows (like the transaction queue) and this often has an extremely negative impact on performance. A high contention value does not indicate the root cause of the problem, but is a signal to search for it.'
           preprocessing:
             -
               type: JSONPATH
@@ -1220,8 +1258,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: sessions
           triggers:
             -
               uuid: 7099e4a160c1446395b9e5b721db7b38
@@ -1229,6 +1267,10 @@ zabbix_export:
               name: 'Oracle: Too high database concurrency (over {$ORACLE.CONCURRENCY.MAX.WARN}% for 5 min)'
               priority: WARNING
               description: 'Concurrency rate is over {$ORACLE.CONCURRENCY.MAX.WARN}%. A high contention value does not indicate the root cause of the problem, but is a signal to search for it. In the case of high competition, an analysis of resource consumption should be carried out, the most "heavy" queries made in the database, possibly - session tracing. All this will help determine the root cause and possible optimization points both in the database configuration and in the logic of building queries of the application itself.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 3459ae7c82454882a9655db8a83120fd
           name: 'Oracle: Session count'
@@ -1247,8 +1289,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: sessions
         -
           uuid: 5abf01d0bad442e7817752ae01dfc2d2
           name: 'Oracle: Inactive user sessions'
@@ -1269,8 +1311,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: sessions
         -
           uuid: ebc142a0784041d2bbe982c4d766b98f
           name: 'Oracle: Sessions limit'
@@ -1288,8 +1330,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: sessions
         -
           uuid: 64361f8862e8482d86a8bdd71c709142
           name: 'Oracle: Sessions lock rate'
@@ -1309,8 +1351,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: sessions
           triggers:
             -
               uuid: 9a75f3a039094ca89c2ba7e3fa93b1a8
@@ -1318,6 +1360,10 @@ zabbix_export:
               name: 'Oracle: Too many locked sessions (over {$ORACLE.SESSIONS.LOCK.MAX.WARN}% for 5 min)'
               priority: WARNING
               description: 'Number of locked sessions is over {$ORACLE.SESSIONS.LOCK.MAX.WARN}% of the running sessions.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: a9669cb6290b4a158e7f02c1f079b6f9
           name: 'Oracle: Sessions locked over {$ORACLE.SESSION.LOCK.MAX.TIME}s'
@@ -1336,8 +1382,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: sessions
           triggers:
             -
               uuid: a8f5ec966f5e4c72baad1380eda4d0a2
@@ -1345,6 +1391,10 @@ zabbix_export:
               name: 'Oracle: Too many sessions locked over {$ORACLE.SESSION.LOCK.MAX.TIME}s (over {$ORACLE.SESSION.LONG.LOCK.MAX.WARN} for 5 min)'
               priority: WARNING
               description: 'Number of sessions locked over {$ORACLE.SESSION.LOCK.MAX.TIME} seconds is too high. Long-term locks can negatively affect database performance, therefore, if they are detected, you should first find the most difficult queries from the database point of view and analyze possible resource leaks.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 94fe3a129f08415bb7e02a862bd9e8a8
           name: 'Oracle: SGA, buffer cache'
@@ -1365,8 +1415,11 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: cache
+            -
+              tag: component
+              value: sga
         -
           uuid: 062fbd601d6f41208e364c80f1d08b1e
           name: 'Oracle: SGA, fixed'
@@ -1387,8 +1440,11 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: sga
         -
           uuid: 614066ff91e144dbae58b4920c1db932
           name: 'Oracle: SGA, java pool'
@@ -1409,8 +1465,11 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: sga
         -
           uuid: 0f726310d4a8426188658f7c093c3989
           name: 'Oracle: SGA, large pool'
@@ -1431,8 +1490,11 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: sga
         -
           uuid: 03e9cea3887447349c9116b89b1be026
           name: 'Oracle: SGA, log buffer'
@@ -1453,8 +1515,11 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: sga
         -
           uuid: eb4c2f63ef8449d99794e5fdb7fed7bf
           name: 'Oracle: SGA, shared pool'
@@ -1475,8 +1540,11 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: sga
         -
           uuid: b14b0126cf64436ea206ec151984cd95
           name: 'Oracle: Shared pool free %'
@@ -1496,8 +1564,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: memory
           triggers:
             -
               uuid: 8facfa98bcd3447ea53d0a3d09ada933
@@ -1505,6 +1573,10 @@ zabbix_export:
               name: 'Oracle: Shared pool free is too low (less {$ORACLE.SHARED.FREE.MIN.WARN}% for 5m)'
               priority: WARNING
               description: 'The shared pool free memory percent has been less than {$ORACLE.SHARED.FREE.MIN.WARN}% in the last 5 minutes.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
         -
           uuid: 8b3e958d76d14ef7a6869634106f1277
           name: 'Oracle: Total sorts per user call'
@@ -1523,8 +1595,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: application
         -
           uuid: fc2cff59b0804989989179e1dbc338b5
           name: 'Oracle: Temp space used'
@@ -1544,8 +1616,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: application
         -
           uuid: 085c097ab3b34f07b262caf80703b469
           name: 'Oracle: PGA, Total allocated'
@@ -1564,8 +1636,11 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: pga
         -
           uuid: c2c18a0a502d4fbe91db25d29ae57d45
           name: 'Oracle: PGA, Total freeable'
@@ -1584,8 +1659,11 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: pga
         -
           uuid: e0e88ce92ece4ca0b776f09dc4ec5039
           name: 'Oracle: PGA, Total inuse'
@@ -1604,8 +1682,11 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: pga
         -
           uuid: 3c817d2b45fc471aa86771ce1739de6f
           name: 'Oracle: Uptime'
@@ -1625,8 +1706,8 @@ zabbix_export:
             key: 'db.odbc.get[get_instance_state,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: application
           triggers:
             -
               uuid: 03a4fb1d6e684c9b82c1317699c71468
@@ -1638,6 +1719,10 @@ zabbix_export:
                 -
                   name: 'Oracle: Port {$ORACLE.PORT} is unavailable'
                   expression: 'max(/Oracle by ODBC/net.tcp.service[tcp,{HOST.CONN},{$ORACLE.PORT}],#3)=0  and max(/Oracle by ODBC/proc.num[,,,"tnslsnr LISTENER"],#3)>0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
             -
               uuid: 431201a1ce0d47948751c7e4e6bbeb92
               expression: 'last(/Oracle by ODBC/oracle.uptime)<10m'
@@ -1645,6 +1730,10 @@ zabbix_export:
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: ad275dbbe8af483b93d37e416c3f1fd2
           name: 'Oracle: User ''{$ORACLE.USER}'' expire password'
@@ -1664,8 +1753,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: application
           triggers:
             -
               uuid: a909d8cccacf4470a3e2da88b4e5c3d5
@@ -1673,6 +1762,10 @@ zabbix_export:
               name: 'Oracle: Zabbix account will expire soon (under {$ORACLE.EXPIRE.PASSWORD.MIN.WARN} days)'
               priority: WARNING
               description: 'Password for zabbix user in the database will expire soon.'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 3455378f6ecf4ecb93a69d2387e4a57d
           name: 'Oracle: User rollbacks per second'
@@ -1692,8 +1785,8 @@ zabbix_export:
             key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: application
         -
           uuid: 45143cb0d0284608bf48897885a91bbb
           name: 'Oracle: Version'
@@ -1717,8 +1810,8 @@ zabbix_export:
             key: 'db.odbc.get[get_instance_state,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: application
           triggers:
             -
               uuid: a5dd4fe627c44afebdfe7beeefc4ec3d
@@ -1727,6 +1820,10 @@ zabbix_export:
               priority: INFO
               description: 'Oracle DB version has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: bf89a6ced768432a9cc3c27e1e3159d0
           name: 'Oracle: Number of LISTENER processes'
@@ -1741,14 +1838,18 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: Oracle
+              tag: component
+              value: application
           triggers:
             -
               uuid: eb5e531eb3f142569775349a126d1ab0
               expression: 'max(/Oracle by ODBC/proc.num[,,,"tnslsnr LISTENER"],#3)=0'
               name: 'Oracle: LISTENER process is not running'
               priority: DISASTER
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: a527b14b1cee4115be5c5e9387af821b
@@ -1786,8 +1887,11 @@ zabbix_export:
                 key: 'db.odbc.get[get_archivelog_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Oracle Archivelog'
+                  tag: component
+                  value: archive-log
+                -
+                  tag: destination
+                  value: '{#DEST_NAME}'
             -
               uuid: 1948e6bfaa48451cac6ee83a16b07826
               name: 'Archivelog ''{#DEST_NAME}'': Last sequence'
@@ -1805,8 +1909,11 @@ zabbix_export:
                 key: 'db.odbc.get[get_archivelog_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Oracle Archivelog'
+                  tag: component
+                  value: archive-log
+                -
+                  tag: destination
+                  value: '{#DEST_NAME}'
             -
               uuid: 0d561969fc2942fea854541a03b6a490
               name: 'Archivelog ''{#DEST_NAME}'': Status'
@@ -1830,8 +1937,11 @@ zabbix_export:
                 key: 'db.odbc.get[get_archivelog_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Oracle Archivelog'
+                  tag: component
+                  value: archive-log
+                -
+                  tag: destination
+                  value: '{#DEST_NAME}'
               trigger_prototypes:
                 -
                   uuid: 1202e75015304115a4ccdab027617816
@@ -1839,6 +1949,10 @@ zabbix_export:
                   name: 'Archivelog ''{#DEST_NAME}'': Log Archive is not valid'
                   priority: HIGH
                   description: 'ARL destination not in 3 - Valid or 2 - Deferred.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
         -
           uuid: c40708b755c7464bb064b7bffc584381
           name: 'ASM disk groups discovery'
@@ -1868,8 +1982,11 @@ zabbix_export:
                 key: 'db.odbc.get[get_asm_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Oracle ASM'
+                  tag: component
+                  value: asm
+                -
+                  tag: disk-group
+                  value: '{#DG_NAME}'
             -
               uuid: 7f2a51d7eeb64c5b8929dcb0e3a49273
               name: 'ASM ''{#DG_NAME}'': Total size'
@@ -1888,8 +2005,11 @@ zabbix_export:
                 key: 'db.odbc.get[get_asm_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Oracle ASM'
+                  tag: component
+                  value: asm
+                -
+                  tag: disk-group
+                  value: '{#DG_NAME}'
             -
               uuid: 9c87a9089a19468f85eb1d3c28893092
               name: 'ASM ''{#DG_NAME}'': Free size'
@@ -1909,8 +2029,11 @@ zabbix_export:
                 key: 'db.odbc.get[get_asm_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Oracle ASM'
+                  tag: component
+                  value: asm
+                -
+                  tag: disk-group
+                  value: '{#DG_NAME}'
               trigger_prototypes:
                 -
                   uuid: 756a8b4b04bc4aadab6b4b4cc856ad32
@@ -1918,6 +2041,10 @@ zabbix_export:
                   name: 'ASM ''{#DG_NAME}'': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.HIGH}% for 5m)'
                   priority: HIGH
                   description: 'Usage percent of ASM disk group is over {$ORACLE.ASM.USED.PCT.MAX.WARN}'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
                 -
                   uuid: d65971e0f3994dfcbcbde145c9866678
                   expression: 'min(/Oracle by ODBC/oracle.asm_used_pct["{#DG_NAME}"],5m)>{$ORACLE.ASM.USED.PCT.MAX.WARN}'
@@ -1928,6 +2055,10 @@ zabbix_export:
                     -
                       name: 'ASM ''{#DG_NAME}'': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.HIGH}% for 5m)'
                       expression: 'min(/Oracle by ODBC/oracle.asm_used_pct["{#DG_NAME}"],5m)>{$ORACLE.ASM.USED.PCT.MAX.HIGH}'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
           graph_prototypes:
             -
               uuid: 75f9f07dbae84443900aad10095e37f9
@@ -1990,8 +2121,14 @@ zabbix_export:
                 key: 'db.odbc.get[get_cdb_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Oracle {#TYPE}'
+                  tag: component
+                  value: database
+                -
+                  tag: database
+                  value: '{#DBNAME}'
+                -
+                  tag: type
+                  value: '{#TYPE}'
             -
               uuid: 9b88e24d523e4111b2ff65ae26650e04
               name: 'Oracle Database ''{#DBNAME}'': Log mode'
@@ -2015,8 +2152,14 @@ zabbix_export:
                 key: 'db.odbc.get[get_cdb_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Oracle {#TYPE}'
+                  tag: component
+                  value: database
+                -
+                  tag: database
+                  value: '{#DBNAME}'
+                -
+                  tag: type
+                  value: '{#TYPE}'
             -
               uuid: f1971909355f4ef48c32695b5d204d56
               name: 'Oracle Database ''{#DBNAME}'': Open status'
@@ -2040,8 +2183,14 @@ zabbix_export:
                 key: 'db.odbc.get[get_cdb_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Oracle {#TYPE}'
+                  tag: component
+                  value: database
+                -
+                  tag: database
+                  value: '{#DBNAME}'
+                -
+                  tag: type
+                  value: '{#TYPE}'
               trigger_prototypes:
                 -
                   uuid: 9bf80a9372ef4b3898fd5a4f0c3cec7c
@@ -2054,12 +2203,20 @@ zabbix_export:
                     -
                       name: 'Oracle Database ''{#DBNAME}'': Open status in mount mode'
                       expression: 'last(/Oracle by ODBC/oracle.db_open_mode["{#DBNAME}"])=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
                 -
                   uuid: 3620ac4e75644789a2f0245dbb948771
                   expression: 'last(/Oracle by ODBC/oracle.db_open_mode["{#DBNAME}"])=1'
                   name: 'Oracle Database ''{#DBNAME}'': Open status in mount mode'
                   priority: WARNING
                   description: 'The Oracle DB has a MOUNTED state.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 949d1e5fc4424b2bb0ffd220f00f6a79
               name: 'Oracle Database ''{#DBNAME}'': Role'
@@ -2083,8 +2240,14 @@ zabbix_export:
                 key: 'db.odbc.get[get_cdb_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Oracle {#TYPE}'
+                  tag: component
+                  value: database
+                -
+                  tag: database
+                  value: '{#DBNAME}'
+                -
+                  tag: type
+                  value: '{#TYPE}'
               trigger_prototypes:
                 -
                   uuid: fb5ccc917a8344d7945b8867a1982d6b
@@ -2093,6 +2256,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Oracle DB role has changed. Ack to close.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           trigger_prototypes:
             -
               uuid: 9c17e0fdd6fe409e8f298433e58b7445
@@ -2100,6 +2267,10 @@ zabbix_export:
               name: 'Oracle Database ''{#DBNAME}'': Force logging is deactivated for DB with active Archivelog'
               priority: WARNING
               description: 'Force Logging mode  - it is very important metric for Databases in ''ARCHIVELOG''. This feature allows to forcibly write all transactions to the REDO.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 2611e69f735a42b190852589658dd591
           name: 'PDB discovery'
@@ -2146,8 +2317,14 @@ zabbix_export:
                 key: 'db.odbc.get[get_pdb_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Oracle PDB'
+                  tag: component
+                  value: database
+                -
+                  tag: database
+                  value: '{#DBNAME}'
+                -
+                  tag: type
+                  value: pdb
               trigger_prototypes:
                 -
                   uuid: 3dbb9379f8024924b197037acfbbdac4
@@ -2156,12 +2333,20 @@ zabbix_export:
                   priority: INFO
                   description: 'Oracle DB open status has changed. Ack to close.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
                 -
                   uuid: 5f8ed69b2c074a29b9975baf10a2a2f8
                   expression: 'last(/Oracle by ODBC/oracle.pdb_open_mode["{#DBNAME}"])=1'
                   name: 'Oracle Database ''{#DBNAME}'': Open status in mount mode'
                   priority: WARNING
                   description: 'The Oracle DB has a MOUNTED state.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
         -
           uuid: c8de553c98f64e59b40bf927f6447ad1
           name: 'Tablespace discovery'
@@ -2206,8 +2391,14 @@ zabbix_export:
                 key: 'db.odbc.get[get_tablespaces_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}'
+                  tag: component
+                  value: tablespaces
+                -
+                  tag: contents
+                  value: '{#CONTENTS}'
+                -
+                  tag: tablespace
+                  value: '{#TABLESPACE}'
             -
               uuid: 8c3284a21872423499ee15fd7b0038f1
               name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace free, bytes'
@@ -2226,8 +2417,14 @@ zabbix_export:
                 key: 'db.odbc.get[get_tablespaces_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}'
+                  tag: component
+                  value: tablespaces
+                -
+                  tag: contents
+                  value: '{#CONTENTS}'
+                -
+                  tag: tablespace
+                  value: '{#TABLESPACE}'
             -
               uuid: afd8c1a01b64408fbc6f8f95fbb13593
               name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace MAX size, bytes'
@@ -2246,8 +2443,14 @@ zabbix_export:
                 key: 'db.odbc.get[get_tablespaces_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}'
+                  tag: component
+                  value: tablespaces
+                -
+                  tag: contents
+                  value: '{#CONTENTS}'
+                -
+                  tag: tablespace
+                  value: '{#TABLESPACE}'
             -
               uuid: 42c7812a75d5433ab8a275498635c81c
               name: 'Oracle TBS ''{#TABLESPACE}'': Open status'
@@ -2267,8 +2470,14 @@ zabbix_export:
                 key: 'db.odbc.get[get_tablespaces_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}'
+                  tag: component
+                  value: tablespaces
+                -
+                  tag: contents
+                  value: '{#CONTENTS}'
+                -
+                  tag: tablespace
+                  value: '{#TABLESPACE}'
               trigger_prototypes:
                 -
                   uuid: 3c5f54f41f95440aa18ca5316aeb50f6
@@ -2276,6 +2485,10 @@ zabbix_export:
                   name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace is OFFLINE'
                   priority: WARNING
                   description: 'The tablespace is in the offline state.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: 05c2af5a765842a1a70f2f67355db1b3
                   expression: 'last(/Oracle by ODBC/oracle.tbs_status["{#TABLESPACE}"],#1)<>last(/Oracle by ODBC/oracle.tbs_status["{#TABLESPACE}"],#2)'
@@ -2287,6 +2500,10 @@ zabbix_export:
                     -
                       name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace is OFFLINE'
                       expression: 'last(/Oracle by ODBC/oracle.tbs_status["{#TABLESPACE}"])=2'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
             -
               uuid: b9cc0eabdcbc404fb0df2a2a082411f1
               name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace used, bytes'
@@ -2305,8 +2522,14 @@ zabbix_export:
                 key: 'db.odbc.get[get_tablespaces_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}'
+                  tag: component
+                  value: tablespaces
+                -
+                  tag: contents
+                  value: '{#CONTENTS}'
+                -
+                  tag: tablespace
+                  value: '{#TABLESPACE}'
             -
               uuid: 877961c286e448238f58cff9c51088c8
               name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace usage, percent'
@@ -2326,14 +2549,24 @@ zabbix_export:
                 key: 'db.odbc.get[get_tablespaces_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}'
+                  tag: component
+                  value: tablespaces
+                -
+                  tag: contents
+                  value: '{#CONTENTS}'
+                -
+                  tag: tablespace
+                  value: '{#TABLESPACE}'
               trigger_prototypes:
                 -
                   uuid: 78c293ae7ded42b0b05d50af99762017
                   expression: 'min(/Oracle by ODBC/oracle.tbs_used_file_pct["{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.HIGH}'
                   name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m).'
                   priority: HIGH
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
                 -
                   uuid: e6f2cb4ade52464b97f5e0f5e05ab61b
                   expression: 'min(/Oracle by ODBC/oracle.tbs_used_file_pct["{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.WARN}'
@@ -2343,6 +2576,10 @@ zabbix_export:
                     -
                       name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m).'
                       expression: 'min(/Oracle by ODBC/oracle.tbs_used_file_pct["{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.HIGH}'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
             -
               uuid: c3a904455ff244e1a30bf32f0b4ea0d7
               name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace allocated, percent'
@@ -2362,8 +2599,14 @@ zabbix_export:
                 key: 'db.odbc.get[get_tablespaces_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}'
+                  tag: component
+                  value: tablespaces
+                -
+                  tag: contents
+                  value: '{#CONTENTS}'
+                -
+                  tag: tablespace
+                  value: '{#TABLESPACE}'
               trigger_prototypes:
                 -
                   uuid: 9469e51bd69e4baba82de4fd4e5eb14c
@@ -2374,11 +2617,19 @@ zabbix_export:
                     -
                       name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace utilization is too high (over {$ORACLE.TBS.UTIL.PCT.MAX.HIGH}% for 5m).'
                       expression: 'min(/Oracle by ODBC/oracle.tbs_used_pct["{#TABLESPACE}"],5m)>{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
                 -
                   uuid: a8aa7255866d4a5ba71d2f89a1d234fe
                   expression: 'min(/Oracle by ODBC/oracle.tbs_used_pct["{#TABLESPACE}"],5m)>{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}'
                   name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace utilization is too high (over {$ORACLE.TBS.UTIL.PCT.MAX.HIGH}% for 5m).'
                   priority: HIGH
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
           graph_prototypes:
             -
               uuid: a9f3bc52aa0340feb35600ad249e82d3
@@ -2401,6 +2652,13 @@ zabbix_export:
                   item:
                     host: 'Oracle by ODBC'
                     key: 'oracle.tbs_used_bytes["{#TABLESPACE}"]'
+      tags:
+        -
+          tag: class
+          value: database
+        -
+          tag: target
+          value: oracle
       macros:
         -
           macro: '{$ORACLE.ASM.USED.PCT.MAX.HIGH}'
@@ -2668,30 +2926,50 @@ zabbix_export:
       name: 'Oracle: Port {$ORACLE.PORT} is unavailable'
       priority: DISASTER
       description: 'The TCP port of the Oracle Server service is currently unavailable.'
+      tags:
+        -
+          tag: scope
+          value: availability
     -
       uuid: 38471058988c46f4b81af9f77637914a
       expression: 'min(/Oracle by ODBC/oracle.processes_count,5m) * 100 / last(/Oracle by ODBC/oracle.processes_limit) > {$ORACLE.PROCESSES.MAX.WARN}'
       name: 'Oracle: Too many active processes (over {$ORACLE.PROCESSES.MAX.WARN}% for 5 min)'
       priority: WARNING
       description: 'Active processes are using more than {$ORACLE.PROCESSES.MAX.WARN}% of the available number of processes.'
+      tags:
+        -
+          tag: scope
+          value: capacity
     -
       uuid: 4a055da31f09489ea0f03e4582ee4333
       expression: 'min(/Oracle by ODBC/oracle.session_count,5m) * 100 / last(/Oracle by ODBC/oracle.session_limit) > {$ORACLE.SESSIONS.MAX.WARN}'
       name: 'Oracle: Too many active sessions (over {$ORACLE.SESSIONS.MAX.WARN}% for 5 min)'
       priority: WARNING
       description: 'Active sessions are using more than {$ORACLE.SESSIONS.MAX.WARN}% of the available sessions.'
+      tags:
+        -
+          tag: scope
+          value: capacity
     -
       uuid: 5752d92063f84aaa818bc85b135cd4fd
       expression: 'min(/Oracle by ODBC/oracle.db_files_count,5m) * 100 / last(/Oracle by ODBC/oracle.db_files_limit) > {$ORACLE.DB.FILE.MAX.WARN}'
       name: 'Oracle: Too many database files (over {$ORACLE.DB.FILE.MAX.WARN}% for 5 min)'
       priority: WARNING
       description: 'Number of datafiles is higher than {$ORACLE.DB.FILE.MAX.WARN}% of the available datafile files limit.'
+      tags:
+        -
+          tag: scope
+          value: capacity
     -
       uuid: 476001f0f52a45f59942d73c643371c1
       expression: 'min(/Oracle by ODBC/oracle.total_pga_used,5m) * 100 / last(/Oracle by ODBC/oracle.pga_target) > {$ORACLE.PGA.USE.MAX.WARN}'
       name: 'Oracle: Total PGA inuse is too high (over {$ORACLE.PGA.USE.MAX.WARN}% for 5 min)'
       priority: WARNING
       description: 'Total PGA in use is more than {$ORACLE.PGA.USE.MAX.WARN}% of PGA_AGGREGATE_TARGET.'
+      tags:
+        -
+          tag: scope
+          value: capacity
   graphs:
     -
       uuid: 72ad9e81bb5147e6827499143d256068

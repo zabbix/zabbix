@@ -114,8 +114,8 @@ There are no template links in this template.
 |PHP-FPM |PHP-FPM: Listen queue, len |<p>Size of the socket queue of pending connections.</p> |DEPENDENT |php-fpm.listen_queue_len<p>**Preprocessing**:</p><p>- JSONPATH: `$.['listen queue len']`</p> |
 |PHP-FPM |PHP-FPM: Queue usage |<p>Queue utilization</p> |CALCULATED |php-fpm.listen_queue_usage<p>**Expression**:</p>`last(//php-fpm.listen_queue)/(last(//php-fpm.listen_queue_len)+(last(//php-fpm.listen_queue_len)=0))*100` |
 |PHP-FPM |PHP-FPM: Max children reached |<p>The number of times that pm.max_children has been reached since the php-fpm pool started </p> |DEPENDENT |php-fpm.max_children<p>**Preprocessing**:</p><p>- JSONPATH: `$.['max children reached']`</p><p>- SIMPLE_CHANGE</p> |
-|Zabbix_raw_items |PHP-FPM: Get ping page |<p>-</p> |HTTP_AGENT |php-fpm.get_ping |
-|Zabbix_raw_items |PHP-FPM: Get status page |<p>-</p> |HTTP_AGENT |php-fpm.get_status |
+|Zabbix raw items |PHP-FPM: Get ping page |<p>-</p> |HTTP_AGENT |php-fpm.get_ping |
+|Zabbix raw items |PHP-FPM: Get status page |<p>-</p> |HTTP_AGENT |php-fpm.get_status |
 
 ## Triggers
 

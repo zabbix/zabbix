@@ -44,9 +44,9 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Topic Metrics (write) |<p>-</p> |JMX |jmx.discovery[beans,"kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec,topic=*"]<p>**Filter**:</p>AND <p>- {#JMXTOPIC} MATCHES_REGEX `{$KAFKA.TOPIC.MATCHES}`</p><p>- {#JMXTOPIC} NOT_MATCHES_REGEX `{$KAFKA.TOPIC.NOT_MATCHES}`</p> |
-|Topic Metrics  (read) |<p>-</p> |JMX |jmx.discovery[beans,"kafka.server:type=BrokerTopicMetrics,name=BytesOutPerSec,topic=*"]<p>**Filter**:</p>AND <p>- {#JMXTOPIC} MATCHES_REGEX `{$KAFKA.TOPIC.MATCHES}`</p><p>- {#JMXTOPIC} NOT_MATCHES_REGEX `{$KAFKA.TOPIC.NOT_MATCHES}`</p> |
 |Topic Metrics (errors) |<p>-</p> |JMX |jmx.discovery[beans,"kafka.server:type=BrokerTopicMetrics,name=BytesRejectedPerSec,topic=*"]<p>**Filter**:</p>AND <p>- {#JMXTOPIC} MATCHES_REGEX `{$KAFKA.TOPIC.MATCHES}`</p><p>- {#JMXTOPIC} NOT_MATCHES_REGEX `{$KAFKA.TOPIC.NOT_MATCHES}`</p> |
+|Topic Metrics (read) |<p>-</p> |JMX |jmx.discovery[beans,"kafka.server:type=BrokerTopicMetrics,name=BytesOutPerSec,topic=*"]<p>**Filter**:</p>AND <p>- {#JMXTOPIC} MATCHES_REGEX `{$KAFKA.TOPIC.MATCHES}`</p><p>- {#JMXTOPIC} NOT_MATCHES_REGEX `{$KAFKA.TOPIC.NOT_MATCHES}`</p> |
+|Topic Metrics (write) |<p>-</p> |JMX |jmx.discovery[beans,"kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec,topic=*"]<p>**Filter**:</p>AND <p>- {#JMXTOPIC} MATCHES_REGEX `{$KAFKA.TOPIC.MATCHES}`</p><p>- {#JMXTOPIC} NOT_MATCHES_REGEX `{$KAFKA.TOPIC.NOT_MATCHES}`</p> |
 
 ## Items collected
 
@@ -111,9 +111,9 @@ There are no template links in this template.
 |Kafka |Kafka: ZooKeeper client request latency |<p>Latency in milliseconds for ZooKeeper requests from broker.</p> |JMX |jmx["kafka.server:type=ZooKeeperClientMetrics,name=ZooKeeperRequestLatencyMs","Count"] |
 |Kafka |Kafka: ZooKeeper connection status |<p>Connection status of broker's ZooKeeper session.</p> |JMX |jmx["kafka.server:type=SessionExpireListener,name=SessionState","Value"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Kafka |Kafka: ZooKeeper disconnect rate |<p>ZooKeeper client disconnect per second.</p> |JMX |jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperDisconnectsPerSec","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
-|Kafka |Kafka: ZooKeeper session expiration rate |<p>ZooKeeper client session expiration  per second.</p> |JMX |jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperExpiresPerSec","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
-|Kafka |Kafka: ZooKeeper readonly rate |<p>ZooKeeper client readonly  per second.</p> |JMX |jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperReadOnlyConnectsPerSec","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
-|Kafka |Kafka: ZooKeeper sync rate |<p>ZooKeeper client sync  per second.</p> |JMX |jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperSyncConnectsPerSec","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
+|Kafka |Kafka: ZooKeeper session expiration rate |<p>ZooKeeper client session expiration per second.</p> |JMX |jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperExpiresPerSec","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
+|Kafka |Kafka: ZooKeeper readonly rate |<p>ZooKeeper client readonly per second.</p> |JMX |jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperReadOnlyConnectsPerSec","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
+|Kafka |Kafka: ZooKeeper sync rate |<p>ZooKeeper client sync per second.</p> |JMX |jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperSyncConnectsPerSec","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
 |Kafka |Kafka {#JMXTOPIC}: Messages in per second |<p>The rate at which individual messages are consumed by topic.</p> |JMX |jmx["kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec,topic={#JMXTOPIC}","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
 |Kafka |Kafka {#JMXTOPIC}: Bytes in per second |<p>The rate at which data sent from producers is consumed by topic.</p> |JMX |jmx["kafka.server:type=BrokerTopicMetrics,name=BytesInPerSec,topic={#JMXTOPIC}","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
 |Kafka |Kafka {#JMXTOPIC}: Bytes out per second |<p>The rate at which data is fetched and read from the broker by consumers (by topic).</p> |JMX |jmx["kafka.server:type=BrokerTopicMetrics,name=BytesOutPerSec,topic={#JMXTOPIC}","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
@@ -139,5 +139,5 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
 

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-11T22:24:40Z'
+  date: '2022-01-26T10:03:32Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -10,7 +10,7 @@ zabbix_export:
       uuid: dd114bf0fb2f46bc84840f1bb24e2b23
       template: 'Zabbix proxy health'
       name: 'Zabbix proxy health'
-      description: 'Template tooling version used: 0.39'
+      description: 'Template tooling version used: 0.41'
       groups:
         -
           name: Templates/Applications
@@ -24,8 +24,8 @@ zabbix_export:
           description: 'Count of values enqueued in the preprocessing queue.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: system
         -
           uuid: 5131f979c17a4346a95f8ba77e7133a4
           name: 'Zabbix proxy: Utilization of availability manager internal processes, in %'
@@ -37,8 +37,8 @@ zabbix_export:
           description: 'Average percentage of time availability manager processes have been busy in the last minute.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: internal-process
           triggers:
             -
               uuid: 5a8375a8eee642f2940ed813ee062336
@@ -47,6 +47,10 @@ zabbix_export:
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,availability manager,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"availability manager"}'
               name: 'Zabbix proxy: Utilization of availability manager processes over {$ZABBIX.PROXY.UTIL.MAX:"availability manager"}%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 3d1bfa64a447427da0b463c3617b212e
           name: 'Zabbix proxy: Utilization of configuration syncer internal processes, in %'
@@ -58,8 +62,8 @@ zabbix_export:
           description: 'Average percentage of time configuration syncer processes have been busy in the last minute.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: internal-process
           triggers:
             -
               uuid: 27eb861e2e6f43f69f17b8ba65bfedcc
@@ -68,6 +72,10 @@ zabbix_export:
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,configuration syncer,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"configuration syncer"}'
               name: 'Zabbix proxy: Utilization of configuration syncer processes over {$ZABBIX.PROXY.UTIL.MAX:"configuration syncer"}%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 69eefd6aba164d71b0a2b8d2df06e9a3
           name: 'Zabbix proxy: Utilization of data sender internal processes, in %'
@@ -79,8 +87,8 @@ zabbix_export:
           description: 'Average percentage of time data sender processes have been busy in the last minute.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: internal-process
           triggers:
             -
               uuid: e8fd57784b9e4289aa4515cfa7c6c4ad
@@ -89,6 +97,10 @@ zabbix_export:
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,data sender,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"data sender"}'
               name: 'Zabbix proxy: Utilization of data sender processes over {$ZABBIX.PROXY.UTIL.MAX:"data sender"}%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 1d00c5ef345f4827a921ff3e3617d316
           name: 'Zabbix proxy: Utilization of discoverer data collector processes, in %'
@@ -100,8 +112,8 @@ zabbix_export:
           description: 'Average percentage of time discoverer processes have been busy in the last minute.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: data-collector
           triggers:
             -
               uuid: 080bd8d98f204d8580cbb1088f07d57b
@@ -110,6 +122,10 @@ zabbix_export:
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,discoverer,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"discoverer"}'
               name: 'Zabbix proxy: Utilization of discoverer processes over {$ZABBIX.PROXY.UTIL.MAX:"discoverer"}%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: a1a7b0f3c34248a0993c305cd76fea5a
           name: 'Zabbix proxy: Utilization of heartbeat sender internal processes, in %'
@@ -121,8 +137,8 @@ zabbix_export:
           description: 'Average percentage of time heartbeat sender processes have been busy in the last minute.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: internal-process
           triggers:
             -
               uuid: 51e9b56f0d854808949c5c89a53edadf
@@ -131,6 +147,10 @@ zabbix_export:
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,heartbeat sender,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"heartbeat sender"}'
               name: 'Zabbix proxy: Utilization of heartbeat sender processes over {$ZABBIX.PROXY.UTIL.MAX:"heartbeat sender"}%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: d34bb8623fff4fb99f87167534299654
           name: 'Zabbix proxy: Utilization of history poller data collector processes, in %'
@@ -142,8 +162,8 @@ zabbix_export:
           description: 'Average percentage of time history poller processes have been busy in the last minute.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: data-collector
           triggers:
             -
               uuid: 7ee08ecfeafc488583e8e4719b8a1be1
@@ -152,6 +172,10 @@ zabbix_export:
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,history poller,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"history poller"}'
               name: 'Zabbix proxy: Utilization of history poller processes over {$ZABBIX.PROXY.UTIL.MAX:"history poller"}%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 7dde8cd03e5043a2bd484f7213a5f112
           name: 'Zabbix proxy: Utilization of history syncer internal processes, in %'
@@ -163,8 +187,8 @@ zabbix_export:
           description: 'Average percentage of time history syncer processes have been busy in the last minute.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: internal-process
           triggers:
             -
               uuid: 52fb303ec9164aa28821117f3a559fe3
@@ -173,6 +197,10 @@ zabbix_export:
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,history syncer,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"history syncer"}'
               name: 'Zabbix proxy: Utilization of history syncer processes over {$ZABBIX.PROXY.UTIL.MAX:"history syncer"}%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 31f0355f4d7c4de6b0d6f206d1ca9fa3
           name: 'Zabbix proxy: Utilization of housekeeper internal processes, in %'
@@ -184,8 +212,8 @@ zabbix_export:
           description: 'Average percentage of time housekeeper processes have been busy in the last minute.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: internal-process
           triggers:
             -
               uuid: b6cbede80a4847ed94a0ba818b7ca261
@@ -194,6 +222,10 @@ zabbix_export:
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,housekeeper,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"housekeeper"}'
               name: 'Zabbix proxy: Utilization of housekeeper processes over {$ZABBIX.PROXY.UTIL.MAX:"housekeeper"}%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 782b11dbe3ce47e3b9098c43d83057ad
           name: 'Zabbix proxy: Utilization of http poller data collector processes, in %'
@@ -205,8 +237,8 @@ zabbix_export:
           description: 'Average percentage of time http poller processes have been busy in the last minute.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: data-collector
           triggers:
             -
               uuid: e93e5a3dd27f4d378bbfe2c8e5b009e7
@@ -215,6 +247,10 @@ zabbix_export:
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,http poller,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"http poller"}'
               name: 'Zabbix proxy: Utilization of http poller processes over {$ZABBIX.PROXY.UTIL.MAX:"http poller"}%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 9b899ab317b447d1a82d1136e0a2ff6f
           name: 'Zabbix proxy: Utilization of icmp pinger data collector processes, in %'
@@ -226,8 +262,8 @@ zabbix_export:
           description: 'Average percentage of time icmp pinger processes have been busy in the last minute.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: data-collector
           triggers:
             -
               uuid: d514f4a08bcd4fe2b696015a74ffafcf
@@ -236,6 +272,10 @@ zabbix_export:
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,icmp pinger,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"icmp pinger"}'
               name: 'Zabbix proxy: Utilization of icmp pinger processes over {$ZABBIX.PROXY.UTIL.MAX:"icmp pinger"}%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 52b3123dfef94d8bba1b1a13314a9d4f
           name: 'Zabbix proxy: Utilization of ipmi manager internal processes, in %'
@@ -247,8 +287,8 @@ zabbix_export:
           description: 'Average percentage of time ipmi manager processes have been busy in the last minute.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: internal-process
           triggers:
             -
               uuid: 751e3000367f42d9af0d4418f3472a91
@@ -257,6 +297,10 @@ zabbix_export:
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,ipmi manager,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"ipmi manager"}'
               name: 'Zabbix proxy: Utilization of ipmi manager processes over {$ZABBIX.PROXY.UTIL.MAX:"ipmi manager"}%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 7cfb2f1504dd4b0aaac804b132d49bc5
           name: 'Zabbix proxy: Utilization of ipmi poller data collector processes, in %'
@@ -268,8 +312,8 @@ zabbix_export:
           description: 'Average percentage of time ipmi poller processes have been busy in the last minute.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: data-collector
           triggers:
             -
               uuid: 99ce9f0ed6204860b7b943e9e3a5fbc0
@@ -278,6 +322,10 @@ zabbix_export:
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,ipmi poller,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"ipmi poller"}'
               name: 'Zabbix proxy: Utilization of ipmi poller processes over {$ZABBIX.PROXY.UTIL.MAX:"ipmi poller"}%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 02214c0c38394bef8d648369584ae30b
           name: 'Zabbix proxy: Utilization of java poller data collector processes, in %'
@@ -289,8 +337,8 @@ zabbix_export:
           description: 'Average percentage of time java poller processes have been busy in the last minute.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: data-collector
           triggers:
             -
               uuid: 5b8cc59c21b145739e346479124c48f5
@@ -299,6 +347,10 @@ zabbix_export:
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,java poller,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"java poller"}'
               name: 'Zabbix proxy: Utilization of java poller processes over {$ZABBIX.PROXY.UTIL.MAX:"java poller"}%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 06bdbdcfdbc04c24ad387b256e430801
           name: 'Zabbix proxy: Utilization of ODBC poller data collector processes, in %'
@@ -310,8 +362,8 @@ zabbix_export:
           description: 'Average percentage of time ODBC poller processes have been busy in the last minute.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: data-collector
           triggers:
             -
               uuid: 3177430235ac4eeaa23b8c39987989cc
@@ -320,6 +372,10 @@ zabbix_export:
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,odbc poller,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"ODBC poller"}'
               name: 'Zabbix proxy: Utilization of ODBC poller processes over {$ZABBIX.PROXY.UTIL.MAX:"ODBC poller"}%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 334398ad893e4146bc1b9370eef9df59
           name: 'Zabbix proxy: Utilization of poller data collector processes, in %'
@@ -331,8 +387,8 @@ zabbix_export:
           description: 'Average percentage of time poller processes have been busy in the last minute.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: data-collector
           triggers:
             -
               uuid: 3f93b378367e48f89abe304ccb624047
@@ -341,6 +397,10 @@ zabbix_export:
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,poller,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"poller"}'
               name: 'Zabbix proxy: Utilization of poller processes over {$ZABBIX.PROXY.UTIL.MAX:"poller"}%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 20705fe12d4c40a4a27306b66ec9a69d
           name: 'Zabbix proxy: Utilization of preprocessing manager internal processes, in %'
@@ -352,8 +412,8 @@ zabbix_export:
           description: 'Average percentage of time preprocessing manager processes have been busy in the last minute.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: internal-process
           triggers:
             -
               uuid: 1ed29eb53708417a827adbdf4d8f145b
@@ -362,6 +422,10 @@ zabbix_export:
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,preprocessing manager,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"preprocessing manager"}'
               name: 'Zabbix proxy: Utilization of preprocessing manager processes over {$ZABBIX.PROXY.UTIL.MAX:"preprocessing manager"}%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 9c7916375cf841fb8edaf383b93a0522
           name: 'Zabbix proxy: Utilization of preprocessing worker internal processes, in %'
@@ -373,8 +437,8 @@ zabbix_export:
           description: 'Average percentage of time preprocessing worker processes have been busy in the last minute.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: internal-process
           triggers:
             -
               uuid: 22831f081149400a86cb18930de0cc20
@@ -383,6 +447,10 @@ zabbix_export:
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,preprocessing worker,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"preprocessing worker"}'
               name: 'Zabbix proxy: Utilization of preprocessing worker processes over {$ZABBIX.PROXY.UTIL.MAX:"preprocessing worker"}%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 1fd488bbb4af450cb2b5e8c81b739f29
           name: 'Zabbix proxy: Utilization of self-monitoring internal processes, in %'
@@ -394,8 +462,8 @@ zabbix_export:
           description: 'Average percentage of time self-monitoring processes have been busy in the last minute.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: internal-process
           triggers:
             -
               uuid: cc9569f75bd44b5cbce4a4c556cd2949
@@ -404,6 +472,10 @@ zabbix_export:
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,self-monitoring,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"self-monitoring"}'
               name: 'Zabbix proxy: Utilization of self-monitoring processes over {$ZABBIX.PROXY.UTIL.MAX:"self-monitoring"}%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 77ab21500d734deea86938a1a90035e0
           name: 'Zabbix proxy: Utilization of snmp trapper data collector processes, in %'
@@ -415,8 +487,8 @@ zabbix_export:
           description: 'Average percentage of time snmp trapper processes have been busy in the last minute.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: data-collector
           triggers:
             -
               uuid: bb0a46beffbc457faea9362d4325c676
@@ -425,6 +497,10 @@ zabbix_export:
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,snmp trapper,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"snmp trapper"}'
               name: 'Zabbix proxy: Utilization of snmp trapper processes over {$ZABBIX.PROXY.UTIL.MAX:"snmp trapper"}%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 94d1aa1bff2d499f9e29dd9cafd04b9e
           name: 'Zabbix proxy: Utilization of task manager internal processes, in %'
@@ -436,8 +512,8 @@ zabbix_export:
           description: 'Average percentage of time task manager processes have been busy in the last minute.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: internal-process
           triggers:
             -
               uuid: 9a42dad8cef04138944f3a1b8c797f4e
@@ -446,6 +522,10 @@ zabbix_export:
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,task manager,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"task manager"}'
               name: 'Zabbix proxy: Utilization of task manager processes over {$ZABBIX.PROXY.UTIL.MAX:"task manager"}%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 8d99635291d14ae8a5ba7d794540bde2
           name: 'Zabbix proxy: Utilization of trapper data collector processes, in %'
@@ -457,8 +537,8 @@ zabbix_export:
           description: 'Average percentage of time trapper processes have been busy in the last minute.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: data-collector
           triggers:
             -
               uuid: 95ad6d80dc9c4f46a4e255d13f1b01a3
@@ -467,6 +547,10 @@ zabbix_export:
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,trapper,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"trapper"}'
               name: 'Zabbix proxy: Utilization of trapper processes over {$ZABBIX.PROXY.UTIL.MAX:"trapper"}%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 7b0f5b75d4854b84a7e1f51975732e25
           name: 'Zabbix proxy: Utilization of unreachable poller data collector processes, in %'
@@ -478,8 +562,8 @@ zabbix_export:
           description: 'Average percentage of time unreachable poller processes have been busy in the last minute.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: data-collector
           triggers:
             -
               uuid: a28abd3f43f843af9646a1f8b1ca056a
@@ -488,6 +572,10 @@ zabbix_export:
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,unreachable poller,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"unreachable poller"}'
               name: 'Zabbix proxy: Utilization of unreachable poller processes over {$ZABBIX.PROXY.UTIL.MAX:"unreachable poller"}%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: a5a7076a175c400f866a4d873d12e1e4
           name: 'Zabbix proxy: Utilization of vmware data collector processes, in %'
@@ -499,8 +587,8 @@ zabbix_export:
           description: 'Average percentage of time vmware collector processes have been busy in the last minute.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: data-collector
           triggers:
             -
               uuid: a1051b5ac8334125a40cb36a95605284
@@ -509,6 +597,10 @@ zabbix_export:
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,vmware collector,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"vmware collector"}'
               name: 'Zabbix proxy: Utilization of vmware collector processes over {$ZABBIX.PROXY.UTIL.MAX:"vmware collector"}%'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 3b66d42ec1fa4dc7a41750aacf6e68f3
           name: 'Zabbix proxy: Values waiting to be sent'
@@ -518,8 +610,8 @@ zabbix_export:
           description: 'Number of values in the proxy history table waiting to be sent to the server.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: system
         -
           uuid: 2fa1c8d8fcb94d4c83cf4e291420a690
           name: 'Zabbix proxy: Queue over 10 minutes'
@@ -529,8 +621,8 @@ zabbix_export:
           description: 'Number of monitored items in the queue which are delayed at least by 10 minutes.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: system
           triggers:
             -
               uuid: f28d8231e0f2486bb68963719359789c
@@ -538,6 +630,10 @@ zabbix_export:
               name: 'Zabbix proxy: More than 100 items having missing data for more than 10 minutes'
               priority: WARNING
               description: 'zabbix[stats,{$IP},{$PORT},queue,10m] item is collecting data about how many items are missing data for more than 10 minutes.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: cfbb623cca754fd49d4f606ab52f658d
           name: 'Zabbix proxy: Queue'
@@ -547,8 +643,8 @@ zabbix_export:
           description: 'Number of monitored items in the queue which are delayed at least by 6 seconds.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: system
         -
           uuid: 606d1d43812341db8260a233295a4a4e
           name: 'Zabbix proxy: Configuration cache, % used'
@@ -560,8 +656,8 @@ zabbix_export:
           description: 'Availability statistics of Zabbix configuration cache. Percentage of used buffer.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: system
           triggers:
             -
               uuid: 98ae52367f69476dbeb9c50e5f28b429
@@ -569,6 +665,13 @@ zabbix_export:
               name: 'Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX}% used in the configuration cache'
               priority: AVERAGE
               description: 'Consider increasing CacheSize in the zabbix_proxy.conf configuration file.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: ef820395239d4a108980fe53017a89fc
           name: 'Zabbix proxy: Required performance'
@@ -579,8 +682,8 @@ zabbix_export:
           description: 'Required performance of Zabbix proxy, in new values per second expected.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: system
         -
           uuid: ef920914bc00432ea4d4007d09e081df
           name: 'Zabbix proxy: Uptime'
@@ -591,8 +694,8 @@ zabbix_export:
           description: 'Uptime of Zabbix proxy process in seconds.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: system
           triggers:
             -
               uuid: b505a16c50f64adb8c5528907925f798
@@ -601,6 +704,10 @@ zabbix_export:
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 4d38d6d107714c96ae2ed2af44fddb60
           name: 'Zabbix proxy: Version'
@@ -617,8 +724,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: system
           triggers:
             -
               uuid: bf7eef07faf14fc4b2603ae952f001da
@@ -627,6 +734,10 @@ zabbix_export:
               priority: INFO
               description: 'Zabbix proxy version has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: fc7412c1a02240b7931d3511743a2662
           name: 'Zabbix proxy: VMware cache, % used'
@@ -638,8 +749,8 @@ zabbix_export:
           description: 'Availability statistics of Zabbix vmware cache. Percentage of used buffer.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: system
           triggers:
             -
               uuid: 69707cc61b7d408f8683dae435183d4f
@@ -647,6 +758,13 @@ zabbix_export:
               name: 'Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX}% used in the vmware cache'
               priority: AVERAGE
               description: 'Consider increasing VMwareCacheSize in the zabbix_proxy.conf configuration file.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: aec73d2a7e444702b352c75998bf636e
           name: 'Zabbix proxy: History write cache, % used'
@@ -660,8 +778,8 @@ zabbix_export:
             History cache is used to store item values. A high number indicates performance problems on the database side.
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: system
           triggers:
             -
               uuid: dc5a87f6c62d47b08ddd4578aa5f293f
@@ -669,6 +787,13 @@ zabbix_export:
               name: 'Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX}% used in the history cache'
               priority: AVERAGE
               description: 'Consider increasing HistoryCacheSize in the zabbix_proxy.conf configuration file.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 8c4c7802497d4de4988278edc29f8eb1
           name: 'Zabbix proxy: History index cache, % used'
@@ -682,8 +807,8 @@ zabbix_export:
             History index cache is used to index values stored in history cache.
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: system
           triggers:
             -
               uuid: 92b94edb126d48af9e5e959357e2107b
@@ -691,6 +816,13 @@ zabbix_export:
               name: 'Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX}% used in the history index cache'
               priority: AVERAGE
               description: 'Consider increasing HistoryIndexCacheSize in the zabbix_proxy.conf configuration file.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: ba5efd0ed21d4ac39e1375788b7198de
           name: 'Zabbix proxy: Number of processed numeric (float) values per second'
@@ -708,8 +840,8 @@ zabbix_export:
                 - ''
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: system
         -
           uuid: 47cdd6ef01734ec1ab15b0ab43d147ca
           name: 'Zabbix proxy: Number of processed log values per second'
@@ -727,8 +859,8 @@ zabbix_export:
                 - ''
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: system
         -
           uuid: 46574db1d70545f6af89e8607d22f5bb
           name: 'Zabbix proxy: Number of processed not supported values per second'
@@ -746,8 +878,8 @@ zabbix_export:
                 - ''
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: system
         -
           uuid: 5f0c3ed0998e499aaa1e4a30726928fc
           name: 'Zabbix proxy: Number of processed character values per second'
@@ -765,8 +897,8 @@ zabbix_export:
                 - ''
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: system
         -
           uuid: 1c259b08b3ff445f9b2f24a02c07c5db
           name: 'Zabbix proxy: Number of processed text values per second'
@@ -784,8 +916,8 @@ zabbix_export:
                 - ''
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: system
         -
           uuid: 8e4b9641b173415c8608ee4863bcd547
           name: 'Zabbix proxy: Number of processed numeric (unsigned) values per second'
@@ -803,8 +935,8 @@ zabbix_export:
                 - ''
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: system
         -
           uuid: 5229b786efc84f01bb31f2819c47d9f4
           name: 'Zabbix proxy: Number of processed values per second'
@@ -822,8 +954,18 @@ zabbix_export:
                 - ''
           tags:
             -
-              tag: Application
-              value: 'Zabbix proxy'
+              tag: component
+              value: system
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: proxy
+        -
+          tag: target
+          value: zabbix
       macros:
         -
           macro: '{$ZABBIX.PROXY.UTIL.MAX}'

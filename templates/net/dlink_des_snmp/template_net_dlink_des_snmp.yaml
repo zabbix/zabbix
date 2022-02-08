@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-18T20:42:30Z'
+  date: '2022-01-26T14:08:18Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -42,8 +42,11 @@ zabbix_export:
             name: 'Service state'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 5d134da7ad044ab591e1b96e1dca1641
@@ -51,6 +54,10 @@ zabbix_export:
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 1c2d54095100404c8e03b179f5df1761
           name: 'ICMP loss'
@@ -61,8 +68,11 @@ zabbix_export:
           units: '%'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 9c48d97b5d4a4668ad382e1d0d9c8e87
@@ -74,6 +84,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/D-Link DES_DGS Switch SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 3f66e84f94254655add99a1152225df7
           name: 'ICMP response time'
@@ -84,8 +101,11 @@ zabbix_export:
           units: s
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 3959884457a7420a9a9007c550d9b886
@@ -100,6 +120,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/D-Link DES_DGS Switch SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: c7c836a53c134dcda931ef9dba401f35
           name: 'SNMP traps (fallback)'
@@ -112,8 +139,8 @@ zabbix_export:
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: network
         -
           uuid: 29ee9181892b49a081299688f8c47798
           name: 'System contact details'
@@ -135,8 +162,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 9d265ce34e9344c6875497e7ed0ebc89
           name: 'CPU utilization'
@@ -151,8 +178,8 @@ zabbix_export:
             The unit of time is 1 minute. The value will be between 0% (idle) and 100%(very busy).
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
           triggers:
             -
               uuid: 621c4933fd9c4b78aae1eedada7ffedf
@@ -161,6 +188,10 @@ zabbix_export:
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 188e1d65459f40a48c3bc0f444024a00
           name: 'System description'
@@ -183,8 +214,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 8e6d4c6568c54aeeb745c5ba43945174
           name: 'Firmware version'
@@ -203,8 +234,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
           triggers:
             -
               uuid: 40a2ad291ded4bf9bc72adc2b8653b98
@@ -214,6 +245,10 @@ zabbix_export:
               priority: INFO
               description: 'Firmware version has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: cc6cdf26ee0f4c5682c956c0ac741898
           name: 'Hardware model name'
@@ -237,8 +272,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
         -
           uuid: 3dd0e86421b5410f9c34680650a0d9a5
           name: 'Hardware serial number'
@@ -260,8 +295,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
           triggers:
             -
               uuid: 3aa2e47f4b8145b8a5e4f67b0987ca2b
@@ -270,6 +305,10 @@ zabbix_export:
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 06e2bd7f602140f49685ae8dbfa44660
           name: 'Hardware version(revision)'
@@ -288,8 +327,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
         -
           uuid: 22473cfba211477ab8fbbb52c814de0d
           name: 'System location'
@@ -311,8 +350,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 38d68b0f6cd4445b966ead7e7301ae86
           name: 'System name'
@@ -334,8 +373,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: 91e1a9f579c64954a89b6efbf6b523dd
@@ -344,6 +383,13 @@ zabbix_export:
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: security
         -
           uuid: 5697ce18530b44f5a7e342344ecfe89a
           name: 'System object ID'
@@ -364,8 +410,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 5ca0653d792d42d1aebba51b36d5cf31
           name: Uptime
@@ -386,8 +432,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: 7a51877b860a479da9bc9f02ee36e01f
@@ -400,6 +446,10 @@ zabbix_export:
                 -
                   name: 'No SNMP data collection'
                   expression: 'max(/D-Link DES_DGS Switch SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 459f95874d194c7da40752f0336034be
           name: 'SNMP agent availability'
@@ -416,8 +466,11 @@ zabbix_export:
             name: zabbix.host.available
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 2b56c7cfef454441863d2f7cc01a330f
@@ -430,6 +483,10 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/D-Link DES_DGS Switch SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: 8e7fe508f2ee4304a6097cabaf93b44f
@@ -466,8 +523,8 @@ zabbix_export:
                 name: 'EQUIPMENT-MIB::swFanStatus'
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
               trigger_prototypes:
                 -
                   uuid: e8cb2d8bc3ee44c58c5111d3ead41d1b
@@ -476,6 +533,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: 0e1d87089c084979ade1f58cdedd42f8
           name: 'Memory Discovery'
@@ -498,8 +562,8 @@ zabbix_export:
                 The percentage of used DRAM memory of the total DRAM memory available.The value will be between 0%(idle) and 100%(very busy)
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
               trigger_prototypes:
                 -
                   uuid: 29352d2cb80f47d98ca6c6d6d366a29f
@@ -507,6 +571,13 @@ zabbix_export:
                   name: '#{#SNMPVALUE}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: 769bb6f6d6cd455fbbcd1e75e44d24ec
@@ -608,8 +679,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 05ac64b0b74e4e048bbf86c077f23d40
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
@@ -628,8 +705,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: b80ca5f6547b42cba3b873fe58448988
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
@@ -653,8 +736,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: b2eafe0414924c82879bf9f389e7936f
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
@@ -677,8 +766,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 151f1946a56d4ce7b7fe30d2e92f97ef
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
@@ -697,8 +792,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: e9ff8b57e89c4dc787f35ea8dd9c3040
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
@@ -722,8 +823,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: fd5324614a554b20bead9a9300c3b800
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
@@ -748,8 +855,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: b3f4568fbaed497aaf2ebcbfc1a385a6
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
@@ -771,8 +884,14 @@ zabbix_export:
                 name: 'IF-MIB::ifOperStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: 6a8f2b5cd5ec4b8a9e5d35f551a756e0
@@ -790,6 +909,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 2c8eadb9d69f4adb833f01bed8e18531
               name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
@@ -813,8 +936,14 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
           trigger_prototypes:
             -
               uuid: e645a0cf5e4f47a5af03f0108070d4e4
@@ -844,6 +973,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/D-Link DES_DGS Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/D-Link DES_DGS Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/D-Link DES_DGS Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/D-Link DES_DGS Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 8afaa3fc79404673880795d7d7dbabd8
               expression: |
@@ -864,6 +997,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/D-Link DES_DGS Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/D-Link DES_DGS Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/D-Link DES_DGS Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/D-Link DES_DGS Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 28ae5085f4ab432ea281658f1439ada1
               expression: |
@@ -883,6 +1020,13 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/D-Link DES_DGS Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/D-Link DES_DGS Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/D-Link DES_DGS Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/D-Link DES_DGS Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
           graph_prototypes:
             -
               uuid: 5742d0a3c579424e951c8b48f626fe4e
@@ -986,8 +1130,14 @@ zabbix_export:
                 name: 'EtherLike-MIB::dot3StatsDuplexStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: d68607dce04f429ab8cd7e8adb5b60f1
@@ -996,6 +1146,10 @@ zabbix_export:
                   priority: WARNING
                   description: 'Please check autonegotiation settings and cabling'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
           preprocessing:
             -
               type: JAVASCRIPT
@@ -1051,8 +1205,8 @@ zabbix_export:
                 name: 'EQUIPMENT-MIB::swPowerStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Power supply'
+                  tag: component
+                  value: power
               trigger_prototypes:
                 -
                   uuid: aabaa197e62649cd929353f131c3fa00
@@ -1061,6 +1215,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: 17702e5430f943fc9ebeefdbdd363e58
           name: 'Temperature Discovery'
@@ -1083,8 +1244,8 @@ zabbix_export:
                 The shelf current temperature.
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: 0cbd0c61e07245af863a19f296f38195
@@ -1095,6 +1256,13 @@ zabbix_export:
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: bc0c87dbf83e49dab264e9f2bf1bb418
                   expression: 'avg(/D-Link DES_DGS Switch SNMP/sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}],5m)>{$TEMP_WARN:""}'
@@ -1109,6 +1277,13 @@ zabbix_export:
                       name: '#{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
                       expression: 'avg(/D-Link DES_DGS Switch SNMP/sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
                       recovery_expression: 'max(/D-Link DES_DGS Switch SNMP/sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 8d93aea3774d4a3bbd98127273c648d1
                   expression: 'avg(/D-Link DES_DGS Switch SNMP/sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
@@ -1117,6 +1292,23 @@ zabbix_export:
                   name: '#{#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
+      tags:
+        -
+          tag: class
+          value: network
+        -
+          tag: target
+          value: des-dgs
+        -
+          tag: target
+          value: dlink
       macros:
         -
           macro: '{$CPU.UTIL.CRIT}'

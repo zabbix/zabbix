@@ -178,7 +178,7 @@ pid_t		*threads = NULL;
 static int	*threads_flags;
 
 static int	ha_status = ZBX_NODE_STATUS_UNKNOWN;
-static int	ha_status_old;
+static int	ha_failover_delay = ZBX_HA_DEFAULT_FAILOVER_DELAY;
 zbx_cuid_t	ha_sessionid;
 
 unsigned char			program_type	= ZBX_PROGRAM_TYPE_SERVER;
@@ -1184,7 +1184,7 @@ static void	zbx_check_db(void)
  * Purpose: initialize shared resources and start processes                   *
  *                                                                            *
  ******************************************************************************/
-static int	server_startup(zbx_socket_t *listen_sock, zbx_rtc_t *rtc)
+static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failover, zbx_rtc_t *rtc)
 {
 	int	i, ret = SUCCEED;
 	char	*error = NULL;
@@ -1284,14 +1284,14 @@ static int	server_startup(zbx_socket_t *listen_sock, zbx_rtc_t *rtc)
 				if (FAIL == (ret = zbx_rtc_wait_config_sync(rtc)))
 					goto out;
 
-				if (SUCCEED != (ret = zbx_ha_get_status(&ha_status, &error)))
+				if (SUCCEED != (ret = zbx_ha_get_status(ha_stat, ha_failover, &error)))
 				{
 					zabbix_log(LOG_LEVEL_CRIT, "cannot obtain HA status: %s", error);
 					zbx_free(error);
 					goto out;
 				}
 
-				if (ZBX_NODE_STATUS_ACTIVE != ha_status)
+				if (ZBX_NODE_STATUS_ACTIVE != *ha_stat)
 					goto out;
 
 				DBconnect(ZBX_DB_CONNECT_NORMAL);
@@ -1426,7 +1426,7 @@ static int	server_startup(zbx_socket_t *listen_sock, zbx_rtc_t *rtc)
 	}
 
 	/* startup/postinit tasks can take a long time, update status */
-	if (SUCCEED != (ret = zbx_ha_get_status(&ha_status, &error)))
+	if (SUCCEED != (ret = zbx_ha_get_status(ha_stat, ha_failover, &error)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot obtain HA status: %s", error);
 		zbx_free(error);
@@ -1472,7 +1472,6 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 	/* killed during logging. The locks will be re-enabled after logger is reinitialized   */
 	zbx_locks_disable();
 #endif
-
 	zbx_ha_kill();
 
 	for (i = 0; i < threads_num; i++)
@@ -1530,7 +1529,8 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	char		*error = NULL;
-	int		i, db_type, ret;
+	int		i, db_type, ret, ha_status_old;
+
 	zbx_socket_t	listen_sock;
 	time_t		standby_warning_time;
 	zbx_rtc_t	rtc;
@@ -1733,7 +1733,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_TRENDS))
 		zbx_trends_export_init("main-process", 0);
 
-	if (SUCCEED != zbx_ha_get_status(&ha_status, &error))
+	if (SUCCEED != zbx_ha_get_status(&ha_status, &ha_failover_delay, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start server: %s", error);
 		zbx_free(error);
@@ -1742,7 +1742,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
 	{
-		if (SUCCEED != server_startup(&listen_sock, &rtc))
+		if (SUCCEED != server_startup(&listen_sock, &ha_status, &ha_failover_delay, &rtc))
 		{
 			sig_exiting = ZBX_EXIT_FAILURE;
 			ha_status = ZBX_NODE_STATUS_ERROR;
@@ -1757,12 +1757,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	if (ZBX_NODE_STATUS_ERROR != ha_status)
 	{
-		if (NULL == CONFIG_HA_NODE_NAME || '\0' == *CONFIG_HA_NODE_NAME)
-		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "standalone node started in \"%s\" mode",
-					zbx_ha_status_str(ha_status));
-		}
-		else
+		if (ZBX_HA_IS_CLUSTER())
 		{
 			zabbix_log(LOG_LEVEL_INFORMATION, "\"%s\" node started in \"%s\" mode", CONFIG_HA_NODE_NAME,
 					zbx_ha_status_str(ha_status));
@@ -1785,7 +1780,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 		if (NULL == message || ZBX_IPC_SERVICE_HA_RTC_FIRST <= message->code)
 		{
-			if (SUCCEED != zbx_ha_dispatch_message(message, &ha_status, &error))
+			if (SUCCEED != zbx_ha_dispatch_message(message, &ha_status, &ha_failover_delay, &error))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "HA manager error: %s", error);
 				sig_exiting = ZBX_EXIT_FAILURE;
@@ -1822,7 +1817,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			switch (ha_status)
 			{
 				case ZBX_NODE_STATUS_ACTIVE:
-					if (SUCCEED != server_startup(&listen_sock, &rtc))
+					if (SUCCEED != server_startup(&listen_sock, &ha_status, &ha_failover_delay, &rtc))
 					{
 						sig_exiting = ZBX_EXIT_FAILURE;
 						ha_status = ZBX_NODE_STATUS_ERROR;
@@ -1830,8 +1825,10 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 					}
 
 					if (ZBX_NODE_STATUS_ACTIVE != ha_status)
+					{
 						server_teardown(&rtc, &listen_sock);
-
+						ha_status_old = ha_status;
+					}
 					break;
 				case ZBX_NODE_STATUS_STANDBY:
 					server_teardown(&rtc, &listen_sock);
@@ -1865,11 +1862,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		if (-1 == ret && EINTR != errno)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
+			sig_exiting = ZBX_EXIT_FAILURE;
 			break;
 		}
 	}
 
-	zbx_rtc_shutdown_subs(&rtc);
+	if (SUCCEED == ZBX_EXIT_STATUS())
+		zbx_rtc_shutdown_subs(&rtc);
 
 	if (SUCCEED != zbx_ha_pause(&error))
 	{
@@ -1895,11 +1894,19 @@ void	zbx_on_exit(int ret)
 		zbx_free(threads_flags);
 	}
 
-	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
-	{
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 		zbx_locks_disable();
 #endif
+
+	if (SUCCEED != zbx_ha_stop(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot stop HA manager: %s", error);
+		zbx_free(error);
+		zbx_ha_kill();
+	}
+
+	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
+	{
 		free_metrics();
 		zbx_ipc_service_free_env();
 
@@ -1918,12 +1925,6 @@ void	zbx_on_exit(int ret)
 		zbx_vmware_destroy();
 
 		free_selfmon_collector();
-	}
-
-	if (SUCCEED != zbx_ha_stop(&error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot stop HA manager: %s", error);
-		zbx_free(error);
 	}
 
 	zbx_uninitialize_events();

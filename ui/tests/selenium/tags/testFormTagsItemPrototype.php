@@ -28,6 +28,7 @@ class testFormTagsItemPrototype extends testFormTags {
 
 	public $update_name = 'Item prototype with tags for updating: {#KEY}';
 	public $clone_name = 'Item prototype with tags for cloning: {#KEY}';
+	public $remove_name = 'Item prototype for removig tags: {#KEY}';
 	public $link;
 	public $saved_link;
 	public $host = 'Host for tags testing';
@@ -123,5 +124,15 @@ class testFormTagsItemPrototype extends testFormTags {
 		$host_link = 'host_discovery.php?filter_set=1&filter_hostids[0]='.$hostid.'&context=host';
 
 		$this->checkInheritedElementTags($data, 'item prototype', $host_link);
+	}
+
+	/**
+	 * Test removing tags from Item prototype.
+	 */
+	public function testFormTagsItemPrototype_RemoveTags() {
+		$discoveryruleid = CDataHelper::get('EntitiesTags.discoveryruleids.Host for tags testing:trap_discovery');
+		$this->link = 'disc_prototypes.php?parent_discoveryid='.$discoveryruleid.'&context=host';
+		$this->saved_link = 'disc_prototypes.php?form=update&context=host&parent_discoveryid='.$discoveryruleid.'&itemid=';
+		$this->clearTags('item prototype');
 	}
 }
