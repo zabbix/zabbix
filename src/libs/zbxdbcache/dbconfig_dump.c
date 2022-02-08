@@ -738,6 +738,35 @@ static void	DCdump_template_items(void)
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }
 
+static void	DCdump_item_discovery(void)
+{
+	ZBX_DC_ITEM_DISCOVERY	*item_discovery;
+	zbx_hashset_iter_t	iter;
+	int			i;
+	zbx_vector_ptr_t	index;
+
+	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
+
+	zbx_vector_ptr_create(&index);
+	zbx_hashset_iter_reset(&config->item_discovery, &iter);
+
+	while (NULL != (item_discovery = (ZBX_DC_ITEM_DISCOVERY *)zbx_hashset_iter_next(&iter)))
+		zbx_vector_ptr_append(&index, item_discovery);
+
+	zbx_vector_ptr_sort(&index, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+	for (i = 0; i < index.values_num; i++)
+	{
+		item_discovery = (ZBX_DC_ITEM_DISCOVERY *)index.values[i];
+		zabbix_log(LOG_LEVEL_TRACE, "itemid:" ZBX_FS_UI64 " parent_itemid:" ZBX_FS_UI64,
+				item_discovery->itemid, item_discovery->parent_itemid);
+	}
+
+	zbx_vector_ptr_destroy(&index);
+
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
+}
+
 static void	DCdump_master_items(void)
 {
 	ZBX_DC_MASTERITEM	*master_item;
@@ -1344,6 +1373,7 @@ void	DCdump_configuration(void)
 	DCdump_hmacros();
 	DCdump_interfaces();
 	DCdump_items();
+	DCdump_item_discovery();
 	DCdump_interface_snmpitems();
 	DCdump_template_items();
 	DCdump_master_items();
