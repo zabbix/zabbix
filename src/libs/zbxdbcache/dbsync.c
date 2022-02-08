@@ -1928,7 +1928,8 @@ static int	dbsync_compare_item_discovery(const ZBX_DC_ITEM_DISCOVERY *item_disco
 
 /******************************************************************************
  *                                                                            *
- * Purpose: compares items that belong to templates with configuration cache  *
+ * Purpose: compares mapping between items, prototypes and rules with         *
+ *          configuration cache                                               *
  *                                                                            *
  * Return value: SUCCEED - the changeset was successfully calculated          *
  *               FAIL    - otherwise                                          *
