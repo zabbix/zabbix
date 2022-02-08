@@ -1658,7 +1658,7 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 		if (FAIL == dbsync_compare_str(dbrow[11], calcitem->params))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_serialized_expression(dbrow[50], calcitem->formula_bin))
+		if (FAIL == dbsync_compare_serialized_expression(dbrow[49], calcitem->formula_bin))
 			return FAIL;
 	}
 	else if (NULL != calcitem)
