@@ -891,12 +891,8 @@ abstract class CTriggerGeneral extends CApiService {
 			$api_input_rules['fields']['discover'] = ['type' => API_INT32, 'in' => implode(',', [TRIGGER_DISCOVER, TRIGGER_NO_DISCOVER])];
 		}
 		else {
-			if (!~API_ALLOW_LLD_MACRO) {
-				$api_input_rules['fields']['expression']['flags'] = false;
-			}
-			if (!~API_ALLOW_LLD_MACRO) {
-				$api_input_rules['fields']['recovery_expression']['flags'] = false;
-			}
+			$api_input_rules['fields']['expression']['flags'] &= ~API_ALLOW_LLD_MACRO;
+			$api_input_rules['fields']['recovery_expression']['flags'] &= ~API_ALLOW_LLD_MACRO;
 		}
 		if (!CApiInputValidator::validate($api_input_rules, $triggers, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -997,12 +993,8 @@ abstract class CTriggerGeneral extends CApiService {
 			$api_input_rules['fields']['discover'] = ['type' => API_INT32, 'in' => implode(',', [TRIGGER_DISCOVER, TRIGGER_NO_DISCOVER])];
 		}
 		else {
-			if (!~API_ALLOW_LLD_MACRO) {
-				$api_input_rules['fields']['expression']['flags'] = false;
-			}
-			if (!~API_ALLOW_LLD_MACRO) {
-				$api_input_rules['fields']['recovery_expression']['flags'] = false;
-			}
+			$api_input_rules['fields']['expression']['flags'] &= ~API_ALLOW_LLD_MACRO;
+			$api_input_rules['fields']['recovery_expression']['flags'] &= ~API_ALLOW_LLD_MACRO;
 		}
 		if (!CApiInputValidator::validate($api_input_rules, $triggers, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -1668,9 +1660,8 @@ abstract class CTriggerGeneral extends CApiService {
 					$lld_ruleids[$key['lld_ruleid']] = true;
 				}
 
-				if ($host_keys['status'] == HOST_STATUS_TEMPLATE ? 0x01 : 0x02) {
-					$status_mask = true;
-				}
+				$status_mask |= ($host_keys['status'] == HOST_STATUS_TEMPLATE ? 0x01 : 0x02);
+
 				$hostids[$host_keys['hostid']] = true;
 				$hosts[$host] = true;
 			}

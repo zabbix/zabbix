@@ -372,7 +372,6 @@ elseif (hasRequest('action') && getRequest('action') === 'graph.masscopyto' && h
 			foreach ($dbHosts as $host) {
 				if (!copyGraphToHost($graphid, $host['hostid'])) {
 					$result = false;
-					break;
 				}
 			}
 		}

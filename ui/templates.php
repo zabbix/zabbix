@@ -342,10 +342,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			if ($dbTriggers) {
 				if (!copyTriggersToHosts(zbx_objectValues($dbTriggers, 'triggerid'),
 					$input_templateid, $cloneTemplateId)) {
-					$result = false;
-				}
-
-				if (!$result) {
 					throw new Exception();
 				}
 			}

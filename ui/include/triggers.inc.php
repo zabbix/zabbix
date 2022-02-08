@@ -555,7 +555,7 @@ function getTriggersOverviewData(array $groupids, array $host_options = [], arra
 
 		$db_hosts = array_intersect_key($db_hosts, $represented_hosts);
 
-		if(!(count($db_hosts) < $limit)) {
+		if(count($db_hosts) >= $limit) {
 			$fetch_hosts = false;
 		}
 		$limit += (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE);

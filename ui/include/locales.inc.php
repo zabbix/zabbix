@@ -19,25 +19,6 @@
 **/
 
 
-function init_mbstrings() {
-	$res = true;
-	if (!extension_loaded('mbstring')) {
-		$res = false;
-	}
-
-	ini_set('default_charset', 'UTF-8');
-	if (!(ini_get('default_charset') === 'UTF-8')) {
-		$res = false;
-	}
-
-	ini_set('mbstring.detect_order', 'UTF-8, ISO-8859-1, JIS, SJIS');
-	if (!(ini_get('mbstring.detect_order') === 'UTF-8, ISO-8859-1, JIS, SJIS')) {
-		$res = false;
-	}
-
-	return $res;
-}
-
 /**
  * Returns a list of all used locales.
  *

@@ -35,9 +35,7 @@ class CJsonExportWriter extends CExportWriter {
 		$options = JSON_UNESCAPED_SLASHES;
 
 		if ($this->formatOutput) {
-			if (JSON_PRETTY_PRINT) {
-				$options = true;
-			}
+			$options |= JSON_PRETTY_PRINT;
 		}
 
 		return json_encode($array, $options);

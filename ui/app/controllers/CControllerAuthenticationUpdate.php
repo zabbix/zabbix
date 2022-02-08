@@ -241,10 +241,7 @@ class CControllerAuthenticationUpdate extends CController {
 		$input['passwd_check_rules'] = 0x00;
 
 		foreach ($rules as $rule) {
-			if ($rule){
-				$input['passwd_check_rules'] = true;
-				break;
-			}
+			$input['passwd_check_rules'] |= $rule;
 		}
 
 		// CNewValidator thinks int32 must be a string type integer.
@@ -378,10 +375,7 @@ class CControllerAuthenticationUpdate extends CController {
 		$data['passwd_check_rules'] = 0x00;
 
 		foreach ($rules as $rule) {
-			if($rule) {
-				$data['passwd_check_rules'] = true;
-				break;
-			}
+			$data['passwd_check_rules'] |= $rule;
 		}
 
 		$data = array_diff_assoc($data, $auth);

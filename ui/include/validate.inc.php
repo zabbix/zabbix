@@ -154,7 +154,6 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 		foreach ($var as $v) {
 			if (check_type($field, $flags, $v, $type)) {
 				$err = true;
-				break;
 			}
 		}
 

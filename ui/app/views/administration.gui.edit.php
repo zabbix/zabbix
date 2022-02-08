@@ -51,9 +51,8 @@ foreach (getLocales() as $localeid => $locale) {
 
 	$lang_select->addOption((new CSelectOption($localeid, $locale['name']))->setDisabled(!$locale_available));
 
-	if (!((int) $locale_available)) {
+	if (!$locale_available) {
 		$all_locales_available = false;
-		break;
 	}
 }
 

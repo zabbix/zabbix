@@ -329,7 +329,6 @@ class CDataHelper extends CAPIHelper {
 			foreach ($source as $name) {
 				if (!static::load($name)) {
 					$result = false;
-					break;
 				}
 			}
 

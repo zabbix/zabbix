@@ -829,7 +829,6 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 					CSettingsHelper::BLINK_PERIOD
 				))) {
 				$i['latelyChanged'] = true;
-				break;
 			}
 		}
 
