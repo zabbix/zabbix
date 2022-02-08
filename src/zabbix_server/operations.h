@@ -22,6 +22,7 @@
 
 #include "db.h"
 #include "zbxalgo.h"
+#include "dbcache.h"
 
 extern int	CONFIG_TIMEOUT;
 

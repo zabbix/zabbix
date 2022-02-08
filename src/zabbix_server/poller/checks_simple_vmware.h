@@ -20,6 +20,8 @@
 #ifndef ZABBIX_CHECKS_SIMPLE_VMWARE_H
 #define ZABBIX_CHECKS_SIMPLE_VMWARE_H
 
+#include "config.h"
+
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 #include "module.h"
 #include "zbxalgo.h"

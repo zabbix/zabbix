@@ -21,7 +21,6 @@
 
 #include "common.h"
 #include "db.h"
-#include "dbcache.h"
 #include "daemon.h"
 #include "zbxserver.h"
 #include "zbxself.h"

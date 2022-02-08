@@ -20,8 +20,6 @@
 #include "history_compress.h"
 
 #include "common.h"
-#include "zbxdb.h"
-#include "dbcache.h"
 #include "log.h"
 
 #if defined(HAVE_POSTGRESQL)

@@ -21,7 +21,6 @@
 
 #include "common.h"
 #include "cfg.h"
-#include "pid.h"
 #include "db.h"
 #include "dbcache.h"
 #include "zbxdbupgrade.h"
@@ -31,12 +30,10 @@
 
 #include "sysinfo.h"
 #include "zbxmodules.h"
-#include "zbxserver.h"
 
 #include "zbxnix.h"
 #include "daemon.h"
 #include "zbxself.h"
-#include "../libs/zbxnix/control.h"
 
 #include "../zabbix_server/dbsyncer/dbsyncer.h"
 #include "../zabbix_server/discoverer/discoverer.h"
@@ -60,7 +57,6 @@
 #include "../zabbix_server/preprocessor/preproc_worker.h"
 #include "../zabbix_server/availability/avail_manager.h"
 #include "zbxvault.h"
-#include "zbxdiag.h"
 #include "sighandler.h"
 #include "zbxrtc.h"
 

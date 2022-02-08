@@ -23,7 +23,6 @@
 #include "comms.h"
 #include "db.h"
 #include "log.h"
-#include "dbcache.h"
 #include "../../libs/zbxaudit/audit.h"
 #include "../../libs/zbxaudit/audit_host.h"
 
