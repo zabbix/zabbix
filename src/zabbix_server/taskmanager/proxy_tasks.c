@@ -95,6 +95,7 @@ void	zbx_tm_get_remote_tasks(zbx_vector_ptr_t *tasks, zbx_uint64_t proxy_hostid)
 				task->data = (void *)zbx_tm_check_now_create(itemid);
 				break;
 			case ZBX_TM_TASK_DATA:
+			case ZBX_TM_PROXYDATA:
 				if (SUCCEED == DBis_null(row[17]))
 				{
 					zbx_free(task);

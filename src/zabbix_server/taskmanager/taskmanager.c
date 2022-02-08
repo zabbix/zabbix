@@ -30,6 +30,8 @@
 #include "taskmanager.h"
 #include "zbxdiag.h"
 #include "service_protocol.h"
+#include "zbxjson.h"
+#include "zbxrtc.h"
 
 #define ZBX_TM_PROCESS_PERIOD		5
 #define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR
@@ -590,6 +592,75 @@ static void	tm_process_diaginfo(zbx_uint64_t taskid, const char *data)
 	zbx_tm_task_free(task);
 }
 
+static void	tm_create_active_proxy_reload_task(zbx_uint64_t proxyid)
+{
+	zbx_tm_task_t	*task;
+	zbx_uint64_t	taskid;
+
+	taskid = DBget_maxid("task");
+
+	DBbegin();
+
+	task = zbx_tm_task_create(taskid, ZBX_TM_TASK_DATA, ZBX_TM_STATUS_NEW, time(NULL), 0, proxyid);
+
+	task->data = zbx_tm_data_create(taskid, "", 1, ZBX_TM_DATA_TYPE_PROXY_CONFIG_RELOAD);
+
+	if (FAIL == zbx_tm_save_task(task))
+		taskid = 0;
+
+	DBcommit();
+
+	zbx_tm_task_free(task);
+}
+
+
+static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, const char *data)
+{
+	struct zbx_json_parse	jp, jp_data;
+	const char		*ptr;
+	char			hostid[16];
+	int			passive_proxy_count = 0;
+
+	if (FAIL == zbx_json_open(data, &jp))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to parse proxy config cache reload task data");
+		return;
+	}
+
+	if (FAIL == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_PROXYIDS_LIST, &jp_data))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to parse proxy config cache reload task data: field "
+				ZBX_PROTO_TAG_PROXYIDS_LIST "not found");
+		return;
+	}
+
+	for (ptr = NULL; NULL != (ptr = zbx_json_next(&jp_data, ptr));)
+	{
+		if (NULL != zbx_json_decodevalue(ptr, hostid, sizeof(hostid), NULL))
+		{
+			zbx_uint64_t	proxyid;
+			int		type;
+
+			ZBX_STR2UINT64(proxyid, ptr);
+
+			zbx_dc_get_proxy_type_by_id(proxyid, &type);
+
+			if (HOST_STATUS_PROXY_ACTIVE == type)
+			{
+				tm_create_active_proxy_reload_task(proxyid);
+			}
+			else if (HOST_STATUS_PROXY_PASSIVE == type)
+			{
+				zbx_dc_update_passive_proxy_nextcheck(proxyid);
+				passive_proxy_count++;
+			}
+		}
+	}
+
+	if (passive_proxy_count > 0)
+		zbx_ipc_async_socket_send(rtc, ZBX_RTC_PROXYPOLLER_PROCESS, NULL, 0);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: process data tasks                                                *
@@ -597,7 +668,7 @@ static void	tm_process_diaginfo(zbx_uint64_t taskid, const char *data)
  * Return value: The number of successfully processed tasks                   *
  *                                                                            *
  ******************************************************************************/
-static int	tm_process_data(zbx_vector_uint64_t *taskids)
+static int	tm_process_data(zbx_ipc_async_socket_t *rtc, zbx_vector_uint64_t *taskids)
 {
 	DB_ROW			row;
 	DB_RESULT		result;
@@ -637,6 +708,10 @@ static int	tm_process_data(zbx_vector_uint64_t *taskids)
 
 		switch (data_type)
 		{
+			case ZBX_TM_DATA_TYPE_PROXY_CONFIG_RELOAD:
+				tm_process_proxy_config_reload_task(rtc, row[2]);
+				zbx_vector_uint64_append(&done_taskids, taskid);
+				break;
 			case ZBX_TM_DATA_TYPE_DIAGINFO:
 				tm_process_diaginfo(taskid, row[2]);
 				zbx_vector_uint64_append(&done_taskids, taskid);
@@ -694,7 +769,7 @@ static int	tm_expire_generic_tasks(zbx_vector_uint64_t *taskids)
  * Return value: The number of successfully processed tasks                   *
  *                                                                            *
  ******************************************************************************/
-static int	tm_process_tasks(int now)
+static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 {
 	DB_ROW			row;
 	DB_RESULT		result;
@@ -750,6 +825,7 @@ static int	tm_process_tasks(int now)
 					zbx_vector_uint64_append(&check_now_taskids, taskid);
 				break;
 			case ZBX_TM_TASK_DATA:
+			case ZBX_TM_PROXYDATA:
 				/* both - 'new' and 'in progress' tasks should expire */
 				if (0 != ttl && clock + ttl < now)
 					zbx_vector_uint64_append(&expire_taskids, taskid);
@@ -775,7 +851,7 @@ static int	tm_process_tasks(int now)
 		processed_num += tm_process_check_now(&check_now_taskids);
 
 	if (0 < data_taskids.values_num)
-		processed_num += tm_process_data(&data_taskids);
+		processed_num += tm_process_data(rtc, &data_taskids);
 
 	if (0 < expire_taskids.values_num)
 		expired_num += tm_expire_generic_tasks(&expire_taskids);
@@ -801,11 +877,41 @@ static void	tm_remove_old_tasks(int now)
 	DBcommit();
 }
 
+static void	tm_reload_all_proxies(zbx_ipc_async_socket_t *rtc)
+{
+	int			i;
+	zbx_vector_uint64_t	act, pas;
+
+	zbx_vector_uint64_create(&act);
+	zbx_vector_uint64_create(&pas);
+
+	zbx_dc_get_all_proxies(&act, &pas);
+
+	for (i = 0; i < act.values_num; i++)
+	{
+		tm_create_active_proxy_reload_task(act.values[i]);
+	}
+
+	if (pas.values_num > 0)
+	{
+		for (i = 0; i < pas.values_num; i++)
+		{
+			zbx_dc_update_passive_proxy_nextcheck(pas.values[i]);
+		}
+
+		zbx_ipc_async_socket_send(rtc, ZBX_RTC_PROXYPOLLER_PROCESS, NULL, 0);
+	}
+
+	zbx_vector_uint64_destroy(&act);
+	zbx_vector_uint64_destroy(&pas);
+}
+
 ZBX_THREAD_ENTRY(taskmanager_thread, args)
 {
-	static int	cleanup_time = 0;
-	double		sec1, sec2;
-	int		tasks_num, sleeptime, nextcheck;
+	static int		cleanup_time = 0;
+	double			sec1, sec2;
+	int			tasks_num, sleeptime, nextcheck;
+	zbx_ipc_async_socket_t	rtc;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -828,16 +934,67 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 
 	zbx_setproctitle("%s [started, idle %d sec]", get_process_type_string(process_type), sleeptime);
 
+	zbx_rtc_subscribe(&rtc, process_type, process_num);
+
 	while (ZBX_IS_RUNNING())
 	{
-		zbx_sleep_loop(sleeptime);
+		zbx_uint32_t	rtc_cmd;
+		unsigned char	*rtc_data;
 
+		if (SUCCEED == zbx_rtc_wait(&rtc, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
+		{
+			if (ZBX_RTC_PROXY_CONFIG_CACHE_RELOAD == rtc_cmd)
+			{
+				struct zbx_json_parse	jp, jp_data;
+				const char		*ptr;
+				char			name[HOST_NAME_LEN + 1];
+				int			passive_proxy_count = 0;
+
+				if (FAIL == zbx_json_open(rtc_data, &jp))
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "failed to parse proxy config cache reload data");
+					goto rtc_skip;
+				}
+
+				if (FAIL == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_PROXY_LIST, &jp_data))
+				{
+					tm_reload_all_proxies(&rtc);
+					goto rtc_skip;
+				}
+
+				for (ptr = NULL; NULL != (ptr = zbx_json_next(&jp_data, ptr));)
+				{
+					if (NULL != zbx_json_decodevalue(ptr, name, sizeof(name), NULL))
+					{
+						zbx_uint64_t	proxyid;
+						unsigned char	type;
+
+						if (FAIL == zbx_dc_get_proxyid_by_name(name, &proxyid, &type))
+							continue;
+
+						if (HOST_STATUS_PROXY_ACTIVE == type)
+						{
+							tm_create_active_proxy_reload_task(proxyid);
+						}
+						else if (HOST_STATUS_PROXY_PASSIVE == type)
+						{
+							zbx_dc_update_passive_proxy_nextcheck(proxyid);
+							passive_proxy_count++;
+						}
+					}
+				}
+
+				if (passive_proxy_count > 0)
+					zbx_ipc_async_socket_send(&rtc, ZBX_RTC_PROXYPOLLER_PROCESS, NULL, 0);
+			}
+		}
+rtc_skip:
 		sec1 = zbx_time();
 		zbx_update_env(sec1);
 
 		zbx_setproctitle("%s [processing tasks]", get_process_type_string(process_type));
 
-		tasks_num = tm_process_tasks((int)sec1);
+		tasks_num = tm_process_tasks(&rtc, (int)sec1);
 		if (ZBX_TM_CLEANUP_PERIOD <= sec1 - cleanup_time)
 		{
 			tm_remove_old_tasks((int)sec1);

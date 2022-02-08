@@ -357,6 +357,8 @@ int	zbx_rtc_init(zbx_rtc_t *rtc ,char **error)
 	return zbx_ipc_service_start(&rtc->service, ZBX_IPC_SERVICE_RTC, error);
 }
 
+extern unsigned char	program_type;
+
 /******************************************************************************
  *                                                                            *
  * Purpose: accept and process runtime control request                        *
@@ -370,6 +372,15 @@ void	zbx_rtc_dispatch(zbx_rtc_t *rtc, zbx_ipc_client_t *client, zbx_ipc_message_
 	{
 		case ZBX_RTC_SUBSCRIBE:
 			rtc_subscribe(rtc, client, message->data);
+			break;
+		case ZBX_RTC_CONFIG_CACHE_RELOAD:
+			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+				rtc_notify(rtc, ZBX_PROCESS_TYPE_CONFSYNCER, 0, ZBX_RTC_CONFIG_CACHE_RELOAD, NULL, 0);
+			else
+				rtc_process(rtc, client, (int)message->code, message->data);
+			break;
+		case ZBX_RTC_PROXYPOLLER_PROCESS:
+			rtc_notify(rtc, ZBX_PROCESS_TYPE_PROXYPOLLER, 0, ZBX_RTC_PROXYPOLLER_PROCESS, NULL, 0);
 			break;
 		case ZBX_RTC_CONFIG_CACHE_RELOAD_WAIT:
 			rtc_add_control_hook(rtc, client, ZBX_RTC_CONFIG_SYNC_NOTIFY);

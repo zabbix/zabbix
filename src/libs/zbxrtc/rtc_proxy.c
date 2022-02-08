@@ -44,8 +44,7 @@ int	rtc_process_request_ex(zbx_rtc_t *rtc, int code, const unsigned char *data, 
 		case ZBX_RTC_CONFIG_CACHE_RELOAD:
 			if (ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE)
 			{
-				*result = zbx_strdup(NULL, "Cannot perform configuration cache reloading on passive"
-						" proxy\n");
+				rtc_notify(rtc, ZBX_PROCESS_TYPE_TASKMANAGER, 0, ZBX_RTC_CONFIG_CACHE_RELOAD, NULL, 0);
 				return SUCCEED;
 			}
 			return FAIL;

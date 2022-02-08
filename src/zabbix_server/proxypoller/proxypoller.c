@@ -32,6 +32,7 @@
 #include "zbxcrypto.h"
 #include "../trapper/proxydata.h"
 #include "zbxcompress.h"
+#include "zbxrtc.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
@@ -550,7 +551,6 @@ static int	process_proxy(void)
 
 			if (proxy.proxy_data_nextcheck <= now)
 			{
-
 				int	more;
 
 				do
@@ -586,9 +586,10 @@ exit:
 
 ZBX_THREAD_ENTRY(proxypoller_thread, args)
 {
-	int	nextcheck, sleeptime = -1, processed = 0, old_processed = 0;
-	double	sec, total_sec = 0.0, old_total_sec = 0.0;
-	time_t	last_stat_time;
+	int			nextcheck, sleeptime = -1, processed = 0, old_processed = 0;
+	double			sec, total_sec = 0.0, old_total_sec = 0.0;
+	time_t			last_stat_time;
+	zbx_ipc_async_socket_t	rtc;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -610,8 +611,13 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
+	zbx_rtc_subscribe(&rtc, process_type, process_num);
+
 	while (ZBX_IS_RUNNING())
 	{
+		zbx_uint32_t	rtc_cmd;
+		unsigned char	*rtc_data;
+
 		sec = zbx_time();
 		zbx_update_env(sec);
 
@@ -649,7 +655,11 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 			last_stat_time = time(NULL);
 		}
 
-		zbx_sleep_loop(sleeptime);
+		if (SUCCEED == zbx_rtc_wait(&rtc, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
+		{
+			if (rtc_cmd == ZBX_RTC_PROXYPOLLER_PROCESS)
+				continue;
+		}
 	}
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);

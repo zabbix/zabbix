@@ -12841,6 +12841,98 @@ out:
 	return ret;
 }
 
+int	zbx_dc_get_proxyid_by_name(const char *name, zbx_uint64_t *proxyid, unsigned char *type)
+{
+	int			ret = FAIL;
+	const ZBX_DC_HOST	*dc_host;
+	const ZBX_DC_PROXY	*dc_proxy;
+
+	RDLOCK_CACHE;
+
+	if (NULL == (dc_host = DCfind_proxy(name)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to reload configuration cache on proxy '%s': failed to find "
+				"proxy", name);
+		goto out;
+	}
+
+	*type = dc_host->status;
+
+	if (NULL == (dc_proxy = (const ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &dc_host->hostid)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to reload configuration cache on proxy '%s': failed to find "
+				"proxy", name);
+		goto out;
+	}
+	else
+		*proxyid = dc_proxy->hostid;
+
+	ret = SUCCEED;
+out:
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
+void	zbx_dc_update_passive_proxy_nextcheck(zbx_uint64_t proxyid)
+{
+	ZBX_DC_PROXY	*dc_proxy;
+
+	RDLOCK_CACHE;
+
+	if (NULL == (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &proxyid)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to reload configuration cache on proxy with id %i: failed to "
+				"update nextcheck", proxyid);
+		goto out;
+	}
+
+	dc_proxy->proxy_config_nextcheck = time(0);
+out:
+	UNLOCK_CACHE;
+}
+
+void	zbx_dc_get_all_proxies(zbx_vector_uint64_t *active_proxyids, zbx_vector_uint64_t *passive_proxyids)
+{
+	ZBX_DC_HOST_H		*dc_host;
+	ZBX_DC_PROXY		*proxy;
+	zbx_hashset_iter_t	iter;
+
+	RDLOCK_CACHE;
+
+	zbx_hashset_iter_reset(&config->hosts_p, &iter);
+
+	while (NULL != (dc_host = (ZBX_DC_HOST_H *)zbx_hashset_iter_next(&iter)))
+	{
+		if (dc_host->host_ptr->status == HOST_STATUS_PROXY_ACTIVE)
+		{
+			zbx_vector_uint64_append(active_proxyids, dc_host->host_ptr->hostid);
+		}
+		else if (dc_host->host_ptr->status == HOST_STATUS_PROXY_PASSIVE)
+		{
+			zbx_vector_uint64_append(passive_proxyids, dc_host->host_ptr->hostid);
+		}
+	}
+
+	UNLOCK_CACHE;
+}
+
+int	zbx_dc_get_proxy_type_by_id(zbx_uint64_t proxyid, int *status)
+{
+	int			found = 0;
+	ZBX_DC_HOST		*dc_host;
+	ZBX_DC_PROXY		*proxy;
+
+	dc_host = (ZBX_DC_HOST *)DCfind_id(&config->hosts, proxyid, sizeof(ZBX_DC_HOST), &found);
+
+	if (NULL == dc_host)
+		return FAIL;
+
+	*status = dc_host->status;
+
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: updates item nextcheck values in configuration cache              *

@@ -123,6 +123,58 @@ int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data, char 
 		}
 	}
 
+	if (0 == strncmp(opt, ZBX_PROXY_CONFIG_CACHE_RELOAD, ZBX_CONST_STRLEN(ZBX_PROXY_CONFIG_CACHE_RELOAD)))
+	{
+		struct zbx_json	j;
+		param = opt + ZBX_CONST_STRLEN(ZBX_PROXY_CONFIG_CACHE_RELOAD);
+
+		zbx_json_init(&j, 1024);
+
+		if ('=' == *param)
+		{
+			char	*token;
+			char	*p;
+
+			if ('\0' == *(param + 1))
+			{
+				*error = zbx_strdup(NULL, "missing proxy name(s)");
+				return FAIL;
+			}
+
+			p = zbx_strdup(NULL, param + 1);
+
+			zbx_json_addarray(&j, ZBX_PROTO_TAG_PROXY_LIST);
+
+			token = strtok(p, ",");
+
+			while (NULL != token)
+			{
+				zbx_json_addstring(&j, NULL, token, ZBX_JSON_TYPE_STRING);
+				token = strtok(NULL, ",");
+			}
+
+			zbx_json_close(&j);
+			*data = zbx_strdup(NULL, j.buffer);
+			zbx_json_free(&j);
+			zbx_free(p);
+
+			*code = ZBX_RTC_PROXY_CONFIG_CACHE_RELOAD;
+
+			return SUCCEED;
+		}
+
+		if ('\0' == *param)
+		{
+			zbx_json_close(&j);
+			*data = zbx_strdup(NULL, j.buffer);
+			zbx_json_free(&j);
+
+			*code = ZBX_RTC_PROXY_CONFIG_CACHE_RELOAD;
+
+			return SUCCEED;
+		}
+	}
+
 	return SUCCEED;
 }
 
@@ -448,6 +500,10 @@ int	rtc_process_request_ex(zbx_rtc_t *rtc, int code, const unsigned char *data, 
 			return SUCCEED;
 		case ZBX_RTC_HA_REMOVE_NODE:
 			rtc_ha_remove_node((const char *)data, result);
+			return SUCCEED;
+		case ZBX_RTC_PROXY_CONFIG_CACHE_RELOAD:
+			rtc_notify(rtc, ZBX_PROCESS_TYPE_TASKMANAGER, 0, ZBX_RTC_PROXY_CONFIG_CACHE_RELOAD,
+					data, (zbx_uint32_t)strlen(data) + 1);
 			return SUCCEED;
 	}
 
