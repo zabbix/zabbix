@@ -11302,9 +11302,7 @@ static int	dc_trigger_items_hosts_enabled(const char *expression, const unsigned
 	zbx_vector_uint64_t	functionids;
 
 	zbx_vector_uint64_create(&functionids);
-
-	if (FAIL == zbx_get_serialized_expression_functionids(expression, data, &functionids))
-		goto out;
+	zbx_get_serialized_expression_functionids(expression, data, &functionids);
 
 	for (i = 0; i < functionids.values_num; i++)
 	{
