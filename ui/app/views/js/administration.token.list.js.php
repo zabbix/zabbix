@@ -79,9 +79,6 @@
 
 			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.tokenSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.tokenDelete, {once: true});
-			overlay.$dialogue[0].addEventListener('overlay.close', () => {
-				history.replaceState({}, '', original_url);
-			}, {once: true});
 		},
 
 		massDeleteToken(target, tokenids) {

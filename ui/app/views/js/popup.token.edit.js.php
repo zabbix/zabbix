@@ -49,8 +49,10 @@ window.token_edit_popup = {
 	},
 
 	addEventListeners() {
-		this.enableNavigationWarning();
-		this.overlay.$dialogue[0].addEventListener('overlay.close', this.events.overlayClose, {once: true});
+		this.overlay.$dialogue[0].addEventListener('overlay.close', () => {
+			history.replaceState({}, '', location.href);
+			location.href = location.href;
+		}, {once: true});
 		this.expires_state.addEventListener('change', () => this.expiresAtHandler());
 	},
 
@@ -120,7 +122,6 @@ window.token_edit_popup = {
 
 	close() {
 		overlayDialogueDestroy(this.overlay.dialogueid);
-		location.href = location.href;
 	},
 
 	removePopupMessages() {
@@ -129,14 +130,6 @@ window.token_edit_popup = {
 				el.parentNode.removeChild(el);
 			}
 		}
-	},
-
-	enableNavigationWarning() {
-		window.addEventListener('beforeunload', this.events.beforeUnload, {passive: false});
-	},
-
-	disableNavigationWarning() {
-		window.removeEventListener('beforeunload', this.events.beforeUnload);
 	},
 
 	ajaxExceptionHandler: (exception) => {
@@ -220,18 +213,6 @@ window.token_edit_popup = {
 				}
 				this.overlay.setProperties(response);
 			});
-	},
-
-	events: {
-		beforeUnload(e) {
-			// Display confirmation message.
-			e.preventDefault();
-			e.returnValue = '';
-		},
-
-		overlayClose() {
-			token_edit_popup.disableNavigationWarning();
-		}
 	}
 };
 
