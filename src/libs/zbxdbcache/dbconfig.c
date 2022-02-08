@@ -6390,7 +6390,7 @@ void	DCsync_configuration(unsigned char mode)
 	}
 
 	update_sec = zbx_time() - sec;
-	zabbix_increase_log_level();
+
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
 		total = csec + hsec + hisec + htsec + gmsec + hmsec + ifsec + idsec + isec +  tisec + pisec + tsec + dsec + fsec + expr_sec +
@@ -6658,7 +6658,6 @@ void	DCsync_configuration(unsigned char mode)
 
 		zbx_mem_dump_stats(LOG_LEVEL_DEBUG, config_mem);
 	}
-	zabbix_decrease_log_level();
 out:
 	if (0 == sync_in_progress)
 	{
