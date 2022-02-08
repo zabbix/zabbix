@@ -23,9 +23,11 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
- * @backup config, widget, hosts
+ * @backup widget, hosts
  *
  * @onBefore prepareZoomData
+ *
+ * @ignoreBrowserErrors
  */
 class testGeomapWidgetScreenshots extends CWebTest {
 
@@ -38,17 +40,23 @@ class testGeomapWidgetScreenshots extends CWebTest {
 			'hostids' => [
 				'Riga' => null,
 				'Tallin' => null,
-				'Vilnius' => null
+				'Vilnius' => null,
+				'Oslo' => null,
+				'Bergen' => null
 			],
 			'itemids' => [
 				'Riga' => null,
 				'Tallin' => null,
-				'Vilnius' => null
+				'Vilnius' => null,
+				'Oslo' => null,
+				'Bergen' => null
 			],
 			'triggerids' => [
 				'Riga' => null,
 				'Tallin' => null,
-				'Vilnius' => null
+				'Vilnius' => null,
+				'Oslo' => null,
+				'Bergen' => null
 			]
 		];
 
@@ -59,19 +67,21 @@ class testGeomapWidgetScreenshots extends CWebTest {
 		self::$cities['hostgroupid'] = $hostgroups['groupids'][0];
 
 		// Create hosts for items and triggers.
-		$cities_names = [
-			'Riga' => ['latitude' => '56.9546328976717', 'longitude' => '24.1207979437706'],
-			'Tallin' => ['latitude' => '59.4349125678522', 'longitude' => '24.7568789765827'],
-			'Vilnius' => ['latitude' => '54.6879298114432', 'longitude' => '25.2793571402776']
+		$cities_location = [
+			['name' => 'Riga', 'latitude' => '56.9546328976717', 'longitude' => '24.1207979437706'],
+			['name' => 'Tallin', 'latitude' => '59.4349125678522', 'longitude' => '24.7568789765827'],
+			['name' => 'Vilnius', 'latitude' => '54.6879298114432', 'longitude' => '25.2793571402776'],
+			['name' => 'Oslo', 'latitude' => '59.9161327671058', 'longitude' => '10.7554327978315'],
+			['name' => 'Bergen', 'latitude' => '60.3995117455505', 'longitude' => '5.20166836521941']
 		];
 
 		$hosts_data = [];
-		foreach ($cities_names as $name => $location) {
+		foreach ($cities_location as $city) {
 				$hosts_data[] = [
-					'host' => $name,
+					'host' => $city['name'],
 					'groups' => [['groupid' => self::$cities['hostgroupid']]],
 					'inventory_mode' => 0,
-					'inventory' => ['location_lat' => $location['latitude'], 'location_lon' => $location['longitude']],
+					'inventory' => ['location_lat' => $city['latitude'], 'location_lon' => $city['longitude']],
 				];
 		}
 
@@ -82,6 +92,9 @@ class testGeomapWidgetScreenshots extends CWebTest {
 		self::$cities['hostids']['Riga'] = $hostids['Riga'];
 		self::$cities['hostids']['Tallin'] = $hostids['Tallin'];
 		self::$cities['hostids']['Vilnius'] = $hostids['Vilnius'];
+		self::$cities['hostids']['Oslo'] = $hostids['Oslo'];
+		self::$cities['hostids']['Bergen'] = $hostids['Bergen'];
+
 
 		// Create items on previously created hosts.
 		$items_data = [];
@@ -100,13 +113,16 @@ class testGeomapWidgetScreenshots extends CWebTest {
 		self::$cities['itemids']['Riga'] = $items['itemids'][0];
 		self::$cities['itemids']['Tallin'] = $items['itemids'][1];
 		self::$cities['itemids']['Vilnius'] = $items['itemids'][2];
+		self::$cities['itemids']['Oslo'] = $items['itemids'][3];
+		self::$cities['itemids']['Bergen'] = $items['itemids'][4];
 
 		// Create triggers based on items.
 		$triggers_data = [];
-		foreach ($cities_names as $host => $location) {
+		foreach ($cities_location as $i => $city) {
 			$triggers_data[] = [
-				'description' => 'Trigger '.$host,
-				'expression' => 'last(/'.$host.'/trapper)=0',
+				'description' => 'Trigger '.$city['name'],
+				'expression' => 'last(/'.$city['name'].'/trapper)=0',
+				'priority' => $i
 			];
 		}
 
@@ -115,6 +131,8 @@ class testGeomapWidgetScreenshots extends CWebTest {
 		self::$cities['triggerids']['Riga'] = $triggers['triggerids'][0];
 		self::$cities['triggerids']['Tallin'] = $triggers['triggerids'][1];
 		self::$cities['triggerids']['Vilnius'] = $triggers['triggerids'][2];
+		self::$cities['triggerids']['Oslo'] = $triggers['triggerids'][3];
+		self::$cities['triggerids']['Bergen'] = $triggers['triggerids'][4];
 
 		$dashboards = CDataHelper::call('dashboard.create', [
 			'name' => 'Geomap zoom widget dashboard',
@@ -202,6 +220,27 @@ class testGeomapWidgetScreenshots extends CWebTest {
 									'value' => self::$cities['hostgroupid']
 								]
 							]
+						],
+						[
+							'type' => 'geomap',
+							'name' => 'Geomap for screenshots, 3',
+							'x' => 0,
+							'y' => 14,
+							'width' => 13,
+							'height' => 7,
+							'view_mode' => 0,
+							'fields' => [
+								[
+									'type' => '2',
+									'name' => 'groupids',
+									'value' => self::$cities['hostgroupid']
+								],
+								[
+									'type' => '1',
+									'name' => 'default_view',
+									'value' => '56.97778948828843, 24.211604679275183,3'
+								]
+							]
 						]
 					]
 				]
@@ -257,7 +296,7 @@ class testGeomapWidgetScreenshots extends CWebTest {
 							'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, '.
 							'map data &copy; <a href="https://www.openstreetmap.org/copyright">'.
 							'OpenStreetMap</a> contributors',
-					'Max zoom level' => '13'
+					'Max zoom level' => '30'
 				]
 			]
 		];
@@ -267,18 +306,50 @@ class testGeomapWidgetScreenshots extends CWebTest {
 	 * @dataProvider getZoomWidgetData
 	 */
 	public function testGeomapWidgetScreenshots_Zoom($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$zoom_dashboardid);
-		$this->page->waitUntilReady();
+		// Create event on hosts to make different color pins.
+		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (10500, 0, 0, '.
+				self::$cities['triggerids']['Riga'].', '.time().', 0, 1, "Trigger Riga", 0)');
+		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (10501, 0, 0, '.
+				self::$cities['triggerids']['Tallin'].', '.time().', 0, 1, "Trigger Tallin", 1)');
+		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (10502, 0, 0, '.
+				self::$cities['triggerids']['Vilnius'].', '.time().', 0, 1, "Trigger Vilnius", 2)');
+		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (10503, 0, 0, '.
+				self::$cities['triggerids']['Oslo'].', '.time().', 0, 1, "Trigger Oslo", 3)');
+		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (10504, 0, 0, '.
+				self::$cities['triggerids']['Bergen'].', '.time().', 0, 1, "Trigger Bergen", 4)');
 
-		if ($data['Tile provider'] === 'default') {
-			$this->assertWidgetScreenshot($data);
-		}
-		else {
+		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (10500, 0, 0, '.
+				self::$cities['triggerids']['Riga'].', '.time().', 0, "Trigger Riga", 0)');
+		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (10501, 0, 0, '.
+				self::$cities['triggerids']['Tallin'].', '.time().', 0, "Trigger Tallin", 1)');
+		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (10502, 0, 0, '.
+				self::$cities['triggerids']['Vilnius'].', '.time().', 0, "Trigger Vilnius", 2)');
+		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (10503, 0, 0, '.
+				self::$cities['triggerids']['Oslo'].', '.time().', 0, "Trigger Oslo", 3)');
+		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (10504, 0, 0, '.
+				self::$cities['triggerids']['Bergen'].', '.time().', 0, "Trigger Bergen", 4)');
+
+		DBexecute('UPDATE triggers SET value = 1 WHERE description = "Trigger Riga"');
+		DBexecute('UPDATE triggers SET value = 1 WHERE description = "Trigger Tallin"');
+		DBexecute('UPDATE triggers SET value = 1 WHERE description = "Trigger Vilnius"');
+		DBexecute('UPDATE triggers SET value = 1 WHERE description = "Trigger Oslo"');
+		DBexecute('UPDATE triggers SET value = 1 WHERE description = "Trigger Bergen"');
+
+		$this->page->login();
+
+		if ($data['Tile provider'] !== 'default') {
 			$this->page->open('zabbix.php?action=geomaps.edit');
+			$this->page->waitUntilReady();
+
 			$form = $this->query('id:geomaps-form')->waitUntilReady()->asForm()->one();
 			$form->fill($data);
 			$form->submit();
 
+			$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$zoom_dashboardid);
+			$this->page->waitUntilReady();
+			$this->assertWidgetScreenshot($data);
+		}
+		else {
 			$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$zoom_dashboardid);
 			$this->page->waitUntilReady();
 			$this->assertWidgetScreenshot($data);
@@ -290,14 +361,17 @@ class testGeomapWidgetScreenshots extends CWebTest {
 			'Geomap for screenshots, 5',
 			'Geomap for screenshots, 10',
 			'Geomap for screenshots, 30',
-			'Geomap for screenshots, no zoom'
+			'Geomap for screenshots, no zoom',
+			'Geomap for screenshots, 3'
 		];
 
 		foreach ($widgets as $widget) {
-			$this->waitUntilMapIsLoaded($widget);
+//			$this->waitUntilMapIsLoaded($widget);
+			$this->query("xpath://h4[text()=".CXPathHelper::escapeQuotes($widget).
+					"]/../../div[not(contains(@class,\"is-loading\"))]")->waitUntilPresent()->one();
 
 			// This sleep is needed because after loader ring disappeared map image needs to load anyway.
-			sleep(2);
+			sleep(1);
 			$this->assertScreenshot($this->query("xpath:.//div[@class=\"dashboard-grid-widget\"]//h4[text()=".
 					CXPathHelper::escapeQuotes($widget)."]/../..")->waitUntilVisible()->one(), $widget.' '.$data['Tile provider']
 			);
@@ -317,8 +391,6 @@ class testGeomapWidgetScreenshots extends CWebTest {
 		}
 
 		return $this->query("xpath://h4[text()=".CXPathHelper::escapeQuotes($widget).
-					"]/../../div[not(contains(@class,\"is-loading\"))]")->waitUntilPresent()->one();
+				"]/../../div[not(contains(@class,\"is-loading\"))]")->waitUntilPresent()->one();
 	}
-
-
 }
