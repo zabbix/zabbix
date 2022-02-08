@@ -269,6 +269,10 @@ class testGeomapWidgetScreenshots extends CWebTest {
 	public function testGeomapWidgetScreenshots_Zoom($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$zoom_dashboardid);
 		$this->page->waitUntilReady();
+		$this->query("xpath://div[contains(@class,\"is-loading\")]/..//h4")->all()->waitUntilNotPresent();
+
+		// This sleep is needed because after loader ring disappeared map image needs to load anyway.
+		sleep(1);
 
 		if ($data['Tile provider'] === 'default') {
 			$this->assertWidgetScreenshot($data);
@@ -281,7 +285,10 @@ class testGeomapWidgetScreenshots extends CWebTest {
 
 			$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$zoom_dashboardid);
 			$this->page->waitUntilReady();
+			$this->query("xpath://div[contains(@class,\"is-loading\")]/..//h4")->all()->waitUntilNotPresent();
 
+			// This sleep is needed because after loader ring disappeared map image needs to load anyway.
+			sleep(1);
 			$this->assertWidgetScreenshot($data);
 		}
 	}
@@ -296,7 +303,7 @@ class testGeomapWidgetScreenshots extends CWebTest {
 
 		foreach ($widgets as $widget) {
 			$this->assertScreenshot($this->query("xpath:.//div[@class=\"dashboard-grid-widget\"]//h4[text()=".
-					CXPathHelper::escapeQuotes($widget)."]")->waitUntilVisible()->one(), $widget.' '.$data['Tile provider']
+					CXPathHelper::escapeQuotes($widget)."]/../..")->waitUntilVisible()->one(), $widget.' '.$data['Tile provider']
 			);
 		}
 	}
