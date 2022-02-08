@@ -629,7 +629,7 @@ class CAudit {
 	 * Checks by path, whether the value of the object should be masked.
 	 *
 	 * @param int    $resource
-	 * @param string $path
+	 * @param string $real_path
 	 * @param array  $object
 	 *
 	 * @return bool
@@ -820,12 +820,11 @@ class CAudit {
 				$result[self::getLastObjectPath($path)] = [self::DETAILS_ACTION_ADD];
 			}
 
-			if (self::isDefaultValue($resource, $path, $value)) {
-				continue;
-			}
-
 			if (self::isValueToMask($resource, $path, $object)) {
 				$result[$path] = [self::DETAILS_ACTION_ADD, ZBX_SECRET_MASK];
+			}
+			elseif (self::isDefaultValue($resource, $path, $value)) {
+				continue;
 			}
 			elseif (in_array($path, self::BLOB_FIELDS)) {
 				$result[$path] = [self::DETAILS_ACTION_ADD];
@@ -883,24 +882,23 @@ class CAudit {
 
 		foreach ($object as $path => $value) {
 			$db_value = array_key_exists($path, $db_object) ? $db_object[$path] : null;
+			$is_mask_value = self::isValueToMask($resource, $path, $object);
 
 			if ($db_value === null) {
-				if (self::isDefaultValue($resource, $path, $value)) {
+				if ($is_mask_value) {
+					$result[$path] = [self::DETAILS_ACTION_ADD, ZBX_SECRET_MASK];
+				}
+				elseif (self::isDefaultValue($resource, $path, $value)) {
 					continue;
 				}
-
-				if (in_array($path, self::BLOB_FIELDS)) {
+				elseif (in_array($path, self::BLOB_FIELDS)) {
 					$result[$path] = [self::DETAILS_ACTION_ADD];
 				}
 				else {
-					$result[$path] = [
-						self::DETAILS_ACTION_ADD,
-						self::isValueToMask($resource, $path, $object) ? ZBX_SECRET_MASK : $value
-					];
+					$result[$path] = [self::DETAILS_ACTION_ADD, $value];
 				}
 			}
 			else {
-				$is_mask_value = self::isValueToMask($resource, $path, $object);
 				$is_mask_db_value = self::isValueToMask($resource, $path, $db_object);
 
 				if ($value != $db_value || $is_mask_value || $is_mask_db_value) {
