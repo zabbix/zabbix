@@ -239,7 +239,7 @@ void	zbx_eval_set_exception(zbx_eval_context_t *ctx, char *message);
 zbx_eval_context_t *zbx_eval_deserialize_dyn(const unsigned char *data, const char *expression,
 		zbx_uint64_t mask);
 int	zbx_eval_check_timer_functions(const zbx_eval_context_t *ctx);
-void	zbx_get_serialized_expression_functionids(const char *expression, const unsigned char *data,
+int	zbx_get_serialized_expression_functionids(const char *expression, const unsigned char *data,
 		zbx_vector_uint64_t *functionids);
 void	zbx_eval_get_constant(const zbx_eval_context_t *ctx, int index, char **value);
 void	zbx_eval_replace_functionid(zbx_eval_context_t *ctx, zbx_uint64_t old_functionid, zbx_uint64_t new_functionid);

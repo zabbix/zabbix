@@ -6709,7 +6709,6 @@ out:
 		zbx_hashset_destroy(&trend_queue);
 
 	zbx_dbsync_free_env();
-
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		DCdump_configuration();
 
@@ -11303,7 +11302,9 @@ static int	dc_trigger_items_hosts_enabled(const char *expression, const unsigned
 	zbx_vector_uint64_t	functionids;
 
 	zbx_vector_uint64_create(&functionids);
-	zbx_get_serialized_expression_functionids(expression, data, &functionids);
+
+	if (FAIL == zbx_get_serialized_expression_functionids(expression, data, &functionids))
+		goto out;
 
 	for (i = 0; i < functionids.values_num; i++)
 	{
@@ -11502,6 +11503,9 @@ static void	dc_status_update(void)
 
 	while (NULL != (dc_trigger = (ZBX_DC_TRIGGER *)zbx_hashset_iter_next(&iter)))
 	{
+		if (NULL == dc_trigger->itemids)
+			continue;
+
 		switch (dc_trigger->status)
 		{
 			case TRIGGER_STATUS_ENABLED:

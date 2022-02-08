@@ -816,7 +816,7 @@ int	zbx_eval_check_timer_functions(const zbx_eval_context_t *ctx)
  *             functionids - [OUT] the extracted functionids                  *
  *                                                                            *
  ******************************************************************************/
-void	zbx_get_serialized_expression_functionids(const char *expression, const unsigned char *data,
+int	zbx_get_serialized_expression_functionids(const char *expression, const unsigned char *data,
 	zbx_vector_uint64_t *functionids)
 {
 	zbx_uint32_t		i, tokens_num, len, loc_l, loc_r, opt;
@@ -851,7 +851,7 @@ void	zbx_get_serialized_expression_functionids(const char *expression, const uns
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
-				return;
+				return FAIL;
 		}
 
 		if (ZBX_EVAL_TOKEN_FUNCTIONID == type)
@@ -861,10 +861,15 @@ void	zbx_get_serialized_expression_functionids(const char *expression, const uns
 			else
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
+
+		if (ZBX_EVAL_TOKEN_EXCEPTION == type)
+			return FAIL;
 	}
 
 	zbx_vector_uint64_sort(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	return SUCCEED;
 }
 
 /******************************************************************************
