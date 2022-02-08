@@ -134,6 +134,7 @@ class testGeomapWidgetScreenshots extends CWebTest {
 		self::$cities['triggerids']['Oslo'] = $triggers['triggerids'][3];
 		self::$cities['triggerids']['Bergen'] = $triggers['triggerids'][4];
 
+		// Create dashboard with geomap widgets.
 		$dashboards = CDataHelper::call('dashboard.create', [
 			'name' => 'Geomap zoom widget dashboard',
 			'auto_start' => 0,
@@ -258,14 +259,15 @@ class testGeomapWidgetScreenshots extends CWebTest {
 					'Tile provider' => 'default'
 				]
 			],
+			[
+				[
+					'Tile provider' => 'OpenTopoMap'
+				]
+			],
+			// These providers are commented, because images on screenshots are not stable, and also they cause browser errors.
 //			[
 //				[
 //					'Tile provider' => 'OpenStreetMap Mapnik'
-//				]
-//			],
-//			[
-//				[
-//					'Tile provider' => 'OpenTopoMap'
 //				]
 //			],
 //			[
@@ -288,17 +290,17 @@ class testGeomapWidgetScreenshots extends CWebTest {
 //					'Tile provider' => 'USGS US Imagery'
 //				]
 //			],
-			[
-				[
-					'Tile provider' => 'Other',
-					'Tile URL' => 'https://tileserver.memomaps.de/tilegen/{z}/{x}/{y}.png',
-					'Attribution' => 'Map <a href="https://memomaps.de/">memomaps.de</a> '.
-							'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, '.
-							'map data &copy; <a href="https://www.openstreetmap.org/copyright">'.
-							'OpenStreetMap</a> contributors',
-					'Max zoom level' => '30'
-				]
-			]
+//			[
+//				[
+//					'Tile provider' => 'Other',
+//					'Tile URL' => 'https://tileserver.memomaps.de/tilegen/{z}/{x}/{y}.png',
+//					'Attribution' => 'Map <a href="https://memomaps.de/">memomaps.de</a> '.
+//							'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, '.
+//							'map data &copy; <a href="https://www.openstreetmap.org/copyright">'.
+//							'OpenStreetMap</a> contributors',
+//					'Max zoom level' => '30'
+//				]
+//			]
 		];
 	}
 
