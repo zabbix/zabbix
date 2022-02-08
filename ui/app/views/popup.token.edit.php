@@ -90,7 +90,6 @@ $token_from_grid->addItem([
 			(new CCheckBox('expires_state', '1'))
 				->setChecked($data['expires_state'])
 				->setUncheckedValue('0')
-				->onChange('window.token_edit_popup.expiresAtHandler();')
 		)
 	])
 	->addItem([

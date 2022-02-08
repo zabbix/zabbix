@@ -69,7 +69,7 @@ $widget = (new CWidget())
 	->setTitleSubmenu(getUserSettingsSubmenu())
 	->setControls(
 		(new CTag('nav', true,
-			(new CList())->addItem((new CSimpleButton(_('Create API token')))->onClick('view.createUserToken()'))
+			(new CList())->addItem((new CSimpleButton(_('Create API token')))->addClass('js-create-token'))
 		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem($filter);
@@ -108,8 +108,9 @@ $token_table = (new CTableInfo())
 	]);
 
 foreach ($data['tokens'] as $token) {
-	$name = (new CLink($token['name'], 'javascript:void(0)')
-	)->onClick('view.editUserToken(event, '.json_decode($token['tokenid']).')');
+	$name = (new CLink($token['name'], 'javascript:void(0)'))
+		->addClass('js-edit-token')
+		->setAttribute('data-tokenid', $token['tokenid']);
 
 	$token_table->addRow([
 		new CCheckBox('tokenids['.$token['tokenid'].']', $token['tokenid']),
@@ -149,11 +150,10 @@ $token_form->addItem([
 		'token.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected API tokens?')],
 		'token.delete' => [
 			'content' => (new CSimpleButton(_('Delete')))
-				->setAttribute('confirm', _('Delete selected API tokens?'))
-				->onClick('view.massDeleteUserToken(this);')
 				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massdelete-token')
 				->addClass('no-chkbxrange')
-				->removeAttribute('id')
+				->removeid()
 		]
 	], 'user.token')
 ]);

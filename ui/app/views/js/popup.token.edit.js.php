@@ -39,18 +39,19 @@ window.token_edit_popup = {
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
-		this.addEventListeners();
-
 		this.expires_at_row = document.getElementById('expires-at-row');
 		this.expires_at_label = this.expires_at_row.previousSibling;
 		this.expires_at = document.getElementById('expires_at');
 		this.expires_state = document.getElementById('expires_state');
 		this.expiresAtHandler();
+
+		this.addEventListeners();
 	},
 
 	addEventListeners() {
 		this.enableNavigationWarning();
 		this.overlay.$dialogue[0].addEventListener('overlay.close', this.events.overlayClose, {once: true});
+		this.expires_state.addEventListener('change', () => this.expiresAtHandler());
 	},
 
 	submit() {

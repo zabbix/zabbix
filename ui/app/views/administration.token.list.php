@@ -104,7 +104,7 @@ $widget = (new CWidget())
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())
-				->addItem((new CSimpleButton(_('Create API token')))->onClick('view.createToken()'))
+				->addItem((new CSimpleButton(_('Create API token')))->addClass('js-create-token'))
 		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem($filter);
@@ -153,8 +153,9 @@ $token_table = (new CTableInfo())
 	]);
 
 foreach ($data['tokens'] as $token) {
-	$name = (new CLink($token['name'], 'javascript:void(0)')
-	)->onClick('view.editToken(event, ' . json_decode($token['tokenid']) . ')');
+	$name = (new CLink($token['name'], 'javascript:void(0)'))
+		->addClass('js-edit-token')
+		->setAttribute('data-tokenid', $token['tokenid']);
 
 	$token_table->addRow([
 		new CCheckBox('tokenids['.$token['tokenid'].']', $token['tokenid']),
@@ -198,9 +199,8 @@ $token_form->addItem([
 		'token.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected API tokens?')],
 		'token.delete' => [
 			'content' => (new CSimpleButton(_('Delete')))
-				->setAttribute('confirm', _('Delete selected API tokens?'))
-				->onClick('view.massDeleteToken(this);')
 				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massdelete-token')
 				->addClass('no-chkbxrange')
 				->removeid()
 		]

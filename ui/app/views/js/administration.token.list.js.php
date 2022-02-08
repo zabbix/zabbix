@@ -31,9 +31,24 @@
 		filter_expires_days: null,
 
 		init() {
+			this.initActionButtons();
 			this.filter_expires_state = document.getElementById('filter-expires-state');
 			this.filter_expires_days = document.getElementById('filter-expires-days');
 			this.expiresDaysHandler();
+		},
+
+		initActionButtons() {
+			document.addEventListener('click', (e) => {
+				if (e.target.classList.contains('js-create-token')) {
+					this.createToken();
+				}
+				else if (e.target.classList.contains('js-edit-token')) {
+					this.editToken(e.target.dataset.tokenid);
+				}
+				else if (e.target.classList.contains('js-massdelete-token')) {
+					this.massDeleteToken(e.target, Object.values(chkbxRange.getSelectedIds()));
+				}
+			})
 		},
 
 		expiresDaysHandler() {
@@ -49,8 +64,7 @@
 			this.openTokenPopup({admin_mode: '1'});
 		},
 
-		editToken(e, tokenid) {
-			e.preventDefault();
+		editToken(tokenid) {
 			const token_data = {tokenid, admin_mode: '1'};
 			this.openTokenPopup(token_data);
 		},
@@ -70,13 +84,16 @@
 			}, {once: true});
 		},
 
-		massDeleteToken(button) {
-			const confirm_text = button.getAttribute('confirm');
-			if (!confirm(confirm_text)) {
+		massDeleteToken(target, tokenids) {
+			const confirmation = tokenids.length > 1
+				? <?= json_encode(_('Delete selected tokens?')) ?>
+				: <?= json_encode(_('Delete selected token?')) ?>;
+
+			if (!window.confirm(confirmation)) {
 				return;
 			}
 
-			button.classList.add('is-loading');
+			target.classList.add('is-loading');
 
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'token.delete');
@@ -119,8 +136,6 @@
 					button.classList.remove('is-loading');
 				});
 		},
-
-
 
 		events: {
 			tokenSuccess(e) {
