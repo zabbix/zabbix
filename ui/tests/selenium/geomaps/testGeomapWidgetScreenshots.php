@@ -281,7 +281,6 @@ class testGeomapWidgetScreenshots extends CWebTest {
 
 			$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$zoom_dashboardid);
 			$this->page->waitUntilReady();
-			$this->query("xpath://div[contains(@class,\"is-loading\")]/..//h4")->all()->waitUntilNotPresent();
 			$this->assertWidgetScreenshot($data);
 		}
 	}
