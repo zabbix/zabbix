@@ -746,6 +746,10 @@ class CAudit {
 			return false;
 		}
 
+		if ($schema_fields[$field_name]['null'] && $value == 0) {
+			return true;
+		}
+
 		if (!array_key_exists('default', $schema_fields[$field_name])) {
 			return false;
 		}

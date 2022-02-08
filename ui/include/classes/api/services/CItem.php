@@ -542,10 +542,6 @@ class CItem extends CItemGeneral {
 		$items_rtdata = [];
 
 		foreach ($items as $key => &$item) {
-			if ($item['type'] != ITEM_TYPE_DEPENDENT) {
-				$item['master_itemid'] = null;
-			}
-
 			if (array_key_exists('rtdata', $item)) {
 				$items_rtdata[$key] = [];
 				unset($item['rtdata']);
