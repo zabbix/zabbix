@@ -64,12 +64,14 @@ class CPopupButtonElement extends CElement {
 	public function getMenu() {
 		$query = $this->query('xpath://ul[contains(@class, "menu-popup-top")]')->asPopupMenu();
 
-		$menu = $query->one(false);
-		if ($menu->isValid()) {
-			return $menu;
-		}
+		for ($i = 0; $i < 2; $i++) {
+			$menu = $query->one(false);
+			if ($menu->isValid()) {
+				return $menu;
+			}
 
-		$this->waitUntilClickable()->click(true);
+			$this->waitUntilClickable()->click(true);
+		}
 
 		return $query->waitUntilVisible()->one();
 	}
