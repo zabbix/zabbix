@@ -13842,7 +13842,10 @@ char	*dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t item
 	ZBX_DC_ITEM	*item;
 
 	if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))
-		return zbx_strdup(NULL, "");
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return zbx_strdup(NULL, params);
+	}
 
 	if ('\0' == *params)
 		return zbx_strdup(NULL, params);
