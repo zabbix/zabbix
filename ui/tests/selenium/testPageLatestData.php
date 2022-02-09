@@ -269,6 +269,7 @@ class testPageLatestData extends CWebTest {
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$this->query('button:Reset')->one()->click();
 		$form->fill(['Name' => '4_item'])->submit();
+		$this->page->waitUntilReady();
 
 		foreach (['Last check', 'Last value'] as $column) {
 			if ($column === 'Last value') {
