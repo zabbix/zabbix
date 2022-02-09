@@ -188,7 +188,7 @@ class CDataHelper extends CAPIHelper {
 		$result['ids'] = [];
 		foreach ($hosts as $host) {
 			foreach ($host['interfaces'] as $interface) {
-				if ($interface['main'] == 1) {
+				if ($interface['main'] == INTERFACE_PRIMARY) {
 					$result['default_interfaces'][$host['host']][$interface['type']] = $interface['interfaceid'];
 				}
 

@@ -276,6 +276,7 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 		switch (interface_type = get_interface_type_by_item_type(item->type))
 		{
 			case INTERFACE_TYPE_UNKNOWN:
+			case INTERFACE_TYPE_OPT:
 				item->interfaceid = 0;
 				break;
 			case INTERFACE_TYPE_ANY:
