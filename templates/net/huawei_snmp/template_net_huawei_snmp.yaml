@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-18T20:42:58Z'
+  date: '2022-01-26T14:23:56Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -35,8 +35,11 @@ zabbix_export:
             name: 'Service state'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 49df55106af2439eb79e66caa2717ec9
@@ -44,6 +47,10 @@ zabbix_export:
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: ee1ee4ce3b3a4545bd407ecc3e428049
           name: 'ICMP loss'
@@ -54,8 +61,11 @@ zabbix_export:
           units: '%'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: b7ca2b5273be4f50b5c20b422a534868
@@ -67,6 +77,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Huawei VRP SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 4f3bda2c7ab84a418bde7602cf0d608d
           name: 'ICMP response time'
@@ -77,8 +94,11 @@ zabbix_export:
           units: s
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: c322fda29bab4f99a0ea204814390551
@@ -93,6 +113,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Huawei VRP SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 023b4403df464029a1493c53a0122d6f
           name: 'SNMP traps (fallback)'
@@ -105,8 +132,8 @@ zabbix_export:
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: network
         -
           uuid: 9aba5f7df03b4904869e0043dc73b9ae
           name: 'System contact details'
@@ -128,8 +155,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 034cdbc177c346e0b49791250b8bf66d
           name: 'System description'
@@ -152,8 +179,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 78041d1a10ed4cb6b89a77bc1478b009
           name: 'System location'
@@ -175,8 +202,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 3fad2aa468c2492a89b28bdbffd00c6c
           name: 'System name'
@@ -198,8 +225,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: 740f78d69b20405da79525365fdc29fe
@@ -208,6 +235,13 @@ zabbix_export:
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: security
         -
           uuid: a5e66466550f44a4b1d2137c751e9009
           name: 'System object ID'
@@ -228,8 +262,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: e9dd0d849aaa499da9e2ef9e21ccd50e
           name: Uptime
@@ -250,8 +284,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: c8c41677f4ba463b90cea501e9112483
@@ -264,6 +298,10 @@ zabbix_export:
                 -
                   name: 'No SNMP data collection'
                   expression: 'max(/Huawei VRP SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 291fbe54d7c845bb9ec5b080be084612
           name: 'SNMP agent availability'
@@ -280,8 +318,11 @@ zabbix_export:
             name: zabbix.host.available
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: cefe56d564434018b6a31c196cc7eb55
@@ -294,6 +335,10 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Huawei VRP SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: 40ceaa1bc97342c18e6af3e0b931a08b
@@ -317,8 +362,8 @@ zabbix_export:
                 name: 'HUAWEI-ENTITY-EXTENT-MIB::hwEntityFanState'
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
               trigger_prototypes:
                 -
                   uuid: ba459f7ce17a4f71a46fa1a0337f0f89
@@ -327,6 +372,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: df877d1d7c9f44b5917b47aa474bbd2f
           name: 'Entity Discovery'
@@ -359,8 +411,8 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: Inventory
+                  tag: component
+                  value: system
         -
           uuid: 597d528e3de944a5807ff37a97763a7e
           name: 'MPU Discovery'
@@ -390,8 +442,8 @@ zabbix_export:
                 The temperature for the {#SNMPVALUE}.
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: d28db9267b9d488f8f359dd7d14d2ac1
@@ -402,6 +454,13 @@ zabbix_export:
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: c54c36491adf4a488d11f2538b337129
                   expression: 'avg(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:""}'
@@ -416,6 +475,13 @@ zabbix_export:
                       name: '{#ENT_NAME}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
                       expression: 'avg(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
                       recovery_expression: 'max(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 7b2cffb3ad47440d8b79b39958794ed9
                   expression: 'avg(/Huawei VRP SNMP/sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
@@ -424,6 +490,13 @@ zabbix_export:
                   name: '{#ENT_NAME}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 6fae73ea06ff4e99956085fb807d75ae
               name: '{#ENT_NAME}: CPU utilization'
@@ -439,8 +512,8 @@ zabbix_export:
                 Reference: http://support.huawei.com/enterprise/KnowledgebaseReadAction.action?contentId=KB1000090234
               tags:
                 -
-                  tag: Application
-                  value: CPU
+                  tag: component
+                  value: cpu
               trigger_prototypes:
                 -
                   uuid: 66bfe7805cae4447a32a6e5877e1231b
@@ -449,6 +522,10 @@ zabbix_export:
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'CPU utilization is too high. The system might be slow to respond.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: d7e128d526c14d1bb5519090104f0e04
               name: '{#ENT_NAME}: Hardware serial number'
@@ -467,8 +544,8 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: Inventory
+                  tag: component
+                  value: system
               trigger_prototypes:
                 -
                   uuid: e379ca4d50a3434e82841e8884a84656
@@ -477,6 +554,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 110646e0177f4fbe840f6ba2d1d2afc4
               name: '{#ENT_NAME}: Hardware version(revision)'
@@ -495,8 +576,8 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: Inventory
+                  tag: component
+                  value: system
             -
               uuid: 4472c8f94cd241468c851283f9854730
               name: '{#ENT_NAME}: Operating system'
@@ -515,8 +596,8 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: Inventory
+                  tag: component
+                  value: os
               trigger_prototypes:
                 -
                   uuid: 698067d647424c96addeb3c9f960dd07
@@ -529,6 +610,10 @@ zabbix_export:
                     -
                       name: 'System name has changed (new name: {ITEM.VALUE})'
                       expression: 'last(/Huawei VRP SNMP/system.name,#1)<>last(/Huawei VRP SNMP/system.name,#2) and length(last(/Huawei VRP SNMP/system.name))>0'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 6215b7e957884516a350f8a7038c7d3e
               name: '{#ENT_NAME}: Memory utilization'
@@ -544,8 +629,8 @@ zabbix_export:
                 Reference: http://support.huawei.com/enterprise/KnowledgebaseReadAction.action?contentId=KB1000090234
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
               trigger_prototypes:
                 -
                   uuid: 2d93533c7cc74dc9a85e280605e21e7d
@@ -553,6 +638,13 @@ zabbix_export:
                   name: '{#ENT_NAME}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: 29cf1159b56b4cf086a980609efaf046
@@ -666,8 +758,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: d21e9fec64c54fd19605f8a8ba230211
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
@@ -686,8 +784,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: e5323fadbfbe4773ab450312a2c29164
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
@@ -711,8 +815,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: c5bc13495caf4a208b21bcd0a515a19d
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
@@ -735,8 +845,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 9291e8cfc58a4c029ff339bae4892faf
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
@@ -755,8 +871,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 998389bdf381441e92ddd597272002fa
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
@@ -780,8 +902,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: c45208952a8f43e7a4ac90dbc9bf2eac
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
@@ -806,8 +934,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 1659d815112945478585fceef9318e68
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
@@ -829,8 +963,14 @@ zabbix_export:
                 name: 'IF-MIB::ifOperStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: b67a4949e886409b89537338f657570e
@@ -848,6 +988,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: f6135b96b3584060b3a605312748edf4
               name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
@@ -871,8 +1015,14 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
           trigger_prototypes:
             -
               uuid: 675512801cb5498887b8411c5afd5f0c
@@ -902,6 +1052,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Huawei VRP SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Huawei VRP SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Huawei VRP SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Huawei VRP SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 9ebcd822aa6a4fb493c74c4d4759510b
               expression: |
@@ -922,6 +1076,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Huawei VRP SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Huawei VRP SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Huawei VRP SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Huawei VRP SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 609c079cc7fd486fb4c938acd1c8b47f
               expression: |
@@ -941,6 +1099,13 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Huawei VRP SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Huawei VRP SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Huawei VRP SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Huawei VRP SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
           graph_prototypes:
             -
               uuid: 2a0d7c12dc4146399cda6b80a1b75f26
@@ -1044,8 +1209,14 @@ zabbix_export:
                 name: 'EtherLike-MIB::dot3StatsDuplexStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: 5f275f483fca402ba8f9aa485398d85b
@@ -1054,6 +1225,10 @@ zabbix_export:
                   priority: WARNING
                   description: 'Please check autonegotiation settings and cabling'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
           preprocessing:
             -
               type: JAVASCRIPT
@@ -1072,6 +1247,16 @@ zabbix_export:
                       });
                   });
                   return JSON.stringify(data);
+      tags:
+        -
+          tag: class
+          value: network
+        -
+          tag: target
+          value: huawei
+        -
+          tag: target
+          value: huawei-vrp
       macros:
         -
           macro: '{$CPU.UTIL.CRIT}'

@@ -7,7 +7,6 @@ For Zabbix version: 6.0 and higher
 Official JMX Template from Zabbix distribution. Could be useful for many Java Applications (JMX).
 
 
-
 ## Setup
 
 Refer to the vendor documentation.
@@ -88,7 +87,7 @@ There are no template links in this template.
 |JMX |MemoryPool: Tenured Gen maximum size |<p>Maximum amount of memory that can be used for memory management. This amount of memory is not guaranteed to be available if it is greater than the amount of committed memory. The Java virtual machine may fail to allocate memory even if the amount of used memory does not exceed this maximum size.</p> |JMX |jmx["java.lang:type=MemoryPool,name=Tenured Gen","Usage.max"] |
 |JMX |MemoryPool: Tenured Gen used |<p>Current memory usage</p> |JMX |jmx["java.lang:type=MemoryPool,name=Tenured Gen","Usage.used"] |
 |JMX |OperatingSystem: File descriptors maximum count |<p>This is the number of file descriptors we can have opened in the same process, as determined by the operating system. You can never have more file descriptors than this number.</p> |JMX |jmx["java.lang:type=OperatingSystem","MaxFileDescriptorCount"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
-|JMX |OperatingSystem: File descriptors opened |<p>This is the number of opened file descriptors at the moment, if this reaches the MaxFileDescriptorCount, the application will throw an IOException: Too many open files. This could mean you’re are opening file descriptors and never closing them.</p> |JMX |jmx["java.lang:type=OperatingSystem","OpenFileDescriptorCount"] |
+|JMX |OperatingSystem: File descriptors opened |<p>This is the number of opened file descriptors at the moment, if this reaches the MaxFileDescriptorCount, the application will throw an IOException: Too many open files. This could mean you're are opening file descriptors and never closing them.</p> |JMX |jmx["java.lang:type=OperatingSystem","OpenFileDescriptorCount"] |
 |JMX |OperatingSystem: Process CPU Load |<p>ProcessCpuLoad represents the CPU load in this process.</p> |JMX |jmx["java.lang:type=OperatingSystem","ProcessCpuLoad"]<p>**Preprocessing**:</p><p>- MULTIPLIER: `100`</p> |
 |JMX |Runtime: JVM uptime |<p>-</p> |JMX |jmx["java.lang:type=Runtime","Uptime"]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
 |JMX |Runtime: JVM name |<p>-</p> |JMX |jmx["java.lang:type=Runtime","VmName"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `30m`</p> |

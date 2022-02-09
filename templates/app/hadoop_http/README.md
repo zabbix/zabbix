@@ -44,8 +44,8 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Node manager discovery |<p>-</p> |HTTP_AGENT |hadoop.nodemanager.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |Data node discovery |<p>-</p> |HTTP_AGENT |hadoop.datanode.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
+|Node manager discovery |<p>-</p> |HTTP_AGENT |hadoop.nodemanager.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 
 ## Items collected
 
@@ -102,12 +102,12 @@ There are no template links in this template.
 |Hadoop |{#HOSTNAME}: Version |<p>DataNode software version.</p> |DEPENDENT |hadoop.datanode.version[{#HOSTNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.HostName=='{#HOSTNAME}')].version.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Hadoop |{#HOSTNAME}: Admin state |<p>Administrative state.</p> |DEPENDENT |hadoop.datanode.admin_state[{#HOSTNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.HostName=='{#HOSTNAME}')].adminState.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Hadoop |{#HOSTNAME}: Oper state |<p>Operational state.</p> |DEPENDENT |hadoop.datanode.oper_state[{#HOSTNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.HostName=='{#HOSTNAME}')].operState.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
-|Zabbix_raw_items |Get ResourceManager stats |<p>-</p> |HTTP_AGENT |hadoop.resourcemanager.get |
-|Zabbix_raw_items |Get NameNode stats |<p>-</p> |HTTP_AGENT |hadoop.namenode.get |
-|Zabbix_raw_items |Get NodeManagers states |<p>-</p> |HTTP_AGENT |hadoop.nodemanagers.get<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return JSON.stringify(JSON.parse(JSON.parse(value).beans[0].LiveNodeManagers))`</p> |
-|Zabbix_raw_items |Get DataNodes states |<p>-</p> |HTTP_AGENT |hadoop.datanodes.get<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
-|Zabbix_raw_items |Hadoop NodeManager {#HOSTNAME}: Get stats |<p>-</p> |HTTP_AGENT |hadoop.nodemanager.get[{#HOSTNAME}] |
-|Zabbix_raw_items |Hadoop DataNode {#HOSTNAME}: Get stats |<p>-</p> |HTTP_AGENT |hadoop.datanode.get[{#HOSTNAME}] |
+|Zabbix raw items |Get ResourceManager stats |<p>-</p> |HTTP_AGENT |hadoop.resourcemanager.get |
+|Zabbix raw items |Get NameNode stats |<p>-</p> |HTTP_AGENT |hadoop.namenode.get |
+|Zabbix raw items |Get NodeManagers states |<p>-</p> |HTTP_AGENT |hadoop.nodemanagers.get<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return JSON.stringify(JSON.parse(JSON.parse(value).beans[0].LiveNodeManagers))`</p> |
+|Zabbix raw items |Get DataNodes states |<p>-</p> |HTTP_AGENT |hadoop.datanodes.get<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
+|Zabbix raw items |Hadoop NodeManager {#HOSTNAME}: Get stats |<p>-</p> |HTTP_AGENT |hadoop.nodemanager.get[{#HOSTNAME}] |
+|Zabbix raw items |Hadoop DataNode {#HOSTNAME}: Get stats |<p>-</p> |HTTP_AGENT |hadoop.datanode.get[{#HOSTNAME}] |
 
 ## Triggers
 
@@ -138,7 +138,7 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/413459-discussion-thread-for-official-zabbix-template-hadoop).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/413459-discussion-thread-for-official-zabbix-template-hadoop).
 
 
 ## References

@@ -53,8 +53,8 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Unicorn metrics discovery |<p>DiscoveryUnicorn specific metrics, when Unicorn is used.</p> |HTTP_AGENT |gitlab.unicorn.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `unicorn_workers`</p><p>- JAVASCRIPT: `return JSON.stringify(value != "[]" ? [{'{#SINGLETON}': ''}] : []);`</p> |
 |Puma metrics discovery |<p>Discovery Puma specific metrics, when Puma is used.</p> |HTTP_AGENT |gitlab.puma.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `puma_workers`</p><p>- JAVASCRIPT: `return JSON.stringify(value != "[]" ? [{'{#SINGLETON}': ''}] : []);`</p> |
+|Unicorn metrics discovery |<p>DiscoveryUnicorn specific metrics, when Unicorn is used.</p> |HTTP_AGENT |gitlab.unicorn.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `unicorn_workers`</p><p>- JAVASCRIPT: `return JSON.stringify(value != "[]" ? [{'{#SINGLETON}': ''}] : []);`</p> |
 
 ## Items collected
 
@@ -115,7 +115,7 @@ There are no template links in this template.
 |GitLab: Unicorn stats |GitLab: Unicorn: Workers |<p>The number of Unicorn workers</p> |DEPENDENT |gitlab.unicorn.unicorn_workers[{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=='unicorn_workers')].value.sum()`</p> |
 |GitLab: Unicorn stats |GitLab: Unicorn: Active connections |<p>The number of active Unicorn connections.</p> |DEPENDENT |gitlab.unicorn.active_connections[{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=='unicorn_active_connections')].value.sum()`</p> |
 |GitLab: Unicorn stats |GitLab: Unicorn: Queued connections |<p>The number of queued Unicorn connections.</p> |DEPENDENT |gitlab.unicorn.queued_connections[{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=='unicorn_queued_connections')].value.sum()`</p> |
-|Zabbix_raw_items |GitLab: Get instance metrics |<p>-</p> |HTTP_AGENT |gitlab.get_metrics<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- PROMETHEUS_TO_JSON</p> |
+|Zabbix raw items |GitLab: Get instance metrics |<p>-</p> |HTTP_AGENT |gitlab.get_metrics<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- PROMETHEUS_TO_JSON</p> |
 
 ## Triggers
 
@@ -139,5 +139,5 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
 

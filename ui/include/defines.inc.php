@@ -18,11 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'6.0.0rc1');
+define('ZABBIX_VERSION',		'6.0.0rc2');
 define('ZABBIX_API_VERSION',	'6.0.0');
 define('ZABBIX_EXPORT_VERSION',	'6.0');
 
-define('ZABBIX_DB_VERSION',		5050143);
+define('ZABBIX_DB_VERSION',		5050147);
 
 define('DB_VERSION_SUPPORTED',				0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',		1);
@@ -1056,6 +1056,10 @@ define('TAG_OPERATOR_NOT_EQUAL',	3);
 define('TAG_OPERATOR_EXISTS',		4);
 define('TAG_OPERATOR_NOT_EXISTS',	5);
 
+define('GRAPH_FILTER_ALL',		0);
+define('GRAPH_FILTER_HOST',		1);
+define('GRAPH_FILTER_SIMPLE',	2);
+
 define('GRAPH_AGGREGATE_DEFAULT_INTERVAL',	'1h');
 
 define('AGGREGATE_NONE',	0);
@@ -1599,6 +1603,9 @@ define('ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE',	3);
 // widget view modes
 define('ZBX_WIDGET_VIEW_MODE_NORMAL',			0);
 define('ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER',	1);
+
+// top hosts widget
+define('ZBX_WIDGET_TOP_HOSTS_DEFAULT_FILL',	'#97AAB3');
 
 // validation
 define('DB_ID',		"({}>=0&&bccomp({},\"9223372036854775807\")<=0)&&");

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-15T06:57:03Z'
+  date: '2022-01-26T10:00:40Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -10,7 +10,7 @@ zabbix_export:
       uuid: 72aab08f7f27406a8f2c291648e5ba95
       template: 'Generic Java JMX'
       name: 'Generic Java JMX'
-      description: 'Template tooling version used: 0.40'
+      description: 'Template tooling version used: 0.41'
       groups:
         -
           name: Templates/Applications
@@ -30,8 +30,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: class
         -
           uuid: fc79c5ac074f4266a88d5c239fa0fb70
           name: 'ClassLoading: Total loaded class count'
@@ -47,8 +47,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: class
         -
           uuid: b7620bdebd044fb1b1d2cb293ea8912c
           name: 'ClassLoading: Unloaded class count'
@@ -64,8 +64,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: class
         -
           uuid: 0d6880c07fcd42bebddc41f5f2eb7bdd
           name: 'Compilation: Name of the current JIT compiler'
@@ -83,8 +83,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: compilation
           triggers:
             -
               uuid: 691f051584d74995b757b4be5e3824fe
@@ -92,6 +92,10 @@ zabbix_export:
               name: 'Compilation: {HOST.NAME} uses suboptimal JIT compiler'
               priority: INFO
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: c097ea2de6034d1d94f528533562b896
           name: 'Compilation: Accumulated time spent'
@@ -113,8 +117,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: compilation
         -
           uuid: 4cbe63dbe9184a0ba4df8cedbd86c2e8
           name: 'GarbageCollector: ConcurrentMarkSweep number of collections per second'
@@ -131,8 +135,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: garbage-collector
         -
           uuid: 133c53c035df4e83b6bf99a98f3f5ee0
           name: 'GarbageCollector: ConcurrentMarkSweep accumulated time spent in collection'
@@ -154,8 +158,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: garbage-collector
         -
           uuid: 2b378c3a34ae40fd9d2425298514860e
           name: 'GarbageCollector: Copy number of collections per second'
@@ -172,8 +176,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: garbage-collector
         -
           uuid: 253cd639242848a1905b22b821951f9c
           name: 'GarbageCollector: Copy accumulated time spent in collection'
@@ -195,8 +199,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: garbage-collector
         -
           uuid: fc7adc1d5bab4bd28481b6e37d82210b
           name: 'GarbageCollector: MarkSweepCompact number of collections per second'
@@ -213,8 +217,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: garbage-collector
         -
           uuid: ce72ee1080114604b42fc0c5b9c4b283
           name: 'GarbageCollector: MarkSweepCompact accumulated time spent in collection'
@@ -236,8 +240,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: garbage-collector
         -
           uuid: d55858afe5d14098a75918a4719a4d00
           name: 'GarbageCollector: ParNew number of collections per second'
@@ -254,8 +258,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: garbage-collector
         -
           uuid: 00f5d02eddbe4bac8816c11da6336600
           name: 'GarbageCollector: ParNew accumulated time spent in collection'
@@ -277,8 +281,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: garbage-collector
         -
           uuid: 65f874c8707d44f3ac35e6a48868c3e7
           name: 'GarbageCollector: PS MarkSweep number of collections per second'
@@ -295,8 +299,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: garbage-collector
         -
           uuid: cd4c77af696b4312b2cf050e954bc5c4
           name: 'GarbageCollector: PS MarkSweep accumulated time spent in collection'
@@ -318,8 +322,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: garbage-collector
         -
           uuid: 161555b8c92346e0a4ea51349d99b7af
           name: 'GarbageCollector: PS Scavenge number of collections per second'
@@ -336,8 +340,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: garbage-collector
         -
           uuid: fd1b0b7149bb41b3a2ba674ae83799d2
           name: 'GarbageCollector: PS Scavenge accumulated time spent in collection'
@@ -359,8 +363,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: garbage-collector
         -
           uuid: d98a8d00639742f4b62a29e0c7394d61
           name: 'Memory: Heap memory committed'
@@ -372,8 +376,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: memory
         -
           uuid: e757e0d3d72548df97066632448dd18c
           name: 'Memory: Heap memory maximum size'
@@ -390,8 +394,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: memory
         -
           uuid: 0c24cd559cd74ddb9ff0b167a3d37c23
           name: 'Memory: Heap memory used'
@@ -408,8 +412,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: memory
         -
           uuid: 50bb1ecb0a2141bbba128dfc842a1e34
           name: 'Memory: Non-Heap memory committed'
@@ -426,8 +430,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: memory
         -
           uuid: 0c6301dfec1c4e6c8ab26091e9372e91
           name: 'Memory: Non-Heap memory maximum size'
@@ -444,8 +448,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: memory
         -
           uuid: 58d2bb1791994cbcacb75d029ed8a21b
           name: 'Memory: Non-Heap memory used'
@@ -462,8 +466,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: memory
         -
           uuid: e309472afb794a2c9cd581275931db79
           name: 'Memory: Object pending finalization count'
@@ -479,8 +483,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: memory
         -
           uuid: 5b5b9458cc284cbe90a4732a656c5745
           name: 'MemoryPool: CMS Old Gen committed'
@@ -497,8 +501,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: memory-pool
         -
           uuid: 60ee3f05569f4b99809090d8b5e06f44
           name: 'MemoryPool: CMS Old Gen maximum size'
@@ -510,8 +514,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: memory-pool
         -
           uuid: 31fbaf48b1634d9b8c3cdbb8155f0347
           name: 'MemoryPool: CMS Old Gen used'
@@ -523,8 +527,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: memory-pool
         -
           uuid: 02e3dc52db244bda9fbcb7e926fbb7fa
           name: 'MemoryPool: CMS Perm Gen committed'
@@ -541,8 +545,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: memory-pool
         -
           uuid: cb595bbf821f44e8b00aee3217070be5
           name: 'MemoryPool: CMS Perm Gen maximum size'
@@ -554,8 +558,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: memory-pool
         -
           uuid: ff3ca233f45b473e8952632d515dbdc1
           name: 'MemoryPool: CMS Perm Gen used'
@@ -567,8 +571,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: memory-pool
         -
           uuid: 9012e9453bb7442fb87aca747c148ed7
           name: 'MemoryPool: Code Cache committed'
@@ -585,8 +589,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: memory-pool
         -
           uuid: a6282cd5464747ec955597d933192f18
           name: 'MemoryPool: CodeCache maximum size'
@@ -598,8 +602,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: memory-pool
         -
           uuid: a004c3a23c2d476ca12c0b6bf4d64ebd
           name: 'MemoryPool: Code Cache used'
@@ -611,8 +615,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: memory-pool
         -
           uuid: 119045200b08450b87e35c5580d24162
           name: 'MemoryPool: Perm Gen committed'
@@ -629,8 +633,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: memory-pool
         -
           uuid: 8ca9e2beaa6d48fbb87fc78967c2d544
           name: 'MemoryPool: Perm Gen maximum size'
@@ -642,8 +646,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: memory-pool
         -
           uuid: e17f81cd11b34eb6ae26e46a157cb84b
           name: 'MemoryPool: Perm Gen used'
@@ -655,8 +659,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: memory-pool
         -
           uuid: 26edef50a85745a488b92ab22094edcd
           name: 'MemoryPool: PS Old Gen'
@@ -673,8 +677,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: memory-pool
         -
           uuid: a708c5a695d6441e984d8d24c58f9971
           name: 'MemoryPool: PS Old Gen maximum size'
@@ -686,8 +690,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: memory-pool
         -
           uuid: e4eb87b021aa49fb88e6b97e33dd2392
           name: 'MemoryPool: PS Old Gen used'
@@ -699,8 +703,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: memory-pool
         -
           uuid: 97022584d6314efaaabb216fd28ed3a0
           name: 'MemoryPool: PS Perm Gen committed'
@@ -717,8 +721,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: memory-pool
         -
           uuid: d6f6c199bd7f4eb6a24a75933a53aa3b
           name: 'MemoryPool: PS Perm Gen maximum size'
@@ -730,8 +734,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: memory-pool
         -
           uuid: 598378a9571943e2925951f381616ea3
           name: 'MemoryPool: PS Perm Gen used'
@@ -743,8 +747,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: memory-pool
         -
           uuid: 088933bc2f5d46008ae26f95e1a07ace
           name: 'MemoryPool: Tenured Gen committed'
@@ -761,8 +765,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: memory-pool
         -
           uuid: 0eddc89e4c6640dea5f958e75b779225
           name: 'MemoryPool: Tenured Gen maximum size'
@@ -774,8 +778,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: memory-pool
         -
           uuid: 08cc0edf464c41dc9e19cbcf14c23012
           name: 'MemoryPool: Tenured Gen used'
@@ -787,8 +791,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: memory-pool
         -
           uuid: 4c847c1239654be7b4f4d03fbb45ea4f
           name: 'OperatingSystem: File descriptors maximum count'
@@ -804,20 +808,20 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: os
         -
           uuid: f72ee698db964f3c9ce84bbb4a1274d7
           name: 'OperatingSystem: File descriptors opened'
           type: JMX
           key: 'jmx["java.lang:type=OperatingSystem","OpenFileDescriptorCount"]'
           history: 7d
-          description: 'This is the number of opened file descriptors at the moment, if this reaches the MaxFileDescriptorCount, the application will throw an IOException: Too many open files. This could mean you’re are opening file descriptors and never closing them.'
+          description: 'This is the number of opened file descriptors at the moment, if this reaches the MaxFileDescriptorCount, the application will throw an IOException: Too many open files. This could mean you''re are opening file descriptors and never closing them.'
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: os
         -
           uuid: 3c252493c9304aabbb2930b9a82a1cbf
           name: 'OperatingSystem: Process CPU Load'
@@ -835,14 +839,18 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: os
           triggers:
             -
               uuid: cc6cc7942e434b8589ff28a0b3112fc7
               expression: 'min(/Generic Java JMX/jmx["java.lang:type=OperatingSystem","ProcessCpuLoad"],{$JMX.CPU.LOAD.TIME})>{$JMX.CPU.LOAD.MAX}'
               name: 'OperatingSystem: Process CPU Load more than {$JMX.CPU.LOAD.MAX}% for {$JMX.CPU.LOAD.TIME}'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: capacity
         -
           uuid: 00007954da00442b9631e15995ef6cab
           name: 'Runtime: JVM uptime'
@@ -857,8 +865,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: runtime
           triggers:
             -
               uuid: c82c23dc5be34bb68ec8b152b3be367b
@@ -866,6 +874,10 @@ zabbix_export:
               name: 'Runtime: JVM is not reachable'
               priority: AVERAGE
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: e824c36de524425eaac253bcf3a1f3ec
           name: 'Runtime: JVM name'
@@ -883,8 +895,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: runtime
           triggers:
             -
               uuid: 560edfbeb7654f1eb7315389f08ef1b3
@@ -892,6 +904,10 @@ zabbix_export:
               name: 'Runtime: {HOST.NAME} runs suboptimal VM type'
               priority: INFO
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: a8675d659349414fa10cc11a1cd4ddd7
           name: 'Runtime: JVM version'
@@ -909,8 +925,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: runtime
         -
           uuid: f2f0836103ea4358a740abc0010336ca
           name: 'Threading: Daemon thread count'
@@ -926,8 +942,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: threading
         -
           uuid: 1793243b7ed147f1a182876fda905ebc
           name: 'Threading: Peak thread count'
@@ -938,8 +954,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: threading
         -
           uuid: ca198e0473384025aecbc16913800c0c
           name: 'Threading: Thread count'
@@ -950,8 +966,8 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: threading
         -
           uuid: 9db83653dfa6449c95ffec2b0e6c8b5d
           name: 'Threading: Total started thread count'
@@ -962,8 +978,15 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             -
-              tag: Application
-              value: JMX
+              tag: component
+              value: threading
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: java
       macros:
         -
           macro: '{$JMX.CPU.LOAD.MAX}'
@@ -1011,66 +1034,118 @@ zabbix_export:
       expression: 'last(/Generic Java JMX/jmx["java.lang:type=GarbageCollector,name=ConcurrentMarkSweep","CollectionCount"])>last(/Generic Java JMX/jmx["java.lang:type=GarbageCollector,name=ParNew","CollectionCount"])'
       name: 'GarbageCollector: Concurrent Mark Sweep in fire fighting mode'
       priority: AVERAGE
+      tags:
+        -
+          tag: scope
+          value: performance
     -
       uuid: 32f2c8687d634240b430bbbd7881e0d8
       expression: 'last(/Generic Java JMX/jmx["java.lang:type=GarbageCollector,name=MarkSweepCompact","CollectionCount"])>last(/Generic Java JMX/jmx["java.lang:type=GarbageCollector,name=Copy","CollectionCount"])'
       name: 'GarbageCollector: Mark Sweep Compact in fire fighting mode'
       priority: AVERAGE
+      tags:
+        -
+          tag: scope
+          value: performance
     -
       uuid: 3dd80e3ba2b843e1b26212239c23ca24
       expression: 'last(/Generic Java JMX/jmx["java.lang:type=GarbageCollector,name=PS MarkSweep","CollectionCount"])>last(/Generic Java JMX/jmx["java.lang:type=GarbageCollector,name=PS Scavenge","CollectionCount"])'
       name: 'GarbageCollector: PS Mark Sweep in fire fighting mode'
       priority: AVERAGE
+      tags:
+        -
+          tag: scope
+          value: performance
     -
       uuid: 69fda060b5004d12b6af0ba5f73cec6d
       expression: 'min(/Generic Java JMX/jmx["java.lang:type=Memory","HeapMemoryUsage.used"],{$JMX.HEAP.MEM.USAGE.TIME})>(last(/Generic Java JMX/jmx["java.lang:type=Memory","HeapMemoryUsage.max"])*{$JMX.HEAP.MEM.USAGE.MAX}/100)'
       name: 'Memory: Heap memory usage more than {$JMX.HEAP.USAGE.MAX}% for {$JMX.HEAP.MEM.USAGE.TIME}'
       priority: WARNING
+      tags:
+        -
+          tag: scope
+          value: capacity
     -
       uuid: 2b4dfda1100d4feeaa66218e57786f38
       expression: 'min(/Generic Java JMX/jmx["java.lang:type=Memory","NonHeapMemoryUsage.used"],{$JMX.NONHEAP.MEM.USAGE.TIME})>(last(/Generic Java JMX/jmx["java.lang:type=Memory","NonHeapMemoryUsage.max"])*{$JMX.NONHEAP.MEM.USAGE.MAX}/100)'
       name: 'Memory: Non-Heap memory usage more than {$JMX.NONHEAP.MEM.USAGE.MAX}% for {$JMX.NONHEAP.MEM.USAGE.TIME}'
       priority: WARNING
+      tags:
+        -
+          tag: scope
+          value: capacity
     -
       uuid: e8efca02403d44de916b6266e06dd230
       expression: 'min(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=CMS Old Gen","Usage.used"],{$JMX.MP.USAGE.TIME:"CMS Old Gen"})>(last(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=CMS Old Gen","Usage.max"])*{$JMX.MP.USAGE.MAX:"CMS Old Gen"}/100)'
       name: 'MemoryPool: CMS Old Gen memory usage more than {$JMX.MP.USAGE.MAX:"CMS Old Gen"}% for {$JMX.MP.USAGE.TIME:"CMS Old Gen"}'
       priority: WARNING
+      tags:
+        -
+          tag: scope
+          value: capacity
     -
       uuid: 1c2d038eaa8546ee81e5498ee1b67433
       expression: 'min(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=CMS Perm Gen","Usage.used"],{$JMX.MP.USAGE.TIME:"CMS Perm Gen"})>(last(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=CMS Perm Gen","Usage.max"])*{$JMX.MP.USAGE.MAX:"CMS Perm Gen"}/100)'
       name: 'MemoryPool: CMS Perm Gen memory usage more than {$JMX.MP.USAGE.MAX:"CMS Perm Gen"}% for {$JMX.MP.USAGE.TIME:"CMS Perm Gen"}'
       priority: WARNING
+      tags:
+        -
+          tag: scope
+          value: capacity
     -
       uuid: 2624989d3a3340c1b8bcb3ba8e2c2a4a
       expression: 'min(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=Code Cache","Usage.used"],{$JMX.MP.USAGE.TIME:"Code Cache"})>(last(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=Code Cache","Usage.max"])*{$JMX.MP.USAGE.MAX:"Code Cache"}/100)'
       name: 'MemoryPool: Code Cache memory usage more than {$JMX.MP.USAGE.MAX:"Code Cache"}% for {$JMX.MP.USAGE.TIME:"Code Cache"}'
       priority: WARNING
+      tags:
+        -
+          tag: scope
+          value: capacity
     -
       uuid: 385f7b11df2c42d19a52502bd63c861f
       expression: 'min(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=Perm Gen","Usage.used"],{$JMX.MP.USAGE.TIME:"Perm Gen"})>(last(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=Perm Gen","Usage.max"])*{$JMX.MP.USAGE.MAX:"Perm Gen"}/100)'
       name: 'MemoryPool: Perm Gen memory usage more than {$JMX.MP.USAGE.MAX:"Perm Gen"}% for {$JMX.MP.USAGE.TIME:"Perm Gen"}'
       priority: WARNING
+      tags:
+        -
+          tag: scope
+          value: capacity
     -
       uuid: 00f060e8925946c3a1d9b0cdfae10f59
       expression: 'min(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=PS Old Gen","Usage.used"],{$JMX.MP.USAGE.TIME:"PS Old Gen"})>(last(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=PS Old Gen","Usage.max"])*{$JMX.MP.USAGE.MAX:"PS Old Gen"}/100)'
       name: 'MemoryPool: PS Old Gen memory usage more than {$JMX.MP.USAGE.MAX:"PS Old Gen"}% for {$JMX.MP.USAGE.TIME:"PS Old Gen"}'
       priority: WARNING
+      tags:
+        -
+          tag: scope
+          value: capacity
     -
       uuid: 2e10427bbac64a7a9d44344b6c862952
       expression: 'min(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=PS Perm Gen","Usage.used"],{$JMX.MP.USAGE.TIME:"PS Perm Gen"})>(last(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=PS Perm Gen","Usage.max"])*{$JMX.MP.USAGE.MAX:"PS Perm Gen"}/100)'
       name: 'MemoryPool: PS Perm Gen memory usage more than {$JMX.MP.USAGE.MAX:"PS Perm Gen"}% for {$JMX.MP.USAGE.TIME:"PS Perm Gen"}'
       priority: WARNING
+      tags:
+        -
+          tag: scope
+          value: capacity
     -
       uuid: ed73f2cee57c4f7d8c581190bd9a70a6
       expression: 'min(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=Tenured Gen","Usage.used"],{$JMX.MP.USAGE.TIME:"Tenured Gen"})>(last(/Generic Java JMX/jmx["java.lang:type=MemoryPool,name=Tenured Gen","Usage.max"])*{$JMX.MP.USAGE.MAX:"Tenured Gen"}/100)'
       name: 'MemoryPool: Tenured Gen memory usage more than {$JMX.MP.USAGE.MAX:"Tenured Gen"}% for {$JMX.MP.USAGE.TIME:"Tenured Gen"}'
       priority: WARNING
+      tags:
+        -
+          tag: scope
+          value: capacity
     -
       uuid: 726a3b8a6209451b9a6cca63a3195a0c
       expression: 'min(/Generic Java JMX/jmx["java.lang:type=OperatingSystem","OpenFileDescriptorCount"],{$JMX.FILE.DESCRIPTORS.TIME})>(last(/Generic Java JMX/jmx["java.lang:type=OperatingSystem","MaxFileDescriptorCount"])*{$JMX.FILE.DESCRIPTORS.MAX}/100)'
       name: 'OperatingSystem: Opened file descriptor count more than {$JMX.FILE.DESCRIPTORS.MAX}% of maximum'
       priority: WARNING
+      tags:
+        -
+          tag: scope
+          value: capacity
   graphs:
     -
       uuid: 69184fc10a914cc78637625cc6cc554c

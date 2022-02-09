@@ -40,6 +40,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20211222';
 @import "components/message-box";
 @import "components/radio-list-control";
 @import "components/service/info";
+@import "components/subfilter";
 @import "components/tabfilter";
 @import "components/toc";
 @import "components/z-bar-gauge";
@@ -1076,43 +1077,6 @@ form {
 				border-bottom-width: 1px;
 			}
 		}
-	}
-}
-
-.subfilter,
-.subfilter-enabled {
-	display: inline-block;
-	height: 18px;
-	position: relative;
-}
-
-.subfilter {
-	margin-right: 10px;
-}
-
-.subfilter-enabled {
-	background-color: $ui-bg-selected-color;
-	border-radius: 2px;
-	color: $font-selected-color;
-	padding: 0 4px;
-
-	.link-action {
-		color: $font-selected-color;
-		text-decoration: none;
-
-		&:focus {
-			color: $font-selected-color;
-			border-bottom: 2px solid rgba($font-selected-color, .7);
-		}
-
-		&:hover {
-			color: $font-selected-color;
-			border-bottom: 1px solid rgba($font-selected-color, .7);
-		}
-	}
-
-	sup {
-		color: lighten($ui-bg-selected-color, 25%);
 	}
 }
 

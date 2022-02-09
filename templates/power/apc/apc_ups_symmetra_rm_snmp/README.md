@@ -51,12 +51,12 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Input phases discovery |<p>The input phase identifier. OID upsPhaseInputPhaseIndex.1.1</p> |SNMP |input.phases.discovery |
-|Output phases discovery |<p>The output phase identifier. OID upsPhaseOutputPhaseIndex.1.1</p> |SNMP |output.phases.discovery |
-|External battery packs discovery |<p>-</p> |SNMP |battery.packs.discovery<p>**Filter**:</p>AND <p>- {#CARTRIDGE_STATUS} NOT_MATCHES_REGEX `^$`</p> |
 |External bad battery packs discovery |<p>Discovery of the number of external defective battery packs.</p> |SNMP |battery.packs.bad.discovery |
+|External battery packs discovery |<p>-</p> |SNMP |battery.packs.discovery<p>**Filter**:</p>AND <p>- {#CARTRIDGE_STATUS} NOT_MATCHES_REGEX `^$`</p> |
 |External sensor port 1 discovery |<p>uioSensorStatusTable</p> |SNMP |external.sensor1.discovery<p>**Overrides:**</p><p>Temp<br> - {#EXTERNAL_SENSOR1_NAME} MATCHES_REGEX `Temp`<br>  - ITEM_PROTOTYPE LIKE `Humidity` - NO_DISCOVER</p> |
 |External sensor port 2 discovery |<p>uioSensorStatusTable</p> |SNMP |external.sensor2.discovery<p>**Overrides:**</p><p>Temp<br> - {#EXTERNAL_SENSOR2_NAME} MATCHES_REGEX `Temp`<br>  - ITEM_PROTOTYPE LIKE `Humidity` - NO_DISCOVER</p> |
+|Input phases discovery |<p>The input phase identifier. OID upsPhaseInputPhaseIndex.1.1</p> |SNMP |input.phases.discovery |
+|Output phases discovery |<p>The output phase identifier. OID upsPhaseOutputPhaseIndex.1.1</p> |SNMP |output.phases.discovery |
 
 ## Items collected
 
@@ -147,5 +147,5 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/420730-discussion-thread-for-official-zabbix-template-apc-ups).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/420730-discussion-thread-for-official-zabbix-template-apc-ups).
 

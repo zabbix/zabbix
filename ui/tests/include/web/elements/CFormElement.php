@@ -285,6 +285,15 @@ class CFormElement extends CElement {
 	}
 
 	/**
+	 * Get tabs from form.
+	 *
+	 * @return CElementCollection
+	 */
+	public function getTabs() {
+		return $this->query("xpath:.//li[@role='tab']")->all()->asText();
+	}
+
+	/**
 	 * Switch to tab by tab name.
 	 *
 	 * @return $this

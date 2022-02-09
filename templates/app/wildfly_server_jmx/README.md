@@ -136,7 +136,7 @@ There are no template links in this template.
 |WildFly {#JMX_DATA_SOURCE}: There are no active connections for 5m |<p>-</p> |`max(/WildFly Server by JMX/jmx["{#JMXOBJ}",ActiveCount],5m)=0` |WARNING | |
 |WildFly {#JMX_DATA_SOURCE}: Connection usage is too high (over {$WILDFLY.CONN.USAGE.WARN.MAX} in 5m) |<p>-</p> |`min(/WildFly Server by JMX/jmx["{#JMXOBJ}",InUseCount],5m)/last(/WildFly Server by JMX/jmx["{#JMXOBJ}",AvailableCount])*100>{$WILDFLY.CONN.USAGE.WARN.MAX}` |HIGH | |
 |WildFly {#JMX_DATA_SOURCE}: Pools monitoring statistic is not enabled |<p>Zabbix has not received data for items for the last 15 minutes</p> |`last(/WildFly Server by JMX/jmx["{#JMXOBJ}",statisticsEnabled])=0` |INFO | |
-|WildFly {#JMX_DATA_SOURCE}: There are timeout  connections |<p>-</p> |`last(/WildFly Server by JMX/jmx["{#JMXOBJ}",TimedOut])>0` |WARNING | |
+|WildFly {#JMX_DATA_SOURCE}: There are timeout connections |<p>-</p> |`last(/WildFly Server by JMX/jmx["{#JMXOBJ}",TimedOut])>0` |WARNING | |
 |WildFly {#JMX_DATA_SOURCE}: Too many waiting connections (over {$WILDFLY.CONN.WAIT.MAX.WARN} for 5m) |<p>-</p> |`min(/WildFly Server by JMX/jmx["{#JMXOBJ}",WaitCount],5m)>{$WILDFLY.CONN.WAIT.MAX.WARN}` |WARNING | |
 |WildFly listener {#HTTP_LISTENER}: There are 500 responses by this listener. |<p>-</p> |`last(/WildFly Server by JMX/jmx["{#JMXOBJ}",errorCount])>0` |WARNING | |
 
@@ -144,5 +144,5 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
 
