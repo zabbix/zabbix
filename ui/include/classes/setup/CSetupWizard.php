@@ -371,7 +371,7 @@ class CSetupWizard extends CForm {
 			->setFocusableElementId('label-default-lang')
 			->setAttribute('autofocus', 'autofocus');
 
-		$all_locales_available = 1;
+		$all_locales_available = true;
 
 		foreach (getLocales() as $localeid => $locale) {
 			if (!$locale['display']) {
@@ -401,7 +401,7 @@ class CSetupWizard extends CForm {
 			$language_error = 'Translations are unavailable because the PHP gettext module is missing.';
 			$lang_select->setReadonly();
 		}
-		elseif ($all_locales_available == 0) {
+		elseif (!$all_locales_available) {
 			$language_error = _('You are not able to choose some of the languages, because locales for them are not installed on the web server.');
 		}
 

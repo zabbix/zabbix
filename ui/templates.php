@@ -340,8 +340,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			]);
 
 			if ($dbTriggers) {
-				if (!copyTriggersToHosts(zbx_objectValues($dbTriggers, 'triggerid'),
-					$input_templateid, $cloneTemplateId)) {
+				if (!copyTriggersToHosts(zbx_objectValues($dbTriggers, 'triggerid'), $input_templateid,
+						$cloneTemplateId)) {
 					throw new Exception();
 				}
 			}

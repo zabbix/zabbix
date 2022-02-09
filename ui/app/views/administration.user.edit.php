@@ -204,7 +204,7 @@ if ($data['action'] === 'user.edit' && $data['db_user']['username'] === ZBX_GUES
 		->setReadonly();
 }
 else {
-	$all_locales_available = 1;
+	$all_locales_available = true;
 
 	foreach (getLocales() as $localeid => $locale) {
 		if (!$locale['display']) {
