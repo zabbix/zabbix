@@ -12841,6 +12841,21 @@ out:
 	return ret;
 }
 
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: find proxyid and type for given proxy name                        *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     name    - [IN] the proxy name                                          *
+ *     proxyid - [OUT] the proxyid                                            *
+ *     type    - [IN/OUT] the type of a proxy                                 *
+ *                                                                            *
+ * Return value:                                                              *
+ *     SUCCEED - id/type were retrieved successfully                          *
+ *     FAIL    - failed to find proxy in cache                                *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_dc_get_proxyid_by_name(const char *name, zbx_uint64_t *proxyid, unsigned char *type)
 {
 	int			ret = FAIL;
@@ -12850,20 +12865,13 @@ int	zbx_dc_get_proxyid_by_name(const char *name, zbx_uint64_t *proxyid, unsigned
 	RDLOCK_CACHE;
 
 	if (NULL == (dc_host = DCfind_proxy(name)))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to reload configuration cache on proxy '%s': failed to find "
-				"proxy", name);
 		goto out;
-	}
 
-	*type = dc_host->status;
+	if (NULL != type)
+		*type = dc_host->status;
 
 	if (NULL == (dc_proxy = (const ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &dc_host->hostid)))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to reload configuration cache on proxy '%s': failed to find "
-				"proxy", name);
 		goto out;
-	}
 	else
 		*proxyid = dc_proxy->hostid;
 
@@ -12887,11 +12895,16 @@ void	zbx_dc_update_passive_proxy_nextcheck(zbx_uint64_t proxyid)
 		goto out;
 	}
 
-	dc_proxy->proxy_config_nextcheck = time(0);
+	dc_proxy->proxy_config_nextcheck = time(NULL);
 out:
 	UNLOCK_CACHE;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve proxyids for all cached proxies                          *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_dc_get_all_proxies(zbx_vector_uint64_t *active_proxyids, zbx_vector_uint64_t *passive_proxyids)
 {
 	ZBX_DC_HOST_H		*dc_host;
@@ -12905,13 +12918,9 @@ void	zbx_dc_get_all_proxies(zbx_vector_uint64_t *active_proxyids, zbx_vector_uin
 	while (NULL != (dc_host = (ZBX_DC_HOST_H *)zbx_hashset_iter_next(&iter)))
 	{
 		if (dc_host->host_ptr->status == HOST_STATUS_PROXY_ACTIVE)
-		{
 			zbx_vector_uint64_append(active_proxyids, dc_host->host_ptr->hostid);
-		}
 		else if (dc_host->host_ptr->status == HOST_STATUS_PROXY_PASSIVE)
-		{
 			zbx_vector_uint64_append(passive_proxyids, dc_host->host_ptr->hostid);
-		}
 	}
 
 	UNLOCK_CACHE;
@@ -12919,9 +12928,11 @@ void	zbx_dc_get_all_proxies(zbx_vector_uint64_t *active_proxyids, zbx_vector_uin
 
 int	zbx_dc_get_proxy_type_by_id(zbx_uint64_t proxyid, int *status)
 {
-	int			found = 0;
-	ZBX_DC_HOST		*dc_host;
-	ZBX_DC_PROXY		*proxy;
+	int		found = 0;
+	ZBX_DC_HOST	*dc_host;
+	ZBX_DC_PROXY	*proxy;
+
+	RDLOCK_CACHE;
 
 	dc_host = (ZBX_DC_HOST *)DCfind_id(&config->hosts, proxyid, sizeof(ZBX_DC_HOST), &found);
 
@@ -12929,6 +12940,8 @@ int	zbx_dc_get_proxy_type_by_id(zbx_uint64_t proxyid, int *status)
 		return FAIL;
 
 	*status = dc_host->status;
+
+	UNLOCK_CACHE;
 
 	return SUCCEED;
 }

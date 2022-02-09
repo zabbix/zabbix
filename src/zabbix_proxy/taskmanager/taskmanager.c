@@ -41,6 +41,7 @@ extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
 extern int				CONFIG_PROXYMODE;
+extern char 				*CONFIG_HOSTNAME;
 
 /******************************************************************************
  *                                                                            *
@@ -388,9 +389,14 @@ static void	tm_remove_old_tasks(int now)
 	DBcommit();
 }
 
-extern char *CONFIG_HOSTNAME;
 
-static void	force_config_sync()
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create config cache reload request to be sent to the server       *
+ *          (only from passive proxy)                                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	force_config_sync(void)
 {
 	zbx_tm_task_t	*task;
 	zbx_uint64_t	taskid;
@@ -406,7 +412,7 @@ static void	force_config_sync()
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_PROXY_LIST, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(&j);
 
-	task->data = zbx_tm_data_create(taskid, j.buffer, strlen(j.buffer), ZBX_TM_DATA_TYPE_PROXY_HOSTID);
+	task->data = zbx_tm_data_create(taskid, j.buffer, strlen(j.buffer), ZBX_TM_DATA_TYPE_PROXY_HOSTNAME);
 
 	zbx_tm_save_task(task);
 

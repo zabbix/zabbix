@@ -132,8 +132,7 @@ int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data, char 
 
 		if ('=' == *param)
 		{
-			char	*token;
-			char	*p;
+			char	*token, *p;
 
 			if ('\0' == *(param + 1))
 			{

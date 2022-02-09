@@ -936,5 +936,4 @@ int	dc_expand_user_macros_len(const char *text, size_t text_len, zbx_uint64_t *h
 #define ZBX_TRIGGER_TIMER_FUNCTION_TREND	0x0004
 #define ZBX_TRIGGER_TIMER_FUNCTION		(ZBX_TRIGGER_TIMER_FUNCTION_TIME | ZBX_TRIGGER_TIMER_FUNCTION_TREND)
 
-
 #endif

@@ -26,6 +26,8 @@
 #include "zbxdiag.h"
 #include "../../libs/zbxalgo/vectorimpl.h"
 
+extern unsigned char	program_type;
+
 ZBX_PTR_VECTOR_IMPL(rtc_sub, zbx_rtc_sub_t *)
 ZBX_PTR_VECTOR_IMPL(rtc_hook, zbx_rtc_hook_t *)
 
@@ -356,8 +358,6 @@ int	zbx_rtc_init(zbx_rtc_t *rtc ,char **error)
 	zbx_vector_rtc_hook_create(&rtc->hooks);
 	return zbx_ipc_service_start(&rtc->service, ZBX_IPC_SERVICE_RTC, error);
 }
-
-extern unsigned char	program_type;
 
 /******************************************************************************
  *                                                                            *
