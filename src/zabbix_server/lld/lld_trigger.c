@@ -2483,14 +2483,6 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 		zbx_vector_uint64_append(&trigger_protoids, trigger_prototype->triggerid);
 	}
 
-	if (SUCCEED != DBlock_hostid(hostid) || SUCCEED != DBlock_triggerids(&trigger_protoids))
-	{
-		/* the host or trigger prototype was removed while processing lld rule */
-		DBrollback();
-		ret = FAIL;
-		goto out;
-	}
-
 	if (0 != new_triggers)
 	{
 		triggerid = DBget_maxid_num("triggers", new_triggers);
@@ -2526,6 +2518,14 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 
 		zbx_db_insert_prepare(&db_insert_ttags, "trigger_tag", "triggertagid", "triggerid", "tag", "value",
 				NULL);
+	}
+
+	if (SUCCEED != DBlock_hostid(hostid) || SUCCEED != DBlock_triggerids(&trigger_protoids))
+	{
+		/* the host or trigger prototype was removed while processing lld rule */
+		DBrollback();
+		ret = FAIL;
+		goto out;
 	}
 
 	if (0 != upd_triggers || 0 != upd_functions.values_num || 0 != del_functionids.values_num ||
