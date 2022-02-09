@@ -360,9 +360,9 @@ class testGeomapWidgetScreenshots extends CWebTest {
 		$widgets = [
 			'Geomap for screenshots, 5',
 			'Geomap for screenshots, 10',
-//			'Geomap for screenshots, 30',
-//			'Geomap for screenshots, no zoom',
-//			'Geomap for screenshots, 3'
+			'Geomap for screenshots, 30',
+			'Geomap for screenshots, no zoom',
+			'Geomap for screenshots, 3'
 		];
 
 		foreach ($widgets as $widget) {
