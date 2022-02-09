@@ -1253,7 +1253,7 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * Get the ID of interface if all fields of given interface are equals to all fields of one of existing interfaces.
+	 * Get the ID of interface if all fields of given interface are equal to all fields of one of existing interfaces.
 	 *
 	 * @param array $interface
 	 * @param array $db_interfaces
@@ -1338,7 +1338,7 @@ class CHostPrototype extends CHostBase {
 		unset($host_prototype);
 
 		if ($del_group_prototypeids) {
-			// Lock group prototypes before delete to prevent server from adding new LLD elements.
+			// Lock group prototypes before the deletion to prevent server from adding new LLD elements.
 			DBselect(
 				'SELECT NULL'.
 				' FROM group_prototype gp'.
@@ -1420,7 +1420,7 @@ class CHostPrototype extends CHostBase {
 		unset($host_prototype);
 
 		if ($del_group_prototypeids) {
-			// Lock group prototypes before delete to prevent server from adding new LLD elements.
+			// Lock group prototypes before the deletion to prevent server from adding new LLD elements.
 			DBselect(
 				'SELECT NULL'.
 				' FROM group_prototype gp'.
@@ -2127,7 +2127,7 @@ class CHostPrototype extends CHostBase {
 	public static function deleteForce(array $db_host_prototypes): void {
 		$hostids = array_keys($db_host_prototypes);
 
-		// Lock host prototypes before delete to prevent server from adding new LLD hosts.
+		// Lock host prototypes before the deletion to prevent server from adding new LLD hosts.
 		DBselect(
 			'SELECT NULL'.
 			' FROM hosts h'.
@@ -2138,7 +2138,7 @@ class CHostPrototype extends CHostBase {
 		$_db_host_prototypes = $db_host_prototypes;
 
 		do {
-			// Lock also inherited host prototypes before delete to prevent server from adding new LLD hosts.
+			// Lock also inherited host prototypes before the deletion to prevent server from adding new LLD hosts.
 			$_db_host_prototypes = DBfetchArrayAssoc(DBselect(
 				'SELECT hostid,host'.
 				' FROM hosts h'.
@@ -2162,7 +2162,7 @@ class CHostPrototype extends CHostBase {
 		CHost::validateDeleteForce($discovered_hosts);
 		CHost::deleteForce($discovered_hosts);
 
-		// Lock group prototypes before delete to prevent server from adding new LLD elements.
+		// Lock group prototypes before the deletion to prevent server from adding new LLD elements.
 		$db_group_prototypes = DBfetchArray(DBselect(
 			'SELECT gp.group_prototypeid,gp.name'.
 			' FROM group_prototype gp'.
