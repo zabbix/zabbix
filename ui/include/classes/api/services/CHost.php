@@ -1372,7 +1372,7 @@ class CHost extends CHostGeneral {
 				'SELECT h.host'.
 				' FROM maintenances_hosts mh,hosts h'.
 				' WHERE mh.hostid=h.hostid'.
-					' AND '.dbConditionId('mh.maintenanceid', $maintenance['maintenanceid'])
+					' AND '.dbConditionId('mh.maintenanceid', [$maintenance['maintenanceid']])
 			), 'host');
 
 			self::exception(ZBX_API_ERROR_PARAMETERS, _n(

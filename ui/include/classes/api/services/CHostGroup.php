@@ -842,7 +842,7 @@ class CHostGroup extends CApiService {
 				'SELECT g.name'.
 				' FROM maintenances_groups mg,hstgrp g'.
 				' WHERE mg.groupid=g.groupid'.
-					' AND '.dbConditionId('mg.maintenanceid',  $maintenance['maintenanceid'])
+					' AND '.dbConditionId('mg.maintenanceid', [$maintenance['maintenanceid']])
 			), 'name');
 
 			self::exception(ZBX_API_ERROR_PARAMETERS, _n(
