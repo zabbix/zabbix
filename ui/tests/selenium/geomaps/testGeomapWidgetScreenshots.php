@@ -265,11 +265,11 @@ class testGeomapWidgetScreenshots extends CWebTest {
 				]
 			],
 			// These providers are commented, because images on screenshots are not stable, and also they cause browser errors.
-			[
-				[
-					'Tile provider' => 'OpenStreetMap Mapnik'
-				]
-			],
+//			[
+//				[
+//					'Tile provider' => 'OpenStreetMap Mapnik'
+//				]
+//			],
 			[
 				[
 					'Tile provider' => 'Stamen Toner Lite'
