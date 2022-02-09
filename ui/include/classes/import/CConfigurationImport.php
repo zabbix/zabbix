@@ -1289,8 +1289,7 @@ class CConfigurationImport {
 				);
 			}
 		}
-		file_put_contents('test.txt', print_r($host_prototypes_to_update, true) . "\n", FILE_APPEND);
-		file_put_contents('test.txt', print_r($host_prototypes_to_create, true) . "\n", FILE_APPEND);
+
 		if ($host_prototypes_to_update) {
 			API::HostPrototype()->update($host_prototypes_to_update);
 		}
