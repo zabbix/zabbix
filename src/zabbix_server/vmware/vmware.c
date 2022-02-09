@@ -267,10 +267,8 @@ static zbx_uint64_t	evt_req_chunk_size;
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.instanceUuid']]"	\
 		"/*[local-name()='val']"
 
-#define ZBX_XPATH_HV_SENSOR_STATUS(sensor)								\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name']"					\
-		"[text()='runtime.healthSystemRuntime.systemHealthInfo']]"				\
-		"/*[local-name()='val']/*[local-name()='numericSensorInfo']"				\
+#define ZBX_XPATH_HV_SENSOR_STATUS(node, sensor)							\
+	ZBX_XPATH_PROP_NAME(node) "/*[local-name()='HostNumericSensorInfo']"				\
 		"[*[local-name()='name'][text()='" sensor "']]"						\
 		"/*[local-name()='healthState']/*[local-name()='key']"
 
@@ -328,14 +326,14 @@ static zbx_vmware_propmap_t	hv_propmap[] = {
 	ZBX_PROPMAP("summary.hardware.uuid"), 			/* ZBX_VMWARE_HVPROP_HW_UUID */
 	ZBX_PROPMAP("summary.hardware.vendor"), 		/* ZBX_VMWARE_HVPROP_HW_VENDOR */
 	ZBX_PROPMAP("summary.quickStats.overallMemoryUsage"),	/* ZBX_VMWARE_HVPROP_MEMORY_USED */
-	{"runtime.healthSystemRuntime.systemHealthInfo", 	/* ZBX_VMWARE_HVPROP_HEALTH_STATE */
-			ZBX_XPATH_HV_SENSOR_STATUS("VMware Rollup Health State"), NULL},
+	{NULL, ZBX_XPATH_HV_SENSOR_STATUS("runtime.healthSystemRuntime.systemHealthInfo.numericSensorInfo",
+			"VMware Rollup Health State"), NULL},	/* ZBX_VMWARE_HVPROP_HEALTH_STATE */
 	ZBX_PROPMAP("summary.quickStats.uptime"),		/* ZBX_VMWARE_HVPROP_UPTIME */
 	ZBX_PROPMAP("summary.config.product.version"),		/* ZBX_VMWARE_HVPROP_VERSION */
 	ZBX_PROPMAP("summary.config.name"),			/* ZBX_VMWARE_HVPROP_NAME */
 	ZBX_PROPMAP("overallStatus"),				/* ZBX_VMWARE_HVPROP_STATUS */
 	ZBX_PROPMAP("runtime.inMaintenanceMode"),		/* ZBX_VMWARE_HVPROP_MAINTENANCE */
-	ZBX_PROPMAP_EXT("summary.runtime.healthSystemRuntime.systemHealthInfo.numericSensorInfo",
+	ZBX_PROPMAP_EXT("runtime.healthSystemRuntime.systemHealthInfo.numericSensorInfo",
 			zbx_xmlnode_to_json),			/* ZBX_VMWARE_HVPROP_SENSOR */
 	{"config.network.dnsConfig", "concat("			/* ZBX_VMWARE_HVPROP_NET_NAME */
 			ZBX_XPATH_PROP_NAME("config.network.dnsConfig") "/*[local-name()='hostName']" ",'.',"
@@ -2886,6 +2884,9 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 
 	for (i = 0; i < props_num; i++)
 	{
+		if (NULL == propmap[i].name)
+			continue;
+
 		zbx_strlcat(props, "<ns0:pathSet>", sizeof(props));
 		zbx_strlcat(props, propmap[i].name, sizeof(props));
 		zbx_strlcat(props, "</ns0:pathSet>", sizeof(props));
