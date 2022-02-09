@@ -50,6 +50,7 @@ typedef struct
 	unsigned char		recovery_mode;		/* see TRIGGER_RECOVERY_MODE_* defines   */
 	unsigned char		correlation_mode;	/* see ZBX_TRIGGER_CORRELATION_* defines */
 	unsigned char		timer;
+	unsigned char		flags;
 
 	zbx_uint64_t		*itemids;
 

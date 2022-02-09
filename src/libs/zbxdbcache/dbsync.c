@@ -2168,6 +2168,9 @@ int	zbx_dbsync_compare_prototype_items(zbx_dbsync_t *sync)
  ******************************************************************************/
 static int	dbsync_compare_trigger(const ZBX_DC_TRIGGER *trigger, const DB_ROW dbrow)
 {
+	if (ZBX_FLAG_DISCOVERY_PROTOTYPE == atoi(dbrow[19]))
+		return dbsync_compare_uchar(dbrow[19], trigger->flags);
+
 	if (FAIL == dbsync_compare_str(dbrow[1], trigger->description))
 		return FAIL;
 
@@ -2233,7 +2236,12 @@ static char	**dbsync_trigger_preproc_row(char **row)
 	zbx_vector_uint64_t	hostids, functionids;
 	zbx_eval_context_t	ctx, ctx_r;
 	char			*error = NULL;
-	unsigned char		mode, timer = ZBX_TRIGGER_TIMER_DEFAULT;
+	unsigned char		mode, timer = ZBX_TRIGGER_TIMER_DEFAULT, flags;
+
+	ZBX_STR2UCHAR(flags, row[19]);
+
+	if (ZBX_FLAG_DISCOVERY_PROTOTYPE == flags)
+		return row;
 
 	zbx_vector_uint64_create(&hostids);
 	zbx_vector_uint64_create(&functionids);
@@ -2342,13 +2350,13 @@ int	zbx_dbsync_compare_triggers(zbx_dbsync_t *sync)
 	if (NULL == (result = DBselect(
 			"select triggerid,description,expression,error,priority,type,value,state,lastchange,status,"
 			"recovery_mode,recovery_expression,correlation_mode,correlation_tag,opdata,event_name,null,"
-			"null,null"
+			"null,null,flags"
 			" from triggers")))
 	{
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 19, dbsync_trigger_preproc_row);
+	dbsync_prepare(sync, 20, dbsync_trigger_preproc_row);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
