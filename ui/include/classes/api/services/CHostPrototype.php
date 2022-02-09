@@ -2114,7 +2114,7 @@ class CHostPrototype extends CHostBase {
 
 		foreach ($hostids as $i => $hostid) {
 			if ($db_host_prototypes[$hostid]['templateid'] != 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.$i,
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1),
 					_('cannot delete templated host prototype')
 				));
 			}
