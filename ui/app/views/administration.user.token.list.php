@@ -45,7 +45,7 @@ $filter = (new CFilter())
 				(new CCheckBox('filter_expires_state'))
 					->setChecked($data['filter']['expires_state'])
 					->setId('filter-expires-state')
-					->onClick('javascript: view.expiresDaysHandler()'),
+					->onClick('view.expiresDaysHandler()'),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CNumericBox('filter_expires_days', $data['filter']['expires_days'], 3, false, false, false))
 					->setId('filter-expires-days')
@@ -69,7 +69,9 @@ $widget = (new CWidget())
 	->setTitleSubmenu(getUserSettingsSubmenu())
 	->setControls(
 		(new CTag('nav', true,
-			(new CList())->addItem((new CSimpleButton(_('Create API token')))->addClass('js-create-token'))
+			(new CList())->addItem(
+				(new CSimpleButton(_('Create API token')))->addClass('js-create-token')
+			)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem($filter);

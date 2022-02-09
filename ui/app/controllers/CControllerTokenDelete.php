@@ -63,7 +63,8 @@ class CControllerTokenDelete extends CController {
 
 			if ($deleted > 1) {
 				$success = ['title' => _('API tokens deleted')];
-			} else {
+			}
+			else {
 				$success = ['title' => _('API token deleted')];
 			}
 
