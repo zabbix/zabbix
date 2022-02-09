@@ -3650,7 +3650,7 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 {
 	char		**row;
 	zbx_uint64_t	rowid;
-	unsigned char	tag, flags;
+	unsigned char	tag;
 
 	ZBX_DC_TRIGGER	*trigger;
 
@@ -3664,11 +3664,6 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 		/* removed rows will be always added at the end */
 		if (ZBX_DBSYNC_ROW_REMOVE == tag)
 			break;
-
-		ZBX_STR2UCHAR(flags, row[19]);
-
-		if (ZBX_FLAG_DISCOVERY_PROTOTYPE == flags)
-			continue;
 
 		ZBX_STR2UINT64(triggerid, row[0]);
 
