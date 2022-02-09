@@ -449,7 +449,6 @@ class CHostGroup extends CApiService {
 
 	/**
 	 * @param array $groupids
-	 * @param bool 	$nopermissions
 	 *
 	 * @return array
 	 */
@@ -616,7 +615,6 @@ class CHostGroup extends CApiService {
 	 *
 	 * @param array      $groupids
 	 * @param array|null $db_groups
-	 * @param bool       $nopermissions
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
@@ -815,7 +813,8 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
-	 * Check if no maintenance with none hosts and host groups will exists when the given host groups will be deleted.
+	 * Check that no maintenance object will be left without hosts and host groups as the result of the given host
+	 * groups deletion.
 	 *
 	 * @param array $groupids
 	 *

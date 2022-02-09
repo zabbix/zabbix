@@ -1343,7 +1343,8 @@ class CHost extends CHostGeneral {
 	}
 
 	/**
-	 * Check if no maintenance with none hosts and host groups will exists when the given hosts will be deleted.
+	 * Check that no maintenance object will be left without hosts and host groups as the result of the given hosts
+	 * deletion.
 	 *
 	 * @param array $hostids
 	 *
