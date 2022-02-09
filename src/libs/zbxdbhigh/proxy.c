@@ -3516,7 +3516,7 @@ static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_v
 
 		total_num += read_num;
 
-		if (NULL != session)
+		if (NULL != session && session->last_valueid < values[values_num - 1].id)
 			session->last_valueid = values[values_num - 1].id;
 
 		DCconfig_clean_items(items, errcodes, values_num);
