@@ -805,18 +805,6 @@ abstract class CItemGeneral extends CApiService {
 		foreach ($items as $item) {
 			$host = $db_hosts[$item['hostid']];
 
-			if ($item['type'] == ITEM_TYPE_DB_MONITOR) {
-				if (($item['flags'] == ZBX_FLAG_DISCOVERY_RULE
-						&& $item['key_'] === ZBX_DEFAULT_KEY_DB_MONITOR_DISCOVERY)
-						|| $item['key_'] === ZBX_DEFAULT_KEY_DB_MONITOR) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Check the key, please. Default example was passed.'));
-				}
-			}
-			elseif (($item['type'] == ITEM_TYPE_SSH && $item['key_'] === ZBX_DEFAULT_KEY_SSH)
-					|| ($item['type'] == ITEM_TYPE_TELNET && $item['key_'] === ZBX_DEFAULT_KEY_TELNET)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Check the key, please. Default example was passed.'));
-			}
-
 			if ($item_key_parser->parse($item['key_']) != CParser::PARSE_SUCCESS) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_params($this->getErrorMsg(self::ERROR_INVALID_KEY), [

@@ -305,26 +305,21 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 	$delay = getRequest('delay', DB::getDefault('items', 'delay'));
 	$type = getRequest('type', ITEM_TYPE_ZABBIX);
+	$item_key = getRequest('key', '');
 
-	$tags = getRequest('tags', []);
-	foreach ($tags as $key => $tag) {
-		if ($tag['tag'] === '' && $tag['value'] === '') {
-			unset($tags[$key]);
-		}
-		elseif (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
-			unset($tags[$key]);
-		}
-		else {
-			unset($tags[$key]['type']);
-		}
+	if (($type == ITEM_TYPE_DB_MONITOR && $item_key === ZBX_DEFAULT_KEY_DB_MONITOR_DISCOVERY)
+			|| ($type == ITEM_TYPE_SSH && $item_key === ZBX_DEFAULT_KEY_SSH)
+			|| ($type == ITEM_TYPE_TELNET && $item_key === ZBX_DEFAULT_KEY_TELNET)) {
+		error(_('Check the key, please. Default example was passed.'));
+		$result = false;
 	}
 
 	/*
 	 * "delay_flex" is a temporary field that collects flexible and scheduling intervals separated by a semicolon.
 	 * In the end, custom intervals together with "delay" are stored in the "delay" variable.
 	 */
-	if (!in_array($type, [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
-			&& ($type != ITEM_TYPE_ZABBIX_ACTIVE || strncmp(getRequest('key'), 'mqtt.get', 8) !== 0)
+	if ($result && !in_array($type, [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
+			&& ($type != ITEM_TYPE_ZABBIX_ACTIVE || strncmp($item_key, 'mqtt.get', 8) !== 0)
 			&& hasRequest('delay_flex')) {
 		$intervals = [];
 		$simple_interval_parser = new CSimpleIntervalParser([
@@ -383,11 +378,24 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	if ($result) {
 		$preprocessing = getRequest('preprocessing', []);
 		$preprocessing = normalizeItemPreprocessingSteps($preprocessing);
+		$tags = getRequest('tags', []);
+
+		foreach ($tags as $key => $tag) {
+			if ($tag['tag'] === '' && $tag['value'] === '') {
+				unset($tags[$key]);
+			}
+			elseif (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
+				unset($tags[$key]);
+			}
+			else {
+				unset($tags[$key]['type']);
+			}
+		}
 
 		$item = [
 			'name'			=> getRequest('name'),
 			'description'	=> getRequest('description'),
-			'key_'			=> getRequest('key'),
+			'key_'			=> $item_key,
 			'hostid'		=> $discoveryRule['hostid'],
 			'interfaceid'	=> getRequest('interfaceid'),
 			'delay'			=> $delay,
@@ -588,7 +596,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$item['preprocessing'] = $preprocessing;
 			}
 
-			$item['tags'] = $tags;
+			if ($tags) {
+				$item['tags'] = $tags;
+			}
 
 			$result = API::ItemPrototype()->create($item);
 		}
