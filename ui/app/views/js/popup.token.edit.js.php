@@ -45,15 +45,9 @@ window.token_edit_popup = {
 		this.expires_state = document.getElementById('expires_state');
 		this.expiresAtHandler();
 
-		this.addEventListeners();
-	},
-
-	addEventListeners() {
-		this.overlay.$dialogue[0].addEventListener('overlay.close', () => {
-			history.replaceState({}, '', location.href);
-			location.href = location.href;
-		}, {once: true});
 		this.expires_state.addEventListener('change', () => this.expiresAtHandler());
+		this.overlay.$dialogue[0].addEventListener('overlay.close', this.events.overlayClose, {once: true});
+		this.enableNavigationWarning();
 	},
 
 	submit() {
@@ -73,16 +67,18 @@ window.token_edit_popup = {
 					throw {error: response.error};
 				}
 
-				if (fields.tokenid !== '0') {
+				if ('data' in response) {
+					this.overlay.$dialogue[0].removeEventListener('overlay.close', this.events.overlayClose);
+					this.loadTokenView(response.data);
+				}
+				else {
 					overlayDialogueDestroy(this.overlay.dialogueid);
+
 					this.dialogue.dispatchEvent(new CustomEvent('dialogue.update', {
 						detail: {
 							success: response.success
 						}
 					}));
-				}
-				else {
-					this.loadTokenView(response.data);
 				}
 			})
 			.catch(this.ajaxExceptionHandler)
@@ -92,6 +88,7 @@ window.token_edit_popup = {
 	},
 
 	regenerate() {
+		this.overlay.$dialogue[0].removeEventListener('overlay.close', this.events.overlayClose);
 		this.removePopupMessages();
 
 		const fields = this.preprocessFormFields(getFormFields(this.form));
@@ -152,6 +149,14 @@ window.token_edit_popup = {
 		overlayDialogueDestroy(this.overlay.dialogueid);
 	},
 
+	enableNavigationWarning() {
+		window.addEventListener('beforeunload', this.events.beforeUnload, {passive: false});
+	},
+
+	disableNavigationWarning() {
+		window.removeEventListener('beforeunload', this.events.beforeUnload);
+	},
+
 	removePopupMessages() {
 		for (const el of this.form.parentNode.children) {
 			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
@@ -181,6 +186,7 @@ window.token_edit_popup = {
 	preprocessFormFields(fields) {
 		this.trimFields(fields);
 		fields.status = fields.status || <?= ZBX_AUTH_TOKEN_DISABLED ?>;
+
 		return fields;
 	},
 
@@ -191,6 +197,7 @@ window.token_edit_popup = {
 				fields[field] = fields[field].trim();
 			}
 		}
+
 		return fields;
 	},
 
@@ -208,8 +215,8 @@ window.token_edit_popup = {
 			this.expires_at.disabled = true;
 		}
 		else {
-			this.expires_at_row.style.display = "";
-			this.expires_at_label.style.display = "";
+			this.expires_at_row.style.display = '';
+			this.expires_at_label.style.display = '';
 			this.expires_at.disabled = false;
 			let expires_state_hidden = document.getElementById('expires_state_hidden');
 			if (expires_state_hidden) {
@@ -232,11 +239,33 @@ window.token_edit_popup = {
 				if ('error' in response) {
 					throw {error: response.error};
 				}
+
 				this.overlay.setProperties(response);
+
+				this.overlay.$dialogue[0].addEventListener('overlay.close', this.events.overlayCloseAndReloadList,
+					{once: true}
+				);
 			})
 			.catch(this.ajaxExceptionHandler)
 			.finally(() => {
 				this.overlay.unsetLoading();
 			});
+	},
+
+	events: {
+		beforeUnload(e) {
+			// Display confirmation message.
+			e.preventDefault();
+			e.returnValue = '';
+		},
+
+		overlayClose() {
+			token_edit_popup.disableNavigationWarning();
+		},
+
+		overlayCloseAndReloadList() {
+			token_edit_popup.disableNavigationWarning();
+			location.href = location.href;
+		}
 	}
 };
