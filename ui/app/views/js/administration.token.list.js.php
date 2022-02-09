@@ -43,7 +43,7 @@
 				else if (e.target.classList.contains('js-massdelete-token')) {
 					this.massDeleteToken(e.target, Object.values(chkbxRange.getSelectedIds()));
 				}
-			})
+			});
 		},
 
 		expiresDaysHandler() {
@@ -63,8 +63,6 @@
 		},
 
 		openTokenPopup(token_data) {
-			const original_url = location.href;
-
 			const overlay = PopUp('popup.token.edit', token_data, {
 				dialogueid: 'token_edit',
 				dialogue_class: 'modal-popup-generic'
@@ -157,5 +155,5 @@
 				location.href = location.href;
 			}
 		}
-	}
+	};
 </script>
