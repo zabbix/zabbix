@@ -265,42 +265,42 @@ class testGeomapWidgetScreenshots extends CWebTest {
 				]
 			],
 			// These providers are commented, because images on screenshots are not stable, and also they cause browser errors.
-//			[
-//				[
-//					'Tile provider' => 'OpenStreetMap Mapnik'
-//				]
-//			],
-//			[
-//				[
-//					'Tile provider' => 'Stamen Toner Lite'
-//				]
-//			],
-//			[
-//				[
-//					'Tile provider' => 'Stamen Terrain'
-//				]
-//			],
-//			[
-//				[
-//					'Tile provider' => 'USGS US Topo'
-//				]
-//			],
-//			[
-//				[
-//					'Tile provider' => 'USGS US Imagery'
-//				]
-//			],
-//			[
-//				[
-//					'Tile provider' => 'Other',
-//					'Tile URL' => 'https://tileserver.memomaps.de/tilegen/{z}/{x}/{y}.png',
-//					'Attribution' => 'Map <a href="https://memomaps.de/">memomaps.de</a> '.
-//							'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, '.
-//							'map data &copy; <a href="https://www.openstreetmap.org/copyright">'.
-//							'OpenStreetMap</a> contributors',
-//					'Max zoom level' => '30'
-//				]
-//			]
+			[
+				[
+					'Tile provider' => 'OpenStreetMap Mapnik'
+				]
+			],
+			[
+				[
+					'Tile provider' => 'Stamen Toner Lite'
+				]
+			],
+			[
+				[
+					'Tile provider' => 'Stamen Terrain'
+				]
+			],
+			[
+				[
+					'Tile provider' => 'USGS US Topo'
+				]
+			],
+			[
+				[
+					'Tile provider' => 'USGS US Imagery'
+				]
+			],
+			[
+				[
+					'Tile provider' => 'Other',
+					'Tile URL' => 'https://tileserver.memomaps.de/tilegen/{z}/{x}/{y}.png',
+					'Attribution' => 'Map <a href="https://memomaps.de/">memomaps.de</a> '.
+							'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, '.
+							'map data &copy; <a href="https://www.openstreetmap.org/copyright">'.
+							'OpenStreetMap</a> contributors',
+					'Max zoom level' => '30'
+				]
+			]
 		];
 	}
 
@@ -358,11 +358,11 @@ class testGeomapWidgetScreenshots extends CWebTest {
 		$this->page->waitUntilReady();
 
 		$widgets = [
-			'Geomap for screenshots, 5',
+//			'Geomap for screenshots, 5',
 			'Geomap for screenshots, 10',
-			'Geomap for screenshots, 30',
-			'Geomap for screenshots, no zoom',
-			'Geomap for screenshots, 3'
+//			'Geomap for screenshots, 30',
+//			'Geomap for screenshots, no zoom',
+//			'Geomap for screenshots, 3'
 		];
 
 		foreach ($widgets as $widget) {
@@ -371,7 +371,7 @@ class testGeomapWidgetScreenshots extends CWebTest {
 					"]/../../div[not(contains(@class,\"is-loading\"))]")->waitUntilPresent()->one();
 
 			// This sleep is needed because after loader ring disappeared map image needs to load anyway.
-			sleep(2);
+			sleep(10);
 			$this->assertScreenshot($this->query("xpath:.//div[@class=\"dashboard-grid-widget\"]//h4[text()=".
 					CXPathHelper::escapeQuotes($widget)."]/../..")->waitUntilVisible()->one(), $widget.' '.$data['Tile provider']
 			);
