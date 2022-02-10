@@ -414,6 +414,12 @@ class testFormGeomapWidget extends CWebTest {
 		$this->checkFormGeomapWidget($data, true);
 	}
 
+	/**
+	 * Function for checking Geomap widget form.
+	 *
+	 * @param array      $data      data provider
+	 * @param boolean    $update    true if update scenario, false if create
+	 */
 	public function checkFormGeomapWidget($data, $update = false) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$old_hash = CDBHelper::getHash($this->sql);
@@ -526,6 +532,12 @@ class testFormGeomapWidget extends CWebTest {
 		$this->checkNoChanges(true);
 	}
 
+	/**
+	 * Function for checking canceling form or submitting without any changes.
+	 *
+	 * @param boolean $cancel    true if cancel scenario, false if form is submitted
+	 * @param boolean $create    true if create scenario, false if update
+	 */
 	private function checkNoChanges($cancel = false, $create = false) {
 		$old_hash = CDBHelper::getHash($this->sql);
 
@@ -540,8 +552,8 @@ class testFormGeomapWidget extends CWebTest {
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 
 		if (!$create) {
-				$values = $form->getFields()->asValues();
-			}
+			$values = $form->getFields()->asValues();
+		}
 
 		if ($cancel) {
 			$form->fill(

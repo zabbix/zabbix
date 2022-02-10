@@ -95,7 +95,6 @@ class testGeomapWidgetScreenshots extends CWebTest {
 		self::$cities['hostids']['Oslo'] = $hostids['Oslo'];
 		self::$cities['hostids']['Bergen'] = $hostids['Bergen'];
 
-
 		// Create items on previously created hosts.
 		$items_data = [];
 		foreach ($hostids as $hostid) {
@@ -305,8 +304,11 @@ class testGeomapWidgetScreenshots extends CWebTest {
 	}
 
 
-	// Create event on hosts to make different color pins.
-	public static function pepareDBData() {
+	/**
+	 * Function for creating problems in DB for hosts being screenshoted.
+	 */
+	public static function pepareProblemsData() {
+		// Create events.
 		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (10500, 0, 0, '.
 				self::$cities['triggerids']['Riga'].', '.time().', 0, 1, '.zbx_dbstr('Trigger Riga').', 0)');
 		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (10501, 0, 0, '.
@@ -318,6 +320,7 @@ class testGeomapWidgetScreenshots extends CWebTest {
 		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (10504, 0, 0, '.
 				self::$cities['triggerids']['Bergen'].', '.time().', 0, 1, '.zbx_dbstr('Trigger Bergen').', 4)');
 
+		// Create problems.
 		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (10500, 0, 0, '.
 				self::$cities['triggerids']['Riga'].', '.time().', 0, '.zbx_dbstr('Trigger Riga').', 0)');
 		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (10501, 0, 0, '.
@@ -329,6 +332,7 @@ class testGeomapWidgetScreenshots extends CWebTest {
 		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (10504, 0, 0, '.
 				self::$cities['triggerids']['Bergen'].', '.time().', 0, '.zbx_dbstr('Trigger Bergen').', 4)');
 
+		// Change triggers' state to Problem.
 		DBexecute('UPDATE triggers SET value = 1 WHERE description = '.zbx_dbstr('Trigger Riga'));
 		DBexecute('UPDATE triggers SET value = 1 WHERE description = '.zbx_dbstr('Trigger Tallin'));
 		DBexecute('UPDATE triggers SET value = 1 WHERE description = '.zbx_dbstr('Trigger Vilnius'));
@@ -337,7 +341,7 @@ class testGeomapWidgetScreenshots extends CWebTest {
 	}
 
 	/**
-	 * @onBeforeOnce pepareDBData
+	 * @onBeforeOnce pepareProblemsData
 	 *
 	 * @dataProvider getZoomWidgetData
 	 */
@@ -359,6 +363,11 @@ class testGeomapWidgetScreenshots extends CWebTest {
 		}
 	}
 
+	/**
+	 * Function for asserting screenshots of every widget depending on Tile provider.
+	 *
+	 * @param array $data    data with tile providers
+	 */
 	private function assertWidgetScreenshot($data) {
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$zoom_dashboardid);
 		$this->page->waitUntilReady();
