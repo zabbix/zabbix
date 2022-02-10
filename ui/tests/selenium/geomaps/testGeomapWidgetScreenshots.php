@@ -264,7 +264,7 @@ class testGeomapWidgetScreenshots extends CWebTest {
 					'Tile provider' => 'OpenTopoMap'
 				]
 			],
-			// These providers are commented, because images on screenshots are not stable, and also they cause browser errors.
+			// This provider is commented, because images on screenshots are not stable.
 //			[
 //				[
 //					'Tile provider' => 'OpenStreetMap Mapnik'
@@ -310,32 +310,32 @@ class testGeomapWidgetScreenshots extends CWebTest {
 	public function testGeomapWidgetScreenshots_Zoom($data) {
 		// Create event on hosts to make different color pins.
 		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (10500, 0, 0, '.
-				self::$cities['triggerids']['Riga'].', '.time().', 0, 1, "Trigger Riga", 0)');
+				self::$cities['triggerids']['Riga'].', '.time().', 0, 1, '.zbx_dbstr('Trigger Riga').', 0)');
 		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (10501, 0, 0, '.
-				self::$cities['triggerids']['Tallin'].', '.time().', 0, 1, "Trigger Tallin", 1)');
+				self::$cities['triggerids']['Tallin'].', '.time().', 0, 1, '.zbx_dbstr('Trigger Tallin').', 1)');
 		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (10502, 0, 0, '.
-				self::$cities['triggerids']['Vilnius'].', '.time().', 0, 1, "Trigger Vilnius", 2)');
+				self::$cities['triggerids']['Vilnius'].', '.time().', 0, 1, '.zbx_dbstr('Trigger Vilnius').', 2)');
 		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (10503, 0, 0, '.
-				self::$cities['triggerids']['Oslo'].', '.time().', 0, 1, "Trigger Oslo", 3)');
+				self::$cities['triggerids']['Oslo'].', '.time().', 0, 1, '.zbx_dbstr('Trigger Oslo').', 3)');
 		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (10504, 0, 0, '.
-				self::$cities['triggerids']['Bergen'].', '.time().', 0, 1, "Trigger Bergen", 4)');
+				self::$cities['triggerids']['Bergen'].', '.time().', 0, 1, '.zbx_dbstr('Trigger Bergen').', 4)');
 
 		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (10500, 0, 0, '.
-				self::$cities['triggerids']['Riga'].', '.time().', 0, "Trigger Riga", 0)');
+				self::$cities['triggerids']['Riga'].', '.time().', 0, '.zbx_dbstr('Trigger Riga').', 0)');
 		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (10501, 0, 0, '.
-				self::$cities['triggerids']['Tallin'].', '.time().', 0, "Trigger Tallin", 1)');
+				self::$cities['triggerids']['Tallin'].', '.time().', 0, '.zbx_dbstr('Trigger Tallin').', 1)');
 		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (10502, 0, 0, '.
-				self::$cities['triggerids']['Vilnius'].', '.time().', 0, "Trigger Vilnius", 2)');
+				self::$cities['triggerids']['Vilnius'].', '.time().', 0, '.zbx_dbstr('Trigger Vilnius').', 2)');
 		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (10503, 0, 0, '.
-				self::$cities['triggerids']['Oslo'].', '.time().', 0, "Trigger Oslo", 3)');
+				self::$cities['triggerids']['Oslo'].', '.time().', 0, '.zbx_dbstr('Trigger Oslo').', 3)');
 		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (10504, 0, 0, '.
-				self::$cities['triggerids']['Bergen'].', '.time().', 0, "Trigger Bergen", 4)');
+				self::$cities['triggerids']['Bergen'].', '.time().', 0, '.zbx_dbstr('Trigger Bergen').', 4)');
 
-		DBexecute('UPDATE triggers SET value = 1 WHERE description = "Trigger Riga"');
-		DBexecute('UPDATE triggers SET value = 1 WHERE description = "Trigger Tallin"');
-		DBexecute('UPDATE triggers SET value = 1 WHERE description = "Trigger Vilnius"');
-		DBexecute('UPDATE triggers SET value = 1 WHERE description = "Trigger Oslo"');
-		DBexecute('UPDATE triggers SET value = 1 WHERE description = "Trigger Bergen"');
+		DBexecute('UPDATE triggers SET value = 1 WHERE description = '.zbx_dbstr('Trigger Riga'));
+		DBexecute('UPDATE triggers SET value = 1 WHERE description = '.zbx_dbstr('Trigger Tallin'));
+		DBexecute('UPDATE triggers SET value = 1 WHERE description = '.zbx_dbstr('Trigger Vilnius'));
+		DBexecute('UPDATE triggers SET value = 1 WHERE description = '.zbx_dbstr('Trigger Oslo'));
+		DBexecute('UPDATE triggers SET value = 1 WHERE description = '.zbx_dbstr('Trigger Bergen'));
 
 		$this->page->login();
 
