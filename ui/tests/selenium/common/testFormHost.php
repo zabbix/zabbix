@@ -806,7 +806,8 @@ class testFormHost extends CWebTest {
 		if (array_key_exists('utf_fields', $data)) {
 			foreach ($data['utf_fields'] as $locator => $value) {
 				CElementQuery::getDriver()->executeScript('arguments[0].value = '.json_encode($value).';',
-						[$form->query($locator)->one()]);
+						[$form->query($locator)->one()]
+				);
 			}
 		}
 
@@ -1699,7 +1700,8 @@ class testFormHost extends CWebTest {
 		if (array_key_exists('utf_fields', $data)) {
 			foreach ($data['utf_fields'] as $locator => $value) {
 				CElementQuery::getDriver()->executeScript('arguments[0].value = '.json_encode($value).';',
-						[$form->query($locator)->one()]);
+						[$form->query($locator)->one()]
+				);
 			}
 		}
 
