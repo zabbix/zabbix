@@ -804,9 +804,9 @@ class testFormHost extends CWebTest {
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
 
 		if (array_key_exists('utf_fields', $data)) {
-			foreach ($data['utf_fields'] as $id => $value) {
-				$element = $form->query($id)->one();
-				CElementQuery::getDriver()->executeScript('arguments[0].value = '.json_encode($value).';', [$element]);
+			foreach ($data['utf_fields'] as $locator => $value) {
+				CElementQuery::getDriver()->executeScript('arguments[0].value = '.json_encode($value).';',
+						[$form->query($locator)->one()]);
 			}
 		}
 
@@ -823,11 +823,11 @@ class testFormHost extends CWebTest {
 				$this->page->assertTitle($this->monitoring ? 'Hosts' : 'Configuration of hosts');
 
 				// Check host fields.
-				$host = (array_key_exists('utf_fields', $data) && array_key_exists('id:visiblename', $data['utf_fields']))
-					? $host = $data['utf_fields']['id:visiblename']
-					: $host = CTestArrayHelper::get($data, 'host_fields.Visible name', $data['host_fields']['Host name']);
+				$host = (CTestArrayHelper::get($data, 'utf_fields.id:visiblename'))
+					? $data['utf_fields']['id:visiblename']
+					: CTestArrayHelper::get($data, 'host_fields.Visible name', $data['host_fields']['Host name']);
 
-				$form = $this->filterAndSelectHost($host, CTestArrayHelper::get($data, 'utf_fields', false));
+				$form = $this->filterAndSelectHost($host, CTestArrayHelper::get($data, 'utf_fields'));
 				$form->checkValue($data['host_fields']);
 
 				foreach ($interfaces as &$interface) {
@@ -1490,9 +1490,9 @@ class testFormHost extends CWebTest {
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
 
 		if (array_key_exists('utf_fields', $data)) {
-			foreach ($data['utf_fields'] as $field => $value) {
-				$element = $form->query($value['locator'])->one();
-				CElementQuery::getDriver()->executeScript('arguments[0].value = '.json_encode($value['text']).';', [$element]);
+			foreach (array_values($data['utf_fields']) as $value) {
+				CElementQuery::getDriver()->executeScript('arguments[0].value = '.json_encode($value['text']).';',
+						[$form->query($value['locator'])->one()]);
 			}
 		}
 
@@ -1506,7 +1506,7 @@ class testFormHost extends CWebTest {
 			case TEST_GOOD:
 				$this->assertMessage(TEST_GOOD, 'Host updated');
 
-				if (array_key_exists('utf_fields', $data) && ($data['utf_fields']['Visible name']['locator']= 'id:visiblename')) {
+				if (CTestArrayHelper::get($data, 'utf_fields.Visible name.locator') === 'id:visiblename') {
 					$host = $data['utf_fields']['Visible name']['text'];
 				}
 				else {
@@ -1515,7 +1515,7 @@ class testFormHost extends CWebTest {
 						: CTestArrayHelper::get($data, 'host_fields.Visible name', 'testFormHost_Update Visible name');
 				}
 
-				$form = $this->filterAndSelectHost($host, CTestArrayHelper::get($data, 'utf_fields', false));
+				$form = $this->filterAndSelectHost($host, CTestArrayHelper::get($data, 'utf_fields'));
 
 				// Update or add new source data from host data.
 				foreach (CTestArrayHelper::get($data, 'host_fields', []) as $key => $value) {
@@ -1697,9 +1697,9 @@ class testFormHost extends CWebTest {
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
 
 		if (array_key_exists('utf_fields', $data)) {
-			foreach ($data['utf_fields'] as $id => $value) {
-				$element = $form->query($id)->one();
-				CElementQuery::getDriver()->executeScript('arguments[0].value = '.json_encode($value).';', [$element]);
+			foreach ($data['utf_fields'] as $locator => $value) {
+				CElementQuery::getDriver()->executeScript('arguments[0].value = '.json_encode($value).';',
+						[$form->query($locator)->one()]);
 			}
 		}
 
@@ -1710,17 +1710,17 @@ class testFormHost extends CWebTest {
 
 		$cloned_form = (!$this->standalone)
 			? COverlayDialogElement::find()->asForm()->waitUntilPresent()->one()
-			: $this->query('id:host-form')->asForm()->waitUntilReady()->one();
+			: $this->query('id:host-form')->asForm()->waitUntilVisible()->one();
 
 		$cloned_form->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Host added');
 
 		// Check the values of the original host with the cloned host.
-		$visible_name = (array_key_exists('utf_fields', $data) && array_key_exists('id:visiblename', $data['utf_fields'])) ?
-			$data['utf_fields']['id:visiblename'] :
-			$data['host_fields']['Host name'];
-		$this->filterAndSelectHost($visible_name, CTestArrayHelper::get($data, 'utf_fields', false))->checkValue($original);
+		$visible_name = (CTestArrayHelper::get($data, 'utf_fields.id:visiblename'))
+			? $data['utf_fields']['id:visiblename']
+			: $data['host_fields']['Host name'];
+		$this->filterAndSelectHost($visible_name, CTestArrayHelper::get($data, 'utf_fields'))->checkValue($original);
 		COverlayDialogElement::find()->one()->close();
 	}
 
@@ -1739,18 +1739,15 @@ class testFormHost extends CWebTest {
 				zbx_dbstr($data['host_fields']['Host name'])
 		);
 
-		if (array_key_exists('utf_fields', $data) && array_key_exists('id:visiblename', $data['utf_fields'])) {
+		if (CTestArrayHelper::get($data, 'utf_fields.id:visiblename')) {
 			$data['host_fields']['Visible name'] =  $data['utf_fields']['id:visiblename'];
 		}
 		elseif (CTestArrayHelper::get($data, 'host_fields.Visible name') === "") {
 			$data['host_fields']['Visible name'] = $data['host_fields']['Host name'];
 		}
 
-		if (array_key_exists('utf_fields', $data) && array_key_exists('id:description', $data['utf_fields'])) {
+		if (CTestArrayHelper::get($data, 'utf_fields.id:description')) {
 			$data['host_fields']['Description'] =  $data['utf_fields']['id:description'];
-		}
-		elseif (CTestArrayHelper::get($data, 'host_fields.Description') === "") {
-			$data['host_fields']['Description'] = $data['host_fields']['Description'];
 		}
 
 		$fields = ['Host name' => 'host', 'Visible name' => 'name', 'Description' => 'description', 'Enabled' => 'status'];
@@ -1976,8 +1973,8 @@ class testFormHost extends CWebTest {
 		$filter_form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 
 		if ($utf) {
-			$element = $filter_form->query('xpath:.//input[@id="filter_host" or @name="name"]')->one();
-			CElementQuery::getDriver()->executeScript('arguments[0].value = '.json_encode($host).';', [$element]);
+			CElementQuery::getDriver()->executeScript('arguments[0].value = '.json_encode($host).';',
+					[$filter_form->query('xpath:.//input[@id="filter_host" or @name="name"]')->one()]);
 		}
 		else {
 			$filter_form->fill(['Name' => $host]);
