@@ -21,7 +21,11 @@
 
 /**
  * SVG graph widget form view.
+ *
+ * @var CView $this
+ * @var array $data
  */
+
 $fields = $data['dialogue']['fields'];
 
 $form = CWidgetHelper::createForm();
@@ -34,9 +38,8 @@ $form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dia
 
 $form->addItem($form_list);
 
-$scripts = [];
+$scripts = [$this->readJsFile('../../../include/classes/widgets/views/js/widget.svggraph.form.view.js.php')];
 $jq_templates = [];
-$form_name = $form->getName();
 
 // Create graph preview box.
 $form->addItem(
@@ -45,171 +48,16 @@ $form->addItem(
 	))->addClass(ZBX_STYLE_SVG_GRAPH_PREVIEW)
 );
 
-// Stick preview to the top of configuration window when scroll.
-$scripts[] =
-	'jQuery(".overlay-dialogue-body").on("scroll", function() {'.
-		'if (jQuery("#svg-graph-preview").length) {'.
-			'var $dialogue_body = jQuery(this),'.
-				'$preview_container = jQuery(".'.ZBX_STYLE_SVG_GRAPH_PREVIEW.'");'.
-				'jQuery("#svg-graph-preview").css("top",'.
-					'($preview_container.offset().top < $dialogue_body.offset().top && $dialogue_body.height() > 500)'.
-						' ? $dialogue_body.offset().top - $preview_container.offset().top'.
-						' : 0'.
-				');'.
-		'}'.
-		'else {'.
-			'jQuery(".overlay-dialogue-body").off("scroll");'.
-		'}'.
-	'})';
-
-$scripts[] =
-	'function onLeftYChange() {'.
-		'var on = (!jQuery("#lefty").is(":disabled") && jQuery("#lefty").is(":checked"));'.
-		'if (jQuery("#lefty").is(":disabled") && !jQuery("#lefty").is(":checked")) {'.
-			'jQuery("#lefty").prop("checked", true);'.
-		'}'.
-		'jQuery("#lefty_min, #lefty_max, #lefty_units").prop("disabled", !on);'.
-		'jQuery("#lefty_static_units").prop("disabled",'.
-			'(!on || jQuery("#lefty_units").val() != "'.SVG_GRAPH_AXIS_UNITS_STATIC.'"));'.
-	'}'.
-	'function onRightYChange() {'.
-		'var on = (!jQuery("#righty").is(":disabled") && jQuery("#righty").is(":checked"));'.
-		'if (jQuery("#righty").is(":disabled") && !jQuery("#righty").is(":checked")) {'.
-			'jQuery("#righty").prop("checked", true);'.
-		'}'.
-		'jQuery("#righty_min, #righty_max, #righty_units").prop("disabled", !on);'.
-		'jQuery("#righty_static_units").prop("disabled",'.
-			'(!on || jQuery("#righty_units").val() != "'.SVG_GRAPH_AXIS_UNITS_STATIC.'"));'.
-	'}';
-
-$scripts[] =
-	'function onGraphConfigChange() {'.
-		// Update graph preview.
-		'var $preview = jQuery("#svg-graph-preview"),'.
-			'$preview_container = $preview.parent(),'.
-			'preview_data = $preview_container.data(),'.
-			'$form = jQuery("#'.$form->getId().'"),'.
-			'url = new Curl("zabbix.php"),'.
-			'data = {'.
-				'uniqueid: 0,'.
-				'preview: 1,'.
-				'content_width: Math.floor($preview.width()),'.
-				'content_height: Math.floor($preview.height()) - 10'.
-			'};'.
-		'url.setArgument("action", "widget.svggraph.view");'.
-
-		// Enable/disable fields for Y axis.
-		'if (this.id !== "lefty" && this.id !== "righty") {'.
-			'var axes_used = {'.GRAPH_YAXIS_SIDE_LEFT.':0, '.GRAPH_YAXIS_SIDE_RIGHT.':0};'.
-
-			'jQuery("[type=radio]", $form).each(function() {'.
-				'if (jQuery(this).attr("name").match(/ds\[\d+\]\[axisy\]/) && jQuery(this).is(":checked")) {'.
-					'axes_used[jQuery(this).val()]++;'.
-				'}'.
-			'});'.
-			'jQuery("[type=hidden]", $form).each(function() {'.
-				'if (jQuery(this).attr("name").match(/or\[\d+\]\[axisy\]/)) {'.
-					'axes_used[jQuery(this).val()]++;'.
-				'}'.
-			'});'.
-
-			'jQuery("#lefty").prop("disabled", !axes_used['.GRAPH_YAXIS_SIDE_LEFT.']);'.
-			'jQuery("#righty").prop("disabled", !axes_used['.GRAPH_YAXIS_SIDE_RIGHT.']);'.
-
-			'onLeftYChange();'.
-			'onRightYChange();'.
-		'}'.
-
-		'var form_fields = $form.serializeJSON();'.
-		'if ("ds" in form_fields) {'.
-			'for (var i in form_fields.ds) {'.
-				'form_fields.ds[i] = jQuery.extend({"hosts":[], "items":[]}, form_fields.ds[i]);'.
-			'}'.
-		'}'.
-		'if ("or" in form_fields) {'.
-			'for (var i in form_fields.or) {'.
-				'form_fields.or[i] = jQuery.extend({"hosts":[], "items":[]}, form_fields.or[i]);'.
-			'}'.
-		'}'.
-		'data.fields = JSON.stringify(form_fields);'.
-
-		'if (preview_data.xhr) {'.
-			'preview_data.xhr.abort();'.
-		'}'.
-
-		'if (preview_data.timeoutid) {'.
-			'clearTimeout(preview_data.timeoutid);'.
-		'}'.
-
-		'preview_data.timeoutid = setTimeout(function() {'.
-			'$preview_container.addClass("is-loading");'.
-		'}, 1000);'.
-
-		'preview_data.xhr = jQuery.ajax({'.
-			'url: url.getUrl(),'.
-			'method: "POST",'.
-			'contentType: "application/json",'.
-			'data: JSON.stringify(data),'.
-			'dataType: "json",'.
-			'success: function(r) {'.
-				'if (preview_data.timeoutid) {'.
-					'clearTimeout(preview_data.timeoutid);'.
-				'}'.
-				'$preview_container.removeClass("is-loading");'.
-
-				'$form.prev(".msg-bad").remove();'.
-				'if (typeof r.messages !== "undefined") {'.
-					'jQuery(r.messages).insertBefore($form);'.
-				'}'.
-				'if (typeof r.body !== "undefined") {'.
-					'$preview.html(jQuery(r.body)).attr("unselectable", "on").css("user-select", "none");'.
-				'}'.
-			'}'.
-		'});'.
-		'$preview_container.data(preview_data);'.
-	'}';
-
-$scripts[] =
-	/**
-	 * This function needs to change element names in "Data set" or "Overrides" controls after reordering elements.
-	 *
-	 * @param obj           "Data set" or "Overrides" element.
-	 * @param row_selector  jQuery selector for rows.
-	 * @param var_prefix    Prefix for the variables, which will be renamed.
-	 */
-	'function updateVariableOrder(obj, row_selector, var_prefix) {'.
-		'jQuery.each([10000, 0], function(index, value) {'.
-			'jQuery(row_selector, obj).each(function(i) {'.
-				'jQuery(".multiselect[data-params]", this).each(function() {'.
-					'var name = jQuery(this).multiSelect("getOption", "name");'.
-					'if (name !== null) {'.
-						'jQuery(this).multiSelect("modify", {'.
-							'name: name.replace(/([a-z]+\[)\d+(\]\[[a-z_]+\])/, "$1" + (value + i) + "$2")'.
-						'});'.
-					'}'.
-				'});'.
-
-				'jQuery(\'[name^="\' + var_prefix + \'["]\', this).filter(function() {'.
-					'return jQuery(this).attr("name").match(/[a-z]+\[\d+\]\[[a-z_]+\]/);'.
-				'}).each(function() {'.
-					'jQuery(this).attr("name", '.
-						'jQuery(this).attr("name").replace(/([a-z]+\[)\d+(\]\[[a-z_]+\])/, "$1" + (value + i) + "$2")'.
-					');'.
-				'});'.
-			'});'.
-		'});'.
-	'}';
-
 // Create 'Data set' tab.
 $tab_data_set = (new CFormList())
-	->addRow(CWidgetHelper::getLabel($fields['ds']), CWidgetHelper::getGraphDataSet($fields['ds'], $form_name));
+	->addRow(CWidgetHelper::getLabel($fields['ds']), CWidgetHelper::getGraphDataSet($fields['ds'], $form->getName()));
 $scripts[] = CWidgetHelper::getGraphDataSetJavascript();
-$jq_templates['dataset-row'] = CWidgetHelper::getGraphDataSetTemplate($fields['ds'], $form_name);
+$jq_templates['dataset-row'] = CWidgetHelper::getGraphDataSetTemplate($fields['ds'], $form->getName());
 
 // Create 'Displaying options' tab.
 $tab_displaying_opt = (new CFormList())
 	->addRow(CWidgetHelper::getLabel($fields['source']),
-		CWidgetHelper::getRadioButtonList($fields['source'], $form_name)
+		CWidgetHelper::getRadioButtonList($fields['source'])
 	);
 
 // Create 'Time period' tab.
@@ -266,7 +114,7 @@ $tab_problems = (new CFormList())
 		CWidgetHelper::getCheckBox($fields['graph_item_problems'])
 	)
 	->addRow(CWidgetHelper::getLabel($fields['problemhosts']),
-		CWidgetHelper::getHostPatternSelect($fields['problemhosts'], $form_name)
+		CWidgetHelper::getHostPatternSelect($fields['problemhosts'], $form->getName())
 	)
 	->addRow(CWidgetHelper::getLabel($fields['severities']),
 		CWidgetHelper::getSeverities($fields['severities'])
@@ -281,10 +129,10 @@ $jq_templates['tag-row-tmpl'] = CWidgetHelper::getTagsTemplate($fields['tags']);
 
 // Create 'Overrides' tab.
 $tab_overrides = (new CFormList())
-	->addRow(CWidgetHelper::getLabel($fields['or']), CWidgetHelper::getGraphOverride($fields['or'], $form_name));
+	->addRow(CWidgetHelper::getLabel($fields['or']), CWidgetHelper::getGraphOverride($fields['or'], $form->getName()));
 
 $scripts[] = CWidgetHelper::getGraphOverrideJavascript($fields['or']);
-$jq_templates['overrides-row'] = CWidgetHelper::getGraphOverrideTemplate($fields['or'], $form_name);
+$jq_templates['overrides-row'] = CWidgetHelper::getGraphOverrideTemplate($fields['or'], $form->getName());
 
 // Create CTabView.
 $form_tabs = (new CTabView())
@@ -302,21 +150,15 @@ $form_tabs = (new CTabView())
 // Add CTabView to form.
 $form->addItem($form_tabs);
 $scripts[] = $form_tabs->makeJavascript();
-$scripts[] = 'jQuery("#'.$form_tabs->getId().'").on("change", "input, z-select, .multiselect", onGraphConfigChange);';
-$scripts[] =
-	'jQuery(function($) {'.
-		'onGraphConfigChange();'.
-		'$(".overlay-dialogue").on("overlay-dialogue-resize", function(event, size_new, size_old) {'.
-			'if (jQuery("#svg-graph-preview").length) {'.
-				'if (size_new.width != size_old.width) {'.
-					'onGraphConfigChange();'.
-				'}'.
-			'}'.
-			'else {'.
-				'$(".overlay-dialogue").off("overlay-dialogue-resize");'.
-			'}'.
-		'});'.
-	'});';
+
+$form->addItem(
+	(new CScriptTag('
+		widget_svggraph_form.init('.json_encode([
+			'form_id' => $form->getId(),
+			'form_tabs_id' =>$form_tabs->getId()
+		]).');
+	'))->setOnDocumentReady()
+);
 
 return [
 	'form' => $form,

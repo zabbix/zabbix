@@ -1,0 +1,264 @@
+<?php declare(strict_types = 1);
+/*
+** Zabbix
+** Copyright (C) 2001-2021 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+
+/**
+ * @var CView $this
+ */
+?>
+
+window.widget_svggraph_form = new class {
+
+	form_id: null,
+	form_tabs: null,
+
+	init({form_id, form_tabs_id}) {
+		this.form_id = form_id;
+		this.form_tabs = form_tabs_id;
+
+		jQuery(".overlay-dialogue-body").on("scroll", function() {
+			if (jQuery("#svg-graph-preview").length) {
+				const $dialogue_body = jQuery(this);
+				const $preview_container = jQuery(".<?= ZBX_STYLE_SVG_GRAPH_PREVIEW ?>");
+
+				jQuery("#svg-graph-preview").css("top",
+					($preview_container.offset().top < $dialogue_body.offset().top && $dialogue_body.height() > 500)
+						? $dialogue_body.offset().top - $preview_container.offset().top
+						: 0
+				);
+			} else {
+				jQuery(".overlay-dialogue-body").off("scroll");
+			}
+		});
+
+		jQuery(`#${this.form_tabs}`)
+			.on("change", "input, z-select, .multiselect", widget_svggraph_form.onGraphConfigChange);
+
+		jQuery(function($) {
+			widget_svggraph_form.onGraphConfigChange();
+
+			$(".overlay-dialogue").on("overlay-dialogue-resize", function(event, size_new, size_old) {
+				if (jQuery("#svg-graph-preview").length) {
+					if (size_new.width != size_old.width) {
+						widget_svggraph_form.onGraphConfigChange();
+					}
+				} else {
+					$(".overlay-dialogue").off("overlay-dialogue-resize");
+				}
+			});
+		});
+
+		document
+			.getElementById('dataset-add')
+			.addEventListener('click', this.events.addDataset);
+	},
+
+	onGraphConfigChange() {
+		// Update graph preview.
+		var $preview = jQuery("#svg-graph-preview"),
+			$preview_container = $preview.parent(),
+			preview_data = $preview_container.data(),
+			$form = jQuery(`#${this.form_id}`),
+			url = new Curl("zabbix.php"),
+			data = {
+				uniqueid: 0,
+				preview: 1,
+				content_width: Math.floor($preview.width()),
+				content_height: Math.floor($preview.height()) - 10
+			};
+
+		url.setArgument("action", "widget.svggraph.view");
+
+		// Enable/disable fields for Y axis.
+		if (this.id !== "lefty" && this.id !== "righty") {
+			var axes_used = {<?= GRAPH_YAXIS_SIDE_LEFT ?>: 0, <?= GRAPH_YAXIS_SIDE_RIGHT ?>: 0};
+
+			jQuery("[type=radio]", $form).each(function() {
+				if (jQuery(this).attr("name").match(/ds\[\d+\]\[axisy\]/) && jQuery(this).is(":checked")) {
+					axes_used[jQuery(this).val()]++;
+				}
+			});
+
+			jQuery("[type=hidden]", $form).each(function() {
+				if (jQuery(this).attr("name").match(/or\[\d+\]\[axisy\]/)) {
+					axes_used[jQuery(this).val()]++;
+				}
+			});
+
+			jQuery("#lefty").prop("disabled", !axes_used[<?= GRAPH_YAXIS_SIDE_LEFT ?>]);
+			jQuery("#righty").prop("disabled", !axes_used[<?= GRAPH_YAXIS_SIDE_RIGHT ?>]);
+
+			this.onLeftYChange();
+			this.onRightYChange();
+		}
+
+		var form_fields = $form.serializeJSON();
+
+		if ("ds" in form_fields) {
+			for (const i in form_fields.ds) {
+				form_fields.ds[i] = jQuery.extend({"hosts": [], "items": []}, form_fields.ds[i]);
+			}
+		}
+
+		if ("or" in form_fields) {
+			for (const i in form_fields.or) {
+				form_fields.or[i] = jQuery.extend({"hosts": [], "items": []}, form_fields.or[i]);
+			}
+		}
+
+		data.fields = JSON.stringify(form_fields);
+
+		if (preview_data.xhr) {
+			preview_data.xhr.abort();
+		}
+
+		if (preview_data.timeoutid) {
+			clearTimeout(preview_data.timeoutid);
+		}
+
+		preview_data.timeoutid = setTimeout(function() {
+			$preview_container.addClass("is-loading");
+		}, 1000);
+
+		preview_data.xhr = jQuery.ajax({
+			url: url.getUrl(),
+			method: "POST",
+			data: data,
+			dataType: "json",
+			success: function(r) {
+				if (preview_data.timeoutid) {
+					clearTimeout(preview_data.timeoutid);
+				}
+
+				$preview_container.removeClass("is-loading");
+
+				$form.prev(".msg-bad").remove();
+
+				if (typeof r.messages !== "undefined") {
+					jQuery(r.messages).insertBefore($form);
+				}
+
+				if (typeof r.body !== "undefined") {
+					$preview.html(jQuery(r.body)).attr("unselectable", "on").css("user-select", "none");
+				}
+			}
+		});
+
+		$preview_container.data(preview_data);
+	},
+
+	onLeftYChange() {
+		const on = (!jQuery("#lefty").is(":disabled") && jQuery("#lefty").is(":checked"));
+
+		if (jQuery("#lefty").is(":disabled") && !jQuery("#lefty").is(":checked")) {
+			jQuery("#lefty").prop("checked", true);
+		}
+
+		jQuery("#lefty_min, #lefty_max, #lefty_units").prop("disabled", !on);
+
+		jQuery("#lefty_static_units").prop("disabled",
+			(!on || jQuery("#lefty_units").val() != "<?= SVG_GRAPH_AXIS_UNITS_STATIC ?>"));
+	},
+
+	onRightYChange() {
+		const on = (!jQuery("#righty").is(":disabled") && jQuery("#righty").is(":checked"));
+
+		if (jQuery("#righty").is(":disabled") && !jQuery("#righty").is(":checked")) {
+			jQuery("#righty").prop("checked", true);
+		}
+
+		jQuery("#righty_min, #righty_max, #righty_units").prop("disabled", !on);
+
+		jQuery("#righty_static_units").prop("disabled",
+			(!on || jQuery("#righty_units").val() != "<?= SVG_GRAPH_AXIS_UNITS_STATIC ?>"));
+	},
+
+	/**
+	 * This function needs to change element names in "Data set" or "Overrides" controls after reordering elements.
+	 *
+	 * @param obj           "Data set" or "Overrides" element.
+	 * @param row_selector  jQuery selector for rows.
+	 * @param var_prefix    Prefix for the variables, which will be renamed.
+	 */
+	updateVariableOrder(obj, row_selector, var_prefix) {
+		jQuery.each([10000, 0], function(index, value) {
+			jQuery(row_selector, obj)
+				.each(function(i) {
+					jQuery(".multiselect[data-params]", this).each(function() {
+						const name = jQuery(this).multiSelect("getOption", "name");
+
+						if (name !== null) {
+							jQuery(this).multiSelect("modify", {
+								name: name.replace(/([a-z]+\[)\d+(\]\[[a-z_]+\])/, "$1" + (value + i) + "$2")
+							});
+						}
+					});
+
+					jQuery(`[name^="${var_prefix}["]`, this).filter(function() {
+						return jQuery(this).attr("name").match(/[a-z]+\[\d+\]\[[a-z_]+\]/);
+					})
+						.each(function() {
+							jQuery(this).attr("name",
+								jQuery(this).attr("name").replace(/([a-z]+\[)\d+(\]\[[a-z_]+\])/, "$1" + (value + i) + "$2")
+							);
+						});
+				});
+		});
+	},
+
+	events: {
+		addDataset: (e) => {
+			const menu = [
+				{
+					items: [
+						{
+							label: <?= json_encode(_('Item pattern')) ?>,
+							clickCallback: (event) => {
+								debugger;
+								addRow();
+							}
+						},
+						{
+							label: <?= json_encode(_('Item list')) ?>,
+							clickCallback: () => ZABBIX.Dashboard.addNewDashboardPage()
+						}
+					]
+				},
+				{
+					items: [
+						{
+							label: <?= json_encode(_('Clone')) ?>,
+							clickCallback: () => ZABBIX.Dashboard.addNewDashboardPage()
+						}
+					]
+				}
+			];
+
+			jQuery(e.target).menuPopup(menu, new jQuery.Event(e), {
+				position: {
+					of: e.target,
+					my: 'left top',
+					at: 'left bottom',
+					within: '.wrapper'
+				}
+			});
+		}
+	}
+}();

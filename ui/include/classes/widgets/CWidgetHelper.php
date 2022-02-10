@@ -925,7 +925,7 @@ class CWidgetHelper {
 					'},'.
 					'override: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'",'.
 					'overridesList: ".'.ZBX_STYLE_OVERRIDES_LIST.'",'.
-					'onUpdate: onGraphConfigChange,'.
+					'onUpdate: widget_svggraph_form.onGraphConfigChange,'.
 					'menu: '.json_encode(self::getGraphOverrideMenu()).
 				'});'.
 			'}',
@@ -948,15 +948,15 @@ class CWidgetHelper {
 					'jQuery(".multiselect", jQuery("#overrides")).each(function() {'.
 						'jQuery(this).multiSelect(jQuery(this).data("params"));'.
 					'});'.
-					'updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");'.
-					'onGraphConfigChange();'.
+					'widget_svggraph_form.updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");'.
+					'widget_svggraph_form.onGraphConfigChange();'.
 				'})'.
 				'.bind("afterremove.dynamicRows", function(event, options) {'.
-					'updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");'.
-					'onGraphConfigChange();'.
+					'widget_svggraph_form.updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");'.
+					'widget_svggraph_form.onGraphConfigChange();'.
 				'})'.
 				'.bind("tableupdate.dynamicRows", function(event, options) {'.
-					'updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");'.
+					'widget_svggraph_form.updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");'.
 					'initializeOverrides();'.
 					'if (jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'").length > 1) {'.
 						'jQuery("#overrides .drag-icon").removeClass("disabled");'.
@@ -995,9 +995,9 @@ class CWidgetHelper {
 				'start: function() {'. // Workaround to fix wrong scrolling at initial sort.
 					'jQuery(this).sortable("refreshPositions");'.
 				'},'.
-				'stop: onGraphConfigChange,'.
+				'stop: widget_svggraph_form.onGraphConfigChange,'.
 				'update: function() {'.
-					'updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");'.
+					'widget_svggraph_form.updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");'.
 				'}'.
 			'});'
 		];
@@ -1347,15 +1347,15 @@ class CWidgetHelper {
 					'jQuery(".multiselect", jQuery("#data_sets")).each(function() {'.
 						'jQuery(this).multiSelect(jQuery(this).data("params"));'.
 					'});'.
-					'updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");'.
-					'onGraphConfigChange();'.
+					'widget_svggraph_form.updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");'.
+					'widget_svggraph_form.onGraphConfigChange();'.
 				'})'.
 				'.bind("afterremove.dynamicRows", function(event, options) {'.
-					'updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");'.
-					'onGraphConfigChange();'.
+					'widget_svggraph_form.updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");'.
+					'widget_svggraph_form.onGraphConfigChange();'.
 				'})'.
 				'.bind("tableupdate.dynamicRows", function(event, options) {'.
-					'updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");'.
+					'widget_svggraph_form.updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");'.
 					'jQuery(".'.CRangeControl::ZBX_STYLE_CLASS.'[data-options]").rangeControl();'.
 					'if (jQuery("#data_sets .'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").length > 1) {'.
 						'jQuery("#data_sets .drag-icon").removeClass("disabled");'.
@@ -1425,9 +1425,9 @@ class CWidgetHelper {
 				'start: function() {'. // Workaround to fix wrong scrolling at initial sort.
 					'jQuery(this).sortable("refreshPositions");'.
 				'},'.
-				'stop: onGraphConfigChange,'.
+				'stop: widget_svggraph_form.onGraphConfigChange,'.
 				'update: function() {'.
-					'updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");'.
+					'widget_svggraph_form.updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");'.
 				'}'.
 			'});'.
 			'$(".overlay-dialogue-body").on("change", "z-select[id$=\"aggregate_function\"]", (e) => {'.

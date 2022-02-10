@@ -21,7 +21,11 @@
 
 /**
  * Clock widget form view.
+ *
+ * @var CView $this
+ * @var array $data
  */
+
 $fields = $data['dialogue']['fields'];
 
 $form = CWidgetHelper::createForm();
@@ -32,7 +36,7 @@ $form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dia
 	$data['dialogue']['view_mode'], $data['known_widget_types'], $rf_rate_field
 );
 
-$scripts = [];
+$scripts = [$this->readJsFile('../../../include/classes/widgets/views/js/widget.clock.form.view.js.php')];
 
 // Time type.
 $form_list->addRow(CWidgetHelper::getLabel($fields['time_type']), CWidgetHelper::getSelect($fields['time_type']));
@@ -46,9 +50,13 @@ if (array_key_exists('itemid', $fields)) {
 	$scripts[] = $field_itemid->getPostJS();
 }
 
-$scripts[] = '$("#time_type").on("change", () => ZABBIX.Dashboard.reloadWidgetProperties());';
-
 $form->addItem($form_list);
+
+$form->addItem(
+	(new CScriptTag('
+		widget_clock_form.init();
+	'))->setOnDocumentReady()
+);
 
 return [
 	'form' => $form,

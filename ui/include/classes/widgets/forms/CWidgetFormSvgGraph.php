@@ -107,7 +107,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		// Show left Y axis.
 		$field_lefty = (new CWidgetFieldCheckBox('lefty', _('Left Y'), _('Show')))
 			->setDefault(SVG_GRAPH_AXIS_SHOW)
-			->setAction('onLeftYChange()');
+			->setAction('widget_svggraph_form.onLeftYChange()');
 
 		if (array_key_exists('lefty', $this->data)) {
 			$field_lefty->setValue($this->data['lefty']);
@@ -179,7 +179,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		// Show right Y axis.
 		$field_righty = (new CWidgetFieldCheckBox('righty', _('Right Y'), _('Show')))
 			->setDefault(SVG_GRAPH_AXIS_SHOW)
-			->setAction('onRightYChange()');
+			->setAction('widget_svggraph_form.onRightYChange()');
 
 		if (array_key_exists('righty', $this->data)) {
 			$field_righty->setValue($this->data['righty']);

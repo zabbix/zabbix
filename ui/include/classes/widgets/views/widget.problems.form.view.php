@@ -21,7 +21,11 @@
 
 /**
  * Problems widget form view.
+ *
+ * @var CView $this
+ * @var array $data
  */
+
 $fields = $data['dialogue']['fields'];
 
 $form = CWidgetHelper::createForm();
@@ -32,7 +36,7 @@ $form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dia
 	$data['dialogue']['view_mode'], $data['known_widget_types'], $rf_rate_field
 );
 
-$scripts = [];
+$scripts = [$this->readJsFile('../../../include/classes/widgets/views/js/widget.problems.form.view.js.php')];
 $jq_templates = [];
 
 // Show.
@@ -128,13 +132,16 @@ $sort_with_enabled_show_timeline = [
 	SCREEN_SORT_TRIGGERS_TIME_ASC => true
 ];
 
-$scripts[] = '$("#sort_triggers").on("change", (e) => {'.
-		'var sort_with_enabled_show_timeline = '.json_encode($sort_with_enabled_show_timeline).';'.
-		'$("#show_timeline")'.
-			'.filter(":disabled").prop("checked", true).end()'.
-			'.prop("disabled", !sort_with_enabled_show_timeline[e.target.value])'.
-			'.filter(":disabled").prop("checked", false);'.
-	'});';
+$form->addItem(
+	(new CScriptTag('
+		widget_problems_form.init('.json_encode([
+			'sort_with_enabled_show_timeline' => [
+				SCREEN_SORT_TRIGGERS_TIME_DESC => true,
+				SCREEN_SORT_TRIGGERS_TIME_ASC => true
+			]
+		]).');
+	'))->setOnDocumentReady()
+);
 
 return [
 	'form' => $form,
