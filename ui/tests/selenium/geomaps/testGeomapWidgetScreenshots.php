@@ -27,6 +27,9 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  *
  * @onBefore prepareZoomData
  *
+ * This annotation is needed because some tile providers produce errors like:
+ * https://stamen-tiles-b.a.ssl.fastly.net/terrain/18/148702/80340.png -
+ * Failed to load resource: the server responded with a status of 404 (Not Found)
  * @ignoreBrowserErrors
  */
 class testGeomapWidgetScreenshots extends CWebTest {
@@ -263,7 +266,7 @@ class testGeomapWidgetScreenshots extends CWebTest {
 					'Tile provider' => 'OpenTopoMap'
 				]
 			],
-			// This provider is commented, because images on screenshots are not stable.
+			// This provider is commented, because images on screenshots are not stable even after 20 seconds sleep.
 //			[
 //				[
 //					'Tile provider' => 'OpenStreetMap Mapnik'

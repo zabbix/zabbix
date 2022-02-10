@@ -162,6 +162,7 @@ class testFormGeomapWidget extends CWebTest {
 		$form->query('id:tags_table_tags')->asMultifieldTable()->one()
 				->checkValue([['tag' => '', 'operator' => 'Contains', 'value' => '']]
 		);
+
 		// Check operator's dropdown options presence.
 		$this->assertEquals(['Exists', 'Equals', 'Contains', 'Does not exist', 'Does not equal',
 				'Does not contain'], $form->getField('id:tags_0_operator')->asZDropdown()->getOptions()->asText()

@@ -21,8 +21,6 @@
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
- * Base class for Tags function tests.
- *
  * @backup config
  */
 class testFormGeographicalMaps extends CWebTest {
@@ -143,7 +141,7 @@ class testFormGeographicalMaps extends CWebTest {
 		$form->fill(['Tile provider' => $data['Tile provider']]);
 		$form->checkValue($data);
 
-		// Check Service tab fields' maxlengths.
+		// Check Service tab fields' maxlength.
 		$limits = [
 			'Tile URL' => 1024,
 			'Attribution' => 1024,
@@ -306,7 +304,7 @@ class testFormGeographicalMaps extends CWebTest {
 						'Tile provider' => 'Other',
 						'Tile URL' => '111',
 						'Attribution' => '222',
-						'Max zoom level' => '13'
+						'Max zoom level' => '1'
 					]
 				]
 			],
@@ -316,7 +314,7 @@ class testFormGeographicalMaps extends CWebTest {
 						'Tile provider' => 'Other',
 						'Tile URL' => 'йцу',
 						'Attribution' => 'кен',
-						'Max zoom level' => '13'
+						'Max zoom level' => '7'
 					]
 				]
 			],
