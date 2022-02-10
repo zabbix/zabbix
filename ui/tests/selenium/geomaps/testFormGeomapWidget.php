@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 /**
  * @backup config, widget
  *
- * @onBefore prepareDasboardData
+ * @onBefore prepareDashboardData
  */
 class testFormGeomapWidget extends CWebTest {
 
@@ -59,7 +59,7 @@ class testFormGeomapWidget extends CWebTest {
 			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
 			' wf.value_itemid, wf.value_graphid';
 
-	public function prepareDasboardData() {
+	public function prepareDashboardData() {
 		$response = CDataHelper::call('dashboard.create', [
 			'name' => 'Geomap widget dashboard',
 			'auto_start' => 0,
@@ -461,7 +461,7 @@ class testFormGeomapWidget extends CWebTest {
 
 			/**
 			 *  When name is absent in create scenario it remains default: "Geomap",
-			 *  if name absent in update scenario then previous name remains.
+			 *  if name is absent in update scenario then previous name remains.
 			 *  If name is empty string in both scenarios it is replaced by "Geomap".
 			 */
 			if (array_key_exists('Name', $data['fields'])) {

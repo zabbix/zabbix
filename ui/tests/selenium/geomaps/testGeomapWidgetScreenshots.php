@@ -31,7 +31,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  */
 class testGeomapWidgetScreenshots extends CWebTest {
 
-	// Dasboard for zoom screenshot tests.
+	// Dashboard for zoom screenshot tests.
 	protected static $zoom_dashboardid;
 
 	// Host data for zoom screenshot tests.
