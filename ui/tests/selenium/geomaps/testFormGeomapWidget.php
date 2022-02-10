@@ -320,7 +320,7 @@ class testFormGeomapWidget extends CWebTest {
 				[
 					'fields' => [
 						'Type' => 'Geomap',
-						'Name' => 'Geomap widget with long coordinates and zoom',
+						'Name' => 'With long coordinates and zoom',
 						'Initial view' => '51.5537236445998, -0.43871069125537776,5'
 					]
 				]
@@ -333,7 +333,7 @@ class testFormGeomapWidget extends CWebTest {
 						'Name' => 'New geomap widget with tags and long coordinates',
 						'Refresh interval' => '2 minutes',
 						'Host groups' => 'Zabbix servers',
-						'Hosts' => ['ЗАББИКС Сервер', 'Test item host'],
+						'Hosts' => ['Test item host', 'ЗАББИКС Сервер'],
 						'Initial view' => '51.5537236445998, -0.43871069125537776'
 					],
 					'Tags' => [
