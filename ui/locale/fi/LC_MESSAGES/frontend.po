@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-01 11:24+0200\n"
+"POT-Creation-Date: 2022-02-04 12:09+0200\n"
 "PO-Revision-Date: 2013-10-10 08:23+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -552,7 +552,7 @@ msgstr ""
 #: app/views/popup.massupdate.trigger.php:83
 #: app/views/popup.massupdate.trigger.php:97
 #: app/views/popup.service.edit.php:66 app/views/popup.service.edit.php:166
-#: app/views/popup.service.edit.php:254 app/views/popup.service.edit.php:271
+#: app/views/popup.service.edit.php:254 app/views/popup.service.edit.php:270
 #: app/views/popup.sla.edit.php:129 app/views/popup.sla.edit.php:185
 #: app/views/popup.tophosts.column.edit.php:199
 #: app/views/popup.valuemap.edit.php:51 app/views/reports.auditlog.list.php:70
@@ -762,7 +762,7 @@ msgstr "Aktiivinen asti"
 #: app/views/popup.scheduledreport.edit.php:43
 #: app/views/popup.scheduledreport.subscription.php:132
 #: app/views/popup.service.edit.php:71 app/views/popup.service.edit.php:173
-#: app/views/popup.service.edit.php:281 app/views/popup.service.edit.php:375
+#: app/views/popup.service.edit.php:280 app/views/popup.service.edit.php:375
 #: app/views/popup.service.edit.php:403
 #: app/views/popup.service.statusrule.edit.php:98
 #: app/views/popup.sla.edit.php:134 app/views/popup.sla.edit.php:192
@@ -855,7 +855,7 @@ msgstr ""
 msgid "Add child service"
 msgstr ""
 
-#: app/views/js/popup.service.edit.js.php:380
+#: app/views/js/popup.service.edit.js.php:401
 msgid "Add child services"
 msgstr ""
 
@@ -898,7 +898,7 @@ msgstr ""
 msgid "Add page"
 msgstr ""
 
-#: app/views/js/popup.service.edit.js.php:410
+#: app/views/js/popup.service.edit.js.php:431
 msgid "Add parent services"
 msgstr ""
 
@@ -3566,7 +3566,7 @@ msgstr ""
 msgid "Checks should be unique."
 msgstr ""
 
-#: app/views/popup.service.edit.php:315 app/views/popup.service.edit.php:328
+#: app/views/popup.service.edit.php:314 app/views/popup.service.edit.php:327
 msgid "Child services"
 msgstr ""
 
@@ -3593,7 +3593,7 @@ msgid "Class %1$s not found for action %2$s."
 msgstr ""
 
 #: include/views/configuration.httpconf.list.php:217
-#: include/views/configuration.item.list.php:300
+#: include/views/configuration.item.list.php:297
 msgid "Clear history"
 msgstr ""
 
@@ -4181,7 +4181,7 @@ msgstr ""
 
 #: include/views/configuration.copy.elements.php:78
 #: include/views/configuration.graph.list.php:240
-#: include/views/configuration.item.list.php:316
+#: include/views/configuration.item.list.php:313
 #: include/views/configuration.triggers.list.php:343 jsLoader.php:135
 #: jsLoader.php:164 jsLoader.php:281
 msgid "Copy"
@@ -5045,7 +5045,7 @@ msgstr ""
 #: include/views/configuration.hostgroups.list.php:204
 #: include/views/configuration.host.prototype.list.php:195
 #: include/views/configuration.httpconf.list.php:224
-#: include/views/configuration.item.list.php:327
+#: include/views/configuration.item.list.php:324
 #: include/views/configuration.item.prototype.list.php:214
 #: include/views/configuration.maintenance.list.php:124
 #: include/views/configuration.template.list.php:290
@@ -5105,7 +5105,7 @@ msgstr ""
 msgid "Delete graph?"
 msgstr ""
 
-#: include/views/configuration.item.list.php:301
+#: include/views/configuration.item.list.php:298
 msgid "Delete history of selected items?"
 msgstr ""
 
@@ -5238,7 +5238,7 @@ msgstr ""
 msgid "Delete selected item prototypes?"
 msgstr ""
 
-#: include/views/configuration.item.list.php:327
+#: include/views/configuration.item.list.php:324
 msgid "Delete selected items?"
 msgstr ""
 
@@ -5496,7 +5496,7 @@ msgstr ""
 #: include/views/configuration.action.list.php:168
 #: include/views/configuration.host.discovery.list.php:325
 #: include/views/configuration.httpconf.list.php:211
-#: include/views/configuration.item.list.php:295
+#: include/views/configuration.item.list.php:292
 #: include/views/configuration.triggers.list.php:342
 msgid "Disable"
 msgstr ""
@@ -5564,7 +5564,7 @@ msgstr ""
 msgid "Disable selected hosts?"
 msgstr ""
 
-#: include/views/configuration.item.list.php:295
+#: include/views/configuration.item.list.php:292
 msgid "Disable selected items?"
 msgstr ""
 
@@ -5871,7 +5871,7 @@ msgstr ""
 
 #: app/controllers/CControllerHintboxActionlist.php:93
 #: app/views/administration.queue.details.php:85
-#: app/views/js/popup.service.edit.js.php:355
+#: app/views/js/popup.service.edit.js.php:376
 #: app/views/monitoring.widget.slareport.view.php:85 app/views/search.php:186
 #: app/views/search.php:271 app/views/search.php:370
 #: include/actions.inc.php:1724 include/actions.inc.php:1796
@@ -6075,7 +6075,7 @@ msgstr ""
 #: app/views/administration.user.edit.php:353
 #: app/views/js/administration.mediatype.edit.js.php:50
 #: app/views/js/configuration.discovery.edit.js.php:33
-#: app/views/js/popup.service.edit.js.php:173
+#: app/views/js/popup.service.edit.js.php:194
 #: app/views/js/popup.sla.edit.js.php:110 app/views/service.list.edit.php:138
 #: app/views/service.list.php:114
 #: include/classes/widgets/CWidgetHelper.php:591
@@ -6213,7 +6213,7 @@ msgstr ""
 #: include/views/configuration.action.list.php:167
 #: include/views/configuration.host.discovery.list.php:324
 #: include/views/configuration.httpconf.list.php:210
-#: include/views/configuration.item.list.php:294
+#: include/views/configuration.item.list.php:291
 #: include/views/configuration.triggers.list.php:341
 msgid "Enable"
 msgstr ""
@@ -6311,7 +6311,7 @@ msgstr ""
 msgid "Enable selected hosts?"
 msgstr ""
 
-#: include/views/configuration.item.list.php:294
+#: include/views/configuration.item.list.php:291
 msgid "Enable selected items?"
 msgstr ""
 
@@ -6629,7 +6629,7 @@ msgstr ""
 #: include/views/configuration.host.discovery.edit.php:990
 #: include/views/configuration.host.discovery.list.php:329
 #: include/views/configuration.item.edit.php:1057
-#: include/views/configuration.item.list.php:310
+#: include/views/configuration.item.list.php:307
 msgid "Execute now"
 msgstr ""
 
@@ -7001,7 +7001,7 @@ msgstr ""
 #: app/views/monitoring.charts.view.php:58
 #: app/views/monitoring.dashboard.list.php:59
 #: app/views/monitoring.discovery.view.php:46
-#: app/views/monitoring.web.view.php:48 app/views/popup.service.edit.php:302
+#: app/views/monitoring.web.view.php:48 app/views/popup.service.edit.php:301
 #: app/views/popup.services.php:49 app/views/reports.auditlog.list.php:84
 #: app/views/reports.scheduledreport.list.php:46
 #: app/views/service.list.edit.php:65 app/views/service.list.php:68
@@ -9286,8 +9286,8 @@ msgstr ""
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:41
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:47
 #: app/controllers/CControllerUserUpdateGeneral.php:111
-#: app/controllers/CControllerWidgetTopHostsView.php:394
-#: app/controllers/CControllerWidgetTopHostsView.php:406
+#: app/controllers/CControllerWidgetTopHostsView.php:409
+#: app/controllers/CControllerWidgetTopHostsView.php:421
 #: include/classes/api/services/CConfiguration.php:167
 #: include/classes/api/services/CDiscoveryRule.php:1866
 #: include/classes/api/services/CDiscoveryRule.php:2280
@@ -11312,7 +11312,7 @@ msgstr ""
 #: app/partials/service.list.edit.php:140
 #: app/views/configuration.host.list.php:518
 #: include/classes/screens/CScreenProblem.php:1130
-#: include/views/configuration.item.list.php:318
+#: include/views/configuration.item.list.php:315
 #: include/views/configuration.item.prototype.list.php:205
 #: include/views/configuration.template.list.php:281
 #: include/views/configuration.trigger.prototype.list.php:204
@@ -11983,7 +11983,7 @@ msgstr ""
 #: app/views/popup.massupdate.trigger.php:97
 #: app/views/popup.service.edit.php:46 app/views/popup.service.edit.php:66
 #: app/views/popup.service.edit.php:166 app/views/popup.service.edit.php:254
-#: app/views/popup.service.edit.php:296 app/views/popup.services.php:42
+#: app/views/popup.service.edit.php:295 app/views/popup.services.php:42
 #: app/views/popup.services.php:60 app/views/popup.sla.edit.php:52
 #: app/views/popup.sla.edit.php:129 app/views/popup.sla.edit.php:185
 #: app/views/popup.sla.excludeddowntime.edit.php:39
@@ -14294,7 +14294,7 @@ msgstr ""
 msgid "Problem resolved"
 msgstr ""
 
-#: app/views/popup.service.edit.php:59 app/views/popup.service.edit.php:270
+#: app/views/popup.service.edit.php:59 app/views/popup.service.edit.php:269
 #: app/views/popup.services.php:62
 msgid "Problem tags"
 msgstr ""
@@ -14768,8 +14768,8 @@ msgstr ""
 #: app/views/js/popup.massupdate.tmpl.js.php:59
 #: app/views/js/popup.massupdate.tmpl.js.php:96
 #: app/views/js/popup.massupdate.tmpl.js.php:108
-#: app/views/js/popup.service.edit.js.php:176
-#: app/views/js/popup.service.edit.js.php:188
+#: app/views/js/popup.service.edit.js.php:197
+#: app/views/js/popup.service.edit.js.php:209
 #: app/views/js/popup.sla.edit.js.php:113
 #: app/views/popup.dashboard.share.edit.php:85
 #: app/views/popup.dashboard.share.edit.php:106
@@ -15044,7 +15044,7 @@ msgstr ""
 msgid "Required string"
 msgstr ""
 
-#: app/views/popup.service.edit.php:306 app/views/popup.services.php:51
+#: app/views/popup.service.edit.php:305 app/views/popup.services.php:51
 #: include/classes/html/CFilter.php:215
 #: include/classes/html/CTabFilter.php:102
 msgid "Reset"
@@ -16031,7 +16031,7 @@ msgstr ""
 #: app/views/js/slareport.list.js.php:39
 #: app/views/monitoring.widget.slareport.view.php:37
 #: app/views/popup.mediatype.message.php:58
-#: app/views/popup.service.edit.php:269 app/views/popup.service.edit.php:326
+#: app/views/popup.service.edit.php:268 app/views/popup.service.edit.php:325
 #: app/views/popup.service.edit.php:357 app/views/service.list.edit.php:108
 #: app/views/slareport.list.php:60 app/views/slareport.list.php:110
 #: include/actions.inc.php:67 include/actions.inc.php:77
@@ -17161,7 +17161,7 @@ msgstr ""
 #: app/views/popup.massupdate.template.php:139
 #: app/views/popup.massupdate.trigger.php:74
 #: app/views/popup.massupdate.trigger.php:149
-#: app/views/popup.service.edit.php:246 app/views/popup.service.edit.php:327
+#: app/views/popup.service.edit.php:246 app/views/popup.service.edit.php:326
 #: app/views/popup.services.php:61 app/views/service.list.edit.php:104
 #: app/views/service.list.php:91 include/blocks.inc.php:583
 #: include/classes/screens/CScreenHttpTest.php:117
@@ -18385,8 +18385,8 @@ msgstr ""
 #: app/views/js/configuration.host.edit.js.php:158
 #: app/views/js/configuration.host.list.js.php:132
 #: app/views/js/popup.host.edit.js.php:177
-#: app/views/js/popup.service.edit.js.php:475
-#: app/views/js/popup.service.edit.js.php:547
+#: app/views/js/popup.service.edit.js.php:496
+#: app/views/js/popup.service.edit.js.php:568
 #: app/views/js/popup.service.statusrule.edit.js.php:104
 #: app/views/js/popup.sla.edit.js.php:232
 #: app/views/js/popup.sla.edit.js.php:297
@@ -21125,7 +21125,7 @@ msgstr ""
 msgid "invalid fourth parameter in function \"%1$s\""
 msgstr ""
 
-#: app/controllers/CControllerWidgetTopHostsView.php:395
+#: app/controllers/CControllerWidgetTopHostsView.php:410
 #: include/classes/graphdraw/CLineGraphDraw.php:240
 #: include/classes/graphdraw/CPieGraphDraw.php:166
 #: include/classes/helpers/CSvgGraphHelper.php:369
@@ -21177,7 +21177,7 @@ msgstr ""
 msgid "invalid third parameter in function \"%1$s\""
 msgstr ""
 
-#: app/controllers/CControllerWidgetTopHostsView.php:407
+#: app/controllers/CControllerWidgetTopHostsView.php:422
 #: include/classes/graphdraw/CLineGraphDraw.php:250
 #: include/classes/graphdraw/CPieGraphDraw.php:176
 #: include/classes/helpers/CSvgGraphHelper.php:381

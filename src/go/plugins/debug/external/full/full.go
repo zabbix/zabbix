@@ -28,7 +28,8 @@ import (
 )
 
 type Options struct {
-	Interval int
+	plugin.SystemOptions `conf:"optional,name=System"`
+	Interval             int
 }
 
 // Plugin -
