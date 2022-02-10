@@ -398,7 +398,7 @@ class testGeomapWidgetScreenshots extends CWebTest {
 					'           if (typeof layers[keys[i]]._url === "undefined") {'.
 					'               continue;'.
 					'           }'.
-					'           result = layers[keys[i]]._loading;'.
+					'           result = !layers[keys[i]]._loading;'.
 					'       }'.
 					'   }'.
 					'});'.
