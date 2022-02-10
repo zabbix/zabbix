@@ -29,7 +29,7 @@ window.token_edit_popup = {
 	dialogue: null,
 	form: null,
 	form_name: null,
-	expires_at_row: null,
+	expires_at_field: null,
 	expires_at_label: null,
 	expires_at: null,
 	expires_state: null,
@@ -39,8 +39,8 @@ window.token_edit_popup = {
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
-		this.expires_at_row = document.getElementById('expires-at-row');
-		this.expires_at_label = this.expires_at_row.previousSibling;
+		this.expires_at_field = document.getElementById('expires-at-row').parentNode;
+		this.expires_at_label = this.expires_at_field.previousSibling;
 		this.expires_at = document.getElementById('expires_at');
 		this.expires_state = document.getElementById('expires_state');
 		this.expiresAtHandler();
@@ -197,8 +197,6 @@ window.token_edit_popup = {
 				fields[field] = fields[field].trim();
 			}
 		}
-
-		return fields;
 	},
 
 	expiresAtHandler() {
@@ -210,12 +208,12 @@ window.token_edit_popup = {
 			expires_state_hidden.setAttribute('id', 'expires_state_hidden');
 			this.expires_state.append(expires_state_hidden);
 
-			this.expires_at_row.style.display = 'none';
+			this.expires_at_field.style.display = 'none';
 			this.expires_at_label.style.display = 'none';
 			this.expires_at.disabled = true;
 		}
 		else {
-			this.expires_at_row.style.display = '';
+			this.expires_at_field.style.display = '';
 			this.expires_at_label.style.display = '';
 			this.expires_at.disabled = false;
 			let expires_state_hidden = document.getElementById('expires_state_hidden');

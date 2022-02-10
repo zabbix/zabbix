@@ -37,9 +37,9 @@ if ($data['admin_mode'] === '0') {
 	$token_form->addVar('userid', CWebUser::$data['userid']);
 }
 
-$token_from_grid = (new CFormGrid())
-	->addItem([
-		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
+$token_from_grid = (new CFormGrid())->addItem([
+	(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
+	new CFormField(
 		(new CTextBox(
 			'name',
 			$data['name'],
@@ -49,7 +49,8 @@ $token_from_grid = (new CFormGrid())
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
 			->setAriaRequired()
-	]);
+	)
+]);
 
 if ($data['admin_mode'] === '1') {
 	$token_from_grid->addItem([
@@ -77,13 +78,15 @@ if ($data['admin_mode'] === '1') {
 }
 
 $token_from_grid->addItem([
-	new CLabel(_('Description'), 'description'),
-	(new CTextArea('description', $data['description']))
-		->addClass(ZBX_STYLE_MONOSPACE_FONT)
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setMaxLength(DB::getFieldLength('token', 'description'))
-		->setAriaRequired()
-])
+		new CLabel(_('Description'), 'description'),
+		new CFormField(
+			(new CTextArea('description', $data['description']))
+				->addClass(ZBX_STYLE_MONOSPACE_FONT)
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxLength(DB::getFieldLength('token', 'description'))
+				->setAriaRequired()
+		)
+	])
 	->addItem([
 		new CLabel(_('Set expiration date and time'), 'expires_state'),
 		new CFormField(
@@ -94,28 +97,26 @@ $token_from_grid->addItem([
 	])
 	->addItem([
 		(new CLabel(_('Expires at')))->setAsteriskMark(),
-		(new CDateSelector('expires_at', $data['expires_at']))
-			->setDateFormat(DATE_TIME_FORMAT_SECONDS)
-			->setPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
-			->setAriaRequired()
-			->setId('expires-at-row')
+		new CFormField(
+			(new CDateSelector('expires_at', $data['expires_at']))
+				->setDateFormat(DATE_TIME_FORMAT_SECONDS)
+				->setPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
+				->setAriaRequired()
+				->setId('expires-at-row')
+		)
 	])
 	->addItem([
 		new CLabel(_('Enabled'), 'status'),
 		new CFormField(
-			(new CCheckBox('status', ZBX_AUTH_TOKEN_ENABLED))
-				->setChecked($data['status'] == ZBX_AUTH_TOKEN_ENABLED)
+			(new CCheckBox('status', ZBX_AUTH_TOKEN_ENABLED))->setChecked($data['status'] == ZBX_AUTH_TOKEN_ENABLED)
 		)
-
 	]);
 
-$token_form
-	->addItem($token_from_grid);
+$token_form->addItem($token_from_grid);
 
 $data['form_name'] = 'token_form';
 
 if ($data['tokenid'] != 0) {
-
 	$buttons = [
 		[
 			'title' => _('Update'),
