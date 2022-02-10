@@ -470,7 +470,7 @@ form {
 				}
 			}
 
-			.icon-maint {
+			.icon-maintenance {
 				position: relative;
 				display: inline-block;
 				height: 12px;
@@ -2576,14 +2576,14 @@ button[disabled] {
 }
 
 $var-icons: (
-	maint: url($sprite-path) no-repeat -46px -802px,
+	maintenance: url($sprite-path) no-repeat -46px -802px,
 	depend-up: url($sprite-path) no-repeat -49px -729px,
 	depend-down: url($sprite-path) no-repeat -49px -765px,
 	ackn: url($sprite-path) no-repeat -45px -693px
 );
 
 // Dynamically generated classes:
-//  .icon-maint
+//  .icon-maintenance
 //  .icon-depend-up
 //  .icon-depend-down
 //  .icon-ackn

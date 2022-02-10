@@ -2735,13 +2735,13 @@ form.is-loading {
       @media screen and (min-width: 1600px) {
         .list-table.compact-view td .tag {
           max-width: 133px; } }
-    .list-table.compact-view td .icon-maint {
+    .list-table.compact-view td .icon-maintenance {
       position: relative;
       display: inline-block;
       height: 12px;
       width: 12px;
       margin: 3px 1px 2px 2px !important; }
-      .list-table.compact-view td .icon-maint::before {
+      .list-table.compact-view td .icon-maintenance::before {
         height: 12px;
         width: 12px;
         background-position: -48px -804px; }
@@ -4066,9 +4066,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   display: inline-block;
   margin: 0 14px 0 0; }
 
-.icon-maint {
+.icon-maintenance {
   margin: 0 18px 0 0; }
-  .icon-maint::before {
+  .icon-maintenance::before {
     background: url("../img/icon-sprite.svg?20211222") no-repeat -46px -802px; }
 
 .icon-depend-up {
@@ -4125,7 +4125,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     opacity: 1;
     background-color: transparent; }
 
-.icon-maint::before, .icon-depend-up::before, .icon-depend-down::before, .icon-ackn::before {
+.icon-maintenance::before, .icon-depend-up::before, .icon-depend-down::before, .icon-ackn::before {
   display: inline-block;
   width: 18px;
   height: 18px;
@@ -6893,9 +6893,9 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .dashboard.dashboard-is-edit-mode .dashboard-grid-widget-placeholder > div {
   background-color: #1f1f1f !important; }
 
-.icon-maint {
+.icon-maintenance {
   margin: 0 18px 0 0; }
-  .icon-maint::before {
+  .icon-maintenance::before {
     background: url("../img/icon-sprite.svg?20211222") no-repeat -357px -802px; }
 
 .icon-depend-up {
@@ -7199,7 +7199,7 @@ z-select button.focusable:focus,
   .list-table.compact-view td.na-bg::after, .list-table.compact-view td.normal-bg::after, .list-table.compact-view td.info-bg::after, .list-table.compact-view td.warning-bg::after, .list-table.compact-view td.average-bg::after, .list-table.compact-view td.high-bg::after, .list-table.compact-view td.disaster-bg::after {
     top: 1px;
     transform: scale(0.8); }
-  .list-table.compact-view td .icon-maint::before {
+  .list-table.compact-view td .icon-maintenance::before {
     background-position: -360px -804px; }
   .list-table.compact-view td .icon-wzrd-action {
     background: transparent url("../img/icon-sprite.svg?20211222") no-repeat -318px -624px; }

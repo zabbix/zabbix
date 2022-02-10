@@ -2769,13 +2769,13 @@ form.is-loading {
       @media screen and (min-width: 1600px) {
         .list-table.compact-view td .tag {
           max-width: 133px; } }
-    .list-table.compact-view td .icon-maint {
+    .list-table.compact-view td .icon-maintenance {
       position: relative;
       display: inline-block;
       height: 12px;
       width: 12px;
       margin: 3px 1px 2px 2px !important; }
-      .list-table.compact-view td .icon-maint::before {
+      .list-table.compact-view td .icon-maintenance::before {
         height: 12px;
         width: 12px;
         background-position: -48px -804px; }
@@ -4100,9 +4100,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   display: inline-block;
   margin: 0 14px 0 0; }
 
-.icon-maint {
+.icon-maintenance {
   margin: 0 18px 0 0; }
-  .icon-maint::before {
+  .icon-maintenance::before {
     background: url("../img/icon-sprite.svg?20211222") no-repeat -46px -802px; }
 
 .icon-depend-up {
@@ -4159,7 +4159,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     opacity: 1;
     background-color: transparent; }
 
-.icon-maint::before, .icon-depend-up::before, .icon-depend-down::before, .icon-ackn::before {
+.icon-maintenance::before, .icon-depend-up::before, .icon-depend-down::before, .icon-ackn::before {
   display: inline-block;
   width: 18px;
   height: 18px;

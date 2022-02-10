@@ -450,14 +450,14 @@ $arrow-fill-up-down: #FFFFFF;
 }
 
 $var-icons: (
-	maint: url($sprite-path) no-repeat -357px -802px,
+	maintenance: url($sprite-path) no-repeat -357px -802px,
 	depend-up: url($sprite-path) no-repeat -361px -729px,
 	depend-down: url($sprite-path) no-repeat -361px -765px,
 	ackn: url($sprite-path) no-repeat -357px -693px
 );
 
 // Dynamically generated classes:
-//  .icon-maint
+//  .icon-maintenance
 //  .icon-depend-up
 //  .icon-depend-down
 //  .icon-ackn
@@ -934,7 +934,7 @@ a.link-action {
 				}
 			}
 
-			.icon-maint::before {
+			.icon-maintenance::before {
 				background-position: -360px -804px;
 			}
 
