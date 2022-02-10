@@ -376,8 +376,27 @@ class testGeomapWidgetScreenshots extends CWebTest {
 			$this->query("xpath://h4[text()=".CXPathHelper::escapeQuotes($widget).
 					"]/../../div[not(contains(@class,\"is-loading\"))]")->waitUntilPresent()->one();
 
-			// This sleep is needed because after loader ring disappeared map image needs to load anyway.
-			sleep(20);
+			// This JS is needed for waiting until map image is loaded.
+			CElementQuery::wait()->until(function () use ($widget) {
+				return CElementQuery::getDriver()->executeScript(
+					'var widgets = ZABBIX.Dashboard._dashboard_pages.keys().next().value._widgets;'.
+					'var result = true;'.
+					'widgets.forEach(function(_, widget) {'.
+					'   if (widget._name === arguments[0]) {'.
+					'       var layers = widget._map._layers;'.
+					'       var keys = Object.keys(layers);'.
+					'       for (var i = 0; i < keys.length; i++) {'.
+					'           if (typeof layers[keys[i]]._url === "undefined") {'.
+					'               continue;'.
+					'           }'.
+					'           result = layers[keys[i]]._loading;'.
+					'       }'.
+					'   }'.
+					'});'.
+					'return result;', [$widget]
+				);
+			});
+
 			$this->assertScreenshot($this->query("xpath:.//div[@class=\"dashboard-grid-widget\"]//h4[text()=".
 					CXPathHelper::escapeQuotes($widget)."]/../..")->waitUntilVisible()->one(), $widget.' '.$data['Tile provider']
 			);
