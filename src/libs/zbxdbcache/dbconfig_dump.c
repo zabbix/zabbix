@@ -907,10 +907,16 @@ static void	DCdump_triggers(void)
 		zbx_uint64_t	*itemid;
 
 		trigger = (ZBX_DC_TRIGGER *)index.values[i];
+		if (ZBX_FLAG_DISCOVERY_PROTOTYPE == trigger->flags)
+		{
+			zabbix_log(LOG_LEVEL_TRACE, "triggerid:" ZBX_FS_UI64 " flags:%u", trigger->triggerid,
+					trigger->flags);
+			continue;
+		}
 
 		zabbix_log(LOG_LEVEL_TRACE, "triggerid:" ZBX_FS_UI64 " description:'%s' event_name:'%s' type:%u"
-				" status:%u priority:%u", trigger->triggerid, trigger->description, trigger->event_name,
-				trigger->type, trigger->status, trigger->priority);
+				" status:%u priority:%u flags:%u", trigger->triggerid, trigger->description,
+				trigger->event_name, trigger->type, trigger->status, trigger->priority, trigger->flags);
 		zabbix_log(LOG_LEVEL_TRACE, "  expression:'%s' recovery_expression:'%s'", trigger->expression,
 				trigger->recovery_expression);
 		zabbix_log(LOG_LEVEL_TRACE, "  value:%u state:%u error:'%s' lastchange:%d", trigger->value,
