@@ -313,7 +313,7 @@ class testFormHost extends CWebTest {
 						'Groups' => 'Zabbix servers'
 					],
 					'error_title' => 'Cannot add host',
-					'error' => 'Host with host name "Available host" already exists.'
+					'error' => 'Host with the same name "Available host" already exists.'
 				]
 			],
 			[
@@ -324,7 +324,7 @@ class testFormHost extends CWebTest {
 						'Groups' => 'Zabbix servers'
 					],
 					'error_title' => 'Cannot add host',
-					'error' => 'Template with host name "Empty template" already exists.'
+					'error' => 'Template with the same name "Empty template" already exists.'
 				]
 			],
 			[
@@ -336,7 +336,7 @@ class testFormHost extends CWebTest {
 						'Visible name' => 'ЗАББИКС Сервер'
 					],
 					'error_title' => 'Cannot add host',
-					'error' => 'Host with visible name "ЗАББИКС Сервер" already exists.'
+					'error' => 'Host with the same visible name "ЗАББИКС Сервер" already exists.'
 				]
 			],
 			// Host name field validation.
@@ -897,7 +897,7 @@ class testFormHost extends CWebTest {
 						'Host name' => 'Available host'
 					],
 					'error_title' => 'Cannot update host',
-					'error' => 'Host with host name "Available host" already exists.'
+					'error' => 'Host with the same name "Available host" already exists.'
 				]
 			],
 			[
@@ -907,7 +907,7 @@ class testFormHost extends CWebTest {
 						'Host name' => 'Empty template'
 					],
 					'error_title' => 'Cannot update host',
-					'error' => 'Template with host name "Empty template" already exists.'
+					'error' => 'Template with the same name "Empty template" already exists.'
 				]
 			],
 			[
@@ -917,7 +917,7 @@ class testFormHost extends CWebTest {
 						'Visible name' => 'ЗАББИКС Сервер'
 					],
 					'error_title' => 'Cannot update host',
-					'error' => 'Host with visible name "ЗАББИКС Сервер" already exists.'
+					'error' => 'Host with the same visible name "ЗАББИКС Сервер" already exists.'
 				]
 			],
 			// Host name field validation.
@@ -1762,7 +1762,7 @@ class testFormHost extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Host for suppression',
-					'error' => 'Cannot delete host because maintenance "Maintenance for suppression test"'.
+					'error' => 'Cannot delete host "Host for suppression" because maintenance "Maintenance for suppression test"'.
 							' must contain at least one host or host group.'
 				]
 			]
