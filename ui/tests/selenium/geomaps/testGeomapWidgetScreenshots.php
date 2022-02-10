@@ -309,26 +309,26 @@ class testGeomapWidgetScreenshots extends CWebTest {
 	 */
 	public function testGeomapWidgetScreenshots_Zoom($data) {
 		// Create event on hosts to make different color pins.
-		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (10500, 0, 0, '.
+		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (105000, 0, 0, '.
 				self::$cities['triggerids']['Riga'].', '.time().', 0, 1, '.zbx_dbstr('Trigger Riga').', 0)');
-		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (10501, 0, 0, '.
+		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (105010, 0, 0, '.
 				self::$cities['triggerids']['Tallin'].', '.time().', 0, 1, '.zbx_dbstr('Trigger Tallin').', 1)');
-		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (10502, 0, 0, '.
+		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (105020, 0, 0, '.
 				self::$cities['triggerids']['Vilnius'].', '.time().', 0, 1, '.zbx_dbstr('Trigger Vilnius').', 2)');
-		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (10503, 0, 0, '.
+		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (105030, 0, 0, '.
 				self::$cities['triggerids']['Oslo'].', '.time().', 0, 1, '.zbx_dbstr('Trigger Oslo').', 3)');
-		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (10504, 0, 0, '.
+		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (105040, 0, 0, '.
 				self::$cities['triggerids']['Bergen'].', '.time().', 0, 1, '.zbx_dbstr('Trigger Bergen').', 4)');
 
-		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (10500, 0, 0, '.
+		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (105000, 0, 0, '.
 				self::$cities['triggerids']['Riga'].', '.time().', 0, '.zbx_dbstr('Trigger Riga').', 0)');
-		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (10501, 0, 0, '.
+		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (105010, 0, 0, '.
 				self::$cities['triggerids']['Tallin'].', '.time().', 0, '.zbx_dbstr('Trigger Tallin').', 1)');
-		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (10502, 0, 0, '.
+		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (105020, 0, 0, '.
 				self::$cities['triggerids']['Vilnius'].', '.time().', 0, '.zbx_dbstr('Trigger Vilnius').', 2)');
-		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (10503, 0, 0, '.
+		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (105030, 0, 0, '.
 				self::$cities['triggerids']['Oslo'].', '.time().', 0, '.zbx_dbstr('Trigger Oslo').', 3)');
-		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (10504, 0, 0, '.
+		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (105040, 0, 0, '.
 				self::$cities['triggerids']['Bergen'].', '.time().', 0, '.zbx_dbstr('Trigger Bergen').', 4)');
 
 		DBexecute('UPDATE triggers SET value = 1 WHERE description = '.zbx_dbstr('Trigger Riga'));
