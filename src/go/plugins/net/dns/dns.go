@@ -128,7 +128,7 @@ func exportDnsRecord(params []string) (result interface{}, err error) {
 func parseAnswers(answers []dns.RR) string {
 	var out string
 	for _, a := range answers {
-		out += strings.TrimSuffix(a.Header().Name, ".") + "           "
+		out += fmt.Sprintf("%-21s", strings.TrimSuffix(a.Header().Name, "."))
 		out += dns.Type(a.Header().Rrtype).String()
 
 		switch rr := a.(type) {
