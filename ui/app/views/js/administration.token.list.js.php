@@ -120,7 +120,7 @@
 					addMessage(message_box);
 				})
 				.finally(() => {
-					button.classList.remove('is-loading');
+					target.classList.remove('is-loading');
 				});
 		},
 
