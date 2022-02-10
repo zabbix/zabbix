@@ -4276,7 +4276,7 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 	char			host[HOST_HOST_LEN_MAX], ip[INTERFACE_IP_LEN_MAX], dns[INTERFACE_DNS_LEN_MAX],
 				tmp[MAX_STRING_LEN], *host_metadata = NULL;
 	unsigned short		port;
-	size_t			host_metadata_alloc = 1;	/* for at least NULL-terminating string */
+	size_t			host_metadata_alloc = 1;	/* for at least NUL-terminating string */
 	zbx_vector_ptr_t	autoreg_hosts;
 	zbx_conn_flags_t	flags = ZBX_CONN_DEFAULT;
 

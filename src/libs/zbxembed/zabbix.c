@@ -106,8 +106,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: es_zabbix_sleep                                                  *
- *                                                                            *
  * Purpose: sleep for given duration in milliseconds                          *
  *                                                                            *
  * Parameters: ctx - [IN] pointer to duk_context                              *

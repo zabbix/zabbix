@@ -2962,8 +2962,8 @@ static int	adjust_position_after_jump(struct st_logfile *logfile, zbx_uint64_t *
 
 		if (NULL != buf_find_newline(p, &p_next, p_end, cr, lf, szbyte))
 		{
-			/* Found the beginning of line. It may not be the closest place we jumped to */
-			/* (it could be about sizeof(buf) bytes away) but it is ok for our purposes. */
+			/* Found the beginning of line. It may not be the closest beginning of line to the place  */
+			/* we jumped to (it could be about sizeof(buf) bytes away) but it is ok for our purposes. */
 
 			*lastlogsize = seek_pos + (zbx_uint64_t)(p_next - buf);
 			logfile->processed_size = *lastlogsize;

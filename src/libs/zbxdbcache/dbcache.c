@@ -2317,7 +2317,7 @@ static int	DBmass_add_history(ZBX_DC_HISTORY *history, int history_num)
  *                                                                            *
  * Purpose: helper function for DCmass_proxy_add_history()                    *
  *                                                                            *
- * Comment: this function is meant for items with value_type other       than *
+ * Comment: this function is meant for items with value_type other than       *
  *          ITEM_VALUE_TYPE_LOG not containing meta information in result     *
  *                                                                            *
  ******************************************************************************/

@@ -5642,13 +5642,11 @@ static int	zbx_default_ptr_pair_ptr_second_compare_func(const void *d1, const vo
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_trigger_add_itemids                                           *
- *                                                                            *
  * Purpose: add new itemids into trigger itemids array                        *
  *                                                                            *
  * Comments: If trigger is already linked to an item and a new function       *
  *           linking the trigger to that item is being added, then the item   *
- *           triggers will be reset causing itemid to be removed from trigger.*                                                                           *
+ *           triggers will be reset causing itemid to be removed from trigger.*
  *           Because of that itemids always can be simply appended to the     *
  *           existing list without checking for duplicates.                   *
  *                                                                            *
@@ -5685,8 +5683,6 @@ static void	dc_trigger_add_itemids(ZBX_DC_TRIGGER *trigger, const zbx_vector_uin
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: dc_item_reset_triggers                                           *
  *                                                                            *
  * Purpose: reset item trigger links and remove corresponding itemids from    *
  *          affected triggers                                                 *

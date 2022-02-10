@@ -504,7 +504,7 @@ static zbx_json_type_t	__zbx_json_type(const char *p)
 
 /******************************************************************************
  *                                                                            *
- * Return value: position of right bracket                                    *
+ * Return value: position of the right bracket                                *
  *               NULL - an error occurred                                     *
  *                                                                            *
  ******************************************************************************/
