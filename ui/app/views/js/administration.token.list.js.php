@@ -88,10 +88,9 @@
 
 			fetch(curl.getUrl(), {
 				method: 'POST',
-				headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-				body: urlEncodeData({
-					tokenids: chkbxRange.getSelectedIds(),
-					admin_mode: '1'
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					tokenids: chkbxRange.getSelectedIds()
 				})
 			})
 				.then((response) => response.json())

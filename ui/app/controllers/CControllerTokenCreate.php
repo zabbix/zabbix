@@ -21,6 +21,10 @@
 
 class CControllerTokenCreate extends CController {
 
+	protected function init() {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
 	protected function checkInput() {
 		$fields = [
 			'name' 			=> 'db token.name|required|not_empty',
@@ -38,7 +42,6 @@ class CControllerTokenCreate extends CController {
 			$this->setResponse(
 				new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
-						'title' => _('Cannot add API token'),
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
 				])])
@@ -57,7 +60,6 @@ class CControllerTokenCreate extends CController {
 	}
 
 	protected function doAction() {
-
 		$this->getInputs($token, ['name', 'description', 'userid', 'expires_at', 'status']);
 
 		$token['expires_at'] = $this->getInput('expires_state')

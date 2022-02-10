@@ -21,6 +21,10 @@
 
 class CControllerTokenUpdate extends CController {
 
+	protected function init(): void {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
 	protected function checkInput() {
 		$fields = [
 			'tokenid'       => 'db token.tokenid|required|fatal',

@@ -21,6 +21,10 @@
 
 class CControllerPopupTokenView extends CController {
 
+	protected function init() {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
 	protected function checkInput() {
 		$fields = [
 			'name'        => 'required',
@@ -39,7 +43,6 @@ class CControllerPopupTokenView extends CController {
 			$this->setResponse(
 				new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
-						'title' => _('Cannot preview API token'),
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
 				])])
@@ -64,8 +67,7 @@ class CControllerPopupTokenView extends CController {
 	}
 
 	protected function doAction() {
-		$data = $this->getInputAll();
-		$response = new CControllerResponseData($data);
+		$response = new CControllerResponseData($this->getInputAll());
 		$response->setTitle(_('API tokens'));
 		$this->setResponse($response);
 	}

@@ -88,10 +88,9 @@
 
 			fetch(curl.getUrl(), {
 				method: 'POST',
-				headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-				body: urlEncodeData({
-					tokenids: chkbxRange.getSelectedIds(),
-					admin_mode: '0'
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					tokenids: chkbxRange.getSelectedIds()
 				})
 			})
 				.then((response) => response.json())
@@ -121,11 +120,9 @@
 					addMessage(message_box);
 				})
 				.finally(() => {
-					button.classList.remove('is-loading');
+					target.classList.remove('is-loading');
 				});
 		},
-
-
 
 		events: {
 			userTokenSuccess(e) {

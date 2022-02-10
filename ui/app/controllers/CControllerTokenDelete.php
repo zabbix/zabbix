@@ -21,10 +21,13 @@
 
 class CControllerTokenDelete extends CController {
 
+	protected function init() {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
 	protected function checkInput() {
 		$fields = [
-			'tokenids'   => 'required|array_db token.tokenid',
-			'admin_mode' => 'required|in 0,1'
+			'tokenids'   => 'required|array_db token.tokenid'
 		];
 
 		$ret = $this->validateInput($fields);

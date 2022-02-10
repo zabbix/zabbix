@@ -34,16 +34,15 @@ $token_from_grid = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Name') . ':'),
 		new CFormField($data['name'])
-	]);
-
-if ($data['admin_mode'] === '1') {
-	$token_from_grid->addItem([
-		new CLabel(_('User') . ':'),
-		new CFormField($data['user'])
-	]);
-}
-
-$token_from_grid->addItem([
+	])
+	->addItem(array_key_exists('user', $data)
+		? [
+			new CLabel(_('User') . ':'),
+			new CFormField($data['user'])
+		]
+		: null
+	)
+	->addItem([
 		new CLabel(_('Auth token') . ':'),
 		new CFormField([
 			$data['auth_token'],
@@ -60,7 +59,7 @@ $token_from_grid->addItem([
 	->addItem([
 		new CLabel(_('Expires at') . ':'),
 		new CFormField([
-			($data['expires_at'] == 0) ? '-' : date(DATE_TIME_FORMAT_SECONDS, (int)$data['expires_at']),
+			($data['expires_at'] == 0) ? '-' : date(DATE_TIME_FORMAT_SECONDS, (int) $data['expires_at']),
 			($data['expires_at'] != 0 && time() > $data['expires_at'])
 				? ['&nbsp;', makeErrorIcon(_('The token has expired. Please update the expiry date to use the token.'))]
 				: null

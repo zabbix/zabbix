@@ -24,12 +24,13 @@
  * @var array $data
  */
 
-$token_form = (new CForm())
+$form_target = (new CUrl())->setArgument('action', ($data['tokenid'] == 0) ? 'token.create' : 'token.update');
+
+$token_form = (new CForm('post', $form_target->getUrl()))
 	->setId('token_form')
 	->setName('token')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('admin_mode', $data['admin_mode'])
-	->addVar('action', ($data['tokenid'] == 0) ? 'token.create' : 'token.update')
 	->addVar('tokenid', $data['tokenid'])
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 

@@ -58,8 +58,8 @@ window.token_edit_popup = {
 
 		fetch(curl.getUrl(), {
 			method: 'POST',
-			headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-			body: urlEncodeData(fields)
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify(fields)
 		})
 			.then((response) => response.json())
 			.then((response) => {
@@ -98,8 +98,8 @@ window.token_edit_popup = {
 
 		fetch(curl.getUrl(), {
 			method: 'POST',
-			headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-			body: urlEncodeData(fields)
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify(fields)
 		})
 			.then((response) => response.json())
 			.then((response) => {
@@ -119,8 +119,8 @@ window.token_edit_popup = {
 
 		fetch(curl.getUrl(), {
 			method: 'POST',
-			headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-			body: urlEncodeData({
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({
 				tokenids: [tokenid],
 				admin_mode: '1'
 			})
@@ -229,8 +229,8 @@ window.token_edit_popup = {
 
 		fetch(curl.getUrl(), {
 			method: 'POST',
-			headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-			body: urlEncodeData(data)
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify(data)
 		})
 			.then((response) => response.json())
 			.then((response) => {
@@ -263,7 +263,7 @@ window.token_edit_popup = {
 
 		overlayCloseAndReloadList() {
 			token_edit_popup.disableNavigationWarning();
-			location.href = location.href;
+			setTimeout(() => location.href = location.href, 0);
 		}
 	}
 };
