@@ -29,7 +29,6 @@ class CControllerUserTokenList extends CController {
 		$fields = [
 			'sort'                   => 'in name,expires_at,lastaccess,status',
 			'sortorder'              => 'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
-			'uncheck'                => 'in 1',
 			'filter_set'             => 'in 1',
 			'filter_rst'             => 'in 1',
 			'filter_name'            => 'string',
@@ -88,7 +87,6 @@ class CControllerUserTokenList extends CController {
 		];
 
 		$data = [
-			'uncheck' => $this->hasInput('uncheck'),
 			'sort' => $sort_field,
 			'sortorder' => $sort_order,
 			'filter' => $filter,
