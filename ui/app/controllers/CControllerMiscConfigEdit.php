@@ -44,7 +44,8 @@ class CControllerMiscConfigEdit extends CController {
 			'media_type_test_timeout' =>		'db config.media_type_test_timeout',
 			'script_timeout' =>					'db config.script_timeout',
 			'item_test_timeout' =>				'db config.item_test_timeout',
-			'report_test_timeout' =>			'db config.report_test_timeout'
+			'report_test_timeout' =>			'db config.report_test_timeout',
+			'vault_provider' =>					'db config.vault_provider'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -111,6 +112,9 @@ class CControllerMiscConfigEdit extends CController {
 			)),
 			'report_test_timeout' => $this->getInput('report_test_timeout', CSettingsHelper::get(
 				CSettingsHelper::SCHEDULED_REPORT_TEST_TIMEOUT
+			)),
+			'vault_provider' => $this->getInput('vault', CSettingsHelper::get(
+				CSettingsHelper::VAULT
 			))
 		];
 
@@ -129,7 +133,7 @@ class CControllerMiscConfigEdit extends CController {
 			'usrgrpids' => $data['alert_usrgrpid']
 		]);
 		$data['alert_usrgrp_data'] = CArrayHelper::renameObjectsKeys($data['alert_usrgrp_data'], ['usrgrpid' => 'id']);
-
+		$data['vault_credentials_used'] = false; // for development purposes only;
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Other configuration parameters'));
 		$this->setResponse($response);

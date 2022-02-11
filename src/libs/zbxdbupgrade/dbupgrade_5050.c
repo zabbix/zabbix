@@ -1887,6 +1887,13 @@ static int	DBpatch_5050142(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_5050143(void)
+{
+	const ZBX_FIELD	field = {"vault_provider", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
 #endif
 
 DBPATCH_START(5050)
@@ -2023,5 +2030,6 @@ DBPATCH_ADD(5050139, 0, 1)
 DBPATCH_ADD(5050140, 0, 1)
 DBPATCH_ADD(5050141, 0, 1)
 DBPATCH_ADD(5050142, 0, 1)
+DBPATCH_ADD(5050143, 0, 1)
 
 DBPATCH_END()
