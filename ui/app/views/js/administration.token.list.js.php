@@ -150,7 +150,7 @@
 					}
 				}
 
-				uncheckTableRows('hosts');
+				uncheckTableRows('token');
 				location.href = location.href;
 			}
 		}
