@@ -356,10 +356,8 @@ class testFormHost extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'host_fields' => [
-						'Groups' => 'Zabbix servers'
-					],
-					'utf_fields' => [
-						'id:host' => '😀'
+						'Groups' => 'Zabbix servers',
+						'Host name' => '😀'
 					],
 					'error_title' => 'Cannot add host',
 					'error' => 'Incorrect characters used for host name "😀".'
@@ -587,10 +585,8 @@ class testFormHost extends CWebTest {
 					'host_fields' => [
 						'Host name' => 'Host with utf8mb4 visible name',
 						'Groups' => 'Zabbix servers',
-					],
-					'utf_fields' => [
-						'id:visiblename' => '😀',
-						'id:description' => '😀🙃😀'
+						'Visible name' => '😀',
+						'Description' => '😀🙃😀'
 					]
 				]
 			],
@@ -803,14 +799,6 @@ class testFormHost extends CWebTest {
 
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
 
-		if (array_key_exists('utf_fields', $data)) {
-			foreach ($data['utf_fields'] as $locator => $value) {
-				CElementQuery::getDriver()->executeScript('arguments[0].value = '.json_encode($value).';',
-						[$form->query($locator)->one()]
-				);
-			}
-		}
-
 		// Set name for field "Default".
 		$names = ['1' => 'default'];
 		$interfaces_form = $form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => $names]);
@@ -824,11 +812,9 @@ class testFormHost extends CWebTest {
 				$this->page->assertTitle($this->monitoring ? 'Hosts' : 'Configuration of hosts');
 
 				// Check host fields.
-				$host = (CTestArrayHelper::get($data, 'utf_fields.id:visiblename'))
-					? $data['utf_fields']['id:visiblename']
-					: CTestArrayHelper::get($data, 'host_fields.Visible name', $data['host_fields']['Host name']);
+				$host = CTestArrayHelper::get($data, 'host_fields.Visible name', $data['host_fields']['Host name']);
 
-				$form = $this->filterAndSelectHost($host, CTestArrayHelper::get($data, 'utf_fields'));
+				$form = $this->filterAndSelectHost($host);
 				$form->checkValue($data['host_fields']);
 
 				foreach ($interfaces as &$interface) {
@@ -974,14 +960,11 @@ class testFormHost extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Host name' => '😀'
+					],
 					'error_title' => 'Cannot update host',
-					'error' => 'Incorrect characters used for host name "😀".',
-					'utf_fields' => [
-						'Host name' => [
-							'locator' => 'id:host',
-							'text' => '😀'
-						]
-					]
+					'error' => 'Incorrect characters used for host name "😀".'
 				]
 			],
 			// Interface fields validation.
@@ -1327,16 +1310,8 @@ class testFormHost extends CWebTest {
 					'host_fields' => [
 						'Host name' => 'Update host with utf8 visible name',
 						'Groups' => 'Linux servers',
-					],
-					'utf_fields' => [
-						'Visible name' => [
-							'locator' => 'id:visiblename',
-							'text' => '😀😀'
-						],
-						'Description' => [
-							'locator' => 'id:description',
-							'text' => '😀😀😀😀😀😀😀'
-						]
+						'Visible name' => '😀😀',
+						'Description' => '😀😀😀😀😀😀😀'
 					],
 					'interfaces' => [
 						[
@@ -1490,13 +1465,6 @@ class testFormHost extends CWebTest {
 		$form = $this->openForm(($this->standalone ? $this->link.$hostid : $this->link), $host);
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
 
-		if (array_key_exists('utf_fields', $data)) {
-			foreach (array_values($data['utf_fields']) as $value) {
-				CElementQuery::getDriver()->executeScript('arguments[0].value = '.json_encode($value['text']).';',
-						[$form->query($value['locator'])->one()]);
-			}
-		}
-
 		// Set name for field "Default".
 		$names = ['1' => 'default'];
 		$interfaces_form = $form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => $names]);
@@ -1507,26 +1475,15 @@ class testFormHost extends CWebTest {
 			case TEST_GOOD:
 				$this->assertMessage(TEST_GOOD, 'Host updated');
 
-				if (CTestArrayHelper::get($data, 'utf_fields.Visible name.locator') === 'id:visiblename') {
-					$host = $data['utf_fields']['Visible name']['text'];
-				}
-				else {
-					$host = (CTestArrayHelper::get($data, 'host_fields.Visible name') === "")
-						? CTestArrayHelper::get($data, 'host_fields.Host name', 'testFormHost_Update')
-						: CTestArrayHelper::get($data, 'host_fields.Visible name', 'testFormHost_Update Visible name');
-				}
+				$host = (CTestArrayHelper::get($data, 'host_fields.Visible name') === "")
+					? CTestArrayHelper::get($data, 'host_fields.Host name', 'testFormHost_Update')
+					: CTestArrayHelper::get($data, 'host_fields.Visible name', 'testFormHost_Update Visible name');
 
-				$form = $this->filterAndSelectHost($host, CTestArrayHelper::get($data, 'utf_fields'));
+				$form = $this->filterAndSelectHost($host);
 
 				// Update or add new source data from host data.
 				foreach (CTestArrayHelper::get($data, 'host_fields', []) as $key => $value) {
 					$source['host_fields'][$key] = $value;
-				}
-
-				if (array_key_exists('utf_fields', $data)) {
-					foreach ($data['utf_fields'] as $field => $value) {
-						$source['host_fields'][$field] = $value['text'];
-					}
 				}
 
 				// Check host fields.
@@ -1644,39 +1601,33 @@ class testFormHost extends CWebTest {
 		return [
 			[
 				[
-					'host_fields' => [
-						'Host name' => microtime().' clone without interface changes'
-					]
+					'Host name' => microtime().' clone without interface changes'
+
 				]
 			],
 			[
 				[
-					'host_fields' => [
-						'Host name' => microtime().' clone with interface changes',
-						'Interfaces' => [
-							[
-								'action' => USER_ACTION_ADD,
-								'type' => 'SNMP',
-								'ip' => '127.3.3.3',
-								'dns' => '',
-								'Connect to' => 'IP',
-								'port' => '122',
-								'SNMP version' => 'SNMPv3',
-								'Context name' => 'zabbix',
-								'Security name' => 'selenium',
-								'Security level' => 'authPriv',
-								'Authentication protocol' => 'SHA256',
-								'Authentication passphrase' => 'test123',
-								'Privacy protocol' => 'AES256',
-								'Privacy passphrase' => '456test',
-								'Use bulk requests' => false
-							]
+					'Host name' => microtime().' clone with interface changes',
+					'Visible name' => microtime().'😀😀😀',
+					'Description' => '😀😀😀😀😀😀😀',
+					'Interfaces' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'ip' => '127.3.3.3',
+							'dns' => '',
+							'Connect to' => 'IP',
+							'port' => '122',
+							'SNMP version' => 'SNMPv3',
+							'Context name' => 'zabbix',
+							'Security name' => 'selenium',
+							'Security level' => 'authPriv',
+							'Authentication protocol' => 'SHA256',
+							'Authentication passphrase' => 'test123',
+							'Privacy protocol' => 'AES256',
+							'Privacy passphrase' => '456test',
+							'Use bulk requests' => false
 						]
-					],
-					'utf_fields' => [
-						'id:visiblename' => microtime().'😀😀😀',
-						'xpath://input[contains(@id,"community")]' => '{😀😀😀😀}',
-						'id:description' => '😀😀😀😀😀😀😀'
 					]
 				]
 			]
@@ -1695,16 +1646,7 @@ class testFormHost extends CWebTest {
 		$form = $this->openForm(($this->standalone ? 'zabbix.php?action=host.edit&hostid='.$hostid : $this->link), $host);
 
 		// Get values from form.
-		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
-
-		if (array_key_exists('utf_fields', $data)) {
-			foreach ($data['utf_fields'] as $locator => $value) {
-				CElementQuery::getDriver()->executeScript('arguments[0].value = '.json_encode($value).';',
-						[$form->query($locator)->one()]
-				);
-			}
-		}
-
+		$form->fill($data);
 		$original = $form->getFields()->asValues();
 
 		// Clone host.
@@ -1719,10 +1661,8 @@ class testFormHost extends CWebTest {
 		$this->assertMessage(TEST_GOOD, 'Host added');
 
 		// Check the values of the original host with the cloned host.
-		$visible_name = (CTestArrayHelper::get($data, 'utf_fields.id:visiblename'))
-			? $data['utf_fields']['id:visiblename']
-			: $data['host_fields']['Host name'];
-		$this->filterAndSelectHost($visible_name, CTestArrayHelper::get($data, 'utf_fields'))->checkValue($original);
+		$this->filterAndSelectHost((CTestArrayHelper::get($data, 'Visible name', 'Host name')) )
+				->checkValue($original);
 		COverlayDialogElement::find()->one()->close();
 	}
 
@@ -1741,15 +1681,8 @@ class testFormHost extends CWebTest {
 				zbx_dbstr($data['host_fields']['Host name'])
 		);
 
-		if (CTestArrayHelper::get($data, 'utf_fields.id:visiblename')) {
-			$data['host_fields']['Visible name'] =  $data['utf_fields']['id:visiblename'];
-		}
-		elseif (CTestArrayHelper::get($data, 'host_fields.Visible name') === "") {
+		if (CTestArrayHelper::get($data, 'host_fields.Visible name') === "") {
 			$data['host_fields']['Visible name'] = $data['host_fields']['Host name'];
-		}
-
-		if (CTestArrayHelper::get($data, 'utf_fields.id:description')) {
-			$data['host_fields']['Description'] =  $data['utf_fields']['id:description'];
 		}
 
 		$fields = ['Host name' => 'host', 'Visible name' => 'name', 'Description' => 'description', 'Enabled' => 'status'];
@@ -1966,22 +1899,12 @@ class testFormHost extends CWebTest {
 	 * Function for filtering necessary host on page.
 	 *
 	 * @param string	$host    host name to be filtered
-	 * @param boolean	$utf     utf8mb4 characters are present
 	 *
 	 * @return CFormElement
 	 */
-	public function filterAndSelectHost($host, $utf = false) {
+	public function filterAndSelectHost($host) {
 		$this->query('button:Reset')->one()->click();
-		$filter_form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
-
-		if ($utf) {
-			CElementQuery::getDriver()->executeScript('arguments[0].value = '.json_encode($host).';',
-					[$filter_form->query('xpath:.//input[@id="filter_host" or @name="name"]')->one()]);
-		}
-		else {
-			$filter_form->fill(['Name' => $host]);
-		}
-
+		$this->query('name:zbx_filter')->asForm()->waitUntilReady()->one()->fill(['Name' => $host]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$this->page->waitUntilReady();
 
