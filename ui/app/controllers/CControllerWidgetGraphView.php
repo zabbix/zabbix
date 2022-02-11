@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -364,21 +364,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 						}
 					}
 
-					if ($resourceid !== null) {
-						$graph_url = $this->checkAccess(CRoleHelper::UI_MONITORING_HOSTS)
-							? (new CUrl('zabbix.php'))
-								->setArgument('action', 'charts.view')
-								->setArgument('view_as', HISTORY_GRAPH)
-								->setArgument('filter_search_type', ZBX_SEARCH_TYPE_STRICT)
-								->setArgument('filter_graphids', [$resourceid])
-								->setArgument('filter_set', '1')
-								->setArgument('from', '')
-								->setArgument('to', '')
-							: null;
-					}
-					else {
-						$graph_url = null;
-					}
+					$graph_url = null;
 				}
 				else {
 					$graph_url = $this->checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)

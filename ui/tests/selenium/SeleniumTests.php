@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -123,11 +123,16 @@ require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingItem.php';
 require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingItemPrototype.php';
 require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingTest.php';
+require_once dirname(__FILE__).'/services/testFormMonitoringServices.php';
+require_once dirname(__FILE__).'/services/testPageMonitoringServices.php';
+require_once dirname(__FILE__).'/services/testPageMonitoringServicesMassUpdate.php';
 require_once dirname(__FILE__).'/testFormSetup.php';
 require_once dirname(__FILE__).'/testFormSysmap.php';
 require_once dirname(__FILE__).'/testFormTabIndicators.php';
 require_once dirname(__FILE__).'/tags/testFormTagsHost.php';
 require_once dirname(__FILE__).'/tags/testFormTagsHostPrototype.php';
+require_once dirname(__FILE__).'/tags/testFormTagsServices.php';
+require_once dirname(__FILE__).'/tags/testFormTagsServicesProblemTags.php';
 require_once dirname(__FILE__).'/tags/testFormTagsItem.php';
 require_once dirname(__FILE__).'/tags/testFormTagsItemPrototype.php';
 require_once dirname(__FILE__).'/tags/testFormTagsTemplate.php';
@@ -238,6 +243,8 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMassUpdateItems');
 		$suite->addTestSuite('testPageMassUpdateItemPrototypes');
 		$suite->addTestSuite('testPageMonitoringHosts');
+		$suite->addTestSuite('testPageMonitoringServices');
+		$suite->addTestSuite('testPageMonitoringServicesMassUpdate');
 		$suite->addTestSuite('testPageNetworkDiscovery');
 /*
 		$suite->addTestSuite('testPageQueueDetails');
@@ -302,6 +309,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormMacrosTemplate');
 		$suite->addTestSuite('testFormMaintenance');
 		$suite->addTestSuite('testFormMap');
+		$suite->addTestSuite('testFormMonitoringServices');
 		$suite->addTestSuite('testFormNetworkDiscovery');
 		$suite->addTestSuite('testFormPreprocessingCloneHost');
 		$suite->addTestSuite('testFormPreprocessingCloneTemplate');
@@ -314,6 +322,8 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormTabIndicators');
 		$suite->addTestSuite('testFormTagsHost');
 		$suite->addTestSuite('testFormTagsHostPrototype');
+		$suite->addTestSuite('testFormTagsServices');
+		$suite->addTestSuite('testFormTagsServicesProblemTags');
 		$suite->addTestSuite('testFormTagsItem');
 		$suite->addTestSuite('testFormTagsItemPrototype');
 		$suite->addTestSuite('testFormTagsTemplate');

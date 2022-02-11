@@ -38,11 +38,14 @@ window.widget_svggraph_form = new class {
 				const $dialogue_body = jQuery(this);
 				const $preview_container = jQuery(".<?= ZBX_STYLE_SVG_GRAPH_PREVIEW ?>");
 
-				jQuery("#svg-graph-preview").css("top",
-					($preview_container.offset().top < $dialogue_body.offset().top && $dialogue_body.height() > 500)
-						? $dialogue_body.offset().top - $preview_container.offset().top
-						: 0
-				);
+				if ($preview_container.offset().top < $dialogue_body.offset().top && $dialogue_body.height() > 400) {
+					jQuery("#svg-graph-preview").css("top", $dialogue_body.offset().top - $preview_container.offset().top);
+					jQuery(".graph-widget-config-tabs .ui-tabs-nav").css("top", $preview_container.height());
+				}
+				else {
+					jQuery("#svg-graph-preview").css("top", 0);
+					jQuery(".graph-widget-config-tabs .ui-tabs-nav").css("top", 0);
+				}
 			} else {
 				jQuery(".overlay-dialogue-body").off("scroll");
 			}

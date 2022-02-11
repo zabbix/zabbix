@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -225,8 +225,6 @@ typedef struct
 zbx_lld_item_full_t;
 
 void	lld_field_str_rollback(char **field, char **field_orig, zbx_uint64_t *flags, zbx_uint64_t flag);
-void	lld_field_uint64_rollback(zbx_uint64_t *field, zbx_uint64_t *field_orig, zbx_uint64_t *flags,
-		zbx_uint64_t flag);
 
 void	lld_override_item(const zbx_vector_ptr_t *overrides, const char *name, const char **delay,
 		const char **history, const char **trends, zbx_vector_db_tag_ptr_t *override_tags,
@@ -238,7 +236,8 @@ void	lld_override_host(const zbx_vector_ptr_t *overrides, const char *name, zbx_
 		unsigned char *discover);
 void	lld_override_graph(const zbx_vector_ptr_t *overrides, const char *name, unsigned char *discover);
 
-int	lld_validate_item_override_no_discover(const zbx_vector_ptr_t *overrides, const char *name);
+int	lld_validate_item_override_no_discover(const zbx_vector_ptr_t *overrides, const char *name,
+		unsigned char override_default);
 
 int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_rows,
 		const zbx_vector_ptr_t *lld_macro_paths, char **error, int lifetime, int lastcheck);

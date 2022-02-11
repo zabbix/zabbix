@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,6 +41,14 @@
 
 <script type="text/x-jquery-tmpl" id="host-interface-row-tmpl">
 	<?= (new CPartial('configuration.host.interface.row'))->getOutput() ?>
+</script>
+
+<script>
+	const view = {
+		editHost(e, hostid) {
+			return;
+		}
+	}
 </script>
 
 <script type="text/javascript">

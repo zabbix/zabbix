@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -288,11 +288,14 @@ function getHostNavigation($current_element, $hostid, $lld_ruleid = 0) {
 				break;
 		}
 
-		$host = new CSpan(new CLink(CHtml::encode($db_host['name']),
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'host.edit')
-				->setArgument('hostid', $db_host['hostid'])
-		));
+		$host = new CSpan(
+			(new CLink(CHtml::encode($db_host['name']),
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'host.edit')
+					->setArgument('hostid', $db_host['hostid'])
+				)
+			)->onClick('view.editHost(event, '.json_encode($db_host['hostid']).')')
+		);
 
 		if ($current_element === '') {
 			$host->addClass(ZBX_STYLE_SELECTED);

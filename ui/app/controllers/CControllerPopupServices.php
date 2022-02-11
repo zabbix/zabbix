@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,8 @@ class CControllerPopupServices extends CController {
 		$fields = [
 			'title' =>				'string|required',
 			'filter_name' =>		'string',
-			'exclude_serviceids' =>	'array_db services.serviceid'
+			'exclude_serviceids' =>	'array_db services.serviceid',
+			'multiple' =>			'in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -49,13 +50,17 @@ class CControllerPopupServices extends CController {
 		return true;
 	}
 
+	/**
+	 * @throws APIException
+	 */
 	protected function doAction(): void {
 		$exclude_serviceids = $this->getInput('exclude_serviceids', []);
 
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 
 		$services = API::Service()->get([
-			'output' => ['serviceid', 'name', 'algorithm'],
+			'output' => ['serviceid', 'name'],
+			'selectTags' => ['tag', 'value'],
 			'selectProblemTags' => ['tag', 'value'],
 			'search' => ['name' => $this->hasInput('filter_name') ? $this->getInput('filter_name') : null],
 			'limit' => $limit + count($exclude_serviceids),
@@ -65,9 +70,15 @@ class CControllerPopupServices extends CController {
 		$services = array_diff_key($services, array_flip($exclude_serviceids));
 		$services = array_slice($services, 0, $limit);
 
+		$tags = [];
 		$problem_tags = [];
 
 		foreach ($services as $service) {
+			$tags[] = [
+				'serviceid' => $service['serviceid'],
+				'tags' => $service['tags']
+			];
+
 			$problem_tags[] = [
 				'serviceid' => $service['serviceid'],
 				'tags' => $service['problem_tags']
@@ -76,8 +87,8 @@ class CControllerPopupServices extends CController {
 
 		$problem_tags_html = [];
 
-		foreach (makeTags($problem_tags, true, 'serviceid') as $serviceid => $tags) {
-			$problem_tags_html[$serviceid] = implode('', $tags);
+		foreach (makeTags($problem_tags, true, 'serviceid') as $serviceid => $service_tags) {
+			$problem_tags_html[$serviceid] = implode('', $service_tags);
 		}
 
 		$data = [
@@ -86,7 +97,9 @@ class CControllerPopupServices extends CController {
 				'name' => $this->getInput('filter_name', '')
 			],
 			'exclude_serviceids' => $exclude_serviceids,
+			'is_multiple' => $this->getInput('multiple', 1) == 1,
 			'services' => $services,
+			'tags' => makeTags($tags, true, 'serviceid'),
 			'problem_tags' => makeTags($problem_tags, true, 'serviceid'),
 			'problem_tags_html' => $problem_tags_html,
 			'user' => [

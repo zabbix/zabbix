@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,8 +22,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_list_create_ext                                              *
- *                                                                            *
  * Purpose: create singly linked list (with custom memory functions)          *
  *                                                                            *
  * Parameters: queue           - [IN] the list                                *
@@ -41,8 +39,6 @@ void	zbx_list_create_ext(zbx_list_t *queue, zbx_mem_malloc_func_t mem_malloc_fun
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_list_create                                                  *
- *                                                                            *
  * Purpose: create singly linked list                                         *
  *                                                                            *
  * Parameters: queue - [IN] the list                                          *
@@ -54,8 +50,6 @@ void	zbx_list_create(zbx_list_t *queue)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_list_destroy                                                 *
  *                                                                            *
  * Purpose: destroy list                                                      *
  *                                                                            *
@@ -69,8 +63,6 @@ void	zbx_list_destroy(zbx_list_t *list)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: list_create_item                                                 *
  *                                                                            *
  * Purpose: allocate memory and initialize a new list item                    *
  *                                                                            *
@@ -93,8 +85,6 @@ static void	list_create_item(zbx_list_t *list, void *value, zbx_list_item_t **cr
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_list_insert_after                                            *
  *                                                                            *
  * Purpose: insert value after specified position in the list                 *
  *                                                                            *
@@ -133,8 +123,6 @@ void	zbx_list_insert_after(zbx_list_t *list, zbx_list_item_t *after, void *value
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_list_append                                                  *
- *                                                                            *
  * Purpose: append value to the end of the list                               *
  *                                                                            *
  * Parameters: list     - [IN] the list                                       *
@@ -148,8 +136,6 @@ void	zbx_list_append(zbx_list_t *list, void *value, zbx_list_item_t **inserted)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_list_prepend                                                 *
  *                                                                            *
  * Purpose: prepend value to the beginning of the list                        *
  *                                                                            *
@@ -174,8 +160,6 @@ void	zbx_list_prepend(zbx_list_t *list, void *value, zbx_list_item_t **inserted)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_list_pop                                                     *
  *                                                                            *
  * Purpose: removes a value from the beginning of the list                    *
  *                                                                            *
@@ -209,8 +193,6 @@ int	zbx_list_pop(zbx_list_t *list, void **value)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_list_peek                                                    *
- *                                                                            *
  * Purpose: get value from the queue without dequeuing                        *
  *                                                                            *
  * Parameters: list  - [IN]  the list                                         *
@@ -233,8 +215,6 @@ int	zbx_list_peek(const zbx_list_t *list, void **value)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_list_iterator_init                                           *
- *                                                                            *
  * Purpose: initialize list iterator                                          *
  *                                                                            *
  * Parameters: list     - [IN]  the list                                      *
@@ -249,8 +229,6 @@ void	zbx_list_iterator_init(zbx_list_t *list, zbx_list_iterator_t *iterator)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_list_iterator_next                                           *
  *                                                                            *
  * Purpose: advance list iterator                                             *
  *                                                                            *
@@ -275,8 +253,6 @@ int	zbx_list_iterator_next(zbx_list_iterator_t *iterator)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_list_iterator_peek                                           *
- *                                                                            *
  * Purpose: get value without removing it from list                           *
  *                                                                            *
  * Parameters: iterator - [IN]  initialized list iterator                     *
@@ -299,8 +275,6 @@ int	zbx_list_iterator_peek(const zbx_list_iterator_t *iterator, void **value)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_list_iterator_clear                                          *
- *                                                                            *
  * Purpose: clears iterator leaving it in uninitialized state                 *
  *                                                                            *
  * Parameters: iterator - [IN]  list iterator                                 *
@@ -312,8 +286,6 @@ void	zbx_list_iterator_clear(zbx_list_iterator_t *iterator)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_list_iterator_equal                                          *
  *                                                                            *
  * Purpose: tests if two iterators points at the same list item               *
  *                                                                            *
@@ -334,8 +306,6 @@ int	zbx_list_iterator_equal(const zbx_list_iterator_t *iterator1, const zbx_list
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_list_iterator_isset                                          *
- *                                                                            *
  * Purpose: checks if the iterator points at some list item                   *
  *                                                                            *
  * Parameters: iterator - [IN] list iterator                                  *
@@ -349,8 +319,6 @@ int	zbx_list_iterator_isset(const zbx_list_iterator_t *iterator)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_list_iterator_update                                         *
  *                                                                            *
  * Purpose: updates iterator                                                  *
  *                                                                            *

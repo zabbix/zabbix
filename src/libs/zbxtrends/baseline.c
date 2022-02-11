@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,8 +22,6 @@
 #include "log.h"
 
 /******************************************************************************
- *                                                                            *
- * Function: baseline_get_common_data                                         *
  *                                                                            *
  * Purpose: get baseline data for common period/season combinations           *
  *                                                                            *
@@ -96,8 +94,6 @@ static int	baseline_get_common_data(zbx_uint64_t itemid, const char *table, time
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: baseline_get_isoyear_data                                        *
  *                                                                            *
  * Purpose: get baseline data for week based periods in a year                *
  *                                                                            *
@@ -185,8 +181,6 @@ static int	baseline_get_isoyear_data(zbx_uint64_t itemid, const char *table, tim
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_baseline_get_data                                            *
  *                                                                            *
  * Purpose: get baseline data for the specified period                        *
  *                                                                            *

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -116,5 +116,19 @@ class CHtmlUrlValidator {
 		else {
 			return (array_key_exists('path', $url_parts) && $url_parts['path'] !== '');
 		}
+	}
+
+	/**
+	 * Verifies that URL will not lead to third party pages.
+	 *
+	 * @param string $url
+	 *
+	 * @return bool
+	 */
+	public static function validateSameSite(string $url): bool {
+		$root_path = __DIR__.'/../../../';
+		preg_match('/^\/?(?<filename>[a-z0-9\_\.]+\.php)(\?.*)?$/i', $url, $url_parts);
+
+		return (array_key_exists('filename', $url_parts) && file_exists($root_path.$url_parts['filename']));
 	}
 }

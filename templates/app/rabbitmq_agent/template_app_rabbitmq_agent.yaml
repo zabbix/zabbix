@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:21Z'
+  version: '6.0'
+  date: '2022-01-26T10:47:03Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -15,7 +15,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387226-discussion-thread-for-official-zabbix-template-rabbitmq
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -39,8 +39,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: messages
         -
           uuid: f78fabbd7e3f44dc81b1cf9c90b26f2e
           name: 'RabbitMQ: Messages acknowledged per second'
@@ -61,8 +61,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: messages
         -
           uuid: 45cf9b5cf5cd4b13b0e140383233799f
           name: 'RabbitMQ: Messages confirmed'
@@ -82,8 +82,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: messages
         -
           uuid: bc85a070e1e9451b953d85bb519ed63d
           name: 'RabbitMQ: Messages confirmed per second'
@@ -104,8 +104,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: messages
         -
           uuid: 004da545af4a4f61bd2167281bb9a02b
           name: 'RabbitMQ: Messages delivered'
@@ -125,8 +125,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: messages
         -
           uuid: c00a84c8676544dcbdd74fec13881063
           name: 'RabbitMQ: Messages delivered per second'
@@ -147,8 +147,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: messages
         -
           uuid: 4215bdf87f0e426f85bd79434a0fb0bb
           name: 'RabbitMQ: Messages published'
@@ -168,8 +168,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: messages
         -
           uuid: cfadadb681474c7eb0512d1f4d223ff6
           name: 'RabbitMQ: Messages published per second'
@@ -190,8 +190,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: messages
         -
           uuid: bb068ac7c6094fb8a59cd1a003e88c39
           name: 'RabbitMQ: Messages publish_in'
@@ -211,8 +211,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: messages
         -
           uuid: db511bf1cd6c465f8fe1ae6b5fa08660
           name: 'RabbitMQ: Messages publish_in per second'
@@ -233,8 +233,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: messages
         -
           uuid: 23dcb85dd9bc4fefb1a9682956181c2e
           name: 'RabbitMQ: Messages publish_out'
@@ -254,8 +254,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: messages
         -
           uuid: 05e4c745be95412995749c352ec0f925
           name: 'RabbitMQ: Messages publish_out per second'
@@ -276,8 +276,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: messages
         -
           uuid: 650d6a94e381477299c62cfb2a2252cf
           name: 'RabbitMQ: Messages returned redeliver'
@@ -297,8 +297,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: messages
         -
           uuid: 6d7eb8880bca4c6e92f65f8a32911599
           name: 'RabbitMQ: Messages returned redeliver per second'
@@ -319,8 +319,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: messages
         -
           uuid: e3faec09ae0a4d7aa8aab50d71de7bb3
           name: 'RabbitMQ: Messages returned unroutable'
@@ -340,8 +340,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: messages
         -
           uuid: 72267cce69cf490ea626ff3ae17b6362
           name: 'RabbitMQ: Messages returned unroutable per second'
@@ -362,8 +362,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: messages
         -
           uuid: 2b03117e863348ee84d94acfe877ef7f
           name: 'RabbitMQ: Channels total'
@@ -381,8 +381,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: channels
         -
           uuid: b3cdd6739a964447b524df4fdd726434
           name: 'RabbitMQ: Connections total'
@@ -400,8 +400,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: connections
         -
           uuid: c39007dbd4374bee943d61b7e90c0f01
           name: 'RabbitMQ: Consumers total'
@@ -419,8 +419,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: consumers
         -
           uuid: be0b952e5d08409aa2c65fe143a9193c
           name: 'RabbitMQ: Exchanges total'
@@ -438,8 +438,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: exchanges
         -
           uuid: d7c86b4921f54924af1b72cd2493da1c
           name: 'RabbitMQ: Queues total'
@@ -457,8 +457,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: queues
         -
           uuid: c98b2b3dd2bd4fec9e7c571bc631167b
           name: 'RabbitMQ: Messages total'
@@ -476,8 +476,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: messages
         -
           uuid: efaabe175e5f4fffa8a810ea35753475
           name: 'RabbitMQ: Messages ready for delivery'
@@ -495,8 +495,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: messages
         -
           uuid: 6cf09ed9d244464288c8050b10622e3a
           name: 'RabbitMQ: Messages unacknowledged'
@@ -514,8 +514,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: messages
         -
           uuid: f015f991bcea4c4dbf83dfb013300010
           name: 'RabbitMQ: Get exchanges'
@@ -532,8 +532,8 @@ zabbix_export:
                 - \1
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: 943eabfb44164908b9135aa4d6478bea
           name: 'RabbitMQ: Get overview'
@@ -550,8 +550,8 @@ zabbix_export:
                 - \1
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
           triggers:
             -
               uuid: 000d3e773f6e4ebf89f16daa2ce8c168
@@ -560,6 +560,10 @@ zabbix_export:
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 30 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: e28b4491721d4dbf8eded86a5caeabc2
@@ -601,8 +605,17 @@ zabbix_export:
                 key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]'
               tags:
                 -
-                  tag: Application
-                  value: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
+                  tag: component
+                  value: messages
+                -
+                  tag: exchange
+                  value: '{#EXCHANGE}'
+                -
+                  tag: type
+                  value: '{#TYPE}'
+                -
+                  tag: vhost
+                  value: '{#VHOST}'
             -
               uuid: fcf7807f096d4cddb8fa2b3671814dfa
               name: 'RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages acknowledged'
@@ -622,8 +635,17 @@ zabbix_export:
                 key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]'
               tags:
                 -
-                  tag: Application
-                  value: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
+                  tag: component
+                  value: messages
+                -
+                  tag: exchange
+                  value: '{#EXCHANGE}'
+                -
+                  tag: type
+                  value: '{#TYPE}'
+                -
+                  tag: vhost
+                  value: '{#VHOST}'
             -
               uuid: 858f8ce62fa04a31902569a712e58234
               name: 'RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages confirmed per second'
@@ -644,8 +666,17 @@ zabbix_export:
                 key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]'
               tags:
                 -
-                  tag: Application
-                  value: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
+                  tag: component
+                  value: messages
+                -
+                  tag: exchange
+                  value: '{#EXCHANGE}'
+                -
+                  tag: type
+                  value: '{#TYPE}'
+                -
+                  tag: vhost
+                  value: '{#VHOST}'
             -
               uuid: 38d41b5d815a40ff816f6fad2395b61a
               name: 'RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages confirmed'
@@ -665,8 +696,17 @@ zabbix_export:
                 key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]'
               tags:
                 -
-                  tag: Application
-                  value: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
+                  tag: component
+                  value: messages
+                -
+                  tag: exchange
+                  value: '{#EXCHANGE}'
+                -
+                  tag: type
+                  value: '{#TYPE}'
+                -
+                  tag: vhost
+                  value: '{#VHOST}'
             -
               uuid: ab53a6957ea641fe8b2a7f26c4bcc743
               name: 'RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages delivered per second'
@@ -687,8 +727,17 @@ zabbix_export:
                 key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]'
               tags:
                 -
-                  tag: Application
-                  value: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
+                  tag: component
+                  value: messages
+                -
+                  tag: exchange
+                  value: '{#EXCHANGE}'
+                -
+                  tag: type
+                  value: '{#TYPE}'
+                -
+                  tag: vhost
+                  value: '{#VHOST}'
             -
               uuid: 412e5003ad2d4e80832ee0551a596791
               name: 'RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages delivered'
@@ -708,8 +757,17 @@ zabbix_export:
                 key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]'
               tags:
                 -
-                  tag: Application
-                  value: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
+                  tag: component
+                  value: messages
+                -
+                  tag: exchange
+                  value: '{#EXCHANGE}'
+                -
+                  tag: type
+                  value: '{#TYPE}'
+                -
+                  tag: vhost
+                  value: '{#VHOST}'
             -
               uuid: 32a0c7af8b9940a482a3a1d63ee90940
               name: 'RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages published per second'
@@ -730,8 +788,17 @@ zabbix_export:
                 key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]'
               tags:
                 -
-                  tag: Application
-                  value: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
+                  tag: component
+                  value: messages
+                -
+                  tag: exchange
+                  value: '{#EXCHANGE}'
+                -
+                  tag: type
+                  value: '{#TYPE}'
+                -
+                  tag: vhost
+                  value: '{#VHOST}'
             -
               uuid: 1eccbe4450d74d5f9c5b8f7e6279b214
               name: 'RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages published'
@@ -751,8 +818,17 @@ zabbix_export:
                 key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]'
               tags:
                 -
-                  tag: Application
-                  value: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
+                  tag: component
+                  value: messages
+                -
+                  tag: exchange
+                  value: '{#EXCHANGE}'
+                -
+                  tag: type
+                  value: '{#TYPE}'
+                -
+                  tag: vhost
+                  value: '{#VHOST}'
             -
               uuid: 3520a523abd1413f88c1c19978e6d562
               name: 'RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages publish_in per second'
@@ -773,8 +849,17 @@ zabbix_export:
                 key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]'
               tags:
                 -
-                  tag: Application
-                  value: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
+                  tag: component
+                  value: messages
+                -
+                  tag: exchange
+                  value: '{#EXCHANGE}'
+                -
+                  tag: type
+                  value: '{#TYPE}'
+                -
+                  tag: vhost
+                  value: '{#VHOST}'
             -
               uuid: 520d8301e48540679472bf508a6e293b
               name: 'RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages publish_in'
@@ -794,8 +879,17 @@ zabbix_export:
                 key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]'
               tags:
                 -
-                  tag: Application
-                  value: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
+                  tag: component
+                  value: messages
+                -
+                  tag: exchange
+                  value: '{#EXCHANGE}'
+                -
+                  tag: type
+                  value: '{#TYPE}'
+                -
+                  tag: vhost
+                  value: '{#VHOST}'
             -
               uuid: 6beb5e40cb8b416a8722ea77abb7355d
               name: 'RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages publish_out per second'
@@ -816,8 +910,17 @@ zabbix_export:
                 key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]'
               tags:
                 -
-                  tag: Application
-                  value: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
+                  tag: component
+                  value: messages
+                -
+                  tag: exchange
+                  value: '{#EXCHANGE}'
+                -
+                  tag: type
+                  value: '{#TYPE}'
+                -
+                  tag: vhost
+                  value: '{#VHOST}'
             -
               uuid: beb929ee395e4caba73f3063c24a1d60
               name: 'RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages publish_out'
@@ -837,8 +940,17 @@ zabbix_export:
                 key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]'
               tags:
                 -
-                  tag: Application
-                  value: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
+                  tag: component
+                  value: messages
+                -
+                  tag: exchange
+                  value: '{#EXCHANGE}'
+                -
+                  tag: type
+                  value: '{#TYPE}'
+                -
+                  tag: vhost
+                  value: '{#VHOST}'
             -
               uuid: 7485d5a12fb04a13810ea54b9cc598e1
               name: 'RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages redelivered per second'
@@ -859,8 +971,17 @@ zabbix_export:
                 key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]'
               tags:
                 -
-                  tag: Application
-                  value: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
+                  tag: component
+                  value: messages
+                -
+                  tag: exchange
+                  value: '{#EXCHANGE}'
+                -
+                  tag: type
+                  value: '{#TYPE}'
+                -
+                  tag: vhost
+                  value: '{#VHOST}'
             -
               uuid: 58a06005659943429122d451acb521e0
               name: 'RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages redelivered'
@@ -880,8 +1001,17 @@ zabbix_export:
                 key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]'
               tags:
                 -
-                  tag: Application
-                  value: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
+                  tag: component
+                  value: messages
+                -
+                  tag: exchange
+                  value: '{#EXCHANGE}'
+                -
+                  tag: type
+                  value: '{#TYPE}'
+                -
+                  tag: vhost
+                  value: '{#VHOST}'
             -
               uuid: 295eeb3bd071400d921efe1f5a924a3e
               name: 'RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages returned unroutable per second'
@@ -902,8 +1032,17 @@ zabbix_export:
                 key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]'
               tags:
                 -
-                  tag: Application
-                  value: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
+                  tag: component
+                  value: messages
+                -
+                  tag: exchange
+                  value: '{#EXCHANGE}'
+                -
+                  tag: type
+                  value: '{#TYPE}'
+                -
+                  tag: vhost
+                  value: '{#VHOST}'
             -
               uuid: 2901eccbd8ef483ba63c5522755155e7
               name: 'RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages returned unroutable'
@@ -923,8 +1062,17 @@ zabbix_export:
                 key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]'
               tags:
                 -
-                  tag: Application
-                  value: 'RabbitMQ: Exchange "{#VHOST}/{#EXCHANGE}/{#TYPE}"'
+                  tag: component
+                  value: messages
+                -
+                  tag: exchange
+                  value: '{#EXCHANGE}'
+                -
+                  tag: type
+                  value: '{#TYPE}'
+                -
+                  tag: vhost
+                  value: '{#VHOST}'
           master_item:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]'
           lld_macro_paths:
@@ -950,6 +1098,7 @@ zabbix_export:
               name: 'RabbitMQ: Healthcheck: alarms in effect in the cluster{#SINGLETON}'
               key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/health/checks/alarms{#SINGLETON}"]'
               history: 7d
+              authtype: NONE
               username: '{$RABBITMQ.API.USER}'
               password: '{$RABBITMQ.API.PASSWORD}'
               description: 'Responds a 200 OK if there are no alarms in effect in the cluster, otherwise responds with a 503 Service Unavailable.'
@@ -978,8 +1127,11 @@ zabbix_export:
               retrieve_mode: HEADERS
               tags:
                 -
-                  tag: Application
-                  value: RabbitMQ
+                  tag: component
+                  value: health
+                -
+                  tag: component
+                  value: system
               trigger_prototypes:
                 -
                   uuid: 032949c387c64223b3125ba1120ae082
@@ -988,6 +1140,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           master_item:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]'
           preprocessing:
@@ -1001,8 +1157,15 @@ zabbix_export:
                 - |
                   var rabbit_version = parseInt(value.split('.')[0]) * 10000 +
                                        parseInt(value.split('.')[1]) * 100 +
-                                       parseInt(value.split('.')[2]) 
+                                       parseInt(value.split('.')[2])
                   return JSON.stringify(rabbit_version >= 30810 ? [{'{#SINGLETON}': ''}] : []);
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: rabbitmq
       macros:
         -
           macro: '{$RABBITMQ.API.CLUSTER_HOST}'
@@ -1136,7 +1299,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387226-discussion-thread-for-official-zabbix-template-rabbitmq
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -1150,8 +1313,8 @@ zabbix_export:
           units: s
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: system
           triggers:
             -
               uuid: 5cb80a7552d74e44a83d0825f039f89f
@@ -1166,6 +1329,10 @@ zabbix_export:
                 -
                   name: 'RabbitMQ: Service is down'
                   expression: 'last(/RabbitMQ node by Zabbix agent/net.tcp.service[http,"{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"])=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 6229b623f5ff40f9a65e9573b3b86e3f
           name: 'RabbitMQ: Service ping'
@@ -1180,8 +1347,11 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: af5cfb0004e04562a9720b9e1b41fd5b
@@ -1193,6 +1363,10 @@ zabbix_export:
                 -
                   name: 'RabbitMQ: Process is not running'
                   expression: 'last(/RabbitMQ node by Zabbix agent/proc.num["{$RABBITMQ.PROCESS_NAME}"])=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 0b195bf594c44b1f869b4a7671f61453
           name: 'RabbitMQ: CPU utilization'
@@ -1203,8 +1377,8 @@ zabbix_export:
           description: 'Process CPU utilization percentage.'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: cpu
         -
           uuid: 6f13f672d8ce4c9592e0f3f5ec3b0ec4
           name: 'RabbitMQ: Memory usage (rss)'
@@ -1214,8 +1388,8 @@ zabbix_export:
           description: 'Resident set size memory used by process in bytes.'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: system
         -
           uuid: 4faac75027d14304ab071602df8f2937
           name: 'RabbitMQ: Memory usage (vsize)'
@@ -1225,8 +1399,8 @@ zabbix_export:
           description: 'Virtual memory size used by process in bytes.'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: memory
         -
           uuid: 8f1c8d2449c44ab590842184d9deb3a6
           name: 'RabbitMQ: Number of processes running'
@@ -1234,14 +1408,18 @@ zabbix_export:
           history: 7d
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: system
           triggers:
             -
               uuid: 2979bc7d779b404696f7eac273e99ea7
               expression: 'last(/RabbitMQ node by Zabbix agent/proc.num["{$RABBITMQ.PROCESS_NAME}"])=0'
               name: 'RabbitMQ: Process is not running'
               priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 7dad79be93bd46bba7a2540b38080b06
           name: 'RabbitMQ: Free disk space'
@@ -1260,8 +1438,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: storage
         -
           uuid: d8de1eb13f024ce99388fc4bb68d6ad0
           name: 'RabbitMQ: Disk free alarm'
@@ -1285,8 +1463,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: storage
           triggers:
             -
               uuid: b68cb12ecd4046fd80a717fb557f04e8
@@ -1295,6 +1473,10 @@ zabbix_export:
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'https://www.rabbitmq.com/disk-alarms.html'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 4e62b476bd11497f9190d1f720f22f75
           name: 'RabbitMQ: Disk free limit'
@@ -1313,8 +1495,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: storage
         -
           uuid: 09aeab86c69846eb82d27c2f82f46d2b
           name: 'RabbitMQ: Used file descriptors'
@@ -1332,8 +1514,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: storage
         -
           uuid: e059b278ba384133a72dc723c2b2c40b
           name: 'RabbitMQ: Memory alarm'
@@ -1357,8 +1539,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: memory
           triggers:
             -
               uuid: ec6ae727fe774b0fa56bb4d9ad773e35
@@ -1367,6 +1549,10 @@ zabbix_export:
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'https://www.rabbitmq.com/memory.html'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 54bd4a47d635444e8e2e955325dbb976
           name: 'RabbitMQ: Memory limit'
@@ -1385,8 +1571,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: memory
         -
           uuid: d6a01ec409a6449986c5c0a81ffaf914
           name: 'RabbitMQ: Memory used'
@@ -1405,8 +1591,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: memory
         -
           uuid: db91f84a5ad7412c959fbfe4e3b6df88
           name: 'RabbitMQ: Management plugin version'
@@ -1430,8 +1616,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/overview"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: system
         -
           uuid: 52a0be5049ee40748761d301a644315b
           name: 'RabbitMQ: RabbitMQ version'
@@ -1455,8 +1641,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/overview"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: system
           triggers:
             -
               uuid: daf98bb4593d4697bc51423b2f65ba41
@@ -1465,6 +1651,10 @@ zabbix_export:
               priority: INFO
               description: 'RabbitMQ version has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 5e8c1ed0b073461eb14477edac3c756a
           name: 'RabbitMQ: Number of network partitions'
@@ -1486,8 +1676,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: network
           triggers:
             -
               uuid: 5bed266725e94000804b0ecc7bce6209
@@ -1496,6 +1686,10 @@ zabbix_export:
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'https://www.rabbitmq.com/partitions.html#detecting'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 087fcb3992ef4e35bacd4b6e69ef93d3
           name: 'RabbitMQ: Is running'
@@ -1519,8 +1713,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: system
           triggers:
             -
               uuid: 253acf98446e4790975b330d44dd6b96
@@ -1536,6 +1730,10 @@ zabbix_export:
                 -
                   name: 'RabbitMQ: Service is down'
                   expression: 'last(/RabbitMQ node by Zabbix agent/net.tcp.service[http,"{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"])=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 1ae6f429e99d4ddaa54aa6adab6b8100
           name: 'RabbitMQ: Runtime run queue'
@@ -1553,8 +1751,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: system
         -
           uuid: 3aa508520f224150a05a7ebb64d22c5e
           name: 'RabbitMQ: Sockets available'
@@ -1572,8 +1770,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: system
         -
           uuid: de2cbe02ff6c47d78b6c7105709f4805
           name: 'RabbitMQ: Sockets used'
@@ -1591,8 +1789,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: system
         -
           uuid: a28b6c8cca5544b79c2d9946c1978c7e
           name: 'RabbitMQ: Uptime'
@@ -1616,8 +1814,8 @@ zabbix_export:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]'
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: system
           triggers:
             -
               uuid: 729c448ebabb417bb7ce17b1634c4484
@@ -1626,6 +1824,10 @@ zabbix_export:
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 61730555a0ae4f798ea740effb82764c
           name: 'RabbitMQ: Get nodes'
@@ -1642,8 +1844,8 @@ zabbix_export:
                 - \1
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
           triggers:
             -
               uuid: 4f2a88d09b1b49879d80e0794ec19e0e
@@ -1659,6 +1861,10 @@ zabbix_export:
                 -
                   name: 'RabbitMQ: Service is down'
                   expression: 'last(/RabbitMQ node by Zabbix agent/net.tcp.service[http,"{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"])=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 1af326f40cdb407a96b34025062b4743
           name: 'RabbitMQ: Get node overview'
@@ -1675,8 +1881,8 @@ zabbix_export:
                 - \1
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: 7fb61ad564db42d5a373912491f5c9d3
           name: 'RabbitMQ: Get queues'
@@ -1693,8 +1899,8 @@ zabbix_export:
                 - \1
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
       discovery_rules:
         -
           uuid: 04ef7d13809c45009553815f60ef5ba8
@@ -1730,8 +1936,11 @@ zabbix_export:
                   error_handler_params: '0'
               tags:
                 -
-                  tag: Application
-                  value: RabbitMQ
+                  tag: component
+                  value: health
+                -
+                  tag: component
+                  value: system
               trigger_prototypes:
                 -
                   uuid: bf6bcbda20ed46cbb779d9c1f446dfa8
@@ -1740,6 +1949,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'https://www.rabbitmq.com/monitoring.html#health-checks'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           master_item:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/overview"]'
           preprocessing:
@@ -1753,7 +1966,7 @@ zabbix_export:
                 - |
                   var rabbit_version = parseInt(value.split('.')[0]) * 10000 +
                                        parseInt(value.split('.')[1]) * 100 +
-                                       parseInt(value.split('.')[2]) 
+                                       parseInt(value.split('.')[2])
                   return JSON.stringify(rabbit_version < 30810 ? [{'{#SINGLETON}': ''}] : []);
         -
           uuid: 3c0021a3e57142eb806deb5b47b6700a
@@ -1768,6 +1981,7 @@ zabbix_export:
               name: 'RabbitMQ: Healthcheck: expiration date on the certificates{#SINGLETON}'
               key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/certificate-expiration/1/months{#SINGLETON}"]'
               history: 7d
+              authtype: NONE
               username: '{$RABBITMQ.API.USER}'
               password: '{$RABBITMQ.API.PASSWORD}'
               description: 'Checks the expiration date on the certificates for every listener configured to use TLS. Responds a 200 OK if all certificates are valid (have not expired), otherwise responds with a 503 Service Unavailable.'
@@ -1795,8 +2009,11 @@ zabbix_export:
               retrieve_mode: HEADERS
               tags:
                 -
-                  tag: Application
-                  value: RabbitMQ
+                  tag: component
+                  value: certificate
+                -
+                  tag: component
+                  value: health
               trigger_prototypes:
                 -
                   uuid: d180912136c74e5cb246655ecab75f57
@@ -1805,11 +2022,16 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 701449b128cb42cdb971fc608ba9f29b
               name: 'RabbitMQ: Healthcheck: local alarms in effect on the this node{#SINGLETON}'
               key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/local-alarms{#SINGLETON}"]'
               history: 7d
+              authtype: NONE
               username: '{$RABBITMQ.API.USER}'
               password: '{$RABBITMQ.API.PASSWORD}'
               description: 'Responds a 200 OK if there are no local alarms in effect on the target node, otherwise responds with a 503 Service Unavailable.'
@@ -1837,8 +2059,11 @@ zabbix_export:
               retrieve_mode: HEADERS
               tags:
                 -
-                  tag: Application
-                  value: RabbitMQ
+                  tag: component
+                  value: health
+                -
+                  tag: component
+                  value: system
               trigger_prototypes:
                 -
                   uuid: 62962f18baa4480294e097fec2cc5e4c
@@ -1847,14 +2072,19 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 7a07966d8dde4f2caa9ff95693b86974
-              name: 'RabbitMQ: Healthcheck: classic mirrored queues without synchronised mirrors online{#SINGLETON}'
+              name: 'RabbitMQ: Healthcheck: classic mirrored queues without synchronized mirrors online{#SINGLETON}'
               key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-mirror-sync-critical{#SINGLETON}"]'
               history: 7d
+              authtype: NONE
               username: '{$RABBITMQ.API.USER}'
               password: '{$RABBITMQ.API.PASSWORD}'
-              description: 'Checks if there are classic mirrored queues without synchronised mirrors online (queues that would potentially lose data if the target node is shut down). Responds a 200 OK if there are no such classic mirrored queues, otherwise responds with a 503 Service Unavailable.'
+              description: 'Checks if there are classic mirrored queues without synchronized mirrors online (queues that would potentially lose data if the target node is shut down). Responds a 200 OK if there are no such classic mirrored queues, otherwise responds with a 503 Service Unavailable.'
               valuemap:
                 name: 'RabbitMQ healthcheck'
               preprocessing:
@@ -1879,8 +2109,11 @@ zabbix_export:
               retrieve_mode: HEADERS
               tags:
                 -
-                  tag: Application
-                  value: RabbitMQ
+                  tag: component
+                  value: health
+                -
+                  tag: component
+                  value: queues
               trigger_prototypes:
                 -
                   uuid: 19e392f9e48e4c8287e04751a2a73843
@@ -1889,11 +2122,16 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: f6ec1bb1cc4741be852136fac2c63333
               name: 'RabbitMQ: Healthcheck: queues with minimum online quorum{#SINGLETON}'
               key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-quorum-critical{#SINGLETON}"]'
               history: 7d
+              authtype: NONE
               username: '{$RABBITMQ.API.USER}'
               password: '{$RABBITMQ.API.PASSWORD}'
               description: 'Checks if there are quorum queues with minimum online quorum (queues that would lose their quorum and availability if the target node is shut down). Responds a 200 OK if there are no such quorum queues, otherwise responds with a 503 Service Unavailable.'
@@ -1921,8 +2159,11 @@ zabbix_export:
               retrieve_mode: HEADERS
               tags:
                 -
-                  tag: Application
-                  value: RabbitMQ
+                  tag: component
+                  value: health
+                -
+                  tag: component
+                  value: queues
               trigger_prototypes:
                 -
                   uuid: e063b6dde6a0484ba1561861d8b1f0c1
@@ -1931,11 +2172,16 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 0d1ad3daf2bb46dba2c9913c1684a0d4
               name: 'RabbitMQ: Healthcheck: virtual hosts on the this node{#SINGLETON}'
               key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/virtual-hosts{#SINGLETON}"]'
               history: 7d
+              authtype: NONE
               username: '{$RABBITMQ.API.USER}'
               password: '{$RABBITMQ.API.PASSWORD}'
               description: 'Responds a 200 OK if all virtual hosts and running on the target node, otherwise responds with a 503 Service Unavailable.'
@@ -1963,8 +2209,11 @@ zabbix_export:
               retrieve_mode: HEADERS
               tags:
                 -
-                  tag: Application
-                  value: RabbitMQ
+                  tag: component
+                  value: health
+                -
+                  tag: component
+                  value: system
               trigger_prototypes:
                 -
                   uuid: b61117e5eeff4d41a9a2f1729ec174b2
@@ -1973,6 +2222,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           master_item:
             key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/overview"]'
           preprocessing:
@@ -1986,7 +2239,7 @@ zabbix_export:
                 - |
                   var rabbit_version = parseInt(value.split('.')[0]) * 10000 +
                                        parseInt(value.split('.')[1]) * 100 +
-                                       parseInt(value.split('.')[2]) 
+                                       parseInt(value.split('.')[2])
                   return JSON.stringify(rabbit_version >= 30810 ? [{'{#SINGLETON}': ''}] : []);
         -
           uuid: d1d32fc6ae1f445a98144a31214ca825
@@ -2029,8 +2282,14 @@ zabbix_export:
                 key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
               tags:
                 -
-                  tag: Application
-                  value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
+                  tag: component
+                  value: consumers
+                -
+                  tag: queue
+                  value: '{#QUEUE}'
+                -
+                  tag: vhost
+                  value: '{#VHOST}'
             -
               uuid: 4b4491d5fb2b41eeae044c3d28de1b18
               name: 'RabbitMQ: Queue {#VHOST}/{#QUEUE}: Memory'
@@ -2049,8 +2308,14 @@ zabbix_export:
                 key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
               tags:
                 -
-                  tag: Application
-                  value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
+                  tag: component
+                  value: memory
+                -
+                  tag: queue
+                  value: '{#QUEUE}'
+                -
+                  tag: vhost
+                  value: '{#VHOST}'
             -
               uuid: 223fa7a8372f4e9883d376c9f3e1af2e
               name: 'RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages acknowledged per second'
@@ -2071,8 +2336,14 @@ zabbix_export:
                 key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
               tags:
                 -
-                  tag: Application
-                  value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
+                  tag: component
+                  value: messages
+                -
+                  tag: queue
+                  value: '{#QUEUE}'
+                -
+                  tag: vhost
+                  value: '{#VHOST}'
             -
               uuid: 335513a34e6a4909acfa1be278dd31b3
               name: 'RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages acknowledged'
@@ -2092,8 +2363,14 @@ zabbix_export:
                 key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
               tags:
                 -
-                  tag: Application
-                  value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
+                  tag: component
+                  value: messages
+                -
+                  tag: queue
+                  value: '{#QUEUE}'
+                -
+                  tag: vhost
+                  value: '{#VHOST}'
             -
               uuid: 55b774e5aac249edbb8881373060b15b
               name: 'RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages delivered per second'
@@ -2114,8 +2391,14 @@ zabbix_export:
                 key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
               tags:
                 -
-                  tag: Application
-                  value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
+                  tag: component
+                  value: messages
+                -
+                  tag: queue
+                  value: '{#QUEUE}'
+                -
+                  tag: vhost
+                  value: '{#VHOST}'
             -
               uuid: 2a87988327e1483c84d3f1867bab367f
               name: 'RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages delivered'
@@ -2135,8 +2418,14 @@ zabbix_export:
                 key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
               tags:
                 -
-                  tag: Application
-                  value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
+                  tag: component
+                  value: messages
+                -
+                  tag: queue
+                  value: '{#QUEUE}'
+                -
+                  tag: vhost
+                  value: '{#VHOST}'
             -
               uuid: 3f3024da744349b59c7810dfd10d11a3
               name: 'RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages delivered per second'
@@ -2157,8 +2446,14 @@ zabbix_export:
                 key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
               tags:
                 -
-                  tag: Application
-                  value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
+                  tag: component
+                  value: messages
+                -
+                  tag: queue
+                  value: '{#QUEUE}'
+                -
+                  tag: vhost
+                  value: '{#VHOST}'
             -
               uuid: ad5e9fa0260e4170887fb2dfdc508959
               name: 'RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages delivered'
@@ -2178,8 +2473,14 @@ zabbix_export:
                 key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
               tags:
                 -
-                  tag: Application
-                  value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
+                  tag: component
+                  value: messages
+                -
+                  tag: queue
+                  value: '{#QUEUE}'
+                -
+                  tag: vhost
+                  value: '{#VHOST}'
             -
               uuid: 393306b9cb0148038d02ad9c48cf1fbb
               name: 'RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages published per second'
@@ -2200,8 +2501,14 @@ zabbix_export:
                 key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
               tags:
                 -
-                  tag: Application
-                  value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
+                  tag: component
+                  value: messages
+                -
+                  tag: queue
+                  value: '{#QUEUE}'
+                -
+                  tag: vhost
+                  value: '{#VHOST}'
             -
               uuid: 44814c9f6f154fdcbab66249d0777eae
               name: 'RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages published'
@@ -2221,8 +2528,14 @@ zabbix_export:
                 key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
               tags:
                 -
-                  tag: Application
-                  value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
+                  tag: component
+                  value: messages
+                -
+                  tag: queue
+                  value: '{#QUEUE}'
+                -
+                  tag: vhost
+                  value: '{#VHOST}'
             -
               uuid: 9096e81341374d2fb7dd58e932783afc
               name: 'RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages per second'
@@ -2241,8 +2554,14 @@ zabbix_export:
                 key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
               tags:
                 -
-                  tag: Application
-                  value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
+                  tag: component
+                  value: messages
+                -
+                  tag: queue
+                  value: '{#QUEUE}'
+                -
+                  tag: vhost
+                  value: '{#VHOST}'
             -
               uuid: 8902103fd86746d0851b75a1262e36a9
               name: 'RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages redelivered per second'
@@ -2263,8 +2582,14 @@ zabbix_export:
                 key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
               tags:
                 -
-                  tag: Application
-                  value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
+                  tag: component
+                  value: messages
+                -
+                  tag: queue
+                  value: '{#QUEUE}'
+                -
+                  tag: vhost
+                  value: '{#VHOST}'
             -
               uuid: 3ac1a4b83c9f4d4c8a438d39aca8e82a
               name: 'RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages redelivered'
@@ -2284,8 +2609,14 @@ zabbix_export:
                 key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
               tags:
                 -
-                  tag: Application
-                  value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
+                  tag: component
+                  value: messages
+                -
+                  tag: queue
+                  value: '{#QUEUE}'
+                -
+                  tag: vhost
+                  value: '{#VHOST}'
             -
               uuid: aabd7d6fe6a047d186504386d3a48ae1
               name: 'RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages'
@@ -2303,8 +2634,14 @@ zabbix_export:
                 key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
               tags:
                 -
-                  tag: Application
-                  value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
+                  tag: component
+                  value: messages
+                -
+                  tag: queue
+                  value: '{#QUEUE}'
+                -
+                  tag: vhost
+                  value: '{#VHOST}'
               trigger_prototypes:
                 -
                   uuid: 58986cee2b4846b3b7bd3caf772d7ac6
@@ -2312,6 +2649,10 @@ zabbix_export:
                   name: 'RabbitMQ: Too many messages in queue (over {$RABBITMQ.MESSAGES.MAX.WARN} for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: d2e1a2857b314ed3818f92312f5d0043
               name: 'RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages ready per second'
@@ -2330,8 +2671,14 @@ zabbix_export:
                 key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
               tags:
                 -
-                  tag: Application
-                  value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
+                  tag: component
+                  value: messages
+                -
+                  tag: queue
+                  value: '{#QUEUE}'
+                -
+                  tag: vhost
+                  value: '{#VHOST}'
             -
               uuid: 4a75c2d9e0354f47b1c8243bad17bd58
               name: 'RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages ready'
@@ -2349,8 +2696,14 @@ zabbix_export:
                 key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
               tags:
                 -
-                  tag: Application
-                  value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
+                  tag: component
+                  value: messages
+                -
+                  tag: queue
+                  value: '{#QUEUE}'
+                -
+                  tag: vhost
+                  value: '{#VHOST}'
             -
               uuid: d5d88879e3b844d7b03ab956a673daff
               name: 'RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages unacknowledged per second'
@@ -2369,8 +2722,14 @@ zabbix_export:
                 key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
               tags:
                 -
-                  tag: Application
-                  value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
+                  tag: component
+                  value: messages
+                -
+                  tag: queue
+                  value: '{#QUEUE}'
+                -
+                  tag: vhost
+                  value: '{#VHOST}'
             -
               uuid: 252dcf1262014ce599a2eec81f7223eb
               name: 'RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages unacknowledged'
@@ -2388,8 +2747,14 @@ zabbix_export:
                 key: 'web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
               tags:
                 -
-                  tag: Application
-                  value: 'RabbitMQ: Queue "{#VHOST}/{#QUEUE}"'
+                  tag: component
+                  value: messages
+                -
+                  tag: queue
+                  value: '{#QUEUE}'
+                -
+                  tag: vhost
+                  value: '{#VHOST}'
           graph_prototypes:
             -
               uuid: a6223df79d334c29ada36ba20729b885
@@ -2505,6 +2870,13 @@ zabbix_export:
             -
               lld_macro: '{#VHOST}'
               path: $.vhost
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: rabbitmq
       macros:
         -
           macro: '{$RABBITMQ.API.HOST}'

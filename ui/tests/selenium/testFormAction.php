@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -145,7 +145,6 @@ class testFormAction extends CLegacyWebTest {
 			[
 				'name' => 'Reference service',
 				'algorithm' => 1,
-				'showsla' => 0,
 				'sortorder' => 1
 			]
 		]);
@@ -849,11 +848,17 @@ class testFormAction extends CLegacyWebTest {
 
 				$this->assertEquals($operations_field->getHeadersText(), ['Steps', 'Details', 'Start in', 'Duration', 'Action']);
 
-				if ($eventsource === EVENT_SOURCE_TRIGGERS) {
-					$this->assertTrue($form->getField('Pause operations for suppressed problems')->getValue());
-				}
-				else {
-					$this->assertFalse($form->query('id:pause_suppresed')->one(false)->isValid());
+				$checkboxes = [
+					'Pause operations for suppressed problems' => 'id:pause_suppressed',
+					'Notify about canceled escalations' => 'id:notify_if_canceled'
+				];
+				foreach ($checkboxes as $label => $locator) {
+					if ($eventsource === EVENT_SOURCE_TRIGGERS) {
+						$this->assertTrue($form->getField($label)->getValue());
+					}
+					else {
+						$this->assertFalse($form->query($locator)->one(false)->isValid());
+					}
 				}
 
 				$recovery_field = $form->getField('Recovery operations')->asTable();
@@ -861,13 +866,15 @@ class testFormAction extends CLegacyWebTest {
 				$update_field = $form->getField('Update operations')->asTable();
 				$this->assertEquals($update_field->getHeadersText(), ['Details', 'Action']);
 				break;
+
 			case EVENT_SOURCE_DISCOVERY:
 			case EVENT_SOURCE_AUTOREGISTRATION:
 				$this->zbxTestTextNotPresent(['Default operation step duration', 'Pause operations for suppressed problems',
-					'Recovery operations', 'Update operations']);
+					'Notify about canceled escalations', 'Recovery operations', 'Update operations']);
 				$this->zbxTestAssertElementNotPresentId('esc_period');
 				$this->zbxTestAssertElementNotPresentId('pause_suppressed');
 				break;
+
 			case EVENT_SOURCE_INTERNAL:
 				$this->assertEquals('1h', $form->getField('Default operation step duration')->getValue());
 				$this->zbxTestAssertVisibleId('esc_period');
@@ -876,7 +883,9 @@ class testFormAction extends CLegacyWebTest {
 				$this->assertEquals($operations_field->getHeadersText(), ['Steps', 'Details', 'Start in', 'Duration', 'Action']);
 				$recovery_field = $form->getField('Recovery operations')->asTable();
 				$this->assertEquals($recovery_field->getHeadersText(), ['Details', 'Action']);
-				$this->zbxTestTextNotPresent(['Pause operations for suppressed problems', 'Update operations']);
+				$this->zbxTestTextNotPresent(['Pause operations for suppressed problems', 'Notify about canceled escalations',
+					'Update operations']
+				);
 				$this->zbxTestAssertElementNotPresentId('pause_suppressed');
 				break;
 		}
@@ -1189,8 +1198,7 @@ class testFormAction extends CLegacyWebTest {
 		}
 		$oldHashActions = CDBHelper::getHash($sqlActions);
 
-		$this->zbxTestLogin('actionconf.php');
-		$this->query('id:page-title-general')->asPopupButton()->one()->select($this->event_sources[$eventsource]);
+		$this->page->login()->open('actionconf.php?eventsource='.$eventsource);
 		$this->zbxTestClickLinkTextWait($name);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of actions');

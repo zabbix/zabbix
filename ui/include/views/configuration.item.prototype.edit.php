@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@ if (!empty($data['hostid'])) {
 }
 
 $url = (new CUrl('disc_prototypes.php'))
+	->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 	->setArgument('context', $data['context'])
 	->getUrl();
 
@@ -88,14 +89,13 @@ if (!$readonly) {
 	$key_controls[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 	$key_controls[] = (new CButton('keyButton', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("popup.generic",jQuery.extend('.
-			json_encode([
+		->onClick(
+			'return PopUp("popup.generic", jQuery.extend('.json_encode([
 				'srctbl' => 'help_items',
 				'srcfld1' => 'key',
 				'dstfrm' => $form->getName(),
 				'dstfld1' => 'key'
-			]).
-				',{itemtype: jQuery("#type").val()}), null, this);'
+			]).', {itemtype: jQuery("#type").val()}), {dialogue_class: "modal-popup-generic"});'
 		);
 }
 
@@ -150,12 +150,21 @@ $item_tab
 $query_fields_data = [];
 
 if (is_array($data['query_fields']) && $data['query_fields']) {
+	$i = 0;
 	foreach ($data['query_fields'] as $pair) {
-		$query_fields_data[] = ['name' => key($pair), 'value' => reset($pair)];
+		$query_fields_data[] = [
+			'name' => key($pair),
+			'value' => reset($pair),
+			'sortorder' => $i++
+		];
 	}
 }
 elseif (!$readonly) {
-	$query_fields_data[] = ['name' => '', 'value' => ''];
+	$query_fields_data[] = [
+		'name' => '',
+		'value' => '',
+		'sortorder' => 0
+	];
 }
 
 $query_fields = (new CTag('script', true))->setAttribute('type', 'text/json');
@@ -228,7 +237,11 @@ $item_tab
 			(new CTag('script', true))
 				->setAttribute('type', 'text/x-jquery-tmpl')
 				->addItem(new CRow([
-					(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+					(new CCol(
+						(new CDiv(
+							new CVar('query_fields[sortorder][#{index}]', '#{sortorder}')
+						))->addClass(ZBX_STYLE_DRAG_ICON)
+					))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 					(new CTextBox('query_fields[name][#{index}]', '#{name}', $readonly))
 						->setAttribute('placeholder', _('name'))
 						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
@@ -342,12 +355,13 @@ $item_tab
 $headers_data = [];
 
 if (is_array($data['headers']) && $data['headers']) {
+	$i = 0;
 	foreach ($data['headers'] as $pair) {
-		$headers_data[] = ['name' => key($pair), 'value' => reset($pair)];
+		$headers_data[] = ['name' => key($pair), 'value' => reset($pair), 'sortorder' => $i++];
 	}
 }
 elseif (!$readonly) {
-	$headers_data[] = ['name' => '', 'value' => ''];
+	$headers_data[] = ['name' => '', 'value' => '', 'sortorder' => 0];
 }
 
 $headers = (new CTag('script', true))->setAttribute('type', 'text/json');
@@ -373,7 +387,11 @@ $item_tab
 				(new CTag('script', true))
 					->setAttribute('type', 'text/x-jquery-tmpl')
 					->addItem(new CRow([
-						(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+						(new CCol(
+							(new CDiv(
+								new CVar('headers[sortorder][#{index}]', '#{sortorder}')
+							))->addClass(ZBX_STYLE_DRAG_ICON)
+						))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 						(new CTextBox('headers[name][#{index}]', '#{name}', $readonly))
 							->setAttribute('placeholder', _('name'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
@@ -528,8 +546,8 @@ if (!$readonly) {
 	$master_item[] = (new CButton('button', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->removeId()
-		->onClick('return PopUp("popup.generic",'.
-			json_encode([
+		->onClick(
+			'return PopUp("popup.generic", '.json_encode([
 				'srctbl' => 'items',
 				'srcfld1' => 'itemid',
 				'srcfld2' => 'name',
@@ -540,14 +558,14 @@ if (!$readonly) {
 				'excludeids' => [$data['itemid']],
 				'with_webitems' => 1,
 				'normal_only' => 1
-			]).', null, this);'
+			]).', {dialogue_class: "modal-popup-generic"});'
 		);
 	$master_item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 	$master_item[] = (new CButton('button', _('Select prototype')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->removeId()
-		->onClick('return PopUp("popup.generic",'.
-			json_encode([
+		->onClick(
+			'return PopUp("popup.generic", '.json_encode([
 				'srctbl' => 'item_prototypes',
 				'srcfld1' => 'itemid',
 				'srcfld2' => 'name',
@@ -556,7 +574,7 @@ if (!$readonly) {
 				'dstfld2' => 'master_itemname',
 				'parent_discoveryid' => $data['parent_discoveryid'],
 				'excludeids' => [$data['itemid']]
-			]).', null, this);'
+			]).', {dialogue_class: "modal-popup-generic"});'
 		);
 }
 
@@ -930,3 +948,11 @@ $widget->show();
 		'interface_types' => itemTypeInterface()
 	]).');
 '))->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'form_name' => $form->getName()
+	]).');
+'))
+	->setOnDocumentReady()
+	->show();

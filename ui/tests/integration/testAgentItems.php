@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,11 +22,9 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 
 define('JSON_COMPARE_LEFT', 1);
 define('JSON_COMPARE_RIGHT', 2);
-define('JSON_COMPARE_BOTH', 3);
 
 define('JSON_ARRAY_COMPARE_LEFT', 4);
 define('JSON_ARRAY_COMPARE_RIGHT', 5);
-define('JSON_ARRAY_COMPARE_BOTH', 6);
 
 /**
  * Test suite for agents metric collection.
@@ -34,9 +32,6 @@ define('JSON_ARRAY_COMPARE_BOTH', 6);
  * @backup history
  */
 class testAgentItems extends CIntegrationTest {
-
-	const COMPARE_AVERAGE = 0;
-	const COMPARE_LAST = 1;
 
 	const TEST_FILE_BASE_NAME = 'test_file';
 	const TEST_LINK_BASE_NAME = 'test_link';
@@ -133,14 +128,14 @@ class testAgentItems extends CIntegrationTest {
 			'type' => ITEM_TYPE_ZABBIX,
 			'component' => self::COMPONENT_AGENT,
 			'valueType' => ITEM_VALUE_TYPE_TEXT,
-			'result_exec' => 'stat -c %a '.self::TEST_FILE_NAME
+			'result_exec' => 'stat -c %04a '.self::TEST_FILE_NAME
 		],
 		[
 			'key' => 'vfs.file.permissions['.self::TEST_FILE_NAME.']',
 			'type' => ITEM_TYPE_ZABBIX,
 			'component' => self::COMPONENT_AGENT2,
 			'valueType' => ITEM_VALUE_TYPE_TEXT,
-			'result_exec' => 'stat -c %a '.self::TEST_FILE_NAME
+			'result_exec' => 'stat -c %04a '.self::TEST_FILE_NAME
 		],
 		[
 			'key' => 'agent.hostmetadata',
@@ -204,18 +199,10 @@ class testAgentItems extends CIntegrationTest {
 			'component' => self::COMPONENT_AGENT,
 			'valueType' => ITEM_VALUE_TYPE_TEXT,
 			'json' => JSON_COMPARE_LEFT,
-			'fields_exec' => [
-					'permissions',
-					'user',
-					'group',
-					'uid',
-					'gid',
-					'access',
-					'change'
-				],
+			'fields_exec' => ['permissions', 'user', 'group', 'uid', 'gid', 'access', 'change'],
 			'result' => [
 					'type' => 'file',
-					'permissions' => 'stat -c %a '.self::TEST_FILE_NAME,
+					'permissions' => 'stat -c %04a '.self::TEST_FILE_NAME,
 					'user' => 'stat -c %U '.self::TEST_FILE_NAME,
 					'group' => 'stat -c %G '.self::TEST_FILE_NAME,
 					'uid' => 'stat -c %u '.self::TEST_FILE_NAME,
@@ -237,18 +224,10 @@ class testAgentItems extends CIntegrationTest {
 			'component' => self::COMPONENT_AGENT2,
 			'valueType' => ITEM_VALUE_TYPE_TEXT,
 			'json' => JSON_COMPARE_LEFT,
-			'fields_exec' => [
-					'permissions',
-					'user',
-					'group',
-					'uid',
-					'gid',
-					'access',
-					'change'
-				],
+			'fields_exec' => ['permissions', 'user', 'group', 'uid', 'gid', 'access', 'change'],
 			'result' => [
 					'type' => 'file',
-					'permissions' => 'stat -c %a '.self::TEST_FILE_NAME,
+					'permissions' => 'stat -c %04a '.self::TEST_FILE_NAME,
 					'user' => 'stat -c %U '.self::TEST_FILE_NAME,
 					'group' => 'stat -c %G '.self::TEST_FILE_NAME,
 					'uid' => 'stat -c %u '.self::TEST_FILE_NAME,
@@ -270,18 +249,10 @@ class testAgentItems extends CIntegrationTest {
 			'component' => self::COMPONENT_AGENT,
 			'valueType' => ITEM_VALUE_TYPE_TEXT,
 			'json' => JSON_COMPARE_LEFT,
-			'fields_exec' => [
-					'permissions',
-					'user',
-					'group',
-					'uid',
-					'gid',
-					'access',
-					'change'
-				],
+			'fields_exec' => ['permissions', 'user', 'group', 'uid', 'gid', 'access', 'change'],
 			'result' => [
 					'type' => 'sym',
-					'permissions' => 'stat -c %a '.self::TEST_LINK_NAME,
+					'permissions' => 'stat -c %04a '.self::TEST_LINK_NAME,
 					'user' => 'stat -c %U '.self::TEST_LINK_NAME,
 					'group' => 'stat -c %G '.self::TEST_LINK_NAME,
 					'uid' => 'stat -c %u '.self::TEST_LINK_NAME,
@@ -303,18 +274,10 @@ class testAgentItems extends CIntegrationTest {
 			'component' => self::COMPONENT_AGENT2,
 			'valueType' => ITEM_VALUE_TYPE_TEXT,
 			'json' => JSON_COMPARE_LEFT,
-			'fields_exec' => [
-					'permissions',
-					'user',
-					'group',
-					'uid',
-					'gid',
-					'access',
-					'change'
-				],
+			'fields_exec' => ['permissions', 'user', 'group', 'uid', 'gid', 'access', 'change'],
 			'result' => [
 					'type' => 'sym',
-					'permissions' => 'stat -c %a '.self::TEST_LINK_NAME,
+					'permissions' => 'stat -c %04a '.self::TEST_LINK_NAME,
 					'user' => 'stat -c %U '.self::TEST_LINK_NAME,
 					'group' => 'stat -c %G '.self::TEST_LINK_NAME,
 					'uid' => 'stat -c %u '.self::TEST_LINK_NAME,
@@ -345,11 +308,11 @@ class testAgentItems extends CIntegrationTest {
 			'result' => 0
 		],
 		[
-			'key' => 'net.udp.socket.count[,ssh]',
+			'key' => 'net.udp.socket.count[]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'component' => self::COMPONENT_AGENT,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'result_exec' => 'netstat -au --numeric-hosts -4 | grep ssh | wc -l'
+			'result_exec' => 'netstat -au --numeric-hosts -4 | grep ^udp | wc -l'
 		],
 		[
 			'key' => 'net.tcp.socket.count[,'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX.',,,listen]',
@@ -366,11 +329,11 @@ class testAgentItems extends CIntegrationTest {
 			'result' => 0
 		],
 		[
-			'key' => 'net.udp.socket.count[,ssh]',
+			'key' => 'net.udp.socket.count[]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'component' => self::COMPONENT_AGENT2,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'result_exec' => 'netstat -au --numeric-hosts -4 | grep ssh | wc -l'
+			'result_exec' => 'netstat -au --numeric-hosts -4 | grep ^udp | wc -l'
 		],
 		[
 			'key' => 'vfs.dir.get['.self::TEST_DIR_NAME.']',
@@ -378,22 +341,14 @@ class testAgentItems extends CIntegrationTest {
 			'component' => self::COMPONENT_AGENT,
 			'valueType' => ITEM_VALUE_TYPE_TEXT,
 			'json' => JSON_ARRAY_COMPARE_LEFT,
-			'fields_exec' => [
-					'permissions',
-					'user',
-					'group',
-					'uid',
-					'gid',
-					'access',
-					'change'
-				],
+			'fields_exec' => ['permissions', 'user', 'group', 'uid', 'gid', 'access', 'change'],
 			'result' => [
 				[
 					'basename' => self::TEST_FILE_BASE_NAME,
 					'pathname' =>  self::TEST_DIR_FILE_NAME,
 					'dirname' => self::TEST_DIR_NAME,
 					'type' => 'file',
-					'permissions' => 'stat -c %a '.self::TEST_DIR_FILE_NAME,
+					'permissions' => 'stat -c %04a '.self::TEST_DIR_FILE_NAME,
 					'user' => 'stat -c %U '.self::TEST_DIR_FILE_NAME,
 					'group' => 'stat -c %G '.self::TEST_DIR_FILE_NAME,
 					'uid' => 'stat -c %u '.self::TEST_DIR_FILE_NAME,
@@ -413,7 +368,7 @@ class testAgentItems extends CIntegrationTest {
 					'pathname' =>  self::TEST_DIR_DIR1_NAME,
 					'dirname' => self::TEST_DIR_NAME,
 					'type' => 'dir',
-					'permissions' => 'stat -c %a '.self::TEST_DIR_DIR1_NAME,
+					'permissions' => 'stat -c %04a '.self::TEST_DIR_DIR1_NAME,
 					'user' => 'stat -c %U '.self::TEST_DIR_DIR1_NAME,
 					'group' => 'stat -c %G '.self::TEST_DIR_DIR1_NAME,
 					'uid' => 'stat -c %u '.self::TEST_DIR_DIR1_NAME,
@@ -433,7 +388,7 @@ class testAgentItems extends CIntegrationTest {
 					'pathname' =>  self::TEST_DIR_FILE_NAME,
 					'dirname' => self::TEST_DIR_NAME,
 					'type' => 'sym',
-					'permissions' => 'stat -c %a '.self::TEST_DIR_LINK_NAME,
+					'permissions' => 'stat -c %04a '.self::TEST_DIR_LINK_NAME,
 					'user' => 'stat -c %U '.self::TEST_DIR_LINK_NAME,
 					'group' => 'stat -c %G '.self::TEST_DIR_LINK_NAME,
 					'uid' => 'stat -c %u '.self::TEST_DIR_LINK_NAME,
@@ -456,22 +411,14 @@ class testAgentItems extends CIntegrationTest {
 			'component' => self::COMPONENT_AGENT2,
 			'valueType' => ITEM_VALUE_TYPE_TEXT,
 			'json' => JSON_ARRAY_COMPARE_LEFT,
-			'fields_exec' => [
-					'permissions',
-					'user',
-					'group',
-					'uid',
-					'gid',
-					'access',
-					'change'
-				],
+			'fields_exec' => ['permissions', 'user', 'group', 'uid', 'gid', 'access', 'change'],
 			'result' => [
 				[
 					'basename' => self::TEST_FILE_BASE_NAME,
 					'pathname' =>  self::TEST_DIR_FILE_NAME,
 					'dirname' => self::TEST_DIR_NAME,
 					'type' => 'file',
-					'permissions' => 'stat -c %a '.self::TEST_DIR_FILE_NAME,
+					'permissions' => 'stat -c %04a '.self::TEST_DIR_FILE_NAME,
 					'user' => 'stat -c %U '.self::TEST_DIR_FILE_NAME,
 					'group' => 'stat -c %G '.self::TEST_DIR_FILE_NAME,
 					'uid' => 'stat -c %u '.self::TEST_DIR_FILE_NAME,
@@ -491,7 +438,7 @@ class testAgentItems extends CIntegrationTest {
 					'pathname' =>  self::TEST_DIR_DIR1_NAME,
 					'dirname' => self::TEST_DIR_NAME,
 					'type' => 'dir',
-					'permissions' => 'stat -c %a '.self::TEST_DIR_DIR1_NAME,
+					'permissions' => 'stat -c %04a '.self::TEST_DIR_DIR1_NAME,
 					'user' => 'stat -c %U '.self::TEST_DIR_DIR1_NAME,
 					'group' => 'stat -c %G '.self::TEST_DIR_DIR1_NAME,
 					'uid' => 'stat -c %u '.self::TEST_DIR_DIR1_NAME,
@@ -511,7 +458,7 @@ class testAgentItems extends CIntegrationTest {
 					'pathname' =>  self::TEST_DIR_FILE_NAME,
 					'dirname' => self::TEST_DIR_NAME,
 					'type' => 'sym',
-					'permissions' => 'stat -c %a '.self::TEST_DIR_LINK_NAME,
+					'permissions' => 'stat -c %04a '.self::TEST_DIR_LINK_NAME,
 					'user' => 'stat -c %U '.self::TEST_DIR_LINK_NAME,
 					'group' => 'stat -c %G '.self::TEST_DIR_LINK_NAME,
 					'uid' => 'stat -c %u '.self::TEST_DIR_LINK_NAME,
@@ -548,25 +495,25 @@ class testAgentItems extends CIntegrationTest {
 	 * @inheritdoc
 	 */
 	public function prepareData() {
-		// Create host "agentd" and "agent2".
+		$components = [
+			self::COMPONENT_AGENT => self::AGENT_PORT_SUFFIX,
+			self::COMPONENT_AGENT2 => self::AGENT2_PORT_SUFFIX
+		];
+
 		$hosts = [];
-		foreach ([self::COMPONENT_AGENT => self::AGENT_PORT_SUFFIX, self::COMPONENT_AGENT2 => 53] as $component => $port) {
+		foreach ($components as $component => $port) {
 			$hosts[] = [
 				'host' => $component,
 				'interfaces' => [
-					[
-						'type' => 1,
-						'main' => 1,
-						'useip' => 1,
-						'ip' => '127.0.0.1',
-						'dns' => '',
-						'port' => PHPUNIT_PORT_PREFIX.$port
-					]
+					'type' => 1,
+					'main' => 1,
+					'useip' => 1,
+					'ip' => '127.0.0.1',
+					'dns' => '',
+					'port' => PHPUNIT_PORT_PREFIX.$port
 				],
 				'groups' => [
-					[
-						'groupid' => 4
-					]
+					'groupid' => 4
 				],
 				'status' => HOST_STATUS_NOT_MONITORED
 			];
@@ -575,16 +522,16 @@ class testAgentItems extends CIntegrationTest {
 		$response = $this->call('host.create', $hosts);
 		$this->assertArrayHasKey('hostids', $response['result']);
 
-		foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $i => $name) {
+		foreach (array_keys($components) as $i => $component) {
 			$this->assertArrayHasKey($i, $response['result']['hostids']);
-			self::$hostids[$name] = $response['result']['hostids'][$i];
+			self::$hostids[$component] = $response['result']['hostids'][$i];
 		}
 
 		// Get host interface ids.
 		$response = $this->call('host.get', [
 			'output' => ['host'],
-			'hostids' => array_values(self::$hostids),
-			'selectInterfaces' => ['interfaceid']
+			'selectInterfaces' => ['interfaceid'],
+			'hostids' => self::$hostids
 		]);
 
 		$interfaceids = [];
@@ -615,9 +562,8 @@ class testAgentItems extends CIntegrationTest {
 
 		// Get item IDs
 		$itemids = $response['result']['itemids'];
-		foreach (self::$items as $i => $value) {
-			$name = $value['key'];
-			self::$itemids[$value['component'].':'.$name] = $itemids[$i];
+		foreach (self::$items as $i => $item) {
+			self::$itemids[$item['component'].':'.$item['key']] = $itemids[$i];
 		}
 
 		// Create test directories
@@ -651,12 +597,11 @@ class testAgentItems extends CIntegrationTest {
 	 *
 	 * @return array
 	 */
-	public function agentConfigurationProvider() {
+	public function configurationProvider_checkDataCollection() {
 		return [
 			self::COMPONENT_SERVER => [
-				'UnreachablePeriod' => 25,
-				'UnavailableDelay' => 15,
-				'UnreachableDelay' => 5
+				'UnavailableDelay' => 5,
+				'UnreachableDelay' => 1
 			],
 			self::COMPONENT_AGENT => [
 				'Hostname' => self::COMPONENT_AGENT,
@@ -667,7 +612,6 @@ class testAgentItems extends CIntegrationTest {
 			self::COMPONENT_AGENT2 => [
 				'Hostname' => self::COMPONENT_AGENT2,
 				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
-				'ListenPort' => PHPUNIT_PORT_PREFIX.'53',
 				'AllowKey' => 'system.run[*]',
 				'Plugins.Uptime.Capacity' => '10',
 				'HostMetadata' => self::AGENT_METADATA
@@ -679,7 +623,7 @@ class testAgentItems extends CIntegrationTest {
 	 * Test if both active and passive go agent checks are processed.
 	 *
 	 * @required-components server, agent, agent2
-	 * @configurationDataProvider agentConfigurationProvider
+	 * @configurationDataProvider configurationProvider_checkDataCollection
 	 * @hosts agentd, agent2
 	 */
 	public function testAgentItems_checkDataCollection() {
@@ -689,8 +633,7 @@ class testAgentItems extends CIntegrationTest {
 			);
 		}
 
-		// Delay to ensure that all metrics were collected.
-		sleep(90);
+		$this->getItemData();
 	}
 
 	/**
@@ -715,36 +658,39 @@ class testAgentItems extends CIntegrationTest {
 	public function getItemData() {
 		static $data = null;
 
-		if ($data === null) {
-			$itemids = [];
+		if ($data !== null) {
+			return $data;
+		}
+
+		$data = [];
+		$wait_iterations = 5;
+		$wait_iteration_delay = 1;
+
+		for ($r = 0; $r < $wait_iterations; $r++) {
+			$db_items = $this->call('item.get', [
+				'output' => ['lastvalue', 'lastclock'],
+				'itemids' => self::$itemids,
+				'preservekeys' => true
+			])['result'];
+
+			$all_collected = true;
+
 			foreach (self::$items as $item) {
-				$itemids[$item['valueType']][] = self::$itemids[$item['component'].':'.$item['key']];
-			}
-
-			$values = [];
-			foreach ($itemids as $type => $ids) {
-				$result = $this->call('history.get', [
-					'output' => ['itemid', 'value', 'clock', 'ns'],
-					'itemids' => $ids,
-					'history' => $type
-				]);
-
-				$this->sort($result['result'], ['itemid', 'clock', 'ns']);
-
-				foreach ($result['result'] as $item) {
-					$values[$item['itemid']][] = $item['value'];
-				}
-			}
-
-			$data = [];
-			foreach (self::$items as $item) {
-				$data[$item['component'].':'.$item['key']] = [];
 				$itemid = self::$itemids[$item['component'].':'.$item['key']];
 
-				if (array_key_exists($itemid, $values)) {
-					$data[$item['component'].':'.$item['key']] = $values[$itemid];
+				if ($db_items[$itemid]['lastclock'] != 0) {
+					$data[$item['component'].':'.$item['key']] = $db_items[$itemid]['lastvalue'];
+				}
+				else {
+					$all_collected = false;
 				}
 			}
+
+			if ($all_collected) {
+				break;
+			}
+
+			sleep($wait_iteration_delay);
 		}
 
 		return $data;
@@ -758,127 +704,80 @@ class testAgentItems extends CIntegrationTest {
 	 */
 	public function testAgentItems_checkData($item) {
 		$data = $this->getItemData();
+
 		if (!array_key_exists($item['component'].':'.$item['key'], $data)) {
 			$this->fail('No metrics for item "'.$item['component'].':'.$item['key'].'"');
 		}
 
-		$values = $data[$item['component'].':'.$item['key']];
+		$value = $data[$item['component'].':'.$item['key']];
 
 		if (array_key_exists('json', $item) && array_key_exists('fields_exec', $item)) {
 			foreach ($item['fields_exec'] as $dyn) {
 				$this->dynupdate($item, $dyn);
 			}
-		} elseif (array_key_exists('result_exec', $item)) {
+		}
+		elseif (array_key_exists('result_exec', $item)) {
 			$item['result'] = exec($item['result_exec']);
 		}
 
 		switch ($item['valueType']) {
 			case ITEM_VALUE_TYPE_TEXT:
-				if (array_key_exists('json', $item))
-				{
-					$jsonval = json_decode(end($values), true);
+				if (array_key_exists('json', $item)) {
+					$jsonval = json_decode($value, true);
 
-					if ($item['json'] === JSON_COMPARE_LEFT)
-					{
+					if ($item['json'] === JSON_COMPARE_LEFT) {
 						$this->arrcmpr($item['result'], $jsonval, $item['key']);
-					} elseif ($item['json'] === JSON_COMPARE_RIGHT) {
+					}
+					elseif ($item['json'] === JSON_COMPARE_RIGHT) {
 						$this->arrcmpr($jsonval, $item['result'], $item['key']);
-					} elseif ($item['json'] === JSON_ARRAY_COMPARE_LEFT) {
+					}
+					elseif ($item['json'] === JSON_ARRAY_COMPARE_LEFT) {
 						foreach ($item['result'] as $result_key => $result_value) {
 							$found = false;
-							foreach ($jsonval as $jsonval_key => $jsonval_value)
-							{
+							foreach ($jsonval as $jsonval_key => $jsonval_value) {
 								$found = $found || $this->arrfind($result_value, $jsonval_value);
 							}
 							self::assertEquals($found, true, 'Value (result_key: '.$result_key.') is not found for '.$item['key']);
 						}
-					} elseif ($item['json'] === JSON_ARRAY_COMPARE_RIGHT) {
+					}
+					elseif ($item['json'] === JSON_ARRAY_COMPARE_RIGHT) {
 						foreach ($jsonval as $jsonval_key => $jsonval_value) {
 							$found = false;
-							foreach ($item['result'] as $result_key => $result_value)
-							{
+
+							foreach ($item['result'] as $result_key => $result_value) {
 								$found = $found || $this->arrfind($jsonval_value, $result_value);
 							}
 							self::assertEquals($found, true, 'Value (jsonval_key: '.$jsonval_key.') is not found for '.$item['key']);
 						}
 					}
-				} else {
-					$actual = end($values);
-
-					if ($actual === false) {
-						$actual = 0;
-					}
-
+				}
+				else {
 					if (array_key_exists('threshold', $item) && $item['threshold'] !== 0) {
-						$actual = substr($actual, 0, $item['threshold']);
+						$value = substr($value, 0, $item['threshold']);
 						$expected = substr($item['result'], 0, $item['threshold']);
-					} else {
+					}
+					else {
 						$expected = $item['result'];
 					}
 
-					$this->assertEquals($expected, $actual, 'Received value is not expected for '.$item['key']);
+					$this->assertEquals($expected, $value, 'Received value is not expected for '.$item['key']);
 				}
 				break;
 
 			case ITEM_VALUE_TYPE_FLOAT:
 			case ITEM_VALUE_TYPE_UINT64:
-				if (CTestArrayHelper::get($item, 'compareType', self::COMPARE_LAST) === self::COMPARE_AVERAGE) {
-					$value = 0;
-					$records = count($values);
-
-					if ($records > 0) {
-						$value = array_sum($values) / $records;
-					}
-
-					$actual = $value;
+				if (array_key_exists('threshold', $item) && $item['threshold'] !== 0) {
+					$diff = abs(abs($value) - abs($item['result']));
+					$this->assertTrue($diff <= $item['threshold'], 'Received value ('.$value.') for '.$item['key'].
+						' differs more than defined threshold '.$diff.' > '.$item['threshold']
+					);
 				}
 				else {
-					$actual = end($values);
-				}
-
-				if ($actual === false) {
-					$actual = 0;
-				}
-
-				if (array_key_exists('threshold', $item) && $item['threshold'] !== 0) {
-					$diff = abs(abs($actual) - abs($item['result']));
-					$this->assertTrue($diff <= $item['threshold'], 'Received value ('.$actual.') for '.$item['key'].
-							' differs more than defined threshold '.$diff.' > '.$item['threshold']
-					);
-				} else {
-					$this->assertEquals($item['result'], $actual, 'Received value is not expected for '.$item['key']);
+					$this->assertEquals($item['result'], $value, 'Received value is not expected for '.$item['key']);
 				}
 
 				break;
 		}
-	}
-
-	/**
-	 * Sort array by multiple fields.
-	 *
-	 * @static
-	 *
-	 * @param array $array  array to sort passed by reference
-	 * @param array $fields fields to sort, can be either string with field name or array with 'field' and 'order' keys
-	 */
-	public static function sort(array &$array, array $fields) {
-		foreach ($fields as $fid => $field) {
-			if (!is_array($field)) {
-				$fields[$fid] = ['field' => $field, 'order' => ZBX_SORT_UP];
-			}
-		}
-
-		uasort($array, function($a, $b) use ($fields) {
-			foreach ($fields as $field) {
-				$cmp = strnatcasecmp($a[$field['field']], $b[$field['field']]);
-
-				if ($cmp != 0) {
-					return $cmp * ($field['order'] == ZBX_SORT_UP ? 1 : -1);
-				}
-			}
-
-			return 0;
-		});
 	}
 
 	/**

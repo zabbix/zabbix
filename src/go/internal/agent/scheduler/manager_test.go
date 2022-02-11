@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1797,4 +1797,105 @@ func TestConfigurator(t *testing.T) {
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
+}
+
+func Test_getCapacity(t *testing.T) {
+	type args struct {
+		optsRaw interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{
+			"default",
+			args{
+				&conf.Node{
+					Name:  "Test",
+					Nodes: []interface{}{},
+				},
+			},
+			100,
+		},
+		{
+			"both_cap",
+			args{
+				&conf.Node{
+					Name: "Test",
+					Nodes: []interface{}{
+						&conf.Node{
+							Name: "Capacity",
+							Nodes: []interface{}{
+								&conf.Value{Value: []byte("10")},
+							},
+						},
+						&conf.Node{
+							Name: "System",
+							Nodes: []interface{}{
+								&conf.Node{
+									Name: "Capacity",
+									Nodes: []interface{}{
+										&conf.Value{Value: []byte("50")},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			50,
+		},
+		{
+			"depriceted_cap",
+			args{
+				&conf.Node{
+					Name: "Test",
+					Nodes: []interface{}{
+						&conf.Node{
+							Name: "Capacity",
+							Nodes: []interface{}{
+								&conf.Value{Value: []byte("10")},
+							},
+						},
+					},
+				},
+			},
+			10,
+		},
+		{
+			"system_cap",
+			args{
+				&conf.Node{
+					Name: "Test",
+					Nodes: []interface{}{
+						&conf.Node{
+							Name: "System",
+							Nodes: []interface{}{
+								&conf.Node{
+									Name: "Capacity",
+									Nodes: []interface{}{
+										&conf.Value{Value: []byte("50")},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			50,
+		},
+		{
+			"nil",
+			args{nil},
+			100,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := getCapacity(tt.args.optsRaw, "test"); got != tt.want {
+				t.Errorf("getCapacity() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }

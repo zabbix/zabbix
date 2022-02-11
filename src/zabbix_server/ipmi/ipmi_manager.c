@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,16 +27,13 @@
 #include "log.h"
 #include "zbxipcservice.h"
 #include "zbxalgo.h"
-#include "zbxserver.h"
 #include "preproc.h"
-
-#include "ipmi_manager.h"
 #include "ipmi_protocol.h"
-#include "checks_ipmi.h"
 #include "ipmi.h"
-
 #include "../poller/poller.h"
 #include "zbxavailability.h"
+
+#include "ipmi_manager.h"
 
 #define ZBX_IPMI_MANAGER_DELAY	1
 
@@ -193,8 +190,6 @@ static int	ipmi_request_compare(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Function: ipmi_request_create                                              *
- *                                                                            *
  * Purpose: creates an IPMI request                                           *
  *                                                                            *
  * Parameters: hostid - [IN] the target hostid                                *
@@ -215,8 +210,6 @@ static zbx_ipmi_request_t	*ipmi_request_create(zbx_uint64_t hostid)
 
 /******************************************************************************
  *                                                                            *
- * Function: ipmi_request_free                                                *
- *                                                                            *
  * Purpose: frees IPMI request                                                *
  *                                                                            *
  ******************************************************************************/
@@ -227,8 +220,6 @@ static void	ipmi_request_free(zbx_ipmi_request_t *request)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ipmi_poller_pop_request                                          *
  *                                                                            *
  * Purpose: pops the next queued request from IPMI poller request queue       *
  *                                                                            *
@@ -254,13 +245,10 @@ static zbx_ipmi_request_t	*ipmi_poller_pop_request(zbx_ipmi_poller_t *poller)
 
 /******************************************************************************
  *                                                                            *
- * Function: ipmi_poller_push_request                                         *
- *                                                                            *
  * Purpose: pushes the requests into IPMI poller request queue                *
  *                                                                            *
  * Parameters: poller  - [IN] the IPMI poller                                 *
  *             request - [IN] the IPMI request to push                        *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 static void	ipmi_poller_push_request(zbx_ipmi_poller_t *poller, zbx_ipmi_request_t *request)
@@ -271,8 +259,6 @@ static void	ipmi_poller_push_request(zbx_ipmi_poller_t *poller, zbx_ipmi_request
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ipmi_poller_send_request                                         *
  *                                                                            *
  * Purpose: sends request to IPMI poller                                      *
  *                                                                            *
@@ -294,8 +280,6 @@ static void	ipmi_poller_send_request(zbx_ipmi_poller_t *poller, zbx_ipmi_request
 
 /******************************************************************************
  *                                                                            *
- * Function: ipmi_poller_schedule_request                                     *
- *                                                                            *
  * Purpose: schedules request to IPMI poller                                  *
  *                                                                            *
  * Parameters: poller  - [IN] the IPMI poller                                 *
@@ -312,8 +296,6 @@ static void	ipmi_poller_schedule_request(zbx_ipmi_poller_t *poller, zbx_ipmi_req
 
 /******************************************************************************
  *                                                                            *
- * Function: ipmi_poller_free_request                                         *
- *                                                                            *
  * Purpose: frees the current request processed by IPMI poller                *
  *                                                                            *
  * Parameters: poller  - [IN] the IPMI poller                                 *
@@ -326,8 +308,6 @@ static void	ipmi_poller_free_request(zbx_ipmi_poller_t *poller)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ipmi_poller_free                                                 *
  *                                                                            *
  * Purpose: frees IPMI poller                                                 *
  *                                                                            *
@@ -347,8 +327,6 @@ static void	ipmi_poller_free(zbx_ipmi_poller_t *poller)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ipmi_manager_init                                                *
  *                                                                            *
  * Purpose: initializes IPMI manager                                          *
  *                                                                            *
@@ -393,8 +371,6 @@ static void	ipmi_manager_init(zbx_ipmi_manager_t *manager)
 
 /******************************************************************************
  *                                                                            *
- * Function: ipmi_manager_destroy                                             *
- *                                                                            *
  * Purpose: destroys IPMI manager                                             *
  *                                                                            *
  * Parameters: manager - [IN] the manager to destroy                          *
@@ -410,8 +386,6 @@ static void	ipmi_manager_destroy(zbx_ipmi_manager_t *manager)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ipmi_manager_host_cleanup                                        *
  *                                                                            *
  * Purpose: performs cleanup of monitored hosts cache                         *
  *                                                                            *
@@ -450,8 +424,6 @@ static void	ipmi_manager_host_cleanup(zbx_ipmi_manager_t *manager, int now)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ipmi_manager_register_poller                                     *
  *                                                                            *
  * Purpose: registers IPMI poller                                             *
  *                                                                            *
@@ -495,8 +467,6 @@ static zbx_ipmi_poller_t	*ipmi_manager_register_poller(zbx_ipmi_manager_t *manag
 
 /******************************************************************************
  *                                                                            *
- * Function: ipmi_manager_get_poller_by_client                                *
- *                                                                            *
  * Purpose: returns IPMI poller by connected client                           *
  *                                                                            *
  * Parameters: manager - [IN] the manager                                     *
@@ -525,8 +495,6 @@ static zbx_ipmi_poller_t	*ipmi_manager_get_poller_by_client(zbx_ipmi_manager_t *
 
 /******************************************************************************
  *                                                                            *
- * Function: ipmi_manager_get_host_poller                                     *
- *                                                                            *
  * Purpose: returns IPMI poller to be assigned to a new host                  *
  *                                                                            *
  * Parameters: manager - [IN] the manager                                     *
@@ -553,8 +521,6 @@ static zbx_ipmi_poller_t	*ipmi_manager_get_host_poller(zbx_ipmi_manager_t *manag
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ipmi_manager_process_poller_queue                                *
  *                                                                            *
  * Purpose: processes IPMI poller request queue                               *
  *                                                                            *
@@ -605,8 +571,6 @@ static void	ipmi_manager_process_poller_queue(zbx_ipmi_manager_t *manager, zbx_i
 
 /******************************************************************************
  *                                                                            *
- * Function: ipmi_manager_cache_host                                          *
- *                                                                            *
  * Purpose: caches host to keep local copy of its availability data           *
  *                                                                            *
  * Parameters: manager - [IN] the IPMI manager                                *
@@ -638,8 +602,6 @@ static zbx_ipmi_manager_host_t	*ipmi_manager_cache_host(zbx_ipmi_manager_t *mana
 
 /******************************************************************************
  *                                                                            *
- * Function: ipmi_manager_update_host                                         *
- *                                                                            *
  * Purpose: updates cached host                                               *
  *                                                                            *
  * Parameters: manager   - [IN] the IPMI manager                              *
@@ -662,8 +624,6 @@ static void	ipmi_manager_update_host(zbx_ipmi_manager_t *manager, const DC_INTER
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ipmi_manager_activate_interface                                  *
  *                                                                            *
  * Purpose: tries to activate item's interface after receiving response       *
  *                                                                            *
@@ -694,8 +654,6 @@ static void	ipmi_manager_activate_interface(zbx_ipmi_manager_t *manager, zbx_uin
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ipmi_manager_deactivate_interface                                *
  *                                                                            *
  * Purpose: tries to deactivate item's interface after receiving              *
  *          host level error                                                  *
@@ -730,8 +688,6 @@ static void	ipmi_manager_deactivate_interface(zbx_ipmi_manager_t *manager, zbx_u
 
 /******************************************************************************
  *                                                                            *
- * Function: ipmi_manager_serialize_request                                   *
- *                                                                            *
  * Purpose: serializes IPMI poll and discovery requests                       *
  *                                                                            *
  * Parameters: item      - [IN] the item to poll                              *
@@ -755,8 +711,6 @@ static void	ipmi_manager_serialize_request(const DC_ITEM *item, zbx_ipc_message_
 
 /******************************************************************************
  *                                                                            *
- * Function: ipmi_manager_schedule_request                                    *
- *                                                                            *
  * Purpose: schedules request to the host                                     *
  *                                                                            *
  * Parameters: manager  - [IN] the IPMI manager                               *
@@ -775,8 +729,6 @@ static void	ipmi_manager_schedule_request(zbx_ipmi_manager_t *manager, zbx_uint6
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ipmi_manager_schedule_requests                                   *
  *                                                                            *
  * Purpose: either sends or queues IPMI poll requests from configuration      *
  *          cache IPMI poller queue                                           *
@@ -832,8 +784,6 @@ static int	ipmi_manager_schedule_requests(zbx_ipmi_manager_t *manager, int now, 
 
 /******************************************************************************
  *                                                                            *
- * Function: ipmi_manager_process_client_request                              *
- *                                                                            *
  * Purpose: forwards IPMI request to the poller managing the specified host   *
  *                                                                            *
  * Parameters: manager - [IN] the IPMI manager                                *
@@ -862,8 +812,6 @@ static void	ipmi_manager_process_client_request(zbx_ipmi_manager_t *manager, zbx
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ipmi_manager_process_client_result                               *
  *                                                                            *
  * Purpose: forwards result of request to the client                          *
  *                                                                            *
@@ -896,8 +844,6 @@ static void	ipmi_manager_process_client_result(zbx_ipmi_manager_t *manager, zbx_
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ipmi_manager_process_value_result                                *
  *                                                                            *
  * Purpose: processes IPMI check result received from IPMI poller             *
  *                                                                            *

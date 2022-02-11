@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -411,10 +411,10 @@ class testItem extends CAPITest {
 	public static function getItemDeleteData() {
 		return [
 			[
-				'item' => ['40072'],
+				'item' => ['400720'],
 				'data' => [
 					'discovered_triggerids' => ['30002'],
-					'dependent_item' => ['40074'],
+					'dependent_item' => ['400740'],
 					'dependent_item_disc_triggerids' => ['30004']
 				],
 				'expected_error' => null

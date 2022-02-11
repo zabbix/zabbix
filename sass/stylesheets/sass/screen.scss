@@ -6,8 +6,8 @@ $ui-transitions: true !default;
 $ui-transition-duration: .3s !default;
 
 // Sprite path
-$sprite-path: '../img/icon-sprite.svg?20200407';
-$browser-sprite-path: '../img/browser-sprite.png?20200407';
+$sprite-path: '../img/icon-sprite.svg?20211222';
+$browser-sprite-path: '../img/browser-sprite.png?20211222';
 
 @import "utils/mixins";
 
@@ -28,8 +28,10 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 @import "layout/form-grid";
 
 @import "components/buttons";
+@import "components/color-picker";
 @import "components/dashboard/dashboard";
 @import "components/dashboard/widget-item";
+@import "components/dashboard/widget-tophosts";
 @import "components/diff";
 @import "components/form-search";
 @import "components/inline-filter";
@@ -38,9 +40,14 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 @import "components/message-box";
 @import "components/radio-list-control";
 @import "components/service/info";
+@import "components/subfilter";
 @import "components/tabfilter";
 @import "components/toc";
+@import "components/z-bar-gauge";
 @import "components/z-select";
+
+@import "components/dashboard/widget-slareport";
+@import "components/dashboard/widget-svggraph";
 
 .link-action {
 	border-bottom: 1px dotted;
@@ -294,17 +301,26 @@ form {
 	.action-container {
 		display: flex;
 		width: 100%;
+		height: 18px;
+		line-height: 18px;
 
-		.label {
+		.link-action {
+			height: 16px;
+			min-width: 1em;
 			@extend %overflow-ellipsis;
-		}
-
-		.separator {
-			margin-right: 4px;
 		}
 
 		[class*='icon-'] {
 			flex-shrink: 0;
+		}
+
+		.rel-container {
+			display: flex;
+		}
+
+		.separator {
+			flex-shrink: 0;
+			margin-right: 4px;
 		}
 	}
 
@@ -492,25 +508,6 @@ form {
 				margin-left: 2px;
 			}
 		}
-
-		.action-container {
-			height: 18px;
-			line-height: 18px;
-
-			.rel-container {
-				display: flex;
-			}
-
-			.link-action {
-				height: 16px;
-				min-width: 1em;
-				@extend %overflow-ellipsis;
-			}
-
-			.separator {
-				flex-shrink: 0;
-			}
-		}
 	}
 
 	thead th {
@@ -596,6 +593,11 @@ form {
 			span {
 				margin: 0;
 			}
+		}
+
+		.vertical {
+			writing-mode: vertical-lr;
+			transform: rotate(180deg);
 		}
 
 		a {
@@ -1078,43 +1080,6 @@ form {
 	}
 }
 
-.subfilter,
-.subfilter-enabled {
-	display: inline-block;
-	height: 18px;
-	position: relative;
-}
-
-.subfilter {
-	margin-right: 10px;
-}
-
-.subfilter-enabled {
-	background-color: $ui-bg-selected-color;
-	border-radius: 2px;
-	color: $font-selected-color;
-	padding: 0 4px;
-
-	.link-action {
-		color: $font-selected-color;
-		text-decoration: none;
-
-		&:focus {
-			color: $font-selected-color;
-			border-bottom: 2px solid rgba($font-selected-color, .7);
-		}
-
-		&:hover {
-			color: $font-selected-color;
-			border-bottom: 1px solid rgba($font-selected-color, .7);
-		}
-	}
-
-	sup {
-		color: lighten($ui-bg-selected-color, 25%);
-	}
-}
-
 .filter-forms {
 	margin: 0 auto;
 	text-align: center;
@@ -1461,12 +1426,6 @@ form {
 		}
 	}
 
-	.form-fields-inline {
-		label {
-			margin: 0 8px 0 3px;
-		}
-	}
-
 	h4 {
 		margin-bottom: -5px;
 	}
@@ -1702,6 +1661,12 @@ select {
 		color: $font-color !important;
 		pointer-events: none;
 		@extend %form-disabled;
+	}
+}
+
+.form-fields-inline {
+	label {
+		margin: 0 8px 0 3px;
 	}
 }
 
@@ -2166,7 +2131,7 @@ $icon-widget-btn: (
 		background-image: none;
 
 		&::after {
-			background: url($sprite-path) no-repeat -398px -407px;
+			background: url($sprite-path) no-repeat -431px -621px;
 		}
 	}
 
@@ -2215,7 +2180,7 @@ $icon-widget-btn: (
 
 		.btn-info {
 			&::after {
-				background-position: -398px -430px;
+				background-position: -279px -621px;
 				top: 1px;
 			}
 		}
@@ -3016,10 +2981,10 @@ $form-icon-btn: (
 			overflow: auto;
 			overflow-x: hidden;
 			width: 100%;
-			max-height: calc(100vh - 190px);
+			max-height: calc(100vh - 220px);
 			max-width: inherit;
-			margin: 0 -10px 8px;
-			padding: 2px 10px;
+			margin: 0 -10px 10px;
+			padding: 0 10px;
 			position: relative;
 			@extend %webkit-scrollbar;
 
@@ -3082,20 +3047,25 @@ $form-icon-btn: (
 		}
 	}
 
-	&.sticked-to-top {
-		top: 50px;
-	}
-
 	&.modal-popup {
+		top: 50px;
 		max-width: 1024px;
+
+		&.modal-popup-small {
+			max-width: 450px;
+			width: 100%;
+		}
 
 		&.modal-popup-medium {
 			min-width: 450px;
 		}
 
-		&.modal-popup-small {
-			max-width: 450px;
+		&.modal-popup-large {
 			width: 100%;
+		}
+
+		&.modal-popup-generic {
+			min-width: 650px;
 		}
 
 		&.modal-popup-static {
@@ -3106,10 +3076,6 @@ $form-icon-btn: (
 		&.modal-popup-preprocessing {
 			max-width: 900px;
 			width: 100%;
-		}
-
-		&.modal-popup-generic {
-			min-width: 650px;
 		}
 
 		&.modal-popup-fullscreen {
@@ -3178,7 +3144,7 @@ $form-icon-btn: (
 	}
 
 	.dashboard-widget-head {
-		margin: -10px -10px 4px;
+		margin: -10px -10px 6px;
 	}
 
 	.maps-container {
@@ -4110,6 +4076,16 @@ a.link-action {
 	@extend %overflow-ellipsis;
 	border-radius: 2px;
 
+	a.link-action {
+		color: inherit !important;
+		border-bottom: none;
+
+		&:hover {
+			text-decoration: underline;
+			border-bottom: none;
+		}
+	}
+
 	&:last-child {
 		margin: 0;
 	}
@@ -4289,91 +4265,6 @@ td.inactive-bg {
 	}
 }
 
-// Color picker.
-.color-picker {
-	height: 20px;
-	white-space: nowrap;
-
-	div {
-		display: inline-block;
-		width: 18px;
-		height: 18px;
-		border: 1px solid $ui-bg-color;
-
-		&:hover {
-			border-color: $alt-dark-blue;
-			box-shadow: inset 0 0 0 1px $ui-bg-color;
-			cursor: pointer;
-		}
-
-		&:active {
-			box-shadow: inset 0 0 0 2px $ui-bg-color;
-			cursor: pointer;
-		}
-	}
-}
-
-.input-color-picker {
-	display: inline-block;
-	vertical-align: middle;
-
-	div {
-		width: 18px;
-		height: 18px;
-		background: url($sprite-path) no-repeat -323px -411px;
-		border: 1px solid $form-border-color;
-		margin: 1px;
-		cursor: pointer;
-
-		&:focus {
-			border-color: $form-border-focus-color;
-			outline: none;
-		}
-	}
-
-	div.use-default {
-		background: none;
-		position: relative;
-
-		&::after {
-			content: attr(data-use-default);
-			position: absolute;
-			text-align: center;
-			line-height: 18px;
-			right: 0;
-			left: 0;
-		}
-	}
-
-	input:disabled + div {
-		cursor: default;
-		background: $form-disabled-font-color !important;
-		border-color: $form-disabled-font-color;
-	}
-
-	input[type="text"] {
-		padding-left: 25px;
-	}
-}
-
-.color-picker-controls {
-	margin-bottom: 5px;
-
-	.input-color-picker {
-		position: relative;
-		cursor: default;
-		margin-top: -2px;
-
-		div {
-			position: absolute;
-			border-width: 1px;
-			margin: 0px;
-			left: 2px;
-			top: 2px;
-		}
-	}
-}
-
 // Preloader.
 @keyframes is-loading-kf {
 	to {
@@ -4443,6 +4334,23 @@ button {
 		&::before {
 			background: none;
 		}
+
+		&::after {
+			box-shadow: none;
+			background: none;
+			border: 1px solid $preloader-disabled-color;
+			border-bottom-color: $preloader-accent-color;
+			width: 12px;
+			height: 12px;
+		}
+	}
+}
+
+.link-action {
+	&.is-loading {
+		position: relative;
+		color: transparent !important;
+		border-bottom-color: transparent;
 
 		&::after {
 			box-shadow: none;
@@ -4793,6 +4701,7 @@ svg {
 		display: inline-block;
 		margin: 2px 7px 2px 0;
 		white-space: nowrap;
+		vertical-align: middle;
 
 		> div {
 			position: relative;
@@ -4819,6 +4728,15 @@ svg {
 				top: 0;
 				min-height: 24px;
 			}
+		}
+	}
+
+	.color-picker {
+		.color-picker-preview {
+			margin: 1px;
+			width: 20px;
+			min-height: 20px;
+			background-position: -323px -411px;
 		}
 	}
 }
@@ -5418,11 +5336,12 @@ button {
 [data-count][class*='icon-']::after,
 .icon-description::after {
 	position: absolute;
+	top: -2px;
 	content: attr(data-count);
 	text-align: center;
-	margin-top: -2px;
 	font-size: 9px;
 	letter-spacing: -.25px;
+	line-height: 18px;
 	width: 18px;
 }
 
@@ -5718,6 +5637,13 @@ $range-input-width: 31px;
 		padding-left: calc(15% + 10px);
 		margin-right: 0;
 		margin-left: 0;
+	}
+
+	.ui-tabs-nav {
+		position: sticky;
+		top: 0;
+		background: $header-bg-color;
+		z-index: 3;
 	}
 }
 
@@ -6342,6 +6268,7 @@ z-select,
 }
 
 .modal-popup-medium,
+.modal-popup-large,
 .modal-popup-static,
 .modal-popup-preprocessing {
 	.table-forms-container {
@@ -6507,7 +6434,7 @@ z-select,
 // Geomap widget.
 .geomap-filter-button,
 .navigate-home-button {
-	background-image: url('../img/icon-sprite.svg');
+	background-image: url($sprite-path);
 	background-repeat: no-repeat;
 }
 .geomap-filter-button {

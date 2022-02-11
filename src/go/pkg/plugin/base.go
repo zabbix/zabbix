@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -62,4 +62,9 @@ func (b *Base) IsExternal() bool {
 
 func (b *Base) SetExternal(isExternal bool) {
 	b.external = isExternal
+}
+
+type SystemOptions struct {
+	Path     string `conf:"optional"`
+	Capacity string `conf:"optional"`
 }

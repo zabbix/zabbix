@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,9 +20,8 @@
 #ifndef ZABBIX_CHECKS_CALCULATED_H
 #define ZABBIX_CHECKS_CALCULATED_H
 
-#include "common.h"
 #include "dbcache.h"
-#include "sysinfo.h"
+#include "module.h"
 
 int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result);
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2187,6 +2187,9 @@ function normalizeItemPreprocessingSteps(array $preprocessing): array {
 			'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
 			'error_handler_params' => ''
 		];
+
+		// Remove fictional field that doesn't belong in DB and API.
+		unset($step['sortorder']);
 	}
 	unset($step);
 

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -725,21 +725,6 @@ final class CItemData {
 					'js-item-public-key-label',
 					'js-item-public-key-field',
 					'publickey'
-				]
-			],
-			// Dropdown entries of parent with {id} to disable for specific type.
-			'disable_for_type' => [
-				ITEM_TYPE_CALCULATED => [
-					'value_type' => [
-						ITEM_VALUE_TYPE_STR,
-						ITEM_VALUE_TYPE_LOG,
-						ITEM_VALUE_TYPE_TEXT
-					],
-					'value_type_steps' => [
-						ITEM_VALUE_TYPE_STR,
-						ITEM_VALUE_TYPE_LOG,
-						ITEM_VALUE_TYPE_TEXT
-					]
 				]
 			],
 			'for_http_auth_type' => [

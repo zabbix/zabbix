@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -482,7 +482,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 	 * @dataProvider getCreateWidgetData
 	 */
 	public function testDashboardProblemsBySeverityWidget_Create($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=104');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1040');
 		$dashboard = CDashboardElement::find()->one();
 		$old_widget_count = $dashboard->getWidgets()->count();
 
@@ -1361,7 +1361,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 		$initial_values = CDBHelper::getHash($this->sql);
 
 		// Open a dashboard widget and then save it without applying any changes
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=104');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1040');
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->edit();
 		$form = $dashboard->getWidget('Reference widget')->edit();
@@ -1416,7 +1416,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 	public function testDashboardProblemsBySeverityWidget_Cancel($data) {
 		$old_hash = CDBHelper::getHash($this->sql);
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=104');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1040');
 		$dashboard = CDashboardElement::find()->one()->edit();
 
 		// Start updating or creating a widget.
@@ -1466,7 +1466,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 
 	public function testDashboardProblemsBySeverityWidget_Delete() {
 		foreach (['Reference PBS widget to delete', 'Totals reference PBS widget to delete'] as $name) {
-			$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=104');
+			$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1040');
 			$dashboard = CDashboardElement::find()->one()->edit();
 			$widget = $dashboard->getWidget($name);
 			$dashboard->deleteWidget($name);
@@ -1671,7 +1671,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 		}
 		foreach ($expected_popup['Tags'] as $tag) {
 			$tag_array = $row->getColumn('Tags')->getText();
-			$this->assertContains($tag, $tag_array);
+			$this->assertStringContainsString($tag, $tag_array);
 		}
 		if (CTestArrayHelper::get($data['fields'], 'Show operational data', 'None') === 'Separately') {
 			$this->assertEquals('*UNKNOWN*', $row->getColumn('Operational data')->getText());

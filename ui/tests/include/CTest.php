@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -171,7 +171,12 @@ class CTest extends TestCase {
 		}
 
 		foreach ($callbacks as $callback) {
-			$method = $class->getMethod($callback);
+			try {
+				$method = $class->getMethod($callback);
+			}
+			catch (ReflectionException $exception) {
+				$method = null;
+			}
 
 			if (!$method) {
 				$error = 'Callback "'.$callback.'" is not defined in requested context.';
@@ -181,6 +186,8 @@ class CTest extends TestCase {
 				else {
 					throw new Exception($error);
 				}
+
+				continue;
 			}
 
 			try {

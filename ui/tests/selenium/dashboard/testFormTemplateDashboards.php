@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -84,7 +84,7 @@ class testFormTemplateDashboards extends CWebTest {
 									[
 										'type' => 4,
 										'name' => 'itemid',
-										'value' => 40041
+										'value' => 400410
 									]
 								]
 							],
@@ -99,7 +99,7 @@ class testFormTemplateDashboards extends CWebTest {
 									[
 										'type' => 4,
 										'name' => 'itemids',
-										'value' => 40041
+										'value' => 400410
 									]
 								]
 							],

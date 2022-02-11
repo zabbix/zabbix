@@ -27,7 +27,7 @@
 window.widget_item_form = {
 
 	init() {
-		$(".input-color-picker input", $(".overlay-dialogue-body"))
+		$(".<?= ZBX_STYLE_COLOR_PICKER ?> input", $(".overlay-dialogue-body"))
 			.colorpicker({appendTo: ".overlay-dialogue-body", use_default: true,
 				onUpdate: this.events.setIndicatorColor
 			});

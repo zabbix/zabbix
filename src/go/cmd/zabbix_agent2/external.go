@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,12 +29,14 @@ import (
 	"zabbix.com/internal/agent"
 	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/plugin"
-	"zabbix.com/pkg/shared"
+	"zabbix.com/pkg/plugin/comms"
 	"zabbix.com/plugins/external"
 )
 
 type pluginOptions struct {
-	Path string
+	System struct {
+		Path string
+	}
 }
 
 func initExternalPlugins(options *agent.AgentOptions) (string, error) {
@@ -43,9 +45,11 @@ func initExternalPlugins(options *agent.AgentOptions) (string, error) {
 	for name, p := range options.Plugins {
 		var o pluginOptions
 		if err := conf.Unmarshal(p, &o, false); err != nil {
-			return "", fmt.Errorf(`Invalid plugin '%s' configuration: %s`, name, err)
+			// not an external plugin, just ignore the error
+			continue
 		}
-		paths[name] = o.Path
+
+		paths[name] = o.System.Path
 	}
 
 	if len(paths) == 0 {
@@ -84,7 +88,7 @@ func initExternalPlugin(name string, p *external.Plugin, options *agent.AgentOpt
 
 	go listenOnPluginFail(p, name)
 
-	var resp *shared.RegisterResponse
+	var resp *comms.RegisterResponse
 	resp, err = p.Register()
 	if err != nil {
 		return
@@ -113,7 +117,7 @@ func initExternalPlugin(name string, p *external.Plugin, options *agent.AgentOpt
 }
 
 func validate(p *external.Plugin, options interface{}) error {
-	if !shared.ImplementsConfigurator(p.Interfaces) {
+	if !comms.ImplementsConfigurator(p.Interfaces) {
 		return nil
 	}
 
