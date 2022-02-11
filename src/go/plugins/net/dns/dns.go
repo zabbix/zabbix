@@ -127,9 +127,9 @@ func exportDnsRecord(params []string) (result interface{}, err error) {
 
 func parseAnswers(answers []dns.RR) string {
 	var out string
-	for _, a := range answers {
-		out += fmt.Sprintf("%-21s", strings.TrimSuffix(a.Header().Name, "."))
-		out += dns.Type(a.Header().Rrtype).String()
+	for i, a := range answers {
+		out += fmt.Sprintf("%-20s", strings.TrimSuffix(a.Header().Name, "."))
+		out += fmt.Sprintf(" %-8s ", dns.Type(a.Header().Rrtype).String())
 
 		switch rr := a.(type) {
 		case *dns.A:
@@ -165,6 +165,10 @@ func parseAnswers(answers []dns.RR) string {
 		case *dns.SRV:
 			out += getSRVString(rr)
 		}
+
+		if i != len(answers) - 1 {
+			out += "\n"
+		}
 	}
 
 	return out
@@ -194,7 +198,7 @@ func getDNSAnswers(params []string) ([]dns.RR, error) {
 }
 
 func getSOAString(in *dns.SOA) string {
-	return "      " + strings.TrimSuffix(in.Ns, ".") +
+	return strings.TrimSuffix(in.Ns, ".") +
 		" " + strings.TrimSuffix(in.Mbox, ".") +
 		" " + strconv.FormatInt(int64(in.Serial), base10) +
 		" " + strconv.FormatInt(int64(in.Refresh), base10) +
@@ -208,58 +212,58 @@ func getAString(in *dns.A) string {
 		return "\n"
 	}
 
-	return "        " + in.A.String() + "\n"
+	return in.A.String()
 }
 
 func getNSString(in *dns.NS) string {
-	return "       " + strings.TrimSuffix(in.Ns, ".") + "\n"
+	return strings.TrimSuffix(in.Ns, ".")
 }
 
 func getCNAMEString(in *dns.CNAME) string {
-	return "    " + strings.TrimSuffix(in.Target, ".") + "\n"
+	return strings.TrimSuffix(in.Target, ".")
 }
 
 func getMBString(in *dns.MB) string {
-	return "       " + strings.TrimSuffix(in.Mb, ".") + "\n"
+	return strings.TrimSuffix(in.Mb, ".")
 }
 
 func getMGString(in *dns.MG) string {
-	return "       " + strings.TrimSuffix(in.Mg, ".") + "\n"
+	return strings.TrimSuffix(in.Mg, ".")
 }
 
 func getPTRString(in *dns.PTR) string {
-	return "      " + strings.TrimSuffix(in.Ptr, ".") + "\n"
+	return strings.TrimSuffix(in.Ptr, ".")
 }
 
 func getMDString(in *dns.MD) string {
-	return "       " + strings.TrimSuffix(in.Md, ".") + "\n"
+	return strings.TrimSuffix(in.Md, ".")
 }
 
 func getMFString(in *dns.MF) string {
-	return "       " + strings.TrimSuffix(in.Mf, ".") + "\n"
+	return strings.TrimSuffix(in.Mf, ".")
 }
 
 func getMXString(in *dns.MX) string {
-	return "       " + strconv.Itoa(int(in.Preference)) +
-		" " + strings.TrimSuffix(in.Mx, ".") + "\n"
+	return strconv.Itoa(int(in.Preference)) +
+		" " + strings.TrimSuffix(in.Mx, ".")
 }
 
 func getNULLString(in *dns.NULL) string {
-	return "     " + strings.TrimSuffix(in.Data, ".") + "\n"
+	return strings.TrimSuffix(in.Data, ".")
 }
 
 func getHINFOString(in *dns.HINFO) string {
-	return "    " + parseTXT(in.Cpu, in.Os)
+	return parseTXT(in.Cpu, in.Os)
 
 }
 
 func getMINFOString(in *dns.MINFO) string {
-	return "    " + strings.TrimSuffix(in.Rmail, ".") + " " +
-		strings.TrimSuffix(in.Email, ".") + "\n"
+	return strings.TrimSuffix(in.Rmail, ".") + " " +
+		strings.TrimSuffix(in.Email, ".")
 }
 
 func getTXTString(in *dns.TXT) string {
-	return "      " + parseTXT(in.Txt...)
+	return parseTXT(in.Txt...)
 }
 
 func getAAAAString(in *dns.AAAA) string {
@@ -267,12 +271,11 @@ func getAAAAString(in *dns.AAAA) string {
 		return "\n"
 	}
 
-	return "     " + in.AAAA.String() + "\n"
+	return in.AAAA.String()
 }
 
 func getSRVString(in *dns.SRV) string {
-	return "      " +
-		strconv.Itoa(int(in.Priority)) + " " +
+	return strconv.Itoa(int(in.Priority)) + " " +
 		strconv.Itoa(int(in.Weight)) + " " +
 		strconv.Itoa(int(in.Port)) + " " +
 		strings.TrimSuffix(in.Target, ".")
@@ -286,7 +289,7 @@ func parseTXT(in ...string) string {
 		}
 	}
 
-	return strings.TrimSpace(out) + "\n"
+	return strings.TrimSpace(out)
 }
 
 func parseParamas(params []string) (o options, err error) {
