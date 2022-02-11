@@ -41,7 +41,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 		'Warning' => 'Warning',
 		'Average' => 'Average',
 		'High' => 'High',
-		'Disaster' => 'Disaster',
+		'Disaster' => 'Disaster'
 
 	];
 

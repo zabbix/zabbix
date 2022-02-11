@@ -1661,7 +1661,7 @@ class testFormHost extends CWebTest {
 		$this->assertMessage(TEST_GOOD, 'Host added');
 
 		// Check the values of the original host with the cloned host.
-		$this->filterAndSelectHost((CTestArrayHelper::get($data, 'Visible name', 'Host name')) )
+		$this->filterAndSelectHost((CTestArrayHelper::get($data, 'Visible name', $data['Host name'])) )
 				->checkValue($original);
 		COverlayDialogElement::find()->one()->close();
 	}
