@@ -19,7 +19,6 @@
 
 #include "common.h"
 #include "sysinfo.h"
-
 #include "cfg.h"
 #include "log.h"
 #include "zbxconf.h"

@@ -33,7 +33,6 @@
 
 #include "sysinfo.h"
 #include "zbxmodules.h"
-#include "zbxserver.h"
 
 #include "zbxnix.h"
 #include "daemon.h"

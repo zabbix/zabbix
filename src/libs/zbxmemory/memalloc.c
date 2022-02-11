@@ -20,7 +20,6 @@
 #include "memalloc.h"
 
 #include "common.h"
-#include "mutexs.h"
 #include "log.h"
 
 /******************************************************************************

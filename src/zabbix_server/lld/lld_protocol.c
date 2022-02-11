@@ -24,7 +24,6 @@
 #include "zbxserialize.h"
 #include "zbxipcservice.h"
 #include "sysinfo.h"
-#include "zbxlld.h"
 #include "lld_manager.h"
 
 zbx_uint32_t	zbx_lld_serialize_item_value(unsigned char **data, zbx_uint64_t itemid, zbx_uint64_t hostid,

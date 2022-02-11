@@ -37,7 +37,6 @@
 #include "zbxserver.h"
 #include "report_protocol.h"
 
-
 #define ZBX_REPORT_INCLUDE_USER		0
 #define ZBX_REPORT_EXCLUDE_USER		1
 

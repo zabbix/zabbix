@@ -24,7 +24,6 @@
 #include "ipmi.h"
 
 #include "log.h"
-#include "dbcache.h"
 #include "zbxipcservice.h"
 #include "ipmi_protocol.h"
 #include "checks_ipmi.h"

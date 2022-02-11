@@ -24,7 +24,6 @@
 #include "zbxservice.h"
 #include "zbxipcservice.h"
 #include "daemon.h"
-#include "sighandler.h"
 #include "zbxalgo.h"
 #include "service_protocol.h"
 #include "service_actions.h"

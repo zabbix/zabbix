@@ -19,7 +19,6 @@
 
 #include "dbsync.h"
 
-#include "zbxtypes.h"
 #include "log.h"
 #include "dbcache.h"
 #include "zbxserialize.h"

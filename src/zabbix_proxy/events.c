@@ -17,10 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "../zabbix_server/events.h"
+
 #include "common.h"
 #include "zbxalgo.h"
-#include "db.h"
-#include "../zabbix_server/events.h"
 
 void	zbx_initialize_events(void)
 {

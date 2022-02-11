@@ -22,7 +22,6 @@
 #include "common.h"
 #include "log.h"
 
-
 #ifndef _WINDOWS
 #	include "diskdevices.h"
 #endif

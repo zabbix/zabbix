@@ -30,7 +30,6 @@
 #include "alerter_protocol.h"
 #include "zbxembed.h"
 
-
 #define	ALARM_ACTION_TIMEOUT	40
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;

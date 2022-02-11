@@ -20,7 +20,6 @@
 #include "report_protocol.h"
 
 #include "common.h"
-#include "zbxreport.h"
 #include "zbxipcservice.h"
 #include "zbxserialize.h"
 #include "zbxalgo.h"

@@ -28,8 +28,6 @@
 #include "../alerter/alerter_protocol.h"
 #include "zbxipcservice.h"
 
-#include "trapper_request.h"
-
 extern int	CONFIG_REPORTMANAGER_FORKS;
 
 static void	trapper_process_report_test(zbx_socket_t *sock, const struct zbx_json_parse *jp)

@@ -19,7 +19,6 @@
 
 #include "scripts.h"
 
-#include "common.h"
 #include "../poller/checks_agent.h"
 #include "../ipmi/ipmi.h"
 #include "../poller/checks_ssh.h"

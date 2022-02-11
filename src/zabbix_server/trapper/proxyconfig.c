@@ -19,15 +19,12 @@
 
 #include "proxyconfig.h"
 
-#include "common.h"
 #include "db.h"
 #include "log.h"
 #include "proxy.h"
 #include "zbxrtc.h"
 
-#include "../../libs/zbxcrypto/tls_tcp_active.h"
 #include "zbxcompress.h"
-#include "zbxipcservice.h"
 
 /******************************************************************************
  *                                                                            *

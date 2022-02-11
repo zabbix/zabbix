@@ -22,7 +22,6 @@
 #include "common.h"
 #include "comms.h"
 #include "log.h"
-#include "../../libs/zbxcrypto/tls_tcp_active.h"
 
 #if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 extern unsigned char	program_type;
