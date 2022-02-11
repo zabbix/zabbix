@@ -21,11 +21,8 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
-
-if ($data['uncheck']) {
-	uncheckTableRows('token');
-}
 
 $this->includeJsFile('administration.token.list.js.php');
 
