@@ -41,7 +41,7 @@ class CControllerMiscConfigUpdate extends CController {
 			'script_timeout' =>					'required|db config.script_timeout|time_unit '.implode(':', [1, 300]),
 			'item_test_timeout' =>				'required|db config.item_test_timeout|time_unit '.implode(':', [1, 300]),
 			'report_test_timeout' =>			'required|db config.report_test_timeout|time_unit '.implode(':', [1, 300]),
-			'vault_provider' =>					'required|db config.vault_provider|in 0,1'
+			'vault_provider' =>					'required|db config.vault_provider|in '.ZBX_VAULT_TYPE_HASHICORP.','.ZBX_VAULT_TYPE_CYBERARK
 		];
 
 		$ret = $this->validateInput($fields);
