@@ -1435,10 +1435,10 @@ class CHost extends CHostGeneral {
 		}
 
 		// delete host from maps
-		if (!empty($hostIds)) {
+		if (!empty($hostids)) {
 			DB::delete('sysmaps_elements', [
 				'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
-				'elementid' => $hostIds
+				'elementid' => $hostids
 			]);
 		}
 
