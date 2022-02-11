@@ -127,6 +127,7 @@ func exportDnsRecord(params []string) (result interface{}, err error) {
 
 func parseAnswers(answers []dns.RR) string {
 	var out string
+	answersNum := len(answers)
 	for i, a := range answers {
 		out += fmt.Sprintf("%-20s", strings.TrimSuffix(a.Header().Name, "."))
 		out += fmt.Sprintf(" %-8s ", dns.Type(a.Header().Rrtype).String())
@@ -166,7 +167,7 @@ func parseAnswers(answers []dns.RR) string {
 			out += getSRVString(rr)
 		}
 
-		if i != len(answers) - 1 {
+		if i != answersNum - 1 {
 			out += "\n"
 		}
 	}
