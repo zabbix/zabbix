@@ -171,82 +171,94 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])) {
 elseif (hasRequest('add') || hasRequest('update')) {
 	DBstart();
 
-	$newHostPrototype = [
-		'host' => getRequest('host', ''),
-		'name' => (getRequest('name', '') === '') ? getRequest('host', '') : getRequest('name', ''),
-		'status' => getRequest('status', HOST_STATUS_NOT_MONITORED),
-		'discover' => getRequest('discover', DB::getDefault('hosts', 'discover')),
-		'groupLinks' => [],
-		'groupPrototypes' => [],
-		'tags' => $tags,
-		'macros' => $macros,
-		'templates' => array_merge(getRequest('templates', []), getRequest('add_templates', [])),
-		'custom_interfaces' => getRequest('custom_interfaces', DB::getDefault('hosts', 'custom_interfaces'))
-	];
+	if ($hostid == 0 || $hostPrototype['templateid'] == 0) {
+		$newHostPrototype = [
+			'host' => getRequest('host', ''),
+			'name' => (getRequest('name', '') === '') ? getRequest('host', '') : getRequest('name', ''),
+			'status' => getRequest('status', HOST_STATUS_NOT_MONITORED),
+			'discover' => getRequest('discover', DB::getDefault('hosts', 'discover')),
+			'groupLinks' => [],
+			'groupPrototypes' => [],
+			'tags' => $tags,
+			'macros' => $macros,
+			'templates' => array_merge(getRequest('templates', []), getRequest('add_templates', [])),
+			'custom_interfaces' => getRequest('custom_interfaces', DB::getDefault('hosts', 'custom_interfaces'))
+		];
 
-	if (hasRequest('inventory_mode')) {
-		$newHostPrototype['inventory_mode'] = getRequest('inventory_mode');
-	}
-
-	// API requires 'templateid' property.
-	if ($newHostPrototype['templates']) {
-		$newHostPrototype['templates'] = zbx_toObject($newHostPrototype['templates'], 'templateid');
-	}
-
-	// add custom group prototypes
-	foreach (getRequest('group_prototypes', []) as $groupPrototype) {
-		if ($groupPrototype['name'] !== '') {
-			$newHostPrototype['groupPrototypes'][] = $groupPrototype;
+		if (hasRequest('inventory_mode')) {
+			$newHostPrototype['inventory_mode'] = getRequest('inventory_mode');
 		}
-	}
 
-	if ($newHostPrototype['custom_interfaces'] == HOST_PROT_INTERFACES_CUSTOM) {
-		$interfaces = getRequest('interfaces', []);
+		// API requires 'templateid' property.
+		if ($newHostPrototype['templates']) {
+			$newHostPrototype['templates'] = zbx_toObject($newHostPrototype['templates'], 'templateid');
+		}
 
-		foreach ($interfaces as &$interface) {
-			// Process SNMP interface fields.
-			if ($interface['type'] == INTERFACE_TYPE_SNMP) {
-				$interface['details']['bulk'] = array_key_exists('bulk', $interface['details'])
-					? SNMP_BULK_ENABLED
-					: SNMP_BULK_DISABLED;
+		// add custom group prototypes
+		foreach (getRequest('group_prototypes', []) as $groupPrototype) {
+			if ($groupPrototype['name'] !== '') {
+				$newHostPrototype['groupPrototypes'][] = $groupPrototype;
+			}
+		}
 
-				switch ($interface['details']['version']) {
-					case SNMP_V1:
-					case SNMP_V2C:
-						$interface['details'] =
-							array_intersect_key($interface['details'], array_flip(['version', 'bulk', 'community']));
-						break;
+		if ($newHostPrototype['custom_interfaces'] == HOST_PROT_INTERFACES_CUSTOM) {
+			$interfaces = getRequest('interfaces', []);
 
-					case SNMP_V3:
-						$field_names = array_flip(['version', 'bulk', 'contextname', 'securityname', 'securitylevel']);
+			foreach ($interfaces as &$interface) {
+				// Process SNMP interface fields.
+				if ($interface['type'] == INTERFACE_TYPE_SNMP) {
+					$interface['details']['bulk'] = array_key_exists('bulk', $interface['details'])
+						? SNMP_BULK_ENABLED
+						: SNMP_BULK_DISABLED;
 
-						if ($interface['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV) {
-							$field_names += array_flip(['authprotocol', 'authpassphrase']);
-						}
-						elseif ($interface['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
-							$field_names +=
-								array_flip(['authprotocol', 'authpassphrase', 'privprotocol', 'privpassphrase']);
-						}
+					switch ($interface['details']['version']) {
+						case SNMP_V1:
+						case SNMP_V2C:
+							$interface['details'] = array_intersect_key($interface['details'],
+								array_flip(['version', 'bulk', 'community'])
+							);
+							break;
 
-						$interface['details'] = array_intersect_key($interface['details'], $field_names);
-						break;
+						case SNMP_V3:
+							$field_names = array_flip(['version', 'bulk', 'contextname', 'securityname',
+								'securitylevel'
+							]);
+
+							if ($interface['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV) {
+								$field_names += array_flip(['authprotocol', 'authpassphrase']);
+							}
+							elseif ($interface['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
+								$field_names +=
+									array_flip(['authprotocol', 'authpassphrase', 'privprotocol', 'privpassphrase']);
+							}
+
+							$interface['details'] = array_intersect_key($interface['details'], $field_names);
+							break;
+					}
+				}
+
+				unset($interface['isNew'], $interface['items'], $interface['interfaceid']);
+				$interface['main'] = 0;
+			}
+			unset($interface);
+
+			$main_interfaces = getRequest('mainInterfaces', []);
+
+			foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $type) {
+				if (array_key_exists($type, $main_interfaces)
+						&& array_key_exists($main_interfaces[$type], $interfaces)) {
+					$interfaces[$main_interfaces[$type]]['main'] = INTERFACE_PRIMARY;
 				}
 			}
 
-			unset($interface['isNew'], $interface['items'], $interface['interfaceid']);
-			$interface['main'] = 0;
+			$newHostPrototype['interfaces'] = $interfaces;
 		}
-		unset($interface);
-
-		$main_interfaces = getRequest('mainInterfaces', []);
-
-		foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $type) {
-			if (array_key_exists($type, $main_interfaces) && array_key_exists($main_interfaces[$type], $interfaces)) {
-				$interfaces[$main_interfaces[$type]]['main'] = INTERFACE_PRIMARY;
-			}
-		}
-
-		$newHostPrototype['interfaces'] = $interfaces;
+	}
+	else {
+		$newHostPrototype = [
+			'status' => getRequest('status', HOST_STATUS_NOT_MONITORED),
+			'discover' => getRequest('discover', DB::getDefault('hosts', 'discover')),
+		];
 	}
 
 	if ($hostid != 0) {
