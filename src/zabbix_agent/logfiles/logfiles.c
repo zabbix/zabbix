@@ -19,10 +19,8 @@
 
 #include "logfiles.h"
 
-#include "common.h"
 #include "log.h"
 #include "sysinfo.h"
-#include "persistent_state.h"
 #include "cfg.h"
 #include "zbxregexp.h"
 

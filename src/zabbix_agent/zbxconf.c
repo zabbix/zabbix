@@ -20,7 +20,6 @@
 #include "zbxconf.h"
 
 #include "common.h"
-#include "cfg.h"
 #include "log.h"
 #include "alias.h"
 #include "sysinfo.h"

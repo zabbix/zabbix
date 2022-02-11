@@ -19,8 +19,6 @@
 
 #include "persistent_state.h"
 
-#include "common.h"
-#include "md5.h"
 #include "log.h"
 #include "logfiles.h"
 #include "zbxjson.h"
