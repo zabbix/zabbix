@@ -384,9 +384,9 @@ class testAgentItems extends CIntegrationTest {
 					]
 				],
 				[
-					'basename' => self::TEST_FILE_BASE_NAME,
-					'pathname' =>  self::TEST_DIR_FILE_NAME,
-					'dirname' => self::TEST_DIR_NAME,
+					'basename' => self::TEST_LINK_BASE_NAME,
+					'pathname' =>  self::TEST_DIR_LINK_NAME,
+					'dirname' => self::TEST_DIR_DIR1_NAME,
 					'type' => 'sym',
 					'permissions' => 'stat -c %04a '.self::TEST_DIR_LINK_NAME,
 					'user' => 'stat -c %U '.self::TEST_DIR_LINK_NAME,
@@ -454,9 +454,9 @@ class testAgentItems extends CIntegrationTest {
 					]
 				],
 				[
-					'basename' => self::TEST_FILE_BASE_NAME,
-					'pathname' =>  self::TEST_DIR_FILE_NAME,
-					'dirname' => self::TEST_DIR_NAME,
+					'basename' => self::TEST_LINK_BASE_NAME,
+					'pathname' =>  self::TEST_DIR_LINK_NAME,
+					'dirname' => self::TEST_DIR_DIR1_NAME,
 					'type' => 'sym',
 					'permissions' => 'stat -c %04a '.self::TEST_DIR_LINK_NAME,
 					'user' => 'stat -c %U '.self::TEST_DIR_LINK_NAME,
