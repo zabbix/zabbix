@@ -608,7 +608,9 @@ class CHostPrototype extends CHostBase {
 		}
 		unset($host_prototype);
 
-		$host_prototypes = $this->extendObjectsByKey($host_prototypes, $db_host_prototypes, 'hostid', ['ruleid']);
+		$host_prototypes = $this->extendObjectsByKey($host_prototypes, $db_host_prototypes, 'hostid',
+			['ruleid', 'custom_interfaces']
+		);
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['ruleid', 'host'], ['ruleid', 'name']], 'fields' => [
 			'ruleid' =>	['type' => API_ID],
