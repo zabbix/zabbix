@@ -86,8 +86,6 @@ class CSettingsHelper extends CConfigGeneralHelper {
 	public const GEOMAPS_ATTRIBUTION = 'geomaps_attribution';
 	public const HA_FAILOVER_DELAY = 'ha_failover_delay';
 	public const VAULT_PROVIDER = 'vault_provider';
-	public const VAULT_TYPE_HASHICORP = '0';
-	public const VAULT_TYPE_CYBERARK = '1';
 
 	/**
 	 * Settings API object parameters array.
