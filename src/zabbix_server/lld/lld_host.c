@@ -699,8 +699,17 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 	}
 	else
 	{
-		lld_override_host(&lld_row->overrides, host->host, &lnk_templateids, &inventory_mode_proto, NULL,
-				&discover_proto);
+		zbx_free(buffer);
+		/* host technical name */
+		if (0 != strcmp(host->host_proto, host_proto))	/* the new host prototype differs */
+		{
+			buffer = zbx_strdup(buffer, host_proto);
+			substitute_lld_macros(&buffer, &lld_row->jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
+			zbx_lrtrim(buffer, ZBX_WHITESPACE);
+		}
+
+		lld_override_host(&lld_row->overrides, NULL != buffer ? buffer : host->host, &lnk_templateids,
+				&inventory_mode_proto, NULL, &discover_proto);
 
 		if (ZBX_PROTOTYPE_NO_DISCOVER == discover_proto)
 		{
@@ -708,13 +717,11 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 			goto out;
 		}
 
-		/* host technical name */
-		if (0 != strcmp(host->host_proto, host_proto))	/* the new host prototype differs */
+		if (NULL != buffer)
 		{
 			host->host_orig = host->host;
-			host->host = zbx_strdup(NULL, host_proto);
-			substitute_lld_macros(&host->host, &lld_row->jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
-			zbx_lrtrim(host->host, ZBX_WHITESPACE);
+			host->host = buffer;
+			buffer = NULL;
 			host->flags |= ZBX_FLAG_LLD_HOST_UPDATE_HOST;
 		}
 
