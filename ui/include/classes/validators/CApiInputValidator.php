@@ -1205,10 +1205,8 @@ class CApiInputValidator {
 								&& self::isInRange($data[$multiple_rule['if']['field']], $multiple_rule['if']['in']))
 							|| ($multiple_rule['if'] instanceof Closure
 								&& call_user_func($multiple_rule['if'], $data))) {
-						if ($multiple_rule['type'] == API_UNEXPECTED && array_key_exists($field_name, $data)) {
-							$error = _s('Invalid parameter "%1$s": %2$s.', $path,
-								_s('unexpected parameter "%1$s"', $field_name)
-							);
+						if ($multiple_rule['type'] == API_UNEXPECTED
+								&& !self::validateUnexpected($field_name, $multiple_rule, $data, $path, $error)) {
 							return false;
 						}
 
@@ -1225,6 +1223,10 @@ class CApiInputValidator {
 					$error = 'Incorrect validation rules.';
 					return false;
 				}
+			}
+			elseif ($field_rule['type'] === API_UNEXPECTED
+					&& !self::validateUnexpected($field_name, $field_rule, $data, $path, $error)) {
+				return false;
 			}
 
 			$flags = array_key_exists('flags', $field_rule) ? $field_rule['flags'] : 0x00;
@@ -2991,5 +2993,49 @@ class CApiInputValidator {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Unexpected validator.
+	 *
+	 * @param string $field_name
+	 * @param array  $field_rule
+	 * @param string $rule[error_type]  (optional) API_ERR_INHERITED, API_ERR_DISCOVERED
+	 * @param array  $object
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateUnexpected(string $field_name, array $field_rule, array $object, string $path,
+			string &$error): bool {
+		if (!array_key_exists($field_name, $object)) {
+			return true;
+		}
+
+		if (!array_key_exists('error_type', $field_rule)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _s('unexpected parameter "%1$s"', $field_name));
+
+			return false;
+		}
+
+		switch ($field_rule['error_type']) {
+			case API_ERR_INHERITED:
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+					_s('cannot update readonly parameter "%1$s" of inherited object', $field_name)
+				);
+				break;
+
+			case API_ERR_DISCOVERED:
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+					_s('cannot update readonly parameter "%1$s" of discovered object', $field_name)
+				);
+				break;
+
+			default:
+				$error = 'Incorrect validation rules.';
+		}
+
+		return false;
 	}
 }

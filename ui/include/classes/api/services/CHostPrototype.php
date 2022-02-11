@@ -590,12 +590,51 @@ class CHostPrototype extends CHostBase {
 			' WHERE '.dbConditionId('h.hostid', array_column($host_prototypes, 'hostid'))
 		), 'hostid');
 
-		$host_prototypes = $this->extendObjectsByKey($host_prototypes, $db_host_prototypes, 'hostid',
-			['ruleid', 'host', 'name', 'custom_interfaces']
-		);
+		foreach ($host_prototypes as $i => &$host_prototype) {
+			if ($db_host_prototypes[$host_prototype['hostid']]['templateid'] == 0) {
+				$host_prototype += array_intersect_key($db_host_prototypes[$host_prototype['hostid']],
+					array_flip(['host', 'name', 'custom_interfaces'])
+				);
 
-		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['ruleid', 'host'], ['ruleid', 'name']], 'fields' => [
-			'ruleid' =>				['type' => API_ID],
+				$api_input_rules = self::getValidationRules();
+			}
+			else {
+				$api_input_rules = self::getInheritedValidationRules();
+			}
+
+			if (!CApiInputValidator::validate($api_input_rules, $host_prototype, '/'.($i + 1).'/', $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			}
+		}
+		unset($host_prototype);
+
+		$host_prototypes = $this->extendObjectsByKey($host_prototypes, $db_host_prototypes, 'hostid', ['ruleid']);
+
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['ruleid', 'host'], ['ruleid', 'name']], 'fields' => [
+			'ruleid' =>	['type' => API_ID],
+			'host' =>	['type' => API_H_NAME],
+			'name' =>	['type' => API_STRING_UTF8]
+		]];
+
+		if (!CApiInputValidator::validateUniqueness($api_input_rules, $host_prototypes, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$this->addAffectedObjects($host_prototypes, $db_host_prototypes);
+
+		self::checkDuplicates($host_prototypes, $db_host_prototypes);
+		self::checkMainInterfaces($host_prototypes);
+		self::checkGroupLinks($host_prototypes, $db_host_prototypes);
+		$this->checkTemplates($host_prototypes, $db_host_prototypes);
+		$this->checkTemplatesLinks($host_prototypes, $db_host_prototypes);
+		$host_prototypes = parent::validateHostMacros($host_prototypes, $db_host_prototypes);
+	}
+
+	/**
+	 * @return array
+	 */
+	private static function getValidationRules(): array {
+		return ['type' => API_OBJECT, 'fields' => [
 			'hostid' =>				['type' => API_ID],
 			'host' =>				['type' => API_H_NAME, 'flags' => API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('hosts', 'host')],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'name')],
@@ -625,19 +664,27 @@ class CHostPrototype extends CHostBase {
 			]],
 			'inventory_mode' =>		['type' => API_INT32, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])]
 		]];
+	}
 
-		if (!CApiInputValidator::validate($api_input_rules, $host_prototypes, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		$this->addAffectedObjects($host_prototypes, $db_host_prototypes);
-
-		self::checkDuplicates($host_prototypes, $db_host_prototypes);
-		self::checkMainInterfaces($host_prototypes);
-		self::checkGroupLinks($host_prototypes, $db_host_prototypes);
-		$this->checkTemplates($host_prototypes, $db_host_prototypes);
-		$this->checkTemplatesLinks($host_prototypes, $db_host_prototypes);
-		$host_prototypes = parent::validateHostMacros($host_prototypes, $db_host_prototypes);
+	/**
+	 * @return array
+	 */
+	private static function getInheritedValidationRules(): array {
+		return ['type' => API_OBJECT, 'fields' => [
+			'hostid' =>				['type' => API_ID],
+			'host' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
+			'name' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
+			'custom_interfaces' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
+			'status' =>				['type' => API_INT32, 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])],
+			'discover' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER])],
+			'interfaces' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
+			'groupLinks' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
+			'groupPrototypes' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
+			'templates' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
+			'tags' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
+			'macros' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
+			'inventory_mode' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED]
+		]];
 	}
 
 	/**
