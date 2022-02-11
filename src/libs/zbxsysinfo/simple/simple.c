@@ -68,7 +68,7 @@ static int	check_ldap(const char *host, unsigned short port, int timeout, int *v
 		goto lbl_ret;
 	}
 
-	#ifdef LDAP_OPT_SOCKET_BIND_ADDRESSES
+	#if defined(LDAP_OPT_SOCKET_BIND_ADDRESSES) && defined(HAVE_LDAP_SOURCEIP)
 	if (NULL != CONFIG_SOURCE_IP)
 	{
 		if (LDAP_SUCCESS != (ldapErr = ldap_set_option(ldap, LDAP_OPT_SOCKET_BIND_ADDRESSES, CONFIG_SOURCE_IP)))
