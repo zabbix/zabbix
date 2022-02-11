@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-02-11T09:44:59Z'
+  date: '2022-02-11T10:27:26Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -98,10 +98,11 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 91d59e7054f440298a6515cd32b83410
-                  expression: 'last(/SMART by Zabbix agent 2 active/smart.disk.attr.raw[{#NAME},{#ID}]) > {$SMART.RAW.ATTRIBUTE.MAX.CRIT:"{#ID}"}'
+                  expression: 'last(/SMART by Zabbix agent 2 active/smart.disk.attr.raw[{#NAME},{#ID}]) > {$SMART.RAW.ATTRIBUTE.MAX.CRIT:"{#ID}"} and (last(/SMART by Zabbix agent 2 active/smart.disk.attr.raw[{#NAME},{#ID}]) > last(/SMART by Zabbix agent 2 active/smart.disk.attr.raw[{#NAME},{#ID}],#2))'
                   name: 'SMART [{#NAME}]: Attribute raw value {#ID} {#ATTRNAME} is greater than {$SMART.RAW.ATTRIBUTE.MAX.CRIT:"{#ID}"}'
                   priority: AVERAGE
                   description: 'The value shouldn''''t be more {$SMART.RAW.ATTRIBUTE.MAX.CRIT:"{#ID}"}'
+                  manual_close: 'YES'
                   tags:
                     -
                       tag: scope
@@ -641,32 +642,32 @@ zabbix_export:
         -
           macro: '{$SMART.ATTRIBUTE.ID.MATCHES}'
           value: '^.*$'
-          description: 'This macro is used in the filter of attribute discovery for filtering IDs. It can be overridden on the host or linked template level.'
+          description: 'This macro is used in the filter of attribute discovery for filtering IDs. It can be overridden on the host or linked on the template level.'
         -
           macro: '{$SMART.ATTRIBUTE.ID.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in the filter of attribute discovery for filtering IDs. It can be overridden on the host or linked template level.'
+          description: 'This macro is used in the filter of attribute discovery for filtering IDs. It can be overridden on the host or linked on the template level.'
         -
           macro: '{$SMART.DISK.NAME.MATCHES}'
           value: '^.*$'
-          description: 'This macro is used in the filter of attribute and disk discoveries. It can be overridden on the host or linked template level.'
+          description: 'This macro is used in the filter of attribute and disk discoveries. It can be overridden on the host or linked on the template level.'
         -
           macro: '{$SMART.DISK.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in the filter of attribute and disk discoveries. It can be overridden on the host or linked template level.'
+          description: 'This macro is used in the filter of attribute and disk discoveries. It can be overridden on the host or linked on the template level.'
         -
           macro: '{$SMART.RAW.ATTRIBUTE.ID.MATCHES}'
           value: '^(?:5|187|188|196|197|198|199)$'
-          description: 'This macro is used for creation integer items instead of text ones and triggers for some raw values.'
+          description: 'This macro is used for the creation of the integer items instead of the text ones and also triggers for some raw values.'
         -
           macro: '{$SMART.RAW.ATTRIBUTE.MAX.CRIT}'
           value: '0'
-          description: 'The threshhold for raw values.'
+          description: 'The threshold for raw values.'
         -
           macro: '{$SMART.TEMPERATURE.MAX.CRIT}'
           value: '65'
-          description: 'This macro is used for trigger expression. It can be overridden on the host or linked template level.'
+          description: 'This macro is used for trigger expression. It can be overridden on the host or linked on the template level.'
         -
           macro: '{$SMART.TEMPERATURE.MAX.WARN}'
           value: '50'
-          description: 'This macro is used for trigger expression. It can be overridden on the host or linked template level.'
+          description: 'This macro is used for trigger expression. It can be overridden on the host or linked on the template level.'

@@ -30,14 +30,14 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$SMART.ATTRIBUTE.ID.MATCHES} |<p>This macro is used in the filter of attribute discovery for filtering IDs. It can be overridden on the host or linked template level.</p> |`^.*$` |
-|{$SMART.ATTRIBUTE.ID.NOT_MATCHES} |<p>This macro is used in the filter of attribute discovery for filtering IDs. It can be overridden on the host or linked template level.</p> |`CHANGE_IF_NEEDED` |
-|{$SMART.DISK.NAME.MATCHES} |<p>This macro is used in the filter of attribute and disk discoveries. It can be overridden on the host or linked template level.</p> |`^.*$` |
-|{$SMART.DISK.NAME.NOT_MATCHES} |<p>This macro is used in the filter of attribute and disk discoveries. It can be overridden on the host or linked template level.</p> |`CHANGE_IF_NEEDED` |
-|{$SMART.RAW.ATTRIBUTE.ID.MATCHES} |<p>This macro is used for creation integer items instead of text ones and triggers for some raw values.</p> |`^(?:5|187|188|196|197|198|199)$` |
-|{$SMART.RAW.ATTRIBUTE.MAX.CRIT} |<p>The threshhold for raw values.</p> |`0` |
-|{$SMART.TEMPERATURE.MAX.CRIT} |<p>This macro is used for trigger expression. It can be overridden on the host or linked template level.</p> |`65` |
-|{$SMART.TEMPERATURE.MAX.WARN} |<p>This macro is used for trigger expression. It can be overridden on the host or linked template level.</p> |`50` |
+|{$SMART.ATTRIBUTE.ID.MATCHES} |<p>This macro is used in the filter of attribute discovery for filtering IDs. It can be overridden on the host or linked on the template level.</p> |`^.*$` |
+|{$SMART.ATTRIBUTE.ID.NOT_MATCHES} |<p>This macro is used in the filter of attribute discovery for filtering IDs. It can be overridden on the host or linked on the template level.</p> |`CHANGE_IF_NEEDED` |
+|{$SMART.DISK.NAME.MATCHES} |<p>This macro is used in the filter of attribute and disk discoveries. It can be overridden on the host or linked on the template level.</p> |`^.*$` |
+|{$SMART.DISK.NAME.NOT_MATCHES} |<p>This macro is used in the filter of attribute and disk discoveries. It can be overridden on the host or linked on the template level.</p> |`CHANGE_IF_NEEDED` |
+|{$SMART.RAW.ATTRIBUTE.ID.MATCHES} |<p>This macro is used for the creation of the integer items instead of the text ones and also triggers for some raw values.</p> |`^(?:5|187|188|196|197|198|199)$` |
+|{$SMART.RAW.ATTRIBUTE.MAX.CRIT} |<p>The threshold for raw values.</p> |`0` |
+|{$SMART.TEMPERATURE.MAX.CRIT} |<p>This macro is used for trigger expression. It can be overridden on the host or linked on the template level.</p> |`65` |
+|{$SMART.TEMPERATURE.MAX.WARN} |<p>This macro is used for trigger expression. It can be overridden on the host or linked on the template level.</p> |`50` |
 
 ## Template links
 
@@ -85,7 +85,7 @@ There are no template links in this template.
 |SMART [{#NAME}]: Error log contains records |<p>The device error log contains records of errors.</p> |`bitand(last(/SMART by Zabbix agent 2 active/smart.disk.es[{#NAME}]),64)=64 and (bitand(last(/SMART by Zabbix agent 2 active/smart.disk.es[{#NAME}]),64) > bitand(last(/SMART by Zabbix agent 2 active/smart.disk.es[{#NAME}],#2),64))` |HIGH |<p>Manual close: YES</p> |
 |SMART [{#NAME}]: Self-test log contains records |<p>The device self-test log contains records of errors. [ATA only] Failed self-tests outdated by a newer successful extended self-test are ignored.</p> |`bitand(last(/SMART by Zabbix agent 2 active/smart.disk.es[{#NAME}]),128)=128 and (bitand(last(/SMART by Zabbix agent 2 active/smart.disk.es[{#NAME}]),128) > bitand(last(/SMART by Zabbix agent 2 active/smart.disk.es[{#NAME}],#2),128))` |HIGH |<p>Manual close: YES</p> |
 |SMART [{#NAME}]: Attribute {#ID} {#ATTRNAME} is failed |<p>The value should be greater than THRESH.</p> |`last(/SMART by Zabbix agent 2 active/smart.disk.error[{#NAME},{#ID}]) <= {#THRESH}` |WARNING | |
-|SMART [{#NAME}]: Attribute raw value {#ID} {#ATTRNAME} is greater than {$SMART.RAW.ATTRIBUTE.MAX.CRIT:"{#ID}"} |<p>The value shouldn''t be more {$SMART.RAW.ATTRIBUTE.MAX.CRIT:"{#ID}"}</p> |`last(/SMART by Zabbix agent 2 active/smart.disk.attr.raw[{#NAME},{#ID}]) > {$SMART.RAW.ATTRIBUTE.MAX.CRIT:"{#ID}"}` |AVERAGE | |
+|SMART [{#NAME}]: Attribute raw value {#ID} {#ATTRNAME} is greater than {$SMART.RAW.ATTRIBUTE.MAX.CRIT:"{#ID}"} |<p>The value shouldn''t be more {$SMART.RAW.ATTRIBUTE.MAX.CRIT:"{#ID}"}</p> |`last(/SMART by Zabbix agent 2 active/smart.disk.attr.raw[{#NAME},{#ID}]) > {$SMART.RAW.ATTRIBUTE.MAX.CRIT:"{#ID}"} and (last(/SMART by Zabbix agent 2 active/smart.disk.attr.raw[{#NAME},{#ID}]) > last(/SMART by Zabbix agent 2 active/smart.disk.attr.raw[{#NAME},{#ID}],#2))` |AVERAGE |<p>Manual close: YES</p> |
 
 ## Feedback
 
