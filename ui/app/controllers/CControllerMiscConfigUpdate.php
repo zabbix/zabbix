@@ -41,7 +41,7 @@ class CControllerMiscConfigUpdate extends CController {
 			'script_timeout' =>					'required|db config.script_timeout|time_unit '.implode(':', [1, 300]),
 			'item_test_timeout' =>				'required|db config.item_test_timeout|time_unit '.implode(':', [1, 300]),
 			'report_test_timeout' =>			'required|db config.report_test_timeout|time_unit '.implode(':', [1, 300]),
-			'vault_provider' =>					'db config.vault_provider'
+			'vault_provider' =>					'required|db config.vault_provider|in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -92,7 +92,7 @@ class CControllerMiscConfigUpdate extends CController {
 			CSettingsHelper::SCRIPT_TIMEOUT => $this->getInput('script_timeout'),
 			CSettingsHelper::ITEM_TEST_TIMEOUT => $this->getInput('item_test_timeout'),
 			CSettingsHelper::SCHEDULED_REPORT_TEST_TIMEOUT => $this->getInput('report_test_timeout'),
-			CSettingsHelper::VAULT => $this->getInput('vault_provider')
+			CSettingsHelper::VAULT_PROVIDER => $this->getInput('vault_provider')
 		];
 
 		$settings[CSettingsHelper::ALERT_USRGRPID] = $this->hasInput('alert_usrgrpid')

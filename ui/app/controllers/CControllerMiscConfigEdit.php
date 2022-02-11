@@ -113,8 +113,8 @@ class CControllerMiscConfigEdit extends CController {
 			'report_test_timeout' => $this->getInput('report_test_timeout', CSettingsHelper::get(
 				CSettingsHelper::SCHEDULED_REPORT_TEST_TIMEOUT
 			)),
-			'vault_provider' => $this->getInput('vault', CSettingsHelper::get(
-				CSettingsHelper::VAULT
+			'vault_provider' => $this->getInput('vault_provider', CSettingsHelper::get(
+				CSettingsHelper::VAULT_PROVIDER
 			))
 		];
 

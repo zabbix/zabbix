@@ -1447,7 +1447,7 @@ define('ZBX_MACRO_TYPE_TEXT', 0); // Display macro value as text.
 define('ZBX_MACRO_TYPE_SECRET', 1); // Display masked macro value.
 define('ZBX_MACRO_TYPE_VAULT', 2); // Display macro value as text (path to secret in HashiCorp Vault).
 
-define('ZBX_VAULT_TYPE_HASHI', 0);
+define('ZBX_VAULT_TYPE_HASHICORP', 0);
 define('ZBX_VAULT_TYPE_CYBERARK', 1);
 
 define('ZBX_SECRET_MASK', '******'); // Placeholder for secret values.
