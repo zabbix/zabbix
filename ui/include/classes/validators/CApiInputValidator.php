@@ -3000,7 +3000,7 @@ class CApiInputValidator {
 	 *
 	 * @param string $field_name
 	 * @param array  $field_rule
-	 * @param string $rule[error_type]  (optional) API_ERR_INHERITED, API_ERR_DISCOVERED
+	 * @param string $field_rule[error_type]  (optional) API_ERR_INHERITED, API_ERR_DISCOVERED
 	 * @param array  $object
 	 * @param string $path
 	 * @param string $error
