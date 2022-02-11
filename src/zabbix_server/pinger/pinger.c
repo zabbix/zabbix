@@ -19,8 +19,6 @@
 
 #include "pinger.h"
 
-#include "common.h"
-#include "dbcache.h"
 #include "log.h"
 #include "zbxserver.h"
 #include "zbxicmpping.h"

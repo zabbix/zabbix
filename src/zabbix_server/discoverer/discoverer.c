@@ -19,10 +19,7 @@
 
 #include "discoverer.h"
 
-#include "common.h"
-#include "db.h"
 #include "log.h"
-#include "sysinfo.h"
 #include "zbxicmpping.h"
 #include "discovery.h"
 #include "zbxserver.h"

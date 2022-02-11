@@ -19,10 +19,7 @@
 
 #include "httptest.h"
 
-#include "common.h"
-#include "db.h"
 #include "log.h"
-#include "dbcache.h"
 #include "preproc.h"
 #include "daemon.h"
 #include "zbxserver.h"

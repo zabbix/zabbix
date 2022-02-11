@@ -19,10 +19,7 @@
 
 #include "lld.h"
 
-#include "common.h"
-#include "db.h"
 #include "log.h"
-#include "zbxalgo.h"
 #include "zbxserver.h"
 #include "zbxregexp.h"
 

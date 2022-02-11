@@ -20,8 +20,6 @@
 #ifndef ZABBIX_AUDIT_H
 #define ZABBIX_AUDIT_H
 
-#include "common.h"
-
 #include "zbxalgo.h"
 #include "zbxjson.h"
 

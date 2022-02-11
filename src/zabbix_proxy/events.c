@@ -19,9 +19,6 @@
 
 #include "../zabbix_server/events.h"
 
-#include "common.h"
-#include "zbxalgo.h"
-
 void	zbx_initialize_events(void)
 {
 	THIS_SHOULD_NEVER_HAPPEN;

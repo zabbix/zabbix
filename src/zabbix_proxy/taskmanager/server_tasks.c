@@ -19,8 +19,6 @@
 
 #include "zbxtasks.h"
 
-#include "common.h"
-#include "zbxdb.h"
 #include "db.h"
 
 /******************************************************************************

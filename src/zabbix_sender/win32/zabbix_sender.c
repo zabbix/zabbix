@@ -19,7 +19,6 @@
 
 #include "zabbix_sender.h"
 
-#include "common.h"
 #include "zbxjson.h"
 #include "comms.h"
 #include "cfg.h"

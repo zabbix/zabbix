@@ -19,13 +19,10 @@
 
 #include "taskmanager.h"
 
-#include "common.h"
 #include "daemon.h"
 #include "zbxself.h"
 #include "zbxtasks.h"
 #include "log.h"
-#include "db.h"
-#include "dbcache.h"
 #include "zbxcrypto.h"
 #include "zbxdiag.h"
 #include "zbxrtc.h"

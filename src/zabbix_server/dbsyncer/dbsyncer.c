@@ -19,8 +19,6 @@
 
 #include "dbsyncer.h"
 
-#include "common.h"
-#include "db.h"
 #include "log.h"
 #include "daemon.h"
 #include "zbxself.h"

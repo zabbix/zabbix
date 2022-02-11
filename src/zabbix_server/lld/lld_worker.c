@@ -19,13 +19,10 @@
 
 #include "lld_worker.h"
 
-#include "common.h"
 #include "daemon.h"
-#include "db.h"
 #include "log.h"
 #include "zbxipcservice.h"
 #include "zbxself.h"
-#include "dbcache.h"
 #include "proxy.h"
 #include "../events.h"
 #include "lld_protocol.h"

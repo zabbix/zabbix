@@ -18,17 +18,11 @@
 **/
 
 #include "housekeeper.h"
-
-#include "common.h"
-#include "db.h"
-#include "dbcache.h"
 #include "log.h"
 #include "daemon.h"
 #include "zbxself.h"
-#include "zbxalgo.h"
 #include "zbxserver.h"
 #include "zbxrtc.h"
-#include "zbxipcservice.h"
 
 #include "history_compress.h"
 #include "../../libs/zbxdbcache/valuecache.h"

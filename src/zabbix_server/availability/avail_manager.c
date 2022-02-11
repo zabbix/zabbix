@@ -26,7 +26,6 @@
 #include "daemon.h"
 #include "sighandler.h"
 #include "dbcache.h"
-#include "zbxalgo.h"
 #include "avail_protocol.h"
 
 

@@ -19,7 +19,6 @@
 
 #include "checks_agent.h"
 
-#include "common.h"
 #include "comms.h"
 #include "log.h"
 

@@ -19,14 +19,8 @@
 
 #include "alerter_protocol.h"
 
-#include "common.h"
 #include "log.h"
 #include "zbxserialize.h"
-#include "zbxalgo.h"
-#include "zbxipcservice.h"
-#include "zbxalert.h"
-#include "db.h"
-
 
 void	zbx_am_db_mediatype_clear(zbx_am_db_mediatype_t *mediatype)
 {

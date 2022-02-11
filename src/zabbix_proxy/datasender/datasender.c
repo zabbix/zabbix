@@ -19,12 +19,10 @@
 
 #include "datasender.h"
 
-#include "common.h"
 #include "comms.h"
 #include "db.h"
 #include "log.h"
 #include "daemon.h"
-#include "zbxjson.h"
 #include "proxy.h"
 #include "zbxself.h"
 #include "zbxtasks.h"

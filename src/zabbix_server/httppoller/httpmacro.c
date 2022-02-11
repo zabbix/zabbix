@@ -19,7 +19,6 @@
 
 #include "httpmacro.h"
 
-#include "common.h"
 #include "log.h"
 #include "zbxregexp.h"
 #include "zbxhttp.h"

@@ -19,9 +19,6 @@
 
 #include "escalator.h"
 
-#include "common.h"
-#include "db.h"
-#include "log.h"
 #include "daemon.h"
 #include "zbxserver.h"
 #include "zbxself.h"
@@ -29,13 +26,9 @@
 #include "../actions.h"
 #include "../scripts/scripts.h"
 #include "zbxcrypto.h"
-#include "comms.h"
 #include "../../libs/zbxserver/get_host_from_event.h"
 #include "../../libs/zbxserver/zabbix_users.h"
-#include "zbxservice.h"
 #include "service_protocol.h"
-#include "dbcache.h"
-
 
 extern int	CONFIG_ESCALATOR_FORKS;
 
