@@ -18,6 +18,7 @@
 **/
 
 #include "zbxeval.h"
+#include "eval.h"
 
 #include "../zbxalgo/vectorimpl.h"
 

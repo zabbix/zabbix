@@ -27,6 +27,7 @@
 #include "zbxalgo.h"
 #include "active.h"
 #include "metrics.h"
+#include "logfiles/logfiles.h"
 
 #define EVT_VARIANT_TYPE_ARRAY	128
 #define EVT_VARIANT_TYPE_MASK	0x7f

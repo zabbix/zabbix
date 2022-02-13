@@ -18,6 +18,7 @@
 **/
 
 #include "lld.h"
+#include "proxy.h"
 
 #include "log.h"
 #include "zbxserver.h"
