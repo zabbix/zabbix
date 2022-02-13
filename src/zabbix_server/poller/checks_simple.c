@@ -19,7 +19,6 @@
 
 #include "checks_simple.h"
 
-#include "common.h"
 #include "checks_simple_vmware.h"
 #include "simple.h"
 #include "log.h"

@@ -19,12 +19,10 @@
 
 #include "timer.h"
 
-#include "common.h"
 #include "log.h"
 #include "dbcache.h"
 #include "daemon.h"
 #include "zbxself.h"
-#include "db.h"
 
 #define ZBX_TIMER_DELAY		SEC_PER_MIN
 

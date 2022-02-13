@@ -20,11 +20,9 @@
 #include "trapper_auth.h"
 
 #include <string.h>
-#include "common.h"
 #include "db.h"
 #include "log.h"
 #include "sha512crypt.h"
-#include "zbxjson.h"
 
 /******************************************************************************
  *                                                                            *

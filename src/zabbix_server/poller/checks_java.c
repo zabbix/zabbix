@@ -19,8 +19,6 @@
 
 #include "checks_java.h"
 
-#include "common.h"
-#include "comms.h"
 #include "log.h"
 #include "zbxjson.h"
 

@@ -19,7 +19,6 @@
 
 #include "service_actions.h"
 
-#include "common.h"
 #include "log.h"
 
 /******************************************************************************

@@ -21,10 +21,7 @@
 
 #include "log.h"
 #include "zbxself.h"
-#include "zbxservice.h"
-#include "zbxipcservice.h"
 #include "daemon.h"
-#include "zbxalgo.h"
 #include "service_protocol.h"
 #include "service_actions.h"
 #include "zbxserialize.h"

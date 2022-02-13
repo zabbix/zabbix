@@ -19,16 +19,9 @@
 
 #include "report_manager.h"
 
-#include "common.h"
-#include "log.h"
 #include "zbxself.h"
-#include "zbxipcservice.h"
 #include "daemon.h"
-#include "db.h"
-#include "zbxjson.h"
 #include "base64.h"
-#include "zbxalgo.h"
-#include "dbcache.h"
 #include "zbxreport.h"
 #include "../../libs/zbxcrypto/hmac_sha256.h"
 #include "sha256crypt.h"

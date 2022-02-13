@@ -19,7 +19,6 @@
 
 #include "selfmon.h"
 
-#include "common.h"
 #include "daemon.h"
 #include "zbxself.h"
 #include "log.h"

@@ -19,9 +19,7 @@
 
 #include "checks_internal.h"
 
-#include "common.h"
 #include "checks_java.h"
-#include "dbcache.h"
 #include "zbxself.h"
 #include "preproc.h"
 #include "zbxtrends.h"

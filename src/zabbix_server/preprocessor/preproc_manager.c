@@ -19,16 +19,11 @@
 
 #include "preproc_manager.h"
 
-#include "common.h"
-#include "dbcache.h"
 #include "daemon.h"
 #include "zbxself.h"
 #include "log.h"
-#include "sysinfo.h"
-#include "zbxipcservice.h"
 #include "zbxlld.h"
 #include "preprocessing.h"
-#include "zbxalgo.h"
 #include "preproc_history.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;

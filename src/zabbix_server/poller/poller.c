@@ -19,8 +19,6 @@
 
 #include "poller.h"
 
-#include "common.h"
-#include "db.h"
 #include "daemon.h"
 #include "zbxserver.h"
 #include "zbxself.h"

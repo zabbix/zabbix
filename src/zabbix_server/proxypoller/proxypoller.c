@@ -21,12 +21,9 @@
 
 #include "common.h"
 #include "daemon.h"
-#include "comms.h"
 #include "zbxself.h"
 #include "zbxserver.h"
-#include "dbcache.h"
 #include "db.h"
-#include "zbxjson.h"
 #include "log.h"
 #include "proxy.h"
 #include "zbxcrypto.h"

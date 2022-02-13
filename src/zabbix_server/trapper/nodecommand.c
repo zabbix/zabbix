@@ -19,10 +19,7 @@
 
 #include "nodecommand.h"
 
-#include "common.h"
-#include "comms.h"
 #include "zbxserver.h"
-#include "db.h"
 #include "log.h"
 #include "trapper_auth.h"
 

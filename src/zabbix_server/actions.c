@@ -19,7 +19,6 @@
 
 #include "actions.h"
 
-#include "db.h"
 #include "log.h"
 #include "zbxserver.h"
 #include "operations.h"

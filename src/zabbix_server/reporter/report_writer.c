@@ -19,14 +19,11 @@
 
 #include "report_writer.h"
 
-#include "common.h"
 #include "daemon.h"
 #include "zbxself.h"
 #include "log.h"
-#include "zbxipcservice.h"
 #include "zbxjson.h"
 #include "zbxalert.h"
-#include "db.h"
 #include "report_protocol.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;

@@ -28,7 +28,6 @@
 #include "db.h"
 #include "log.h"
 #include "zbxtasks.h"
-#include "zbxjson.h"
 #include "zbxembed.h"
 
 extern int	CONFIG_TRAPPER_TIMEOUT;

@@ -19,10 +19,7 @@
 
 #include "trapper.h"
 
-#include "common.h"
 #include "log.h"
-#include "zbxjson.h"
-#include "dbcache.h"
 #include "proxy.h"
 #include "zbxself.h"
 #include "active.h"

@@ -19,7 +19,6 @@
 
 #include "checks_agent.h"
 
-#include "comms.h"
 #include "log.h"
 
 #if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))

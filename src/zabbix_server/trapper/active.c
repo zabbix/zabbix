@@ -19,9 +19,6 @@
 
 #include "active.h"
 
-#include "common.h"
-#include "db.h"
-#include "dbcache.h"
 #include "log.h"
 #include "zbxserver.h"
 #include "zbxregexp.h"
