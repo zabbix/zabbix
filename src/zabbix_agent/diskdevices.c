@@ -21,7 +21,6 @@
 
 #include "diskdevices.h"
 
-#include "common.h"
 #include "stats.h"
 #include "log.h"
 #include "mutexs.h"

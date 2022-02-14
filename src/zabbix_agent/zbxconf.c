@@ -19,11 +19,9 @@
 
 #include "zbxconf.h"
 
-#include "common.h"
 #include "log.h"
 #include "alias.h"
 #include "sysinfo.h"
-
 
 #ifdef _WINDOWS
 #	include "perfstat.h"

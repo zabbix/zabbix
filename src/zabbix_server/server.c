@@ -23,6 +23,7 @@
 
 #include "export.h"
 #include "zbxself.h"
+#include "sighandler.h"
 
 #include "cfg.h"
 #include "zbxdbupgrade.h"

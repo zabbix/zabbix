@@ -19,10 +19,7 @@
 
 #include "active.h"
 
-#include "common.h"
 #include "zbxconf.h"
-
-#include "cfg.h"
 #include "log.h"
 #include "sysinfo.h"
 #include "logfiles/logfiles.h"
@@ -30,9 +27,7 @@
 #include "threads.h"
 #include "zbxjson.h"
 #include "alias.h"
-#include "metrics.h"
 #include "zbxregexp.h"
-
 
 extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
