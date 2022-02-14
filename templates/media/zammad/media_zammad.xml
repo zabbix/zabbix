@@ -171,7 +171,6 @@
             o_id: ticket_id&#13;
         };&#13;
 &#13;
-
         try {&#13;
             var tags_json = JSON.parse(tags),&#13;
                 result;&#13;
