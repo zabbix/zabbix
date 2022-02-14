@@ -1066,20 +1066,6 @@ function makeHelpIcon($help_text): CSpan {
 }
 
 /**
- * Renders an unknown icon like grey [i] with error message
- *
- * @param string $error
- *
- * @return CSpan
- */
-function makeUnknownIcon($error) {
-	return (new CSpan())
-		->addClass(ZBX_STYLE_ICON_INFO)
-		->addClass(ZBX_STYLE_STATUS_DARK_GREY)
-		->setHint($error, ZBX_STYLE_HINTBOX_WRAP." ".ZBX_STYLE_RED);
-}
-
-/**
  * Renders a warning icon like yellow [i] with error message
  *
  * @param string $error

@@ -2699,7 +2699,7 @@ $form-icon-btn: (
 	&:link,
 	&:hover,
 	&:focus {
-		border-bottom: none;
+		border-bottom: 1px solid;
 	}
 
 	&:focus {
@@ -2715,6 +2715,22 @@ $form-icon-btn: (
 		width: 14px;
 		height: 14px;
 		background: url($sprite-path) no-repeat -47px -659px;
+	}
+
+	&.status-red {
+		&:link,
+		&:hover,
+		&:focus {
+			border-color: darken(desaturate($alt-red, 10%), 9%);
+		}
+	}
+
+	&.status-yellow {
+		&:link,
+		&:hover,
+		&:focus {
+			border-color: darken(desaturate($alt-yellow, 9%), 20%);
+		}
 	}
 }
 

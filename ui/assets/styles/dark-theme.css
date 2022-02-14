@@ -4177,7 +4177,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   cursor: pointer;
   margin: -12px 0 -4px; }
   .icon-info:link, .icon-info:hover, .icon-info:focus {
-    border-bottom: none; }
+    border-bottom: 1px solid; }
   .icon-info:focus {
     box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35); }
   .icon-info::before {
@@ -4189,6 +4189,10 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     width: 14px;
     height: 14px;
     background: url("../img/icon-sprite.svg?20211222") no-repeat -47px -659px; }
+  .icon-info.status-red:link, .icon-info.status-red:hover, .icon-info.status-red:focus {
+    border-color: #d23d3d; }
+  .icon-info.status-yellow:link, .icon-info.status-yellow:hover, .icon-info.status-yellow:focus {
+    border-color: #e79e0b; }
 
 .setup-container {
   background-color: #2b2b2b;
