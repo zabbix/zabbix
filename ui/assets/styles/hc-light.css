@@ -4162,11 +4162,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   display: inline-block;
   margin: 0 14px 0 0; }
 
-.icon-maintenance {
-  margin: 0 18px 0 0; }
-  .icon-maintenance::before {
-    background: url("../img/icon-sprite.svg?20211222") no-repeat -46px -802px; }
-
 .icon-depend-up {
   margin: 0 18px 0 0; }
   .icon-depend-up::before {
@@ -4181,6 +4176,13 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   margin: 0 18px 0 0; }
   .icon-ackn::before {
     background: url("../img/icon-sprite.svg?20211222") no-repeat -45px -693px; }
+
+.icon-maintenance {
+  display: inline-block;
+  width: 18px;
+  height: 13px; }
+  .icon-maintenance::before {
+    background: url("../img/icon-sprite.svg?20211222") no-repeat -46px -802px; }
 
 .icon-tree-top-bottom, .icon-tree-top-bottom-right, .icon-tree-top-right, .icon-tree-empty {
   margin: 0 12px 0 0; }
@@ -4221,7 +4223,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     opacity: 1;
     background-color: transparent; }
 
-.icon-maintenance::before, .icon-depend-up::before, .icon-depend-down::before, .icon-ackn::before {
+.icon-depend-up::before, .icon-depend-down::before, .icon-ackn::before, .icon-maintenance::before {
   display: inline-block;
   width: 18px;
   height: 18px;
