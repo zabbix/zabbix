@@ -63,10 +63,14 @@ class testFormApiTokens extends CWebTest {
 	 * @param string $source	Section from which the scenario is executed.
 	 */
 	public function checkTokensFormLayout($source) {
-		$this->page->login()->open('zabbix.php?action='.(($source === 'user settings') ? 'user.token.edit' : 'token.edit'));
+		$this->page->login()->open('zabbix.php?action='.(($source === 'user settings') ? 'user.token.list' : 'token.list'));
+		$this->page->waitUntilReady();
 		$this->page->assertTitle('API tokens');
 		$this->page->assertHeader('API tokens');
 
+		$this->query('button:Create API token')->one()->waitUntilClickable()->click();
+
+		COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $this->query('id:token_form')->asForm()->one();
 
 		foreach (['Name' => '64', 'Description' => '65535'] as $field_name => $maxlength) {
@@ -103,6 +107,8 @@ class testFormApiTokens extends CWebTest {
 		foreach($form->query('button', ['Add', 'Cancel'])->all() as $button) {
 			$this->assertTrue($button->isClickable());
 		}
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	/**
@@ -124,18 +130,17 @@ class testFormApiTokens extends CWebTest {
 			unset($values['User:']);
 		}
 
-		$this->page->login()->open('zabbix.php?&tokenid='.self::$tokenid.'&action='.(($source === 'user settings')
-			? 'user.token.edit'
-			: 'token.edit'));
+		$this->page->login()->open('zabbix.php?action='.(($source === 'user settings') ? 'user.token.list' : 'token.list'));
+		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible()->findRow('Name',
+				self::UPDATE_TOKEN)->getColumn('Name')->query('tag:a')->waitUntilClickable()->one()->click();
 
-		$this->query('button:Regenerate')->one()->waitUntilClickable()->click();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$this->assertEquals('API token', $dialog->getTitle());
+		$dialog->query('button:Regenerate')->one()->waitUntilClickable()->click();
 		$this->page->acceptAlert();
-		$this->page->waitUntilReady();
-
-		$this->page->assertTitle('API tokens');
-		$this->page->assertHeader('API tokens');
+		$dialog ->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'API token updated');
-		$form = $this->query('id:token_form')->asForm()->one();
+		$form = $dialog->asForm();
 		$this->assertEquals(true, $form->getField('Enabled:')->getValue());
 
 		foreach ($values as $name => $value) {
@@ -152,10 +157,11 @@ class testFormApiTokens extends CWebTest {
 
 		// Check the hintbox text in the Auth token field.
 		$auth_token->query('xpath:./span[@data-hintbox]')->one()->click();
-		$hintbox_text = $this->query('xpath://div[@class="overlay-dialogue"]')->one()->waitUntilVisible()->getText();
 		$this->assertEquals('Make sure to copy the auth token as you won\'t be able to view it after the page is closed.',
-				$hintbox_text);
-		$this->assertTrue($form->query('button:Close')->one()->isClickable());
+				$this->query('xpath://div[@class="overlay-dialogue"]')->one()->waitUntilVisible()->getText()
+		);
+		$this->assertTrue($dialog->query('xpath:.//button[@title="Close"]')->one()->isClickable());
+		$dialog->close();
 	}
 
 	/**
