@@ -173,7 +173,10 @@ static void	*tfc_realloc_func(void *old, size_t size)
 static void	tfc_free_func(void *ptr)
 {
 	if (ptr >= (void *)cache->slots && ptr < (void *)(cache->slots + cache->slots_num))
+	{
 		tfc_free_slot(ptr);
+		return;
+	}
 
 	__tfc_mem_free_func(ptr);
 }

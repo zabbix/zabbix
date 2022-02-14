@@ -639,12 +639,7 @@ static int	sql_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t *his
 	}
 
 	if (0 != h_num)
-	{
-		zbx_history_func_t	add_history_func;
-
-		add_history_func = hist->data.sql_history_func;
-		add_history_func(history);
-	}
+		hist->data.sql_history_func(history);
 
 	return h_num;
 }

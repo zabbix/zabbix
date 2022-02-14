@@ -191,7 +191,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 	struct curl_slist	*headers_slist = NULL;
 	struct zbx_json		json;
 	zbx_http_response_t	body = {0}, header = {0};
-	zbx_curl_common_cb_t	curl_body_cb;
+	zbx_curl_cb_t		curl_body_cb;
 	char			application_json[] = {"Content-Type: application/json"};
 	char			application_xml[] = {"Content-Type: application/xml"};
 

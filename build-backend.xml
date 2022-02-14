@@ -165,7 +165,7 @@
 	<target name="make-db-mysql" unless="${with.mysql}">
 		<!-- Build Zabbix with mysql database -->
 		<sequential>
-			<make args="${ZBX_BASE_FLAGS} --with-mysql --with-openipmi --with-openssl"/>
+			<make args="${ZBX_BASE_FLAGS} --with-mysql --with-openipmi --with-openssl --enable-ipv6 --with-libmodbus"/>
 		</sequential>
 	</target>
 
