@@ -352,8 +352,7 @@ end:
 }
 
 #define COPY_OID(proto_name, proto_len)					\
-	session->securityAuthProto = snmp_duplicate_objid(proto_name,	\
-			OID_LENGTH(proto_name));			\
+	session->securityAuthProto = (oid*)proto_name;			\
 	session->securityAuthProtoLen = proto_len;
 
 static int	zbx_snmpv3_set_auth_protocol(const DC_ITEM *item, struct snmp_session *session)
@@ -576,8 +575,7 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 				}
 
 #define COPY_OID(proto_name, proto_len)								\
-				session.securityPrivProto = snmp_duplicate_objid(proto_name,	\
-						OID_LENGTH(proto_name));			\
+				session.securityPrivProto = (oid*)proto_name;		\
 				session.securityPrivProtoLen = proto_len;
 
 				switch (item->snmpv3_privprotocol)
