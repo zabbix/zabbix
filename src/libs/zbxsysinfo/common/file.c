@@ -1270,13 +1270,27 @@ static char	*get_print_time(time_t st_raw)
 #	define ZBX_DIR_DELIMITER	"/"
 #endif
 
-static void	get_dir_base_names(const char *filename, char **basename, char **dirname)
+static int	get_dir_names(const char *filename, char **basename, char **dirname, char **pathname)
 {
-	const char	*ptr1;
-	char		*ptr2;
-	size_t		len;
+	char	*ptr1, *ptr2;
+	size_t	len;
 
-	ptr1 = filename;
+#if defined(_WINDOWS) || defined(__MINGW32__)
+	if (NULL == (*pathname = _fullpath(NULL, filename, 0)))
+		return FAIL;
+#elif defined(__hpux)
+	char resolved_path[PATH_MAX + 1];
+
+	if (NULL == (*pathname = realpath(filename, resolved_path)))
+		return FAIL;
+
+	*pathname = zbx_strdup(NULL, *pathname);
+#else
+	if (NULL == (*pathname = realpath(filename, NULL)))
+		return FAIL;
+#endif
+
+	ptr1 = *pathname;
 	ptr2 = strstr(ptr1, ZBX_DIR_DELIMITER);
 
 	while (NULL != ptr2)
@@ -1287,70 +1301,21 @@ static void	get_dir_base_names(const char *filename, char **basename, char **dir
 	}
 
 	if (0 == strlen(ptr1))
-		*basename = zbx_strdup(NULL, filename);
+		*basename = zbx_strdup(NULL, *pathname);
 	else
 		*basename = zbx_strdup(NULL, ptr1);
 
-	ptr2 = zbx_strdup(NULL, filename);
-	len = strlen(filename) - strlen(ptr1);
+	ptr2 = zbx_strdup(NULL, *pathname);
+	len = strlen(*pathname) - strlen(ptr1);
 #if defined(_WINDOWS) || defined(__MINGW32__)
 	if (3 == len)
 #else
 	if (1 == len)
 #endif
 		len++;
-
 	ptr2[len - 1] = '\0';
 	*dirname = zbx_dsprintf(NULL, "%s", ptr2);
 	zbx_free(ptr2);
-}
-
-#if defined(_WINDOWS) || defined(__MINGW32__)
-static int	get_dir_names(const char *filename, char **basename, char **dirname, char **pathname)
-#else
-static int	get_dir_names(const char *filename, char **basename, char **dirname, char **pathname, int symlink)
-#endif
-{
-#if defined(_WINDOWS) || defined(__MINGW32__)
-	if (NULL == (*pathname = _fullpath(NULL, filename, 0)))
-		return FAIL;
-#else
-	char	resolved_path[PATH_MAX + 1];
-
-	if (0 != symlink)
-	{
-		char	*symdir = NULL, *symname = NULL, *symdir_canonic;
-		size_t	pathname_alloc = 0, pathname_offset = 0;
-
-		get_dir_base_names(filename, &symname, &symdir);
-
-		if (NULL == (symdir_canonic = realpath(symdir, resolved_path)))
-		{
-			zbx_free(symdir);
-			zbx_free(symname);
-			return FAIL;
-		}
-
-		zbx_strcpy_alloc(pathname, &pathname_alloc, &pathname_offset, symdir_canonic);
-		zbx_snprintf_alloc(pathname, &pathname_alloc, &pathname_offset, "/%s", symname);
-
-		zbx_free(symdir);
-		zbx_free(symname);
-	}
-	else
-	{
-#if defined(__hpux)
-		if (NULL == (*pathname = realpath(filename, resolved_path)))
-			return FAIL;
-
-		*pathname = zbx_strdup(NULL, *pathname);
-#else
-		if (NULL == (*pathname = realpath(filename, NULL)))
-			return FAIL;
-	}
-#endif
-#endif
-	get_dir_base_names(*pathname, basename, dirname);
 
 	return SUCCEED;
 }
@@ -1525,7 +1490,7 @@ err:
 #else /* not _WINDOWS or __MINGW32__ */
 int	zbx_vfs_file_info(const char *filename, struct zbx_json *j, int array, char **error)
 {
-	int		ret = FAIL, symlink = 0;
+	int		ret = FAIL;
 	char		*permissions, *type = NULL, *basename = NULL, *dirname = NULL, *pathname = NULL;
 	zbx_file_time_t	file_time;
 	zbx_stat_t	buf;
@@ -1539,10 +1504,7 @@ int	zbx_vfs_file_info(const char *filename, struct zbx_json *j, int array, char 
 	}
 
 	if (0 != S_ISLNK(buf.st_mode))
-	{
 		type = zbx_strdup(NULL, "sym");
-		symlink = 1;
-	}
 	else if (0 != S_ISREG(buf.st_mode))
 		type = zbx_strdup(NULL, "file");
 	else if (0 != S_ISDIR(buf.st_mode))
@@ -1556,7 +1518,7 @@ int	zbx_vfs_file_info(const char *filename, struct zbx_json *j, int array, char 
 	else if (0 != S_ISFIFO(buf.st_mode))
 		type = zbx_strdup(NULL, "fifo");
 
-	if (SUCCEED != get_dir_names(filename, &basename, &dirname, &pathname, symlink))
+	if (SUCCEED != get_dir_names(filename, &basename, &dirname, &pathname))
 	{
 		*error = zbx_strdup(NULL, "Cannot obtain file or directory name.");
 		goto err;
