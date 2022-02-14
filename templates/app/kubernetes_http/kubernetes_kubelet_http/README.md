@@ -1,5 +1,5 @@
 
-# Kubernetes kubelet by HTTP
+# Kubernetes Kubelet by HTTP
 
 ## Overview
 

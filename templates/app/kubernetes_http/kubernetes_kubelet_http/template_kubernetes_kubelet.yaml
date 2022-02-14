@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-02-14T18:18:44Z'
+  date: '2022-02-14T18:24:19Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: e785916967c14544b59c3644c3edda3a
-      template: 'Kubernetes kubelet by HTTP'
-      name: 'Kubernetes kubelet by HTTP'
+      template: 'Kubernetes Kubelet by HTTP'
+      name: 'Kubernetes Kubelet by HTTP'
       description: |
         Get Kubernetes kubelet metrics by HTTP agent from Prometheus metrics endpoint.
         
@@ -828,25 +828,25 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'Kubernetes kubelet by HTTP'
+                    host: 'Kubernetes Kubelet by HTTP'
                     key: 'kube.kublet.runtime_ops_duration_seconds_p90["{#OP_TYPE}"]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'Kubernetes kubelet by HTTP'
+                    host: 'Kubernetes Kubelet by HTTP'
                     key: 'kube.kublet.runtime_ops_duration_seconds_p95["{#OP_TYPE}"]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
-                    host: 'Kubernetes kubelet by HTTP'
+                    host: 'Kubernetes Kubelet by HTTP'
                     key: 'kube.kublet.runtime_ops_duration_seconds_p99["{#OP_TYPE}"]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
-                    host: 'Kubernetes kubelet by HTTP'
+                    host: 'Kubernetes Kubelet by HTTP'
                     key: 'kube.kublet.runtime_ops_duration_seconds_p50["{#OP_TYPE}"]'
           master_item:
             key: kube.kubelet.metrics
