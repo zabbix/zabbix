@@ -349,7 +349,6 @@ func (r *runner) getBasicDevices(jsonRunner bool) {
 	defer r.wg.Done()
 
 	for name := range r.names {
-		fmt.Println("name", name)
 		devices, err := r.plugin.executeSmartctl(fmt.Sprintf("-a %s -j", name), false)
 		if err != nil {
 			r.err <- fmt.Errorf("Failed to execute smartctl: %s.", err.Error())
@@ -395,46 +394,68 @@ runner:
 			return
 		}
 
-		name := fmt.Sprintf("%s -d %s", raid.name, raid.rType)
-		device, err := r.plugin.executeSmartctl(fmt.Sprintf("-a %s -j ", name), false)
-		if err != nil {
-			r.plugin.Tracef(
-				"stopped looking for RAID devices of %s type, err:",
-				raid.rType, fmt.Errorf("failed to get RAID disk data from smartctl: %s", err.Error()),
-			)
+		var i int
 
-			continue runner
+		if raid.rType == "areca" {
+			i = 1
 		}
 
-		var dp deviceParser
-		if err = json.Unmarshal(device, &dp); err != nil {
-			r.plugin.Tracef(
-				"stopped looking for RAID devices of %s type, err:",
-				raid.rType, fmt.Errorf("failed to get RAID disk data from smartctl: %s", err.Error()),
-			)
+		for {
+			var name string
 
-			continue runner
-		}
+			if raid.rType == satType {
+				name = fmt.Sprintf("%s -d %s", raid.name, raid.rType)
+			} else {
+				name = fmt.Sprintf("%s -d %s,%d", raid.name, raid.rType, i)
+			}
 
-		err = dp.checkErr()
-		if err != nil {
-			r.plugin.Tracef(
-				"stopped looking for RAID devices of %s type, err:",
-				raid.rType, fmt.Errorf("failed to get disk data from smartctl: %s", err.Error()),
-			)
+			device, err := r.plugin.executeSmartctl(fmt.Sprintf("-a %s -j ", name), false)
+			if err != nil {
+				r.plugin.Tracef(
+					"stopped looking for RAID devices of %s type, err:",
+					raid.rType, fmt.Errorf("failed to get RAID disk data from smartctl: %s", err.Error()),
+				)
 
-			continue runner
-		}
-
-		if dp.SmartStatus != nil {
-			dp.Info.Name = fmt.Sprintf("%s %s", raid.name, raid.rType)
-			if r.setRaidDevices(dp, device, raid.rType, jsonRunner) {
 				continue runner
 			}
-		}
 
-		if raid.rType == satType {
-			continue runner
+			var dp deviceParser
+			if err = json.Unmarshal(device, &dp); err != nil {
+				r.plugin.Tracef(
+					"stopped looking for RAID devices of %s type, err:",
+					raid.rType, fmt.Errorf("failed to get RAID disk data from smartctl: %s", err.Error()),
+				)
+
+				continue runner
+			}
+
+			err = dp.checkErr()
+			if err != nil {
+				r.plugin.Tracef(
+					"stopped looking for RAID devices of %s type, err:",
+					raid.rType, fmt.Errorf("failed to get disk data from smartctl: %s", err.Error()),
+				)
+
+				continue runner
+			}
+
+			if dp.SmartStatus != nil {
+				if raid.rType == satType {
+					dp.Info.Name = fmt.Sprintf("%s %s", raid.name, raid.rType)
+				} else {
+					dp.Info.Name = fmt.Sprintf("%s %s,%d", raid.name, raid.rType, i)
+				}
+
+				if r.setRaidDevices(dp, device, raid.rType, jsonRunner) {
+					continue runner
+				}
+			}
+
+			if raid.rType == satType {
+				continue runner
+			}
+
+			i++
 		}
 	}
 }
