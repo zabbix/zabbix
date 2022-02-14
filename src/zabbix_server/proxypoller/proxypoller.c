@@ -550,7 +550,6 @@ static int	process_proxy(void)
 
 			if (proxy.proxy_data_nextcheck <= now)
 			{
-
 				int	more;
 
 				do
