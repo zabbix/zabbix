@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-14T14:27:52Z'
+  date: '2022-02-14T18:18:44Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -18,7 +18,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -714,7 +714,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.kublet.runtime_ops_duration_seconds_bucket[{#LE},"{#OP_TYPE}"]'
               delay: '0'
-              history: 7d
+              history: 1h
+              trends: '0'
               discover: NO_DISCOVER
               value_type: FLOAT
               description: 'Duration in seconds of runtime operations. Broken down by operation type.'
@@ -863,7 +864,7 @@ zabbix_export:
                       result = [];
                   
                   JSON.parse(value).forEach(function (item) {
-                      if (item.name === 'kubelet_runtime_operations_total') {
+                      if (item.name === 'kubelet_runtime_operations_total'){
                           var op_type = item.labels.operation_type;
                   
                           if (lookup[op_type]) {
@@ -875,8 +876,8 @@ zabbix_export:
                               '{#OP_TYPE}': op_type
                           });
                       }
-
-                      else if (item.name === 'kubelet_runtime_operations_duration_seconds_bucket') {
+                  
+                      else if (item.name === 'kubelet_runtime_operations_duration_seconds_bucket'){
                           var labels = item.labels.operation_type + item.labels.le;
                   
                           if (lookup_histogram[labels]) {

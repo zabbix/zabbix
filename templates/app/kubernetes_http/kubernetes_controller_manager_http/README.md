@@ -22,7 +22,7 @@ This template was tested on:
 Internal service metrics are collected from /metrics endpoint.
 Template needs to use Authorization via API token. 
 
-Don't forget change macros {$KUBE.CONTROLLER.SERVER.URL}, {$KUBE.CONTROLLER.TOKEN}.
+Don't forget change macros {$KUBE.CONTROLLER.SERVER.URL}, {$KUBE.API.TOKEN}.
 Also, see the Macros section for a list of macros used to set trigger values.
 *NOTE.* Some metrics may not be collected depending on your Kubernetes Controller manager instance version and configuration.
 
@@ -35,9 +35,9 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$KUBE.API.TOKEN} |<p>API Authorization Token</p> |`` |
 |{$KUBE.CONTROLLER.HTTP.CLIENT.ERROR} |<p>Maximum number of HTTP client requests failures used for trigger</p> |`2` |
 |{$KUBE.CONTROLLER.SERVER.URL} |<p>Instance URL</p> |`http://localhost:10252/metrics` |
-|{$KUBE.CONTROLLER.TOKEN} |<p>Controller Authorization Token</p> |`` |
 
 ## Template links
 

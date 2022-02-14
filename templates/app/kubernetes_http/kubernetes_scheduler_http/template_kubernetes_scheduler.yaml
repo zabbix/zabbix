@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-27T09:52:19Z'
+  date: '2022-02-14T18:07:02Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -260,7 +260,7 @@ zabbix_export:
           headers:
             -
               name: Authorization
-              value: 'Bearer {$KUBE.SCHEDULER.TOKEN}'
+              value: 'Bearer {$KUBE.API.TOKEN}'
           tags:
             -
               tag: component
@@ -579,7 +579,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'kubernetes.scheduler.e2e_scheduling_bucket[{#LE},"{#RESULT}"]'
               delay: '0'
-              history: 7d
+              history: 1h
+              trends: '0'
               discover: NO_DISCOVER
               value_type: FLOAT
               description: 'E2e scheduling latency in seconds (scheduling algorithm + binding)'
@@ -789,7 +790,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'kubernetes.scheduler.binding_duration[{#LE}]'
               delay: '0'
-              history: 7d
+              history: 1h
+              trends: '0'
               value_type: FLOAT
               description: 'Binding latency in seconds.'
               preprocessing:
@@ -840,7 +842,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'kubernetes.scheduler.scheduling_algorithm_duration[{#LE}]'
               delay: '0'
-              history: 7d
+              history: 1h
+              trends: '0'
               value_type: FLOAT
               description: 'Scheduling algorithm latency in seconds.'
               preprocessing:
@@ -886,6 +889,9 @@ zabbix_export:
           value: 'kubernetes scheduler'
       macros:
         -
+          macro: '{$KUBE.API.TOKEN}'
+          description: 'API Authorization Token'
+        -
           macro: '{$KUBE.SCHEDULER.ERROR}'
           value: '2'
           description: 'Maximum number of scheduling failures with ''error'' used for trigger'
@@ -897,9 +903,6 @@ zabbix_export:
           macro: '{$KUBE.SCHEDULER.SERVER.URL}'
           value: 'http://localhost:10251/metrics'
           description: 'Instance URL'
-        -
-          macro: '{$KUBE.SCHEDULER.TOKEN}'
-          description: 'Scheduler Authorization Token'
         -
           macro: '{$KUBE.SCHEDULER.UNSCHEDULABLE}'
           value: '2'

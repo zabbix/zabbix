@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-27T09:51:32Z'
+  date: '2022-02-14T18:07:08Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -906,7 +906,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'kubernetes.api.client_certificate_expiration_seconds_bucket[{#LE}]'
               delay: '0'
-              history: 7d
+              history: 1h
+              trends: '0'
               value_type: FLOAT
               description: 'Distribution of the remaining lifetime on the certificate used to authenticate a request.'
               preprocessing:
@@ -1212,7 +1213,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'kubernetes.api.request_duration_seconds_bucket[{#LE},"{#VERB}"]'
               delay: '0'
-              history: 7d
+              history: 1h
+              trends: '0'
               discover: NO_DISCOVER
               value_type: FLOAT
               description: 'Response latency distribution in seconds for each verb.'
@@ -1348,7 +1350,7 @@ zabbix_export:
                       result = [];
                   
                   JSON.parse(value).forEach(function (item) {
-                      if (item.name === "apiserver_request_duration_seconds_count"){
+                      if (item.name === 'apiserver_request_duration_seconds_count') {
                           var label_verb = item.labels.verb;
                           if (lookup[label_verb]) {
                               return;
@@ -1360,12 +1362,13 @@ zabbix_export:
                           });
                   
                         }
-                      else if  (item.name === "apiserver_request_duration_seconds_bucket"){
-                       var labels = item.labels.verb + item.labels.le;
+                      else if  (item.name === 'apiserver_request_duration_seconds_bucket') {
+                          var labels = item.labels.verb + item.labels.le;
                   
                           if (lookup_histogram[labels]) {
                               return;
                           }
+                  
                           lookup_histogram[labels] = 1;
                           result.push({
                               '{#TYPE}': 'buckets',
