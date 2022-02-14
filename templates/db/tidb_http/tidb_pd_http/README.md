@@ -48,11 +48,11 @@ There are no template links in this template.
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |Cluster metrics discovery |<p>Discovery cluster specific metrics.</p> |DEPENDENT |pd.cluster.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="pd_cluster_status")]`</p><p>- JAVASCRIPT: `return JSON.stringify(value != "[]" ? [{'{#SINGLETON}': ''}] : []);`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|gRPC commands discovery |<p>Discovery grpc commands specific metrics.</p> |DEPENDENT |pd.grpc_command.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name == "grpc_server_handling_seconds_count")]`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Region discovery |<p>Discovery region specific metrics.</p> |DEPENDENT |pd.region.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name == "pd_scheduler_region_heartbeat")]`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Region labels discovery |<p>Discovery region labels specific metrics.</p> |DEPENDENT |pd.region_labels.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name == "pd_regions_label_level")]`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Region status discovery |<p>Discovery region status specific metrics.</p> |DEPENDENT |pd.region_status.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name == "pd_regions_status")]`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Overrides:**</p><p>Too many missed regions trigger<br> - {#TYPE} MATCHES_REGEX `miss_peer_region_count`<br>  - TRIGGER_PROTOTYPE LIKE `Too many missed regions` - DISCOVER</p><p>Unresponsive peers trigger<br> - {#TYPE} MATCHES_REGEX `down_peer_region_count`<br>  - TRIGGER_PROTOTYPE LIKE `There are unresponsive peers` - DISCOVER</p> |
 |Running scheduler discovery |<p>Discovery scheduler specific metrics.</p> |DEPENDENT |pd.scheduler.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name == "pd_scheduler_status" && @.labels.type == "allow")]`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|gRPC commands discovery |<p>Discovery grpc commands specific metrics.</p> |DEPENDENT |pd.grpc_command.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name == "grpc_server_handling_seconds_count")]`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Region discovery |<p>Discovery region specific metrics.</p> |DEPENDENT |pd.region.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name == "pd_scheduler_region_heartbeat")]`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 
 ## Items collected
 
@@ -81,8 +81,8 @@ There are no template links in this template.
 |TiDB cluster |PD: Region heartbeat: error, rate |<p>The count of heartbeats with the error status per second.</p> |DEPENDENT |pd.region_heartbeat.error.rate[{#STORE_ADDRESS}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name == "pd_scheduler_region_heartbeat" && @.labels.status == "err" && @.labels.type == "report" && @.labels.address == "{#STORE_ADDRESS}")].value.sum()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- CHANGE_PER_SECOND</p> |
 |TiDB cluster |PD: Region heartbeat: total, rate |<p>The count of heartbeats reported to PD per instance per second.</p> |DEPENDENT |pd.region_heartbeat.rate[{#STORE_ADDRESS}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name == "pd_scheduler_region_heartbeat" && @.labels.type == "report" && @.labels.address == "{#STORE_ADDRESS}")].value.sum()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- CHANGE_PER_SECOND</p> |
 |TiDB cluster |PD: Region schedule push: total, rate |<p>-</p> |DEPENDENT |pd.region_heartbeat.push.err.rate[{#STORE_ADDRESS}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name == "pd_scheduler_region_heartbeat" && @.labels.type == "push" && @.labels.address == "{#STORE_ADDRESS}")].value.sum()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- CHANGE_PER_SECOND</p> |
-|Zabbix_raw_items |PD: Get instance metrics |<p>Get TiDB PD instance metrics.</p> |HTTP_AGENT |pd.get_metrics<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- PROMETHEUS_TO_JSON</p> |
-|Zabbix_raw_items |PD: Get instance status |<p>Get TiDB PD instance status info.</p> |HTTP_AGENT |pd.get_status<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> {"status": "0"}`</p> |
+|Zabbix raw items |PD: Get instance metrics |<p>Get TiDB PD instance metrics.</p> |HTTP_AGENT |pd.get_metrics<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- PROMETHEUS_TO_JSON</p> |
+|Zabbix raw items |PD: Get instance status |<p>Get TiDB PD instance status info.</p> |HTTP_AGENT |pd.get_status<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> {"status": "0"}`</p> |
 
 ## Triggers
 
@@ -102,5 +102,5 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
 

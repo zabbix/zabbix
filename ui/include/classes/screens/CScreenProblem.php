@@ -827,20 +827,20 @@ class CScreenProblem extends CScreenBase {
 
 			// Create table.
 			if ($this->data['filter']['compact_view']) {
-				if ($this->data['filter']['show_tags'] == PROBLEMS_SHOW_TAGS_NONE) {
+				if ($this->data['filter']['show_tags'] == SHOW_TAGS_NONE) {
 					$tags_header = null;
 				}
 				else {
 					$tags_header = (new CColHeader(_('Tags')));
 
 					switch ($this->data['filter']['show_tags']) {
-						case PROBLEMS_SHOW_TAGS_1:
+						case SHOW_TAGS_1:
 							$tags_header->addClass(ZBX_STYLE_COLUMN_TAGS_1);
 							break;
-						case PROBLEMS_SHOW_TAGS_2:
+						case SHOW_TAGS_2:
 							$tags_header->addClass(ZBX_STYLE_COLUMN_TAGS_2);
 							break;
-						case PROBLEMS_SHOW_TAGS_3:
+						case SHOW_TAGS_3:
 							$tags_header->addClass(ZBX_STYLE_COLUMN_TAGS_3);
 							break;
 					}
@@ -893,7 +893,7 @@ class CScreenProblem extends CScreenBase {
 
 			if ($this->data['filter']['show_tags']) {
 				$tags = makeTags($data['problems'], true, 'eventid', $this->data['filter']['show_tags'],
-					array_key_exists('tags', $this->data['filter']) ? $this->data['filter']['tags'] : [],
+					array_key_exists('tags', $this->data['filter']) ? $this->data['filter']['tags'] : [], null,
 					$this->data['filter']['tag_name_format'], $this->data['filter']['tag_priority']
 				);
 			}

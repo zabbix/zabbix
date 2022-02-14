@@ -40,6 +40,7 @@ if (!hasRequest('form_refresh')) {
 }
 
 $url = (new CUrl('host_prototypes.php'))
+	->setArgument('parent_discoveryid', $data['discovery_rule']['itemid'])
 	->setArgument('context', $data['context'])
 	->getUrl();
 
@@ -49,7 +50,8 @@ $form = (new CForm('post', $url))
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', getRequest('form', 1))
 	->addVar('parent_discoveryid', $data['discovery_rule']['itemid'])
-	->addVar('tls_accept', $parent_host['tls_accept']);
+	->addVar('tls_accept', $parent_host['tls_accept'])
+	->addvar('context', $data['context']);
 
 if ($host_prototype['hostid'] != 0) {
 	$form->addVar('hostid', $host_prototype['hostid']);

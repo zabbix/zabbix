@@ -76,7 +76,7 @@ $itemTable = (new CTableInfo())
 		(new CColHeader(
 			(new CCheckBox('all_items'))->onClick("checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		_('Wizard'),
+		'',
 		($data['hostid'] == 0)
 			? ($data['context'] === 'host')
 				? _('Host')
@@ -170,6 +170,10 @@ foreach ($data['items'] as $item) {
 	// triggers info
 	$triggerHintTable = (new CTableInfo())->setHeader([_('Severity'), _('Name'), _('Expression'), _('Status')]);
 
+	$backurl = (new CUrl('items.php'))
+		->setArgument('context', $data['context'])
+		->getUrl();
+
 	foreach ($item['triggers'] as $num => &$trigger) {
 		$trigger = $data['itemTriggers'][$trigger['triggerid']];
 
@@ -191,6 +195,7 @@ foreach ($data['items'] as $item) {
 					->setArgument('hostid', key($trigger['hosts']))
 					->setArgument('triggerid', $trigger['triggerid'])
 					->setArgument('context', $data['context'])
+					->setArgument('backurl', $backurl)
 			);
 		}
 
@@ -231,13 +236,14 @@ foreach ($data['items'] as $item) {
 
 	$wizard = (new CButton(null))
 		->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
-		->setMenuPopup(CMenuPopupHelper::getItem(['itemid' => $item['itemid'], 'context' => $data['context']]));
+		->setMenuPopup(CMenuPopupHelper::getItemConfiguration([
+			'itemid' => $item['itemid'],
+			'context' => $data['context'],
+			'backurl' => $backurl
+		]));
 
 	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
 		$item['trends'] = '';
-	}
-	else if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-		$wizard = '';
 	}
 
 	// Hide zeros for trapper, SNMP trap and dependent items.
@@ -327,3 +333,7 @@ $itemForm->addItem([$itemTable, $data['paging'], new CActionButtonList('action',
 $widget->addItem($itemForm);
 
 $widget->show();
+
+(new CScriptTag('view.init();'))
+	->setOnDocumentReady()
+	->show();

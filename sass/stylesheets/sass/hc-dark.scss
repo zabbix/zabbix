@@ -1521,14 +1521,14 @@ td.inactive-bg {
 
 .filter-container.tabfilter-container {
 
-	.selected.expanded .icon-home::before {
+	.selected.expanded .icon-filter::before {
 		// white icon
-		background: url($sprite-path) no-repeat -433px -510px;
+		background: url($sprite-path) no-repeat -87px -547px;
 	}
 
-	.icon-home::before {
+	.icon-filter::before {
 		// black icon
-		background: url($sprite-path) no-repeat -281px -510px;
+		background: url($sprite-path) no-repeat -246px -547px;
 	}
 
 	.tabfilter-item-label {

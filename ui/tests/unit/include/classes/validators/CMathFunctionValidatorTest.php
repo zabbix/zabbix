@@ -116,7 +116,8 @@ class CMathFunctionValidatorTest extends TestCase {
 			['concat()', ['rc' => false, 'error' => 'invalid number of parameters in function "concat"']],
 			['concat("a")', ['rc' => false, 'error' => 'invalid number of parameters in function "concat"']],
 			['concat("a", "a")', ['rc' => true, 'error' => null]],
-			['concat("a", "a", "a")', ['rc' => false, 'error' => 'invalid number of parameters in function "concat"']],
+			['concat("a", "a", "a")', ['rc' => true, 'error' => null]],
+			['concat("a", "a", "a", "a")', ['rc' => true, 'error' => null]],
 
 			['cos()', ['rc' => false, 'error' => 'invalid number of parameters in function "cos"']],
 			['cos(1)', ['rc' => true, 'error' => null]],

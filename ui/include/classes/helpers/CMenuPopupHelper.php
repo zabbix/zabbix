@@ -162,11 +162,10 @@ class CMenuPopupHelper {
 	}
 
 	/**
-	 * Prepare data for item popup menu.
+	 * Prepare data for item latest data popup menu.
 	 *
 	 * @param array  $data
 	 * @param string $data['itemid']   Item ID.
-	 * @param string $data['context']  Additional parameter in URL to identify main section.
 	 *
 	 * @return array
 	 */
@@ -175,25 +174,47 @@ class CMenuPopupHelper {
 			'type' => 'item',
 			'data' => [
 				'itemid' => $data['itemid']
+			]
+		];
+	}
+
+	/**
+	 * Prepare data for item configuration popup menu.
+	 *
+	 * @param array  $data
+	 * @param string $data['itemid']   Item ID.
+	 * @param string $data['context']  Additional parameter in URL to identify main section.
+	 * @param string $data['backurl']  Url from where the function was called.
+	 *
+	 * @return array
+	 */
+	public static function getItemConfiguration(array $data): array {
+		return [
+			'type' => 'item_configuration',
+			'data' => [
+				'itemid' => $data['itemid'],
+				'backurl' => $data['backurl']
 			],
 			'context' => $data['context']
 		];
 	}
 
 	/**
-	 * Prepare data for item prototype popup menu.
+	 * Prepare data for item prototype configuration popup menu.
 	 *
 	 * @param array  $data
 	 * @param string $data['itemid']   Item ID.
 	 * @param string $data['context']  Additional parameter in URL to identify main section.
+	 * @param string $data['backurl']  Url from where the function was called.
 	 *
 	 * @return array
 	 */
-	public static function getItemPrototype(array $data): array {
+	public static function getItemPrototypeConfiguration(array $data): array {
 		return [
-			'type' => 'item_prototype',
+			'type' => 'item_prototype_configuration',
 			'data' => [
-				'itemid' => $data['itemid']
+				'itemid' => $data['itemid'],
+				'backurl' => $data['backurl']
 			],
 			'context' => $data['context']
 		];

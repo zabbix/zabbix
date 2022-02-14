@@ -55,7 +55,6 @@ void	get_selfmon_stats(unsigned char proc_type, unsigned char aggr_func, int pro
 		double *value);
 int	zbx_get_all_process_stats(zbx_process_info_t *stats);
 void	zbx_sleep_loop(int sleeptime);
-void	zbx_sleep_forever(void);
 void	zbx_wakeup(void);
 int	zbx_sleep_get_remainder(void);
 #endif

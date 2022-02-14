@@ -18,6 +18,7 @@
 **/
 
 #include "common.h"
+#include "log.h"
 
 #include "zbxdb.h"
 
@@ -26,6 +27,7 @@
 #	include "errmsg.h"
 #	include "mysqld_error.h"
 #elif defined(HAVE_ORACLE)
+#	include "dbschema.h"
 #	include "oci.h"
 #elif defined(HAVE_POSTGRESQL)
 #	include <libpq-fe.h>
@@ -33,8 +35,6 @@
 #	include <sqlite3.h>
 #endif
 
-#include "dbschema.h"
-#include "log.h"
 #if defined(HAVE_SQLITE3)
 #	include "mutexs.h"
 #endif

@@ -84,7 +84,7 @@ class testFormTemplateDashboards extends CWebTest {
 									[
 										'type' => 4,
 										'name' => 'itemid',
-										'value' => 40041
+										'value' => 400410
 									]
 								]
 							],
@@ -99,7 +99,7 @@ class testFormTemplateDashboards extends CWebTest {
 									[
 										'type' => 4,
 										'name' => 'itemids',
-										'value' => 40041
+										'value' => 400410
 									]
 								]
 							],

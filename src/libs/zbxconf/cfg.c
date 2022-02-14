@@ -18,9 +18,9 @@
 **/
 
 #include "common.h"
-#include "cfg.h"
 #include "log.h"
-#include "comms.h"
+
+#include "cfg.h"
 
 extern unsigned char	program_type;
 

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-15T07:17:09Z'
+  date: '2022-01-26T10:48:44Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -16,7 +16,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384764-discussion-thread-for-official-zabbix-template-apache
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -44,8 +44,8 @@ zabbix_export:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: network
         -
           uuid: be97c53d82f846cdbc2d0ec640435b6f
           name: 'Apache: Bytes per second'
@@ -75,8 +75,8 @@ zabbix_export:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: network
         -
           uuid: 5919f29c692b468fb5642e83f408c2e5
           name: 'Apache: Total requests'
@@ -94,8 +94,8 @@ zabbix_export:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: network
         -
           uuid: 7e1e674a23d24fafa31b76a048fe9fd0
           name: 'Apache: Requests per second'
@@ -120,8 +120,8 @@ zabbix_export:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: network
         -
           uuid: 5a4bd2d6c2874d888ec4c82409e1c711
           name: 'Apache: Uptime'
@@ -140,8 +140,8 @@ zabbix_export:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: system
           triggers:
             -
               uuid: 7872d9665c234f45941ca26206e0255c
@@ -150,6 +150,10 @@ zabbix_export:
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 78a611c2b15c4ae8949257b6fdf922f1
           name: 'Apache: Version'
@@ -173,8 +177,8 @@ zabbix_export:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: system
           triggers:
             -
               uuid: 5124b17918f545758ca5c936332f51cd
@@ -183,6 +187,10 @@ zabbix_export:
               priority: INFO
               description: 'Apache version has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 35f48761ec6d451bbb8b0d80cd0ccd91
           name: 'Apache: Workers idle cleanup'
@@ -200,8 +208,8 @@ zabbix_export:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: system
         -
           uuid: ebd391702cbd432ab458578a3cb45361
           name: 'Apache: Workers closing connection'
@@ -219,8 +227,8 @@ zabbix_export:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: system
         -
           uuid: 6a961707e7084d8ebc09f572b15ef1fd
           name: 'Apache: Workers DNS lookup'
@@ -238,8 +246,8 @@ zabbix_export:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: system
         -
           uuid: fd383c9ace4647deb9d3e3882554b8d0
           name: 'Apache: Workers finishing'
@@ -257,8 +265,8 @@ zabbix_export:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: system
         -
           uuid: 2a02413c0e9144b4a70b8a5a71d680e0
           name: 'Apache: Workers keepalive (read)'
@@ -276,8 +284,8 @@ zabbix_export:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: system
         -
           uuid: ed71fb2ec75f4537a2937293add75274
           name: 'Apache: Workers logging'
@@ -295,8 +303,8 @@ zabbix_export:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: system
         -
           uuid: 6c38147f9f3449a194f36a6e6d828865
           name: 'Apache: Workers reading request'
@@ -314,8 +322,8 @@ zabbix_export:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: system
         -
           uuid: 47856ac3b68644e0861b593d3083d35b
           name: 'Apache: Workers sending reply'
@@ -333,8 +341,8 @@ zabbix_export:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: system
         -
           uuid: 60cf954a40594cf69afdd1bf0319c031
           name: 'Apache: Workers slot with no current process'
@@ -352,8 +360,8 @@ zabbix_export:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: system
         -
           uuid: 441c797164bf4c8da8112d78240abc43
           name: 'Apache: Workers starting up'
@@ -371,8 +379,8 @@ zabbix_export:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: system
         -
           uuid: ec87e89ee9304acd8c7a76e863cb4443
           name: 'Apache: Workers waiting for connection'
@@ -390,8 +398,8 @@ zabbix_export:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: system
         -
           uuid: b52addb50ccb415fb63eaf67076991c1
           name: 'Apache: Total workers busy'
@@ -409,8 +417,8 @@ zabbix_export:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: system
         -
           uuid: 6955f78c203b435987b5ab75a1114867
           name: 'Apache: Total workers idle'
@@ -428,8 +436,8 @@ zabbix_export:
             key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: system
         -
           uuid: 267ca6fe038346e5be1113f3bf9b4023
           name: 'Apache: Service response time'
@@ -439,8 +447,11 @@ zabbix_export:
           units: s
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: application
+            -
+              tag: component
+              value: health
           triggers:
             -
               uuid: 128905793a4b4a1db5a49f87e87d3383
@@ -455,6 +466,10 @@ zabbix_export:
                 -
                   name: 'Apache: Service is down'
                   expression: 'last(/Apache by Zabbix agent/net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"])=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 369f00e2970048c786ce3bd609e65566
           name: 'Apache: Service ping'
@@ -469,8 +484,11 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: application
+            -
+              tag: component
+              value: health
           triggers:
             -
               uuid: e24dbf9b89c34d839cb12a22b1103df3
@@ -482,6 +500,10 @@ zabbix_export:
                 -
                   name: 'Apache: Process is not running'
                   expression: 'last(/Apache by Zabbix agent/proc.num["{$APACHE.PROCESS_NAME}"])=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: b73280fb0af64c7899abfc74cc074b13
           name: 'Apache: CPU utilization'
@@ -492,8 +514,8 @@ zabbix_export:
           description: 'Process CPU utilization percentage.'
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: cpu
         -
           uuid: 384bf197e6a241b3b63bb89d009bba6b
           name: 'Apache: Memory usage (rss)'
@@ -503,8 +525,8 @@ zabbix_export:
           description: 'Resident set size memory used by process in bytes.'
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: memory
         -
           uuid: f20b7a01ff134a128c54ea83af8557e2
           name: 'Apache: Memory usage (vsize)'
@@ -514,8 +536,8 @@ zabbix_export:
           description: 'Virtual memory size used by process in bytes.'
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: memory
         -
           uuid: 233b5466014640e4b990ffd81fa19fa1
           name: 'Apache: Number of processes running'
@@ -523,14 +545,18 @@ zabbix_export:
           history: 7d
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: system
           triggers:
             -
               uuid: b62f49b09d6b4c6ca01ff60cd9dd2209
               expression: 'last(/Apache by Zabbix agent/proc.num["{$APACHE.PROCESS_NAME}"])=0'
               name: 'Apache: Process is not running'
               priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 115413a0f5ab4caba418ab841ad81eba
           name: 'Apache: Get status'
@@ -589,8 +615,8 @@ zabbix_export:
                   return JSON.stringify(output);
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
           triggers:
             -
               uuid: 0166ec63913e4bbea25c54b458b3213a
@@ -606,6 +632,10 @@ zabbix_export:
                 -
                   name: 'Apache: Service is down'
                   expression: 'last(/Apache by Zabbix agent/net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"])=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: 36a82bdda7754c51a05da3bb0b65b83e
@@ -636,8 +666,8 @@ zabbix_export:
                 key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
               tags:
                 -
-                  tag: Application
-                  value: Apache
+                  tag: component
+                  value: connection
             -
               uuid: 2e0692f36b924b52ab7b2ff7788b641d
               name: 'Apache: Connections async closing'
@@ -655,8 +685,8 @@ zabbix_export:
                 key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
               tags:
                 -
-                  tag: Application
-                  value: Apache
+                  tag: component
+                  value: connection
             -
               uuid: 33d3fec8f45c493097bab986d5ea1e55
               name: 'Apache: Connections async keep alive'
@@ -674,8 +704,8 @@ zabbix_export:
                 key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
               tags:
                 -
-                  tag: Application
-                  value: Apache
+                  tag: component
+                  value: connection
             -
               uuid: 9ad0e5c49e7c4b939eb7977a5158953f
               name: 'Apache: Connections async writing'
@@ -693,8 +723,8 @@ zabbix_export:
                 key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
               tags:
                 -
-                  tag: Application
-                  value: Apache
+                  tag: component
+                  value: connection
             -
               uuid: 0fbfbfae187040c790bb4d68f9e2fae5
               name: 'Apache: Connections total'
@@ -712,8 +742,8 @@ zabbix_export:
                 key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
               tags:
                 -
-                  tag: Application
-                  value: Apache
+                  tag: component
+                  value: connection
             -
               uuid: 778a1bfeaa1b474ba529e6c0a55a9949
               name: 'Apache: Number of async processes'
@@ -731,8 +761,8 @@ zabbix_export:
                 key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
               tags:
                 -
-                  tag: Application
-                  value: Apache
+                  tag: component
+                  value: system
           graph_prototypes:
             -
               uuid: 4845e6716bd74e7698406e6d8389eba5
@@ -785,6 +815,13 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: apache
       macros:
         -
           macro: '{$APACHE.PROCESS_NAME}'

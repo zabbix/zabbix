@@ -18,6 +18,8 @@
 **/
 
 #include "common.h"
+#include "zbxsysinfo_common.h"
+
 #include "system.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)

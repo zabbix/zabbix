@@ -74,14 +74,14 @@ if (array_key_exists('problems', $data)) {
 			_('Status'),
 			_('Duration'),
 			_('Ack'),
-			($data['show_tags'] != PROBLEMS_SHOW_TAGS_NONE) ? _('Tags') : null
+			($data['show_tags'] != SHOW_TAGS_NONE) ? _('Tags') : null
 		]));
 
 	$today = strtotime('today');
 	$last_clock = 0;
 
-	if ($data['problems'] && $data['show_tags'] != PROBLEMS_SHOW_TAGS_NONE) {
-		$tags = makeTags($data['problems'], true, 'eventid', $data['show_tags'], $data['filter_tags'],
+	if ($data['problems'] && $data['show_tags'] != SHOW_TAGS_NONE) {
+		$tags = makeTags($data['problems'], true, 'eventid', $data['show_tags'], $data['filter_tags'], null,
 			$data['tag_name_format'], $data['tag_priority']
 		);
 	}
@@ -193,7 +193,7 @@ if (array_key_exists('problems', $data)) {
 			))
 				->addClass(ZBX_STYLE_NOWRAP),
 			$problem_update_link,
-			($data['show_tags'] != PROBLEMS_SHOW_TAGS_NONE) ? $tags[$problem['eventid']] : null
+			($data['show_tags'] != SHOW_TAGS_NONE) ? $tags[$problem['eventid']] : null
 		]));
 	}
 
