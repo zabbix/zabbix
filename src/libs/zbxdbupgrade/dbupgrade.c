@@ -18,11 +18,10 @@
 **/
 
 #include "common.h"
-
 #include "db.h"
 #include "log.h"
-#include "sysinfo.h"
 #include "zbxdbupgrade.h"
+
 #include "dbupgrade.h"
 
 typedef struct
@@ -782,6 +781,7 @@ extern zbx_dbpatch_t	DBPATCH_VERSION(5020)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(5030)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(5040)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(5050)[];
+extern zbx_dbpatch_t	DBPATCH_VERSION(6000)[];
 
 static zbx_db_version_t dbversions[] = {
 	{DBPATCH_VERSION(2010), "2.2 development"},
@@ -807,6 +807,7 @@ static zbx_db_version_t dbversions[] = {
 	{DBPATCH_VERSION(5030), "5.4 development"},
 	{DBPATCH_VERSION(5040), "5.4 maintenance"},
 	{DBPATCH_VERSION(5050), "6.0 development"},
+	{DBPATCH_VERSION(6000), "6.0 maintenance"},
 	{NULL}
 };
 

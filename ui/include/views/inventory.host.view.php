@@ -144,9 +144,9 @@ $overviewFormList->addRow(_('Monitoring'),
 		$data['allowed_ui_latest_data']
 			? new CLink(_('Latest data'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'latest.view')
-				->setArgument('filter_hostids[]', $data['host']['hostid'])
-				->setArgument('filter_show_details', '1')
-				->setArgument('filter_set', '1')
+				->setArgument('hostids[]', $data['host']['hostid'])
+				->setArgument('show_details', '1')
+				->setArgument('filter_name', '')
 			)
 			: _('Latest data'),
 		$data['allowed_ui_problems']
@@ -160,11 +160,9 @@ $overviewFormList->addRow(_('Monitoring'),
 			? new CLink(_('Graphs'),
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'charts.view')
-					->setArgument('filter_set', '1')
-					->setArgument('view_as', HISTORY_GRAPH)
-					->setArgument('filter_search_type', ZBX_SEARCH_TYPE_STRICT)
 					->setArgument('filter_hostids', [$data['host']['hostid']])
-			)
+					->setArgument('filter_set', '1')
+		)
 			: _('Graphs'),
 		$data['allowed_ui_hosts']
 			? new CLink(_('Dashboards'), (new CUrl('zabbix.php'))

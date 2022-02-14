@@ -21,7 +21,6 @@
 #include "zbxjson.h"
 #include "dbcache.h"
 #include "valuecache.h"
-#include "preproc.h"
 #include "zbxlld.h"
 #include "log.h"
 #include "zbxtrends.h"

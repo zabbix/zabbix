@@ -208,21 +208,21 @@ $filter_tags_table->addRow(
 
 $tag_format_line = (new CHorList())
 	->addItem((new CRadioButtonList('show_tags', (int) $data['show_tags']))
-		->addValue(_('None'), PROBLEMS_SHOW_TAGS_NONE, 'show_tags_0#{uniqid}')
-		->addValue(PROBLEMS_SHOW_TAGS_1, PROBLEMS_SHOW_TAGS_1, 'show_tags_1#{uniqid}')
-		->addValue(PROBLEMS_SHOW_TAGS_2, PROBLEMS_SHOW_TAGS_2, 'show_tags_2#{uniqid}')
-		->addValue(PROBLEMS_SHOW_TAGS_3, PROBLEMS_SHOW_TAGS_3, 'show_tags_3#{uniqid}')
+		->addValue(_('None'), SHOW_TAGS_NONE, 'show_tags_0#{uniqid}')
+		->addValue(SHOW_TAGS_1, SHOW_TAGS_1, 'show_tags_1#{uniqid}')
+		->addValue(SHOW_TAGS_2, SHOW_TAGS_2, 'show_tags_2#{uniqid}')
+		->addValue(SHOW_TAGS_3, SHOW_TAGS_3, 'show_tags_3#{uniqid}')
 		->setModern(true)
 		->setId('show_tags_#{uniqid}')
 	)
 	->addItem((new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN))
 	->addItem(new CLabel(_('Tag name')))
 	->addItem((new CRadioButtonList('tag_name_format', (int) $data['tag_name_format']))
-		->addValue(_('Full'), PROBLEMS_TAG_NAME_FULL, 'tag_name_format_0#{uniqid}')
-		->addValue(_('Shortened'), PROBLEMS_TAG_NAME_SHORTENED, 'tag_name_format_1#{uniqid}')
-		->addValue(_('None'), PROBLEMS_TAG_NAME_NONE, 'tag_name_format_2#{uniqid}')
+		->addValue(_('Full'), TAG_NAME_FULL, 'tag_name_format_0#{uniqid}')
+		->addValue(_('Shortened'), TAG_NAME_SHORTENED, 'tag_name_format_1#{uniqid}')
+		->addValue(_('None'), TAG_NAME_NONE, 'tag_name_format_2#{uniqid}')
 		->setModern(true)
-		->setEnabled((int) $data['show_tags'] !== PROBLEMS_SHOW_TAGS_NONE)
+		->setEnabled((int) $data['show_tags'] !== SHOW_TAGS_NONE)
 		->setId('tag_name_format_#{uniqid}')
 	);
 
@@ -234,7 +234,7 @@ $right_column = (new CFormList())
 		(new CTextBox('tag_priority', $data['tag_priority']))
 			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 			->setAttribute('placeholder', _('comma-separated list'))
-			->setEnabled((int) $data['show_tags'] !== PROBLEMS_SHOW_TAGS_NONE)
+			->setEnabled((int) $data['show_tags'] !== SHOW_TAGS_NONE)
 			->setId('tag_priority_#{uniqid}')
 	)
 	->addRow(_('Show operational data'), [
@@ -432,7 +432,7 @@ if (array_key_exists('render_html', $data)) {
 					$('[name="highlight_row"]', container).prop('disabled', !checked);
 				},
 				show_tags: () => {
-					let disabled = ($('[name="show_tags"]:checked', container).val() == <?= PROBLEMS_SHOW_TAGS_NONE ?>);
+					let disabled = ($('[name="show_tags"]:checked', container).val() == <?= SHOW_TAGS_NONE ?>);
 
 					$('[name="tag_priority"]', container).prop('disabled', disabled);
 					$('[name="tag_name_format"]', container).prop('disabled', disabled);

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-10-01T14:12:43Z'
+  date: '2022-01-26T10:32:37Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -15,7 +15,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/415662-discussion-thread-for-official-zabbix-smart-disk-monitoring
         
-        Template tooling version used: 0.39
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Modules
@@ -29,8 +29,11 @@ zabbix_export:
           value_type: TEXT
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
+            -
+              tag: component
+              value: storage
       discovery_rules:
         -
           uuid: c5aede547c19434c90f72e43276fe1d7
@@ -61,8 +64,14 @@ zabbix_export:
                 key: smart.disk.get
               tags:
                 -
-                  tag: Application
-                  value: '{#DISKTYPE} {#NAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: diskname
+                  value: '{#NAME}'
+                -
+                  tag: disktype
+                  value: '{#DISKTYPE}'
             -
               uuid: 2af3d630a99a4989b94e2afd782a3f78
               name: 'SMART [{#NAME}]: ID {#ID} {#ATTRNAME}'
@@ -83,8 +92,14 @@ zabbix_export:
                 key: smart.disk.get
               tags:
                 -
-                  tag: Application
-                  value: '{#DISKTYPE} {#NAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: diskname
+                  value: '{#NAME}'
+                -
+                  tag: disktype
+                  value: '{#DISKTYPE}'
               trigger_prototypes:
                 -
                   uuid: 686066892ab94b86a97ba1902d361f97
@@ -92,6 +107,10 @@ zabbix_export:
                   name: 'SMART [{#NAME}]: Attribute {#ID} {#ATTRNAME} is failed'
                   priority: WARNING
                   description: 'The value should be greater than THRESH.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           overrides:
             -
               name: 'ID filter'
@@ -140,8 +159,14 @@ zabbix_export:
                 key: smart.disk.get
               tags:
                 -
-                  tag: Application
-                  value: '{#DISKTYPE} {#NAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: diskname
+                  value: '{#NAME}'
+                -
+                  tag: disktype
+                  value: '{#DISKTYPE}'
             -
               uuid: 365f9642f2764116923bb3e014eefa22
               name: 'SMART [{#NAME}]: Power on hours'
@@ -163,8 +188,14 @@ zabbix_export:
                 key: smart.disk.get
               tags:
                 -
-                  tag: Application
-                  value: '{#DISKTYPE} {#NAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: diskname
+                  value: '{#NAME}'
+                -
+                  tag: disktype
+                  value: '{#DISKTYPE}'
             -
               uuid: 8478d6421fb044339e2118848ac6d56b
               name: 'SMART [{#NAME}]: Media errors'
@@ -186,8 +217,14 @@ zabbix_export:
                 key: smart.disk.get
               tags:
                 -
-                  tag: Application
-                  value: '{#DISKTYPE} {#NAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: diskname
+                  value: '{#NAME}'
+                -
+                  tag: disktype
+                  value: '{#DISKTYPE}'
             -
               uuid: b6abf9b52c694600b63fce4a68fc0fbd
               name: 'SMART [{#NAME}]: Device model'
@@ -210,8 +247,14 @@ zabbix_export:
                 key: smart.disk.get
               tags:
                 -
-                  tag: Application
-                  value: '{#DISKTYPE} {#NAME}'
+                  tag: component
+                  value: inventory
+                -
+                  tag: diskname
+                  value: '{#NAME}'
+                -
+                  tag: disktype
+                  value: '{#DISKTYPE}'
             -
               uuid: 6ce46d274a694eac9700bd02a936f4be
               name: 'SMART [{#NAME}]: Percentage used'
@@ -220,7 +263,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: '%'
-              description: 'Contains a vendor specific estimate of the percentage of NVM subsystem life used based on the actual usage and the manufacturer’s prediction of NVM life. A value of 100 indicates that the estimated endurance of the NVM in the NVM subsystem has been consumed, but may not indicate an NVM subsystem failure. The value is allowed to exceed 100. Percentages greater than 254 shall be represented as 255. This value shall be updated once per power-on hour (when the controller is not in a sleep state).'
+              description: 'Contains a vendor specific estimate of the percentage of NVM subsystem life used based on the actual usage and the manufacturer''s prediction of NVM life. A value of 100 indicates that the estimated endurance of the NVM in the NVM subsystem has been consumed, but may not indicate an NVM subsystem failure. The value is allowed to exceed 100. Percentages greater than 254 shall be represented as 255. This value shall be updated once per power-on hour (when the controller is not in a sleep state).'
               preprocessing:
                 -
                   type: JSONPATH
@@ -234,14 +277,24 @@ zabbix_export:
                 key: smart.disk.get
               tags:
                 -
-                  tag: Application
-                  value: '{#DISKTYPE} {#NAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: diskname
+                  value: '{#NAME}'
+                -
+                  tag: disktype
+                  value: '{#DISKTYPE}'
               trigger_prototypes:
                 -
                   uuid: e2bc2b0e195446d7973037be8e41eb6f
                   expression: 'last(/SMART by Zabbix agent 2/smart.disk.percentage_used[{#NAME}])>90'
                   name: 'SMART [{#NAME}]: NVMe disk percentage using is over 90% of estimated endurance'
                   priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 62f98419c8034f389a5be3755eac8938
               name: 'SMART [{#NAME}]: Serial number'
@@ -264,8 +317,14 @@ zabbix_export:
                 key: smart.disk.get
               tags:
                 -
-                  tag: Application
-                  value: '{#DISKTYPE} {#NAME}'
+                  tag: component
+                  value: inventory
+                -
+                  tag: diskname
+                  value: '{#NAME}'
+                -
+                  tag: disktype
+                  value: '{#DISKTYPE}'
               trigger_prototypes:
                 -
                   uuid: 7257c02f398f4338ace1eb3a07cb7362
@@ -274,6 +333,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 2f5b054d7a644e029a195d17f525c191
               name: 'SMART [{#NAME}]: Temperature'
@@ -296,14 +359,24 @@ zabbix_export:
                 key: smart.disk.get
               tags:
                 -
-                  tag: Application
-                  value: '{#DISKTYPE} {#NAME}'
+                  tag: component
+                  value: temperature
+                -
+                  tag: diskname
+                  value: '{#NAME}'
+                -
+                  tag: disktype
+                  value: '{#DISKTYPE}'
               trigger_prototypes:
                 -
                   uuid: cd09aebe3ca146119cdf5b977bf6b018
                   expression: 'avg(/SMART by Zabbix agent 2/smart.disk.temperature[{#NAME}],5m)>{$SMART.TEMPERATURE.MAX.CRIT}'
                   name: 'SMART [{#NAME}]: Average disk temperature is critical (over {$SMART.TEMPERATURE.MAX.CRIT}°C for 5m)'
                   priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
                 -
                   uuid: aaa5acb3196b481f894998c0ca5ea165
                   expression: 'avg(/SMART by Zabbix agent 2/smart.disk.temperature[{#NAME}],5m)>{$SMART.TEMPERATURE.MAX.WARN}'
@@ -313,6 +386,10 @@ zabbix_export:
                     -
                       name: 'SMART [{#NAME}]: Average disk temperature is critical (over {$SMART.TEMPERATURE.MAX.CRIT}°C for 5m)'
                       expression: 'avg(/SMART by Zabbix agent 2/smart.disk.temperature[{#NAME}],5m)>{$SMART.TEMPERATURE.MAX.CRIT}'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 434b338d88e041dd9b6a0b7aaa403076
               name: 'SMART [{#NAME}]: Self-test passed'
@@ -336,14 +413,24 @@ zabbix_export:
                 key: smart.disk.get
               tags:
                 -
-                  tag: Application
-                  value: '{#DISKTYPE} {#NAME}'
+                  tag: component
+                  value: health
+                -
+                  tag: diskname
+                  value: '{#NAME}'
+                -
+                  tag: disktype
+                  value: '{#DISKTYPE}'
               trigger_prototypes:
                 -
                   uuid: 5fa97df4012e45279fb55724f617ef4a
                   expression: 'last(/SMART by Zabbix agent 2/smart.disk.test[{#NAME}])="false"'
                   name: 'SMART [{#NAME}]: Disk self-test is not passed'
                   priority: HIGH
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           overrides:
             -
               name: 'Not NVMe'

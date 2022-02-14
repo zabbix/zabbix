@@ -26,9 +26,9 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  */
 class testDashboardCopyWidgets extends CWebTest {
 
-	const DASHBOARD_ID = 130;
-	const PASTE_DASHBOARD_ID = 131;
-	const NEW_PAGE_ID = 143;
+	const DASHBOARD_ID = 1300;
+	const PASTE_DASHBOARD_ID = 1310;
+	const NEW_PAGE_ID = 1430;
 	const NEW_PAGE_NAME = 'Test_page';
 	const UPDATE_TEMPLATEID = 50000;
 	const TEMPLATED_PAGE_NAME = 'Page for pasting widgets';
@@ -87,7 +87,7 @@ class testDashboardCopyWidgets extends CWebTest {
 									[
 										'type' => 4,
 										'name' => 'itemid',
-										'value' => 40041
+										'value' => 400410
 									]
 								]
 							],
@@ -102,7 +102,7 @@ class testDashboardCopyWidgets extends CWebTest {
 									[
 										'type' => 4,
 										'name' => 'itemids',
-										'value' => 40041
+										'value' => 400410
 									]
 								]
 							],

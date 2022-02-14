@@ -19,13 +19,11 @@
 
 #include "common.h"
 #include "sysinfo.h"
-
 #include "comms.h"
 #include "log.h"
-#include "cfg.h"
+#include "zbxalgo.h"
 
 #include "dns.h"
-#include "zbxalgo.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #	include <windns.h>
@@ -728,7 +726,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 
 				GETLONG(value, msg_ptr);	/* serial number */
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %u", (zbx_uint32_t)value);
 
 				GETLONG(value, msg_ptr);	/* refresh time */
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);

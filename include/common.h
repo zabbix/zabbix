@@ -569,7 +569,7 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_REPORTMANAGER		33
 #define ZBX_PROCESS_TYPE_REPORTWRITER		34
 #define ZBX_PROCESS_TYPE_SERVICEMAN		35
-#define ZBX_PROCESS_TYPE_PROBLEMHOUSEKEEPER	36
+#define ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER	36
 #define ZBX_PROCESS_TYPE_ODBCPOLLER		37
 #define ZBX_PROCESS_TYPE_COUNT			38	/* number of process types */
 
@@ -998,6 +998,11 @@ zbx_task_t;
 #define ZBX_RTC_HA_REMOVE_NODE			15
 #define ZBX_RTC_HA_SET_FAILOVER_DELAY		16
 #define ZBX_RTC_USER_PARAMETERS_RELOAD		17
+
+/* internal rtc messages */
+#define ZBX_RTC_SUBSCRIBE			100
+#define ZBX_RTC_SHUTDOWN			101
+#define ZBX_RTC_CONFIG_CACHE_RELOAD_WAIT	102
 
 /* runtime control notifications, must be less than 10000 */
 #define ZBX_RTC_CONFIG_SYNC_NOTIFY		9999

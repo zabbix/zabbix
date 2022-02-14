@@ -34,7 +34,9 @@ import (
 )
 
 type pluginOptions struct {
-	Path string
+	System struct {
+		Path string
+	}
 }
 
 func initExternalPlugins(options *agent.AgentOptions) (string, error) {
@@ -46,7 +48,8 @@ func initExternalPlugins(options *agent.AgentOptions) (string, error) {
 			// not an external plugin, just ignore the error
 			continue
 		}
-		paths[name] = o.Path
+
+		paths[name] = o.System.Path
 	}
 
 	if len(paths) == 0 {

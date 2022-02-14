@@ -136,7 +136,9 @@ class testDiagnosticDataTask extends CIntegrationTest {
 
 		$result = $this->call('task.create', $api_request, $expected_error);
 
-		if ($expected_error === null && isset($result['result']['taskids'])) {
+		if ($expected_error === null) {
+			$this->assertArrayHasKey('taskids', $result['result']);
+
 			foreach ($result['result']['taskids'] as $taskid) {
 				$params = [
 					'output' => ['status'],

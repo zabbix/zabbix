@@ -135,7 +135,7 @@ class CSvgGraphHelper {
 		$dataset_metrics = [];
 
 		foreach ($metrics as $metric_num => &$metric) {
-			if ($metric['options']['aggregate_function'] == GRAPH_AGGREGATE_NONE) {
+			if ($metric['options']['aggregate_function'] == AGGREGATE_NONE) {
 				continue;
 			}
 
@@ -177,11 +177,11 @@ class CSvgGraphHelper {
 		unset($metric);
 
 		foreach ($metrics as &$metric) {
-			if ($metric['options']['aggregate_function'] == GRAPH_AGGREGATE_NONE) {
+			if ($metric['options']['aggregate_function'] == AGGREGATE_NONE) {
 				continue;
 			}
 
-			$result = Manager::History()->getGraphAggregationByInterval(
+			$result = Manager::History()->getAggregationByInterval(
 				$metric['items'], $metric['time_period']['time_from'], $metric['time_period']['time_to'],
 				$metric['options']['aggregate_function'], $metric['options']['aggregate_interval']
 			);
@@ -205,17 +205,17 @@ class CSvgGraphHelper {
 				ksort($metric_points, SORT_NUMERIC);
 
 				switch ($metric['options']['aggregate_function']) {
-					case GRAPH_AGGREGATE_MIN:
+					case AGGREGATE_MIN:
 						foreach ($metric_points as $tick => $point) {
 							$metric['points'][] = ['clock' => $tick, 'value' => min($point['value'])];
 						}
 						break;
-					case GRAPH_AGGREGATE_MAX:
+					case AGGREGATE_MAX:
 						foreach ($metric_points as $tick => $point) {
 							$metric['points'][] = ['clock' => $tick, 'value' => max($point['value'])];
 						}
 						break;
-					case GRAPH_AGGREGATE_AVG:
+					case AGGREGATE_AVG:
 						foreach ($metric_points as $tick => $point) {
 							$metric['points'][] = [
 								'clock' => $tick,
@@ -223,17 +223,17 @@ class CSvgGraphHelper {
 							];
 						}
 						break;
-					case GRAPH_AGGREGATE_COUNT:
+					case AGGREGATE_COUNT:
 						foreach ($metric_points as $tick => $point) {
 							$metric['points'][] = ['clock' => $tick, 'value' => array_sum($point['count'])];
 						}
 						break;
-					case GRAPH_AGGREGATE_SUM:
+					case AGGREGATE_SUM:
 						foreach ($metric_points as $tick => $point) {
 							$metric['points'][] = ['clock' => $tick, 'value' => array_sum($point['value'])];
 						}
 						break;
-					case GRAPH_AGGREGATE_FIRST:
+					case AGGREGATE_FIRST:
 						foreach ($metric_points as $tick => $point) {
 							if ($point['clock']) {
 								$metric['points'][] = [
@@ -243,7 +243,7 @@ class CSvgGraphHelper {
 							}
 						}
 						break;
-					case GRAPH_AGGREGATE_LAST:
+					case AGGREGATE_LAST:
 						foreach ($metric_points as $tick => $point) {
 							if ($point['clock']) {
 								$metric['points'][] = [
@@ -265,7 +265,7 @@ class CSvgGraphHelper {
 		// To reduce number of requests, group metrics by time range.
 		$tr_groups = [];
 		foreach ($metrics as $metric_num => &$metric) {
-			if ($metric['options']['aggregate_function'] != GRAPH_AGGREGATE_NONE) {
+			if ($metric['options']['aggregate_function'] != AGGREGATE_NONE) {
 				continue;
 			}
 
