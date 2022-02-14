@@ -35,7 +35,6 @@ define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2022');
 
 define('ZBX_BCRYPT_COST',		10);
-define('ZBX_MD5_SIZE',			32);
 
 define('ZBX_SESSION_NAME', 'zbx_session'); // Session cookie name for Zabbix front-end.
 
