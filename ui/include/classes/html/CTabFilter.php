@@ -29,7 +29,7 @@ class CTabFilter extends CDiv {
 	const CSS_TAB_EXPANDED = 'expanded';
 	const CSS_TAB_SORTABLE_CONTAINER = 'ui-sortable-container';
 	const CSS_ID_PREFIX = 'tabfilter_';
-	const CSS_TABFILTER_ICON_HOME = 'icon-home';
+	const CSS_TABFILTER_ICON_FILTER = 'icon-filter';
 	const CSS_TABFILTER_ITEM = 'tabfilter-item-label';
 
 	/**
@@ -63,6 +63,11 @@ class CTabFilter extends CDiv {
 	 * Tab form available buttons node. Will be initialized during __construct but can be overwritten if needed.
 	 */
 	public $buttons = null;
+
+	/**
+	 * Subfilter node.
+	 */
+	public $subfilter = null;
 
 	/**
 	 * Array of CPartial elements used as tab content rendering templates.
@@ -127,6 +132,17 @@ class CTabFilter extends CDiv {
 	}
 
 	/**
+	 * Add subfilter.
+	 *
+	 * @param CPartial $subfilter  Rendered subfilter.
+	 */
+	public function addSubfilter(CPartial $subfilter) {
+		$this->subfilter = $subfilter;
+
+		return $this;
+	}
+
+	/**
 	 * Add single tab filter.
 	 *
 	 * @param CTag|string $label                          String or CTag as tab label element.
@@ -148,7 +164,7 @@ class CTabFilter extends CDiv {
 			if ($tab_index == 0) {
 				$label = (new CLink(''))
 					->setAttribute('aria-label', _('Home'))
-					->addClass(self::CSS_TABFILTER_ICON_HOME);
+					->addClass(self::CSS_TABFILTER_ICON_FILTER);
 				$data += [
 					'filter_sortable' => false,
 					'filter_configurable' => false
@@ -257,14 +273,22 @@ class CTabFilter extends CDiv {
 			$templates .= $template->getOutput();
 		}
 
+		$tabfilter_container_classes = 'tabfilter-content-container';
+		if (!$this->options['expanded']) {
+			$tabfilter_container_classes .= ' tabfilter-collapsed';
+			if (!$this->subfilter) {
+				$tabfilter_container_classes .= ' display-none';
+			}
+		}
+
 		return implode('', [
 			$this->getNavigation(),
 			(new CDiv([
 				(new CDiv($this->contents))->addClass('tabfilter-tabs-container'),
-				$this->buttons
+				$this->buttons,
+				$this->subfilter
 			]))
-				->addClass('tabfilter-content-container')
-				->addClass($this->options['expanded'] ? null : ZBX_STYLE_DISPLAY_NONE),
+				->addClass($tabfilter_container_classes),
 			$templates
 		]);
 	}

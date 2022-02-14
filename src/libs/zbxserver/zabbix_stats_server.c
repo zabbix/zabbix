@@ -21,7 +21,6 @@
 #include "zbxjson.h"
 #include "dbcache.h"
 #include "valuecache.h"
-#include "preproc.h"
 #include "zbxlld.h"
 #include "log.h"
 #include "zbxtrends.h"
@@ -30,8 +29,6 @@
 #include "zabbix_stats.h"
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_get_zabbix_stats_ext                                         *
  *                                                                            *
  * Purpose: get program type (server) specific internal statistics            *
  *                                                                            *

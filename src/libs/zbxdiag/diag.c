@@ -33,8 +33,6 @@ void	diag_map_free(zbx_diag_map_t *map)
 
 /******************************************************************************
  *                                                                            *
- * Function: diag_parse_request                                               *
- *                                                                            *
  * Purpose: parse diagnostic section request having json format               *
  *          {"stats":[<field1>,<field2>,...], "top":{<field1>:<limit1>,...}}  *
  *                                                                            *
@@ -133,8 +131,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: diag_add_mem_stats                                               *
- *                                                                            *
  * Purpose: add memory statistics to the json data                            *
  *                                                                            *
  * Parameters: json  - [IN/OUT] the json to update                            *
@@ -185,8 +181,6 @@ void	diag_add_mem_stats(struct zbx_json *json, const char *name, const zbx_mem_s
 
 /******************************************************************************
  *                                                                            *
- * Function: diag_compare_pair_second_desc                                    *
- *                                                                            *
  * Purpose: compare uint64 pairs by second value for descending sorting       *
  *                                                                            *
  ******************************************************************************/
@@ -203,8 +197,6 @@ static int	diag_compare_pair_second_desc(const void *d1, const void *d2)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: diag_historycahe_add_items                                       *
  *                                                                            *
  * Purpose: add history cache items diagnostic statistics to json             *
  *                                                                            *
@@ -228,8 +220,6 @@ static void	diag_historycache_add_items(struct zbx_json *json, const char *field
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: diag_add_historycache_info                                       *
  *                                                                            *
  * Purpose: add requested history cache diagnostic information to json data   *
  *                                                                            *
@@ -349,8 +339,6 @@ int	diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json 
 
 /******************************************************************************
  *                                                                            *
- * Function: diag_add_preproc_items                                           *
- *                                                                            *
  * Purpose: add item top list to output json                                  *
  *                                                                            *
  * Parameters: json  - [OUT] the output json                                  *
@@ -379,8 +367,6 @@ static void	diag_add_preproc_items(struct zbx_json *json, const char *field, con
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: diag_add_preproc_info                                            *
  *                                                                            *
  * Purpose: add requested preprocessing diagnostic information to json data   *
  *                                                                            *
@@ -503,8 +489,6 @@ static void	zbx_json_addhex(struct zbx_json *j, const char *name, zbx_uint64_t v
 
 /******************************************************************************
  *                                                                            *
- * Function: diag_add_locks_info                                              *
- *                                                                            *
  * Purpose: add requested locks diagnostic information to json data           *
  *                                                                            *
  * Parameters: json  - [IN/OUT] the json to update                            *
@@ -546,8 +530,6 @@ void	diag_add_locks_info(struct zbx_json *json)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_diag_get_info                                                *
  *                                                                            *
  * Purpose: get diagnostic information                                        *
  *                                                                            *
@@ -592,8 +574,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: diag_add_section_request                                         *
- *                                                                            *
  * Purpose: add default diagnostic section request                            *
  *                                                                            *
  * Parameters: j       - [OUT] the request json                               *
@@ -624,8 +604,6 @@ static void	diag_add_section_request(struct zbx_json *j, const char *section, ..
 
 /******************************************************************************
  *                                                                            *
- * Function: diag_prepare_default_request                                     *
- *                                                                            *
  * Purpose: prepare default diagnostic request for all sections               *
  *                                                                            *
  ******************************************************************************/
@@ -651,8 +629,6 @@ static void	diag_prepare_default_request(struct zbx_json *j, unsigned int flags)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: diag_get_simple_values                                           *
  *                                                                            *
  * Purpose: extract simple values in format <key1>:<value1> <key2>:<value2>...*
  *          from the specified json location                                  *
@@ -687,8 +663,6 @@ static void	diag_get_simple_values(const struct zbx_json_parse *jp, char **msg)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: diag_log_memory_info                                             *
  *                                                                            *
  * Purpose: log shared memory information                                     *
  *                                                                            *
@@ -744,8 +718,6 @@ static void	diag_log_memory_info(struct zbx_json_parse *jp, const char *field, c
 
 /******************************************************************************
  *                                                                            *
- * Function: diag_log_top_view                                                *
- *                                                                            *
  * Purpose: log top view                                                      *
  *                                                                            *
  * Parameters: jp         - [IN] the section json                             *
@@ -785,8 +757,6 @@ static void	diag_log_top_view(struct zbx_json_parse *jp, const char *field, cons
 
 /******************************************************************************
  *                                                                            *
- * Function: diag_log_history_cache                                           *
- *                                                                            *
  * Purpose: log history cache diagnostic information                          *
  *                                                                            *
  ******************************************************************************/
@@ -809,8 +779,6 @@ static void	diag_log_history_cache(struct zbx_json_parse *jp, char **out, size_t
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: diag_log_value_cache                                             *
  *                                                                            *
  * Purpose: log value cache diagnostic information                            *
  *                                                                            *
@@ -835,8 +803,6 @@ static void	diag_log_value_cache(struct zbx_json_parse *jp, char **out, size_t *
 
 /******************************************************************************
  *                                                                            *
- * Function: diag_log_preprocessing                                           *
- *                                                                            *
  * Purpose: log preprocessing diagnostic information                          *
  *                                                                            *
  ******************************************************************************/
@@ -857,8 +823,6 @@ static void	diag_log_preprocessing(struct zbx_json_parse *jp, char **out, size_t
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: diag_log_lld                                                     *
  *                                                                            *
  * Purpose: log LLD diagnostic information                                    *
  *                                                                            *
@@ -881,8 +845,6 @@ static void	diag_log_lld(struct zbx_json_parse *jp, char **out, size_t *out_allo
 
 /******************************************************************************
  *                                                                            *
- * Function: diag_log_alerting                                                *
- *                                                                            *
  * Purpose: log alerting diagnostic information                               *
  *                                                                            *
  ******************************************************************************/
@@ -903,8 +865,6 @@ static void	diag_log_alerting(struct zbx_json_parse *jp, char **out, size_t *out
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_diag_log_info                                                *
  *                                                                            *
  * Purpose: log diagnostic information                                        *
  *                                                                            *

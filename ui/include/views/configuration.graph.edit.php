@@ -37,6 +37,7 @@ else {
 }
 
 $url = (new CUrl('graphs.php'))
+	->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 	->setArgument('context', $data['context'])
 	->getUrl();
 
@@ -195,8 +196,8 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		// Select item button.
 		$yaxisMinData[] = (new CButton('yaxis_min', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
-			->onClick('return PopUp("popup.generic",jQuery.extend('.
-				json_encode([
+			->onClick(
+				'return PopUp("popup.generic", jQuery.extend('.json_encode([
 					'srctbl' => 'items',
 					'srcfld1' => 'itemid',
 					'srcfld2' => 'name',
@@ -206,8 +207,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 					'with_webitems' => '1',
 					'numeric' => '1',
 					'writeonly' => '1'
-				]).
-					',getOnlyHostParam()), null, this);'
+				]).', view.getOnlyHostParam()), {dialogue_class: "modal-popup-generic"});'
 			)
 			->setEnabled(!$readonly);
 
@@ -216,8 +216,8 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 			$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 			$yaxisMinData[] = (new CButton('yaxis_min_prototype', _('Select prototype')))
 				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick('return PopUp("popup.generic",'.
-					json_encode([
+				->onClick(
+					'return PopUp("popup.generic", '.json_encode([
 						'srctbl' => 'item_prototypes',
 						'srcfld1' => 'itemid',
 						'srcfld2' => 'name',
@@ -226,7 +226,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 						'dstfld2' => 'ymin_name',
 						'parent_discoveryid' => $data['parent_discoveryid'],
 						'numeric' => '1'
-					]).', null, this);'
+					]).', {dialogue_class: "modal-popup-generic"});'
 				)
 				->setEnabled(!$readonly);
 		}
@@ -271,8 +271,8 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		// Select item button.
 		$yaxisMaxData[] = (new CButton('yaxis_max', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
-			->onClick('return PopUp("popup.generic",jQuery.extend('.
-				json_encode([
+			->onClick(
+				'return PopUp("popup.generic", jQuery.extend('.json_encode([
 					'srctbl' => 'items',
 					'srcfld1' => 'itemid',
 					'srcfld2' => 'name',
@@ -282,8 +282,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 					'with_webitems' => '1',
 					'numeric' => '1',
 					'writeonly' => '1'
-				]).
-					',getOnlyHostParam()), null, this);'
+				]).', view.getOnlyHostParam()), {dialogue_class: "modal-popup-generic"});'
 			)
 			->setEnabled(!$readonly);
 
@@ -292,8 +291,8 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 			$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 			$yaxisMaxData[] = (new CButton('yaxis_max_prototype', _('Select prototype')))
 				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick('return PopUp("popup.generic",'.
-					json_encode([
+				->onClick(
+					'return PopUp("popup.generic", '.json_encode([
 						'srctbl' => 'item_prototypes',
 						'srcfld1' => 'itemid',
 						'srcfld2' => 'name',
@@ -302,7 +301,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 						'dstfld2' => 'ymax_name',
 						'parent_discoveryid' => $data['parent_discoveryid'],
 						'numeric' => '1'
-					]).', null, this);'
+					]).', {dialogue_class: "modal-popup-generic"});'
 				)
 				->setEnabled(!$readonly);
 		}
@@ -358,7 +357,7 @@ $items_table = (new CTable())
 		$readonly ? null : (new CTableColumn(_('Action')))->addClass('table-col-action')
 	]);
 
-$popup_options_add = [
+$parameters_add = [
 	'srctbl' => 'items',
 	'srcfld1' => 'itemid',
 	'srcfld2' => 'name',
@@ -369,13 +368,13 @@ $popup_options_add = [
 	'with_webitems' => '1'
 ];
 if ($data['normal_only']) {
-	$popup_options_add['normal_only'] = '1';
+	$parameters_add['normal_only'] = '1';
 }
 if ($data['hostid']) {
-	$popup_options_add['hostid'] = $data['hostid'];
+	$parameters_add['hostid'] = $data['hostid'];
 }
 
-$popup_options_add_prototype = [
+$parameters_add_prototype = [
 	'srctbl' => 'item_prototypes',
 	'srcfld1' => 'itemid',
 	'srcfld2' => 'name',
@@ -386,10 +385,10 @@ $popup_options_add_prototype = [
 	'graphtype' => $data['graphtype']
 ];
 if ($data['normal_only']) {
-	$popup_options_add_prototype['normal_only'] = '1';
+	$parameters_add_prototype['normal_only'] = '1';
 }
 if ($data['parent_discoveryid']) {
-	$popup_options_add_prototype['parent_discoveryid'] = $data['parent_discoveryid'];
+	$parameters_add_prototype['parent_discoveryid'] = $data['parent_discoveryid'];
 }
 
 $items_table->addRow(
@@ -399,14 +398,18 @@ $items_table->addRow(
 			: (new CCol(
 				new CHorList([
 					(new CButton('add_item', _('Add')))
-						->onClick('return PopUp("popup.generic",jQuery.extend('.
-							json_encode($popup_options_add).',getOnlyHostParam()), null, this);'
+						->onClick(
+							'return PopUp("popup.generic",
+								jQuery.extend('.json_encode($parameters_add).', view.getOnlyHostParam())
+							);'
 						)
 						->addClass(ZBX_STYLE_BTN_LINK),
 					$data['parent_discoveryid']
 						? (new CButton('add_protoitem', _('Add prototype')))
-							->onClick('return PopUp("popup.generic",'.
-								json_encode($popup_options_add_prototype).', null, this);'
+							->onClick(
+								'return PopUp("popup.generic", '.json_encode($parameters_add_prototype).',
+									{dialogue_class: "modal-popup-generic"}
+								);'
 							)
 							->addClass(ZBX_STYLE_BTN_LINK)
 						: null
@@ -414,28 +417,6 @@ $items_table->addRow(
 			))->setColSpan(8)
 	))->setId('itemButtonsRow')
 );
-
-foreach ($this->data['items'] as $n => $item) {
-	$name = $item['host'].NAME_DELIMITER.$item['name'];
-
-	if (zbx_empty($item['drawtype'])) {
-		$item['drawtype'] = 0;
-	}
-
-	if (zbx_empty($item['yaxisside'])) {
-		$item['yaxisside'] = 0;
-	}
-
-	if (!array_key_exists('gitemid', $item)) {
-		$item['gitemid'] = '';
-	}
-
-	insert_js('loadItem('.$n.', '.json_encode($item['gitemid']).', '.$item['itemid'].', '.
-		json_encode($name).', '.$item['type'].', '.$item['calc_fnc'].', '.$item['drawtype'].', '.
-		$item['yaxisside'].', \''.$item['color'].'\', '.$item['flags'].');',
-		true
-	);
-}
 
 $graphFormList->addRow(
 	(new CLabel(_('Items'), $items_table->getId()))->setAsteriskMark(),
@@ -512,3 +493,21 @@ $graphForm->addItem($graphTab);
 $widget->addItem($graphForm);
 
 $widget->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'form_name' => $graphForm->getName(),
+		'theme_colors' => explode(',', getUserGraphTheme()['colorpalette']),
+		'graphs' => [
+			'graphtype' =>  $data['graphtype'],
+			'readonly' => $readonly,
+			'hostid' => $data['hostid'],
+			'is_template' => $data['is_template'],
+			'normal_only' => $data['normal_only'],
+			'parent_discoveryid' => $data['parent_discoveryid']
+		],
+		'items' => $data['items']
+	]).');
+'))
+	->setOnDocumentReady()
+	->show();

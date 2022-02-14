@@ -54,13 +54,8 @@ if (hasRequest('reconnect') && CWebUser::isLoggedIn()) {
 $autologin = hasRequest('enter') ? getRequest('autologin', 0) : getRequest('autologin', 1);
 $request = getRequest('request', '');
 
-if ($request) {
-	$test_request = [];
-	preg_match('/^\/?(?<filename>[a-z0-9\_\.]+\.php)(?<request>\?.*)?$/i', $request, $test_request);
-
-	$request = (array_key_exists('filename', $test_request) && file_exists('./'.$test_request['filename']))
-		? $test_request['filename'].(array_key_exists('request', $test_request) ? $test_request['request'] : '')
-		: '';
+if ($request !== '' && !CHtmlUrlValidator::validateSameSite($request)) {
+	$request = '';
 }
 
 if (!hasRequest('form') && CAuthenticationHelper::get(CAuthenticationHelper::HTTP_AUTH_ENABLED) == ZBX_AUTH_HTTP_ENABLED

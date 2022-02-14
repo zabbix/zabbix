@@ -38,13 +38,14 @@
 			$(".js-event-color-picker").each(function() {
 				var $field = $(this);
 				$field.toggleClass('<?= ZBX_STYLE_DISABLED ?>', !checked);
-				$("input", $field).prop('disabled', !checked);
+				$("input, input+button", $field).prop('disabled', !checked);
 			});
 		});
 
 		$("#resetDefaults").click(function() {
 			overlayDialogue({
 				'title': <?= json_encode(_('Reset confirmation')) ?>,
+				'class': 'position-middle',
 				'content': $('<span>').text(<?= json_encode(_('Reset all fields to default values?')) ?>),
 				'buttons': [
 					{

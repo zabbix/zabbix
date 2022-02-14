@@ -66,11 +66,6 @@ static void	test_match(const char *prefix, zbx_mock_handle_t hmatch, zbx_prometh
 	zbx_mock_assert_str_eq(buffer, zbx_mock_get_object_member_string(hmatch, "op"), match->op);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: zbx_mock_test_entry                                              *
- *                                                                            *
- ******************************************************************************/
 void	zbx_mock_test_entry(void **state)
 {
 	const char			*filter;

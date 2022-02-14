@@ -20,7 +20,6 @@
 #include "common.h"
 #include "zbxalgo.h"
 #include "zbxeval.h"
-#include "log.h"
 #include "../../libs/zbxalgo/vectorimpl.h"
 
 typedef struct
@@ -42,8 +41,6 @@ static int	zbx_is_normal_double(double dbl)
 
 /******************************************************************************
  *                                                                            *
- * Function: calc_arithmetic_mean                                             *
- *                                                                            *
  * Purpose: calculate arithmetic mean (i.e. average)                          *
  *                                                                            *
  * Parameters: v - [IN] non-empty vector with input data                      *
@@ -63,8 +60,6 @@ static double	calc_arithmetic_mean(const zbx_vector_dbl_t *v)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_eval_calc_kurtosis                                           *
  *                                                                            *
  * Purpose: evaluate function 'kurtosis'                                      *
  *                                                                            *
@@ -123,8 +118,6 @@ err:
 
 /******************************************************************************
  *                                                                            *
- * Function: find_median                                                      *
- *                                                                            *
  * Purpose: find median (helper function)                                     *
  *                                                                            *
  * Parameters: v - [IN/OUT] non-empty vector with input data.                 *
@@ -144,8 +137,6 @@ static double	find_median(zbx_vector_dbl_t *v)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_eval_calc_mad                                                *
  *                                                                            *
  * Purpose: calculate 'median absolute deviation'                             *
  *                                                                            *
@@ -191,8 +182,6 @@ err:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_eval_calc_skewness                                           *
  *                                                                            *
  * Purpose: evaluate 'skewness' function                                      *
  *                                                                            *
@@ -245,8 +234,6 @@ err:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_eval_calc_stddevpop                                          *
- *                                                                            *
  * Purpose: evaluate function 'stdevpop' (population standard deviation)      *
  *                                                                            *
  * Parameters: values - [IN] non-empty vector with input data                 *
@@ -296,8 +283,6 @@ err:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_eval_calc_stddevsamp                                         *
  *                                                                            *
  * Purpose: evaluate function 'stddevsamp' (sample standard deviation)        *
  *                                                                            *
@@ -355,8 +340,6 @@ err:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_eval_calc_sumofsquares                                       *
- *                                                                            *
  * Purpose: calculate sum of squares                                          *
  *                                                                            *
  * Parameters: values - [IN] non-empty vector with input data                 *
@@ -387,8 +370,6 @@ int	zbx_eval_calc_sumofsquares(zbx_vector_dbl_t *values, double *result, char **
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_eval_calc_varpop                                             *
  *                                                                            *
  * Purpose: evaluate function 'varpop' (population variance)                  *
  *                                                                            *
@@ -438,8 +419,6 @@ err:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_eval_calc_varsamp                                            *
  *                                                                            *
  * Purpose: evaluate function 'varsamp' (sample variance)                     *
  *                                                                            *
@@ -536,8 +515,6 @@ static void	ensure_histogram_monotonic(zbx_vector_histogram_t *h)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_eval_calc_histogram_quantile                                 *
  *                                                                            *
  * Purpose: calculate histogram quantile base on vector, where odd position   *
  *          is bucket upper bound ('le') and even position is 'rate' value    *
@@ -660,8 +637,6 @@ err:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_eval_calc_avg                                                *
- *                                                                            *
  * Purpose: evaluate function avg                                             *
  *                                                                            *
  * Parameters: values - [IN] non-empty vector with input data                 *
@@ -686,8 +661,6 @@ int	zbx_eval_calc_avg(zbx_vector_dbl_t *values, double *result, char **error)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_eval_calc_min                                                *
  *                                                                            *
  * Purpose: evaluate function min                                             *
  *                                                                            *
@@ -725,8 +698,6 @@ int	zbx_eval_calc_min(zbx_vector_dbl_t *values, double *result, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_eval_calc_max                                                *
- *                                                                            *
  * Purpose: evaluate function max                                             *
  *                                                                            *
  * Parameters: values - [IN] non-empty vector with input data                 *
@@ -762,8 +733,6 @@ int	zbx_eval_calc_max(zbx_vector_dbl_t *values, double *result, char **error)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_eval_calc_sum                                                *
  *                                                                            *
  * Purpose: evaluate function sum                                             *
  *                                                                            *

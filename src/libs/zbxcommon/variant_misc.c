@@ -22,8 +22,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_variant_to_value_type                                        *
- *                                                                            *
  * Purpose: converts variant value to type compatible with requested value    *
  *          type                                                              *
  *                                                                            *

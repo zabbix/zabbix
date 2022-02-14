@@ -187,7 +187,7 @@ int	CONFIG_ALERTDB_FORKS		= 0;
 int	CONFIG_HISTORYPOLLER_FORKS	= 1;	/* for zabbix[proxy_history] internal check */
 int	CONFIG_AVAILMAN_FORKS		= 1;
 int	CONFIG_SERVICEMAN_FORKS		= 0;
-int	CONFIG_PROBLEMHOUSEKEEPER_FORKS	= 0;
+int	CONFIG_TRIGGERHOUSEKEEPER_FORKS	= 0;
 int	CONFIG_ODBCPOLLER_FORKS		= 1;
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
@@ -454,8 +454,6 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_set_defaults                                                 *
- *                                                                            *
  * Purpose: set configuration defaults                                        *
  *                                                                            *
  ******************************************************************************/
@@ -559,8 +557,6 @@ static void	zbx_set_defaults(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_validate_config                                              *
  *                                                                            *
  * Purpose: validate configuration parameters                                 *
  *                                                                            *
@@ -687,8 +683,6 @@ static int	proxy_add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vec
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_load_config                                                  *
  *                                                                            *
  * Purpose: parse config file and update configuration parameters             *
  *                                                                            *
@@ -937,8 +931,6 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_free_config                                                  *
- *                                                                            *
  * Purpose: free configuration memory                                         *
  *                                                                            *
  ******************************************************************************/
@@ -948,8 +940,6 @@ static void	zbx_free_config(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: main                                                             *
  *                                                                            *
  * Purpose: executes proxy processes                                          *
  *                                                                            *
@@ -1328,7 +1318,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		{
 			case ZBX_PROCESS_TYPE_CONFSYNCER:
 				zbx_thread_start(proxyconfig_thread, &thread_args, &threads[i]);
-				zbx_rtc_wait_config_sync(&rtc);
+				if (FAIL == zbx_rtc_wait_config_sync(&rtc))
+					goto out;
 				break;
 			case ZBX_PROCESS_TYPE_TRAPPER:
 				thread_args.args = &listen_sock;
@@ -1425,7 +1416,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 		if (NULL != message)
 		{
-			zbx_rtc_dispatch(client, message);
+			zbx_rtc_dispatch(&rtc, client, message);
 			zbx_ipc_message_free(message);
 		}
 
@@ -1446,6 +1437,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			break;
 		}
 	}
+out:
+	if (SUCCEED == ZBX_EXIT_STATUS())
+		zbx_rtc_shutdown_subs(&rtc);
 
 	zbx_on_exit(ZBX_EXIT_STATUS());
 

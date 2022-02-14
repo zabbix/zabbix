@@ -20,8 +20,8 @@
 #include "common.h"
 #include "zbxserialize.h"
 #include "db.h"
+
 #include "avail_protocol.h"
-#include "dbcache.h"
 
 void	zbx_availability_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset,
 		const zbx_interface_availability_t *interface_availability)

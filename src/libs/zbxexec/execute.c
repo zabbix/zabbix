@@ -29,8 +29,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_get_timediff_ms                                              *
- *                                                                            *
  * Purpose: considers a difference between times in milliseconds              *
  *                                                                            *
  * Parameters: time1         - [IN] first time point                          *
@@ -53,8 +51,6 @@ static int	zbx_get_timediff_ms(struct _timeb *time1, struct _timeb *time2)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_read_from_pipe                                               *
  *                                                                            *
  * Purpose: read data from pipe                                               *
  *                                                                            *
@@ -116,8 +112,6 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t *buf_size, size_t
 #else	/* not _WINDOWS */
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_popen                                                        *
  *                                                                            *
  * Purpose: this function opens a process by creating a pipe, forking,        *
  *          and invoking the shell                                            *
@@ -238,8 +232,6 @@ static int	zbx_popen(pid_t *pid, const char *command, const char *dir)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_waitpid                                                      *
- *                                                                            *
  * Purpose: this function waits for process to change state                   *
  *                                                                            *
  * Parameters: pid     - [IN] child process PID                               *
@@ -299,8 +291,6 @@ exit:
 #endif	/* _WINDOWS */
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_execute                                                      *
  *                                                                            *
  * Purpose: this function executes a script and returns result from stdout    *
  *                                                                            *
@@ -550,8 +540,6 @@ close:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_execute_nowait                                               *
  *                                                                            *
  * Purpose: this function executes a script in the background and             *
  *          suppresses the std output                                         *

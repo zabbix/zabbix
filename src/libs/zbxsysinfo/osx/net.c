@@ -19,7 +19,7 @@
 
 #include "common.h"
 #include "sysinfo.h"
-#include "../common/common.h"
+#include "../common/zbxsysinfo_common.h"
 #include "log.h"
 
 static struct ifmibdata	ifmd;

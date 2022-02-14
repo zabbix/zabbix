@@ -26,11 +26,6 @@
 #include "zbxalgo.h"
 #include "prometheus_test.h"
 
-/******************************************************************************
- *                                                                            *
- * Function: zbx_mock_test_entry                                              *
- *                                                                            *
- ******************************************************************************/
 void	zbx_mock_test_entry(void **state)
 {
 	const char		*data;

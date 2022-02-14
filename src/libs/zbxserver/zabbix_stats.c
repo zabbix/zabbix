@@ -21,18 +21,14 @@
 #include "zbxjson.h"
 #include "dbcache.h"
 #include "zbxself.h"
-#include "valuecache.h"
 #include "../../zabbix_server/vmware/vmware.h"
 #include "preproc.h"
-#include "zbxtrends.h"
 
 #include "zabbix_stats.h"
 
 extern unsigned char	program_type;
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_send_zabbix_stats                                            *
  *                                                                            *
  * Purpose: collects all metrics required for Zabbix stats request            *
  *                                                                            *

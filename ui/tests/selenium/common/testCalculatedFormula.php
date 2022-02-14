@@ -3011,6 +3011,11 @@ class testCalculatedFormula extends CWebTest {
 			],
 			[
 				[
+					'formula' => "concat(\"Last value: \", last(//trap_text), \"Average value: \", avg(//trap_text,1h))"
+				]
+			],
+			[
+				[
 					'formula' => "insert(last(//trap_text),2,1,\"ab\")=\"Zabbix\""
 				]
 			],

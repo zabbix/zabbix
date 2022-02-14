@@ -33,8 +33,6 @@
 
 #define ZBX_HA_POLL_PERIOD	5
 
-#define ZBX_HA_DEFAULT_FAILOVER_DELAY	SEC_PER_MIN
-
 #define ZBX_HA_NODE_LOCK	1
 
 static pid_t			ha_pid = ZBX_THREAD_ERROR;
@@ -43,8 +41,6 @@ extern char	*CONFIG_HA_NODE_NAME;
 extern char	*CONFIG_NODE_ADDRESS;
 
 extern zbx_cuid_t	ha_sessionid;
-
-#define ZBX_HA_IS_CLUSTER()	(NULL != CONFIG_HA_NODE_NAME && '\0' != *CONFIG_HA_NODE_NAME)
 
 typedef struct
 {
@@ -104,8 +100,6 @@ static DB_RESULT	ha_db_select(zbx_ha_info_t *info, const char *sql, ...) __zbx_a
 static int	ha_db_execute(zbx_ha_info_t *info, const char *sql, ...) __zbx_attr_format_printf(2, 3);
 
 /******************************************************************************
- *                                                                            *
- * Function: ha_manager_send_message                                          *
  *                                                                            *
  * Purpose: connect, send message and receive response in a given timeout     *
  *                                                                            *
@@ -170,8 +164,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_update_parent                                                 *
- *                                                                            *
  * Purpose: update parent process with ha_status and failover delay           *
  *                                                                            *
  ******************************************************************************/
@@ -182,8 +174,8 @@ static void	ha_update_parent(zbx_ipc_async_socket_t *rtc_socket, zbx_ha_info_t *
 	const char	*error = info->error;
 	int		ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ha_status:%s info:%s", __func__, zbx_ha_status_str(info->ha_status),
-			ZBX_NULL2EMPTY_STR(info->error));
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ha_status:%s failover_delay:%d info:%s", __func__,
+			zbx_ha_status_str(info->ha_status),  info->failover_delay, ZBX_NULL2EMPTY_STR(info->error));
 
 	zbx_serialize_prepare_value(len, info->ha_status);
 	zbx_serialize_prepare_value(len, info->failover_delay);
@@ -210,8 +202,6 @@ static void	ha_update_parent(zbx_ipc_async_socket_t *rtc_socket, zbx_ha_info_t *
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_send_heartbeat                                                *
- *                                                                            *
  * Purpose: send heartbeat message to main process                            *
  *                                                                            *
  ******************************************************************************/
@@ -226,8 +216,6 @@ static void	ha_send_heartbeat(zbx_ipc_async_socket_t *rtc_socket)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_ha_set_error                                                 *
  *                                                                            *
  * Purpose: set HA manager error                                              *
  *                                                                            *
@@ -256,8 +244,6 @@ static void	ha_set_error(zbx_ha_info_t *info, const char *fmt, ...)
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_db_begin                                                      *
- *                                                                            *
  * Purpose: start database transaction                                        *
  *                                                                            *
  * Comments: Sets error status on non-recoverable database error              *
@@ -279,8 +265,6 @@ static int	ha_db_begin(zbx_ha_info_t *info)
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_db_rollback                                                   *
- *                                                                            *
  * Purpose: roll back database transaction                                    *
  *                                                                            *
  * Comments: Sets error status on non-recoverable database error              *
@@ -301,8 +285,6 @@ static int	ha_db_rollback(zbx_ha_info_t *info)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ha_db_commit                                                     *
  *                                                                            *
  * Purpose: commit/rollback database transaction depending on commit result   *
  *                                                                            *
@@ -328,8 +310,6 @@ static int	ha_db_commit(zbx_ha_info_t *info)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ha_db_select                                                     *
  *                                                                            *
  * Purpose: perform database select sql query based on current database       *
  *          connection status                                                 *
@@ -362,8 +342,6 @@ static DB_RESULT	ha_db_select(zbx_ha_info_t *info, const char *sql, ...)
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_db_select                                                     *
- *                                                                            *
  * Purpose: perform database sql query based on current database              *
  *          connection status                                                 *
  *                                                                            *
@@ -384,8 +362,6 @@ static int	ha_db_execute(zbx_ha_info_t *info, const char *sql, ...)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ha_db_update_config                                              *
  *                                                                            *
  * Purpose: update HA configuration from database                             *
  *                                                                            *
@@ -414,8 +390,6 @@ static int	ha_db_update_config(zbx_ha_info_t *info)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ha_db_get_nodes                                                  *
  *                                                                            *
  * Purpose: get all nodes from database                                       *
  *                                                                            *
@@ -463,8 +437,6 @@ static int	ha_db_get_nodes(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes, int
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_check_registered_node                                         *
- *                                                                            *
  * Purpose: check if the node is registered in node table and get ID          *
  *                                                                            *
  ******************************************************************************/
@@ -483,8 +455,6 @@ static zbx_ha_node_t	*ha_find_node_by_name(zbx_vector_ha_node_t *nodes, const ch
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_get_external_address                                          *
- *                                                                            *
  * Purpose: get server external address and port from configuration           *
  *                                                                            *
  ******************************************************************************/
@@ -494,8 +464,6 @@ static void	ha_get_external_address(char **address, unsigned short *port)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ha_db_lock_nodes                                                 *
  *                                                                            *
  * Purpose: lock nodes in database                                            *
  *                                                                            *
@@ -516,8 +484,6 @@ static int	ha_db_lock_nodes(zbx_ha_info_t *info)
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_is_available                                                  *
- *                                                                            *
  * Purpose: check availability based on lastaccess timestamp, database time   *
  *          and failover delay                                                *
  *                                                                            *
@@ -534,8 +500,6 @@ static int	ha_is_available(const zbx_ha_info_t *info, int lastaccess, int db_tim
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ha_check_standalone_config                                       *
  *                                                                            *
  * Purpose: check if server can be started in standalone configuration        *
  *                                                                            *
@@ -567,8 +531,6 @@ static int	ha_check_standalone_config(zbx_ha_info_t *info, zbx_vector_ha_node_t 
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ha_check_cluster_config                                          *
  *                                                                            *
  * Purpose: check if server can be started in cluster configuration           *
  *                                                                            *
@@ -625,8 +587,6 @@ static int	ha_check_cluster_config(zbx_ha_info_t *info, zbx_vector_ha_node_t *no
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_db_get_time                                                   *
- *                                                                            *
  * Purpose: get current database time                                         *
  *                                                                            *
  ******************************************************************************/
@@ -658,8 +618,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_flush_audit                                                   *
- *                                                                            *
  * Purpose: flush audit taking in account database connection status          *
  *                                                                            *
  ******************************************************************************/
@@ -675,8 +633,6 @@ static void	ha_flush_audit(zbx_ha_info_t *info)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ha_db_create_node                                                *
  *                                                                            *
  * Purpose: add new node record in ha_node table if necessary                 *
  *                                                                            *
@@ -760,8 +716,6 @@ finish:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ha_db_register_node                                              *
  *                                                                            *
  * Purpose: register server node                                              *
  *                                                                            *
@@ -883,8 +837,6 @@ finish:
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_check_standby_nodes                                           *
- *                                                                            *
  * Purpose: check for standby nodes being unavailable for failrover_delay     *
  *          seconds and mark them unavailable                                 *
  *                                                                            *
@@ -943,8 +895,6 @@ static int	ha_check_standby_nodes(zbx_ha_info_t *info, zbx_vector_ha_node_t *nod
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_check_active_node                                             *
- *                                                                            *
  * Purpose: check for active nodes being unavailable for failover_delay       *
  *          seconds, mark them unavailable and set own status to active       *
  *                                                                            *
@@ -997,8 +947,6 @@ static int	ha_check_active_node(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ha_check_nodes                                                   *
  *                                                                            *
  * Purpose: check HA status based on nodes                                    *
  *                                                                            *
@@ -1113,8 +1061,6 @@ finish:
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_db_update_lastaccess                                          *
- *                                                                            *
  * Purpose: update node lastaccess                                            *
  *                                                                            *
  ******************************************************************************/
@@ -1138,8 +1084,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ha_db_get_nodes_json                                             *
  *                                                                            *
  * Purpose: get cluster status in lld compatible json format                  *
  *                                                                            *
@@ -1202,8 +1146,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ha_remove_node_impl                                              *
  *                                                                            *
  * Purpose: remove node by its cuid or name                                   *
  *                                                                            *
@@ -1292,8 +1234,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_report_cluster_status                                         *
- *                                                                            *
  * Purpose: report cluster status in log file                                 *
  *                                                                            *
  ******************************************************************************/
@@ -1326,8 +1266,6 @@ static void	ha_remove_node(zbx_ha_info_t *info, zbx_ipc_client_t *client, const 
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_send_status                                                   *
- *                                                                            *
  * Purpose: reply to ha_status request                                        *
  *                                                                            *
  ******************************************************************************/
@@ -1358,8 +1296,6 @@ static void	ha_send_status(zbx_ha_info_t *info, zbx_ipc_client_t *client)
 
 
 /******************************************************************************
- *                                                                            *
- * Function: ha_set_failover_delay                                            *
  *                                                                            *
  * Purpose: set failover delay                                                *
  *                                                                            *
@@ -1416,8 +1352,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_get_failover_delay                                            *
- *                                                                            *
  * Purpose: get failover delay                                                *
  *                                                                            *
  ******************************************************************************/
@@ -1432,8 +1366,6 @@ static void	ha_get_failover_delay(zbx_ha_info_t *info, zbx_ipc_client_t *client)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 /******************************************************************************
- *                                                                            *
- * Function: ha_send_node_list                                               *
  *                                                                            *
  * Purpose: reply to get nodes request                                        *
  *                                                                            *
@@ -1468,8 +1400,6 @@ static void	ha_send_node_list(zbx_ha_info_t *info, zbx_ipc_client_t *client)
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_db_update_exit_status                                         *
- *                                                                            *
  * Purpose: update node status in database on shutdown                        *
  *                                                                            *
  ******************************************************************************/
@@ -1502,15 +1432,15 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_ha_get_status                                                *
- *                                                                            *
  * Purpose: get HA manager status                                             *
  *                                                                            *
+ * Comments: In the case of timeout the ha_status will be force to:           *
+ *   standby - for cluster setup                                              *
+ *   active  - for standalone setup                                           *
+ *                                                                            *
  ******************************************************************************/
-int	zbx_ha_get_status(int *ha_status, char **error)
+int	zbx_ha_get_status(int *ha_status, int *ha_failover_delay, char **error)
 {
-	static time_t	last_update;
-	static int	ha_failover_delay = ZBX_HA_DEFAULT_FAILOVER_DELAY;
 	int		ret;
 	unsigned char	*result = NULL;
 
@@ -1525,28 +1455,20 @@ int	zbx_ha_get_status(int *ha_status, char **error)
 			zbx_uint32_t	len;
 
 			ptr += zbx_deserialize_value(ptr, ha_status);
-			ptr += zbx_deserialize_value(ptr, &ha_failover_delay);
+			ptr += zbx_deserialize_value(ptr, ha_failover_delay);
 			(void)zbx_deserialize_str(ptr, error, len);
 
 			zbx_free(result);
-			last_update = time(NULL);
 
 			if (ZBX_NODE_STATUS_ERROR == *ha_status)
 				ret = FAIL;
 		}
 		else
 		{
-			time_t	now;
-
-			now = time(NULL);
-
-			/* in the case of timeout switch status to standby if enough time has */
-			/* passed since last successful update                                */
-			if (ZBX_HA_IS_CLUSTER() && *ha_status == ZBX_NODE_STATUS_ACTIVE && 0 != last_update)
-			{
-				if (last_update + ha_failover_delay - ZBX_HA_POLL_PERIOD <= now || now < last_update)
-					*ha_status = ZBX_NODE_STATUS_STANDBY;
-			}
+			if (ZBX_HA_IS_CLUSTER())
+				*ha_status = ZBX_NODE_STATUS_STANDBY;
+			else
+				*ha_status = ZBX_NODE_STATUS_ACTIVE;
 		}
 	}
 
@@ -1557,8 +1479,6 @@ int	zbx_ha_get_status(int *ha_status, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_ha_dispatch_message                                          *
- *                                                                            *
  * Purpose: handle HA manager notifications                                   *
  *                                                                            *
  * Comments: This function also monitors heartbeat notifications and          *
@@ -1567,10 +1487,9 @@ int	zbx_ha_get_status(int *ha_status, char **error)
  *           process to switch to standby mode and initiate teardown process  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_ha_dispatch_message(zbx_ipc_message_t *message, int *ha_status, char **error)
+int	zbx_ha_dispatch_message(zbx_ipc_message_t *message, int *ha_status, int *ha_failover_delay, char **error)
 {
 	static time_t	last_hb;
-	static int	ha_failover_delay = ZBX_HA_DEFAULT_FAILOVER_DELAY;
 	int		ret = SUCCEED, ha_status_old;
 	time_t		now;
 	unsigned char	*ptr;
@@ -1589,7 +1508,7 @@ int	zbx_ha_dispatch_message(zbx_ipc_message_t *message, int *ha_status, char **e
 
 				ptr = message->data;
 				ptr += zbx_deserialize_value(ptr, ha_status);
-				ptr += zbx_deserialize_value(ptr, &ha_failover_delay);
+				ptr += zbx_deserialize_value(ptr, ha_failover_delay);
 				(void)zbx_deserialize_str(ptr, error, len);
 
 				if (ZBX_NODE_STATUS_ERROR == *ha_status)
@@ -1612,7 +1531,7 @@ int	zbx_ha_dispatch_message(zbx_ipc_message_t *message, int *ha_status, char **e
 
 	if (ZBX_HA_IS_CLUSTER() && *ha_status == ZBX_NODE_STATUS_ACTIVE && 0 != last_hb)
 	{
-		if (last_hb + ha_failover_delay - ZBX_HA_POLL_PERIOD <= now || now < last_hb)
+		if (last_hb + *ha_failover_delay - ZBX_HA_POLL_PERIOD <= now || now < last_hb)
 			*ha_status = ZBX_NODE_STATUS_STANDBY;
 	}
 out:
@@ -1620,8 +1539,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_ha_start                                                     *
  *                                                                            *
  * Purpose: start HA manager                                                  *
  *                                                                            *
@@ -1691,8 +1608,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_ha_pause                                                     *
- *                                                                            *
  * Purpose: pause HA manager                                                  *
  *                                                                            *
  * Comments: HA manager must be paused before stopping it normally            *
@@ -1715,8 +1630,6 @@ int	zbx_ha_pause(char **error)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_ha_stop                                                      *
  *                                                                            *
  * Purpose: stop  HA manager                                                  *
  *                                                                            *
@@ -1759,8 +1672,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_ha_kill                                                      *
- *                                                                            *
  * Purpose: kill HA manager                                                   *
  *                                                                            *
  ******************************************************************************/
@@ -1772,8 +1683,6 @@ void	zbx_ha_kill(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_ha_check_pid                                                 *
  *                                                                            *
  * Purpose: check if the pid is HA manager pid                                *
  *                                                                            *
@@ -1842,8 +1751,6 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 		if (ZBX_NODE_STATUS_ERROR == info.ha_status)
 			goto pause;
 	}
-
-	ha_update_parent(&rtc_socket, &info);
 
 	nextcheck = ZBX_HA_POLL_PERIOD;
 

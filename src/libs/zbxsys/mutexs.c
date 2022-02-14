@@ -57,8 +57,6 @@ static int			shm_id, locks_disabled;
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_locks_create                                                 *
- *                                                                            *
  * Purpose: if pthread mutexes and read-write locks can be shared between     *
  *          processes then create them, otherwise fallback to System V        *
  *          semaphore operations                                              *
@@ -194,8 +192,6 @@ void	zbx_locks_destroy(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_mutex_addr_get                                               *
- *                                                                            *
  * Purpose: acquire address of the mutex                                      *
  *                                                                            *
  * Parameters: mutex_name - name of the mutex to return address for           *
@@ -214,8 +210,6 @@ zbx_mutex_t	zbx_mutex_addr_get(zbx_mutex_name_t mutex_name)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_mutex_addr_get                                               *
- *                                                                            *
  * Purpose: acquire address of the rwlock                                     *
  *                                                                            *
  * Parameters: rwlock_name - name of the rwlock to return address for         *
@@ -233,8 +227,6 @@ zbx_rwlock_t	zbx_rwlock_addr_get(zbx_rwlock_name_t rwlock_name)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_rwlock_create                                                *
  *                                                                            *
  * Purpose: read-write locks are created using zbx_locks_create() function    *
  *          this is only to obtain handle, if read write locks are not        *
@@ -262,8 +254,6 @@ int	zbx_rwlock_create(zbx_rwlock_t *rwlock, zbx_rwlock_name_t name, char **error
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 /******************************************************************************
  *                                                                            *
- * Function: __zbx_rwlock_wrlock                                              *
- *                                                                            *
  * Purpose: acquire write lock for read-write lock (exclusive access)         *
  *                                                                            *
  * Parameters: rwlock - handle of read-write lock                             *
@@ -285,8 +275,6 @@ void	__zbx_rwlock_wrlock(const char *filename, int line, zbx_rwlock_t rwlock)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: __zbx_rwlock_rdlock                                              *
  *                                                                            *
  * Purpose: acquire read lock for read-write lock (there can be many readers) *
  *                                                                            *
@@ -310,8 +298,6 @@ void	__zbx_rwlock_rdlock(const char *filename, int line, zbx_rwlock_t rwlock)
 
 /******************************************************************************
  *                                                                            *
- * Function: __zbx_rwlock_unlock                                              *
- *                                                                            *
  * Purpose: unlock read-write lock                                            *
  *                                                                            *
  * Parameters: rwlock - handle of read-write lock                             *
@@ -334,8 +320,6 @@ void	__zbx_rwlock_unlock(const char *filename, int line, zbx_rwlock_t rwlock)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_rwlock_destroy                                               *
- *                                                                            *
  * Purpose: Destroy read-write lock                                           *
  *                                                                            *
  * Parameters: rwlock - handle of read-write lock                             *
@@ -352,8 +336,6 @@ void	zbx_rwlock_destroy(zbx_rwlock_t *rwlock)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_locks_disable                                                *
- *                                                                            *
  * Purpose:  disable locks                                                    *
  *                                                                            *
  ******************************************************************************/
@@ -364,8 +346,6 @@ void	zbx_locks_disable(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_locks_enable                                                 *
  *                                                                            *
  * Purpose:  enable locks                                                     *
  *                                                                            *
@@ -380,8 +360,6 @@ void	zbx_locks_enable(void)
 #endif	/* _WINDOWS */
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_mutex_create                                                 *
  *                                                                            *
  * Purpose: Create the mutex                                                  *
  *                                                                            *
@@ -413,8 +391,6 @@ int	zbx_mutex_create(zbx_mutex_t *mutex, zbx_mutex_name_t name, char **error)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_mutex_lock                                                   *
  *                                                                            *
  * Purpose: Waits until the mutex is in the signalled state                   *
  *                                                                            *
@@ -486,8 +462,6 @@ void	__zbx_mutex_lock(const char *filename, int line, zbx_mutex_t mutex)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_mutex_unlock                                                 *
- *                                                                            *
  * Purpose: Unlock the mutex                                                  *
  *                                                                            *
  * Parameters: mutex - handle of mutex                                        *
@@ -540,8 +514,6 @@ void	__zbx_mutex_unlock(const char *filename, int line, zbx_mutex_t mutex)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_mutex_destroy                                                *
- *                                                                            *
  * Purpose: Destroy the mutex                                                 *
  *                                                                            *
  * Parameters: mutex - handle of mutex                                        *
@@ -561,8 +533,6 @@ void	zbx_mutex_destroy(zbx_mutex_t *mutex)
 
 #ifdef _WINDOWS
 /******************************************************************************
- *                                                                            *
- * Function: zbx_mutex_create_per_process_name                                *
  *                                                                            *
  * Purpose: Appends PID to the prefix of the mutex                            *
  *                                                                            *

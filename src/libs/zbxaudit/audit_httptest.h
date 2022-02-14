@@ -21,9 +21,7 @@
 #define ZABBIX_AUDIT_HTTPTEST_H
 
 #include "common.h"
-#include "audit.h"
-
-#include "../zbxdbhigh/template.h"
+#include "zbxalgo.h"
 
 void	zbx_audit_httptest_create_entry(int audit_action, zbx_uint64_t httptestid, const char *name);
 

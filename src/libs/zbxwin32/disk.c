@@ -22,8 +22,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: get_cluster_size                                                 *
- *                                                                            *
  * Purpose: get file system cluster size for specified path (for cases when   *
  *          the file system is mounted on empty NTFS directory)               *
  *                                                                            *
