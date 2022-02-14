@@ -3526,7 +3526,16 @@ static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_v
 	}
 
 	if (NULL != session && 0 != last_valueid)
+	{
+		if (session->last_valueid > last_valueid)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "received id:" ZBX_FS_UI64 " is less than last id:"
+					ZBX_FS_UI64, last_valueid, session->last_valueid);
+		}
+
 		session->last_valueid = last_valueid;
+	}
+
 
 	zbx_free(errcodes);
 	zbx_free(items);
@@ -3726,7 +3735,17 @@ static void	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_val
 			}
 
 			if (NULL != session)
-				session->last_valueid = values[i].id;
+			{
+				if (session->last_valueid < values[i].id)
+				{
+					session->last_valueid = values[i].id;
+				}
+				else
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "received id:" ZBX_FS_UI64 " is less than"
+							" last id:" ZBX_FS_UI64, values[i].id, session->last_valueid);
+				}
+			}
 		}
 
 		processed_num += process_history_data(items, values, errcodes, values_num, NULL);
