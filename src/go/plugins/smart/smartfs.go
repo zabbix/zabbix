@@ -157,8 +157,6 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 		return nil, err
 	}
 
-	// os.Exit(0)
-
 	r := &runner{
 		names:        make(chan string, len(basicDev)),
 		err:          make(chan error, cpuCount),
