@@ -3735,17 +3735,7 @@ static void	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_val
 			}
 
 			if (NULL != session)
-			{
-				if (session->last_valueid < values[i].id)
-				{
-					session->last_valueid = values[i].id;
-				}
-				else
-				{
-					zabbix_log(LOG_LEVEL_DEBUG, "received id:" ZBX_FS_UI64 " is less than"
-							" last id:" ZBX_FS_UI64, values[i].id, session->last_valueid);
-				}
-			}
+				session->last_valueid = values[i].id;
 		}
 
 		processed_num += process_history_data(items, values, errcodes, values_num, NULL);
