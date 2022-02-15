@@ -1268,6 +1268,70 @@ static char	*get_print_time(time_t st_raw)
 #	define ZBX_DIR_DELIMITER	"\\"
 #else
 #	define ZBX_DIR_DELIMITER	"/"
+
+static char	*canonicalize_path(const char *fullname)
+{
+	int			i, up_level = 0;
+	char			*name, *p2;
+	const char		*p1 = &fullname[1];
+	size_t			name_alloc = 0, name_offset = 0;
+	zbx_vector_str_t	names;
+
+	zbx_vector_str_create(&names);
+
+	do
+	{
+		if (NULL != (p2 = strchr(p1, '/')))
+		{
+			name = zbx_dsprintf(NULL, "%.*s", (int)(p2 - p1), p1);
+			p1 = p2 + 1;
+		}
+		else
+			name = zbx_strdup(NULL, p1);
+
+		zbx_vector_str_append(&names, name);
+	}
+	while (NULL != p2);
+
+	name = NULL;
+
+	/* casts to silence warning */
+	for (i = (int)((unsigned)names.values_num - 1); 0 <= i; i--)
+	{
+		char *ptr = names.values[i];
+
+		if (0 == strcmp(ptr, ".") || 0 == strlen(ptr))
+		{
+			zbx_free(ptr);
+			zbx_vector_str_remove(&names, i);
+		}
+		else if (0 == strcmp(ptr, ".."))
+		{
+			zbx_free(ptr);
+			zbx_vector_str_remove(&names, i);
+			up_level++;
+		}
+		else if (0 < up_level)
+		{
+			zbx_free(ptr);
+			zbx_vector_str_remove(&names, i);
+			up_level--;
+		}
+	}
+
+	if (0 < names.values_num)
+	{
+		for (i = 0; i < names.values_num; i++)
+			zbx_snprintf_alloc(&name, &name_alloc, &name_offset, "/%s", names.values[i]);
+	}
+	else
+		zbx_snprintf_alloc(&name, &name_alloc, &name_offset, "/");
+
+	zbx_vector_str_clear_ext(&names, zbx_str_free);
+	zbx_vector_str_destroy(&names);
+
+	return name;
+}
 #endif
 
 static int	get_dir_names(const char *filename, char **basename, char **dirname, char **pathname)
@@ -1278,16 +1342,22 @@ static int	get_dir_names(const char *filename, char **basename, char **dirname, 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 	if (NULL == (*pathname = _fullpath(NULL, filename, 0)))
 		return FAIL;
-#elif defined(__hpux)
-	char resolved_path[PATH_MAX + 1];
-
-	if (NULL == (*pathname = realpath(filename, resolved_path)))
-		return FAIL;
-
-	*pathname = zbx_strdup(NULL, *pathname);
 #else
-	if (NULL == (*pathname = realpath(filename, NULL)))
-		return FAIL;
+	char	resolved_path[PATH_MAX + 1], *name = NULL;
+	size_t	name_alloc = 0, name_offset = 0;
+
+	if ( '/' != filename[0])
+	{
+		if (NULL == getcwd(resolved_path, PATH_MAX))
+			return FAIL;
+
+		zbx_snprintf_alloc(&name, &name_alloc, &name_offset, "%s/%s", resolved_path, filename);
+	}
+	else
+		name = zbx_strdup(NULL, filename);
+
+	*pathname = canonicalize_path(name);
+	zbx_free(name);
 #endif
 
 	ptr1 = *pathname;
