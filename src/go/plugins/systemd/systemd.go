@@ -266,10 +266,7 @@ func (p *Plugin) discovery(params []string, conn *dbus.Conn) (interface{}, error
 			continue
 		}
 
-		array = append(array, unitJson{basePath, details["Description"].(string), details["LoadState"].(string),
-			details["ActiveState"].(string), details["SubState"].(string), "", unitPath, 0, "", "",
-			f.EnablementState,
-		})
+		array = append(array, unitJson{basePath, "", "", "inactive", "", "", unitPath, 0, "", "", f.EnablementState})
 	}
 
 	jsonArray, err := json.Marshal(array)
