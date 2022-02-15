@@ -257,7 +257,6 @@ class testPageApiTokens extends CWebTest {
 	public function checkDelete($url, $token) {
 		$this->page->login()->open($url);
 
-		var_dump($token);
 		// Delete API token.
 		$this->query('class:list-table')->asTable()->one()->findRow('Name', $token)->select();
 		$this->query('button:Delete')->one()->waitUntilClickable()->click();
