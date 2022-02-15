@@ -3532,10 +3532,9 @@ static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_v
 			zabbix_log(LOG_LEVEL_WARNING, "received id:" ZBX_FS_UI64 " is less than last id:"
 					ZBX_FS_UI64, last_valueid, session->last_valueid);
 		}
-
-		session->last_valueid = last_valueid;
+		else
+			session->last_valueid = last_valueid;
 	}
-
 
 	zbx_free(errcodes);
 	zbx_free(items);
