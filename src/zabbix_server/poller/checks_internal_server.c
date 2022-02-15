@@ -58,31 +58,6 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 
 		SET_UI64_RESULT(result, DCget_trigger_count());
 	}
-	else if (0 == strcmp(param1, "history") ||		/* zabbix["history"] */
-			0 == strcmp(param1, "history_log") ||	/* zabbix["history_log"] */
-			0 == strcmp(param1, "history_str") ||	/* zabbix["history_str"] */
-			0 == strcmp(param1, "history_text") ||	/* zabbix["history_text"] */
-			0 == strcmp(param1, "history_uint"))	/* zabbix["history_uint"] */
-	{
-		if (1 != nparams)
-		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
-			goto out;
-		}
-
-		SET_UI64_RESULT(result, DBget_row_count(param1));
-	}
-	else if (0 == strcmp(param1, "trends") ||			/* zabbix["trends"] */
-			0 == strcmp(param1, "trends_uint"))	/* zabbix["trends_uint"] */
-	{
-		if (1 != nparams)
-		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
-			goto out;
-		}
-
-		SET_UI64_RESULT(result, DBget_row_count(param1));
-	}
 	else if (0 == strcmp(param1, "proxy"))			/* zabbix["proxy",<hostname>,"lastaccess" OR "delay"] */
 	{
 		int	value, res;
