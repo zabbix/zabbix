@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -20,24 +20,20 @@
 
 
 /**
- * Factory for creating import conversions.
+ * Converter for converting import data from 6.0 to 6.2.
  */
-class CImportConverterFactory extends CRegistryFactory {
+class C60ImportConverter extends CConverter {
 
-	public function __construct() {
-		parent::__construct([
-			'1.0' => 'C10ImportConverter',
-			'2.0' => 'C20ImportConverter',
-			'3.0' => 'C30ImportConverter',
-			'3.2' => 'C32ImportConverter',
-			'3.4' => 'C34ImportConverter',
-			'4.0' => 'C40ImportConverter',
-			'4.2' => 'C42ImportConverter',
-			'4.4' => 'C44ImportConverter',
-			'5.0' => 'C50ImportConverter',
-			'5.2' => 'C52ImportConverter',
-			'5.4' => 'C54ImportConverter',
-			'6.0' => 'C60ImportConverter'
-		]);
+	/**
+	 * Convert import data from 6.0 to 6.2 version.
+	 *
+	 * @param array $data
+	 *
+	 * @return array
+	 */
+	public function convert(array $data): array {
+		$data['zabbix_export']['version'] = '6.2';
+
+		return $data;
 	}
 }
