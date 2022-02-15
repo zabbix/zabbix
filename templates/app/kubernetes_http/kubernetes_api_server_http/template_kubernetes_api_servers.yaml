@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-02-14T18:07:08Z'
+  date: '2022-02-15T14:24:06Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -257,45 +257,6 @@ zabbix_export:
             -
               tag: component
               value: audit
-        -
-          uuid: 5b4c8a01ab03480bb7d95ab6e1630d98
-          name: 'Kubernetes API: Client certificate expiration, p1'
-          type: CALCULATED
-          key: kubernetes.api.client_certificate_expiration_p1
-          history: 7d
-          value_type: FLOAT
-          units: s
-          params: 'bucket_percentile(//kubernetes.api.client_certificate_expiration_seconds_bucket[*],5m,1)'
-          description: '1 percentile of of the remaining lifetime on the certificate used to authenticate a request.'
-          tags:
-            -
-              tag: component
-              value: client-certificate
-          triggers:
-            -
-              uuid: 132d58724bd141afa3f28101326fe922
-              expression: 'last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1) > 0 and last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1) < {$KUBE.API.CERT.EXPIRATION}*24*60*60'
-              name: 'Kubernetes API: Kubernetes client certificate expires in {$KUBE.API.CERT.EXPIRATION} days'
-              priority: WARNING
-              description: 'A client certificate used to authenticate to the apiserver is expiring in {$KUBE.API.CERT.EXPIRATION} days.'
-              dependencies:
-                -
-                  name: 'Kubernetes API: Kubernetes client certificate expires soon'
-                  expression: 'last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1) > 0 and last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1) < 24*60*60'
-              tags:
-                -
-                  tag: scope
-                  value: availability
-            -
-              uuid: 1371958c0339430b8a333851766c01c0
-              expression: 'last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1) > 0 and last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1) < 24*60*60'
-              name: 'Kubernetes API: Kubernetes client certificate expires soon'
-              priority: WARNING
-              description: 'A client certificate used to authenticate to the apiserver is expiring in less than 24.0 hours.'
-              tags:
-                -
-                  tag: scope
-                  value: availability
         -
           uuid: de87284b8bd644398e4a88a064e206bb
           name: 'Kubernetes API: CPU'
@@ -901,6 +862,46 @@ zabbix_export:
           description: 'Discovery raw data of client certificate expiration'
           item_prototypes:
             -
+              uuid: b69600f22c7b42b48f8601ada06a5a9f
+              name: 'Kubernetes API: Client certificate expiration, p1'
+              type: CALCULATED
+              key: 'kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]'
+              history: 7d
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              units: s
+              params: 'bucket_percentile(//kubernetes.api.client_certificate_expiration_seconds_bucket[*],5m,1)'
+              description: '1 percentile of of the remaining lifetime on the certificate used to authenticate a request.'
+              tags:
+                -
+                  tag: component
+                  value: client-certificate
+              trigger_prototypes:
+                -
+                  uuid: 132d58724bd141afa3f28101326fe922
+                  expression: 'last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) > 0 and last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) < {$KUBE.API.CERT.EXPIRATION}*24*60*60'
+                  name: 'Kubernetes API: Kubernetes client certificate expires in {$KUBE.API.CERT.EXPIRATION} days'
+                  priority: WARNING
+                  description: 'A client certificate used to authenticate to the apiserver is expiring in {$KUBE.API.CERT.EXPIRATION} days.'
+                  dependencies:
+                    -
+                      name: 'Kubernetes API: Kubernetes client certificate expires soon'
+                      expression: 'last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) > 0 and last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) < 24*60*60'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                -
+                  uuid: 1371958c0339430b8a333851766c01c0
+                  expression: 'last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) > 0 and last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) < 24*60*60'
+                  name: 'Kubernetes API: Kubernetes client certificate expires soon'
+                  priority: WARNING
+                  description: 'A client certificate used to authenticate to the apiserver is expiring in less than 24.0 hours.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
               uuid: 860cc40806254564bddb3617b8b75e74
               name: 'Kubernetes API: Certificate expiration seconds bucket, {#LE}'
               type: DEPENDENT
@@ -908,6 +909,7 @@ zabbix_export:
               delay: '0'
               history: 1h
               trends: '0'
+              discover: NO_DISCOVER
               value_type: FLOAT
               description: 'Distribution of the remaining lifetime on the certificate used to authenticate a request.'
               preprocessing:
@@ -930,20 +932,68 @@ zabbix_export:
             -
               type: PROMETHEUS_TO_JSON
               parameters:
-                - apiserver_client_certificate_expiration_seconds_bucket
+                - '{__name__=~ "apiserver_client_certificate_expiration_seconds_*"}'
             -
               type: JAVASCRIPT
               parameters:
                 - |
-                  var output = JSON.parse(value).map(function(item) {
-                      return {'{#LE}': item.labels.le};
+                  var lookup = {},
+                      result = [];
+                  
+                  JSON.parse(value).forEach(function (item) {
+                      if (item.name === "apiserver_client_certificate_expiration_seconds_count"){
+                          result.push({
+                              '{#TYPE}': 'totals',
+                              '{#SINGLETON}': ''
+                          });
+                  
+                        }
+                      else if  (item.name === "apiserver_client_certificate_expiration_seconds_bucket"){
+                          result.push({
+                              '{#TYPE}': 'buckets',
+                              '{#LE}': item.labels.le
+                          });
+                      }
                   });
                   
-                  return JSON.stringify({'data': output});
+                  return JSON.stringify(result);
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
+          overrides:
+            -
+              name: 'bucket item'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#TYPE}'
+                    value: buckets
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
+                  value: bucket
+                  status: ENABLED
+                  discover: DISCOVER
+            -
+              name: 'total item'
+              step: '2'
+              filter:
+                conditions:
+                  -
+                    macro: '{#TYPE}'
+                    value: totals
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: NOT_LIKE
+                  value: bucket
+                  status: ENABLED
+                  discover: DISCOVER
         -
           uuid: 8dcd7c95a9364efdb2fe64c651360ad4
           name: 'Etcd objects metrics discovery'
