@@ -67,7 +67,9 @@ class CControllerPopupTokenView extends CController {
 	}
 
 	protected function doAction() {
-		$response = new CControllerResponseData($this->getInputAll());
+		$data = $this->getInputAll();
+		$data['user'] = ['debug_mode' => $this->getDebugMode()];
+		$response = new CControllerResponseData($data);
 		$response->setTitle(_('API tokens'));
 		$this->setResponse($response);
 	}

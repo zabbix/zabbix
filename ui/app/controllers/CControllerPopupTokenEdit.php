@@ -108,6 +108,8 @@ class CControllerPopupTokenEdit extends CController {
 
 		$data['admin_mode'] = $this->getInput('admin_mode');
 
+		$data['user'] = ['debug_mode' => $this->getDebugMode()];
+
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('API tokens'));
 		$this->setResponse($response);
