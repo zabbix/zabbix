@@ -850,10 +850,10 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 						}
 					}
 					if (isset($constructor['elementError'])) {
-						$this->zbxTestAssertElementPresentXpath('//span[@class="icon-info status-red"]');
+						$this->zbxTestAssertElementPresentXpath('//a[@class="icon-info status-red"]');
 					}
 					else {
-						$this->zbxTestAssertElementNotPresentXpath('//span[@class="icon-info status-red"]');
+						$this->zbxTestAssertElementNotPresentXpath('//a[@class="icon-info status-red"]');
 					}
 
 					if (isset($constructor['text'])) {
