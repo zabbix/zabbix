@@ -434,7 +434,6 @@ if (empty($_GET['files'])) {
 		'class.cdebug.js',
 		'class.overlaycollection.js',
 		'class.overlay.js',
-		'class.calendar.js',
 		'class.cdate.js',
 		'class.cookie.js',
 		'class.curl.js',

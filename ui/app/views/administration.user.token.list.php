@@ -25,6 +25,7 @@
  */
 
 $this->includeJsFile('administration.user.token.list.js.php');
+$this->addJsFile('class.calendar.js');
 
 $filter = (new CFilter())
 	->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'user.token.list'))
