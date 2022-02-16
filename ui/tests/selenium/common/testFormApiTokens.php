@@ -198,16 +198,16 @@ class testFormApiTokens extends CWebTest {
 		}
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$title = ($action === 'create') ? 'Cannot add API token' : 'Cannot update API token';
-			$this->assertMessage(TEST_BAD, null, $data['error_details']);
+			$this->assertMessage(TEST_BAD, ($action === 'create') ? 'Cannot add API token' : 'Cannot update API token',
+					$data['error_details']
+			);
 
 			// Check that DB hash is not changed.
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 			$dialog->close();
 		}
 		else {
-			$title = ($action === 'create') ? 'API token added' : 'API token updated';
-			$this->assertMessage(TEST_GOOD, $title);
+			$this->assertMessage(TEST_GOOD, ($action === 'create') ? 'API token added' : 'API token updated');
 
 			// Substitute user name with full name in the data provider for reference.
 			if (array_key_exists('full_name', $data)) {
