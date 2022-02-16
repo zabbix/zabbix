@@ -246,7 +246,7 @@ func (p *Plugin) discovery(params []string, conn *dbus.Conn) (interface{}, error
 
 	for _, f := range unitFiles {
 		unitFileExt := filepath.Ext(f.Name)
-		if f.EnablementState != "disabled" || (len(ext) != 0 && ext != unitFileExt) {
+		if f.EnablementState != "disabled" || (len(ext) != 0 && ext != unitFileExt) || isEnabledUnit(units, f.Name) {
 			continue
 		}
 
@@ -369,6 +369,15 @@ func (p *Plugin) createStateMapping(v map[string]interface{}, key string, names 
 		p.Debugf("cannot create mapping for '%s' unit state: unit state with information type string not found", key)
 	}
 
+}
+
+func isEnabledUnit(units []unit, p string) bool {
+	for _, u := range units {
+		if u.Name == p {
+			return true
+		}
+	}
+	return false
 }
 
 func init() {
