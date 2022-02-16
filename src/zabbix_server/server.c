@@ -1687,9 +1687,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		return FAIL;
 	}
 
-	zbx_check_db();
-
 	DBcheck_character_set();
+	zbx_check_db();
 
 	if (SUCCEED != DBcheck_double_type())
 	{
