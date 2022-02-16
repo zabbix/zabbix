@@ -380,7 +380,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 {
 	int		ret = ZBX_DB_OK, last_txn_error, last_txn_level;
 #if defined(HAVE_MYSQL)
-	const char	*charset;
 #if LIBMYSQL_VERSION_ID >= 80000	/* my_bool type is removed in MySQL 8.0 */
 	bool		mysql_reconnect = 1;
 #else
@@ -572,10 +571,9 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	if (ZBX_DB_OK == ret && 0 != mysql_options(conn, MYSQL_OPT_RECONNECT, &mysql_reconnect))
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot set MySQL reconnect option.");
 
-	charset = NULL == ZBX_CHARSET ? "utf8" : ZBX_CHARSET;
 	/* in contrast to "set names utf8" results of this call will survive auto-reconnects */
-	if (ZBX_DB_OK == ret && 0 != mysql_set_character_set(conn, charset))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot set MySQL character set to \"%s\"", charset);
+	if (NULL != ZBX_CHARSET && ZBX_DB_OK == ret && 0 != mysql_set_character_set(conn, ZBX_CHARSET))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set MySQL character set to \"%s\"", ZBX_CHARSET);
 
 	if (ZBX_DB_OK == ret && 0 != mysql_autocommit(conn, 1))
 	{
