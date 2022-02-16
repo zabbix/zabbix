@@ -28,7 +28,7 @@ class CControllerPopupTokenView extends CController {
 	protected function checkInput() {
 		$fields = [
 			'name'        => 'required',
-			'user'        => 'required',
+			'user_name'   => 'required',
 			'auth_token'  => 'required',
 			'description' => 'required',
 			'expires_at'  => 'required',
@@ -68,7 +68,6 @@ class CControllerPopupTokenView extends CController {
 
 	protected function doAction() {
 		$data = $this->getInputAll();
-		$data['token_user'] = $data['user'];
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];
 
 		$response = new CControllerResponseData($data);

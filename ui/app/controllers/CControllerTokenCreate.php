@@ -92,7 +92,7 @@ class CControllerTokenCreate extends CController {
 
 			$data = [
 				'name' => $token['name'],
-				'user' => getUserFullname($user),
+				'user_name' => getUserFullname($user),
 				'auth_token' => $auth_token,
 				'expires_at' => $token['expires_at'],
 				'description' => $token['description'],
