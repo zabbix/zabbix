@@ -224,7 +224,6 @@ zabbix_export:
         
                 if (status) {
                     data.issue.status_id = status;
-                    data.issue.due_date = new Date().toISOString().split('T')[0];
                 }
         
                 Redmine.request('put', 'issues/' + Redmine.params.issue_key + '.json', Redmine.addCustomFields(data, fields));
