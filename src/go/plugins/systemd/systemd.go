@@ -246,7 +246,8 @@ func (p *Plugin) discovery(params []string, conn *dbus.Conn) (interface{}, error
 
 	for _, f := range unitFiles {
 		unitFileExt := filepath.Ext(f.Name)
-		if f.EnablementState != "disabled" || (len(ext) != 0 && ext != unitFileExt) || isEnabledUnit(units, f.Name) {
+		basePath := filepath.Base(f.Name)
+		if f.EnablementState != "disabled" || (len(ext) != 0 && ext != unitFileExt) || isEnabledUnit(units, basePath) {
 			continue
 		}
 
@@ -255,7 +256,6 @@ func (p *Plugin) discovery(params []string, conn *dbus.Conn) (interface{}, error
 			continue
 		}
 
-		basePath := filepath.Base(f.Name)
 		unitPath := "/org/freedesktop/systemd1/unit/" + getName(basePath)
 
 		var details map[string]interface{}
