@@ -35,10 +35,10 @@ $token_from_grid = (new CFormGrid())
 		new CLabel(_('Name') . ':'),
 		new CFormField($data['name'])
 	])
-	->addItem(array_key_exists('user', $data)
+	->addItem(array_key_exists('token_user', $data)
 		? [
 			new CLabel(_('User') . ':'),
-			new CFormField($data['user'])
+			new CFormField($data['token_user'])
 		]
 		: null
 	)
