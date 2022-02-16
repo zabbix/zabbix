@@ -178,19 +178,6 @@ class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 					'error_details' => 'Incorrect value for field "expires_at": a time is expected.'
 				]
 			],
-			// Correct format but wrong numbers in the "Expires at" field.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Wrong time value in Expires at field token',
-						'User' => 'Admin',
-						'Set expiration date and time' => true,
-						'Expires at' => '2021-01-01 24:00:00'
-					],
-					'error_details' => 'Incorrect value for field "expires_at": a time is expected.'
-				]
-			],
 			// API token with special symbols in name and without an expiry date.
 			[
 				[
