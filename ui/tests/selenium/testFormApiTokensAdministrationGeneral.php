@@ -178,6 +178,19 @@ class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 					'error_details' => 'Incorrect value for field "expires_at": a time is expected.'
 				]
 			],
+			// Correct format but wrong numbers in the "Expires at" field.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Wrong time value in Expires at field token',
+						'User' => 'Admin',
+						'Set expiration date and time' => true,
+						'Expires at' => '2021-01-01 24:00:00'
+					],
+					'error_details' => 'Incorrect value for field "expires_at": a time is expected.'
+				]
+			],
 			// API token with special symbols in name and without an expiry date.
 			[
 				[
@@ -252,9 +265,6 @@ class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 		$this->checkTokensFormLayout('administration');
 	}
 
-	/**
-	 * @onBeforeOnce getTokenId
-	 */
 	public function testFormApiTokensAdministrationGeneral_RegenerationFormLayout() {
 		$this->checkTokensRegenerateFormLayout('administration');
 	}
@@ -265,13 +275,11 @@ class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 	 * @dataProvider getTokenData
 	 */
 	public function testFormApiTokensAdministrationGeneral_Create($data) {
-		$this->checkTokensAction($data, 'zabbix.php?action=token.edit', 'create');
+		$this->checkTokensAction($data, 'create');
 	}
 
 	/**
 	 * @backupOnce token
-	 *
-	 * @onBeforeOnce getTokenId
 	 *
 	 * @dataProvider getTokenData
 	 */
@@ -281,7 +289,7 @@ class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 			return;
 		}
 
-		$this->checkTokensAction($data, 'zabbix.php?action=token.edit&tokenid='.self::$tokenid, 'update');
+		$this->checkTokensAction($data, 'update', self::$update_token);
 	}
 
 	public function testFormApiTokensAdministrationGeneral_UpdateOtherUserToken() {
@@ -294,33 +302,26 @@ class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 				'Enabled' => false
 			]
 		];
-		$token_id = $this->getTokenId(self::USER_ZABBIX_TOKEN);
-		$this->checkTokensAction($data, 'zabbix.php?action=token.edit&tokenid='.$token_id, 'update');
+
+		$this->checkTokensAction($data, 'update', self::USER_ZABBIX_TOKEN);
 	}
 
-	/**
-	 * @onBeforeOnce getTokenId
-	 */
 	public function testFormApiTokensAdministrationGeneral_SimpleUpdate() {
-		$this->checkTokenSimpleUpdate('zabbix.php?action=token.edit&tokenid='.self::$tokenid);
+		$this->checkTokenSimpleUpdate(self::$update_token);
 	}
 
-	/**
-	 * @onBeforeOnce getTokenId
-	 */
-	public function testFormApiTokensAdministrationGeneral_Cancel() {
-		$this->checkTokenCancel('zabbix.php?action=token.edit', 'Admin');
-		$this->checkTokenCancel('zabbix.php?action=token.edit&tokenid='.self::$tokenid);
+	public function testFormApiTokensAdministrationGeneral_CancelCreate() {
+		$this->checkTokenCancel('Admin');
+	}
+
+	public function testFormApiTokensAdministrationGeneral_CancelUpdate() {
+		$this->checkTokenCancel();
 	}
 
 	public function testFormApiTokensAdministrationGeneral_Delete() {
-		$token_id = $this->getTokenId(self::DELETE_TOKEN);
-		$this->checkTokenDelete('zabbix.php?action=token.edit&tokenid='.$token_id, self::DELETE_TOKEN);
+		$this->checkTokenDelete(self::DELETE_TOKEN);
 	}
 
-	/**
-	 * @onBeforeOnce getTokenId
-	 */
 	public function testFormApiTokensAdministrationGeneral_Regenerate() {
 		$data = [
 			'fields' => [
@@ -330,9 +331,8 @@ class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 				'Set expiration date and time' => true,
 				'Expires at' => '2026-12-31 23:59:59',
 				'Enabled' => true
-			],
-			'tokenid' => self::$tokenid
+			]
 		];
-		$this->checkTokensAction($data, 'zabbix.php?action=token.edit&tokenid='.self::$tokenid, 'regenerate');
+		$this->checkTokensAction($data, 'regenerate', $data['fields']['Name']);
 	}
 }
