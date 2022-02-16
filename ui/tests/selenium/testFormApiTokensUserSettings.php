@@ -25,8 +25,12 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  * @backup token
  *
  * @onBefore prepareUserTokenData
+ *
+ * @onAfter resetUpdateTokenName
  */
 class testFormApiTokensUserSettings extends testFormApiTokens {
+
+	public $url = 'zabbix.php?action=user.token.list';
 
 	/**
 	 * Function creates the given API tokens in the test branch.
@@ -44,6 +48,13 @@ class testFormApiTokensUserSettings extends testFormApiTokens {
 				'name' => 'Token to be deleted',
 				'userid' => 1,
 				'description' => 'Token to be deleted in the delete scenario',
+				'status' => '0',
+				'expires_at' => '1798754399'
+			],
+			[
+				'name' => 'Token for cancel or simple update',
+				'userid' => 1,
+				'description' => 'Token for testing cancelling',
 				'status' => '0',
 				'expires_at' => '1798754399'
 			]
@@ -205,9 +216,6 @@ class testFormApiTokensUserSettings extends testFormApiTokens {
 		$this->checkTokensFormLayout('user settings');
 	}
 
-	/**
-	 * @onBeforeOnce getTokenId
-	 */
 	public function testFormApiTokensUserSettings_RegenerationFormLayout() {
 		$this->checkTokensRegenerateFormLayout('user settings');
 	}
@@ -218,54 +226,45 @@ class testFormApiTokensUserSettings extends testFormApiTokens {
 	 * @dataProvider getTokenData
 	 */
 	public function testFormApiTokensUserSettings_Create($data) {
-		$this->checkTokensAction($data, 'zabbix.php?action=user.token.edit', 'create');
+		$this->checkTokensAction($data, 'create');
 	}
 
 	/**
 	 * @backupOnce token
 	 *
-	 * @onBeforeOnce getTokenId
-	 *
 	 * @dataProvider getTokenData
 	 */
 	public function testFormApiTokensUserSettings_Update($data) {
-		$this->checkTokensAction($data, 'zabbix.php?action=user.token.edit&tokenid='.self::$tokenid, 'update');
+		$this->checkTokensAction($data, 'update', self::$update_token);
 	}
 
-	/**
-	 * @onBeforeOnce getTokenId
-	 */
 	public function testFormApiTokensUserSettings_SimpleUpdate() {
-		$this->checkTokenSimpleUpdate('zabbix.php?action=user.token.edit&tokenid='.self::$tokenid);
+		$this->checkTokenSimpleUpdate();
 	}
 
-	/**
-	 * @onBeforeOnce getTokenId
-	 */
-	public function testFormApiTokensUserSettings_Cancel() {
-		$this->checkTokenCancel('zabbix.php?action=user.token.edit');
-		$this->checkTokenCancel('zabbix.php?action=user.token.edit&tokenid='.self::$tokenid);
+	public function testFormApiTokensUserSettings_CancelCreate() {
+		$this->checkTokenCancel();
+	}
+
+	public function testFormApiTokensUserSettings_CancelUpdate() {
+		$this->checkTokenCancel('update');
 	}
 
 	public function testFormApiTokensUserSettings_Delete() {
-		$token_id = $this->getTokenId(self::DELETE_TOKEN);
-		$this->checkTokenDelete('zabbix.php?action=user.token.edit&tokenid='.$token_id, self::DELETE_TOKEN);
+		$this->checkTokenDelete();
 	}
 
-	/**
-	 * @onBeforeOnce getTokenId
-	 */
 	public function testFormApiTokensUserSettings_Regenerate() {
 		$data = [
 			'fields' => [
-				'Name' => 'Admin reference token',
-				'Description' => 'admin token to be used in update scenarios',
+				'Name' => 'Token for cancel or simple update',
+				'Description' => 'Token for testing cancelling',
 				'Set expiration date and time' => true,
 				'Expires at' => '2026-12-31 23:59:59',
 				'Enabled' => true
-			],
-			'tokenid' => self::$tokenid
+			]
 		];
-		$this->checkTokensAction($data, 'zabbix.php?action=user.token.edit&tokenid='.self::$tokenid, 'regenerate');
+
+		$this->checkTokensAction($data, 'regenerate', $data['fields']['Name']);
 	}
 }

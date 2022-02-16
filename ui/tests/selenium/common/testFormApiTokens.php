@@ -37,10 +37,12 @@ class testFormApiTokens extends CWebTest {
 		];
 	}
 
-	const DELETE_TOKEN = 'Token to be deleted';		// Token for deletion.
-	const USER_ZABBIX_TOKEN = 'user-zabbix token';	// Token to be updated that belongs to user-zabbix.
+	const DELETE_TOKEN = 'Token to be deleted';		                     // Token for deletion.
+	const USER_ZABBIX_TOKEN = 'user-zabbix token';	                     // Token to be updated that belongs to user-zabbix.
+	const CANCEL_SIMPLE_UPDATE = 'Token for cancel or simple update';    // Token for cancel or simple update.
 
-	public static $update_token = 'Admin reference token';	// Token for update.
+	public static $update_token = 'Admin reference token';
+	public $url;
 
 	/**
 	 * Function that checks the layout of the API token configuration form in Administration or User settings section.
@@ -48,7 +50,7 @@ class testFormApiTokens extends CWebTest {
 	 * @param string $source	Section from which the scenario is executed.
 	 */
 	public function checkTokensFormLayout($source) {
-		$this->page->login()->open('zabbix.php?action='.(($source === 'user settings') ? 'user.token.list' : 'token.list'));
+		$this->page->login()->open($this->url);
 		$this->page->waitUntilReady();
 		$this->page->assertTitle('API tokens');
 		$this->page->assertHeader('API tokens');
@@ -100,13 +102,12 @@ class testFormApiTokens extends CWebTest {
 	 * Function checks the layout in Token regenerate form.
 	 *
 	 * @param string	$source		Section from which the scenario is executed.
-	 * @param integer	$tokenid	ID of the token for which the regenerate form is opened.
 	 */
 	public function checkTokensRegenerateFormLayout($source) {
 		$values = [
-			'Name:' => 'Admin reference token',
+			'Name:' => 'Token for cancel or simple update',
 			'User:' => 'Admin (Zabbix Administrator)',
-			'Description:' => 'admin token to be used in update scenarios',
+			'Description:' => 'Token for testing cancelling',
 			'Expires at:' => '2026-12-31 23:59:59'
 		];
 
@@ -115,15 +116,15 @@ class testFormApiTokens extends CWebTest {
 			unset($values['User:']);
 		}
 
-		$this->page->login()->open('zabbix.php?action='.(($source === 'user settings') ? 'user.token.list' : 'token.list'));
+		$this->page->login()->open($this->url);
 		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible()->findRow('Name',
-				self::$update_token)->getColumn('Name')->query('tag:a')->waitUntilClickable()->one()->click();
+				self::CANCEL_SIMPLE_UPDATE)->getColumn('Name')->query('tag:a')->waitUntilClickable()->one()->click();
 
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$this->assertEquals('API token', $dialog->getTitle());
 		$dialog->query('button:Regenerate')->one()->waitUntilClickable()->click();
 		$this->page->acceptAlert();
-		$dialog ->waitUntilReady();
+		$dialog->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'API token updated');
 		$form = $dialog->asForm();
 		$this->assertEquals(true, $form->getField('Enabled:')->getValue());
@@ -162,7 +163,7 @@ class testFormApiTokens extends CWebTest {
 			$old_hash = CDBHelper::getHash($sql);
 		}
 
-		$this->page->login()->open('zabbix.php?action=token.list')->waitUntilReady();
+		$this->page->login()->open($this->url)->waitUntilReady();
 
 		if ($action === 'create') {
 			$this->query('button:Create API token')->one()->waitUntilClickable()->click();
@@ -266,16 +267,14 @@ class testFormApiTokens extends CWebTest {
 
 	/**
 	 * Function that checks that no database changes occurred if nothing was actually changed during token update.
-	 *
-	 * @param string $url	URL that leads to the form to be updated.
 	 */
-	public function checkTokenSimpleUpdate($token) {
+	public function checkTokenSimpleUpdate() {
 		$sql = 'SELECT * FROM token ORDER BY tokenid';
 		$old_hash = CDBHelper::getHash($sql);
 
-		$this->page->login()->open('zabbix.php?action=token.list');
+		$this->page->login()->open($this->url);
 		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible()->findRow('Name',
-				$token)->getColumn('Name')->query('tag:a')->waitUntilClickable()->one()->click();
+				self::CANCEL_SIMPLE_UPDATE)->getColumn('Name')->query('tag:a')->waitUntilClickable()->one()->click();
 
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$dialog->query('button:Update')->one()->waitUntilClickable()->click();
@@ -289,9 +288,10 @@ class testFormApiTokens extends CWebTest {
 	/**
 	 * Function that check that no database changes are occurred if token create or update action is cancelled.
 	 *
-	 * @param string $username	user name in User field of the form if form opened from Administration section
+	 * @param string $action      create, update or regenerate
+	 * @param string $username    user name in User field of the form if form opened from Administration section
 	 */
-	public function checkTokenCancel($username = null) {
+	public function checkTokenCancel($action = 'create', $username = null) {
 		$sql = 'SELECT * FROM token ORDER BY tokenid';
 		$old_hash = CDBHelper::getHash($sql);
 
@@ -303,14 +303,14 @@ class testFormApiTokens extends CWebTest {
 			'Enabled' => false
 		];
 
-		$this->page->login()->open('zabbix.php?action=token.list');
+		$this->page->login()->open($this->url);
 
-		if ($username) {
+		if ($action === 'create') {
 			$this->query('button:Create API token')->one()->waitUntilClickable()->click();
 		}
 		else {
 			$this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible()->findRow('Name',
-					self::$update_token)->getColumn('Name')->query('tag:a')->waitUntilClickable()->one()->click();
+					self::CANCEL_SIMPLE_UPDATE)->getColumn('Name')->query('tag:a')->waitUntilClickable()->one()->click();
 		}
 
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
@@ -330,16 +330,13 @@ class testFormApiTokens extends CWebTest {
 
 	/**
 	 * Function that checks token deletion from token edit form.
-	 *
-	 * @param string $url			URL that leads to the form to be updated.
-	 * @param string $token_name	The name of the token to be deleted.
 	 */
-	public function checkTokenDelete($token_name) {
-		$sql = 'SELECT tokenid FROM token WHERE name = '.zbx_dbstr($token_name);
+	public function checkTokenDelete() {
+		$sql = 'SELECT tokenid FROM token WHERE name = '.zbx_dbstr(self::DELETE_TOKEN);
 
-		$this->page->login()->open('zabbix.php?action=token.list');
+		$this->page->login()->open($this->url);
 		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible()->findRow('Name',
-				$token_name)->getColumn('Name')->query('tag:a')->waitUntilClickable()->one()->click();
+				self::DELETE_TOKEN)->getColumn('Name')->query('tag:a')->waitUntilClickable()->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$dialog->query('button:Delete')->one()->waitUntilClickable()->click();
 		$this->page->acceptAlert();
@@ -353,8 +350,8 @@ class testFormApiTokens extends CWebTest {
 	/**
 	 * Function that checks the token string.
 	 *
-	 * @param CElement $auth_token		page element that contains the token string.
-	 * @param string $original_token	token string that belonged to the token before token regeneration.
+	 * @param CElement $auth_token		  page element that contains the token string.
+	 * @param string   $original_token    token string that belonged to the token before token regeneration.
 	 */
 	private function checkAuthToken($auth_token, $original_token) {
 		// Get token text.
@@ -368,5 +365,9 @@ class testFormApiTokens extends CWebTest {
 		// Check that token string will be copied to clipboard.
 		$clipboard_element = $auth_token->query('xpath:./a[text()="Copy to clipboard"]')->one();
 		$this->assertEquals('writeTextClipboard("'.$token_text.'")', $clipboard_element->getAttribute('onclick'));
+	}
+
+	public static function resetUpdateTokenName() {
+		self::$update_token = 'Admin reference token';
 	}
 }

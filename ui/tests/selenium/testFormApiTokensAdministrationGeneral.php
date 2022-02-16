@@ -25,8 +25,12 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  * @backup token
  *
  * @onBefore prepareTokenData
+ *
+ * @onAfter resetUpdateTokenName
  */
 class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
+
+	public $url = 'zabbix.php?action=token.list';
 
 	/**
 	 * Function creates the given API tokens in the test branch.
@@ -51,6 +55,13 @@ class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 				'name' => 'user-zabbix token',
 				'userid' => 5,
 				'description' => 'Token that is generated for user',
+				'status' => '0',
+				'expires_at' => '1798754399'
+			],
+			[
+				'name' => 'Token for cancel or simple update',
+				'userid' => 1,
+				'description' => 'Token for testing cancelling',
 				'status' => '0',
 				'expires_at' => '1798754399'
 			]
@@ -294,32 +305,33 @@ class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 	}
 
 	public function testFormApiTokensAdministrationGeneral_SimpleUpdate() {
-		$this->checkTokenSimpleUpdate(self::$update_token);
+		$this->checkTokenSimpleUpdate();
 	}
 
 	public function testFormApiTokensAdministrationGeneral_CancelCreate() {
-		$this->checkTokenCancel('Admin');
+		$this->checkTokenCancel('create', 'Admin');
 	}
 
 	public function testFormApiTokensAdministrationGeneral_CancelUpdate() {
-		$this->checkTokenCancel();
+		$this->checkTokenCancel('update');
 	}
 
 	public function testFormApiTokensAdministrationGeneral_Delete() {
-		$this->checkTokenDelete(self::DELETE_TOKEN);
+		$this->checkTokenDelete();
 	}
 
 	public function testFormApiTokensAdministrationGeneral_Regenerate() {
 		$data = [
 			'fields' => [
-				'Name' => 'Admin reference token',
+				'Name' => 'Token for cancel or simple update',
 				'User' => 'Admin (Zabbix Administrator)',
-				'Description' => 'admin token to be used in update scenarios',
+				'Description' => 'Token for testing cancelling',
 				'Set expiration date and time' => true,
 				'Expires at' => '2026-12-31 23:59:59',
 				'Enabled' => true
 			]
 		];
+
 		$this->checkTokensAction($data, 'regenerate', $data['fields']['Name']);
 	}
 }
