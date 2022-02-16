@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2022-02-16T06:51:54Z</date>
+   <date>2022-02-16T10:23:07Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -316,22 +316,6 @@ Template tooling version used: 0.39</description>
                </preprocessing>
             </item>
             <item>
-               <name>VMware: CPU latency in percents</name>
-               <type>SIMPLE</type>
-               <key>vmware.vm.cpu.latency[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
-               <history>7d</history>
-               <value_type>FLOAT</value_type>
-               <units>%</units>
-               <username>{$VMWARE.USERNAME}</username>
-               <password>{$VMWARE.PASSWORD}</password>
-               <description>Percentage of time the virtual machine is unable to run because it is contending for access to the physical CPU(s).</description>
-               <applications>
-                  <application>
-                     <name>VMware</name>
-                  </application>
-               </applications>
-            </item>
-            <item>
                <name>VMware: Number of virtual CPUs</name>
                <type>SIMPLE</type>
                <key>vmware.vm.cpu.num[{$VMWARE.URL},{HOST.HOST}]</key>
@@ -353,22 +337,6 @@ Template tooling version used: 0.39</description>
                </preprocessing>
             </item>
             <item>
-               <name>VMware: CPU readiness latency in percents</name>
-               <type>SIMPLE</type>
-               <key>vmware.vm.cpu.readiness[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
-               <history>7d</history>
-               <value_type>FLOAT</value_type>
-               <units>%</units>
-               <username>{$VMWARE.USERNAME}</username>
-               <password>{$VMWARE.PASSWORD}</password>
-               <description>Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU.</description>
-               <applications>
-                  <application>
-                     <name>VMware</name>
-                  </application>
-               </applications>
-            </item>
-            <item>
                <name>VMware: CPU ready</name>
                <type>SIMPLE</type>
                <key>vmware.vm.cpu.ready[{$VMWARE.URL},{HOST.HOST}]</key>
@@ -377,37 +345,6 @@ Template tooling version used: 0.39</description>
                <username>{$VMWARE.USERNAME}</username>
                <password>{$VMWARE.PASSWORD}</password>
                <description>Time that the virtual machine was ready, but could not get scheduled to run on the physical CPU during last measurement interval (VMware vCenter/ESXi Server performance counter sampling interval - 20 seconds)</description>
-               <applications>
-                  <application>
-                     <name>VMware</name>
-                  </application>
-               </applications>
-            </item>
-            <item>
-               <name>VMware: CPU swap-in latency in percents</name>
-               <type>SIMPLE</type>
-               <key>vmware.vm.cpu.swapwait[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
-               <history>7d</history>
-               <units>%</units>
-               <username>{$VMWARE.USERNAME}</username>
-               <password>{$VMWARE.PASSWORD}</password>
-               <description>Percentage of CPU time spent waiting for swap-in.</description>
-               <applications>
-                  <application>
-                     <name>VMware</name>
-                  </application>
-               </applications>
-            </item>
-            <item>
-               <name>VMware: CPU usage in percents</name>
-               <type>SIMPLE</type>
-               <key>vmware.vm.cpu.usage.perf[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
-               <history>7d</history>
-               <value_type>FLOAT</value_type>
-               <units>%</units>
-               <username>{$VMWARE.USERNAME}</username>
-               <password>{$VMWARE.PASSWORD}</password>
-               <description>CPU usage as a percentage during the interval.</description>
                <applications>
                   <application>
                      <name>VMware</name>
@@ -451,45 +388,6 @@ Template tooling version used: 0.39</description>
                      <params>1d</params>
                   </step>
                </preprocessing>
-            </item>
-            <item>
-               <name>VMware: Guest memory swapped</name>
-               <type>SIMPLE</type>
-               <key>vmware.vm.guest.memory.size.swapped[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
-               <history>7d</history>
-               <units>B</units>
-               <username>{$VMWARE.USERNAME}</username>
-               <password>{$VMWARE.PASSWORD}</password>
-               <description>Amount of guest physical memory that is swapped out to the swap space.</description>
-               <applications>
-                  <application>
-                     <name>VMware</name>
-                  </application>
-               </applications>
-            </item>
-            <item>
-               <name>VMware: Uptime of guest OS</name>
-               <type>SIMPLE</type>
-               <key>vmware.vm.guest.osuptime[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
-               <history>7d</history>
-               <units>uptime</units>
-               <username>{$VMWARE.USERNAME}</username>
-               <password>{$VMWARE.PASSWORD}</password>
-               <description>Total time elapsed since the last operating system boot-up (in seconds).</description>
-               <applications>
-                  <application>
-                     <name>VMware</name>
-                  </application>
-               </applications>
-               <triggers>
-                  <trigger>
-                     <expression>{last()}&lt;10m</expression>
-                     <name>VMware: {HOST.HOST} has been restarted (uptime &lt; 10m)</name>
-                     <priority>WARNING</priority>
-                     <description>Uptime is less than 10 minutes.</description>
-                     <manual_close>YES</manual_close>
-                  </trigger>
-               </triggers>
             </item>
             <item>
                <name>VMware: Hypervisor name</name>
@@ -538,21 +436,6 @@ Template tooling version used: 0.39</description>
                <username>{$VMWARE.USERNAME}</username>
                <password>{$VMWARE.PASSWORD}</password>
                <description>The amount of memory currently in the compression cache for this VM.</description>
-               <applications>
-                  <application>
-                     <name>VMware</name>
-                  </application>
-               </applications>
-            </item>
-            <item>
-               <name>VMware: Host memory consumed</name>
-               <type>SIMPLE</type>
-               <key>vmware.vm.memory.size.consumed[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
-               <history>7d</history>
-               <units>B</units>
-               <username>{$VMWARE.USERNAME}</username>
-               <password>{$VMWARE.PASSWORD}</password>
-               <description>Amount of host physical memory consumed for backing up guest physical memory pages.</description>
                <applications>
                   <application>
                      <name>VMware</name>
@@ -657,22 +540,6 @@ Template tooling version used: 0.39</description>
                </preprocessing>
             </item>
             <item>
-               <name>VMware: Host memory usage in percents</name>
-               <type>SIMPLE</type>
-               <key>vmware.vm.memory.usage[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
-               <history>7d</history>
-               <value_type>FLOAT</value_type>
-               <units>%</units>
-               <username>{$VMWARE.USERNAME}</username>
-               <password>{$VMWARE.PASSWORD}</password>
-               <description>Percentage of host physical memory that has been consumed.</description>
-               <applications>
-                  <application>
-                     <name>VMware</name>
-                  </application>
-               </applications>
-            </item>
-            <item>
                <name>VMware: Power state</name>
                <type>SIMPLE</type>
                <key>vmware.vm.powerstate[{$VMWARE.URL},{HOST.HOST}]</key>
@@ -754,6 +621,15 @@ Template tooling version used: 0.39</description>
                      <name>VMware</name>
                   </application>
                </applications>
+               <triggers>
+                  <trigger>
+                     <expression>{last()}&lt;10m</expression>
+                     <name>VMware: {HOST.HOST} has been restarted (uptime &lt; 10m)</name>
+                     <priority>WARNING</priority>
+                     <description>Uptime is less than 10 minutes.</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
             </item>
          </items>
          <discovery_rules>
