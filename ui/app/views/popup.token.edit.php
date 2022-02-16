@@ -24,7 +24,7 @@
  * @var array $data
  */
 
-$form_target = (new CUrl())->setArgument('action', ($data['tokenid'] == 0) ? 'token.create' : 'token.update');
+$form_target = (new CUrl('zabbix.php'))->setArgument('action', ($data['tokenid'] == 0) ? 'token.create' : 'token.update');
 
 $token_form = (new CForm('post', $form_target->getUrl()))
 	->setId('token_form')
