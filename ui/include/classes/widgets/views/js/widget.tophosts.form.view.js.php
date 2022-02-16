@@ -139,4 +139,4 @@ window.widget_tophosts_form = new class {
 	removeColorpicker() {
 		$('#color_picker').hide();
 	}
-}();
+};

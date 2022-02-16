@@ -576,4 +576,4 @@ window.service_edit_popup = new class {
 				this.overlay.unsetLoading();
 			});
 	}
-}();
+};

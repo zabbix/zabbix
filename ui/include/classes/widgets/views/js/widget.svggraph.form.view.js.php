@@ -17,17 +17,10 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
-
-/**
- * @var CView $this
- */
 ?>
 
-window.widget_svggraph_form = new class {
 
-	form_id: null,
-	form_tabs: null,
+window.widget_svggraph_form = new class {
 
 	init({form_id, form_tabs_id}) {
 		this.form_id = form_id;
@@ -46,61 +39,82 @@ window.widget_svggraph_form = new class {
 					jQuery("#svg-graph-preview").css("top", 0);
 					jQuery(".graph-widget-config-tabs .ui-tabs-nav").css("top", 0);
 				}
-			} else {
+			}
+			else {
 				jQuery(".overlay-dialogue-body").off("scroll");
 			}
 		});
 
-		jQuery(`#${this.form_tabs}`)
-			.on("change", "input, z-select, .multiselect", widget_svggraph_form.onGraphConfigChange);
+		jQuery(`#${this.form_tabs}`).on("change", "input, z-select, .multiselect", () => this.onGraphConfigChange());
 
-		jQuery(function($) {
-			widget_svggraph_form.onGraphConfigChange();
 
-			$(".overlay-dialogue").on("overlay-dialogue-resize", function(event, size_new, size_old) {
-				if (jQuery("#svg-graph-preview").length) {
-					if (size_new.width != size_old.width) {
-						widget_svggraph_form.onGraphConfigChange();
-					}
-				} else {
-					$(".overlay-dialogue").off("overlay-dialogue-resize");
+		this.onGraphConfigChange();
+
+		$(".overlay-dialogue").on("overlay-dialogue-resize", (event, size_new, size_old) => {
+			if (jQuery("#svg-graph-preview").length) {
+				if (size_new.width != size_old.width) {
+					this.onGraphConfigChange();
 				}
-			});
+			} else {
+				$(".overlay-dialogue").off("overlay-dialogue-resize");
+			}
 		});
+	}
 
-		document
-			.getElementById('dataset-add')
-			.addEventListener('click', this.events.addDataset);
-	},
+	onLeftYChange() {
+		const on = (!jQuery("#lefty").is(":disabled") && jQuery("#lefty").is(":checked"));
+
+		if (jQuery("#lefty").is(":disabled") && !jQuery("#lefty").is(":checked")) {
+			jQuery("#lefty").prop("checked", true);
+		}
+
+		jQuery("#lefty_min, #lefty_max, #lefty_units").prop("disabled", !on);
+
+		jQuery("#lefty_static_units").prop("disabled",
+			(!on || jQuery("#lefty_units").val() != <?= SVG_GRAPH_AXIS_UNITS_STATIC ?>));
+	}
+
+	onRightYChange() {
+		const on = (!jQuery("#righty").is(":disabled") && jQuery("#righty").is(":checked"));
+
+		if (jQuery("#righty").is(":disabled") && !jQuery("#righty").is(":checked")) {
+			jQuery("#righty").prop("checked", true);
+		}
+
+		jQuery("#righty_min, #righty_max, #righty_units").prop("disabled", !on);
+
+		jQuery("#righty_static_units").prop("disabled",
+			(!on || jQuery("#righty_units").val() != <?= SVG_GRAPH_AXIS_UNITS_STATIC ?>));
+	}
 
 	onGraphConfigChange() {
 		// Update graph preview.
-		var $preview = jQuery("#svg-graph-preview"),
-			$preview_container = $preview.parent(),
-			preview_data = $preview_container.data(),
-			$form = jQuery(`#${this.form_id}`),
-			url = new Curl("zabbix.php"),
-			data = {
-				uniqueid: 0,
-				preview: 1,
-				content_width: Math.floor($preview.width()),
-				content_height: Math.floor($preview.height()) - 10
-			};
+		const $preview = jQuery("#svg-graph-preview");
+		const $preview_container = $preview.parent();
+		const preview_data = $preview_container.data();
+		const $form = jQuery(`#${this.form_id}`);
+		const url = new Curl("zabbix.php");
+		const data = {
+			uniqueid: 0,
+			preview: 1,
+			content_width: Math.floor($preview.width()),
+			content_height: Math.floor($preview.height()) - 10
+		};
 
 		url.setArgument("action", "widget.svggraph.view");
 
 		// Enable/disable fields for Y axis.
 		if (this.id !== "lefty" && this.id !== "righty") {
-			var axes_used = {<?= GRAPH_YAXIS_SIDE_LEFT ?>: 0, <?= GRAPH_YAXIS_SIDE_RIGHT ?>: 0};
+			const axes_used = {<?= GRAPH_YAXIS_SIDE_LEFT ?>: 0, <?= GRAPH_YAXIS_SIDE_RIGHT ?>: 0};
 
 			jQuery("[type=radio]", $form).each(function() {
-				if (jQuery(this).attr("name").match(/ds\[\d+\]\[axisy\]/) && jQuery(this).is(":checked")) {
+				if (jQuery(this).attr("name").match(/ds\[\d+]\[axisy]/) && jQuery(this).is(":checked")) {
 					axes_used[jQuery(this).val()]++;
 				}
 			});
 
 			jQuery("[type=hidden]", $form).each(function() {
-				if (jQuery(this).attr("name").match(/or\[\d+\]\[axisy\]/)) {
+				if (jQuery(this).attr("name").match(/or\[\d+]\[axisy]/)) {
 					axes_used[jQuery(this).val()]++;
 				}
 			});
@@ -112,20 +126,18 @@ window.widget_svggraph_form = new class {
 			this.onRightYChange();
 		}
 
-		var form_fields = $form.serializeJSON();
+		const form_fields = $form.serializeJSON();
 
 		if ("ds" in form_fields) {
-			for (const i in form_fields.ds) {
+			for (var i in form_fields.ds) {
 				form_fields.ds[i] = jQuery.extend({"hosts": [], "items": []}, form_fields.ds[i]);
 			}
 		}
-
 		if ("or" in form_fields) {
-			for (const i in form_fields.or) {
+			for (var i in form_fields.or) {
 				form_fields.or[i] = jQuery.extend({"hosts": [], "items": []}, form_fields.or[i]);
 			}
 		}
-
 		data.fields = JSON.stringify(form_fields);
 
 		if (preview_data.xhr) {
@@ -143,21 +155,19 @@ window.widget_svggraph_form = new class {
 		preview_data.xhr = jQuery.ajax({
 			url: url.getUrl(),
 			method: "POST",
-			data: data,
+			contentType: "application/json",
+			data: JSON.stringify(data),
 			dataType: "json",
 			success: function(r) {
 				if (preview_data.timeoutid) {
 					clearTimeout(preview_data.timeoutid);
 				}
-
 				$preview_container.removeClass("is-loading");
 
 				$form.prev(".msg-bad").remove();
-
 				if (typeof r.messages !== "undefined") {
 					jQuery(r.messages).insertBefore($form);
 				}
-
 				if (typeof r.body !== "undefined") {
 					$preview.html(jQuery(r.body)).attr("unselectable", "on").css("user-select", "none");
 				}
@@ -165,103 +175,29 @@ window.widget_svggraph_form = new class {
 		});
 
 		$preview_container.data(preview_data);
-	},
+	}
 
-	onLeftYChange() {
-		const on = (!jQuery("#lefty").is(":disabled") && jQuery("#lefty").is(":checked"));
-
-		if (jQuery("#lefty").is(":disabled") && !jQuery("#lefty").is(":checked")) {
-			jQuery("#lefty").prop("checked", true);
-		}
-
-		jQuery("#lefty_min, #lefty_max, #lefty_units").prop("disabled", !on);
-
-		jQuery("#lefty_static_units").prop("disabled",
-			(!on || jQuery("#lefty_units").val() != "<?= SVG_GRAPH_AXIS_UNITS_STATIC ?>"));
-	},
-
-	onRightYChange() {
-		const on = (!jQuery("#righty").is(":disabled") && jQuery("#righty").is(":checked"));
-
-		if (jQuery("#righty").is(":disabled") && !jQuery("#righty").is(":checked")) {
-			jQuery("#righty").prop("checked", true);
-		}
-
-		jQuery("#righty_min, #righty_max, #righty_units").prop("disabled", !on);
-
-		jQuery("#righty_static_units").prop("disabled",
-			(!on || jQuery("#righty_units").val() != "<?= SVG_GRAPH_AXIS_UNITS_STATIC ?>"));
-	},
-
-	/**
-	 * This function needs to change element names in "Data set" or "Overrides" controls after reordering elements.
-	 *
-	 * @param obj           "Data set" or "Overrides" element.
-	 * @param row_selector  jQuery selector for rows.
-	 * @param var_prefix    Prefix for the variables, which will be renamed.
-	 */
 	updateVariableOrder(obj, row_selector, var_prefix) {
 		jQuery.each([10000, 0], function(index, value) {
-			jQuery(row_selector, obj)
-				.each(function(i) {
-					jQuery(".multiselect[data-params]", this).each(function() {
-						const name = jQuery(this).multiSelect("getOption", "name");
+			jQuery(row_selector, obj).each(function(i) {
+				jQuery(".multiselect[data-params]", this).each(function() {
+					const name = jQuery(this).multiSelect("getOption", "name");
 
-						if (name !== null) {
-							jQuery(this).multiSelect("modify", {
-								name: name.replace(/([a-z]+\[)\d+(\]\[[a-z_]+\])/, "$1" + (value + i) + "$2")
-							});
-						}
-					});
-
-					jQuery(`[name^="${var_prefix}["]`, this).filter(function() {
-						return jQuery(this).attr("name").match(/[a-z]+\[\d+\]\[[a-z_]+\]/);
-					})
-						.each(function() {
-							jQuery(this).attr("name",
-								jQuery(this).attr("name").replace(/([a-z]+\[)\d+(\]\[[a-z_]+\])/, "$1" + (value + i) + "$2")
-							);
+					if (name !== null) {
+						jQuery(this).multiSelect("modify", {
+							name: name.replace(/([a-z]+\[)\d+(]\[[a-z_]+])/, "$1" + (value + i) + "$2")
 						});
+					}
 				});
-		});
-	},
 
-	events: {
-		addDataset: (e) => {
-			const menu = [
-				{
-					items: [
-						{
-							label: <?= json_encode(_('Item pattern')) ?>,
-							clickCallback: (event) => {
-								debugger;
-								addRow();
-							}
-						},
-						{
-							label: <?= json_encode(_('Item list')) ?>,
-							clickCallback: () => ZABBIX.Dashboard.addNewDashboardPage()
-						}
-					]
-				},
-				{
-					items: [
-						{
-							label: <?= json_encode(_('Clone')) ?>,
-							clickCallback: () => ZABBIX.Dashboard.addNewDashboardPage()
-						}
-					]
-				}
-			];
-
-			jQuery(e.target).menuPopup(menu, new jQuery.Event(e), {
-				position: {
-					of: e.target,
-					my: 'left top',
-					at: 'left bottom',
-					within: '.wrapper'
-				}
+				jQuery('[name^="' + var_prefix + '["]', this).filter(function() {
+					return jQuery(this).attr("name").match(/[a-z]+\[\d+]\[[a-z_]+]/);
+				}).each(function() {
+					jQuery(this).attr("name",
+						jQuery(this).attr("name").replace(/([a-z]+\[)\d+(]\[[a-z_]+])/, "$1" + (value + i) + "$2")
+					);
+				});
 			});
-		}
+		});
 	}
-}();
+};

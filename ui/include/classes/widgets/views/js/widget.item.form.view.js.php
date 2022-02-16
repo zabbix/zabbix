@@ -17,93 +17,101 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
-
-/**
- * @var CView $this
- */
 ?>
 
-window.widget_item_form = {
+
+window.widget_item_form = new class {
 
 	init() {
-		$(".<?= ZBX_STYLE_COLOR_PICKER ?> input", $(".overlay-dialogue-body"))
-			.colorpicker({appendTo: ".overlay-dialogue-body", use_default: true,
-				onUpdate: this.events.setIndicatorColor
+		this.show_description = document.getElementById(`show_${<?= WIDGET_ITEM_SHOW_DESCRIPTION ?>}`);
+		this.show_value = document.getElementById(`show_${<?= WIDGET_ITEM_SHOW_VALUE ?>}`);
+		this.show_time = document.getElementById(`show_${<?= WIDGET_ITEM_SHOW_TIME ?>}`);
+		this.show_change_indicator = document.getElementById(`show_${<?= WIDGET_ITEM_SHOW_CHANGE_INDICATOR ?>}`);
+		this.advance_configuration = document.getElementById('adv_conf');
+		this.units_show = document.getElementById('units_show');
+
+		this.description_row = document.getElementById('description-row');
+		this.value_row = document.getElementById('value-row');
+		this.time_row = document.getElementById('time-row');
+		this.change_indicator_row = document.getElementById('change-indicator-row');
+		this.bg_color_row = document.getElementById('bg-color-row');
+
+		const show = [this.show_description, this.show_value, this.show_time, this.show_change_indicator];
+
+		for (const checkbox of show) {
+			checkbox.addEventListener('change', (e) => {
+				if (show.filter((checkbox) => checkbox.checked).length > 0) {
+					this.updateForm();
+				}
+				else {
+					e.target.checked = true;
+				}
+			});
+		}
+
+		for (const checkbox of [this.advance_configuration, this.units_show]) {
+			checkbox.addEventListener('change', () => {
+				this.updateForm();
+			});
+		}
+
+		document.querySelectorAll('#widget-dialogue-form .<?= ZBX_STYLE_COLOR_PICKER ?> input')
+			.forEach((colorpicker) => {
+				$(colorpicker).colorpicker({
+					appendTo: ".overlay-dialogue-body",
+					use_default: true,
+					onUpdate: ['up_color', 'down_color', 'updown_color'].includes(colorpicker.name)
+						? (color) => this.setIndicatorColor(colorpicker.name, color)
+						: null
+				});
 			});
 
-		const $show = $('input[id^="show_"]', "#widget-dialogue-form").not("#show_header");
+		this.updateForm();
+	}
 
-		$("#adv_conf").on("change", function() {
-			$show.trigger("change");
+	updateForm() {
+		this.description_row.style.display =
+			(this.advance_configuration.checked && this.show_description.checked) ? '' : 'none';
 
-			$("#bg-color-row")
-				.toggle(this.checked)
-				.find("input")
-				.prop("disabled", !this.checked);
+		this.description_row.querySelectorAll('input, textarea').forEach((element) => {
+			element.disabled = !this.advance_configuration.checked || !this.show_description.checked;
 		});
 
-		// Prevent unchecking last "Show" checkbox.
-		$show.on("click", function() {
-			return $show.filter(":checked").length > 0;
+		this.value_row.style.display = (this.advance_configuration.checked && this.show_value.checked) ? '' : 'none';
+		this.value_row.querySelectorAll('input').forEach((element) => {
+			element.disabled = !this.advance_configuration.checked || !this.show_value.checked;
 		});
 
-		$show.on("change", function() {
-			const adv_conf_checked = $("#adv_conf").prop("checked");
-
-			switch($(this).val()) {
-				case "<?= WIDGET_ITEM_SHOW_DESCRIPTION ?>":
-					$("#description-row")
-						.toggle(adv_conf_checked && this.checked)
-						.find("input, textarea")
-						.prop("disabled", !adv_conf_checked || !this.checked);
-					break;
-
-				case "<?= WIDGET_ITEM_SHOW_VALUE ?>":
-					$("#value-row")
-						.toggle(adv_conf_checked && this.checked)
-						.find("input")
-						.prop("disabled", !adv_conf_checked || !this.checked);
-					break;
-
-				case "<?= WIDGET_ITEM_SHOW_TIME ?>":
-					$("#time-row")
-						.toggle(adv_conf_checked && this.checked)
-						.find("input")
-						.prop("disabled", !adv_conf_checked || !this.checked);
-					break;
-
-				case "<?= WIDGET_ITEM_SHOW_CHANGE_INDICATOR ?>":
-					$("#change-indicator-row")
-						.toggle(adv_conf_checked && this.checked)
-						.find("input")
-						.prop("disabled", !adv_conf_checked || !this.checked);
-					break;
-			}
+		this.time_row.style.display = (this.advance_configuration.checked && this.show_time.checked) ? '' : 'none';
+		this.time_row.querySelectorAll('input').forEach((element) => {
+			element.disabled = !this.advance_configuration.checked || !this.show_time.checked;
 		});
 
-		$("#adv_conf").trigger("change");
+		this.change_indicator_row.style.display =
+			(this.advance_configuration.checked && this.show_change_indicator.checked) ? '' : 'none';
 
-		$("#units_show").on("change", function() {
-			$("#units, #units_pos, #units_size, #units_bold, #units_color").prop("disabled", !this.checked);
+		this.change_indicator_row.querySelectorAll('input').forEach((element) => {
+			element.disabled = !this.advance_configuration.checked || !this.show_change_indicator.checked;
 		});
 
-		$("#units_show").trigger("change");
-	},
+		this.bg_color_row.style.display = this.advance_configuration.checked ? '' : 'none';
+		this.bg_color_row.querySelectorAll('input').forEach((element) => {
+			element.disabled = !this.advance_configuration.checked;
+		});
 
-	events: {
-		setIndicatorColor(color) {
-			const indicator_ids = {
-				up_color: 'change-indicator-up',
-				down_color: 'change-indicator-down',
-				updown_color: 'change-indicator-updown'
-			};
+		document.querySelectorAll('#units, #units_pos, #units_size, #units_bold, #units_color').forEach((element) => {
+			element.disabled = !this.units_show.checked;
+		});
+	}
 
-			if (this.name in indicator_ids) {
-				const indicator = document.getElementById(indicator_ids[this.name]);
+	setIndicatorColor(name, color) {
+		const indicator_ids = {
+			up_color: 'change-indicator-up',
+			down_color: 'change-indicator-down',
+			updown_color: 'change-indicator-updown'
+		};
 
-				indicator.querySelector("polygon").style.fill = (color !== "") ? "#" + color : "";
-			}
-		}
+		document.getElementById(indicator_ids[name])
+			.querySelector("polygon").style.fill = (color !== '') ? `#${color}` : '';
 	}
 };

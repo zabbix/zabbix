@@ -168,7 +168,7 @@ class CWidgetHelper {
 	/**
 	 * @param CWidgetFieldTextArea $field
 	 *
-	 * @return CTextBox
+	 * @return CTextArea
 	 */
 	public static function getTextArea($field) {
 		return (new CTextArea($field->getName(), $field->getValue()))
@@ -230,7 +230,7 @@ class CWidgetHelper {
 	 * @param CWidgetFieldHostPatternSelect  $field      Widget field object.
 	 * @param string                         $form_name  HTML form element name.
 	 *
-	 * @return CDiv
+	 * @return CPatternSelect
 	 */
 	public static function getHostPatternSelect($field, $form_name) {
 		return (new CPatternSelect([
@@ -769,7 +769,7 @@ class CWidgetHelper {
 	 * @param string                     $form_name  Name of form in which data set fields resides.
 	 * @param int|string                 $row_num    Unique data set numeric identifier. Used to make unique field names.
 	 *
-	 * @return array
+	 * @return CListItem
 	 */
 	public static function getGraphOverrideLayout($field, array $value, $form_name, $row_num) {
 		$inputs = [];
@@ -1027,101 +1027,102 @@ class CWidgetHelper {
 	 * @return string
 	 */
 	public static function getGraphOverrideJavascript($field) {
-		$scripts = [
+		return '
 			// Define it as function to avoid redundancy.
-			'function initializeOverrides() {'.
-				'jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_OPTIONS_LIST.'").overrides({'.
-					'add: ".'.ZBX_STYLE_BTN_ALT.'",'.
-					'options: "input[type=hidden]",'.
-					'captions: '.json_encode(self::getGraphOverrideOptionNames()).','.
-					'makeName: function(option, row_id) {'.
-						'return "'.$field->getName().'[" + row_id + "][" + option + "]";'.
-					'},'.
-					'makeOption: function(name) {'.
-						'return name.match('.
-							'/.*\[('.implode('|', CWidgetFieldGraphOverride::getOverrideOptions()).')\]/'.
-						')[1];'.
-					'},'.
-					'override: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'",'.
-					'overridesList: ".'.ZBX_STYLE_OVERRIDES_LIST.'",'.
-					'onUpdate: widget_svggraph_form.onGraphConfigChange,'.
-					'menu: '.json_encode(self::getGraphOverrideMenu()).
-				'});'.
-			'}',
+			function initializeOverrides() {
+				jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_OPTIONS_LIST.'").overrides({
+					add: ".'.ZBX_STYLE_BTN_ALT.'",
+					options: "input[type=hidden]",
+					captions: '.json_encode(self::getGraphOverrideOptionNames()).',
+					makeName: function(option, row_id) {
+						return "'.$field->getName().'[" + row_id + "][" + option + "]";
+					},
+					makeOption: function(name) {
+						return name.match(
+							/.*\[('.implode('|', CWidgetFieldGraphOverride::getOverrideOptions()).')\]/
+						)[1];
+					},
+					override: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'",
+					overridesList: ".'.ZBX_STYLE_OVERRIDES_LIST.'",
+					onUpdate: () => widget_svggraph_form.onGraphConfigChange(),
+					menu: '.json_encode(self::getGraphOverrideMenu()).'
+				});
+			}
 
 			// Initialize dynamicRows.
-			'jQuery("#overrides")'.
-				'.dynamicRows({'.
-					'template: "#overrides-row",'.
-					'beforeRow: ".overrides-foot",'.
-					'remove: ".'.ZBX_STYLE_BTN_REMOVE.'",'.
-					'add: "#override-add",'.
-					'row: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'"'.
-				'})'.
-				'.bind("afteradd.dynamicRows", function(event, options) {'.
-					'var container = jQuery(".overlay-dialogue-body");'.
-					'container.scrollTop(Math.max(container.scrollTop(),
-						jQuery("#widget-dialogue-form")[0].scrollHeight - container.height()
-					));'.
+			jQuery("#overrides")
+				.dynamicRows({
+					template: "#overrides-row",
+					beforeRow: ".overrides-foot",
+					remove: ".'.ZBX_STYLE_BTN_REMOVE.'",
+					add: "#override-add",
+					row: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'"
+				})
+				.bind("afteradd.dynamicRows", function(event, options) {
+					const container = jQuery(".overlay-dialogue-body");
 
-					'jQuery(".multiselect", jQuery("#overrides")).each(function() {'.
-						'jQuery(this).multiSelect(jQuery(this).data("params"));'.
-					'});'.
-					'widget_svggraph_form.updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");'.
-					'widget_svggraph_form.onGraphConfigChange();'.
-				'})'.
-				'.bind("afterremove.dynamicRows", function(event, options) {'.
-					'widget_svggraph_form.updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");'.
-					'widget_svggraph_form.onGraphConfigChange();'.
-				'})'.
-				'.bind("tableupdate.dynamicRows", function(event, options) {'.
-					'widget_svggraph_form.updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");'.
-					'initializeOverrides();'.
-					'if (jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'").length > 1) {'.
-						'jQuery("#overrides .drag-icon").removeClass("disabled");'.
-						'jQuery("#overrides").sortable("enable");'.
-					'}'.
-					'else {'.
-						'jQuery("#overrides .drag-icon").addClass("disabled");'.
-						'jQuery("#overrides").sortable("disable");'.
-					'}'.
-				'});',
+					container.scrollTop(Math.max(container.scrollTop(),
+						jQuery("#widget-dialogue-form")[0].scrollHeight - container.height()
+					));
+
+					jQuery(".multiselect", jQuery("#overrides")).each(function() {
+						jQuery(this).multiSelect(jQuery(this).data("params"));
+					});
+
+					widget_svggraph_form.updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");
+					widget_svggraph_form.onGraphConfigChange();
+				})
+				.bind("afterremove.dynamicRows", function(event, options) {
+					widget_svggraph_form.updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");
+					widget_svggraph_form.onGraphConfigChange();
+				})
+				.bind("tableupdate.dynamicRows", function(event, options) {
+					widget_svggraph_form.updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");
+					initializeOverrides();
+					if (jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'").length > 1) {
+						jQuery("#overrides .drag-icon").removeClass("disabled");
+						jQuery("#overrides").sortable("enable");
+					}
+					else {
+						jQuery("#overrides .drag-icon").addClass("disabled");
+						jQuery("#overrides").sortable("disable");
+					}
+				});
 
 			// Initialize overrides UI control.
-			'initializeOverrides();',
+			initializeOverrides();
 
 			// Initialize override pattern-selectors.
-			'jQuery(".multiselect", jQuery("#overrides")).each(function() {'.
-				'jQuery(this).multiSelect(jQuery(this).data("params"));'.
-			'});',
+			jQuery(".multiselect", jQuery("#overrides")).each(function() {
+				jQuery(this).multiSelect(jQuery(this).data("params"));
+			});
 
 			// Make overrides sortable.
-			'if (jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'").length < 2) {'.
-				'jQuery("#overrides .drag-icon").addClass("disabled");'.
-			'}'.
-			'jQuery("#overrides").sortable({'.
-				'items: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'",'.
-				'containment: "parent",'.
-				'handle: ".drag-icon",'.
-				'tolerance: "pointer",'.
-				'scroll: false,'.
-				'cursor: "grabbing",'.
-				'opacity: 0.6,'.
-				'axis: "y",'.
-				'disabled: function() {'.
-					'return jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'").length < 2;'.
-				'}(),'.
-				'start: function() {'. // Workaround to fix wrong scrolling at initial sort.
-					'jQuery(this).sortable("refreshPositions");'.
-				'},'.
-				'stop: widget_svggraph_form.onGraphConfigChange,'.
-				'update: function() {'.
-					'widget_svggraph_form.updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");'.
-				'}'.
-			'});'
-		];
+			if (jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'").length < 2) {
+				jQuery("#overrides .drag-icon").addClass("disabled");
+			}
 
-		return implode ('', $scripts);
+			jQuery("#overrides").sortable({
+				items: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'",
+				containment: "parent",
+				handle: ".drag-icon",
+				tolerance: "pointer",
+				scroll: false,
+				cursor: "grabbing",
+				opacity: 0.6,
+				axis: "y",
+				disabled: function() {
+					return jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'").length < 2;
+				}(),
+				start: function() { // Workaround to fix wrong scrolling at initial sort.
+					jQuery(this).sortable("refreshPositions");
+				},
+				stop: () => widget_svggraph_form.onGraphConfigChange(),
+				update: function() {
+					widget_svggraph_form.updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");
+				}
+			});
+		';
 	}
 
 	/**
@@ -1391,170 +1392,177 @@ class CWidgetHelper {
 	 * @return string
 	 */
 	public static function getGraphDataSetJavascript() {
-		$scripts = [
-			'function changeDataSetDrawType(obj) {'.
-				'var row_num = obj.id.replace("ds_", "").replace("_type", "");'.
-				'switch (jQuery(":checked", jQuery(obj)).val()) {'.
-					'case "'.SVG_GRAPH_TYPE_POINTS.'":'.
-						'jQuery("#ds_" + row_num + "_width").rangeControl("disable");'.
-						'jQuery("#ds_" + row_num + "_pointsize").rangeControl("enable");'.
-						'jQuery("#ds_" + row_num + "_transparency").rangeControl("enable");'.
-						'jQuery("#ds_" + row_num + "_fill").rangeControl("disable");'.
-						'jQuery("#ds_" + row_num + "_missingdatafunc_0").prop("disabled", true);'.
-						'jQuery("#ds_" + row_num + "_missingdatafunc_1").prop("disabled", true);'.
-						'jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", true);'.
-						'break;'.
-					'case "'.SVG_GRAPH_TYPE_BAR.'":'.
-						'jQuery("#ds_" + row_num + "_width").rangeControl("disable");'.
-						'jQuery("#ds_" + row_num + "_pointsize").rangeControl("disable");'.
-						'jQuery("#ds_" + row_num + "_transparency").rangeControl("enable");'.
-						'jQuery("#ds_" + row_num + "_fill").rangeControl("disable");'.
-						'jQuery("#ds_" + row_num + "_missingdatafunc_0").prop("disabled", true);'.
-						'jQuery("#ds_" + row_num + "_missingdatafunc_1").prop("disabled", true);'.
-						'jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", true);'.
-						'break;'.
-					'default:'.
-						'jQuery("#ds_" + row_num + "_width").rangeControl("enable");'.
-						'jQuery("#ds_" + row_num + "_pointsize").rangeControl("disable");'.
-						'jQuery("#ds_" + row_num + "_transparency").rangeControl("enable");'.
-						'jQuery("#ds_" + row_num + "_fill").rangeControl("enable");'.
-						'jQuery("#ds_" + row_num + "_missingdatafunc_0").prop("disabled", false);'.
-						'jQuery("#ds_" + row_num + "_missingdatafunc_1").prop("disabled", false);'.
-						'jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", false);'.
-						'break;'.
-				'}'.
-			'};',
+		return '
+			function changeDataSetDrawType(obj) {
+				const row_num = obj.id.replace("ds_", "").replace("_type", "");
 
-			'function changeDataSetAggregateFunction(obj) {'.
-				'var row_num = obj.id.replace("ds_", "").replace("_aggregate_function", "");'.
-				'var no_aggregation = (jQuery(obj).val() == '.AGGREGATE_NONE.');'.
-				'jQuery("#ds_" + row_num + "_aggregate_interval").prop("disabled", no_aggregation);'.
-				'jQuery("#ds_" + row_num + "_aggregate_grouping_0").prop("disabled", no_aggregation);'.
-				'jQuery("#ds_" + row_num + "_aggregate_grouping_1").prop("disabled", no_aggregation);'.
-			'};',
+				switch (jQuery(":checked", jQuery(obj)).val()) {
+					case "'.SVG_GRAPH_TYPE_POINTS.'":
+						jQuery("#ds_" + row_num + "_width").rangeControl("disable");
+						jQuery("#ds_" + row_num + "_pointsize").rangeControl("enable");
+						jQuery("#ds_" + row_num + "_transparency").rangeControl("enable");
+						jQuery("#ds_" + row_num + "_fill").rangeControl("disable");
+						jQuery("#ds_" + row_num + "_missingdatafunc_0").prop("disabled", true);
+						jQuery("#ds_" + row_num + "_missingdatafunc_1").prop("disabled", true);
+						jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", true);
+						break;
+					case "'.SVG_GRAPH_TYPE_BAR.'":
+						jQuery("#ds_" + row_num + "_width").rangeControl("disable");
+						jQuery("#ds_" + row_num + "_pointsize").rangeControl("disable");
+						jQuery("#ds_" + row_num + "_transparency").rangeControl("enable");
+						jQuery("#ds_" + row_num + "_fill").rangeControl("disable");
+						jQuery("#ds_" + row_num + "_missingdatafunc_0").prop("disabled", true);
+						jQuery("#ds_" + row_num + "_missingdatafunc_1").prop("disabled", true);
+						jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", true);
+						break;
+					default:
+						jQuery("#ds_" + row_num + "_width").rangeControl("enable");
+						jQuery("#ds_" + row_num + "_pointsize").rangeControl("disable");
+						jQuery("#ds_" + row_num + "_transparency").rangeControl("enable");
+						jQuery("#ds_" + row_num + "_fill").rangeControl("enable");
+						jQuery("#ds_" + row_num + "_missingdatafunc_0").prop("disabled", false);
+						jQuery("#ds_" + row_num + "_missingdatafunc_1").prop("disabled", false);
+						jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", false);
+						break;
+				}
+			};
+
+			function changeDataSetAggregateFunction(obj) {
+				const row_num = obj.id.replace("ds_", "").replace("_aggregate_function", "");
+				const no_aggregation = (jQuery(obj).val() == '.AGGREGATE_NONE.');
+
+				jQuery("#ds_" + row_num + "_aggregate_interval").prop("disabled", no_aggregation);
+				jQuery("#ds_" + row_num + "_aggregate_grouping_0").prop("disabled", no_aggregation);
+				jQuery("#ds_" + row_num + "_aggregate_grouping_1").prop("disabled", no_aggregation);
+			};
 
 			// Initialize dynamic rows.
-			'jQuery("#data_sets")'.
-				'.dynamicRows({'.
-					'template: "#dataset-row",'.
-					'beforeRow: ".'.ZBX_STYLE_LIST_ACCORDION_FOOT.'",'.
-					'remove: ".'.ZBX_STYLE_BTN_REMOVE.'",'.
-					'add: "#dataset-add",'.
-					'row: ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'",'.
-					'dataCallback: function(data) {'.
-						'data.color = function(num) {'.
-							'var palette = '.CWidgetFieldGraphDataSet::DEFAULT_COLOR_PALETTE.';'.
-							'return palette[num % palette.length];'.
-						'} (data.rowNum);'.
-						'return data;'.
-					'}'.
-				'})'.
-				'.bind("beforeadd.dynamicRows", function(event, options) {'.
-					'jQuery("#data_sets").zbx_vertical_accordion("collapseAll");'.
-				'})'.
-				'.bind("afteradd.dynamicRows", function(event, options) {'.
-					'var container = jQuery(".overlay-dialogue-body");'.
-					'container.scrollTop(Math.max(container.scrollTop(),
+			jQuery("#data_sets")
+				.dynamicRows({
+					template: "#dataset-row",
+					beforeRow: ".'.ZBX_STYLE_LIST_ACCORDION_FOOT.'",
+					remove: ".'.ZBX_STYLE_BTN_REMOVE.'",
+					add: "#dataset-add",
+					row: ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'",
+					dataCallback: function(data) {
+						data.color = function(num) {
+							var palette = '.CWidgetFieldGraphDataSet::DEFAULT_COLOR_PALETTE.';
+							return palette[num % palette.length];
+						} (data.rowNum);
+						return data;
+					}
+				})
+				.bind("beforeadd.dynamicRows", function(event, options) {
+					jQuery("#data_sets").zbx_vertical_accordion("collapseAll");
+				})
+				.bind("afteradd.dynamicRows", function(event, options) {
+					const container = jQuery(".overlay-dialogue-body");
+
+					container.scrollTop(Math.max(container.scrollTop(),
 						jQuery("#widget-dialogue-form")[0].scrollHeight - container.height()
-					));'.
+					));
 
-					'jQuery(".'.ZBX_STYLE_COLOR_PICKER.' input").colorpicker({onUpdate: function(color) {'.
-						'var ds = jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'");'.
-						'jQuery(".'.ZBX_STYLE_COLOR_PREVIEW_BOX.'", ds).css("background-color", "#"+color);'.
-					'}, appendTo: ".overlay-dialogue-body"});'.
+					jQuery(".'.ZBX_STYLE_COLOR_PICKER.' input").colorpicker({onUpdate: function(color) {
+						jQuery(".'.ZBX_STYLE_COLOR_PREVIEW_BOX.'", 
+							jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'")
+						).css("background-color", "#"+color);
+					}, appendTo: ".overlay-dialogue-body"});
 
-					'jQuery(".multiselect", jQuery("#data_sets")).each(function() {'.
-						'jQuery(this).multiSelect(jQuery(this).data("params"));'.
-					'});'.
-					'widget_svggraph_form.updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");'.
-					'widget_svggraph_form.onGraphConfigChange();'.
-				'})'.
-				'.bind("afterremove.dynamicRows", function(event, options) {'.
-					'widget_svggraph_form.updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");'.
-					'widget_svggraph_form.onGraphConfigChange();'.
-				'})'.
-				'.bind("tableupdate.dynamicRows", function(event, options) {'.
-					'widget_svggraph_form.updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");'.
-					'jQuery(".'.CRangeControl::ZBX_STYLE_CLASS.'[data-options]").rangeControl();'.
-					'if (jQuery("#data_sets .'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").length > 1) {'.
-						'jQuery("#data_sets .drag-icon").removeClass("disabled");'.
-						'jQuery("#data_sets").sortable("enable");'.
-					'}'.
-					'else {'.
-						'jQuery("#data_sets .drag-icon").addClass("disabled");'.
-						'jQuery("#data_sets").sortable("disable");'.
-					'}'.
-				'});',
+					jQuery(".multiselect", jQuery("#data_sets")).each(function() {
+						jQuery(this).multiSelect(jQuery(this).data("params"));
+					});
+
+					widget_svggraph_form.updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");
+					widget_svggraph_form.onGraphConfigChange();
+				})
+				.bind("afterremove.dynamicRows", function(event, options) {
+					widget_svggraph_form.updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");
+					widget_svggraph_form.onGraphConfigChange();
+				})
+				.bind("tableupdate.dynamicRows", function(event, options) {
+					widget_svggraph_form.updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");
+					jQuery(".'.CRangeControl::ZBX_STYLE_CLASS.'[data-options]").rangeControl();
+
+					if (jQuery("#data_sets .'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").length > 1) {
+						jQuery("#data_sets .drag-icon").removeClass("disabled");
+						jQuery("#data_sets").sortable("enable");
+					}
+					else {
+						jQuery("#data_sets .drag-icon").addClass("disabled");
+						jQuery("#data_sets").sortable("disable");
+					}
+				});
 
 			// Initialize vertical accordion.
-			'jQuery("#data_sets")'.
-				'.on("focus", ".'.CMultiSelect::ZBX_STYLE_CLASS.' input.input", function() {'.
-					'jQuery("#data_sets").zbx_vertical_accordion("expandNth",'.
-						'jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").index());'.
-					'})'.
-				'.on("collapse", function(event, data) {'.
-					'jQuery("textarea, .multiselect", data.section).scrollTop(0);'.
-					'jQuery(window).trigger("resize");'.
-				'})'.
-				'.on("expand", function() {'.
-					'jQuery(window).trigger("resize");'.
-				'})'.
-				'.zbx_vertical_accordion({handler: ".'.ZBX_STYLE_COLOR_PREVIEW_BOX.'"});',
+			jQuery("#data_sets")
+				.on("focus", ".'.CMultiSelect::ZBX_STYLE_CLASS.' input.input", function() {
+					jQuery("#data_sets").zbx_vertical_accordion("expandNth",
+						jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").index());
+					})
+				.on("collapse", function(event, data) {
+					jQuery("textarea, .multiselect", data.section).scrollTop(0);
+					jQuery(window).trigger("resize");
+				})
+				.on("expand", function() {
+					jQuery(window).trigger("resize");
+				})
+				.zbx_vertical_accordion({handler: ".'.ZBX_STYLE_COLOR_PREVIEW_BOX.'"});
 
 			// Initialize rangeControl UI elements.
-			'jQuery(".'.CRangeControl::ZBX_STYLE_CLASS.'", jQuery("#data_sets")).rangeControl();',
+			jQuery(".'.CRangeControl::ZBX_STYLE_CLASS.'", jQuery("#data_sets")).rangeControl();
 
 			// Expand dataset when click in pattern fields.
-			'jQuery("#data_sets").on("click", "'.implode(', ', [
-				'.'.ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED.' .'.CPatternSelect::ZBX_STYLE_CLASS,
+			jQuery("#data_sets").on("click", "'.implode(', ', [
+				'.'.ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED.' .'.CMultiSelect::ZBX_STYLE_CLASS,
 				'.'.ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED.' .'.ZBX_STYLE_BTN_GREY
-			]).'", function(event) {'.
-				'var index = jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").index();'.
-				'jQuery("#data_sets").zbx_vertical_accordion("expandNth", index);'.
-				'jQuery(event.currentTarget).find("input.input").focus();'.
-			'});',
+			]).'", function(event) {
+				jQuery("#data_sets").zbx_vertical_accordion("expandNth", 
+					jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").index());
+
+				jQuery(event.currentTarget).find("input.input").focus();
+			});
 
 			// Initialize pattern fields.
-			'jQuery(".multiselect", jQuery("#data_sets")).each(function() {'.
-				'jQuery(this).multiSelect(jQuery(this).data("params"));'.
-			'});',
+			jQuery(".multiselect", jQuery("#data_sets")).each(function() {
+				jQuery(this).multiSelect(jQuery(this).data("params"));
+			});
 
 			// Initialize color-picker UI elements.
-			'jQuery(".'.ZBX_STYLE_COLOR_PICKER.' input").colorpicker({onUpdate: function(color){'.
-				'var ds = jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'");'.
-				'jQuery(".'.ZBX_STYLE_COLOR_PREVIEW_BOX.'", ds).css("background-color", "#"+color);'.
-			'}, appendTo: ".overlay-dialogue-body"});',
+			jQuery(".'.ZBX_STYLE_COLOR_PICKER.' input").colorpicker({onUpdate: function(color){
+				jQuery(".'.ZBX_STYLE_COLOR_PREVIEW_BOX.'", jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'"))
+					.css("background-color", "#"+color);
+			}, appendTo: ".overlay-dialogue-body"});
 
-			// Initialize sortability.
-			'if (jQuery("#data_sets .'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").length < 2) {'.
-				'jQuery("#data_sets .drag-icon").addClass("disabled");'.
-			'}'.
-			'jQuery("#data_sets").sortable({'.
-				'items: ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'",'.
-				'containment: "parent",'.
-				'handle: ".drag-icon",'.
-				'tolerance: "pointer",'.
-				'scroll: false,'.
-				'cursor: "grabbing",'.
-				'opacity: 0.6,'.
-				'axis: "y",'.
-				'disabled: function() {'.
-					'return jQuery("#data_sets .'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").length < 2;'.
-				'}(),'.
-				'start: function() {'. // Workaround to fix wrong scrolling at initial sort.
-					'jQuery(this).sortable("refreshPositions");'.
-				'},'.
-				'stop: widget_svggraph_form.onGraphConfigChange,'.
-				'update: function() {'.
-					'widget_svggraph_form.updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");'.
-				'}'.
-			'});'.
-			'$(".overlay-dialogue-body").on("change", "z-select[id$=\"aggregate_function\"]", (e) => {'.
-				'changeDataSetAggregateFunction(e.target);'.
-			'});'
-		];
+			// Initialize sorting.
+			if (jQuery("#data_sets .'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").length < 2) {
+				jQuery("#data_sets .drag-icon").addClass("disabled");
+			}
 
-		return implode ('', $scripts);
+			jQuery("#data_sets").sortable({
+				items: ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'",
+				containment: "parent",
+				handle: ".drag-icon",
+				tolerance: "pointer",
+				scroll: false,
+				cursor: "grabbing",
+				opacity: 0.6,
+				axis: "y",
+				disabled: function() {
+					return jQuery("#data_sets .'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").length < 2;
+				}(),
+				start: function() { // Workaround to fix wrong scrolling at initial sort.
+					jQuery(this).sortable("refreshPositions");
+				},
+				stop: () => widget_svggraph_form.onGraphConfigChange(),
+				update: function() {
+					widget_svggraph_form.updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");
+				}
+			});
+
+			$(".overlay-dialogue-body").on("change", "z-select[id$=\"aggregate_function\"]", (e) => {
+				changeDataSetAggregateFunction(e.target);
+			});
+		';
 	}
 
 	/**

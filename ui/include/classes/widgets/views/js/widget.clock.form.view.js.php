@@ -17,18 +17,14 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
-
-/**
- * @var CView $this
- */
 ?>
 
-window.widget_clock_form = {
+
+window.widget_clock_form = new class {
 
 	init() {
-		$("#time_type").on("change", () => {
+		document.getElementById('time_type').addEventListener('change', () => {
 			ZABBIX.Dashboard.reloadWidgetProperties();
-		});
+		})
 	}
 };

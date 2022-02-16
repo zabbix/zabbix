@@ -17,21 +17,17 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
-
-/**
- * @var CView $this
- */
 ?>
 
-window.widget_problems_form = {
+
+window.widget_problems_form = new class {
 
 	init({sort_with_enabled_show_timeline}) {
-		$("#sort_triggers").on("change", (e) => {
-			$("#show_timeline")
-				.filter(":disabled").prop("checked", true).end()
-				.prop("disabled", !sort_with_enabled_show_timeline[e.target.value])
-				.filter(":disabled").prop("checked", false);
+		document.getElementById('sort_triggers').addEventListener('change', (e) => {
+			const show_timeline = document.getElementById('show_timeline');
+
+			show_timeline.disabled = !sort_with_enabled_show_timeline[e.target.value];
+			show_timeline.checked = !show_timeline.disabled;
 		});
 	}
 };
