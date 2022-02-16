@@ -1463,7 +1463,7 @@ class CWidgetHelper {
 					));
 
 					jQuery(".'.ZBX_STYLE_COLOR_PICKER.' input").colorpicker({onUpdate: function(color) {
-						jQuery(".'.ZBX_STYLE_COLOR_PREVIEW_BOX.'", 
+						jQuery(".'.ZBX_STYLE_COLOR_PREVIEW_BOX.'",
 							jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'")
 						).css("background-color", "#"+color);
 					}, appendTo: ".overlay-dialogue-body"});
@@ -1516,7 +1516,7 @@ class CWidgetHelper {
 				'.'.ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED.' .'.CMultiSelect::ZBX_STYLE_CLASS,
 				'.'.ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED.' .'.ZBX_STYLE_BTN_GREY
 			]).'", function(event) {
-				jQuery("#data_sets").zbx_vertical_accordion("expandNth", 
+				jQuery("#data_sets").zbx_vertical_accordion("expandNth",
 					jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").index());
 
 				jQuery(event.currentTarget).find("input.input").focus();
