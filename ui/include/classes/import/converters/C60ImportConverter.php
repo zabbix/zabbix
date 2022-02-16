@@ -1,3 +1,4 @@
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -17,30 +18,22 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_VERSION_H
-#define ZABBIX_VERSION_H
 
-#define ZBX_STR2(str)	#str
-#define ZBX_STR(str)	ZBX_STR2(str)
+/**
+ * Converter for converting import data from 6.0 to 6.2.
+ */
+class C60ImportConverter extends CConverter {
 
-#define APPLICATION_NAME	"Zabbix Agent"
-#define ZABBIX_REVDATE		"14 February 2022"
-#define ZABBIX_VERSION_MAJOR	6
-#define ZABBIX_VERSION_MINOR	2
-#define ZABBIX_VERSION_PATCH	0
-#ifndef ZABBIX_VERSION_REVISION
-#	define ZABBIX_VERSION_REVISION	{ZABBIX_REVISION}
-#endif
-#ifdef _WINDOWS
-#	ifndef ZABBIX_VERSION_RC_NUM
-#		define ZABBIX_VERSION_RC_NUM	{ZABBIX_RC_NUM}
-#	endif
-#endif
-#define ZABBIX_VERSION_RC	"alpha1"
-#define ZABBIX_VERSION		ZBX_STR(ZABBIX_VERSION_MAJOR) "." ZBX_STR(ZABBIX_VERSION_MINOR) "." \
-				ZBX_STR(ZABBIX_VERSION_PATCH) ZABBIX_VERSION_RC
-#define ZABBIX_REVISION		ZBX_STR(ZABBIX_VERSION_REVISION)
+	/**
+	 * Convert import data from 6.0 to 6.2 version.
+	 *
+	 * @param array $data
+	 *
+	 * @return array
+	 */
+	public function convert(array $data): array {
+		$data['zabbix_export']['version'] = '6.2';
 
-int	zbx_get_component_version(char *value);
-
-#endif
+		return $data;
+	}
+}

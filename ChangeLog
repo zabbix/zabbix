@@ -1,3 +1,22 @@
+Changes for 6.2.0alpha1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.1rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.0
+
+6.0.0rc2 was released as 6.0.0 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.0rc2
 
 Bug fixes:
@@ -391,6 +410,7 @@ New features:
 ...G...... [ZBXNEXT-7408] added native support for the net.dns and net.dns.record keys in Zabbix agent 2, fixed Zabbix agent 1 SOA response formatting (esneiders, ssimonenko)
 
 Bug fixes:
+..F....... [ZBX-19796] fixed macros tab indicator showing incorrect count when inherited option is selected and a new macro is added (miks)
 ...G...PS. [ZBX-20228] improved error reporting when SSL_write() or SSL_read() functions fail, removed redundant code that resulted in timeout on windows (vso)
 ...G...... [ZBX-20339] fixed incorrect smart plugin device type in Zabbix agent 2 (esneiders)
 .........T [ZBX-20499] removed unsupported items in Zabbix server health template (abakaldin)

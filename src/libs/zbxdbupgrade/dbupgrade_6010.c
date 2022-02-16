@@ -17,30 +17,29 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_VERSION_H
-#define ZABBIX_VERSION_H
+#include "common.h"
+#include "db.h"
+#include "dbupgrade.h"
 
-#define ZBX_STR2(str)	#str
-#define ZBX_STR(str)	ZBX_STR2(str)
+extern unsigned char	program_type;
 
-#define APPLICATION_NAME	"Zabbix Agent"
-#define ZABBIX_REVDATE		"14 February 2022"
-#define ZABBIX_VERSION_MAJOR	6
-#define ZABBIX_VERSION_MINOR	2
-#define ZABBIX_VERSION_PATCH	0
-#ifndef ZABBIX_VERSION_REVISION
-#	define ZABBIX_VERSION_REVISION	{ZABBIX_REVISION}
-#endif
-#ifdef _WINDOWS
-#	ifndef ZABBIX_VERSION_RC_NUM
-#		define ZABBIX_VERSION_RC_NUM	{ZABBIX_RC_NUM}
-#	endif
-#endif
-#define ZABBIX_VERSION_RC	"alpha1"
-#define ZABBIX_VERSION		ZBX_STR(ZABBIX_VERSION_MAJOR) "." ZBX_STR(ZABBIX_VERSION_MINOR) "." \
-				ZBX_STR(ZABBIX_VERSION_PATCH) ZABBIX_VERSION_RC
-#define ZABBIX_REVISION		ZBX_STR(ZABBIX_VERSION_REVISION)
+/*
+ * 6.2 development database patches
+ */
 
-int	zbx_get_component_version(char *value);
+#ifndef HAVE_SQLITE3
+
+/*static int	DBpatch_6010000(void)
+{
+	*** put first upgrade patch here ***
+}*/
 
 #endif
+
+DBPATCH_START(6010)
+
+/* version, duplicates flag, mandatory flag */
+
+/*DBPATCH_ADD(6010001, 0, 1)*/
+
+DBPATCH_END()
