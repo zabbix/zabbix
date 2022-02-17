@@ -713,7 +713,7 @@ class CControllerPopupTriggerExpr extends CController {
 			'length' => [
 				'types' => [ZBX_FUNCTION_TYPE_STRING],
 				'description' => _('length() - Length of last (most recent) T value in characters'),
-				'params' =>$this->param1SecCount,
+				'params' => $this->param1SecCount,
 				'allowed_types' => $this->allowedTypesStr,
 				'operators' => $this->operators
 			],
