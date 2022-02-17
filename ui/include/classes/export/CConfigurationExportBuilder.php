@@ -839,14 +839,14 @@ class CConfigurationExportBuilder {
 	 *
 	 * @return array
 	 */
-	protected function formatGroupLinks(array $groupLinks) {
+	protected function formatGroupLinks(array $group_links) {
 		$result = [];
 
-		CArrayHelper::sort($groupLinks, ['name']);
+		CArrayHelper::sort($group_links, ['name']);
 
-		foreach ($groupLinks as $groupLink) {
+		foreach ($group_links as $group_link) {
 			$result[] = [
-				'group' => $groupLink['groupid']
+				'group' => $group_link
 			];
 		}
 
