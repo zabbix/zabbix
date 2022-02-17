@@ -1620,7 +1620,7 @@ class CHostPrototype extends CHostBase {
 				'groupPrototypes' => [],
 				'templates' => [],
 				'tags' => [],
-				'macros' => [],
+				'macros' => []
 			];
 		}
 
@@ -1932,7 +1932,7 @@ class CHostPrototype extends CHostBase {
 					'groupPrototypes' => [],
 					'templates' => [],
 					'tags' => [],
-					'macros' => [],
+					'macros' => []
 				];
 
 				$upd_host_prototypes[] = $upd_host_prototype;

@@ -1617,7 +1617,7 @@ class CApiInputValidatorTest extends TestCase {
 					'hostid' => '10428',
 					'custom_interface' => 1,
 					'interface_ip' => '127.0.0.1'
-				],
+				]
 			],
 			[
 				['type' => API_OBJECT, 'fields' => [
@@ -2426,7 +2426,7 @@ class CApiInputValidatorTest extends TestCase {
 				]],
 				[
 					['type' => '1'],
-					['type' => '1', 'level' => '1', 'value' => '1'],
+					['type' => '1', 'level' => '1', 'value' => '1']
 				],
 				'/',
 				'Invalid parameter "/2": unexpected parameter "level".'
@@ -2447,7 +2447,7 @@ class CApiInputValidatorTest extends TestCase {
 				]],
 				[
 					['type' => '1'],
-					['type' => '3', 'level' => '1', 'value' => '1'],
+					['type' => '3', 'level' => '1', 'value' => '1']
 				],
 				'/',
 				'Invalid parameter "/2": unexpected parameter "value".'
@@ -2469,13 +2469,13 @@ class CApiInputValidatorTest extends TestCase {
 				[
 					['type' => '1'],
 					['type' => '3', 'level' => '1'],
-					['type' => '3', 'level' => '2', 'value' => '1'],
+					['type' => '3', 'level' => '2', 'value' => '1']
 				],
 				'/',
 				[
 					['type' => 1],
 					['type' => 3, 'level' => 1],
-					['type' => 3, 'level' => 2, 'value' => 1],
+					['type' => 3, 'level' => 2, 'value' => 1]
 				]
 			],
 			[
@@ -6045,7 +6045,7 @@ class CApiInputValidatorTest extends TestCase {
 				[
 					['type' => '3', 'level' => '1'],
 					['type' => '3', 'level' => '2', 'value' => ['1', '2', '3']],
-					['type' => '3', 'level' => '2', 'value' => ['1', '2', '3', '4', '1']],
+					['type' => '3', 'level' => '2', 'value' => ['1', '2', '3', '4', '1']]
 				],
 				'/',
 				false,
