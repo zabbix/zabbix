@@ -50,7 +50,7 @@ typedef struct
 }
 zbx_expression_query_one_t;
 
-/* many item query data - matching itemids */
+/* many items query data - matching itemids */
 typedef struct
 {
 	zbx_vector_uint64_t	itemids;
@@ -60,7 +60,7 @@ zbx_expression_query_many_t;
 /* expression item query */
 typedef struct
 {
-	/* query flags, see see ZBX_ITEM_QUERY_* defines */
+	/* query flags, see ZBX_ITEM_QUERY_* defines */
 	zbx_uint32_t		flags;
 
 	/* the item query /host/key?[filter] */

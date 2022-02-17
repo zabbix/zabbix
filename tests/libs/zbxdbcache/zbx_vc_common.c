@@ -17,17 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbx_vc_common.h"
+
 #include "zbxmocktest.h"
-#include "zbxmockdata.h"
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
 #include "common.h"
+#include "mutexs.h"
 #include "valuecache.h"
 #include "valuecache_test.h"
 #include "mocks/valuecache/valuecache_mock.h"
-
-#include "zbx_vc_common.h"
 
 extern zbx_uint64_t	CONFIG_VALUE_CACHE_SIZE;
 

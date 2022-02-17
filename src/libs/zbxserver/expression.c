@@ -17,6 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "expression.h"
+
 #include "zbxserver.h"
 #include "evalfunc.h"
 #include "log.h"
@@ -53,8 +55,6 @@ zbx_rootcause_t;
 
 ZBX_VECTOR_DECL(rootcause, zbx_rootcause_t)
 ZBX_VECTOR_IMPL(rootcause, zbx_rootcause_t)
-
-#include "expression.h"
 
 /* The following definitions are used to identify the request field */
 /* for various value getters grouped by their scope:                */
@@ -117,7 +117,7 @@ static int	get_trigger_severity_name(unsigned char priority, char **replace_to)
  *                                                                            *
  * Purpose: get human readable list of problem update actions                 *
  *                                                                            *
- * Parameters: ack     - [IN] the acknowledge (problem update) data           *
+ * Parameters: ack     - [IN] problem update data                             *
  *             actions - [IN] the required action flags                       *
  *             out     - [OUT] the output buffer                              *
  *                                                                            *
@@ -4760,7 +4760,7 @@ static int	expand_trigger_macros(zbx_eval_context_t *ctx, const DB_EVENT *event,
 		if (ZBX_EVAL_TOKEN_VAR_MACRO != token->type && ZBX_EVAL_TOKEN_VAR_STR != token->type)
 			continue;
 
-		/* all trigger macros macros are already extracted into strings */
+		/* all trigger macros are already extracted into strings */
 		if (ZBX_VARIANT_STR != token->value.type)
 			continue;
 

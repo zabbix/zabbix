@@ -2161,7 +2161,7 @@ static int	DBpatch_3030186(void)
 	return DBadd_foreign_key("items", 5, &field);
 }
 
-/* Patches 3030187-3030198 are solve ZBX-12505 issue */
+/* Patches 3030187-3030198 solve the issue ZBX-12505 */
 
 static int	DBpatch_3030187(void)
 {

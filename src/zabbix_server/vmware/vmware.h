@@ -19,8 +19,10 @@
 #ifndef ZABBIX_VMWARE_H
 #define ZABBIX_VMWARE_H
 
-#include "common.h"
+#include "config.h"
+#include "zbxtypes.h"
 #include "threads.h"
+#include "zbxalgo.h"
 
 /* the vmware service state */
 #define ZBX_VMWARE_STATE_NEW		0x001

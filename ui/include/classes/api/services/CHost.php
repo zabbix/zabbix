@@ -1219,7 +1219,7 @@ class CHost extends CHostGeneral {
 
 		/*
 		 * Update host and host group linkage. This procedure should be done the last because user can unlink
-		 * him self from a group with write permissions leaving only read premissions. Thus other procedures, like
+		 * him self from a group with write permissions leaving only read permissions. Thus other procedures, like
 		 * host-template linkage, inventory update, macros update, must be done before this.
 		 */
 		if (isset($updateGroups)) {
@@ -1329,7 +1329,7 @@ class CHost extends CHostGeneral {
 	/**
 	 * Validates if hosts may be deleted, due to maintenance constrain.
 	 *
-	 * @throws APIException if a constrain failed
+	 * @throws APIException if a constraint failed
 	 *
 	 * @param array $hostids
 	 */

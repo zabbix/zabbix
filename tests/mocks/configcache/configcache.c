@@ -18,20 +18,7 @@
 **/
 
 #include "configcache.h"
-
-#include "zbxmocktest.h"
-#include "zbxmockdata.h"
-#include "zbxmockassert.h"
-#include "zbxmockutil.h"
-
-#include "zbxserver.h"
-#include "common.h"
-#include "zbxalgo.h"
-#include "dbcache.h"
-#include "mutexs.h"
-
-#define ZBX_DBCONFIG_IMPL
-#include "dbconfig.h"
+#include "configcache_mock.h"
 
 zbx_mock_config_t	mock_config;
 

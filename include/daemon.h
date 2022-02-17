@@ -20,13 +20,14 @@
 #ifndef ZABBIX_DAEMON_H
 #define ZABBIX_DAEMON_H
 
+#include "sysinc.h"
+
 #if defined(_WINDOWS)
 #	error "This module allowed only for Unix OS"
 #endif
 
 extern char			*CONFIG_PID_FILE;
 extern volatile sig_atomic_t	sig_exiting;
-#include "threads.h"
 
 #define ZBX_EXIT_NONE		0
 #define ZBX_EXIT_SUCCESS	1

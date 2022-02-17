@@ -20,12 +20,6 @@
 #ifndef ZABBIX_SERVICE_PROTOCOL_H
 #define ZABBIX_SERVICE_PROTOCOL_H
 
-#include "common.h"
-#include "db.h"
-#include "zbxalgo.h"
-#include "dbcache.h"
-
-#include "log.h"
 #include "zbxalgo.h"
 #include "zbxservice.h"
 

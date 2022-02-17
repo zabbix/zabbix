@@ -17,12 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "log.h"
-#include "zbxalgo.h"
-#include "zbxhistory.h"
 #include "history.h"
 
+#include "common.h"
+#include "log.h"
 #include "../zbxalgo/vectorimpl.h"
 
 ZBX_VECTOR_IMPL(history_record, zbx_history_record_t)
