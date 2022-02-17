@@ -247,8 +247,9 @@ func (p *Plugin) discovery(params []string, conn *dbus.Conn) (interface{}, error
 	for _, f := range unitFiles {
 		unitFileExt := filepath.Ext(f.Name)
 		basePath := filepath.Base(f.Name)
-		if f.EnablementState != "disabled" || (len(ext) != 0 && ext != unitFileExt) || isEnabledUnit(array, basePath) ||
-			strings.HasSuffix(strings.TrimSuffix(f.Name, unitFileExt), "@") { /* skip unit templates */
+		if f.EnablementState != "disabled" || (len(ext) != 0 && ext != unitFileExt) ||
+			strings.HasSuffix(strings.TrimSuffix(f.Name, unitFileExt), "@") || /* skip unit templates */
+			isEnabledUnit(array, basePath) {
 			continue
 		}
 
