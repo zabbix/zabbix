@@ -2834,6 +2834,8 @@ form.is-loading {
     .list-table .action-container .separator {
       flex-shrink: 0;
       margin-right: 4px; }
+  .list-table td .icon-maintenance {
+    margin: 0 0 -3px 4px; }
   .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td {
     color: #000000; }
     .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td sup,
@@ -2905,11 +2907,9 @@ form.is-loading {
         .list-table.compact-view td .tag {
           max-width: 133px; } }
     .list-table.compact-view td .icon-maintenance {
-      position: relative;
-      display: inline-block;
       height: 12px;
       width: 12px;
-      margin: 3px 1px 2px 2px !important; }
+      margin: 3px 1px 2px 2px; }
       .list-table.compact-view td .icon-maintenance::before {
         height: 12px;
         width: 12px;
@@ -4215,11 +4215,21 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     background: url("../img/icon-sprite.svg?20211222") no-repeat -45px -693px; }
 
 .icon-maintenance {
+  position: relative;
   display: inline-block;
-  width: 18px;
-  height: 13px; }
+  width: 16px;
+  height: 16px;
+  border-radius: 2px; }
   .icon-maintenance::before {
-    background: url("../img/icon-sprite.svg?20211222") no-repeat -46px -802px; }
+    background: url("../img/icon-sprite.svg?20211222") no-repeat -47px -803px;
+    width: 14px;
+    height: 14px;
+    left: 1px;
+    top: 1px; }
+  .icon-maintenance:link, .icon-maintenance:hover, .icon-maintenance:focus {
+    border-bottom: none; }
+  .icon-maintenance:focus {
+    box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35); }
 
 .icon-tree-top-bottom, .icon-tree-top-bottom-right, .icon-tree-top-right, .icon-tree-empty {
   margin: 0 12px 0 0; }
@@ -6301,6 +6311,10 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
     font-size: 10px;
     font-weight: bold;
     color: #f2f2f2; }
+  .icon-help-hint:link, .icon-help-hint:hover, .icon-help-hint:focus {
+    border-bottom: none; }
+  .icon-help-hint:focus {
+    box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35); }
 
 #expressions_list .ui-sortable-helper {
   display: table; }

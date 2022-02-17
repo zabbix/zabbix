@@ -920,10 +920,10 @@ function makeInformationList($info_icons) {
  *
  * @param string $message
  *
- * @return CSpan
+ * @return CLink
  */
 function makeInformationIcon($message) {
-	return (new CSpan())
+	return (new CLink())
 		->addClass(ZBX_STYLE_ICON_INFO)
 		->addClass(ZBX_STYLE_STATUS_GREEN)
 		->setHint($message, ZBX_STYLE_HINTBOX_WRAP);
@@ -936,7 +936,7 @@ function makeInformationIcon($message) {
  * @param string $name         Name of the maintenance.
  * @param string $description  Description of the maintenance.
  *
- * @return CSpan
+ * @return CLink
  */
 function makeMaintenanceIcon($type, $name, $description) {
 	$hint = $name.' ['.($type
@@ -947,7 +947,7 @@ function makeMaintenanceIcon($type, $name, $description) {
 		$hint .= "\n".$description;
 	}
 
-	return (new CSpan())
+	return (new CLink())
 		->addClass(ZBX_STYLE_ICON_MAINTENANCE)
 		->addClass(ZBX_STYLE_CURSOR_POINTER)
 		->setHint($hint);
@@ -1031,7 +1031,7 @@ function makeActionIcon(array $icon_data): CTag {
  *
  * @param string $description
  *
- * @return CSpan
+ * @return CLink
  */
 function makeDescriptionIcon($description) {
 	return (new CLink())
@@ -1045,7 +1045,7 @@ function makeDescriptionIcon($description) {
  *
  * @param string $error
  *
- * @return CSpan
+ * @return CLink
  */
 function makeErrorIcon($error) {
 	return (new CLink())
@@ -1059,10 +1059,10 @@ function makeErrorIcon($error) {
  *
  * @param string|array|CTag $help_text
  *
- * @return CSpan
+ * @return CLink
  */
-function makeHelpIcon($help_text): CSpan {
-	return (new CSpan())
+function makeHelpIcon($help_text): CLink {
+	return (new CLink())
 		->addClass(ZBX_STYLE_ICON_HELP_HINT)
 		->addClass(ZBX_STYLE_CURSOR_POINTER)
 		->setHint($help_text, ZBX_STYLE_HINTBOX_WRAP);
@@ -1073,7 +1073,7 @@ function makeHelpIcon($help_text): CSpan {
  *
  * @param string $error
  *
- * @return CSpan
+ * @return CLink
  */
 function makeWarningIcon($error) {
 	return (new CLink())
