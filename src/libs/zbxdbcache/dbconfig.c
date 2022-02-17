@@ -5688,13 +5688,11 @@ static int	zbx_default_ptr_pair_ptr_second_compare_func(const void *d1, const vo
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_trigger_add_itemids                                           *
- *                                                                            *
  * Purpose: add new itemids into trigger itemids array                        *
  *                                                                            *
  * Comments: If trigger is already linked to an item and a new function       *
  *           linking the trigger to that item is being added, then the item   *
- *           triggers will be reset causing itemid to be removed from trigger.*                                                                           *
+ *           triggers will be reset causing itemid to be removed from trigger.*
  *           Because of that itemids always can be simply appended to the     *
  *           existing list without checking for duplicates.                   *
  *                                                                            *
@@ -5731,8 +5729,6 @@ static void	dc_trigger_add_itemids(ZBX_DC_TRIGGER *trigger, const zbx_vector_uin
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: dc_item_reset_triggers                                           *
  *                                                                            *
  * Purpose: reset item trigger links and remove corresponding itemids from    *
  *          affected triggers                                                 *
@@ -8741,7 +8737,7 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 			{
 				/* DCconfig_get_triggers_by_itemids() function is called during trigger processing */
 				/* when syncing history cache. A trigger cannot be processed by two syncers at the */
-				/* same time, so its safe to update trigger timespec within read lock.             */
+				/* same time, so it is safe to update trigger timespec within read lock.           */
 				trigger->timespec = timespecs[i];
 			}
 		}
@@ -10286,7 +10282,7 @@ out:
  * Purpose: update availability of interfaces in configuration cache and      *
  *          return the updated field flags                                    *
  *                                                                            *
- * Parameters: availabilities - [IN/OUT] the interfacess availability data    *
+ * Parameters: availabilities - [IN/OUT] the interfaces availability data     *
  *                                                                            *
  * Return value: SUCCEED - at least one interface availability data           *
  *                         was updated                                        *
@@ -13435,8 +13431,8 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 			if (ps_win->flags != ds_win->flags)
 				ps_win->flags = ds_win->flags;
 
-			if (0 > ps_win->values_num)	/* some new values was processed faster than old */
-				ps_win->values_num = 0;	/* we will suppress more                         */
+			if (0 > ps_win->values_num)	/* some new values were processed faster than old */
+				ps_win->values_num = 0;	/* we will suppress more                          */
 
 			ps_win->values_num += ds_win->values_num;
 			diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN);

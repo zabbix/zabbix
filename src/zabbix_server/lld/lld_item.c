@@ -1286,8 +1286,8 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: validation of a item preprocessing step expressions for discovery *
- *          process                                                           *
+ * Purpose: validation of an item preprocessing step expressions for          *
+ *          discovery process                                                 *
  *                                                                            *
  * Parameters: pp       - [IN] the item preprocessing step                    *
  *             itemid   - [IN] item ID for logging                            *
@@ -2557,7 +2557,7 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, zbx_vector_p
 
 /******************************************************************************
  *                                                                            *
- * Purpose: escaping of a symbols in items preprocessing steps for discovery  *
+ * Purpose: escaping of symbols in items preprocessing steps for discovery    *
  *          process                                                           *
  *                                                                            *
  * Parameters: type            - [IN] the item preprocessing step type        *

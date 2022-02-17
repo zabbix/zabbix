@@ -1625,7 +1625,7 @@ static void	pick_logfile(const char *directory, const char *filename, int mtime,
  *                                                                            *
  * Comments: This is a helper function for make_logfile_list()                *
  *                                                                            *
- * Comments: Thead-safety - readdir() is a gray area, supposed to work on     *
+ * Comments: Thread-safety - readdir() is a gray area, supposed to work on    *
  *           modern implementations when the directory stream is not shared   *
  *           between threads.                                                 *
  *                                                                            *
@@ -2962,8 +2962,8 @@ static int	adjust_position_after_jump(struct st_logfile *logfile, zbx_uint64_t *
 
 		if (NULL != buf_find_newline(p, &p_next, p_end, cr, lf, szbyte))
 		{
-			/* Found the beginning of line. It may not be the one closest to place we jumped to */
-			/* (it could be about sizeof(buf) bytes away) but it is ok for our purposes. */
+			/* Found the beginning of line. It may not be the closest beginning of line to the place  */
+			/* we jumped to (it could be about sizeof(buf) bytes away) but it is ok for our purposes. */
 
 			*lastlogsize = seek_pos + (zbx_uint64_t)(p_next - buf);
 			logfile->processed_size = *lastlogsize;
@@ -4152,7 +4152,7 @@ struct st_logfile	*find_last_processed_file_in_logfiles_list(struct st_logfile *
 		return logfiles;
 
 	/* The last (at least partially) processed file is the one with the maximum 'seq' value. */
-	/* If no one file is processed then return pointer to the list first element. */
+	/* If no any file is processed then return pointer to the list first element. */
 
 	for (i = 0; i < logfiles_num; i++)
 	{
