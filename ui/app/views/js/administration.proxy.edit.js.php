@@ -67,6 +67,7 @@
 
 		$('#change_psk').click(function() {
 			let input = document.createElement('input');
+
 			input.setAttribute('type', 'hidden');
 			input.setAttribute('name', 'action');
 			input.setAttribute('value', 'proxy.edit');
@@ -90,6 +91,7 @@
 			$('#tls_in_psk').prop('checked', true);
 
 			const event = new Event('change');
+
 			document.querySelector('[name=tls_in_psk]').dispatchEvent(event);
 		}
 
@@ -97,6 +99,7 @@
 			$('#tls_in_cert').prop('checked', true);
 
 			const event = new Event('change');
+
 			document.querySelector('[name=tls_in_cert]').dispatchEvent(event);
 		}
 
