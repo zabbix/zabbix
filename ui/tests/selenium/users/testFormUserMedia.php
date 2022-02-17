@@ -277,7 +277,7 @@ class testFormUserMedia extends CWebTest {
 					'error_message' => 'Incorrect value for field "period": a time period is expected'
 				]
 			],
-			// When active defined using a LLD marco.
+			// When active defined using a LLD macro.
 			[
 				[
 					'expected' => TEST_BAD,

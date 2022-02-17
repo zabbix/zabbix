@@ -53,7 +53,7 @@ class CBrandHelper {
 	}
 
 	/**
-	 * Get value by key from configuration (load configuration if need).
+	 * Get value by key from configuration (load configuration if needed).
 	 *
 	 * @param string $key      configuration key
 	 * @param mixed  $default  default value
