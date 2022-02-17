@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2022-02-10T15:44:25Z</date>
+   <date>2022-02-17T20:45:20Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -51,7 +51,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
                </master_item>
             </item>
             <item>
@@ -76,7 +76,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
                </master_item>
             </item>
             <item>
@@ -100,7 +100,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
                </master_item>
             </item>
             <item>
@@ -125,7 +125,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
                </master_item>
             </item>
             <item>
@@ -149,7 +149,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
                </master_item>
             </item>
             <item>
@@ -174,7 +174,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
                </master_item>
             </item>
             <item>
@@ -198,7 +198,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
                </master_item>
             </item>
             <item>
@@ -222,7 +222,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
                </master_item>
             </item>
             <item>
@@ -247,7 +247,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
                </master_item>
             </item>
             <item>
@@ -271,7 +271,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
                </master_item>
             </item>
             <item>
@@ -296,7 +296,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
                </master_item>
             </item>
             <item>
@@ -321,7 +321,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
                </master_item>
             </item>
             <item>
@@ -345,7 +345,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
                </master_item>
             </item>
             <item>
@@ -370,7 +370,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
                </master_item>
             </item>
             <item>
@@ -394,7 +394,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
                </master_item>
             </item>
             <item>
@@ -419,7 +419,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
                </master_item>
             </item>
             <item>
@@ -441,7 +441,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
                </master_item>
             </item>
             <item>
@@ -463,7 +463,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
                </master_item>
             </item>
             <item>
@@ -485,7 +485,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
                </master_item>
             </item>
             <item>
@@ -507,7 +507,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
                </master_item>
             </item>
             <item>
@@ -529,7 +529,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
                </master_item>
             </item>
             <item>
@@ -551,7 +551,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
                </master_item>
             </item>
             <item>
@@ -573,7 +573,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
                </master_item>
             </item>
             <item>
@@ -595,12 +595,12 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
                </master_item>
             </item>
             <item>
                <name>RabbitMQ: Get exchanges</name>
-               <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]</key>
+               <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]</key>
                <history>1h</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
@@ -620,7 +620,7 @@ Template tooling version used: 0.39</description>
             </item>
             <item>
                <name>RabbitMQ: Get overview</name>
-               <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
+               <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
                <history>1h</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
@@ -694,7 +694,7 @@ Template tooling version used: 0.39</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]</key>
+                        <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -718,7 +718,7 @@ Template tooling version used: 0.39</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]</key>
+                        <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -743,7 +743,7 @@ Template tooling version used: 0.39</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]</key>
+                        <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -767,7 +767,7 @@ Template tooling version used: 0.39</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]</key>
+                        <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -792,7 +792,7 @@ Template tooling version used: 0.39</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]</key>
+                        <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -816,7 +816,7 @@ Template tooling version used: 0.39</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]</key>
+                        <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -841,7 +841,7 @@ Template tooling version used: 0.39</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]</key>
+                        <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -865,7 +865,7 @@ Template tooling version used: 0.39</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]</key>
+                        <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -890,7 +890,7 @@ Template tooling version used: 0.39</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]</key>
+                        <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -914,7 +914,7 @@ Template tooling version used: 0.39</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]</key>
+                        <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -939,7 +939,7 @@ Template tooling version used: 0.39</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]</key>
+                        <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -963,7 +963,7 @@ Template tooling version used: 0.39</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]</key>
+                        <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -988,7 +988,7 @@ Template tooling version used: 0.39</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]</key>
+                        <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1012,7 +1012,7 @@ Template tooling version used: 0.39</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]</key>
+                        <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1037,7 +1037,7 @@ Template tooling version used: 0.39</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]</key>
+                        <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1061,12 +1061,12 @@ Template tooling version used: 0.39</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]</key>
+                        <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]</key>
                      </master_item>
                   </item_prototype>
                </item_prototypes>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]</key>
                </master_item>
                <lld_macro_paths>
                   <lld_macro_path>
@@ -1092,7 +1092,7 @@ Template tooling version used: 0.39</description>
                <item_prototypes>
                   <item_prototype>
                      <name>RabbitMQ: Healthcheck: alarms in effect in the cluster{#SINGLETON}</name>
-                     <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/health/checks/alarms{#SINGLETON}"]</key>
+                     <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/health/checks/alarms{#SINGLETON}"]</key>
                      <history>7d</history>
                      <authtype>BASIC</authtype>
                      <username>{$RABBITMQ.API.USER}</username>
@@ -1139,7 +1139,7 @@ default: 2}</params>
                   </item_prototype>
                </item_prototypes>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
                </master_item>
                <preprocessing>
                   <step>
@@ -1170,6 +1170,11 @@ return JSON.stringify(rabbit_version &gt;= 30810 ? [{'{#SINGLETON}': ''}] : []);
                <macro>{$RABBITMQ.API.PORT}</macro>
                <value>15672</value>
                <description>The port of RabbitMQ API endpoint</description>
+            </macro>
+            <macro>
+               <macro>{$RABBITMQ.API.SCHEME}</macro>
+               <value>http</value>
+               <description>Request scheme which may be http or https</description>
             </macro>
             <macro>
                <macro>{$RABBITMQ.API.USER}</macro>
@@ -1330,7 +1335,7 @@ Template tooling version used: 0.39</description>
          <items>
             <item>
                <name>RabbitMQ: Service response time</name>
-               <key>net.tcp.service.perf[http,"{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"]</key>
+               <key>net.tcp.service.perf["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"]</key>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>s</units>
@@ -1352,7 +1357,7 @@ Template tooling version used: 0.39</description>
                         </dependency>
                         <dependency>
                            <name>RabbitMQ: Service is down</name>
-                           <expression>{RabbitMQ node by Zabbix agent:net.tcp.service[http,"{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"].last()}=0</expression>
+                           <expression>{RabbitMQ node by Zabbix agent:net.tcp.service["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"].last()}=0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -1360,7 +1365,7 @@ Template tooling version used: 0.39</description>
             </item>
             <item>
                <name>RabbitMQ: Service ping</name>
-               <key>net.tcp.service[http,"{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"]</key>
+               <key>net.tcp.service["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"]</key>
                <history>7d</history>
                <applications>
                   <application>
@@ -1465,7 +1470,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]</key>
                </master_item>
             </item>
             <item>
@@ -1494,7 +1499,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]</key>
                </master_item>
                <triggers>
                   <trigger>
@@ -1526,7 +1531,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]</key>
                </master_item>
             </item>
             <item>
@@ -1548,7 +1553,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]</key>
                </master_item>
             </item>
             <item>
@@ -1577,7 +1582,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]</key>
                </master_item>
                <triggers>
                   <trigger>
@@ -1609,7 +1614,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]</key>
                </master_item>
             </item>
             <item>
@@ -1632,7 +1637,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]</key>
                </master_item>
             </item>
             <item>
@@ -1660,7 +1665,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
                </master_item>
             </item>
             <item>
@@ -1688,7 +1693,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
                </master_item>
                <triggers>
                   <trigger>
@@ -1723,7 +1728,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]</key>
                </master_item>
                <triggers>
                   <trigger>
@@ -1754,7 +1759,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]</key>
                </master_item>
             </item>
             <item>
@@ -1783,7 +1788,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]</key>
                </master_item>
                <triggers>
                   <trigger>
@@ -1799,7 +1804,7 @@ Template tooling version used: 0.39</description>
                         </dependency>
                         <dependency>
                            <name>RabbitMQ: Service is down</name>
-                           <expression>{RabbitMQ node by Zabbix agent:net.tcp.service[http,"{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"].last()}=0</expression>
+                           <expression>{RabbitMQ node by Zabbix agent:net.tcp.service["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"].last()}=0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -1824,7 +1829,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]</key>
                </master_item>
             </item>
             <item>
@@ -1846,7 +1851,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]</key>
                </master_item>
             </item>
             <item>
@@ -1874,7 +1879,7 @@ Template tooling version used: 0.39</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]</key>
                </master_item>
                <triggers>
                   <trigger>
@@ -1888,7 +1893,7 @@ Template tooling version used: 0.39</description>
             </item>
             <item>
                <name>RabbitMQ: Get nodes</name>
-               <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]</key>
+               <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]</key>
                <history>1h</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
@@ -1919,7 +1924,7 @@ Template tooling version used: 0.39</description>
                         </dependency>
                         <dependency>
                            <name>RabbitMQ: Service is down</name>
-                           <expression>{RabbitMQ node by Zabbix agent:net.tcp.service[http,"{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"].last()}=0</expression>
+                           <expression>{RabbitMQ node by Zabbix agent:net.tcp.service["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"].last()}=0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -1927,7 +1932,7 @@ Template tooling version used: 0.39</description>
             </item>
             <item>
                <name>RabbitMQ: Get node overview</name>
-               <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
+               <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
                <history>1h</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
@@ -1947,7 +1952,7 @@ Template tooling version used: 0.39</description>
             </item>
             <item>
                <name>RabbitMQ: Get queues</name>
-               <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
+               <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
                <history>1h</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
@@ -1976,7 +1981,7 @@ Template tooling version used: 0.39</description>
                <item_prototypes>
                   <item_prototype>
                      <name>RabbitMQ: Healthcheck: expiration date on the certificates{#SINGLETON}</name>
-                     <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/certificate-expiration/1/months{#SINGLETON}"]</key>
+                     <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/certificate-expiration/1/months{#SINGLETON}"]</key>
                      <history>7d</history>
                      <authtype>BASIC</authtype>
                      <username>{$RABBITMQ.API.USER}</username>
@@ -2022,7 +2027,7 @@ default: 2}</params>
                   </item_prototype>
                   <item_prototype>
                      <name>RabbitMQ: Healthcheck: local alarms in effect on the this node{#SINGLETON}</name>
-                     <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/local-alarms{#SINGLETON}"]</key>
+                     <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/local-alarms{#SINGLETON}"]</key>
                      <history>7d</history>
                      <authtype>BASIC</authtype>
                      <username>{$RABBITMQ.API.USER}</username>
@@ -2068,7 +2073,7 @@ default: 2}</params>
                   </item_prototype>
                   <item_prototype>
                      <name>RabbitMQ: Healthcheck: classic mirrored queues without synchronized mirrors online{#SINGLETON}</name>
-                     <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-mirror-sync-critical{#SINGLETON}"]</key>
+                     <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-mirror-sync-critical{#SINGLETON}"]</key>
                      <history>7d</history>
                      <authtype>BASIC</authtype>
                      <username>{$RABBITMQ.API.USER}</username>
@@ -2114,7 +2119,7 @@ default: 2}</params>
                   </item_prototype>
                   <item_prototype>
                      <name>RabbitMQ: Healthcheck: queues with minimum online quorum{#SINGLETON}</name>
-                     <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-quorum-critical{#SINGLETON}"]</key>
+                     <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-quorum-critical{#SINGLETON}"]</key>
                      <history>7d</history>
                      <authtype>BASIC</authtype>
                      <username>{$RABBITMQ.API.USER}</username>
@@ -2160,7 +2165,7 @@ default: 2}</params>
                   </item_prototype>
                   <item_prototype>
                      <name>RabbitMQ: Healthcheck: virtual hosts on the this node{#SINGLETON}</name>
-                     <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/virtual-hosts{#SINGLETON}"]</key>
+                     <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/virtual-hosts{#SINGLETON}"]</key>
                      <history>7d</history>
                      <authtype>BASIC</authtype>
                      <username>{$RABBITMQ.API.USER}</username>
@@ -2206,7 +2211,7 @@ default: 2}</params>
                   </item_prototype>
                </item_prototypes>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
                </master_item>
                <preprocessing>
                   <step>
@@ -2231,7 +2236,7 @@ return JSON.stringify(rabbit_version &gt;= 30810 ? [{'{#SINGLETON}': ''}] : []);
                <item_prototypes>
                   <item_prototype>
                      <name>RabbitMQ: Healthcheck{#SINGLETON}</name>
-                     <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/healthchecks/node{#SINGLETON}"]</key>
+                     <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/healthchecks/node{#SINGLETON}"]</key>
                      <history>7h</history>
                      <description>Runs basic healthchecks in the current node. Checks that the rabbit application is running, channels and queues can be listed successfully, and that no alarms are in effect.</description>
                      <applications>
@@ -2271,7 +2276,7 @@ return JSON.stringify(rabbit_version &gt;= 30810 ? [{'{#SINGLETON}': ''}] : []);
                   </item_prototype>
                </item_prototypes>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/overview"]</key>
                </master_item>
                <preprocessing>
                   <step>
@@ -2334,7 +2339,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
+                        <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -2357,7 +2362,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
+                        <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -2380,7 +2385,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
+                        <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -2402,7 +2407,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
+                        <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -2425,7 +2430,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
+                        <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -2447,7 +2452,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
+                        <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -2472,7 +2477,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
+                        <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -2496,7 +2501,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
+                        <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -2521,7 +2526,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
+                        <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -2545,7 +2550,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
+                        <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -2570,7 +2575,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
+                        <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -2594,7 +2599,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
+                        <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -2619,7 +2624,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
+                        <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -2643,7 +2648,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
+                        <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -2666,7 +2671,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
+                        <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -2691,7 +2696,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
+                        <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -2715,7 +2720,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
+                        <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -2737,7 +2742,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
+                        <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -2888,7 +2893,7 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                   </graph_prototype>
                </graph_prototypes>
                <master_item>
-                  <key>web.page.get["http://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
+                  <key>web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]</key>
                </master_item>
                <lld_macro_paths>
                   <lld_macro_path>
@@ -2920,6 +2925,11 @@ return JSON.stringify(rabbit_version &lt; 30810 ? [{'{#SINGLETON}': ''}] : []);<
                <macro>{$RABBITMQ.API.PORT}</macro>
                <value>15672</value>
                <description>The port of RabbitMQ API endpoint</description>
+            </macro>
+            <macro>
+               <macro>{$RABBITMQ.API.SCHEME}</macro>
+               <value>http</value>
+               <description>Request scheme which may be http or https</description>
             </macro>
             <macro>
                <macro>{$RABBITMQ.API.USER}</macro>

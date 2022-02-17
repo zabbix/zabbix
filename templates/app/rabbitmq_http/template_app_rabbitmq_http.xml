@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2022-02-10T15:44:26Z</date>
+   <date>2022-02-17T20:45:20Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -1328,7 +1328,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>RabbitMQ: Service response time</name>
                <type>SIMPLE</type>
-               <key>net.tcp.service.perf[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"]</key>
+               <key>net.tcp.service.perf["{$RABBITMQ.API.SCHEME}","{HOST.CONN}","{$RABBITMQ.API.PORT}"]</key>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>s</units>
@@ -1346,7 +1346,7 @@ Template tooling version used: 0.39</description>
                      <dependencies>
                         <dependency>
                            <name>RabbitMQ: Service is down</name>
-                           <expression>{RabbitMQ node by HTTP:net.tcp.service[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"].last()}=0</expression>
+                           <expression>{RabbitMQ node by HTTP:net.tcp.service["{$RABBITMQ.API.SCHEME}","{HOST.CONN}","{$RABBITMQ.API.PORT}"].last()}=0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -1355,7 +1355,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>RabbitMQ: Service ping</name>
                <type>SIMPLE</type>
-               <key>net.tcp.service[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"]</key>
+               <key>net.tcp.service["{$RABBITMQ.API.SCHEME}","{HOST.CONN}","{$RABBITMQ.API.PORT}"]</key>
                <history>7d</history>
                <applications>
                   <application>
@@ -1425,7 +1425,7 @@ Template tooling version used: 0.39</description>
                      <dependencies>
                         <dependency>
                            <name>RabbitMQ: Service is down</name>
-                           <expression>{RabbitMQ node by HTTP:net.tcp.service[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"].last()}=0</expression>
+                           <expression>{RabbitMQ node by HTTP:net.tcp.service["{$RABBITMQ.API.SCHEME}","{HOST.CONN}","{$RABBITMQ.API.PORT}"].last()}=0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -1799,7 +1799,7 @@ Template tooling version used: 0.39</description>
                      <dependencies>
                         <dependency>
                            <name>RabbitMQ: Service is down</name>
-                           <expression>{RabbitMQ node by HTTP:net.tcp.service[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"].last()}=0</expression>
+                           <expression>{RabbitMQ node by HTTP:net.tcp.service["{$RABBITMQ.API.SCHEME}","{HOST.CONN}","{$RABBITMQ.API.PORT}"].last()}=0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
