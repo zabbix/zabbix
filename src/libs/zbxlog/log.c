@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "log.h"
+
 #include "mutexs.h"
 #include "threads.h"
 #include "cfg.h"

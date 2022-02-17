@@ -16,9 +16,9 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-#include "common.h"
-#include "module.h"
+
 #include "sysinfo.h"
+
 #include "log.h"
 #include "alias.h"
 #include "threads.h"

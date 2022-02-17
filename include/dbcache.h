@@ -20,9 +20,9 @@
 #ifndef ZABBIX_DBCACHE_H
 #define ZABBIX_DBCACHE_H
 
+#include "sysinfo.h" //included for convenience
 #include "db.h"
 #include "comms.h"
-#include "sysinfo.h"
 #include "zbxalgo.h"
 #include "zbxjson.h"
 #include "memalloc.h"

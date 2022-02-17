@@ -17,10 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "json_parser.h"
+
 #include "common.h"
 #include "json.h"
-
-#include "json_parser.h"
 
 static zbx_int64_t	json_parse_object(const char *start, char **error);
 

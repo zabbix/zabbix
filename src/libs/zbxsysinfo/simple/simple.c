@@ -17,6 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "simple.h"
+
 #include "common.h"
 #include "sysinfo.h"
 #include "comms.h"
@@ -25,7 +27,6 @@
 #include "telnet.h"
 #include "../common/net.h"
 #include "ntp.h"
-#include "simple.h"
 
 #ifdef HAVE_LDAP
 #	include <ldap.h>

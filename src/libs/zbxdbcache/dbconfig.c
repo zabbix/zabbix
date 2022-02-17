@@ -17,32 +17,22 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include <stddef.h>
+#include "dbconfig.h"
 
-#include "common.h"
 #include "log.h"
-#include "dbcache.h"
-#include "mutexs.h"
-#include "memalloc.h"
+#include "zbxtasks.h"
 #include "zbxserver.h"
-#include "zbxalgo.h"
 #include "zbxregexp.h"
 #include "cfg.h"
-#include "zbxtasks.h"
 #include "../zbxcrypto/tls_tcp_active.h"
 #include "../zbxalgo/vectorimpl.h"
 #include "base64.h"
-#include "zbxeval.h"
-
-#define ZBX_DBCONFIG_IMPL
+#include "db.h"
 #include "dbsync.h"
-#include "proxy.h"
 #include "actions.h"
 #include "zbxtrends.h"
 #include "zbxvault.h"
 #include "zbxserialize.h"
-
-#include "dbconfig.h"
 
 int	sync_in_progress = 0;
 
