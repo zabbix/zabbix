@@ -1,0 +1,1 @@
+.......PS. [ZBX-20450] fixed non ascii symbols being replaced by question marks when using MariaDB (vso)
