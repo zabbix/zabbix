@@ -92,7 +92,7 @@ class CControllerUsergroupEdit extends CController {
 			'form_refresh' => 0
 		];
 
-		// get values from the dabatase
+		// get values from the database
 		if ($this->hasInput('usrgrpid')) {
 			$data['usrgrpid'] = $this->user_group['usrgrpid'];
 			$data['name'] = $this->user_group['name'];

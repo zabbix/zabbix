@@ -508,7 +508,7 @@ class CAudit {
 	}
 
 	/**
-	 * Return recordsetid. Generate recordsetid if its not been generated yet.
+	 * Return recordsetid. Generate recordsetid if it has not been generated yet.
 	 *
 	 * @return string
 	 */

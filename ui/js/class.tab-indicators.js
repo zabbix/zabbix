@@ -496,17 +496,17 @@ class EncryptionTabIndicatorItem extends TabIndicatorItem {
 		const tls_in_psk_node = document.querySelector('[name=tls_in_psk]');
 
 		if (tls_in_psk_node !== null) {
-			tls_in_psk_node.addEventListener('click', () => {
-				this.addAttributes(element);
-			});
+			['click', 'change'].forEach(event =>
+				tls_in_psk_node.addEventListener(event, () => this.addAttributes(element))
+			);
 		}
 
 		const tls_in_cert_node = document.querySelector('[name=tls_in_cert]');
 
 		if (tls_in_cert_node !== null) {
-			tls_in_cert_node.addEventListener('click', () => {
-				this.addAttributes(element);
-			});
+			['click', 'change'].forEach(event =>
+				tls_in_cert_node.addEventListener(event, () => this.addAttributes(element))
+			);
 		}
 
 		for (const input of document.querySelectorAll('[name=tls_connect]')) {
