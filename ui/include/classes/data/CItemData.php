@@ -1004,7 +1004,7 @@ final class CItemData {
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
 			'proc.get[<name>,<user>,<cmdline>,<mode>]' => [
-				'description' => _('List of OS processes with their corresponding parameters. Returns JSON array'),
+				'description' => _('List of OS processes with attributes. Returns JSON array'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'proc.mem[<name>,<user>,<mode>,<cmdline>,<memtype>]' => [
