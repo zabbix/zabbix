@@ -22,7 +22,7 @@
 
 #include "../zbxkvs/kvs.h"
 
-#define ZBX_CYBERARKCCP_NAME		"CyberArkCCP"
+#define ZBX_CYBERARK_NAME		"CyberArk"
 #define ZBX_CYBERARK_DBUSER_KEY		"UserName"
 #define ZBX_CYBERARK_DBPASSWORD_KEY	"Content"
 
