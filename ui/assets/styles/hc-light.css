@@ -1170,6 +1170,8 @@ form.is-loading {
       margin-right: 4px; }
     .list-table .action-container [class*='icon-'] {
       flex-shrink: 0; }
+  .list-table td .icon-maintenance {
+    margin: 0 0 -3px 4px; }
   .list-table.compact-view .link-action {
     color: #000000; }
     .list-table.compact-view .link-action.red {
@@ -1219,13 +1221,11 @@ form.is-loading {
       @media screen and (min-width: 1600px) {
         .list-table.compact-view td .tag {
           max-width: 133px; } }
-    .list-table.compact-view td .icon-maint {
-      position: relative;
-      display: inline-block;
+    .list-table.compact-view td .icon-maintenance {
       height: 12px;
       width: 12px;
-      margin: 3px 1px 2px 2px !important; }
-      .list-table.compact-view td .icon-maint::before {
+      margin: 3px 1px 2px 2px; }
+      .list-table.compact-view td .icon-maintenance::before {
         height: 12px;
         width: 12px;
         background-position: -48px -804px; }
@@ -2557,6 +2557,23 @@ z-select[disabled] button,
   .icon-ackn::before {
     background: url("../img/icon-sprite.svg?20200407") no-repeat -45px -693px; }
 
+.icon-maintenance {
+  position: relative;
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 2px; }
+  .icon-maintenance::before {
+    background: url("../img/icon-sprite.svg?20200407") no-repeat -47px -803px;
+    width: 14px;
+    height: 14px;
+    left: 1px;
+    top: 1px; }
+  .icon-maintenance:link, .icon-maintenance:hover, .icon-maintenance:focus {
+    border-bottom: none; }
+  .icon-maintenance:focus {
+    box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35); }
+
 .icon-tree-top-bottom, .icon-tree-top-bottom-right, .icon-tree-top-right, .icon-tree-empty {
   margin: 0 12px 0 0; }
   .icon-tree-top-bottom::before, .icon-tree-top-bottom-right::before, .icon-tree-top-right::before, .icon-tree-empty::before {
@@ -2596,7 +2613,7 @@ z-select[disabled] button,
     opacity: 1;
     background-color: transparent; }
 
-.icon-maint::before, .icon-depend-up::before, .icon-depend-down::before, .icon-ackn::before {
+.icon-maint::before, .icon-depend-up::before, .icon-depend-down::before, .icon-ackn::before, .icon-maintenance::before {
   display: inline-block;
   width: 18px;
   height: 18px;
@@ -5981,7 +5998,7 @@ z-select button.focusable:focus,
   .list-table.compact-view td.na-bg::after, .list-table.compact-view td.normal-bg::after, .list-table.compact-view td.info-bg::after, .list-table.compact-view td.warning-bg::after, .list-table.compact-view td.average-bg::after, .list-table.compact-view td.high-bg::after, .list-table.compact-view td.disaster-bg::after {
     top: 1px;
     transform: scale(0.8); }
-  .list-table.compact-view td .icon-maint::before {
+  .list-table.compact-view td .icon-maintenance::before {
     background-position: -206px -804px; }
   .list-table.compact-view td .icon-wzrd-action {
     background: transparent url("../img/icon-sprite.svg?20200407") no-repeat -165px -624px; }

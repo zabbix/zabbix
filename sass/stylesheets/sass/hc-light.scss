@@ -315,7 +315,7 @@ $var-icons: (
 );
 
 // Dynamically generated classes:
-//  .icon-maint
+//  .icon-maintenance
 //  .icon-depend-up
 //  .icon-depend-down
 //  .icon-ackn
@@ -741,7 +741,7 @@ a.link-action {
 
 			box-shadow: inset 0 -1px 0 0 $table-border-color;
 
-			.icon-maint::before {
+			.icon-maintenance::before {
 				background-position: -206px -804px;
 			}
 

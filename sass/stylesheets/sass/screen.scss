@@ -376,7 +376,11 @@ form {
 			flex-shrink: 0;
 		}
 	}
-
+	td {
+		.icon-maintenance {
+			margin: 0 0 -3px 4px;
+		}
+	}
 	&.compact-view {
 		tr {
 			&[class*='flh-'] {
@@ -535,12 +539,10 @@ form {
 				}
 			}
 
-			.icon-maint {
-				position: relative;
-				display: inline-block;
+			.icon-maintenance {
 				height: 12px;
 				width: 12px;
-				margin: 3px 1px 2px 2px !important;
+				margin: 3px 1px 2px 2px;
 
 				&::before {
 					height: 12px;
@@ -2643,7 +2645,6 @@ $var-icons: (
 );
 
 // Dynamically generated classes:
-//  .icon-maint
 //  .icon-depend-up
 //  .icon-depend-down
 //  .icon-ackn
@@ -2655,6 +2656,34 @@ $var-icons: (
 			@extend %var-icons;
 		}
 	}
+}
+
+.icon-maintenance {
+	position: relative;
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	border-radius: 2px;
+
+	&::before {
+		@extend %var-icons;
+		background: url($sprite-path) no-repeat -47px -803px;
+		width: 14px;
+		height: 14px;
+		left: 1px;
+		top: 1px;
+	}
+
+	&:link,
+	&:hover,
+	&:focus {
+		border-bottom: none;
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 2px $btn-border-focus-color;
+	}
+
 }
 
 $trigger-expression-tree-icons: (

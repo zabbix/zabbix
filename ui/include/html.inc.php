@@ -927,10 +927,10 @@ function makeInformationList($info_icons) {
  *
  * @param string $message
  *
- * @return CSpan
+ * @return CLink
  */
 function makeInformationIcon($message) {
-	return (new CSpan())
+	return (new CLink())
 		->addClass(ZBX_STYLE_ICON_INFO)
 		->addClass(ZBX_STYLE_STATUS_GREEN)
 		->setHint($message, ZBX_STYLE_HINTBOX_WRAP);
@@ -954,8 +954,8 @@ function makeMaintenanceIcon($type, $name, $description) {
 		$hint .= "\n".$description;
 	}
 
-	return (new CSpan())
-		->addClass(ZBX_STYLE_ICON_MAINT)
+	return (new CLink())
+		->addClass(ZBX_STYLE_ICON_MAINTENANCE)
 		->addClass(ZBX_STYLE_CURSOR_POINTER)
 		->setHint($hint);
 }
@@ -975,7 +975,7 @@ function makeSuppressedProblemIcon(array $icon_data) {
 	CArrayHelper::sort($icon_data, ['maintenance_name']);
 	$maintenance_names = implode(', ', zbx_objectValues($icon_data, 'maintenance_name'));
 
-	return (new CSpan())
+	return (new CLink())
 		->addClass(ZBX_STYLE_ICON_INVISIBLE)
 		->addClass(ZBX_STYLE_CURSOR_POINTER)
 		->setHint(
@@ -1038,7 +1038,7 @@ function makeActionIcon(array $icon_data): CTag {
  *
  * @param string $description
  *
- * @return CSpan
+ * @return CLink
  */
 function makeDescriptionIcon($description) {
 	return (new CLink())
@@ -1052,7 +1052,7 @@ function makeDescriptionIcon($description) {
  *
  * @param string $error
  *
- * @return CSpan
+ * @return CLink
  */
 function makeErrorIcon($error) {
 	return (new CLink())
@@ -1062,11 +1062,25 @@ function makeErrorIcon($error) {
 }
 
 /**
+ * Renders an unknown icon like grey [i] with error message
+ *
+ * @param string $error
+ *
+ * @return CLink
+ */
+function makeUnknownIcon($error) {
+	return (new CLink())
+		->addClass(ZBX_STYLE_ICON_INFO)
+		->addClass(ZBX_STYLE_STATUS_DARK_GREY)
+		->setHint($error, ZBX_STYLE_HINTBOX_WRAP." ".ZBX_STYLE_RED);
+}
+
+/**
  * Renders a warning icon like yellow [i] with error message
  *
  * @param string $error
  *
- * @return CSpan
+ * @return CLink
  */
 function makeWarningIcon($error) {
 	return (new CLink())
