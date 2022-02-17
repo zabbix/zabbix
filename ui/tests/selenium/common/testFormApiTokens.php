@@ -26,23 +26,21 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  */
 class testFormApiTokens extends CWebTest {
 
+	const DELETE_TOKEN = 'Token to be deleted';		                     // Token for deletion.
+	const USER_ZABBIX_TOKEN = 'user-zabbix token';	                     // Token to be updated that belongs to user-zabbix.
+	const CANCEL_SIMPLE_UPDATE = 'Token for cancel or simple update';    // Token for cancel or simple update.
+
+	public static $update_token;
+	public $url;
+
 	/**
 	 * Attach MessageBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [
-			'class' => CMessageBehavior::class
-		];
+		return ['class' => CMessageBehavior::class];
 	}
-
-	const DELETE_TOKEN = 'Token to be deleted';		                     // Token for deletion.
-	const USER_ZABBIX_TOKEN = 'user-zabbix token';	                     // Token to be updated that belongs to user-zabbix.
-	const CANCEL_SIMPLE_UPDATE = 'Token for cancel or simple update';    // Token for cancel or simple update.
-
-	public static $update_token = 'Admin reference token';
-	public $url;
 
 	/**
 	 * Function that checks the layout of the API token configuration form in Administration or User settings section.
@@ -365,9 +363,5 @@ class testFormApiTokens extends CWebTest {
 		// Check that token string will be copied to clipboard.
 		$clipboard_element = $auth_token->query('xpath:./a[text()="Copy to clipboard"]')->one();
 		$this->assertEquals('writeTextClipboard("'.$token_text.'")', $clipboard_element->getAttribute('onclick'));
-	}
-
-	public static function resetUpdateTokenName() {
-		self::$update_token = 'Admin reference token';
 	}
 }

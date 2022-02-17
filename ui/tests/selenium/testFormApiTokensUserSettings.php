@@ -25,8 +25,6 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  * @backup token
  *
  * @onBefore prepareUserTokenData
- *
- * @onAfter resetUpdateTokenName
  */
 class testFormApiTokensUserSettings extends testFormApiTokens {
 
@@ -64,6 +62,8 @@ class testFormApiTokensUserSettings extends testFormApiTokens {
 		foreach ($response['tokenids'] as $tokenid) {
 			CDataHelper::call('token.generate', ['tokenids' => $tokenid]);
 		}
+
+		self::$update_token = 'Admin reference token';
 	}
 
 	public function getTokenData() {
