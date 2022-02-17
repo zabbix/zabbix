@@ -602,7 +602,7 @@ class CHostPrototype extends CHostBase {
 				$api_input_rules = self::getInheritedValidationRules();
 			}
 
-			if (!CApiInputValidator::validate($api_input_rules, $host_prototype, '/'.($i + 1).'/', $error)) {
+			if (!CApiInputValidator::validate($api_input_rules, $host_prototype, '/'.($i + 1), $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 		}
