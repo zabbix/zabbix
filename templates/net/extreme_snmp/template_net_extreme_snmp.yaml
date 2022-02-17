@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-18T20:42:34Z'
+  date: '2022-01-26T14:17:39Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -36,8 +36,11 @@ zabbix_export:
             name: 'Service state'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 445766fc99c1480eac4d3d403c3ede2b
@@ -45,6 +48,10 @@ zabbix_export:
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: bd39116401f249008d21e4109a34c6c7
           name: 'ICMP loss'
@@ -55,8 +62,11 @@ zabbix_export:
           units: '%'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: fb0abe322fd644b4bb3c1255d564bb47
@@ -68,6 +78,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Extreme EXOS SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: c59f57d99c7045b6920e26c8c1b58e52
           name: 'ICMP response time'
@@ -78,8 +95,11 @@ zabbix_export:
           units: s
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: d29defd9360c489a892821989eeda10c
@@ -94,6 +114,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Extreme EXOS SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: b17bfccc91f1489fb9f85d719ca19d70
           name: 'Device: Temperature status'
@@ -110,8 +137,8 @@ zabbix_export:
             name: 'EXTREME-SYSTEM-MIB::extremeOverTemperatureAlarm'
           tags:
             -
-              tag: Application
-              value: Temperature
+              tag: component
+              value: temperature
         -
           uuid: 2e8384090e304767bc6bba60d822e223
           name: 'Device: Temperature'
@@ -127,8 +154,8 @@ zabbix_export:
             Reference: https://gtacknowledge.extremenetworks.com/articles/Q_A/Does-EXOS-support-temperature-polling-via-SNMP-on-all-nodes-in-a-stack
           tags:
             -
-              tag: Application
-              value: Temperature
+              tag: component
+              value: temperature
           triggers:
             -
               uuid: 54362c94be0243ffb907905def0ad06a
@@ -147,6 +174,13 @@ zabbix_export:
                     or
                     last(/Extreme EXOS SNMP/sensor.temp.status[extremeOverTemperatureAlarm.0])={$TEMP_CRIT_STATUS}
                   recovery_expression: 'max(/Extreme EXOS SNMP/sensor.temp.value[extremeCurrentTemperature.0],5m)<{$TEMP_CRIT:""}-3'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 91a10b28c7a14dd09110448a28a328f9
               expression: 'avg(/Extreme EXOS SNMP/sensor.temp.value[extremeCurrentTemperature.0],5m)<{$TEMP_CRIT_LOW:""}'
@@ -155,6 +189,13 @@ zabbix_export:
               name: 'Device: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: da2bc25bb40642feaaff04b1cd5f85a0
           name: 'SNMP traps (fallback)'
@@ -167,8 +208,8 @@ zabbix_export:
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: network
         -
           uuid: aa2eb0947ea34b2bbb739d6025d914ea
           name: 'System contact details'
@@ -190,8 +231,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: fd93c5fb3e054f84b052d7f682a87655
           name: 'CPU utilization'
@@ -206,8 +247,8 @@ zabbix_export:
             Total CPU utlization (percentage) as of last sampling.
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
           triggers:
             -
               uuid: a77bbfe0755f4901b67a7957805bc566
@@ -216,6 +257,10 @@ zabbix_export:
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: e23764de0cda451d959e73ca0ea211ae
           name: 'System description'
@@ -238,8 +283,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 7f6260a568644e89ba87ccca63102357
           name: 'Firmware version'
@@ -258,8 +303,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
           triggers:
             -
               uuid: dd9fbc501f9047fd8fae9dfd741e3778
@@ -269,6 +314,10 @@ zabbix_export:
               priority: INFO
               description: 'Firmware version has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 42ec93c3013d428c9f72fe721ea46db5
           name: 'Hardware model name'
@@ -288,8 +337,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
         -
           uuid: 93882ec52eed40778858e52dc7153093
           name: 'Hardware serial number'
@@ -309,8 +358,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
           triggers:
             -
               uuid: db1760a34c884b1aa36e4fc4639791dd
@@ -319,6 +368,10 @@ zabbix_export:
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 8ec263e1593e48d18b3e50f215e94196
           name: 'Hardware version(revision)'
@@ -337,8 +390,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
         -
           uuid: d8c7f5611f544299a95eedc0c80cedb5
           name: 'System location'
@@ -360,8 +413,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 7345ee5a5db545a9a5bb90ab5626a2aa
           name: 'System name'
@@ -383,8 +436,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: 2923c342e8474e3ea3d7411c104a6988
@@ -393,6 +446,13 @@ zabbix_export:
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: security
         -
           uuid: 041115a5c3f44c8c9a9e1e0c7bc7203e
           name: 'System object ID'
@@ -413,8 +473,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 0ba6360ecf4c4487a249e3efabca2e0c
           name: 'Operating system'
@@ -438,8 +498,8 @@ zabbix_export:
                 - 1d
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: os
           triggers:
             -
               uuid: af6a823b8f2d4fddae970828d0a3a9c9
@@ -452,6 +512,10 @@ zabbix_export:
                 -
                   name: 'System name has changed (new name: {ITEM.VALUE})'
                   expression: 'last(/Extreme EXOS SNMP/system.name,#1)<>last(/Extreme EXOS SNMP/system.name,#2) and length(last(/Extreme EXOS SNMP/system.name))>0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 92f8e91c4d2c423984cb14440bc83328
           name: Uptime
@@ -472,8 +536,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: bb967f81aaad4a00ae7916ea80574ae0
@@ -486,6 +550,10 @@ zabbix_export:
                 -
                   name: 'No SNMP data collection'
                   expression: 'max(/Extreme EXOS SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 62a022d402c24da29c1aa7cb0eb64244
           name: 'SNMP agent availability'
@@ -502,8 +570,11 @@ zabbix_export:
             name: zabbix.host.available
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: ecc42656a3d845ee8ad42d0fe45319c2
@@ -516,6 +587,10 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Extreme EXOS SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: 1ed41878ed4a455c8a3871169225b8f6
@@ -537,8 +612,8 @@ zabbix_export:
                 The speed (RPM) of a cooling fan in the fantray {#SNMPVALUE}
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
             -
               uuid: 601afb1fdc4744b29c2e52a260ccecfd
               name: 'Fan {#SNMPVALUE}: Fan status'
@@ -555,8 +630,8 @@ zabbix_export:
                 name: 'EXTREME-SYSTEM-MIB::extremeFanOperational'
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
               trigger_prototypes:
                 -
                   uuid: bd0c753f33c441a0bf4567f8b81186d6
@@ -565,6 +640,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: 53af0f95ffe243c394c273a1bc2857a3
           name: 'Memory Discovery'
@@ -591,8 +673,8 @@ zabbix_export:
                     - '1024'
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
             -
               uuid: b22ba07a208d41788d0fb33074125ffd
               name: '#{#SNMPVALUE}: Total memory'
@@ -611,8 +693,8 @@ zabbix_export:
                     - '1024'
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
             -
               uuid: 830ec2341dc64980be35d87141a31b67
               name: '#{#SNMPVALUE}: Memory utilization'
@@ -625,8 +707,8 @@ zabbix_export:
               description: 'Memory utilization in %'
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
               trigger_prototypes:
                 -
                   uuid: 50733fd8b4a641708e3a90292f182f20
@@ -634,6 +716,13 @@ zabbix_export:
                   name: '#{#SNMPVALUE}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: 672315e9b8dc4858be7a991bed4f06fc
@@ -753,8 +842,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 26f5e3bec06048c598d76c47b3260813
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
@@ -773,8 +868,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 2ec7bfa7073e471bb2f7941bff97f2fd
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
@@ -798,8 +899,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 4dac28ac2be748d5a2bba7bf92550c2b
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
@@ -822,8 +929,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 2ed84c7b80eb4c94b02c91154f1f9736
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
@@ -842,8 +955,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: e40f4821891c45318a732b1aae222382
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
@@ -867,8 +986,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 5014332a57b8479fa0638f275e2e0992
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
@@ -893,8 +1018,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 058b94a177e646829c37a96c83829aa1
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
@@ -916,8 +1047,14 @@ zabbix_export:
                 name: 'IF-MIB::ifOperStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: 706148cec9f24e81a96f44484d3829d3
@@ -935,6 +1072,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: e6e5a562e7ce418aaecff58b4aef7b3e
               name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
@@ -958,8 +1099,14 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
           trigger_prototypes:
             -
               uuid: eb704d12b7ef450a85a805392adb2e6b
@@ -989,6 +1136,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Extreme EXOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Extreme EXOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Extreme EXOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Extreme EXOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: f61f3c59c1aa488d9ef19a67d46fb5e8
               expression: |
@@ -1009,6 +1160,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Extreme EXOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Extreme EXOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Extreme EXOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Extreme EXOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: ccf92f29e2564c0bbef6baf6daf93d86
               expression: |
@@ -1028,6 +1183,13 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Extreme EXOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Extreme EXOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Extreme EXOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Extreme EXOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
           graph_prototypes:
             -
               uuid: 910004d1f3354f80bf57a36efc1b7156
@@ -1131,8 +1293,14 @@ zabbix_export:
                 name: 'EtherLike-MIB::dot3StatsDuplexStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: f82c0234ebbd4f2686ce97642f7bbcf8
@@ -1141,6 +1309,10 @@ zabbix_export:
                   priority: WARNING
                   description: 'Please check autonegotiation settings and cabling'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
           preprocessing:
             -
               type: JAVASCRIPT
@@ -1184,8 +1356,8 @@ zabbix_export:
                 name: 'EXTREME-SYSTEM-MIB::extremePowerSupplyStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Power supply'
+                  tag: component
+                  value: power
               trigger_prototypes:
                 -
                   uuid: 710f1bf31381470f9a13c45f887bda4e
@@ -1194,6 +1366,23 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
+      tags:
+        -
+          tag: class
+          value: network
+        -
+          tag: target
+          value: exos
+        -
+          tag: target
+          value: extreme
       macros:
         -
           macro: '{$CPU.UTIL.CRIT}'
@@ -2277,6 +2466,13 @@ zabbix_export:
       opdata: 'Current value: {ITEM.LASTVALUE1}'
       priority: HIGH
       description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+      tags:
+        -
+          tag: scope
+          value: availability
+        -
+          tag: scope
+          value: performance
   graphs:
     -
       uuid: 9dc8bc10d4044889bd53c56f1da45c60

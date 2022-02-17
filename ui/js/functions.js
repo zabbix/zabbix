@@ -946,6 +946,13 @@ function urlEncodeData(parameters, prefix = '') {
 	return result.join('&');
 }
 
+/**
+ * Get all input fields from the given form and return them. The order of returned fields is not predictable.
+ *
+ * @param {object}  form    Form object from which fields are retrieved.
+ *
+ * @return {object}
+ */
 function getFormFields(form) {
 	const fields = {};
 

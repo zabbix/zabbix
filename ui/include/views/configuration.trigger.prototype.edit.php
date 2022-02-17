@@ -30,6 +30,7 @@ $triggersWidget = (new CWidget())
 	->setNavigation(getHostNavigation('triggers', $data['hostid'], $data['parent_discoveryid']));
 
 $url = (new CUrl('trigger_prototypes.php'))
+	->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 	->setArgument('context', $data['context'])
 	->getUrl();
 
@@ -604,7 +605,7 @@ foreach ($data['db_dependencies'] as $dependency) {
 	$row = new CRow([$description,
 		(new CCol(
 			(new CButton('remove', _('Remove')))
-				->onClick('javascript: removeDependency("'.$dependency['triggerid'].'");')
+				->onClick('view.removeDependency('.json_encode($dependency['triggerid']).')')
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->removeId()
 		))->addClass(ZBX_STYLE_NOWRAP)
@@ -650,7 +651,7 @@ $dependenciesFormList->addRow(_('Dependencies'),
 );
 $triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList, TAB_INDICATOR_DEPENDENCY);
 
-$cancelButton = $data['backurl']
+$cancelButton = $data['backurl'] !== null
 	? new CButtonCancel(null, "redirect('".$data['backurl']."');")
 	: new CButtonCancel(url_params(['parent_discoveryid', 'context']));
 
@@ -684,3 +685,11 @@ $triggersForm->addItem($triggersTab);
 $triggersWidget->addItem($triggersForm);
 
 $triggersWidget->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'form_name' => $triggersForm->getName()
+	]).');
+'))
+	->setOnDocumentReady()
+	->show();

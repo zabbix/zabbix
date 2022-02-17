@@ -288,11 +288,14 @@ function getHostNavigation($current_element, $hostid, $lld_ruleid = 0) {
 				break;
 		}
 
-		$host = new CSpan(new CLink(CHtml::encode($db_host['name']),
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'host.edit')
-				->setArgument('hostid', $db_host['hostid'])
-		));
+		$host = new CSpan(
+			(new CLink(CHtml::encode($db_host['name']),
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'host.edit')
+					->setArgument('hostid', $db_host['hostid'])
+				)
+			)->onClick('view.editHost(event, '.json_encode($db_host['hostid']).')')
+		);
 
 		if ($current_element === '') {
 			$host->addClass(ZBX_STYLE_SELECTED);
@@ -945,7 +948,7 @@ function makeMaintenanceIcon($type, $name, $description) {
 	}
 
 	return (new CSpan())
-		->addClass(ZBX_STYLE_ICON_MAINT)
+		->addClass(ZBX_STYLE_ICON_MAINTENANCE)
 		->addClass(ZBX_STYLE_CURSOR_POINTER)
 		->setHint($hint);
 }

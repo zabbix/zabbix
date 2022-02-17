@@ -245,9 +245,6 @@ foreach ($data['items'] as $item) {
 	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
 		$item['trends'] = '';
 	}
-	else if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-		$wizard = '';
-	}
 
 	// Hide zeros for trapper, SNMP trap and dependent items.
 	if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP
@@ -336,3 +333,7 @@ $itemForm->addItem([$itemTable, $data['paging'], new CActionButtonList('action',
 $widget->addItem($itemForm);
 
 $widget->show();
+
+(new CScriptTag('view.init();'))
+	->setOnDocumentReady()
+	->show();

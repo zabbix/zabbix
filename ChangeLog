@@ -1,11 +1,78 @@
+Changes for 6.0.1rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.0
+
+6.0.0rc2 was released as 6.0.0 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 6.0.0rc2
+
+Bug fixes:
+.........T [ZBX-16896] added interface speed metric to linux by agent templates and fixed interfaces tags (vkhaliev)
+..F....... [ZBX-20370] fixed textarea tags not expanding in service editing form (averza)
+..F....... [ZBX-20466] fixed context menu, which was not appearing for numeric discovered items (epulke)
+...G...... [ZBX-20475] fixed panic when Plugins.Smart.Path is set in Zabbix agent 2, by inroducing System config keywords (esneiders)
+..F....... [ZBX-20524] fixed usage of history source and extra data selection in Top hosts widget (averza)
+........S. [ZBX-20490] fixed initial ha failover delay update, improved RTC and HA service communications (wiper)
+
+--------------------------------------------------------------------------------
 Changes for 6.0.0rc1
 
 New features:
+.........T [ZBXNEXT-7414] added new tags to all templates (vkhaliev)
+
+Bug fixes:
+.........T [ZBX-20509] changed host group in Squid, Hikvision, Morningstar templates (mchudinov)
+.........T [ZBX-20396] fixed expression for "Calculated value of innodb_log_file_size" item in MySQL templates (mchudinov)
+..F....... [ZBX-20415] fixed host list page showing incorrect default interface (Ivo)
+..F....... [ZBX-17748] improved host graphs page (ashubin, epulke, vmurzins)
+..F....... [ZBX-20508] fixed console error when creating or editing host prototypes (averza)
+..F....... [ZBX-20504] fixed impossibility to select a service in conditions of service actions (averza)
+.......P.. [ZBX-20481] fixed warning in log when updgrading Zabbix proxy database (vso)
+..F....... [ZBX-19356] fixed failure when editing Templates caused by exceeding max_input_vars limit (jfreibergs)
+..F....... [ZBX-20267] fixed browser error when using dynamic rows (rdetlavs)
+..F....... [ZBX-20485] fixed cancel button not working when creating a new discovery rule (rdetlavs)
+..F....... [ZBX-20494] fixed multiple hintbox issue upon widget updates (averza)
+..F....... [ZBX-20432] fixed impossibility to import templates with triggers mapping to hosts with numeric names (averza)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.0beta3
+
+New features:
+..F....... [ZBXNEXT-7125] added new widget "Top hosts"; deprecated widget "Data overview" (ashubin, averza, gcalenko)
+.......PS. [ZBXNEXT-7411] replaced signals with IPC messages for most of internal runtime control option processing (wiper)
+.........T [ZBXNEXT-4635] added templates for Kubernetes Controlplane and Kubestate metrics (afayantsev, ychukina)
+..F....... [ZBXNEXT-7107] added Item popup menu in Latest data; added new links in Configuration Items popup menu and Item prototypes popup menu (epulke)
+...G...... [ZBXNEXT-7409] added native support for the vfs.dir.size and vfs.dir.count keys in Zabbix agent 2 (esneiders)
+A.F.....S. [ZBXNEXT-1911,ZBXNEXT-7399] allowed textual types of information for Calculated items (dgoloscapov, jfreibergs)
+.........T [ZBXNEXT-7389] changed templates to use no linked templates, moved OS templates from the classic folder to the os folder (mchudinov)
+..F.I..... [ZBXNEXT-6687] implemented subfilter and named filters for latest data section (miks)
 ........S. [ZBXNEXT-7101] implemented sleep function into JS engine (asestakovs)
 .........T [ZBXNEXT-6861] updated Zabbix proxy templates according to the latest guidelines (abakaldin)
 .........T [ZBXNEXT-7078] added pfsense template (vkhaliev)
 
 Bug fixes:
+..F....... [ZBX-20225] fixed host modal window not opening on many pages (Ivo, miks, vmurzins)
+...G...... [ZBX-20453] fixed Agent 2 compilation issues on macOS (ssimonenko)
+..F....... [ZBX-20359] fixed export on Monitoring Problems page getting out of sync with filter (jfreibergs)
+........S. [ZBX-19961] fixed possible crash due to trigger functions being updated during LLD (vso)
+..F....... [ZBX-20300] fixed displaying extra decimal digits in vertical scales of graphs for item units prefixed with "!" (averza)
+...GI..... [ZBX-20444] fixed Agent and Agent 2 compilation with libpcre2 on Windows (ssimonenko)
+..F....... [ZBX-20460] fixed color-picker not updating selected color in its input element (ashubin)
+........S. [ZBX-20446] fixed housekeeper failure when deleting auditlog entries; thanks to Yuuki Enomoto for the patch (arimdjonoks)
+........S. [ZBX-20420] increased storage size of the 'parameters' field of the 'alerts' table for Oracle backend (arimdjonoks)
+...G...... [ZBX-20416] fixed vfs.file.owner to display unknown user:group numerically instead of error (asestakovs)
+..F....... [ZBX-20288] fixed cloning services twice hitting enter key in configuration form (averza)
+.......PS. [ZBX-20293] fixed icmpping items group becomes not supported due to error in interval detection (akozlovs)
+..F....... [ZBX-20428] fixed table headers above the graph area in Graph widget configuration form (ashubin)
+..F....... [ZBX-20342] fixed keyboard navigation for colorpicker (acikuns, ashubin)
+...G...... [ZBX-20417] fixed vfs.file.get error for HP-UX; thanks to Yuuki Enomoto for the patch (arimdjonoks)
+........S. [ZBX-20175] changed functions with disabled history/trends to return error (wiper)
 ...G...... [ZBX-20436] fixed hardcoded -lpcre in Agent 2 embedded C code (ssimonenko)
 ..F....... [ZBX-20431] fixed template import button shown out of bounds (jfreibergs)
 A......... [ZBX-19991] fixed template import of dependent items and item prototypes having newly created master item (miks)
@@ -330,15 +397,43 @@ Bug fixes:
 .........T [ZBX-19395] changed version in links of the templates and the media (mchudinov)
 
 --------------------------------------------------------------------------------
+Changes for 5.4.11rc1
+
+New features:
+...G...... [ZBXNEXT-7408] added native support for the net.dns and net.dns.record keys in Zabbix agent 2, fixed Zabbix agent 1 SOA response formatting (esneiders, ssimonenko)
+
+Bug fixes:
+..F....... [ZBX-19796] fixed macros tab indicator showing incorrect count when inherited option is selected and a new macro is added (miks)
+...G...PS. [ZBX-20228] improved error reporting when SSL_write() or SSL_read() functions fail, removed redundant code that resulted in timeout on windows (vso)
+...G...... [ZBX-20339] fixed incorrect smart plugin device type in Zabbix agent 2 (esneiders)
+.........T [ZBX-20499] removed unsupported items in Zabbix server health template (abakaldin)
+...G...... [ZBX-20030] fixed system.cpu.num runtime cpu change in Zabbix agent 2 (esneiders)
+.........T [ZBX-16896] added interface speed metric to linux by agent templates (vkhaliev)
+...GI..... [ZBX-20290] fixed missing HTTP metrics support for Windows Agent (ssimonenko)
+.........T [ZBX-20396] fixed expression for "Calculated value of innodb_log_file_size" item in MySQL templates (mchudinov)
+.........T [ZBX-20509] changed host group in Squid, Morningstar templates (mchudinov)
+..F....... [ZBX-20494] fixed multiple hintbox issue upon widget updates (averza)
+..F....... [ZBX-20432] fixed impossibility to import templates with triggers mapping to hosts with numeric names (averza)
+
+--------------------------------------------------------------------------------
+Changes for 5.4.10
+
+5.4.10rc1 was released as 5.4.10 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.4.10rc1
 
 New features:
+...G...... [ZBXNEXT-7409] added native support for the vfs.dir.size and vfs.dir.count keys in Zabbix agent 2 (esneiders)
 ........S. [ZBXNEXT-7101] implemented sleep function into JS engine (asestakovs)
 .........T [ZBXNEXT-6861] updated Zabbix proxy templates according to the latest guidelines (abakaldin)
 .........T [ZBXNEXT-7078] added template for pfsense (vkhaliev)
 ...G...... [ZBXNEXT-6875] added native support for the system.hw.chassis and system.hw.devices keys in Zabbix agent 2 (esneiders)
 
 Bug fixes:
+..F....... [ZBX-20359] fixed export on Monitoring Problems page getting out of sync with filter (jfreibergs)
+........S. [ZBX-19961] fixed possible crash due to trigger functions being updated during LLD (vso)
+.......PS. [ZBX-20293] fixed icmpping items group becomes not supported due to error in interval detection (akozlovs)
 A......... [ZBX-19991] fixed template import of dependent items and item prototypes having newly created master item (miks)
 .........T [ZBX-20316] added macro for password and changed conf file in postgresql by user parameters template (vkhaliev)
 .........T [ZBX-20303] fixed trigger name in MSSQL template (vkhaliev)
@@ -1536,15 +1631,37 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
+Changes for 5.0.21rc1
+
+New features:
+...G...... [ZBXNEXT-7408] added native support for the net.dns and net.dns.record keys in Zabbix agent 2, fixed Zabbix agent 1 SOA response formatting (esneiders, ssimonenko)
+
+Bug fixes:
+...G...PS. [ZBX-20228] improved error reporting when SSL_write() or SSL_read() functions fail, removed redundant code that resulted in timeout on windows (vso)
+...G...... [ZBX-20339] fixed incorrect smart plugin device type in Zabbix agent 2 (esneiders)
+.........T [ZBX-16896] added interface speed metric to linux by agent templates (vkhaliev)
+...G...... [ZBX-20030] fixed system.cpu.num runtime cpu change in Zabbix agent 2 (esneiders)
+.........T [ZBX-20396] fixed expression for "Calculated value of innodb_log_file_size" item in MySQL templates (mchudinov)
+.........T [ZBX-20509] changed host group in Squid, Morningstar templates (mchudinov)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.20
+
+5.0.20rc1 was released as 5.0.20 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.20rc1
 
 New features:
+...G...... [ZBXNEXT-7409] added native support for the vfs.dir.size and vfs.dir.count keys in Zabbix agent 2 (esneiders)
 ........S. [ZBXNEXT-7101] implemented sleep function into JS engine (asestakovs)
 .........T [ZBXNEXT-6861] updated Zabbix proxy templates according to the latest guidelines (abakaldin)
 .........T [ZBXNEXT-7078] added template for pfsense (vkhaliev)
 ...G...... [ZBXNEXT-6875] added native support for the system.hw.chassis and system.hw.devices keys in Zabbix agent 2 (esneiders)
 
 Bug fixes:
+.......PS. [ZBX-20293] fixed icmpping items group becomes not supported due to error in interval detection (akozlovs)
+..F.I..... [ZBX-20387] fixed default language of the setup routine for logged in superadmin users (averza)
 .........T [ZBX-20316] added macro for password and changed conf file in postgresql by user parameters template (vkhaliev)
 .........T [ZBX-20303] fixed trigger name in MSSQL template (vkhaliev)
 ...G...... [ZBX-19565] fixed agent2 to return the same 255 code as agent1 when key service.info does not find service (arimdjonoks)
@@ -3913,12 +4030,23 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
-Changes for 4.0.38rc1
+Changes for 4.0.39rc1
 
 New features:
-..F....... [ZBX-19652] fixed JavaScript syntax for Internet Explorer 11 compatibility (jfreibergs)
 
 Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.38
+
+4.0.38rc1 was released as 4.0.38 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.38rc1
+
+Bug fixes:
+..F.I..... [ZBX-20387] fixed default language of the setup routine for logged in superadmin users (averza)
+..F....... [ZBX-19652] fixed JavaScript syntax for Internet Explorer 11 compatibility (jfreibergs)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.37

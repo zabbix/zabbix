@@ -2187,6 +2187,9 @@ function normalizeItemPreprocessingSteps(array $preprocessing): array {
 			'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
 			'error_handler_params' => ''
 		];
+
+		// Remove fictional field that doesn't belong in DB and API.
+		unset($step['sortorder']);
 	}
 	unset($step);
 

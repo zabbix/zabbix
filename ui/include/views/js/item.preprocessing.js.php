@@ -43,7 +43,7 @@
 
 	echo (new CListItem([
 		(new CDiv([
-			(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
+			(new CDiv(new CVar('preprocessing[#{rowNum}][sortorder]', '#{sortorder}')))->addClass(ZBX_STYLE_DRAG_ICON),
 			(new CDiv($preproc_types_select))
 				->addClass('list-numbered-item')
 				->addClass('step-name'),
@@ -295,7 +295,7 @@
 			$preprocessing = $(obj.querySelector('#preprocessing'));
 		}
 
-		var step_index = $preprocessing.find('li.sortable').length;
+		let step_index = $preprocessing.find('li.sortable').length;
 
 		$preprocessing.sortable({
 			disabled: $preprocessing.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').hasClass('<?= ZBX_STYLE_DISABLED ?>'),
@@ -305,23 +305,32 @@
 			cursor: 'grabbing',
 			handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 			tolerance: 'pointer',
-			opacity: 0.6
+			opacity: 0.6,
+			update: function() {
+				let i = 0;
+
+				$(this).find('li.sortable').each(function() {
+					$(this).find('[name*="sortorder"]').val(i++);
+				});
+			}
 		});
 
 		const change_event = new CustomEvent('item.preprocessing.change');
 
 		$preprocessing
 			.on('click', '.element-table-add', function() {
-				var preproc_row_tmpl = new Template($('#preprocessing-steps-tmpl').html()),
-					$row = $(preproc_row_tmpl.evaluate({rowNum: step_index}));
-					type = $('z-select[name*="type"]', $row).val();
+				let sortable_count = $preprocessing.find('li.sortable').length;
+				const preproc_row_tmpl = new Template($('#preprocessing-steps-tmpl').html());
+				const $row = $(preproc_row_tmpl.evaluate({
+					rowNum: step_index,
+					sortorder: sortable_count++
+				}));
+				const type = $('z-select[name*="type"]', $row).val();
 
 				$('.step-parameters', $row).html(makeParameterInput(step_index, type));
 				$(this).closest('.preprocessing-list-foot').before($row);
 
 				$('.preprocessing-list-head').show();
-
-				var sortable_count = $preprocessing.find('li.sortable').length;
 
 				if (sortable_count == 1) {
 					$('#preproc_test_all').show();
@@ -360,7 +369,7 @@
 			.on('click', '.element-table-remove', function() {
 				$(this).closest('li.sortable').remove();
 
-				var sortable_count = $preprocessing.find('li.sortable').length;
+				const sortable_count = $preprocessing.find('li.sortable').length;
 
 				if (sortable_count == 0) {
 					$('#preproc_test_all').hide();
@@ -370,6 +379,14 @@
 					$preprocessing
 						.sortable('disable')
 						.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').addClass('<?= ZBX_STYLE_DISABLED ?>');
+				}
+
+				if (sortable_count > 0) {
+					let i = 0;
+
+					$preprocessing.find('li.sortable').each(function() {
+						$(this).find('[name*="sortorder"]').val(i++);
+					});
 				}
 
 				$preprocessing[0].dispatchEvent(change_event);

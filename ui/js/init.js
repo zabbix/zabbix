@@ -364,6 +364,9 @@ jQuery(function($) {
 			// execute function if they exist
 			window.addPopupValues(data);
 		}
+		else if (typeof view.addPopupValues !== 'undefined') {
+			view.addPopupValues(data);
+		}
 		else {
 			$('#' + data.parentId).val(data.values[0].name);
 		}
@@ -372,10 +375,10 @@ jQuery(function($) {
 	// redirect buttons
 	$('button[data-url]').click(function() {
 		var button = $(this);
-		var confirmation = button.data('confirmation');
+		var confirmation = button.attr('data-confirmation');
 
 		if (typeof confirmation === 'undefined' || (typeof confirmation !== 'undefined' && confirm(confirmation))) {
-			window.location = button.data('url');
+			window.location = button.attr('data-url');
 		}
 	});
 

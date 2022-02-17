@@ -28,7 +28,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 	public $config_link = 'zabbix.php?action=miscconfig.edit';
 	public $form_selector = 'name:otherForm';
 
-	public $default = [
+	public $default_values = [
 		'Frontend URL' => '',
 		'Group for discovered hosts' => 'Empty group',
 		'Default host inventory mode' => 'Disabled',
@@ -51,7 +51,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 		'Network timeout for item test' => '60s'
 	];
 
-	public $db_default = [
+	public $db_default_values = [
 		'url' => '',
 		'discovery_groupid' => 50006,
 		'default_inventory_mode' => -1,
@@ -74,7 +74,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 		'item_test_timeout' => '60s'
 	];
 
-	public $custom = [
+	public $custom_values = [
 		'Frontend URL' => 'http://zabbix.com',
 		'Group for discovered hosts' => 'Hypervisors',
 		'Default host inventory mode' => 'Automatic',
