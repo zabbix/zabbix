@@ -257,7 +257,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	else {
 		$newHostPrototype = [
 			'status' => getRequest('status', HOST_STATUS_NOT_MONITORED),
-			'discover' => getRequest('discover', DB::getDefault('hosts', 'discover')),
+			'discover' => getRequest('discover', DB::getDefault('hosts', 'discover'))
 		];
 	}
 
