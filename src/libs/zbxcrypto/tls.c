@@ -3498,6 +3498,66 @@ out1:
 	return ret;
 }
 #elif defined(HAVE_OPENSSL)
+static int	zbx_tls_get_error(const SSL *s, int res, const char *func, size_t *error_alloc, size_t *error_offset,
+		char **error)
+{
+	int	result_code;
+
+	result_code = SSL_get_error(s, res);
+
+	switch (result_code)
+	{
+		case SSL_ERROR_NONE:		/* handshake successful */
+			return SUCCEED;
+		case SSL_ERROR_ZERO_RETURN:
+			zbx_snprintf_alloc(error, error_alloc, error_offset,
+					"%s() TLS connection has been closed during read", func);
+			return FAIL;
+		case SSL_ERROR_SYSCALL:
+			if (0 == ERR_peek_error())
+			{
+				if (0 == res)
+				{
+					zbx_snprintf_alloc(error, error_alloc, error_offset,
+							"%s() connection closed by peer", func);
+				}
+				else if (-1 == res)
+				{
+					zbx_snprintf_alloc(error, error_alloc, error_offset, "%s()"
+							" I/O error: %s", func,
+							strerror_from_system(zbx_socket_last_error()));
+				}
+				else
+				{
+					/* "man SSL_get_error" describes only res == 0 and res == -1 for */
+					/* SSL_ERROR_SYSCALL case */
+					zbx_snprintf_alloc(error, error_alloc, error_offset, "%s()"
+							" returned undocumented code %d", func, res);
+				}
+			}
+			else
+			{
+				zbx_snprintf_alloc(error, error_alloc, error_offset, "%s() set"
+						" result code to SSL_ERROR_SYSCALL:", func);
+				zbx_tls_error_msg(error, error_alloc, error_offset);
+				zbx_snprintf_alloc(error, error_alloc, error_offset, "%s", info_buf);
+			}
+			return FAIL;
+		case SSL_ERROR_SSL:
+			zbx_snprintf_alloc(error, error_alloc, error_offset, "%s() set"
+					" result code to SSL_ERROR_SSL:", func);
+			zbx_tls_error_msg(error, error_alloc, error_offset);
+			zbx_snprintf_alloc(error, error_alloc, error_offset, "%s", info_buf);
+			return FAIL;
+		default:
+			zbx_snprintf_alloc(error, error_alloc, error_offset, "%s() set result code"
+					" to %d", func, result_code);
+			zbx_tls_error_msg(error, error_alloc, error_offset);
+			zbx_snprintf_alloc(error, error_alloc, error_offset, "%s", info_buf);
+			return FAIL;
+	}
+}
+
 int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
 		char **error)
 {
@@ -3614,8 +3674,6 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 #endif
 	if (1 != (res = SSL_connect(s->tls_ctx->ctx)))
 	{
-		int	result_code;
-
 #if defined(_WINDOWS)
 		if (s->timeout < zbx_time() - sec)
 			zbx_alarm_flag_set();
@@ -3639,59 +3697,8 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 			}
 		}
 
-		result_code = SSL_get_error(s->tls_ctx->ctx, res);
-
-		switch (result_code)
-		{
-			case SSL_ERROR_NONE:		/* handshake successful */
-				break;
-			case SSL_ERROR_ZERO_RETURN:
-				zbx_snprintf_alloc(error, &error_alloc, &error_offset,
-						"TLS connection has been closed during handshake");
-				goto out;
-			case SSL_ERROR_SYSCALL:
-				if (0 == ERR_peek_error())
-				{
-					if (0 == res)
-					{
-						zbx_snprintf_alloc(error, &error_alloc, &error_offset,
-								"connection closed by peer");
-					}
-					else if (-1 == res)
-					{
-						zbx_snprintf_alloc(error, &error_alloc, &error_offset, "SSL_connect()"
-								" I/O error: %s",
-								strerror_from_system(zbx_socket_last_error()));
-					}
-					else
-					{
-						/* "man SSL_get_error" describes only res == 0 and res == -1 for */
-						/* SSL_ERROR_SYSCALL case */
-						zbx_snprintf_alloc(error, &error_alloc, &error_offset, "SSL_connect()"
-								" returned undocumented code %d", res);
-					}
-				}
-				else
-				{
-					zbx_snprintf_alloc(error, &error_alloc, &error_offset, "SSL_connect() set"
-							" result code to SSL_ERROR_SYSCALL:");
-					zbx_tls_error_msg(error, &error_alloc, &error_offset);
-					zbx_snprintf_alloc(error, &error_alloc, &error_offset, "%s", info_buf);
-				}
-				goto out;
-			case SSL_ERROR_SSL:
-				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "SSL_connect() set"
-						" result code to SSL_ERROR_SSL:");
-				zbx_tls_error_msg(error, &error_alloc, &error_offset);
-				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "%s", info_buf);
-				goto out;
-			default:
-				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "SSL_connect() set result code"
-						" to %d", result_code);
-				zbx_tls_error_msg(error, &error_alloc, &error_offset);
-				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "%s", info_buf);
-				goto out;
-		}
+		if (FAIL == zbx_tls_get_error(s->tls_ctx->ctx, res, "SSL_connect", &error_alloc, &error_offset, error))
+			goto out;
 	}
 
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect)
@@ -4289,34 +4296,25 @@ out1:
 
 ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error)
 {
-#if defined(_WINDOWS)
-	double	sec;
-#endif
 #if defined(HAVE_GNUTLS)
 	ssize_t	res;
 #elif defined(HAVE_OPENSSL)
 	int	res;
 #endif
 
-#if defined(_WINDOWS)
-	zbx_alarm_flag_clear();
-	sec = zbx_time();
-#endif
 #if defined(HAVE_OPENSSL)
 	info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_cb() messages */
 #endif
 	do
 	{
 		res = ZBX_TLS_WRITE(s->tls_ctx->ctx, buf, len);
-#if defined(_WINDOWS)
-		if (s->timeout < zbx_time() - sec)
-			zbx_alarm_flag_set();
-#endif
+#if !defined(_WINDOWS)
 		if (SUCCEED == zbx_alarm_timed_out())
 		{
 			*error = zbx_strdup(*error, ZBX_TLS_WRITE_FUNC_NAME "() timed out");
 			return ZBX_PROTO_ERROR;
 		}
+#endif
 	}
 	while (SUCCEED == ZBX_TLS_WANT_WRITE(res));
 
@@ -4331,24 +4329,12 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error
 #elif defined(HAVE_OPENSSL)
 	if (0 >= res)
 	{
-		int	result_code;
+		size_t	error_alloc = 0, error_offset = 0;
 
-		result_code = SSL_get_error(s->tls_ctx->ctx, res);
-
-		if (0 == res && SSL_ERROR_ZERO_RETURN == result_code)
+		if (SUCCEED == zbx_tls_get_error(s->tls_ctx->ctx, res, ZBX_TLS_WRITE_FUNC_NAME, &error_alloc,
+				&error_offset, error))
 		{
-			*error = zbx_strdup(*error, "connection closed during write");
-		}
-		else
-		{
-			char	*err = NULL;
-			size_t	error_alloc = 0, error_offset = 0;
-
-			zbx_snprintf_alloc(&err, &error_alloc, &error_offset, "TLS write set result code to"
-					" %d:", result_code);
-			zbx_tls_error_msg(&err, &error_alloc, &error_offset);
-			*error = zbx_dsprintf(*error, "%s%s", err, info_buf);
-			zbx_free(err);
+			*error = zbx_strdup(*error, ZBX_TLS_WRITE_FUNC_NAME "() unexpected result code");
 		}
 
 		return ZBX_PROTO_ERROR;
@@ -4360,34 +4346,25 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error
 
 ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
 {
-#if defined(_WINDOWS)
-	double	sec;
-#endif
 #if defined(HAVE_GNUTLS)
 	ssize_t	res;
 #elif defined(HAVE_OPENSSL)
 	int	res;
 #endif
 
-#if defined(_WINDOWS)
-	zbx_alarm_flag_clear();
-	sec = zbx_time();
-#endif
 #if defined(HAVE_OPENSSL)
 	info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_cb() messages */
 #endif
 	do
 	{
 		res = ZBX_TLS_READ(s->tls_ctx->ctx, buf, len);
-#if defined(_WINDOWS)
-		if (s->timeout < zbx_time() - sec)
-			zbx_alarm_flag_set();
-#endif
+#if !defined(_WINDOWS)
 		if (SUCCEED == zbx_alarm_timed_out())
 		{
 			*error = zbx_strdup(*error, ZBX_TLS_READ_FUNC_NAME "() timed out");
 			return ZBX_PROTO_ERROR;
 		}
+#endif
 	}
 	while (SUCCEED == ZBX_TLS_WANT_READ(res));
 
@@ -4403,24 +4380,12 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
 #elif defined(HAVE_OPENSSL)
 	if (0 >= res)
 	{
-		int	result_code;
+		size_t	error_alloc = 0, error_offset = 0;
 
-		result_code = SSL_get_error(s->tls_ctx->ctx, res);
-
-		if (0 == res && SSL_ERROR_ZERO_RETURN == result_code)
+		if (SUCCEED == zbx_tls_get_error(s->tls_ctx->ctx, res, ZBX_TLS_READ_FUNC_NAME, &error_alloc,
+				&error_offset, error))
 		{
-			*error = zbx_strdup(*error, "connection closed during read");
-		}
-		else
-		{
-			char	*err = NULL;
-			size_t	error_alloc = 0, error_offset = 0;
-
-			zbx_snprintf_alloc(&err, &error_alloc, &error_offset, "TLS read set result code to"
-					" %d:", result_code);
-			zbx_tls_error_msg(&err, &error_alloc, &error_offset);
-			*error = zbx_dsprintf(*error, "%s%s", err, info_buf);
-			zbx_free(err);
+			*error = zbx_strdup(*error, ZBX_TLS_READ_FUNC_NAME "() unexpected result code");
 		}
 
 		return ZBX_PROTO_ERROR;
