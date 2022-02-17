@@ -17,12 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "audit_trigger.h"
+
 #include "log.h"
 #include "db.h"
 #include "zbxdb.h"
 #include "audit.h"
-
-#include "audit_trigger.h"
 
 static int	trigger_flag_to_resource_type(int flag)
 {

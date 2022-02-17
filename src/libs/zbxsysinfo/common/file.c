@@ -17,10 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "file.h"
+
 #include "common.h"
 #include "sysinfo.h"
 #include "md5.h"
-#include "file.h"
 #include "zbxregexp.h"
 #include "log.h"
 #include "dir.h"

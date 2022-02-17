@@ -17,7 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "vmware.h"
+
+#include "mutexs.h"
 
 /* LIBXML2 is used */
 #ifdef HAVE_LIBXML2
@@ -28,11 +30,8 @@
 
 #include "memalloc.h"
 #include "log.h"
-#include "zbxalgo.h"
 #include "daemon.h"
 #include "zbxself.h"
-
-#include "vmware.h"
 #include "../../libs/zbxalgo/vectorimpl.h"
 
 /*
@@ -3516,7 +3515,6 @@ clean:
 }
 
 /******************************************************************************
- * Function: vmware_v4mask2pefix                                              *
  *                                                                            *
  * Purpose: Convert ipv4 netmask to cidr prefix                               *
  *                                                                            *
@@ -3547,7 +3545,6 @@ static int	vmware_v4mask2pefix(const char *mask)
 }
 
 /******************************************************************************
- * Function: vmware_hv_ip_search                                              *
  *                                                                            *
  * Purpose: Search HV management interface ip value from a xml data           *
  *                                                                            *
@@ -6928,8 +6925,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_xml_node_read_value                                          *
- *                                                                            *
  * Purpose: retrieve a value from xml data relative to the specified node     *
  *                                                                            *
  * Parameters: doc    - [IN] the XML document                                 *
@@ -6999,8 +6994,6 @@ static char	*zbx_xml_doc_read_value(xmlDoc *xdoc, const char *xpath)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_xml_doc_read_num                                             *
- *                                                                            *
  * Purpose: retrieves numeric xpath value                                     *
  *                                                                            *
  * Parameters: xdoc  - [IN] xml document                                      *
@@ -7037,8 +7030,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_xml_read_values                                              *
- *                                                                            *
  * Purpose: populate array of values from an xml data                         *
  *                                                                            *
  * Parameters: xdoc   - [IN] XML document                                     *
@@ -7055,8 +7046,6 @@ static int	zbx_xml_read_values(xmlDoc *xdoc, const char *xpath, zbx_vector_str_t
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_xml_node_read_values                                         *
  *                                                                            *
  * Purpose: populate array of values from an xml data                         *
  *                                                                            *

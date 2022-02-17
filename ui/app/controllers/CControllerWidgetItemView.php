@@ -259,7 +259,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 			else {
 				$value_type = ITEM_VALUE_TYPE_TEXT;
 
-				// Since there no value, we can still show time.
+				// Since there is no value, we can still show time.
 				if (array_key_exists(WIDGET_ITEM_SHOW_TIME, $show)) {
 					$time = date(ZBX_FULL_DATE_TIME);
 				}
@@ -269,7 +269,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 				if ($this->getContext() === CWidgetConfig::CONTEXT_DASHBOARD
 						|| $this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
 						&& $this->hasInput('dynamic_hostid')) {
-					// Resolve original item name when user is in normal dashboards or template dashbods view mode.
+					// Resolve original item name when user is in normal dashboards or template dashboards view mode.
 					$name = $items[$itemid]['name'];
 				}
 
