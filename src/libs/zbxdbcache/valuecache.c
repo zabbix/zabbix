@@ -109,7 +109,7 @@ typedef struct zbx_vc_chunk
 }
 zbx_vc_chunk_t;
 
-/* min/max number number of item history values to store in chunk */
+/* min/max number of item history values to store in chunk */
 
 #define ZBX_VC_MIN_CHUNK_RECORDS	2
 

@@ -434,7 +434,7 @@ zbx_int64_t	zbx_json_validate(const char *start, char **error)
 				return 0;
 			break;
 		default:
-			/* not an json data, failing */
+			/* not json data, failing */
 			return json_error("invalid object format, expected opening character '{' or '['", start, error);
 	}
 

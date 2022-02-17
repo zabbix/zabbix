@@ -191,7 +191,7 @@ typedef struct
 #define ZBX_LLD_TRIGGER_DEPENDENCY_NEW		1
 #define ZBX_LLD_TRIGGER_DEPENDENCY_DELETE	2
 
-	/* flags used to mark dependencies when trigger reference is use to store dependency links */
+	/* flags used to mark dependencies when trigger reference is used to store dependency links */
 	int			flags;
 }
 zbx_lld_trigger_ref_t;
@@ -1683,7 +1683,7 @@ static void	lld_triggers_make(const zbx_vector_ptr_t *trigger_prototypes, zbx_ve
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create a trigger dependencies                                     *
+ * Purpose: create trigger dependencies                                       *
  *                                                                            *
  ******************************************************************************/
 static void 	lld_trigger_dependency_make(const zbx_lld_trigger_prototype_t *trigger_prototype,
