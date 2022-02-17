@@ -17,12 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "dbupgrade.h"
+
 #include "common.h"
 #include "db.h"
 #include "log.h"
 #include "zbxdbupgrade.h"
-
-#include "dbupgrade.h"
 
 typedef struct
 {

@@ -17,30 +17,22 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "dbcache.h"
+
 #include "common.h"
 #include "log.h"
-#include "threads.h"
-
-#include "db.h"
-#include "ipc.h"
 #include "mutexs.h"
 #include "zbxserver.h"
-#include "proxy.h"
 #include "events.h"
-#include "memalloc.h"
 #include "valuecache.h"
 #include "zbxmodules.h"
 #include "module.h"
 #include "export.h"
-#include "zbxjson.h"
 #include "zbxhistory.h"
 #include "daemon.h"
 #include "zbxavailability.h"
 #include "zbxtrends.h"
-#include "zbxalgo.h"
 #include "../zbxalgo/vectorimpl.h"
-
-#include "dbcache.h"
 
 static zbx_mem_info_t	*hc_index_mem = NULL;
 static zbx_mem_info_t	*hc_mem = NULL;

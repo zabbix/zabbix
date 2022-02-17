@@ -20,6 +20,9 @@
 #ifndef ZABBIX_GET_HOST_FROM_EVENT_H
 #define ZABBIX_GET_HOST_FROM_EVENT_H
 
+#include "db.h"
+#include "dbcache.h"
+
 int	get_host_from_event(const DB_EVENT *event, DC_HOST *host, char *error, size_t max_error_len);
 
 #endif

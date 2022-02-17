@@ -17,13 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxprometheus.h"
+
 #include "common.h"
-#include "zbxalgo.h"
 #include "zbxregexp.h"
 #include "log.h"
 #include "zbxjson.h"
 #include "zbxeval.h"
-#include "zbxprometheus.h"
 
 /* Defines maximum row length to be written in error message in the case of parsing failure */
 #define ZBX_PROMEHTEUS_ERROR_MAX_ROW_LENGTH	50
