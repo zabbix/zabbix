@@ -897,7 +897,7 @@ static void	zbx_alerter_deserialize_top_sources_result(const unsigned char *data
 
 		for (i = 0; i < sources_num; i++)
 		{
-			zbx_am_source_stats_t	*source;;
+			zbx_am_source_stats_t	*source;
 
 			source = (zbx_am_source_stats_t *)zbx_malloc(NULL, sizeof(zbx_am_source_stats_t));
 			data += zbx_deserialize_value(data, &source->source);
