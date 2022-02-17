@@ -69,7 +69,7 @@ class CMessageElement extends CElement {
 			return strtok($this->getText(), "\n");
 		}
 		else {
-			return $this->query('xpath:./span | .//li')->one()->getText();
+			return $this->query('xpath:./span')->one()->getText();
 		}
 	}
 
