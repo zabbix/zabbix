@@ -3470,7 +3470,7 @@ static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_v
 	double			sec;
 	DC_ITEM			*items;
 	char			*error = NULL;
-	zbx_uint64_t		itemids[ZBX_HISTORY_VALUES_MAX];
+	zbx_uint64_t		itemids[ZBX_HISTORY_VALUES_MAX], last_valueid = 0;
 	zbx_agent_value_t	values[ZBX_HISTORY_VALUES_MAX];
 	zbx_timespec_t		unique_shift = {0, 0};
 
@@ -3516,14 +3516,24 @@ static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_v
 
 		total_num += read_num;
 
-		if (NULL != session)
-			session->last_valueid = values[values_num - 1].id;
+		last_valueid = values[values_num - 1].id;
 
 		DCconfig_clean_items(items, errcodes, values_num);
 		zbx_agent_values_clean(values, values_num);
 
 		if (NULL == pnext)
 			break;
+	}
+
+	if (NULL != session && 0 != last_valueid)
+	{
+		if (session->last_valueid > last_valueid)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "received id:" ZBX_FS_UI64 " is less than last id:"
+					ZBX_FS_UI64, last_valueid, session->last_valueid);
+		}
+		else
+			session->last_valueid = last_valueid;
 	}
 
 	zbx_free(errcodes);

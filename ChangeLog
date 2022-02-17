@@ -1,3 +1,22 @@
+Changes for 5.0.21rc1
+
+New features:
+...G...... [ZBXNEXT-7408] added native support for the net.dns and net.dns.record keys in Zabbix agent 2, fixed Zabbix agent 1 SOA response formatting (esneiders, ssimonenko)
+
+Bug fixes:
+...G...PS. [ZBX-20228] improved error reporting when SSL_write() or SSL_read() functions fail, removed redundant code that resulted in timeout on windows (vso)
+...G...... [ZBX-20339] fixed incorrect smart plugin device type in Zabbix agent 2 (esneiders)
+.........T [ZBX-16896] added interface speed metric to linux by agent templates (vkhaliev)
+...G...... [ZBX-20030] fixed system.cpu.num runtime cpu change in Zabbix agent 2 (esneiders)
+.........T [ZBX-20396] fixed expression for "Calculated value of innodb_log_file_size" item in MySQL templates (mchudinov)
+.........T [ZBX-20509] changed host group in Squid, Morningstar templates (mchudinov)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.20
+
+5.0.20rc1 was released as 5.0.20 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.20rc1
 
 New features:
@@ -2376,6 +2395,18 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.39rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.38
+
+4.0.38rc1 was released as 4.0.38 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.0.38rc1
