@@ -376,7 +376,7 @@ abstract class CControllerPopupItemTest extends CController {
 	 * Function returns array of item specific properties used for item testing.
 	 *
 	 * @param array $input       Stored user input used to overwrite values retrieved from database.
-	 * @param bool  $for_server  Whether need to add to result an additional properties used only for connection with
+	 * @param bool  $for_server  Whether need to add to result additional properties used only for connection with
 	 *                           Zabbix server.
 	 *
 	 * @return array

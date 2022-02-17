@@ -812,7 +812,6 @@ class CHostGroup extends CApiService {
 		}
 	}
 
-	/**
 	 * Check that no maintenance object will be left without hosts and host groups as the result of the given host
 	 * groups deletion.
 	 *

@@ -271,7 +271,7 @@ class testFormSetup extends CWebTest {
 		// Check layout via screenshot for dark theme.
 		$this->assertScreenshotExcept($form, $this->query('id:label-default-timezone')->one(), 'GUISettings_Dark');
 
-		// Complite the setup and check in DB that the default timezone was applied.
+		// Complete the setup and check in DB that the default timezone was applied.
 		$this->query('button:Next step')->one()->click();
 		$this->query('button:Next step')->one()->click();
 		$this->query('button:Finish')->one()->click();
@@ -282,7 +282,7 @@ class testFormSetup extends CWebTest {
 	public function testFormSetup_summarySection() {
 		$this->openSpecifiedSection('Pre-installation summary');
 
-		// Check that Zabbix server name sield is not displayed if its not populated.
+		// Check that Zabbix server name field is not displayed if it is not populated.
 		$this->assertFalse($this->query('xpath://span[text()="Zabbix server name"]')->one(false)->isValid());
 		$this->query('button:Back')->one()->click();
 		// Fill in the Zabbix server name field and proceed with checking Pre-installation summary.
