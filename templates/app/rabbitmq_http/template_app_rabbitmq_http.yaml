@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-02-10T10:21:11Z'
+  date: '2022-02-17T19:48:29Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1307,7 +1307,7 @@ zabbix_export:
           uuid: 542f36f0b4e24d99a402a98b6f6fe4c4
           name: 'RabbitMQ: Service response time'
           type: SIMPLE
-          key: 'net.tcp.service.perf[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"]'
+          key: 'net.tcp.service.perf["{$RABBITMQ.API.SCHEME}","{HOST.CONN}","{$RABBITMQ.API.PORT}"]'
           history: 7d
           value_type: FLOAT
           units: s
@@ -1318,14 +1318,14 @@ zabbix_export:
           triggers:
             -
               uuid: 220eedd4f69b43fabe233b5127e09c50
-              expression: 'min(/RabbitMQ node by HTTP/net.tcp.service.perf[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"],5m)>{$RABBITMQ.RESPONSE_TIME.MAX.WARN}'
+              expression: 'min(/RabbitMQ node by HTTP/net.tcp.service.perf["{$RABBITMQ.API.SCHEME}","{HOST.CONN}","{$RABBITMQ.API.PORT}"],5m)>{$RABBITMQ.RESPONSE_TIME.MAX.WARN}'
               name: 'RabbitMQ: Service response time is too high (over {$RABBITMQ.RESPONSE_TIME.MAX.WARN}s for 5m)'
               priority: WARNING
               manual_close: 'YES'
               dependencies:
                 -
                   name: 'RabbitMQ: Service is down'
-                  expression: 'last(/RabbitMQ node by HTTP/net.tcp.service[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"])=0'
+                  expression: 'last(/RabbitMQ node by HTTP/net.tcp.service["{$RABBITMQ.API.SCHEME}","{HOST.CONN}","{$RABBITMQ.API.PORT}"])=0'
               tags:
                 -
                   tag: scope
@@ -1334,7 +1334,7 @@ zabbix_export:
           uuid: f53379f858f74714b15ee12fe6fc2d08
           name: 'RabbitMQ: Service ping'
           type: SIMPLE
-          key: 'net.tcp.service[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"]'
+          key: 'net.tcp.service["{$RABBITMQ.API.SCHEME}","{HOST.CONN}","{$RABBITMQ.API.PORT}"]'
           history: 7d
           valuemap:
             name: 'Service state'
@@ -1353,7 +1353,7 @@ zabbix_export:
           triggers:
             -
               uuid: 636356e5255d49d992df4b7a0c7d222d
-              expression: 'last(/RabbitMQ node by HTTP/net.tcp.service[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"])=0'
+              expression: 'last(/RabbitMQ node by HTTP/net.tcp.service["{$RABBITMQ.API.SCHEME}","{HOST.CONN}","{$RABBITMQ.API.PORT}"])=0'
               name: 'RabbitMQ: Service is down'
               priority: AVERAGE
               manual_close: 'YES'
@@ -1389,7 +1389,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'RabbitMQ: Service is down'
-                  expression: 'last(/RabbitMQ node by HTTP/net.tcp.service[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"])=0'
+                  expression: 'last(/RabbitMQ node by HTTP/net.tcp.service["{$RABBITMQ.API.SCHEME}","{HOST.CONN}","{$RABBITMQ.API.PORT}"])=0'
               tags:
                 -
                   tag: scope
@@ -1734,7 +1734,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'RabbitMQ: Service is down'
-                  expression: 'last(/RabbitMQ node by HTTP/net.tcp.service[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"])=0'
+                  expression: 'last(/RabbitMQ node by HTTP/net.tcp.service["{$RABBITMQ.API.SCHEME}","{HOST.CONN}","{$RABBITMQ.API.PORT}"])=0'
               tags:
                 -
                   tag: scope
