@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-14T14:27:47Z'
+  date: '2022-02-17T06:36:40Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -3051,7 +3051,7 @@ zabbix_export:
                   name: 'Kubernetes/Nodes/Role: {#ROLE.WORKER}'
               templates:
                 -
-                  name: 'Kubernetes kubelet by HTTP'
+                  name: 'Kubernetes Kubelet by HTTP'
               macros:
                 -
                   macro: '{$KUBE.KUBELET.URL}'
