@@ -418,7 +418,7 @@ $translate_strings = [
 		'value' => _('value')
 	],
 	'popup.condition.common.js' => [
-		'Add parent services' => _('Add parent services')
+		'Services' => _('Services')
 	]
 ];
 

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-15T06:57:50Z'
+  date: '2022-01-26T10:51:08Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -17,7 +17,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -35,8 +35,11 @@ zabbix_export:
           status_codes: '200,404'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: connections
+            -
+              tag: component
+              value: raw
         -
           uuid: 1734b26ca856405e8c08f222944cadc3
           name: 'Nginx: Connections accepted, rate'
@@ -58,8 +61,8 @@ zabbix_export:
             key: nginx.connections
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: connections
         -
           uuid: a0fd403c29e4452a9be0aecb650ab063
           name: 'Nginx: Connections active'
@@ -77,8 +80,8 @@ zabbix_export:
             key: nginx.connections
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: connections
         -
           uuid: 06395827019542b7bd381d42beb76b10
           name: 'Nginx: Connections dropped'
@@ -96,8 +99,8 @@ zabbix_export:
             key: nginx.connections
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: connections
           triggers:
             -
               uuid: 91c9dab8147a4d0086019119e4e55b5e
@@ -105,6 +108,10 @@ zabbix_export:
               name: 'Nginx: High connections drop rate (more than {$NGINX.DROP_RATE.MAX.WARN} for 5m)'
               priority: WARNING
               description: 'The dropping rate connections is greater than {$NGINX.DROP_RATE.MAX.WARN} for the last 5 minutes.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 0c0e5a2ba5f643e09d07e34d724aff9a
           name: 'Nginx: Connections idle'
@@ -122,8 +129,8 @@ zabbix_export:
             key: nginx.connections
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: connections
         -
           uuid: 51c50d69acdb451395736902733673fe
           name: 'Nginx: Get HTTP location zones'
@@ -137,8 +144,11 @@ zabbix_export:
           status_codes: '200,404'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: location_zones
+            -
+              tag: component
+              value: raw
         -
           uuid: 5b337c675bc14d9ab3ac6d2cf5b82dce
           name: 'Nginx: Get HTTP zones'
@@ -152,8 +162,11 @@ zabbix_export:
           status_codes: '200,404'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
+            -
+              tag: component
+              value: server_zones
         -
           uuid: 4ec5e9b1d17141f49db5d9bf29134a49
           name: 'Nginx: Get HTTP upstreams'
@@ -167,8 +180,11 @@ zabbix_export:
           status_codes: '200,404'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
+            -
+              tag: component
+              value: upstreams
         -
           uuid: d6c37400f8e64d89a698896afa6589de
           name: 'Nginx: Get info'
@@ -182,8 +198,11 @@ zabbix_export:
           status_codes: '200,404'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: info
+            -
+              tag: component
+              value: raw
         -
           uuid: 178f9f0c2ae74a6bbf1ae6965021ccde
           name: 'Nginx: Address'
@@ -207,8 +226,8 @@ zabbix_export:
             key: nginx.info
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: info
         -
           uuid: 14c417b374ef4674bb374979135f8617
           name: 'Nginx: Get info error'
@@ -233,14 +252,21 @@ zabbix_export:
             key: nginx.info
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: health
+            -
+              tag: component
+              value: info
           triggers:
             -
               uuid: e444c708371748bd831bba6c8d9a92e0
               expression: 'length(last(/Nginx Plus by HTTP/nginx.info.error))>0'
               name: 'Nginx: Server response error (text: {ITEM.VALUE})'
               priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 9baff3e318d84cd78c6a8ec6ae294de5
           name: 'Nginx: Generation'
@@ -262,8 +288,8 @@ zabbix_export:
             key: nginx.info
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: info
         -
           uuid: 1baceaa7af4d45e487a448670e213c94
           name: 'Nginx: Uptime'
@@ -287,8 +313,8 @@ zabbix_export:
             key: nginx.info
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: info
           triggers:
             -
               uuid: 396fb4be618e45578566971d5399d611
@@ -297,6 +323,10 @@ zabbix_export:
               priority: WARNING
               description: 'Zabbix has not received data for metrics for the last 30 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
             -
               uuid: 95622a29bd58444b9f0bd985db99f922
               expression: 'last(/Nginx Plus by HTTP/nginx.info.uptime)<10m'
@@ -304,6 +334,10 @@ zabbix_export:
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 89059effd28641e08e2002c807784bcb
           name: 'Nginx: Version'
@@ -327,8 +361,8 @@ zabbix_export:
             key: nginx.info
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: info
           triggers:
             -
               uuid: a91ff018fe4f4a1495b08adeb2b0005f
@@ -337,6 +371,10 @@ zabbix_export:
               priority: INFO
               description: 'Nginx version has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 65377fc7308340348199c4c63720a7e1
           name: 'Nginx: Get requests'
@@ -350,8 +388,11 @@ zabbix_export:
           status_codes: '200,404'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
+            -
+              tag: component
+              value: requests
         -
           uuid: 630c4f81f9f44397a156e2d4e5d21af8
           name: 'Nginx: Requests current'
@@ -369,8 +410,8 @@ zabbix_export:
             key: nginx.requests
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: requests
         -
           uuid: 8130bfb659a94641b97a1abcdb9a4f66
           name: 'Nginx: Requests total, rate'
@@ -392,8 +433,8 @@ zabbix_export:
             key: nginx.requests
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: requests
         -
           uuid: 9ea35f4f2ca24187896b7f44fb410d24
           name: 'Nginx: Get resolvers'
@@ -407,8 +448,11 @@ zabbix_export:
           status_codes: '200,404'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
+            -
+              tag: component
+              value: resolvers
         -
           uuid: e0798bb2d16c418781e19880fd78832c
           name: 'Nginx: Get SSL'
@@ -422,8 +466,11 @@ zabbix_export:
           status_codes: '200,404'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
+            -
+              tag: component
+              value: ssl
         -
           uuid: 09c7ab8555d046a69a96889185650dfe
           name: 'Nginx: SSL handshakes, rate'
@@ -445,8 +492,8 @@ zabbix_export:
             key: nginx.ssl
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: ssl
         -
           uuid: 77fcc55ced2045e099b37580f7ef6d5b
           name: 'Nginx: SSL handshakes failed, rate'
@@ -468,8 +515,8 @@ zabbix_export:
             key: nginx.ssl
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: ssl
         -
           uuid: 98ec8bec834a42caba8d260d939beb0e
           name: 'Nginx: SSL session reuses, rate'
@@ -491,8 +538,8 @@ zabbix_export:
             key: nginx.ssl
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: ssl
         -
           uuid: 148a8612964b445ba37e340c9341f49d
           name: 'Nginx: Get Stream server zones'
@@ -506,8 +553,11 @@ zabbix_export:
           status_codes: '200,404'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
+            -
+              tag: component
+              value: server_zones
         -
           uuid: c48ca144a8414b2db1c35d518ca5a24f
           name: 'Nginx: Get Stream upstreams'
@@ -521,8 +571,11 @@ zabbix_export:
           status_codes: '200,404'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
+            -
+              tag: component
+              value: upstreams
       discovery_rules:
         -
           uuid: 33fdb45a55544c628c0106ed193ebc0b
@@ -564,8 +617,11 @@ zabbix_export:
                 key: nginx.http.location_zones
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP location zone [{#NAME}]'
+                  tag: component
+                  value: location_zones
+                -
+                  tag: zone
+                  value: '{#NAME}'
             -
               uuid: 17e01c9171bd493f98b37811dcf49802
               name: 'Nginx: HTTP location zone [{#NAME}]: Received, rate'
@@ -587,8 +643,11 @@ zabbix_export:
                 key: nginx.http.location_zones
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP location zone [{#NAME}]'
+                  tag: component
+                  value: location_zones
+                -
+                  tag: zone
+                  value: '{#NAME}'
             -
               uuid: c646c18580ef4b8695cbc03ce0d5122d
               name: 'Nginx: HTTP location zone [{#NAME}]: Requests, rate'
@@ -610,8 +669,11 @@ zabbix_export:
                 key: nginx.http.location_zones
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP location zone [{#NAME}]'
+                  tag: component
+                  value: location_zones
+                -
+                  tag: zone
+                  value: '{#NAME}'
             -
               uuid: 82c9f68d10ec47f1a701eee692e3b9ae
               name: 'Nginx: HTTP location zone [{#NAME}]: Responses 1xx, rate'
@@ -633,8 +695,11 @@ zabbix_export:
                 key: nginx.http.location_zones
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP location zone [{#NAME}]'
+                  tag: component
+                  value: location_zones
+                -
+                  tag: zone
+                  value: '{#NAME}'
             -
               uuid: 0cedd14450ba44f0b4c026afabb522a9
               name: 'Nginx: HTTP location zone [{#NAME}]: Responses 2xx, rate'
@@ -656,8 +721,11 @@ zabbix_export:
                 key: nginx.http.location_zones
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP location zone [{#NAME}]'
+                  tag: component
+                  value: location_zones
+                -
+                  tag: zone
+                  value: '{#NAME}'
             -
               uuid: 046a2a3b9a644dc1b4a0078b6722c867
               name: 'Nginx: HTTP location zone [{#NAME}]: Responses 3xx, rate'
@@ -679,8 +747,11 @@ zabbix_export:
                 key: nginx.http.location_zones
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP location zone [{#NAME}]'
+                  tag: component
+                  value: location_zones
+                -
+                  tag: zone
+                  value: '{#NAME}'
             -
               uuid: 32eb7cb8f04044d6a00ead678ff44a00
               name: 'Nginx: HTTP location zone [{#NAME}]: Responses 4xx, rate'
@@ -702,8 +773,11 @@ zabbix_export:
                 key: nginx.http.location_zones
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP location zone [{#NAME}]'
+                  tag: component
+                  value: location_zones
+                -
+                  tag: zone
+                  value: '{#NAME}'
             -
               uuid: dd5a27eb32da42d7998f89a96e29304f
               name: 'Nginx: HTTP location zone [{#NAME}]: Responses 5xx, rate'
@@ -725,8 +799,11 @@ zabbix_export:
                 key: nginx.http.location_zones
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP location zone [{#NAME}]'
+                  tag: component
+                  value: location_zones
+                -
+                  tag: zone
+                  value: '{#NAME}'
             -
               uuid: b6e3c7f074b54531aa57dce55169aedd
               name: 'Nginx: HTTP location zone [{#NAME}]: Responses total, rate'
@@ -748,8 +825,11 @@ zabbix_export:
                 key: nginx.http.location_zones
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP location zone [{#NAME}]'
+                  tag: component
+                  value: location_zones
+                -
+                  tag: zone
+                  value: '{#NAME}'
             -
               uuid: 0af45d37b3a24d5491054aa3cf319315
               name: 'Nginx: HTTP location zone [{#NAME}]: Sent, rate'
@@ -771,8 +851,11 @@ zabbix_export:
                 key: nginx.http.location_zones
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP location zone [{#NAME}]'
+                  tag: component
+                  value: location_zones
+                -
+                  tag: zone
+                  value: '{#NAME}'
           graph_prototypes:
             -
               uuid: 85880c097a1c47bfafa35de05304abbc
@@ -880,8 +963,11 @@ zabbix_export:
                 key: nginx.http.server_zones
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP zone [{#NAME}]'
+                  tag: component
+                  value: server_zones
+                -
+                  tag: zone
+                  value: '{#NAME}'
             -
               uuid: e8dd5302fced4d23ba93656f383222d9
               name: 'Nginx: HTTP server zone [{#NAME}]: Processing'
@@ -899,8 +985,11 @@ zabbix_export:
                 key: nginx.http.server_zones
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP zone [{#NAME}]'
+                  tag: component
+                  value: server_zones
+                -
+                  tag: zone
+                  value: '{#NAME}'
             -
               uuid: edc834403218460b8c7b8b3ca0709a76
               name: 'Nginx: HTTP server zone [{#NAME}]: Received, rate'
@@ -922,8 +1011,11 @@ zabbix_export:
                 key: nginx.http.server_zones
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP zone [{#NAME}]'
+                  tag: component
+                  value: server_zones
+                -
+                  tag: zone
+                  value: '{#NAME}'
             -
               uuid: e33079d5cc684a5687bd7cd10eaec541
               name: 'Nginx: HTTP server zone [{#NAME}]: Requests, rate'
@@ -945,8 +1037,11 @@ zabbix_export:
                 key: nginx.http.server_zones
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP zone [{#NAME}]'
+                  tag: component
+                  value: server_zones
+                -
+                  tag: zone
+                  value: '{#NAME}'
             -
               uuid: 2b37ee1a3c1243c38534f70acf7a32d9
               name: 'Nginx: HTTP server zone [{#NAME}]: Responses 1xx, rate'
@@ -968,8 +1063,11 @@ zabbix_export:
                 key: nginx.http.server_zones
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP zone [{#NAME}]'
+                  tag: component
+                  value: server_zones
+                -
+                  tag: zone
+                  value: '{#NAME}'
             -
               uuid: 4e127d8bfac940f1b3703053ada05fbd
               name: 'Nginx: HTTP server zone [{#NAME}]: Responses 2xx, rate'
@@ -991,8 +1089,11 @@ zabbix_export:
                 key: nginx.http.server_zones
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP zone [{#NAME}]'
+                  tag: component
+                  value: server_zones
+                -
+                  tag: zone
+                  value: '{#NAME}'
             -
               uuid: 6add98c2b5334160a0e4cc363f53cb7e
               name: 'Nginx: HTTP server zone [{#NAME}]: Responses 3xx, rate'
@@ -1014,8 +1115,11 @@ zabbix_export:
                 key: nginx.http.server_zones
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP zone [{#NAME}]'
+                  tag: component
+                  value: server_zones
+                -
+                  tag: zone
+                  value: '{#NAME}'
             -
               uuid: 1f2cd6dcddf948a9bf17f05c68502f46
               name: 'Nginx: HTTP server zone [{#NAME}]: Responses 4xx, rate'
@@ -1037,8 +1141,11 @@ zabbix_export:
                 key: nginx.http.server_zones
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP zone [{#NAME}]'
+                  tag: component
+                  value: server_zones
+                -
+                  tag: zone
+                  value: '{#NAME}'
             -
               uuid: fc6654f2627e47cbbe1a7628c073520a
               name: 'Nginx: HTTP server zone [{#NAME}]: Responses 5xx, rate'
@@ -1060,8 +1167,11 @@ zabbix_export:
                 key: nginx.http.server_zones
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP zone [{#NAME}]'
+                  tag: component
+                  value: server_zones
+                -
+                  tag: zone
+                  value: '{#NAME}'
             -
               uuid: fd81275f0c994a62a9412d595d7d2e8b
               name: 'Nginx: HTTP server zone [{#NAME}]: Responses total, rate'
@@ -1083,8 +1193,11 @@ zabbix_export:
                 key: nginx.http.server_zones
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP zone [{#NAME}]'
+                  tag: component
+                  value: server_zones
+                -
+                  tag: zone
+                  value: '{#NAME}'
             -
               uuid: 91acfc8de0e64d52820d509ced251e5b
               name: 'Nginx: HTTP server zone [{#NAME}]: Sent, rate'
@@ -1106,8 +1219,11 @@ zabbix_export:
                 key: nginx.http.server_zones
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP zone [{#NAME}]'
+                  tag: component
+                  value: server_zones
+                -
+                  tag: zone
+                  value: '{#NAME}'
           graph_prototypes:
             -
               uuid: ba4bc0201f0741078e1512fd79bddf59
@@ -1211,8 +1327,14 @@ zabbix_export:
                 key: nginx.http.upstreams
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]'
+                  tag: component
+                  value: upstream
+                -
+                  tag: peer
+                  value: '{#PEER}'
+                -
+                  tag: upstream
+                  value: '{#NAME}'
             -
               uuid: cd7455016ac549598df2551a716545ef
               name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Fails, rate'
@@ -1234,8 +1356,14 @@ zabbix_export:
                 key: nginx.http.upstreams
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]'
+                  tag: component
+                  value: upstream
+                -
+                  tag: peer
+                  value: '{#PEER}'
+                -
+                  tag: upstream
+                  value: '{#NAME}'
             -
               uuid: b0607f003d7a4713a28f0d75b7933087
               name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Header time'
@@ -1255,8 +1383,14 @@ zabbix_export:
                 key: nginx.http.upstreams
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]'
+                  tag: component
+                  value: upstream
+                -
+                  tag: peer
+                  value: '{#PEER}'
+                -
+                  tag: upstream
+                  value: '{#NAME}'
             -
               uuid: 89f89850409a4aff8447b9f7c2839f01
               name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Health checks, check'
@@ -1274,8 +1408,14 @@ zabbix_export:
                 key: nginx.http.upstreams
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]'
+                  tag: component
+                  value: upstream
+                -
+                  tag: peer
+                  value: '{#PEER}'
+                -
+                  tag: upstream
+                  value: '{#NAME}'
             -
               uuid: 31292e9dbc8c45dd936ed1e77d44940b
               name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Health checks, fails'
@@ -1293,8 +1433,14 @@ zabbix_export:
                 key: nginx.http.upstreams
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]'
+                  tag: component
+                  value: upstream
+                -
+                  tag: peer
+                  value: '{#PEER}'
+                -
+                  tag: upstream
+                  value: '{#NAME}'
             -
               uuid: 89c57fb94cab4635b14532961560a8bf
               name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Health checks, unhealthy'
@@ -1312,8 +1458,14 @@ zabbix_export:
                 key: nginx.http.upstreams
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]'
+                  tag: component
+                  value: upstream
+                -
+                  tag: peer
+                  value: '{#PEER}'
+                -
+                  tag: upstream
+                  value: '{#NAME}'
             -
               uuid: 8731deb89d1c4fc2bab90aca5802c721
               name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Received, rate'
@@ -1335,8 +1487,14 @@ zabbix_export:
                 key: nginx.http.upstreams
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]'
+                  tag: component
+                  value: upstream
+                -
+                  tag: peer
+                  value: '{#PEER}'
+                -
+                  tag: upstream
+                  value: '{#NAME}'
             -
               uuid: 3ff18cfb4028421e9af0460aeaa2d6a4
               name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Requests, rate'
@@ -1358,8 +1516,14 @@ zabbix_export:
                 key: nginx.http.upstreams
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]'
+                  tag: component
+                  value: upstream
+                -
+                  tag: peer
+                  value: '{#PEER}'
+                -
+                  tag: upstream
+                  value: '{#NAME}'
             -
               uuid: 6ca38995050e44488df4fde7dc543541
               name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Responses 1xx, rate'
@@ -1381,8 +1545,14 @@ zabbix_export:
                 key: nginx.http.upstreams
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]'
+                  tag: component
+                  value: upstream
+                -
+                  tag: peer
+                  value: '{#PEER}'
+                -
+                  tag: upstream
+                  value: '{#NAME}'
             -
               uuid: e526b61c48eb45568ef92434eee3a2cb
               name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Responses 2xx, rate'
@@ -1404,8 +1574,14 @@ zabbix_export:
                 key: nginx.http.upstreams
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]'
+                  tag: component
+                  value: upstream
+                -
+                  tag: peer
+                  value: '{#PEER}'
+                -
+                  tag: upstream
+                  value: '{#NAME}'
             -
               uuid: 7b2851137d77418a8548e92332c66c86
               name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Responses 3xx, rate'
@@ -1427,8 +1603,14 @@ zabbix_export:
                 key: nginx.http.upstreams
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]'
+                  tag: component
+                  value: upstream
+                -
+                  tag: peer
+                  value: '{#PEER}'
+                -
+                  tag: upstream
+                  value: '{#NAME}'
             -
               uuid: cb81f113d289409ca26af48aeb68f8cc
               name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Responses 4xx, rate'
@@ -1450,8 +1632,14 @@ zabbix_export:
                 key: nginx.http.upstreams
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]'
+                  tag: component
+                  value: upstream
+                -
+                  tag: peer
+                  value: '{#PEER}'
+                -
+                  tag: upstream
+                  value: '{#NAME}'
             -
               uuid: 172cb81d02f04fd48c7b82d8ae7dac69
               name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Responses 5xx, rate'
@@ -1473,8 +1661,14 @@ zabbix_export:
                 key: nginx.http.upstreams
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]'
+                  tag: component
+                  value: upstream
+                -
+                  tag: peer
+                  value: '{#PEER}'
+                -
+                  tag: upstream
+                  value: '{#NAME}'
             -
               uuid: d587254989c743b4aa9c8043bf18baa5
               name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Responses total, rate'
@@ -1496,8 +1690,14 @@ zabbix_export:
                 key: nginx.http.upstreams
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]'
+                  tag: component
+                  value: upstream
+                -
+                  tag: peer
+                  value: '{#PEER}'
+                -
+                  tag: upstream
+                  value: '{#NAME}'
             -
               uuid: 868562df5ab44d3cadeb6fa294b33559
               name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Response time'
@@ -1517,8 +1717,14 @@ zabbix_export:
                 key: nginx.http.upstreams
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]'
+                  tag: component
+                  value: upstream
+                -
+                  tag: peer
+                  value: '{#PEER}'
+                -
+                  tag: upstream
+                  value: '{#NAME}'
             -
               uuid: 2a0a36d22acf453e80d79820990db9b8
               name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Sent, rate'
@@ -1540,8 +1746,14 @@ zabbix_export:
                 key: nginx.http.upstreams
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]'
+                  tag: component
+                  value: upstream
+                -
+                  tag: peer
+                  value: '{#PEER}'
+                -
+                  tag: upstream
+                  value: '{#NAME}'
             -
               uuid: 33eacaa48f974c348e37475341a6c8af
               name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: State'
@@ -1565,8 +1777,14 @@ zabbix_export:
                 key: nginx.http.upstreams
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]'
+                  tag: component
+                  value: upstream
+                -
+                  tag: peer
+                  value: '{#PEER}'
+                -
+                  tag: upstream
+                  value: '{#NAME}'
               trigger_prototypes:
                 -
                   uuid: fc6586fe2eef457bac1d71ce0313f95d
@@ -1574,6 +1792,10 @@ zabbix_export:
                   name: 'Nginx: HTTP upstream server is not in UP or DOWN state.'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: e89e6c141217465794febd9131ccafae
               name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Unavail'
@@ -1591,19 +1813,33 @@ zabbix_export:
                 key: nginx.http.upstreams
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]'
+                  tag: component
+                  value: upstream
+                -
+                  tag: peer
+                  value: '{#PEER}'
+                -
+                  tag: upstream
+                  value: '{#NAME}'
           trigger_prototypes:
             -
               uuid: e7b4782a796b4710b50a96f3d24c8208
               expression: 'sum(/Nginx Plus by HTTP/nginx.http.upstream.peer.responses.4xx.rate[{#UPSTREAM},{#PEER}],5m) > (sum(/Nginx Plus by HTTP/nginx.http.upstream.peer.responses.total.rate[{#UPSTREAM},{#PEER}],5m)*({$NGINX.HTTP.UPSTREAM.4XX.MAX.WARN}/100))'
               name: 'Nginx: Too many HTTP requests with code 4xx (over {$NGINX.HTTP.UPSTREAM.4XX.MAX.WARN}% for 5m)'
               priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: f542573d149547d3844f635bf2a87120
               expression: 'sum(/Nginx Plus by HTTP/nginx.http.upstream.peer.responses.5xx.rate[{#UPSTREAM},{#PEER}],5m) > (sum(/Nginx Plus by HTTP/nginx.http.upstream.peer.responses.total.rate[{#UPSTREAM},{#PEER}],5m)*({$NGINX.HTTP.UPSTREAM.5XX.MAX.WARN}/100))'
               name: 'Nginx: Too many HTTP requests with code 5xx (over {$NGINX.HTTP.UPSTREAM.5XX.MAX.WARN}% for 5m)'
               priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: performance
           graph_prototypes:
             -
               uuid: 63582bcbe4c741e88cd64a43ff1b7d9d
@@ -1724,8 +1960,11 @@ zabbix_export:
                 key: nginx.http.upstreams
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP upstream [{#NAME}]'
+                  tag: component
+                  value: upstreams
+                -
+                  tag: upstream
+                  value: '{#NAME}'
             -
               uuid: 1a426d42dada4eb082aa4e912ae1256c
               name: 'Nginx: HTTP upstream [{#NAME}]: Zombies'
@@ -1743,8 +1982,11 @@ zabbix_export:
                 key: nginx.http.upstreams
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP upstream [{#NAME}]'
+                  tag: component
+                  value: upstreams
+                -
+                  tag: upstream
+                  value: '{#NAME}'
             -
               uuid: 8aa415f2a55a4e8fb28ea87a8d307bd4
               name: 'Nginx: HTTP upstream [{#NAME}]: Zone'
@@ -1754,7 +1996,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'The name of the shared memory zone that keeps the group’s configuration and run-time state.'
+              description: 'The name of the shared memory zone that keeps the group''s configuration and run-time state.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1768,8 +2010,11 @@ zabbix_export:
                 key: nginx.http.upstreams
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: HTTP upstream [{#NAME}]'
+                  tag: component
+                  value: upstreams
+                -
+                  tag: upstream
+                  value: '{#NAME}'
           master_item:
             key: nginx.http.upstreams
           preprocessing:
@@ -1828,8 +2073,11 @@ zabbix_export:
                 key: nginx.resolvers
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: Resolver [{#NAME}]'
+                  tag: component
+                  value: resolver
+                -
+                  tag: resolver
+                  value: '{#NAME}'
             -
               uuid: fb149324f11a4edc9971e9e2572282a6
               name: 'Nginx: Resolver [{#NAME}]: Requests name, rate'
@@ -1851,8 +2099,11 @@ zabbix_export:
                 key: nginx.resolvers
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: Resolver [{#NAME}]'
+                  tag: component
+                  value: resolver
+                -
+                  tag: resolver
+                  value: '{#NAME}'
             -
               uuid: 9ebd08e8b6a3416c940b16a03158bafe
               name: 'Nginx: Resolver [{#NAME}]: Requests srv, rate'
@@ -1874,8 +2125,11 @@ zabbix_export:
                 key: nginx.resolvers
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: Resolver [{#NAME}]'
+                  tag: component
+                  value: resolver
+                -
+                  tag: resolver
+                  value: '{#NAME}'
             -
               uuid: 8a7db7d9c24f4f88b9ad9dde32b2b2e0
               name: 'Nginx: Resolver [{#NAME}]: Responses formerr, rate'
@@ -1897,8 +2151,11 @@ zabbix_export:
                 key: nginx.resolvers
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: Resolver [{#NAME}]'
+                  tag: component
+                  value: resolver
+                -
+                  tag: resolver
+                  value: '{#NAME}'
             -
               uuid: bf5a55d771724cfeaec90950f653b181
               name: 'Nginx: Resolver [{#NAME}]: Responses noerror, rate'
@@ -1920,8 +2177,11 @@ zabbix_export:
                 key: nginx.resolvers
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: Resolver [{#NAME}]'
+                  tag: component
+                  value: resolver
+                -
+                  tag: resolver
+                  value: '{#NAME}'
             -
               uuid: 46cd31140a3342568c7d7ae0cdae6270
               name: 'Nginx: Resolver [{#NAME}]: Responses notimp, rate'
@@ -1943,8 +2203,11 @@ zabbix_export:
                 key: nginx.resolvers
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: Resolver [{#NAME}]'
+                  tag: component
+                  value: resolver
+                -
+                  tag: resolver
+                  value: '{#NAME}'
             -
               uuid: b4e002955de844a69a755076993b0577
               name: 'Nginx: Resolver [{#NAME}]: Responses nxdomain, rate'
@@ -1966,8 +2229,11 @@ zabbix_export:
                 key: nginx.resolvers
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: Resolver [{#NAME}]'
+                  tag: component
+                  value: resolver
+                -
+                  tag: resolver
+                  value: '{#NAME}'
             -
               uuid: 114f260fc9754e80927494dce51f9e46
               name: 'Nginx: Resolver [{#NAME}]: Responses refused, rate'
@@ -1989,8 +2255,11 @@ zabbix_export:
                 key: nginx.resolvers
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: Resolver [{#NAME}]'
+                  tag: component
+                  value: resolver
+                -
+                  tag: resolver
+                  value: '{#NAME}'
             -
               uuid: 7b4f4f609807407e849525f9f99c0fcc
               name: 'Nginx: Resolver [{#NAME}]: Responses servfail, rate'
@@ -2012,8 +2281,11 @@ zabbix_export:
                 key: nginx.resolvers
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: Resolver [{#NAME}]'
+                  tag: component
+                  value: resolver
+                -
+                  tag: resolver
+                  value: '{#NAME}'
             -
               uuid: 28b11b8bfd6143ada94b041390281a2f
               name: 'Nginx: Resolver [{#NAME}]: Responses timedout, rate'
@@ -2035,8 +2307,11 @@ zabbix_export:
                 key: nginx.resolvers
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: Resolver [{#NAME}]'
+                  tag: component
+                  value: resolver
+                -
+                  tag: resolver
+                  value: '{#NAME}'
             -
               uuid: b68f19ad119941b58da491d2cd827277
               name: 'Nginx: Resolver [{#NAME}]: Responses unknown, rate'
@@ -2058,8 +2333,11 @@ zabbix_export:
                 key: nginx.resolvers
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: Resolver [{#NAME}]'
+                  tag: component
+                  value: resolver
+                -
+                  tag: resolver
+                  value: '{#NAME}'
           graph_prototypes:
             -
               uuid: 7c91ca5b8477468fa19c56b621e0c32a
@@ -2202,8 +2480,11 @@ zabbix_export:
                 key: nginx.stream.server_zones
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: Stream zone [{#NAME}]'
+                  tag: component
+                  value: server_zones
+                -
+                  tag: zone
+                  value: '{#NAME}'
             -
               uuid: c9e9d883123842d291c922d5bbcca8f3
               name: 'Nginx: Stream server zone [{#NAME}]: Discarded, rate'
@@ -2225,8 +2506,11 @@ zabbix_export:
                 key: nginx.stream.server_zones
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: Stream zone [{#NAME}]'
+                  tag: component
+                  value: server_zones
+                -
+                  tag: zone
+                  value: '{#NAME}'
             -
               uuid: f8d16f41fe9e4be685c28bb4acd2187f
               name: 'Nginx: Stream server zone [{#NAME}]: Processing'
@@ -2244,8 +2528,11 @@ zabbix_export:
                 key: nginx.stream.server_zones
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: Stream zone [{#NAME}]'
+                  tag: component
+                  value: server_zones
+                -
+                  tag: zone
+                  value: '{#NAME}'
             -
               uuid: 47a9959627e3423e9739b55dac23edd2
               name: 'Nginx: Stream server zone [{#NAME}]: Received, rate'
@@ -2267,8 +2554,11 @@ zabbix_export:
                 key: nginx.stream.server_zones
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: Stream zone [{#NAME}]'
+                  tag: component
+                  value: server_zones
+                -
+                  tag: zone
+                  value: '{#NAME}'
             -
               uuid: 2aafb1ae6ce24f14a3494826d63cfce2
               name: 'Nginx: Stream server zone [{#NAME}]: Sent, rate'
@@ -2290,8 +2580,11 @@ zabbix_export:
                 key: nginx.stream.server_zones
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: Stream zone [{#NAME}]'
+                  tag: component
+                  value: server_zones
+                -
+                  tag: zone
+                  value: '{#NAME}'
             -
               uuid: 7399335b883040c495b5cbfade3e182e
               name: 'Nginx: Stream server zone [{#NAME}]: Sessions 2xx, rate'
@@ -2313,8 +2606,11 @@ zabbix_export:
                 key: nginx.stream.server_zones
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: Stream zone [{#NAME}]'
+                  tag: component
+                  value: server_zones
+                -
+                  tag: zone
+                  value: '{#NAME}'
             -
               uuid: 5e654682849748bea849db9ab73f7075
               name: 'Nginx: Stream server zone [{#NAME}]: Sessions 4xx, rate'
@@ -2336,8 +2632,11 @@ zabbix_export:
                 key: nginx.stream.server_zones
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: Stream zone [{#NAME}]'
+                  tag: component
+                  value: server_zones
+                -
+                  tag: zone
+                  value: '{#NAME}'
             -
               uuid: 0cdc4545f6dc4a1e8f247291302824a4
               name: 'Nginx: Stream server zone [{#NAME}]: Sessions 5xx, rate'
@@ -2359,8 +2658,11 @@ zabbix_export:
                 key: nginx.stream.server_zones
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: Stream zone [{#NAME}]'
+                  tag: component
+                  value: server_zones
+                -
+                  tag: zone
+                  value: '{#NAME}'
             -
               uuid: 30313c91655042b8948422c13fbdfca3
               name: 'Nginx: Stream server zone [{#NAME}]: Sessions total, rate'
@@ -2382,8 +2684,11 @@ zabbix_export:
                 key: nginx.stream.server_zones
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: Stream zone [{#NAME}]'
+                  tag: component
+                  value: server_zones
+                -
+                  tag: zone
+                  value: '{#NAME}'
           graph_prototypes:
             -
               uuid: f833112506e941d791057925c58bd1d9
@@ -2463,8 +2768,14 @@ zabbix_export:
                 key: nginx.stream.upstreams
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]'
+                  tag: component
+                  value: upstream
+                -
+                  tag: peer
+                  value: '{#PEER}'
+                -
+                  tag: upstream
+                  value: '{#UPSTREAM}'
             -
               uuid: 2ae319abd31b40b7a765c300e5dfa954
               name: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: Connections'
@@ -2482,8 +2793,14 @@ zabbix_export:
                 key: nginx.stream.upstreams
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]'
+                  tag: component
+                  value: upstream
+                -
+                  tag: peer
+                  value: '{#PEER}'
+                -
+                  tag: upstream
+                  value: '{#UPSTREAM}'
             -
               uuid: f98409ef166b47f3a70d46dffe233166
               name: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: Connect time'
@@ -2503,8 +2820,14 @@ zabbix_export:
                 key: nginx.stream.upstreams
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]'
+                  tag: component
+                  value: upstream
+                -
+                  tag: peer
+                  value: '{#PEER}'
+                -
+                  tag: upstream
+                  value: '{#UPSTREAM}'
             -
               uuid: 0b1000ddc883422cb9fb3382a839c10a
               name: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: Fails, rate'
@@ -2526,8 +2849,14 @@ zabbix_export:
                 key: nginx.stream.upstreams
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]'
+                  tag: component
+                  value: upstream
+                -
+                  tag: peer
+                  value: '{#PEER}'
+                -
+                  tag: upstream
+                  value: '{#UPSTREAM}'
             -
               uuid: 23a02d1c0a63483fb1eb4914a7e48ecf
               name: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: First byte time'
@@ -2547,8 +2876,14 @@ zabbix_export:
                 key: nginx.stream.upstreams
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]'
+                  tag: component
+                  value: upstream
+                -
+                  tag: peer
+                  value: '{#PEER}'
+                -
+                  tag: upstream
+                  value: '{#UPSTREAM}'
             -
               uuid: dac0196daad74fc385a336c7dbddbcfd
               name: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: Health checks, check'
@@ -2566,8 +2901,14 @@ zabbix_export:
                 key: nginx.stream.upstreams
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]'
+                  tag: component
+                  value: upstream
+                -
+                  tag: peer
+                  value: '{#PEER}'
+                -
+                  tag: upstream
+                  value: '{#UPSTREAM}'
             -
               uuid: af2a6991b432439cb4afb071974a05e7
               name: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: Health checks, fails'
@@ -2585,8 +2926,14 @@ zabbix_export:
                 key: nginx.stream.upstreams
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]'
+                  tag: component
+                  value: upstream
+                -
+                  tag: peer
+                  value: '{#PEER}'
+                -
+                  tag: upstream
+                  value: '{#UPSTREAM}'
             -
               uuid: 089bbb9c602a4654a3d2c582c643745f
               name: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: Health checks, unhealthy'
@@ -2604,8 +2951,14 @@ zabbix_export:
                 key: nginx.stream.upstreams
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]'
+                  tag: component
+                  value: upstream
+                -
+                  tag: peer
+                  value: '{#PEER}'
+                -
+                  tag: upstream
+                  value: '{#UPSTREAM}'
             -
               uuid: 12193b1723eb419a9bbcb235c7b45308
               name: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: Received, rate'
@@ -2627,8 +2980,14 @@ zabbix_export:
                 key: nginx.stream.upstreams
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]'
+                  tag: component
+                  value: upstream
+                -
+                  tag: peer
+                  value: '{#PEER}'
+                -
+                  tag: upstream
+                  value: '{#UPSTREAM}'
             -
               uuid: bda851b725454395b59988f03c534b3b
               name: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: Response time'
@@ -2648,8 +3007,14 @@ zabbix_export:
                 key: nginx.stream.upstreams
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]'
+                  tag: component
+                  value: upstream
+                -
+                  tag: peer
+                  value: '{#PEER}'
+                -
+                  tag: upstream
+                  value: '{#UPSTREAM}'
             -
               uuid: 6ae8685716cf487fa72534a76e4b286a
               name: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: Sent, rate'
@@ -2671,8 +3036,14 @@ zabbix_export:
                 key: nginx.stream.upstreams
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]'
+                  tag: component
+                  value: upstream
+                -
+                  tag: peer
+                  value: '{#PEER}'
+                -
+                  tag: upstream
+                  value: '{#UPSTREAM}'
             -
               uuid: ae7b6564244845518816fffc38bbf9aa
               name: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: State'
@@ -2696,8 +3067,14 @@ zabbix_export:
                 key: nginx.stream.upstreams
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]'
+                  tag: component
+                  value: upstream
+                -
+                  tag: peer
+                  value: '{#PEER}'
+                -
+                  tag: upstream
+                  value: '{#UPSTREAM}'
               trigger_prototypes:
                 -
                   uuid: 20ef9b9e953246ef856dd46033595e52
@@ -2705,6 +3082,10 @@ zabbix_export:
                   name: 'Nginx: Stream upstream server is not in UP or DOWN state.'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 732f0ea262454ab3a4cfeb09aea66b9b
               name: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: Unavail'
@@ -2722,8 +3103,14 @@ zabbix_export:
                 key: nginx.stream.upstreams
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]'
+                  tag: component
+                  value: upstream
+                -
+                  tag: peer
+                  value: '{#PEER}'
+                -
+                  tag: upstream
+                  value: '{#UPSTREAM}'
           graph_prototypes:
             -
               uuid: abb23d681d0a461db00648b412b176c8
@@ -2805,8 +3192,11 @@ zabbix_export:
                 key: nginx.stream.upstreams
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: Stream upstream [{#NAME}]'
+                  tag: component
+                  value: upstreams
+                -
+                  tag: upstream
+                  value: '{#NAME}'
             -
               uuid: 8c273c10ece545a58e4d34f6d3812fe0
               name: 'Nginx: Stream upstream [{#NAME}]: Zone'
@@ -2829,8 +3219,11 @@ zabbix_export:
                 key: nginx.stream.upstreams
               tags:
                 -
-                  tag: Application
-                  value: 'Nginx: Stream upstream [{#NAME}]'
+                  tag: component
+                  value: upstreams
+                -
+                  tag: upstream
+                  value: '{#NAME}'
           master_item:
             key: nginx.stream.upstreams
           preprocessing:
@@ -2849,6 +3242,13 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 30m
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: nginx
       macros:
         -
           macro: '{$NGINX.API.ENDPOINT}'

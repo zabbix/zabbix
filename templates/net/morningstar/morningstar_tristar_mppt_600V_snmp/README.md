@@ -66,7 +66,7 @@ There are no template links in this template.
 |Status |Status: Alarms |<p>MIB: TRISTAR-MPPT</p><p>Description:Alarms</p><p>Modbus addresses:H=0x002e L=0x002f</p> |SNMP |status.alarms[alarms.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |Temperature |Temperature: Battery |<p>MIB: TRISTAR-MPPT</p><p>Description:Batt. Temp</p><p>Scaling Factor:1.0</p><p>Units:C</p><p>Range:[-40, 80]</p><p>Modbus address:0x0025</p> |SNMP |temp.battery[batteryTemperature.0] |
 |Temperature |Temperature: Heatsink |<p>MIB: TRISTAR-MPPT</p><p>Description:HS Temp</p><p>Scaling Factor:1.0</p><p>Units:C</p><p>Range:[-40, 80]</p><p>Modbus address:0x0023</p> |SNMP |temp.heatsink[heatsinkTemperature.0] |
-|Zabbix_raw_items |Battery: Battery Voltage discovery |<p>MIB: TRISTAR-MPPT</p><p>Description:Battery voltage</p><p>Scaling Factor:1.0</p><p>Units:V</p><p>Range:[-10, 80]</p><p>Modbus address:0x0018</p> |SNMP |battery.voltage.discovery[batteryVoltage.0] |
+|Zabbix raw items |Battery: Battery Voltage discovery |<p>MIB: TRISTAR-MPPT</p><p>Description:Battery voltage</p><p>Scaling Factor:1.0</p><p>Units:V</p><p>Range:[-10, 80]</p><p>Modbus address:0x0018</p> |SNMP |battery.voltage.discovery[batteryVoltage.0] |
 
 ## Triggers
 

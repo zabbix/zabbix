@@ -31,6 +31,8 @@ $this->addJsFile('layout.mode.js');
 $this->addJsFile('class.calendar.js');
 $this->addJsFile('gtlc.js');
 
+$this->includeJsFile('monitoring.charts.view.js.php');
+
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
 
@@ -39,32 +41,6 @@ $widget = (new CWidget())
 	->setWebLayoutMode($web_layout_mode)
 	->setControls(
 		(new CTag('nav', true, (new CList())
-			->addItem((new CForm('get'))
-				->cleanItems()
-				->setName('main_filter')
-				->addVar('action', 'charts.view')
-				->setAttribute('aria-label', _('Main filter'))
-				->addItem((new CList())
-					->addItem([
-						new CLabel(_('View as'), 'label-view-as'),
-						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-						(new CSelect('view_as'))
-							->setId('view-as')
-							->setFocusableElementId('label-view-as')
-							->setValue($data['view_as'])
-							->addOption(new CSelectOption(HISTORY_GRAPH, _('Graph')))
-							->addOption(new CSelectOption(HISTORY_VALUES, _('Values')))
-					])
-				)
-			)
-			->addItem(($data['filter_search_type'] == ZBX_SEARCH_TYPE_STRICT && count($data['graphids']) == 1)
-				? get_icon('favourite', [
-					'fav' => 'web.favorite.graphids',
-					'elname' => 'graphid',
-					'elid' => $data['graphids'][0]
-				])
-				: null
-			)
 			->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 		))->setAttribute('aria-label', _('Content controls'))
 	);
@@ -76,15 +52,13 @@ $filter = (new CFilter())
 	->addTimeSelector($data['timeline']['from'], $data['timeline']['to'],
 		$web_layout_mode != ZBX_LAYOUT_KIOSKMODE
 	)
-	->addFormItem((new CVar('view_as', $data['view_as']))->removeId())
 	->addFormItem((new CVar('action', 'charts.view'))->removeId());
 
 if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	$filter->addFilterTab(_('Filter'), [
 		(new CFormList())
-			->addRow((new CLabel(_('Host'), 'filter_hostids__ms')),
+			->addRow((new CLabel(_('Hosts'), 'filter_hostids__ms')),
 				(new CMultiSelect([
-					'multiple' => false,
 					'name' => 'filter_hostids[]',
 					'object_name' => 'hosts',
 					'data' => $data['ms_hosts'],
@@ -100,109 +74,32 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 					]
 				]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 			)
-			->addRow((new CLabel(_('Search type'), 'filter_search_type')),
-				(new CRadioButtonList('filter_search_type', $data['filter_search_type']))
-					->addValue(_('Strict'), ZBX_SEARCH_TYPE_STRICT)
-					->addValue(_('Pattern'), ZBX_SEARCH_TYPE_PATTERN)
+			->addRow((new CLabel(_('Name'), 'filter_name')),
+				(new CTextBox('filter_name', $data['filter_name']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+			)
+			->addRow((new CLabel(_('Show'), 'filter_show')),
+				(new CRadioButtonList('filter_show', $data['filter_show']))
+					->addValue(_('All graphs'), GRAPH_FILTER_ALL)
+					->addValue(_('Host graphs'), GRAPH_FILTER_HOST)
+					->addValue(_('Simple graphs'), GRAPH_FILTER_SIMPLE)
 					->setModern(true)
 			)
-			->addRow(
-				(new CLabel(_('Graphs'), 'filter_graphids__ms')),
-				(new CMultiSelect([
-					'multiple' => true,
-					'name' => 'filter_graphids[]',
-					'object_name' => 'graphs',
-					'data' => $data['ms_graphs'],
-					'autosuggest' => [
-						'filter_preselect_fields' => [
-							'hosts' => 'filter_hostids_'
-						]
-					],
-					'popup' => [
-						'filter_preselect_fields' => [
-							'hosts' => 'filter_hostids_'
-						],
-						'parameters' => [
-							'srctbl' => 'graphs',
-							'srcfld1' => 'graphid',
-							'dstfrm' => 'zbx_filter',
-							'dstfld1' => 'filter_graphids_',
-							'real_hosts' => true
-						]
-					]
-				]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
-				'ms_graphids',
-				($data['filter_search_type'] == ZBX_SEARCH_TYPE_STRICT) ? '' : ZBX_STYLE_DISPLAY_NONE
-			)
-			->addRow(
-				(new CLabel(_('Graphs'), 'filter_graph_patterns__ms')),
-				(new CPatternSelect([
-					'placeholder' => _('graph pattern'),
-					'name' => 'filter_graph_patterns[]',
-					'object_name' => 'graphs',
-					'data' => $data['ms_graph_patterns'],
-					'autosuggest' => [
-						'filter_preselect_fields' => [
-							'hosts' => 'filter_hostids_'
-						]
-					],
-					'popup' => [
-						'filter_preselect_fields' => [
-							'hosts' => 'filter_hostids_'
-						],
-						'parameters' => [
-							'srctbl' => 'graphs',
-							'srcfld1' => 'graphid',
-							'dstfrm' => 'zbx_filter',
-							'dstfld1' => 'filter_graph_patterns_',
-							'real_hosts' => true
-						]
-					],
-					'add_post_js' => true
-				]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
-				'ms_graph_patterns',
-				($data['filter_search_type'] == ZBX_SEARCH_TYPE_STRICT) ? ZBX_STYLE_DISPLAY_NONE : ''
-			)
-	]);
+	],
+	new CPartial('monitoring.charts.subfilter', $data['subfilters']));
 }
 
 $widget->addItem($filter);
 
-if ($data['must_specify_host']) {
+if (!$data['filter_hostids']) {
 	$widget->addItem((new CTableInfo())->setNoDataMessage(_('Specify host to see the graphs.')));
 }
-elseif ($data['graphids']) {
-	$table = (new CTable())->setAttribute('style', 'width: 100%;');
-
-	if ($data['view_as'] === HISTORY_VALUES) {
-		$this->addJsFile('flickerfreescreen.js');
-		$screen = CScreenBuilder::getScreen([
-			'resourcetype' => SCREEN_RESOURCE_HISTORY,
-			'action' => HISTORY_VALUES,
-			'itemids' => $data['itemids'],
-			'pageFile' => (new CUrl('zabbix.php'))
-				->setArgument('action', 'charts.view')
-				->setArgument('filter_graph_patterns', $data['filter_graph_patterns'])
-				->setArgument('filter_graphids', $data['filter_graphids'])
-				->setArgument('filter_hostids', $data['filter_hostids'])
-				->setArgument('view_as', $data['view_as'])
-				->getUrl(),
-			'profileIdx' => $data['timeline']['profileIdx'],
-			'profileIdx2' => $data['timeline']['profileIdx2'],
-			'from' => $data['timeline']['from'],
-			'to' => $data['timeline']['to'],
-			'page' => $data['page']
-		]);
-
-		CScreenBuilder::insertScreenStandardJs($screen->timeline);
-
-		$table->addRow($screen->get());
-	}
-	else {
-		$table->setId('charts');
-	}
-
-	$widget->addItem($table);
+elseif ($data['charts']) {
+	$table = (new CTable())
+		->setAttribute('style', 'width: 100%;')
+		->setId('charts');
+	$widget
+		->addItem($table)
+		->addItem($data['paging']);
 }
 else {
 	$widget->addItem(new CTableInfo());
@@ -210,13 +107,21 @@ else {
 
 $widget->show();
 
-$this->includeJsFile('monitoring.charts.view.js.php', [
-	'charts' => $data['charts'],
-	'timeline' => $data['timeline'],
-	'config' => [
-		'refresh_interval' => (int) CWebUser::getRefresh(),
-		'refresh_list' => $data['filter_search_type'] == ZBX_SEARCH_TYPE_PATTERN,
-		'filter_graph_patterns' => $data['filter_graph_patterns'],
-		'filter_hostids' => $data['filter_hostids']
-	]
-]);
+(new CScriptTag('
+	view.init('.json_encode([
+		'filter_form_name' => 'zbx_filter',
+		'data' => [
+			'charts' => $data['charts'],
+			'timeline' => $data['timeline'],
+			'config' => [
+				'refresh_interval' => CWebUser::getRefresh(),
+				'filter_hostids' => $data['filter_hostids'],
+				'filter_name' => $data['filter_name'],
+				'filter_show' => $data['filter_show'],
+				'subfilter_tagnames' => $data['subfilter_tagnames'],
+				'subfilter_tags' => $data['subfilter_tags'],
+				'page' => $data['page']
+			]
+		]
+	]).');
+'))->show();

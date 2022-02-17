@@ -60,8 +60,8 @@ There are no template links in this template.
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |Databases discovery |<p>Discovery of Exchange databases.</p> |ZABBIX_PASSIVE |perf_instance.discovery["MSExchange Active Manager"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
-|Web services discovery |<p>Discovery of Exchange web services.</p> |ZABBIX_PASSIVE |perf_instance_en.discovery["Web Service"] |
 |LDAP discovery |<p>Discovery of domain controller.</p> |ZABBIX_PASSIVE |perf_instance_en.discovery["MSExchange ADAccess Domain Controllers"] |
+|Web services discovery |<p>Discovery of Exchange web services.</p> |ZABBIX_PASSIVE |perf_instance_en.discovery["Web Service"] |
 
 ## Items collected
 
@@ -114,5 +114,5 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/415007-discussion-thread-for-official-zabbix-template-microsoft-exchange).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/415007-discussion-thread-for-official-zabbix-template-microsoft-exchange).
 

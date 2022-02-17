@@ -1267,12 +1267,11 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
+	DBcheck_character_set();
 	zbx_check_db();
 
 	if (SUCCEED != DBcheck_version())
 		exit(EXIT_FAILURE);
-
-	DBcheck_character_set();
 
 	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_HEARTBEAT_FORKS + CONFIG_DATASENDER_FORKS
 			+ CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS
@@ -1438,7 +1437,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		}
 	}
 out:
-	zbx_rtc_shutdown_subs(&rtc);
+	if (SUCCEED == ZBX_EXIT_STATUS())
+		zbx_rtc_shutdown_subs(&rtc);
 
 	zbx_on_exit(ZBX_EXIT_STATUS());
 
