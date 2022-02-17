@@ -3160,6 +3160,7 @@ void	zbx_tls_free(void)
  *                        or empty string if not important) or PSK            *
  *                        (in hex-string) to connect with depending on value  *
  *                        of 'tls_connect'.                                   *
+ *     server_name - [IN] optional server name indication for TLS             *
  *                                                                            *
  * Return value:                                                              *
  *     SUCCEED - successful TLS handshake with a valid certificate or PSK     *
@@ -3168,7 +3169,7 @@ void	zbx_tls_free(void)
  ******************************************************************************/
 #if defined(HAVE_GNUTLS)
 int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
-		char **error)
+		const char *server_name, char **error)
 {
 	int	ret = FAIL, res;
 #if defined(_WINDOWS)
@@ -3301,6 +3302,12 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 				goto out;
 			}
 		}
+	}
+
+	if (NULL != server_name && ZBX_TCP_SEC_UNENCRYPTED != tls_connect && GNUTLS_E_SUCCESS != gnutls_server_name_set(
+			s->tls_ctx->ctx, GNUTLS_NAME_DNS, server_name, strlen(server_name)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set %s tls host name", server_name);
 	}
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
@@ -3497,7 +3504,7 @@ static int	zbx_tls_get_error(const SSL *s, int res, const char *func, size_t *er
 }
 
 int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
-		char **error)
+		const char *server_name, char **error)
 {
 	int	ret = FAIL, res;
 	size_t	error_alloc = 0, error_offset = 0;
@@ -3594,6 +3601,12 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 		*error = zbx_strdup(*error, "invalid connection parameters");
 		THIS_SHOULD_NEVER_HAPPEN;
 		goto out1;
+	}
+
+	if (NULL != server_name && ZBX_TCP_SEC_UNENCRYPTED != tls_connect && 1 != SSL_set_tlsext_host_name(
+			s->tls_ctx->ctx, server_name))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set %s tls host name", server_name);
 	}
 
 	/* set our connected TCP socket to TLS context */
