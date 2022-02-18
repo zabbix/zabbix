@@ -1,9 +1,29 @@
 Changes for 5.4.11rc1
 
 New features:
+........S. [ZBX-19789] added SourceIP support to ldap simple checks (dgoloscapov)
 ...G...... [ZBXNEXT-7408] added native support for the net.dns and net.dns.record keys in Zabbix agent 2, fixed Zabbix agent 1 SOA response formatting (esneiders, ssimonenko)
 
 Bug fixes:
+........S. [ZBX-20530] fixed compilation error on FreeBSD (asestakovs)
+....I..... [ZBX-20570] fixed --with-libevent option on FreeBSD (asestakovs)
+.........T [ZBX-20564] changed health state sensor item to lld in vmware hypervisor template (vkhaliev)
+.......PS. [ZBX-12852] fixed redundant query of vmware hv sensors info (MVekslers)
+.........T [ZBX-20562] fixed item names in rabbitmq and elasticsearch templates (vkhaliev)
+.........T [ZBX-20443] fixed requirement of admin rights for creating issues with custom fields and added option to close tasks in Redmine webhook (abiba)
+.........T [ZBX-20537] fixed uptime oid for pfsense template (vkhaliev)
+..F....... [ZBX-20005] fixed main checkbox not being selected when all other checkboxes are selected (epulke)
+........S. [ZBX-20334] fixed macro support in aggregate functions (asestakovs)
+..F....... [ZBX-20430] fixed stretching action log screen because of long messages without whitespace (rdetlavs)
+..F....... [ZBX-19178] fixed trigger wizard user interface breaking because of long expressions (rdetlavs)
+.......P.. [ZBX-20373] fixed conf syncer appearing to be busy on proxy on network problem (dgoloscapov, vso)
+.......PS. [ZBX-20325] fixed harmless use of unitialised value in preprocessing manager when single 'check for not supported value' step is used (vso)
+..F....... [ZBX-20253] fixed incorrect usage of function "length" in zabbix server trigger creation (rdetlavs)
+........S. [ZBX-20502] fixed host prototype discovery override in case LLD JSON contains duplicate hosts (vso)
+..F....... [ZBX-19956] fixed missing proxy address after cloning proxy; fixed proxy address trimming on save (miks)
+...G...... [ZBX-20487] fixed agent handling of invalid time intervals (wiper)
+...G...... [ZBX-20472] fixed database lock crash in Zabbix Agent 2 using SQLite (akozlovs)
+........S. [ZBX-20059] fixed duplicate metric values being inserted when there is network issue between Zabbix server and Zabbix proxy (vso)
 ..F....... [ZBX-19796] fixed macros tab indicator showing incorrect count when inherited option is selected and a new macro is added (miks)
 ...G...PS. [ZBX-20228] improved error reporting when SSL_write() or SSL_read() functions fail, removed redundant code that resulted in timeout on windows (vso)
 ...G...... [ZBX-20339] fixed incorrect smart plugin device type in Zabbix agent 2 (esneiders)
