@@ -1,0 +1,1 @@
+........S. [ZBX-20059] fixed duplicate metric values being inserted when there is network issue between Zabbix server and Zabbix proxy (vso)
