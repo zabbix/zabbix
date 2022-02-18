@@ -1212,9 +1212,10 @@ class testSID extends CWebTest {
 			$input->delete();
 		}
 
-		$this->query(($this->query('button:Update')->exists()) ? 'button:Update' : 'xpath://button[text()="Add" and'.
-				' @type="submit"] | //div[@class="overlay-dialogue-footer"]//button[text()="Add"]')->waitUntilClickable()
-				->one()->click();
+		$query = ($this->query('button:Update')->exists())
+			? 'button:Update'
+			: 'xpath://button[text()="Add" and @type="submit"] | //div[@class="overlay-dialogue-footer"]//button[text()="Add"]';
+		$this->query($query)->waitUntilClickable()->one()->click();
 
 		if (CTestArrayHelper::get($data, 'incorrect_request')) {
 			$message = 'Access denied';

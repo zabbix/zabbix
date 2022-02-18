@@ -115,9 +115,7 @@ class testFormApiTokens extends CWebTest {
 		}
 
 		$this->page->login()->open($this->url);
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible()->findRow('Name',
-				self::CANCEL_SIMPLE_UPDATE)->getColumn('Name')->query('tag:a')->waitUntilClickable()->one()->click();
-
+		$this->query('link', self::CANCEL_SIMPLE_UPDATE)->waitUntilClickable()->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$this->assertEquals('API token', $dialog->getTitle());
 		$dialog->query('button:Regenerate')->one()->waitUntilClickable()->click();
@@ -167,8 +165,7 @@ class testFormApiTokens extends CWebTest {
 			$this->query('button:Create API token')->one()->waitUntilClickable()->click();
 		}
 		else {
-			$this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible()->findRow('Name',
-					$token)->getColumn('Name')->query('tag:a')->waitUntilClickable()->one()->click();
+			$this->query('link', $token)->waitUntilClickable()->one()->click();
 		}
 
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
@@ -271,8 +268,7 @@ class testFormApiTokens extends CWebTest {
 		$old_hash = CDBHelper::getHash($sql);
 
 		$this->page->login()->open($this->url);
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible()->findRow('Name',
-				self::CANCEL_SIMPLE_UPDATE)->getColumn('Name')->query('tag:a')->waitUntilClickable()->one()->click();
+		$this->query('link', self::CANCEL_SIMPLE_UPDATE)->waitUntilClickable()->one()->click();
 
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$dialog->query('button:Update')->one()->waitUntilClickable()->click();
@@ -307,18 +303,16 @@ class testFormApiTokens extends CWebTest {
 			$this->query('button:Create API token')->one()->waitUntilClickable()->click();
 		}
 		else {
-			$this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible()->findRow('Name',
-					self::CANCEL_SIMPLE_UPDATE)->getColumn('Name')->query('tag:a')->waitUntilClickable()->one()->click();
+			$this->query('link', self::CANCEL_SIMPLE_UPDATE)->waitUntilClickable()->one()->click();
 		}
 
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-		$form = $dialog->asForm();
 
 		if ($username) {
 			$data['User'] = $username;
 		}
 
-		$form->fill($data);
+		$dialog->asForm()->fill($data);
 		$dialog->query('button:Cancel')->one()->waitUntilClickable()->click();
 		$dialog->ensureNotPresent();
 
@@ -333,8 +327,7 @@ class testFormApiTokens extends CWebTest {
 		$sql = 'SELECT tokenid FROM token WHERE name = '.zbx_dbstr(self::DELETE_TOKEN);
 
 		$this->page->login()->open($this->url);
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible()->findRow('Name',
-				self::DELETE_TOKEN)->getColumn('Name')->query('tag:a')->waitUntilClickable()->one()->click();
+		$this->query('link', self::DELETE_TOKEN)->waitUntilClickable()->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$dialog->query('button:Delete')->one()->waitUntilClickable()->click();
 		$this->page->acceptAlert();
