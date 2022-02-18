@@ -563,25 +563,6 @@ class testDashboardTopHostsWidget extends CWebTest {
 				unset($values['Base color']);
 			}
 
-//			// Check Thresholds values.
-//			if (array_key_exists('Thresholds', $values)) {
-//				$threshold_amount = count($values['Thresholds']);
-//				foreach ($values['Thresholds'] as $threshold) {
-//					for ($i = 0; $i < $threshold_amount; $i++) {
-//						$column_form->query('id:thresholds_'.$i.'_threshold')->one()->fill($threshold['value']);
-//					}
-//
-//					// Check Threshold colors.
-//					if (array_key_exists('color', $threshold)) {
-//						for ($i = 0; $i < $threshold_amount; $i++) {
-//							$column_form->query('id:lbl_thresholds_'.$i.'_color')->one()->click();
-//							$this->query('xpath://div[@id="color_picker"]')->asColorPicker()->one()->fill($threshold['color']);
-//						}
-//					}
-//				}
-//
-//				unset($values['Thresholds']);
-//			}
 
 			$column_form->checkValue($values);
 			$column_form->query('xpath:(//button[text()="Cancel"])[2]')->one()->click();
