@@ -48,6 +48,7 @@
 			var url = new Curl('zabbix.php?action=proxy.edit');
 			url.setArgument('host', $('#host').val());
 			url.setArgument('status', $('input[name=status]:checked').val());
+			url.setArgument('proxy_address', $('#proxy_address').val());
 			url.setArgument('description', $('#description').val());
 			url.setArgument('ip', $('#ip').val());
 			url.setArgument('dns', $('#dns').val());
@@ -81,7 +82,7 @@
 		$('#proxyForm').submit(function() {
 			$(this).trimValues([
 				'#host', '#ip', '#dns', '#port', '#description', '#tls_psk_identity', '#tls_psk', '#tls_issuer',
-				'#tls_subject'
+				'#tls_subject', '#proxy_address'
 			]);
 			$('#tls_accept').val(getTlsAccept());
 		});
