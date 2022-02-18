@@ -48,6 +48,7 @@
 			var url = new Curl('zabbix.php?action=proxy.edit');
 			url.setArgument('host', $('#host').val());
 			url.setArgument('status', $('input[name=status]:checked').val());
+			url.setArgument('proxy_address', $('#proxy_address').val());
 			url.setArgument('description', $('#description').val());
 			url.setArgument('ip', $('#ip').val());
 			url.setArgument('dns', $('#dns').val());
@@ -66,6 +67,7 @@
 
 		$('#change_psk').click(function() {
 			let input = document.createElement('input');
+
 			input.setAttribute('type', 'hidden');
 			input.setAttribute('name', 'action');
 			input.setAttribute('value', 'proxy.edit');
@@ -79,12 +81,26 @@
 			$('#tls_in_none').prop('checked', true);
 		}
 
+		/*
+		 * Calling 'click' would reverse the property that was just set, and calling a manual 'click' even is just a not
+		 * good idea for checkboxes. For some reason jQuery .trigger('change') doesn't work on checkboxes. The event
+		 * listener in class.tab-indicators.js is not registering a change to it, so this is a workaround. So after the
+		 * property has changed by script, the tab indicator should update.
+		 */
 		if (($('#tls_accept').val() & <?= HOST_ENCRYPTION_PSK ?>) == <?= HOST_ENCRYPTION_PSK ?>) {
 			$('#tls_in_psk').prop('checked', true);
+
+			const event = new Event('change');
+
+			document.querySelector('[name=tls_in_psk]').dispatchEvent(event);
 		}
 
 		if (($('#tls_accept').val() & <?= HOST_ENCRYPTION_CERTIFICATE ?>) == <?= HOST_ENCRYPTION_CERTIFICATE ?>) {
 			$('#tls_in_cert').prop('checked', true);
+
+			const event = new Event('change');
+
+			document.querySelector('[name=tls_in_cert]').dispatchEvent(event);
 		}
 
 		$('input[name=tls_connect]').trigger('change');
@@ -93,7 +109,7 @@
 		$('#proxy-form').submit(function() {
 			$(this).trimValues([
 				'#host', '#ip', '#dns', '#port', '#description', '#tls_psk_identity', '#tls_psk', '#tls_issuer',
-				'#tls_subject'
+				'#tls_subject', '#proxy_address'
 			]);
 			$('#tls_accept').val(getTlsAccept());
 		});

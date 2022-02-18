@@ -20,6 +20,8 @@
 #ifndef ZABBIX_ALERT_SYNCER_H
 #define ZABBIX_ALERT_SYNCER_H
 
+#include "threads.h"
+
 ZBX_THREAD_ENTRY(alert_syncer_thread, args);
 
 #endif

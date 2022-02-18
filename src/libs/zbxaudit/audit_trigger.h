@@ -21,6 +21,7 @@
 #define ZABBIX_AUDIT_TRIGGER_H
 
 #include "common.h"
+#include "zbxalgo.h"
 
 void	zbx_audit_trigger_create_entry(int audit_action, zbx_uint64_t triggerid, const char *name, int flags);
 
@@ -48,6 +49,7 @@ PREPARE_AUDIT_TRIGGER_UPDATE_H(priority, int)
 PREPARE_AUDIT_TRIGGER_UPDATE_H(comments, const char*)
 PREPARE_AUDIT_TRIGGER_UPDATE_H(url, const char*)
 PREPARE_AUDIT_TRIGGER_UPDATE_H(type, int)
+PREPARE_AUDIT_TRIGGER_UPDATE_H(status, int)
 PREPARE_AUDIT_TRIGGER_UPDATE_H(templateid, zbx_uint64_t)
 PREPARE_AUDIT_TRIGGER_UPDATE_H(description, const char*)
 PREPARE_AUDIT_TRIGGER_UPDATE_H(expression, const char*)

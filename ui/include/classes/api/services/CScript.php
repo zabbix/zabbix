@@ -559,7 +559,7 @@ class CScript extends CApiService {
 			if ($script['scope'] != $db_script['scope'] && $script['scope'] == ZBX_SCRIPT_SCOPE_ACTION) {
 				$script['menu_path'] = '';
 				$script['usrgrpid'] = 0;
-				$script['host_access'] = DB::getDefault('scripts', 'host_access');;
+				$script['host_access'] = DB::getDefault('scripts', 'host_access');
 				$script['confirmation'] = '';
 			}
 

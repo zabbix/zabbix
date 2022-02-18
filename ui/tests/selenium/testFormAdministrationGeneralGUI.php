@@ -28,7 +28,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 	public $config_link = 'zabbix.php?action=gui.edit';
 	public $form_selector = 'xpath://form[contains(@action, "gui.update")]';
 
-	public $default = [
+	public $default_values = [
 		'Default language' => 'English (en_US)',
 		'Default time zone' => 'System',
 		'Default theme' => 'Blue',
@@ -43,7 +43,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 		'Max period for time selector' => '2y'
 	];
 
-	public $db_default = [
+	public $db_default_values = [
 		'default_lang' => 'en_US',
 		'default_timezone' => 'system',
 		'default_theme' => 'blue-theme',
@@ -58,7 +58,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 		'max_period' => '2y'
 	];
 
-	public $custom = [
+	public $custom_values = [
 		'Default language' => 'English (en_US)',
 		'Default theme' => 'Dark',
 		'Limit for search and filter results' => '50',
@@ -970,7 +970,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 		$this->page->login()->open('zabbix.php?action=gui.edit');
 		$form = $this->query($this->form_selector)->waitUntilReady()->asForm()->one();
 		// Reset form in case of previous test case.
-		$this->resetConfiguration($form, $this->default, 'Reset defaults');
+		$this->resetConfiguration($form, $this->default_values, 'Reset defaults');
 		// Fill nesessary settings.
 		$form->fill($data['field']);
 		$form->submit();

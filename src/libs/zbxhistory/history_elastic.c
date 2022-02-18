@@ -244,7 +244,7 @@ static void	elastic_close(zbx_history_iface_t *hist)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check a error from Elastic json response                          *
+ * Purpose: check an error from Elastic json response                         *
  *                                                                            *
  * Parameters: page - [IN]  the buffer with json response                     *
  *             err  - [OUT] the parse error message. If the error value is    *
