@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-12-13T13:54:15Z</date>
+   <date>2022-02-16T10:23:07Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -870,6 +870,9 @@ Template tooling version used: 0.39</description>
             <application>
                <name>VMware</name>
             </application>
+            <application>
+               <name>Zabbix raw items</name>
+            </application>
          </applications>
          <items>
             <item>
@@ -1183,55 +1186,20 @@ Template tooling version used: 0.39</description>
                </applications>
             </item>
             <item>
-               <name>VMware: Health state rollup</name>
+               <name>VMware: Get sensors</name>
                <type>SIMPLE</type>
-               <key>vmware.hv.sensor.health.state[{$VMWARE.URL},{HOST.HOST}]</key>
-               <history>7d</history>
+               <key>vmware.hv.sensors.get[{$VMWARE.URL},{HOST.HOST}]</key>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
                <username>{$VMWARE.USERNAME}</username>
                <password>{$VMWARE.PASSWORD}</password>
-               <description>The host health state rollup sensor value: gray - unknown, green - ok, red - it has a problem, yellow - it might have a problem.</description>
+               <description>Master item for sensors data.</description>
                <applications>
                   <application>
-                     <name>VMware</name>
+                     <name>Zabbix raw items</name>
                   </application>
                </applications>
-               <valuemap>
-                  <name>VMware status</name>
-               </valuemap>
-               <triggers>
-                  <trigger>
-                     <expression>{last()}=3</expression>
-                     <name>VMware: The {HOST.HOST} health is Red</name>
-                     <priority>HIGH</priority>
-                     <description>One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.</description>
-                     <dependencies>
-                        <dependency>
-                           <name>VMware: The {HOST.HOST} health is Red</name>
-                           <expression>{Template VM VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{HOST.HOST}].last()}=3</expression>
-                        </dependency>
-                     </dependencies>
-                  </trigger>
-                  <trigger>
-                     <expression>{last()}=2</expression>
-                     <name>VMware: The {HOST.HOST} health is Yellow</name>
-                     <priority>AVERAGE</priority>
-                     <description>One or more components in the appliance might become overloaded soon.</description>
-                     <dependencies>
-                        <dependency>
-                           <name>VMware: The {HOST.HOST} health is Red</name>
-                           <expression>{Template VM VMware Hypervisor:vmware.hv.sensor.health.state[{$VMWARE.URL},{HOST.HOST}].last()}=3</expression>
-                        </dependency>
-                        <dependency>
-                           <name>VMware: The {HOST.HOST} health is Red</name>
-                           <expression>{Template VM VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{HOST.HOST}].last()}=3</expression>
-                        </dependency>
-                        <dependency>
-                           <name>VMware: The {HOST.HOST} health is Yellow</name>
-                           <expression>{Template VM VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{HOST.HOST}].last()}=2</expression>
-                        </dependency>
-                     </dependencies>
-                  </trigger>
-               </triggers>
             </item>
             <item>
                <name>VMware: Overall status</name>
@@ -1398,6 +1366,78 @@ Template tooling version used: 0.39</description>
                      </applications>
                   </item_prototype>
                </item_prototypes>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Healthcheck discovery</name>
+               <type>DEPENDENT</type>
+               <key>vmware.hv.healthcheck.discovery</key>
+               <delay>0</delay>
+               <description>VMware Rollup Health State sensor discovery</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>VMware: Health state rollup</name>
+                     <type>DEPENDENT</type>
+                     <key>vmware.hv.sensor.health.state[{#SINGLETON}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <description>The host health state rollup sensor value: gray - unknown, green - ok, red - it has a problem, yellow - it might have a problem.</description>
+                     <applications>
+                        <application>
+                           <name>VMware</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$..HostNumericSensorInfo[?(@.name=="VMware Rollup Health State")].healthState.label.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>vmware.hv.sensors.get[{$VMWARE.URL},{HOST.HOST}]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{str("Red")}=1</expression>
+                           <name>VMware: The {HOST.HOST} health is Red</name>
+                           <priority>HIGH</priority>
+                           <description>One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{str("Yellow")}=1</expression>
+                           <name>VMware: The {HOST.HOST} health is Yellow</name>
+                           <priority>AVERAGE</priority>
+                           <description>One or more components in the appliance might become overloaded soon.</description>
+                           <dependencies>
+                              <dependency>
+                                 <name>VMware: The {HOST.HOST} health is Red</name>
+                                 <expression>{Template VM VMware Hypervisor:vmware.hv.sensor.health.state[{#SINGLETON}].str("Red")}=1</expression>
+                              </dependency>
+                           </dependencies>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <master_item>
+                  <key>vmware.hv.sensors.get[{$VMWARE.URL},{HOST.HOST}]</key>
+               </master_item>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$..HostNumericSensorInfo[?(@.name=="VMware Rollup Health State")]</params>
+                     <error_handler>CUSTOM_VALUE</error_handler>
+                     <error_handler_params>[]</error_handler_params>
+                  </step>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>return JSON.stringify(value != "[]" ? [{'{#SINGLETON}': ''}] : []);</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
             </discovery_rule>
          </discovery_rules>
       </template>
