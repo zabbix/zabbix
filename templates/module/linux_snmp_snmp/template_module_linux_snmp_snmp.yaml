@@ -964,7 +964,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          params: 'last(//system.swap.free[memAvailSwap.0])/last(//system.swap.total[memTotalSwap.0])*100'
+          params: '(last(//system.swap.total[memTotalSwap.0]) <> 0) * last(//system.swap.free[memAvailSwap.0]) / (last(//system.swap.total[memTotalSwap.0]) + (last(//system.swap.total[memTotalSwap.0]) = 0) ) * 100'
           description: 'The free space of swap volume/file in percent.'
           tags:
             -
