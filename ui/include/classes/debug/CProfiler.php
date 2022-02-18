@@ -258,7 +258,7 @@ class CProfiler {
 		$this->sqlQueryLog[] = [
 			$time,
 			$sql,
-			array_slice(debug_backtrace(), 1)
+			array_slice(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), 1)
 		];
 	}
 
@@ -271,7 +271,7 @@ class CProfiler {
 	 * @param array  $result
 	 */
 	public function profileApiCall($class, $method, array $params, $result) {
-		$backtrace = debug_backtrace();
+		$backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 
 		// Use the file name and line number from the first call to the API wrapper object.
 		// Due to a bug earlier versions of PHP 5.3 did not provide the file name and line number
@@ -317,7 +317,7 @@ class CProfiler {
 			$method,
 			$endpoint,
 			$query,
-			array_slice(debug_backtrace(), 1)
+			array_slice(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), 1)
 		];
 	}
 
@@ -342,7 +342,7 @@ class CProfiler {
 	 */
 	public function formatCallStack(array $callStack = null) {
 		if (!$callStack) {
-			$callStack = debug_backtrace(false);
+			$callStack = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 
 			// never show the call to this method
 			array_shift($callStack);
