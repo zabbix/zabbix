@@ -714,20 +714,25 @@ static void	preprocessor_enqueue(zbx_preprocessing_manager_t *manager, zbx_prepr
 	if (REQUEST_STATE_QUEUED == state && 0 <= notsupp_shift)
 	{
 		request->value_type = item->value_type;
-		request->steps = (zbx_preproc_op_t *)zbx_malloc(NULL, sizeof(zbx_preproc_op_t) *
-				(item->preproc_ops_num - notsupp_shift));
-		request->steps_num = item->preproc_ops_num - notsupp_shift;
-
-		for (i = 0; i < item->preproc_ops_num - notsupp_shift; i++)
+		if (0 < item->preproc_ops_num - notsupp_shift)
 		{
-			request->steps[i].type = item->preproc_ops[i + notsupp_shift].type;
-			request->steps[i].params = zbx_strdup(NULL, item->preproc_ops[i + notsupp_shift].params);
-			request->steps[i].error_handler = item->preproc_ops[i + notsupp_shift].error_handler;
-			request->steps[i].error_handler_params = zbx_strdup(NULL,
-					item->preproc_ops[i + notsupp_shift].error_handler_params);
-		}
+			request->steps = (zbx_preproc_op_t *)zbx_malloc(NULL, sizeof(zbx_preproc_op_t) *
+					(item->preproc_ops_num - notsupp_shift));
+			request->steps_num = item->preproc_ops_num - notsupp_shift;
 
-		manager->preproc_num++;
+			for (i = 0; i < item->preproc_ops_num - notsupp_shift; i++)
+			{
+				request->steps[i].type = item->preproc_ops[i + notsupp_shift].type;
+				request->steps[i].params = zbx_strdup(NULL, item->preproc_ops[i + notsupp_shift].params);
+				request->steps[i].error_handler = item->preproc_ops[i + notsupp_shift].error_handler;
+				request->steps[i].error_handler_params = zbx_strdup(NULL,
+						item->preproc_ops[i + notsupp_shift].error_handler_params);
+			}
+
+			manager->preproc_num++;
+		}
+		else
+			request->state = REQUEST_STATE_DONE;
 	}
 
 	/* priority items are enqueued at the beginning of the line */

@@ -1,9 +1,8 @@
-//go:build !windows
 // +build !windows
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,11 +19,26 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package zabbixsync
+package dns
 
-func getMetrics() []string {
-	return []string{
-		"net.dns", "Checks if DNS service is up.",
-		"net.dns.record", "Performs DNS query.",
+import (
+	"fmt"
+	"os"
+	"strings"
+)
+
+func (o *options) setDefaultIP() (err error) {
+	data, err := os.ReadFile("/etc/resolv.conf")
+	if err != nil {
+		return
 	}
+
+	s := strings.Split(string(data), "\n")
+	for _, tmp := range s {
+		if strings.HasPrefix(tmp, "nameserver") {
+			return o.setIP(strings.TrimSpace(strings.TrimPrefix(tmp, "nameserver")))
+		}
+	}
+
+	return fmt.Errorf("cannot find default dns nameserver")
 }

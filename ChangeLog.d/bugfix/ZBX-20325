@@ -1,0 +1,1 @@
+.......PS. [ZBX-20325] fixed harmless use of unitialised value in preprocessing manager when single 'check for not supported value' step is used (vso)
