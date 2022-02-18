@@ -1241,7 +1241,7 @@ class testWebScenario extends CAPITest {
 				'method' => 'httptest.create',
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'httptest' => [
-					'name' => 'API create web as zabbix admin with read permissions',
+					'name' => 'API create web as zabbix admin with read permissionss',
 					'hostid' => '50012',
 					'steps' => [
 						[
@@ -1257,7 +1257,7 @@ class testWebScenario extends CAPITest {
 				'method' => 'httptest.update',
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'httptest' => [
-					'name' => 'API update web as zabbix admin with read permissions',
+					'name' => 'API update web as zabbix admin with read permissionss',
 					'httptestid' => '15008'
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
@@ -1273,7 +1273,7 @@ class testWebScenario extends CAPITest {
 				'method' => 'httptest.create',
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'httptest' => [
-					'name' => 'API create web as zabbix admin with deny permissions',
+					'name' => 'API create web as zabbix admin with deny permissionss',
 					'hostid' => '50014',
 					'steps' => [
 						[
@@ -1289,7 +1289,7 @@ class testWebScenario extends CAPITest {
 				'method' => 'httptest.update',
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'httptest' => [
-					'name' => 'API update web as zabbix admin with read permissions',
+					'name' => 'API update web as zabbix admin with read permissionss',
 					'httptestid' => '15009'
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
@@ -1305,7 +1305,7 @@ class testWebScenario extends CAPITest {
 				'method' => 'httptest.create',
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'httptest' => [
-					'name' => 'API create web as zabbix admin with none permissions',
+					'name' => 'API create web as zabbix admin with none permissionss',
 					'hostid' => '50010',
 					'steps' => [
 						[
@@ -1321,7 +1321,7 @@ class testWebScenario extends CAPITest {
 				'method' => 'httptest.update',
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'httptest' => [
-					'name' => 'API update web as zabbix admin with none permissions',
+					'name' => 'API update web as zabbix admin with none permissionss',
 					'httptestid' => '15006'
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
@@ -1369,7 +1369,7 @@ class testWebScenario extends CAPITest {
 				'method' => 'httptest.create',
 				'login' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'httptest' => [
-					'name' => 'API create web as zabbix user with read permissions',
+					'name' => 'API create web as zabbix user with read permissionss',
 					'hostid' => '50012',
 					'steps' => [
 						[
@@ -1385,7 +1385,7 @@ class testWebScenario extends CAPITest {
 				'method' => 'httptest.update',
 				'login' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'httptest' => [
-					'name' => 'API update web as zabbix user with read permissions',
+					'name' => 'API update web as zabbix user with read permissionss',
 					'httptestid' => '15008'
 				],
 				'expected_error' => 'No permissions to call "httptest.update".'
@@ -1401,7 +1401,7 @@ class testWebScenario extends CAPITest {
 				'method' => 'httptest.create',
 				'login' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'httptest' => [
-					'name' => 'API create web as zabbix admin with deny permissions',
+					'name' => 'API create web as zabbix admin with deny permissionss',
 					'hostid' => '50014',
 					'steps' => [
 						[
@@ -1417,7 +1417,7 @@ class testWebScenario extends CAPITest {
 				'method' => 'httptest.update',
 				'login' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'httptest' => [
-					'name' => 'API update web as zabbix user with read permissions',
+					'name' => 'API update web as zabbix user with read permissionss',
 					'httptestid' => '15009'
 				],
 				'expected_error' => 'No permissions to call "httptest.update".'
@@ -1433,7 +1433,7 @@ class testWebScenario extends CAPITest {
 				'method' => 'httptest.create',
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'httptest' => [
-					'name' => 'API create web as zabbix user with none permissions',
+					'name' => 'API create web as zabbix user with none permissionss',
 					'hostid' => '50010',
 					'steps' => [
 						[
@@ -1449,7 +1449,7 @@ class testWebScenario extends CAPITest {
 				'method' => 'httptest.update',
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'httptest' => [
-					'name' => 'API update web as zabbix user with none permissions',
+					'name' => 'API update web as zabbix user with none permissionss',
 					'httptestid' => '15006'
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'

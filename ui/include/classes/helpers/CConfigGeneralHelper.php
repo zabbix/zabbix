@@ -35,7 +35,7 @@ abstract class CConfigGeneralHelper {
 	abstract protected static function loadParams(?string $param = null, bool $is_global = false): void;
 
 	/**
-	 * Get value by parameter name of API object (load parameters if needed).
+	 * Get value by parameter name of API object (load parameters if need).
 	 *
 	 * @static
 	 *
@@ -50,7 +50,7 @@ abstract class CConfigGeneralHelper {
 	}
 
 	/**
-	 * Get values of all parameters of API object (load parameters if needed).
+	 * Get values of all parameters of API object (load parameters if need).
 	 *
 	 * @static
 	 *
@@ -63,7 +63,7 @@ abstract class CConfigGeneralHelper {
 	}
 
 	/**
-	 * Set value by parameter name of API object into $params (load parameters if needed).
+	 * Set value by parameter name of API object into $params (load parameters if need).
 	 *
 	 * @static
 	 *

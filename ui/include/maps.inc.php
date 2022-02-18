@@ -715,7 +715,7 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 			$filtered_problems = getProblemsMatchingTags($filtered_problems, $selement['tags'], $selement['evaltype']);
 		}
 
-		// Apply filtered problems to elements they belong to.
+		// Apply filtgered problems to elements they belong to.
 		foreach ($filtered_problems as $problem) {
 			$selement['triggers'][$problem['objectid']]['problems'][] = $problem;
 		}

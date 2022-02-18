@@ -458,7 +458,7 @@ class CMap extends CMapElement {
 	}
 
 	/**
-	 * Removes all inaccessible maps by inaccessible elements.
+	 * Removes all inaccessible maps by inacessible elements.
 	 *
 	 * @param array $sysmaps_rw[<sysmapids>]              The list of writable maps.
 	 * @param array $elements                             The map elements.

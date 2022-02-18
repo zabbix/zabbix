@@ -658,7 +658,7 @@ insert_javascript_for_visibilitybox();
 	}
 
 	/**
-	 * Opens popup for an override.
+	 * Opens popup for a override.
 	 *
 	 * @param {number} no
 	 */
@@ -667,7 +667,7 @@ insert_javascript_for_visibilitybox();
 	};
 
 	/**
-	 * This object represents an override of web scenario.
+	 * This object represents a override of web scenario.
 	 *
 	 * @param {object} data  Optional override initial data.
 	 */

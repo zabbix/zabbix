@@ -41,7 +41,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 					'error_message' => 'Invalid parameter "/1/script": cannot be empty.'
 				]
 			],
-			// Attempt to add a webhook media type with a name that is already taken.
+			// Attepmt to add a webhook media type with a name that is already taken.
 			[
 				[
 					'fields' => [
@@ -192,13 +192,13 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 					'error_message' => 'Invalid parameter "/1/maxattempts": value must be one of 1-100.'
 				]
 			],
-			// Attempt to add a webhook with too many Attempts.
+			// Attempt to add a webhook with too much Attempts.
 			[
 				[
 					'fields' => [
-						'Name' => 'Webhook with too many attempts',
+						'Name' => 'Webhook with too much attempts',
 						'Type' => 'Webhook',
-						'Script' => 'Too many Attempts'
+						'Script' => 'Too much Attempts'
 					],
 					'options' => [
 						'Attempts' => '101'
@@ -380,7 +380,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 					'update' => true,
 					'fields' => [
 						'Type' => 'Webhook',
-						'Script' => 'Too many Attempts'
+						'Script' => 'Too much Attempts'
 					],
 					'options' => [
 						'Attempts' => '101'
@@ -825,7 +825,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 
 	/**
 	 * Function used to populate fields located in the Operations tab.
-	 * Field concurrent sessions has two input elements - one of them is displayed only if concurrent sessions = Custom.
+	 * Field concurrent sessions has two input elelents - one of them is displayed only if concurrent sessions = Custom.
 	 * Therefore, fill() method cannot be used for this field, and it needs to be populated separately.
 	 */
 	private function fillOperationsTab($data, $form) {

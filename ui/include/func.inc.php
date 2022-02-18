@@ -2152,7 +2152,7 @@ function imageOut(&$image, $format = null) {
  *
  * @return bool
  */
-function hasErrorMessages() {
+function hasErrorMesssages() {
 	return CMessageHelper::getType() === CMessageHelper::MESSAGE_TYPE_ERROR;
 }
 

@@ -654,7 +654,7 @@ class CPieGraphDraw extends CGraphDraw {
 		$this->calculateTopPadding();
 
 		$this->selectData();
-		if (hasErrorMessages()) {
+		if (hasErrorMesssages()) {
 			show_messages();
 		}
 

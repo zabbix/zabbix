@@ -1602,7 +1602,7 @@ class CControllerPopupTriggerExpr extends CController {
 			$this->setResponse(new CControllerResponseData(
 				$data + [
 					'title' => _('Condition'),
-					'errors' => hasErrorMessages() ? getMessages() : null,
+					'errors' => hasErrorMesssages() ? getMessages() : null,
 					'user' => [
 						'debug_mode' => $this->getDebugMode()
 					]

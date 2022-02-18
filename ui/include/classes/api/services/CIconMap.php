@@ -24,7 +24,7 @@
  *
  * Icon maps work only with map elements that represent hosts, and used for automatic changing
  * icons based on host inventory data.
- * Icon maps has read access for everyone and write access only for superadmins
+ * Icon maps has read access for everyone and write access only for superamins
  */
 class CIconMap extends CApiService {
 

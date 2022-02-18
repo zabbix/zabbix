@@ -112,7 +112,7 @@ class CControllerScriptEdit extends CController {
 			'actions' => []
 		];
 
-		// Get values from the database.
+		// Get values from the dabatase.
 		if ($this->hasInput('scriptid')) {
 			$scripts = API::Script()->get([
 				'output' => ['scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'description',

@@ -216,7 +216,7 @@ class CControllerPopupMaintenancePeriod extends CController {
 
 		$this->setResponse(new CControllerResponseData([
 			'title' => _('Maintenance period'),
-			'errors' => hasErrorMessages() ? getMessages() : null,
+			'errors' => hasErrorMesssages() ? getMessages() : null,
 			'params' => $params,
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		] + $data));

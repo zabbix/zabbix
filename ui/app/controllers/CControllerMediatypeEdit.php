@@ -155,7 +155,7 @@ class CControllerMediatypeEdit extends CController {
 		];
 		$message_templates = [];
 
-		// get values from the database
+		// get values from the dabatase
 		if ($this->hasInput('mediatypeid')) {
 			$data['mediatypeid'] = $this->mediatype['mediatypeid'];
 			$data['type'] = $this->mediatype['type'];

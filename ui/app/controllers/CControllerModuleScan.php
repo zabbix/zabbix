@@ -127,7 +127,7 @@ class CControllerModuleScan extends CController {
 			? _('Modules updated')
 			: _('No new modules discovered');
 
-		if (hasErrorMessages()) {
+		if (hasErrorMesssages()) {
 			CMessageHelper::setErrorTitle($message);
 		}
 		else {
