@@ -20,6 +20,8 @@
 #ifndef ZABBIX_SIGHANDLER_H
 #define ZABBIX_SIGHANDLER_H
 
+#include "sysinc.h"
+
 void	zbx_set_common_signal_handlers(void);
 void	zbx_set_child_signal_handler(void);
 void	zbx_unset_child_signal_handler(void);

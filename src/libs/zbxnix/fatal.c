@@ -17,6 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "fatal.h"
+
 #include "config.h"
 
 #ifdef HAVE_SIGNAL_H
@@ -39,8 +41,6 @@
 
 #include "common.h"
 #include "log.h"
-
-#include "fatal.h"
 
 const char	*get_signal_name(int sig)
 {

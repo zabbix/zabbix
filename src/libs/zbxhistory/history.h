@@ -21,6 +21,8 @@
 #define ZABBIX_HISTORY_H
 
 #include "zbxjson.h"
+#include "zbxalgo.h"
+#include "zbxhistory.h"
 
 #define ZBX_HISTORY_IFACE_SQL		0
 #define ZBX_HISTORY_IFACE_ELASTIC	1

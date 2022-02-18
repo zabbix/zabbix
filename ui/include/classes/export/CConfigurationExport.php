@@ -836,11 +836,11 @@ class CConfigurationExport {
 		}
 
 		// gather host prototypes
-		$hostPrototypes = API::HostPrototype()->get([
+		$host_prototypes = API::HostPrototype()->get([
 			'discoveryids' => zbx_objectValues($items, 'itemid'),
 			'output' => API_OUTPUT_EXTEND,
-			'selectGroupLinks' => API_OUTPUT_EXTEND,
-			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
+			'selectGroupLinks' => ['groupid'],
+			'selectGroupPrototypes' => ['name'],
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 			'selectTemplates' => API_OUTPUT_EXTEND,
 			'selectMacros' => API_OUTPUT_EXTEND,
@@ -850,27 +850,25 @@ class CConfigurationExport {
 			'preservekeys' => true
 		]);
 
-		// replace group prototype group IDs with references
-		$groupIds = [];
+		// Replace group prototype group IDs with references.
+		$groupids = [];
 
-		foreach ($hostPrototypes as $hostPrototype) {
-			foreach ($hostPrototype['groupLinks'] as $groupLink) {
-				$groupIds[$groupLink['groupid']] = true;
-			}
+		foreach ($host_prototypes as $host_prototype) {
+			$groupids += array_flip(array_column($host_prototype['groupLinks'], 'groupid'));
 		}
 
-		$groups = $this->getGroupsReferences(array_keys($groupIds));
+		$groups = $this->getGroupsReferences(array_keys($groupids));
 
-		// export the groups used in group prototypes
+		// Export the groups used in group prototypes.
 		$this->data['groups'] += $groups;
 
-		foreach ($hostPrototypes as $hostPrototype) {
-			foreach ($hostPrototype['groupLinks'] as &$groupLink) {
-				$groupLink['groupid'] = $groups[$groupLink['groupid']];
+		foreach ($host_prototypes as $host_prototype) {
+			foreach ($host_prototype['groupLinks'] as &$group_link) {
+				$group_link = $groups[$group_link['groupid']];
 			}
-			unset($groupLink);
+			unset($group_link);
 
-			$items[$hostPrototype['discoveryRule']['itemid']]['hostPrototypes'][] = $hostPrototype;
+			$items[$host_prototype['discoveryRule']['itemid']]['hostPrototypes'][] = $host_prototype;
 		}
 
 		return $items;

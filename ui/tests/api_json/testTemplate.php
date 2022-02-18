@@ -108,7 +108,7 @@ class testTemplate extends CAPITest {
 						'groups' => ['groupid' => 1]
 					]
 				],
-				'expected_error' => 'Template with the same name "test-template-09" already exists.'
+				'expected_error' => 'Template with host name "test-template-09" already exists.'
 			],
 			[
 				'request' => [
@@ -118,7 +118,7 @@ class testTemplate extends CAPITest {
 						'groups' => ['groupid' => 1]
 					]
 				],
-				'expected_error' => 'Template with the same visible name "test-template-09" already exists.'
+				'expected_error' => 'Template with visible name "test-template-09" already exists.'
 			],
 			// The next two test cases depends on the existing host "Zabbix server".
 			[
@@ -128,7 +128,7 @@ class testTemplate extends CAPITest {
 						'groups' => ['groupid' => 1]
 					]
 				],
-				'expected_error' => 'Host with the same name "Zabbix server" already exists.'
+				'expected_error' => 'Host with host name "Zabbix server" already exists.'
 			],
 			[
 				'request' => [
@@ -138,7 +138,7 @@ class testTemplate extends CAPITest {
 						'groups' => ['groupid' => 1]
 					]
 				],
-				'expected_error' => 'Host with the same visible name "Zabbix server" already exists.'
+				'expected_error' => 'Host with visible name "Zabbix server" already exists.'
 			],
 			[
 				'request' => [
@@ -272,7 +272,7 @@ class testTemplate extends CAPITest {
 					['templateid' => $templateids[2]]
 				]
 			]
-		], 'Cannot link template "test-template-double-link-03" to template "test-template-double-link-04" due to its parent template "test-template-double-link-01" will be linked twice.');
+		], 'Cannot link template "test-template-double-link-01" to template "test-template-double-link-04" because its parent template "test-template-double-link-01" will be linked twice.');
 	}
 
 	public function testTemplate_CreateTriggerDependency() {

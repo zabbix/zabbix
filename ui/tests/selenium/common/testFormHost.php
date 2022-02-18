@@ -130,7 +130,7 @@ class testFormHost extends CWebTest {
 				'details' => [
 					'version' => 1,
 					'bulk' => 0,
-					'community' => 'zabbix'
+					'community' => '🙃zabbix🙃'
 				]
 			],
 			[
@@ -169,7 +169,7 @@ class testFormHost extends CWebTest {
 			],
 			[
 				'host' => 'testFormHost with items',
-				'description' => 'Created host via API to test clone functionality in host form and interfaces',
+				'description' => 'Created host via API to test clone functionality in host form and interfaces 😀',
 				'interfaces' => $interfaces,
 				'groups' => $groups,
 				'proxy_hostid' => 20001,
@@ -236,7 +236,7 @@ class testFormHost extends CWebTest {
 
 		foreach ($interfaces_form->getRows() as $i => $row) {
 			$enabled = ($i !== 0 && $i !== 2);
-			// "Remove" button is disabled (in the 7th column) for Agent (in 0th row) and JMX (in 2th row) interfaces.
+			// "Remove" button is disabled (in the 7th column) for Agent (in 0th row) and JMX (in 2nd row) interfaces.
 			$this->assertTrue($row->getColumn(7)->query('tag:button')->one()->isEnabled($enabled));
 		}
 		// Interface fields maxlength attribute.
@@ -246,7 +246,7 @@ class testFormHost extends CWebTest {
 			);
 		}
 
-		// Click the "expand" icon (in the 0th column) for the SNMP interface (1th row).
+		// Click the "expand" icon (in the 0th column) for the SNMP interface (1st row).
 		$interfaces_form->getRow(1)->getColumn(0)->query('tag:button')->one()->click();
 		$snmp_form = $interfaces_form->getRow(1)->query('xpath:.//div[@class="form-grid"]')->one()->parents()
 				->asForm(['normalized' => true])->one();
@@ -349,6 +349,18 @@ class testFormHost extends CWebTest {
 					],
 					'error_title' => 'Cannot add host',
 					'error' => 'Incorrect characters used for host name "@#$%^&*()_+".'
+				]
+			],
+			// UTF8MB4 check.
+			[
+				[
+					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Groups' => 'Zabbix servers',
+						'Host name' => '😀'
+					],
+					'error_title' => 'Cannot add host',
+					'error' => 'Incorrect characters used for host name "😀".'
 				]
 			],
 			// Interface fields validation.
@@ -563,6 +575,18 @@ class testFormHost extends CWebTest {
 					'host_fields' => [
 						'Host name' => 'Host without interfaces',
 						'Groups' => 'Zabbix servers'
+					]
+				]
+			],
+			// UTF8MB4 check.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'host_fields' => [
+						'Host name' => 'Host with utf8mb4 visible name',
+						'Groups' => 'Zabbix servers',
+						'Visible name' => '😀',
+						'Description' => '😀🙃😀'
 					]
 				]
 			],
@@ -789,6 +813,7 @@ class testFormHost extends CWebTest {
 
 				// Check host fields.
 				$host = CTestArrayHelper::get($data, 'host_fields.Visible name', $data['host_fields']['Host name']);
+
 				$form = $this->filterAndSelectHost($host);
 				$form->checkValue($data['host_fields']);
 
@@ -929,6 +954,17 @@ class testFormHost extends CWebTest {
 					],
 					'error_title' => 'Cannot update host',
 					'error' => 'Incorrect characters used for host name "@#$%^&*()_+".'
+				]
+			],
+			// UTF8MB4 check.
+			[
+				[
+					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Host name' => '😀'
+					],
+					'error_title' => 'Cannot update host',
+					'error' => 'Incorrect characters used for host name "😀".'
 				]
 			],
 			// Interface fields validation.
@@ -1267,6 +1303,36 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
+			// UTF8MB4 check.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'host_fields' => [
+						'Host name' => 'Update host with utf8 visible name',
+						'Groups' => 'Linux servers',
+						'Visible name' => '😀😀',
+						'Description' => '😀😀😀😀😀😀😀'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'Agent'
+						],
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'Agent'
+						],
+						[
+							'action' => USER_ACTION_REMOVE,
+							'index' => 1
+						],
+						[
+							'action' => USER_ACTION_REMOVE,
+							'index' => 1
+						]
+					]
+				]
+			],
 			// Add two agent interfaces and remove it.
 			[
 				[
@@ -1368,7 +1434,7 @@ class testFormHost extends CWebTest {
 						'Connect to' => 'IP',
 						'port' => '122',
 						'SNMP version' => 'SNMPv1',
-						'SNMP community' => 'zabbix',
+						'SNMP community' => '🙃zabbix🙃',
 						'Use bulk requests' => false
 					]
 				],
@@ -1408,6 +1474,7 @@ class testFormHost extends CWebTest {
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->assertMessage(TEST_GOOD, 'Host updated');
+
 				$host = (CTestArrayHelper::get($data, 'host_fields.Visible name') === "")
 					? CTestArrayHelper::get($data, 'host_fields.Host name', 'testFormHost_Update')
 					: CTestArrayHelper::get($data, 'host_fields.Visible name', 'testFormHost_Update Visible name');
@@ -1418,6 +1485,7 @@ class testFormHost extends CWebTest {
 				foreach (CTestArrayHelper::get($data, 'host_fields', []) as $key => $value) {
 					$source['host_fields'][$key] = $value;
 				}
+
 				// Check host fields.
 				$form->checkValue($source['host_fields']);
 
@@ -1533,33 +1601,32 @@ class testFormHost extends CWebTest {
 		return [
 			[
 				[
-					'host_fields' => [
-						'Host name' => microtime().' clone without interface changes'
-					]
+					'Host name' => microtime().' clone without interface changes'
+
 				]
 			],
 			[
 				[
-					'host_fields' => [
-						'Host name' => microtime().' clone with interface changes',
-						'Interfaces' => [
-							[
-								'action' => USER_ACTION_ADD,
-								'type' => 'SNMP',
-								'ip' => '127.3.3.3',
-								'dns' => '',
-								'Connect to' => 'IP',
-								'port' => '122',
-								'SNMP version' => 'SNMPv3',
-								'Context name' => 'zabbix',
-								'Security name' => 'selenium',
-								'Security level' => 'authPriv',
-								'Authentication protocol' => 'SHA256',
-								'Authentication passphrase' => 'test123',
-								'Privacy protocol' => 'AES256',
-								'Privacy passphrase' => '456test',
-								'Use bulk requests' => false
-							]
+					'Host name' => microtime().' clone with interface changes',
+					'Visible name' => microtime().'😀😀😀',
+					'Description' => '😀😀😀😀😀😀😀',
+					'Interfaces' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'ip' => '127.3.3.3',
+							'dns' => '',
+							'Connect to' => 'IP',
+							'port' => '122',
+							'SNMP version' => 'SNMPv3',
+							'Context name' => 'zabbix',
+							'Security name' => 'selenium',
+							'Security level' => 'authPriv',
+							'Authentication protocol' => 'SHA256',
+							'Authentication passphrase' => 'test123',
+							'Privacy protocol' => 'AES256',
+							'Privacy passphrase' => '456test',
+							'Use bulk requests' => false
 						]
 					]
 				]
@@ -1576,11 +1643,10 @@ class testFormHost extends CWebTest {
 	public function cloneHost($data, $button = 'Clone') {
 		$host = 'testFormHost with items';
 		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($host));
-
 		$form = $this->openForm(($this->standalone ? 'zabbix.php?action=host.edit&hostid='.$hostid : $this->link), $host);
 
 		// Get values from form.
-		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
+		$form->fill($data);
 		$original = $form->getFields()->asValues();
 
 		// Clone host.
@@ -1588,15 +1654,15 @@ class testFormHost extends CWebTest {
 
 		$cloned_form = (!$this->standalone)
 			? COverlayDialogElement::find()->asForm()->waitUntilPresent()->one()
-			: $this->query('id:host-form')->asForm()->waitUntilReady()->one();
+			: $this->query('id:host-form')->asForm()->waitUntilVisible()->one();
 
 		$cloned_form->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Host added');
 
 		// Check the values of the original host with the cloned host.
-		$this->filterAndSelectHost($data['host_fields']['Host name'])->checkValue($original);
-
+		$this->filterAndSelectHost((CTestArrayHelper::get($data, 'Visible name', $data['Host name'])) )
+				->checkValue($original);
 		COverlayDialogElement::find()->one()->close();
 	}
 
@@ -1618,6 +1684,7 @@ class testFormHost extends CWebTest {
 		if (CTestArrayHelper::get($data, 'host_fields.Visible name') === "") {
 			$data['host_fields']['Visible name'] = $data['host_fields']['Host name'];
 		}
+
 		$fields = ['Host name' => 'host', 'Visible name' => 'name', 'Description' => 'description', 'Enabled' => 'status'];
 		foreach ($fields as $ui_field => $db_field) {
 			if (array_key_exists($ui_field, $data['host_fields'])) {
@@ -1762,7 +1829,7 @@ class testFormHost extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Host for suppression',
-					'error' => 'Cannot delete host because maintenance "Maintenance for suppression test"'.
+					'error' => 'Cannot delete host "Host for suppression" because maintenance "Maintenance for suppression test"'.
 							' must contain at least one host or host group.'
 				]
 			]

@@ -948,7 +948,7 @@ function makeMaintenanceIcon($type, $name, $description) {
 	}
 
 	return (new CSpan())
-		->addClass(ZBX_STYLE_ICON_MAINT)
+		->addClass(ZBX_STYLE_ICON_MAINTENANCE)
 		->addClass(ZBX_STYLE_CURSOR_POINTER)
 		->setHint($hint);
 }

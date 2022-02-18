@@ -181,7 +181,7 @@ class CControllerSlaReportList extends CController {
 			error(_s('"%1$s" date must be less than "%2$s" date.', _('From'), _('To')));
 		}
 
-		$has_errors = hasErrorMesssages();
+		$has_errors = hasErrorMessages();
 
 		$data = [
 			'has_access' => [

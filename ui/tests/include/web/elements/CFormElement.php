@@ -285,6 +285,15 @@ class CFormElement extends CElement {
 	}
 
 	/**
+	 * Get tabs from form.
+	 *
+	 * @return CElementCollection
+	 */
+	public function getTabs() {
+		return $this->query("xpath:.//li[@role='tab']")->all()->asText();
+	}
+
+	/**
 	 * Switch to tab by tab name.
 	 *
 	 * @return $this
@@ -361,7 +370,7 @@ class CFormElement extends CElement {
 
 				foreach ($values as $name => $value) {
 					$xpath = './/*[@id='.CXPathHelper::escapeQuotes($name).' or @name='.CXPathHelper::escapeQuotes($name).']';
-					$container->query('xpath', $xpath)->one()->detect()->fill($value);
+					$this->setUTFValue($container->query('xpath', $xpath)->one()->detect(), $value);
 				}
 			}
 
@@ -372,9 +381,24 @@ class CFormElement extends CElement {
 			return $this;
 		}
 
-		$element->fill($values);
+		$this->setUTFValue($element, $values);
 
 		return $this;
+	}
+
+	/**
+	 * Function for utf8mb4 values detection and filling.
+	 *
+	 * @param CElement $element   element to be filled
+	 * @param string   $value     value to be filled in
+	 */
+	protected function setUTFValue($element, $value) {
+		if (!is_array($value) && preg_match('/[\x{10000}-\x{10FFFF}]/u', $value) === 1) {
+			CElementQuery::getDriver()->executeScript('arguments[0].value = '.json_encode($value).';', [$element]);
+		}
+		else {
+			$element->fill($value);
+		}
 	}
 
 	/**

@@ -317,7 +317,7 @@ int	get_cpu_perf_counter_value(int cpu_num, int interval, double *value, char **
 {
 	int	idx;
 
-	/* For Windows we identify CPU by it's index in cpus array, which is CPU ID + 1. */
+	/* For Windows we identify CPU by its index in cpus array, which is CPU ID + 1. */
 	/* At index 0 we keep information about all CPUs. */
 
 	if (ZBX_CPUNUM_ALL == cpu_num)

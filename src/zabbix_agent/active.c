@@ -557,7 +557,7 @@ static void process_config_item(struct zbx_json *json, char *config, size_t leng
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot get host %s using \"%s\" item specified by"
 					" \"%s\" configuration parameter: returned value is not"
-					" an UTF-8 string",config_type, config, config_name);
+					" a UTF-8 string",config_type, config, config_name);
 		}
 		else
 		{
@@ -1227,6 +1227,7 @@ static void	process_active_checks(zbx_vector_ptr_t *addrs)
 		if (0 == metric->refresh)
 		{
 			ret = FAIL;
+			metric->refresh = SEC_PER_YEAR;
 			error = zbx_strdup(error, "Incorrect update interval.");
 		}
 		else if (0 != ((ZBX_METRIC_FLAG_LOG_LOG | ZBX_METRIC_FLAG_LOG_LOGRT) & metric->flags))
@@ -1419,6 +1420,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 			else
 			{
 				nextrefresh = time(NULL) + CONFIG_REFRESH_ACTIVE_CHECKS;
+				nextcheck = 0;
 			}
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 			zbx_remove_inactive_persistent_files(&persistent_inactive_vec);

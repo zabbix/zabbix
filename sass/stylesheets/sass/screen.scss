@@ -40,6 +40,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20211222';
 @import "components/message-box";
 @import "components/radio-list-control";
 @import "components/service/info";
+@import "components/subfilter";
 @import "components/tabfilter";
 @import "components/toc";
 @import "components/z-bar-gauge";
@@ -481,7 +482,7 @@ form {
 				}
 			}
 
-			.icon-maint {
+			.icon-maintenance {
 				position: relative;
 				display: inline-block;
 				height: 12px;
@@ -1076,43 +1077,6 @@ form {
 				border-bottom-width: 1px;
 			}
 		}
-	}
-}
-
-.subfilter,
-.subfilter-enabled {
-	display: inline-block;
-	height: 18px;
-	position: relative;
-}
-
-.subfilter {
-	margin-right: 10px;
-}
-
-.subfilter-enabled {
-	background-color: $ui-bg-selected-color;
-	border-radius: 2px;
-	color: $font-selected-color;
-	padding: 0 4px;
-
-	.link-action {
-		color: $font-selected-color;
-		text-decoration: none;
-
-		&:focus {
-			color: $font-selected-color;
-			border-bottom: 2px solid rgba($font-selected-color, .7);
-		}
-
-		&:hover {
-			color: $font-selected-color;
-			border-bottom: 1px solid rgba($font-selected-color, .7);
-		}
-	}
-
-	sup {
-		color: lighten($ui-bg-selected-color, 25%);
 	}
 }
 
@@ -2568,24 +2532,34 @@ button[disabled] {
 }
 
 $var-icons: (
-	maint: url($sprite-path) no-repeat -46px -802px,
 	depend-up: url($sprite-path) no-repeat -49px -729px,
 	depend-down: url($sprite-path) no-repeat -49px -765px,
 	ackn: url($sprite-path) no-repeat -45px -693px
 );
 
 // Dynamically generated classes:
-//  .icon-maint
 //  .icon-depend-up
 //  .icon-depend-down
 //  .icon-ackn
 @each $var-icons, $bgimage in $var-icons {
 	.icon-#{$var-icons} {
 		margin: 0 18px 0 0;
+
 		&::before {
 			background: $bgimage;
 			@extend %var-icons;
 		}
+	}
+}
+
+.icon-maintenance {
+	display: inline-block;
+	width: 18px;
+	height: 13px;
+
+	&::before {
+		background: url($sprite-path) no-repeat -46px -802px;
+		@extend %var-icons;
 	}
 }
 

@@ -17,6 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "simple.h"
+
 #include "common.h"
 #include "sysinfo.h"
 #include "comms.h"
@@ -25,7 +27,6 @@
 #include "telnet.h"
 #include "../common/net.h"
 #include "ntp.h"
-#include "simple.h"
 
 #ifdef HAVE_LDAP
 #	include <ldap.h>
@@ -67,6 +68,18 @@ static int	check_ldap(const char *host, unsigned short port, int timeout, int *v
 		zabbix_log(LOG_LEVEL_DEBUG, "LDAP - initialization failed [%s:%hu]", host, port);
 		goto lbl_ret;
 	}
+
+	#if defined(LDAP_OPT_SOCKET_BIND_ADDRESSES) && defined(HAVE_LDAP_SOURCEIP)
+	if (NULL != CONFIG_SOURCE_IP)
+	{
+		if (LDAP_SUCCESS != (ldapErr = ldap_set_option(ldap, LDAP_OPT_SOCKET_BIND_ADDRESSES, CONFIG_SOURCE_IP)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "LDAP - failed to set source ip address [%s]",
+					ldap_err2string(ldapErr));
+			goto lbl_ret;
+		}
+	}
+	#endif
 
 	if (LDAP_SUCCESS != (ldapErr = ldap_search_s(ldap, "", LDAP_SCOPE_BASE, "(objectClass=*)", attrs, 0, &res)))
 	{

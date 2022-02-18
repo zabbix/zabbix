@@ -17,10 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "cfg.h"
+
 #include "common.h"
 #include "log.h"
-
-#include "cfg.h"
 
 extern unsigned char	program_type;
 
