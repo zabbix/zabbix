@@ -64,13 +64,7 @@ class CControllerTokenDelete extends CController {
 
 			$output['keepids'] = array_column($tokenids, 'tokenid');
 
-			if ($deleted > 1) {
-				$success = ['title' => _('API tokens deleted')];
-			}
-			else {
-				$success = ['title' => _('API token deleted')];
-			}
-
+			$success = ['title' => _n('API token deleted', 'API tokens deleted', $deleted)];
 
 			if ($messages = get_and_clear_messages()) {
 				$success['messages'] = array_column($messages, 'message');
