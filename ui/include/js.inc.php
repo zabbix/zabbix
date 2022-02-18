@@ -64,7 +64,9 @@ function zbx_jsvalue($value, $as_object = false, $addQuotes = true) {
 	$is_object = $as_object;
 
 	foreach ($value as $key => &$v) {
-		$is_object |= is_string($key);
+		if (is_string($key)) {
+			$is_object = true;
+		}
 		$escaped_key = $is_object ? '"'.zbx_jsvalue($key, false, false).'":' : '';
 		$v = $escaped_key.zbx_jsvalue($v, $as_object, $addQuotes);
 	}

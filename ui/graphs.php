@@ -370,7 +370,9 @@ elseif (hasRequest('action') && getRequest('action') === 'graph.masscopyto' && h
 		DBstart();
 		foreach (getRequest('group_graphid') as $graphid) {
 			foreach ($dbHosts as $host) {
-				$result &= (bool) copyGraphToHost($graphid, $host['hostid']);
+				if (!copyGraphToHost($graphid, $host['hostid'])) {
+					$result = false;
+				}
 			}
 		}
 		$result = DBend($result);
