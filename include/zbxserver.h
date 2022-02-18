@@ -55,6 +55,7 @@
 #define MACRO_TYPE_SCRIPT_NORMAL	0x08000000
 #define MACRO_TYPE_SCRIPT_RECOVERY	0x10000000
 #define MACRO_TYPE_REPORT		0x20000000
+#define MACRO_TYPE_QUERY_FILTER		0x40000000
 
 #define MACRO_EXPAND_NO			0
 #define MACRO_EXPAND_YES		1
@@ -115,6 +116,7 @@ zbx_expression_eval_t;
 void	zbx_expression_eval_init(zbx_expression_eval_t *eval, int mode, zbx_eval_context_t *ctx);
 void	zbx_expression_eval_clear(zbx_expression_eval_t *eval);
 void	zbx_expression_eval_resolve_item_hosts(zbx_expression_eval_t *eval, const DC_ITEM *item);
+void	zbx_expression_eval_resolve_filter_macros(zbx_expression_eval_t *eval, const DC_ITEM *item);
 void	zbx_expression_eval_resolve_trigger_hosts(zbx_expression_eval_t *eval, const DB_TRIGGER *trigger);
 int	zbx_expression_eval_execute(zbx_expression_eval_t *eval, const zbx_timespec_t *ts, zbx_variant_t *value,
 		char **error);
