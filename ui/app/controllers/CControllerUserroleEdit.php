@@ -81,6 +81,7 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			'actions_manage_api_tokens' => 				'in 0,1',
 			'actions_manage_scheduled_reports' => 		'in 0,1',
 			'actions_manage_sla' => 					'in 0,1',
+			'actions_invoke_execute_now' =>				'in 0,1',
 			'ui_default_access' => 						'in 0,1',
 			'modules_default_access' => 				'in 0,1',
 			'actions_default_access' => 				'in 0,1',
@@ -161,6 +162,10 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			];
 		}
 		else {
+			/*
+			 * Since default user type from DB is 0, the edit form JS will manage changing the checkboxes to correct
+			 * default values.
+			 */
 			$data = [
 				'roleid' => null,
 				'name' => $db_defaults['name'],

@@ -123,20 +123,28 @@
 				CRoleHelper::ACTIONS_EXECUTE_SCRIPTS => USER_TYPE_ZABBIX_USER,
 				CRoleHelper::ACTIONS_MANAGE_API_TOKENS => USER_TYPE_ZABBIX_USER,
 				CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS => USER_TYPE_ZABBIX_ADMIN,
-				CRoleHelper::ACTIONS_MANAGE_SLA => USER_TYPE_ZABBIX_ADMIN
+				CRoleHelper::ACTIONS_MANAGE_SLA => USER_TYPE_ZABBIX_ADMIN,
+				CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW => USER_TYPE_ZABBIX_USER
 			], JSON_FORCE_OBJECT) ?>;
 
 			for (const [id, value] of Object.entries(access)) {
 				const checkbox = document.getElementById(id);
 
-				if (user_type < value) {
-					checkbox.readOnly = true;
-					checkbox.checked = false;
-				} else {
-					if (checkbox.readOnly) {
-						checkbox.checked = true;
+				// The current CRRoleHelper set up doesn't allow to set readonly for each checkbox individually.
+				if (id === '<?= CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW ?>') {
+					checkbox.readOnly = (user_type == <?= USER_TYPE_SUPER_ADMIN ?>);
+				}
+				else {
+					if (user_type < value) {
+						checkbox.readOnly = true;
+						checkbox.checked = false;
 					}
-					checkbox.readOnly = false;
+					else {
+						if (checkbox.readOnly) {
+							checkbox.checked = true;
+						}
+						checkbox.readOnly = false;
+					}
 				}
 			}
 		},
