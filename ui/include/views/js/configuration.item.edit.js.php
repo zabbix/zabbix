@@ -21,7 +21,6 @@
 
 /**
  * @var CView $this
- * @var array $data
  */
 
 include __DIR__.'/common.item.edit.js.php';
@@ -33,7 +32,7 @@ include __DIR__.'/itemtest.js.php';
 	const view = {
 		form_name: null,
 
-		init({form_name}) {
+		init({form_name, trends_default}) {
 			this.form_name = form_name;
 
 			// Field switchers.
@@ -57,7 +56,7 @@ include __DIR__.'/itemtest.js.php';
 							&& (new_value == <?= ITEM_VALUE_TYPE_FLOAT ?>
 							|| new_value == <?= ITEM_VALUE_TYPE_UINT64 ?>)) {
 						if ($trends.val() == 0) {
-							$trends.val('<?= $data['trends_default'] ?>');
+							$trends.val(trends_default);
 						}
 
 						$('#trends_mode_1').prop('checked', true);
@@ -98,7 +97,6 @@ include __DIR__.'/itemtest.js.php';
 		typeChangeHandler() {
 			// Selected item type.
 			const type = parseInt($('#type').val());
-			const asterisk = '<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>';
 
 			$('#keyButton').prop('disabled',
 				type != <?= ITEM_TYPE_ZABBIX ?>
@@ -112,11 +110,11 @@ include __DIR__.'/itemtest.js.php';
 			)
 
 			if (type == <?= ITEM_TYPE_SSH ?> || type == <?= ITEM_TYPE_TELNET ?>) {
-				$('label[for=username]').addClass(asterisk);
+				$('label[for=username]').addClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
 				$('input[name=username]').attr('aria-required', 'true');
 			}
 			else {
-				$('label[for=username]').removeClass(asterisk);
+				$('label[for=username]').removeClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
 				$('input[name=username]').removeAttr('aria-required');
 			}
 		},
