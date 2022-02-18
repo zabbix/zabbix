@@ -3634,6 +3634,7 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.39rc1
 
 New features:
+........S. [ZBX-19789] added SourceIP support to ldap simple checks (dgoloscapov)
 
 Bug fixes:
 
