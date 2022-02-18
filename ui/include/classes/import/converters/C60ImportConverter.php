@@ -1,3 +1,4 @@
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -17,12 +18,22 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package zabbixsync
 
-func getMetrics() []string {
-	return []string{
-		"net.dns", "Checks if DNS service is up.",
-		"net.dns.record", "Performs DNS query.",
-		"vfs.dir.get", "Directory entry list.",
+/**
+ * Converter for converting import data from 6.0 to 6.2.
+ */
+class C60ImportConverter extends CConverter {
+
+	/**
+	 * Convert import data from 6.0 to 6.2 version.
+	 *
+	 * @param array $data
+	 *
+	 * @return array
+	 */
+	public function convert(array $data): array {
+		$data['zabbix_export']['version'] = '6.2';
+
+		return $data;
 	}
 }

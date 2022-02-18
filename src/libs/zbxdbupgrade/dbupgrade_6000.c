@@ -1,6 +1,3 @@
-//go:build !windows
-// +build !windows
-
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -20,12 +17,28 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package zabbixsync
+#include "common.h"
+#include "dbupgrade.h"
 
-func getMetrics() []string {
-	return []string{
-		"net.dns", "Checks if DNS service is up.",
-		"net.dns.record", "Performs DNS query.",
-		"vfs.dir.get", "Directory entry list.",
-	}
+extern unsigned char	program_type;
+
+/*
+ * 6.0 maintenance database patches
+ */
+
+#ifndef HAVE_SQLITE3
+
+static int	DBpatch_6000000(void)
+{
+	return SUCCEED;
 }
+
+#endif
+
+DBPATCH_START(6000)
+
+/* version, duplicates flag, mandatory flag */
+
+DBPATCH_ADD(6000000, 0, 1)
+
+DBPATCH_END()

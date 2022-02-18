@@ -1546,6 +1546,131 @@ class CApiInputValidatorTest extends TestCase {
 				]
 			],
 			[
+				['type' => API_OBJECT, 'fields' => [
+					'hostid' =>	['type' => API_ID],
+					'host' =>	['type'=> API_STRING_UTF8],
+					'ruleid' =>	['type' => API_UNEXPECTED]
+				]],
+				[
+					'hostid' => '10428',
+					'host' => 'Abc host'
+				],
+				'/',
+				[
+					'hostid' => '10428',
+					'host' => 'Abc host'
+				]
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'hostid' =>	['type' => API_ID],
+					'host' =>	['type'=> API_STRING_UTF8],
+					'ruleid' =>	['type' => API_UNEXPECTED]
+				]],
+				[
+					'hostid' => '10428',
+					'ruleid' => '12345'
+				],
+				'/',
+				'Invalid parameter "/": unexpected parameter "ruleid".'
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'hostid' =>	['type' => API_ID],
+					'host' =>	['type'=> API_UNEXPECTED, 'error_type' => API_ERR_INHERITED]
+				]],
+				[
+					'hostid' => '10428',
+					'host' => 'Abcd host'
+				],
+				'/',
+				'Invalid parameter "/": cannot update readonly parameter "host" of inherited object.'
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'hostid' =>	['type' => API_ID],
+					'host' =>	['type'=> API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED]
+				]],
+				[
+					'hostid' => '10428',
+					'host' => 'Abcd host'
+				],
+				'/',
+				'Invalid parameter "/": cannot update readonly parameter "host" of discovered object.'
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'hostid' =>				['type' => API_ID],
+					'custom_interface' =>	['type'=> API_INT32, 'flags' => API_REQUIRED, 'in' => '0,1'],
+					'interface_ip' =>		['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'custom_interface', 'in' => '1'], 'type' => API_IP],
+												['else' => true, 'type' => API_UNEXPECTED]
+					]]
+				]],
+				[
+					'hostid' => '10428',
+					'custom_interface' => '1',
+					'interface_ip' => '127.0.0.1'
+				],
+				'/',
+				[
+					'hostid' => '10428',
+					'custom_interface' => 1,
+					'interface_ip' => '127.0.0.1'
+				]
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'hostid' =>				['type' => API_ID],
+					'custom_interface' =>	['type'=> API_INT32, 'flags' => API_REQUIRED, 'in' => '0,1'],
+					'interface_ip' =>		['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'custom_interface', 'in' => '1'], 'type' => API_IP],
+												['else' => true, 'type' => API_UNEXPECTED]
+					]]
+				]],
+				[
+					'hostid' => '10428',
+					'custom_interface' => '0',
+					'interface_ip' => '127.0.0.1'
+				],
+				'/',
+				'Invalid parameter "/": unexpected parameter "interface_ip".'
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'hostid' =>				['type' => API_ID],
+					'custom_interface' =>	['type'=> API_INT32, 'flags' => API_REQUIRED, 'in' => '0,1'],
+					'interface_ip' =>		['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'custom_interface', 'in' => '1'], 'type' => API_IP],
+												['else' => true, 'type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED]
+					]]
+				]],
+				[
+					'hostid' => '10428',
+					'custom_interface' => '0',
+					'interface_ip' => '127.0.0.1'
+				],
+				'/',
+				'Invalid parameter "/": cannot update readonly parameter "interface_ip" of inherited object.'
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'hostid' =>				['type' => API_ID],
+					'custom_interface' =>	['type'=> API_INT32, 'flags' => API_REQUIRED, 'in' => '0,1'],
+					'interface_ip' =>		['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'custom_interface', 'in' => '1'], 'type' => API_IP],
+												['else' => true, 'type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED]
+					]]
+				]],
+				[
+					'hostid' => '10428',
+					'custom_interface' => '0',
+					'interface_ip' => '127.0.0.1'
+				],
+				'/',
+				'Invalid parameter "/": cannot update readonly parameter "interface_ip" of discovered object.'
+			],
+			[
 				['type' => API_IDS],
 				[],
 				'/',
@@ -2287,6 +2412,74 @@ class CApiInputValidatorTest extends TestCase {
 			],
 			[
 				['type' => API_OBJECTS, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1,2,3'],
+					'level' =>	['type' => API_MULTIPLE, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_INT32, 'in' => '1:3', 'flags' => API_REQUIRED],
+						['else' => true, 'type' => API_UNEXPECTED]
+					]],
+					'value' =>	['type' => API_MULTIPLE, 'rules' => [
+						['if' => function (array $data): bool {
+							return $data['type'] == 3 && in_array($data['level'], [2, 3]);
+						}, 'type' => API_INT32, 'in' => '1,2'],
+						['else' => true, 'type' => API_UNEXPECTED]
+					]]
+				]],
+				[
+					['type' => '1'],
+					['type' => '1', 'level' => '1', 'value' => '1']
+				],
+				'/',
+				'Invalid parameter "/2": unexpected parameter "level".'
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1,2,3'],
+					'level' =>	['type' => API_MULTIPLE, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_INT32, 'in' => '1:3', 'flags' => API_REQUIRED],
+						['else' => true, 'type' => API_UNEXPECTED]
+					]],
+					'value' =>	['type' => API_MULTIPLE, 'rules' => [
+						['if' => function (array $data): bool {
+							return $data['type'] == 3 && in_array($data['level'], [2, 3]);
+						}, 'type' => API_INT32, 'in' => '1,2'],
+						['else' => true, 'type' => API_UNEXPECTED]
+					]]
+				]],
+				[
+					['type' => '1'],
+					['type' => '3', 'level' => '1', 'value' => '1']
+				],
+				'/',
+				'Invalid parameter "/2": unexpected parameter "value".'
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1,2,3'],
+					'level' =>	['type' => API_MULTIPLE, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_INT32, 'in' => '1:3', 'flags' => API_REQUIRED],
+						['else' => true, 'type' => API_UNEXPECTED]
+					]],
+					'value' =>	['type' => API_MULTIPLE, 'rules' => [
+						['if' => function (array $data): bool {
+							return $data['type'] == 3 && in_array($data['level'], [2, 3]);
+						}, 'type' => API_INT32, 'in' => '1,2'],
+						['else' => true, 'type' => API_UNEXPECTED]
+					]]
+				]],
+				[
+					['type' => '1'],
+					['type' => '3', 'level' => '1'],
+					['type' => '3', 'level' => '2', 'value' => '1']
+				],
+				'/',
+				[
+					['type' => 1],
+					['type' => 3, 'level' => 1],
+					['type' => 3, 'level' => 2, 'value' => 1]
+				]
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
 					'host' =>	['type' => API_H_NAME, 'flags' => API_REQUIRED],
 					'name' =>	['type' => API_STRING_UTF8, 'default_source' => 'host']
 				]],
@@ -2329,6 +2522,25 @@ class CApiInputValidatorTest extends TestCase {
 					[],
 					[]
 				]
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
+					'hostid' =>	['type' => API_ID],
+					'host' =>	['type'=> API_STRING_UTF8],
+					'ruleid' =>	['type' => API_UNEXPECTED]
+				]],
+				[
+					[
+						'hostid' => '10428',
+						'host' => 'Abc host'
+					],
+					[
+						'hostid' => '10428',
+						'ruleid' => '12345'
+					]
+				],
+				'/',
+				'Invalid parameter "/2": unexpected parameter "ruleid".'
 			],
 			[
 				['type' => API_HG_NAME, 'length' => 16],
@@ -5702,6 +5914,142 @@ class CApiInputValidatorTest extends TestCase {
 				'/',
 				false,
 				'Invalid parameter "/1/tags/2": value (tag, operator, value)=(tag, 0, ) already exists.'
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1,2,3'],
+					'levels' =>	['type' => API_MULTIPLE, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_INTS32, 'flags' => API_REQUIRED, 'in' => '1,2,3', 'uniq' => true],
+						['else' => true, 'type' => API_UNEXPECTED]
+					]]
+				]],
+				['type' => '2'],
+				'/',
+				true,
+				''
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1,2,3'],
+					'levels' =>	['type' => API_MULTIPLE, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_INTS32, 'flags' => API_REQUIRED, 'in' => '1,2,3', 'uniq' => true],
+						['else' => true, 'type' => API_UNEXPECTED]
+					]]
+				]],
+				['type' => '3', 'levels' => ['1', '2']],
+				'/',
+				true,
+				''
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1,2,3'],
+					'levels' =>	['type' => API_MULTIPLE, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_INTS32, 'flags' => API_REQUIRED, 'in' => '1,2,3', 'uniq' => true],
+						['else' => true, 'type' => API_UNEXPECTED]
+					]]
+				]],
+				['type' => '3', 'levels' => ['1', '2', '1']],
+				'/',
+				false,
+				'Invalid parameter "/levels/3": value (1) already exists.'
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1,2,3'],
+					'levels' =>	['type' => API_MULTIPLE, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_INTS32, 'flags' => API_REQUIRED, 'in' => '1,2,3', 'uniq' => true],
+						['else' => true, 'type' => API_UNEXPECTED]
+					]]
+				]],
+				[
+					['type' => '2'],
+					['type' => '3', 'levels' => ['1', '2']],
+					['type' => '3', 'levels' => ['1', '2', '1']]
+				],
+				'/',
+				false,
+				'Invalid parameter "/3/levels/3": value (1) already exists.'
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1,2,3'],
+					'level' =>	['type' => API_MULTIPLE, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1,2,3'],
+						['else' => true, 'type' => API_UNEXPECTED]
+					]],
+					'value' =>	['type' => API_MULTIPLE, 'rules' => [
+						['if' => function (array $data): bool {
+							return $data['type'] == 3 && in_array($data['level'], [2, 3]);
+						}, 'type' => API_INTS32, 'in' => '1,2,3,4', 'uniq' => true],
+						['else' => true, 'type' => API_UNEXPECTED]
+					]]
+				]],
+				['type' => '3', 'level' => '1'],
+				'/',
+				true,
+				''
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1,2,3'],
+					'level' =>	['type' => API_MULTIPLE, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1,2,3'],
+						['else' => true, 'type' => API_UNEXPECTED]
+					]],
+					'value' =>	['type' => API_MULTIPLE, 'rules' => [
+						['if' => function (array $data): bool {
+							return $data['type'] == 3 && in_array($data['level'], [2, 3]);
+						}, 'type' => API_INTS32, 'in' => '1,2,3,4', 'uniq' => true],
+						['else' => true, 'type' => API_UNEXPECTED]
+					]]
+				]],
+				['type' => '3', 'level' => '2', 'value' => ['1', '2', '3']],
+				'/',
+				true,
+				''
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1,2,3'],
+					'level' =>	['type' => API_MULTIPLE, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1,2,3'],
+						['else' => true, 'type' => API_UNEXPECTED]
+					]],
+					'value' =>	['type' => API_MULTIPLE, 'rules' => [
+						['if' => function (array $data): bool {
+							return $data['type'] == 3 && in_array($data['level'], [2, 3]);
+						}, 'type' => API_INTS32, 'in' => '1,2,3,4', 'uniq' => true],
+						['else' => true, 'type' => API_UNEXPECTED]
+					]]
+				]],
+				['type' => '3', 'level' => '2', 'value' => ['1', '2', '3', '4', '1']],
+				'/',
+				false,
+				'Invalid parameter "/value/5": value (1) already exists.'
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1,2,3'],
+					'level' =>	['type' => API_MULTIPLE, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1,2,3'],
+						['else' => true, 'type' => API_UNEXPECTED]
+					]],
+					'value' =>	['type' => API_MULTIPLE, 'rules' => [
+						['if' => function (array $data): bool {
+							return $data['type'] == 3 && in_array($data['level'], [2, 3]);
+						}, 'type' => API_INTS32, 'in' => '1,2,3,4', 'uniq' => true],
+						['else' => true, 'type' => API_UNEXPECTED]
+					]]
+				]],
+				[
+					['type' => '3', 'level' => '1'],
+					['type' => '3', 'level' => '2', 'value' => ['1', '2', '3']],
+					['type' => '3', 'level' => '2', 'value' => ['1', '2', '3', '4', '1']]
+				],
+				'/',
+				false,
+				'Invalid parameter "/3/value/5": value (1) already exists.'
 			]
 		];
 	}
