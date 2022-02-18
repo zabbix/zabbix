@@ -1358,47 +1358,20 @@ zabbix_export:
               tag: Application
               value: VMware
         -
-          uuid: 36b28fccf6db4c49bf20157c419400d0
-          name: 'VMware: Health state rollup'
+          uuid: 3c9d6ffb53624758ad888bf70f69218c
+          name: 'VMware: Get sensors'
           type: SIMPLE
-          key: 'vmware.hv.sensor.health.state[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
-          history: 7d
+          key: 'vmware.hv.sensors.get[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
-          description: 'The host health state rollup sensor value: gray - unknown, green - ok, red - it has a problem, yellow - it might have a problem.'
-          valuemap:
-            name: 'VMware status'
+          description: 'Master item for sensors data.'
           tags:
             -
               tag: Application
-              value: VMware
-          triggers:
-            -
-              uuid: ffb8e14b1ea546b69f40070c628ac653
-              expression: 'last(/VMware Hypervisor/vmware.hv.sensor.health.state[{$VMWARE.URL},{$VMWARE.HV.UUID}])=3'
-              name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
-              priority: HIGH
-              description: 'One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.'
-              dependencies:
-                -
-                  name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
-                  expression: 'last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=3'
-            -
-              uuid: 4825f11dcbf74e2c8e7e2b251cbeb7d9
-              expression: 'last(/VMware Hypervisor/vmware.hv.sensor.health.state[{$VMWARE.URL},{$VMWARE.HV.UUID}])=2'
-              name: 'VMware: The {$VMWARE.HV.UUID} health is Yellow'
-              priority: AVERAGE
-              description: 'One or more components in the appliance might become overloaded soon.'
-              dependencies:
-                -
-                  name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
-                  expression: 'last(/VMware Hypervisor/vmware.hv.sensor.health.state[{$VMWARE.URL},{$VMWARE.HV.UUID}])=3'
-                -
-                  name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
-                  expression: 'last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=3'
-                -
-                  name: 'VMware: The {$VMWARE.HV.UUID} health is Yellow'
-                  expression: 'last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=2'
+              value: 'Zabbix raw items'
         -
           uuid: 0cec294521314c5482233b5b96e90c8d
           name: 'VMware: Overall status'
@@ -1572,6 +1545,79 @@ zabbix_export:
                 -
                   tag: Application
                   value: VMware
+        -
+          uuid: deb31adf69634837839e2d8f87167f28
+          name: 'Healthcheck discovery'
+          type: DEPENDENT
+          key: vmware.hv.healthcheck.discovery
+          delay: '0'
+          description: 'VMware Rollup Health State sensor discovery'
+          item_prototypes:
+            -
+              uuid: fabb7524dd454daa942266e5565ce40e
+              name: 'VMware: Health state rollup'
+              type: DEPENDENT
+              key: 'vmware.hv.sensor.health.state[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'The host health state rollup sensor value: gray - unknown, green - ok, red - it has a problem, yellow - it might have a problem.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..HostNumericSensorInfo[?(@.name=="VMware Rollup Health State")].healthState.label.first()'
+              master_item:
+                key: 'vmware.hv.sensors.get[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
+              tags:
+                -
+                  tag: Application
+                  value: VMware
+              trigger_prototypes:
+                -
+                  uuid: 9f2a65161946436986aacf6c9a637673
+                  expression: 'last(/VMware Hypervisor/vmware.hv.sensor.health.state[{#SINGLETON}])="Red"'
+                  name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
+                  priority: HIGH
+                  description: 'One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.'
+                  dependencies:
+                    -
+                      name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
+                      expression: 'last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=3'
+                -
+                  uuid: dc4f84eb8d2143bb80999fbc58f38928
+                  expression: 'last(/VMware Hypervisor/vmware.hv.sensor.health.state[{#SINGLETON}])="Yellow"'
+                  name: 'VMware: The {$VMWARE.HV.UUID} health is Yellow'
+                  priority: AVERAGE
+                  description: 'One or more components in the appliance might become overloaded soon.'
+                  dependencies:
+                    -
+                      name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
+                      expression: 'last(/VMware Hypervisor/vmware.hv.sensor.health.state[{#SINGLETON}])="Red"'
+                    -
+                      name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
+                      expression: 'last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=3'
+                    -
+                      name: 'VMware: The {$VMWARE.HV.UUID} health is Yellow'
+                      expression: 'last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=2'
+          master_item:
+            key: 'vmware.hv.sensors.get[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$..HostNumericSensorInfo[?(@.name=="VMware Rollup Health State")]'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '[]'
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return JSON.stringify(value != "[]" ? [{''{#SINGLETON}'': ''''}] : []);'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
       valuemaps:
         -
           uuid: 25d04e2838af4fcca9ddd21df6781497
