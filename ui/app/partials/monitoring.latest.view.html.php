@@ -103,9 +103,10 @@ foreach ($data['items'] as $itemid => $item) {
 	$state_css = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? ZBX_STYLE_GREY : null;
 
 	$item_name = (new CDiv([
-		(new CSpan($item['name']))->addClass('label'),
+		(new CLinkAction($item['name']))
+			->setMenuPopup(CMenuPopupHelper::getItem(['itemid' => $itemid])),
 		($item['description_expanded'] !== '') ? makeDescriptionIcon($item['description_expanded']) : null
-	]))->addClass('action-container');
+	]))->addClass(ZBX_STYLE_ACTION_CONTAINER);
 
 	// Row history data preparation.
 	$last_history = array_key_exists($itemid, $data['history'])
@@ -122,7 +123,7 @@ foreach ($data['items'] as $itemid => $item) {
 		$last_value = (new CSpan(formatHistoryValue($last_history['value'], $item, false)))
 			->addClass(ZBX_STYLE_CURSOR_POINTER)
 			->setHint(
-				(new CDiv(mb_substr($last_history['value'], 0, 8000)))->addClass(ZBX_STYLE_HINTBOX_WRAP),
+				(new CDiv(mb_substr($last_history['value'], 0, ZBX_HINTBOX_CONTENT_LIMIT)))->addClass(ZBX_STYLE_HINTBOX_WRAP),
 				'', true, '', 0
 			);
 
@@ -194,9 +195,6 @@ foreach ($data['items'] as $itemid => $item) {
 	}
 
 	$host = $data['hosts'][$item['hostid']];
-	$host_name = (new CLinkAction($host['name']))
-		->addClass($host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_RED : null)
-		->setMenuPopup(CMenuPopupHelper::getHost($item['hostid']));
 
 	$maintenance_icon = '';
 
@@ -214,22 +212,20 @@ foreach ($data['items'] as $itemid => $item) {
 		}
 	}
 
+	$host_name_container = (new CDiv([
+		(new CLinkAction($host['name']))
+			->addClass($host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_RED : null)
+			->setMenuPopup(CMenuPopupHelper::getHost($item['hostid'])),
+		$maintenance_icon
+	]))->addClass(ZBX_STYLE_ACTION_CONTAINER);
+
 	$item_icons = [];
 	if ($item['status'] == ITEM_STATUS_ACTIVE && $item['error'] !== '') {
 		$item_icons[] = makeErrorIcon($item['error']);
 	}
 
 	if ($data['filter']['show_details']) {
-		$item_config_url = (new CUrl('items.php'))
-			->setArgument('form', 'update')
-			->setArgument('itemid', $itemid)
-			->setArgument('context', 'host');
-
-		$item_key = ($item['type'] == ITEM_TYPE_HTTPTEST)
-			? (new CSpan($item['key_expanded']))->addClass(ZBX_STYLE_GREEN)
-			: (new CLink($item['key_expanded'], $item_config_url))
-				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(ZBX_STYLE_GREEN);
+		$item_key = (new CSpan($item['key_expanded']))->addClass(ZBX_STYLE_GREEN);
 
 		if (in_array($item['type'], [ITEM_TYPE_SNMPTRAP, ITEM_TYPE_TRAPPER, ITEM_TYPE_DEPENDENT])
 				|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_expanded'], 'mqtt.get', 8) === 0)) {
@@ -248,7 +244,7 @@ foreach ($data['items'] as $itemid => $item) {
 
 		$table_row = new CRow([
 			$checkbox,
-			[$host_name, $maintenance_icon],
+			$host_name_container,
 			(new CCol([$item_name, $item_key]))->addClass($state_css),
 			(new CCol($item_delay))->addClass($state_css),
 			(new CCol($item_history))->addClass($state_css),
@@ -265,7 +261,7 @@ foreach ($data['items'] as $itemid => $item) {
 	else {
 		$table_row = new CRow([
 			$checkbox,
-			[$host_name, $maintenance_icon],
+			$host_name_container,
 			(new CCol($item_name))->addClass($state_css),
 			(new CCol($last_check))->addClass($state_css),
 			(new CCol($last_value))->addClass($state_css),

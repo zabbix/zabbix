@@ -1311,8 +1311,8 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "report writer";
 		case ZBX_PROCESS_TYPE_SERVICEMAN:
 			return "service manager";
-		case ZBX_PROCESS_TYPE_PROBLEMHOUSEKEEPER:
-			return "problem housekeeper";
+		case ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER:
+			return "trigger housekeeper";
 		case ZBX_PROCESS_TYPE_HA_MANAGER:
 			return "ha manager";
 		case ZBX_PROCESS_TYPE_ODBCPOLLER:
@@ -2024,7 +2024,7 @@ char	*zbx_strshift_utf8(char *text, size_t num)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Returns the size (in bytes) of an UTF-8 encoded character or 0    *
+ * Purpose: Returns the size (in bytes) of a UTF-8 encoded character or 0     *
  *          if the character is not a valid UTF-8.                            *
  *                                                                            *
  * Parameters: text - [IN] pointer to the 1st byte of UTF-8 character         *
@@ -5782,7 +5782,7 @@ const char	*zbx_truncate_value(const char *val, const size_t char_max, char *buf
  *             size   - [IN] the output buffer size                           *
  *             val    - [IN] double value to be converted                     *
  *                                                                            *
- * Return value: the oputput buffer with printed value                        *
+ * Return value: the output buffer with printed value                         *
  *                                                                            *
  ******************************************************************************/
 const char	*zbx_print_double(char *buffer, size_t size, double val)

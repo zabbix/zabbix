@@ -62,8 +62,8 @@ There are no template links in this template.
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |Database discovery |<p>Scanning databases in DBMS.</p> |ZABBIX_PASSIVE |mysql.db.discovery["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p><p>**Filter**:</p>AND_OR <p>- {#DATABASE} NOT_MATCHES_REGEX `information_schema`</p> |
-|Replication discovery |<p>If "show slave status" returns Master_Host, "Replication: *" items are created.</p> |ZABBIX_PASSIVE |mysql.replication.discovery["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |MariaDB discovery |<p>Additional metrics if MariaDB is used.</p> |DEPENDENT |mysql.extra_metric.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return JSON.stringify(value.search('MariaDB')>-1 ? [{'{#SINGLETON}': ''}] : []);`</p> |
+|Replication discovery |<p>If "show slave status" returns Master_Host, "Replication: *" items are created.</p> |ZABBIX_PASSIVE |mysql.replication.discovery["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 
 ## Items collected
 
@@ -113,7 +113,7 @@ There are no template links in this template.
 |MySQL |MySQL: Open table definitions |<p>Number of cached table definitions.</p> |DEPENDENT |mysql.open_table_definitions<p>**Preprocessing**:</p><p>- JSONPATH: `$.Open_table_definitions`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |MySQL |MySQL: Open tables |<p>Number of tables that are open.</p> |DEPENDENT |mysql.open_tables<p>**Preprocessing**:</p><p>- JSONPATH: `$.Open_tables`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |MySQL |MySQL: Innodb log written |<p>Number of bytes written to the InnoDB log.</p> |DEPENDENT |mysql.innodb_os_log_written<p>**Preprocessing**:</p><p>- JSONPATH: `$.Innodb_os_log_written`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
-|MySQL |MySQL: Calculated value of innodb_log_file_size |<p>Calculated by (innodb_os_log_written-innodb_os_log_written(time shift -1h))/{$MYSQL.INNODB_LOG_FILES} value of the innodb_log_file_size. Innodb_log_file_size is the size in bytes of the each InnoDB redo log file in the log group. The combined size can be no more than 512GB. Larger values mean less disk I/O due to less flushing checkpoint activity, but also slower recovery from a crash.</p> |CALCULATED |mysql.innodb_log_file_size<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Expression**:</p>`(last(//mysql.innodb_os_log_written) - first(//mysql.innodb_os_log_written,1h)) / {$MYSQL.INNODB_LOG_FILES}` |
+|MySQL |MySQL: Calculated value of innodb_log_file_size |<p>Calculated by (innodb_os_log_written-innodb_os_log_written(time shift -1h))/{$MYSQL.INNODB_LOG_FILES} value of the innodb_log_file_size. Innodb_log_file_size is the size in bytes of the each InnoDB redo log file in the log group. The combined size can be no more than 512GB. Larger values mean less disk I/O due to less flushing checkpoint activity, but also slower recovery from a crash.</p> |CALCULATED |mysql.innodb_log_file_size<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Expression**:</p>`(last(//mysql.innodb_os_log_written) - last(//mysql.innodb_os_log_written,#1:now-1h)) / {$MYSQL.INNODB_LOG_FILES}` |
 |MySQL |MySQL: Size of database {#DATABASE} |<p>-</p> |ZABBIX_PASSIVE |mysql.db.size["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}","{#DATABASE}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |MySQL |MySQL: Replication Slave SQL Running State {#MASTER_HOST} |<p>This shows the state of the SQL driver threads.</p> |DEPENDENT |mysql.replication.slave_sql_running_state["{#MASTER_HOST}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Slave_SQL_Running_State`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |MySQL |MySQL: Replication Seconds Behind Master {#MASTER_HOST} |<p>Number of seconds that the slave SQL thread is behind processing the master binary log.</p><p>A high number (or an increasing one) can indicate that the slave is unable to handle events</p><p>from the master in a timely fashion.</p> |DEPENDENT |mysql.replication.seconds_behind_master["{#MASTER_HOST}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Seconds_Behind_Master`</p><p>- MATCHES_REGEX: `\d+`</p><p>⛔️ON_FAIL: `CUSTOM_ERROR -> Replication is not performed.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
@@ -124,10 +124,10 @@ There are no template links in this template.
 |MySQL |MySQL: Master GTID wait count |<p>The number of times MASTER_GTID_WAIT called.</p> |DEPENDENT |mysql.master_gtid_wait_count[{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Master_gtid_wait_count`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |MySQL |MySQL: Master GTID wait time |<p>Total number of time spent in MASTER_GTID_WAIT.</p> |DEPENDENT |mysql.master_gtid_wait_time[{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Master_gtid_wait_time`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |MySQL |MySQL: Master GTID wait timeouts |<p>Number of timeouts occurring in MASTER_GTID_WAIT.</p> |DEPENDENT |mysql.master_gtid_wait_timeouts[{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Master_gtid_wait_timeouts`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
-|Zabbix_raw_items |MySQL: Get status variables |<p>The item gets server global status information.</p> |ZABBIX_PASSIVE |mysql.get_status_variables["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"] |
-|Zabbix_raw_items |MySQL: InnoDB buffer pool read requests |<p>Number of logical read requests.</p> |DEPENDENT |mysql.innodb_buffer_pool_read_requests<p>**Preprocessing**:</p><p>- JSONPATH: `$.Innodb_buffer_pool_read_requests`</p> |
-|Zabbix_raw_items |MySQL: InnoDB buffer pool reads |<p>Number of logical reads that InnoDB could not satisfy from the buffer pool, and had to read directly from the disk.</p> |DEPENDENT |mysql.innodb_buffer_pool_reads<p>**Preprocessing**:</p><p>- JSONPATH: `$.Innodb_buffer_pool_reads`</p> |
-|Zabbix_raw_items |MySQL: Replication Slave status {#MASTER_HOST} |<p>The item gets status information on the essential parameters of the slave threads.</p> |ZABBIX_PASSIVE |mysql.replication.get_slave_status["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}","{#MASTER_HOST}"] |
+|Zabbix raw items |MySQL: Get status variables |<p>The item gets server global status information.</p> |ZABBIX_PASSIVE |mysql.get_status_variables["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"] |
+|Zabbix raw items |MySQL: InnoDB buffer pool read requests |<p>Number of logical read requests.</p> |DEPENDENT |mysql.innodb_buffer_pool_read_requests<p>**Preprocessing**:</p><p>- JSONPATH: `$.Innodb_buffer_pool_read_requests`</p> |
+|Zabbix raw items |MySQL: InnoDB buffer pool reads |<p>Number of logical reads that InnoDB could not satisfy from the buffer pool, and had to read directly from the disk.</p> |DEPENDENT |mysql.innodb_buffer_pool_reads<p>**Preprocessing**:</p><p>- JSONPATH: `$.Innodb_buffer_pool_reads`</p> |
+|Zabbix raw items |MySQL: Replication Slave status {#MASTER_HOST} |<p>The item gets status information on the essential parameters of the slave threads.</p> |ZABBIX_PASSIVE |mysql.replication.get_slave_status["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}","{#MASTER_HOST}"] |
 
 ## Triggers
 
@@ -153,5 +153,5 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384189-discussion-thread-for-official-zabbix-template-db-mysql).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384189-discussion-thread-for-official-zabbix-template-db-mysql).
 

@@ -130,7 +130,7 @@ class testDashboardPages extends CWebTest {
 									[
 										'type' => 4,
 										'name' => 'itemid',
-										'value' => 40041
+										'value' => 400410
 									]
 								]
 							]
@@ -462,13 +462,17 @@ class testDashboardPages extends CWebTest {
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
-
 		$next_page = $this->query(self::NEXT_BUTTON)->one();
 		$tab = $this->query('class:selected-tab')->one();
-		while ($next_page->isClickable()) {
-			$next_page->click();
-			$tab->waitUntilAttributesNotPresent(['class' => 'selected-tab']);
-			$tab->reload();
+
+		// If next page button exists press next tab buttun until the required tab is selected.
+		if ($next_page->isVisible()) {
+			while ($tab->getText() !== $data['fields']['Name'] && $next_page->isClickable()) {
+				$next_page->click();
+				$tab->waitUntilAttributesNotPresent(['class' => 'selected-tab']);
+				$tab->reload();
+			}
+
 		}
 
 		$index = CTestArrayHelper::get($data, 'duplicate', false) ? 2 : 1;
@@ -555,7 +559,7 @@ class testDashboardPages extends CWebTest {
 	 * Check default page names adding new pages.
 	 */
 	public function testDashboardPages_EmptyPagesName() {
-		// Check that first page do not has any name.
+		// Check that first page does not have any names.
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids['Dashboard for pages empty name'])
 				->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
@@ -669,11 +673,11 @@ class testDashboardPages extends CWebTest {
 	private function getPageMenu($page_name, $index = 1) {
 		$selector = '//ul[@class="sortable-list"]//span[@title='.CXPathHelper::escapeQuotes($page_name);
 
-		$value = $this->query('xpath:('.$selector.']/../../div)['.$index.']')->one()->getAttribute('class');
+		$value = $this->query('xpath:('.$selector.']/../../div)['.$index.']')->waitUntilVisible()->one()->getAttribute('class');
 		if ($value !== 'selected-tab') {
 			$this->selectPage($page_name, $index);
 		}
-		$this->query('xpath:('.$selector.']/following-sibling::button)['.$index.']')->waitUntilPresent()->one()->click();
+		$this->query('xpath:('.$selector.']/following-sibling::button)['.$index.']')->waitUntilClickable()->one()->click();
 
 		return CPopupMenuElement::find()->waitUntilVisible()->one();
 	}

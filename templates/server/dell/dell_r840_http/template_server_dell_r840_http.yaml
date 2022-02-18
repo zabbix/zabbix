@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-16T20:03:29Z'
+  date: '2022-01-27T18:35:49Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -15,7 +15,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/426752-discussion-thread-for-official-zabbix-dell-templates
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: 'Templates/Server hardware'
@@ -43,8 +43,8 @@ zabbix_export:
             key: dell.server.system.get
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
           triggers:
             -
               uuid: 9fa14edc793842ba8858dd09d1c3058c
@@ -54,6 +54,10 @@ zabbix_export:
               priority: INFO
               description: 'Firmware version has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 0002bc9eaeb34479819b027f58460970
           name: 'Dell R840: Hardware model name'
@@ -78,8 +82,8 @@ zabbix_export:
             key: dell.server.system.get
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
         -
           uuid: 5031003a95fe4a23a3a706813f1221c4
           name: 'Dell R840: Hardware serial number'
@@ -104,8 +108,8 @@ zabbix_export:
             key: dell.server.system.get
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
           triggers:
             -
               uuid: 5932f468c8614187aefc284a5c2e1475
@@ -114,6 +118,10 @@ zabbix_export:
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: de315f6a1fd44475a7c5a84ae337f37c
           name: 'Dell R840: Overall system health status'
@@ -137,8 +145,11 @@ zabbix_export:
             key: dell.server.system.get
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: system
           triggers:
             -
               uuid: 41fac4cfc084411081db8d7a4b81e18d
@@ -147,6 +158,10 @@ zabbix_export:
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Please check the device for faults.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
             -
               uuid: 60a19490be4142be800a8a9fc2c3917d
               expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.status,,"like","Warning")=1'
@@ -158,6 +173,10 @@ zabbix_export:
                 -
                   name: 'Dell R840: Server is in a critical state'
                   expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.status,,"like","Critical")=1'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: b7f3a7fba3924e7ab12d692b62dccda5
           name: 'Dell R840: Get system'
@@ -270,8 +289,8 @@ zabbix_export:
           url: '{$API.URL}/redfish/v1/Systems/System.Embedded.1'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: system
         -
           uuid: c98a5cd525ea4a93a9c48ba4a817a434
           name: 'Dell R840: Redfish API'
@@ -287,8 +306,11 @@ zabbix_export:
             name: zabbix.host.available
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: system
           triggers:
             -
               uuid: bb504167936543818487aef62bb5bbb1
@@ -296,6 +318,10 @@ zabbix_export:
               name: 'Dell R840: Redfish API service is unavailable'
               priority: HIGH
               description: 'The service is unavailable or does not accept TCP connections.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: c77e51cd40324a9f98f6c42127fb0503
@@ -332,8 +358,11 @@ zabbix_export:
               url: '{$API.URL}{#ODATA}'
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: battery
+                -
+                  tag: component
+                  value: diskarray
               trigger_prototypes:
                 -
                   uuid: 4e8f7f543ff9448ba091117548a7957c
@@ -342,6 +371,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: 76035c29874c4ad5912737230b0fcfcb
                   expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.hw.diskarray.cache.battery.status[{#BATTERY_NAME}],,"like","Warning")=1'
@@ -353,6 +386,10 @@ zabbix_export:
                     -
                       name: 'Dell R840: {#BATTERY_NAME} is in a critical state'
                       expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.hw.diskarray.cache.battery.status[{#BATTERY_NAME}],,"like","Critical")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           url: '{$API.URL}/redfish/v1/Systems/System.Embedded.1/Storage'
           preprocessing:
             -
@@ -493,8 +530,11 @@ zabbix_export:
               url: '{$API.URL}{#ODATA}'
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: diskarray
+                -
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: 94f468fe3f8142b4903a4e4f7186d5f8
@@ -503,6 +543,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: 9b4f65ee67b748469d4226d556211de1
                   expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.hw.diskarray.status[{#CNTLR_NAME}{#SLOT}],,"like","Warning")=1'
@@ -514,6 +558,10 @@ zabbix_export:
                     -
                       name: 'Dell R840: {#CNTLR_NAME} in slot {#SLOT} is in a critical state'
                       expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.hw.diskarray.status[{#CNTLR_NAME}{#SLOT}],,"like","Critical")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           url: '{$API.URL}/redfish/v1/Systems/System.Embedded.1/Storage'
           preprocessing:
             -
@@ -646,8 +694,11 @@ zabbix_export:
               url: '{$API.URL}{#ODATA}'
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: fan
+                -
+                  tag: component
+                  value: raw
             -
               uuid: 76a021e37c19459fa224fa1ec694a8da
               name: 'Dell R840: {#SENSOR_NAME} Speed'
@@ -666,8 +717,8 @@ zabbix_export:
                 key: 'dell.server.sensor.fan.get[{#SENSOR_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
             -
               uuid: 77ea551bc11949b59ce5a653d3823f99
               name: 'Dell R840: {#SENSOR_NAME} Status'
@@ -691,8 +742,8 @@ zabbix_export:
                 key: 'dell.server.sensor.fan.get[{#SENSOR_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
               trigger_prototypes:
                 -
                   uuid: 45d2e75c18b34f5aa1e46296d71debe4
@@ -701,6 +752,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: 9b5b5fd923624f05bb7c9cce28f29116
                   expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.sensor.fan.status[{#SENSOR_NAME}],,"like","Warning")=1'
@@ -712,6 +767,10 @@ zabbix_export:
                     -
                       name: 'Dell R840: {#SENSOR_NAME} is in a critical state'
                       expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.sensor.fan.status[{#SENSOR_NAME}],,"like","Critical")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           url: '{$API.URL}/redfish/v1/Chassis/System.Embedded.1/Sensors'
           preprocessing:
             -
@@ -825,8 +884,11 @@ zabbix_export:
               url: '{$API.URL}{#ODATA}'
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: raw
             -
               uuid: c633aac31c3d45738007dac60f538950
               name: 'Dell R840: {#IFNAME} Status'
@@ -850,8 +912,8 @@ zabbix_export:
                 key: 'dell.server.net.if.get[{#IFNAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Network interfaces'
+                  tag: component
+                  value: network
               trigger_prototypes:
                 -
                   uuid: f46e4a69e41a42d091f378d7dc0fa3c2
@@ -860,6 +922,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: e325ba5c20834fa6ad7db6cb2a12a927
                   expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.net.if.health[{#IFNAME}],,"like","Warning")=1'
@@ -871,6 +937,10 @@ zabbix_export:
                     -
                       name: 'Dell R840: {#IFNAME} is in a critical state'
                       expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.net.if.health[{#IFNAME}],,"like","Critical")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: f784b9a5e50549dab4fd3522998ae65d
               name: 'Dell R840: {#IFNAME} Speed'
@@ -893,8 +963,8 @@ zabbix_export:
                 key: 'dell.server.net.if.get[{#IFNAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Network interfaces'
+                  tag: component
+                  value: network
             -
               uuid: 7b948100c1c14ec18c676d5b53e04fd7
               name: 'Dell R840: {#IFNAME} State'
@@ -918,8 +988,8 @@ zabbix_export:
                 key: 'dell.server.net.if.get[{#IFNAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Network interfaces'
+                  tag: component
+                  value: network
             -
               uuid: c9412c81178a4e4c81b87163d0d47ae9
               name: 'Dell R840: {#IFNAME} Link status'
@@ -943,8 +1013,8 @@ zabbix_export:
                 key: 'dell.server.net.if.get[{#IFNAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Network interfaces'
+                  tag: component
+                  value: network
               trigger_prototypes:
                 -
                   uuid: b3c1ceb91dc342d9aa4c05ca4b55b10c
@@ -962,6 +1032,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           url: '{$API.URL}/redfish/v1/Chassis/System.Embedded.1/NetworkAdapters'
           preprocessing:
             -
@@ -1095,8 +1169,14 @@ zabbix_export:
               url: '{$API.URL}{#ODATA}'
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: physicaldisk
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: component
+                  value: storage
             -
               uuid: d3cd9e2c0b7745ebb069e3d7bba8f4ae
               name: 'Dell R840: {#DISK_NAME} Media type'
@@ -1120,8 +1200,11 @@ zabbix_export:
                 key: 'dell.server.hw.physicaldisk.get[{#DISK_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: physicaldisk
+                -
+                  tag: component
+                  value: storage
             -
               uuid: 941a692ea9dd4246ad990f8926e267ab
               name: 'Dell R840: {#DISK_NAME} Model name'
@@ -1145,8 +1228,11 @@ zabbix_export:
                 key: 'dell.server.hw.physicaldisk.get[{#DISK_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: physicaldisk
+                -
+                  tag: component
+                  value: storage
             -
               uuid: 6af8448b44614fecbf532fac3a0a8e49
               name: 'Dell R840: {#DISK_NAME} Serial number'
@@ -1170,8 +1256,11 @@ zabbix_export:
                 key: 'dell.server.hw.physicaldisk.get[{#DISK_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: physicaldisk
+                -
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: 859aeaa7bebb4958ac82b19d787a1d34
@@ -1180,6 +1269,10 @@ zabbix_export:
                   priority: INFO
                   description: '{#DISK_NAME} serial number has changed. Ack to close'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 3a9ce45d4ced4053b52f68453705066d
               name: 'Dell R840: {#DISK_NAME} Size'
@@ -1203,8 +1296,11 @@ zabbix_export:
                 key: 'dell.server.hw.physicaldisk.get[{#DISK_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: physicaldisk
+                -
+                  tag: component
+                  value: storage
             -
               uuid: 03ef4df980114b6aaa42e5ae965813b9
               name: 'Dell R840: {#DISK_NAME} Status'
@@ -1228,8 +1324,11 @@ zabbix_export:
                 key: 'dell.server.hw.physicaldisk.get[{#DISK_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: physicaldisk
+                -
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: 92c13e7385be48f898a74ee54d8ec382
@@ -1238,6 +1337,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: a1c432739ea942c7a7463531d4b268c9
                   expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.hw.physicaldisk.status[{#DISK_NAME}],,"like","Warning")=1'
@@ -1249,6 +1352,10 @@ zabbix_export:
                     -
                       name: 'Dell R840: {#DISK_NAME} is in a critical state'
                       expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.hw.physicaldisk.status[{#DISK_NAME}],,"like","Critical")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           url: '{$API.URL}/redfish/v1/Systems/System.Embedded.1/Storage'
           preprocessing:
             -
@@ -1382,8 +1489,11 @@ zabbix_export:
               url: '{$API.URL}{#ODATA}'
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: psu
+                -
+                  tag: component
+                  value: raw
             -
               uuid: c9ea5871c9214aa1986bf0f2b78ad47c
               name: 'Dell R840: {#SENSOR_NAME} Status'
@@ -1407,8 +1517,8 @@ zabbix_export:
                 key: 'dell.server.sensor.psu.get[{#SENSOR_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Power supply'
+                  tag: component
+                  value: psu
               trigger_prototypes:
                 -
                   uuid: 4b381c89bf0e41f1843eff537f20db34
@@ -1417,6 +1527,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: 4f72a8417a9048449ab56353c27fe0b7
                   expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.sensor.psu.status[{#SENSOR_NAME}],,"like","Warning")=1'
@@ -1428,6 +1542,10 @@ zabbix_export:
                     -
                       name: 'Dell R840: {#SENSOR_NAME} is in a critical state'
                       expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.sensor.psu.status[{#SENSOR_NAME}],,"like","Critical")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           url: '{$API.URL}/redfish/v1/Chassis/System.Embedded.1/Sensors'
           preprocessing:
             -
@@ -1555,8 +1673,11 @@ zabbix_export:
               url: '{$API.URL}{#ODATA}'
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: raw
+                -
+                  tag: component
+                  value: temperature
             -
               uuid: e2a386c8abfa4bcdac269d780bcc4ee9
               name: 'Dell R840: {#SENSOR_NAME} Status'
@@ -1580,8 +1701,8 @@ zabbix_export:
                 key: 'dell.server.sensor.temp.get[{#SENSOR_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: 8611c1a1594a45318da88cd556db6310
@@ -1590,6 +1711,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: 9f9ff19a71274eef890776c942b3dfa1
                   expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.sensor.temp.status[{#SENSOR_NAME}],,"like","Warning")=1'
@@ -1601,6 +1726,10 @@ zabbix_export:
                     -
                       name: 'Dell R840: {#SENSOR_NAME} is in a critical state'
                       expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.sensor.temp.status[{#SENSOR_NAME}],,"like","Critical")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 2de5e243052b4adf86921ea83ef33026
               name: 'Dell R840: {#SENSOR_NAME} Value'
@@ -1620,8 +1749,8 @@ zabbix_export:
                 key: 'dell.server.sensor.temp.get[{#SENSOR_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
           url: '{$API.URL}/redfish/v1/Chassis/System.Embedded.1/Sensors'
           preprocessing:
             -
@@ -1749,8 +1878,11 @@ zabbix_export:
               url: '{$API.URL}{#ODATA}'
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: raw
+                -
+                  tag: component
+                  value: virtualdisk
             -
               uuid: 736e0df33a1a44b99cdf8c93f12db99a
               name: 'Dell R840: {#DISK_NAME} RAID status'
@@ -1774,8 +1906,11 @@ zabbix_export:
                 key: 'dell.server.hw.virtualdisk.get[{#DISK_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: virtualdisk
             -
               uuid: 1247bccb744a4b8b81c4d98c275dbf96
               name: 'Dell R840: {#DISK_NAME} Read policy'
@@ -1799,8 +1934,11 @@ zabbix_export:
                 key: 'dell.server.hw.virtualdisk.get[{#DISK_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: virtualdisk
             -
               uuid: 9e299d9046de421e8c35a64894ee8f34
               name: 'Dell R840: {#DISK_NAME} Size'
@@ -1824,8 +1962,11 @@ zabbix_export:
                 key: 'dell.server.hw.virtualdisk.get[{#DISK_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: virtualdisk
             -
               uuid: e0ac8a63aa634240941b2497d40c7d1f
               name: 'Dell R840: {#DISK_NAME} Current state'
@@ -1849,8 +1990,11 @@ zabbix_export:
                 key: 'dell.server.hw.virtualdisk.get[{#DISK_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: virtualdisk
             -
               uuid: 1bb3f5e218bf4f1d984e160bb8e4a169
               name: 'Dell R840: {#DISK_NAME} Status'
@@ -1874,8 +2018,11 @@ zabbix_export:
                 key: 'dell.server.hw.virtualdisk.get[{#DISK_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: virtualdisk
               trigger_prototypes:
                 -
                   uuid: 6c9e68f155634b9e95beeaf4cbf06ce2
@@ -1884,6 +2031,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: ceb271b06657474aa9a9b0c4c7462474
                   expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.hw.virtualdisk.status[{#DISK_NAME}],,"like","Warning")=1'
@@ -1895,6 +2046,10 @@ zabbix_export:
                     -
                       name: 'Dell R840: {#DISK_NAME} is in a critical state'
                       expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.hw.virtualdisk.status[{#DISK_NAME}],,"like","Critical")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 5b5679210d5f4f9e915d20a0e529b338
               name: 'Dell R840: {#DISK_NAME} Write policy'
@@ -1918,8 +2073,11 @@ zabbix_export:
                 key: 'dell.server.hw.virtualdisk.get[{#DISK_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: virtualdisk
           url: '{$API.URL}/redfish/v1/Systems/System.Embedded.1/Storage'
           preprocessing:
             -
@@ -2027,6 +2185,16 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+      tags:
+        -
+          tag: class
+          value: hardware
+        -
+          tag: target
+          value: dell
+        -
+          tag: target
+          value: 'dell poweredge'
       macros:
         -
           macro: '{$API.PASSWORD}'

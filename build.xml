@@ -285,7 +285,7 @@
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
 			<arg line="--password=${dbpassword}"/>
-			<arg line="--execute='create database ${dbname} character set utf8 collate utf8_bin'"/>
+			<arg line="--execute='create database ${dbname} character set utf8mb4 collate utf8mb4_bin'"/>
 		</exec>
 		<exec executable="mysql" input="database/mysql/schema.sql" failonerror="on">
 			<arg line="--host=${dbhost}"/>
@@ -329,7 +329,7 @@
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
 			<arg line="--password=${dbpassword}"/>
-			<arg line="--execute='create database ${dbname}_proxy character set utf8 collate utf8_bin'"/>
+			<arg line="--execute='create database ${dbname}_proxy character set utf8mb4 collate utf8mb4_bin'"/>
 		</exec>
 		<exec executable="mysql" input="database/mysql/schema.sql" failonerror="on">
 			<arg line="--host=${dbhost}"/>

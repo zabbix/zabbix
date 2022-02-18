@@ -167,7 +167,7 @@ class testFormTabIndicators extends CWebTest {
 			// Host prototype configuration form tab data.
 			[
 				[
-					'url' => 'host_prototypes.php?form=create&context=host&parent_discoveryid=31369',
+					'url' => 'host_prototypes.php?form=create&parent_discoveryid=42275&context=host',
 					'form' => 'name:hostPrototypeForm',
 					'tabs' => [
 						[
@@ -241,7 +241,7 @@ class testFormTabIndicators extends CWebTest {
 			// Item prototype configuration form tab data.
 			[
 				[
-					'url' => 'disc_prototypes.php?form=create&context=host&parent_discoveryid=31369',
+					'url' => 'disc_prototypes.php?form=create&parent_discoveryid=42275&context=host',
 					'form' => 'name:itemForm',
 					'tabs' => [
 						[
@@ -936,6 +936,8 @@ class testFormTabIndicators extends CWebTest {
 
 			case 'data_set':
 				if ($action === USER_ACTION_REMOVE) {
+					// In graph widget form the 1st row is covered by header with tabs if scroll is not in top position.
+					COverlayDialogElement::find()->one()->scrollToTop();
 					$form->query('class:btn-remove')->all()->click();
 				}
 				else {

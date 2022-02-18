@@ -1,0 +1,47 @@
+.subfilter-option-grid {
+	grid-template-columns: minmax(75px, max-content) auto;
+	display: grid;
+	margin: 5px 0;
+
+	.subfilter-options {
+		grid-column: 2 / -1;
+	}
+}
+
+.subfilter,
+.subfilter-enabled {
+	display: inline-block;
+	height: 18px;
+	position: relative;
+}
+
+.subfilter {
+	margin-right: 10px;
+	white-space: nowrap;
+}
+
+.subfilter-enabled {
+	background-color: $ui-bg-selected-color;
+	border-radius: 2px;
+	color: $font-selected-color;
+	padding: 0 4px;
+
+	.link-action {
+		color: $font-selected-color;
+		text-decoration: none;
+
+		&:focus {
+			color: $font-selected-color;
+			border-bottom: 2px solid rgba($font-selected-color, .7);
+		}
+
+		&:hover {
+			color: $font-selected-color;
+			border-bottom: 1px solid rgba($font-selected-color, .7);
+		}
+	}
+
+	sup {
+		color: lighten($ui-bg-selected-color, 25%);
+	}
+}

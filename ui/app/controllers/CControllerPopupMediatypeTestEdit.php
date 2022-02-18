@@ -75,7 +75,7 @@ class CControllerPopupMediatypeTestEdit extends CController {
 
 		$this->setResponse(new CControllerResponseData([
 			'title' => _s('Test media type "%1$s"', $mediatype[0]['name']),
-			'errors' => hasErrorMesssages() ? getMessages() : null,
+			'errors' => hasErrorMessages() ? getMessages() : null,
 			'mediatypeid' => $this->getInput('mediatypeid'),
 			'sendto' => '',
 			'subject' => _('Test subject'),

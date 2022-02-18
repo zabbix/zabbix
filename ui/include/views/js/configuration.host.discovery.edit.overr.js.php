@@ -658,7 +658,7 @@ insert_javascript_for_visibilitybox();
 	}
 
 	/**
-	 * Opens popup for a override.
+	 * Opens popup for an override.
 	 *
 	 * @param {number} no
 	 */
@@ -667,7 +667,7 @@ insert_javascript_for_visibilitybox();
 	};
 
 	/**
-	 * This object represents a override of web scenario.
+	 * This object represents an override of web scenario.
 	 *
 	 * @param {object} data  Optional override initial data.
 	 */
@@ -788,7 +788,7 @@ insert_javascript_for_visibilitybox();
 			.on('afteradd.dynamicRows', (event) => {
 				[...event.currentTarget.querySelectorAll('.js-operator')]
 					.pop()
-					.addEventListener('change', toggleConditionValue);
+					.addEventListener('change', view.toggleConditionValue);
 			})
 			.ready(function() {
 				jQuery('#overrideRow').toggle(jQuery('.form_row', jQuery('#overrides_filters')).length > 1);
@@ -810,7 +810,7 @@ insert_javascript_for_visibilitybox();
 		jQuery('#overrides-evaltype').trigger('change');
 
 		[...document.getElementById('overrides_filters').querySelectorAll('.js-operator')].map((elem) => {
-			elem.addEventListener('change', toggleConditionValue);
+			elem.addEventListener('change', view.toggleConditionValue);
 		});
 	};
 

@@ -96,12 +96,8 @@ if (isset($_REQUEST['yaxismax']) && zbx_empty($_REQUEST['yaxismax'])) {
 }
 check_fields($fields);
 
-$gitems = [];
-foreach (getRequest('items', []) as $gitem) {
-	$gitems[] = json_decode($gitem, true);
-}
+$gitems = getRequest('items', []);
 
-$_REQUEST['items'] = $gitems;
 $_REQUEST['show_3d'] = getRequest('show_3d', 0);
 $_REQUEST['show_legend'] = getRequest('show_legend', 0);
 

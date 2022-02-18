@@ -239,7 +239,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 	public function testPageLowLevelDiscovery_CheckNow($data) {
 		$context = array_key_exists('template', $data) ? '&context=template' : '&context=host';
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$data['hostid'].$context);
-		// Enable all LLDs, so Check now can be send successfully.
+		// Enable all LLDs, so Check now can be sent successfully.
 		$this->massChangeStatus('Enable');
 		$this->selectTableRows($data['names'], 'Name', $this->selector);
 
@@ -412,10 +412,10 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'State' => 'Normal'
 					],
 					'expected' => [
-						'Linux block devices by Zabbix agent: Block devices discovery',
+						'Linux by Zabbix agent: Block devices discovery',
 						'Zabbix server health: Zabbix stats cluster: High availability cluster node discovery',
-						'Linux filesystems by Zabbix agent: Mounted filesystem discovery',
-						'Linux network interfaces by Zabbix agent: Network interface discovery'
+						'Linux by Zabbix agent: Mounted filesystem discovery',
+						'Linux by Zabbix agent: Network interface discovery'
 					]
 				]
 			],
@@ -426,7 +426,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'State' => 'Normal'
 					],
 					'expected' => [
-						'Linux block devices by Zabbix agent: Block devices discovery'
+						'Linux by Zabbix agent: Block devices discovery'
 					]
 				]
 			],

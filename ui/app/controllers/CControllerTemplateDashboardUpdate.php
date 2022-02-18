@@ -144,7 +144,7 @@ class CControllerTemplateDashboardUpdate extends CController {
 			$data['system-message-ok'] = $message;
 		}
 		else {
-			if (!hasErrorMesssages()) {
+			if (!hasErrorMessages()) {
 				error($error_msg);
 			}
 		}

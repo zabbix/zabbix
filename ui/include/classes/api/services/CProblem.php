@@ -71,7 +71,7 @@ class CProblem extends CApiService {
 			'acknowledged'				=> null,
 			'suppressed'				=> null,
 			'recent'					=> null,
-			'any'						=> null,	// (internal) true if need not filtred by r_eventid
+			'any'						=> null,	// (internal) true if need not filtered by r_eventid
 			'evaltype'					=> TAG_EVAL_TYPE_AND_OR,
 			'tags'						=> null,
 			'filter'					=> null,

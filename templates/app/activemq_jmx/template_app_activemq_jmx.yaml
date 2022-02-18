@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-14T17:43:19Z'
+  date: '2022-01-26T10:02:13Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -18,7 +18,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/411049-discussion-thread-for-official-zabbix-template-amq
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -65,8 +65,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: '{#JMXBROKERNAME}'
+                  tag: component
+                  value: inventory
               trigger_prototypes:
                 -
                   uuid: 7902d81681874aa3acf33d90316f9864
@@ -75,6 +75,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Broker {#JMXBROKERNAME} version has changed. Ack to close.'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 85c19ccb8b6a4242a8ba699e76836427
               name: 'Broker {#JMXBROKERNAME}: Memory limit'
@@ -93,8 +97,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: '{#JMXBROKERNAME}'
+                  tag: component
+                  value: memory
             -
               uuid: 5e2a5638adf6405087014bfcfc8ffc93
               name: 'Broker {#JMXBROKERNAME}: Memory usage in percents'
@@ -108,14 +112,18 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: '{#JMXBROKERNAME}'
+                  tag: component
+                  value: memory
               trigger_prototypes:
                 -
                   uuid: e805b8cca9744940affc3bdd234a7587
                   expression: 'min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ}, MemoryPercentUsage],{$ACTIVEMQ.MEM.TIME:"{#JMXBROKERNAME}"})>{$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXBROKERNAME}"}'
                   name: 'Broker {#JMXBROKERNAME}: Memory usage is too high (over {$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXBROKERNAME}"}%)'
                   priority: HIGH
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 3e741e339fff422fae67b5333faa1e20
                   expression: 'min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ}, MemoryPercentUsage],{$ACTIVEMQ.MEM.TIME:"{#JMXBROKERNAME}"})>{$ACTIVEMQ.MEM.MAX.WARN:"{#JMXBROKERNAME}"}'
@@ -125,6 +133,10 @@ zabbix_export:
                     -
                       name: 'Broker {#JMXBROKERNAME}: Memory usage is too high (over {$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXBROKERNAME}"}%)'
                       expression: 'min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ}, MemoryPercentUsage],{$ACTIVEMQ.MEM.TIME:"{#JMXBROKERNAME}"})>{$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXBROKERNAME}"}'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 78806476b5cb4ce48f8ca8dbd173c7c3
               name: 'Broker {#JMXBROKERNAME}: Storage limit'
@@ -143,8 +155,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: '{#JMXBROKERNAME}'
+                  tag: component
+                  value: storage
             -
               uuid: fc4c79543a6f4b7b9c22f11b61b644c9
               name: 'Broker {#JMXBROKERNAME}: Storage usage in percents'
@@ -158,14 +170,18 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: '{#JMXBROKERNAME}'
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: 2e1c9f92c87f446ebab68ac638c713c5
                   expression: 'min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},StorePercentUsage],{$ACTIVEMQ.STORE.TIME:"{#JMXBROKERNAME}"})>{$ACTIVEMQ.STORE.MAX.HIGH:"{#JMXBROKERNAME}"}'
                   name: 'Broker {#JMXBROKERNAME}: Storage usage is too high (over {$ACTIVEMQ.STORE.MAX.HIGH:"{#JMXBROKERNAME}"}%)'
                   priority: HIGH
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
                 -
                   uuid: 271b33edce84439a91d6a253f45e5bf6
                   expression: 'min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},StorePercentUsage],{$ACTIVEMQ.STORE.TIME:"{#JMXBROKERNAME}"})>{$ACTIVEMQ.STORE.MAX.WARN:"{#JMXBROKERNAME}"}'
@@ -175,6 +191,10 @@ zabbix_export:
                     -
                       name: 'Broker {#JMXBROKERNAME}: Storage usage is too high (over {$ACTIVEMQ.STORE.MAX.HIGH:"{#JMXBROKERNAME}"}%)'
                       expression: 'min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},StorePercentUsage],{$ACTIVEMQ.STORE.TIME:"{#JMXBROKERNAME}"})>{$ACTIVEMQ.STORE.MAX.HIGH:"{#JMXBROKERNAME}"}'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
             -
               uuid: 09db80ee80ea47189142130d35a8e1c2
               name: 'Broker {#JMXBROKERNAME}: Temp limit'
@@ -193,8 +213,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: '{#JMXBROKERNAME}'
+                  tag: component
+                  value: storage
             -
               uuid: 95354144839e4d22a82c4e9a1fab83d9
               name: 'Broker {#JMXBROKERNAME}: Temp usage in percents'
@@ -208,14 +228,18 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: '{#JMXBROKERNAME}'
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: 422252a81e3e4261bbd7f331f48c6257
                   expression: 'min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},TempPercentUsage],{$ACTIVEMQ.TEMP.TIME:"{#JMXBROKERNAME}"})>{$ACTIVEMQ.TEMP.MAX.HIGH}'
                   name: 'Broker {#JMXBROKERNAME}: Temp usage is too high (over {$ACTIVEMQ.TEMP.MAX.WARN:"{#JMXBROKERNAME}"}%)'
                   priority: HIGH
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
                 -
                   uuid: acb8f6e0762f48c2bd4c03f2a55b2f44
                   expression: 'min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},TempPercentUsage],{$ACTIVEMQ.TEMP.TIME:"{#JMXBROKERNAME}"})>{$ACTIVEMQ.TEMP.MAX.WARN}'
@@ -225,6 +249,10 @@ zabbix_export:
                     -
                       name: 'Broker {#JMXBROKERNAME}: Temp usage is too high (over {$ACTIVEMQ.TEMP.MAX.WARN:"{#JMXBROKERNAME}"}%)'
                       expression: 'min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},TempPercentUsage],{$ACTIVEMQ.TEMP.TIME:"{#JMXBROKERNAME}"})>{$ACTIVEMQ.TEMP.MAX.HIGH}'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
             -
               uuid: 64ab04e456804e10a6c78c3190807506
               name: 'Broker {#JMXBROKERNAME}: Consumers count total'
@@ -237,14 +265,18 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: '{#JMXBROKERNAME}'
+                  tag: component
+                  value: broker
               trigger_prototypes:
                 -
                   uuid: 6906f0a1ef804da4a1203ca9d96ab8a0
                   expression: 'max(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},TotalConsumerCount],{$ACTIVEMQ.BROKER.CONSUMERS.MIN.TIME:"{#JMXBROKERNAME}"})<{$ACTIVEMQ.BROKER.CONSUMERS.MIN.HIGH:"{#JMXBROKERNAME}"}'
                   name: 'Broker {#JMXBROKERNAME}: Consumers count is too low (below {$ACTIVEMQ.BROKER.CONSUMERS.MIN.HIGH:"{#JMXBROKERNAME}"} for {$ACTIVEMQ.BROKER.CONSUMERS.MIN.TIME:"{#JMXBROKERNAME}"})'
                   priority: HIGH
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 48bc7dab4a1a40d8a823e880018cf8e7
               name: 'Broker {#JMXBROKERNAME}: Messages dequeue rate'
@@ -263,8 +295,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: '{#JMXBROKERNAME}'
+                  tag: component
+                  value: broker
             -
               uuid: a462499eecbd443e931a9aa831240f65
               name: 'Broker {#JMXBROKERNAME}: Messages enqueue rate'
@@ -283,8 +315,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: '{#JMXBROKERNAME}'
+                  tag: component
+                  value: broker
               trigger_prototypes:
                 -
                   uuid: a3ab7bca031c45059418fa82a3c67369
@@ -292,6 +324,10 @@ zabbix_export:
                   name: 'Broker {#JMXBROKERNAME}: Message enqueue rate is higher than dequeue rate for {$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXBROKERNAME}"}'
                   priority: AVERAGE
                   description: 'Enqueue rate is higher than dequeue rate. It may indicate performance problems.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 2453d8221cec4e1ead6622c001ac9a8c
               name: 'Broker {#JMXBROKERNAME}: Producers count total'
@@ -304,14 +340,18 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: '{#JMXBROKERNAME}'
+                  tag: component
+                  value: broker
               trigger_prototypes:
                 -
                   uuid: 2ee6ad72a98143b59d8d1136fffdbe50
                   expression: 'max(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},TotalProducerCount],{$ACTIVEMQ.BROKER.PRODUCERS.MIN.TIME:"{#JMXBROKERNAME}"})<{$ACTIVEMQ.BROKER.PRODUCERS.MIN.HIGH:"{#JMXBROKERNAME}"}'
                   name: 'Broker {#JMXBROKERNAME}: Producers count is too low (below {$ACTIVEMQ.BROKER.PRODUCERS.MIN.HIGH:"{#JMXBROKERNAME}"} for {$ACTIVEMQ.BROKER.PRODUCERS.MIN.TIME:"{#JMXBROKERNAME}"})'
                   priority: HIGH
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: a46d7281cb234ccaadacbb7d311cbd39
               name: 'Broker {#JMXBROKERNAME}: Uptime'
@@ -330,8 +370,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: '{#JMXBROKERNAME}'
+                  tag: component
+                  value: system
               trigger_prototypes:
                 -
                   uuid: 6abb3813bb52465aa4a5f4bebfe999c3
@@ -340,6 +380,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Uptime is less than 10 minutes'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           graph_prototypes:
             -
               uuid: 465b9319e0dc4728a2733c69521e9e81
@@ -447,8 +491,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: '{#JMXBROKERNAME}'
+                  tag: component
+                  value: destination
             -
               uuid: 99f2094b02f848e785e40296958c5450
               name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Producers count total on {#JMXBROKERNAME}'
@@ -473,8 +517,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: '{#JMXBROKERNAME}'
+                  tag: component
+                  value: destination
             -
               uuid: 5e93e53a0c2d49a49d421ded87b6b1f8
               name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Consumers count'
@@ -487,8 +531,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: '{#JMXBROKERNAME}'
+                  tag: component
+                  value: destination
             -
               uuid: 3536ec77069a434e854415f0a3270e67
               name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Messages dequeue rate'
@@ -507,8 +551,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: '{#JMXBROKERNAME}'
+                  tag: component
+                  value: destination
             -
               uuid: a6dacc8c4d1f4724bf49c63449992035
               name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Messages enqueue rate'
@@ -527,8 +571,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: '{#JMXBROKERNAME}'
+                  tag: component
+                  value: destination
             -
               uuid: 1c4ea913a9564d74b31ef82314203a15
               name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Expired messages count'
@@ -546,8 +590,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: '{#JMXBROKERNAME}'
+                  tag: component
+                  value: destination
               trigger_prototypes:
                 -
                   uuid: a498405c5b764c1ea9f0e151adf94ed7
@@ -555,6 +599,10 @@ zabbix_export:
                   name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Expired messages count higher than {$ACTIVEMQ.EXPIRED.WARN:"{#JMXDESTINATIONNAME}"}'
                   priority: AVERAGE
                   description: 'This metric represents the number of messages that expired before they could be delivered. If you expect all messages to be delivered and acknowledged within a certain amount of time, you can set an expiration for each message, and investigate if your ExpiredCount metric rises above zero.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 158fac5a1b3c4f07a4004a733f9b6995
               name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Memory usage in percents'
@@ -568,19 +616,27 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: '{#JMXBROKERNAME}'
+                  tag: component
+                  value: memory
               trigger_prototypes:
                 -
                   uuid: 197ab32730a84f79ba1b1e827a10e175
                   expression: 'last(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},MemoryPercentUsage])>{$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXDESTINATIONNAME}"}'
                   name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Memory usage is too high (over {$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXDESTINATIONNAME}"}%)'
                   priority: HIGH
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 1e4e3a969b434c6d972251f8c9b3f2a7
                   expression: 'last(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},MemoryPercentUsage])>{$ACTIVEMQ.MEM.MAX.WARN:"{#JMXDESTINATIONNAME}"}'
                   name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Memory usage is too high (over {$ACTIVEMQ.MEM.MAX.WARN:"{#JMXDESTINATIONNAME}"}%)'
                   priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 82ee74872f6e46efbf16ae0705bcf2a6
               name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Producers count'
@@ -593,8 +649,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: '{#JMXBROKERNAME}'
+                  tag: component
+                  value: destination
             -
               uuid: fdc1e26fbe6545d3bdfc86f6f8c91b8b
               name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Queue size'
@@ -607,8 +663,8 @@ zabbix_export:
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 -
-                  tag: Application
-                  value: '{#JMXBROKERNAME}'
+                  tag: component
+                  value: destination
               trigger_prototypes:
                 -
                   uuid: f1c49943152c407088e3bf288b650b41
@@ -616,6 +672,10 @@ zabbix_export:
                   name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Queue size higher than {$ACTIVEMQ.QUEUE.WARN:"{#JMXDESTINATIONNAME}"} for {$ACTIVEMQ.QUEUE.TIME:"{#JMXDESTINATIONNAME}"}'
                   priority: AVERAGE
                   description: 'Queue size is higher than threshold. It may indicate performance problems.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
           trigger_prototypes:
             -
               uuid: c366d4b329c0471386566d6795c5787f
@@ -625,12 +685,20 @@ zabbix_export:
               name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Consumers count is too low (below {$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"} for {$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})'
               priority: AVERAGE
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
             -
               uuid: 344a0b83a5444d009aa56e97c1c0171b
               expression: 'avg(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},EnqueueCount],{$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXDESTINATIONNAME}"})>avg(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},DequeueCount],{$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXDESTINATIONNAME}"})'
               name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Message enqueue rate is higher than dequeue rate for {$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXDESTINATIONNAME}"}'
               priority: AVERAGE
               description: 'Enqueue rate is higher than dequeue rate. It may indicate performance problems.'
+              tags:
+                -
+                  tag: scope
+                  value: notice
             -
               uuid: 725d0270554e4fe59d138becfa3e6377
               expression: 'max(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},ProducerCount],{$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})<{$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"} and last(/Apache ActiveMQ by JMX/jmx["org.apache.activemq:type=Broker,brokerName={#JMXBROKERNAME}",{$ACTIVEMQ.TOTAL.PRODUCERS.COUNT: "{#JMXDESTINATIONNAME}"}])>{$ACTIVEMQ.BROKER.PRODUCERS.MIN.HIGH:"{#JMXBROKERNAME}"}'
@@ -639,6 +707,10 @@ zabbix_export:
               name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Producers count is too low (below {$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"} for {$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})'
               priority: AVERAGE
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
           graph_prototypes:
             -
               uuid: 006f397fbb664f9981b9228808870239
@@ -685,6 +757,13 @@ zabbix_export:
                     host: 'Apache ActiveMQ by JMX'
                     key: 'jmx[{#JMXOBJ},ConsumerCount]'
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+      tags:
+        -
+          tag: class
+          value: application
+        -
+          tag: target
+          value: apache-activemq
       macros:
         -
           macro: '{$ACTIVEMQ.BROKER.CONSUMERS.MIN.HIGH}'

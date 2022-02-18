@@ -442,7 +442,7 @@ struct tm	*zbx_localtime(const time_t *time, const char *tz)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get UTC time from time from broken down time elements             *
+ * Purpose: get UTC time from broken down time elements                       *
  *                                                                            *
  * Parameters:                                                                *
  *     year  - [IN] year (1970-...)                                           *
@@ -1469,10 +1469,10 @@ static int	scheduler_get_day_nextcheck(const zbx_scheduler_interval_t *interval,
 	if (NULL == interval->mdays)
 		return scheduler_get_wday_nextcheck(interval, tm);
 
-	/* iterate through month days until week day filter matches or we have ran out of month days */
+	/* iterate through month days until week day filter matches or we have run out of month days */
 	while (SUCCEED == scheduler_get_nearest_filter_value(interval->mdays, &tm->tm_mday))
 	{
-		/* check if the date is still valid - we haven't ran out of month days */
+		/* check if the date is still valid - we haven't run out of month days */
 		if (tm->tm_mday > zbx_day_in_month(tm->tm_year + 1970, tm->tm_mon + 1))
 			break;
 
@@ -1481,7 +1481,7 @@ static int	scheduler_get_day_nextcheck(const zbx_scheduler_interval_t *interval,
 
 		tm->tm_mday++;
 
-		/* check if the date is still valid - we haven't ran out of month days */
+		/* check if the date is still valid - we haven't run out of month days */
 		if (tm->tm_mday > zbx_day_in_month(tm->tm_year + 1970, tm->tm_mon + 1))
 			break;
 	}

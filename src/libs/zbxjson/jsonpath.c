@@ -17,16 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "jsonpath.h"
+
 #include "common.h"
-#include "zbxalgo.h"
 #include "zbxregexp.h"
 #include "zbxjson.h"
 #include "json.h"
 #include "json_parser.h"
 #include "zbxvariant.h"
 #include "../zbxalgo/vectorimpl.h"
-
-#include "jsonpath.h"
 
 typedef struct
 {
@@ -1427,7 +1426,7 @@ out:
  *                                                                            *
  * Purpose: convert jsonpath expression to text format                        *
  *                                                                            *
- * Parameters: expression - [IN] the jsonpath exprssion                       *
+ * Parameters: expression - [IN] the jsonpath expression                      *
  *                                                                            *
  * Return value: The converted expression, must be freed by the caller.       *
  *                                                                            *
@@ -1516,7 +1515,7 @@ static char	*jsonpath_expression_to_str(zbx_jsonpath_expression_t *expression)
  *                                                                            *
  * Purpose: set jsonpath expression error message                             *
  *                                                                            *
- * Parameters: expression - [IN] the jsonpath exprssion                       *
+ * Parameters: expression - [IN] the jsonpath expression                      *
  *                                                                            *
  * Comments: This function is used to set error message when expression       *
  *           evaluation fails                                                 *
@@ -2440,7 +2439,7 @@ int	zbx_jsonpath_compile(const char *path, zbx_jsonpath_t *jsonpath)
 		if (SUCCEED != ret)
 			break;
 
-		/* function segments can followed only by function segments */
+		/* function segments can be followed only by function segments */
 		segment_type = jpquery.segments[jpquery.segments_num - 1].type;
 		if (ZBX_JSONPATH_SEGMENT_FUNCTION == last_segment_type && ZBX_JSONPATH_SEGMENT_FUNCTION != segment_type)
 		{

@@ -46,7 +46,7 @@ There are no template links in this template.
 |-----|----|-----------|----|---------------------|
 |General |IPMI: {#SENSOR_ID} |<p>It is a state of the discrete IPMI sensor.</p> |DEPENDENT |ipmi.state_text[{#SENSOR_ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.id=='{#SENSOR_ID}')].state.text.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |General |IPMI: {#SENSOR_ID}, {#SENSOR_UNIT} |<p>It is a state of the threshold IPMI sensor.</p> |DEPENDENT |ipmi.value[{#SENSOR_ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.id=='{#SENSOR_ID}')].value.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Zabbix_raw_items |Get IPMI sensors |<p>The master item that receives all sensors with values for LLD and dependent elements from BMC.</p> |IPMI |ipmi.get |
+|Zabbix raw items |Get IPMI sensors |<p>The master item that receives all sensors with values for LLD and dependent elements from BMC.</p> |IPMI |ipmi.get |
 
 ## Triggers
 
@@ -64,7 +64,7 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/398023-discussion-thread-for-official-zabbix-template-ipmi).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/398023-discussion-thread-for-official-zabbix-template-ipmi).
 
 ## Known Issues
 

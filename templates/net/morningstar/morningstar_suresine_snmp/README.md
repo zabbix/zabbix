@@ -56,7 +56,7 @@ There are no template links in this template.
 |Status |Status: Faults |<p>MIB: SURESINE</p><p>Description:Faults</p><p>Modbus address:0x0007</p> |SNMP |status.faults[faults.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |Status |Status: Alarms |<p>MIB: SURESINE</p><p>Description:Faults</p><p>Modbus address:0x0007</p> |SNMP |status.alarms[alarms.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |Temperature |Temperature: Heatsink |<p>MIB: SURESINE</p><p>Description:Heatsink Temperature</p><p>Scaling Factor:1</p><p>Units:C</p><p>Range:[-128, 127]</p><p>Modbus address:0x0006</p> |SNMP |temp.heatsink[heatsinkTemperature.0] |
-|Zabbix_raw_items |Battery: Battery Voltage discovery |<p>MIB: SURESINE</p> |SNMP |battery.voltage.discovery[batteryVoltageSlow.0]<p>**Preprocessing**:</p><p>- MULTIPLIER: `2.581787109375E-4`</p><p>- REGEX: `^(\d+)(\.\d{1,2})? \1\2`</p> |
+|Zabbix raw items |Battery: Battery Voltage discovery |<p>MIB: SURESINE</p> |SNMP |battery.voltage.discovery[batteryVoltageSlow.0]<p>**Preprocessing**:</p><p>- MULTIPLIER: `2.581787109375E-4`</p><p>- REGEX: `^(\d+)(\.\d{1,2})? \1\2`</p> |
 
 ## Triggers
 

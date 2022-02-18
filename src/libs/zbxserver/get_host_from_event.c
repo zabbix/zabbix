@@ -17,9 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "db.h"
-#include "dbcache.h"
 #include "get_host_from_event.h"
+
 #include "log.h"
 
 #ifdef HAVE_OPENIPMI

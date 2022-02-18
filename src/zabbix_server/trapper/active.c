@@ -526,8 +526,8 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	struct zbx_json		json;
 	int			ret = FAIL, i, version;
 	zbx_uint64_t		hostid;
-	size_t			host_metadata_alloc = 1;	/* for at least NUL-termination char */
-	size_t			interface_alloc = 1;		/* for at least NUL-termination char */
+	size_t			host_metadata_alloc = 1;	/* for at least NUL-terminated string */
+	size_t			interface_alloc = 1;		/* for at least NUL-terminated string */
 	size_t			buffer_size, reserved = 0;
 	unsigned short		port;
 	zbx_vector_uint64_t	itemids;
@@ -653,6 +653,11 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 					zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY_ORIG,
 							dc_items[i].key_orig, ZBX_JSON_TYPE_STRING);
 				}
+
+				/* in the case scheduled/flexible interval set delay to 0 causing */
+				/* 'Incorrect update interval' error in agent                     */
+				if (NULL != strchr(dc_items[i].delay, ';'))
+					delay = 0;
 
 				zbx_json_adduint64(&json, ZBX_PROTO_TAG_DELAY, delay);
 			}
