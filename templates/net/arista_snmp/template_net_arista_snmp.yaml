@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-18T20:50:04Z'
+  date: '2022-01-26T13:51:46Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -37,8 +37,11 @@ zabbix_export:
             name: 'Service state'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 736dc5694fc741e6bcb96e2ba27a0898
@@ -46,6 +49,10 @@ zabbix_export:
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 643a2c6f8d724bd392dd97bada7d24c2
           name: 'ICMP loss'
@@ -56,8 +63,11 @@ zabbix_export:
           units: '%'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: dfa6f280b6304bfdb0063be94f7a4c5e
@@ -69,6 +79,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Arista SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: e731e59672be40fa8ae7aced60ed3efc
           name: 'ICMP response time'
@@ -79,8 +96,11 @@ zabbix_export:
           units: s
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 18aeec70f72d43ceb4994501fb36d434
@@ -95,6 +115,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Arista SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 8954dfa9dc4445ad987f764e35c7db6e
           name: 'Get sensors'
@@ -126,8 +153,8 @@ zabbix_export:
                   return JSON.stringify(data);
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: e2d2516fb77f4e4faf13a69705d6af77
           name: 'SNMP traps (fallback)'
@@ -140,8 +167,8 @@ zabbix_export:
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: network
         -
           uuid: 48446cefda57477eb19dfc6db23a5ee1
           name: 'System contact details'
@@ -163,8 +190,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: fde390cc8671441194fb274209a8c190
           name: 'CPU utilization'
@@ -185,8 +212,8 @@ zabbix_export:
                 - '$..[''{#CPU.UTIL}''].avg()'
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
           triggers:
             -
               uuid: 6737f0672c244e048509358d220874a6
@@ -195,6 +222,10 @@ zabbix_export:
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 861f3aef96e64cf0a68e0fc81693f118
           name: 'System description'
@@ -217,8 +248,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 55418095abea4f109476530af23e2829
           name: 'System location'
@@ -240,8 +271,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: d4538fc49f554fb6a1514cd9487a7291
           name: 'System name'
@@ -263,8 +294,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: 362d455c9d9944cea7c37d58bcabc0a0
@@ -273,6 +304,13 @@ zabbix_export:
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: security
         -
           uuid: 8f2e8b5fa0464e4d964253f361d1e033
           name: 'System object ID'
@@ -293,8 +331,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: ed9ad1ae7fba4073bb80307dbd6849cd
           name: Uptime
@@ -315,8 +353,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: e3907a8b6aba4512a24a677ed31e4362
@@ -329,6 +367,10 @@ zabbix_export:
                 -
                   name: 'No SNMP data collection'
                   expression: 'max(/Arista SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: f57ed8cec3144effa6ffb2a4f604ab0b
           name: 'SNMP agent availability'
@@ -345,8 +387,11 @@ zabbix_export:
             name: zabbix.host.available
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 53501c72392a4bbc8fa0f5ed086d2591
@@ -359,6 +404,10 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Arista SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: 54b839c0606741bfad5c84497cf1d295
@@ -392,8 +441,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: Inventory
+                  tag: component
+                  value: system
             -
               uuid: 2f25bd11644d4bd3917d6c6693e74c99
               name: '{#ENT_NAME}: Hardware serial number'
@@ -412,8 +461,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: Inventory
+                  tag: component
+                  value: system
               trigger_prototypes:
                 -
                   uuid: 218209a40ec54a489738345c4485be83
@@ -422,6 +471,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
         -
           uuid: c78a9f82601847338d687ed01577e958
           name: 'Fan discovery'
@@ -451,8 +504,8 @@ zabbix_export:
                 entPhySensorScale, and entPhySensorPrecision objects must also be examined.
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
               trigger_prototypes:
                 -
                   uuid: 660fd32236464fd69409099c67478ff5
@@ -465,6 +518,10 @@ zabbix_export:
                     -
                       name: '{#SENSOR_INFO}: Fan is in critical state'
                       expression: 'count(/Arista SNMP/sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
                 -
                   uuid: b1131f42627047ca9629693b91d9185e
                   expression: 'min(/Arista SNMP/sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_WARN}'
@@ -479,6 +536,10 @@ zabbix_export:
                     -
                       name: '{#SENSOR_INFO}: Fan speed is above the critical threshold of {#THRESHOLD_HI_CRIT}rpm for 5m'
                       expression: 'min(/Arista SNMP/sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_CRIT}'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
                 -
                   uuid: 0cd8e252a77b4c90a155e57aab963e5e
                   expression: 'max(/Arista SNMP/sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_CRIT}'
@@ -490,6 +551,10 @@ zabbix_export:
                     -
                       name: '{#SENSOR_INFO}: Fan is in critical state'
                       expression: 'count(/Arista SNMP/sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
                 -
                   uuid: d37c360fea9143bab6ff07699ed4acb1
                   expression: 'max(/Arista SNMP/sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_WARN}'
@@ -504,6 +569,10 @@ zabbix_export:
                     -
                       name: '{#SENSOR_INFO}: Fan speed is below the critical threshold of {#THRESHOLD_LO_CRIT}rpm for 5m'
                       expression: 'max(/Arista SNMP/sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_CRIT}'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: c5e6aaebbf9d467488fdfa1127a31fd7
               name: '{#SENSOR_INFO}: Fan status'
@@ -520,8 +589,8 @@ zabbix_export:
                 name: 'ENTITY-SENSORS-MIB::EntitySensorStatus'
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
               trigger_prototypes:
                 -
                   uuid: 11dddf9f12a0423bb886808759cd429d
@@ -530,6 +599,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
           master_item:
             key: sensors.get
           overrides:
@@ -685,8 +761,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 32217efa18d74fef8d467eb1ffdffe77
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
@@ -705,8 +787,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: bb496495e10d4ba9b4e111df5f4c212c
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
@@ -730,8 +818,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 84763d17b876499d9a7a67f93b21a2a7
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
@@ -754,8 +848,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 825e8d8d1528498ba11caa0152daa3f9
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
@@ -774,8 +874,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 9f54178529434f248bbba6eed46df8ac
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
@@ -799,8 +905,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 77a0e72b17bf4f04a813b224fba88156
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
@@ -825,8 +937,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 57006254d61a411296021ee32924cce7
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
@@ -848,8 +966,14 @@ zabbix_export:
                 name: 'IF-MIB::ifOperStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: 11c5b8073b3540e4b0698a8db9e3c33e
@@ -867,6 +991,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 9ccd7ecb83bf4ff387b8541d807e6a69
               name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
@@ -890,8 +1018,14 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
           trigger_prototypes:
             -
               uuid: 9715da7cb2404bf2a3cb3e80d4bb3bde
@@ -921,6 +1055,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Arista SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Arista SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Arista SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Arista SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 32c978fecfcb42738cd179c19bcd2360
               expression: |
@@ -941,6 +1079,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Arista SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Arista SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Arista SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Arista SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 47d5a599bc574ccea4baeebc3aad34f5
               expression: |
@@ -960,6 +1102,13 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Arista SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Arista SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Arista SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Arista SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
           graph_prototypes:
             -
               uuid: ecce7b4f1bf844239328705e46958c85
@@ -1063,8 +1212,14 @@ zabbix_export:
                 name: 'EtherLike-MIB::dot3StatsDuplexStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: c1bddd15c68243aeb69dc47f57eb6631
@@ -1073,6 +1228,10 @@ zabbix_export:
                   priority: WARNING
                   description: 'Please check autonegotiation settings and cabling'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
           preprocessing:
             -
               type: JAVASCRIPT
@@ -1119,8 +1278,8 @@ zabbix_export:
                 name: 'ENTITY-STATE-MIB::EntityOperState'
               tags:
                 -
-                  tag: Application
-                  value: 'Power supply'
+                  tag: component
+                  value: power
               trigger_prototypes:
                 -
                   uuid: 4faa99278cd94abaace8b09529a6efaa
@@ -1129,6 +1288,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: 50d834b15d7f4755b1ff89ddba90fa4d
           name: 'Temperature discovery'
@@ -1164,8 +1330,8 @@ zabbix_export:
                 name: 'ENTITY-SENSORS-MIB::EntitySensorStatus'
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
             -
               uuid: 0f769e8ce0b647989085460beb9a2155
               name: '{#SENSOR_INFO}: Temperature'
@@ -1187,8 +1353,8 @@ zabbix_export:
                     - '0.1'
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: 791d55e21828472e93c97d8fa4f96d26
@@ -1197,6 +1363,10 @@ zabbix_export:
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values defined in the device.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
                 -
                   uuid: c65457a8a6d4427995626ff9ff12e339
                   expression: 'min(/Arista SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_WARN}'
@@ -1208,6 +1378,10 @@ zabbix_export:
                     -
                       name: '{#SENSOR_INFO}: Temperature is above the critical threshold of {#THRESHOLD_HI_CRIT}°C for 5m'
                       expression: 'min(/Arista SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_CRIT}'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
                 -
                   uuid: b521cd99d9fb4f6f9d1241ac33c01a86
                   expression: 'max(/Arista SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_CRIT}'
@@ -1215,6 +1389,10 @@ zabbix_export:
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values defined in the device.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
                 -
                   uuid: 750888bd98fa475dba03591945416b89
                   expression: 'max(/Arista SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_WARN}'
@@ -1226,6 +1404,10 @@ zabbix_export:
                     -
                       name: '{#SENSOR_INFO}: Temperature is below the critical threshold of {#THRESHOLD_LO_CRIT}°C for 5m'
                       expression: 'max(/Arista SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_CRIT}'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           master_item:
             key: sensors.get
           overrides:
@@ -1335,8 +1517,11 @@ zabbix_export:
               description: 'Space utilization in % for {#FSNAME}'
               tags:
                 -
-                  tag: Application
-                  value: 'Filesystem {#FSNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
             -
               uuid: 22bf8f2fc376489a9b3f65414fb10f47
               name: '{#FSNAME}: Total space'
@@ -1357,8 +1542,11 @@ zabbix_export:
                     - '{#ALLOC_UNITS}'
               tags:
                 -
-                  tag: Application
-                  value: 'Filesystem {#FSNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
             -
               uuid: 967fce12f9b34723a5984d2f4c2a74f3
               name: '{#FSNAME}: Used space'
@@ -1377,8 +1565,11 @@ zabbix_export:
                     - '{#ALLOC_UNITS}'
               tags:
                 -
-                  tag: Application
-                  value: 'Filesystem {#FSNAME}'
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
           trigger_prototypes:
             -
               uuid: f4bfac8d247144b3bebac7245248553e
@@ -1394,6 +1585,13 @@ zabbix_export:
                  - The disk free space is less than 5G.
                  - The disk will be full in less than 24 hours.
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: capacity
             -
               uuid: 9912ab9619ce46b88afe358ab50a2c4f
               expression: |
@@ -1414,6 +1612,13 @@ zabbix_export:
                   expression: |
                     last(/Arista SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
                     ((last(/Arista SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Arista SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<5G or timeleft(/Arista SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: capacity
           graph_prototypes:
             -
               uuid: 9d5287bdf6cb4bbb9cada4c24b9ecd17
@@ -1487,8 +1692,8 @@ zabbix_export:
                     - '{#ALLOC_UNITS}'
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
             -
               uuid: 520fa8a8954e4992ba18d6d2c1f18259
               name: '{#MEMNAME}: Used memory'
@@ -1507,8 +1712,8 @@ zabbix_export:
                     - '{#ALLOC_UNITS}'
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
             -
               uuid: d85df76fd2b7409c84f77459bf037f0e
               name: '{#MEMNAME}: Memory utilization'
@@ -1521,8 +1726,8 @@ zabbix_export:
               description: 'Memory utilization in %'
               tags:
                 -
-                  tag: Application
-                  value: Memory
+                  tag: component
+                  value: memory
               trigger_prototypes:
                 -
                   uuid: 6b9010e0ad4e4549ac91a91d4bb3983a
@@ -1530,6 +1735,13 @@ zabbix_export:
                   name: '{#MEMNAME}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: 1094490b59674fb58ca36cf6543b3bdb
@@ -1573,8 +1785,8 @@ zabbix_export:
                 entPhySensorScale, and entPhySensorPrecision objects must also be examined.
               tags:
                 -
-                  tag: Application
-                  value: Voltage
+                  tag: component
+                  value: voltage
               trigger_prototypes:
                 -
                   uuid: 1c78dea0380a4bf68b05c1323a208c3a
@@ -1583,6 +1795,10 @@ zabbix_export:
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses voltage sensor values defined in the device.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
                 -
                   uuid: 08b4f59d66ea45eaa95426a27586c4bd
                   expression: 'min(/Arista SNMP/sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_WARN}'
@@ -1594,6 +1810,10 @@ zabbix_export:
                     -
                       name: '{#SENSOR_INFO}: Voltage is above the critical threshold of {#THRESHOLD_HI_CRIT}V for 5m'
                       expression: 'min(/Arista SNMP/sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_CRIT}'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
                 -
                   uuid: d2df35a764234716a286a8019e6c9411
                   expression: 'max(/Arista SNMP/sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_CRIT}'
@@ -1601,6 +1821,10 @@ zabbix_export:
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses voltage sensor values defined in the device.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
                 -
                   uuid: 481908babd3f44b3a73f3e0a628fe6d4
                   expression: 'max(/Arista SNMP/sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_WARN}'
@@ -1612,6 +1836,10 @@ zabbix_export:
                     -
                       name: '{#SENSOR_INFO}: Voltage is below the critical threshold of {#THRESHOLD_LO_CRIT}V for 5m'
                       expression: 'max(/Arista SNMP/sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_CRIT}'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           master_item:
             key: sensors.get
           overrides:
@@ -1679,6 +1907,13 @@ zabbix_export:
                   value: 'Voltage is below the warning threshold'
                   status: ENABLED
                   discover: NO_DISCOVER
+      tags:
+        -
+          tag: class
+          value: network
+        -
+          tag: target
+          value: arista
       macros:
         -
           macro: '{$CPU.UTIL.CRIT}'

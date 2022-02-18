@@ -21,7 +21,6 @@ package smart
 
 import (
 	"encoding/json"
-	"strings"
 
 	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/plugin"
@@ -30,8 +29,9 @@ import (
 
 // Options -
 type Options struct {
-	Timeout int    `conf:"optional,range=1:30"`
-	Path    string `conf:"optional"`
+	plugin.SystemOptions `conf:"optional,name=System"`
+	Timeout              int    `conf:"optional,range=1:30"`
+	Path                 string `conf:"optional"`
 }
 
 // Plugin -
@@ -83,7 +83,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		for _, dev := range r.devices {
 			out = append(out, device{
 				Name:       cutPrefix(dev.Info.Name),
-				DeviceType: strings.ToUpper(getType(dev.Info.DevType, dev.RotationRate)),
+				DeviceType: getType(dev.Info.DevType, dev.RotationRate, dev.SmartAttributes.Table),
 				Model:      dev.ModelName, SerialNumber: dev.SerialNumber,
 			})
 		}
@@ -127,13 +127,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		}
 
 		for _, dev := range r.devices {
-			var t string
-			if dev.RotationRate == 0 {
-				t = "SSD"
-			} else {
-				t = "HDD"
-			}
-
+			t := getAttributeType(dev.Info.DevType, dev.RotationRate, dev.SmartAttributes.Table)
 			for _, attr := range dev.SmartAttributes.Table {
 				out = append(
 					out, attribute{
@@ -169,52 +163,108 @@ func setDiskFields(deviceJsons map[string]jsonDevice) (out []interface{}, err er
 		}
 
 		b["disk_name"] = cutPrefix(k)
+		b["disk_type"] = getType(getTypeFromJson(b), getRateFromJson(b), getTablesFromJson(b))
 
-		var devType string
-
-		if dev, ok := b["device"]; ok {
-			s, ok := dev.(string)
-			if ok {
-				info := make(map[string]string)
-				if err = json.Unmarshal([]byte(s), &info); err != nil {
-					return out, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
-				}
-
-				devType = info["type"]
-			}
-		}
-
-		rateInt := -1
-
-		if rate, ok := b["rotation_rate"]; ok {
-			switch r := rate.(type) {
-			case int:
-				rateInt = r
-			case float64:
-				rateInt = int(r)
-			}
-		}
-
-		b["disk_type"] = getType(devType, rateInt)
 		out = append(out, b)
 	}
 
 	return
 }
 
-func getType(devType string, rate int) (out string) {
-	out = "unknown"
-	if devType == "nvme" {
-		out = "nvme"
-	} else {
-		if rate == 0 {
-			out = "ssd"
-		} else if rate > 0 {
-			out = "hdd"
+func getRateFromJson(in map[string]interface{}) (out int) {
+	if r, ok := in[rotationRateFieldName]; ok {
+		switch rate := r.(type) {
+		case int:
+			out = rate
+		case float64:
+			out = int(rate)
 		}
 	}
 
 	return
+}
+
+func getTypeFromJson(in map[string]interface{}) (out string) {
+	if dev, ok := in[deviceFieldName]; ok {
+		m, ok := dev.(map[string]interface{})
+		if ok {
+			if t, ok := m[typeFieldName]; ok {
+				s, ok := t.(string)
+				if ok {
+					out = s
+				}
+			}
+		}
+	}
+
+	return
+}
+
+func getTablesFromJson(in map[string]interface{}) (out []table) {
+	attr, ok := in[ataSmartAttrFieldName]
+	if !ok {
+		return
+	}
+
+	a, ok := attr.(map[string]interface{})
+	if !ok {
+		return
+	}
+
+	tables, ok := a[ataSmartAttrTableFieldName]
+	if !ok {
+		return
+	}
+
+	tmp, ok := tables.([]interface{})
+	if !ok {
+		return
+	}
+
+	b, err := json.Marshal(tmp)
+	if err != nil {
+		return
+	}
+
+	err = json.Unmarshal(b, &out)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+func getAttributeType(devType string, rate int, tables []table) string {
+	if devType == unknownType {
+		return unknownType
+	}
+
+	return getTypeByRateAndAttr(rate, tables)
+}
+
+func getType(devType string, rate int, tables []table) string {
+	switch devType {
+	case nvmeType:
+		return nvmeType
+	case unknownType:
+		return unknownType
+	default:
+		return getTypeByRateAndAttr(rate, tables)
+	}
+}
+
+func getTypeByRateAndAttr(rate int, tables []table) string {
+	if rate > 0 {
+		return hddType
+	}
+
+	for _, t := range tables {
+		if t.Attrname == spinUpAttrName {
+			return hddType
+		}
+	}
+
+	return ssdType
 }
 
 func init() {

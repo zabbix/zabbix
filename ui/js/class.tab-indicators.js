@@ -303,13 +303,25 @@ class TabIndicatorItem {
 
 class MacrosTabIndicatorItem extends TabIndicatorItem {
 
+	static ZBX_PROPERTY_INHERITED = 1;
+
 	constructor() {
 		super(TAB_INDICATOR_TYPE_COUNT);
 	}
 
 	getValue() {
-		return document
-			.querySelectorAll('#tbl_macros tr.form_row > td:first-child > textarea:not(:placeholder-shown):not([readonly])')
+		return [...document.querySelectorAll('#tbl_macros .form_row')]
+			.filter((row) => {
+				const macro = row.querySelector('textarea[name$="[macro]"]');
+				const inherited_type = row.querySelector('input[name$="[inherited_type]"]');
+
+				if (inherited_type !== null
+						&& parseInt(inherited_type.value, 10) == MacrosTabIndicatorItem.ZBX_PROPERTY_INHERITED) {
+					return false;
+				}
+
+				return (macro !== null && macro.value !== '');
+			})
 			.length;
 	}
 
@@ -496,17 +508,17 @@ class EncryptionTabIndicatorItem extends TabIndicatorItem {
 		const tls_in_psk_node = document.querySelector('[name=tls_in_psk]');
 
 		if (tls_in_psk_node !== null) {
-			tls_in_psk_node.addEventListener('click', () => {
-				this.addAttributes(element);
-			});
+			['click', 'change'].forEach(event =>
+				tls_in_psk_node.addEventListener(event, () => this.addAttributes(element))
+			);
 		}
 
 		const tls_in_cert_node = document.querySelector('[name=tls_in_cert]');
 
 		if (tls_in_cert_node !== null) {
-			tls_in_cert_node.addEventListener('click', () => {
-				this.addAttributes(element);
-			});
+			['click', 'change'].forEach(event =>
+				tls_in_cert_node.addEventListener(event, () => this.addAttributes(element))
+			);
 		}
 
 		for (const input of document.querySelectorAll('[name=tls_connect]')) {

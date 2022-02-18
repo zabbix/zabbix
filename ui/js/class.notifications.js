@@ -38,8 +38,8 @@ ZBX_Notifications.ALARM_ONCE_SERVER = 1;
  * these "actions" by passing the new received state value through a method prefixed with <consume> that will adjust
  * instance's internal state, that in turn can be dispatched as "action". Other methods prefixed with <handle> responds
  * to other events than localStorage change event - (poll, focus, timeout..) and still they would reuse <consume>
- * domain methods and issue an anction via <push> if needed and call to render method explicitly. The <handlePushed> is
- * not reused on the instance that produces the action. This is so to reduce complexity and increase maintainebility,
+ * domain methods and issue an action via <push> if needed and call to render method explicitly. The <handlePushed> is
+ * not reused on the instance that produces the action. This is so to reduce complexity and increase maintainability,
  * because when an action produces an action, logic diverges deep, instead <consume> various domain within logic
  * and call `render` once, then <push> into localStorage once.
  *
@@ -522,7 +522,7 @@ ZBX_Notifications.prototype.renderAudio = function() {
 
 /**
  * @param {string} resource  A value for 'action' parameter.
- * @param {object} params    Form data to be send.
+ * @param {object} params    Form data to be sent.
  *
  * @return {Promise}
  */

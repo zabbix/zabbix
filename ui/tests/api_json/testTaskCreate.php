@@ -166,7 +166,7 @@ class testTaskCreate extends CAPITest {
 				'task' => [
 					'type' => '6',
 					'request' => [
-						'itemid' => '29207'
+						'itemid' => '42276'
 					]
 				],
 				'expected_error' => null
@@ -273,7 +273,7 @@ class testTaskCreate extends CAPITest {
 				'item' => [
 					'itemid' => '90004',
 					'type' => '18',
-					'master_itemid' => '23287'
+					'master_itemid' => '42237'
 				],
 				'expected_error' => 'Cannot send request: wrong item type.'
 			],
@@ -329,7 +329,7 @@ class testTaskCreate extends CAPITest {
 				'task' => [
 					'type' => '6',
 					'request' => [
-						'itemid' => '23287'
+						'itemid' => '42237'
 					]
 				],
 				'expected_error' => 'No permissions to call "task.create".'
@@ -349,7 +349,7 @@ class testTaskCreate extends CAPITest {
 				'task' => [
 					'type' => '6',
 					'request' => [
-						'itemid' => '23287'
+						'itemid' => '42237'
 					]
 				],
 				'expected_error' => 'No permissions to call "task.create".'

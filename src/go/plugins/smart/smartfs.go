@@ -33,9 +33,25 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
-const supportedSmartctl = 7.1
+const (
+	supportedSmartctl = 7.1
 
-const satType = "sat"
+	satType     = "sat"
+	nvmeType    = "nvme"
+	unknownType = "unknown"
+	ssdType     = "ssd"
+	hddType     = "hdd"
+
+	spinUpAttrName = "Spin_Up_Time"
+
+	ataSmartAttrFieldName      = "ata_smart_attributes"
+	ataSmartAttrTableFieldName = "table"
+
+	rotationRateFieldName = "rotation_rate"
+
+	deviceFieldName = "device"
+	typeFieldName   = "type"
+)
 
 var (
 	cpuCount     int
@@ -374,7 +390,7 @@ runner:
 			device, err := r.plugin.executeSmartctl(fmt.Sprintf("-a %s -j ", name), false)
 			if err != nil {
 				r.plugin.Tracef(
-					"stopped looking for RAID devices of %s type, err:",
+					"stopped looking for RAID devices of %s type, err: %s",
 					raid.rType, fmt.Errorf("failed to get RAID disk data from smartctl: %s", err.Error()),
 				)
 
@@ -384,8 +400,8 @@ runner:
 			var dp deviceParser
 			if err = json.Unmarshal(device, &dp); err != nil {
 				r.plugin.Tracef(
-					"stopped looking for RAID devices of %s type, err:",
-					raid.rType, fmt.Errorf("failed to get RAID disk data from smartctl: %s", err.Error()),
+					"stopped looking for RAID devices of %s type, err: %s",
+					raid.rType, fmt.Errorf("failed to parse RAID disk data from smartctl: %s", err.Error()),
 				)
 
 				continue runner
@@ -394,7 +410,7 @@ runner:
 			err = dp.checkErr()
 			if err != nil {
 				r.plugin.Tracef(
-					"stopped looking for RAID devices of %s type, err:",
+					"stopped looking for RAID devices of %s type, err: %s",
 					raid.rType, fmt.Errorf("failed to get disk data from smartctl: %s", err.Error()),
 				)
 

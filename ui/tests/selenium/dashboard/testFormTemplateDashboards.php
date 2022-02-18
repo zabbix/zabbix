@@ -84,7 +84,7 @@ class testFormTemplateDashboards extends CWebTest {
 									[
 										'type' => 4,
 										'name' => 'itemid',
-										'value' => 40041
+										'value' => 400410
 									]
 								]
 							],
@@ -99,7 +99,7 @@ class testFormTemplateDashboards extends CWebTest {
 									[
 										'type' => 4,
 										'name' => 'itemids',
-										'value' => 40041
+										'value' => 400410
 									]
 								]
 							],
@@ -463,7 +463,7 @@ class testFormTemplateDashboards extends CWebTest {
 		}
 		$this->assertTrue($widget_dialog->getField('Show header')->getValue());
 
-		// Close editing dashboard so that next test case would not failed with "Unexpected alert" error.
+		// Close editing dashboard so that next test case would not fail with "Unexpected alert" error.
 		$this->closeDialogue();
 	}
 

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-18T20:40:37Z'
+  date: '2022-01-26T10:51:29Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -32,8 +32,11 @@ zabbix_export:
             name: 'Service state'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 680c72ab6bb441779553b198081e3bf4
@@ -41,6 +44,10 @@ zabbix_export:
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 4a8bd0d13bab4666aaf4c53b7722ec74
           name: 'ICMP loss'
@@ -51,8 +58,11 @@ zabbix_export:
           units: '%'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: e2e4bfca2d0c4f8ebd64bef322d2a368
@@ -64,6 +74,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Supermicro Aten SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: feb1b9189b904b42b17ac4e1db49806e
           name: 'ICMP response time'
@@ -74,8 +91,11 @@ zabbix_export:
           units: s
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: b6fb489c6a624b2994c5e50ba75539b2
@@ -90,6 +110,13 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Supermicro Aten SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: cadc501d69624baa8ad292c2c8f6fd52
           name: 'SNMP traps (fallback)'
@@ -102,8 +129,8 @@ zabbix_export:
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: network
         -
           uuid: ccba865de57a41718b53ff1f82b2ca87
           name: 'System contact details'
@@ -125,8 +152,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 70f51b4370c64c2bab2c811359ef690b
           name: 'System description'
@@ -149,8 +176,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 52169be1d3924c638476a290590066f3
           name: 'System location'
@@ -172,8 +199,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: afa2acff36034dccb96a1946e7039f39
           name: 'System name'
@@ -195,8 +222,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: 07b7a49bffea4c03a022eed632754f47
@@ -205,6 +232,13 @@ zabbix_export:
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: security
         -
           uuid: a0c0d3ee729b4a159719271232024b45
           name: 'System object ID'
@@ -225,8 +259,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: cc33c0e22893432280d642c75020a222
           name: Uptime
@@ -247,8 +281,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: 37aab043ea474548ab1e54e504720bed
@@ -261,6 +295,10 @@ zabbix_export:
                 -
                   name: 'No SNMP data collection'
                   expression: 'max(/Supermicro Aten SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: e205f1aa96a448a2955e988fa8528600
           name: 'SNMP agent availability'
@@ -277,8 +315,11 @@ zabbix_export:
             name: zabbix.host.available
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: caeb9732846b4ae586ee103ac0c4a65b
@@ -291,6 +332,10 @@ zabbix_export:
                 -
                   name: 'Unavailable by ICMP ping'
                   expression: 'max(/Supermicro Aten SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: e31995e21b3942e58b7ed451f57f0360
@@ -325,8 +370,8 @@ zabbix_export:
                 This string should include the name of the manufacturer, the product name and the version of the interface hardware/software.
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
         -
           uuid: c03c556ed8e441099513aaacaf4a3752
           name: 'Temperature Discovery'
@@ -362,8 +407,8 @@ zabbix_export:
                 This string should include the name of the manufacturer, the product name and the version of the interface hardware/software.
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: 1a48aee477d54d34bdea47fc6027968c
@@ -374,6 +419,13 @@ zabbix_export:
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 2c2914d1c8c846d180ee308fa861540e
                   expression: 'avg(/Supermicro Aten SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)>{$TEMP_WARN:""}'
@@ -388,6 +440,13 @@ zabbix_export:
                       name: '{#SENSOR_DESCR}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
                       expression: 'avg(/Supermicro Aten SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)>{$TEMP_CRIT:""}'
                       recovery_expression: 'max(/Supermicro Aten SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)<{$TEMP_CRIT:""}-3'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 1439e7a34bbf4046836890f208f99a48
                   expression: 'avg(/Supermicro Aten SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:""}'
@@ -396,6 +455,23 @@ zabbix_export:
                   name: '{#SENSOR_DESCR}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
+      tags:
+        -
+          tag: class
+          value: hardware
+        -
+          tag: target
+          value: aten
+        -
+          tag: target
+          value: supermicro
       macros:
         -
           macro: '{$ICMP_LOSS_WARN}'

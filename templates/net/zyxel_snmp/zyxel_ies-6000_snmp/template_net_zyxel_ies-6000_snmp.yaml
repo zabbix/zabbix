@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-17T06:34:14Z'
+  date: '2022-01-26T19:42:11Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -27,7 +27,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/422668-discussion-thread-for-official-zabbix-templates-for-zyxel
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: 'Templates/Network devices'
@@ -47,8 +47,8 @@ zabbix_export:
                 - 1h
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: network
           triggers:
             -
               uuid: 41eb76d6be3e47b8b0ca1296470372aa
@@ -57,6 +57,10 @@ zabbix_export:
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: c4856aae926047078d33bc760833ec12
           name: 'ZYXEL IES-6000: Contact'
@@ -80,8 +84,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
         -
           uuid: 631f2bc2963c4abb8d01b5cca6179d77
           name: 'ZYXEL IES-6000: Location'
@@ -104,8 +108,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
         -
           uuid: 663131027cc84bd188fb4e5bd240777c
           name: 'ZYXEL IES-6000: MAC address'
@@ -131,8 +135,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
         -
           uuid: a91730326e1c4479bb330110a15ee689
           name: 'ZYXEL IES-6000: Hardware model name'
@@ -159,8 +163,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
           triggers:
             -
               uuid: 7f6f8bdde2644182a892792ff2bb7c68
@@ -168,6 +172,10 @@ zabbix_export:
               name: 'ZYXEL IES-6000: Template does not match hardware'
               priority: INFO
               description: 'This template is for Zyxel IES-6000, but connected to {ITEM.VALUE}'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 2062eb7816e242668936c020e6e1d532
           name: 'ZYXEL IES-6000: Host name'
@@ -191,8 +199,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
         -
           uuid: e79a790f3ca54943997f1d0b3e74943d
           name: 'ZYXEL IES-6000: Uptime'
@@ -215,8 +223,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: 7a52520cc3dc4350bd7aa14260899f1c
@@ -225,6 +233,10 @@ zabbix_export:
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
       discovery_rules:
         -
           uuid: 6023c8a68b5547dcab838414cbf544ea
@@ -253,8 +265,8 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID}'
+                  tag: component
+                  value: system
               trigger_prototypes:
                 -
                   uuid: 1173ae0cf9f440f595366a6da7a4c672
@@ -262,6 +274,10 @@ zabbix_export:
                   name: 'ZYXEL IES-6000: High Packet buffer utilization in Slot {#ZYXEL.SLOT.ID} (>{#ZYXEL.BUFFERHIGHTHRESH}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free buffer.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: fcb46fd73a884e60b1ba3d4e8873bbce
@@ -314,8 +330,8 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID}'
+                  tag: component
+                  value: cpu
               trigger_prototypes:
                 -
                   uuid: 0d882e8f017e46c78727437bd55759d4
@@ -324,6 +340,10 @@ zabbix_export:
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'CPU utilization is too high. The system might be slow to respond.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: 6c3837433afe4a1cb64038c62743be15
@@ -374,8 +394,11 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
+                -
+                  tag: component
+                  value: sensor
               trigger_prototypes:
                 -
                   uuid: d5f65aebabf741798dcd0b452302aefb
@@ -384,6 +407,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           graph_prototypes:
             -
               uuid: 48736da52a8947e6a69cef3a9980bfbb
@@ -421,8 +448,8 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID}'
+                  tag: component
+                  value: memory
               trigger_prototypes:
                 -
                   uuid: 64108d56dc6d43148f67503383fc6705
@@ -430,6 +457,10 @@ zabbix_export:
                   name: 'ZYXEL IES-6000: High memory utilization in Slot {#ZYXEL.SLOT.ID} pool (>{#ZYXEL.MEMORYHIGHTHRESH}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: c85c2345f80448feb2253a10ec16778a
@@ -507,8 +538,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: dfd46b4bf39140b391bb2a8ab21db668
               name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: ATUC attenuation'
@@ -534,8 +571,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: e1233b29eb764b0bb5a2ce35f79060bf
@@ -543,6 +586,10 @@ zabbix_export:
                   name: 'ZYXEL IES-6000: High the DSL line attenuation in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID} (>{$ZYXEL.ADSL.ATN.MAX}dB for 5m)'
                   priority: WARNING
                   description: 'The reductions in amplitude of the downstream and upstream DSL signals.'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
             -
               uuid: 0b77f799291548de84478dff54742afe
               name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: ATUC output power'
@@ -567,8 +614,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 292d33986274498b819ab0b6b3ac3c21
               name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: ATUC noise margin'
@@ -594,8 +647,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: d7392fd0c372459bb21b9a85a47ccb8c
@@ -603,6 +662,10 @@ zabbix_export:
                   name: 'ZYXEL IES-6000: Low the DSL line noise margins in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID} (<{$ZYXEL.ADSL.SNR.MIN}dB for 5m)'
                   priority: WARNING
                   description: 'Signal-to-noise margin (SNR Margin) which is the difference between the actual SNR and the SNR required to sync at a specific speed'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
             -
               uuid: f6d71feb40954a88a2fa5ebe35af25cb
               name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: ATUR attenuation'
@@ -628,8 +691,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: 2ef5b800bb4148ce82bed8c4bf977a35
@@ -637,6 +706,10 @@ zabbix_export:
                   name: 'ZYXEL IES-6000: High the DSL line attenuation in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID} (>{$ZYXEL.ADSL.ATN.MAX}dB for 5m)'
                   priority: WARNING
                   description: 'The reductions in amplitude of the downstream and upstream DSL signals.'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
             -
               uuid: c4d523e2ef9c4d7d901383e19876af80
               name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: ATUR output power'
@@ -661,8 +734,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: ad834d61ca834dd987784180211320f7
               name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: ATUR noise margin'
@@ -688,8 +767,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: ba6eb4b3b6904b5dac4c057d3f6f3c17
@@ -697,6 +782,10 @@ zabbix_export:
                   name: 'ZYXEL IES-6000: Low the DSL line noise margins in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID} (<{$ZYXEL.ADSL.SNR.MIN}dB for 5m)'
                   priority: WARNING
                   description: 'Signal-to-noise margin (SNR Margin) which is the difference between the actual SNR and the SNR required to sync at a specific speed'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
             -
               uuid: 2349bae6bb864a4f8c6c8d9b0087503f
               name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Interface description'
@@ -716,8 +805,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: fd6e0cff15834d9ea5d5f5f570608abb
               name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Incoming broadcast packages'
@@ -738,8 +833,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: eff728cc8d824bb98a840e07c0c370ed
               name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Incoming multicast packages'
@@ -761,8 +862,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: f689c73f2aae4b4aa1688c584c88a562
               name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Incoming traffic'
@@ -786,8 +893,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 26a0ded897e745208787710bca306658
               name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Incoming unicast packages'
@@ -808,8 +921,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 8d0583741866478cb77f21e4e8e982ec
               name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Interface name'
@@ -829,8 +948,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: ba66aeea219840929dfbc7b8cb61b2ab
               name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Operational status'
@@ -852,8 +977,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: 3fbe4b16a94648089df78829ee7e683f
@@ -870,6 +1001,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: d4911b93b2084ca5b4e1c5a91bbb50af
               name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Outgoing broadcast packages'
@@ -891,8 +1026,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: d2d5d679e4974b3099111cb79506cbab
               name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Outgoing multicast packages'
@@ -915,8 +1056,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 982554d0208a422d94b53a55ca566239
               name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Outgoing traffic'
@@ -941,8 +1088,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 49c3f935e21248b69ea351e1210cc62d
               name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Outgoing unicast packages'
@@ -964,8 +1117,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
           graph_prototypes:
             -
               uuid: e8a72d0fe2d745ffbffae11b379297e4
@@ -1106,8 +1265,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: a70d2041768945a6906ab0cbe0f518ae
               name: 'ZYXEL IES-6000: Port {#SNMPINDEX}: Interface description'
@@ -1127,8 +1292,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: cee8836a0e00466fbe72a5de85007a49
               name: 'ZYXEL IES-6000: Port {#SNMPINDEX}: Link speed'
@@ -1151,8 +1322,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: a37e15f8480e47bf8b8f542e65df0a80
               name: 'ZYXEL IES-6000: Port {#SNMPINDEX}: Incoming broadcast packages'
@@ -1173,8 +1350,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: c3c7164096c845b599267186f66aa8ee
               name: 'ZYXEL IES-6000: Port {#SNMPINDEX}: Incoming multicast packages'
@@ -1196,8 +1379,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 03aeeb2bb9c9454ebd91714fff1eb713
               name: 'ZYXEL IES-6000: Port {#SNMPINDEX}: Incoming traffic'
@@ -1221,8 +1410,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: c2b9296b58bf4617b86348c82f88b1c2
               name: 'ZYXEL IES-6000: Port {#SNMPINDEX}: Incoming unicast packages'
@@ -1243,8 +1438,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 2dc6ed1aacb84706bccd26c9c4e1e944
               name: 'ZYXEL IES-6000: Port {#SNMPINDEX}: Incoming utilization'
@@ -1268,8 +1469,14 @@ zabbix_export:
                     - 'return +parseFloat(value).toFixed(0);'
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: c4a8c8d0b51d496cbae4089ffee1e531
               name: 'ZYXEL IES-6000: Port {#SNMPINDEX}: Interface name'
@@ -1289,8 +1496,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 00c015d42840420c9878ef84177c8d42
               name: 'ZYXEL IES-6000: Port {#SNMPINDEX}: Operational status'
@@ -1312,8 +1525,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: a9aac7e6c66a4a69a77f8c165f9a9d5c
@@ -1330,6 +1549,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: ff5b7d95366d47c68589c65b4b0dcb15
               name: 'ZYXEL IES-6000: Port {#SNMPINDEX}: Outgoing broadcast packages'
@@ -1351,8 +1574,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: e88787c50f654d5295d03b55d94810bf
               name: 'ZYXEL IES-6000: Port {#SNMPINDEX}: Outgoing multicast packages'
@@ -1375,8 +1604,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: ac2959db86d44152b4a87294ee817dd7
               name: 'ZYXEL IES-6000: Port {#SNMPINDEX}: Outgoing traffic'
@@ -1401,8 +1636,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: c11fc8f0eacc42e5a6ca2443bdca60ce
               name: 'ZYXEL IES-6000: Port {#SNMPINDEX}: Outgoing unicast packages'
@@ -1424,8 +1665,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 6ef41c7cc0074674b43d583a8fa36868
               name: 'ZYXEL IES-6000: Port {#SNMPINDEX}: Outgoing utilization'
@@ -1449,8 +1696,14 @@ zabbix_export:
                     - 'return +parseFloat(value).toFixed(0);'
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
           graph_prototypes:
             -
               uuid: 006679b6dfd64b65ad13de41be74783d
@@ -1627,8 +1880,11 @@ zabbix_export:
                       return outArray.join();
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID}'
+                  tag: component
+                  value: line-card
+                -
+                  tag: interface
+                  value: 'slot-{#ZYXEL.SLOT.ID}'
               trigger_prototypes:
                 -
                   uuid: c3f610ab856e42c7bb6460f552779e12
@@ -1636,6 +1892,10 @@ zabbix_export:
                   name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} alarm'
                   priority: AVERAGE
                   description: 'The slot reported an error.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 6ce4b55490ed425b8fbc1ad337071730
               name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: DSL modem code version'
@@ -1656,8 +1916,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID}'
+                  tag: component
+                  value: firmware
+                -
+                  tag: component
+                  value: line-card
+                -
+                  tag: interface
+                  value: 'slot-{#ZYXEL.SLOT.ID}'
               trigger_prototypes:
                 -
                   uuid: c62327e51d27445b893e80bf77c9696c
@@ -1667,6 +1933,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Firmware version has changed. Ack to close'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 780fdca5ba10495d8ae1dfec6a655d4a
               name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: Description'
@@ -1686,8 +1956,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID}'
+                  tag: component
+                  value: line-card
+                -
+                  tag: interface
+                  value: 'slot-{#ZYXEL.SLOT.ID}'
             -
               uuid: a0dc5b9a8968401a832dfd76cda474f1
               name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: Driver version'
@@ -1708,8 +1981,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID}'
+                  tag: component
+                  value: firmware
+                -
+                  tag: component
+                  value: line-card
+                -
+                  tag: interface
+                  value: 'slot-{#ZYXEL.SLOT.ID}'
               trigger_prototypes:
                 -
                   uuid: 63a4bdc73f8c49a7abb914f47e162dec
@@ -1719,6 +1998,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Firmware version has changed. Ack to close'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: e74a7678743c4739b98160a9cf3d516b
               name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: Firmware version'
@@ -1739,8 +2022,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID}'
+                  tag: component
+                  value: firmware
+                -
+                  tag: component
+                  value: line-card
+                -
+                  tag: interface
+                  value: 'slot-{#ZYXEL.SLOT.ID}'
               trigger_prototypes:
                 -
                   uuid: 7a2ef454d9624fd78416d2e1345be9a5
@@ -1750,6 +2039,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Firmware version has changed. Ack to close'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 96ee73d987be4576b6b40f21d43ebbac
               name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: Hardware version'
@@ -1770,8 +2063,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID}'
+                  tag: component
+                  value: firmware
+                -
+                  tag: component
+                  value: line-card
+                -
+                  tag: interface
+                  value: 'slot-{#ZYXEL.SLOT.ID}'
               trigger_prototypes:
                 -
                   uuid: 537f28be56984664822b574a2064453b
@@ -1781,6 +2080,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Firmware version has changed. Ack to close'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: aa0c1799930a46d9a658f26bf3549a18
               name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: MAC address 1'
@@ -1800,8 +2103,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID}'
+                  tag: component
+                  value: line-card
+                -
+                  tag: interface
+                  value: 'slot-{#ZYXEL.SLOT.ID}'
             -
               uuid: 6fdbc67b2612400c9e8372b310ca496e
               name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: MAC address 2'
@@ -1821,8 +2127,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID}'
+                  tag: component
+                  value: line-card
+                -
+                  tag: interface
+                  value: 'slot-{#ZYXEL.SLOT.ID}'
             -
               uuid: 5edbf1b21ca5436a9522f5dcfe80b61d
               name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: Serial number'
@@ -1842,8 +2151,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID}'
+                  tag: component
+                  value: line-card
+                -
+                  tag: interface
+                  value: 'slot-{#ZYXEL.SLOT.ID}'
               trigger_prototypes:
                 -
                   uuid: 3fbbcffe1c46497d89fe0d987a5f6eff
@@ -1852,6 +2164,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Slot {#ZYXEL.SLOT.ID} serial number has changed. Ack to close'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 5eeedb8e70764975872bd6dc6bc10821
               name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: Status'
@@ -1871,8 +2187,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID}'
+                  tag: component
+                  value: line-card
+                -
+                  tag: interface
+                  value: 'slot-{#ZYXEL.SLOT.ID}'
             -
               uuid: ea78751ce7954aa5b84caf9bdfcfeefd
               name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: Type'
@@ -1892,8 +2211,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID}'
+                  tag: component
+                  value: line-card
+                -
+                  tag: interface
+                  value: 'slot-{#ZYXEL.SLOT.ID}'
             -
               uuid: 37de3e96e8d8420192e6aae7a56ff9ef
               name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: Uptime'
@@ -1907,8 +2229,11 @@ zabbix_export:
                 The time (in seconds) since the plug-in card was last re-initialized.
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID}'
+                  tag: component
+                  value: line-card
+                -
+                  tag: interface
+                  value: 'slot-{#ZYXEL.SLOT.ID}'
               trigger_prototypes:
                 -
                   uuid: 50e43c41d0e241238b65da25c12d1616
@@ -1917,6 +2242,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Uptime is less than 10 minutes'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
         -
           uuid: 65972390ff734a088e984ac6531833c6
           name: 'Temperature discovery'
@@ -1944,8 +2273,11 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID}'
+                  tag: component
+                  value: sensor
+                -
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: c517b703b5084e9b8053fb139e3350ae
@@ -1954,6 +2286,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the temperature'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           graph_prototypes:
             -
               uuid: 8e885ce1061b4400abce9eaad1271ea1
@@ -2009,8 +2345,11 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Slot {#ZYXEL.SLOT.ID}'
+                  tag: component
+                  value: sensor
+                -
+                  tag: component
+                  value: voltage
               trigger_prototypes:
                 -
                   uuid: 14c98fc8b4864a3c87062510a079d948
@@ -2019,6 +2358,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           graph_prototypes:
             -
               uuid: d7f01a58a08a4403818242a907152f78
@@ -2045,6 +2388,19 @@ zabbix_export:
                       outArr.push(item)
                   });
                   return JSON.stringify(outArr);
+      tags:
+        -
+          tag: class
+          value: network
+        -
+          tag: target
+          value: dslam
+        -
+          tag: target
+          value: ies-6000
+        -
+          tag: target
+          value: zyxel
       macros:
         -
           macro: '{$SNMP.TIMEOUT}'

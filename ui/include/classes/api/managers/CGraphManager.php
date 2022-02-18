@@ -52,12 +52,6 @@ class CGraphManager {
 		$del_graphids = array_keys($del_graphids);
 
 		DB::delete('profiles', [
-			'idx' => 'web.favorite.graphids',
-			'source' => 'graphid',
-			'value_id' => $del_graphids
-		]);
-
-		DB::delete('profiles', [
 			'idx' => 'web.latest.graphid',
 			'value_id' => $del_graphids
 		]);

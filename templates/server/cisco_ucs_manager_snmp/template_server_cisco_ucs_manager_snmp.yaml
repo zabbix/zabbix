@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-16T20:04:06Z'
+  date: '2022-01-26T14:03:57Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -24,7 +24,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/418396-discussion-thread-for-official-zabbix-templates-for-cisco
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: 'Templates/Server hardware'
@@ -52,8 +52,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 286fdb0fa49a4b378a6219a5ed76aac4
           name: 'System description'
@@ -76,8 +76,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 88bd32f8520144858a8ddb03dd200638
           name: 'System location'
@@ -100,8 +100,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: 8bd3a60e4c70450492432c6abfa7b5f9
           name: 'System name'
@@ -125,8 +125,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
           triggers:
             -
               uuid: 622ac72c0e534bba94bb93636e4dc103
@@ -135,6 +135,10 @@ zabbix_export:
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 10d22e53318347658b2418ff33c26e0d
           name: 'System object ID'
@@ -160,8 +164,8 @@ zabbix_export:
                 - 12h
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: system
         -
           uuid: b87e425f1bdf404a8e53ff277c0ff0c0
           name: Uptime
@@ -183,8 +187,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: 9026e680b409424e8fa29934878cb771
@@ -197,6 +201,10 @@ zabbix_export:
                 -
                   name: 'No SNMP data collection'
                   expression: 'max(/Cisco UCS Manager SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 5d839f68b6534dc8bd1fb5db7a757f02
           name: 'SNMP traps (fallback)'
@@ -209,8 +217,8 @@ zabbix_export:
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
             -
-              tag: Application
-              value: General
+              tag: component
+              value: network
         -
           uuid: 0926417e279a4e52a7f12587e9422e92
           name: 'SNMP agent availability'
@@ -232,8 +240,11 @@ zabbix_export:
                 - 1h
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 010a749e3a3242cd8e3ea30459fae5a4
@@ -242,6 +253,10 @@ zabbix_export:
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: f44bb3e5a8ad4d0c98df56267700b171
@@ -270,8 +285,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Disk arrays'
+                  tag: component
+                  value: array
+                -
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: 0300b4bf4e0b42adb1b9e4985e80e356
@@ -280,6 +301,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the device for faults'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 158561ecab8b4bbd9c0a616f419bda10
                   expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.diskarray.cache.battery.status[cucsStorageRaidBatteryOperability.{#SNMPINDEX}])<>{$DISK.ARRAY.CACHE.BATTERY.STATUS.OK}'
@@ -291,6 +319,13 @@ zabbix_export:
                     -
                       name: '{#DISKARRAY_CACHE_LOCATION}: Disk array cache controller battery is in critical state!'
                       expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.diskarray.cache.battery.status[cucsStorageRaidBatteryOperability.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: bd1cf5ecd41f4dc49c6e31f32119787b
           name: 'Array controller discovery'
@@ -317,8 +352,14 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: 'Disk arrays'
+                  tag: component
+                  value: array
+                -
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
             -
               uuid: a732688d6fa347b597854078dd084935
               name: '{#DISKARRAY_LOCATION}: Disk array controller status'
@@ -339,8 +380,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Disk arrays'
+                  tag: component
+                  value: array
+                -
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: 28c32222815f47e193d09afe5aafae79
@@ -349,6 +396,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 4e758fac4df54388b5f4555bb170bdd3
                   expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.WARN:"degraded"}'
@@ -360,6 +414,13 @@ zabbix_export:
                     -
                       name: '{#DISKARRAY_LOCATION}: Disk array controller is in critical state'
                       expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.CRIT:"inoperable"}'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 264e15d04626432987c2193bf190c56c
                   expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}])>{$DISK.ARRAY.STATUS.OK:"operable"}'
@@ -374,6 +435,13 @@ zabbix_export:
                     -
                       name: '{#DISKARRAY_LOCATION}: Disk array controller is in warning state'
                       expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.WARN:"degraded"}'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: c799941bb99a4ce0af2ab50253c40259
           name: 'FAN discovery'
@@ -403,8 +471,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
               trigger_prototypes:
                 -
                   uuid: 7417bd7646c248eb9664875d7d19e9ea
@@ -413,6 +481,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: b3d6cb64470e4e4c9bf1d619c0015823
                   expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.sensor.fan.status[cucsEquipmentFanOperState.{#SNMPINDEX}])={$FAN.STATUS.WARN:"degraded"}'
@@ -424,6 +499,13 @@ zabbix_export:
                     -
                       name: '{#FAN_LOCATION}: Fan is in critical state'
                       expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.sensor.fan.status[cucsEquipmentFanOperState.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"inoperable"}'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: 20b43c2620114a9da4ff4d97b409f53e
           name: 'Network interface discovery'
@@ -513,8 +595,14 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 009aeec02b3b46dc93bd52c2f1a4de0a
               name: 'Interface {#IFNAME}({#IFALIAS}): Broadcast packets received'
@@ -540,8 +628,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 533b7352983e4adfbd9ca1c0e2e5e4b1
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets discarded'
@@ -564,8 +658,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 84e21f59350248c185a79dd916587140
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
@@ -584,8 +684,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: d72b570e01f5479db47628e399932988
               name: 'Interface {#IFNAME}({#IFALIAS}): Multicast packets received'
@@ -612,8 +718,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: eef7c3f6945a48e886de08a842c08f72
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
@@ -637,8 +749,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: f682fdf3144145f3998066a77353c4e2
               name: 'Interface {#IFNAME}({#IFALIAS}): Broadcast packets sent'
@@ -665,8 +783,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: b61c1b8a08aa40d696d03ae584230e8e
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
@@ -689,8 +813,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 0b9d7feb75674225ac8e6ad0952380ac
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
@@ -709,8 +839,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 3ddc4cca78f14dfc8e6d51efae831ba2
               name: 'Interface {#IFNAME}({#IFALIAS}): Multicast packets sent'
@@ -738,8 +874,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: e48a1926828645c49afec898d01fa81a
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
@@ -763,8 +905,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 56aa529b14b14f6f8f9a9b5f1a2ba0d8
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
@@ -789,8 +937,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 16a4394c6b824bacbc7f074d487fcdfb
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
@@ -817,8 +971,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: edfbf339b2664fae88e2a9003383e37f
@@ -836,6 +996,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 00b0f0fb6c0b4026b438627edab908fb
               name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
@@ -859,8 +1023,14 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
           trigger_prototypes:
             -
               uuid: caaa61b8d89540c496678d739610ae38
@@ -877,6 +1047,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Cisco UCS Manager SNMP/cisco.ucs.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Cisco UCS Manager SNMP/cisco.ucs.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Cisco UCS Manager SNMP/cisco.ucs.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
           graph_prototypes:
             -
               uuid: d5e5f60602cc41ba8e0b79a63644bf08
@@ -972,8 +1146,11 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
             -
               uuid: 317d489e9bf94467a228f5bbccb03436
               name: '{#DISK_LOCATION}: Physical disk model name'
@@ -994,8 +1171,11 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
             -
               uuid: d768239496f2457fbec3a1103e84914d
               name: '{#DISK_LOCATION}: Physical disk serial number'
@@ -1015,8 +1195,11 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: 693cdcf58cb34def90ade23e2f2485cb
@@ -1025,6 +1208,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Disk serial number has changed. Ack to close'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: c3c38ffc10fb4d139099c551b3c21728
               name: '{#DISK_LOCATION}: Disk size'
@@ -1049,8 +1236,11 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
             -
               uuid: ad4616916d6644f480a2687dbc56a4a3
               name: '{#DISK_LOCATION}: Physical disk status'
@@ -1071,8 +1261,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: ba92b99606fa4bf0bc4f1b6a362c2cdb
@@ -1085,6 +1278,13 @@ zabbix_export:
                     -
                       name: '{#DISK_LOCATION}: Physical disk failed'
                       expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.physicaldisk.status[cucsStorageLocalDiskDiskState.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"failed"}'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: eabf5aa62f004a2c996cc11bb5a6716a
                   expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.physicaldisk.status[cucsStorageLocalDiskDiskState.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"failed"}'
@@ -1092,6 +1292,13 @@ zabbix_export:
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check physical disk for warnings or errors'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: 8ac363db6f2346bba13b63f75cdabd22
           name: 'PSU discovery'
@@ -1121,8 +1328,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Power supply'
+                  tag: component
+                  value: power
               trigger_prototypes:
                 -
                   uuid: 0d2713cf2b72472c8d8896880476c20e
@@ -1131,6 +1338,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 468f08407a7448a384e5dcde589cb9d0
                   expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.sensor.psu.status[cucsEquipmentPsuOperState.{#SNMPINDEX}])={$PSU.STATUS.WARN:"degraded"}'
@@ -1142,6 +1356,13 @@ zabbix_export:
                     -
                       name: '{#PSU_LOCATION}: Power supply is in critical state'
                       expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.sensor.psu.status[cucsEquipmentPsuOperState.{#SNMPINDEX}])={$PSU.STATUS.CRIT:"inoperable"}'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: 90b24337c3304ff6a30428c7d46c26fd
           name: 'Temperature CPU discovery'
@@ -1169,8 +1390,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: c3b3933ceb504207a87054a1f9773a76
@@ -1181,6 +1402,13 @@ zabbix_export:
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 13b393265f59431687b776297cb0b104
                   expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}],5m)>{$TEMP.MAX.WARN:"CPU"}'
@@ -1195,6 +1423,13 @@ zabbix_export:
                       name: '{#SENSOR_LOCATION}: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"CPU"}'
                       expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"CPU"}'
                       recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"CPU"}-3'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: b99a5c977c32418ea9efded6d507e3b5
           name: 'Temperature discovery'
@@ -1222,8 +1457,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: aa4bf1c8b942462dbd21ccf8bd8c4a6b
@@ -1234,6 +1469,13 @@ zabbix_export:
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 7751dd6bf1394daa9d918005d2d99d10
                   expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)>{$TEMP.MAX.WARN:"Ambient"}'
@@ -1248,6 +1490,13 @@ zabbix_export:
                       name: '{#SENSOR_LOCATION}.IOH: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
                       expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
                       recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: d5e4b5b7e18c4545853c48db018dc127
               name: '{#SENSOR_LOCATION}.Ambient: Temperature'
@@ -1267,8 +1516,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: 230958b560374a118857b77418c6ba11
@@ -1279,6 +1528,13 @@ zabbix_export:
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 4cdcddd04b0e4625893a1e20ce22a10f
                   expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.WARN:"Ambient"}'
@@ -1293,6 +1549,13 @@ zabbix_export:
                       name: '{#SENSOR_LOCATION}.Ambient: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
                       expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
                       recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 9980042de8d74353bf4a386bb0f28d30
               name: '{#SENSOR_LOCATION}.Front: Temperature'
@@ -1312,8 +1575,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: 8ee1dfc360aa4aca84a03b452ead92ce
@@ -1324,6 +1587,13 @@ zabbix_export:
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 196c9fe3facf4e3db348337714c77e17
                   expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.WARN:"Ambient"}'
@@ -1338,6 +1608,13 @@ zabbix_export:
                       name: '{#SENSOR_LOCATION}.Front: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
                       expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
                       recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: e20bfa52f31f4a1a9f08ba02fe27f90c
               name: '{#SENSOR_LOCATION}.Rear: Temperature'
@@ -1357,8 +1634,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: a8714fcba51c46f9aa84fa02fba37743
@@ -1369,6 +1646,13 @@ zabbix_export:
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 87068c693e574cd3952ca90e95a7a681
                   expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.WARN:"Ambient"}'
@@ -1383,6 +1667,13 @@ zabbix_export:
                       name: '{#SENSOR_LOCATION}.Rear: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
                       expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
                       recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: 9c5d5ce2f672487db83cf91f22c1a413
           name: 'Unit discovery'
@@ -1411,8 +1702,8 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: Inventory
+                  tag: component
+                  value: system
             -
               uuid: ac3217187db3453eb8b9932fce7c79c4
               name: '{#UNIT_LOCATION}: Hardware serial number'
@@ -1433,8 +1724,8 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: Inventory
+                  tag: component
+                  value: system
               trigger_prototypes:
                 -
                   uuid: 27253665837647bb9c3be58f7d0881ae
@@ -1443,6 +1734,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Device serial number has changed. Ack to close'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: c6ebb7db809f4c62aae795a8b1c4b740
               name: '{#UNIT_LOCATION}: Overall system health status'
@@ -1464,8 +1759,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: Status
+                  tag: component
+                  value: system
               trigger_prototypes:
                 -
                   uuid: 7f7c337f4f9f44a3a176acce5bf27f29
@@ -1474,6 +1769,13 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for errors'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
                 -
                   uuid: 15ee6a98f2af4da4bcaa95821ffff524
                   expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.WARN:"testFailed"} or last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.WARN:"thermalProblem"} or last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.WARN:"powerProblem"} or last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.WARN:"voltageProblem"} or last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.WARN:"diagnosticsFailed"}'
@@ -1485,6 +1787,13 @@ zabbix_export:
                     -
                       name: '{#UNIT_LOCATION}: System status is in critical state'
                       expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.CRIT:"computeFailed"} or last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.CRIT:"configFailure"} or last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.CRIT:"unconfigFailure"} or last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.CRIT:"inoperable"}'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
         -
           uuid: 6d0760c4d29d4113b179b0e5c18f7e3b
           name: 'Virtual disk discovery'
@@ -1514,8 +1823,11 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
             -
               uuid: 59a403629e8b40d981c2926ead601966
               name: '{#VDISK_LOCATION}: Disk size'
@@ -1542,8 +1854,11 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
             -
               uuid: 39504e417781414081e1198adef562d4
               name: '{#VDISK_LOCATION}: Status'
@@ -1564,8 +1879,11 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: 63232b4e1f6b411a93ff8abad1ff3200
@@ -1574,6 +1892,23 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'Please check virtual disk for warnings or errors'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
+      tags:
+        -
+          tag: class
+          value: hardware
+        -
+          tag: target
+          value: cisco
+        -
+          tag: target
+          value: cisco-ucs-manager
       macros:
         -
           macro: '{$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}'

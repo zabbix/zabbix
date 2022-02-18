@@ -53,10 +53,10 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|SIP peers discovery |<p>-</p> |DEPENDENT |asterisk.sip_peers.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.sip.trunks`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |IAX peers discovery |<p>-</p> |DEPENDENT |asterisk.iax_peers.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.iax.trunks`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |PJSIP endpoints discovery |<p>-</p> |DEPENDENT |asterisk.pjsip_endpoints.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.pjsip.trunks`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Queues discovery |<p>-</p> |DEPENDENT |asterisk.queues.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.queue.queues`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|SIP peers discovery |<p>-</p> |DEPENDENT |asterisk.sip_peers.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.sip.trunks`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 
 ## Items collected
 
@@ -96,7 +96,7 @@ There are no template links in this template.
 |Asterisk |"{#QUEUE}": Logged in |<p>The number of queue members.</p> |DEPENDENT |asterisk.queue.loggedin[{#QUEUE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.queue.queues[?(@.Queue=='{#QUEUE}')].LoggedIn.first()`</p> |
 |Asterisk |"{#QUEUE}": Available |<p>The number of available queue members.</p> |DEPENDENT |asterisk.queue.available[{#QUEUE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.queue.queues[?(@.Queue=='{#QUEUE}')].Available.first()`</p> |
 |Asterisk |"{#QUEUE}": Callers |<p>The number incoming calls in queue.</p> |DEPENDENT |asterisk.queue.callers[{#QUEUE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.queue.queues[?(@.Queue=='{#QUEUE}')].Callers.first()`</p> |
-|Zabbix_raw_items |Asterisk: Get stats |<p>Asterisk system information in JSON format.</p> |HTTP_AGENT |asterisk.get_stats<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
+|Zabbix raw items |Asterisk: Get stats |<p>Asterisk system information in JSON format.</p> |HTTP_AGENT |asterisk.get_stats<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 
 ## Triggers
 
@@ -123,7 +123,7 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/410060-discussion-thread-for-official-zabbix-template-asterisk).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/410060-discussion-thread-for-official-zabbix-template-asterisk).
 
 
 ## References

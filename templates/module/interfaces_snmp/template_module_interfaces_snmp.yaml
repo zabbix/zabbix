@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-16T08:28:23Z'
+  date: '2022-01-28T12:41:43Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -16,7 +16,7 @@ zabbix_export:
         MIBs used:
         IF-MIB
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Modules
@@ -109,8 +109,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 2c7296aa56884ef48bb66c25097848f9
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
@@ -129,8 +135,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 633cdf45222b454198ec66308aa7a55d
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
@@ -154,8 +166,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: baca586b493448959a945c9433c38fe7
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
@@ -178,8 +196,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 2712f191e05046da85321c0ceeea85b3
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
@@ -198,8 +222,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 9037dd45e90a45baa58014d20db3ab0f
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
@@ -223,8 +253,14 @@ zabbix_export:
                     - '8'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: b63cb94bb9954ee4ab56d2a7d25d5957
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
@@ -249,8 +285,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
             -
               uuid: 0ac3b237358a4df69712d3829341766b
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
@@ -272,8 +314,14 @@ zabbix_export:
                 name: 'IF-MIB::ifOperStatus'
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
               trigger_prototypes:
                 -
                   uuid: 35d62eb5323141a3a3f3afc4c9250243
@@ -291,6 +339,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 565967032d23436486868eb495f7ed17
               name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
@@ -314,8 +366,14 @@ zabbix_export:
                     - 1d
               tags:
                 -
-                  tag: Application
-                  value: 'Interface {#IFNAME}({#IFALIAS})'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
           trigger_prototypes:
             -
               uuid: 9f1f6cff58454b469f588af8624f9078
@@ -345,6 +403,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 913c87be8cd94aeb8a3f9e008a4cd560
               expression: |
@@ -365,6 +427,10 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
             -
               uuid: 15b436b13012415bb9773d3ddab22178
               expression: |
@@ -384,6 +450,13 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Interfaces SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
           graph_prototypes:
             -
               uuid: 748719ae10ea43da9efec7225dac54cb

@@ -39,6 +39,8 @@ abstract class CHostGeneral extends CHostBase {
 	 *
 	 * @param array      $hosts
 	 * @param array|null $db_hosts
+	 *
+	 * @throws APIException if groups are not valid.
 	 */
 	protected function checkGroups(array $hosts, array $db_hosts = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
@@ -121,8 +123,8 @@ abstract class CHostGeneral extends CHostBase {
 
 			if ($duplicates) {
 				$error = ($duplicates[0]['status'] == HOST_STATUS_TEMPLATE)
-					? _s('Template with the same name "%1$s" already exists.', $duplicates[0]['host'])
-					: _s('Host with the same name "%1$s" already exists.', $duplicates[0]['host']);
+					? _s('Template with host name "%1$s" already exists.', $duplicates[0]['host'])
+					: _s('Host with host name "%1$s" already exists.', $duplicates[0]['host']);
 
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
@@ -141,8 +143,8 @@ abstract class CHostGeneral extends CHostBase {
 
 			if ($duplicates) {
 				$error = ($duplicates[0]['status'] == HOST_STATUS_TEMPLATE)
-					? _s('Template with the same visible name "%1$s" already exists.', $duplicates[0]['name'])
-					: _s('Host with the same visible name "%1$s" already exists.', $duplicates[0]['name']);
+					? _s('Template with visible name "%1$s" already exists.', $duplicates[0]['name'])
+					: _s('Host with visible name "%1$s" already exists.', $duplicates[0]['name']);
 
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
@@ -289,135 +291,6 @@ abstract class CHostGeneral extends CHostBase {
 				}
 			}
 			unset($group);
-		}
-		unset($host);
-	}
-
-	/**
-	 * @param array      $hosts
-	 * @param array|null $db_hosts
-	 */
-	protected function updateTagsNew(array &$hosts, array $db_hosts = null): void {
-		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
-
-		$ins_tags = [];
-		$del_hosttagids = [];
-
-		foreach ($hosts as &$host) {
-			if (!array_key_exists('tags', $host)) {
-				continue;
-			}
-
-			$db_tags = ($db_hosts !== null) ? $db_hosts[$host[$id_field_name]]['tags'] : [];
-
-			$hosttagid_by_tag_value = [];
-			foreach ($db_tags as $db_tag) {
-				$hosttagid_by_tag_value[$db_tag['tag']][$db_tag['value']] = $db_tag['hosttagid'];
-			}
-
-			foreach ($host['tags'] as &$tag) {
-				if (array_key_exists($tag['tag'], $hosttagid_by_tag_value)
-						&& array_key_exists($tag['value'], $hosttagid_by_tag_value[$tag['tag']])) {
-					$tag['hosttagid'] = $hosttagid_by_tag_value[$tag['tag']][$tag['value']];
-					unset($db_tags[$tag['hosttagid']]);
-				}
-				else {
-					$ins_tags[] = ['hostid' => $host[$id_field_name]] + $tag;
-				}
-			}
-			unset($tag);
-
-			$del_hosttagids = array_merge($del_hosttagids, array_keys($db_tags));
-		}
-		unset($host);
-
-		if ($del_hosttagids) {
-			DB::delete('host_tag', ['hosttagid' => $del_hosttagids]);
-		}
-
-		if ($ins_tags) {
-			$hosttagids = DB::insert('host_tag', $ins_tags);
-		}
-
-		foreach ($hosts as &$host) {
-			if (!array_key_exists('tags', $host)) {
-				continue;
-			}
-
-			foreach ($host['tags'] as &$tag) {
-				if (!array_key_exists('hosttagid', $tag)) {
-					$tag['hosttagid'] = array_shift($hosttagids);
-				}
-			}
-			unset($tag);
-		}
-		unset($host);
-	}
-
-	/**
-	 * @param array      $hosts
-	 * @param array|null $db_hosts
-	 */
-	protected function updateMacros(array &$hosts, array $db_hosts = null): void {
-		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
-
-		$ins_hostmacros = [];
-		$upd_hostmacros = [];
-		$del_hostmacroids = [];
-
-		foreach ($hosts as &$host) {
-			if (!array_key_exists('macros', $host)) {
-				continue;
-			}
-
-			$db_macros = ($db_hosts !== null) ? $db_hosts[$host[$id_field_name]]['macros'] : [];
-
-			foreach ($host['macros'] as &$macro) {
-				if (array_key_exists('hostmacroid', $macro)) {
-					$upd_hostmacro = DB::getUpdatedValues('hostmacro', $macro, $db_macros[$macro['hostmacroid']]);
-
-					if ($upd_hostmacro) {
-						$upd_hostmacros[] = [
-							'values' => $upd_hostmacro,
-							'where' => ['hostmacroid' => $macro['hostmacroid']]
-						];
-					}
-
-					unset($db_macros[$macro['hostmacroid']]);
-				}
-				else {
-					$ins_hostmacros[] = ['hostid' => $host[$id_field_name]] + $macro;
-				}
-			}
-			unset($macro);
-
-			$del_hostmacroids = array_merge($del_hostmacroids, array_keys($db_macros));
-		}
-		unset($host);
-
-		if ($del_hostmacroids) {
-			DB::delete('hostmacro', ['hostmacroid' => $del_hostmacroids]);
-		}
-
-		if ($upd_hostmacros) {
-			DB::update('hostmacro', $upd_hostmacros);
-		}
-
-		if ($ins_hostmacros) {
-			$hostmacroids = DB::insert('hostmacro', $ins_hostmacros);
-		}
-
-		foreach ($hosts as &$host) {
-			if (!array_key_exists('macros', $host)) {
-				continue;
-			}
-
-			foreach ($host['macros'] as &$macro) {
-				if (!array_key_exists('hostmacroid', $macro)) {
-					$macro['hostmacroid'] = array_shift($hostmacroids);
-				}
-			}
-			unset($macro);
 		}
 		unset($host);
 	}
@@ -871,17 +744,27 @@ abstract class CHostGeneral extends CHostBase {
 		}
 
 		API::Item()->syncTemplates($link_request);
-		API::DiscoveryRule()->syncTemplates($link_request);
-		API::ItemPrototype()->syncTemplates($link_request);
-		API::HostPrototype()->syncTemplates($link_request);
+		$ruleids = API::DiscoveryRule()->syncTemplates($templateids, $hostids);
+
+		if ($ruleids) {
+			API::ItemPrototype()->syncTemplates($link_request);
+			API::HostPrototype()->syncTemplates($ruleids, $hostids);
+		}
 
 		API::Trigger()->syncTemplates($link_request);
-		API::TriggerPrototype()->syncTemplates($link_request);
-		API::GraphPrototype()->syncTemplates($link_request);
+
+		if ($ruleids) {
+			API::TriggerPrototype()->syncTemplates($link_request);
+			API::GraphPrototype()->syncTemplates($link_request);
+		}
+
 		API::Graph()->syncTemplates($link_request);
 
 		API::Trigger()->syncTemplateDependencies($link_request);
-		API::TriggerPrototype()->syncTemplateDependencies($link_request);
+
+		if ($ruleids) {
+			API::TriggerPrototype()->syncTemplateDependencies($link_request);
+		}
 	}
 
 	/**
@@ -1098,9 +981,12 @@ abstract class CHostGeneral extends CHostBase {
 
 		foreach ($link_requests as $link_request) {
 			API::Item()->syncTemplates($link_request);
-			API::DiscoveryRule()->syncTemplates($link_request);
-			API::ItemPrototype()->syncTemplates($link_request);
-			API::HostPrototype()->syncTemplates($link_request);
+			$ruleids = API::DiscoveryRule()->syncTemplates($link_request['templateids'], $link_request['hostids']);
+
+			if ($ruleids) {
+				API::ItemPrototype()->syncTemplates($link_request);
+				API::HostPrototype()->syncTemplates($ruleids, $link_request['hostids']);
+			}
 		}
 
 		// we do linkage in two separate loops because for triggers you need all items already created on host
@@ -1826,117 +1712,57 @@ abstract class CHostGeneral extends CHostBase {
 	}
 
 	/**
-	 * Add the existing host groups, templates, tags, macros. Also add an empty array of templates to clear.
+	 * Add the existing host groups, templates, tags, macros.
 	 *
 	 * @param array $hosts
 	 * @param array $db_hosts
 	 */
-	public function addAffectedObjects(array $hosts, array &$db_hosts): void {
+	protected function addAffectedObjects(array $hosts, array &$db_hosts): void {
+		$this->addAffectedGroups($hosts, $db_hosts);
+		parent::addAffectedObjects($hosts, $db_hosts);
+	}
+
+	/**
+	 * @param array $hosts
+	 * @param array $db_hosts
+	 */
+	protected function addAffectedGroups(array $hosts, array &$db_hosts): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
-		$hostids = ['groups' => [], 'templates' => [], 'tags' => [], 'macros' => []];
+		$hostids = [];
 
 		foreach ($hosts as $host) {
 			if (array_key_exists('groups', $host)) {
-				$hostids['groups'][] = $host[$id_field_name];
+				$hostids[] = $host[$id_field_name];
 				$db_hosts[$host[$id_field_name]]['groups'] = [];
 			}
-
-			if (array_key_exists('templates', $host) || array_key_exists('templates_clear', $host)) {
-				$hostids['templates'][] = $host[$id_field_name];
-				$db_hosts[$host[$id_field_name]]['templates'] = [];
-			}
-
-			if (array_key_exists('tags', $host)) {
-				$hostids['tags'][] = $host[$id_field_name];
-				$db_hosts[$host[$id_field_name]]['tags'] = [];
-			}
-
-			if (array_key_exists('macros', $host)) {
-				$hostids['macros'][] = $host[$id_field_name];
-				$db_hosts[$host[$id_field_name]]['macros'] = [];
-			}
 		}
 
-		if ($hostids['groups']) {
-			$filter = ['hostid' => $hostids['groups']];
-
-			if (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
-				$db_groups = API::HostGroup()->get([
-					'output' => [],
-					$id_field_name.'s' => $hostids['groups'],
-					'preservekeys' => true
-				]);
-
-				$filter += ['groupid' => array_keys($db_groups)];
-			}
-
-			$options = [
-				'output' => ['hostgroupid', 'hostid', 'groupid'],
-				'filter' => $filter
-			];
-			$db_groups = DBselect(DB::makeSql('hosts_groups', $options));
-
-			while ($db_group = DBfetch($db_groups)) {
-				$db_hosts[$db_group['hostid']]['groups'][$db_group['hostgroupid']] =
-					array_diff_key($db_group, array_flip(['hostid']));
-			}
+		if (!$hostids) {
+			return;
 		}
 
-		if ($hostids['templates']) {
-			$permitted_templates = [];
+		$filter = ['hostid' => $hostids];
 
-			if (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
-				$permitted_templates = API::Template()->get([
-					'output' => [],
-					'hostids' => $hostids['templates'],
-					'preservekeys' => true
-				]);
-			}
+		if (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
+			$db_groups = API::HostGroup()->get([
+				'output' => [],
+				$id_field_name.'s' => $hostids,
+				'preservekeys' => true
+			]);
 
-			$options = [
-				'output' => ['hosttemplateid', 'hostid', 'templateid'],
-				'filter' => ['hostid' => $hostids['templates']]
-			];
-			$db_templates = DBselect(DB::makeSql('hosts_templates', $options));
-
-			while ($db_template = DBfetch($db_templates)) {
-				if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN
-						|| array_key_exists($db_template['templateid'], $permitted_templates)) {
-					$db_hosts[$db_template['hostid']]['templates'][$db_template['hosttemplateid']] =
-						array_diff_key($db_template, array_flip(['hostid']));
-				}
-				else {
-					$db_hosts[$db_template['hostid']]['nopermissions_templates'][$db_template['hosttemplateid']] =
-						array_diff_key($db_template, array_flip(['hostid']));
-				}
-			}
+			$filter += ['groupid' => array_keys($db_groups)];
 		}
 
-		if ($hostids['tags']) {
-			$options = [
-				'output' => ['hosttagid', 'hostid', 'tag', 'value'],
-				'filter' => ['hostid' => $hostids['tags']]
-			];
-			$db_tags = DBselect(DB::makeSql('host_tag', $options));
+		$options = [
+			'output' => ['hostgroupid', 'hostid', 'groupid'],
+			'filter' => $filter
+		];
+		$db_groups = DBselect(DB::makeSql('hosts_groups', $options));
 
-			while ($db_tag = DBfetch($db_tags)) {
-				$db_hosts[$db_tag['hostid']]['tags'][$db_tag['hosttagid']] =
-					array_diff_key($db_tag, array_flip(['hostid']));
-			}
-		}
-
-		if ($hostids['macros']) {
-			$options = [
-				'output' => ['hostmacroid', 'hostid', 'macro', 'value', 'description', 'type'],
-				'filter' => ['hostid' => $hostids['macros']]
-			];
-			$db_macros = DBselect(DB::makeSql('hostmacro', $options));
-
-			while ($db_macro = DBfetch($db_macros)) {
-				$db_hosts[$db_macro['hostid']]['macros'][$db_macro['hostmacroid']] =
-					array_diff_key($db_macro, array_flip(['hostid']));
-			}
+		while ($db_group = DBfetch($db_groups)) {
+			$db_hosts[$db_group['hostid']]['groups'][$db_group['hostgroupid']] =
+				array_diff_key($db_group, array_flip(['hostid']));
 		}
 	}
 

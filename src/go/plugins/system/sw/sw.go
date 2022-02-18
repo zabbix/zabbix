@@ -1,3 +1,4 @@
+//go:build !windows
 // +build !windows
 
 /*
@@ -42,7 +43,8 @@ type Plugin struct {
 
 // Options -
 type Options struct {
-	Timeout int
+	plugin.SystemOptions `conf:"optional,name=System"`
+	Timeout              int
 }
 
 type manager struct {

@@ -621,7 +621,7 @@ foreach ($data['db_dependencies'] as $dependency) {
 				$readonly
 					? null
 					: (new CButton('remove', _('Remove')))
-						->onClick('javascript: removeDependency("'.$dependency['triggerid'].'");')
+						->onClick('view.removeDependency('.json_encode($dependency['triggerid']).')')
 						->addClass(ZBX_STYLE_BTN_LINK)
 						->removeId()
 			))->addClass(ZBX_STYLE_NOWRAP)
@@ -653,7 +653,7 @@ $dependenciesFormList->addRow(_('Dependencies'),
 );
 $triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList, TAB_INDICATOR_DEPENDENCY);
 
-$cancelButton = $data['backurl']
+$cancelButton = $data['backurl'] !== null
 	? new CButtonCancel(null, "redirect('".$data['backurl']."');")
 	: new CButtonCancel(url_param('context'));
 
@@ -684,3 +684,11 @@ $triggersForm->addItem($triggersTab);
 $widget->addItem($triggersForm);
 
 $widget->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'form_name' => $triggersForm->getName()
+	]).');
+'))
+	->setOnDocumentReady()
+	->show();

@@ -106,12 +106,21 @@ $item_tab
 $query_fields_data = [];
 
 if (is_array($data['query_fields']) && $data['query_fields']) {
+	$i = 0;
 	foreach ($data['query_fields'] as $pair) {
-		$query_fields_data[] = ['name' => key($pair), 'value' => reset($pair)];
+		$query_fields_data[] = [
+			'name' => key($pair),
+			'value' => reset($pair),
+			'sortorder' => $i++
+		];
 	}
 }
 elseif (!$data['limited']) {
-	$query_fields_data[] = ['name' => '', 'value' => ''];
+	$query_fields_data[] = [
+		'name' => '',
+		'value' => '',
+		'sortorder' => 0
+	];
 }
 
 $query_fields = (new CTag('script', true))->setAttribute('type', 'text/json');
@@ -186,7 +195,11 @@ $item_tab
 				(new CTag('script', true))
 					->setAttribute('type', 'text/x-jquery-tmpl')
 					->addItem(new CRow([
-						(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+						(new CCol(
+							(new CDiv(
+								new CVar('query_fields[sortorder][#{index}]', '#{sortorder}')
+							))->addClass(ZBX_STYLE_DRAG_ICON)
+						))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 						(new CTextBox('query_fields[name][#{index}]', '#{name}', $data['limited']))
 							->setAttribute('placeholder', _('name'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
@@ -301,12 +314,21 @@ $item_tab
 $headers_data = [];
 
 if (is_array($data['headers']) && $data['headers']) {
+	$i = 0;
 	foreach ($data['headers'] as $pair) {
-		$headers_data[] = ['name' => key($pair), 'value' => reset($pair)];
+		$headers_data[] = [
+			'name' => key($pair),
+			'value' => reset($pair),
+			'sortorder' => $i++
+		];
 	}
 }
 elseif (!$data['limited']) {
-	$headers_data[] = ['name' => '', 'value' => ''];
+	$headers_data[] = [
+		'name' => '',
+		'value' => '',
+		'sortorder' => 0
+	];
 }
 $headers = (new CTag('script', true))->setAttribute('type', 'text/json');
 $headers->items = [json_encode($headers_data)];
@@ -330,7 +352,11 @@ $item_tab
 				(new CTag('script', true))
 					->setAttribute('type', 'text/x-jquery-tmpl')
 					->addItem(new CRow([
-						(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+						(new CCol(
+							(new CDiv(
+								new CVar('headers[sortorder][#{index}]', '#{sortorder}')
+							))->addClass(ZBX_STYLE_DRAG_ICON)
+						))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 						(new CTextBox('headers[name][#{index}]', '#{name}', $data['limited']))
 							->setAttribute('placeholder', _('name'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
@@ -978,11 +1004,15 @@ if (!empty($data['itemid'])) {
 	$tab->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
 }
 else {
+	$cancel_button = $data['backurl'] !== null
+		? new CButtonCancel(null, "redirect('".$data['backurl']."');")
+		: new CButtonCancel(url_param('context'));
+
 	$tab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		[
 			(new CSimpleButton(_('Test')))->setId('test_item'),
-			new CButtonCancel(url_param('context'), "redirect('".$data['backurl']."');")
+			$cancel_button
 		]
 	));
 }
@@ -1002,3 +1032,12 @@ $widget->show();
 		'interface_types' => itemTypeInterface()
 	]).');
 '))->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'form_name' => $form->getName(),
+		'counter' => $data['counter']
+	]).');
+'))
+	->setOnDocumentReady()
+	->show();

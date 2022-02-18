@@ -1,10 +1,10 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-10T07:40:16Z'
+  date: '2022-01-31T08:52:21Z'
   groups:
     -
-      uuid: 57b7ae836ca64446ba2c296389c009b7
-      name: Templates/Modules
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
   templates:
     -
       uuid: 8e5236f799b347a8ae90a979198be85e
@@ -15,10 +15,10 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/409339-discussion-thread-for-official-zabbix-template-squid
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
-          name: Templates/Modules
+          name: Templates/Applications
       items:
         -
           uuid: 86cc718ce21b4ff9b0a09479ae3fc130
@@ -35,8 +35,11 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 7e0f0a9e8a9d4f6193946e4f8cd4a2e3
@@ -44,6 +47,10 @@ zabbix_export:
               name: 'Squid: Port {$SQUID.HTTP.PORT} is down'
               priority: AVERAGE
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 6d7f0f6b0f89462e96e86940b779eb69
           name: 'Squid: CPU usage'
@@ -56,8 +63,8 @@ zabbix_export:
           description: 'The percentage use of the CPU'
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: cpu
         -
           uuid: 960b137ab773492ab3073e108575e4fc
           name: 'Squid: File descriptor count - current used'
@@ -69,8 +76,8 @@ zabbix_export:
           description: 'Number of file descriptors in use'
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: system
         -
           uuid: 37b45201f8444583b01e0df5af2bc14e
           name: 'Squid: File descriptor count - current maximum'
@@ -82,8 +89,8 @@ zabbix_export:
           description: 'Highest number of file descriptors in use'
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: system
         -
           uuid: 910afdc20767408f90d1bc5b7a9fd6a4
           name: 'Squid: Objects LRU expiration age'
@@ -101,8 +108,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: objects
         -
           uuid: 26b8b1a25dc74099b61813905477b414
           name: 'Squid: File descriptor count - current reserved'
@@ -114,8 +121,8 @@ zabbix_export:
           description: 'Reserved number of file descriptors'
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: system
         -
           uuid: 35f3009401b6449d95988d9ee7a621a7
           name: 'Squid: Cache swap current size'
@@ -128,8 +135,11 @@ zabbix_export:
           description: 'Storage Swap Size'
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: storage
         -
           uuid: 0789a0fa3e3b42a08a5e5bf8d0307970
           name: 'Squid: Objects unlinkd requests'
@@ -141,8 +151,8 @@ zabbix_export:
           description: 'Requests given to unlinkd'
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: objects
         -
           uuid: 6bc024be663b466ca677941130e11f50
           name: 'Squid: File descriptor count - current available'
@@ -154,14 +164,18 @@ zabbix_export:
           description: 'Available number of file descriptors'
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: system
           triggers:
             -
               uuid: 40c41c87e46443f886506da5e580657e
               expression: 'last(/Squid SNMP/squid[cacheCurrentUnusedFDescrCnt])<{$SQUID.FILE.DESC.WARN.MIN}'
               name: 'Squid: Squid is running out of file descriptors (<{$SQUID.FILE.DESC.WARN.MIN})'
               priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 1aecf10756f949999c8f3fe5ce9c2a32
           name: 'Squid: DNS server replies per second'
@@ -178,8 +192,11 @@ zabbix_export:
                 - ''
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: dns
+            -
+              tag: component
+              value: replies
         -
           uuid: e5f647c77bdb498e9cc286795bc4077c
           name: 'Squid: DNS server requests per second'
@@ -196,8 +213,11 @@ zabbix_export:
                 - ''
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: dns
+            -
+              tag: component
+              value: requests
         -
           uuid: 3f4366896dd84b8ab78d6e3dc8a6ab63
           name: 'Squid: DNS service time per 5 minutes'
@@ -215,8 +235,8 @@ zabbix_export:
                 - '0.001'
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: dns
         -
           uuid: 99448052f1a34e15a5c042124db7b651
           name: 'Squid: DNS service time per hour'
@@ -234,8 +254,8 @@ zabbix_export:
                 - '0.001'
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: dns
         -
           uuid: 0aea1fe702004d65919fc010c971c3b5
           name: 'Squid: FQDN cache hits per second'
@@ -252,8 +272,11 @@ zabbix_export:
                 - ''
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: dns
+            -
+              tag: component
+              value: hits
         -
           uuid: 2dea9b707b844d32b65a2d479ddb7d72
           name: 'Squid: FQDN cache misses per second'
@@ -270,8 +293,11 @@ zabbix_export:
                 - ''
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: dns
+            -
+              tag: component
+              value: misses
         -
           uuid: 1dad3f381c174b869c73f55cd831b40a
           name: 'Squid: FQDN cache requests per second'
@@ -288,8 +314,11 @@ zabbix_export:
                 - ''
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: dns
+            -
+              tag: component
+              value: requests
         -
           uuid: 633a70cd41c44f2c895148a7ae394acd
           name: 'Squid: HTTP all service time per 5 minutes'
@@ -307,8 +336,8 @@ zabbix_export:
                 - '0.001'
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: http
         -
           uuid: d3aa021743134d97af9dd8840b0ef692
           name: 'Squid: HTTP all service time per hour'
@@ -326,8 +355,8 @@ zabbix_export:
                 - '0.001'
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: http
         -
           uuid: 7f5bd8f89ea0495ea87c294fb8c606dd
           name: 'Squid: HTTP Errors sent per second'
@@ -344,11 +373,14 @@ zabbix_export:
                 - ''
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: errors
+            -
+              tag: component
+              value: http
         -
           uuid: 0c4fd7c154a44442a3cec82ba4026b7d
-          name: 'Squid: HTTP miss service time per 5 minutes'
+          name: 'Squid: HTTP hit service time per 5 minutes'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.2.1.5.5
           key: 'squid[cacheHttpHitSvcTime.5]'
@@ -363,8 +395,11 @@ zabbix_export:
                 - '0.001'
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: hits
+            -
+              tag: component
+              value: http
         -
           uuid: a642c99d6c3f4f5e8ec218459fd76f04
           name: 'Squid: HTTP hit service time per hour'
@@ -382,8 +417,11 @@ zabbix_export:
                 - '0.001'
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: hits
+            -
+              tag: component
+              value: http
         -
           uuid: adfe3e2fc775400991d2ea2f06218daf
           name: 'Squid: HTTP Hits sent from cache per second'
@@ -400,8 +438,11 @@ zabbix_export:
                 - ''
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: hits
+            -
+              tag: component
+              value: http
         -
           uuid: f2366a6008cb4dc7856904ea5c6631dd
           name: 'Squid: HTTP traffic received per second'
@@ -423,8 +464,11 @@ zabbix_export:
                 - ''
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: http
+            -
+              tag: component
+              value: network
         -
           uuid: f8fa271a272442369b6cbc4fb1a2decc
           name: 'Squid: HTTP miss service time per 5 minutes'
@@ -442,8 +486,11 @@ zabbix_export:
                 - '0.001'
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: http
+            -
+              tag: component
+              value: misses
         -
           uuid: 23e5a3bd6e9a4c50a7d54336a6afc1e1
           name: 'Squid: HTTP miss service time per hour'
@@ -461,8 +508,11 @@ zabbix_export:
                 - '0.001'
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: http
+            -
+              tag: component
+              value: misses
         -
           uuid: ff6b7946363d44bba5721c82c8f84df7
           name: 'Squid: HTTP traffic sent per second'
@@ -484,8 +534,11 @@ zabbix_export:
                 - ''
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: http
+            -
+              tag: component
+              value: network
         -
           uuid: bde307ead15d48859a97e35e52327d50
           name: 'Squid: ICP traffic received per second'
@@ -507,8 +560,11 @@ zabbix_export:
                 - ''
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: icp
+            -
+              tag: component
+              value: network
         -
           uuid: 7234b612b50a45e0a1bb69654e2e784d
           name: 'Squid: ICP traffic transmitted per second'
@@ -530,8 +586,11 @@ zabbix_export:
                 - ''
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: icp
+            -
+              tag: component
+              value: network
         -
           uuid: 9ee83c13fa6d41dfb8bfea91c02341b9
           name: 'Squid: ICP messages received per second'
@@ -548,8 +607,8 @@ zabbix_export:
                 - ''
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: icp
         -
           uuid: dee7d8cf211b4ad0a645a8d6d4f24c31
           name: 'Squid: ICP messages sent per second'
@@ -566,8 +625,8 @@ zabbix_export:
                 - ''
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: icp
         -
           uuid: cb9d0c300beb47568e99ff7966e1b10e
           name: 'Squid: ICP query service time per 5 minutes'
@@ -585,8 +644,11 @@ zabbix_export:
                 - '0.001'
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: icp
+            -
+              tag: component
+              value: queries
         -
           uuid: 9130a0bc53144fe992b701aa9159ff70
           name: 'Squid: ICP query service time per hour'
@@ -604,8 +666,11 @@ zabbix_export:
                 - '0.001'
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: icp
+            -
+              tag: component
+              value: queries
         -
           uuid: 35a7585432b3467585ff98b23e610d82
           name: 'Squid: ICP reply service time per 5 minutes'
@@ -623,8 +688,11 @@ zabbix_export:
                 - '0.001'
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: icp
+            -
+              tag: component
+              value: replies
         -
           uuid: 94eab55af41a465196588d08acbacb56
           name: 'Squid: ICP reply service time per hour'
@@ -642,8 +710,11 @@ zabbix_export:
                 - '0.001'
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: icp
+            -
+              tag: component
+              value: replies
         -
           uuid: c5409583483e4024aabaab500bcb637a
           name: 'Squid: IP cache hits per second'
@@ -660,8 +731,11 @@ zabbix_export:
                 - ''
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: hits
+            -
+              tag: component
+              value: ip
         -
           uuid: 8e474d2fd410472bb03024d2a2361b5d
           name: 'Squid: IP cache misses per second'
@@ -678,8 +752,11 @@ zabbix_export:
                 - ''
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: ip
+            -
+              tag: component
+              value: misses
         -
           uuid: dc837a887c3c463a9011d923dbbfbc0f
           name: 'Squid: IP cache requests per second'
@@ -696,8 +773,11 @@ zabbix_export:
                 - ''
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: ip
+            -
+              tag: component
+              value: requests
         -
           uuid: 70786920f94f41eeb0fc525c2e6431cf
           name: 'Squid: Memory maximum resident size'
@@ -715,8 +795,8 @@ zabbix_export:
                 - '1024'
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: memory
         -
           uuid: d84c3a3633784f77bf9375bf59da490b
           name: 'Squid: Memory maximum cache size'
@@ -734,8 +814,8 @@ zabbix_export:
                 - '1048576'
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: memory
         -
           uuid: c14fe87f87ca48f39bbe765db60e0a41
           name: 'Squid: Memory cache usage'
@@ -753,8 +833,8 @@ zabbix_export:
                 - '1024'
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: memory
         -
           uuid: 387bbd61d3bd469baa6c560afe8a18ae
           name: 'Squid: Objects count'
@@ -766,8 +846,8 @@ zabbix_export:
           description: 'Number of objects stored by the cache'
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: objects
         -
           uuid: 1e648a20db904e92ae4ec0c3f9037a99
           name: 'Squid: HTTP requests received per second'
@@ -784,8 +864,11 @@ zabbix_export:
                 - ''
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: http
+            -
+              tag: component
+              value: requests
         -
           uuid: 31f3e3bb57d645ff8df6b9b8d1b70a49
           name: 'Squid: Byte hit ratio per 1 minute'
@@ -797,8 +880,8 @@ zabbix_export:
           description: 'Byte Hit Ratios'
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: hits
         -
           uuid: e19775b9c83648d58655a1130c5771e4
           name: 'Squid: Byte hit ratio per 5 minutes'
@@ -810,8 +893,8 @@ zabbix_export:
           description: 'Byte Hit Ratios'
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: hits
         -
           uuid: ffb3fc17631f4cd6b55ed6eefd2e6cea
           name: 'Squid: Byte hit ratio per 1 hour'
@@ -823,8 +906,8 @@ zabbix_export:
           description: 'Byte Hit Ratios'
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: hits
         -
           uuid: a4ba5af69dd64fd8acf707ee1eaaeb32
           name: 'Squid: Request hit ratio per 1 minute'
@@ -836,8 +919,11 @@ zabbix_export:
           description: 'Byte Hit Ratios'
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: hits
+            -
+              tag: component
+              value: requests
         -
           uuid: b5ae7935e9be40e18c3020820a7865c7
           name: 'Squid: Request hit ratio per 5 minutes'
@@ -849,8 +935,11 @@ zabbix_export:
           description: 'Byte Hit Ratios'
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: hits
+            -
+              tag: component
+              value: requests
         -
           uuid: b09f7a1d9dc340b88106016586099dba
           name: 'Squid: Request hit ratio per 1 hour'
@@ -862,8 +951,11 @@ zabbix_export:
           description: 'Byte Hit Ratios'
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: hits
+            -
+              tag: component
+              value: requests
         -
           uuid: 69e4fb088c6949ac94eabcb892df46ab
           name: 'Squid: Cache swap high water mark'
@@ -876,8 +968,11 @@ zabbix_export:
           description: 'Cache Swap High Water Mark'
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: storage
         -
           uuid: 221e583d7cf2455b9d848462de4b1e9a
           name: 'Squid: Cache swap low water mark'
@@ -890,8 +985,11 @@ zabbix_export:
           description: 'Cache Swap Low Water Mark'
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: storage
         -
           uuid: 215aefddd30e41aea54e30678f290215
           name: 'Squid: Cache swap directory size'
@@ -909,8 +1007,11 @@ zabbix_export:
                 - '1048576'
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: storage
         -
           uuid: 38ad99f9b30c4d729030ceab6575f4f5
           name: 'Squid: Sys page faults per second'
@@ -927,8 +1028,8 @@ zabbix_export:
                 - ''
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: faults
         -
           uuid: 67460731d9c94166870874239c9a60da
           name: 'Squid: Uptime'
@@ -946,8 +1047,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: application
           triggers:
             -
               uuid: 89efc9400197427fa718395286dd3583
@@ -956,6 +1057,10 @@ zabbix_export:
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: d7c7f0faa1f64745be774e30e6f0b68f
           name: 'Squid: Version'
@@ -973,8 +1078,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Squid
+              tag: component
+              value: application
           triggers:
             -
               uuid: c5991152d2da4df7ae0d978233c5a859
@@ -983,6 +1088,17 @@ zabbix_export:
               priority: INFO
               description: 'Squid version has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+      tags:
+        -
+          tag: class
+          value: application
+        -
+          tag: target
+          value: squid
       macros:
         -
           macro: '{$SQUID.FILE.DESC.WARN.MIN}'
@@ -1021,18 +1137,36 @@ zabbix_export:
       expression: 'avg(/Squid SNMP/squid[cacheSysPageFaults],5m)>avg(/Squid SNMP/squid[cacheProtoClientHttpRequests],5m)/100*{$SQUID.PAGE.FAULT.WARN}'
       name: 'Squid: High sys page faults rate (>{$SQUID.PAGE.FAULT.WARN}% of received HTTP requests)'
       priority: WARNING
+      tags:
+        -
+          tag: scope
+          value: performance
     -
       uuid: 5676f1e02dc7413fb1a34543ccaf1384
       expression: 'last(/Squid SNMP/squid[cacheCurrentSwapSize])>last(/Squid SNMP/squid[cacheSwapHighWM])*last(/Squid SNMP/squid[cacheSwapMaxSize])/100'
       name: 'Squid: Swap usage is more than high watermark (>{ITEM.VALUE2}%)'
       opdata: 'Used: {ITEM.LASTVALUE1}'
       priority: HIGH
+      tags:
+        -
+          tag: scope
+          value: capacity
+        -
+          tag: scope
+          value: performance
     -
       uuid: 2cf87472ebf74239bb782580448f696c
       expression: 'last(/Squid SNMP/squid[cacheCurrentSwapSize])>last(/Squid SNMP/squid[cacheSwapLowWM])*last(/Squid SNMP/squid[cacheSwapMaxSize])/100'
       name: 'Squid: Swap usage is more than low watermark (>{ITEM.VALUE2}%)'
       opdata: 'Used: {ITEM.LASTVALUE1}'
       priority: WARNING
+      tags:
+        -
+          tag: scope
+          value: capacity
+        -
+          tag: scope
+          value: performance
   graphs:
     -
       uuid: d8bb2c1dac8a4cb5999d29227a8510e6

@@ -155,15 +155,15 @@ There are no template links in this template.
 |PostgreSQL |DB {#DBNAME}: Queries sum transaction time |<p>Sum transaction query time</p> |DEPENDENT |pgsql.queries.tx.time_sum["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].tx_time_sum`</p> |
 |PostgreSQL |DB {#DBNAME}: Index scans per second |<p>Number of index scans in the database</p> |DEPENDENT |pgsql.scans.idx.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.idx`</p><p>- CHANGE_PER_SECOND</p> |
 |PostgreSQL |DB {#DBNAME}: Sequential scans per second |<p>Number of sequential scans in the database</p> |DEPENDENT |pgsql.scans.seq.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.seq`</p><p>- CHANGE_PER_SECOND</p> |
-|Zabbix_raw_items |PostgreSQL: Get bgwriter |<p>Statistics about the background writer process's activity</p> |ZABBIX_PASSIVE |pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"] |
-|Zabbix_raw_items |PostgreSQL: Get connections sum |<p>Collect all metrics from pg_stat_activity</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-VIEW</p> |ZABBIX_PASSIVE |pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"] |
-|Zabbix_raw_items |PostgreSQL: Get dbstat |<p>Collect all metrics from pg_stat_database per database</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW</p> |ZABBIX_PASSIVE |pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"] |
-|Zabbix_raw_items |PostgreSQL: Get locks |<p>Collect all metrics from pg_locks per database</p><p>https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</p> |ZABBIX_PASSIVE |pgsql.locks["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"] |
-|Zabbix_raw_items |PostgreSQL: Get queries |<p>Collect all metrics by query execution time</p> |ZABBIX_PASSIVE |pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"] |
-|Zabbix_raw_items |PostgreSQL: Get transactions |<p>Collect metrics by transaction execution time</p> |ZABBIX_PASSIVE |pgsql.transactions["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"] |
-|Zabbix_raw_items |PostgreSQL: Get WAL |<p>Master item to collect WAL metrics</p> |ZABBIX_PASSIVE |pgsql.wal.stat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"] |
-|Zabbix_raw_items |DB {#DBNAME}: Get frozen XID |<p>-</p> |ZABBIX_PASSIVE |pgsql.frozenxid["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"] |
-|Zabbix_raw_items |DB {#DBNAME}: Get scans |<p>Number of scans done for table/index in the database</p> |ZABBIX_PASSIVE |pgsql.scans["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"] |
+|Zabbix raw items |PostgreSQL: Get bgwriter |<p>Statistics about the background writer process's activity</p> |ZABBIX_PASSIVE |pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"] |
+|Zabbix raw items |PostgreSQL: Get connections sum |<p>Collect all metrics from pg_stat_activity</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-VIEW</p> |ZABBIX_PASSIVE |pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"] |
+|Zabbix raw items |PostgreSQL: Get dbstat |<p>Collect all metrics from pg_stat_database per database</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW</p> |ZABBIX_PASSIVE |pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"] |
+|Zabbix raw items |PostgreSQL: Get locks |<p>Collect all metrics from pg_locks per database</p><p>https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</p> |ZABBIX_PASSIVE |pgsql.locks["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"] |
+|Zabbix raw items |PostgreSQL: Get queries |<p>Collect all metrics by query execution time</p> |ZABBIX_PASSIVE |pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"] |
+|Zabbix raw items |PostgreSQL: Get transactions |<p>Collect metrics by transaction execution time</p> |ZABBIX_PASSIVE |pgsql.transactions["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"] |
+|Zabbix raw items |PostgreSQL: Get WAL |<p>Master item to collect WAL metrics</p> |ZABBIX_PASSIVE |pgsql.wal.stat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"] |
+|Zabbix raw items |DB {#DBNAME}: Get frozen XID |<p>-</p> |ZABBIX_PASSIVE |pgsql.frozenxid["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"] |
+|Zabbix raw items |DB {#DBNAME}: Get scans |<p>Number of scans done for table/index in the database</p> |ZABBIX_PASSIVE |pgsql.scans["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"] |
 
 ## Triggers
 
@@ -190,5 +190,5 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384190-%C2%A0discussion-thread-for-official-zabbix-template-db-postgresql).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384190-%C2%A0discussion-thread-for-official-zabbix-template-db-postgresql).
 

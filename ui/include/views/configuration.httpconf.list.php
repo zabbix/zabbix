@@ -233,3 +233,7 @@ $httpForm->addItem([$httpTable, $data['paging'], new CActionButtonList('action',
 $widget->addItem($httpForm);
 
 $widget->show();
+
+(new CScriptTag('view.init();'))
+	->setOnDocumentReady()
+	->show();

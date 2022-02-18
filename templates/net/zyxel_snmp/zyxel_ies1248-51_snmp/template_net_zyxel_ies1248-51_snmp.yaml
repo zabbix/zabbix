@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-12-17T06:34:19Z'
+  date: '2022-01-26T19:42:12Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -27,7 +27,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/422668-discussion-thread-for-official-zabbix-templates-for-zyxel
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: 'Templates/Network devices'
@@ -47,8 +47,8 @@ zabbix_export:
                 - 1h
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: network
           triggers:
             -
               uuid: 40466f29b8e54dc88cb49e818fc48281
@@ -57,6 +57,10 @@ zabbix_export:
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: a01b8490f3b94ac5ab500d67171cfe1a
           name: 'ZYXEL IES1248-51: Contact'
@@ -80,8 +84,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
         -
           uuid: 56974ccbede04e9eb966951ac3c88250
           name: 'ZYXEL IES1248-51: ZyNOS F/W Version'
@@ -101,8 +105,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
           triggers:
             -
               uuid: b64e891456674457ab4abf994b097277
@@ -112,6 +116,10 @@ zabbix_export:
               priority: INFO
               description: 'Firmware version has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 600e6a8b9dd549b69f64f1a536bce7de
           name: 'ZYXEL IES1248-51: Location'
@@ -134,8 +142,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
         -
           uuid: ad09c90a951a4c41b935a70f58f5c26a
           name: 'ZYXEL IES1248-51: MAC address'
@@ -161,8 +169,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
         -
           uuid: 427ef42e55ca498db16d078ed41e7ad9
           name: 'ZYXEL IES1248-51: Hardware model name'
@@ -189,8 +197,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
           triggers:
             -
               uuid: 21b638f9f1154b6bb78a652d8e54c1c2
@@ -198,6 +206,10 @@ zabbix_export:
               name: 'ZYXEL IES1248-51: Template does not match hardware'
               priority: INFO
               description: 'This template is for Zyxel IES1248-51, but connected to {ITEM.VALUE}'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 8c6546b670d4455aa1234c35bb033ac7
           name: 'ZYXEL IES1248-51: Host name'
@@ -221,8 +233,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
         -
           uuid: 0d30380bb9a24bd1939d16287d5d0711
           name: 'ZYXEL IES1248-51: Hardware serial number'
@@ -244,8 +256,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
           triggers:
             -
               uuid: 2f2972169c164053a8d439b0e572b0c6
@@ -254,6 +266,10 @@ zabbix_export:
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: bafdca2040ba44be911fd1e5a09f3298
           name: 'ZYXEL IES1248-51: Alarm status'
@@ -319,8 +335,11 @@ zabbix_export:
                   return outArray.join();
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: line-card
+            -
+              tag: interface
+              value: 'slot-{#ZYXEL.SLOT.ID}'
           triggers:
             -
               uuid: 6b1b1b27241f42229e8b159320371356
@@ -328,6 +347,10 @@ zabbix_export:
               name: 'ZYXEL IES1248-51: Port {#SNMPINDEX} alarm'
               priority: AVERAGE
               description: 'The slot reported an error.'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: ba41848140394ac29fe9b77e77627f20
           name: 'ZYXEL IES1248-51: Uptime'
@@ -350,8 +373,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: bbccceac3dc24b9ab76a820fe5be4788
@@ -360,6 +383,10 @@ zabbix_export:
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
       discovery_rules:
         -
           uuid: 9ffacb42c2fe4abd9e8d10e4b8803fc2
@@ -388,8 +415,11 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
+                -
+                  tag: component
+                  value: sensor
               trigger_prototypes:
                 -
                   uuid: 86f18f4e598443ab9e0ec30554d78e1a
@@ -398,6 +428,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           graph_prototypes:
             -
               uuid: f8d2136dab70403a98da660bcf4c02a2
@@ -453,8 +487,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 7c13234155f343bc90bf1584a7f0fb3f
               name: 'ZYXEL IES1248-51: Port {#SNMPINDEX}: ATUC attenuation'
@@ -480,8 +520,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: 23e50c0031c1457596b1366a40606ef9
@@ -489,6 +535,10 @@ zabbix_export:
                   name: 'ZYXEL IES1248-51: High the DSL line attenuation in Port {#SNMPINDEX} (>{$ZYXEL.ADSL.ATN.MAX}dB for 5m)'
                   priority: WARNING
                   description: 'The reductions in amplitude of the downstream and upstream DSL signals.'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
             -
               uuid: 524bf397c9a640c48716fa20e4c45034
               name: 'ZYXEL IES1248-51: Port {#SNMPINDEX}: ATUC output power'
@@ -513,8 +563,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: ed1768b17f0f434392c5cbc91ddd5222
               name: 'ZYXEL IES1248-51: Port {#SNMPINDEX}: ATUC noise margin'
@@ -540,8 +596,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: 23bbc44b2f114afe99a8175a2b7f0ddd
@@ -549,6 +611,10 @@ zabbix_export:
                   name: 'ZYXEL IES1248-51: Low the DSL line noise margins in Port {#SNMPINDEX} (<{$ZYXEL.ADSL.SNR.MIN}dB for 5m)'
                   priority: WARNING
                   description: 'Signal-to-noise margin (SNR Margin) which is the difference between the actual SNR and the SNR required to sync at a specific speed'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
             -
               uuid: 0dd3a9f10abb4a8a92f627228c9fbb52
               name: 'ZYXEL IES1248-51: Port {#SNMPINDEX}: ATUR attenuation'
@@ -574,8 +640,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: 2132fed26fe54a7daa017b7264c37f1c
@@ -583,6 +655,10 @@ zabbix_export:
                   name: 'ZYXEL IES1248-51: High the DSL line attenuation in Port {#SNMPINDEX} (>{$ZYXEL.ADSL.ATN.MAX}dB for 5m)'
                   priority: WARNING
                   description: 'The reductions in amplitude of the downstream and upstream DSL signals.'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
             -
               uuid: 54c5b104d96945eca7cf402a2e910f90
               name: 'ZYXEL IES1248-51: Port {#SNMPINDEX}: ATUR output power'
@@ -607,8 +683,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 9744b18d3eec4bd2954ec7ea29e341fd
               name: 'ZYXEL IES1248-51: Port {#SNMPINDEX}: ATUR noise margin'
@@ -634,8 +716,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: 2d8f752b376f4c10bc8efbd39c8f45a9
@@ -643,6 +731,10 @@ zabbix_export:
                   name: 'ZYXEL IES1248-51: Low the DSL line noise margins in Port {#SNMPINDEX} (<{$ZYXEL.ADSL.SNR.MIN}dB for 5m)'
                   priority: WARNING
                   description: 'Signal-to-noise margin (SNR Margin) which is the difference between the actual SNR and the SNR required to sync at a specific speed'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
             -
               uuid: b7f622f72f98417cab3954717d311080
               name: 'ZYXEL IES1248-51: Port {#SNMPINDEX}: Incoming traffic'
@@ -666,8 +758,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: bff933861d744ee5a3229c2c6b1dc4c0
               name: 'ZYXEL IES1248-51: Port {#SNMPINDEX}: Interface name'
@@ -687,8 +785,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 25c07c59e30e42b191162fa40066c8b8
               name: 'ZYXEL IES1248-51: Port {#SNMPINDEX}: Operational status'
@@ -710,8 +814,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: 93a58c14939d4c3491646171910fe5ad
@@ -728,6 +838,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 6df1c990c9dc49caa151dfc989d055b9
               name: 'ZYXEL IES1248-51: Port {#SNMPINDEX}: Outgoing traffic'
@@ -752,8 +866,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
           graph_prototypes:
             -
               uuid: 7c9c5ff332394b97a311225de08b6bc6
@@ -833,8 +953,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#ZYXEL.IF.NAME}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: de5cf230831840cc985b63ba58d05059
               name: 'ZYXEL IES1248-51: Port {#ZYXEL.IF.NAME}: Incoming traffic'
@@ -858,8 +984,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#ZYXEL.IF.NAME}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: eeb4236d4ebe4cb396413f13d1fa669b
               name: 'ZYXEL IES1248-51: Port {#SNMPINDEX}: Interface name'
@@ -879,8 +1011,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#ZYXEL.IF.NAME}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: cd0bbc3c587a47e6a2a2307343a377b7
               name: 'ZYXEL IES1248-51: Port {#ZYXEL.IF.NAME}: Operational status'
@@ -902,8 +1040,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#ZYXEL.IF.NAME}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: 8d90a989c82a4890a3a1a0b8eeb53462
@@ -920,6 +1064,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 2e39a01f6315444cb3ae47836945b514
               name: 'ZYXEL IES1248-51: Port {#ZYXEL.IF.NAME}: Outgoing traffic'
@@ -944,8 +1092,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#ZYXEL.IF.NAME}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
           graph_prototypes:
             -
               uuid: 1988adb1e96b423a8df3c55ea2f63d47
@@ -1022,8 +1176,11 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: sensor
+                -
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: f0d7f5282c784224b0cd5f76d3c2ad90
@@ -1032,6 +1189,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the temperature'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           graph_prototypes:
             -
               uuid: a5ec11a8936746c492fcf2e4462c7ca7
@@ -1074,8 +1235,11 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Power supply'
+                  tag: component
+                  value: sensor
+                -
+                  tag: component
+                  value: voltage
               trigger_prototypes:
                 -
                   uuid: 9815420fe46c45ce8731b9688b4a543e
@@ -1084,6 +1248,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           graph_prototypes:
             -
               uuid: ebbc2726558c4504aa6bd22844d0bc83
@@ -1110,6 +1278,19 @@ zabbix_export:
                       outArr.push(item)
                   });
                   return JSON.stringify(outArr);
+      tags:
+        -
+          tag: class
+          value: network
+        -
+          tag: target
+          value: aam1248-51
+        -
+          tag: target
+          value: dslam
+        -
+          tag: target
+          value: zyxel
       macros:
         -
           macro: '{$SNMP.TIMEOUT}'

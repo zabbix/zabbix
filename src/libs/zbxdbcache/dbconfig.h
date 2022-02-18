@@ -20,9 +20,9 @@
 #ifndef ZABBIX_DBCONFIG_H
 #define ZABBIX_DBCONFIG_H
 
-#ifndef ZBX_DBCONFIG_IMPL
-#	error This header must be used by configuration cache implementation
-#endif
+#include "mutexs.h"
+#include "zbxalgo.h"
+#include "dbcache.h"
 
 typedef struct
 {
@@ -50,6 +50,9 @@ typedef struct
 	unsigned char		recovery_mode;		/* see TRIGGER_RECOVERY_MODE_* defines   */
 	unsigned char		correlation_mode;	/* see ZBX_TRIGGER_CORRELATION_* defines */
 	unsigned char		timer;
+	unsigned char		flags;
+
+	zbx_uint64_t		*itemids;
 
 	zbx_vector_ptr_t	tags;
 }
@@ -113,11 +116,17 @@ typedef struct
 	unsigned char		schedulable;
 	unsigned char		update_triggers;
 	zbx_uint64_t		templateid;
-	zbx_uint64_t		parent_itemid; /* from joined item_discovery table */
 
 	zbx_vector_ptr_t	tags;
 }
 ZBX_DC_ITEM;
+
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	zbx_uint64_t	parent_itemid;
+}
+ZBX_DC_ITEM_DISCOVERY;
 
 typedef struct
 {
@@ -802,6 +811,7 @@ typedef struct
 
 	zbx_hashset_t		items;
 	zbx_hashset_t		items_hk;		/* hostid, key */
+	zbx_hashset_t		item_discovery;
 	zbx_hashset_t		template_items;		/* template items selected from items table */
 	zbx_hashset_t		prototype_items;	/* item prototypes selected from items table */
 	zbx_hashset_t		numitems;
@@ -921,7 +931,7 @@ void	DCsync_maintenance_hosts(zbx_dbsync_t *sync);
 		((CONFIG_TIMER_FORKS + sizeof(uint64_t) * 8 - 1) / (sizeof(uint64_t) * 8))
 
 char	*dc_expand_user_macros_in_expression(const char *text, zbx_uint64_t *hostids, int hostids_num);
-char	*dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t hostid);
+char	*dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t itemid);
 char	*dc_expand_user_macros_in_calcitem(const char *formula, zbx_uint64_t hostid);
 
 char	*dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids_num);

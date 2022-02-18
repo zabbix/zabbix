@@ -17,9 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "daemon.h"
 
+#include "common.h"
 #include "pid.h"
 #include "cfg.h"
 #include "log.h"
@@ -447,6 +447,7 @@ int	zbx_sigusr_send(int flags)
 		}
 	}
 #else
+	ZBX_UNUSED(flags);
 	zbx_snprintf(error, sizeof(error), "operation is not supported on the given operating system");
 #endif
 	if (SUCCEED != ret)

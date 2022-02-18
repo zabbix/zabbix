@@ -234,8 +234,8 @@
 
 		openHostPopup(host_data) {
 			clearMessages();
-			const original_url = location.href;
 
+			const original_url = location.href;
 			const overlay = PopUp('popup.host.edit', host_data, {
 				dialogueid: 'host_edit',
 				dialogue_class: 'modal-popup-large'
