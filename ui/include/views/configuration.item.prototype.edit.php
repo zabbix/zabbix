@@ -656,7 +656,7 @@ $item_tab
 		))->setId('js-item-private-key-field')
 	])
 	->addItem([
-		(new CLabel(_('Password')))->setId('js-item-password-label'),
+		(new CLabel(_('Password'), 'password'))->setId('js-item-password-label'),
 		(new CFormField((new CTextBox('password', $data['password'], false, 64))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->disableAutocomplete()
@@ -835,7 +835,7 @@ $item_tab
 	])
 	// Append description to form list.
 	->addItem([
-		new CLabel(_('Description')),
+		new CLabel(_('Description'), 'description'),
 		new CFormField((new CTextArea('description', $data['description']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setMaxlength(DB::getFieldLength('items', 'description'))
@@ -843,11 +843,11 @@ $item_tab
 	])
 	// Append status to form list.
 	->addItem([
-		new CLabel(_('Create enabled')),
+		new CLabel(_('Create enabled'), 'status'),
 		new CFormField((new CCheckBox('status', ITEM_STATUS_ACTIVE))->setChecked($data['status'] == ITEM_STATUS_ACTIVE))
 	])
 	->addItem([
-		new CLabel(_('Discover')),
+		new CLabel(_('Discover'), 'discover'),
 		new CFormField((new CCheckBox('discover', ZBX_PROTOTYPE_DISCOVER))
 			->setChecked($data['discover'] == ZBX_PROTOTYPE_DISCOVER)
 			->setUncheckedValue(ZBX_PROTOTYPE_NO_DISCOVER)

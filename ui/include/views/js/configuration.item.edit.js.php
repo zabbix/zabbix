@@ -32,8 +32,7 @@ include __DIR__.'/itemtest.js.php';
 	jQuery(document).ready(function($) {
 		function typeChangeHandler() {
 			// selected item type
-			var type = parseInt($('#type').val()),
-				asterisk = '<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>';
+			var type = parseInt($('#type').val());
 
 			$('#keyButton').prop('disabled',
 				type != <?= ITEM_TYPE_ZABBIX ?>
@@ -47,11 +46,11 @@ include __DIR__.'/itemtest.js.php';
 			)
 
 			if ((type == <?= ITEM_TYPE_SSH ?> || type == <?= ITEM_TYPE_TELNET ?>)) {
-				$('label[for=username]').addClass(asterisk);
+				$('label[for=username]').addClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
 				$('input[name=username]').attr('aria-required', 'true');
 			}
 			else {
-				$('label[for=username]').removeClass(asterisk);
+				$('label[for=username]').removeClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
 				$('input[name=username]').removeAttr('aria-required');
 			}
 		}
