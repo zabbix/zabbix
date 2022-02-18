@@ -463,7 +463,8 @@ run:
 type capacity struct {
 	Capacity int `conf:"optional"`
 	System   struct {
-		Capacity int `conf:"optional"`
+		ForceActiveChecksOnStart *int `conf:"optional"`
+		Capacity                 int  `conf:"optional"`
 	} `conf:"optional"`
 }
 
@@ -486,7 +487,7 @@ func (m *Manager) init() {
 	pagent := &pluginAgent{}
 	for _, metric := range metrics {
 		if metric.Plugin != pagent.impl {
-			capacity := getCapacity(agent.Options.Plugins[metric.Plugin.Name()], metric.Plugin.Name())
+			capacity, forceActiveChecksOnStart := getCapacity(agent.Options.Plugins[metric.Plugin.Name()], metric.Plugin.Name())
 			if capacity > metric.Plugin.Capacity() {
 				log.Warningf("lowering the plugin %s capacity to %d as the configured capacity %d exceeds limits",
 					metric.Plugin.Name(), metric.Plugin.Capacity(), capacity)
@@ -494,13 +495,14 @@ func (m *Manager) init() {
 			}
 
 			pagent = &pluginAgent{
-				impl:         metric.Plugin,
-				tasks:        make(performerHeap, 0),
-				maxCapacity:  capacity,
-				usedCapacity: 0,
-				index:        -1,
-				refcount:     0,
-				usrprm:       metric.UsrPrm,
+				impl:                     metric.Plugin,
+				tasks:                    make(performerHeap, 0),
+				maxCapacity:              capacity,
+				usedCapacity:             0,
+				forceActiveChecksOnStart: forceActiveChecksOnStart,
+				index:                    -1,
+				refcount:                 0,
+				usrprm:                   metric.UsrPrm,
 			}
 
 			interfaces := ""
@@ -669,37 +671,48 @@ func peekTask(tasks performerHeap) performer {
 	return tasks[0]
 }
 
-func getCapacity(optsRaw interface{}, name string) int {
-	if optsRaw == nil {
-		return plugin.DefaultCapacity
-	}
+func getCapacity(optsRaw interface{}, name string) (capacity int, forceActiveChecksOnStart int) {
 
-	pluginCap, pluginSystemCap := getPluginCap(optsRaw, name)
-	if pluginCap > 0 && pluginSystemCap > 0 {
-		log.Warningf("both Plugins.%s.Capacity and Plugins.%s.System.Capacity configuration parameters are set, using System.Capacity: %d",
-			name, name, pluginSystemCap)
-
-		return pluginSystemCap
-	}
+	pluginCap, pluginSystemCap, pluginForceActiveChecksOnStart := getPluginCap(optsRaw, name)
 
 	if pluginSystemCap > 0 {
-		return pluginSystemCap
+		if pluginCap > 0 {
+			log.Warningf("both Plugins.%s.Capacity and Plugins.%s.System.Capacity configuration parameters are set, using System.Capacity: %d",
+				name, name, pluginSystemCap)
+		}
+		capacity = pluginSystemCap
+	} else if pluginCap > 0 {
+		log.Warningf(
+			"plugin %s configuration parameter Plugins.%s.Capacity is deprecated, use Plugins.%s.System.Capacity instead",
+			name, name, name,
+		)
+		capacity = pluginCap
+	} else {
+		capacity = plugin.DefaultCapacity
 	}
 
-	if pluginCap > 0 {
-		return pluginCap
+	if nil != pluginForceActiveChecksOnStart {
+		if *pluginForceActiveChecksOnStart > 1 || *pluginForceActiveChecksOnStart < 0 {
+			log.Warningf("invalid Plugins.%s.System.ForceActiveChecksOnStart configuration parameter: %d",
+				name, pluginSystemCap)
+			forceActiveChecksOnStart = plugin.DefaulForceActiveChecksOnStart
+		} else {
+			forceActiveChecksOnStart = *pluginForceActiveChecksOnStart
+		}
+	} else {
+		forceActiveChecksOnStart = agent.Options.ForceActiveChecksOnStart
 	}
 
-	log.Warningf(
-		"using default plugin capacity settings `%d` for plugin %s",
-		plugin.DefaultCapacity, name,
-	)
-
-	return plugin.DefaultCapacity
+	return
 }
 
-func getPluginCap(optsRaw interface{}, name string) (pluginCap, pluginSystemCap int) {
+func getPluginCap(optsRaw interface{}, name string) (pluginCap, pluginSystemCap int, forceActiveChecksOnStart *int) {
 	var cap capacity
+
+	if optsRaw == nil {
+		return
+	}
+
 	if err := conf.Unmarshal(optsRaw, &cap, false); err != nil {
 		log.Warningf("invalid plugin %s configuration: %s", name, err)
 
@@ -708,13 +721,7 @@ func getPluginCap(optsRaw interface{}, name string) (pluginCap, pluginSystemCap 
 
 	pluginCap = cap.Capacity
 	pluginSystemCap = cap.System.Capacity
-
-	if pluginCap > 0 {
-		log.Warningf(
-			"plugin %s configuration parameter Plugins.%s.Capacity is deprecated, use Plugins.%s.System.Capacity instead",
-			name, name, name,
-		)
-	}
+	forceActiveChecksOnStart = cap.System.ForceActiveChecksOnStart
 
 	return
 }
