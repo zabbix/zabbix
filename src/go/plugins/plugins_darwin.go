@@ -27,6 +27,7 @@ import (
 	_ "zabbix.com/plugins/modbus"
 	_ "zabbix.com/plugins/mongodb"
 	_ "zabbix.com/plugins/mysql"
+	_ "zabbix.com/plugins/net/dns"
 	_ "zabbix.com/plugins/net/tcp"
 	_ "zabbix.com/plugins/oracle"
 	_ "zabbix.com/plugins/postgres"
