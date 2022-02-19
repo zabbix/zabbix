@@ -241,7 +241,7 @@ window.token_edit_popup = {
 				}
 
 				this.overlay.$dialogue[0].removeEventListener('overlay.close', this.events.overlayClose);
-				this.overlay.$dialogue[0].addEventListener('overlay.close', this.events.overlayCloseAndReloadList,
+				this.overlay.$dialogue[0].addEventListener('overlay.close', this.events.overlayCloseAfterUpdate,
 					{once: true}
 				);
 
@@ -264,9 +264,9 @@ window.token_edit_popup = {
 			token_edit_popup.disableNavigationWarning();
 		},
 
-		overlayCloseAndReloadList() {
+		overlayCloseAfterUpdate() {
 			token_edit_popup.disableNavigationWarning();
-			setTimeout(() => location.href = location.href, 0);
+			token_edit_popup.dialogue.dispatchEvent(new CustomEvent('dialogue.update', {detail: {}}));
 		}
 	}
 };
