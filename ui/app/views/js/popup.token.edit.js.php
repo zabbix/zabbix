@@ -103,6 +103,10 @@ window.token_edit_popup = {
 		})
 			.then((response) => response.json())
 			.then((response) => {
+				if ('error' in response) {
+					throw {error: response.error};
+				}
+
 				this.loadTokenView(response.data);
 			})
 			.catch(this.ajaxExceptionHandler)
