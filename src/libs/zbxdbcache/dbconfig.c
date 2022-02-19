@@ -13428,8 +13428,7 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 				ps_win->period_end = ds_win->period_end;
 			}
 
-			if (ps_win->flags != ds_win->flags)
-				ps_win->flags = ds_win->flags;
+			ps_win->flags = ds_win->flags;
 
 			if (0 > ps_win->values_num)	/* some new values were processed faster than old */
 				ps_win->values_num = 0;	/* we will suppress more                          */
