@@ -68,7 +68,6 @@ window.token_edit_popup = {
 				}
 
 				if ('data' in response) {
-					this.overlay.$dialogue[0].removeEventListener('overlay.close', this.events.overlayClose);
 					this.loadTokenView(response.data);
 				}
 				else {
@@ -88,7 +87,6 @@ window.token_edit_popup = {
 	},
 
 	regenerate() {
-		this.overlay.$dialogue[0].removeEventListener('overlay.close', this.events.overlayClose);
 		this.removePopupMessages();
 
 		const fields = this.preprocessFormFields(getFormFields(this.form));
@@ -242,11 +240,12 @@ window.token_edit_popup = {
 					throw {error: response.error};
 				}
 
-				this.overlay.setProperties(response);
-
+				this.overlay.$dialogue[0].removeEventListener('overlay.close', this.events.overlayClose);
 				this.overlay.$dialogue[0].addEventListener('overlay.close', this.events.overlayCloseAndReloadList,
 					{once: true}
 				);
+
+				this.overlay.setProperties(response);
 			})
 			.catch(this.ajaxExceptionHandler)
 			.finally(() => {
