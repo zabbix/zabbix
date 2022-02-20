@@ -259,10 +259,10 @@
 		<!-- Zabbix various configuration parameters for cmocka Oracle tests -->
 		<!-- Configuration option name must consist of prefix 'cmocka-ora-', configuration order number
 			and configuration title: cmocka-<number>-<title> -->
-		<property name="cmocka-ora-1-default" value="-q CFLAGS='${COMP_FLAGS_ORACLE}' ${ZBX_BASE_FLAGS} --enable-ipv6 --with-jabber --with-openipmi --with-openssl --with-iconv --with-libpcre --with-oracle --with-oracle-include=${ORA_INCLUDE} --with-oracle-lib=${ORA_LIB}"/>
+		<property name="cmocka-ora-1-default" value="-q CFLAGS='${COMP_FLAGS_ORACLE}' ${ZBX_BASE_FLAGS} --enable-ipv6 --with-openipmi --with-openssl --with-iconv --with-libpcre --with-oracle --with-oracle-include=${ORA_INCLUDE} --with-oracle-lib=${ORA_LIB}"/>
 		<property name="cmocka-ora-2-server-only" value="-q CFLAGS='${COMP_FLAGS_ORACLE}' --enable-server --with-oracle --with-oracle-include=${ORA_INCLUDE} --with-oracle-lib=${ORA_LIB}"/>
 		<property name="cmocka-ora-3-proxy-only" value="-q CFLAGS='${COMP_FLAGS_ORACLE}' --enable-proxy --with-oracle --with-oracle-include=${ORA_INCLUDE} --with-oracle-lib=${ORA_LIB}"/>
-		<property name="cmocka-ora-4-sanitizer" value="CC=clang CFLAGS='${COMP_FLAGS_ORACLE} -Wenum-conversion -O2 -fsanitize=leak,address' LDFLAGS='-fsanitize=leak,address' -q ${ZBX_BASE_FLAGS}  --enable-ipv6 --with-jabber --with-openipmi --with-openssl --with-iconv --with-libpcre --with-oracle --with-oracle-include=${ORA_INCLUDE} --with-oracle-lib=${ORA_LIB}"/>
+		<property name="cmocka-ora-4-sanitizer" value="CC=clang CFLAGS='${COMP_FLAGS_ORACLE} -Wenum-conversion -O2 -fsanitize=leak,address' LDFLAGS='-fsanitize=leak,address' -q ${ZBX_BASE_FLAGS}  --enable-ipv6 --with-openipmi --with-openssl --with-iconv --with-libpcre --with-oracle --with-oracle-include=${ORA_INCLUDE} --with-oracle-lib=${ORA_LIB}"/>
 	</target>
 
 	<target name="cmocka-ora-tests" depends="init-cmocka-ora-test-conf-options">
