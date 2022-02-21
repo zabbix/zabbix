@@ -85,12 +85,13 @@ class CLogHelper {
 	 * @param string       $path          log file path
 	 * @param string|array $lines         line(s) to look for
 	 * @param boolean      $incremental   flag to be used to enable incremental read
+	 * @param boolean      $match_regex   flag to be used to match line by regex
 	 *
 	 * @return string|null
 	 *
 	 * @throws Exception    on cases when log is not available
 	 */
-	public static function readLogUntil($path, $lines, $incremental = true) {
+	public static function readLogUntil($path, $lines, $incremental = true, $match_regex = false) {
 		if (!is_array($lines)) {
 			$lines = [$lines];
 		}
@@ -98,7 +99,7 @@ class CLogHelper {
 		$content = self::readLog($path, $incremental);
 		$offset = -1;
 		foreach ($lines as $line) {
-			if (($temp = self::getLineOffset($content, $line)) === null) {
+			if (($temp = self::getLineOffset($content, $line, $match_regex)) === null) {
 				continue;
 			}
 
@@ -131,18 +132,29 @@ class CLogHelper {
 	/**
 	 * Get offset of line in log content.
 	 *
-	 * @param string  $content    log content
-	 * @param string  $line       line to look for
+	 * @param string  $content      log content
+	 * @param string  $line         line to look for
+	 * @param bool    $match_regex  match lines by regex
 	 *
 	 * @return integer|null
 	 */
-	public static function getLineOffset($content, $line) {
+	public static function getLineOffset($content, $line, $match_regex = false) {
 		$matches = [];
+
+		$pattern = '';
+
 		// "  563:20220112:232318.543 ..."
 		$log_pattern = ' *[0-9]+:[0-9]+:[0-9]+\.[0-9]+';
+
 		// "2022/01/12 23:23:19.550415 ..."
 		$log2_pattern = '[0-9]+\/[0-9]+\/[0-9]+ [0-9]+:[0-9]+:[0-9]+\.[0-9]+';
-		$pattern = '/^('.$log_pattern.'|'.$log2_pattern.') .*'.preg_quote($line, '/').'.*$/m';
+
+		if ($match_regex === false) {
+			$pattern = '/^('.$log_pattern.'|'.$log2_pattern.') .*'.preg_quote($line, '/').'.*$/m';
+		}
+		else {
+			$pattern = '/^('.$log_pattern.'|'.$log2_pattern.') .*'.$line.'.*$/m';
+		}
 
 		if (preg_match($pattern, $content, $matches, PREG_OFFSET_CAPTURE) === 1) {
 			return $matches[0][1];
@@ -157,10 +169,11 @@ class CLogHelper {
 	 * @param string  $path          log file path
 	 * @param string|array $lines    line(s) to look for
 	 * @param boolean $incremental   flag to be used to enable incremental read
+	 * @param boolean $match_regex   flag to be used to match line by regex
 	 *
 	 * @return boolean
 	 */
-	public static function isLogLinePresent($path, $lines, $incremental = true) {
-		return (self::readLogUntil($path, $lines, $incremental) !== null);
+	public static function isLogLinePresent($path, $lines, $incremental = true, $match_regex = false) {
+		return (self::readLogUntil($path, $lines, $incremental, $match_regex) !== null);
 	}
 }
