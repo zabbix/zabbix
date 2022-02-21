@@ -623,7 +623,7 @@ $item_tab->addItem([
 
 $item_tab
 	->addItem([
-		(new CLabel(_('IPMI sensor')))->setId('js-item-impi-sensor-label'),
+		(new CLabel(_('IPMI sensor'), 'ipmi_sensor'))->setId('js-item-impi-sensor-label'),
 		(new CFormField((new CTextBox('ipmi_sensor', $data['ipmi_sensor'], $readonly, 128))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->setId('js-item-impi-sensor-field')
@@ -712,7 +712,7 @@ $item_tab
 		))->setId('js-item-formula-field')
 	])
 	->addItem([
-		(new CLabel(_('Units')))->setId('js-item-units-label'),
+		(new CLabel(_('Units'), 'units'))->setId('js-item-units-label'),
 		(new CFormField((new CTextBox('units', $data['units'], $readonly))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)))
 			->setId('js-item-units-field')
 	])
@@ -807,7 +807,7 @@ $item_tab
 		]))->setId('js-item-trends-field')
 	])
 	->addItem([
-		(new CLabel(_('Log time format')))->setId('js-item-log-time-format-label'),
+		(new CLabel(_('Log time format'), 'logtimefmt'))->setId('js-item-log-time-format-label'),
 		(new CFormField(
 			(new CTextBox('logtimefmt', $data['logtimefmt'], $readonly, 64))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->setId('js-item-log-time-format-field')
@@ -847,7 +847,7 @@ $item_tab
 		))->setId('js-item-allow-traps-field')
 	])
 	->addItem([
-		(new CLabel(_('Allowed hosts')))->setId('js-item-trapper-hosts-label'),
+		(new CLabel(_('Allowed hosts'), 'trapper_hosts'))->setId('js-item-trapper-hosts-label'),
 		(new CFormField((new CTextBox('trapper_hosts', $data['trapper_hosts']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->setId('js-item-trapper-hosts-field')
