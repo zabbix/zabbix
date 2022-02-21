@@ -2086,9 +2086,12 @@ class CUser extends CApiService {
 	/**
 	 * Sets the default user timezone used by all date/time functions.
 	 *
-	 * @param string $timezone
+	 * @param string|null $timezone
 	 */
-	private function setTimezone(string $timezone): void {
+	private function setTimezone(?string $timezone): void {
+		if($timezone === NULL) {
+			return;
+		}
 		if ($timezone !== ZBX_DEFAULT_TIMEZONE) {
 			date_default_timezone_set($timezone);
 		}

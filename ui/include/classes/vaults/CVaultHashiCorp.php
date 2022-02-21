@@ -20,9 +20,14 @@
 
 
 /**
- * A class for load secrets from HashiCorp Vault secret manager.
+ * A class for loading secrets from HashiCorp Vault secret manager.
  */
-class CVaultHelper {
+class CVaultHashiCorp extends CVault {
+
+	/**
+	 * @var string
+	 */
+	public const NAME = 'HashiCorp';
 
 	/**
 	 * Vault API endpoint.
@@ -38,7 +43,7 @@ class CVaultHelper {
 	 */
 	protected $token = '';
 
-	public function __construct(string $api_endpoint, string $token) {
+	public function 	__construct(string $api_endpoint, string $token) {
 		if (self::validateVaultApiEndpoint($api_endpoint)) {
 			$this->api_endpoint = rtrim(trim($api_endpoint), '/');
 		}
@@ -93,6 +98,40 @@ class CVaultHelper {
 		}
 	}
 
+	public function getCredentials(bool $use_cache = false): array {
+		$username = '';
+		$password = '';
+
+		if ($use_cache) {
+			$username = CDataCacheHelper::getValue('db_username', '');
+			$password = CDataCacheHelper::getValue('db_password', '');
+		}
+
+		if ($username === '' || $password === '') {
+			$secret = $this->loadSecret($this->credentials_path);
+
+			$username = array_key_exists('username', $secret) ? $secret['username'] : '';
+			$password = array_key_exists('password', $secret) ? $secret['password'] : '';
+
+			if ($use_cache) {
+				if ($username !== '' && $password !== '') {
+					CDataCacheHelper::setValueArray([
+						'db_username' => $username,
+						'db_password' => $password
+					]);
+				}
+				else {
+					CDataCacheHelper::clearValues(['db_username', 'db_password']);
+				}
+			}
+		}
+
+		return [
+			'username' => $username,
+			'password' => $password
+		];
+	}
+
 	/**
 	 * Function validates if given string is valid API endpoint.
 	 *
@@ -102,7 +141,6 @@ class CVaultHelper {
 	 */
 	public static function validateVaultApiEndpoint(string $api_endpoint): bool {
 		$url_parts = parse_url($api_endpoint);
-
 		if (!$url_parts || !array_key_exists('host', $url_parts)) {
 			error(_s('Provided URL "%1$s" is invalid.', $api_endpoint));
 
@@ -141,5 +179,13 @@ class CVaultHelper {
 		array_splice($path, 1, 0, 'data');
 
 		return $this->api_endpoint.'/v1/'.implode('/', $path);
+	}
+
+	public function getPlaceholder(): string {
+		return 'path/to/secret:key';
+	}
+
+	public function validateMacroValue(string $value): bool {
+		return true;
 	}
 }

@@ -20,6 +20,7 @@ $DB['VERIFY_HOST']		= false;
 $DB['CIPHER_LIST']		= '';
 
 // Vault configuration. Used if database credentials are stored in Vault secrets manager.
+$DB['VAULT_PROVIDER'] = '';
 $DB['VAULT_URL']		= '';
 $DB['VAULT_DB_PATH']	= '';
 $DB['VAULT_TOKEN']		= '';

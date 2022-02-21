@@ -168,6 +168,7 @@ define('ORACLE_CESU8_CHARSET', 'UTF8');
 
 define('DB_STORE_CREDS_CONFIG', 0);
 define('DB_STORE_CREDS_VAULT', 1);
+define('DB_STORE_CREDS_VAULT_CYBERARK', 2);
 
 define('PAGE_TYPE_HTML',				0);
 define('PAGE_TYPE_IMAGE',				1);
@@ -1456,7 +1457,7 @@ define('ZBX_MACRO_TYPE_SECRET', 1); // Display masked macro value.
 define('ZBX_MACRO_TYPE_VAULT', 2); // Display macro value as text (path to secret in HashiCorp Vault).
 
 define('ZBX_VAULT_TYPE_HASHICORP', 0);
-define('ZBX_VAULT_TYPE_CYBERARK', 1);
+define('ZBX_VAULT_TYPE_CYBERARK',  1);
 
 define('ZBX_SECRET_MASK', '******'); // Placeholder for secret values.
 

@@ -188,10 +188,11 @@ class CSetupWizard extends CForm {
 					if (ini_get('allow_url_fopen') != 1) {
 						error(_('Please enable "allow_url_fopen" directive.'));
 					}
-					elseif (CVaultHelper::validateVaultApiEndpoint($vault_url)
-							&& CVaultHelper::validateVaultToken($vault_token)
+					// TODO: HUNTER - fix validation
+					elseif (CVaultHashiCorp::validateVaultApiEndpoint($vault_url)
+							&& CVaultHashiCorp::validateVaultToken($vault_token)
 							&& $secret_parser->parse($vault_db_path) == CParser::PARSE_SUCCESS) {
-						$vault = new CVaultHelper($vault_url, $vault_token);
+						$vault = new CVaultHashiCorp($vault_url, $vault_token);
 						$secret = $vault->loadSecret($vault_db_path);
 
 						if ($secret) {
@@ -509,15 +510,20 @@ class CSetupWizard extends CForm {
 				(new CRadioButtonList('creds_storage', $db_creds_storage))
 					->addValue(_('Plain text'), DB_STORE_CREDS_CONFIG)
 					->addValue(_('HashiCorp Vault'), DB_STORE_CREDS_VAULT)
+					->addValue(_('CyberArk Vault'), DB_STORE_CREDS_VAULT_CYBERARK)
 					->setModern(true)
 			)
-			->addRow(_('Vault API endpoint'),
+			->addRow(
+				(new CLabel(_('Vault API endpoint')))->setAsteriskMark(),
 				(new CTextBox('vault_url', $this->getConfig('DB_VAULT_URL', self::VAULT_URL_DEFAULT)))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 				'vault_url_row',
-				($db_creds_storage == DB_STORE_CREDS_VAULT) ? ZBX_STYLE_DISPLAY_NONE : null
+				in_array($db_creds_storage, [DB_STORE_CREDS_VAULT, DB_STORE_CREDS_VAULT_CYBERARK])
+					? ZBX_STYLE_DISPLAY_NONE : null
 			)
-			->addRow(_('Vault secret path'),
+			// HashiCorp Vault - related fields.
+			->addRow(
+				_('Vault secret path'),
 				(new CTextBox('vault_db_path', $this->getConfig('DB_VAULT_DB_PATH')))
 					->setAttribute('placeholder', _('path/to/secret'))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
@@ -531,6 +537,40 @@ class CSetupWizard extends CForm {
 				'vault_token_row',
 				($db_creds_storage == DB_STORE_CREDS_VAULT) ? ZBX_STYLE_DISPLAY_NONE : null
 			)
+			// CyberArk Vault - related fields.
+			->addRow(
+				(new CLabel(_('Vault secret query string')))->setAsteriskMark(),
+				(new CTextBox('vault_query_string', $this->getConfig('VAULT_QUERY_STRING')))
+					// APP::VaultProvider()->getPlaceholder()
+					->setAttribute('placeholder', _('AppID=foo&Query=Safe=bar;Object=buzz:key'))
+					->setAttribute('maxlength', 2048)
+					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+				'vault_query_string_row',
+				($db_creds_storage == DB_STORE_CREDS_VAULT_CYBERARK) ? ZBX_STYLE_DISPLAY_NONE : null
+			)
+			->addRow(
+				(new CLabel(_('Vault certificates'), 'vault_certificates_toggle')),
+				(new CCheckBox('vault_certificates'))
+					->setId('vault_certificates_toggle')
+					->setChecked(true),
+				'vault_certificates',
+				($db_creds_storage == DB_STORE_CREDS_VAULT_CYBERARK) ? ZBX_STYLE_DISPLAY_NONE : null
+			)
+			->addRow(_('SSL cerificate file'),
+				(new CTextBox('vault_cert_file', $this->getConfig('VAULT_CERT_FILE', 'conf/certs/cyberark-cert.pem')))
+					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+					->setAttribute('maxlength', 2048),
+				'vault_cert_file',
+				($db_creds_storage == DB_STORE_CREDS_VAULT_CYBERARK) ? ZBX_STYLE_DISPLAY_NONE : null
+			)
+			->addRow(_('SSL key file'),
+				(new CTextBox('vault_key_file', $this->getConfig('VAULT_KEY_FILE', 'conf/certs/cyberark-key.pem')))
+					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+					->setAttribute('maxlength', 2048),
+				'vault_key_file',
+				($db_creds_storage == DB_STORE_CREDS_VAULT_CYBERARK) ? ZBX_STYLE_DISPLAY_NONE : null
+			)
+			// Plaintext.
 			->addRow(_('User'),
 				(new CTextBox('user', $this->getConfig('DB_USER', 'zabbix')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 				'db_user',
@@ -789,6 +829,7 @@ class CSetupWizard extends CForm {
 			$vault_config['VAULT_DB_PATH'] = $this->getConfig('DB_VAULT_DB_PATH');
 			$vault_config['VAULT_TOKEN'] = $this->getConfig('DB_VAULT_TOKEN');
 
+			// TODO: HUNTER - check vault on setup
 			$vault = new CVaultHelper($vault_config['VAULT_URL'], $vault_config['VAULT_TOKEN']);
 			$secret = $vault->loadSecret($vault_config['VAULT_DB_PATH']);
 

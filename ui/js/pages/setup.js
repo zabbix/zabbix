@@ -21,6 +21,8 @@
 const ZBX_DB_MYSQL = 'MYSQL';
 const ZBX_DB_POSTGRESQL = 'POSTGRESQL';
 const ZBX_STYLE_DISPLAY_NONE = 'display-none';
+const DB_STORE_CREDS_VAULT = 1;
+const DB_STORE_CREDS_VAULT_CYBERARK = 2;
 
 function updateElementsAvailability() {
 	const db_type = document.querySelector('[name=type]').value;
@@ -31,7 +33,7 @@ function updateElementsAvailability() {
 		|| (db_type === ZBX_DB_POSTGRESQL && !host.startsWith('/'))));
 	const encryption_customizable = (encryption_supported && encryption_allowed && encryption_enabled
 		&& document.querySelector('#verify_certificate').checked);
-	const vault_enabled = (document.querySelector('#creds_storage_0:checked, #creds_storage_1:checked').value == 1);
+	const vault_selected = document.querySelector('input[name="creds_storage"]:checked').value;
 	const rows = {
 			'#db_schema_row': (db_type === ZBX_DB_POSTGRESQL),
 			'#db_encryption_row': encryption_supported,
@@ -41,11 +43,15 @@ function updateElementsAvailability() {
 			'#db_cafile_row': encryption_customizable,
 			'#db_verify_host_row': encryption_customizable,
 			'#db_cipher_row': (encryption_customizable && (db_type === ZBX_DB_MYSQL)),
-			'#vault_url_row': vault_enabled,
-			'#vault_db_path_row': vault_enabled,
-			'#vault_token_row': vault_enabled,
-			'#db_user': !vault_enabled,
-			'#db_password': !vault_enabled
+			'#vault_url_row': (vault_selected != 0),
+			'#vault_db_path_row': (vault_selected == DB_STORE_CREDS_VAULT),
+			'#vault_token_row': (vault_selected == DB_STORE_CREDS_VAULT),
+			'#db_user': (vault_selected == 0),
+			'#db_password': (vault_selected == 0),
+			'#vault_query_string_row': (vault_selected == DB_STORE_CREDS_VAULT_CYBERARK),
+			'#vault_certificates': (vault_selected == DB_STORE_CREDS_VAULT_CYBERARK),
+			'#vault_cert_file': (vault_selected == DB_STORE_CREDS_VAULT_CYBERARK),
+			'#vault_key_file': (vault_selected == DB_STORE_CREDS_VAULT_CYBERARK)
 		};
 
 	for (let selector in rows) {
@@ -135,4 +141,11 @@ document.addEventListener('DOMContentLoaded', () => {
 	if (theme) {
 		theme.addEventListener('change', () => document.forms['setup-form'].submit());
 	}
+
+	document.getElementById('vault_certificates_toggle').addEventListener('change', (e) => {
+		for (const input of document.querySelectorAll('#vault_cert_file, #vault_key_file')) {
+			input.disabled = !e.target.checked;
+			input.style.display = e.target.checked ? '' : 'none';
+		}
+	});
 });

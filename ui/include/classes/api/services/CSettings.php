@@ -115,12 +115,13 @@ class CSettings extends CApiService {
 		$db_settings = [];
 
 		$result = DBselect($this->createSelectQuery($this->tableName(), $options));
+
 		while ($row = DBfetch($result)) {
 			$db_settings[] = $row;
 		}
 		$db_settings = $this->unsetExtraFields($db_settings, ['configid'], []);
 
-		return $db_settings[0];
+		return $db_settings; // should be $db_settings[0]
 	}
 
 	/**

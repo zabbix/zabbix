@@ -142,6 +142,10 @@ class CConfigFile {
 			$this->config['DB']['DOUBLE_IEEE754'] = $DB['DOUBLE_IEEE754'];
 		}
 
+		if (isset($DB['VAULT_PROVIDER'])) {
+			$this->config['DB']['VAULT_PROVIDER'] = $DB['VAULT_PROVIDER'];
+		}
+
 		if (isset($DB['VAULT_URL'])) {
 			$this->config['DB']['VAULT_URL'] = $DB['VAULT_URL'];
 		}
@@ -152,6 +156,18 @@ class CConfigFile {
 
 		if (isset($DB['VAULT_TOKEN'])) {
 			$this->config['DB']['VAULT_TOKEN'] = $DB['VAULT_TOKEN'];
+		}
+
+		if (isset($DB['VAULT_CACHE'])) {
+			$this->config['DB']['VAULT_CACHE'] = $DB['VAULT_CACHE'];
+		}
+
+		if (isset($DB['VAULT_KEY_FILE'])) {
+			$this->config['DB']['VAULT_KEY_FILE'] = $DB['VAULT_KEY_FILE'];
+		}
+
+		if (isset($DB['VAULT_CERT_FILE'])) {
+			$this->config['DB']['VAULT_CERT_FILE'] = $DB['VAULT_CERT_FILE'];
 		}
 
 		if (isset($ZBX_SERVER)) {
@@ -178,45 +194,23 @@ class CConfigFile {
 			$this->config['SSO'] = $SSO;
 		}
 
-		if ($this->config['DB']['VAULT_URL'] !== ''
-				&& $this->config['DB']['VAULT_DB_PATH'] !== ''
-				&& $this->config['DB']['VAULT_TOKEN'] !== '') {
-			list($this->config['DB']['USER'], $this->config['DB']['PASSWORD']) = $this->getCredentialsFromVault();
+//		CVault::init(array_intersect_key($this->config['DB'], array_fill_keys([
+//			'VAULT',
+//			'VAULT_URL',
+//			'VAULT_DB_PATH',
+//			'VAULT_TOKEN',
+//			'VAULT_KEY_FILE',
+//			'VAULT_CERT_FILE',
+//			'VAULT_CACHE'
+//		], true)));
 
-			if ($this->config['DB']['USER'] === '' || $this->config['DB']['PASSWORD'] === '') {
-				self::exception(_('Unable to load database credentials from Vault.'), self::CONFIG_VAULT_ERROR);
-			}
-		}
+//		if (CVault::credentialsInUse()) {
+//			list($this->config['DB']['USER'], $this->config['DB']['PASSWORD']) = CVault::loadCredentials();
+//		}
 
 		$this->makeGlobal();
 
 		return $this->config;
-	}
-
-	protected function getCredentialsFromVault(): array {
-		$username = CDataCacheHelper::getValue('db_username', '');
-		$password = CDataCacheHelper::getValue('db_password', '');
-
-		if ($username === '' || $password === '') {
-			$vault = new CVaultHelper($this->config['DB']['VAULT_URL'], $this->config['DB']['VAULT_TOKEN']);
-			$secret = $vault->loadSecret($this->config['DB']['VAULT_DB_PATH']);
-
-			$username = array_key_exists('username', $secret) ? $secret['username'] : '';
-			$password = array_key_exists('password', $secret) ? $secret['password'] : '';
-
-			if ($username !== '' && $password !== '') {
-				// Update cache.
-				CDataCacheHelper::setValueArray([
-					'db_username' => $username,
-					'db_password' => $password
-				]);
-			}
-			else {
-				CDataCacheHelper::clearValues(['db_username', 'db_password']);
-			}
-		}
-
-		return [$username, $password];
 	}
 
 	public function makeGlobal() {
@@ -344,9 +338,13 @@ $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 			'VERIFY_HOST' => true,
 			'CIPHER_LIST' => '',
 			'DOUBLE_IEEE754' => false,
+			'VAULT' => '',
 			'VAULT_URL' => '',
 			'VAULT_DB_PATH' => '',
-			'VAULT_TOKEN' => ''
+			'VAULT_TOKEN' => '',
+			'VAULT_CERT_FILE' => '',
+			'VAULT_KEY_FILE' => '',
+			'VAULT_CACHE' => false
 		];
 		$this->config['ZBX_SERVER'] = null;
 		$this->config['ZBX_SERVER_PORT'] = null;

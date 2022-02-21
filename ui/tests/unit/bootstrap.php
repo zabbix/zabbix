@@ -65,11 +65,13 @@ $autoloader->addNamespace('', [
 	__DIR__.'/../../include/classes/html/interfaces',
 	__DIR__.'/../../include/classes/xml',
 	__DIR__.'/../../include/classes/macros',
+	__DIR__.'/../../include/classes/vaults',
 	__DIR__.'/include/classes/db',
 	__DIR__.'/include/classes/html',
 	__DIR__.'/include/classes/validators',
 	__DIR__.'/include/classes/parsers',
-	__DIR__.'/include/classes/import/converters'
+	__DIR__.'/include/classes/import/converters',
+	__DIR__.'/include/classes/include/classes/vaults'
 ]);
 $autoloader->addNamespace('Core', [__DIR__.'/../../include/classes/core']);
 $autoloader->register();
