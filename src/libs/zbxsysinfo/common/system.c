@@ -17,10 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "system.h"
+
 #include "common.h"
 #include "zbxsysinfo_common.h"
-
-#include "system.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #	include "perfmon.h"

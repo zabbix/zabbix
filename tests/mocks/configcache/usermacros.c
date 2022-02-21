@@ -19,18 +19,10 @@
 
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
-#include "zbxmockassert.h"
 #include "zbxmockutil.h"
-
-#include "zbxserver.h"
-#include "common.h"
-#include "zbxalgo.h"
-#include "dbcache.h"
-#include "mutexs.h"
-#define ZBX_DBCONFIG_IMPL
 #include "dbconfig.h"
-
 #include "configcache.h"
+#include "configcache_mock.h"
 
 extern zbx_mock_config_t	mock_config;
 

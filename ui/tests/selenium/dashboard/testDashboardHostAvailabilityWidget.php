@@ -378,7 +378,7 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 				[
 					'fields' => [
 						'Type' => 'Host availability',
-						'Name' => 'Show completely all hosts for Zabbixagent and SNMP',
+						'Name' => 'Show completely all hosts for Zabbix agent and SNMP',
 						'Refresh interval' => '10 seconds',
 						'Interface type' => ['Zabbix agent', 'SNMP'],
 						'Show hosts in maintenance' => true

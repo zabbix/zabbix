@@ -24,6 +24,8 @@
 #	error "This module is only available for Windows OS"
 #endif
 
+#include "sysinc.h"
+
 /* this struct must be only modified along with mapping builtin_counter_ref[] in perfmon.c */
 typedef enum
 {

@@ -1661,6 +1661,7 @@ abstract class CTriggerGeneral extends CApiService {
 				}
 
 				$status_mask |= ($host_keys['status'] == HOST_STATUS_TEMPLATE ? 0x01 : 0x02);
+
 				$hostids[$host_keys['hostid']] = true;
 				$hosts[$host] = true;
 			}

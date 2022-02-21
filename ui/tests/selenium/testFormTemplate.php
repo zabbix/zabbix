@@ -60,7 +60,7 @@ class testFormTemplate extends CLegacyWebTest {
 					'name' => 'Selenium Test Template',
 					'error_msg' => 'Cannot add template',
 					'errors' => [
-						'Template with the same name "Selenium Test Template" already exists.'
+						'Template with host name "Selenium Test Template" already exists.'
 					]
 
 				]
@@ -72,7 +72,7 @@ class testFormTemplate extends CLegacyWebTest {
 					'visible_name' => 'Selenium Test template with visible name',
 					'error_msg' => 'Cannot add template',
 					'errors' => [
-						'Template with the same visible name "Selenium Test template with visible name" already exists.'
+						'Template with visible name "Selenium Test template with visible name" already exists.'
 					]
 
 				]
