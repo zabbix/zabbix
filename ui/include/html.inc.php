@@ -943,7 +943,7 @@ function makeInformationIcon($message) {
  * @param string $name         Name of the maintenance.
  * @param string $description  Description of the maintenance.
  *
- * @return CSpan
+ * @return CLink
  */
 function makeMaintenanceIcon($type, $name, $description) {
 	$hint = $name.' ['.($type
@@ -956,7 +956,6 @@ function makeMaintenanceIcon($type, $name, $description) {
 
 	return (new CLink())
 		->addClass(ZBX_STYLE_ICON_MAINTENANCE)
-		->addClass(ZBX_STYLE_CURSOR_POINTER)
 		->setHint($hint);
 }
 
@@ -1042,7 +1041,6 @@ function makeActionIcon(array $icon_data): CTag {
 function makeDescriptionIcon($description) {
 	return (new CLink())
 		->addClass(ZBX_STYLE_ICON_DESCRIPTION)
-		->addClass(ZBX_STYLE_CURSOR_POINTER)
 		->setHint(zbx_str2links($description), ZBX_STYLE_HINTBOX_WRAP);
 }
 
@@ -1057,20 +1055,6 @@ function makeErrorIcon($error) {
 	return (new CLink())
 		->addClass(ZBX_STYLE_ICON_INFO)
 		->addClass(ZBX_STYLE_STATUS_RED)
-		->setHint($error, ZBX_STYLE_HINTBOX_WRAP." ".ZBX_STYLE_RED);
-}
-
-/**
- * Renders an unknown icon like grey [i] with error message
- *
- * @param string $error
- *
- * @return CLink
- */
-function makeUnknownIcon($error) {
-	return (new CLink())
-		->addClass(ZBX_STYLE_ICON_INFO)
-		->addClass(ZBX_STYLE_STATUS_DARK_GREY)
 		->setHint($error, ZBX_STYLE_HINTBOX_WRAP." ".ZBX_STYLE_RED);
 }
 
