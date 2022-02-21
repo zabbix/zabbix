@@ -461,7 +461,7 @@ run:
 	monitor.Unregister(monitor.Scheduler)
 }
 
-type capacity struct {
+type pluginOptions struct {
 	Capacity int `conf:"optional"`
 	System   struct {
 		ForceActiveChecksOnStart *int `conf:"optional"`
@@ -488,7 +488,7 @@ func (m *Manager) init() {
 	pagent := &pluginAgent{}
 	for _, metric := range metrics {
 		if metric.Plugin != pagent.impl {
-			capacity, forceActiveChecksOnStart := getCapacity(agent.Options.Plugins[metric.Plugin.Name()], metric.Plugin.Name())
+			capacity, forceActiveChecksOnStart := getPluginOptions(agent.Options.Plugins[metric.Plugin.Name()], metric.Plugin.Name())
 			if capacity > metric.Plugin.Capacity() {
 				log.Warningf("lowering the plugin %s capacity to %d as the configured capacity %d exceeds limits",
 					metric.Plugin.Name(), metric.Plugin.Capacity(), capacity)
@@ -673,8 +673,8 @@ func peekTask(tasks performerHeap) performer {
 	return tasks[0]
 }
 
-func getCapacity(optsRaw interface{}, name string) (capacity int, forceActiveChecksOnStart int) {
-	pluginCap, pluginSystemCap, pluginForceActiveChecksOnStart := getPluginCap(optsRaw, name)
+func getPluginOptions(optsRaw interface{}, name string) (capacity int, forceActiveChecksOnStart int) {
+	pluginCap, pluginSystemCap, pluginForceActiveChecksOnStart := getPluginOpts(optsRaw, name)
 
 	if pluginSystemCap > 0 {
 		if pluginCap > 0 {
@@ -707,22 +707,22 @@ func getCapacity(optsRaw interface{}, name string) (capacity int, forceActiveChe
 	return
 }
 
-func getPluginCap(optsRaw interface{}, name string) (pluginCap, pluginSystemCap int, forceActiveChecksOnStart *int) {
-	var cap capacity
+func getPluginOpts(optsRaw interface{}, name string) (pluginCap, pluginSystemCap int, forceActiveChecksOnStart *int) {
+	var opt pluginOptions
 
 	if optsRaw == nil {
 		return
 	}
 
-	if err := conf.Unmarshal(optsRaw, &cap, false); err != nil {
+	if err := conf.Unmarshal(optsRaw, &opt, false); err != nil {
 		log.Warningf("invalid plugin %s configuration: %s", name, err)
 
 		return
 	}
 
-	pluginCap = cap.Capacity
-	pluginSystemCap = cap.System.Capacity
-	forceActiveChecksOnStart = cap.System.ForceActiveChecksOnStart
+	pluginCap = opt.Capacity
+	pluginSystemCap = opt.System.Capacity
+	forceActiveChecksOnStart = opt.System.ForceActiveChecksOnStart
 
 	return
 }
