@@ -1269,6 +1269,7 @@ static void	process_active_checks(char *server, unsigned short port)
 		if (0 == metric->refresh)
 		{
 			ret = FAIL;
+			metric->refresh = SEC_PER_YEAR;
 			error = zbx_strdup(error, "Incorrect update interval.");
 		}
 		else if (0 != ((ZBX_METRIC_FLAG_LOG_LOG | ZBX_METRIC_FLAG_LOG_LOGRT) & metric->flags))
@@ -1441,6 +1442,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 			else
 			{
 				nextrefresh = time(NULL) + CONFIG_REFRESH_ACTIVE_CHECKS;
+				nextcheck = 0;
 			}
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 			zbx_remove_inactive_persistent_files(&persistent_inactive_vec);

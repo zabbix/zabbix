@@ -490,6 +490,7 @@ zbx_get_report_nextcheck_CFLAGS = $(COMMON_COMPILER_FLAGS)
 # zbx_ltrim_utf8
 
 zbx_ltrim_utf8_SOURCES = \
+	zbx_common_trim_utf8.c \
 	zbx_ltrim_utf8.c \
 	$(COMMON_SRC_FILES)
 
@@ -505,6 +506,7 @@ zbx_ltrim_utf8_CFLAGS = $(COMMON_COMPILER_FLAGS)
 # zbx_ltrim_utf8
 
 zbx_rtrim_utf8_SOURCES = \
+	zbx_common_trim_utf8.c \
 	zbx_rtrim_utf8.c \
 	$(COMMON_SRC_FILES)
 
