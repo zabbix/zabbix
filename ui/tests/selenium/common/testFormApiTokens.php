@@ -162,7 +162,7 @@ class testFormApiTokens extends CWebTest {
 		$this->page->login()->open($this->url)->waitUntilReady();
 
 		if ($action === 'create') {
-			$this->query('button:Create API token')->one()->waitUntilClickable()->click();
+			$this->query('button:Create API token')->waitUntilClickable()->one()->click();
 		}
 		else {
 			$this->query('link', $token)->waitUntilClickable()->one()->click();
