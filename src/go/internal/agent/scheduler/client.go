@@ -137,8 +137,9 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 
 		if c.id > agent.MaxBuiltinClientID {
 			var task *exporterTask
+			var scheduling bool
 
-			if _, err = zbxlib.GetNextcheck(r.Itemid, r.Delay, now); err != nil {
+			if _, scheduling, err = zbxlib.GetNextcheck(r.Itemid, r.Delay, now); err != nil {
 				return err
 			}
 			if tacc, ok = c.exporters[r.Itemid]; ok {
@@ -164,7 +165,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 					output:   sink,
 				}
 
-				if firstActiveChecksRefreshed == false && p.forceActiveChecksOnStart != 0 {
+				if scheduling == false && firstActiveChecksRefreshed == false && p.forceActiveChecksOnStart != 0 {
 					task.scheduled = time.Unix(now.Unix(), priorityExporterTaskNs)
 				} else if err = task.reschedule(now); err != nil {
 					return
