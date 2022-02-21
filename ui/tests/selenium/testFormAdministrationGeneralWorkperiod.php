@@ -37,7 +37,6 @@ class testFormAdministrationGeneralWorkperiod extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Working time');
 
 		$this->zbxTestAssertAttribute("//input[@id='work_period']", "maxlength", 255);
-		$this->zbxTestAssertAttribute("//input[@id='work_period']", "size", 20);
 		$this->zbxTestAssertAttribute("//input[@id='work_period']", "value", $WorkingTime['work_period']);
 	}
 
