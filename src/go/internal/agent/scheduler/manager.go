@@ -61,10 +61,11 @@ type Manager struct {
 
 // updateRequest contains list of metrics monitored by a client and additional client configuration data.
 type updateRequest struct {
-	clientID    uint64
-	sink        plugin.ResultWriter
-	requests    []*plugin.Request
-	expressions []*glexpr.Expression
+	clientID                   uint64
+	sink                       plugin.ResultWriter
+	firstActiveChecksRefreshed bool
+	requests                   []*plugin.Request
+	expressions                []*glexpr.Expression
 }
 
 // queryRequest contains status/debug query request.
@@ -79,8 +80,8 @@ type queryRequestUserParams struct {
 }
 
 type Scheduler interface {
-	UpdateTasks(clientID uint64, writer plugin.ResultWriter, expressions []*glexpr.Expression,
-		requests []*plugin.Request)
+	UpdateTasks(clientID uint64, writer plugin.ResultWriter, firstActiveChecksRefreshed bool,
+		expressions []*glexpr.Expression, requests []*plugin.Request)
 	FinishTask(task performer)
 	PerformTask(key string, timeout time.Duration, clientID uint64) (result string, err error)
 	Query(command string) (status string)
@@ -190,7 +191,7 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 			if !ok {
 				err = fmt.Errorf("Unknown metric %s", key)
 			} else {
-				err = c.addRequest(p, r, update.sink, now)
+				err = c.addRequest(p, r, update.sink, now, update.firstActiveChecksRefreshed)
 			}
 		}
 
@@ -545,13 +546,14 @@ func (m *Manager) Stop() {
 	m.input <- nil
 }
 
-func (m *Manager) UpdateTasks(clientID uint64, writer plugin.ResultWriter,
+func (m *Manager) UpdateTasks(clientID uint64, writer plugin.ResultWriter, firstActiveChecksRefreshed bool,
 	expressions []*glexpr.Expression, requests []*plugin.Request) {
 
 	m.input <- &updateRequest{clientID: clientID,
-		sink:        writer,
-		requests:    requests,
-		expressions: expressions,
+		sink:                       writer,
+		requests:                   requests,
+		expressions:                expressions,
+		firstActiveChecksRefreshed: firstActiveChecksRefreshed,
 	}
 }
 
@@ -578,7 +580,7 @@ func (m *Manager) PerformTask(key string, timeout time.Duration, clientID uint64
 
 	w := make(resultWriter, 1)
 
-	m.UpdateTasks(clientID, w, nil, []*plugin.Request{{Key: key, LastLogsize: &lastLogsize, Mtime: &mtime}})
+	m.UpdateTasks(clientID, w, false, nil, []*plugin.Request{{Key: key, LastLogsize: &lastLogsize, Mtime: &mtime}})
 
 	select {
 	case r := <-w:
@@ -672,7 +674,6 @@ func peekTask(tasks performerHeap) performer {
 }
 
 func getCapacity(optsRaw interface{}, name string) (capacity int, forceActiveChecksOnStart int) {
-
 	pluginCap, pluginSystemCap, pluginForceActiveChecksOnStart := getPluginCap(optsRaw, name)
 
 	if pluginSystemCap > 0 {
@@ -695,7 +696,7 @@ func getCapacity(optsRaw interface{}, name string) (capacity int, forceActiveChe
 		if *pluginForceActiveChecksOnStart > 1 || *pluginForceActiveChecksOnStart < 0 {
 			log.Warningf("invalid Plugins.%s.System.ForceActiveChecksOnStart configuration parameter: %d",
 				name, pluginSystemCap)
-			forceActiveChecksOnStart = plugin.DefaulForceActiveChecksOnStart
+			forceActiveChecksOnStart = agent.Options.ForceActiveChecksOnStart
 		} else {
 			forceActiveChecksOnStart = *pluginForceActiveChecksOnStart
 		}

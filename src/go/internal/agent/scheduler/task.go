@@ -210,6 +210,7 @@ func (t *exporterTask) reschedule(now time.Time) (err error) {
 	if err != nil {
 		return
 	}
+
 	t.scheduled = nextcheck.Add(priorityExporterTaskNs)
 	return
 }
@@ -310,9 +311,6 @@ func (t *directExporterTask) perform(s Scheduler) {
 
 func (t *directExporterTask) reschedule(now time.Time) (err error) {
 	if t.scheduled.IsZero() {
-		if 0 != t.plugin.forceActiveChecksOnStart {
-			t.scheduled = time.Unix(now.Unix(), priorityExporterTaskNs)
-		}
 		t.scheduled = time.Unix(now.Unix(), priorityExporterTaskNs)
 	} else {
 		t.scheduled = time.Unix(now.Unix()+1, priorityExporterTaskNs)

@@ -26,8 +26,7 @@ import (
 )
 
 const (
-	DefaultCapacity                = 100
-	DefaulForceActiveChecksOnStart = 0
+	DefaultCapacity = 100
 )
 
 var UnsupportedMetricError error
