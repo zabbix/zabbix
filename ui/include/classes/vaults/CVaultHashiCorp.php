@@ -24,168 +24,135 @@
  */
 class CVaultHashiCorp extends CVault {
 
-	/**
-	 * @var string
-	 */
 	public const NAME = 'HashiCorp';
+	public const API_ENDPOINT_DEFAULT = 'https://localhost:8200';
+	public const DB_PATH_PLACEHOLDER = 'path/to/secret:key';
 
 	/**
-	 * Vault API endpoint.
-	 *
 	 * @var string
 	 */
-	protected $api_endpoint = '';
+	private $api_endpoint;
 
 	/**
-	 * Vault access token.
-	 *
 	 * @var string
 	 */
-	protected $token = '';
+	private $db_path;
 
-	public function 	__construct(string $api_endpoint, string $token) {
-		if (self::validateVaultApiEndpoint($api_endpoint)) {
-			$this->api_endpoint = rtrim(trim($api_endpoint), '/');
-		}
-		if (self::validateVaultToken($token)) {
-			$this->token = $token;
-		}
+	/**
+	 * @var string
+	 */
+	private $token;
+
+	public function __construct(string $api_endpoint, string $db_path, string $token) {
+		$this->api_endpoint = rtrim(trim($api_endpoint), '/');
+		$this->db_path = $db_path;
+		$this->token = trim($token);
 	}
 
-	/**
-	 * Function returns Vault secret. Assumes given $path is correct.
-	 *
-	 * @param string $path  Path to secret.
-	 *
-	 * @throws Exception in case of configuration is not set.
-	 *
-	 * @return array
-	 */
-	public function loadSecret(string $path): array {
-		if ($this->token === '') {
-			throw new Exception(_('Incorrect Vault token.'));
+	public function validateParameters(): bool {
+		if (parse_url($this->api_endpoint, PHP_URL_HOST) === null) {
+			$this->addError(_s('Provided API endpoint "%1$s" is invalid.', $this->api_endpoint)); // TODO: 7402 - translation string
 		}
 
-		$options = [
-			'http' => [
-				'method' => 'GET',
-				'header' => "X-Vault-Token: $this->token\r\n",
-				'ignore_errors' => true
-			]
-		];
+		$secret_parser = new CVaultSecretParser(['with_key' => false]);
+		if ($secret_parser->parse($this->db_path) != CParser::PARSE_SUCCESS) {
+			$this->addError(_s('Provided secret path "%1$s" is invalid.', $this->db_path)); // TODO: 7402 - translation string
+		}
+
+		if ($this->token === '') {
+			// Function validates if token is not empty string
+			$this->addError(_s('Provided authentication token "%1$s" is empty.', $this->token)); // TODO: 7402 - translation string
+		}
+
+		return !$this->getErrors();
+	}
+
+	public function getCredentials(): ?array {
+		$this->addError(_('Unable to load database credentials from Vault.')); // TODO: 7402 - translation
+		return null;
+
+		$path_parts = explode('/', $this->db_path);
+		array_splice($path_parts, 1, 0, 'data');
+
+		$url = $this->api_endpoint.'/v1/'.implode('/', $path_parts);
 
 		try {
-			$url = $this->getURL($path);
+			$secret = file_get_contents($url, false, stream_context_create([
+				'http' => [
+					'method' => 'GET',
+					'header' => "X-Vault-Token: $this->token\r\n",
+					'ignore_errors' => true
+				]
+			]));
 		}
 		catch (Exception $e) {
-			error($e->getMessage());
-			return [];
-		}
+			$this->addError($e->getMessage());
 
-		$secret = @file_get_contents($url, false, stream_context_create($options));
-		if ($secret === false) {
-			return [];
+			return null;
 		}
 
 		$secret = json_decode($secret, true);
 
-		if (is_array($secret) && array_key_exists('data', $secret) && is_array($secret['data'])
-				&& array_key_exists('data', $secret['data']) && is_array($secret['data']['data'])) {
-			return $secret['data']['data'];
-		}
-		else {
-			return [];
-		}
-	}
+		if ($secret === null || !isset($secret['data']['data']) || !is_array($secret['data']['data'])) {
+			$this->addError(_('Unable to load database credentials from Vault.')); // TODO: 7402 - translation
 
-	public function getCredentials(bool $use_cache = false): array {
-		$username = '';
-		$password = '';
-
-		if ($use_cache) {
-			$username = CDataCacheHelper::getValue('db_username', '');
-			$password = CDataCacheHelper::getValue('db_password', '');
+			return null;
 		}
 
-		if ($username === '' || $password === '') {
-			$secret = $this->loadSecret($this->credentials_path);
-
-			$username = array_key_exists('username', $secret) ? $secret['username'] : '';
-			$password = array_key_exists('password', $secret) ? $secret['password'] : '';
-
-			if ($use_cache) {
-				if ($username !== '' && $password !== '') {
-					CDataCacheHelper::setValueArray([
-						'db_username' => $username,
-						'db_password' => $password
-					]);
-				}
-				else {
-					CDataCacheHelper::clearValues(['db_username', 'db_password']);
-				}
-			}
-		}
-
-		return [
-			'username' => $username,
-			'password' => $password
-		];
+		return $secret['data']['data'];
 	}
 
-	/**
-	 * Function validates if given string is valid API endpoint.
-	 *
-	 * @param string $api_endpoint
-	 *
-	 * @return bool
-	 */
-	public static function validateVaultApiEndpoint(string $api_endpoint): bool {
-		$url_parts = parse_url($api_endpoint);
-		if (!$url_parts || !array_key_exists('host', $url_parts)) {
-			error(_s('Provided URL "%1$s" is invalid.', $api_endpoint));
-
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * Function validates if token is not empty string.
-	 *
-	 * @param string $token
-	 *
-	 * @return bool
-	 */
-	public static function validateVaultToken(string $token): bool {
-		return (trim($token) !== '');
-	}
-
-	/**
-	 * Function returns Vault API request URL including path to secret.
-	 *
-	 * @param string $secret_path
-	 *
-	 * @throws Exception in case of configuration is not set.
-	 *
-	 * @return string
-	 */
-	public function getURL(string $path): string {
-		if ($this->api_endpoint === '') {
-			throw new Exception(_('Incorrect Vault API endpoint.'));
-		}
-
-		$path = explode('/', $path);
-		array_splice($path, 1, 0, 'data');
-
-		return $this->api_endpoint.'/v1/'.implode('/', $path);
-	}
-
-	public function getPlaceholder(): string {
-		return 'path/to/secret:key';
-	}
-
+	// TODO: 7402
 	public function validateMacroValue(string $value): bool {
-		return true;
+		return false;
 	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//	public function getCredentials(bool $use_cache = false): array {
+//		$username = '';
+//		$password = '';
+
+//		if ($use_cache) {
+//			$username = CDataCacheHelper::getValue('db_username', '');
+//			$password = CDataCacheHelper::getValue('db_password', '');
+//		}
+
+//		if ($username === '' || $password === '') {
+//			$secret = $this->loadSecret($this->credentials_path);
+
+//			$username = array_key_exists('username', $secret) ? $secret['username'] : '';
+//			$password = array_key_exists('password', $secret) ? $secret['password'] : '';
+
+//			if ($use_cache) {
+//				if ($username !== '' && $password !== '') {
+//					CDataCacheHelper::setValueArray([
+//						'db_username' => $username,
+//						'db_password' => $password
+//					]);
+//				}
+//				else {
+//					CDataCacheHelper::clearValues(['db_username', 'db_password']);
+//				}
+//			}
+//		}
+
+//		return [
+//			'username' => $username,
+//			'password' => $password
+//		];
+//	}
+
 }

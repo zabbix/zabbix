@@ -24,33 +24,66 @@
  */
 class CVaultCyberArk extends CVault {
 
-	/**
-	 * @var string
-	 */
 	public const NAME = 'CyberArk';
+	public const API_ENDPOINT_DEFAULT = 'https://localhost:1858';
+	public const DB_PATH_PLACEHOLDER = 'AppID=foo&Query=Safe=bar;Object=buzz:key';
 
 	/**
-	 * Vault API endpoint.
-	 *
 	 * @var string
 	 */
-	protected string $api_endpoint = '';
+	protected $url = '';
 
 	/**
-	 * Vault access token.
-	 *
 	 * @var string
 	 */
-	protected string $db_path = '';
+	protected $db_path = '';
+
+	/**
+	 * @var string
+	 */
+	protected $cert_file = '';
+
+	/**
+	 * @var string
+	 */
+	protected $key_file = '';
 
 	public function __construct($url, $db_path, $cert_file, $key_file) {
-		if (self::validateVaultApiEndpoint($url)) {
-			$this->api_endpoint = rtrim(trim($api_endpoint), '/');
+		if ($this->validateVaultApiEndpoint($url)) {
+			$this->url = rtrim(trim($url), '/');
 		}
+
 		if (self::validateVaultDBPath($db_path)) {
 			$this->token = $db_path;
 		}
 	}
+
+	public function validateParameters(): bool {
+
+	}
+
+	public function getCredentials(): ?array {
+		// TODO: Implement getCredentials() method.
+	}
+
+	public function validateMacroValue(string $value): bool {
+
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 	public function getCredentials(): array {
@@ -154,10 +187,6 @@ class CVaultCyberArk extends CVault {
 		array_splice($path, 1, 0, 'data');
 
 		return $this->api_endpoint.'/v1/'.implode('/', $path);
-	}
-
-	public function getPlaceholder(): string {
-		return 'AppID=foo&Query=Safe=bar;Object=buzz:key';
 	}
 
 	public function validateMacroValue(string $value): bool {

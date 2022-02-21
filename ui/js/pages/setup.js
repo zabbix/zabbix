@@ -21,7 +21,7 @@
 const ZBX_DB_MYSQL = 'MYSQL';
 const ZBX_DB_POSTGRESQL = 'POSTGRESQL';
 const ZBX_STYLE_DISPLAY_NONE = 'display-none';
-const DB_STORE_CREDS_VAULT = 1;
+const DB_STORE_CREDS_VAULT_HASHICORP = 1;
 const DB_STORE_CREDS_VAULT_CYBERARK = 2;
 
 function updateElementsAvailability() {
@@ -44,8 +44,8 @@ function updateElementsAvailability() {
 			'#db_verify_host_row': encryption_customizable,
 			'#db_cipher_row': (encryption_customizable && (db_type === ZBX_DB_MYSQL)),
 			'#vault_url_row': (vault_selected != 0),
-			'#vault_db_path_row': (vault_selected == DB_STORE_CREDS_VAULT),
-			'#vault_token_row': (vault_selected == DB_STORE_CREDS_VAULT),
+			'#vault_db_path_row': (vault_selected == DB_STORE_CREDS_VAULT_HASHICORP),
+			'#vault_token_row': (vault_selected == DB_STORE_CREDS_VAULT_HASHICORP),
 			'#db_user': (vault_selected == 0),
 			'#db_password': (vault_selected == 0),
 			'#vault_query_string_row': (vault_selected == DB_STORE_CREDS_VAULT_CYBERARK),
