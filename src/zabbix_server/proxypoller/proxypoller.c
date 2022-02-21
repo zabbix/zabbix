@@ -548,12 +548,6 @@ static int	process_proxy(void)
 					goto error;
 			}
 
-			if (proxy.proxy_tasks_nextcheck <= now)
-			{
-				if (SUCCEED != (ret = proxy_get_tasks(&proxy)))
-					goto error;
-			}
-
 			if (proxy.proxy_data_nextcheck <= now)
 			{
 				int	more;
@@ -561,12 +555,18 @@ static int	process_proxy(void)
 				do
 				{
 					if (FAIL == zbx_hc_check_proxy(proxy.hostid))
-						goto error;
+						goto request_tasks;
 
 					if (SUCCEED != (ret = proxy_get_data(&proxy, &more)))
 						goto error;
 				}
 				while (ZBX_PROXY_DATA_MORE == more);
+			}
+			else if (proxy.proxy_tasks_nextcheck <= now)
+			{
+request_tasks:
+				if (SUCCEED != (ret = proxy_get_tasks(&proxy)))
+					goto error;
 			}
 		}
 error:
