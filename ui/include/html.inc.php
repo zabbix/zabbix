@@ -949,7 +949,6 @@ function makeMaintenanceIcon($type, $name, $description) {
 
 	return (new CLink())
 		->addClass(ZBX_STYLE_ICON_MAINTENANCE)
-		->addClass(ZBX_STYLE_CURSOR_POINTER)
 		->setHint($hint);
 }
 
@@ -1035,7 +1034,6 @@ function makeActionIcon(array $icon_data): CTag {
 function makeDescriptionIcon($description) {
 	return (new CLink())
 		->addClass(ZBX_STYLE_ICON_DESCRIPTION)
-		->addClass(ZBX_STYLE_CURSOR_POINTER)
 		->setHint(zbx_str2links($description), ZBX_STYLE_HINTBOX_WRAP);
 }
 
@@ -1063,7 +1061,6 @@ function makeErrorIcon($error) {
 function makeHelpIcon($help_text): CLink {
 	return (new CLink())
 		->addClass(ZBX_STYLE_ICON_HELP_HINT)
-		->addClass(ZBX_STYLE_CURSOR_POINTER)
 		->setHint($help_text, ZBX_STYLE_HINTBOX_WRAP);
 }
 
