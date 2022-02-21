@@ -24,9 +24,11 @@
  * @var array $data
  */
 
-$form_target = (new CUrl('zabbix.php'))->setArgument('action', ($data['tokenid'] == 0) ? 'token.create' : 'token.update');
+$url = (new CUrl('zabbix.php'))
+	->setArgument('action', ($data['tokenid'] == 0) ? 'token.create' : 'token.update')
+	->getUrl();
 
-$token_form = (new CForm('post', $form_target->getUrl()))
+$token_form = (new CForm('post', $url))
 	->setId('token_form')
 	->setName('token')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
