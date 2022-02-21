@@ -2573,11 +2573,6 @@ z-select[disabled] button,
   display: inline-block;
   margin: 0 14px 0 0; }
 
-.icon-maint {
-  margin: 0 18px 0 0; }
-  .icon-maint::before {
-    background: url("../img/icon-sprite.svg?20200407") no-repeat -46px -802px; }
-
 .icon-depend-up {
   margin: 0 18px 0 0; }
   .icon-depend-up::before {
@@ -2600,7 +2595,7 @@ z-select[disabled] button,
   height: 16px;
   border-radius: 2px; }
   .icon-maintenance::before {
-    background: url("../img/icon-sprite.svg?20200407") no-repeat -47px -803px;
+    background: url("../img/icon-sprite.svg?20200407") no-repeat -49px -805px;
     width: 14px;
     height: 14px;
     left: 1px;
@@ -2649,7 +2644,7 @@ z-select[disabled] button,
     opacity: 1;
     background-color: transparent; }
 
-.icon-maint::before, .icon-depend-up::before, .icon-depend-down::before, .icon-ackn::before, .icon-maintenance::before {
+.icon-depend-up::before, .icon-depend-down::before, .icon-ackn::before, .icon-maintenance::before {
   display: inline-block;
   width: 18px;
   height: 18px;

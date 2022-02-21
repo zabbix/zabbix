@@ -2537,11 +2537,6 @@ z-select[disabled] button,
   display: inline-block;
   margin: 0 14px 0 0; }
 
-.icon-maint {
-  margin: 0 18px 0 0; }
-  .icon-maint::before {
-    background: url("../img/icon-sprite.svg?20200407") no-repeat -46px -802px; }
-
 .icon-depend-up {
   margin: 0 18px 0 0; }
   .icon-depend-up::before {
@@ -2564,7 +2559,7 @@ z-select[disabled] button,
   height: 16px;
   border-radius: 2px; }
   .icon-maintenance::before {
-    background: url("../img/icon-sprite.svg?20200407") no-repeat -47px -803px;
+    background: url("../img/icon-sprite.svg?20200407") no-repeat -49px -805px;
     width: 14px;
     height: 14px;
     left: 1px;
@@ -2613,7 +2608,7 @@ z-select[disabled] button,
     opacity: 1;
     background-color: transparent; }
 
-.icon-maint::before, .icon-depend-up::before, .icon-depend-down::before, .icon-ackn::before, .icon-maintenance::before {
+.icon-depend-up::before, .icon-depend-down::before, .icon-ackn::before, .icon-maintenance::before {
   display: inline-block;
   width: 18px;
   height: 18px;
@@ -5743,25 +5738,17 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-mask, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-mask {
   border: 0; }
 
-.icon-maint {
-  margin: 0 18px 0 0; }
-  .icon-maint::before {
-    background: url("../img/icon-sprite.svg?20200407") no-repeat -203px -802px; }
+.icon-maintenance::before {
+  background-position: -205px -803px; }
 
-.icon-depend-up {
-  margin: 0 18px 0 0; }
-  .icon-depend-up::before {
-    background: url("../img/icon-sprite.svg?20200407") no-repeat -208px -729px; }
+.icon-depend-up::before {
+  background-position: -208px -729px; }
 
-.icon-depend-down {
-  margin: 0 18px 0 0; }
-  .icon-depend-down::before {
-    background: url("../img/icon-sprite.svg?20200407") no-repeat -208px -765px; }
+.icon-depend-down::before {
+  background-position: -208px -765px; }
 
-.icon-ackn {
-  margin: 0 18px 0 0; }
-  .icon-ackn::before {
-    background: url("../img/icon-sprite.svg?20200407") no-repeat -203px -693px; }
+.icon-ackn::before {
+  background-position: -203px -693px; }
 
 .icon-cal {
   background: transparent url("../img/icon-sprite.svg?20200407") no-repeat -201px -834px; }
@@ -5999,7 +5986,7 @@ z-select button.focusable:focus,
     top: 1px;
     transform: scale(0.8); }
   .list-table.compact-view td .icon-maintenance::before {
-    background-position: -206px -804px; }
+    background-position: -208px -805px; }
   .list-table.compact-view td .icon-wzrd-action {
     background: transparent url("../img/icon-sprite.svg?20200407") no-repeat -165px -624px; }
 

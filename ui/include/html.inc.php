@@ -967,17 +967,16 @@ function makeMaintenanceIcon($type, $name, $description) {
  * @param string $icon_data[]['suppress_until']    Time until the problem is suppressed.
  * @param string $icon_data[]['maintenance_name']  Name of the maintenance.
  *
- * @return CSpan
+ * @return CLink
  */
 function makeSuppressedProblemIcon(array $icon_data) {
-	$suppress_until = max(zbx_objectValues($icon_data, 'suppress_until'));
+	$suppress_until = max(array_column($icon_data, 'suppress_until'));
 
 	CArrayHelper::sort($icon_data, ['maintenance_name']);
-	$maintenance_names = implode(', ', zbx_objectValues($icon_data, 'maintenance_name'));
+	$maintenance_names = implode(', ', array_column($icon_data, 'maintenance_name'));
 
 	return (new CLink())
 		->addClass(ZBX_STYLE_ICON_INVISIBLE)
-		->addClass(ZBX_STYLE_CURSOR_POINTER)
 		->setHint(
 			_s('Suppressed till: %1$s', ($suppress_until < strtotime('tomorrow'))
 				? zbx_date2str(TIME_FORMAT, $suppress_until)

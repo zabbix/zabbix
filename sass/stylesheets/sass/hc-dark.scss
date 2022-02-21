@@ -391,10 +391,10 @@ $multiselect-selected-bg-color: #222222;
 }
 
 $var-icons: (
-	maint: url($sprite-path) no-repeat -357px -802px,
-	depend-up: url($sprite-path) no-repeat -361px -729px,
-	depend-down: url($sprite-path) no-repeat -361px -765px,
-	ackn: url($sprite-path) no-repeat -357px -693px
+	maintenance: -359px -803px,
+	depend-up: -361px -729px,
+	depend-down: -361px -765px,
+	ackn: -357px -693px
 );
 
 // Dynamically generated classes:
@@ -404,10 +404,8 @@ $var-icons: (
 //  .icon-ackn
 @each $var-icons, $bgimage in $var-icons {
 	.icon-#{$var-icons} {
-		margin: 0 18px 0 0;
 		&::before {
-			background: $bgimage;
-			@extend %var-icons;
+			background-position: $bgimage;
 		}
 	}
 }
@@ -874,7 +872,7 @@ a.link-action {
 			}
 
 			.icon-maintenance::before {
-				background-position: -360px -804px;
+				background-position: -362px -805px;
 			}
 
 			.icon-wzrd-action {
