@@ -695,7 +695,7 @@ func getPluginOptions(optsRaw interface{}, name string) (capacity int, forceActi
 	if nil != pluginForceActiveChecksOnStart {
 		if *pluginForceActiveChecksOnStart > 1 || *pluginForceActiveChecksOnStart < 0 {
 			log.Warningf("invalid Plugins.%s.System.ForceActiveChecksOnStart configuration parameter: %d",
-				name, pluginSystemCap)
+				name, *pluginForceActiveChecksOnStart)
 			forceActiveChecksOnStart = agent.Options.ForceActiveChecksOnStart
 		} else {
 			forceActiveChecksOnStart = *pluginForceActiveChecksOnStart
