@@ -210,7 +210,6 @@ func (t *exporterTask) reschedule(now time.Time) (err error) {
 	if err != nil {
 		return
 	}
-
 	t.scheduled = nextcheck.Add(priorityExporterTaskNs)
 	return
 }

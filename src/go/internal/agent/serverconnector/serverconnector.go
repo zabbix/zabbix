@@ -211,6 +211,7 @@ func (c *Connector) refreshActiveChecks() {
 		}
 		c.taskManager.UpdateTasks(c.clientID, c.resultCache.(plugin.ResultWriter), c.firstActiveChecksRefreshed,
 			[]*glexpr.Expression{}, []*plugin.Request{})
+		c.firstActiveChecksRefreshed = true
 		return
 	}
 
