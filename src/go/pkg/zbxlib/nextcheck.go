@@ -36,8 +36,7 @@ import (
 )
 
 func GetNextcheck(itemid uint64, delay string, from time.Time) (nextcheck time.Time, scheduling bool, err error) {
-	var cnextcheck C.int
-	var cscheduling C.int
+	var cnextcheck, cscheduling C.int
 	var cerr *C.char
 	cdelay := C.CString(delay)
 
