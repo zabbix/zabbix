@@ -2868,7 +2868,7 @@ form.is-loading {
       .list-table.compact-view td .icon-maintenance::before {
         height: 12px;
         width: 12px;
-        background-position: -48px -804px; }
+        background-position: -49px -805px; }
     .list-table.compact-view td .icon-wzrd-action {
       background: url("../img/icon-sprite.svg?20211222") no-repeat -6px -624px;
       height: 12px;
@@ -6132,6 +6132,12 @@ svg {
     background-image: url("../img/icon-sprite.svg?20211222");
     background-repeat: no-repeat; }
 
+.icon-invisible:link, .icon-invisible:hover, .icon-invisible:focus {
+  border-bottom: none; }
+.icon-invisible:focus {
+  box-shadow: 0 0 0 2px #000000;
+  border-radius: 2px; }
+
 button.icon-action-command, button.icon-action-close, button.icon-action-msg, button.icon-action-msgs, button.icon-action-severity-up, button.icon-action-severity-down, button.icon-action-severity-changed, button.icon-action-message, button.icon-action-ack, button.icon-problem-generated, button.icon-problem-recovery, button.icon-actions-number-gray, button.icon-actions-number-yellow, button.icon-actions-number-red {
   background: none;
   border: none;
@@ -6933,25 +6939,17 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-mask, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-mask {
   border: 0; }
 
-.icon-maintenance {
-  margin: 0 18px 0 0; }
-  .icon-maintenance::before {
-    background: url("../img/icon-sprite.svg?20211222") no-repeat -203px -802px; }
+.icon-maintenance::before {
+  background-position: -205px -803px; }
 
-.icon-depend-up {
-  margin: 0 18px 0 0; }
-  .icon-depend-up::before {
-    background: url("../img/icon-sprite.svg?20211222") no-repeat -208px -729px; }
+.icon-depend-up::before {
+  background-position: -208px -729px; }
 
-.icon-depend-down {
-  margin: 0 18px 0 0; }
-  .icon-depend-down::before {
-    background: url("../img/icon-sprite.svg?20211222") no-repeat -208px -765px; }
+.icon-depend-down::before {
+  background-position: -208px -765px; }
 
-.icon-ackn {
-  margin: 0 18px 0 0; }
-  .icon-ackn::before {
-    background: url("../img/icon-sprite.svg?20211222") no-repeat -203px -693px; }
+.icon-ackn::before {
+  background-position: -203px -693px; }
 
 .icon-cal {
   background: transparent url("../img/icon-sprite.svg?20211222") no-repeat -201px -834px; }
@@ -7199,7 +7197,7 @@ z-select button.focusable:focus,
     top: 1px;
     transform: scale(0.8); }
   .list-table.compact-view td .icon-maintenance::before {
-    background-position: -206px -804px; }
+    background-position: -208px -805px; }
   .list-table.compact-view td .icon-wzrd-action {
     background: transparent url("../img/icon-sprite.svg?20211222") no-repeat -165px -624px; }
 

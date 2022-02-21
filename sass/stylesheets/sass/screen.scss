@@ -496,7 +496,7 @@ form {
 				&::before {
 					height: 12px;
 					width: 12px;
-					background-position: -48px -804px;
+					background-position: -49px -805px;
 				}
 			}
 
@@ -5359,6 +5359,19 @@ svg {
 		height: 18px;
 		background-image: url($sprite-path);
 		background-repeat: no-repeat;
+	}
+}
+
+.icon-invisible {
+	&:link,
+	&:hover,
+	&:focus {
+		border-bottom: none;
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 2px $btn-border-focus-color;
+		border-radius: 2px;
 	}
 }
 
