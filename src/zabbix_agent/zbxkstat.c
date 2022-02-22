@@ -164,11 +164,12 @@ void	zbx_kstat_collect(zbx_kstat_t *kstat)
 	while (-1 == (kid = kstat_read(kc, kc_vminfo, &vminfo)) || kc_id != kid)
 	{
 		if (-1 == kid)
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot collect kstat data, kstat_read: %s", error);
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot collect kstat data, kstat_read: %s", ZBX_NULL2STR(error));
 
 		if (SUCCEED != zbx_kstat_refresh(&error))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot collect kstat data, kstat_refresh: %s", error);
+			zabbix_log(LOG_LEVEL_WARNING, "cannot collect kstat data, kstat_refresh: %s",
+					ZBX_NULL2STR(error));
 			zbx_free(error);
 			goto out;
 		}
@@ -182,9 +183,9 @@ void	zbx_kstat_collect(zbx_kstat_t *kstat)
 
 	zbx_mutex_unlock(kstat_lock);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "vm_index: %d, freemem: %lu, updates: %lu", (int)kstat->vminfo_index,
-			(long unsigned)kstat->vminfo[kstat->vminfo_index].freemem,
-			(long unsigned)kstat->vminfo[kstat->vminfo_index].updates);
+	zabbix_log(LOG_LEVEL_DEBUG, "vm_index: %d, freemem: " ZBX_FS_UI64 ", updates: " ZBX_FS_UI64,
+			(int)kstat->vminfo_index, kstat->vminfo[kstat->vminfo_index].freemem,
+			kstat->vminfo[kstat->vminfo_index].updates);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -214,18 +215,11 @@ int	zbx_kstat_get_freemem(zbx_uint64_t *value, char **error)
 	zbx_mutex_lock(kstat_lock);
 
 	if (NULL == collector)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Collector is not started");
-		*error = zbx_strdup(*error, "Collector is not started.");
 		goto out;
-	}
 
 	last = collector->kstat.vminfo_index;
 	prev = last ^ 1;
 	vminfo = collector->kstat.vminfo;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "last: %d, prev: %d, vminfo[prev].updates: %lu, vminfo[last].updates: %lu", last,
-			prev, vminfo[prev].updates, vminfo[last].updates);
 
 	if (0 != vminfo[prev].updates && vminfo[prev].updates < vminfo[last].updates)
 	{
@@ -236,17 +230,25 @@ int	zbx_kstat_get_freemem(zbx_uint64_t *value, char **error)
 		}
 
 		*value = (vminfo[last].freemem - vminfo[prev].freemem) /
-			(vminfo[last].updates - vminfo[prev].updates) * sysconf_pagesize;
+				(vminfo[last].updates - vminfo[prev].updates) * sysconf_pagesize;
 		ret = SUCCEED;
 	}
 	else
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "no new vminfo update is available, vminfo[prev].updates: %lu,"
-				"vminfo[prev].updates: %lu, vminfo[last].updates: %lu", vminfo[prev].updates,
-				vminfo[prev].updates, vminfo[last].updates);
-	}
+		zabbix_log(LOG_LEVEL_DEBUG, "no new vminfo update is available");
 out:
 	zbx_mutex_unlock(kstat_lock);
+
+	if (NULL == collector)
+	{
+		*error = zbx_strdup(*error, "Collector is not started.");
+		zabbix_log(LOG_LEVEL_DEBUG, "Collector is not started");
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "last: %d, prev: %d, vminfo[prev].updates: " ZBX_FS_UI64
+				", vminfo[last].updates: " ZBX_FS_UI64, last, prev, vminfo[prev].updates,
+				vminfo[last].updates);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
