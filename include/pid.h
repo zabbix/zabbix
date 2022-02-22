@@ -28,6 +28,7 @@
 
 int	create_pid_file(const char *pidfile);
 int	read_pid_file(const char *pidfile, pid_t *pid, char *error, size_t max_error_len);
+int	pid_file_exists(const char *pidfile);
 void	drop_pid_file(const char *pidfile);
 
 #endif
