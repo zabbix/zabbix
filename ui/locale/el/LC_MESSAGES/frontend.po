@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 5.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-14 19:53+0200\n"
+"POT-Creation-Date: 2022-02-22 13:30+0200\n"
 "PO-Revision-Date: 2014-10-03 08:43+0300\n"
 "Last-Translator: ΓΙΑΝΝΗΣ <yannis@computerstudio.gr>\n"
 "Language-Team: none\n"
@@ -568,7 +568,7 @@ msgstr ""
 #: include/views/configuration.item.prototype.edit.php:654
 #: include/views/configuration.maintenance.edit.php:45
 #: include/views/configuration.services.edit.php:126
-#: include/views/configuration.services.edit.php:180
+#: include/views/configuration.services.edit.php:181
 #: include/views/configuration.template.edit.php:127
 #: include/views/configuration.trigger.prototype.edit.php:199
 #: include/views/configuration.trigger.prototype.edit.php:394
@@ -801,9 +801,9 @@ msgstr "Ενεργό έως"
 #: include/views/configuration.maintenance.edit.php:86
 #: include/views/configuration.maintenance.edit.php:200
 #: include/views/configuration.maintenance.edit.php:275
-#: include/views/configuration.services.edit.php:164
-#: include/views/configuration.services.edit.php:340
-#: include/views/configuration.services.edit.php:379
+#: include/views/configuration.services.edit.php:165
+#: include/views/configuration.services.edit.php:341
+#: include/views/configuration.services.edit.php:380
 #: include/views/configuration.template.edit.php:252
 #: include/views/configuration.trigger.prototype.edit.php:111
 #: include/views/configuration.trigger.prototype.edit.php:148
@@ -2623,7 +2623,7 @@ msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not 
 msgstr[0] "Δεν μπορώ να εισάγω σχεδιότυπο \"%1$s\", συνδεδεμένο σχεδιότυπο \"%2$s\" ανύπαρκτο."
 msgstr[1] "Δεν μπορώ να εισάγω σχεδιότυπο \"%1$s\", συνδεδεμένα σχεδιότυπα \"%2$s\" ανύπαρκτα."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1438
+#: app/controllers/CControllerPopupTriggerExpr.php:1439
 msgid "Cannot insert trigger expression"
 msgstr "Αδύνατη η εισαγωγή έκφρασης εναύσματος"
 
@@ -3214,9 +3214,9 @@ msgstr "Περιλαμβάνεται στοιχειοσειρά χαρακτήρ
 msgid "Character string not included"
 msgstr "Δεν περιλαμβάνεται στοιχειοσειρά χαρακτήρων"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:701
-#: app/controllers/CControllerPopupTriggerExpr.php:873
-#: app/controllers/CControllerPopupTriggerExpr.php:1004
+#: app/controllers/CControllerPopupTriggerExpr.php:702
+#: app/controllers/CControllerPopupTriggerExpr.php:874
+#: app/controllers/CControllerPopupTriggerExpr.php:1005
 msgid "Chars"
 msgstr ""
 
@@ -3529,7 +3529,7 @@ msgstr ""
 msgid "Concurrent sessions"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1461
+#: app/controllers/CControllerPopupTriggerExpr.php:1462
 #: app/views/popup.lldoperation.php:59 app/views/popup.lldoverride.php:195
 msgid "Condition"
 msgstr "Συνθήκη"
@@ -4018,8 +4018,8 @@ msgstr "Αδύνατη η αποθήκευση εικόνας!"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:50
 #: app/controllers/CControllerPopupTriggerExpr.php:647
-#: app/controllers/CControllerPopupTriggerExpr.php:816
-#: app/controllers/CControllerPopupTriggerExpr.php:847
+#: app/controllers/CControllerPopupTriggerExpr.php:817
+#: app/controllers/CControllerPopupTriggerExpr.php:848
 msgid "Count"
 msgstr "Απαρίθμηση"
 
@@ -4662,8 +4662,8 @@ msgstr "Δεκ"
 msgid "December"
 msgstr "Δεκέμβριος"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:860
-#: app/controllers/CControllerPopupTriggerExpr.php:1017
+#: app/controllers/CControllerPopupTriggerExpr.php:861
+#: app/controllers/CControllerPopupTriggerExpr.php:1018
 msgid "Decimal places"
 msgstr ""
 
@@ -5098,7 +5098,7 @@ msgid "Deny list"
 msgstr ""
 
 #: app/views/popup.massupdate.trigger.php:154
-#: include/views/configuration.services.edit.php:357
+#: include/views/configuration.services.edit.php:358
 #: include/views/configuration.trigger.prototype.edit.php:606
 #: include/views/configuration.trigger.prototype.edit.php:640
 #: include/views/configuration.triggers.edit.php:619
@@ -5115,7 +5115,7 @@ msgid "Dependent item"
 msgstr ""
 
 #: app/views/popup.generic.php:303 include/triggers.inc.php:2572
-#: include/views/configuration.services.edit.php:161
+#: include/views/configuration.services.edit.php:162
 #: include/views/configuration.trigger.prototype.list.php:92
 #: include/views/configuration.triggers.list.php:237
 msgid "Depends on"
@@ -5586,7 +5586,7 @@ msgstr ""
 msgid "Displaying options"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:753
+#: app/controllers/CControllerPopupTriggerExpr.php:754
 msgid "Division denominator"
 msgstr ""
 
@@ -5675,8 +5675,8 @@ msgstr ""
 #: app/views/report.services.php:80 app/views/report.services.php:81
 #: app/views/report.services.php:82 app/views/report.services.php:83
 #: include/classes/screens/CScreenDiscovery.php:120
-#: include/views/configuration.services.edit.php:193
-#: include/views/configuration.services.edit.php:245
+#: include/views/configuration.services.edit.php:194
+#: include/views/configuration.services.edit.php:246
 msgid "Downtime"
 msgstr "Χρόνος μη διαθεσιμότητας"
 
@@ -6881,8 +6881,8 @@ msgstr "Παρασκευή"
 #: app/views/popup.tabfilter.edit.php:44 app/views/report.services.php:82
 #: include/classes/html/CFilter.php:282
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:79
-#: include/views/configuration.services.edit.php:259
-#: include/views/configuration.services.edit.php:307
+#: include/views/configuration.services.edit.php:260
+#: include/views/configuration.services.edit.php:308
 #: include/views/js/monitoring.sysmaps.js.php:748 report4.php:191
 #: services.php:47 services.php:182
 msgid "From"
@@ -9570,7 +9570,7 @@ msgstr "Internet Explorer"
 #: include/views/configuration.item.list.php:88
 #: include/views/configuration.item.prototype.edit.php:654
 #: include/views/configuration.item.prototype.list.php:61
-#: include/views/configuration.services.edit.php:180
+#: include/views/configuration.services.edit.php:181
 msgid "Interval"
 msgstr "Χρονικό διάστημα"
 
@@ -9601,7 +9601,7 @@ msgstr ""
 msgid "Invalid action condition: %1$s."
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1428
+#: app/controllers/CControllerPopupTriggerExpr.php:1429
 #, c-format
 msgid "Invalid condition: %1$s."
 msgstr ""
@@ -10023,7 +10023,7 @@ msgstr[1] "Συλλέκτες ενεργοποιημένοι"
 msgid "Item in \"not supported\" state"
 msgstr "Συλλέκτης σε \"ανυποστήρικτη\" κατάσταση"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1421
+#: app/controllers/CControllerPopupTriggerExpr.php:1422
 msgid "Item not selected"
 msgstr "Συλλέκτης μή επιλεγμένος"
 
@@ -10568,7 +10568,7 @@ msgid "Legend"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:615
-#: app/controllers/CControllerPopupTriggerExpr.php:733
+#: app/controllers/CControllerPopupTriggerExpr.php:734
 msgid "Length"
 msgstr ""
 
@@ -11972,7 +11972,7 @@ msgstr ""
 msgid "New regular expression"
 msgstr "Νέα κανονική έκφραση"
 
-#: include/views/configuration.services.edit.php:337
+#: include/views/configuration.services.edit.php:338
 msgid "New service time"
 msgstr "Νέος χρόνος υπηρεσίας"
 
@@ -12597,8 +12597,8 @@ msgid "Not supported"
 msgstr "Μη υποστηριζόμενο"
 
 #: app/views/popup.services.php:71
-#: include/views/configuration.services.edit.php:180
-#: include/views/configuration.services.edit.php:253
+#: include/views/configuration.services.edit.php:181
+#: include/views/configuration.services.edit.php:254
 msgid "Note"
 msgstr "Σημείωση"
 
@@ -12929,8 +12929,8 @@ msgstr "Ένα των αντικειμένων χωρίς ομάδα ξενισ�
 msgid "One time only"
 msgstr "Μία φορά μόνο"
 
-#: include/views/configuration.services.edit.php:199
-#: include/views/configuration.services.edit.php:246
+#: include/views/configuration.services.edit.php:200
+#: include/views/configuration.services.edit.php:247
 msgid "One-time downtime"
 msgstr "Μία φορά μή διαθέσιμο"
 
@@ -13646,7 +13646,7 @@ msgstr ""
 msgid "Paste without external links"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:829
+#: app/controllers/CControllerPopupTriggerExpr.php:830
 #: app/views/monitoring.charts.view.php:106
 msgid "Pattern"
 msgstr ""
@@ -13708,7 +13708,7 @@ msgstr ""
 
 #: app/views/popup.maintenance.period.php:69
 #: include/views/configuration.maintenance.edit.php:45
-#: include/views/configuration.services.edit.php:238
+#: include/views/configuration.services.edit.php:239
 msgid "Period type"
 msgstr "Τύπος περιόδου"
 
@@ -13860,7 +13860,7 @@ msgstr ""
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:791
+#: app/controllers/CControllerPopupTriggerExpr.php:792
 msgid "Power value"
 msgstr ""
 
@@ -14567,7 +14567,7 @@ msgstr "Απομακρυσμένη εντολή"
 #: include/views/configuration.maintenance.edit.php:164
 #: include/views/configuration.maintenance.edit.php:187
 #: include/views/configuration.services.edit.php:143
-#: include/views/configuration.services.edit.php:218
+#: include/views/configuration.services.edit.php:219
 #: include/views/configuration.trigger.prototype.edit.php:244
 #: include/views/configuration.trigger.prototype.edit.php:440
 #: include/views/configuration.trigger.prototype.edit.php:595
@@ -14596,8 +14596,8 @@ msgstr "Απομακρυσμένη εντολή"
 #: include/views/js/configuration.host.prototype.edit.js.php:33
 #: include/views/js/configuration.httpconf.edit.js.php:52
 #: include/views/js/configuration.httpconf.edit.js.php:77
-#: include/views/js/configuration.item.list.js.php:64
-#: include/views/js/configuration.item.list.js.php:79
+#: include/views/js/configuration.item.list.js.php:67
+#: include/views/js/configuration.item.list.js.php:85
 #: include/views/js/configuration.maintenance.edit.js.php:40
 #: include/views/js/configuration.services.edit.js.php:112
 #: include/views/js/item.preprocessing.js.php:57
@@ -14697,7 +14697,7 @@ msgid "Replace dependencies"
 msgstr "Αντικατάσταση εξαρτήσεων"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:620
-#: app/controllers/CControllerPopupTriggerExpr.php:834
+#: app/controllers/CControllerPopupTriggerExpr.php:835
 msgid "Replacement"
 msgstr ""
 
@@ -15682,7 +15682,7 @@ msgstr "Ώρα εξυπηρετητή"
 
 #: app/controllers/CControllerAuditLogList.php:201
 #: app/views/popup.services.php:46 include/actions.inc.php:75
-#: include/views/configuration.services.edit.php:356 services.php:352
+#: include/views/configuration.services.edit.php:357 services.php:352
 #: srv_status.php:144
 msgid "Service"
 msgstr "Υπηρεσία"
@@ -15740,7 +15740,7 @@ msgstr "Θύρα υπηρεσίας"
 msgid "Service start time must be less than end time."
 msgstr "Χρόνος έναρξης υπηρεσίας πρέπει να είναι μικρότερος του χρόνου λήξης."
 
-#: include/views/configuration.services.edit.php:229
+#: include/views/configuration.services.edit.php:230
 msgid "Service times"
 msgstr "Χρόνοι υπηρεσίας"
 
@@ -16249,7 +16249,7 @@ msgid "Standard items"
 msgstr "Τυπικοί συλλέκτες"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:610
-#: app/controllers/CControllerPopupTriggerExpr.php:728
+#: app/controllers/CControllerPopupTriggerExpr.php:729
 msgid "Start"
 msgstr ""
 
@@ -17173,8 +17173,8 @@ msgid "Thursday"
 msgstr "Πέμπτη"
 
 #: app/views/report.services.php:82
-#: include/views/configuration.services.edit.php:266
-#: include/views/configuration.services.edit.php:321 report4.php:191
+#: include/views/configuration.services.edit.php:267
+#: include/views/configuration.services.edit.php:322 report4.php:191
 #: services.php:48 services.php:191
 msgid "Till"
 msgstr "Έως"
@@ -17197,9 +17197,9 @@ msgstr "Έως"
 #: include/classes/widgets/forms/CWidgetFormProblems.php:201
 #: include/events.inc.php:189 include/events.inc.php:282
 #: include/views/administration.auditacts.list.php:62
-#: include/views/configuration.services.edit.php:311
-#: include/views/configuration.services.edit.php:325
-#: include/views/configuration.services.edit.php:360
+#: include/views/configuration.services.edit.php:312
+#: include/views/configuration.services.edit.php:326
+#: include/views/configuration.services.edit.php:361
 msgid "Time"
 msgstr "Χρόνος"
 
@@ -17690,7 +17690,7 @@ msgstr ""
 #: include/views/configuration.item.prototype.edit.php:654
 #: include/views/configuration.item.prototype.list.php:64
 #: include/views/configuration.maintenance.list.php:85
-#: include/views/configuration.services.edit.php:180
+#: include/views/configuration.services.edit.php:181
 #: include/views/inventory.host.list.php:86
 #: include/views/js/monitoring.sysmaps.js.php:88
 #: include/views/js/monitoring.sysmaps.js.php:413
@@ -17936,7 +17936,7 @@ msgid "Unknown error"
 msgstr "Άγνωστο σφάλμα"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:47
-#: app/controllers/CControllerPopupTriggerExpr.php:1210
+#: app/controllers/CControllerPopupTriggerExpr.php:1211
 #: include/triggers.inc.php:1323
 msgid "Unknown host item, no such item in selected host"
 msgstr "Άγνωστος συλλέκτης ξενιστή, κανένας τέτοιος συλλέκτης σε επιλεγμένο ξενιστή"
@@ -18098,7 +18098,7 @@ msgstr "Ανοικτά"
 #: include/views/configuration.item.edit.php:953
 #: include/views/configuration.item.prototype.edit.php:810
 #: include/views/configuration.maintenance.edit.php:264
-#: include/views/configuration.services.edit.php:373
+#: include/views/configuration.services.edit.php:374
 #: include/views/configuration.template.edit.php:235
 #: include/views/configuration.trigger.prototype.edit.php:653
 #: include/views/configuration.triggers.edit.php:646
@@ -18155,8 +18155,8 @@ msgid "Upper level maps"
 msgstr "Χάρτες Άνω επίπεδο"
 
 #: include/classes/screens/CScreenDiscovery.php:120
-#: include/views/configuration.services.edit.php:187
-#: include/views/configuration.services.edit.php:244
+#: include/views/configuration.services.edit.php:188
+#: include/views/configuration.services.edit.php:245
 msgid "Uptime"
 msgstr "Χρόνος διαθεσιμότητας"
 
@@ -19398,8 +19398,8 @@ msgstr ""
 #: app/views/popup.maintenance.period.php:150
 #: include/views/configuration.maintenance.edit.php:113
 #: include/views/configuration.maintenance.edit.php:120
-#: include/views/configuration.services.edit.php:262
-#: include/views/configuration.services.edit.php:269
+#: include/views/configuration.services.edit.php:263
+#: include/views/configuration.services.edit.php:270
 msgid "YYYY-MM-DD hh:mm"
 msgstr ""
 
@@ -20381,8 +20381,8 @@ msgid "h"
 msgstr "ω"
 
 # ωω
-#: include/views/configuration.services.edit.php:288
-#: include/views/configuration.services.edit.php:298
+#: include/views/configuration.services.edit.php:289
+#: include/views/configuration.services.edit.php:299
 msgid "hh"
 msgstr "ωω"
 
@@ -20631,23 +20631,23 @@ msgstr ""
 msgid "list of characters"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:663
+#: app/controllers/CControllerPopupTriggerExpr.php:664
 msgid "log() - Natural logarithm"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:670
+#: app/controllers/CControllerPopupTriggerExpr.php:671
 msgid "log10() - Decimal logarithm"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:677
+#: app/controllers/CControllerPopupTriggerExpr.php:678
 msgid "logeventid() - Event ID of last log entry matching regular expression V for period T (1 - match, 0 - no match)"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:684
+#: app/controllers/CControllerPopupTriggerExpr.php:685
 msgid "logseverity() - Log severity of the last log entry for period T"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:691
+#: app/controllers/CControllerPopupTriggerExpr.php:692
 msgid "logsource() - Log source of the last log entry matching parameter V for period T (1 - match, 0 - no match)"
 msgstr ""
 
@@ -20655,7 +20655,7 @@ msgstr ""
 msgid "low-level discovery rule"
 msgstr "κανόνας εντοπισμού χαμηλού επιπέδου"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:698
+#: app/controllers/CControllerPopupTriggerExpr.php:699
 msgid "ltrim() - Remove specified characters from the beginning of a string"
 msgstr ""
 
@@ -20687,7 +20687,7 @@ msgstr ""
 msgid "macro(s)"
 msgstr "μακροεντολή(ες)"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:711
+#: app/controllers/CControllerPopupTriggerExpr.php:712
 msgid "mad() - Median absolute deviation"
 msgstr ""
 
@@ -20727,7 +20727,7 @@ msgstr "μεγ."
 msgid "max period is less than time filter default period"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:718
+#: app/controllers/CControllerPopupTriggerExpr.php:719
 msgid "max() - Maximum value for period T"
 msgstr ""
 
@@ -20741,7 +20741,7 @@ msgstr ""
 msgid "maximum number of dependency levels reached"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:725
+#: app/controllers/CControllerPopupTriggerExpr.php:726
 msgid "mid() - Returns a substring beginning at the character position specified by start for N characters"
 msgstr ""
 
@@ -20758,7 +20758,7 @@ msgstr ""
 msgid "min"
 msgstr "ελάχ."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:743
+#: app/controllers/CControllerPopupTriggerExpr.php:744
 msgid "min() - Minimum value for period T"
 msgstr ""
 
@@ -20768,12 +20768,12 @@ msgstr ""
 msgid "minimum length is %1$s characters"
 msgstr ""
 
-#: include/views/configuration.services.edit.php:293
-#: include/views/configuration.services.edit.php:303
+#: include/views/configuration.services.edit.php:294
+#: include/views/configuration.services.edit.php:304
 msgid "mm"
 msgstr "mm"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:750
+#: app/controllers/CControllerPopupTriggerExpr.php:751
 msgid "mod() - Division remainder"
 msgstr ""
 
@@ -20865,7 +20865,7 @@ msgstr ""
 msgid "no permissions to unacknowledge problems"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:763
+#: app/controllers/CControllerPopupTriggerExpr.php:764
 msgid "nodata() - No data received during period of time T (1 - true, 0 - false), Mode (strict - ignore proxy time delay in sending data)"
 msgstr ""
 
@@ -20886,7 +20886,7 @@ msgstr "όχι σε"
 msgid "not selected"
 msgstr "δεν επιλέχθηκε"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:770
+#: app/controllers/CControllerPopupTriggerExpr.php:771
 msgid "now() - Number of seconds since the Epoch"
 msgstr ""
 
@@ -20973,15 +20973,15 @@ msgstr ""
 msgid "pattern"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:776
+#: app/controllers/CControllerPopupTriggerExpr.php:777
 msgid "percentile() - Percentile P of a period T"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:783
+#: app/controllers/CControllerPopupTriggerExpr.php:784
 msgid "pi() - Returns the Pi constant"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:788
+#: app/controllers/CControllerPopupTriggerExpr.php:789
 msgid "power() - The power of a base value to a power value"
 msgstr ""
 
@@ -20989,11 +20989,11 @@ msgstr ""
 msgid "problem pattern"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:801
+#: app/controllers/CControllerPopupTriggerExpr.php:802
 msgid "radians() - Converts a value from degrees to radians"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:808
+#: app/controllers/CControllerPopupTriggerExpr.php:809
 msgid "rand() - A random integer value"
 msgstr ""
 
@@ -21021,11 +21021,11 @@ msgstr ""
 msgid "regular expression"
 msgstr "κανονική έκφραση"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:813
+#: app/controllers/CControllerPopupTriggerExpr.php:814
 msgid "repeat() - Returns a string composed of value repeated count times"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:826
+#: app/controllers/CControllerPopupTriggerExpr.php:827
 msgid "replace() - Search value for occurrences of pattern, and replace with replacement"
 msgstr ""
 
@@ -21037,7 +21037,7 @@ msgstr ""
 msgid "right"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:844
+#: app/controllers/CControllerPopupTriggerExpr.php:845
 msgid "right() - Returns the rightmost count characters"
 msgstr ""
 
@@ -21048,11 +21048,11 @@ msgstr ""
 msgid "root"
 msgstr "root"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:857
+#: app/controllers/CControllerPopupTriggerExpr.php:858
 msgid "round() - Rounds a value to decimal places"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:870
+#: app/controllers/CControllerPopupTriggerExpr.php:871
 msgid "rtrim() - Removes specified characters from the end of a string"
 msgstr ""
 
@@ -21096,7 +21096,7 @@ msgstr ""
 msgid "selected"
 msgstr ""
 
-#: include/views/configuration.services.edit.php:256
+#: include/views/configuration.services.edit.php:257
 msgid "short description"
 msgstr "σύντομη περιγραφή"
 
@@ -21141,31 +21141,31 @@ msgstr "εμφάνιση αντιστοιχίσεων εικονίδιου"
 msgid "sign in as guest"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:883
+#: app/controllers/CControllerPopupTriggerExpr.php:884
 msgid "signum() - Returns -1 if a value is negative, 0 if a value is zero, 1 if a value is positive"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:890
+#: app/controllers/CControllerPopupTriggerExpr.php:891
 msgid "sin() - The sine of a value, where the value is an angle expressed in radians"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:897
+#: app/controllers/CControllerPopupTriggerExpr.php:898
 msgid "sinh() - The hyperbolic sine of a value"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:904
+#: app/controllers/CControllerPopupTriggerExpr.php:905
 msgid "skewness() - Measures the asymmetry of the probability distribution"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:911
+#: app/controllers/CControllerPopupTriggerExpr.php:912
 msgid "sqrt() - Square root of a value"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:918
+#: app/controllers/CControllerPopupTriggerExpr.php:919
 msgid "stddevpop() - Population standard deviation"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:925
+#: app/controllers/CControllerPopupTriggerExpr.php:926
 msgid "stddevsamp() - Sample standard deviation"
 msgstr ""
 
@@ -21173,11 +21173,11 @@ msgstr ""
 msgid "sum"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:932
+#: app/controllers/CControllerPopupTriggerExpr.php:933
 msgid "sum() - Sum of values of a period T"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:939
+#: app/controllers/CControllerPopupTriggerExpr.php:940
 msgid "sumofsquares() - The sum of squares"
 msgstr ""
 
@@ -21202,7 +21202,7 @@ msgstr ""
 msgid "tag"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:946
+#: app/controllers/CControllerPopupTriggerExpr.php:947
 msgid "tan() - The tangent of a value"
 msgstr ""
 
@@ -21275,31 +21275,31 @@ msgstr ""
 msgid "time shift"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:953
+#: app/controllers/CControllerPopupTriggerExpr.php:954
 msgid "time() - Current time"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:959
+#: app/controllers/CControllerPopupTriggerExpr.php:960
 msgid "timeleft() - Time to reach threshold estimated based on period T"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:966
+#: app/controllers/CControllerPopupTriggerExpr.php:967
 msgid "trendavg() - Average value of a period T with exact period shift"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:973
+#: app/controllers/CControllerPopupTriggerExpr.php:974
 msgid "trendcount() - Number of successfully retrieved values for period T"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:980
+#: app/controllers/CControllerPopupTriggerExpr.php:981
 msgid "trendmax() - Maximum value for period T with exact period shift"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:987
+#: app/controllers/CControllerPopupTriggerExpr.php:988
 msgid "trendmin() - Minimum value for period T with exact period shift"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:994
+#: app/controllers/CControllerPopupTriggerExpr.php:995
 msgid "trendsum() - Sum of values of a period T with exact period shift"
 msgstr ""
 
@@ -21325,11 +21325,11 @@ msgstr ""
 msgid "trigger with linkages cannot be moved to another template or host"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1001
+#: app/controllers/CControllerPopupTriggerExpr.php:1002
 msgid "trim() - Remove specified characters from the beginning and the end of a string"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1014
+#: app/controllers/CControllerPopupTriggerExpr.php:1015
 msgid "truncate() - Truncates a value to decimal places"
 msgstr ""
 
@@ -21593,11 +21593,11 @@ msgstr ""
 msgid "value of third parameter must be one of %1$s"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1027
+#: app/controllers/CControllerPopupTriggerExpr.php:1028
 msgid "varpop() - Population variance"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1034
+#: app/controllers/CControllerPopupTriggerExpr.php:1035
 msgid "varsamp() - Sample variance"
 msgstr ""
 
