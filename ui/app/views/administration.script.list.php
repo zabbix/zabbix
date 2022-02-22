@@ -106,7 +106,6 @@ foreach ($data['scripts'] as $script) {
 
 					if (CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_ACTIONS)) {
 						$url = (new CUrl('actionconf.php'))
-							->setArgument('eventsource', $action['eventsource'])
 							->setArgument('form', 'update')
 							->setArgument('actionid', $action['actionid']);
 

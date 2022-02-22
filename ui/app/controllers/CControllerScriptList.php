@@ -144,7 +144,7 @@ class CControllerScriptList extends CController {
 			$script_actions = API::Script()->get([
 				'output' => [],
 				'scriptids' => array_keys($action_scriptids),
-				'selectActions' => ['actionid', 'name', 'eventsource'],
+				'selectActions' => ['actionid', 'name'],
 				'preservekeys' => true
 			]);
 
