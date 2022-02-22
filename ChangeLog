@@ -1,7 +1,7 @@
 Changes for 5.0.21rc1
 
 New features:
-........S. [ZBX-19789] added SourceIP support to ldap simple checks (dgoloscapov)
+
 ...G...... [ZBXNEXT-7408] added native support for the net.dns and net.dns.record keys in Zabbix agent 2, fixed Zabbix agent 1 SOA response formatting (esneiders, ssimonenko)
 
 Bug fixes:
@@ -25,6 +25,7 @@ Bug fixes:
 ...G...... [ZBX-20030] fixed system.cpu.num runtime cpu change in Zabbix agent 2 (esneiders)
 .........T [ZBX-20396] fixed expression for "Calculated value of innodb_log_file_size" item in MySQL templates (mchudinov)
 .........T [ZBX-20509] changed host group in Squid, Morningstar templates (mchudinov)
+........S. [ZBX-19789] added SourceIP support to ldap simple checks (dgoloscapov)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.20
@@ -2414,10 +2415,8 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 --------------------------------------------------------------------------------
 Changes for 4.0.39rc1
 
-New features:
-........S. [ZBX-19789] added SourceIP support to ldap simple checks (dgoloscapov)
-
 Bug fixes:
+........S. [ZBX-19789] added SourceIP support to ldap simple checks (dgoloscapov)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.38
