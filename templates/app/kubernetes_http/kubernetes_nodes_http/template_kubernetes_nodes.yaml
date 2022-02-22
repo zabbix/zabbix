@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-02-17T06:33:37Z'
+  date: '2022-02-22T17:06:38Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -18,7 +18,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -279,7 +279,7 @@ zabbix_export:
           parameters:
             -
               name: api_endpoint
-              value: '{$KUBE.API.ENDPOINT}'
+              value: '{$KUBE.API.ENDPOINT.URL}'
             -
               name: token
               value: '{$KUBE.API.TOKEN}'
@@ -1147,28 +1147,6 @@ zabbix_export:
                   tag: node
                   value: '{#NAME}'
             -
-              uuid: 0203ec4fb37a4eb180edcba398bf470d
-              name: 'Node [{#NAME}] Pods'
-              type: DEPENDENT
-              key: 'kube.node.pods[{#NAME}]'
-              delay: '0'
-              history: 7d
-              description: 'Current number of pods on the node.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$.items[?(@.metadata.name == "{#NAME}")].status.podsCount.first()'
-              master_item:
-                key: kube.nodes
-              tags:
-                -
-                  tag: component
-                  value: pods
-                -
-                  tag: node
-                  value: '{#NAME}'
-            -
               uuid: 8ea2954c99cc4e22a82c5a333146d936
               name: 'Node [{#NAME}] Requests: CPU'
               type: DEPENDENT
@@ -1259,18 +1237,29 @@ zabbix_export:
                     -
                       tag: scope
                       value: notice
-          trigger_prototypes:
             -
-              uuid: 0126dfbfa9d949499e0f7689b714c855
-              expression: 'last(/Kubernetes nodes by HTTP/kube.node.pods[{#NAME}])/ last(/Kubernetes nodes by HTTP/kube.node.capacity.pods[{#NAME}]) > 0.9'
-              name: 'Kubelet too many pods (more than 95% of capacity)'
-              opdata: 'Used: {ITEM.LASTVALUE1}, Capacity: {ITEM.LASTVALUE2}'
-              priority: WARNING
-              description: 'Kubelet is running at capacity.'
+              uuid: 0203ec4fb37a4eb180edcba398bf470d
+              name: 'Node [{#NAME}] Used: Pods'
+              type: DEPENDENT
+              key: 'kube.node.used.pods[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'Current number of pods on the node.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items[?(@.metadata.name == "{#NAME}")].status.podsCount.first()'
+              master_item:
+                key: kube.nodes
               tags:
                 -
-                  tag: scope
-                  value: performance
+                  tag: component
+                  value: used
+                -
+                  tag: node
+                  value: '{#NAME}'
+          trigger_prototypes:
             -
               uuid: f64efc13be2c4c53a48de40504cf064d
               expression: 'last(/Kubernetes nodes by HTTP/kube.node.limits.cpu[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.cpu[{#NAME}]) > 0.9'
@@ -1367,6 +1356,17 @@ zabbix_export:
                 -
                   tag: scope
                   value: performance
+            -
+              uuid: 0126dfbfa9d949499e0f7689b714c855
+              expression: 'last(/Kubernetes nodes by HTTP/kube.node.used.pods[{#NAME}])/ last(/Kubernetes nodes by HTTP/kube.node.capacity.pods[{#NAME}]) > 0.9'
+              name: 'Node [{#NAME}] Used: Kubelet too many pods (more than 95% of capacity)'
+              opdata: 'Used: {ITEM.LASTVALUE1}, Capacity: {ITEM.LASTVALUE2}'
+              priority: WARNING
+              description: 'Kubelet is running at capacity.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
           graph_prototypes:
             -
               uuid: 646efb7b19f5408dba2f3fe2d6a92213
@@ -1392,7 +1392,7 @@ zabbix_export:
                   calc_fnc: MAX
                   item:
                     host: 'Kubernetes nodes by HTTP'
-                    key: 'kube.node.pods[{#NAME}]'
+                    key: 'kube.node.used.pods[{#NAME}]'
           master_item:
             key: kube.nodes.lld
         -
@@ -1753,9 +1753,7 @@ zabbix_export:
                 -
                   type: JAVASCRIPT
                   parameters:
-                    - |
-                      var now = Date.now();
-                      return Math.floor((now - new Date(value || now)) / 1000);
+                    - 'return Math.floor((Date.now() - new Date(value)) / 1000);'
               master_item:
                 key: kube.nodes
               tags:
@@ -1864,9 +1862,9 @@ zabbix_export:
           value: 'kubernetes nodes'
       macros:
         -
-          macro: '{$KUBE.API.ENDPOINT}'
-          value: '<PUT YOUR KUBERNETES API ENDPOINT>'
-          description: 'Kubernetes API endpoint in the format <scheme>://<host>:<port>/api'
+          macro: '{$KUBE.API.ENDPOINT.URL}'
+          value: 'https://localhost:6443/api'
+          description: 'Kubernetes API endpoint URL in the format <scheme>://<host>:<port>/api'
         -
           macro: '{$KUBE.API.TOKEN}'
           description: 'Service account bearer token'
@@ -1919,7 +1917,7 @@ zabbix_export:
         -
           macro: '{$KUBE.NODES.ENDPOINT.NAME}'
           value: zabbix-zabbix-helm-chrt-agent
-          description: 'Kubenetes nodes endpoint name'
+          description: 'Kubenetes nodes endpoint name. See kubectl -n monitoring get ep'
         -
           macro: '{$KUBE.POD.FILTER.ANNOTATIONS}'
           description: 'Annotations to filter pods (regex in values are supported)'

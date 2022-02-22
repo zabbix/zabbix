@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-02-17T06:36:40Z'
+  date: '2022-02-22T16:55:26Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -18,7 +18,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -38,7 +38,7 @@ zabbix_export:
               parameters:
                 - ''
           timeout: 10s
-          url: 'https://{$KUBE.API.HOST}:{$KUBE.API.PORT}/api/v1/componentstatuses'
+          url: '{$KUBE.API.URL}{$KUBE.API.COMPONENTSTATUSES.ENDPOINT}'
           status_codes: '200, 403'
           headers:
             -
@@ -62,7 +62,7 @@ zabbix_export:
                 params: {},
             
                 setParams: function (params) {
-                    ['api_host', 'api_port', 'token'].forEach(function (field) {
+                    ['api_endpoint', 'token'].forEach(function (field) {
                         if (typeof params !== 'object' || typeof params[field] === 'undefined'
                             || params[field] === '') {
                             throw 'Required param is not set: "' + field + '".';
@@ -70,12 +70,15 @@ zabbix_export:
                     });
             
                     Kube.params = params;
+                    if (typeof Kube.params.api_endpoint === 'string' && !Kube.params.api_endpoint.endsWith('/')) {
+                        Kube.params.api_endpoint += '/';
+                    }
                 },
             
                 request: function (query) {
                     var response,
                         request = new HttpRequest(),
-                        url = 'https://' + Kube.params.api_host + ':' + Kube.params.api_port + '/api/' + query;
+                        url = Kube.params.api_endpoint + query;
             
                     request.addHeader('Content-Type: application/json');
                     request.addHeader('Authorization: Bearer ' + Kube.params.token);
@@ -139,9 +142,9 @@ zabbix_export:
                                 '{#KUBE.API.SERVER.URL}': Kube.params.api_server_scheme + '://' + internalIP + ':' + Kube.params.api_server_port + '/metrics',
                                 '{#KUBE.CONTROLLER.SERVER.URL}': Kube.params.controller_scheme + '://' + internalIP + ':' + Kube.params.controller_port + '/metrics',
                                 '{#KUBE.SCHEDULER.SERVER.URL}': Kube.params.scheduler_scheme + '://' + internalIP + ':' + Kube.params.scheduler_port + '/metrics',
-                                '{#ROLE.API}' : 'API',
-                                '{#ROLE.CONTROLLER}' : 'Controller manager',
-                                '{#ROLE.SCHEDULER}' : 'Scheduler'
+                                '{#COMPONENT.API}' : 'API',
+                                '{#COMPONENT.CONTROLLER}' : 'Controller manager',
+                                '{#COMPONENT.SCHEDULER}' : 'Scheduler'
                             });
             
                             break;
@@ -159,12 +162,6 @@ zabbix_export:
           description: 'Generation of data for Control plane discovery rules.'
           timeout: 10s
           parameters:
-            -
-              name: api_host
-              value: '{$KUBE.API.HOST}'
-            -
-              name: api_port
-              value: '{$KUBE.API.PORT}'
             -
               name: token
               value: '{$KUBE.API.TOKEN}'
@@ -186,6 +183,9 @@ zabbix_export:
             -
               name: scheduler_port
               value: '{$KUBE.SCHEDULER.PORT}'
+            -
+              name: api_endpoint
+              value: '{$KUBE.API.URL}/api'
           tags:
             -
               tag: component
@@ -240,7 +240,7 @@ zabbix_export:
                   
                   return JSON.stringify(output);
           timeout: 10s
-          url: 'https://{$KUBE.API.HOST}:{$KUBE.API.PORT}/livez?verbose'
+          url: '{$KUBE.API.URL}{$KUBE.API.LIVEZ.ENDPOINT}?verbose'
           status_codes: '200, 403'
           headers:
             -
@@ -295,6 +295,126 @@ zabbix_export:
               tag: component
               value: node
         -
+          uuid: aae78585c668466da5d0ab8d8b899828
+          name: 'Kubernetes: Node LLD'
+          type: SCRIPT
+          key: kube.node.lld
+          delay: 1h
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          params: |
+            var Kube = {
+                params: {},
+            
+                setParams: function (params) {
+                    ['api_endpoint', 'token'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined'
+                            || params[field] === '') {
+                            throw 'Required param is not set: "' + field + '".';
+                        }
+                    });
+            
+                    Kube.params = params;
+                    if (typeof Kube.params.api_endpoint === 'string' && !Kube.params.api_endpoint.endsWith('/')) {
+                        Kube.params.api_endpoint += '/';
+                    }
+                },
+            
+                request: function (query) {
+                    var response,
+                        request = new HttpRequest(),
+                        url = Kube.params.api_endpoint + query;
+            
+                    request.addHeader('Content-Type: application/json');
+                    request.addHeader('Authorization: Bearer ' + Kube.params.token);
+            
+                    Zabbix.log(4, '[ Kubernetes ] Sending request: ' + url);
+            
+                    response = request.get(url);
+            
+                    Zabbix.log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus() + ': ' + response);
+            
+                    if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                    }
+            
+                    if (response !== null) {
+                        try {
+                            response = JSON.parse(response);
+                        }
+                        catch (error) {
+                            throw 'Failed to parse response received from Kubernetes API. Check debug log for more information.';
+                        }
+                    }
+            
+                    return {
+                        status: request.getStatus(),
+                        response: response
+                    };
+                },
+            
+                getNodes: function () {
+                    var result = Kube.request('v1/nodes');
+            
+                    if (typeof result.response !== 'object'
+                        || typeof result.response.items === 'undefined'
+                        || result.status != 200) {
+                        throw 'Cannot get nodes from Kubernetes API. Check debug log for more information.';
+                    };
+            
+                    return result.response;
+                },
+            };
+            
+            try {
+                Kube.setParams(JSON.parse(value));
+            
+                var nodes = Kube.getNodes(),
+                    kubeNodes = [];
+            
+                for (idx in nodes.items) {
+                    var internalIPs = nodes.items[idx].status.addresses.filter(function (addr) {
+                        return addr.type === 'InternalIP';
+                    });
+            
+                    var internalIP = internalIPs.length && internalIPs[0].address;
+            
+                    kubeNodes.push({
+                        '{#NAME}': nodes.items[idx].metadata.name,
+                        '{#IP}': internalIP,
+                        '{#KUBE.KUBELET.URL}': Kube.params.kubelet_scheme + '://' + internalIP + ':' + Kube.params.kubelet_port,
+                        '{#COMPONENT}': 'Kubelet'
+                    });
+                }
+            
+                return JSON.stringify(kubeNodes);
+            }
+            catch (error) {
+                error += (String(error).endsWith('.')) ? '' : '.';
+                Zabbix.log(3, '[ Kubernetes ] ERROR: ' + error);
+                return JSON.stringify({ error: error });
+            }
+          description: 'Generation of data for Kubelet discovery rules.'
+          timeout: 10s
+          parameters:
+            -
+              name: token
+              value: '{$KUBE.API.TOKEN}'
+            -
+              name: kubelet_scheme
+              value: '{$KUBE.KUBELET.SCHEME}'
+            -
+              name: kubelet_port
+              value: '{$KUBE.KUBELET.PORT}'
+            -
+              name: api_endpoint
+              value: '{$KUBE.API.URL}/api'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
           uuid: 3a5eaef4e8134dfb9f2935f98a8b88f7
           name: 'Kubernetes: Get readyz'
           type: HTTP_AGENT
@@ -322,7 +442,7 @@ zabbix_export:
                   
                   return JSON.stringify(output);
           timeout: 10s
-          url: 'https://{$KUBE.API.HOST}:{$KUBE.API.PORT}/readyz?verbose'
+          url: '{$KUBE.API.URL}{$KUBE.API.READYZ.ENDPOINT}?verbose'
           status_codes: '200, 403'
           headers:
             -
@@ -369,20 +489,23 @@ zabbix_export:
                 metrics_endpoint: undefined,
             
                 setParams: function (params) {
-                    ['api_host', 'api_port', 'token', 'state_endpoint_name'].forEach(function (field) {
+                    ['api_endpoint', 'token', 'state_endpoint_name'].forEach(function (field) {
                         if (typeof params !== 'object' || typeof params[field] === 'undefined'
                             || params[field] === '') {
                             throw 'Required param is not set: "' + field + '".';
                         }
                     });
             
-                    Kube.params = params;
+                      Kube.params = params;
+                      if (typeof Kube.params.api_endpoint === 'string' && !Kube.params.api_endpoint.endsWith('/')) {
+                          Kube.params.api_endpoint += '/';
+                      }
                 },
             
                 apiRequest: function (query) {
                     var response,
                         request = new HttpRequest(),
-                        url = 'https://' + Kube.params.api_host + ':' + Kube.params.api_port + '/api/' + query;
+                        url = Kube.params.api_endpoint + query;
             
                     request.addHeader('Content-Type: application/json');
                     request.addHeader('Authorization: Bearer ' + Kube.params.token);
@@ -489,17 +612,14 @@ zabbix_export:
           timeout: 10s
           parameters:
             -
-              name: api_host
-              value: '{$KUBE.API.HOST}'
-            -
-              name: api_port
-              value: '{$KUBE.API.PORT}'
-            -
               name: state_endpoint_name
               value: '{$KUBE.STATE.ENDPOINT.NAME}'
             -
               name: token
               value: '{$KUBE.API.TOKEN}'
+            -
+              name: api_endpoint
+              value: '{$KUBE.API.URL}/api'
           tags:
             -
               tag: component
@@ -526,126 +646,6 @@ zabbix_export:
             -
               tag: component
               value: statefulset
-        -
-          uuid: aae78585c668466da5d0ab8d8b899828
-          name: 'Kubernetes: Worker node LLD'
-          type: SCRIPT
-          key: kube.worker_node.lld
-          delay: 1h
-          history: '0'
-          trends: '0'
-          value_type: TEXT
-          params: |
-            var Kube = {
-                params: {},
-            
-                setParams: function (params) {
-                    ['api_host', 'api_port', 'token'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined'
-                            || params[field] === '') {
-                            throw 'Required param is not set: "' + field + '".';
-                        }
-                    });
-            
-                    Kube.params = params;
-                },
-            
-                request: function (query) {
-                    var response,
-                        request = new HttpRequest(),
-                        url = 'https://' + Kube.params.api_host + ':' + Kube.params.api_port + '/api/' + query;
-            
-                    request.addHeader('Content-Type: application/json');
-                    request.addHeader('Authorization: Bearer ' + Kube.params.token);
-            
-                    Zabbix.log(4, '[ Kubernetes ] Sending request: ' + url);
-            
-                    response = request.get(url);
-            
-                    Zabbix.log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus() + ': ' + response);
-            
-                    if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-                    }
-            
-                    if (response !== null) {
-                        try {
-                            response = JSON.parse(response);
-                        }
-                        catch (error) {
-                            throw 'Failed to parse response received from Kubernetes API. Check debug log for more information.';
-                        }
-                    }
-            
-                    return {
-                        status: request.getStatus(),
-                        response: response
-                    };
-                },
-            
-                getNodes: function () {
-                    var result = Kube.request('v1/nodes');
-            
-                    if (typeof result.response !== 'object'
-                        || typeof result.response.items === 'undefined'
-                        || result.status != 200) {
-                        throw 'Cannot get nodes from Kubernetes API. Check debug log for more information.';
-                    };
-            
-                    return result.response;
-                },
-            };
-            
-            try {
-                Kube.setParams(JSON.parse(value));
-            
-                var nodes = Kube.getNodes(),
-                    workerNodes = [];
-            
-                for (idx in nodes.items) {
-                    var internalIPs = nodes.items[idx].status.addresses.filter(function (addr) {
-                        return addr.type === 'InternalIP';
-                    });
-            
-                    var internalIP = internalIPs.length && internalIPs[0].address;
-            
-                    workerNodes.push({
-                        '{#NAME}': nodes.items[idx].metadata.name,
-                        '{#IP}': internalIP,
-                        '{#KUBE.KUBELET.URL}': Kube.params.kubelet_scheme + '://' + internalIP + ':' + Kube.params.kubelet_port,
-                        '{#ROLE.WORKER}' : 'Worker'
-                    });
-                }
-            
-                return JSON.stringify(workerNodes);
-            }
-            catch (error) {
-                error += (String(error).endsWith('.')) ? '' : '.';
-                Zabbix.log(3, '[ Kubernetes ] ERROR: ' + error);
-                return JSON.stringify({ error: error });
-            }
-          description: 'Generation of data for Control plane discovery rules.'
-          timeout: 10s
-          parameters:
-            -
-              name: api_host
-              value: '{$KUBE.API.HOST}'
-            -
-              name: api_port
-              value: '{$KUBE.API.PORT}'
-            -
-              name: token
-              value: '{$KUBE.API.TOKEN}'
-            -
-              name: kubelet_scheme
-              value: '{$KUBE.KUBELET.SCHEME}'
-            -
-              name: kubelet_port
-              value: '{$KUBE.KUBELET.PORT}'
-          tags:
-            -
-              tag: component
-              value: raw
       discovery_rules:
         -
           uuid: dbfd8959361f4cdd973ed552eb18eb86
@@ -664,7 +664,7 @@ zabbix_export:
                     name: Templates/Applications
               group_prototypes:
                 -
-                  name: 'Kubernetes/Nodes/Role: {#ROLE.API}'
+                  name: 'Kubernetes/Components: {#COMPONENT.API}'
               templates:
                 -
                   name: 'Kubernetes API server by HTTP'
@@ -717,7 +717,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 58828a692aa2418ba98c6d66a23f1506
-                  expression: 'count(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}],3m,,"True")<2'
+                  expression: 'count(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}],3m,,"True")<2 and length(last(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}]))>0'
                   name: 'Kubernetes: Component [{#NAME}] is unhealthy'
                   priority: WARNING
                   tags:
@@ -762,7 +762,7 @@ zabbix_export:
                     name: Templates/Applications
               group_prototypes:
                 -
-                  name: 'Kubernetes/Nodes/Role: {#ROLE.CONTROLLER}'
+                  name: 'Kubernetes/Components: {#COMPONENT.CONTROLLER}'
               templates:
                 -
                   name: 'Kubernetes Controller manager by HTTP'
@@ -1403,7 +1403,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 9fcb23d29ac3481a8613515cc2cccfcf
-                  expression: 'count(/Kubernetes cluster state by HTTP/kube.livez.helthcheck[{#NAME}],3m,,"ok")<2'
+                  expression: 'count(/Kubernetes cluster state by HTTP/kube.livez.helthcheck[{#NAME}],3m,,"ok")<2 and length(last(/Kubernetes cluster state by HTTP/kube.livez.helthcheck[{#NAME}]))>0'
                   name: 'Kubernetes: Livez [{#NAME}] is unhealthy'
                   priority: WARNING
                   tags:
@@ -2244,36 +2244,6 @@ zabbix_export:
                   tag: phase
                   value: '{#NAME}'
             -
-              uuid: 4c40f651f72446efb48cd50cdc2a32bb
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] PVC [{#NAME}] Resource: Requests storage'
-              type: DEPENDENT
-              key: 'kube.pvc.requests_storage[{#NAMESPACE}/{#NAME}]'
-              delay: '0'
-              history: 7d
-              value_type: FLOAT
-              units: B
-              description: 'The capacity of storage requested by the persistent volume claim.'
-              preprocessing:
-                -
-                  type: PROMETHEUS_PATTERN
-                  parameters:
-                    - 'kube_persistentvolumeclaim_resource_requests_storage_bytes{namespace="{#NAMESPACE}", persistentvolumeclaim="{#NAME}"}'
-                    - value
-                    - ''
-                  error_handler: DISCARD_VALUE
-              master_item:
-                key: kube.state.metrics
-              tags:
-                -
-                  tag: component
-                  value: pvc
-                -
-                  tag: namespace
-                  value: '{#NAMESPACE}'
-                -
-                  tag: pvc
-                  value: '{#NAME}'
-            -
               uuid: 6bbe0a1846834467b6147ecfe0c53035
               name: 'Kubernetes: Namespace [{#NAMESPACE}] Status phase: Active, sum'
               type: DEPENDENT
@@ -2576,7 +2546,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 1a88c2cf94d3444c9e5320776b323ce6
-                  expression: 'count(/Kubernetes cluster state by HTTP/kube.readyz.helthcheck[{#NAME}],3m,,"ok")<2'
+                  expression: 'count(/Kubernetes cluster state by HTTP/kube.readyz.helthcheck[{#NAME}],3m,,"ok")<2 and length(last(/Kubernetes cluster state by HTTP/kube.readyz.helthcheck[{#NAME}]))>0'
                   name: 'Kubernetes: Readyz [{#NAME}] is unhealthy'
                   priority: WARNING
                   tags:
@@ -2792,7 +2762,7 @@ zabbix_export:
                     name: Templates/Applications
               group_prototypes:
                 -
-                  name: 'Kubernetes/Nodes/Role: {#ROLE.SCHEDULER}'
+                  name: 'Kubernetes/Components: {#COMPONENT.SCHEDULER}'
               templates:
                 -
                   name: 'Kubernetes Scheduler by HTTP'
@@ -3048,7 +3018,7 @@ zabbix_export:
                     name: Templates/Applications
               group_prototypes:
                 -
-                  name: 'Kubernetes/Nodes/Role: {#ROLE.WORKER}'
+                  name: 'Kubernetes/Components: {#COMPONENT}'
               templates:
                 -
                   name: 'Kubernetes Kubelet by HTTP'
@@ -3065,7 +3035,7 @@ zabbix_export:
                 -
                   ip: '{#IP}'
           master_item:
-            key: kube.worker_node.lld
+            key: kube.node.lld
       tags:
         -
           tag: class
@@ -3075,16 +3045,20 @@ zabbix_export:
           value: 'kubernetes state'
       macros:
         -
-          macro: '{$KUBE.API.HOST}'
-          value: '<PUT YOUR KUBERNETES API HOST>'
-          description: 'Kubernetes API host'
+          macro: '{$KUBE.API.LIVEZ.ENDPOINT}'
+          value: /livez
+          description: 'Kubernetes API livez endpoint /livez'
         -
-          macro: '{$KUBE.API.PORT}'
-          value: '6443'
-          description: 'Kubernetes API port'
+          macro: '{$KUBE.API.READYZ.ENDPOINT}'
+          value: /readyz
+          description: 'Kubernetes API readyz endpoint /readyz'
         -
           macro: '{$KUBE.API.TOKEN}'
           description: 'Service account bearer token'
+        -
+          macro: '{$KUBE.API.URL}'
+          value: 'https://localhost:6443'
+          description: 'Kubernetes API endpoint URL in the format <scheme>://<host>:<port>'
         -
           macro: '{$KUBE.API_SERVER.PORT}'
           value: '6443'

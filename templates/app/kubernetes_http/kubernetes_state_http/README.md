@@ -9,6 +9,9 @@ It works without external scripts and uses the script item to make HTTP requests
 
 Template `Kubernetes cluster state by HTTP` — collects metrics by HTTP agent from kube-state-metrics endpoint and Kubernetes API.
 
+Don't forget change macros {$KUBE.API.ENDPOINT.URL} and {$KUBE.API.TOKEN}.
+Also, see the Macros section for a list of macros used to set trigger values.
+*NOTE.* Some metrics may not be collected depending on your Kubernetes version and configuration.
 
 
 This template was tested on:
@@ -22,7 +25,7 @@ This template was tested on:
 Internal service metrics are collected from kube-state-metrics endpoint.
 Template needs to use Authorization via API token.
 
-Don't forget change macros {$KUBE.API.HOST}, {$KUBE.API.PORT} and {$KUBE.API.TOKEN}.
+Don't forget change macros {$KUBE.API.ENDPOINT.URL} and {$KUBE.API.TOKEN}.
 Also, see the Macros section for a list of macros used to set trigger values.
 *NOTE.* Some metrics may not be collected depending on your Kubernetes version and configuration.
 
@@ -53,9 +56,10 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$KUBE.API.HOST} |<p>Kubernetes API host</p> |`<PUT YOUR KUBERNETES API HOST>` |
-|{$KUBE.API.PORT} |<p>Kubernetes API port</p> |`6443` |
+|{$KUBE.API.LIVEZ.ENDPOINT} |<p>Kubernetes API livez endpoint /livez</p> |`/livez` |
+|{$KUBE.API.READYZ.ENDPOINT} |<p>Kubernetes API readyz endpoint /readyz</p> |`/readyz` |
 |{$KUBE.API.TOKEN} |<p>Service account bearer token</p> |`` |
+|{$KUBE.API.URL} |<p>Kubernetes API endpoint URL in the format <scheme>://<host>:<port></p> |`https://localhost:6443` |
 |{$KUBE.API_SERVER.PORT} | |`6443` |
 |{$KUBE.API_SERVER.SCHEME} | |`https` |
 |{$KUBE.CONTROLLER_MANAGER.PORT} | |`10252` |
@@ -81,20 +85,20 @@ There are no template links in this template.
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |API servers discovery |<p>-</p> |DEPENDENT |kube.api_servers.discovery |
+|Component statuses discovery |<p>-</p> |DEPENDENT |kube.componentstatuses.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT |
 |Controller manager nodes discovery |<p>-</p> |DEPENDENT |kube.controller_manager.discovery |
-|Scheduler servers nodes discovery |<p>-</p> |DEPENDENT |kube.scheduler.discovery |
-|Kubelet discovery |<p>-</p> |DEPENDENT |kube.worker_node.discovery<p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$KUBE.LLD.FILTER.WORKER_NODE.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.WORKER_NODE.NOT_MATCHES}`</p> |
 |Daemonset discovery |<p>-</p> |DEPENDENT |kube.daemonset.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NAMESPACE} MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}`</p><p>- {#NAMESPACE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}`</p> |
-|PVC discovery |<p>-</p> |DEPENDENT |kube.pvc.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NAMESPACE} MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}`</p><p>- {#NAMESPACE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}`</p> |
 |Deployment discovery |<p>-</p> |DEPENDENT |kube.deployment.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NAMESPACE} MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}`</p><p>- {#NAMESPACE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}`</p> |
 |Endpoint discovery |<p>-</p> |DEPENDENT |kube.endpoint.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NAMESPACE} MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}`</p><p>- {#NAMESPACE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}`</p> |
+|Kubelet discovery |<p>-</p> |DEPENDENT |kube.worker_node.discovery<p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$KUBE.LLD.FILTER.WORKER_NODE.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.WORKER_NODE.NOT_MATCHES}`</p> |
+|Livez discovery |<p>-</p> |DEPENDENT |kube.livez.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT |
 |Node discovery |<p>-</p> |DEPENDENT |kube.node.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE.NOT_MATCHES}`</p> |
 |Pod discovery |<p>-</p> |DEPENDENT |kube.pod.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NAMESPACE} MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}`</p><p>- {#NAMESPACE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}`</p> |
-|Replicaset discovery |<p>-</p> |DEPENDENT |kube.replicaset.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NAMESPACE} MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}`</p><p>- {#NAMESPACE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}`</p> |
-|Statefulset discovery |<p>-</p> |DEPENDENT |kube.statefulset.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NAMESPACE} MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}`</p><p>- {#NAMESPACE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}`</p> |
-|Component statuses discovery |<p>-</p> |DEPENDENT |kube.componentstatuses.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT |
+|PVC discovery |<p>-</p> |DEPENDENT |kube.pvc.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NAMESPACE} MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}`</p><p>- {#NAMESPACE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}`</p> |
 |Readyz discovery |<p>-</p> |DEPENDENT |kube.readyz.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT |
-|Livez discovery |<p>-</p> |DEPENDENT |kube.livez.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT |
+|Replicaset discovery |<p>-</p> |DEPENDENT |kube.replicaset.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NAMESPACE} MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}`</p><p>- {#NAMESPACE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}`</p> |
+|Scheduler servers nodes discovery |<p>-</p> |DEPENDENT |kube.scheduler.discovery |
+|Statefulset discovery |<p>-</p> |DEPENDENT |kube.statefulset.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NAMESPACE} MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}`</p><p>- {#NAMESPACE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}`</p> |
 
 ## Items collected
 
@@ -102,7 +106,7 @@ There are no template links in this template.
 |-----|----|-----------|----|---------------------|
 |Kubernetes |Kubernetes: Get state metrics |<p>Collecting Kubernetes metrics from kube-state-metrics.</p> |SCRIPT |kube.state.metrics<p>**Expression**:</p>`The text is too long. Please see the template.` |
 |Kubernetes |Kubernetes: Control plane LLD |<p>Generation of data for Control plane discovery rules.</p> |SCRIPT |kube.control_plane.lld<p>**Expression**:</p>`The text is too long. Please see the template.` |
-|Kubernetes |Kubernetes: Worker node LLD |<p>Generation of data for Control plane discovery rules.</p> |SCRIPT |kube.worker_node.lld<p>**Expression**:</p>`The text is too long. Please see the template.` |
+|Kubernetes |Kubernetes: Node LLD |<p>Generation of data for Kubelet discovery rules.</p> |SCRIPT |kube.node.lld<p>**Expression**:</p>`The text is too long. Please see the template.` |
 |Kubernetes |Kubernetes: Get component statuses |<p>-</p> |HTTP_AGENT |kube.componentstatuses<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Kubernetes |Kubernetes: Get readyz |<p>-</p> |HTTP_AGENT |kube.readyz<p>**Preprocessing**:</p><p>- JAVASCRIPT: `var output = [],     component; value.split(/\n/).forEach(function (entry) {     if (component = entry.match(/^\[.+\](.+)\s(\w+)$/)) {         output.push({             name: component[1],             value: component[2]         });     } }); return JSON.stringify(output); `</p> |
 |Kubernetes |Kubernetes: Get livez |<p>-</p> |HTTP_AGENT |kube.livez<p>**Preprocessing**:</p><p>- JAVASCRIPT: `var output = [],     conponent; value.split(/\n/).forEach(function (entry) {     if (component = entry.match(/^\[.+\](.+)\s(\w+)$/)) {         output.push({             name: component[1],             value: component[2]         });     } }); return JSON.stringify(output); `</p> |
@@ -117,7 +121,6 @@ There are no template links in this template.
 |Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Daemonset [{#NAME}]: Desired |<p>The number of nodes that should be running the daemon pod</p> |DEPENDENT |kube.daemonset.desired[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_daemonset_status_desired_number_scheduled{namespace="{#NAMESPACE}", daemonset="{#NAME}"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Daemonset [{#NAME}]: Misscheduled |<p>The number of nodes running a daemon pod but are not supposed to</p> |DEPENDENT |kube.daemonset.misscheduled[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_daemonset_status_number_misscheduled{namespace="{#NAMESPACE}", daemonset="{#NAME}"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Daemonset [{#NAME}]: Updated number scheduled |<p>The total number of nodes that are running updated daemon pod</p> |DEPENDENT |kube.daemonset.updated[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_daemonset_status_updated_number_scheduled{namespace="{#NAMESPACE}", daemonset="{#NAME}"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] PVC [{#NAME}] Resource: Requests storage |<p>The capacity of storage requested by the persistent volume claim.</p> |DEPENDENT |kube.pvc.requests_storage[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_persistentvolumeclaim_resource_requests_storage_bytes{namespace="{#NAMESPACE}", persistentvolumeclaim="{#NAME}"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] PVC [{#NAME}] Status phase: Available |<p>Persistent volume claim is currently in Active phase.</p> |DEPENDENT |kube.pvc.status_phase.active[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_persistentvolumeclaim_status_phase{namespace="{#NAMESPACE}", name="{#NAME}", phase="Available"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] PVC [{#NAME}] Status phase: Lost |<p>Persistent volume claim is currently in Lost phase.</p> |DEPENDENT |kube.pvc.status_phase.lost[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_persistentvolumeclaim_status_phase{namespace="{#NAMESPACE}", name="{#NAME}", phase="Lost"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] PVC [{#NAME}] Status phase: Bound |<p>Persistent volume claim is currently in Bound phase.</p> |DEPENDENT |kube.pvc.status_phase.bound[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kube_persistentvolumeclaim_status_phase{namespace="{#NAMESPACE}", name="{#NAME}", phase="Bound"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
@@ -184,13 +187,13 @@ There are no template links in this template.
 |Kubernetes: Namespace [{#NAMESPACE}] RS [{#NAME}]: ReplicasSet mismatch |<p>-</p> |`(last(/Kubernetes cluster state by HTTP/kube.replicaset.replicas[{#NAMESPACE}/{#NAME}])-last(/Kubernetes cluster state by HTTP/kube.replicaset.ready[{#NAMESPACE}/{#NAME}]))<>0` |WARNING | |
 |Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: StatfulSet is down |<p>-</p> |`(last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_ready[{#NAMESPACE}/{#NAME}]) / last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_current[{#NAMESPACE}/{#NAME}]))<>1` |HIGH | |
 |Kubernetes: Namespace [{#NAMESPACE}] RS [{#NAME}]: Statefulset replicas mismatch |<p>-</p> |`(last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas[{#NAMESPACE}/{#NAME}])-last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_ready[{#NAMESPACE}/{#NAME}]))<>0` |WARNING | |
-|Kubernetes: Component [{#NAME}] is unhealthy |<p>-</p> |`count(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}],3m,,"True")<2` |WARNING | |
-|Kubernetes: Readyz [{#NAME}] is unhealthy |<p>-</p> |`count(/Kubernetes cluster state by HTTP/kube.readyz.helthcheck[{#NAME}],3m,,"ok")<2` |WARNING | |
-|Kubernetes: Livez [{#NAME}] is unhealthy |<p>-</p> |`count(/Kubernetes cluster state by HTTP/kube.livez.helthcheck[{#NAME}],3m,,"ok")<2` |WARNING | |
+|Kubernetes: Component [{#NAME}] is unhealthy |<p>-</p> |`count(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}],3m,,"True")<2 and length(last(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}]))>0` |WARNING | |
+|Kubernetes: Readyz [{#NAME}] is unhealthy |<p>-</p> |`count(/Kubernetes cluster state by HTTP/kube.readyz.helthcheck[{#NAME}],3m,,"ok")<2 and length(last(/Kubernetes cluster state by HTTP/kube.readyz.helthcheck[{#NAME}]))>0` |WARNING | |
+|Kubernetes: Livez [{#NAME}] is unhealthy |<p>-</p> |`count(/Kubernetes cluster state by HTTP/kube.livez.helthcheck[{#NAME}],3m,,"ok")<2 and length(last(/Kubernetes cluster state by HTTP/kube.livez.helthcheck[{#NAME}]))>0` |WARNING | |
 
 ## Feedback
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
 

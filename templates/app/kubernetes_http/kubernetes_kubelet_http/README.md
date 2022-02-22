@@ -9,6 +9,9 @@ Most of the metrics are collected in one go, thanks to Zabbix bulk data collecti
 
 Template `Kubernetes Controller manager by HTTP` — collects metrics by HTTP agent from Controller manager /metrics endpoint.
 
+Don't forget change macros {$KUBE.KUBELET.URL}, {$KUBE.API.TOKEN}.
+*NOTE.* Some metrics may not be collected depending on your Kubernetes instance version and configuration.
+
 
 
 This template was tested on:
@@ -35,6 +38,9 @@ No specific Zabbix configuration is required.
 |Name|Description|Default|
 |----|-----------|-------|
 |{$KUBE.API.TOKEN} |<p>Service account bearer token</p> |`` |
+|{$KUBE.KUBELET.CADVISOR.ENDPOINT} |<p>cAdvisor metrics from Kubelet /metrics/cadvisor endpoint</p> |`/metrics/cadvisor` |
+|{$KUBE.KUBELET.METRIC.ENDPOINT} |<p>Kubelet /metrics endpoint</p> |`/metrics` |
+|{$KUBE.KUBELET.PODS.ENDPOINT} |<p>Kubelet /pods endpoint</p> |`/pods` |
 |{$KUBE.KUBELET.URL} | |`https://localhost:10250` |
 
 ## Template links
@@ -45,10 +51,10 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Runtime operations discovery | |DEPENDENT |kube.kubelet.runtime_operations_bucket.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~ "kubelet_runtime_operations_*", operation_type =~ ".*"}`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Overrides:**</p><p>bucket item<br> - {#TYPE} MATCHES_REGEX `buckets`<br>  - ITEM_PROTOTYPE LIKE `bucket` - DISCOVER</p><p>total item<br> - {#TYPE} MATCHES_REGEX `totals`<br>  - ITEM_PROTOTYPE NOT_LIKE `bucket` - DISCOVER</p> |
+|Container memory discovery | |DEPENDENT |kube.kubelet.container.memory.cache.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |Pods discovery | |DEPENDENT |kube.kubelet.pods.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |REST client requests discovery | |DEPENDENT |kube.kubelet.rest.requests.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
-|Container memory discovery | |DEPENDENT |kube.kubelet.container.memory.cache.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
+|Runtime operations discovery | |DEPENDENT |kube.kubelet.runtime_operations_bucket.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~ "kubelet_runtime_operations_*", operation_type =~ ".*"}`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Overrides:**</p><p>bucket item<br> - {#TYPE} MATCHES_REGEX `buckets`<br>  - ITEM_PROTOTYPE LIKE `bucket` - DISCOVER</p><p>total item<br> - {#TYPE} MATCHES_REGEX `totals`<br>  - ITEM_PROTOTYPE NOT_LIKE `bucket` - DISCOVER</p> |
 
 ## Items collected
 
@@ -92,5 +98,5 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
 

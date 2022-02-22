@@ -6,7 +6,17 @@
 For Zabbix version: 6.0 and higher  
 The template to monitor Kubernetes nodes that work without any external scripts.  
 It works without external scripts and uses the script item to make HTTP requests to the Kubernetes API.
+Install the Zabbix Helm Chart (https://git.zabbix.com/projects/ZT/repos/kubernetes-helm/browse?at=refs%2Fheads%2Frelease%2F6.0) in your Kubernetes cluster.
 
+Set the `{$KUBE.API.ENDPOINT.URL}` such as `<scheme>://<host>:<port>/api`.
+
+Get the generated service account token using the command
+
+`kubectl get secret zabbix-service-account -n monitoring -o jsonpath={.data.token} | base64 -d`
+
+Then set it to the macro `{$KUBE.API.TOKEN}`.
+
+Set up the macros to filter the metrics of discovered nodes
 
 
 This template was tested on:
@@ -17,13 +27,13 @@ This template was tested on:
 
 > See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/http) for basic instructions.
 
-Install the [Zabbix Helm Chart](https://git.zabbix.com/projects/ZT/repos/kubernetes-helm/browse?at=refs%2Fheads%2Frelease%2F5.4) in your Kubernetes cluster.
+Install the [Zabbix Helm Chart](https://git.zabbix.com/projects/ZT/repos/kubernetes-helm/browse?at=refs%2Fheads%2Frelease%2F6.0) in your Kubernetes cluster.
 
-Set the `{$KUBE.API.ENDPOINT}` such as `<scheme>://<host>:<port>/api`.
+Set the `{$KUBE.API.ENDPOINT.URL}` such as `<scheme>://<host>:<port>/api`.
 
 Get the generated service account token using the command
 
-`kubectl get secret zabbix-service-account -n zabbix -o jsonpath={.data.token} | base64 -d`
+`kubectl get secret zabbix-service-account -n monitoring -o jsonpath={.data.token} | base64 -d`
 
 Then set it to the macro `{$KUBE.API.TOKEN}`.
 
@@ -70,7 +80,7 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$KUBE.API.ENDPOINT} |<p>Kubernetes API endpoint in the format <scheme>://<host>:<port>/api</p> |`<PUT YOUR KUBERNETES API ENDPOINT>` |
+|{$KUBE.API.ENDPOINT.URL} |<p>Kubernetes API endpoint URL in the format <scheme>://<host>:<port>/api</p> |`https://localhost:6443/api` |
 |{$KUBE.API.TOKEN} |<p>Service account bearer token</p> |`` |
 |{$KUBE.LLD.FILTER.NODE.MATCHES} |<p>Filter of discoverable nodes</p> |`.*` |
 |{$KUBE.LLD.FILTER.NODE.NOT_MATCHES} |<p>Filter to exclude discovered nodes</p> |`CHANGE_IF_NEEDED` |
@@ -84,7 +94,7 @@ No specific Zabbix configuration is required.
 |{$KUBE.LLD.FILTER.POD.NAMESPACE.NOT_MATCHES} |<p>Filter to exclude discovered pods by namespace</p> |`CHANGE_IF_NEEDED` |
 |{$KUBE.NODE.FILTER.ANNOTATIONS} |<p>Annotations to filter nodes (regex in values are supported)</p> |`` |
 |{$KUBE.NODE.FILTER.LABELS} |<p>Labels to filter nodes (regex in values are supported)</p> |`` |
-|{$KUBE.NODES.ENDPOINT.NAME} |<p>Kubenetes nodes endpoint name</p> |`zabbix-zabbix-helm-chrt-agent` |
+|{$KUBE.NODES.ENDPOINT.NAME} |<p>Kubenetes nodes endpoint name. See kubectl -n monitoring get ep</p> |`zabbix-zabbix-helm-chrt-agent` |
 |{$KUBE.POD.FILTER.ANNOTATIONS} |<p>Annotations to filter pods (regex in values are supported)</p> |`` |
 |{$KUBE.POD.FILTER.LABELS} |<p>Labels to filter Pods (regex in values are supported)</p> |`` |
 
@@ -96,8 +106,8 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Node discovery |<p>-</p> |DEPENDENT |kube.node.discovery<p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE.NOT_MATCHES}`</p><p>- {#ROLES} MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE.ROLE.MATCHES}`</p><p>- {#ROLES} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE.ROLE.NOT_MATCHES}`</p> |
 |Cluster node discovery |<p>-</p> |DEPENDENT |kube.node_host.discovery<p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE_HOST.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE_HOST.NOT_MATCHES}`</p><p>- {#ROLES} MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE_HOST.ROLE.MATCHES}`</p><p>- {#ROLES} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE_HOST.ROLE.NOT_MATCHES}`</p> |
+|Node discovery |<p>-</p> |DEPENDENT |kube.node.discovery<p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE.NOT_MATCHES}`</p><p>- {#ROLES} MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE.ROLE.MATCHES}`</p><p>- {#ROLES} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE.ROLE.NOT_MATCHES}`</p> |
 |Pod discovery |<p>-</p> |DEPENDENT |kube.pod.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NODE} MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE.MATCHES}`</p><p>- {#NODE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE.NOT_MATCHES}`</p><p>- {#NAMESPACE} MATCHES_REGEX `{$KUBE.LLD.FILTER.POD.NAMESPACE.MATCHES}`</p><p>- {#NAMESPACE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.POD.NAMESPACE.NOT_MATCHES}`</p> |
 
 ## Items collected
@@ -133,14 +143,14 @@ There are no template links in this template.
 |Kubernetes |Node [{#NAME}] Requests: CPU |<p>Node CPU requests.</p><p>https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/</p> |DEPENDENT |kube.node.requests.cpu[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.items[?(@.metadata.name == "{#NAME}")].pods[*].containers.requests.cpu.sum()`</p> |
 |Kubernetes |Node [{#NAME}] Requests: Memory |<p>Node Memory requests.</p><p>https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/</p> |DEPENDENT |kube.node.requests.memory[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.items[?(@.metadata.name == "{#NAME}")].pods[*].containers.requests.memory.sum()`</p> |
 |Kubernetes |Node [{#NAME}] Uptime |<p>Node uptime.</p> |DEPENDENT |kube.node.uptime[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.items[?(@.metadata.name == "{#NAME}")].metadata.creationTimestamp.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `return Math.floor((Date.now() - new Date(value)) / 1000);`</p> |
-|Kubernetes |Node [{#NAME}] Pods |<p>Current number of pods on the node.</p> |DEPENDENT |kube.node.pods[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.items[?(@.metadata.name == "{#NAME}")].status.podsCount.first()`</p> |
+|Kubernetes |Node [{#NAME}] Used: Pods |<p>Current number of pods on the node.</p> |DEPENDENT |kube.node.used.pods[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.items[?(@.metadata.name == "{#NAME}")].status.podsCount.first()`</p> |
 |Kubernetes |Node [{#NODE}] Pod [{#POD}] Conditions: Containers ready |<p>All containers in the Pod are ready.</p><p>https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-conditions</p> |DEPENDENT |kube.pod.conditions.containers_ready[{#POD}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.items[?(@.metadata.name == "{#NODE}")].pods[?(@.name == "{#POD}")].conditions[?(@.type == "ContainersReady")].status.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `return ['True', 'False', 'Unknown'].indexOf(value) + 1 || 'Problem with status processing in JS'; `</p> |
 |Kubernetes |Node [{#NODE}] Pod [{#POD}] Conditions: Initialized |<p>All init containers have started successfully.</p><p>https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-conditions</p> |DEPENDENT |kube.pod.conditions.initialized[{#POD}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.items[?(@.metadata.name == "{#NODE}")].pods[?(@.name == "{#POD}")].conditions[?(@.type == "Initialized")].status.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `return ['True', 'False', 'Unknown'].indexOf(value) + 1 || 'Problem with status processing in JS'; `</p> |
 |Kubernetes |Node [{#NODE}] Pod [{#POD}] Conditions: Ready |<p>The Pod is able to serve requests and should be added to the load balancing pools of all matching Services.</p><p>https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-conditions</p> |DEPENDENT |kube.pod.conditions.ready[{#POD}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.items[?(@.metadata.name == "{#NODE}")].pods[?(@.name == "{#POD}")].conditions[?(@.type == "Ready")].status.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `return ['True', 'False', 'Unknown'].indexOf(value) + 1 || 'Problem with status processing in JS'; `</p> |
 |Kubernetes |Node [{#NODE}] Pod [{#POD}] Conditions: Scheduled |<p>The Pod has been scheduled to a node.</p><p>https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-conditions</p> |DEPENDENT |kube.pod.conditions.scheduled[{#POD}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.items[?(@.metadata.name == "{#NODE}")].pods[?(@.name == "{#POD}")].conditions[?(@.type == "PodScheduled")].status.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `return ['True', 'False', 'Unknown'].indexOf(value) + 1 || 'Problem with status processing in JS'; `</p> |
 |Kubernetes |Node [{#NODE}] Pod [{#POD}] Containers: Restarts |<p>The number of times the container has been restarted, currently based on the number of dead containers that have not yet been removed. Note that this is calculated from dead containers. But those containers are subject to garbage collection.</p> |DEPENDENT |kube.pod.containers.restartcount[{#POD}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.items[?(@.metadata.name == "{#NODE}")].pods[?(@.name == "{#POD}")].containers.restartCount.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Kubernetes |Node [{#NODE}] Pod [{#POD}] Status: Phase |<p>The phase of a Pod is a simple, high-level summary of where the Pod is in its lifecycle.</p><p>https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-phase</p> |DEPENDENT |kube.pod.status.phase[{#POD}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.items[?(@.metadata.name == "{#NODE}")].pods[?(@.name == "{#POD}")].phase.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `return ['Pending', 'Running', 'Succeeded', 'Failed', 'Unknown'].indexOf(value) + 1 || 'Problem with status processing in JS'; `</p> |
-|Kubernetes |Node [{#NODE}] Pod [{#POD}] Uptime |<p>Pod uptime.</p> |DEPENDENT |kube.pod.uptime[{#POD}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.items[?(@.metadata.name == "{#NODE}")].pods[?(@.name == "{#POD}")].startTime.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `var now = Date.now(); return Math.floor((now - new Date(value || now)) / 1000); `</p> |
+|Kubernetes |Node [{#NODE}] Pod [{#POD}] Uptime |<p>Pod uptime.</p> |DEPENDENT |kube.pod.uptime[{#POD}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.items[?(@.metadata.name == "{#NODE}")].pods[?(@.name == "{#POD}")].startTime.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `return Math.floor((Date.now() - new Date(value)) / 1000);`</p> |
 
 ## Triggers
 
@@ -161,7 +171,7 @@ There are no template links in this template.
 |Node [{#NAME}] Requests: Total memory requests are too high (more than 50% of allocatable) |<p>-</p> |`last(/Kubernetes nodes by HTTP/kube.node.requests.memory[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.memory[{#NAME}]) > 0.5` |WARNING |<p>**Depends on**:</p><p>- Node [{#NAME}] Requests: Total memory requests are too high (more than 80% of allocatable)</p> |
 |Node [{#NAME}] Requests: Total memory requests are too high (more than 80% of allocatable) |<p>-</p> |`last(/Kubernetes nodes by HTTP/kube.node.requests.memory[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.memory[{#NAME}]) > 0.8` |AVERAGE | |
 |Node [{#NAME}]: Has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/Kubernetes nodes by HTTP/kube.node.uptime[{#NAME}])<10` |INFO | |
-|Kubelet too many pods (more than 95% of capacity) |<p>Kubelet is running at capacity.</p> |`last(/Kubernetes nodes by HTTP/kube.node.pods[{#NAME}])/ last(/Kubernetes nodes by HTTP/kube.node.capacity.pods[{#NAME}]) > 0.9` |WARNING | |
+|Node [{#NAME}] Used: Kubelet too many pods (more than 95% of capacity) |<p>Kubelet is running at capacity.</p> |`last(/Kubernetes nodes by HTTP/kube.node.used.pods[{#NAME}])/ last(/Kubernetes nodes by HTTP/kube.node.capacity.pods[{#NAME}]) > 0.9` |WARNING | |
 |Node [{#NODE}] Pod [{#POD}]: Pod is crash looping |<p>Pos restarts more than 2 times in the last 3 minutes.</p> |`(last(/Kubernetes nodes by HTTP/kube.pod.containers.restartcount[{#POD}])-min(/Kubernetes nodes by HTTP/kube.pod.containers.restartcount[{#POD}],3m))>2` |WARNING | |
 |Node [{#NODE}] Pod [{#POD}] Status: Kubernetes Pod not healthy |<p>Pod has been in a non-ready state for longer than 10 minutes.</p> |`count(/Kubernetes nodes by HTTP/kube.pod.status.phase[{#POD}],10m, "regexp","^(1|4|5)$")>=9` |HIGH | |
 
@@ -169,5 +179,5 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
 

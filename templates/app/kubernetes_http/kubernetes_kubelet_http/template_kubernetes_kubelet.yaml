@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-02-17T06:36:58Z'
+  date: '2022-02-22T16:38:34Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -18,7 +18,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.40
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -34,7 +34,7 @@ zabbix_export:
           value_type: TEXT
           description: 'Collecting raw Kubelet metrics from /metrics/cadvisor endpoint.'
           timeout: 10s
-          url: '{$KUBE.KUBELET.URL}/metrics/cadvisor'
+          url: '{$KUBE.KUBELET.URL}{$KUBE.KUBELET.CADVISOR.ENDPOINT}'
           status_codes: '200, 403'
           headers:
             -
@@ -140,7 +140,7 @@ zabbix_export:
           value_type: TEXT
           description: 'Collecting raw Kubelet metrics from /metrics endpoint.'
           timeout: 10s
-          url: '{$KUBE.KUBELET.URL}/metrics'
+          url: '{$KUBE.KUBELET.URL}{$KUBE.KUBELET.METRIC.ENDPOINT}'
           status_codes: '200, 403'
           headers:
             -
@@ -268,7 +268,7 @@ zabbix_export:
           value_type: TEXT
           description: 'Collecting raw Kubelet metrics from /pods endpoint.'
           timeout: 10s
-          url: '{$KUBE.KUBELET.URL}/pods'
+          url: '{$KUBE.KUBELET.URL}{$KUBE.KUBELET.PODS.ENDPOINT}'
           status_codes: '200, 403'
           headers:
             -
@@ -714,7 +714,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.kublet.runtime_ops_duration_seconds_bucket[{#LE},"{#OP_TYPE}"]'
               delay: '0'
-              history: 7d
+              history: 1h
+              trends: '0'
               discover: NO_DISCOVER
               value_type: FLOAT
               description: 'Duration in seconds of runtime operations. Broken down by operation type.'
@@ -940,6 +941,18 @@ zabbix_export:
         -
           macro: '{$KUBE.API.TOKEN}'
           description: 'Service account bearer token'
+        -
+          macro: '{$KUBE.KUBELET.CADVISOR.ENDPOINT}'
+          value: /metrics/cadvisor
+          description: 'cAdvisor metrics from Kubelet /metrics/cadvisor endpoint'
+        -
+          macro: '{$KUBE.KUBELET.METRIC.ENDPOINT}'
+          value: /metrics
+          description: 'Kubelet /metrics endpoint'
+        -
+          macro: '{$KUBE.KUBELET.PODS.ENDPOINT}'
+          value: /pods
+          description: 'Kubelet /pods endpoint'
         -
           macro: '{$KUBE.KUBELET.URL}'
           value: 'https://localhost:10250'
