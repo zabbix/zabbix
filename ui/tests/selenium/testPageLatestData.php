@@ -41,7 +41,7 @@ class testPageLatestData extends CWebTest {
 
 	const HOSTNAME = 'Host for items tags filtering';
 
-	// Host with items for tag filtering.
+	// Host with items for filtering Latest data by item tags.
 	protected static $data = [
 		'hostgroupid' => null,
 		'hostid' => null,
@@ -59,6 +59,8 @@ class testPageLatestData extends CWebTest {
 		$this->assertArrayHasKey('groupids', $hostgroups);
 		self::$data['hostgroupid'] = $hostgroups['groupids'][0];
 
+
+		// Create host for items.
 		$hosts = CDataHelper::call('host.create', [
 			'host' => self::HOSTNAME,
 			'groups' => [['groupid' => self::$data['hostgroupid']]],
@@ -68,7 +70,7 @@ class testPageLatestData extends CWebTest {
 		$hostids = CDataHelper::getIds('host');
 		self::$data['hostid'] = $hostids['Host for items tags filtering'];
 
-		// Create items on previously created hosts.
+		// Create items on previously created host.
 		$items_tags_data = [];
 		foreach (self::$data['itemids'] as $i => $item) {
 			$items_tags_data[] = [
@@ -101,7 +103,7 @@ class testPageLatestData extends CWebTest {
 		self::$data['itemids']['tag_item_3'] = $items['itemids'][2];
 		self::$data['itemids']['tag_item_4'] = $items['itemids'][3];
 
-		// Add data to item to see "With data"/"Without data" subfilter.
+		// Add data to one item to see "With data"/"Without data" subfilter.
 		$time = time() - 100;
 		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".zbx_dbstr(self::$data['itemids']['tag_item_1']).
 				", ".zbx_dbstr($time).", 1, 0)");
