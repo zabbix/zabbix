@@ -2867,13 +2867,13 @@ form.is-loading {
       @media screen and (min-width: 1600px) {
         .list-table.compact-view td .tag {
           max-width: 133px; } }
-    .list-table.compact-view td .icon-maint {
+    .list-table.compact-view td .icon-maintenance {
       position: relative;
       display: inline-block;
       height: 12px;
       width: 12px;
       margin: 3px 1px 2px 2px !important; }
-      .list-table.compact-view td .icon-maint::before {
+      .list-table.compact-view td .icon-maintenance::before {
         height: 12px;
         width: 12px;
         background-position: -48px -804px; }
@@ -4162,11 +4162,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   display: inline-block;
   margin: 0 14px 0 0; }
 
-.icon-maint {
-  margin: 0 18px 0 0; }
-  .icon-maint::before {
-    background: url("../img/icon-sprite.svg?20211222") no-repeat -46px -802px; }
-
 .icon-depend-up {
   margin: 0 18px 0 0; }
   .icon-depend-up::before {
@@ -4181,6 +4176,13 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   margin: 0 18px 0 0; }
   .icon-ackn::before {
     background: url("../img/icon-sprite.svg?20211222") no-repeat -45px -693px; }
+
+.icon-maintenance {
+  display: inline-block;
+  width: 18px;
+  height: 13px; }
+  .icon-maintenance::before {
+    background: url("../img/icon-sprite.svg?20211222") no-repeat -46px -802px; }
 
 .icon-tree-top-bottom, .icon-tree-top-bottom-right, .icon-tree-top-right, .icon-tree-empty {
   margin: 0 12px 0 0; }
@@ -4221,7 +4223,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     opacity: 1;
     background-color: transparent; }
 
-.icon-maint::before, .icon-depend-up::before, .icon-depend-down::before, .icon-ackn::before {
+.icon-depend-up::before, .icon-depend-down::before, .icon-ackn::before, .icon-maintenance::before {
   display: inline-block;
   width: 18px;
   height: 18px;
@@ -4489,12 +4491,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       .overlay-dialogue.modal .overlay-dialogue-controls z-select {
         text-align: left;
         padding: inherit; }
-      .overlay-dialogue.modal .overlay-dialogue-controls li {
-        display: inline;
-        padding-left: 10px; }
-      .overlay-dialogue.modal .overlay-dialogue-controls z-select li {
-        display: block;
-        padding-left: 5px; }
+        .overlay-dialogue.modal .overlay-dialogue-controls z-select li {
+          display: block;
+          padding-left: 5px; }
       .overlay-dialogue.modal .overlay-dialogue-controls .inline-filter li {
         padding-left: 0; }
     .overlay-dialogue.modal > .overlay-close-btn {
@@ -6911,9 +6910,9 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-mask, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-mask {
   border: 0; }
 
-.icon-maint {
+.icon-maintenance {
   margin: 0 18px 0 0; }
-  .icon-maint::before {
+  .icon-maintenance::before {
     background: url("../img/icon-sprite.svg?20211222") no-repeat -203px -802px; }
 
 .icon-depend-up {
@@ -7176,7 +7175,7 @@ z-select button.focusable:focus,
   .list-table.compact-view td.na-bg::after, .list-table.compact-view td.normal-bg::after, .list-table.compact-view td.info-bg::after, .list-table.compact-view td.warning-bg::after, .list-table.compact-view td.average-bg::after, .list-table.compact-view td.high-bg::after, .list-table.compact-view td.disaster-bg::after {
     top: 1px;
     transform: scale(0.8); }
-  .list-table.compact-view td .icon-maint::before {
+  .list-table.compact-view td .icon-maintenance::before {
     background-position: -206px -804px; }
   .list-table.compact-view td .icon-wzrd-action {
     background: transparent url("../img/icon-sprite.svg?20211222") no-repeat -165px -624px; }

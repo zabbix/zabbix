@@ -3291,12 +3291,12 @@ void	process_actions(const zbx_vector_ptr_t *events, const zbx_vector_uint64_pai
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process actions for each acknowledgement in the array             *
+ * Purpose: process actions for each acknowledgment in the array              *
  *                                                                            *
  * Parameters: event_ack        - [IN] vector for eventid/ackid pairs         *
  *                                                                            *
  ******************************************************************************/
-int	process_actions_by_acknowledgements(const zbx_vector_ptr_t *ack_tasks)
+int	process_actions_by_acknowledgments(const zbx_vector_ptr_t *ack_tasks)
 {
 	zbx_vector_ptr_t	actions;
 	zbx_hashset_t		uniq_conditions[EVENT_SOURCE_COUNT];

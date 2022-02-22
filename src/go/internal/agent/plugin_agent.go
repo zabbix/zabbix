@@ -73,7 +73,7 @@ func processConfigItem(timeout time.Duration, name, value, item string, length i
 	}
 
 	if !utf8.ValidString(value) {
-		return "", fmt.Errorf("value is not an UTF-8 string.")
+		return "", fmt.Errorf("value is not a UTF-8 string.")
 	}
 
 	if len(value) > length {

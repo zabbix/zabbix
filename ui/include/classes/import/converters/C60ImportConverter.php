@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -20,31 +20,20 @@
 
 
 /**
- * @var CView $this
+ * Converter for converting import data from 6.0 to 6.2.
  */
-?>
+class C60ImportConverter extends CConverter {
 
-<script type="text/javascript">
-	$(() => {
-		const $expires_row = $('#expires-at-row');
-		const $expires_at = $expires_row.find('#expires_at');
-		const $form = $(document.forms['token']);
+	/**
+	 * Convert import data from 6.0 to 6.2 version.
+	 *
+	 * @param array $data
+	 *
+	 * @return array
+	 */
+	public function convert(array $data): array {
+		$data['zabbix_export']['version'] = '6.2';
 
-		$form.on('submit', () => $form.trimValues(['#name', '#description']));
-
-		$('#expires_state')
-			.on('change', ({target: {checked}}) => {
-				$expires_row.toggle(checked);
-				$expires_at.prop('disabled', !checked);
-			})
-			.trigger('change');
-
-		$('#regenerate').on('click', ({target}) => {
-			if (confirm($(target).data('confirmation'))) {
-				$form.append($('<input>', {type: 'hidden', name: 'regenerate', value: '1'}));
-				$form.find('#action_dst').val('user.token.view');
-				$form.submit();
-			}
-		});
-	});
-</script>
+		return $data;
+	}
+}

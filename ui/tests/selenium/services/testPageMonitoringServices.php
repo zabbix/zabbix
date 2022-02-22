@@ -464,7 +464,7 @@ class testPageMonitoringServices extends CWebTest {
 	 */
 	private function checkServiceButtons($row, $exists) {
 		foreach (['Add child service', 'Edit', 'Delete'] as $button) {
-			// Here checking only visible, not clickabe, because in some cases button can be disabled.
+			// Here checking only visible, not clickable, because in some cases button can be disabled.
 			$this->assertEquals($exists, $row->query("xpath:.//button[@title=".CXPathHelper::escapeQuotes($button).
 					"]")->one(false)->isVisible()
 			);
