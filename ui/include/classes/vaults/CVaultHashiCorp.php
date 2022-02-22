@@ -86,6 +86,7 @@ class CVaultHashiCorp extends CVault {
 			]));
 		}
 		catch (Exception $e) {
+			$this->addError(_('Vault connection failed.'));
 			$this->addError($e->getMessage());
 
 			return null;
@@ -99,60 +100,22 @@ class CVaultHashiCorp extends CVault {
 			return null;
 		}
 
-		return $secret['data']['data'];
+		$db_credentials = $secret['data']['data'];
+
+		if (!array_key_exists('username', $db_credentials) || !array_key_exists('password', $db_credentials)) {
+			$this->addError(_('Username and password must be stored in Vault secret keys "username" and "password".'));
+
+			return null;
+		}
+
+		return [
+			'user' => $db_credentials['username'],
+			'password' => $db_credentials['password']
+		];
 	}
 
 	// TODO: 7402
 	public function validateMacroValue(string $value): bool {
 		return false;
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//	public function getCredentials(bool $use_cache = false): array {
-//		$username = '';
-//		$password = '';
-
-//		if ($use_cache) {
-//			$username = CDataCacheHelper::getValue('db_username', '');
-//			$password = CDataCacheHelper::getValue('db_password', '');
-//		}
-
-//		if ($username === '' || $password === '') {
-//			$secret = $this->loadSecret($this->credentials_path);
-
-//			$username = array_key_exists('username', $secret) ? $secret['username'] : '';
-//			$password = array_key_exists('password', $secret) ? $secret['password'] : '';
-
-//			if ($use_cache) {
-//				if ($username !== '' && $password !== '') {
-//					CDataCacheHelper::setValueArray([
-//						'db_username' => $username,
-//						'db_password' => $password
-//					]);
-//				}
-//				else {
-//					CDataCacheHelper::clearValues(['db_username', 'db_password']);
-//				}
-//			}
-//		}
-
-//		return [
-//			'username' => $username,
-//			'password' => $password
-//		];
-//	}
-
 }

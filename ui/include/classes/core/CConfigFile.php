@@ -194,20 +194,6 @@ class CConfigFile {
 			$this->config['SSO'] = $SSO;
 		}
 
-//		CVault::init(array_intersect_key($this->config['DB'], array_fill_keys([
-//			'VAULT',
-//			'VAULT_URL',
-//			'VAULT_DB_PATH',
-//			'VAULT_TOKEN',
-//			'VAULT_KEY_FILE',
-//			'VAULT_CERT_FILE',
-//			'VAULT_CACHE'
-//		], true)));
-
-//		if (CVault::credentialsInUse()) {
-//			list($this->config['DB']['USER'], $this->config['DB']['PASSWORD']) = CVault::loadCredentials();
-//		}
-
 		$this->makeGlobal();
 
 		return $this->config;

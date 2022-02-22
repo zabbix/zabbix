@@ -49,6 +49,9 @@ class ZBase {
 	 */
 	protected $config = [];
 
+	/**
+	 * @var CVault
+	 */
 	protected $vault;
 
 	/**
@@ -432,7 +435,7 @@ class ZBase {
 				break;
 			case CVaultHashiCorp::NAME:
 				$this->vault = new CVaultHashiCorp($this->config['DB']['VAULT_URL'],
-					$this->config['DB']['VAULT_TOKEN']);
+					$this->config['DB']['VAULT_DB_PATH'], $this->config['DB']['VAULT_TOKEN']);
 				break;
 		}
 	}
@@ -446,23 +449,39 @@ class ZBase {
 		$error = null;
 
 		if ($this->vault !== null) {
-			if ($this->config['DB']['VAULT_CACHE']) {
+			$db_user = $this->config['DB']['VAULT_CACHE'] ? CDataCacheHelper::getValue('db_user', '') : '';
+			$db_password = $this->config['DB']['VAULT_CACHE'] ? CDataCacheHelper::getValue('db_password', '') : '';
 
+			if ($db_user === '' || $db_password === '') {
+				$db_credentials = $this->vault->getCredentials();
+
+				if ($db_credentials === null) {
+					throw new DBException(_('Unable to load database credentials from Vault.'));
+				}
+
+				['user' => $db_user, 'password' => $db_password] = $db_credentials;
 			}
 
+			if ($this->config['DB']['VAULT_CACHE'] && $db_user !== '' && $db_password !== '') {
+				CDataCacheHelper::setValueArray([
+					'db_user' => $db_user,
+					'db_password' => $db_password
+				]);
+			}
+			else {
+				CDataCacheHelper::clearValues(['db_user', 'db_password']);
+			}
 
+			$this->config['DB']['USER'] = $db_user;
+			$this->config['DB']['PASSWORD'] = $db_password;
 
+			global $DB; // TODO: 7402
 
-			[
-				'username' => $this->config['DB']['USER'],
-				'password' => $this->config['DB']['PASSWORD']
-			] = $this->vault->loadCredentials([
-
-			]);
+			$DB = $this->config['DB']; // TODO: 7402
 		}
 
 		if (!DBconnect($error)) {
-			CDataCacheHelper::clearValues(['db_username', 'db_password']);
+			CDataCacheHelper::clearValues(['db_user', 'db_password']);
 
 			throw new DBException($error);
 		}

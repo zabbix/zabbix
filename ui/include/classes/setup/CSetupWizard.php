@@ -204,85 +204,36 @@ class CSetupWizard extends CForm {
 			}
 
 			if (hasRequest('next') && array_key_exists(self::STAGE_DB_CONNECTION, getRequest('next'))) {
+				$db_connected = false;
+
 				if ($vault_provider !== null) {
 					if (ini_get('allow_url_fopen') != 1) {
 						error(_('Please enable "allow_url_fopen" directive.'));
 					}
-					else {
-						if ($vault_provider->validateParameters()) {
-							$secret = $vault->loadSecret($vault_db_path);
-						}
-
-						$secret = $vault->loadSecret($vault_db_path);
-
-						if ($secret) {
-							$vault_connection_checked = true;
-						}
-					}
-				}
-				else {
-					$db_connected = $this->dbConnect();
-				}
-
-
-
-
-
-
-
-
-
-
-				if ($creds_storage == DB_STORE_CREDS_VAULT_HASHICORP) {
-					$vault_connection_checked = false;
-					$vault_provider = new CVaultHashiCorp($vault_url, $vault_db_path, $vault_token);
-					$secret_parser = new CVaultSecretParser(['with_key' => false]);
-					$secret = [];
-
-					if (ini_get('allow_url_fopen') != 1) {
-						error(_('Please enable "allow_url_fopen" directive.'));
-					}
 					elseif ($vault_provider->validateParameters()) {
-						$vault = new CVaultHashiCorp($vault_url, $vault_token);
-						$secret = $vault->loadSecret($vault_db_path);
+						$db_credentials = $vault_provider->getCredentials();
 
-						if ($secret) {
-							$vault_connection_checked = true;
+						if ($db_credentials === null) {
+							foreach ($vault_provider->getErrors() as $error) {
+								error($error);
+							}
 						}
-					}
-
-					if (!$vault_connection_checked) {
-						$db_connected = _('Vault connection failed.');
-					}
-					elseif (!array_key_exists('username', $secret) || !array_key_exists('password', $secret)) {
-						$db_connected = _('Username and password must be stored in Vault secret keys "username" and "password".');
-					}
-					else {
-						$db_connected = $this->dbConnect($secret['username'], $secret['password']);
+						else {
+							$db_connected = $this->dbConnect($db_credentials['user'], $db_credentials['password']);
+						}
 					}
 				}
 				else {
 					$db_connected = $this->dbConnect();
 				}
 
-				if ($db_connected === true) {
-					$db_connection_checked = $this->checkConnection();
-				}
-				else {
-					error($db_connected);
-					$db_connection_checked = false;
-				}
+				if ($db_connected) {
+					if ($this->checkConnection()) {
+						$this->setConfig('DB_DOUBLE_IEEE754', DB::getDbBackend()->isDoubleIEEE754());
+						$this->doNext();
+					}
 
-				if ($db_connection_checked) {
-					$this->setConfig('DB_DOUBLE_IEEE754', DB::getDbBackend()->isDoubleIEEE754());
-				}
-
-				if ($db_connected === true) {
 					$this->dbClose();
-				}
-
-				if ($db_connection_checked) {
-					$this->doNext();
 				}
 				else {
 					$this->step_failed = true;
@@ -940,13 +891,13 @@ class CSetupWizard extends CForm {
 		 * Create session secret key for first installation. If installation already exists, don't make a new key
 		 * because that will terminate the existing session.
 		 */
-		$db_connect = $this->dbConnect($db_user, $db_pass);
+		$db_connected = $this->dbConnect($db_user, $db_pass);
 		$is_superadmin = (CWebUser::$data && CWebUser::getType() == USER_TYPE_SUPER_ADMIN);
-		$session_key_update_failed = ($db_connect && !$is_superadmin)
+		$session_key_update_failed = ($db_connected && !$is_superadmin)
 			? !CEncryptHelper::updateKey(CEncryptHelper::generateKey())
 			: false;
 
-		if (!$db_connect || $session_key_update_failed) {
+		if ($db_connected || $session_key_update_failed) {
 			$this->step_failed = true;
 			$this->setConfig('step', self::STAGE_DB_CONNECTION);
 
@@ -1066,27 +1017,30 @@ class CSetupWizard extends CForm {
 		// Check certificate files exists.
 		if ($DB['ENCRYPTION'] && ($DB['TYPE'] === ZBX_DB_MYSQL || $DB['TYPE'] === ZBX_DB_POSTGRESQL)) {
 			if (($this->getConfig('DB_ENCRYPTION_ADVANCED') || $DB['CA_FILE'] !== '') && !file_exists($DB['CA_FILE'])) {
-				return _s('Incorrect file path for "%1$s": %2$s.', _('Database TLS CA file'), $DB['CA_FILE']);
+				error(_s('Incorrect file path for "%1$s": %2$s.', _('Database TLS CA file'), $DB['CA_FILE']));
+
+				return false;
 			}
 
 			if ($DB['KEY_FILE'] !== '' && !file_exists($DB['KEY_FILE'])) {
-				return _s('Incorrect file path for "%1$s": %2$s.', _('Database TLS key file'), $DB['KEY_FILE']);
+				error(_s('Incorrect file path for "%1$s": %2$s.', _('Database TLS key file'), $DB['KEY_FILE']));
+
+				return false;
 			}
 
 			if ($DB['CERT_FILE'] !== '' && !file_exists($DB['CERT_FILE'])) {
-				return _s('Incorrect file path for "%1$s": %2$s.', _('Database TLS certificate file'),
-					$DB['CERT_FILE']
-				);
+				error(_s('Incorrect file path for "%1$s": %2$s.', _('Database TLS certificate file'),
+					$DB['CERT_FILE']));
+
+				return false;
 			}
 		}
 
-		// During setup set debug to false to avoid displaying unwanted PHP errors in messages.
-		if (DBconnect($error)) {
-			return true;
+		if (!DBconnect($error)) {
+			return false;
 		}
-		else {
-			return $error;
-		}
+
+		return true;
 	}
 
 	private function dbClose(): void {
@@ -1102,7 +1056,7 @@ class CSetupWizard extends CForm {
 
 		$result = true;
 
-		if (!zbx_empty($DB['SCHEMA']) && $DB['TYPE'] == ZBX_DB_POSTGRESQL) {
+		if ($DB['SCHEMA'] !== '' && $DB['TYPE'] === ZBX_DB_POSTGRESQL) {
 			$db_schema = DBselect(
 				"SELECT schema_name".
 				" FROM information_schema.schemata".
