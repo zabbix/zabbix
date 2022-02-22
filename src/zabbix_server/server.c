@@ -1122,8 +1122,7 @@ static void	zbx_check_db(void)
 
 			if (DB_VERSION_HIGHER_THAN_MAXIMUM == db_version_info.flag)
 			{
-				zabbix_log(LOG_LEVEL_ERR, "Must be up to (%s)",
-						db_version_info.friendly_max_version);
+				zabbix_log(LOG_LEVEL_ERR, "Must be up to (%s)", db_version_info.friendly_max_version);
 			}
 			else
 			{
@@ -1145,8 +1144,7 @@ static void	zbx_check_db(void)
 
 			if (DB_VERSION_HIGHER_THAN_MAXIMUM == db_version_info.flag)
 			{
-				zabbix_log(LOG_LEVEL_ERR, "Should be up to (%s)",
-						db_version_info.friendly_max_version);
+				zabbix_log(LOG_LEVEL_ERR, "Should be up to (%s)", db_version_info.friendly_max_version);
 			}
 			else
 			{
