@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:32:37Z'
+  date: '2022-02-13T07:13:24Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -40,6 +40,27 @@ zabbix_export:
           name: 'Attribute discovery'
           key: smart.attribute.discovery
           delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAME}'
+                value: '{$SMART.DISK.NAME.MATCHES}'
+                formulaid: C
+              -
+                macro: '{#NAME}'
+                value: '{$SMART.DISK.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              -
+                macro: '{#ID}'
+                value: '{$SMART.ATTRIBUTE.ID.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#ID}'
+                value: '{$SMART.ATTRIBUTE.ID.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
           description: 'Discovery SMART Vendor Specific Attributes of disks.'
           item_prototypes:
             -
@@ -72,6 +93,21 @@ zabbix_export:
                 -
                   tag: disktype
                   value: '{#DISKTYPE}'
+              trigger_prototypes:
+                -
+                  uuid: b2cbd7450bdd48bf845136c5a0d63c5f
+                  expression: |
+                    ( count(/SMART by Zabbix agent 2/smart.disk.attr.raw[{#NAME},{#ID}],#2) = 1 and last(/SMART by Zabbix agent 2/smart.disk.attr.raw[{#NAME},{#ID}]) > {$SMART.RAW.ATTRIBUTE.MAX.CRIT:"{#ID}"} )
+                    or ( last(/SMART by Zabbix agent 2/smart.disk.attr.raw[{#NAME},{#ID}]) > {$SMART.RAW.ATTRIBUTE.MAX.CRIT:"{#ID}"} and last(/SMART by Zabbix agent 2/smart.disk.attr.raw[{#NAME},{#ID}]) > last(/SMART by Zabbix agent 2/smart.disk.attr.raw[{#NAME},{#ID}],#2) )
+                  recovery_mode: NONE
+                  name: 'SMART [{#NAME}]: Attribute raw value {#ID} {#ATTRNAME} is greater than {$SMART.RAW.ATTRIBUTE.MAX.CRIT:"{#ID}"}'
+                  priority: AVERAGE
+                  description: 'The value should not be more {$SMART.RAW.ATTRIBUTE.MAX.CRIT:"{#ID}"}'
+                  manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 2af3d630a99a4989b94e2afd782a3f78
               name: 'SMART [{#NAME}]: ID {#ID} {#ATTRNAME}'
@@ -113,22 +149,20 @@ zabbix_export:
                       value: notice
           overrides:
             -
-              name: 'ID filter'
+              name: 'ID filter for Raw trigger'
               step: '1'
               filter:
                 conditions:
                   -
                     macro: '{#ID}'
-                    value: '{$SMART.ATTRIBUTE.ID.MATCHES}'
+                    value: '{$SMART.RAW.ATTRIBUTE.ID.MATCHES}'
+                    operator: NOT_MATCHES_REGEX
                     formulaid: A
-                  -
-                    macro: '{#NAME}'
-                    value: '{$SMART.DISK.NAME.MATCHES}'
-                    formulaid: B
               operations:
                 -
-                  operationobject: ITEM_PROTOTYPE
-                  operator: REGEXP
+                  operationobject: TRIGGER_PROTOTYPE
+                  operator: LIKE
+                  value: 'Attribute raw value'
                   status: ENABLED
                   discover: NO_DISCOVER
         -
@@ -136,6 +170,18 @@ zabbix_export:
           name: 'Disk discovery'
           key: smart.disk.discovery
           delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAME}'
+                value: '{$SMART.DISK.NAME.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#NAME}'
+                value: '{$SMART.DISK.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
           description: 'Discovery SMART disks.'
           item_prototypes:
             -
@@ -167,6 +213,165 @@ zabbix_export:
                 -
                   tag: disktype
                   value: '{#DISKTYPE}'
+            -
+              uuid: 849a9d5c9b9d4b969a09ab5cf4629ded
+              name: 'SMART [{#NAME}]: Exit status'
+              type: DEPENDENT
+              key: 'smart.disk.es[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: |
+                The exit statuses of smartctl are defined by a bitmask but in decimal value. The eight different bits in the exit status have the following  meanings  for  ATA disks; some of these values may also be returned for SCSI disks.
+                Bit 0: Command line did not parse.
+                Bit 1: Device  open failed, device did not return an IDENTIFY DEVICE structure, or device is in a low-power mode (see '-n' option above).
+                Bit 2: Some SMART or other ATA command to the disk failed, or there was a checksum error in a SMART data  structure  (see '-b' option above).
+                Bit 3: SMART status check returned "DISK FAILING".
+                Bit 4: We found prefail Attributes <= threshold.
+                Bit 5: SMART  status  check returned "DISK OK" but we found that some (usage or prefail) Attributes have been <= threshold at some time in the past.
+                Bit 6: The device error log contains records of errors.
+                Bit 7: The device self-test log contains records of errors. [ATA only] Failed self-tests outdated by a newer successful extended self-test are ignored.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.disk_name==''{#NAME}'')].smartctl.exit_status.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: smart.disk.get
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: diskname
+                  value: '{#NAME}'
+                -
+                  tag: disktype
+                  value: '{#DISKTYPE}'
+              trigger_prototypes:
+                -
+                  uuid: c51b609f267c45c3bcb4a3f5f40b6d35
+                  expression: |
+                    ( count(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}],#2) = 1 and bitand(last(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}]),8) = 8 )
+                    or ( bitand(last(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}]),8) = 8
+                    and bitand(last(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}]),8) > bitand(last(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}],#2),8) )
+                  recovery_mode: NONE
+                  name: 'SMART [{#NAME}]: Check returned "DISK FAILING"'
+                  priority: HIGH
+                  description: 'SMART status check returned "DISK FAILING".'
+                  manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+                -
+                  uuid: 12ed61dfd27c4666883c4240a5726d06
+                  expression: |
+                    ( count(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}],#2) = 1 and bitand(last(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}]),1) = 1 )
+                    or ( bitand(last(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}]),1) = 1
+                    and bitand(last(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}]),1) > bitand(last(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}],#2),1) )
+                  recovery_mode: NONE
+                  name: 'SMART [{#NAME}]: Command line did not parse'
+                  priority: HIGH
+                  description: 'Command line did not parse.'
+                  manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+                -
+                  uuid: 9b960cb324774b3fa5e3d39aeb3141e2
+                  expression: |
+                    ( count(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}],#2) = 1 and bitand(last(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}]),2) = 2 )
+                    or ( bitand(last(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}]),2) = 2
+                    and bitand(last(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}]),2) > bitand(last(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}],#2),2) )
+                  recovery_mode: NONE
+                  name: 'SMART [{#NAME}]: Device open failed'
+                  priority: HIGH
+                  description: 'Device open failed, device did not return an IDENTIFY DEVICE structure, or device is in a low-power mode.'
+                  manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+                -
+                  uuid: ccff1b75f69a47cdbb5a04c58d201a0f
+                  expression: |
+                    ( count(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}],#2) = 1 and bitand(last(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}]),64) = 64 )
+                    or ( bitand(last(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}]),64) = 64
+                    and bitand(last(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}]),64) > bitand(last(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}],#2),64) )
+                  recovery_mode: NONE
+                  name: 'SMART [{#NAME}]: Error log contains records'
+                  priority: HIGH
+                  description: 'The device error log contains records of errors.'
+                  manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+                -
+                  uuid: 69fb021abcc841b7b35cc93358ef085c
+                  expression: |
+                    ( count(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}],#2) = 1 and bitand(last(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}]),128) = 128 )
+                    or ( bitand(last(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}]),128) = 128
+                    and bitand(last(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}]),128) > bitand(last(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}],#2),128) )
+                  recovery_mode: NONE
+                  name: 'SMART [{#NAME}]: Self-test log contains records'
+                  priority: HIGH
+                  description: 'The device self-test log contains records of errors. [ATA only] Failed self-tests outdated by a newer successful extended self-test are ignored.'
+                  manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+                -
+                  uuid: 4ad2fbb5b6e349f6852a489b99a2760d
+                  expression: |
+                    ( count(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}],#2) = 1 and bitand(last(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}]),32) = 32 )
+                    or ( bitand(last(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}]),32) = 32
+                    and bitand(last(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}]),32) > bitand(last(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}],#2),32) )
+                  recovery_mode: NONE
+                  name: 'SMART [{#NAME}]: Some Attributes have been <= threshold'
+                  priority: HIGH
+                  description: 'SMART status check returned "DISK OK" but we found that some (usage or prefail) Attributes have been <= threshold at some time in the past.'
+                  manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+                -
+                  uuid: 592e647842d048e3985e65726cdc838c
+                  expression: |
+                    ( count(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}],#2) = 1 and bitand(last(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}]),4) = 4 )
+                    or ( bitand(last(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}]),4) = 4
+                    and bitand(last(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}]),4) > bitand(last(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}],#2),4) )
+                  recovery_mode: NONE
+                  name: 'SMART [{#NAME}]: Some command to the disk failed'
+                  priority: HIGH
+                  description: 'Some SMART or other ATA command to the disk failed, or there was a checksum error in a SMART data structure.'
+                  manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+                -
+                  uuid: ec137781d51249c89d8891a35a596445
+                  expression: |
+                    ( count(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}],#2) = 1 and bitand(last(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}]),16) = 16 )
+                    or ( bitand(last(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}]),16) = 16
+                    and bitand(last(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}]),16) > bitand(last(/SMART by Zabbix agent 2/smart.disk.es[{#NAME}],#2),16) )
+                  recovery_mode: NONE
+                  name: 'SMART [{#NAME}]: Some prefail Attributes <= threshold'
+                  priority: HIGH
+                  description: 'We found prefail Attributes <= threshold.'
+                  manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 365f9642f2764116923bb3e014eefa22
               name: 'SMART [{#NAME}]: Power on hours'
@@ -468,17 +673,33 @@ zabbix_export:
       macros:
         -
           macro: '{$SMART.ATTRIBUTE.ID.MATCHES}'
+          value: '^.*$'
+          description: 'This macro is used in the filter of attribute discovery for filtering IDs. It can be overridden on the host or linked on the template level.'
+        -
+          macro: '{$SMART.ATTRIBUTE.ID.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in overrides of attribute discovery for filtering IDs. It can be overridden on the host or linked template level.'
+          description: 'This macro is used in the filter of attribute discovery for filtering IDs. It can be overridden on the host or linked on the template level.'
         -
           macro: '{$SMART.DISK.NAME.MATCHES}'
+          value: '^.*$'
+          description: 'This macro is used in the filter of attribute and disk discoveries. It can be overridden on the host or linked on the template level.'
+        -
+          macro: '{$SMART.DISK.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in overrides of attribute discovery for filtering IDs. It can be overridden on the host or linked template level.'
+          description: 'This macro is used in the filter of attribute and disk discoveries. It can be overridden on the host or linked on the template level.'
+        -
+          macro: '{$SMART.RAW.ATTRIBUTE.ID.MATCHES}'
+          value: '^(?:5|187|188|196|197|198|199)$'
+          description: 'This macro is used for the creation of the integer items instead of the text ones and also triggers for some raw values.'
+        -
+          macro: '{$SMART.RAW.ATTRIBUTE.MAX.CRIT}'
+          value: '0'
+          description: 'The threshold for raw values.'
         -
           macro: '{$SMART.TEMPERATURE.MAX.CRIT}'
           value: '65'
-          description: 'This macro is used for trigger expression. It can be overridden on the host or linked template level.'
+          description: 'This macro is used for trigger expression. It can be overridden on the host or linked on the template level.'
         -
           macro: '{$SMART.TEMPERATURE.MAX.WARN}'
           value: '50'
-          description: 'This macro is used for trigger expression. It can be overridden on the host or linked template level.'
+          description: 'This macro is used for trigger expression. It can be overridden on the host or linked on the template level.'

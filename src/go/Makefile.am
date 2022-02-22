@@ -7,6 +7,7 @@ BUILD_DATE=`date +"%b %_d %Y"`
 GOOS=`go env GOOS`
 GOARCH=`go env GOARCH`
 PKG=zabbix.com/pkg/version
+NEW_FROM_REV=""
 
 GOLDFLAGS = -X '${PKG}.compileDate=${BUILD_DATE}'
 GOLDFLAGS += -X ${PKG}.compileTime=${BUILD_TIME}
@@ -76,3 +77,5 @@ install-exec-local: ${INSTALL_TARGETS}
 
 check:
 	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" go test ./...
+style:
+	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" golangci-lint run --new-from-rev=$(NEW_FROM_REV)  ./...

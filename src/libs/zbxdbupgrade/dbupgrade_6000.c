@@ -1,4 +1,3 @@
-<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -18,33 +17,28 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "common.h"
+#include "dbupgrade.h"
 
-/**
- * @var CView $this
+extern unsigned char	program_type;
+
+/*
+ * 6.0 maintenance database patches
  */
-?>
 
-<script type="text/javascript">
-	$(() => {
-		const $expires_row = $('#expires-at-row');
-		const $expires_at = $expires_row.find('#expires_at');
-		const $form = $(document.forms['token']);
+#ifndef HAVE_SQLITE3
 
-		$form.on('submit', () => $form.trimValues(['#name', '#description']));
+static int	DBpatch_6000000(void)
+{
+	return SUCCEED;
+}
 
-		$('#expires_state')
-			.on('change', ({target: {checked}}) => {
-				$expires_row.toggle(checked);
-				$expires_at.prop('disabled', !checked);
-			})
-			.trigger('change');
+#endif
 
-		$('#regenerate').on('click', ({target}) => {
-			if (confirm($(target).data('confirmation'))) {
-				$form.append($('<input>', {type: 'hidden', name: 'regenerate', value: '1'}));
-				$form.find('#action_dst').val('token.view');
-				$form.submit();
-			}
-		});
-	});
-</script>
+DBPATCH_START(6000)
+
+/* version, duplicates flag, mandatory flag */
+
+DBPATCH_ADD(6000000, 0, 1)
+
+DBPATCH_END()

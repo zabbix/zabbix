@@ -776,8 +776,7 @@ class testPageLatestData extends CWebTest {
 		$form->fill(['Hosts' => 'Available host in maintenance']);
 		$form->submit();
 
-		// TODO: change forceClick after ZBX-20426 merge.
-		$this->query('xpath://span[contains(@class, "icon-maint")]')->one()->forceClick();
+		$this->query('xpath://span['.CXPathHelper::fromClass('icon-maintenance').']')->waitUntilClickable()->one()->click();
 		$hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last()->getText();
 		$hint_text = "Maintenance for Host availability widget [Maintenance with data collection]\n".
 				"Maintenance for checking Show hosts in maintenance option in Host availability widget";
