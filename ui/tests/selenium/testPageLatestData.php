@@ -100,21 +100,14 @@ class testPageLatestData extends CWebTest {
 		self::$data['itemids']['tag_item_2'] = $items['itemids'][1];
 		self::$data['itemids']['tag_item_3'] = $items['itemids'][2];
 		self::$data['itemids']['tag_item_4'] = $items['itemids'][3];
+
+		// Add data to item to see "With data"/"Without data" subfilter.
+		$time = time() - 100;
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".zbx_dbstr(self::$data['itemids']['tag_item_1']).
+				", ".zbx_dbstr($time).", 1, 0)");
 	}
 
 	public function testPageLatestData_CheckLayout() {
-		$time = time() - 100;
-
-		$id = CDBHelper::getValue('SELECT itemid'.
-			' FROM items WHERE hostid in ('.
-				'SELECT hostid FROM hosts'.
-				' WHERE name='.zbx_dbstr(self::HOSTNAME).
-			') AND name='.zbx_dbstr('tag_item_1')
-		);
-
-		// Add data to item agent.ping to see "With data"/"Without data" subfilter.
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".zbx_dbstr($id).", ".zbx_dbstr($time).", 1, 0)");
-
 		$this->page->login()->open('zabbix.php?action=latest.view');
 		$this->page->assertTitle('Latest data');
 		$this->page->assertHeader('Latest data');
@@ -500,21 +493,148 @@ class testPageLatestData extends CWebTest {
 		$this->query('button:Reset')->one()->click();
 	}
 
-	// Check that no real host or template names displayed.
-	public function testPageLatestData_NoHostNames() {
-		$result = CDBHelper::getAll(
-			'SELECT host'.
-			' FROM hosts'.
-			' WHERE status IN ('.HOST_STATUS_MONITORED.', '.HOST_STATUS_NOT_MONITORED.', '.HOST_STATUS_TEMPLATE.')'.
-				' AND name <> host'
+	public static function getSubfilterData() {
+		return [
+			// Tag values.
+			[
+				[
+					'subfilter' => [
+						'Tag values' => [
+							'name:tag_item_1',
+							'name:tag_item_2'
+						]
+					],
+					'result' => [
+						['Name' => 'tag_item_1'],
+						['Name' => 'tag_item_2']
+					]
+				]
+			],
+			// Tag values and Data.
+			[
+				[
+					'subfilter' => [
+						'Tag values' => [
+							'name:tag_item_1',
+							'name:tag_item_2'
+						],
+						'Data' => [
+							'With data'
+						]
+					],
+					'result' => [
+						['Name' => 'tag_item_1']
+					]
+				]
+			],
+			// Hosts and Tag values.
+			[
+				[
+					'subfilter' => [
+						'Hosts' => [
+							'1_Host_to_check_Monitoring_Overview',
+							'3_Host_to_check_Monitoring_Overview'
+						],
+						'Tag values' => [
+							'Oracle'
+						]
+					],
+					'result' => [
+						['Name' => '3_item']
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getSubfilterData
+	 */
+	public function testPageLatestData_Subfilter($data) {
+		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr(self::HOSTNAME));
+
+		$link = (CTestArrayHelper::get($data['subfilter'], 'Data'))
+			? 'zabbix.php?action=latest.view&hostids%5B%5D='.$hostid
+			: 'zabbix.php?action=latest.view';
+
+		$this->page->login()->open($link)->waitUntilReady();
+
+		foreach ($data['subfilter'] as $header => $values) {
+			foreach ($values as $value) {
+				$this->query("xpath://h3[text()=".CXPathHelper::escapeQuotes($header)."]/..//a[text()=".
+					CXPathHelper::escapeQuotes($value)."]")->waitUntilClickable()->one()->click();
+				$this->page->waitUntilReady();
+			}
+		}
+
+		$this->page->assertTitle('Latest data');
+		$this->page->assertHeader('Latest data');
+
+		$this->assertTableData($data['result'], $this->getTableSelector());
+		$this->query('button:Reset')->waitUntilClickable()->one()->click();
+	}
+
+	public function testPageLatestData_ClickTag() {
+		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr('ЗАББИКС Сервер'));
+		$this->page->login()->open('zabbix.php?action=latest.view&hostids%5B%5D='.$hostid)->waitUntilReady();
+
+		$this->getTable()->query('link:component: storage')->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
+
+		$this->page->assertTitle('Latest data');
+		$this->page->assertHeader('Latest data');
+
+		$this->assertTableData([
+				['Name' => 'Free swap space'],
+				['Name' => 'Free swap space in %'],
+				['Name' => 'Total swap space'],
+			], $this->getTableSelector()
 		);
+	}
+
+	/**
+	 * Test that checks if host has visible name, it cannot be found by host name on Latest Data page.
+	 */
+	public function testPageLatestData_NoHostNames() {
+		$result = [
+			CDBHelper::getRandom(
+				'SELECT host'.
+				' FROM hosts'.
+				' WHERE status IN ('.HOST_STATUS_MONITORED.')'.
+					' AND name <> host', 3
+			),
+
+			CDBHelper::getRandom(
+				'SELECT host'.
+				' FROM hosts'.
+				' WHERE status IN ('.HOST_STATUS_NOT_MONITORED.')'.
+					' AND name <> host', 3
+			),
+
+			CDBHelper::getRandom(
+				'SELECT host'.
+				' FROM hosts'.
+				' WHERE status IN ('.HOST_STATUS_TEMPLATE.')'.
+					' AND name <> host', 3
+			)
+		];
 
 		$this->page->login()->open('zabbix.php?action=latest.view');
 
-		foreach ($result as $hostname) {
-			$this->assertFalse($this->getTable()->query('xpath://td/a[text()='.CXPathHelper::escapeQuotes($hostname['host']).']')
-					->one(false)->isDisplayed()
-			);
+		foreach ($result as $hosts) {
+			foreach ($hosts as $host) {
+				/*
+				 * Check if hostname is present on page, if not, go to next page.
+				 * Now there are 3 pages for unfiltered Latest data.
+				 */
+				for ($i = 1; $i < 3; $i++) {
+					$this->assertFalse($this->query('link', $host['host'])->one(false)->isValid());
+					$this->query('xpath://div[@class="table-paging"]//span[@class="arrow-right"]/..')->one()->click();
+					$this->page->waitUntilReady();
+				}
+
+				$this->query('button:Reset')->waitUntilClickable()->one()->click();
+			}
 		}
 	}
 
