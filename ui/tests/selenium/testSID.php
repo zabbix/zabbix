@@ -859,7 +859,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM actions',
-					'link' => 'actionconf.php?eventsource=0&form=update&actionid=3'
+					'link' => 'actionconf.php?form=update&actionid=3'
 				]
 			],
 
