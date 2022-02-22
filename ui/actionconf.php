@@ -102,7 +102,7 @@ $dataValid = check_fields($fields);
 $edit_ack_operationid = null;
 $new_ack_operation = getRequest('new_ack_operation', []);
 $ack_operations = getRequest('ack_operations', []);
-$eventsource = getRequest('eventsource');
+$eventsource = getRequest('eventsource', EVENT_SOURCE_TRIGGERS);
 
 if (hasRequest('actionid')) {
 	$actionPermissions = API::Action()->get([
