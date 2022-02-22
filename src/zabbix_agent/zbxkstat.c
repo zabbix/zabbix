@@ -178,7 +178,7 @@ void	zbx_kstat_collect(zbx_kstat_t *kstat)
 
 	kstat->vminfo_index ^= 1;
 	kstat->vminfo[kstat->vminfo_index].freemem = vminfo.freemem;
-	kstat->vminfo[kstat->vminfo_index].updates = vminfo.updates;
+	kstat->vminfo[kstat->vminfo_index].updates = time(NULL);
 
 	zbx_mutex_unlock(kstat_lock);
 
