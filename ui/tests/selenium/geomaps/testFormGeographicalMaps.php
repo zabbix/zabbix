@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
@@ -43,7 +44,7 @@ class testFormGeographicalMaps extends CWebTest {
 					'Tile provider' => 'OpenStreetMap Mapnik',
 					'Tile URL' => 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
 					'Attribution' => '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-					'Max zoom level' => '19'
+					'Max zoom level' => 19
 				]
 			],
 			[
@@ -54,7 +55,7 @@ class testFormGeographicalMaps extends CWebTest {
 							'OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | '.
 							'Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> '.
 							'(<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
-					'Max zoom level' => '17'
+					'Max zoom level' => 17
 				]
 			],
 			[
@@ -64,7 +65,7 @@ class testFormGeographicalMaps extends CWebTest {
 					'Attribution' => 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href='.
 							'"http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; '.
 							'<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-					'Max zoom level' => '20'
+					'Max zoom level' => 20
 				]
 			],
 			[
@@ -74,7 +75,7 @@ class testFormGeographicalMaps extends CWebTest {
 					'Attribution' => 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href='.
 							'"http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; '.
 							'<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-					'Max zoom level' => '18'
+					'Max zoom level' => 18
 				]
 			],
 			[
@@ -82,7 +83,7 @@ class testFormGeographicalMaps extends CWebTest {
 					'Tile provider' => 'USGS US Topo',
 					'Tile URL' => 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}',
 					'Attribution' => 'Tiles courtesy of the <a href="https://usgs.gov/">U.S. Geological Survey</a>',
-					'Max zoom level' => '20'
+					'Max zoom level' => 20
 				]
 			],
 			[
@@ -90,7 +91,7 @@ class testFormGeographicalMaps extends CWebTest {
 					'Tile provider' => 'USGS US Imagery',
 					'Tile URL' => 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}',
 					'Attribution' => 'Tiles courtesy of the <a href="https://usgs.gov/">U.S. Geological Survey</a>',
-					'Max zoom level' => '20'
+					'Max zoom level' => 20
 				]
 			],
 			[
@@ -109,47 +110,54 @@ class testFormGeographicalMaps extends CWebTest {
 	 */
 	public function testFormGeographicalMaps_Layout($data) {
 		$this->page->login()->open('zabbix.php?action=geomaps.edit');
-		$form = $this->query('id:geomaps-form')->waitUntilReady()->asForm()->one();
+		$form = $this->query('id:geomaps-form')->asForm()->one();
 
-		// Check dropdown options presence.
-		$this->assertEquals(['OpenStreetMap Mapnik', 'OpenTopoMap', 'Stamen Toner Lite', 'Stamen Terrain', 'USGS US Topo',
-				'USGS US Imagery', 'Other'], $form->getField('Tile provider')->asZDropdown()->getOptions()->asText()
-		);
+		/**
+		 * Check form attributes only for first case, to make test faster, because page
+		 * is not reloaded while changing providers and fields don't change.
+		 */
+		if ($data['Tile provider'] === 'OpenStreetMap Mapnik') {
+			// Check dropdown options presence.
+			$this->assertEquals(['OpenStreetMap Mapnik', 'OpenTopoMap', 'Stamen Toner Lite', 'Stamen Terrain',
+					'USGS US Topo', 'USGS US Imagery', 'Other'], $form->getField('Tile provider')->asZDropdown()
+					->getOptions()->asText()
+			);
 
-		// Open hintboxes and compare text.
-		$hintboxes = [
-				'Tile URL' => "The URL template is used to load and display the tile layer on geographical maps.".
-						"\n".
-						"\nExample: https://{s}.example.com/{z}/{x}/{y}{r}.png".
-						"\n".
-						"\nThe following placeholders are supported:".
-						"\n{s} represents one of the available subdomains;".
-						"\n{z} represents zoom level parameter in the URL;".
-						"\n{x} and {y} represent tile coordinates;".
-						"\n{r} can be used to add \"@2x\" to the URL to load retina tiles.",
-				'Attribution' => 'Tile provider attribution data displayed in a small text box on the map.',
-				'Max zoom level' => 'Maximum zoom level of the map.'
-		];
+			// Open hintboxes and compare text.
+			$hintboxes = [
+					'Tile URL' => "The URL template is used to load and display the tile layer on geographical maps.".
+							"\n".
+							"\nExample: https://{s}.example.com/{z}/{x}/{y}{r}.png".
+							"\n".
+							"\nThe following placeholders are supported:".
+							"\n{s} represents one of the available subdomains;".
+							"\n{z} represents zoom level parameter in the URL;".
+							"\n{x} and {y} represent tile coordinates;".
+							"\n{r} can be used to add \"@2x\" to the URL to load retina tiles.",
+					'Attribution' => 'Tile provider attribution data displayed in a small text box on the map.',
+					'Max zoom level' => 'Maximum zoom level of the map.'
+			];
 
-		foreach ($hintboxes as $field => $text) {
-			$form->query('xpath://label[text()='.CXPathHelper::escapeQuotes($field).']//span')->one()->click();
-			$hint = $form->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent();
-			$this->assertEquals($text, $hint->one()->getText());
-			$hint->asOverlayDialog()->one()->close();
+			foreach ($hintboxes as $field => $text) {
+				$form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($field).']//span')->one()->click();
+				$hint = $form->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent()->one();
+				$this->assertEquals($text, $hint->getText());
+				$hint->asOverlayDialog()->close();
+			}
+
+			// Check Service tab fields' maxlength.
+			$limits = [
+				'Tile URL' => 1024,
+				'Attribution' => 1024,
+				'Max zoom level' => 10
+			];
+			foreach ($limits as $field => $max_length) {
+				$this->assertEquals($max_length, $form->getField($field)->getAttribute('maxlength'));
+			}
 		}
 
 		$form->fill(['Tile provider' => $data['Tile provider']]);
 		$form->checkValue($data);
-
-		// Check Service tab fields' maxlength.
-		$limits = [
-			'Tile URL' => 1024,
-			'Attribution' => 1024,
-			'Max zoom level' => 10
-		];
-		foreach ($limits as $field => $max_length) {
-			$this->assertEquals($max_length, $form->getField($field)->getAttribute('maxlength'));
-		}
 
 		// Check empty string in "Other" case when selected right after another provider.
 		if ($data['Tile provider'] === 'Other') {
@@ -159,7 +167,7 @@ class testFormGeographicalMaps extends CWebTest {
 		}
 		else {
 			// Take all fields except dropdown and check they are disabled.
-			array_shift($data);
+			unset($data['Tile provider']);
 			$fields = array_keys($data);
 			foreach ($fields as $field) {
 				$this->assertFalse($form->getField($field)->isEnabled());
@@ -330,7 +338,18 @@ class testFormGeographicalMaps extends CWebTest {
 						'Max zoom level' => '13'
 					]
 				]
-			]
+			],
+			// TODO: uncomment after ZBX-20621 is fixed.
+//			[
+//				[
+//					'fields' => [
+//						'Tile provider' => 'Other',
+//						'Tile URL' => '     bbb           ',
+//						'Max zoom level' => '29'
+//					],
+//					'trim' => true
+//				]
+//			]
 		];
 	}
 
@@ -360,27 +379,33 @@ class testFormGeographicalMaps extends CWebTest {
 			// Check values in frontend form.
 			$this->page->login()->open('zabbix.php?action=geomaps.edit');
 			$form->invalidate();
+
+			// Remove leading and trailing spaces from data for assertion.
+			if (CTestArrayHelper::get($data, 'trim', false)) {
+				$data['fields']['Tile URL'] = trim($data['fields']['Tile URL']);
+			}
+
 			$form->checkValue($data['fields']);
 
 			// Check db values.
 			if ($data['fields']['Tile provider'] === 'Other') {
-				$expected_db = [[
+				$expected_db = [
 					'geomaps_tile_provider' => '',
 					'geomaps_tile_url' => $data['fields']['Tile URL'],
 					'geomaps_attribution' => CTestArrayHelper::get($data['fields'], 'Attribution', ''),
 					'geomaps_max_zoom' => $data['fields']['Max zoom level']
-				]];
+				];
 			}
 			else {
-				$expected_db = [[
+				$expected_db = [
 					'geomaps_tile_provider' => $data['db'],
 					'geomaps_tile_url' => '',
 					'geomaps_attribution' => '',
 					'geomaps_max_zoom' => '0'
-				]];
+				];
 			}
 
-			$this->assertEquals($expected_db, CDBHelper::getAll('SELECT geomaps_tile_provider, geomaps_tile_url, '.
+			$this->assertEquals($expected_db, CDBHelper::getRow('SELECT geomaps_tile_provider, geomaps_tile_url, '.
 					'geomaps_attribution, geomaps_max_zoom FROM config'
 			));
 		}

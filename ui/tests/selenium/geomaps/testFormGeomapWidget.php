@@ -139,14 +139,16 @@ class testFormGeomapWidget extends CWebTest {
 
 	public function testFormGeomapWidget_Layout() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
-		$dashboard = CDashboardElement::find()->one();
-		$form = $dashboard->edit()->addWidget()->asForm();
+		$form = CDashboardElement::find()->one()->edit()->addWidget()->asForm();
 
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$this->assertEquals('Add widget', $dialog->getTitle());
 		$form->fill(['Type' => 'Geomap']);
 		$dialog->waitUntilReady();
-		$form->checkValue(['id:show_header' => true]);
+		$this->assertEquals(["Type", "Name", "Refresh interval", "Host groups", "Hosts", "Tags", "", "Initial view"],
+				$form->getLabels()->asText()
+		);
+		$form->checkValue(['id:show_header' => true, 'Refresh interval' => 'Default (1 minute)']);
 
 		// Check fields' lengths and placeholders.
 		foreach (['Name', 'Initial view'] as $field) {
@@ -160,8 +162,7 @@ class testFormGeomapWidget extends CWebTest {
 		// Check tags table initial values.
 		$form->checkValue(['id:evaltype' => 'And/Or']);
 		$form->query('id:tags_table_tags')->asMultifieldTable()->one()
-				->checkValue([['tag' => '', 'operator' => 'Contains', 'value' => '']]
-		);
+				->checkValue([['tag' => '', 'operator' => 'Contains', 'value' => '']]);
 
 		// Check operator's dropdown options presence.
 		$this->assertEquals(['Exists', 'Equals', 'Contains', 'Does not exist', 'Does not equal',
@@ -176,7 +177,7 @@ class testFormGeomapWidget extends CWebTest {
 				"\nThe maximum zoom level is \"0\".".
 				"\nInitial view is ignored if the default view is set.";
 
-		$form->query('xpath://label[text()="Initial view"]//span')->one()->click();
+		$form->query('xpath:.//label[text()="Initial view"]//span')->one()->click();
 		$hint = $this->query('xpath://div[@data-hintboxid]')->waitUntilPresent();
 		$this->assertEquals($hint_text, $hint->one()->getText());
 		$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
@@ -201,18 +202,16 @@ class testFormGeomapWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Geomap',
 						'Initial view' => '1'
 					],
-					'error' => 'Invalid parameter "Initial view": geographical coordinates (values of'.
-							' comma separated latitude and longitude) are expected.'
+					'error' => 'Invalid parameter "Initial view": geographical coordinates (values of '.
+							'comma separated latitude and longitude) are expected.'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Geomap',
 						'Name' => 'Zoom more than 30 in coordinates',
 						'Initial view' => '56.95008,24.11509,31'
 					],
@@ -223,67 +222,61 @@ class testFormGeomapWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Geomap',
 						'Name' => 'Text in coordinates',
 						'Initial view' => 'test'
 					],
-					'error' => 'Invalid parameter "Initial view": geographical coordinates (values of'.
-							' comma separated latitude and longitude) are expected.'
+					'error' => 'Invalid parameter "Initial view": geographical coordinates (values of '.
+							'comma separated latitude and longitude) are expected.'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Geomap',
 						'Name' => 'Space before zoom in coordinates',
 						'Initial view' => '56.95008,24.11509, 25'
 					],
-					'error' => 'Invalid parameter "Initial view": geographical coordinates (values of'.
-							' comma separated latitude and longitude) are expected.'
+					'error' => 'Invalid parameter "Initial view": geographical coordinates (values of '.
+							'comma separated latitude and longitude) are expected.'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Geomap',
 						'Name' => 'Space before zoom in long coordinates',
 						'Initial view' => '51.5537236445998, -0.43871069125537776, 25'
 					],
-					'error' => 'Invalid parameter "Initial view": geographical coordinates (values of'.
-							' comma separated latitude and longitude) are expected.'
+					'error' => 'Invalid parameter "Initial view": geographical coordinates (values of '.
+							'comma separated latitude and longitude) are expected.'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Geomap',
 						'Name' => 'Negative zoom in coordinates',
 						'Initial view' => '56.95008,24.11509,-25'
 					],
-					'error' => 'Invalid parameter "Initial view": geographical coordinates (values of'.
-							' comma separated latitude and longitude) are expected.'
+					'error' => 'Invalid parameter "Initial view": geographical coordinates (values of '.
+							'comma separated latitude and longitude) are expected.'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Geomap',
 						'Name' => 'Negative number in coordinates',
 						'Initial view' => '-5'
 					],
-					'error' => 'Invalid parameter "Initial view": geographical coordinates (values of'.
-							' comma separated latitude and longitude) are expected.'
+					'error' => 'Invalid parameter "Initial view": geographical coordinates (values of '.
+							'comma separated latitude and longitude) are expected.'
 				]
 			],
 			[
 				[
 					'show_header' => false,
 					'fields' => [
-						'Type' => 'Geomap',
 						'Name' => 'Short coordinates',
 						'Initial view' => '56.95008,24.11509'
 					]
@@ -292,7 +285,6 @@ class testFormGeomapWidget extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Type' => 'Geomap',
 						'Name' => 'Short negative coordinates',
 						'Initial view' => '-56.95008,-24.11509'
 					]
@@ -301,7 +293,6 @@ class testFormGeomapWidget extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Type' => 'Geomap',
 						'Name' => 'Short coordinates with zoom',
 						'Initial view' => '56.95008, 24.11509,25'
 					]
@@ -310,7 +301,6 @@ class testFormGeomapWidget extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Type' => 'Geomap',
 						'Name' => 'Short coordinates with zoom 0',
 						'Initial view' => '56.95008, 24.11509,0'
 					]
@@ -319,7 +309,6 @@ class testFormGeomapWidget extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Type' => 'Geomap',
 						'Name' => 'With long coordinates and zoom',
 						'Initial view' => '51.5537236445998, -0.43871069125537776,5'
 					]
@@ -329,7 +318,6 @@ class testFormGeomapWidget extends CWebTest {
 				[
 					'show_header' => true,
 					'fields' => [
-						'Type' => 'Geomap',
 						'Name' => 'New geomap widget with tags and long coordinates',
 						'Refresh interval' => '2 minutes',
 						'Host groups' => 'Zabbix servers',
@@ -353,7 +341,7 @@ class testFormGeomapWidget extends CWebTest {
 							],
 							[
 								'tag' => 'tag2',
-								'operator' => 'Exists',
+								'operator' => 'Exists'
 							],
 							[
 								'tag' => 'tag3',
@@ -385,7 +373,6 @@ class testFormGeomapWidget extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Type' => 'Geomap',
 						'Name' => '',
 						'Host groups' => '',
 						'Hosts' => '',
@@ -434,8 +421,11 @@ class testFormGeomapWidget extends CWebTest {
 			? $dashboard->getWidget(self::$update_geomap)->edit()
 			: $dashboard->edit()->addWidget()->asForm();
 
-		// After changing "Source", the overlay is reloaded.
 		COverlayDialogElement::find()->one()->waitUntilReady();
+		$form->fill(['Type' => 'Geomap']);
+
+		// After changing "Source", the overlay is reloaded.
+		$form->invalidate();
 		$form->fill($data['fields']);
 
 		if (array_key_exists('show_header', $data)) {
@@ -445,7 +435,7 @@ class testFormGeomapWidget extends CWebTest {
 		if (array_key_exists('Tags', $data)) {
 			$tags_table = $form->getField('id:tags_table_tags')->asMultifieldTable();
 
-			if ($data['Tags'] === []) {
+			if (empty($data['Tags'])) {
 				$tags_table->clear();
 			}
 			else {
@@ -472,18 +462,15 @@ class testFormGeomapWidget extends CWebTest {
 			 *  If name is empty string in both scenarios it is replaced by "Geomap".
 			 */
 			if (array_key_exists('Name', $data['fields'])) {
-				if ($data['fields']['Name'] === '') {
-					$header = 'Geomap';
-				}
-				else {
-					$header = $data['fields']['Name'];
-				}
+				$header = ($data['fields']['Name'] === '')
+					? 'Geomap'
+					: $data['fields']['Name'];
 			}
 			else {
 				$header = $update ? self::$update_geomap : 'Geomap';
 			}
 
-			$dashboard->getWidget($header)->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
+			$dashboard->getWidget($header)->waitUntilReady();
 			$dashboard->save();
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 			$this->assertEquals($old_widget_count + ($update ? 0 : 1), $dashboard->getWidgets()->count());
@@ -514,9 +501,7 @@ class testFormGeomapWidget extends CWebTest {
 
 			// Write new name to updated widget name.
 			if ($update) {
-				self::$update_geomap = (CTestArrayHelper::get($data['fields'], 'Name') === '')
-					? 'Geomap'
-					: CTestArrayHelper::get($data, 'fields.Name', self::$update_geomap);
+				self::$update_geomap = $header;
 			}
 		}
 	}
@@ -533,13 +518,21 @@ class testFormGeomapWidget extends CWebTest {
 		$this->checkNoChanges(true);
 	}
 
+	public function testFormGeomapWidget_SaveCreateCancelDashboard() {
+		$this->checkNoChanges(false, true, false);
+	}
+
+	public function testFormGeomapWidget_SaveUpdateCancelDashboard() {
+		$this->checkNoChanges(false, false, false);
+	}
+
 	/**
 	 * Function for checking canceling form or submitting without any changes.
 	 *
 	 * @param boolean $cancel    true if cancel scenario, false if form is submitted
 	 * @param boolean $create    true if create scenario, false if update
 	 */
-	private function checkNoChanges($cancel = false, $create = false) {
+	private function checkNoChanges($cancel = false, $create = false, $save_dashboard = true) {
 		$old_hash = CDBHelper::getHash($this->sql);
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
@@ -556,7 +549,7 @@ class testFormGeomapWidget extends CWebTest {
 			$values = $form->getFields()->asValues();
 		}
 
-		if ($cancel) {
+		if ($cancel || !$save_dashboard) {
 			$form->fill(
 					[
 						'Name' => 'new name',
@@ -576,7 +569,9 @@ class testFormGeomapWidget extends CWebTest {
 						'value' => 'new value'
 					]
 			]);
+		}
 
+		if ($cancel) {
 			$dialog->query('button:Cancel')->one()->click();
 		}
 		else {
@@ -586,16 +581,21 @@ class testFormGeomapWidget extends CWebTest {
 		COverlayDialogElement::ensureNotPresent();
 
 		if (!$cancel) {
-			$dashboard->getWidget(self::$update_geomap)->query('xpath://div[contains(@class, "is-loading")]')
-					->waitUntilNotPresent();
+			$dashboard->getWidget(!$save_dashboard ? 'new name' : self::$update_geomap)->waitUntilReady();
 		}
 
-		$dashboard->save();
-		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+		if ($save_dashboard) {
+			$dashboard->save();
+			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+		}
+		else {
+			$dashboard->cancelEditing();
+		}
+
 		$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
 
 		// Check that updating widget form values did not change in frontend.
-		if (!$create) {
+		if (!$create && !$save_dashboard) {
 			$this->assertEquals($values, $dashboard->getWidget(self::$update_geomap)->edit()->getFields()->asValues());
 		}
 
