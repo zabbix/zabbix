@@ -719,7 +719,7 @@ $item_tab
 		))->setId('js-item-allow-traps-field')
 	])
 	->addItem([
-		(new CLabel(_('Allowed hosts')))->setId('js-item-trapper-hosts-label'),
+		(new CLabel(_('Allowed hosts'), 'trapper_hosts'))->setId('js-item-trapper-hosts-label'),
 		(new CFormField((new CTextBox('trapper_hosts', $data['trapper_hosts']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->setId('js-item-trapper-hosts-field')
