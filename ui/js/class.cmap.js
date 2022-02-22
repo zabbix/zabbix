@@ -609,7 +609,7 @@ ZABBIX.apps.map = (function($) {
 							type: target.attr('data-type')
 						},
 						can_copy = false,
-						can_paste = (that.copypaste_buffer.items && that.copypaste_buffer.items.length > 0),
+						can_paste = ('items' in that.copypaste_buffer && that.copypaste_buffer.items.length > 0),
 						can_remove = false,
 						can_reorder = false;
 
@@ -745,7 +745,22 @@ ZABBIX.apps.map = (function($) {
 						}
 					];
 
-					$(event.target).menuPopup(items, event);
+					$(event.target).menuPopup(items, event, {position: {
+						of: event,
+						my: 'left top',
+						at: 'left bottom',
+						using: (pos, data) => {
+							let max_left = (data.horizontal === 'left')
+								? document.getElementById(containerId).clientWidth
+								: document.getElementById(containerId) - data.element.width;
+
+							pos.top = Math.max(0, pos.top);
+							pos.left = Math.max(0, Math.min(max_left, pos.left));
+
+							data.element.element[0].style.top = `${pos.top}px`;
+							data.element.element[0].style.left = `${pos.left}px`;
+						}
+					}});
 				});
 
 				/*
