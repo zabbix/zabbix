@@ -161,14 +161,13 @@ class CSetupWizard extends CForm {
 
 			switch ($creds_storage) {
 				case DB_STORE_CREDS_VAULT_HASHICORP:
-					$vault_api_endpoint = getRequest('vault_url', $this->getConfig('DB_VAULT_URL'));
-					if (!$vault_api_endpoint) {
-						$vault_api_endpoint = CVaultHashiCorp::API_ENDPOINT_DEFAULT;
-					}
+					$vault_api_endpoint = getRequest('vault_url',
+						$this->getConfig('DB_VAULT_URL', CVaultHashiCorp::API_ENDPOINT_DEFAULT));
 
 					$vault_db_path = getRequest('vault_db_path', $this->getConfig('DB_VAULT_DB_PATH'));
 					$vault_token = getRequest('vault_token', $this->getConfig('DB_VAULT_TOKEN'));
 
+					$this->setConfig('DB_VAULT', CVaultHashiCorp::NAME);
 					$this->setConfig('DB_VAULT_URL', $vault_api_endpoint);
 					$this->setConfig('DB_VAULT_DB_PATH', $vault_db_path);
 					$this->setConfig('DB_VAULT_TOKEN', $vault_token);
@@ -177,15 +176,14 @@ class CSetupWizard extends CForm {
 					break;
 
 				case DB_STORE_CREDS_VAULT_CYBERARK:
-					$vault_api_endpoint = getRequest('vault_url', $this->getConfig('DB_VAULT_URL'));
-					if (!$vault_api_endpoint) {
-						$vault_api_endpoint = CVaultCyberArk::API_ENDPOINT_DEFAULT;
-					}
+					$vault_api_endpoint = getRequest('vault_url', $this->getConfig('DB_VAULT_URL',
+						CVaultCyberArk::API_ENDPOINT_DEFAULT));
 
 					$vault_db_path = getRequest('vault_db_path', $this->getConfig('DB_VAULT_DB_PATH'));
 					$vault_cert_file = getRequest('vault_cert_file', $this->getConfig('DB_VAULT_CERT_FILE'));
 					$vault_key_file = getRequest('vault_key_file', $this->getConfig('DB_VAULT_KEY_FILE'));
 
+					$this->setConfig('DB_VAULT', CVaultCyberArk::NAME);
 					$this->setConfig('DB_VAULT_URL', $vault_api_endpoint);
 					$this->setConfig('DB_VAULT_DB_PATH', $vault_db_path);
 					$this->setConfig('DB_VAULT_CERT_FILE', $vault_cert_file);
@@ -210,8 +208,10 @@ class CSetupWizard extends CForm {
 					if (ini_get('allow_url_fopen') != 1) {
 						error(_('Please enable "allow_url_fopen" directive.'));
 					}
-					elseif ($vault_provider->validateParameters()) {
-						$db_credentials = $vault_provider->getCredentials();
+					else {
+						$db_credentials = $vault_provider->validateParameters()
+							? $vault_provider->getCredentials()
+							: null;
 
 						if ($db_credentials === null) {
 							foreach ($vault_provider->getErrors() as $error) {
@@ -239,9 +239,6 @@ class CSetupWizard extends CForm {
 					$this->step_failed = true;
 					unset($_REQUEST['next']);
 				}
-
-				$this->step_failed = true; // TODO: 7402 - debug
-				unset($_REQUEST['next']); // TODO: 7402 - debug
 			}
 		}
 		elseif ($this->getStep() == self::STAGE_SETTINGS) {
@@ -254,9 +251,12 @@ class CSetupWizard extends CForm {
 		elseif ($this->getStep() == self::STAGE_INSTALL) {
 			if (hasRequest('save_config')) {
 				$vault_config = [
+					'VAULT' => '',
 					'VAULT_URL' => '',
 					'VAULT_DB_PATH' => '',
-					'VAULT_TOKEN' => ''
+					'VAULT_TOKEN' => '',
+					'VAULT_CERT_FILE' => '',
+					'VAULT_KEY_FILE' => ''
 				];
 
 				$db_creds_config = [
@@ -264,14 +264,24 @@ class CSetupWizard extends CForm {
 					'PASSWORD' => ''
 				];
 
-				if ($this->getConfig('DB_CREDS_STORAGE', DB_STORE_CREDS_CONFIG) == DB_STORE_CREDS_VAULT_HASHICORP) {
-					$vault_config['VAULT_URL'] = $this->getConfig('DB_VAULT_URL');
-					$vault_config['VAULT_DB_PATH'] = $this->getConfig('DB_VAULT_DB_PATH');
-					$vault_config['VAULT_TOKEN'] = $this->getConfig('DB_VAULT_TOKEN');
-				}
-				else {
-					$db_creds_config['USER'] = $this->getConfig('DB_USER');
-					$db_creds_config['PASSWORD'] = $this->getConfig('DB_PASSWORD');
+				switch ($this->getConfig('DB_CREDS_STORAGE', DB_STORE_CREDS_CONFIG)) {
+					case DB_STORE_CREDS_VAULT_HASHICORP:
+						$vault_config['VAULT'] = $this->getConfig('DB_VAULT');
+						$vault_config['VAULT_URL'] = $this->getConfig('DB_VAULT_URL');
+						$vault_config['VAULT_DB_PATH'] = $this->getConfig('DB_VAULT_DB_PATH');
+						$vault_config['VAULT_TOKEN'] = $this->getConfig('DB_VAULT_TOKEN');
+						break;
+					case DB_STORE_CREDS_VAULT_CYBERARK:
+						$vault_config['VAULT'] = $this->getConfig('DB_VAULT');
+						$vault_config['VAULT_URL'] = $this->getConfig('DB_VAULT_URL');
+						$vault_config['VAULT_DB_PATH'] = $this->getConfig('DB_VAULT_DB_PATH');
+						$vault_config['VAULT_CERT_FILE'] = $this->getConfig('VAULT_CERT_FILE');
+						$vault_config['VAULT_KEY_FILE'] = $this->getConfig('VAULT_KEY_FILE');
+						break;
+					default:
+						$db_creds_config['USER'] = $this->getConfig('DB_USER');
+						$db_creds_config['PASSWORD'] = $this->getConfig('DB_PASSWORD');
+						break;
 				}
 
 				// make zabbix.conf.php downloadable
@@ -524,13 +534,14 @@ class CSetupWizard extends CForm {
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 				'vault_url_row',
 				in_array($db_creds_storage, [DB_STORE_CREDS_VAULT_HASHICORP, DB_STORE_CREDS_VAULT_CYBERARK])
-					? ZBX_STYLE_DISPLAY_NONE : null
+					? ZBX_STYLE_DISPLAY_NONE
+					: null
 			)
 			// HashiCorp Vault - related fields.
 			->addRow(
 				_('Vault secret path'),
 				(new CTextBox('vault_db_path', $this->getConfig('DB_VAULT_DB_PATH')))
-					->setAttribute('placeholder', _('path/to/secret'))
+					->setAttribute('placeholder', CVaultHashiCorp::DB_PATH_PLACEHOLDER)
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 				'vault_db_path_row',
 				($db_creds_storage == DB_STORE_CREDS_VAULT_HASHICORP) ? ZBX_STYLE_DISPLAY_NONE : null
@@ -545,9 +556,8 @@ class CSetupWizard extends CForm {
 			// CyberArk Vault - related fields.
 			->addRow(
 				(new CLabel(_('Vault secret query string')))->setAsteriskMark(),
-				(new CTextBox('vault_query_string', $this->getConfig('VAULT_QUERY_STRING')))
-					// APP::VaultProvider()->getPlaceholder()
-					->setAttribute('placeholder', _('AppID=foo&Query=Safe=bar;Object=buzz:key'))
+				(new CTextBox('vault_query_string', $this->getConfig('VAULT_DB_PATH')))
+					->setAttribute('placeholder', CVaultCyberArk::DB_PATH_PLACEHOLDER)
 					->setAttribute('maxlength', 2048)
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 				'vault_query_string_row',
@@ -561,7 +571,7 @@ class CSetupWizard extends CForm {
 				'vault_certificates',
 				($db_creds_storage == DB_STORE_CREDS_VAULT_CYBERARK) ? ZBX_STYLE_DISPLAY_NONE : null
 			)
-			->addRow(_('SSL cerificate file'),
+			->addRow(_('SSL certificate file'),		// TODO: 7402 - translation
 				(new CTextBox('vault_cert_file', $this->getConfig('VAULT_CERT_FILE', 'conf/certs/cyberark-cert.pem')))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					->setAttribute('maxlength', 2048),
@@ -695,13 +705,13 @@ class CSetupWizard extends CForm {
 
 		$db_port = ($this->getConfig('DB_PORT') == 0) ? _('default') : $this->getConfig('DB_PORT');
 
-		if ($this->getConfig('DB_CREDS_STORAGE', DB_STORE_CREDS_CONFIG) == DB_STORE_CREDS_VAULT_HASHICORP) {
-			$db_password = _('Stored in HashiCorp Vault secret');
-			$db_username = _('Stored in HashiCorp Vault secret');
-		}
-		else {
+		if ($this->getConfig('DB_CREDS_STORAGE', DB_STORE_CREDS_CONFIG) == DB_STORE_CREDS_CONFIG) {
 			$db_password = preg_replace('/./', '*', $this->getConfig('DB_PASSWORD'));
 			$db_username = $this->getConfig('DB_USER');
+		}
+		else {
+			$db_password = _('Stored in Vault secret'); // TODO: 4702 - translation
+			$db_username = _('Stored in Vault secret'); // TODO: 4702 - translation
 		}
 
 		$table
@@ -746,6 +756,26 @@ class CSetupWizard extends CForm {
 				->addRow(
 					(new CSpan(_('Vault authentication token')))->addClass(ZBX_STYLE_GREY),
 					$this->getConfig('DB_VAULT_TOKEN')
+				);
+		}
+
+		if ($this->getConfig('DB_CREDS_STORAGE', DB_STORE_CREDS_CONFIG) == DB_STORE_CREDS_VAULT_CYBERARK) {
+			$table
+				->addRow(
+					(new CSpan(_('Vault API endpoint')))->addClass(ZBX_STYLE_GREY),
+					$this->getConfig('DB_VAULT_URL')
+				)
+				->addRow(
+					(new CSpan(_('Vault secret query string')))->addClass(ZBX_STYLE_GREY),
+					$this->getConfig('DB_VAULT_DB_PATH')
+				)
+				->addRow(
+					(new CSpan(_('SSL certificate file')))->addClass(ZBX_STYLE_GREY),
+					$this->getConfig('VAULT_CERT_FILE')
+				)
+				->addRow(
+					(new CSpan(_('SSL key file')))->addClass(ZBX_STYLE_GREY),
+					$this->getConfig('VAULT_KEY_FILE')
 				);
 		}
 
