@@ -2475,12 +2475,23 @@ static const char	*zbx_ctx_name(SSL_CTX *param)
 static int	zbx_set_ecdhe_parameters(SSL_CTX *ctx)
 {
 	const char	*msg = "Perfect Forward Secrecy ECDHE ciphersuites will not be available for";
-	EC_KEY		*ecdh;
 	long		res;
 	int		ret = SUCCEED;
+#if defined(OPENSSL_VERSION_MAJOR) && OPENSSL_VERSION_NUMBER >= 3	/* OpenSSL 3.0.0 or newer */
+	int		grp_list[1] = { NID_X9_62_prime256v1 };	/* use curve secp256r1/prime256v1/NIST P-256 */
+
+	SSL_CTX_set_options(ctx, SSL_OP_SINGLE_ECDH_USE);
+
+	if (1 != (res = SSL_CTX_set1_groups(ctx, grp_list, ARRSIZE(grp_list))))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "%s() SSL_CTX_set1_groups() returned %ld. %s %s",
+				__func__, res, msg, zbx_ctx_name(ctx));
+		ret = FAIL;
+	}
+#else									/* OpenSSL 1.x.x or LibreSSL */
+	EC_KEY	*ecdh;
 
 	/* use curve secp256r1/prime256v1/NIST P-256 */
-
 	if (NULL == (ecdh = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "%s() EC_KEY_new_by_curve_name() failed. %s %s",
@@ -2498,7 +2509,7 @@ static int	zbx_set_ecdhe_parameters(SSL_CTX *ctx)
 	}
 
 	EC_KEY_free(ecdh);
-
+#endif
 	return ret;
 }
 
