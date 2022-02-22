@@ -24,6 +24,9 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
  * @backup token
+ *
+ * @dataSource ScheduledReports
+ *
  * @onBefore prepareTokenData
  */
 class testSID extends CWebTest {
