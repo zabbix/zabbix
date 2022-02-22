@@ -2480,8 +2480,6 @@ static int	zbx_set_ecdhe_parameters(SSL_CTX *ctx)
 #if defined(OPENSSL_VERSION_MAJOR) && OPENSSL_VERSION_NUMBER >= 3	/* OpenSSL 3.0.0 or newer */
 	int		grp_list[1] = { NID_X9_62_prime256v1 };	/* use curve secp256r1/prime256v1/NIST P-256 */
 
-	SSL_CTX_set_options(ctx, SSL_OP_SINGLE_ECDH_USE);
-
 	if (1 != (res = SSL_CTX_set1_groups(ctx, grp_list, ARRSIZE(grp_list))))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "%s() SSL_CTX_set1_groups() returned %ld. %s %s",
