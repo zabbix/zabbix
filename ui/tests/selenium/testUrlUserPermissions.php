@@ -388,16 +388,6 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'actionconf.php',
-				'title' =>	'Configuration of actions',
-				'header' => 'Trigger actions',
-				'users' => [
-					'guest' => false,
-					'user-zabbix' => false,
-					'admin-zabbix' => true
-				]
-			]],
-			[[
 				'url' => 'actionconf.php?eventsource=0',
 				'title' =>	'Configuration of actions',
 				'header' => 'Trigger actions',

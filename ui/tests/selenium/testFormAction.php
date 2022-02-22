@@ -1207,7 +1207,7 @@ class testFormAction extends CLegacyWebTest {
 		}
 		$oldHashActions = CDBHelper::getHash($sqlActions);
 
-		$this->zbxTestLogin('actionconf.php');
+		$this->zbxTestLogin('actionconf.php?eventsource='.$eventsource);
 		switch ($eventsource) {
 			case EVENT_SOURCE_TRIGGERS:
 				$this->query('id:page-title-general')->asPopupButton()->one()->select('Trigger actions');

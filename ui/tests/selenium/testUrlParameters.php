@@ -231,18 +231,18 @@ class testUrlParameters extends CLegacyWebTest {
 				'server_name_on_page' => true,
 				'test_cases' => [
 					[
-						'url' => 'actionconf.php?form=update&actionid=3',
+						'url' => 'actionconf.php?eventsource=0&form=update&actionid=3',
 						'text_present' => 'Actions'
 					],
 					[
-						'url' => 'actionconf.php?form=update&actionid=9999999',
+						'url' => 'actionconf.php?eventsource=0&form=update&actionid=9999999',
 						'text_not_present' => 'Actions',
 						'text_present' => [
 							'No permissions to referred object or it does not exist!'
 						]
 					],
 					[
-						'url' => 'actionconf.php?form=update&actionid=abc',
+						'url' => 'actionconf.php?eventsource=0&form=update&actionid=abc',
 						'text_not_present' => 'Actions',
 						'text_present' => [
 							'Zabbix has received an incorrect request.',
@@ -250,7 +250,7 @@ class testUrlParameters extends CLegacyWebTest {
 						]
 					],
 					[
-						'url' => 'actionconf.php?form=update&actionid=',
+						'url' => 'actionconf.php?eventsource=0&form=update&actionid=',
 						'text_not_present' => 'Actions',
 						'text_present' => [
 							'Zabbix has received an incorrect request.',
@@ -258,7 +258,7 @@ class testUrlParameters extends CLegacyWebTest {
 						]
 					],
 					[
-						'url' => 'actionconf.php?form=update&actionid=-1',
+						'url' => 'actionconf.php?eventsource=0&form=update&actionid=-1',
 						'text_not_present' => 'Actions',
 						'text_present' => [
 							'Zabbix has received an incorrect request.',
@@ -266,7 +266,7 @@ class testUrlParameters extends CLegacyWebTest {
 						]
 					],
 					[
-						'url' => 'actionconf.php?form=update',
+						'url' => 'actionconf.php?eventsource=0&form=update',
 						'text_not_present' => 'Actions',
 						'text_present' => [
 							'Zabbix has received an incorrect request.',

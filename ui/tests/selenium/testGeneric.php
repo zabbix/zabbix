@@ -69,7 +69,6 @@ class testGeneric extends CLegacyWebTest {
 			['maintenance.php',				'Configuration of maintenance periods'],
 			['httpconf.php',					'Configuration of web monitoring'],
 
-			['actionconf.php',					'Configuration of actions'],
 			['actionconf.php?eventsource=0',	'Configuration of actions'],
 			['actionconf.php?eventsource=1',	'Configuration of actions'],
 			['actionconf.php?eventsource=2',	'Configuration of actions'],

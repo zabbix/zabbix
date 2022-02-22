@@ -108,7 +108,13 @@ foreach ($data['mediatypes'] as $mediaType) {
 	$actionLinks = [];
 	if (!empty($mediaType['listOfActions'])) {
 		foreach ($mediaType['listOfActions'] as $action) {
-			$actionLinks[] = new CLink($action['name'], 'actionconf.php?form=update&actionid='.$action['actionid']);
+			$actionLinks[] = new CLink($action['name'],
+				(new CUrl('actionconf.php'))
+					->setArgument('eventsource', $action['eventsource'])
+					->setArgument('form', 'update')
+					->setArgument('actionid', $action['actionid'])
+					->getUrl()
+			);
 			$actionLinks[] = ', ';
 		}
 		array_pop($actionLinks);
