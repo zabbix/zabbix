@@ -1,6 +1,7 @@
 Changes for 6.2.0alpha1
 
 New features:
+..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
 ...G...... [ZBXNEXT-7408] added native support for the net.dns and net.dns.record keys in Zabbix agent 2, fixed Zabbix agent 1 SOA response formatting (esneiders, ssimonenko)
 A.F....... [ZBXNEXT-7467] fixed strict types in bitwise operators (acikuns)
 ...G...... [ZBXNEXT-7487] implemented discovery of disabled systemd units with Zabbix agent 2 (ssimonenko)
