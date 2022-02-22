@@ -319,13 +319,22 @@ void	zbx_tls_error_msg(char **error, size_t *error_alloc, size_t *error_offset)
 	char		err[1024];
 
 	/* concatenate all error messages in the queue into one string */
+#if defined(OPENSSL_VERSION_MAJOR) && OPENSSL_VERSION_NUMBER >=	3	/* OpenSSL 3.0.0 or newer */
+	const char	*func;
 
+	while (0 != (error_code = ERR_get_error_all(&file, &line, &func, &data, &flags)))
+#else									/* OpenSSL 1.x.x or LibreSSL */
 	while (0 != (error_code = ERR_get_error_line_data(&file, &line, &data, &flags)))
+#endif
 	{
 		ERR_error_string_n(error_code, err, sizeof(err));
 
+#if defined(OPENSSL_VERSION_MAJOR) && OPENSSL_VERSION_NUMBER >=	3	/* OpenSSL 3.0.0 or newer */
+		zbx_snprintf_alloc(error, error_alloc, error_offset, " file %s line %d func %s: %s",
+				file, line, func, err);
+#else									/* OpenSSL 1.x.x or LibreSSL */
 		zbx_snprintf_alloc(error, error_alloc, error_offset, " file %s line %d: %s", file, line, err);
-
+#endif
 		if (NULL != data && 0 != (flags & ERR_TXT_STRING))
 			zbx_snprintf_alloc(error, error_alloc, error_offset, ": %s", data);
 	}
