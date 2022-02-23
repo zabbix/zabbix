@@ -64,7 +64,8 @@ function Overlay(type, dialogueid) {
 	this.$dialogue.$footer = jQuery('<div>', {class: 'overlay-dialogue-footer'});
 	this.$dialogue.$script = jQuery('<script>');
 
-	this.$dialogue.append(jQuery('<div>', {class: 'dashboard-widget-head'}).append(this.$dialogue.$header));
+	this.$dialogue.append(jQuery('<div>', {class: 'dashboard-widget-head'})
+		.append(this.$dialogue.$header));
 	this.$dialogue.append(this.$dialogue.$body);
 	this.$dialogue.append(this.$dialogue.$footer);
 
@@ -405,6 +406,13 @@ Overlay.prototype.unsetProperty = function(key) {
 			this.$dialogue.$header.text('');
 			break;
 
+		case 'doc_url':
+			const doc_url = this.$dialogue[0].querySelector('.dashboard-widget-head .overlay-dialogue-doc-url');
+			if (doc_url !== null) {
+				doc_url.remove();
+			}
+			break;
+
 		case 'buttons':
 			this.$dialogue.$footer.find('button').remove();
 			break;
@@ -449,6 +457,15 @@ Overlay.prototype.setProperties = function(obj) {
 
 			case 'title':
 				this.$dialogue.$header.text(obj[key]);
+				break;
+
+			case 'doc_url':
+				this.unsetProperty(key);
+				this.$dialogue.find('.dashboard-widget-head')[0].insertAdjacentHTML('beforeend', `
+					<div class="overlay-dialogue-doc-url">
+						<a class="overlay-icon-doc" target="_blank" title="${t('Help')}" href="${obj[key]}"></a>
+					</div>
+				`);
 				break;
 
 			case 'buttons':

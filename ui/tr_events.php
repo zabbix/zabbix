@@ -194,6 +194,7 @@ $event_tab = (new CDiv([
 (new CWidget())
 	->setTitle(_('Event details'))
 	->setWebLayoutMode($page['web_layout_mode'])
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::TR_EVENTS))
 	->setControls((new CTag('nav', true,
 		(new CList())
 			->addItem(get_icon('kioskmode', ['mode' => $page['web_layout_mode']]))

@@ -3099,8 +3099,15 @@ $form-icon-btn: (
 		> .overlay-close-btn {
 			position: relative;
 			float: right;
-			top: -13px;
-			right: -8px;
+			top: -11px;
+			right: -6px;
+			font-size: 2em;
+		}
+
+		.overlay-dialogue-doc-url {
+			position: absolute;
+			right: 32px;
+			top: -3px;
 		}
 	}
 
@@ -5581,6 +5588,53 @@ button {
 
 	&:focus {
 		box-shadow: 0 0 0 2px $btn-border-focus-color;
+	}
+}
+
+.icon-doc-url {
+	display: block;
+	margin: 2px;
+	height: 24px;
+	width: 24px;
+	text-align: center;
+	line-height: 24px;
+	background-color: transparent;
+	border-radius: 2px;
+	border-bottom: none !important;
+
+	&:focus {
+		opacity: 1;
+		box-shadow: 0 0 0 2px $btn-border-focus-color;
+	}
+
+	&::after {
+		content: '?';
+		position: relative;
+		opacity: 0.5;
+		font-size: 18px;
+		font-weight: bold;
+		color: $link-icon-doc-color;
+	}
+
+	&:hover::after {
+		opacity: 1;
+		transition: opacity .2s ease-out;
+	}
+	&:focus::after, &:visited::after{
+		opacity: 1;
+	}
+}
+
+.overlay-icon-doc {
+	@extend .icon-doc-url;
+	width: 18px;
+	height: 18px;
+	line-height: 18px;
+
+	&::after {
+		@extend .icon-doc-url::after;
+		font-size: 15px;
+		color: $font-alt-color;
 	}
 }
 

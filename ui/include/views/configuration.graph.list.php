@@ -44,6 +44,10 @@ if (!empty($this->data['parent_discoveryid'])) {
 else {
 	$widget = (new CWidget())
 		->setTitle(_('Graphs'))
+		->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
+			? CDocHelper::CONFIGURATION_HOST_GRAPH_LIST
+			: CDocHelper::CONFIGURATION_TEMPLATE_GRAPH_LIST
+		))
 		->setControls(
 			(new CTag('nav', true, ($data['hostid'] == 0)
 				? (new CButton('form',

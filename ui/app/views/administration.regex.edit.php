@@ -27,7 +27,8 @@ $this->includeJsFile('administration.regex.edit.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Regular expressions'))
-	->setTitleSubmenu(getAdministrationGeneralSubmenu());
+	->setTitleSubmenu(getAdministrationGeneralSubmenu())
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_REGEX_EDIT));
 
 $action = (new CUrl('zabbix.php'))->setArgument('action', ($data['regexid'] == 0) ? 'regex.create' : 'regex.update');
 

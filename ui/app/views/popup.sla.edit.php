@@ -294,6 +294,7 @@ else {
 
 $output = [
 	'header' => $title,
+	'doc_url' => CDocHelper::getUrl(CDocHelper::POPUP_SLA_EDIT),
 	'body' => $form->toString(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().

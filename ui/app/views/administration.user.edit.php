@@ -33,6 +33,7 @@ $widget = new CWidget();
 
 if ($data['action'] === 'user.edit') {
 	$widget_name = _('Users');
+	$doc_url = CDocHelper::ADMINISTRATION_USER_EDIT;
 }
 else {
 	$widget_name = _('User profile').NAME_DELIMITER;
@@ -40,9 +41,12 @@ else {
 		? $data['name'].' '.$data['surname']
 		: $data['username'];
 	$widget->setTitleSubmenu(getUserSettingsSubmenu());
+	$doc_url = CDocHelper::ADMINISTRATION_USERPROFILE_EDIT;
 }
 
-$widget->setTitle($widget_name);
+$widget
+	->setTitle($widget_name)
+	->setDocUrl(CDocHelper::getUrl($doc_url));
 $tabs = new CTabView();
 
 if ($data['form_refresh'] == 0) {

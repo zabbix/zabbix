@@ -109,6 +109,7 @@ $form->addItem($form_list);
 
 $output = [
 	'header' => $data['title'],
+	'doc_url' => CDocHelper::getUrl(CDocHelper::POPUP_ACKNOWLEDGE_EDIT),
 	'body' => (new CDiv([$data['errors'], $form]))->toString(),
 	'buttons' => [
 		[

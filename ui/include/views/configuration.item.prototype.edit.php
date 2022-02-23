@@ -24,7 +24,9 @@
  * @var array $data
  */
 
-$widget = (new CWidget())->setTitle(_('Item prototypes'));
+$widget = (new CWidget())
+	->setTitle(_('Item prototypes'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_ITEM_PROTOTYPE_EDIT));
 
 if (!empty($data['hostid'])) {
 	$widget->setNavigation(getHostNavigation('items', $data['hostid'], $data['parent_discoveryid']));

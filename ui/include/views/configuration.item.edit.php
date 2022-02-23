@@ -24,7 +24,9 @@
  * @var array $data
  */
 
-$widget = (new CWidget())->setTitle(_('Items'));
+$widget = (new CWidget())
+	->setTitle(_('Items'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_ITEM_EDIT));
 
 $host = $data['host'];
 

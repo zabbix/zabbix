@@ -21,12 +21,14 @@
 
 class CWidget {
 	private const ZBX_STYLE_HEADER_TITLE = 'header-title';
+	private const ZBX_STYLE_HEADER_DOC_URL = 'header-doc-url';
 	private const ZBX_STYLE_HEADER_NAVIGATION = 'header-navigation';
 	private const ZBX_STYLE_HEADER_CONTROLS = 'header-controls';
 	private const ZBX_STYLE_HEADER_KIOSKMODE_CONTROLS = 'header-kioskmode-controls';
 
 	private $title;
 	private $title_submenu;
+	private $url;
 	private $controls;
 	private $kiosk_mode_controls;
 
@@ -59,6 +61,12 @@ class CWidget {
 
 	public function setTitleSubmenu($title_submenu) {
 		$this->title_submenu = $title_submenu;
+
+		return $this;
+	}
+
+	public function setDocUrl($url) {
+		$this->url = $url;
 
 		return $this;
 	}
@@ -129,7 +137,7 @@ class CWidget {
 					)
 			);
 		}
-		elseif ($this->title !== null || $this->controls !== null) {
+		elseif ($this->title !== null || $this->controls !== null || $this->url !== null) {
 			$items[] = $this->createTopHeader();
 		}
 
@@ -178,6 +186,15 @@ class CWidget {
 			}
 
 			$divs[] = new CDiv($title_tag);
+		}
+
+		if ($this->url !== null) {
+			$divs[] = (new CDiv(
+				(new CLink(null, $this->url))
+					->setTitle(_('Help'))
+					->setTarget('_blank')
+					->addClass(ZBX_STYLE_ICON_DOC)
+				))->addClass(self::ZBX_STYLE_HEADER_DOC_URL);
 		}
 
 		if ($this->controls !== null) {

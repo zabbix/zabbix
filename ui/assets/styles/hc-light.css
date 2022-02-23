@@ -406,6 +406,11 @@ header {
     line-height: 24px;
     text-overflow: ellipsis;
     white-space: nowrap; }
+  header .header-doc-url {
+    flex-shrink: 0;
+    margin-left: auto; }
+    header .header-doc-url + .header-controls {
+      margin-left: 0; }
   header .header-controls {
     flex-shrink: 0;
     margin: 0 -2px 0 auto;
@@ -4559,8 +4564,13 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     .overlay-dialogue.modal > .overlay-close-btn {
       position: relative;
       float: right;
-      top: -13px;
-      right: -8px; }
+      top: -11px;
+      right: -6px;
+      font-size: 2em; }
+    .overlay-dialogue.modal .overlay-dialogue-doc-url {
+      position: absolute;
+      right: 32px;
+      top: -3px; }
   .overlay-dialogue.modal-popup {
     top: 50px;
     max-width: 1024px; }
@@ -6315,6 +6325,40 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
     border-bottom: none; }
   .icon-help-hint:focus {
     box-shadow: 0 0 0 2px #000000; }
+
+.icon-doc-url, .overlay-icon-doc {
+  display: block;
+  margin: 2px;
+  height: 24px;
+  width: 24px;
+  text-align: center;
+  line-height: 24px;
+  background-color: transparent;
+  border-radius: 2px;
+  border-bottom: none !important; }
+  .icon-doc-url:focus, .overlay-icon-doc:focus {
+    opacity: 1;
+    box-shadow: 0 0 0 2px #000000; }
+  .icon-doc-url::after, .overlay-icon-doc::after {
+    content: '?';
+    position: relative;
+    opacity: 0.5;
+    font-size: 18px;
+    font-weight: bold;
+    color: #000000; }
+  .icon-doc-url:hover::after, .overlay-icon-doc:hover::after {
+    opacity: 1;
+    transition: opacity .2s ease-out; }
+  .icon-doc-url:focus::after, .overlay-icon-doc:focus::after, .icon-doc-url:visited::after, .overlay-icon-doc:visited::after {
+    opacity: 1; }
+
+.overlay-icon-doc {
+  width: 18px;
+  height: 18px;
+  line-height: 18px; }
+  .overlay-icon-doc::after {
+    font-size: 15px;
+    color: #333333; }
 
 #expressions_list .ui-sortable-helper {
   display: table; }
