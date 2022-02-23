@@ -255,11 +255,11 @@ class testGeomapWidgetScreenshots extends CWebTest {
 
 	public static function getZoomWidgetData() {
 		return [
-			[
-				[
-					'Tile provider' => 'default'
-				]
-			],
+//			[
+//				[
+//					'Tile provider' => 'default'
+//				]
+//			],
 			[
 				[
 					'Tile provider' => 'OpenTopoMap'
