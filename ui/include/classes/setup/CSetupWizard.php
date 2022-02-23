@@ -865,8 +865,29 @@ class CSetupWizard extends CForm {
 			$vault_config['VAULT_TOKEN'] = $this->getConfig('DB_VAULT_TOKEN');
 
 			// TODO: 7402 - check vault on setup
-			$vault = new CVaultHelper($vault_config['VAULT_URL'], $vault_config['VAULT_TOKEN']);
-			$secret = $vault->loadSecret($vault_config['VAULT_DB_PATH']);
+			$vault = new CVaultHashiCorp($vault_config['VAULT_URL'], $vault_config['VAULT_DB_PATH'] ,$vault_config['VAULT_TOKEN']);
+			$secret = $vault->getCredentials();
+
+			if (array_key_exists('username', $secret) && array_key_exists('password', $secret)) {
+				$db_user = $secret['username'];
+				$db_pass = $secret['password'];
+			}
+			else {
+				error(_('Username and password must be stored in Vault secret keys "username" and "password".'));
+				$this->step_failed = true;
+				$this->setConfig('step', self::STAGE_DB_CONNECTION);
+				return $this->stageDbConnection();
+			}
+		}
+		elseif ($this->getConfig('DB_CREDS_STORAGE', DB_STORE_CREDS_CONFIG) == DB_STORE_CREDS_VAULT_CYBERARK) {
+			$vault_config['VAULT_URL'] = $this->getConfig('DB_VAULT_URL');
+			$vault_config['VAULT_DB_PATH'] = $this->getConfig('DB_VAULT_DB_PATH');
+			$vault_config['VAULT_CERT_FILE'] = $this->getConfig('DB_VAULT_CERT_FILE');
+			$vault_config['VAULT_KEY_FILE'] = $this->getConfig('DB_VAULT_KEY_FILE');
+
+			// TODO: 7402 - check vault on setup
+			$vault = new CVaultCyberArk($vault_config['VAULT_URL'], $vault_config['VAULT_DB_PATH'], $vault_config['VAULT_CERT_FILE'], $vault_config['VAULT_KEY_FILE']);
+			$secret = $vault->getCredentials();
 
 			if (array_key_exists('username', $secret) && array_key_exists('password', $secret)) {
 				$db_user = $secret['username'];

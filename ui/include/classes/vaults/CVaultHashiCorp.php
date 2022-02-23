@@ -68,8 +68,8 @@ class CVaultHashiCorp extends CVault {
 	}
 
 	public function getCredentials(): ?array {
-		$this->addError(_('Unable to load database credentials from Vault.')); // TODO: 7402 - translation
-		return null;
+//		$this->addError(_('Unable to load database credentials from Vault.')); // TODO: 7402 - translation
+//		return null;
 
 		$path_parts = explode('/', $this->db_path);
 		array_splice($path_parts, 1, 0, 'data');
@@ -92,7 +92,7 @@ class CVaultHashiCorp extends CVault {
 			return null;
 		}
 
-		$secret = json_decode($secret, true);
+		$secret ? $secret = json_decode($secret, true) : $secret = null;
 
 		if ($secret === null || !isset($secret['data']['data']) || !is_array($secret['data']['data'])) {
 			$this->addError(_('Unable to load database credentials from Vault.')); // TODO: 7402 - translation

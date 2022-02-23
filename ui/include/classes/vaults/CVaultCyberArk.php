@@ -31,165 +31,91 @@ class CVaultCyberArk extends CVault {
 	/**
 	 * @var string
 	 */
-	protected $url = '';
+	protected $api_endpoint;
 
 	/**
 	 * @var string
 	 */
-	protected $db_path = '';
+	protected $db_path;
 
 	/**
 	 * @var string
 	 */
-	protected $cert_file = '';
+	protected $cert_file;
 
 	/**
 	 * @var string
 	 */
-	protected $key_file = '';
+	protected $key_file;
 
-	public function __construct($url, $db_path, $cert_file, $key_file) {
-		if ($this->validateVaultApiEndpoint($url)) {
-			$this->url = rtrim(trim($url), '/');
-		}
-
-		if (self::validateVaultDBPath($db_path)) {
-			$this->token = $db_path;
-		}
+	public function __construct($api_endpoint, $db_path, $cert_file, $key_file) {
+		$this->api_endpoint = rtrim(trim($api_endpoint), '/');
+		$this->db_path = $db_path;
+		$this->cert_file = $cert_file;
+		$this->key_file = $key_file;
 	}
 
 	public function validateParameters(): bool {
+		if (parse_url($this->api_endpoint, PHP_URL_HOST) === null) {
+			$this->addError(_s('Provided API endpoint "%1$s" is invalid.', $this->api_endpoint)); // TODO: 7402 - translation string
+		}
 
+		$secret_parser = new CVaultSecretParser(['with_key' => false]);
+		if ($secret_parser->parse($this->db_path) != CParser::PARSE_SUCCESS) {
+			$this->addError(_s('Provided secret path "%1$s" is invalid.', $this->db_path)); // TODO: 7402 - translation string
+		}
+
+		return !$this->getErrors();
 	}
 
 	public function getCredentials(): ?array {
-		// TODO: Implement getCredentials() method.
-	}
+		$this->addError(_('Unable to load database credentials from Vault.')); // TODO: 7402 - translation
+		return null;
 
-	public function validateMacroValue(string $value): bool {
+		$path_parts = explode('/', $this->db_path); // TODO: db_path validator and parser needs to be implemented
+		array_splice($path_parts, 1, 0, 'data');
 
-	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	public function getCredentials(): array {
-
-		$arr = [];
-		return $arr;
-		// TODO: Implement getCredentials() method.
-	}
-
-	/**
-	 * Function returns Vault secret. Assumes given $path is correct.
-	 *
-	 * @param string $path  Path to secret.
-	 *
-	 * @throws Exception in case of configuration is not set.
-	 *
-	 * @return array
-	 */
-	public function loadSecret(string $path): array {
-		if ($this->token === '') {
-			throw new Exception(_('Incorrect Vault token.'));
-		}
-
-		$options = [
-			'http' => [
-				'method' => 'GET',
-				'header' => "X-Vault-DBPath: $this->token\r\n",
-				'ignore_errors' => true
-			]
-		];
+		$url = $this->api_endpoint.'/v1/'.implode('/', $path_parts);
 
 		try {
-			$url = $this->getURL($path);
+			$secret = file_get_contents($url, false, stream_context_create([
+				'http' => [
+					'method' => 'GET',
+					'header' => "X-Vault-Cert-File: $this->cert_file\r\n", // TODO: Modify the request for CyberArk
+					'ignore_errors' => true
+				]
+			]));
 		}
 		catch (Exception $e) {
-			error($e->getMessage());
-			return [];
+			$this->addError(_('Vault connection failed.'));
+			$this->addError($e->getMessage());
+
+			return null;
 		}
 
-		$secret = @file_get_contents($url, false, stream_context_create($options));
-		if ($secret === false) {
-			return [];
+		$secret ? $secret = json_decode($secret, true) : $secret = null;
+
+		if ($secret === null || !isset($secret['data']['data']) || !is_array($secret['data']['data'])) {
+			$this->addError(_('Unable to load database credentials from Vault.')); // TODO: 7402 - translation
+
+			return null;
 		}
 
-		$secret = json_decode($secret, true);
+		$db_credentials = $secret['data']['data'];
 
-		if (is_array($secret) && array_key_exists('data', $secret) && is_array($secret['data'])
-				&& array_key_exists('data', $secret['data']) && is_array($secret['data']['data'])) {
-			return $secret['data']['data'];
-		}
-		else {
-			return [];
-		}
-	}
+		if (!array_key_exists('username', $db_credentials) || !array_key_exists('password', $db_credentials)) {
+			$this->addError(_('Username and password must be stored in Vault secret keys "username" and "password".'));
 
-	/**
-	 * Function validates if given string is valid API endpoint.
-	 *
-	 * @param string $api_endpoint
-	 *
-	 * @return bool
-	 */
-	public function validateVaultApiEndpoint(string $api_endpoint): bool {
-		$url_parts = parse_url($api_endpoint);
-
-		if (!$url_parts || !array_key_exists('host', $url_parts)) {
-			error(_s(' "%1$s" is invalid.', $api_endpoint));
-
-			return false;
+			return null;
 		}
 
-		return true;
-	}
-
-	/**
-	 * Function validates if token is not empty string.
-	 *
-	 * @param string $db_path
-	 *
-	 * @return bool
-	 */
-	public static function validateVaultDBPath(string $db_path): bool {
-		return (trim($db_path) !== '');
-	}
-
-	/**
-	 * Function returns Vault API request URL including path to secret.
-	 *
-	 * @param string $secret_path
-	 *
-	 * @throws Exception in case of configuration is not set.
-	 *
-	 * @return string
-	 */
-	public function getURL(string $path): string {
-		if ($this->api_endpoint === '') {
-			throw new Exception(_('Incorrect Vault API endpoint.'));
-		}
-
-		$path = explode('/', $path);
-		array_splice($path, 1, 0, 'data');
-
-		return $this->api_endpoint.'/v1/'.implode('/', $path);
+		return [
+			'user' => $db_credentials['username'],
+			'password' => $db_credentials['password']
+		];
 	}
 
 	public function validateMacroValue(string $value): bool {
-		return true;
+		return false;
 	}
 }
