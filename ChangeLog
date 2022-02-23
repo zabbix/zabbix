@@ -47,7 +47,7 @@ Bug fixes:
 Changes for 6.0.1rc2
 
 Bug fixes:
-........S. [ZBX-20649] fixed crash when server attempted to use trigger after it was removed from cache (azeila)
+........S. [ZBX-20649] fixed crash when server attempted to use trigger after it was removed from cache (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.1rc1
@@ -489,7 +489,7 @@ Bug fixes:
 Changes for 5.4.11rc2
 
 Bug fixes:
-........S. [ZBX-20649] fixed crash when server attempted to use trigger after it was removed from cache (azeila)
+........S. [ZBX-20649] fixed crash when server attempted to use trigger after it was removed from cache (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 5.4.11rc1
