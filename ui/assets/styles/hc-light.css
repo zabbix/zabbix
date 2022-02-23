@@ -1,4 +1,4 @@
-.sidebar .server-name, .dashboard-navigation-tabs .sortable-item > div span, .dashboard-grid-widget-head h4, .dashboard-grid-iterator-head h4, form.dashboard-grid-widget-tophosts #list_columns .text, .list-table .action-container .link-action, .menu-popup .menu-popup-item, .menu-popup h3, .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a {
+.sidebar .server-name, .dashboard-navigation-tabs .sortable-item > div span, .dashboard-grid-widget-head h4, .dashboard-grid-iterator-head h4, form.dashboard-grid-widget-tophosts #list_columns .text, .list-table .action-container .link-action, .menu-popup .menu-popup-item, .menu-popup h3, .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, .notif-body h4, .overlay-descr-url, .tag, .btn-tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; }
@@ -2870,20 +2870,20 @@ form.is-loading {
         margin-right: 0; }
     .list-table.compact-view td .rel-container span {
       margin: 0; }
-    .list-table.compact-view td .tag {
+    .list-table.compact-view td .tag, .list-table.compact-view td .btn-tag {
       display: inline-block;
       line-height: 16px;
       margin-right: 3px;
       padding: 0 3px;
       max-width: 40px; }
       @media screen and (min-width: 1200px) {
-        .list-table.compact-view td .tag {
+        .list-table.compact-view td .tag, .list-table.compact-view td .btn-tag {
           max-width: 71px; } }
       @media screen and (min-width: 1400px) {
-        .list-table.compact-view td .tag {
+        .list-table.compact-view td .tag, .list-table.compact-view td .btn-tag {
           max-width: 102px; } }
       @media screen and (min-width: 1600px) {
-        .list-table.compact-view td .tag {
+        .list-table.compact-view td .tag, .list-table.compact-view td .btn-tag {
           max-width: 133px; } }
     .list-table.compact-view td .icon-maintenance {
       height: 12px;
@@ -3763,6 +3763,16 @@ button {
       background-color: #ffffff; }
       .btn-alt:active .plus-icon::after {
         background-color: #ffffff; }
+
+.btn-tag {
+  min-height: unset;
+  outline: none;
+  border: none; }
+  .btn-tag:hover {
+    text-decoration: underline;
+    background-color: #333333; }
+  .btn-tag:focus {
+    background-color: #333333; }
 
 .btn-grey {
   color: #333333;
@@ -5241,7 +5251,7 @@ a.link-action {
   background-color: #f0f0f0;
   border: 1px solid rgba(0, 0, 0, 0.2); }
 
-.tag {
+.tag, .btn-tag {
   display: inline-block;
   color: #ffffff;
   background-color: #333333;
@@ -5251,17 +5261,17 @@ a.link-action {
   max-width: 133px;
   vertical-align: middle;
   border-radius: 2px; }
-  .tag a.link-action {
+  .tag a.link-action, .btn-tag a.link-action {
     color: inherit !important;
     border-bottom: none; }
-    .tag a.link-action:hover {
+    .tag a.link-action:hover, .btn-tag a.link-action:hover {
       text-decoration: underline;
       border-bottom: none; }
-  .tag:last-child {
+  .tag:last-child, .btn-tag:last-child {
     margin: 0; }
-  .tag.green-bg {
+  .tag.green-bg, .green-bg.btn-tag {
     color: #0e4123; }
-  .tag.yellow-bg {
+  .tag.yellow-bg, .yellow-bg.btn-tag {
     color: #734d00; }
 
 .green-bg {
@@ -7198,7 +7208,7 @@ a.link-action {
 .filter-trigger .arrow-down {
   border-top-color: #ffffff !important; }
 
-.tag.green-bg, .tag.yellow-bg {
+.tag.green-bg, .green-bg.btn-tag, .tag.yellow-bg, .yellow-bg.btn-tag {
   background-color: #333333;
   color: #ffffff; }
 

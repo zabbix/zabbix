@@ -1936,6 +1936,22 @@ button {
 	}
 }
 
+.btn-tag {
+	@extend .tag;
+
+	min-height: unset;
+	outline: none;
+	border: none;
+
+	&:hover {
+		text-decoration: underline;
+		background-color: $ui-bg-selected-color;
+	}
+	&:focus {
+		background-color: $ui-bg-selected-color;
+	}
+}
+
 .btn-grey {
 	color: $btn-form-font-color;
 	background-color: $btn-form-bg-color;
