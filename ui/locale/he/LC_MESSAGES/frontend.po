@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-02-22 13:32+0200\n"
-"PO-Revision-Date: 2022-02-20 08:23+0300\n"
+"PO-Revision-Date: 2022-02-22 14:36+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1645338227.000000\n"
+"X-POOTLE-MTIME: 1645533405.000000\n"
 
 #: app/controllers/CControllerSlaReportList.php:181
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:104
@@ -5290,12 +5290,12 @@ msgstr "למחוק את התבניות הנבחרות?"
 #: app/views/js/administration.token.list.js.php:78
 #: app/views/js/administration.user.token.list.js.php:78
 msgid "Delete selected token?"
-msgstr ""
+msgstr "למחוק את האסימון הנבחר?"
 
 #: app/views/js/administration.token.list.js.php:77
 #: app/views/js/administration.user.token.list.js.php:77
 msgid "Delete selected tokens?"
-msgstr ""
+msgstr "למחוק את האסימונים הנבחרים?"
 
 #: include/views/configuration.trigger.prototype.list.php:214
 msgid "Delete selected trigger prototypes?"
@@ -5833,7 +5833,7 @@ msgstr "סטטיסטיקת כתיבה לכונן. מחזירה מספר שלם �
 
 #: app/views/popup.tophosts.column.edit.php:147
 msgid "Display"
-msgstr ""
+msgstr "תצוגה"
 
 #: app/views/administration.trigdisplay.edit.php:89
 msgid "Display OK triggers for"
@@ -6099,7 +6099,7 @@ msgstr "עריכת וידג׳ט"
 
 #: app/views/popup.sla.edit.php:113 app/views/sla.list.php:89
 msgid "Effective date"
-msgstr ""
+msgstr "תאריך תוקף"
 
 #: app/partials/hostmacros.inherited.list.html.php:49
 msgid "Effective value"
@@ -6449,7 +6449,7 @@ msgstr "שגיאה"
 #: app/views/monitoring.widget.slareport.view.php:101
 #: app/views/slareport.list.php:166
 msgid "Error budget"
-msgstr ""
+msgstr "תקציב שגיאה"
 
 #: include/db.inc.php:518
 #, c-format
@@ -7761,7 +7761,7 @@ msgstr "מחיקת ההיסטוריה עשויה לארוך זמן רב. להמ�
 
 #: app/views/popup.tophosts.column.edit.php:159
 msgid "History data"
-msgstr ""
+msgstr "נתונים היסטוריים"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:47
 msgid "History data selection"
@@ -7801,7 +7801,7 @@ msgstr "יישור אופקי"
 #: include/classes/widgets/forms/CWidgetFormItem.php:171
 #: include/classes/widgets/forms/CWidgetFormItem.php:294
 msgid "Horizontal position"
-msgstr ""
+msgstr "מיקום אופקי"
 
 #: app/controllers/CControllerAuditLogList.php:219
 #: app/partials/configuration.host.edit.html.php:522
@@ -8210,7 +8210,7 @@ msgstr "המארחים עודכנו"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:118
 msgid "Hour"
-msgstr ""
+msgstr "שעה"
 
 #: app/views/popup.maintenance.period.php:170
 #: app/views/popup.sla.excludeddowntime.edit.php:68
