@@ -31,23 +31,34 @@
 class CVaultSecretParser extends CParser {
 
 	private $options = [
+		'provider' => null,
 		'with_key' => true
 	];
 
 	/**
-	 * @param array  $options
-	 * @param bool   $options['with_key']  (optional) Validated string must contain key.
+	 * @param array $options
+	 * @param int   $options['provider']  (optional) Vault provider.
+	 * @param bool  $options['with_key']  (optional) Validated string must contain key.
 	 */
 	public function __construct(array $options = []) {
-		if (array_key_exists('with_key', $options)) {
-			$this->options['with_key'] = $options['with_key'];
-		}
+		$this->options = $options + $this->options;
 	}
 
 	/**
 	 * @inheritDoc
 	 */
 	public function parse($source, $pos = 0) {
+		switch ($this->options['provider']) {
+			case ZBX_VAULT_TYPE_HASHICORP:
+				return $this->parseHashiCorp($source, $pos);
+			case ZBX_VAULT_TYPE_CYBERARK:
+				return $this->parseCyberArk($source, $pos);
+			default:
+				return self::PARSE_FAIL;
+		}
+	}
+
+	private function parseHashiCorp($source, $pos) {
 		$this->start = $pos;
 		$this->errorClear();
 
@@ -96,5 +107,9 @@ class CVaultSecretParser extends CParser {
 		}
 
 		return self::PARSE_SUCCESS;
+	}
+
+	private function parseCyberArk($source, $pos) {
+		return self::PARSE_FAIL;
 	}
 }
