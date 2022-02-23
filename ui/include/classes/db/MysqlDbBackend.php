@@ -156,34 +156,38 @@ class MysqlDbBackend extends DbBackend {
 	 * @param string $dbname       Database name.
 	 * @param string $schema       DB schema.
 	 *
-	 * @param
-	 * @return resource|null
+	 * @return mysqli|false|null
 	 */
 	public function connect($host, $port, $user, $password, $dbname, $schema) {
-		$resource = mysqli_init();
-		$tls_mode = null;
+		$tls_mode = 0;
 
-		if ($this->tls_encryption) {
-			$cipher_suit = ($this->tls_cipher_list === '') ? null : $this->tls_cipher_list;
-			$resource->ssl_set($this->tls_key_file, $this->tls_cert_file, $this->tls_ca_file, null, $cipher_suit);
+		try {
+			$resource = mysqli_init();
 
-			$tls_mode = MYSQLI_CLIENT_SSL;
+			if ($this->tls_encryption) {
+				$cipher_suit = ($this->tls_cipher_list === '') ? null : $this->tls_cipher_list;
+				$resource->ssl_set($this->tls_key_file, $this->tls_cert_file, $this->tls_ca_file, null, $cipher_suit);
+
+				$tls_mode = MYSQLI_CLIENT_SSL;
+			}
+
+			$resource->real_connect($host, $user, $password, $dbname, $port, null, $tls_mode);
+
+			if ($resource->error) {
+				throw new RuntimeException($resource->error);
+			}
+
+			if ($resource->errno) {
+				throw new RuntimeException('Database error code '.$resource->errno);
+			}
+
+			if ($resource->autocommit(true) === false) {
+				throw new RuntimeException('Error setting auto commit.');
+			}
 		}
+		catch (Throwable $exception) {
+			$this->setError($exception->getMessage());
 
-		@$resource->real_connect($host, $user, $password, $dbname, $port, null, $tls_mode);
-
-		if ($resource->error) {
-			$this->setError($resource->error);
-			return null;
-		}
-
-		if ($resource->errno) {
-			$this->setError('Database error code '.$resource->errno);
-			return null;
-		}
-
-		if ($resource->autocommit(true) === false) {
-			$this->setError('Error setting auto commit.');
 			return null;
 		}
 

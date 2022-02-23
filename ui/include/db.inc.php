@@ -224,41 +224,47 @@ function DBrollback() {
 function DBselect($query, $limit = null, $offset = 0) {
 	global $DB;
 
-	$result = false;
-
 	if (!isset($DB['DB']) || empty($DB['DB'])) {
-		return $result;
-	}
-
-	// add the LIMIT clause
-	if(!$query = DBaddLimit($query, $limit, $offset)) {
 		return false;
 	}
 
+	// add the LIMIT clause
+	if (!$query = DBaddLimit($query, $limit, $offset)) {
+		return false;
+	}
+
+	$result = false;
 	$time_start = microtime(true);
 	$DB['SELECT_COUNT']++;
 
-	switch ($DB['TYPE']) {
-		case ZBX_DB_MYSQL:
-			if (!$result = mysqli_query($DB['DB'], $query)) {
-				error('Error in query ['.$query.'] ['.mysqli_error($DB['DB']).']', 'sql');
-			}
-			break;
-		case ZBX_DB_POSTGRESQL:
-			if (!$result = pg_query($DB['DB'], $query)) {
-				error('Error in query ['.$query.'] ['.pg_last_error().']', 'sql');
-			}
-			break;
-		case ZBX_DB_ORACLE:
-			if (!$result = oci_parse($DB['DB'], $query)) {
-				$e = @oci_error();
-				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']', 'sql');
-			}
-			elseif (!@oci_execute($result, ($DB['TRANSACTIONS'] ? OCI_DEFAULT : OCI_COMMIT_ON_SUCCESS))) {
-				$e = oci_error($result);
-				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']', 'sql');
-			}
-			break;
+	try {
+		switch ($DB['TYPE']) {
+			case ZBX_DB_MYSQL:
+				if (!$result = mysqli_query($DB['DB'], $query)) {
+					throw new RuntimeException('Error in query ['.$query.'] ['.mysqli_error($DB['DB']).']');
+				}
+				break;
+
+			case ZBX_DB_POSTGRESQL:
+				if (!$result = pg_query($DB['DB'], $query)) {
+					throw new RuntimeException('Error in query ['.$query.'] ['.pg_last_error().']');
+				}
+				break;
+
+			case ZBX_DB_ORACLE:
+				if (!$result = oci_parse($DB['DB'], $query)) {
+					$e = oci_error();
+					throw new RuntimeException('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
+				}
+				elseif (!oci_execute($result, ($DB['TRANSACTIONS'] ? OCI_DEFAULT : OCI_COMMIT_ON_SUCCESS))) {
+					$e = oci_error($result);
+					throw new RuntimeException('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
+				}
+				break;
+		}
+	} catch (Throwable $exception) {
+		error($exception->getMessage(), 'sql');
+		$result = false;
 	}
 
 	// $result is false only if an error occurred
@@ -339,31 +345,37 @@ function DBexecute($query) {
 
 	$DB['EXECUTE_COUNT']++;
 
-	switch ($DB['TYPE']) {
-		case ZBX_DB_MYSQL:
-			if (!$result = mysqli_query($DB['DB'], $query)) {
-				error('Error in query ['.$query.'] ['.mysqli_error($DB['DB']).']', 'sql');
-			}
-			break;
-		case ZBX_DB_POSTGRESQL:
-			if (!$result = (bool) pg_query($DB['DB'], $query)) {
-				error('Error in query ['.$query.'] ['.pg_last_error().']', 'sql');
-			}
-			break;
-		case ZBX_DB_ORACLE:
-			if (!$result = oci_parse($DB['DB'], $query)) {
-				$e = @oci_error();
-				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']', 'sql');
-			}
-			elseif (!@oci_execute($result, ($DB['TRANSACTIONS'] ? OCI_DEFAULT : OCI_COMMIT_ON_SUCCESS))) {
-				$e = oci_error($result);
-				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']', 'sql');
-			}
-			else {
-				$result = true; // function must return boolean
-			}
-			break;
+	try {
+		switch ($DB['TYPE']) {
+			case ZBX_DB_MYSQL:
+				if (!$result = mysqli_query($DB['DB'], $query)) {
+					error('Error in query ['.$query.'] ['.mysqli_error($DB['DB']).']', 'sql');
+				}
+				break;
+			case ZBX_DB_POSTGRESQL:
+				if (!$result = (bool) pg_query($DB['DB'], $query)) {
+					error('Error in query ['.$query.'] ['.pg_last_error().']', 'sql');
+				}
+				break;
+			case ZBX_DB_ORACLE:
+				if (!$result = oci_parse($DB['DB'], $query)) {
+					$e = @oci_error();
+					error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']', 'sql');
+				}
+				elseif (!@oci_execute($result, ($DB['TRANSACTIONS'] ? OCI_DEFAULT : OCI_COMMIT_ON_SUCCESS))) {
+					$e = oci_error($result);
+					error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']', 'sql');
+				}
+				else {
+					$result = true; // function must return boolean
+				}
+				break;
+		}
 	}
+	catch (Throwable $exception) {
+		error($exception->getMessage());
+	}
+
 	if ($DB['TRANSACTIONS'] != 0 && !$result) {
 		$DB['TRANSACTION_NO_FAILED_SQLS'] = false;
 	}
@@ -379,7 +391,7 @@ function DBexecute($query) {
 /**
  * Returns the next data set from a DB resource or false if there are no more results.
  *
- * @param resource $cursor
+ * @param mysqli_result $cursor
  * @param bool     $convertNulls  Convert all null values to string zeros.
  *
  * @return array|bool
@@ -393,43 +405,59 @@ function DBfetch($cursor, $convertNulls = true) {
 		return $result;
 	}
 
-	switch ($DB['TYPE']) {
-		case ZBX_DB_MYSQL:
-			$result = mysqli_fetch_assoc($cursor);
-			if (!$result) {
-				mysqli_free_result($cursor);
-			}
-			break;
-		case ZBX_DB_POSTGRESQL:
-			if ($result = pg_fetch_assoc($cursor)) {
-				$i = 0;
-				foreach ($result as &$value) {
-					if (pg_field_type($cursor, $i++) === 'bytea') {
-						$value = pg_unescape_bytea($value);
-					}
-				}
-				unset($value);
-			}
-			else {
-				pg_free_result($cursor);
-			}
-			break;
-		case ZBX_DB_ORACLE:
-			if ($row = oci_fetch_assoc($cursor)) {
-				$result = [];
-				foreach ($row as $key => $value) {
-					$field_type = strtolower(oci_field_type($cursor, $key));
-					// Oracle does not support NULL values for string fields, so if the string is empty, it will return NULL
-					// convert it to an empty string to be consistent with other databases
-					$value = (str_in_array($field_type, ['varchar', 'varchar2', 'blob', 'clob']) && is_null($value)) ? '' : $value;
+	try {
+		switch ($DB['TYPE']) {
+			case ZBX_DB_MYSQL:
+				$result = mysqli_fetch_assoc($cursor);
 
-					if (is_object($value) && (strpos($field_type, 'lob') !== false)) {
-						$value = $value->load();
-					}
-					$result[strtolower($key)] = $value;
+				if (!$result) {
+					mysqli_free_result($cursor);
 				}
-			}
-			break;
+				break;
+
+			case ZBX_DB_POSTGRESQL:
+				if ($result = pg_fetch_assoc($cursor)) {
+					$i = 0;
+
+					foreach ($result as &$value) {
+						if (pg_field_type($cursor, $i++) === 'bytea') {
+							$value = pg_unescape_bytea($value);
+						}
+					}
+					unset($value);
+				}
+				else {
+					pg_free_result($cursor);
+				}
+				break;
+
+			case ZBX_DB_ORACLE:
+				if ($row = oci_fetch_assoc($cursor)) {
+					$result = [];
+
+					foreach ($row as $key => $value) {
+						$field_type = strtolower(oci_field_type($cursor, $key));
+
+						// Oracle does not support NULL values for string fields,
+						// so if the string is empty, it will return NULL.
+						// Convert it to an empty string to be consistent with other databases.
+						$value = (str_in_array($field_type, ['varchar', 'varchar2', 'blob', 'clob']) && is_null($value))
+							? ''
+							: $value;
+
+						if (is_object($value) && (strpos($field_type, 'lob') !== false)) {
+							$value = $value->load();
+						}
+
+						$result[strtolower($key)] = $value;
+					}
+				}
+				break;
+		}
+	} catch (Throwable $exception) {
+		error($exception->getMessage(), 'sql');
+
+		return false;
 	}
 
 	if ($result) {
