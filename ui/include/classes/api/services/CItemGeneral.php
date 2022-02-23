@@ -34,7 +34,6 @@ abstract class CItemGeneral extends CApiService {
 	protected const ERROR_EXISTS_TEMPLATE = 'existsTemplate';
 	protected const ERROR_EXISTS = 'exists';
 	protected const ERROR_NO_INTERFACE = 'noInterface';
-	protected const ERROR_INVALID_KEY = 'invalidKey';
 
 	/**
 	 * @var array
@@ -122,166 +121,26 @@ abstract class CItemGeneral extends CApiService {
 
 	/**
 	 * @param array $items
-	 * @param array $specific_rules
 	 *
 	 * @throws APIException
 	 */
-	protected function validateCreate(array &$items, array $specific_rules): void {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['hostid', 'key_']], 'fields' => [
-			'type' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', static::SUPPORTED_ITEM_TYPES)],
-			'snmp_oid' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_SNMP], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'snmp_oid')],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
-			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'name')],
-			'key_' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'key_')],
-			'delay' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'delay')],
-			'status' =>				['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
-			'allow_traps' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_HTTPAGENT], 'type' => API_INT32, 'in' => implode(',', [HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON])],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'trapper_hosts' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => implode(',', [ITEM_TYPE_TRAPPER, ITEM_TYPE_HTTPAGENT])], 'type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS | API_ALLOW_USER_MACRO, 'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}'], 'length' => DB::getFieldLength('items', 'trapper_hosts')],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'ipmi_sensor' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_IPMI], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ipmi_sensor')],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'authtype' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_SSH], 'type' => API_INT32, 'in' => implode(',', [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY])],
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_HTTPAGENT], 'type' => API_INT32, 'in' => implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST])],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'username' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => implode(',', [ITEM_TYPE_SIMPLE, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],
-										['if' => ['field' => 'type', 'in' => implode(',', [ITEM_TYPE_SSH, ITEM_TYPE_TELNET])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'username')],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'password' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => implode(',', [ITEM_TYPE_SIMPLE, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'publickey' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_SSH], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'publickey')],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'privatekey' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_SSH], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'privatekey')],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'description')],
-			'jmx_endpoint' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_JMX], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'jmx_endpoint'), 'default' => ZBX_DEFAULT_JMX_ENDPOINT],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'master_itemid' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_DEPENDENT], 'type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'timeout' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => implode(',', [ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT])], 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0, 'in' => '1:'.SEC_PER_MIN, 'length' => DB::getFieldLength('items', 'timeout')],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'url' =>				['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_HTTPAGENT], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'url')],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'query_fields' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_HTTPAGENT], 'type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => []],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'post_type' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_HTTPAGENT], 'type' => API_INT32, 'in' => implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]), 'default' => ZBX_POSTTYPE_RAW],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'posts' =>				['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_HTTPAGENT], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'posts')],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'status_codes' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_HTTPAGENT], 'type' => API_INT32_RANGES, 'flags' => API_ALLOW_USER_MACRO | $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0, 'length' => DB::getFieldLength('items', 'status_codes')],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'follow_redirects' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_HTTPAGENT], 'type' => API_INT32, 'in' => implode(',', [HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON])],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'http_proxy' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_HTTPAGENT], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'http_proxy')],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'headers' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_HTTPAGENT], 'type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => []],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'retrieve_mode' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_HTTPAGENT], 'type' => API_INT32, 'in' => implode(',', [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS, HTTPTEST_STEP_RETRIEVE_MODE_BOTH])],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'request_method' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_HTTPAGENT], 'type' => API_INT32, 'in' => implode(',', [HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD])],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'output_format' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_HTTPAGENT], 'type' => API_INT32, 'in' => implode(',', [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON])],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'ssl_cert_file' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_HTTPAGENT], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_cert_file')],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'ssl_key_file' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_HTTPAGENT], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_key_file')],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'ssl_key_password' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_HTTPAGENT], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_key_password')],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'verify_peer' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_HTTPAGENT], 'type' => API_INT32, 'in' => implode(',', [HTTPTEST_VERIFY_PEER_OFF, HTTPTEST_VERIFY_PEER_ON])],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'verify_host' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_HTTPAGENT], 'type' => API_INT32, 'in' => implode(',', [HTTPTEST_VERIFY_HOST_OFF, HTTPTEST_VERIFY_HOST_ON])],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'uuid' =>				['type' => API_UUID],
-			'parameters' =>			self::getParametersValidationRules(),
-			'preprocessing' =>		['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => []]
-		] + $specific_rules];
+	protected function validateCreate(array &$items): void {
+		self::checkItemKey($items);
 
-		if (!CApiInputValidator::validate($api_input_rules, $items, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		if ($this instanceof CItem) {
-			$flags = ZBX_FLAG_DISCOVERY_NORMAL;
-		}
-		elseif ($this instanceof CItemPrototype) {
-			$flags = ZBX_FLAG_DISCOVERY_PROTOTYPE;
-		}
-		else {
-			$flags = ZBX_FLAG_DISCOVERY_RULE;
-		}
-
-		foreach ($items as &$item) {
-			$item['flags'] = $flags;
-		}
-		unset($item);
+		$hostids = array_unique(array_column($items, 'hostid'));
 
 		$db_hosts = API::Host()->get([
-			'output' => ['hostid', 'status', 'name'],
-			'hostids' => array_column($items, 'hostid'),
+			'output' => ['hostid', 'status'],
+			'hostids' => $hostids,
 			'templated_hosts' => true,
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
-		$this->checkItemKey($items, $db_hosts);
+		if (count($hostids) != count($db_hosts)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+		}
+
 		self::checkAndAddUuid($items, $db_hosts);
 		self::checkDuplicates($items);
 		self::checkHostInterface($items, $db_hosts);
@@ -291,201 +150,114 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * @param array      $items
-	 * @param array|null $db_items
-	 * @param array      $specific_rules
+	 * @param array $api_input_rules
+	 * @param array $items
 	 *
 	 * @throws APIException
 	 */
-	protected function validateUpdate(array &$items, ?array &$db_items, array $specific_rules): void {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['itemid']], 'fields' => [
-			'itemid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
-		]];
+	protected function validateCreateByType(array $api_input_rules, array &$items): void {
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => array_fill_keys(array_keys($api_input_rules['fields']), ['type' => API_ANY])];
 
-		if (!CApiInputValidator::validate($api_input_rules, $items, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
+		foreach ($items as $i => &$item) {
+			switch ($item['type']) {
+				case ITEM_TYPE_ZABBIX:
+					$api_input_rules['fields'] += CItemTypeZabbix::getCreateValidationRules(static::class);
+					break;
 
-		$db_items = $this->getAffectedObjects($items);
+				case ITEM_TYPE_TRAPPER:
+					$api_input_rules['fields'] += CItemTypeTrapper::getCreateValidationRules(static::class);
+					break;
 
-		$items = $this->extendObjectsByKey($items, $db_items, 'itemid', ['type', 'name', 'key_', 'value_type']);
+				case ITEM_TYPE_SIMPLE:
+					$api_input_rules['fields'] += CItemTypeSimple::getCreateValidationRules(static::class);
+					break;
 
-		$api_input_rules = ['type' => API_OBJECTS, 'fields' => [
-			'itemid' =>				['type' => API_ID],
-			'type' =>				['type' => API_INT32, 'in' => implode(',', static::SUPPORTED_ITEM_TYPES)],
-			'snmp_oid' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_SNMP], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'snmp_oid')],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'name')],
-			'key_' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'key_')],
-			'delay' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'delay')],
-			'status' =>				['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
-			'allow_traps' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_HTTPAGENT], 'type' => API_INT32, 'in' => implode(',', [HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON])],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'trapper_hosts' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => implode(',', [ITEM_TYPE_TRAPPER, ITEM_TYPE_HTTPAGENT])], 'type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS | API_ALLOW_USER_MACRO, 'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}'], 'length' => DB::getFieldLength('items', 'trapper_hosts')],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'ipmi_sensor' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_IPMI], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ipmi_sensor')],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'authtype' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_SSH], 'type' => API_INT32, 'in' => implode(',', [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY])],
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_HTTPAGENT], 'type' => API_INT32, 'in' => implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST])],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'username' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => implode(',', [ITEM_TYPE_SIMPLE, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],
-										['if' => ['field' => 'type', 'in' => implode(',', [ITEM_TYPE_SSH, ITEM_TYPE_TELNET])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'username')],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'password' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => implode(',', [ITEM_TYPE_SIMPLE, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'publickey' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_SSH], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'publickey')],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'privatekey' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_SSH], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'privatekey')],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'description')],
-			'jmx_endpoint' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_JMX], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'jmx_endpoint')],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'master_itemid' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_DEPENDENT], 'type' => API_ID, 'flags' => API_NOT_EMPTY],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'timeout' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => implode(',', [ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT])], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO | $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0, 'in' => '1:'.SEC_PER_MIN, 'length' => DB::getFieldLength('items', 'timeout')],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'url' =>				['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_HTTPAGENT], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'url')],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'query_fields' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_HTTPAGENT], 'type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => []],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'post_type' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_HTTPAGENT], 'type' => API_INT32, 'in' => implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML])],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'posts' =>				['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_HTTPAGENT], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'posts')],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'status_codes' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_HTTPAGENT], 'type' => API_INT32_RANGES, 'flags' => API_ALLOW_USER_MACRO | $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0, 'length' => DB::getFieldLength('items', 'status_codes')],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'follow_redirects' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_HTTPAGENT], 'type' => API_INT32, 'in' => implode(',', [HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON])],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'http_proxy' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_HTTPAGENT], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'http_proxy')],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'headers' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_HTTPAGENT], 'type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => []],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'retrieve_mode' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_HTTPAGENT], 'type' => API_INT32, 'in' => implode(',', [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS, HTTPTEST_STEP_RETRIEVE_MODE_BOTH])],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'request_method' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_HTTPAGENT], 'type' => API_INT32, 'in' => implode(',', [HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD])],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'output_format' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_HTTPAGENT], 'type' => API_INT32, 'in' => implode(',', [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON])],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'ssl_cert_file' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_HTTPAGENT], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_cert_file')],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'ssl_key_file' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_HTTPAGENT], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_key_file')],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'ssl_key_password' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_HTTPAGENT], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_key_password')],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'verify_peer' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_HTTPAGENT], 'type' => API_INT32, 'in' => implode(',', [HTTPTEST_VERIFY_PEER_OFF, HTTPTEST_VERIFY_PEER_ON])],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'verify_host' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'type', 'in' => ITEM_TYPE_HTTPAGENT], 'type' => API_INT32, 'in' => implode(',', [HTTPTEST_VERIFY_HOST_OFF, HTTPTEST_VERIFY_HOST_ON])],
-										['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'parameters' =>			self::getParametersValidationRules(),
-			'preprocessing' =>		['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => []]
-		] + $specific_rules];
+				case ITEM_TYPE_INTERNAL:
+					$api_input_rules['fields'] += CItemTypeInternal::getCreateValidationRules(static::class);
+					break;
 
-		if (!CApiInputValidator::validate($api_input_rules, $items, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
+				case ITEM_TYPE_ZABBIX_ACTIVE:
+					$api_input_rules['fields'] += CItemTypeZabbixActive::getCreateValidationRules(static::class);
+					break;
 
-		// Fields of discovered items, except status, cannot be updated.
-		$discovered_item_validator = new CUpdateDiscoveredValidator([
-			'allowed' => ['itemid', 'status'],
-			'messageAllowedField' => _('Cannot update "%2$s" for a discovered item "%1$s".')
-		]);
+				case ITEM_TYPE_EXTERNAL:
+					$api_input_rules['fields'] += CItemTypeExternal::getCreateValidationRules(static::class);
+					break;
 
-		foreach ($items as &$item) {
-			$discovered_item_validator->setObjectName($item['name']);
-			$this->checkPartialValidator($item, $discovered_item_validator, $db_items[$item['itemid']]);
+				case ITEM_TYPE_DB_MONITOR:
+					$api_input_rules['fields'] += CItemTypeDbMonitor::getCreateValidationRules(static::class);
+					break;
 
-			$db_item = $db_items[$item['itemid']];
+				case ITEM_TYPE_IPMI:
+					$api_input_rules['fields'] += CItemTypeIpmi::getCreateValidationRules(static::class);
+					break;
 
-			foreach ($this->field_rules as $field => $rules) {
-				if ($item['type'] == ITEM_TYPE_SCRIPT) {
-					$rules['template'] = 1;
-				}
+				case ITEM_TYPE_SSH:
+					$api_input_rules['fields'] += CItemTypeSsh::getCreateValidationRules(static::class);
+					break;
 
-				if ($db_item['templateid'] != 0 && array_key_exists('template', $rules)) {
-					unset($item[$field]);
+				case ITEM_TYPE_TELNET:
+					$api_input_rules['fields'] += CItemTypeTelnet::getCreateValidationRules(static::class);
+					break;
 
-					// For templated item and fields that should not be modified, use the value from DB.
-					if (array_key_exists($field, $item) && array_key_exists($field, $db_item)) {
-						$item[$field] = $db_item[$field];
-					}
-				}
+				case ITEM_TYPE_CALCULATED:
+					$api_input_rules['fields'] += CItemTypeCalculated::getCreateValidationRules(static::class);
+					break;
+
+				case ITEM_TYPE_JMX:
+					$api_input_rules['fields'] += CItemTypeJmx::getCreateValidationRules(static::class);
+					break;
+
+				case ITEM_TYPE_SNMPTRAP:
+					$api_input_rules['fields'] += CItemTypeSnmpTrap::getCreateValidationRules(static::class);
+					break;
+
+				case ITEM_TYPE_DEPENDENT:
+					$api_input_rules['fields'] += CItemTypeDependent::getCreateValidationRules(static::class);
+					break;
+
+				case ITEM_TYPE_HTTPAGENT:
+					$api_input_rules['fields'] += CItemTypeHttpAgent::getCreateValidationRules(static::class);
+					break;
+
+				case ITEM_TYPE_SNMP:
+					$api_input_rules['fields'] += CItemTypeSnmp::getCreateValidationRules(static::class);
+					break;
+
+				case ITEM_TYPE_SCRIPT:
+					$api_input_rules['fields'] += CItemTypeScript::getCreateValidationRules(static::class);
+					break;
 			}
 
-			$item['flags'] = $db_item['flags'];
-			$item['hostid'] = $db_item['hostid'];
-
-			if ($this instanceof CItemPrototype) {
-				$item['ruleid'] = $db_item['discoveryRule']['itemid'];
+			if (!CApiInputValidator::validate($api_input_rules, $item, '/'.($i + 1), $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 		}
 		unset($item);
+	}
+
+	/**
+	 * @param array      $items
+	 * @param array|null $db_items
+	 *
+	 * @throws APIException
+	 */
+	protected function validateUpdate(array &$items, ?array &$db_items): void {
+		static::addAffectedObjects($items, $db_items);
+
+		self::checkItemKey($items, $db_items);
+
+		$hostids = array_unique(array_column($items, 'hostid'));
 
 		$db_hosts = API::Host()->get([
-			'output' => ['hostid', 'status', 'name'],
-			'hostids' => array_column($db_items, 'hostid'),
+			'output' => ['hostid', 'status'],
+			'hostids' => $hostids,
 			'templated_hosts' => true,
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
-		$this->checkItemKey($items, $db_hosts);
-		self::checkDuplicates($items);
+		self::checkDuplicates($items, $db_items);
 		self::checkHostInterface($items, $db_hosts, $db_items);
 		$this->checkSpecificFields($items);
 		$this->validatePreprocessing($items);
@@ -493,16 +265,104 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * @return array
+	 * @param array $api_input_rules
+	 * @param array $items
+	 * @param array $db_items
+	 *
+	 * @throws APIException
 	 */
-	protected static function getParametersValidationRules(): array {
-		return ['type' => API_MULTIPLE, 'rules' => [
-				['if' => ['field' => 'type', 'in' => ITEM_TYPE_SCRIPT], 'type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
-					'name' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('item_parameter', 'name')],
-					'value' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('item_parameter', 'value')]
-				]],
-				['else' => true, 'type' => API_UNEXPECTED]
-		]];
+	protected function validateUpdateByType(array $api_input_rules, array &$items, array $db_items): void {
+		$checked_fields = array_fill_keys(array_keys($api_input_rules['fields']), ['type' => API_ANY]);
+
+		foreach ($items as $i => &$item) {
+			$api_input_rules = ['type' => API_OBJECT, 'fields' => $checked_fields];
+			$db_item = $db_items[$item['itemid']];
+
+			if ($db_item['templateid'] != 0) {
+				$method = 'getUpdateValidationRulesInherited';
+			}
+			elseif ($db_item['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+				$method = 'getUpdateValidationRulesDiscovered';
+			}
+			else {
+				$method = 'getUpdateValidationRules';
+			}
+
+			switch ($item['type']) {
+				case ITEM_TYPE_ZABBIX:
+					$api_input_rules['fields'] += CItemTypeZabbix::$method(static::class, $db_item);
+					break;
+
+				case ITEM_TYPE_TRAPPER:
+					$api_input_rules['fields'] += CItemTypeTrapper::$method(static::class, $db_item);
+					break;
+
+				case ITEM_TYPE_SIMPLE:
+					$api_input_rules['fields'] += CItemTypeSimple::$method(static::class, $db_item);
+					break;
+
+				case ITEM_TYPE_INTERNAL:
+					$api_input_rules['fields'] += CItemTypeInternal::$method(static::class, $db_item);
+					break;
+
+				case ITEM_TYPE_ZABBIX_ACTIVE:
+					$api_input_rules['fields'] += CItemTypeZabbixActive::$method(static::class, $db_item);
+					break;
+
+				case ITEM_TYPE_EXTERNAL:
+					$api_input_rules['fields'] += CItemTypeExternal::$method(static::class, $db_item);
+					break;
+
+				case ITEM_TYPE_DB_MONITOR:
+					$api_input_rules['fields'] += CItemTypeDbMonitor::$method(static::class, $db_item);
+					break;
+
+				case ITEM_TYPE_IPMI:
+					$api_input_rules['fields'] += CItemTypeIpmi::$method(static::class, $db_item);
+					break;
+
+				case ITEM_TYPE_SSH:
+					$api_input_rules['fields'] += CItemTypeSsh::$method(static::class, $db_item);
+					break;
+
+				case ITEM_TYPE_TELNET:
+					$api_input_rules['fields'] += CItemTypeTelnet::$method(static::class, $db_item);
+					break;
+
+				case ITEM_TYPE_CALCULATED:
+					$api_input_rules['fields'] += CItemTypeCalculated::$method(static::class, $db_item);
+					break;
+
+				case ITEM_TYPE_JMX:
+					$api_input_rules['fields'] += CItemTypeJmx::$method(static::class, $db_item);
+					break;
+
+				case ITEM_TYPE_SNMPTRAP:
+					$api_input_rules['fields'] += CItemTypeSnmpTrap::$method(static::class, $db_item);
+					break;
+
+				case ITEM_TYPE_DEPENDENT:
+					$api_input_rules['fields'] += CItemTypeDependent::$method(static::class, $db_item);
+					break;
+
+				case ITEM_TYPE_HTTPAGENT:
+					$api_input_rules['fields'] += CItemTypeHttpAgent::$method(static::class, $db_item);
+					break;
+
+				case ITEM_TYPE_SNMP:
+					$api_input_rules['fields'] += CItemTypeSnmp::$method(static::class, $db_item);
+					break;
+
+				case ITEM_TYPE_SCRIPT:
+					$api_input_rules['fields'] += CItemTypeScript::$method(static::class, $db_item);
+					break;
+			}
+
+			if (!CApiInputValidator::validate($api_input_rules, $item, '/'.($i + 1), $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			}
+		}
+		unset($item);
 	}
 
 	/**
@@ -794,28 +654,31 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * @param array $items
-	 * @param array $db_hosts
+	 * @param array      $items
+	 * @param array|null $db_items
 	 *
 	 * @throws APIException
 	 */
-	protected function checkItemKey(array $items, array $db_hosts): void {
+	protected static function checkItemKey(array $items, array $db_items = null): void {
 		$item_key_parser = new CItemKey();
 
-		foreach ($items as $item) {
-			$host = $db_hosts[$item['hostid']];
+		foreach ($items as $i => $item) {
+			if ($db_items !== null && $item['type'] == $db_items[$item['itemid']]['type']
+					&& $item['key_'] === $db_items[$item['itemid']]['key_']) {
+				continue;
+			}
 
 			if ($item_key_parser->parse($item['key_']) != CParser::PARSE_SUCCESS) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_params($this->getErrorMsg(self::ERROR_INVALID_KEY), [
-						$item['key_'], $item['name'], $host['name'], $item_key_parser->getError()
-					])
-				);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/key_',
+					$item_key_parser->getError()
+				));
 			}
 
 			if ($item['type'] == ITEM_TYPE_SNMPTRAP && $item['key_'] !== 'snmptrap.fallback'
 					&& $item_key_parser->getKey() !== 'snmptrap') {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('SNMP trap key is invalid.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/key_',
+					_('invalid SNMP trap key')
+				));
 			}
 		}
 	}
@@ -826,43 +689,13 @@ abstract class CItemGeneral extends CApiService {
 	 * @throws APIException
 	 */
 	protected function checkSpecificFields(array &$items): void {
-		$update_interval_parser = new CUpdateIntervalParser([
-			'usermacros' => true,
-			'lldmacros' => ($this instanceof CItemPrototype)
-		]);
-
 		foreach ($items as $i => &$item) {
-			if (array_key_exists('delay', $item)
-					&& !in_array($item['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
-					&& ($item['type'] != ITEM_TYPE_ZABBIX_ACTIVE || strncmp($item['key_'], 'mqtt.get', 8) !== 0)
-					&& !validateDelay($update_interval_parser, 'delay', $item['delay'], $error)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-			}
-
 			switch ($item['type']) {
-				case ITEM_TYPE_IPMI:
-					if ($item['key_'] !== 'ipmi.get'
-							&& (!array_key_exists('ipmi_sensor', $item) || $item['ipmi_sensor'] === '')) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-							'ipmi_sensor', _('cannot be empty')
-						));
-					}
-					break;
-
-				case ITEM_TYPE_SSH:
-					if (array_key_exists('authtype', $item) && $item['authtype'] == ITEM_AUTHTYPE_PUBLICKEY) {
-						if ($item['publickey'] === '') {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('No public key file specified.'));
-						}
-
-						if ($item['privatekey'] === '') {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('No private key file specified.'));
-						}
-					}
-					break;
-
 				case ITEM_TYPE_JMX:
-					if (($item['username'] === '') !== ($item['password'] === '')) {
+					if ((array_key_exists('username', $item) && !array_key_exists('password', $item))
+							|| (!array_key_exists('username', $item) && array_key_exists('password', $item))
+							|| (array_key_exists('username', $item) && array_key_exists('password', $item)
+								&& ($item['username'] === '') !== ($item['password'] === ''))) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 							'username', _('both username and password should be either present or empty')
 						));
@@ -870,46 +703,12 @@ abstract class CItemGeneral extends CApiService {
 					break;
 
 				case ITEM_TYPE_HTTPAGENT:
-					$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-						'post_type' =>	['type' => API_INT32, 'in' => implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML])],
-						'posts' =>		['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'post_type', 'in' => ZBX_POSTTYPE_JSON], 'type' => API_JSON, 'flags' => API_ALLOW_USER_MACRO | $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0, 'macros_n' => ['{HOST.IP}', '{HOST.CONN}', '{HOST.DNS}', '{HOST.HOST}', '{HOST.NAME}', '{ITEM.ID}', '{ITEM.KEY}', '{ITEM.KEY.ORIG}'], 'length' => DB::getFieldLength('items', 'posts')],
-											['if' => ['field' => 'post_type', 'in' => ZBX_POSTTYPE_XML], 'type' => API_XML, 'length' => DB::getFieldLength('items', 'posts')],
-											['else' => true, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'posts')]
-						]]
-					]];
-
-					$data = array_intersect_key($item, $api_input_rules['fields']);
-
-					if ($data) {
-						if (!CApiInputValidator::validate($api_input_rules, $data, '/'.($i + 1), $error)) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-						}
-					}
-
-					if (array_key_exists('request_method', $item)
-							&& $item['request_method'] == HTTPCHECK_REQUEST_HEAD
-							&& array_key_exists('retrieve_mode', $item)
-							&& $item['retrieve_mode'] != HTTPTEST_STEP_RETRIEVE_MODE_HEADERS) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-							'retrieve_mode', _s('value must be %1$s', HTTPTEST_STEP_RETRIEVE_MODE_HEADERS)
-						));
-					}
-
-					if (array_key_exists('trapper_hosts', $item) && $item['trapper_hosts'] !== ''
-							&& (!array_key_exists('allow_traps', $item)
-								|| $item['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_OFF)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Incorrect value for field "%1$s": %2$s.', 'trapper_hosts', _('should be empty'))
-						);
-					}
-
 					if (array_key_exists('query_fields', $item)) {
 						if ($item['query_fields']) {
 							foreach ($item['query_fields'] as $v) {
 								if (!is_array($v) || count($v) > 1 || key($v) === '') {
 									self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-										'query_fields', _('nonempty key and value pair expected'))
+										'/'.($i + 1).'/query_fields', _('nonempty key and value pair expected'))
 									);
 								}
 							}
@@ -1109,7 +908,7 @@ abstract class CItemGeneral extends CApiService {
 				static::validateInventoryLinks($upd_items, true);
 			}
 
-			$db_items = $this->getAffectedObjects($upd_items, false);
+			$db_items = $this->getDbObjects($upd_items);
 
 			$this->updateForce($upd_items, $db_items);
 		}
@@ -1693,14 +1492,19 @@ abstract class CItemGeneral extends CApiService {
 	 * Check if any item from list already exists.
 	 * If items have item ids it will check for existing item with different itemid.
 	 *
-	 * @throws APIException
+	 * @param array      $items
+	 * @param array|null $db_items
 	 *
-	 * @param array $items
+	 * @throws APIException
 	 */
-	protected static function checkDuplicates(array $items): void {
+	protected static function checkDuplicates(array $items, array $db_items = null): void {
 		$itemKeysByHostId = [];
 		$itemIds = [];
 		foreach ($items as $item) {
+			if ($db_items !== null && $item['key_'] === $db_items[$item['itemid']]['key_']) {
+				continue;
+			}
+
 			if (!isset($itemKeysByHostId[$item['hostid']])) {
 				$itemKeysByHostId[$item['hostid']] = [];
 			}
@@ -1741,12 +1545,11 @@ abstract class CItemGeneral extends CApiService {
 	 * @throws APIException
 	 */
 	protected static function checkHostInterface(array $items, array $db_hosts, array $db_items = null): void {
-		$db_interfaces = API::HostInterface()->get([
-			'output' => ['interfaceid', 'hostid', 'type'],
-			'hostids' => array_column($db_hosts, 'hostid'),
-			'nopermissions' => true,
-			'preservekeys' => true
-		]);
+		$db_interfaces = DBfetchArrayAssoc(DBselect(
+			'SELECT i.interfaceid,i.hostid,i.type'.
+				' FROM interface i'.
+				' WHERE '.dbConditionInt('i.hostid', array_column($db_hosts, 'hostid'))
+		), 'interfaceid');
 
 		$item_types_with_interfaces = [
 			ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
@@ -2324,13 +2127,10 @@ abstract class CItemGeneral extends CApiService {
 
 	/**
 	 * @param array $items
-	 * @param bool  $check_permissions
-	 *
-	 * @throws APIException
 	 *
 	 * @return array
 	 */
-	protected function getAffectedObjects(array $items, bool $check_permissions = true): array {
+	protected function getDbObjects(array $items): array {
 		$output = ['itemid', 'templateid'];
 
 		foreach ($this->field_rules as $field => $rules) {
@@ -2343,6 +2143,7 @@ abstract class CItemGeneral extends CApiService {
 			'output' => $output,
 			'itemids' => array_column($items, 'itemid'),
 			'editable' => true,
+			'nopermissions' => true,
 			'preservekeys' => true
 		];
 
@@ -2352,18 +2153,17 @@ abstract class CItemGeneral extends CApiService {
 
 		$db_items = $this->get($options);
 
-		if ($check_permissions && count($items) != count($db_items)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-
-		if ($this instanceof CItemPrototype) {
-			foreach ($db_items as &$db_item) {
+		foreach ($db_items as &$db_item) {
+			if ($db_item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$db_item['ruleid'] = $db_item['discoveryRule']['itemid'];
+				unset($db_item['discoveryRule']);
 			}
-			unset($db_item);
-		}
 
-		static::addAffectedObjects($items, $db_items);
+			// Fix for audit log, because field type in object is different from field type in DB object.
+			$db_item['query_fields'] = $db_item['query_fields'] ? json_encode($db_item['query_fields']) : '';
+			$db_item['headers'] = self::headersArrayToString($db_item['headers']);
+		}
+		unset($db_item);
 
 		return $db_items;
 	}
@@ -2373,13 +2173,6 @@ abstract class CItemGeneral extends CApiService {
 	 * @param array $db_items
 	 */
 	protected static function addAffectedObjects(array $items, array &$db_items): void {
-		// Fix for audit log, because field type in object is different from field type in DB object.
-		foreach ($db_items as &$db_item) {
-			$db_item['query_fields'] = $db_item['query_fields'] ? json_encode($db_item['query_fields']) : '';
-			$db_item['headers'] = self::headersArrayToString($db_item['headers']);
-		}
-		unset($db_item);
-
 		self::addAffectedParameters($items, $db_items);
 		self::addAffectedPreprocessing($items, $db_items);
 	}
