@@ -1564,6 +1564,34 @@ class CApiInputValidatorTest extends TestCase {
 			],
 			[
 				['type' => API_OBJECT, 'fields' => [
+					'host' => ['type' => API_ANY],
+					'name' => ['type' => API_STRING_UTF8]
+				]],
+				[
+					'host' => 'Zabbix server'
+				],
+				'/',
+				[
+					'host' => 'Zabbix server'
+				]
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'host' => ['type' => API_ANY],
+					'name' => ['type' => API_STRING_UTF8]
+				]],
+				[
+					'host' => 'Zabbix server',
+					'name' => 'Zabbix server'
+				],
+				'/',
+				[
+					'host' => 'Zabbix server',
+					'name' => 'Zabbix server'
+				]
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
 					'host' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
 					'name' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
 				]],
@@ -1615,6 +1643,18 @@ class CApiInputValidatorTest extends TestCase {
 				],
 				'/',
 				'Invalid parameter "/": unexpected parameter "ruleid".'
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'hostid' =>	['type' => API_ID],
+					'host' =>	['type'=> API_UNEXPECTED, 'error_type' => API_ERR_READONLY]
+				]],
+				[
+					'hostid' => '10428',
+					'host' => 'Abcd host'
+				],
+				'/',
+				'Invalid parameter "/": cannot update readonly parameter "host".'
 			],
 			[
 				['type' => API_OBJECT, 'fields' => [
@@ -1677,6 +1717,23 @@ class CApiInputValidatorTest extends TestCase {
 				],
 				'/',
 				'Invalid parameter "/": unexpected parameter "interface_ip".'
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'hostid' =>				['type' => API_ID],
+					'custom_interface' =>	['type'=> API_INT32, 'flags' => API_REQUIRED, 'in' => '0,1'],
+					'interface_ip' =>		['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'custom_interface', 'in' => '1'], 'type' => API_IP],
+												['else' => true, 'type' => API_UNEXPECTED, 'error_type' => API_ERR_READONLY]
+					]]
+				]],
+				[
+					'hostid' => '10428',
+					'custom_interface' => '0',
+					'interface_ip' => '127.0.0.1'
+				],
+				'/',
+				'Invalid parameter "/": cannot update readonly parameter "interface_ip".'
 			],
 			[
 				['type' => API_OBJECT, 'fields' => [
@@ -5863,6 +5920,156 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_PROMETHEUS_PATTERN, 'flags' => API_ALLOW_LLD_MACRO],
 				'{#LLD}',
 				'/1/prometheus_pattern',
+				'{#LLD}'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				null,
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": a character string is expected.'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				123,
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": a character string is expected.'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'',
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": cannot be empty.'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'abc',
+				'/1/item_key',
+				'abc'
+			],
+			[
+				['type' => API_ITEM_KEY, 'length' => 2],
+				'abc',
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": value is too long.'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'/abc',
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": incorrect syntax near "/abc".'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'abc[',
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": unexpected end of key.'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'abc]',
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": incorrect syntax near "]".'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'[abc]',
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": incorrect syntax near "[abc]".'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'abc[]',
+				'/1/item_key',
+				'abc[]'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'abc[0]',
+				'/1/item_key',
+				'abc[0]'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'item.key[server_{HOST.HOST}_local]',
+				'/1/item_key',
+				'item.key[server_{HOST.HOST}_local]'
+			],
+			[
+				['type' => API_ITEM_DELAY],
+				null,
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": a character string is expected.'
+			],
+			[
+				['type' => API_ITEM_DELAY],
+				'abc',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": invalid delay.'
+			],
+			[
+				['type' => API_ITEM_DELAY],
+				123,
+				'/1/item_delay',
+				'123'
+			],
+			[
+				['type' => API_ITEM_DELAY],
+				'1m',
+				'/1/item_delay',
+				'1m'
+			],
+			[
+				['type' => API_ITEM_DELAY, 'length' => 2],
+				'10m',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": value is too long.'
+			],
+			[
+				['type' => API_ITEM_DELAY],
+				0,
+				'/1/item_delay',
+				'Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval.'
+			],
+			[
+				['type' => API_ITEM_DELAY],
+				'0;1m/1-5,10:00-18:00',
+				'/1/item_delay',
+				'0;1m/1-5,10:00-18:00'
+			],
+			[
+				['type' => API_ITEM_DELAY],
+				SEC_PER_DAY + 1,
+				'/1/item_delay',
+				'Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used.'
+			],
+			[
+				['type' => API_ITEM_DELAY],
+				'1m;30s/1-7,10:00-18:00',
+				'/1/item_delay',
+				'1m;30s/1-7,10:00-18:00'
+			],
+			[
+				['type' => API_ITEM_DELAY],
+				'1m;h9m/30',
+				'/1/item_delay',
+				'1m;h9m/30'
+			],
+			[
+				['type' => API_ITEM_DELAY],
+				'{$MACRO}',
+				'/1/item_delay',
+				'{$MACRO}'
+			],
+			[
+				['type' => API_ITEM_DELAY],
+				'{#LLD}',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": invalid delay.'
+			],
+			[
+				['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#LLD}',
+				'/1/item_delay',
 				'{#LLD}'
 			]
 		];

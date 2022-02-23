@@ -3331,6 +3331,10 @@ class CApiInputValidator {
 	private static function validateItemDelay(array $rule, &$data, string $path, string &$error): bool {
 		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
 
+		if (is_int($data)) {
+			$data = (string) $data;
+		}
+
 		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
 			return false;
 		}

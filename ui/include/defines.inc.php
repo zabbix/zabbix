@@ -1442,9 +1442,9 @@ define('ZBX_API_ERROR_NO_AUTH',		200);
 define('ZBX_API_ERROR_NO_METHOD',	300);
 
 // Error types of unexpected API parameter.
-define('API_ERR_READONLY', 1);
-define('API_ERR_INHERITED', 2);
-define('API_ERR_DISCOVERED', 3);
+define('API_ERR_READONLY', 0);
+define('API_ERR_INHERITED', 1);
+define('API_ERR_DISCOVERED', 2);
 
 define('API_OUTPUT_EXTEND',		'extend');
 define('API_OUTPUT_COUNT',		'count');
