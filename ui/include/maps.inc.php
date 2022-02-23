@@ -825,9 +825,9 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 				}
 			}
 
-			$i['latelyChanged'] |= ((time() - $lately_changed) < timeUnitToSeconds(CSettingsHelper::get(
-				CSettingsHelper::BLINK_PERIOD
-			)));
+			if ((time() - $lately_changed) < timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::BLINK_PERIOD))) {
+				$i['latelyChanged'] = true;
+			}
 		}
 
 		if ($critical_problem) {

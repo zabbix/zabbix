@@ -1,4 +1,3 @@
-<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -18,33 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+package zabbixsync
 
-/**
- * @var CView $this
- */
-?>
-
-<script type="text/javascript">
-	$(() => {
-		const $expires_row = $('#expires-at-row');
-		const $expires_at = $expires_row.find('#expires_at');
-		const $form = $(document.forms['token']);
-
-		$form.on('submit', () => $form.trimValues(['#name', '#description']));
-
-		$('#expires_state')
-			.on('change', ({target: {checked}}) => {
-				$expires_row.toggle(checked);
-				$expires_at.prop('disabled', !checked);
-			})
-			.trigger('change');
-
-		$('#regenerate').on('click', ({target}) => {
-			if (confirm($(target).data('confirmation'))) {
-				$form.append($('<input>', {type: 'hidden', name: 'regenerate', value: '1'}));
-				$form.find('#action_dst').val('token.view');
-				$form.submit();
-			}
-		});
-	});
-</script>
+func getMetrics() []string {
+	return []string{
+		"vfs.dir.get", "Directory entry list.",
+	}
+}
