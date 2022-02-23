@@ -44,6 +44,12 @@ Bug fixes:
 ...G...... [ZBX-20487] fixed agent handling of invalid time intervals (wiper)
 
 --------------------------------------------------------------------------------
+Changes for 6.0.1rc2
+
+Bug fixes:
+........S. [ZBX-20649] fixed crash when server attempted to use trigger after it was removed from cache (azeila)
+
+--------------------------------------------------------------------------------
 Changes for 6.0.1rc1
 
 New features:
@@ -478,6 +484,12 @@ A.F....... [ZBXNEXT-6528,ZBXNEXT-6669] moved auditlog calls from frontend sectio
 
 Bug fixes:
 .........T [ZBX-19395] changed version in links of the templates and the media (mchudinov)
+
+--------------------------------------------------------------------------------
+Changes for 5.4.11rc2
+
+Bug fixes:
+........S. [ZBX-20649] fixed crash when server attempted to use trigger after it was removed from cache (azeila)
 
 --------------------------------------------------------------------------------
 Changes for 5.4.11rc1
