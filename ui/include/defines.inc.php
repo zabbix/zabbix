@@ -1403,6 +1403,9 @@ define('API_MULTIPLIER',			56);
 define('API_JSON',					57);
 define('API_XML',					58);
 define('API_PROMETHEUS_PATTERN',	59);
+define('API_ITEM_KEY',				60);
+define('API_ITEM_DELAY',			61);
+define('API_ANY',					62);
 
 // flags
 define('API_REQUIRED',					0x00001);
@@ -1439,8 +1442,9 @@ define('ZBX_API_ERROR_NO_AUTH',		200);
 define('ZBX_API_ERROR_NO_METHOD',	300);
 
 // Error types of unexpected API parameter.
-define('API_ERR_INHERITED', 0);
-define('API_ERR_DISCOVERED', 1);
+define('API_ERR_READONLY', 1);
+define('API_ERR_INHERITED', 2);
+define('API_ERR_DISCOVERED', 3);
 
 define('API_OUTPUT_EXTEND',		'extend');
 define('API_OUTPUT_COUNT',		'count');

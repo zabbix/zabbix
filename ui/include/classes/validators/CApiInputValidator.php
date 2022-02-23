@@ -239,6 +239,12 @@ class CApiInputValidator {
 
 			case API_PROMETHEUS_PATTERN:
 				return self::validatePrometheusPattern($rule, $data, $path, $error);
+
+			case API_ITEM_KEY:
+				return self::validateItemKey($rule, $data, $path, $error);
+
+			case API_ITEM_DELAY:
+				return self::validateItemDelay($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -310,11 +316,13 @@ class CApiInputValidator {
 			case API_MULTIPLIER:
 			case API_XML:
 			case API_PROMETHEUS_PATTERN:
+			case API_ITEM_KEY:
+			case API_ITEM_DELAY:
 				return true;
 
 			case API_OBJECT:
 				foreach ($rule['fields'] as $field_name => $field_rule) {
-					if ($data !== null && array_key_exists($field_name, $data)) {
+					if ($data !== null && array_key_exists($field_name, $data) && $field_rule['type'] != API_ANY) {
 						if ($field_rule['type'] === API_MULTIPLE) {
 							foreach ($field_rule['rules'] as $multiple_rule) {
 								if (array_key_exists('else', $multiple_rule)
@@ -1222,6 +1230,10 @@ class CApiInputValidator {
 
 		// validation of the values type
 		foreach ($rule['fields'] as $field_name => $field_rule) {
+			if ($field_rule['type'] == API_ANY) {
+				continue;
+			}
+
 			if ($field_rule['type'] === API_MULTIPLE) {
 				foreach ($field_rule['rules'] as $multiple_rule) {
 					if (array_key_exists('else', $multiple_rule)
@@ -2113,7 +2125,7 @@ class CApiInputValidator {
 
 		foreach ($data as $index => $object) {
 			foreach ($rule['fields'] as $field_name => $field_rule) {
-				if (array_key_exists($field_name, $object)) {
+				if (array_key_exists($field_name, $object) && $field_rule['type'] != API_ANY) {
 					if ($field_rule['type'] === API_MULTIPLE) {
 						foreach ($field_rule['rules'] as $multiple_rule) {
 							if (array_key_exists('else', $multiple_rule)
@@ -3091,7 +3103,7 @@ class CApiInputValidator {
 	 *
 	 * @param string $field_name
 	 * @param array  $field_rule
-	 * @param string $field_rule[error_type]  (optional) API_ERR_INHERITED, API_ERR_DISCOVERED
+	 * @param string $field_rule['error_type']  (optional) API_ERR_READONLY, API_ERR_INHERITED, API_ERR_DISCOVERED
 	 * @param array  $object
 	 * @param string $path
 	 * @param string $error
@@ -3111,6 +3123,12 @@ class CApiInputValidator {
 		}
 
 		switch ($field_rule['error_type']) {
+			case API_ERR_READONLY:
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+					_s('cannot update readonly parameter "%1$s"', $field_name)
+				);
+				break;
+
 			case API_ERR_INHERITED:
 				$error = _s('Invalid parameter "%1$s": %2$s.', $path,
 					_s('cannot update readonly parameter "%1$s" of inherited object', $field_name)
@@ -3266,6 +3284,110 @@ class CApiInputValidator {
 		if ($prometheus_pattern_parser->parse($data) != CParser::PARSE_SUCCESS) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid Prometheus pattern'));
 			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * @param array  $rule
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateItemKey(array $rule, &$data, string $path, string &$error): bool {
+		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		$item_key_parser = new CItemKey();
+
+		if ($item_key_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $item_key_parser->getError());
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_ALLOW_LLD_MACRO
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateItemDelay(array $rule, &$data, string $path, string &$error): bool {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+
+			return false;
+		}
+
+		$update_interval_parser = new CUpdateIntervalParser([
+			'usermacros' => true,
+			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO)
+		]);
+
+		if ($update_interval_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid delay'));
+
+			return false;
+		}
+
+		$delay = $update_interval_parser->getDelay();
+
+		if ($delay[0] !== '{') {
+			$delay_sec = timeUnitToSeconds($delay);
+			$intervals = $update_interval_parser->getIntervals();
+			$flexible_intervals = $update_interval_parser->getIntervals(ITEM_DELAY_FLEXIBLE);
+			$has_scheduling_intervals = (bool) $update_interval_parser->getIntervals(ITEM_DELAY_SCHEDULING);
+			$has_macros = false;
+
+			foreach ($intervals as $interval) {
+				if (strpos($interval['interval'], '{') !== false) {
+					$has_macros = true;
+					break;
+				}
+			}
+
+			// If delay is 0, there must be at least one either flexible or scheduling interval.
+			if ($delay_sec == 0 && !$intervals) {
+				$error = _('Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval.');
+
+				return false;
+			}
+
+			if ($delay_sec < 0 || $delay_sec > SEC_PER_DAY) {
+				$error = _('Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used.');
+
+				return false;
+			}
+
+			// If there are scheduling intervals or intervals with macros, skip the next check calculation.
+			if (!$has_macros && !$has_scheduling_intervals && $flexible_intervals
+					&& calculateItemNextCheck(0, $delay_sec, $flexible_intervals, time()) == ZBX_JAN_2038) {
+				$error = _('Item will not be refreshed. Please enter a correct update interval.');
+
+				return false;
+			}
 		}
 
 		return true;
