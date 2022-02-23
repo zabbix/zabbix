@@ -635,7 +635,7 @@ class CAudit {
 	 * Checks by path, whether the value of the object should be masked.
 	 *
 	 * @param int    $resource
-	 * @param string $real_path
+	 * @param string $path
 	 * @param array  $object
 	 *
 	 * @return bool
