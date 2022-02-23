@@ -387,31 +387,32 @@ class testGeomapWidgetScreenshots extends CWebTest {
 			$this->query("xpath://h4[text()=".CXPathHelper::escapeQuotes($widget).
 					"]/../../div[not(contains(@class,\"is-loading\"))]")->waitUntilPresent()->one();
 
-			// This JS is needed for waiting until map image is loaded.
-			$expected = true;
-			$callback = function () use ($widget, &$expected) {
-				return CElementQuery::getDriver()->executeScript(
-					'var widgets = ZABBIX.Dashboard._dashboard_pages.keys().next().value._widgets;'.
-					'var result = false;'.
-					'widgets.forEach(function(_, widget) {'.
-					'   if (widget._name === '.json_encode($widget).') {'.
-					'       var layers = widget._map._layers;'.
-					'       var keys = Object.keys(layers);'.
-					'       for (var i = 0; i < keys.length; i++) {'.
-					'           if (typeof layers[keys[i]]._url === "undefined") {'.
-					'               continue;'.
-					'           }'.
-					'           result = layers[keys[i]]._loading === '.json_encode($expected).';'.
-					'       }'.
-					'   }'.
-					'});'.
-					'return result;'
-				);
-			};
-			CElementQuery::wait()->until($callback);
-			$expected = false;
-			CElementQuery::wait()->until($callback);
+//			// This JS is needed for waiting until map image is loaded.
+//			$expected = true;
+//			$callback = function () use ($widget, &$expected) {
+//				return CElementQuery::getDriver()->executeScript(
+//					'var widgets = ZABBIX.Dashboard._dashboard_pages.keys().next().value._widgets;'.
+//					'var result = false;'.
+//					'widgets.forEach(function(_, widget) {'.
+//					'   if (widget._name === '.json_encode($widget).') {'.
+//					'       var layers = widget._map._layers;'.
+//					'       var keys = Object.keys(layers);'.
+//					'       for (var i = 0; i < keys.length; i++) {'.
+//					'           if (typeof layers[keys[i]]._url === "undefined") {'.
+//					'               continue;'.
+//					'           }'.
+//					'           result = layers[keys[i]]._loading === '.json_encode($expected).';'.
+//					'       }'.
+//					'   }'.
+//					'});'.
+//					'return result;'
+//				);
+//			};
+//			CElementQuery::wait()->until($callback);
+//			$expected = false;
+//			CElementQuery::wait()->until($callback);
 
+			sleep(25);
 			$this->assertScreenshot($this->query("xpath://div[@class=\"dashboard-grid-widget\"]//h4[text()=".
 					CXPathHelper::escapeQuotes($widget)."]/../..")->waitUntilVisible()->one(), $widget.' '.$data['Tile provider']
 			);
