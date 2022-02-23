@@ -11,6 +11,7 @@ A.F....... [ZBXNEXT-6470,ZBXNEXT-6959] implemented audit logging of host prototy
 .........T [ZBXNEXT-6624] added triggers, macros, changed filters and overrides in LLD rules (mchudinov)
 
 Bug fixes:
+........S. [ZBX-20649] fixed crash when server attempted to use trigger after it was removed from cache (wiper)
 ....I..... [ZBX-20617] fixed default geomap provider on clean install (Sasha)
 ........S. [ZBX-20530] fixed compilation error on FreeBSD (asestakovs)
 .........T [ZBX-20443] fixed requirement of admin rights for creating issues with custom fields and added option to close tasks in Redmine webhook (abiba)
