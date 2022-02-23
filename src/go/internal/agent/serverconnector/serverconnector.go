@@ -45,16 +45,17 @@ const hostInterfaceLen = 255
 const defaultAgentPort = 10050
 
 type Connector struct {
-	clientID    uint64
-	input       chan interface{}
-	address     string
-	hostname    string
-	localAddr   net.Addr
-	lastError   error
-	resultCache resultcache.ResultCache
-	taskManager scheduler.Scheduler
-	options     *agent.AgentOptions
-	tlsConfig   *tls.Config
+	clientID                   uint64
+	input                      chan interface{}
+	address                    string
+	hostname                   string
+	localAddr                  net.Addr
+	lastError                  error
+	firstActiveChecksRefreshed bool
+	resultCache                resultcache.ResultCache
+	taskManager                scheduler.Scheduler
+	options                    *agent.AgentOptions
+	tlsConfig                  *tls.Config
 }
 
 type activeChecksRequest struct {
@@ -68,9 +69,9 @@ type activeChecksRequest struct {
 }
 
 type activeChecksResponse struct {
-	Response string            `json:"response"`
-	Info     string            `json:"info"`
-	Data     []*plugin.Request `json:"data"`
+	Response    string               `json:"response"`
+	Info        string               `json:"info"`
+	Data        []*plugin.Request    `json:"data"`
 	Expressions []*glexpr.Expression `json:"regexp"`
 }
 
@@ -192,7 +193,9 @@ func (c *Connector) refreshActiveChecks() {
 		} else {
 			log.Errf("[%d] no active checks on server [%s]", c.clientID, c.address)
 		}
-		c.taskManager.UpdateTasks(c.clientID, c.resultCache.(plugin.ResultWriter), []*glexpr.Expression{}, []*plugin.Request{})
+		c.taskManager.UpdateTasks(c.clientID, c.resultCache.(plugin.ResultWriter), c.firstActiveChecksRefreshed,
+			[]*glexpr.Expression{}, []*plugin.Request{})
+		c.firstActiveChecksRefreshed = true
 		return
 	}
 
@@ -278,7 +281,9 @@ func (c *Connector) refreshActiveChecks() {
 		}
 	}
 
-	c.taskManager.UpdateTasks(c.clientID, c.resultCache.(plugin.ResultWriter), response.Expressions, response.Data)
+	c.taskManager.UpdateTasks(c.clientID, c.resultCache.(plugin.ResultWriter), c.firstActiveChecksRefreshed,
+		response.Expressions, response.Data)
+	c.firstActiveChecksRefreshed = true
 }
 
 func (c *Connector) run() {
