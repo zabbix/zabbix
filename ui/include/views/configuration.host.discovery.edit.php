@@ -766,7 +766,7 @@ $condition_tab->addItem([
 $condition_table = (new CTable())
 	->setId('conditions')
 	->addStyle('width: 100%;')
-	->setHeader([_('Label'), _('Macro'), '', _('Regular expression'), _('Action')]);
+	->setHeader(['',_('Label'), _('Macro'), _('Regular expression'), (new CColHeader(_('Action')))->setWidth('100%')]);
 
 $conditions = $data['conditions'];
 
