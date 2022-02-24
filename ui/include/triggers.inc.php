@@ -2562,7 +2562,7 @@ function makeTriggerDependencies(array $dependencies, $freeze_on_click = true) {
 				$table->addRow($description);
 			}
 
-			$result[] = (new CSpan())
+			$result[] = (new CLink())
 				->addClass($class)
 				->addClass(ZBX_STYLE_CURSOR_POINTER)
 				->setHint($table, '', $freeze_on_click);
