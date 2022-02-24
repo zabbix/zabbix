@@ -255,7 +255,7 @@ class testGeomapWidgetScreenshots extends CWebTest {
 
 	public static function getZoomWidgetData() {
 		return [
-			// These providers are commented, because images on screenshots are not stable even after 20 seconds sleep.
+			// Some providers are commented, because images on screenshots are not stable even after 20 seconds sleep.
 //			[
 //				[
 //					'Tile provider' => 'OpenTopoMap'
