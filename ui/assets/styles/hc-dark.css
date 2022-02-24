@@ -1170,10 +1170,12 @@ form.is-loading {
       margin-right: 4px; }
     .list-table .action-container [class*='icon-'] {
       flex-shrink: 0; }
-  .list-table td .icon-maintenance,
-  .list-table td .icon-depend-up,
-  .list-table td .icon-depend-down {
+  .list-table td .icon-maintenance {
     margin: 0 0 -3px 4px; }
+  .list-table td .icon-depend-up,
+  .list-table td .icon-depend-down,
+  .list-table td .icon-ackn {
+    margin: 0 4px -3px 0; }
   .list-table.compact-view .link-action {
     color: #ffffff; }
     .list-table.compact-view .link-action.red {
@@ -1204,9 +1206,6 @@ form.is-loading {
         top: 0; }
       .list-table.compact-view td [class*='icon-']:last-of-type {
         margin-right: 0; }
-    .list-table.compact-view td [class*='icon-depend-'] {
-      width: 12px;
-      margin-right: 0; }
     .list-table.compact-view td .rel-container span {
       margin: 0; }
     .list-table.compact-view td .tag {
@@ -1227,11 +1226,18 @@ form.is-loading {
     .list-table.compact-view td .icon-maintenance {
       height: 12px;
       width: 12px;
-      margin: 3px 1px 2px 2px; }
+      margin: 3px 1px 2px 4px; }
       .list-table.compact-view td .icon-maintenance::before {
         height: 12px;
         width: 12px;
         background-position: -48px -804px; }
+    .list-table.compact-view td .icon-depend-up,
+    .list-table.compact-view td .icon-depend-down {
+      width: 12px; }
+    .list-table.compact-view td .icon-depend-up::before {
+      background-position: -49px -731px; }
+    .list-table.compact-view td .icon-depend-down::before {
+      background-position: -49px -767px; }
     .list-table.compact-view td .icon-wzrd-action {
       background: url("../img/icon-sprite.svg?20200407") no-repeat -6px -624px;
       height: 12px;
@@ -2540,20 +2546,37 @@ z-select[disabled] button,
   display: inline-block;
   margin: 0 14px 0 0; }
 
+.icon-maintenance {
+  margin: 0 18px 0 0;
+  position: relative;
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 2px; }
+  .icon-maintenance::before {
+    background: url("../img/icon-sprite.svg?20200407") no-repeat -47px -803px;
+    width: 14px;
+    height: 14px;
+    left: 1px;
+    top: 1px; }
+  .icon-maintenance:link, .icon-maintenance:hover, .icon-maintenance:focus {
+    border-bottom: none; }
+  .icon-maintenance:focus {
+    box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35); }
+
 .icon-depend-up {
   margin: 0 18px 0 0;
   position: relative;
   display: inline-block;
   width: 16px;
   height: 16px;
-  border-radius: 2px;
-  right: 5px; }
+  border-radius: 2px; }
   .icon-depend-up::before {
-    background: url("../img/icon-sprite.svg?20200407") no-repeat -49px -729px;
+    background: url("../img/icon-sprite.svg?20200407") no-repeat -47px -731px;
     width: 14px;
     height: 14px;
-    left: 3px;
-    top: -1px; }
+    left: 1px;
+    top: 1px; }
   .icon-depend-up:link, .icon-depend-up:hover, .icon-depend-up:focus {
     border-bottom: none; }
   .icon-depend-up:focus {
@@ -2565,14 +2588,13 @@ z-select[disabled] button,
   display: inline-block;
   width: 16px;
   height: 16px;
-  border-radius: 2px;
-  right: 5px; }
+  border-radius: 2px; }
   .icon-depend-down::before {
-    background: url("../img/icon-sprite.svg?20200407") no-repeat -49px -765px;
+    background: url("../img/icon-sprite.svg?20200407") no-repeat -47px -767px;
     width: 14px;
     height: 14px;
-    left: 3px;
-    top: -1px; }
+    left: 1px;
+    top: 1px; }
   .icon-depend-down:link, .icon-depend-down:hover, .icon-depend-down:focus {
     border-bottom: none; }
   .icon-depend-down:focus {
@@ -2584,34 +2606,16 @@ z-select[disabled] button,
   display: inline-block;
   width: 16px;
   height: 16px;
-  border-radius: 2px;
-  right: 5px; }
-  .icon-ackn::before {
-    background: url("../img/icon-sprite.svg?20200407") no-repeat -45px -693px;
-    width: 14px;
-    height: 14px;
-    left: 3px;
-    top: -1px; }
-  .icon-ackn:link, .icon-ackn:hover, .icon-ackn:focus {
-    border-bottom: none; }
-  .icon-ackn:focus {
-    box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35); }
-
-.icon-maintenance {
-  position: relative;
-  display: inline-block;
-  width: 16px;
-  height: 16px;
   border-radius: 2px; }
-  .icon-maintenance::before {
-    background: url("../img/icon-sprite.svg?20200407") no-repeat -49px -805px;
+  .icon-ackn::before {
+    background: url("../img/icon-sprite.svg?20200407") no-repeat -47px -694px;
     width: 14px;
     height: 14px;
     left: 1px;
     top: 1px; }
-  .icon-maintenance:link, .icon-maintenance:hover, .icon-maintenance:focus {
+  .icon-ackn:link, .icon-ackn:hover, .icon-ackn:focus {
     border-bottom: none; }
-  .icon-maintenance:focus {
+  .icon-ackn:focus {
     box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35); }
 
 .icon-tree-top-bottom, .icon-tree-top-bottom-right, .icon-tree-top-right, .icon-tree-empty {
@@ -2653,7 +2657,7 @@ z-select[disabled] button,
     opacity: 1;
     background-color: transparent; }
 
-.icon-depend-up::before, .icon-depend-down::before, .icon-ackn::before, .icon-maintenance::before {
+.icon-maintenance::before, .icon-depend-up::before, .icon-depend-down::before, .icon-ackn::before {
   display: inline-block;
   width: 18px;
   height: 18px;
@@ -5812,10 +5816,10 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   background-position: -359px -803px; }
 
 .icon-depend-up::before {
-  background-position: -361px -729px; }
+  background-position: -359px -731px; }
 
 .icon-depend-down::before {
-  background-position: -361px -765px; }
+  background-position: -359px -766px; }
 
 .icon-ackn::before {
   background-position: -357px -693px; }
@@ -6094,8 +6098,10 @@ z-select button.focusable:focus,
   .list-table.compact-view td.na-bg::after, .list-table.compact-view td.normal-bg::after, .list-table.compact-view td.info-bg::after, .list-table.compact-view td.warning-bg::after, .list-table.compact-view td.average-bg::after, .list-table.compact-view td.high-bg::after, .list-table.compact-view td.disaster-bg::after {
     top: 1px;
     transform: scale(0.8); }
-  .list-table.compact-view td .icon-maintenance::before {
-    background-position: -362px -805px; }
+  .list-table.compact-view td .icon-depend-up::before {
+    background-position: -361px -731px; }
+  .list-table.compact-view td .icon-depend-down::before {
+    background-position: -361px -767px; }
   .list-table.compact-view td .icon-wzrd-action {
     background: transparent url("../img/icon-sprite.svg?20200407") no-repeat -318px -624px; }
 
