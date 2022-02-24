@@ -30,8 +30,6 @@ use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriverDimension;
 use Facebook\WebDriver\Exception\NoSuchAlertException;
 use Facebook\WebDriver\WebDriverExpectedCondition;
-use Facebook\WebDriver\Interactions\Internal\WebDriverCoordinates;
-use Facebook\WebDriver\WebDriverPoint;
 
 /**
  * Web page implementation.
@@ -363,13 +361,6 @@ class CPage {
 
 				$this->viewportUpdated = true;
 			}
-		} catch (Exception $exception) {
-			// Code is not missing here.
-		}
-
-		try {
-			$callback = function () { return new WebDriverPoint(0, 0); };
-			$this->driver->getMouse()->mouseMove(new WebDriverCoordinates($callback, $callback, $callback, null));
 		} catch (Exception $exception) {
 			// Code is not missing here.
 		}

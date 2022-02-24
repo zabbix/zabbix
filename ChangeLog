@@ -1,6 +1,7 @@
 Changes for 6.2.0alpha1
 
 New features:
+.D.G...... [ZBXNEXT-7116] added ability to force active checks after restart on Zabbix agent2 (vso)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
 ...G...... [ZBXNEXT-7408] added native support for the net.dns and net.dns.record keys in Zabbix agent 2, fixed Zabbix agent 1 SOA response formatting (esneiders, ssimonenko)
 A.F....... [ZBXNEXT-7467] fixed strict types in bitwise operators (acikuns)
@@ -11,6 +12,9 @@ A.F....... [ZBXNEXT-6470,ZBXNEXT-6959] implemented audit logging of host prototy
 .........T [ZBXNEXT-6624] added triggers, macros, changed filters and overrides in LLD rules (mchudinov)
 
 Bug fixes:
+..F....... [ZBX-20619] fixed massupdate button form on Safari browser (ashubin)
+..F....... [ZBX-20465] fixed marking username entry mandatory for SSH and Telnet agent items (jfreibergs)
+........S. [ZBX-20649] fixed crash when server attempted to use trigger after it was removed from cache (wiper)
 ....I..... [ZBX-20617] fixed default geomap provider on clean install (Sasha)
 ........S. [ZBX-20530] fixed compilation error on FreeBSD (asestakovs)
 .........T [ZBX-20443] fixed requirement of admin rights for creating issues with custom fields and added option to close tasks in Redmine webhook (abiba)
@@ -41,6 +45,18 @@ Bug fixes:
 ..F....... [ZBX-19956] fixed Proxy address and PSK field issues when cloning a proxy and fixed green indicator not showing in edit mode (Ivo, miks)
 ..F....... [ZBX-20426] fixed maintenance icon with host name in latest data table (acikuns)
 ...G...... [ZBX-20487] fixed agent handling of invalid time intervals (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.1rc3
+
+Bug fixes:
+..F....... [ZBX-20619] fixed massupdate button form in Safari browser (ashubin)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.1rc2
+
+Bug fixes:
+........S. [ZBX-20649] fixed crash when server attempted to use trigger after it was removed from cache (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.1rc1
@@ -477,6 +493,12 @@ A.F....... [ZBXNEXT-6528,ZBXNEXT-6669] moved auditlog calls from frontend sectio
 
 Bug fixes:
 .........T [ZBX-19395] changed version in links of the templates and the media (mchudinov)
+
+--------------------------------------------------------------------------------
+Changes for 5.4.11rc2
+
+Bug fixes:
+........S. [ZBX-20649] fixed crash when server attempted to use trigger after it was removed from cache (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 5.4.11rc1
