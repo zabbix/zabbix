@@ -366,56 +366,55 @@ class testGeomapWidgetScreenshots extends CWebTest {
 	}
 
 	/**
-	 * Function for asserting screenshots of every widget depending on Tile provider.
+	 *  Function for asserting screenshots of every widget depending on Tile provider.
 	 *
 	 * @param array $data    data with tile providers
 	 */
 	private function assertWidgetScreenshot($data) {
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$zoom_dashboardid);
 		$this->page->waitUntilReady();
-
 		$widgets = [
-			'Geomap for screenshots, 5',
-			'Geomap for screenshots, 10',
-			'Geomap for screenshots, 30',
-			'Geomap for screenshots, no zoom',
-			'Geomap for screenshots, 3'
+				'Geomap for screenshots, 5',
+				'Geomap for screenshots, 10',
+				'Geomap for screenshots, 30',
+				'Geomap for screenshots, no zoom',
+				'Geomap for screenshots, 3'
 		];
-
 		foreach ($widgets as $widget) {
-			// Wait until loader disappears.
-			$this->query("xpath://h4[text()=".CXPathHelper::escapeQuotes($widget).
-					"]/../../div[not(contains(@class,\"is-loading\"))]")->waitUntilPresent()->one();
-
-			// This JS is needed for waiting until map image is loaded.
-			$expected = true;
-			$callback = function () use ($widget, &$expected) {
+				// Wait until loader disappears.
+				$this->query("xpath://h4[text()=".CXPathHelper::escapeQuotes($widget).
+								"]/../../div[not(contains(@class,\"is-loading\"))]")->waitUntilPresent()->one();
+		}
+		// Additional 2 seconds for loading sequence to settle.
+		sleep(20);
+		CElementQuery::wait(90)->until(function () {
 				return CElementQuery::getDriver()->executeScript(
-					'var widgets = ZABBIX.Dashboard._dashboard_pages.keys().next().value._widgets;'.
-					'var result = false;'.
-					'widgets.forEach(function(_, widget) {'.
-					'   if (widget._name === '.json_encode($widget).') {'.
-					'       var layers = widget._map._layers;'.
-					'       var keys = Object.keys(layers);'.
-					'       for (var i = 0; i < keys.length; i++) {'.
-					'           if (typeof layers[keys[i]]._url === "undefined") {'.
-					'               continue;'.
-					'           }'.
-					'           result = layers[keys[i]]._loading === '.json_encode($expected).';'.
-					'       }'.
-					'   }'.
-					'});'.
-					'return result;'
+						'var widgets = ZABBIX.Dashboard._dashboard_pages.keys().next().value._widgets;'.
+						'var result = true;'.
+						'widgets.forEach(function(_, widget) {'.
+						'   var layers = widget._map._layers;'.
+						'   var keys = Object.keys(layers);'.
+						'   for (var i = 0; i < keys.length; i++) {'.
+						'       if (typeof layers[keys[i]]._url === "undefined") {'.
+						'           continue;'.
+						'       }'.
+						'       result &= !layers[keys[i]]._loading;'.
+						'   }'.
+						'});'.
+						'return result;'
 				);
-			};
-			CElementQuery::wait()->until($callback);
-			$expected = false;
-			CElementQuery::wait()->until($callback);
-
-//			sleep(25);
-			$this->assertScreenshot($this->query("xpath://div[@class=\"dashboard-grid-widget\"]//h4[text()=".
-					CXPathHelper::escapeQuotes($widget)."]/../..")->waitUntilVisible()->one(), $widget.' '.$data['Tile provider']
-			);
+		});
+		foreach ($widgets as $widget) {
+			$id = $widget.' '.$data['Tile provider'];
+			$element = $this->query("xpath://div[@class=\"dashboard-grid-widget\"]//h4[text()=".
+									CXPathHelper::escapeQuotes($widget)."]/../..")->waitUntilVisible()->one();
+			try {
+					$this->assertScreenshot($element, $id);
+			}
+			catch (Exception $e) {
+					sleep(3);
+					$this->assertScreenshot($element, $id);
+			}
 		}
 	}
 }
