@@ -384,7 +384,7 @@ int	daemon_start(int allow_root, const char *user, unsigned int flags)
 			{
 				/* wait for the forked child to create pid file*/
 				while (0 < pid_file_timeout && 0 == kill(child_pid, 0) &&
-						0 != stat(CONFIG_PID_FILE, &stat_buff))
+						0 != zbx_stat(CONFIG_PID_FILE, &stat_buff))
 				{
 					pid_file_timeout--;
 					usleep(100000);
