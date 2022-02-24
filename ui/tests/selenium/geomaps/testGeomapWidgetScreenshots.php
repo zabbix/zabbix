@@ -276,11 +276,11 @@ class testGeomapWidgetScreenshots extends CWebTest {
 					'Tile provider' => 'Stamen Terrain'
 				]
 			],
-			[
-				[
-					'Tile provider' => 'USGS US Topo'
-				]
-			],
+//			[
+//				[
+//					'Tile provider' => 'USGS US Topo'
+//				]
+//			],
 			[
 				[
 					'Tile provider' => 'USGS US Imagery'
