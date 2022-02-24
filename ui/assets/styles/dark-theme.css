@@ -2891,13 +2891,6 @@ form.is-loading {
         top: 0; }
       .list-table.compact-view td [class*='icon-']:last-of-type {
         margin-right: 0; }
-    .list-table.compact-view td .icon-depend-up,
-    .list-table.compact-view td .icon-depend-down {
-      width: 12px; }
-    .list-table.compact-view td .icon-depend-up::before {
-      background-position: -49px -731px; }
-    .list-table.compact-view td .icon-depend-down::before {
-      background-position: -49px -767px; }
     .list-table.compact-view td .rel-container span {
       margin: 0; }
     .list-table.compact-view td .tag {
@@ -2923,6 +2916,13 @@ form.is-loading {
         height: 12px;
         width: 12px;
         background-position: -49px -805px; }
+    .list-table.compact-view td .icon-depend-up,
+    .list-table.compact-view td .icon-depend-down {
+      width: 12px; }
+    .list-table.compact-view td .icon-depend-up::before {
+      background-position: -49px -731px; }
+    .list-table.compact-view td .icon-depend-down::before {
+      background-position: -49px -767px; }
     .list-table.compact-view td .icon-wzrd-action {
       background: url("../img/icon-sprite.svg?20211222") no-repeat -6px -624px;
       height: 12px;

@@ -464,19 +464,6 @@ form {
 				}
 			}
 
-			.icon-depend-up,
-			.icon-depend-down {
-				width: 12px;
-			}
-
-			.icon-depend-up::before {
-				background-position: -49px -731px;
-			}
-
-			.icon-depend-down::before {
-				background-position: -49px -767px;
-			}
-
 			.rel-container {
 				span {
 					margin: 0;
@@ -513,6 +500,19 @@ form {
 					width: 12px;
 					background-position: -49px -805px;
 				}
+			}
+
+			.icon-depend-up,
+			.icon-depend-down {
+				width: 12px;
+			}
+
+			.icon-depend-up::before {
+				background-position: -49px -731px;
+			}
+
+			.icon-depend-down::before {
+				background-position: -49px -767px;
 			}
 
 			.icon-wzrd-action {

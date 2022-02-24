@@ -2846,13 +2846,6 @@ form.is-loading {
         top: 0; }
       .list-table.compact-view td [class*='icon-']:last-of-type {
         margin-right: 0; }
-    .list-table.compact-view td .icon-depend-up,
-    .list-table.compact-view td .icon-depend-down {
-      width: 12px; }
-    .list-table.compact-view td .icon-depend-up::before {
-      background-position: -49px -731px; }
-    .list-table.compact-view td .icon-depend-down::before {
-      background-position: -49px -767px; }
     .list-table.compact-view td .rel-container span {
       margin: 0; }
     .list-table.compact-view td .tag {
@@ -2878,6 +2871,13 @@ form.is-loading {
         height: 12px;
         width: 12px;
         background-position: -49px -805px; }
+    .list-table.compact-view td .icon-depend-up,
+    .list-table.compact-view td .icon-depend-down {
+      width: 12px; }
+    .list-table.compact-view td .icon-depend-up::before {
+      background-position: -49px -731px; }
+    .list-table.compact-view td .icon-depend-down::before {
+      background-position: -49px -767px; }
     .list-table.compact-view td .icon-wzrd-action {
       background: url("../img/icon-sprite.svg?20211222") no-repeat -6px -624px;
       height: 12px;
@@ -6988,10 +6988,10 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   background-position: -205px -803px; }
 
 .icon-depend-up::before {
-  background-position: -208px -729px; }
+  background-position: -206px -731px; }
 
 .icon-depend-down::before {
-  background-position: -208px -765px; }
+  background-position: -206px -766px; }
 
 .icon-ackn::before {
   background-position: -203px -693px; }
@@ -7241,8 +7241,12 @@ z-select button.focusable:focus,
   .list-table.compact-view td.na-bg::after, .list-table.compact-view td.normal-bg::after, .list-table.compact-view td.info-bg::after, .list-table.compact-view td.warning-bg::after, .list-table.compact-view td.average-bg::after, .list-table.compact-view td.high-bg::after, .list-table.compact-view td.disaster-bg::after {
     top: 1px;
     transform: scale(0.8); }
-  .list-table.compact-view td .icon-maintenance::before {
-    background-position: -208px -805px; }
+  .list-table.compact-view td .icon-depend-up::before {
+    background-position: -208px -731px; }
+  .list-table.compact-view td .icon-depend-down::before {
+    background-position: -208px -767px; }
+  .list-table.compact-view td .icon-wzrd-action {
+    background: transparent url("../img/icon-sprite.svg?20211222") no-repeat -318px -624px; }
   .list-table.compact-view td .icon-wzrd-action {
     background: transparent url("../img/icon-sprite.svg?20211222") no-repeat -165px -624px; }
 
