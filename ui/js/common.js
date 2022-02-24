@@ -1037,10 +1037,10 @@ function openMassupdatePopup(action, parameters = {}, {
  *
  * @param {string}       page
  * @param {array|Object} keepids
+ * @param {bool}         mvc
  */
-function uncheckTableRows(page, keepids = []) {
-	// This key only works for new MVC pages.
-	const key = (page === '') ? 'cb_zabbix' : 'cb_zabbix_'+page;
+function uncheckTableRows(page, keepids = [], mvc = true) {
+	const key = mvc ? 'cb_zabbix_'+page : 'cb_'+page;
 
 	if (keepids.length) {
 		// If keepids will not have same key as value, it will create mess, when new checkbox will be checked.

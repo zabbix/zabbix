@@ -333,7 +333,7 @@
 					view._addPopupMessage(makeMessageBox('good', messages, title));
 				}
 
-				uncheckTableRows('');
+				uncheckTableRows('latest');
 				view.refresh();
 			}
 		}

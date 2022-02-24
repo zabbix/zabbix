@@ -30,7 +30,10 @@
 
 <script>
 	const view = {
-		init() {
+		init({checkbox_hash, checkbox_object}) {
+			this.checkbox_hash = checkbox_hash;
+			this.checkbox_object = checkbox_object;
+
 			// Disable the status filter when using the state filter.
 			$('#filter_state')
 				.on('change', function() {
@@ -71,6 +74,67 @@
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
+		},
+
+		massCheckNow(button) {
+			button.classList.add('is-loading');
+
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'item.masscheck_now');
+
+			fetch(curl.getUrl(), {
+				method: 'POST',
+				headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+				body: urlEncodeData({itemids: chkbxRange.getSelectedIds()})
+			})
+				.then((response) => response.json())
+				.then((response) => {
+					const keepids = ('keepids' in response) ? response.keepids : [];
+
+					clearMessages();
+
+					/*
+					 * Using postMessageError or postMessageOk would mean that those messages are stored in session
+					 * messages and that would mean to reload the page and show them. Also postMessageError would be
+					 * displayed right after header is loaded. Meaning message is not inside the page form like that is
+					 * in postMessageOk case. Instead show message directly that comes from controller. Checkboxes
+					 * use uncheckTableRows which only unsets checkboxes from session storage, but not physically
+					 * deselects them. Another reason for need for page reload. Instead of page reload, manually
+					 * deselect the checkboxes that were selected previously in session storage, but only in case of
+					 * success message. In case of error message leave checkboxes checked.
+					 */
+					if ('error' in response) {
+						addMessage(makeMessageBox('bad', [response.error.messages], response.error.title, true, true));
+					}
+					else if('success' in response) {
+						addMessage(makeMessageBox('good', [], response.success.title, true, false));
+
+						uncheckids = chkbxRange.getSelectedIds();
+						uncheckids = Object.values(uncheckids);
+
+						// This will only unset checkboxes from session storage, but not physically deselect them.
+						uncheckTableRows('items_' + this.checkbox_hash, keepids, false);
+
+						// Deselect the previous checkboxes.
+						chkbxRange.checkObjects(this.checkbox_object, uncheckids, false);
+
+						// Reset the buttons in footer and update main checkbox.
+						chkbxRange.update(this.checkbox_object);
+					}
+				})
+				.catch(() => {
+					const title = <?= json_encode(_('Unexpected server error.')) ?>;
+					const message_box = makeMessageBox('bad', [], title)[0];
+
+					clearMessages();
+					addMessage(message_box);
+				})
+				.finally(() => {
+					button.classList.remove('is-loading');
+
+					// Deselect the "Execute now" button in both success and error cases, since there is no page reload.
+					button.blur();
+				});
 		},
 
 		events: {

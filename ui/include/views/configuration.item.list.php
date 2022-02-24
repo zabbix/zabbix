@@ -304,7 +304,15 @@ if ($data['context'] === 'host') {
 	}
 
 	$button_list += [
-		'item.masscheck_now' => ['name' => _('Execute now'), 'disabled' => $data['is_template']],
+		'item.masscheck_now' => [
+			'content' => (new CSimpleButton(_('Execute now')))
+				->onClick('view.massCheckNow(this);')
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('no-chkbxrange')
+				->setEnabled(!$data['is_template'])
+				->setAttribute('data-disabled', $data['is_template'])
+				->removeAttribute('id')
+		],
 		'item.massclearhistory' => $massclearhistory
 	];
 }
@@ -334,6 +342,11 @@ $widget->addItem($itemForm);
 
 $widget->show();
 
-(new CScriptTag('view.init();'))
+(new CScriptTag('
+	view.init('.json_encode([
+		'checkbox_hash' => $data['checkbox_hash'],
+		'checkbox_object' => 'group_itemid'
+	]).');
+'))
 	->setOnDocumentReady()
 	->show();

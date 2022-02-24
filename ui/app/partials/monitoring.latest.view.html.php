@@ -281,7 +281,7 @@ $form->addItem([
 	new CActionButtonList('graphtype', 'itemids', [
 		GRAPH_TYPE_STACKED => ['name' => _('Display stacked graph')],
 		GRAPH_TYPE_NORMAL => ['name' => _('Display graph')]
-	])
+	], 'latest')
 ]);
 
 echo $form;
