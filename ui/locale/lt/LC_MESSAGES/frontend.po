@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-22 13:32+0200\n"
+"POT-Creation-Date: 2022-02-24 17:15+0200\n"
 "PO-Revision-Date: 2013-10-10 08:29+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -5089,7 +5089,7 @@ msgstr ""
 #: app/views/configuration.discovery.edit.php:155
 #: app/views/configuration.discovery.list.php:122
 #: app/views/configuration.host.edit.php:49
-#: app/views/configuration.host.list.php:526
+#: app/views/configuration.host.list.php:529
 #: app/views/monitoring.dashboard.list.php:123
 #: app/views/popup.host.edit.php:82 app/views/popup.service.edit.php:390
 #: app/views/popup.sla.edit.php:273 app/views/popup.tabfilter.edit.php:71
@@ -5104,12 +5104,12 @@ msgstr ""
 #: include/views/configuration.hostgroups.list.php:204
 #: include/views/configuration.host.prototype.list.php:195
 #: include/views/configuration.httpconf.list.php:224
-#: include/views/configuration.item.list.php:324
-#: include/views/configuration.item.prototype.list.php:214
+#: include/views/configuration.item.list.php:325
+#: include/views/configuration.item.prototype.list.php:215
 #: include/views/configuration.maintenance.list.php:124
-#: include/views/configuration.template.list.php:290
-#: include/views/configuration.trigger.prototype.list.php:213
-#: include/views/configuration.triggers.list.php:354
+#: include/views/configuration.template.list.php:291
+#: include/views/configuration.trigger.prototype.list.php:214
+#: include/views/configuration.triggers.list.php:355
 #: include/views/monitoring.sysmap.list.php:114 jsLoader.php:136
 #: jsLoader.php:165 jsLoader.php:361
 msgid "Delete"
@@ -5120,11 +5120,11 @@ msgid "Delete all elements that are not present in the import file?"
 msgstr ""
 
 #: include/views/configuration.template.edit.php:224
-#: include/views/configuration.template.list.php:291
+#: include/views/configuration.template.list.php:292
 msgid "Delete and clear"
 msgstr ""
 
-#: include/views/configuration.template.list.php:292
+#: include/views/configuration.template.list.php:293
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr ""
 
@@ -5279,7 +5279,7 @@ msgstr ""
 msgid "Delete selected host?"
 msgstr ""
 
-#: app/views/configuration.host.list.php:527
+#: app/views/configuration.host.list.php:530
 msgid "Delete selected hosts?"
 msgstr ""
 
@@ -5287,11 +5287,11 @@ msgstr ""
 msgid "Delete selected image?"
 msgstr ""
 
-#: include/views/configuration.item.prototype.list.php:215
+#: include/views/configuration.item.prototype.list.php:216
 msgid "Delete selected item prototypes?"
 msgstr ""
 
-#: include/views/configuration.item.list.php:324
+#: include/views/configuration.item.list.php:325
 msgid "Delete selected items?"
 msgstr ""
 
@@ -5351,7 +5351,7 @@ msgstr ""
 msgid "Delete selected shapes?"
 msgstr ""
 
-#: include/views/configuration.template.list.php:290
+#: include/views/configuration.template.list.php:291
 msgid "Delete selected templates?"
 msgstr ""
 
@@ -5365,11 +5365,11 @@ msgstr ""
 msgid "Delete selected tokens?"
 msgstr ""
 
-#: include/views/configuration.trigger.prototype.list.php:214
+#: include/views/configuration.trigger.prototype.list.php:215
 msgid "Delete selected trigger prototypes?"
 msgstr ""
 
-#: include/views/configuration.triggers.list.php:354
+#: include/views/configuration.triggers.list.php:355
 msgid "Delete selected triggers?"
 msgstr ""
 

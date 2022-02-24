@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-22 13:32+0200\n"
+"POT-Creation-Date: 2022-02-24 17:15+0200\n"
 "PO-Revision-Date: 2022-02-15 13:19+0300\n"
 "Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -4940,7 +4940,7 @@ msgstr "遅延時間"
 #: app/views/configuration.discovery.edit.php:155
 #: app/views/configuration.discovery.list.php:122
 #: app/views/configuration.host.edit.php:49
-#: app/views/configuration.host.list.php:526
+#: app/views/configuration.host.list.php:529
 #: app/views/monitoring.dashboard.list.php:123
 #: app/views/popup.host.edit.php:82 app/views/popup.service.edit.php:390
 #: app/views/popup.sla.edit.php:273 app/views/popup.tabfilter.edit.php:71
@@ -4955,12 +4955,12 @@ msgstr "遅延時間"
 #: include/views/configuration.hostgroups.list.php:204
 #: include/views/configuration.host.prototype.list.php:195
 #: include/views/configuration.httpconf.list.php:224
-#: include/views/configuration.item.list.php:324
-#: include/views/configuration.item.prototype.list.php:214
+#: include/views/configuration.item.list.php:325
+#: include/views/configuration.item.prototype.list.php:215
 #: include/views/configuration.maintenance.list.php:124
-#: include/views/configuration.template.list.php:290
-#: include/views/configuration.trigger.prototype.list.php:213
-#: include/views/configuration.triggers.list.php:354
+#: include/views/configuration.template.list.php:291
+#: include/views/configuration.trigger.prototype.list.php:214
+#: include/views/configuration.triggers.list.php:355
 #: include/views/monitoring.sysmap.list.php:114 jsLoader.php:136
 #: jsLoader.php:165 jsLoader.php:361
 msgid "Delete"
@@ -4971,11 +4971,11 @@ msgid "Delete all elements that are not present in the import file?"
 msgstr "インポートするファイル内に存在しないすべての要素を削除しますか？"
 
 #: include/views/configuration.template.edit.php:224
-#: include/views/configuration.template.list.php:291
+#: include/views/configuration.template.list.php:292
 msgid "Delete and clear"
 msgstr "削除とクリア"
 
-#: include/views/configuration.template.list.php:292
+#: include/views/configuration.template.list.php:293
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr "選択したテンプレートとデータを削除しますか？(警告: リンクしているすべてのホストからデータが削除されます！)"
 
@@ -5130,7 +5130,7 @@ msgstr "選択したホストのプロトタイプを削除しますか？"
 msgid "Delete selected host?"
 msgstr "選択したホストを削除しますか？"
 
-#: app/views/configuration.host.list.php:527
+#: app/views/configuration.host.list.php:530
 msgid "Delete selected hosts?"
 msgstr "選択したホストを削除しますか？"
 
@@ -5138,11 +5138,11 @@ msgstr "選択したホストを削除しますか？"
 msgid "Delete selected image?"
 msgstr "選択したイメージを削除しますか？"
 
-#: include/views/configuration.item.prototype.list.php:215
+#: include/views/configuration.item.prototype.list.php:216
 msgid "Delete selected item prototypes?"
 msgstr "選択したアイテムのプロトタイプを削除しますか？"
 
-#: include/views/configuration.item.list.php:324
+#: include/views/configuration.item.list.php:325
 msgid "Delete selected items?"
 msgstr "選択したアイテムを削除しますか？"
 
@@ -5202,7 +5202,7 @@ msgstr "選択したサービスを削除しますか？"
 msgid "Delete selected shapes?"
 msgstr "選択した図形を削除しますか？"
 
-#: include/views/configuration.template.list.php:290
+#: include/views/configuration.template.list.php:291
 msgid "Delete selected templates?"
 msgstr "選択したテンプレートを削除しますか？"
 
@@ -5216,11 +5216,11 @@ msgstr ""
 msgid "Delete selected tokens?"
 msgstr ""
 
-#: include/views/configuration.trigger.prototype.list.php:214
+#: include/views/configuration.trigger.prototype.list.php:215
 msgid "Delete selected trigger prototypes?"
 msgstr "選択したトリガーのプロトタイプを削除しますか？"
 
-#: include/views/configuration.triggers.list.php:354
+#: include/views/configuration.triggers.list.php:355
 msgid "Delete selected triggers?"
 msgstr "選択したトリガーを削除しますか？"
 

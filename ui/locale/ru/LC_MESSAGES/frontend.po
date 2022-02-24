@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-22 13:32+0200\n"
+"POT-Creation-Date: 2022-02-24 17:15+0200\n"
 "PO-Revision-Date: 2022-01-13 01:11+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -5104,7 +5104,7 @@ msgstr "Задерживается на"
 #: app/views/configuration.discovery.edit.php:155
 #: app/views/configuration.discovery.list.php:122
 #: app/views/configuration.host.edit.php:49
-#: app/views/configuration.host.list.php:526
+#: app/views/configuration.host.list.php:529
 #: app/views/monitoring.dashboard.list.php:123
 #: app/views/popup.host.edit.php:82 app/views/popup.service.edit.php:390
 #: app/views/popup.sla.edit.php:273 app/views/popup.tabfilter.edit.php:71
@@ -5119,12 +5119,12 @@ msgstr "Задерживается на"
 #: include/views/configuration.hostgroups.list.php:204
 #: include/views/configuration.host.prototype.list.php:195
 #: include/views/configuration.httpconf.list.php:224
-#: include/views/configuration.item.list.php:324
-#: include/views/configuration.item.prototype.list.php:214
+#: include/views/configuration.item.list.php:325
+#: include/views/configuration.item.prototype.list.php:215
 #: include/views/configuration.maintenance.list.php:124
-#: include/views/configuration.template.list.php:290
-#: include/views/configuration.trigger.prototype.list.php:213
-#: include/views/configuration.triggers.list.php:354
+#: include/views/configuration.template.list.php:291
+#: include/views/configuration.trigger.prototype.list.php:214
+#: include/views/configuration.triggers.list.php:355
 #: include/views/monitoring.sysmap.list.php:114 jsLoader.php:136
 #: jsLoader.php:165 jsLoader.php:361
 msgid "Delete"
@@ -5135,11 +5135,11 @@ msgid "Delete all elements that are not present in the import file?"
 msgstr "Удалить все элементы, которые не присутствуют в файле импорта?"
 
 #: include/views/configuration.template.edit.php:224
-#: include/views/configuration.template.list.php:291
+#: include/views/configuration.template.list.php:292
 msgid "Delete and clear"
 msgstr "Удалить и очистить"
 
-#: include/views/configuration.template.list.php:292
+#: include/views/configuration.template.list.php:293
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr "Удалить и очистить выбранные шаблоны? (Внимание: все присоединенные к ним узлы сети будут очищены!)"
 
@@ -5294,7 +5294,7 @@ msgstr "Удалить выбранные прототипы узлов сети
 msgid "Delete selected host?"
 msgstr "Удалить выбранный узел сети?"
 
-#: app/views/configuration.host.list.php:527
+#: app/views/configuration.host.list.php:530
 msgid "Delete selected hosts?"
 msgstr "Удалить выбранные узлы сети?"
 
@@ -5302,11 +5302,11 @@ msgstr "Удалить выбранные узлы сети?"
 msgid "Delete selected image?"
 msgstr "Удалить выбранное изображение?"
 
-#: include/views/configuration.item.prototype.list.php:215
+#: include/views/configuration.item.prototype.list.php:216
 msgid "Delete selected item prototypes?"
 msgstr "Удалить выбранные прототипы элементов данных?"
 
-#: include/views/configuration.item.list.php:324
+#: include/views/configuration.item.list.php:325
 msgid "Delete selected items?"
 msgstr "Удалить выбранные элементы данных?"
 
@@ -5366,7 +5366,7 @@ msgstr "Удалить выбранные услуги?"
 msgid "Delete selected shapes?"
 msgstr "Удалить выбранные фигуры?"
 
-#: include/views/configuration.template.list.php:290
+#: include/views/configuration.template.list.php:291
 msgid "Delete selected templates?"
 msgstr "Удалить выбранные шаблоны?"
 
@@ -5380,11 +5380,11 @@ msgstr ""
 msgid "Delete selected tokens?"
 msgstr ""
 
-#: include/views/configuration.trigger.prototype.list.php:214
+#: include/views/configuration.trigger.prototype.list.php:215
 msgid "Delete selected trigger prototypes?"
 msgstr "Удалить выбранные прототипы триггеров?"
 
-#: include/views/configuration.triggers.list.php:354
+#: include/views/configuration.triggers.list.php:355
 msgid "Delete selected triggers?"
 msgstr "Удалить выбранные триггеры?"
 
