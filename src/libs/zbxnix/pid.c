@@ -92,20 +92,6 @@ int	read_pid_file(const char *pidfile, pid_t *pid, char *error, size_t max_error
 	return ret;
 }
 
-
-int	pid_file_exists(const char *pidfile)
-{
-	FILE	*f_pid;
-
-	if (NULL != (f_pid = fopen(pidfile, "r")))
-	{
-		zbx_fclose(f_pid);
-		return SUCCEED;
-	}
-
-	return FAIL;
-}
-
 void	drop_pid_file(const char *pidfile)
 {
 	struct flock	fl;
