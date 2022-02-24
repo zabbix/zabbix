@@ -368,6 +368,7 @@ class testGeomapWidgetScreenshots extends CWebTest {
 
 		// Additional 2 seconds for loading sequence to settle.
 		sleep(2);
+		// Script for waiting until tile providers are loaded.
 		CElementQuery::wait(40)->until(function () {
 			return CElementQuery::getDriver()->executeScript(
 					'var widgets = ZABBIX.Dashboard._dashboard_pages.keys().next().value._widgets;'.

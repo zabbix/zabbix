@@ -99,7 +99,7 @@ class testFormGeographicalMaps extends CWebTest {
 					'Tile provider' => 'Other',
 					'Tile URL' => '',
 					'Attribution' => '',
-					'Max zoom level' => '0'
+					'Max zoom level' => ''
 				]
 			]
 		];
@@ -159,18 +159,17 @@ class testFormGeographicalMaps extends CWebTest {
 		$form->fill(['Tile provider' => $data['Tile provider']]);
 		$form->checkValue($data);
 
-		// Check empty string in "Other" case when selected right after another provider.
-		if ($data['Tile provider'] === 'Other') {
-			$form->fill(['Tile provider' => 'OpenStreetMap Mapnik']);
-			$form->fill(['Tile provider' => 'Other']);
-			$form->checkValue(['Max zoom level' => '']);
-		}
-		else {
+		$fields = array_keys($data);
+		if ($data['Tile provider'] !== 'Other') {
 			// Take all fields except dropdown and check they are disabled.
-			unset($data['Tile provider']);
-			$fields = array_keys($data);
+			unset($fields[0]);
 			foreach ($fields as $field) {
 				$this->assertFalse($form->getField($field)->isEnabled());
+			}
+		}
+		else {
+			foreach ($fields as $field) {
+				$this->assertTrue($form->getField($field)->isEnabled());
 			}
 		}
 	}
